@@ -2,63 +2,93 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6CAFC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 16:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5633C76191
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 16:57:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C429621951
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 16:38:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C429621951
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADCAD21926
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 16:57:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADCAD21926
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqKHi-0006US-4D
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 12:38:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38170)
+	id 1hqKaC-00031M-Kv
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 12:57:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44100)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hqKHY-0005xy-0e
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:38:25 -0400
+ (envelope-from <groug@kaod.org>) id 1hqKZy-0002Rw-9i
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hqKHW-00047J-TC
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:38:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59360)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hqKHU-0003z1-D5; Wed, 24 Jul 2019 12:38:20 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 508A930B9BF7;
- Wed, 24 Jul 2019 16:38:19 +0000 (UTC)
-Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F267410190AA;
- Wed, 24 Jul 2019 16:38:15 +0000 (UTC)
-Date: Wed, 24 Jul 2019 17:38:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190724163812.GJ2717@work-vm>
-References: <20190724143553.21557-1-damien.hedde@greensocs.com>
- <543de194-b4e9-de7b-3dab-55fcc0976bc2@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1hqKZx-000171-BF
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:57:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49866)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hqKZx-0000gU-2o
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 12:57:25 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6OGvEpx034712
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 12:57:15 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2txsqsmed1-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 12:57:15 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 24 Jul 2019 17:57:13 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 24 Jul 2019 17:57:10 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6OGv9J857344252
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 24 Jul 2019 16:57:09 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C2D2FA4053;
+ Wed, 24 Jul 2019 16:57:09 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 93BD6A404D;
+ Wed, 24 Jul 2019 16:57:09 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.15.116])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 24 Jul 2019 16:57:09 +0000 (GMT)
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Date: Wed, 24 Jul 2019 18:57:09 +0200
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <543de194-b4e9-de7b-3dab-55fcc0976bc2@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 24 Jul 2019 16:38:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for 4.1?] pl330: fix vmstate description
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19072416-4275-0000-0000-000003503247
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072416-4276-0000-0000-000038605B3C
+Message-Id: <156398742921.546975.8822387598242513827.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-24_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=874 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907240182
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH for-4.1 0/2] spapr/xics: Last minute fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,110 +100,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, peter.maydell@linaro.org,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
-> On 7/24/19 4:35 PM, Damien Hedde wrote:
-> > Fix the pl330 main and queue vmstate description.
-> > There were missing POINTER flags causing crashes during
-> > incoming migration because:
-> > + PL330State chan field is a pointer to an array
-> > + PL330Queue queue field is a pointer to an array
-> >=20
-> > Also bump corresponding vmsd version numbers.
-> >=20
-> > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> > ---
-> >=20
-> > I found this while working on reset with xilinx-zynq machine.
-> >=20
-> > I'm not sure what's the vmsd version policy in such cases (for
-> > backward compatibility). I've simply bumped them since migration
-> > was not working anyway (vmstate_load_state was erasing critical part
-> > of PL330State and causing segfaults while loading following fields).
->=20
-> I still not understand versioning and migration
+KVM on POWER9 doesn't use the XIVE VP space optimally. This currently
+limits the number of VMs we can start to 127. Starting with the 128th
+one, KVM fails to create the XIVE or the XICS-on-XIVE device and we
+go through the fallback paths in QEMU.
 
-Incrementing the version (and minimum) is the right thing
-to do if you conclude the old one was hopelessly broken.
-Migration to and from old qemu breaks, but who cares since it was toast
-anyway.
-As far as I can tell pl330 is only on our zynq and exynos models
-so wont break our versioned 'virt' type.
-So from a migration point of view:
+The XICS error path still has an issue that prevents the guest to do
+interrupts, even after QEMU fell back on XICS emulation. This is
+fixed with patch 2.
 
+Patch 1 is just a _trivial_ improvement of the warning that gets
+emited when falling back to emulated IC. Feel free to apply it to
+4.2 or even to drop it if you don't want it in 4.1.
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-
-> so I can't say, but
-> then you use the correct macro, since we have:
->=20
->     s->chan =3D g_new0(PL330Chan, s->num_chnls);
->=20
-> So:
-> Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
->=20
-> >=20
-> > Tested doing migration with the xilinx-zynq-a9 machine.
-> >=20
-> > ---
-> >  hw/dma/pl330.c | 17 +++++++++--------
-> >  1 file changed, 9 insertions(+), 8 deletions(-)
-> >=20
-> > diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-> > index 58df965a46..a56a3e7771 100644
-> > --- a/hw/dma/pl330.c
-> > +++ b/hw/dma/pl330.c
-> > @@ -218,11 +218,12 @@ typedef struct PL330Queue {
-> > =20
-> >  static const VMStateDescription vmstate_pl330_queue =3D {
-> >      .name =3D "pl330_queue",
-> > -    .version_id =3D 1,
-> > -    .minimum_version_id =3D 1,
-> > +    .version_id =3D 2,
-> > +    .minimum_version_id =3D 2,
-> >      .fields =3D (VMStateField[]) {
-> > -        VMSTATE_STRUCT_VARRAY_UINT32(queue, PL330Queue, queue_size, =
-1,
-> > -                                 vmstate_pl330_queue_entry, PL330Que=
-ueEntry),
-> > +        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(queue, PL330Queue, queu=
-e_size,
-> > +                                             vmstate_pl330_queue_ent=
-ry,
-> > +                                             PL330QueueEntry),
-> >          VMSTATE_END_OF_LIST()
-> >      }
-> >  };
-> > @@ -278,12 +279,12 @@ struct PL330State {
-> > =20
-> >  static const VMStateDescription vmstate_pl330 =3D {
-> >      .name =3D "pl330",
-> > -    .version_id =3D 1,
-> > -    .minimum_version_id =3D 1,
-> > +    .version_id =3D 2,
-> > +    .minimum_version_id =3D 2,
-> >      .fields =3D (VMStateField[]) {
-> >          VMSTATE_STRUCT(manager, PL330State, 0, vmstate_pl330_chan, P=
-L330Chan),
-> > -        VMSTATE_STRUCT_VARRAY_UINT32(chan, PL330State, num_chnls, 0,
-> > -                                     vmstate_pl330_chan, PL330Chan),
-> > +        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(chan, PL330State, num_c=
-hnls,
-> > +                                             vmstate_pl330_chan, PL3=
-30Chan),
-> >          VMSTATE_VBUFFER_UINT32(lo_seqn, PL330State, 1, NULL, num_chn=
-ls),
-> >          VMSTATE_VBUFFER_UINT32(hi_seqn, PL330State, 1, NULL, num_chn=
-ls),
-> >          VMSTATE_STRUCT(fifo, PL330State, 0, vmstate_pl330_fifo, PL33=
-0Fifo),
-> >=20
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Greg
+
+---
+
+Greg Kurz (2):
+      spapr/irq: Inform the user when falling back to emulated IC
+      xics/kvm: Fix fallback to emulated XICS
+
+
+ hw/intc/xics_kvm.c |   11 -----------
+ hw/ppc/spapr_irq.c |    1 +
+ 2 files changed, 1 insertion(+), 11 deletions(-)
+
 
