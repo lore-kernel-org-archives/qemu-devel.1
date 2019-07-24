@@ -2,63 +2,65 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B82C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F050C76191
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:12:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CCA12084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:01:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCA12084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6AB3422ADF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:12:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="AFgb730Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AB3422ADF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqD9H-00044n-Ir
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 05:01:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38777)
+	id 1hqDJd-0007JY-8E
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 05:12:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41169)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hqD96-0003gX-Ej
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:01:13 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hqDJK-0006SK-Bf
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hqD95-0006xT-CI
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:01:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58990)
+ (envelope-from <dgibson@ozlabs.org>) id 1hqDJJ-0005QC-2r
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:11:46 -0400
+Received: from ozlabs.org ([203.11.71.1]:57525)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hqD95-0006wd-3v
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:01:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2447F307D85B;
- Wed, 24 Jul 2019 09:01:10 +0000 (UTC)
-Received: from redhat.com (ovpn-116-17.ams2.redhat.com [10.36.116.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A5B37608A5;
- Wed, 24 Jul 2019 09:01:09 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Ivan Ren <renyime@gmail.com>
-In-Reply-To: <1561468699-9819-4-git-send-email-ivanren@tencent.com> (Ivan
- Ren's message of "Tue, 25 Jun 2019 21:18:19 +0800")
-References: <1561468699-9819-1-git-send-email-ivanren@tencent.com>
- <1561468699-9819-4-git-send-email-ivanren@tencent.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Wed, 24 Jul 2019 11:01:07 +0200
-Message-ID: <878ssn957w.fsf@trasno.org>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hqDJI-0005JK-0v; Wed, 24 Jul 2019 05:11:45 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45tqN55dtqz9sBF; Wed, 24 Jul 2019 19:11:33 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1563959493;
+ bh=ecABDlLs7AqG7OoYm1WKQCXaArWZYEUKkdBa4cNCzNY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=AFgb730ZzUc30NF21KNtScCRED1HONyc/AK6tt0X7JDhhXgWkIYfHu23gTPnmtJx0
+ K2zz7lp11jtno716uFyeNLg2OQOlZ6IOhll1CNv4s9/jSBMMS7K6nWv/8LY7CPBtGv
+ J6EyXAyO41U5bAN8r+OiOLFxHNUqRP3TsWoNc474=
+Date: Wed, 24 Jul 2019 18:57:30 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190724085730.GX25073@umbus.fritz.box>
+References: <20190723090138.30623-1-clg@kaod.org>
+ <20190724032308.GV25073@umbus.fritz.box>
+ <0b80925b-c25b-04ee-2875-cbd155497a55@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 24 Jul 2019 09:01:10 +0000 (UTC)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="fqQSV+MVmQEkpBtA"
+Content-Disposition: inline
+In-Reply-To: <0b80925b-c25b-04ee-2875-cbd155497a55@kaod.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] migration: fix migrate_cancel multifd
- migration leads destination hung forever
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: Generate phandle for the
+ "interrupt-parent" property
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,102 +72,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: Joel Stanley <joel@jms.id.au>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ivan Ren <renyime@gmail.com> wrote:
-> When migrate_cancel a multifd migration, if run sequence like this:
->
->         [source]                              [destination]
->
-> multifd_send_sync_main[finish]
->                                     multifd_recv_thread wait &p->sem_sync
-> shutdown to_dst_file
->                                     detect error from_src_file
-> send  RAM_SAVE_FLAG_EOS[fail]       [no chance to run multifd_recv_sync_main]
->                                     multifd_load_cleanup
->                                     join multifd receive thread forever
->
-> will lead destination qemu hung at following stack:
->
-> pthread_join
-> qemu_thread_join
-> multifd_load_cleanup
-> process_incoming_migration_co
-> coroutine_trampoline
->
-> Signed-off-by: Ivan Ren <ivanren@tencent.com>
 
-I think this one is not enough.  We need to set some error code, or
-disable the running bit at that point.
+--fqQSV+MVmQEkpBtA
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  migration/ram.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/migration/ram.c b/migration/ram.c
-> index e4eb9c441f..504c8ccb03 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1291,6 +1291,11 @@ int multifd_load_cleanup(Error **errp)
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
->          if (p->running) {
-> +            /*
-> +             * multifd_recv_thread may hung at MULTIFD_FLAG_SYNC handle code,
-> +             * however try to wakeup it without harm in cleanup phase.
-> +             */
-> +            qemu_sem_post(&p->sem_sync);
->              qemu_thread_join(&p->thread);
->          }
->          object_unref(OBJECT(p->c));
+On Wed, Jul 24, 2019 at 09:11:54AM +0200, C=E9dric Le Goater wrote:
+> On 24/07/2019 05:23, David Gibson wrote:
+> > On Tue, Jul 23, 2019 at 11:01:38AM +0200, C=E9dric Le Goater wrote:
+> >> Devices such as the BT or serial devices require a valid
+> >> "interrupt-parent" phandle in the device tree and it is currently
+> >> empty (0x0). It was not a problem until now but since OpenFirmare
+> >> started using a recent libdft (>=3D 1.4.7), petitboot fails to boot the
+> >> system image with error :
+> >>
+> >>    dtc_resize: fdt_open_into returned FDT_ERR_BADMAGIC
+> >>
+> >> Provide a phandle for the LPC bus.
+> >>
+> >> Suggested-by: Greg Kurz <groug@kaod.org>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > I've applied this, since it looks to be correct.
+> >=20
+> > But.. can you connect the dots for me in how this being missing
+> > results in a BADMAGIC error??
+>=20
+> Some binary called by petitboot segfaults when trying to kexec an image o=
+n=20
+> a system with a bogus DT (generated by QEMU). I don't know exactly which =
+one=20
+> as I only see the error message above and the segv message in dmesg
 
-Let's see where we wait for p->sem_sync:
+Ok, I'm still not seeing how that gets you to a BADMAGIC error.
 
+>=20
+> I didn't notice before because I was using an old open-power-v2.1 image. =
+I have
+> switched to more recent ones now :
+>=20
+>   https://openpower.xyz/job/openpower/job/openpower-op-build/label=3Dslav=
+e,target=3Dwitherspoon/lastSuccessfulBuild/
+>   https://openpower.xyz/job/openpower/job/openpower-op-build/label=3Dslav=
+e,target=3Dpalmetto/lastSuccessfulBuild/
+>=20
+> Btw, where could we keep some images of reference ? I have a couple of pa=
+tches=20
+> which enables the QEMU PowerNV machine to boot directly from the PNOR usi=
+ng :
+> =20
+>   -drive file=3D./witherspoon.pnor,format=3Draw,if=3Dmtd
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+> >=20
+> >> ---
+> >>  hw/ppc/pnv.c | 5 +++++
+> >>  1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> >> index 36f57479a1f5..2deceecdccb5 100644
+> >> --- a/hw/ppc/pnv.c
+> >> +++ b/hw/ppc/pnv.c
+> >> @@ -431,9 +431,14 @@ static void pnv_dt_isa(PnvMachineState *pnv, void=
+ *fdt)
+> >>          .fdt =3D fdt,
+> >>          .offset =3D isa_offset,
+> >>      };
+> >> +    uint32_t phandle;
+> >> =20
+> >>      _FDT((fdt_setprop(fdt, isa_offset, "primary", NULL, 0)));
+> >> =20
+> >> +    phandle =3D qemu_fdt_alloc_phandle(fdt);
+> >> +    assert(phandle > 0);
+> >> +    _FDT((fdt_setprop_cell(fdt, isa_offset, "phandle", phandle)));
+> >> +
+> >>      /* ISA devices are not necessarily parented to the ISA bus so we
+> >>       * can not use object_child_foreach() */
+> >>      qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NU=
+LL, NULL,
+> >=20
+>=20
 
-static void *multifd_recv_thread(void *opaque)
-{
-    ....
-    while (true) {
-        uint32_t used;
-        uint32_t flags;
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-        ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
-                                       p->packet_len, &local_err);
-        .....
+--fqQSV+MVmQEkpBtA
+Content-Type: application/pgp-signature; name="signature.asc"
 
-        if (flags & MULTIFD_FLAG_SYNC) {
-            qemu_sem_post(&multifd_recv_state->sem_sync);
-            qemu_sem_wait(&p->sem_sync);
-        }
-    }
-    if (local_err) {
-        multifd_recv_terminate_threads(local_err);
-    }
-    qemu_mutex_lock(&p->mutex);
-    p->running = false;
-    qemu_mutex_unlock(&p->mutex);
+-----BEGIN PGP SIGNATURE-----
 
-    rcu_unregister_thread();
-    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl04HXoACgkQbDjKyiDZ
+s5K7uhAAy0rMz6eTtDft3/Uf4dXtkcvn3yTMRgir6Lb8GuEBDxhVvtXBBacqo1Hp
+wEm4Xrl5izl4TetWA1aTrFgghYiTfvVO4sWF2AcfaHsmaiU/p6MjMOiovqIo/A+h
+PNn9HcYFfapYp1uaJPMieISgcd+g49rwzl0nCciM1ytPIw/C1plkX/gZT9brwn+T
+v75uuRSBEvoMlsSqsxraNGTOVsd2o/7BLjG+Ym+WsQhoLJyoMN0h1gh30Hv1jwux
+xV/RGU2Qzo5bXuPDml7fmBtgIlYlugw6Uh7TRocfc+TTxbhhqWqQ2wW/Fdhuw6T5
+ZO8u9EEx3wXaUywDaTJ4xrBveiaQB9Rw4GpedZnFwpzan55K1oEH75QKf69iYamX
+0BTajHwjT8Pa6svfk30VZhy6B4lNnkJBO+fh9MP8ugo2xcPpqWdwSMmXZ1yc8PWJ
+PTBWQgLbBl83+bygg0jCInJVSvY4CnwhyUaX50NrqBBRNh7YJ6c87mH6aujVqs8x
+DDbz7qiVhEt50PB7yyBdnbaLy2rYJv84vE/XZxqxHmpFd/fZoDnJZFUZ6WVCeq8M
+1u0GEXEb9+Ad6A1q/AfHgAbQW1qrb9snfWi7UYz0HB1oXxvSr2iqRyeeXAN08OMQ
+X95YG9DbTjidaKLdiE7laG3ndLmP3RefzM5FW6jvCmrsj+0nYBI=
+=H1Kc
+-----END PGP SIGNATURE-----
 
-    return NULL;
-}
-
-If we just post it there, we get out of the wait (that bit is ok), but
-then we go back to the beggining of the bucle, we (probably) got one
-error on the qui_channel_read_all_eof(), and we go back to
-multifd_recv_terminate_threads(), or wait there.
-
-I think that it is better to *also* set an p->quit variable there, and
-not even try to receive anything for that channel?
-
-I will send a patch later.
-
-Good catch.
-
-Later, Juan.
+--fqQSV+MVmQEkpBtA--
 
