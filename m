@@ -2,53 +2,143 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B34FEC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:46:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D4ABC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:47:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AAD2227BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:46:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AAD2227BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8787227BF
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:47:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8787227BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqCuu-0005nZ-Ps
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:46:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34359)
+	id 1hqCvy-0006iJ-LJ
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:47:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35352)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hqCsp-0005xj-Ot
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:44:24 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hqCvj-0006Jk-Jj
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hqCso-0002Xz-Ls
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:44:23 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:59052)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hqCso-0002Xh-Ef
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:44:22 -0400
-Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 90F5054006A;
- Wed, 24 Jul 2019 11:44:21 +0300 (MSK)
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 24 Jul 2019 11:44:21 +0300
-Message-ID: <156395786137.510.11135678145835158746.stgit@pasha-Precision-3630-Tower>
-In-Reply-To: <156395778867.510.17588721322993616668.stgit@pasha-Precision-3630-Tower>
-References: <156395778867.510.17588721322993616668.stgit@pasha-Precision-3630-Tower>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <borntraeger@de.ibm.com>) id 1hqCvi-0004ZX-J2
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23046)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1hqCvi-0004Z3-Ae
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:22 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6O8ktZg107228
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:47:20 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2txhqaxfcn-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:47:20 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Wed, 24 Jul 2019 09:47:18 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 24 Jul 2019 09:47:03 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6O8l20A59572468
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 24 Jul 2019 08:47:02 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6E615A4051;
+ Wed, 24 Jul 2019 08:47:02 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 2E315A4053;
+ Wed, 24 Jul 2019 08:47:02 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.97.184])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 24 Jul 2019 08:47:02 +0000 (GMT)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <1563956754-393910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Wed, 24 Jul 2019 10:47:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1563956754-393910-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [PATCH for-4.2 12/14] replay: refine replay-time module
+X-TM-AS-GCONF: 00
+x-cbid: 19072408-0008-0000-0000-0000030045A4
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072408-0009-0000-0000-0000226DD558
+Message-Id: <0af83e83-e446-3e07-6a33-ef3d75302a87@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-24_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907240099
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [PATCH] Fixes: a6862418fec4072 iotests change in
+ 051.out
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,85 +150,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com,
- mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
- mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
- thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com,
- dgilbert@redhat.com, rth@twiddle.net
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-s390x@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch removes refactoring artifacts from the replay/replay-time.c
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- replay/replay-time.c |   36 ++++++++++++++++--------------------
- 1 file changed, 16 insertions(+), 20 deletions(-)
+On 24.07.19 10:25, Andrey Shinkevich wrote:
+> The patch "iotests: Set read-zeroes on in null block driver for Valgrind"
+> needs the change in 051.out when compared against on the s390 system.
+> 
+> Reported-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Tested-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-diff --git a/replay/replay-time.c b/replay/replay-time.c
-index 5154cb0ce9..49c9e5d8b2 100644
---- a/replay/replay-time.c
-+++ b/replay/replay-time.c
-@@ -14,18 +14,19 @@
- #include "replay-internal.h"
- #include "qemu/error-report.h"
- 
--int64_t replay_save_clock(ReplayClockKind kind, int64_t clock, int64_t raw_icount)
-+int64_t replay_save_clock(ReplayClockKind kind, int64_t clock,
-+                          int64_t raw_icount)
- {
--    if (replay_file) {
--        g_assert(replay_mutex_locked());
-+    g_assert(replay_file);
-+    g_assert(replay_mutex_locked());
- 
--        /* Due to the caller's locking requirements we get the icount from it
--         * instead of using replay_save_instructions().
--         */
--        replay_advance_current_step(raw_icount);
--        replay_put_event(EVENT_CLOCK + kind);
--        replay_put_qword(clock);
--    }
-+    /*
-+     * Due to the caller's locking requirements we get the icount from it
-+     * instead of using replay_save_instructions().
-+     */
-+    replay_advance_current_step(raw_icount);
-+    replay_put_event(EVENT_CLOCK + kind);
-+    replay_put_qword(clock);
- 
-     return clock;
- }
-@@ -47,20 +48,15 @@ void replay_read_next_clock(ReplayClockKind kind)
- /*! Reads next clock event from the input. */
- int64_t replay_read_clock(ReplayClockKind kind)
- {
-+    int64_t ret;
-     g_assert(replay_file && replay_mutex_locked());
- 
-     replay_account_executed_instructions();
- 
--    if (replay_file) {
--        int64_t ret;
--        if (replay_next_event_is(EVENT_CLOCK + kind)) {
--            replay_read_next_clock(kind);
--        }
--        ret = replay_state.cached_clock[kind];
--
--        return ret;
-+    if (replay_next_event_is(EVENT_CLOCK + kind)) {
-+        replay_read_next_clock(kind);
-     }
-+    ret = replay_state.cached_clock[kind];
- 
--    error_report("REPLAY INTERNAL ERROR %d", __LINE__);
--    exit(1);
-+    return ret;
- }
+FWIW, the Fixes tag should be inside the patch description.
+Maybe Kevin will fix this up when applying?
+
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/051.out | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
+> index 8993835..554c5ca 100644
+> --- a/tests/qemu-iotests/051.out
+> +++ b/tests/qemu-iotests/051.out
+> @@ -149,23 +149,23 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>  
+>  === Cache modes ===
+>  
+> -Testing: -drive driver=null-co,cache=none
+> +Testing: -drive driver=null-co,read-zeroes=on,cache=none
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> -Testing: -drive driver=null-co,cache=directsync
+> +Testing: -drive driver=null-co,read-zeroes=on,cache=directsync
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> -Testing: -drive driver=null-co,cache=writeback
+> +Testing: -drive driver=null-co,read-zeroes=on,cache=writeback
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> -Testing: -drive driver=null-co,cache=writethrough
+> +Testing: -drive driver=null-co,read-zeroes=on,cache=writethrough
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> -Testing: -drive driver=null-co,cache=unsafe
+> +Testing: -drive driver=null-co,read-zeroes=on,cache=unsafe
+>  QEMU X.Y.Z monitor - type 'help' for more information
+>  (qemu) quit
+>  
+> 
 
 
