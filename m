@@ -2,60 +2,56 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E9AC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:32:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C390AC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:34:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58FD92070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:32:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58FD92070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A03212070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:34:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A03212070B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqIJT-0005WJ-NO
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:32:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58822)
+	id 1hqILY-0006dX-VR
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:34:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59559)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hqIIf-0002bd-2H
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:31:26 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hqILO-0006BB-Fd
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:34:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hqIIe-00059x-0R
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:31:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33942)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hqILJ-0006ka-DM
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:34:12 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:59791 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqIId-00059F-NN
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:31:23 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0338D87630;
- Wed, 24 Jul 2019 14:31:23 +0000 (UTC)
-Received: from steredhat.redhat.com (ovpn-117-46.ams2.redhat.com
- [10.36.117.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CC6D60BEC;
- Wed, 24 Jul 2019 14:31:20 +0000 (UTC)
-From: Stefano Garzarella <sgarzare@redhat.com>
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hqILF-0006U6-7u
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:34:07 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 14B401A215C;
+ Wed, 24 Jul 2019 16:33:27 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id E2E2A1A1183;
+ Wed, 24 Jul 2019 16:33:26 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Jul 2019 16:31:05 +0200
-Message-Id: <20190724143105.307042-4-sgarzare@redhat.com>
-In-Reply-To: <20190724143105.307042-1-sgarzare@redhat.com>
-References: <20190724143105.307042-1-sgarzare@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 24 Jul 2019 14:31:23 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 3/3] hw/i386/pc: Map into memory the initrd
+Date: Wed, 24 Jul 2019 16:33:20 +0200
+Message-Id: <1563978800-31836-3-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1563978800-31836-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1563978800-31836-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH for 4.2 2/2] tests/tcg: target/mips: Add
+ optional printing of more detailed failure info
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,106 +63,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In order to reduce the memory footprint we map into memory
-the initrd using g_mapped_file_new() instead of reading it.
-In this way we can share the initrd pages between multiple
-instances of QEMU.
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
-v3:
-  - renamed 'GMappedFile *gmf' in 'GMappedFile *mapped_filed' for readabi=
-lity
-  - stored the initrd GMappedFile* in PCMachineState to avoid Coverity
-    issue [Paolo]
----
- hw/i386/pc.c         | 17 +++++++++++++----
- include/hw/i386/pc.h |  1 +
- 2 files changed, 14 insertions(+), 4 deletions(-)
+There is a need for printing input and output data for failure cases,
+for debugging purpose. This is achieved by this patch, and only if a
+preprocessor constant is manually set to 1. (Assumption is that the
+need for such priontout is relatively rare.)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 549c437050..96f6b89f70 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1241,17 +1241,21 @@ static void load_linux(PCMachineState *pcms,
-=20
-             /* load initrd */
-             if (initrd_filename) {
-+                GMappedFile *mapped_file;
-                 gsize initrd_size;
-                 gchar *initrd_data;
-                 GError *gerr =3D NULL;
-=20
--                if (!g_file_get_contents(initrd_filename, &initrd_data,
--                            &initrd_size, &gerr)) {
-+                mapped_file =3D g_mapped_file_new(initrd_filename, false=
-, &gerr);
-+                if (!mapped_file) {
-                     fprintf(stderr, "qemu: error reading initrd %s: %s\n=
-",
-                             initrd_filename, gerr->message);
-                     exit(1);
-                 }
-+                pcms->initrd_mapped_file =3D mapped_file;
-=20
-+                initrd_data =3D g_mapped_file_get_contents(mapped_file);
-+                initrd_size =3D g_mapped_file_get_length(mapped_file);
-                 initrd_max =3D pcms->below_4g_mem_size - pcmc->acpi_data=
-_size - 1;
-                 if (initrd_size >=3D initrd_max) {
-                     fprintf(stderr, "qemu: initrd is too large, cannot s=
-upport."
-@@ -1378,6 +1382,7 @@ static void load_linux(PCMachineState *pcms,
-=20
-     /* load initrd */
-     if (initrd_filename) {
-+        GMappedFile *mapped_file;
-         gsize initrd_size;
-         gchar *initrd_data;
-         GError *gerr =3D NULL;
-@@ -1387,12 +1392,16 @@ static void load_linux(PCMachineState *pcms,
-             exit(1);
-         }
-=20
--        if (!g_file_get_contents(initrd_filename, &initrd_data,
--                                 &initrd_size, &gerr)) {
-+        mapped_file =3D g_mapped_file_new(initrd_filename, false, &gerr)=
-;
-+        if (!mapped_file) {
-             fprintf(stderr, "qemu: error reading initrd %s: %s\n",
-                     initrd_filename, gerr->message);
-             exit(1);
-         }
-+        pcms->initrd_mapped_file =3D mapped_file;
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ tests/tcg/mips/include/test_utils_128.h | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/tests/tcg/mips/include/test_utils_128.h b/tests/tcg/mips/include/test_utils_128.h
+index 2fea610..debb264 100644
+--- a/tests/tcg/mips/include/test_utils_128.h
++++ b/tests/tcg/mips/include/test_utils_128.h
+@@ -27,7 +27,8 @@
+ #include <inttypes.h>
+ #include <string.h>
+ 
+-#define PRINT_RESULTS 0
++#define PRINT_RESULTS    0
++#define PRINT_FAILURES   0
+ 
+ 
+ static inline int32_t check_results_128(const char *isa_ase_name,
+@@ -65,6 +66,24 @@ static inline int32_t check_results_128(const char *isa_ase_name,
+             (b128_result[2 * i + 1] == b128_expect[2 * i + 1])) {
+             pass_count++;
+         } else {
++#if PRINT_FAILURES
++            uint32_t ii;
++            uint64_t a, b;
 +
-+        initrd_data =3D g_mapped_file_get_contents(mapped_file);
-+        initrd_size =3D g_mapped_file_get_length(mapped_file);
-         if (initrd_size >=3D initrd_max) {
-             fprintf(stderr, "qemu: initrd is too large, cannot support."
-                     "(max: %"PRIu32", need %"PRId64")\n",
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 859b64c51d..44edc6955e 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -42,6 +42,7 @@ struct PCMachineState {
-     FWCfgState *fw_cfg;
-     qemu_irq *gsi;
-     PFlashCFI01 *flash[2];
-+    GMappedFile *initrd_mapped_file;
-=20
-     /* Configuration options: */
-     uint64_t max_ram_below_4g;
---=20
-2.20.1
++            printf("\n");
++
++            printf("FAILURE for test case %d!\n", i);
++
++            memcpy(&a, (b128_expect + 2 * i), 8);
++            memcpy(&b, (b128_expect + 2 * i + 1), 8);
++            printf("Expected result : { 0x%016llxULL, 0x%016llxULL, },\n", a, b);
++
++            memcpy(&a, (b128_result + 2 * i), 8);
++            memcpy(&b, (b128_result + 2 * i + 1), 8);
++            printf("Actual result   : { 0x%016llxULL, 0x%016llxULL, },\n", a, b);
++
++            printf("\n");
++#endif
+             fail_count++;
+         }
+     }
+-- 
+2.7.4
 
 
