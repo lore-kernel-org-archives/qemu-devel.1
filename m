@@ -2,67 +2,143 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B38C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 040B1C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F248922ADA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:51:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F248922ADA
+	by mail.kernel.org (Postfix) with ESMTPS id D111E218B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:52:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D111E218B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqGkC-0000GL-W2
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 08:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56027)
+	id 1hqGl0-0001bz-Ti
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 08:52:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56399)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hqGjr-0007mT-Kt
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:51:24 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hqGkp-0001Ba-GP
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:52:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hqGjq-0003hQ-CH
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:51:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44908)
+ (envelope-from <jsnow@redhat.com>) id 1hqGko-0004Mm-9C
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:52:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44986)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hqGjn-0003ej-Nf; Wed, 24 Jul 2019 08:51:19 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hqGkl-0004IQ-KS; Wed, 24 Jul 2019 08:52:19 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 09B09C065F8D;
- Wed, 24 Jul 2019 12:51:19 +0000 (UTC)
-Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF43D60605;
- Wed, 24 Jul 2019 12:51:16 +0000 (UTC)
-To: Andrew Jones <drjones@redhat.com>
-References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-2-drjones@redhat.com>
- <1ed69063-eaae-2c02-1fe1-2650492496d4@redhat.com>
- <20190625133452.3f4ik4xn7vh5zi2b@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8dea18ae-39ed-6f7d-0e91-61abd22eb74e@redhat.com>
-Date: Wed, 24 Jul 2019 14:51:15 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 39C407FDE9;
+ Wed, 24 Jul 2019 12:52:18 +0000 (UTC)
+Received: from [10.10.121.109] (ovpn-121-109.rdu2.redhat.com [10.10.121.109])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 181B319C67;
+ Wed, 24 Jul 2019 12:52:13 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190708220502.12977-1-jsnow@redhat.com>
+ <bfd251ed-2f86-f463-b682-cd00c1caba51@redhat.com>
+ <dc4deae4-d80c-66a2-df4f-4966a6068767@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <5e8d0302-6a92-30d0-740e-6d70711221fa@redhat.com>
+Date: Wed, 24 Jul 2019 08:52:14 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190625133452.3f4ik4xn7vh5zi2b@kamzik.brq.redhat.com>
+In-Reply-To: <dc4deae4-d80c-66a2-df4f-4966a6068767@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 24 Jul 2019 12:51:19 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Wed, 24 Jul 2019 12:52:18 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 01/14] target/arm/cpu64: Ensure kvm
- really supports aarch64=off
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] qapi: block-dirty-bitmap-remove
+ transaction action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,140 +150,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, armbru@redhat.com, qemu-arm@nongnu.org,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
 
-On 6/25/19 3:34 PM, Andrew Jones wrote:
-> On Tue, Jun 25, 2019 at 11:35:12AM +0200, Auger Eric wrote:
->> Hi Drew,
->>
->> On 6/21/19 6:34 PM, Andrew Jones wrote:
->>> If -cpu <cpu>,aarch64=off is used then KVM must also be used, and it
->>> and the host must support running the vcpu in 32-bit mode. Also, if
-s/and it//
->>> -cpu <cpu>,aarch64=on is used, then it doesn't matter if kvm is
->>> enabled or not.
->>>
->>> Signed-off-by: Andrew Jones <drjones@redhat.com>
->>
->>
->>> ---
->>>  target/arm/cpu64.c   | 12 ++++++------
->>>  target/arm/kvm64.c   | 11 +++++++++++
->>>  target/arm/kvm_arm.h | 14 ++++++++++++++
->>>  3 files changed, 31 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
->>> index 1901997a0645..946994838d8a 100644
->>> --- a/target/arm/cpu64.c
->>> +++ b/target/arm/cpu64.c
->>> @@ -407,13 +407,13 @@ static void aarch64_cpu_set_aarch64(Object *obj, bool value, Error **errp)
->>>       * restriction allows us to avoid fixing up functionality that assumes a
->>>       * uniform execution state like do_interrupt.
->>>       */> -    if (!kvm_enabled()) {
->>> -        error_setg(errp, "'aarch64' feature cannot be disabled "
->>> -                         "unless KVM is enabled");
->>> -        return;
->>> -    }
->>> -
->>>      if (value == false) {
->>> +        if (!kvm_enabled() || !kvm_arm_aarch32_supported(CPU(cpu))) {
->>> +            error_setg(errp, "'aarch64' feature cannot be disabled "
->>> +                             "unless KVM is enabled and 32-bit EL1 "
->>> +                             "is supported");
->>> +            return;
->>> +        }
->>>          unset_feature(&cpu->env, ARM_FEATURE_AARCH64);
->>>      } else {
->>>          set_feature(&cpu->env, ARM_FEATURE_AARCH64);
->>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->>> index 22d19c9aec6f..45ccda589903 100644
->>> --- a/target/arm/kvm64.c
->>> +++ b/target/arm/kvm64.c
->>> @@ -24,7 +24,9 @@
->>>  #include "exec/gdbstub.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "sysemu/kvm.h"
->>> +#include "sysemu/kvm_int.h"
->>>  #include "kvm_arm.h"
->>> +#include "hw/boards.h"
-By the way those two new headers are not needed by this patch
->>>  #include "internals.h"
->>>  
->>>  static bool have_guest_debug;
->>> @@ -593,6 +595,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>>      return true;
->>>  }
->>>  
->>> +bool kvm_arm_aarch32_supported(CPUState *cpu)
->>> +{
->>> +    KVMState *s = KVM_STATE(current_machine->accelerator);
->>> +    int ret;
->>> +
->>> +    ret = kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
->>> +    return ret > 0;
->> nit: return kvm_check_extension() should be sufficient
-> 
-> Ah yes, I forgot kvm_check_extension() already converts negative
-> error codes to zero. I'll fix that for v3.
-> 
->>> +}
->>> +
->>>  #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
->>>  
->>>  int kvm_arch_init_vcpu(CPUState *cs)
->>> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
->>> index 2a07333c615f..812125f805a1 100644
->>> --- a/target/arm/kvm_arm.h
->>> +++ b/target/arm/kvm_arm.h
->>> @@ -207,6 +207,15 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf);
->>>   */
->>>  void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
->>>  
->>> +/**
->>> + * kvm_arm_aarch32_supported:
->>> + * @cs: CPUState
->> use kernel-doc comment style?
-> 
-> This file (kvm_arm.h) doesn't appear to have a super consistent comment
-> style. I see some use @var: for the parameters and some have 'Returns:
-> ...' lines as well. I'm happy to do whatever the maintainers prefer. For
-> now I was just trying to mimic whatever caught my eye.>
->>> + *
->>> + * Returns true if the KVM VCPU can enable AArch32 mode and false
->>> + * otherwise.
->>> + */
->>> +bool kvm_arm_aarch32_supported(CPUState *cs);
->>> +
->>>  /**
->>>   * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
->>>   * IPA address space supported by KVM
->>> @@ -247,6 +256,11 @@ static inline void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
->>>      cpu->host_cpu_probe_failed = true;
->>>  }
->>>  
->>> +static inline bool kvm_arm_aarch32_supported(CPUState *cs)
->>> +{
->>> +    return false;
->>> +}
->>> +
->>>  static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
->>>  {
->>>      return -ENOENT;
->>>
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Thanks
 
-Eric
+On 7/24/19 7:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 15.07.2019 22:48, John Snow wrote:
+>>
+>>
+>> On 7/8/19 6:04 PM, John Snow wrote:
+>>> Hi, this is a proposal based off of Vladimir's patchset:
+>>> [Qemu-devel] [PATCH 0/4] qapi: block-dirty-bitmap-remove transaction action
+>>>
+>>> ===
+>>> V3:
+>>> ===
+>>>
+>>> 001/3:[----] [--] 'blockdev: reduce aio_context locked sections in bitmap add/remove'
+>>> 002/3:[0024] [FC] 'qapi: implement block-dirty-bitmap-remove transaction action'
+>>> 003/3:[----] [--] 'iotests: test bitmap moving inside 254'
+>>>
+>>> - Changed "squelch_persistence" to "skip_store"
+>>> - Use Max's suggestion for return expr
+>>>
+>>> ===
+>>> V2:
+>>> ===
+>>>
+>>> It replaces patches two and three with a modified patch (now patch 2)
+>>> that foregoes the need for a hide()/unhide() bitmap API. I think it's
+>>> suitable as a smaller alternative, but I'm not sure if it covers all
+>>> of the use cases of the original series.
+>>>
+>>> Patches 1 and 3 (formerly 4) included as-is.
+>>>
+>>> John Snow (1):
+>>>    qapi: implement block-dirty-bitmap-remove transaction action
+>>>
+>>> Vladimir Sementsov-Ogievskiy (2):
+>>>    blockdev: reduce aio_context locked sections in bitmap add/remove
+>>>    iotests: test bitmap moving inside 254
+>>>
+>>>   block.c                        |   2 +-
+>>>   block/dirty-bitmap.c           |  15 +++--
+>>>   blockdev.c                     | 105 ++++++++++++++++++++++++++-------
+>>>   include/block/dirty-bitmap.h   |   2 +-
+>>>   migration/block-dirty-bitmap.c |   2 +-
+>>>   qapi/transaction.json          |   2 +
+>>>   tests/qemu-iotests/254         |  30 +++++++++-
+>>>   tests/qemu-iotests/254.out     |  82 +++++++++++++++++++++++++
+>>>   8 files changed, 206 insertions(+), 34 deletions(-)
+>>>
+>>
+>> Thanks, applied to my bitmaps tree:
+>>
+>> https://github.com/jnsnow/qemu/commits/bitmaps
+>> https://github.com/jnsnow/qemu.git
+>>
+>> --js
+>>
+>>
+>> (Vladimir: if this isn't amenable to you, it's going in for 4.2, so we
+>> have until the next freeze to change it. Let me know, OK?)
 >>
 > 
-> Thanks,
-> drew 
 > 
+> And finally I'm here :)
+> 
+> Thanks a lot for doing this job and for your explanations in other threads which
+> I'm reading today and sorry for the delay! I'll look through these series soon.
+> 
+> Actually, my second child (girl:) was born a month ago, and then her elder brother
+> was ill, so I took two weeks sick leave after about two weeks vacation and forget
+> about work for a month.
+> 
+> Hmm. And Nikolay, who doing libvirt part is on vocation now (I started bitmap remove
+> transaction series by his request), so I don't know about the end of the story with
+> release and this functionality..
+> 
+> Anyway, it's cool, thanks!
+> 
+
+Wow!
+
+Congratulations Vladimir!
+
 
