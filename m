@@ -2,63 +2,63 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5E6C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB31C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:53:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 167F9229ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:48:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167F9229ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 46CC32083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:53:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CC32083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqCwL-00084T-UT
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:48:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35424)
+	id 1hqD1u-0001OW-JP
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:53:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <quintela@redhat.com>) id 1hqCvw-0006px-5n
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:37 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hqD1k-000107-AH
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:53:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <quintela@redhat.com>) id 1hqCvv-0004eQ-1U
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54356)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hqD1j-0000h7-1z
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:53:36 -0400
+Received: from mga05.intel.com ([192.55.52.43]:64576)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hqCvu-0004eB-RQ
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2FDC5307D96F;
- Wed, 24 Jul 2019 08:47:34 +0000 (UTC)
-Received: from redhat.com (ovpn-116-17.ams2.redhat.com [10.36.116.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B69E45DA2E;
- Wed, 24 Jul 2019 08:47:33 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-To: Ivan Ren <renyime@gmail.com>
-In-Reply-To: <1561468699-9819-3-git-send-email-ivanren@tencent.com> (Ivan
- Ren's message of "Tue, 25 Jun 2019 21:18:18 +0800")
-References: <1561468699-9819-1-git-send-email-ivanren@tencent.com>
- <1561468699-9819-3-git-send-email-ivanren@tencent.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-Date: Wed, 24 Jul 2019 10:47:31 +0200
-Message-ID: <87imrr95uk.fsf@trasno.org>
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hqD1i-0000g1-Q3
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:53:35 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Jul 2019 01:53:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,302,1559545200"; d="scan'208";a="197429486"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga002.fm.intel.com with ESMTP; 24 Jul 2019 01:53:32 -0700
+Date: Wed, 24 Jul 2019 16:53:08 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <20190724085308.GA12530@richard>
+References: <20190724070307.12568-1-richardw.yang@linux.intel.com>
+ <1382557614.4041474.1563953302894.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 24 Jul 2019 08:47:34 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: fix migrate_cancel leads
- live_migration thread hung forever
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1382557614.4041474.1563953302894.JavaMail.zimbra@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.43
+Subject: Re: [Qemu-devel] [PATCH] docs/nvdimm: add example on persistent
+ backend setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,80 +70,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: quintela@redhat.com
-Cc: dgilbert@redhat.com, qemu-devel@nongnu.org
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, mst@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ivan Ren <renyime@gmail.com> wrote:
-> When we 'migrate_cancel' a multifd migration, live_migration thread may
-> hung forever at some points, because of multifd_send_thread has already
-> exit for socket error:
-> 1. multifd_send_pages may hung at qemu_sem_wait(&multifd_send_state->
->    channels_ready)
-> 2. multifd_send_sync_main my hung at qemu_sem_wait(&multifd_send_state->
->    sem_sync)
+On Wed, Jul 24, 2019 at 03:28:22AM -0400, Pankaj Gupta wrote:
 >
-> Signed-off-by: Ivan Ren <ivanren@tencent.com>
-> ---
->  migration/ram.c | 23 +++++++++++++++++++----
->  1 file changed, 19 insertions(+), 4 deletions(-)
+>> 
+>> Persistent backend setup requires some knowledge about nvdimm and ndctl
+>> tool. Some users report they may struggle to gather these knowledge and
+>> have difficulty to setup it properly.
+>> 
+>> Here we provide two examples for persistent backend and gives the link
+>> to ndctl. By doing so, user could try it directly and do more
+>> investigation on persistent backend setup with ndctl.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  docs/nvdimm.txt | 28 ++++++++++++++++++++++++++++
+>>  1 file changed, 28 insertions(+)
+>> 
+>> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+>> index b531cacd35..baba7a940d 100644
+>> --- a/docs/nvdimm.txt
+>> +++ b/docs/nvdimm.txt
+>> @@ -171,6 +171,32 @@ guest software that this vNVDIMM device contains a
+>> region that cannot
+>>  accept persistent writes. In result, for example, the guest Linux
+>>  NVDIMM driver, marks such vNVDIMM device as read-only.
+>>  
+>> +Backend File Setup Example
+>> +..........................
+>> +
+>> +Here is two examples for how to setup these persistent backend on
+>> +linux, which leverages the tool ndctl [3].
+>> +
+>> +It is easy to setup DAX device backend file.
+>> +
+>> +A. DAX device
+>> +
+>> +    ndctl create-namespace -f -e namespace0.0 -m devdax
+>> +
+>> +The /dev/dax0.0 could be used directly in "mem-path" option.
+>> +
+>> +For DAX file, it is more than creating the proper namespace. The
+>> +block device should be partitioned and mounted (with dax option).
+>> +
+>> +B. DAX file
+>> +
+>> +    ndctl create-namespace -f -e namespace0.0 -m fsdax
+>> +    (partition /dev/pmem0 with name pmem0p1)
+>> +    mount -o dax /dev/pmem0p1 /mnt
+>> +    (dd a file with proper size in /mnt)
 >
-> diff --git a/migration/ram.c b/migration/ram.c
-> index f8908286c2..e4eb9c441f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1097,7 +1097,11 @@ static void *multifd_send_thread(void *opaque)
->  {
->      MultiFDSendParams *p = opaque;
->      Error *local_err = NULL;
-> -    int ret;
-> +    int ret = 0;
 
-I agree with the ret change.
+Hi, Pankaj
 
-> +
-> +    uint32_t used = 0;
-> +    uint64_t packet_num = 0;
-> +    uint32_t flags = 0;
+Thanks for your comment.
 
-This movement is unneeded.
+>This namespace is for filesystem DAX? What if user wants to create namespace for
+>device DAX to be used as persistent backend?
+>
 
->      trace_multifd_send_thread_start(p->id);
->      rcu_register_thread();
-> @@ -1113,9 +1117,9 @@ static void *multifd_send_thread(void *opaque)
->          qemu_mutex_lock(&p->mutex);
->  
->          if (p->pending_job) {
-> -            uint32_t used = p->pages->used;
-> -            uint64_t packet_num = p->packet_num;
-> -            uint32_t flags = p->flags;
-> +            used = p->pages->used;
-> +            packet_num = p->packet_num;
-> +            flags = p->flags;
->  
->              p->next_packet_size = used * qemu_target_page_size();
->              multifd_send_fill_packet(p);
-> @@ -1164,6 +1168,17 @@ out:
->          multifd_send_terminate_threads(local_err);
->      }
->  
-> +    /*
-> +     * Error happen, I will exit, but I can't just leave, tell
-> +     * who pay attention to me.
-> +     */
-> +    if (ret != 0) {
-> +        if (flags & MULTIFD_FLAG_SYNC) {
-> +            qemu_sem_post(&multifd_send_state->sem_sync);
-> +        }
-> +        qemu_sem_post(&multifd_send_state->channels_ready);
-> +    }
+User could choose the type (devdax/fsdax) in ndctl command line with -m
+option.
 
-The real change is just this one.  Good catch, thanks.
+>Does this makes sense to mention about by default namespace created on persistent
+>backend?
+>
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+I don't get your point. Here is an example to let user know how to create
+persistent backend. In case they want to get more control about the backend,
+they can refer to the ndctl link. 
 
+You mean it is not proper to mention the backend setup example in the
+document? We found many users come to us for how to setup it, so we decide to
+add this section.
 
-Later, Juan.
+Do you have other option?
+
+>Thanks,
+>Pankaj
+>
+>> +
+>> +Then the new file in /mnt could be used in "mem-path" option.
+>> +
+>>  NVDIMM Persistence
+>>  ------------------
+>>  
+>> @@ -212,3 +238,5 @@ References
+>>      https://www.snia.org/sites/default/files/technical_work/final/NVMProgrammingModel_v1.2.pdf
+>>  [2] Persistent Memory Development Kit (PMDK), formerly known as NVML
+>>  project, home page:
+>>      http://pmem.io/pmdk/
+>> +[3] ndctl-create-namespace - provision or reconfigure a namespace
+>> +    http://pmem.io/ndctl/ndctl-create-namespace.html
+>> --
+>> 2.17.1
+>> 
+>> 
+>> 
+
+-- 
+Wei Yang
+Help you, Help me
 
