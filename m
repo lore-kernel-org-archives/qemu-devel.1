@@ -2,78 +2,63 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6651AC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5E6C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:48:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B9EE227BF
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:48:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B9EE227BF
+	by mail.kernel.org (Postfix) with ESMTPS id 167F9229ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 08:48:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167F9229ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqCwJ-0007sF-6U
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35399)
+	id 1hqCwL-00084T-UT
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 04:48:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35424)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqCvr-0006bP-Tw
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:32 -0400
+ (envelope-from <quintela@redhat.com>) id 1hqCvw-0006px-5n
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqCvq-0004ca-RB
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:31 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50230)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqCvq-0004cB-J1
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:30 -0400
-Received: by mail-wm1-f68.google.com with SMTP id v15so41024556wml.0
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 01:47:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=c3PohLBx/jDy88dv1OeoJfGBMbiEykVSWAJ5lbldAww=;
- b=gBLb+ayoS1dERpRntg7zInbLBd3ixdSu7nthnCmIHWEstVgwqhSVp5eSITl2IjDL1J
- gGskMo+5WRgxLkw1pl2OoB5PqnEQ9952RUeym/kxk+tV7uvHJ5XKmzTOUNE1V2Ohrq+D
- a9idx+BiFMTFcKNJgyf7r1ASncHrx2olW0WZaKr59VvUXSpw1OpOYEZfdf9QiF9DRrCy
- RAzWIT72rrWO7LJkISi+o0OTw/hgrEk8D/QxpumEWtQJPH1uBiuTJpajkRMUV+9Ftrtl
- 69solUhHmZX58rZwJOGEoLpsZ5ZvEd+W7lH5/C2uajbZvj5zXaW995RR1J5tnekURh3K
- QPrA==
-X-Gm-Message-State: APjAAAWrB6+lbExzn1ysYJ9EgeblSXpDfh7jWGUvDCNSbj6YOeKRHBUL
- bId6LPx1+GNZacWNE+b5+9+02A==
-X-Google-Smtp-Source: APXvYqzuNPmjpMJEL7nOvaosA4eFhkh2++HqFYXRGwAdMKoy43S5p+oSolKeQG8DvZ4T/tiuhRTvaA==
-X-Received: by 2002:a1c:f408:: with SMTP id z8mr47827707wma.97.1563958049507; 
- Wed, 24 Jul 2019 01:47:29 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512?
- ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
- by smtp.gmail.com with ESMTPSA id o11sm41889770wmh.37.2019.07.24.01.47.28
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 24 Jul 2019 01:47:29 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20190723190623.21537-1-stefanha@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <7287eae6-0c19-e082-9a8c-4fbd47afcd94@redhat.com>
-Date: Wed, 24 Jul 2019 10:47:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <quintela@redhat.com>) id 1hqCvv-0004eQ-1U
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54356)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1hqCvu-0004eB-RQ
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 04:47:34 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2FDC5307D96F;
+ Wed, 24 Jul 2019 08:47:34 +0000 (UTC)
+Received: from redhat.com (ovpn-116-17.ams2.redhat.com [10.36.116.17])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B69E45DA2E;
+ Wed, 24 Jul 2019 08:47:33 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Ivan Ren <renyime@gmail.com>
+In-Reply-To: <1561468699-9819-3-git-send-email-ivanren@tencent.com> (Ivan
+ Ren's message of "Tue, 25 Jun 2019 21:18:18 +0800")
+References: <1561468699-9819-1-git-send-email-ivanren@tencent.com>
+ <1561468699-9819-3-git-send-email-ivanren@tencent.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Wed, 24 Jul 2019 10:47:31 +0200
+Message-ID: <87imrr95uk.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20190723190623.21537-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Wed, 24 Jul 2019 08:47:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH] util/async: hold AioContext ref to prevent
- use-after-free
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: fix migrate_cancel leads
+ live_migration thread hung forever
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,69 +70,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-block@nongnu.org
+Reply-To: quintela@redhat.com
+Cc: dgilbert@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/07/19 21:06, Stefan Hajnoczi wrote:
-> The tests/test-bdrv-drain /bdrv-drain/iothread/drain test case does the
-> following:
-> 
-> 1. The preadv coroutine calls aio_bh_schedule_oneshot() and then yields.
-> 2. The one-shot BH executes in another AioContext.  All it does is call
->    aio_co_wakeup(preadv_co).
-> 3. The preadv coroutine is re-entered and returns.
-> 
-> There is a race condition in aio_co_wake() where the preadv coroutine
-> returns and the test case destroys the preadv IOThread.  aio_co_wake()
-> can still be running in the other AioContext and it performs an access
-> to the freed IOThread AioContext.
-> 
-> Here is the race in aio_co_schedule():
-> 
->   QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
->                             co, co_scheduled_next);
->   <-- race: co may execute before we invoke qemu_bh_schedule()!
->   qemu_bh_schedule(ctx->co_schedule_bh);
-> 
-> So if co causes ctx to be freed then we're in trouble.  Fix this problem
-> by holding a reference to ctx.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Ivan Ren <renyime@gmail.com> wrote:
+> When we 'migrate_cancel' a multifd migration, live_migration thread may
+> hung forever at some points, because of multifd_send_thread has already
+> exit for socket error:
+> 1. multifd_send_pages may hung at qemu_sem_wait(&multifd_send_state->
+>    channels_ready)
+> 2. multifd_send_sync_main my hung at qemu_sem_wait(&multifd_send_state->
+>    sem_sync)
+>
+> Signed-off-by: Ivan Ren <ivanren@tencent.com>
 > ---
->  util/async.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/util/async.c b/util/async.c
-> index 8d2105729c..4e4c7af51e 100644
-> --- a/util/async.c
-> +++ b/util/async.c
-> @@ -459,9 +459,17 @@ void aio_co_schedule(AioContext *ctx, Coroutine *co)
->          abort();
+>  migration/ram.c | 23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
+>
+> diff --git a/migration/ram.c b/migration/ram.c
+> index f8908286c2..e4eb9c441f 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1097,7 +1097,11 @@ static void *multifd_send_thread(void *opaque)
+>  {
+>      MultiFDSendParams *p = opaque;
+>      Error *local_err = NULL;
+> -    int ret;
+> +    int ret = 0;
+
+I agree with the ret change.
+
+> +
+> +    uint32_t used = 0;
+> +    uint64_t packet_num = 0;
+> +    uint32_t flags = 0;
+
+This movement is unneeded.
+
+>      trace_multifd_send_thread_start(p->id);
+>      rcu_register_thread();
+> @@ -1113,9 +1117,9 @@ static void *multifd_send_thread(void *opaque)
+>          qemu_mutex_lock(&p->mutex);
+>  
+>          if (p->pending_job) {
+> -            uint32_t used = p->pages->used;
+> -            uint64_t packet_num = p->packet_num;
+> -            uint32_t flags = p->flags;
+> +            used = p->pages->used;
+> +            packet_num = p->packet_num;
+> +            flags = p->flags;
+>  
+>              p->next_packet_size = used * qemu_target_page_size();
+>              multifd_send_fill_packet(p);
+> @@ -1164,6 +1168,17 @@ out:
+>          multifd_send_terminate_threads(local_err);
 >      }
 >  
-> +    /* The coroutine might run and release the last ctx reference before we
-> +     * invoke qemu_bh_schedule().  Take a reference to keep ctx alive until
-> +     * we're done.
+> +    /*
+> +     * Error happen, I will exit, but I can't just leave, tell
+> +     * who pay attention to me.
 > +     */
-> +    aio_context_ref(ctx);
-> +
->      QSLIST_INSERT_HEAD_ATOMIC(&ctx->scheduled_coroutines,
->                                co, co_scheduled_next);
->      qemu_bh_schedule(ctx->co_schedule_bh);
-> +
-> +    aio_context_unref(ctx);
->  }
->  
->  void aio_co_wake(struct Coroutine *co)
-> 
+> +    if (ret != 0) {
+> +        if (flags & MULTIFD_FLAG_SYNC) {
+> +            qemu_sem_post(&multifd_send_state->sem_sync);
+> +        }
+> +        qemu_sem_post(&multifd_send_state->channels_ready);
+> +    }
 
-This must have been painful to debug.
+The real change is just this one.  Good catch, thanks.
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-Paolo
+
+Later, Juan.
 
