@@ -2,59 +2,64 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA69C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42504C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 773F121911
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:16:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 773F121911
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1970920840
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:18:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1970920840
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqKsA-0000GD-D3
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 13:16:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49723)
+	id 1hqKtw-0001uG-CP
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 13:18:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51373)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hqKpC-0004iC-JE
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:11 -0400
+ (envelope-from <clg@kaod.org>) id 1hqKtl-0001QV-Fv
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:17:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hqKpB-0005m4-Ho
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59344)
+ (envelope-from <clg@kaod.org>) id 1hqKtj-0003pR-7l
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:17:53 -0400
+Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:45984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hqKp7-0005V0-91; Wed, 24 Jul 2019 13:13:05 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 913993E2D7;
- Wed, 24 Jul 2019 17:13:04 +0000 (UTC)
-Received: from localhost (ovpn-204-115.brq.redhat.com [10.40.204.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D44719C70;
- Wed, 24 Jul 2019 17:13:03 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Date: Wed, 24 Jul 2019 19:12:35 +0200
-Message-Id: <20190724171239.8764-8-mreitz@redhat.com>
-In-Reply-To: <20190724171239.8764-1-mreitz@redhat.com>
-References: <20190724171239.8764-1-mreitz@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hqKtj-0003fy-21
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:17:51 -0400
+Received: from player726.ha.ovh.net (unknown [10.108.57.18])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id C9C756394A
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 19:17:47 +0200 (CEST)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player726.ha.ovh.net (Postfix) with ESMTPSA id C597D8343CCD;
+ Wed, 24 Jul 2019 17:17:43 +0000 (UTC)
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <156398742921.546975.8822387598242513827.stgit@bahia.lan>
+ <156398744035.546975.7029414194633598474.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <5da9f5f5-2df6-3526-ea4f-0abe5f10151b@kaod.org>
+Date: Wed, 24 Jul 2019 19:17:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 24 Jul 2019 17:13:04 +0000 (UTC)
+In-Reply-To: <156398744035.546975.7029414194633598474.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 10573044554224667475
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrkedtgddutdeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 07/11] vdi: Fix .bdrv_has_zero_init()
+X-Received-From: 178.33.251.173
+Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] xics/kvm: Fix fallback to
+ emulated XICS
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,57 +71,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Static VDI images cannot guarantee to be zero-initialized.  If the image
-has been statically allocated, forward the call to the underlying
-storage node.
+On 24/07/2019 18:57, Greg Kurz wrote:
+> Commit 4812f2615288 tried to fix rollback path of xics_kvm_connect() bu=
+t
+> it isn't enough. If we fail to create the KVM device, the guest fails
+> to boot later on with:
+>=20
+> [    0.010817] pci 0000:00:00.0: Adding to iommu group 0
+> [    0.010863] irq: unknown-1 didn't like hwirq-0x1200 to VIRQ17 mappin=
+g (rc=3D-22)
+> [    0.010923] pci 0000:00:01.0: Adding to iommu group 0
+> [    0.010968] irq: unknown-1 didn't like hwirq-0x1201 to VIRQ17 mappin=
+g (rc=3D-22)
+> [    0.011543] EEH: No capable adapters found
+> [    0.011597] irq: unknown-1 didn't like hwirq-0x1000 to VIRQ17 mappin=
+g (rc=3D-22)
+> [    0.011651] audit: type=3D2000 audit(1563977526.000:1): state=3Dinit=
+ialized audit_enabled=3D0 res=3D1
+> [    0.011703] ------------[ cut here ]------------
+> [    0.011729] event-sources: Unable to allocate interrupt number for /=
+event-sources/epow-events
+> [    0.011776] WARNING: CPU: 0 PID: 1 at arch/powerpc/platforms/pseries=
+/event_sources.c:34 request_event_sources_irqs+0xbc/0x150
+> [    0.011828] Modules linked in:
+> [    0.011850] CPU: 0 PID: 1 Comm: swapper/0 Not tainted 5.1.17-300.fc3=
+0.ppc64le #1
+> [    0.011886] NIP:  c0000000000d4fac LR: c0000000000d4fa8 CTR: c000000=
+0018f0000
+> [    0.011923] REGS: c00000001e4c38d0 TRAP: 0700   Not tainted  (5.1.17=
+-300.fc30.ppc64le)
+> [    0.011966] MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 2=
+8000284  XER: 20040000
+> [    0.012012] CFAR: c00000000011b42c IRQMASK: 0
+> [    0.012012] GPR00: c0000000000d4fa8 c00000001e4c3b60 c0000000015fc40=
+0 0000000000000051
+> [    0.012012] GPR04: 0000000000000001 0000000000000000 000000000000008=
+1 772d6576656e7473
+> [    0.012012] GPR08: 000000001edf0000 c0000000014d4830 c0000000014d483=
+0 6e6576652f20726f
+> [    0.012012] GPR12: 0000000000000000 c0000000018f0000 c000000000010bf=
+0 0000000000000000
+> [    0.012012] GPR16: 0000000000000000 0000000000000000 000000000000000=
+0 0000000000000000
+> [    0.012012] GPR20: 0000000000000000 0000000000000000 000000000000000=
+0 0000000000000000
+> [    0.012012] GPR24: 0000000000000000 0000000000000000 c000000000ebbf0=
+0 c0000000000d5570
+> [    0.012012] GPR28: c000000000ebc008 c00000001fff8248 000000000000000=
+0 0000000000000000
+> [    0.012372] NIP [c0000000000d4fac] request_event_sources_irqs+0xbc/0=
+x150
+> [    0.012409] LR [c0000000000d4fa8] request_event_sources_irqs+0xb8/0x=
+150
+> [    0.012445] Call Trace:
+> [    0.012462] [c00000001e4c3b60] [c0000000000d4fa8] request_event_sour=
+ces_irqs+0xb8/0x150 (unreliable)
+> [    0.012513] [c00000001e4c3bf0] [c000000001042848] __machine_initcall=
+_pseries_init_ras_IRQ+0xc8/0xf8
+> [    0.012563] [c00000001e4c3c20] [c000000000010810] do_one_initcall+0x=
+60/0x254
+> [    0.012611] [c00000001e4c3cf0] [c000000001024538] kernel_init_freeab=
+le+0x35c/0x444
+> [    0.012655] [c00000001e4c3db0] [c000000000010c14] kernel_init+0x2c/0=
+x148
+> [    0.012693] [c00000001e4c3e20] [c00000000000bdc4] ret_from_kernel_th=
+read+0x5c/0x78
+> [    0.012736] Instruction dump:
+> [    0.012759] 38a00000 7c7f1b78 7f64db78 2c1f0000 2fbf0000 78630020 41=
+80002c 409effa8
+> [    0.012805] 7fa4eb78 7f43d378 48046421 60000000 <0fe00000> 3bde0001 =
+2c1e0010 7fde07b4
+> [    0.012851] ---[ end trace aa5785707323fad3 ]---
+>=20
+> This happens because QEMU fell back on XICS emulation but didn't unregi=
+ster
+> the RTAS calls from KVM. The emulated RTAS calls are hence never called=
+ and
+> the KVM ones return an error to the guest since the KVM device is absen=
+t.
+>=20
+> The sanity checks in xics_kvm_disconnect() are abusive since we're free=
+ing
+> the KVM device. Simply drop them.
+>=20
+> Fixes: 4812f2615288 "xics/kvm: Add proper rollback to xics_kvm_init()"
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Reported-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
-Tested-by: Stefano Garzarella <sgarzare@redhat.com>
----
- block/vdi.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/block/vdi.c b/block/vdi.c
-index b9845a4cbd..0caa3f281d 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -988,6 +988,17 @@ static void vdi_close(BlockDriverState *bs)
-     error_free(s->migration_blocker);
- }
-=20
-+static int vdi_has_zero_init(BlockDriverState *bs)
-+{
-+    BDRVVdiState *s =3D bs->opaque;
-+
-+    if (s->header.image_type =3D=3D VDI_TYPE_STATIC) {
-+        return bdrv_has_zero_init(bs->file->bs);
-+    } else {
-+        return 1;
-+    }
-+}
-+
- static QemuOptsList vdi_create_opts =3D {
-     .name =3D "vdi-create-opts",
-     .head =3D QTAILQ_HEAD_INITIALIZER(vdi_create_opts.head),
-@@ -1028,7 +1039,7 @@ static BlockDriver bdrv_vdi =3D {
-     .bdrv_child_perm          =3D bdrv_format_default_perms,
-     .bdrv_co_create      =3D vdi_co_create,
-     .bdrv_co_create_opts =3D vdi_co_create_opts,
--    .bdrv_has_zero_init =3D bdrv_has_zero_init_1,
-+    .bdrv_has_zero_init  =3D vdi_has_zero_init,
-     .bdrv_co_block_status =3D vdi_co_block_status,
-     .bdrv_make_empty =3D vdi_make_empty,
-=20
---=20
-2.21.0
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
+> ---
+>  hw/intc/xics_kvm.c |   11 -----------
+>  1 file changed, 11 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 2df1f3e92c7e..65c35f90f9af 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -430,17 +430,6 @@ fail:
+> =20
+>  void xics_kvm_disconnect(SpaprMachineState *spapr, Error **errp)
+>  {
+> -    /* The KVM XICS device is not in use */
+> -    if (kernel_xics_fd =3D=3D -1) {
+> -        return;
+> -    }
+> -
+> -    if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_=
+XICS)) {
+> -        error_setg(errp,
+> -                   "KVM and IRQ_XICS capability must be present for KV=
+M XICS device");
+> -        return;
+> -    }
+> -
+>      /*
+>       * Only on P9 using the XICS-on XIVE KVM device:
+>       *
+>=20
 
 
