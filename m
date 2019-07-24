@@ -2,110 +2,58 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509D7C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2B5C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:25:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2685E2190F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:25:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2685E2190F
+	by mail.kernel.org (Postfix) with ESMTPS id D74712190F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:25:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74712190F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqFOi-0007je-Sk
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:25:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54911)
+	id 1hqFP4-0000I5-3b
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:25:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55074)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hqFOV-00078P-3R
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:16 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hqFOt-0008Kx-KG
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hqFOT-0001ue-T3
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35886)
+ (envelope-from <sgarzare@redhat.com>) id 1hqFOs-0002DJ-HJ
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34816)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hqFOT-0001tp-Lh
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqFOs-0002CX-CB
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:38 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ED2A1C06513F;
- Wed, 24 Jul 2019 11:25:11 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 59E9160A9F;
- Wed, 24 Jul 2019 11:25:06 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <156390240449.12764.14466682904037881386@c4a48874b076>
- <d4992f3d-489a-644e-093f-dfbff27bdda8@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <25cbf95c-cf79-0cd8-497f-511a868d588a@redhat.com>
-Date: Wed, 24 Jul 2019 13:25:06 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by mx1.redhat.com (Postfix) with ESMTPS id EAA4B88318;
+ Wed, 24 Jul 2019 11:25:36 +0000 (UTC)
+Received: from steredhat.redhat.com (ovpn-117-46.ams2.redhat.com
+ [10.36.117.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F3E0C19C70;
+ Wed, 24 Jul 2019 11:25:31 +0000 (UTC)
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 24 Jul 2019 13:25:28 +0200
+Message-Id: <20190724112531.232260-1-sgarzare@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <d4992f3d-489a-644e-093f-dfbff27bdda8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 24 Jul 2019 11:25:12 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Wed, 24 Jul 2019 11:25:37 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/docker: Refresh APT cache before
- installing new packages on Debian
+Subject: [Qemu-devel] [PATCH v3 0/3] pc: mmap kernel (ELF image) and initrd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,39 +65,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Laurent Vivier <lvivier@redhat.com>, alex.bennee@linaro.org,
- Xiao Guangrong <xiaoguangrong@tencent.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/07/2019 12.46, Philippe Mathieu-Daud=C3=A9 wrote:
-> Cc'ing the qtest maintainers and Xiao since I have no clue about this t=
-est.
->=20
-> On 7/23/19 7:20 PM, no-reply@patchew.org wrote:
->> Patchew URL: https://patchew.org/QEMU/20190723141528.18023-1-philmd@re=
-dhat.com/
->> ---
->> PASS 4 pxe-test /x86_64/pxe/ipv4/q35/virtio-net-pci
->> MALLOC_PERTURB_=3D${MALLOC_PERTURB_:-$(( ${RANDOM:-0} % 255 + 1))}  QT=
-EST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=3Dqemu=
--img tests/rtc-test -m=3Dquick -k --tap < /dev/null | ./scripts/tap-drive=
-r.pl --test-name=3D"rtc-test"=20
->> **
->> ERROR:/tmp/qemu-test/src/tests/rtc-test.c:173:check_time: assertion fa=
-iled (ABS(t - s) <=3D wiggle): (3 <=3D 2)
->> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/rtc-test.c:173:check_=
-time: assertion failed (ABS(t - s) <=3D wiggle): (3 <=3D 2)
+In order to reduce the memory footprint when PVH kernel and initrd
+are used, we map them into memory instead of reading them.
+In this way we can share them between multiple instances of QEMU.
 
-Was the test running on a machine with heavy load? In that case, the
-test thread just might have been suspended for too long...
-We might need to set the "wiggle" parameter there to a higher value
-(like 5 seconds maybe)?
-Or maybe we should fence the check_time() related tests with "if
-(g_test_slow())" to make sure that they are not run on CI systems anymore=
-...
+v3:
+- Added patch 1 to handle memory-mapped ELFs in rom_add_elf_program() [Pa=
+olo]
+- Patch 2:
+  ~ passed the GMappedFile* to rom_add_elf_program() [Paolo]
+  ~ renamed 'GMappedFile *gmf' in 'GMappedFile *mapped_filed' for readabi=
+lity
+  ~ set 'data' pointer only if 'file_size > 0' as the original behaviour
+    [check-qtest-ppc64 fails without it]
+- Patch 3:
+  ~ stored the initrd GMappedFile* in PCMachineState to avoid Coverity
+    issue [Paolo]
+  ~ renamed 'GMappedFile *gmf' in 'GMappedFile *mapped_filed' for readabi=
+lity
 
- Thomas
+v2: https://patchew.org/QEMU/20190723140445.12748-1-sgarzare@redhat.com/
+
+These are the results using a PVH kernel and initrd (cpio):
+- memory footprint (using smem) [MB]
+        QEMU              before                   now
+    # instances        USS      PSS            USS      PSS
+         1           102.0M   105.8M         102.3M   106.2M
+         2            94.6M   101.2M          72.3M    90.1M
+         4            94.1M    98.0M          72.0M    81.5M
+         8            94.0M    96.2M          71.8M    76.9M
+        16            93.9M    95.1M          71.6M    74.3M
+
+    Initrd size: 3.0M
+    Kernel
+        image size: 28M
+        sections size [size -A -d vmlinux]:  18.9M
+
+- boot time [ms]
+                          before                   now
+ qemu_init_end:           63.85                   55.91
+ linux_start_kernel:      82.11 (+18.26)          74.51 (+18.60)
+ linux_start_user:       169.94 (+87.83)         159.06 (+84.56)
+
+QEMU command used:
+./qemu-system-x86_64 -bios /path/to/seabios/out/bios.bin -no-hpet \
+    -machine q35,accel=3Dkvm,kernel_irqchip,nvdimm,sata=3Doff,smbus=3Doff=
+,vmport=3Doff \
+    -cpu host -m 1G -smp 1 -vga none -display none -no-user-config -nodef=
+aults \
+    -kernel /path/to/vmlinux -initrd /path/to/rootfs.cpio \
+    -append 'root=3D/dev/mem0 ro console=3Dhvc0 pci=3Dlastbus=3D0 nosmap'
+
+Stefano Garzarella (3):
+  loader: Handle memory-mapped ELFs
+  elf-ops.h: Map into memory the ELF to load
+  hw/i386/pc: Map into memory the initrd
+
+ hw/core/loader.c     | 37 +++++++++++++++++++-----
+ hw/i386/pc.c         | 17 ++++++++---
+ include/hw/elf_ops.h | 68 ++++++++++++++++++++++++++------------------
+ include/hw/i386/pc.h |  1 +
+ include/hw/loader.h  |  5 ++--
+ 5 files changed, 88 insertions(+), 40 deletions(-)
+
+--=20
+2.20.1
+
 
