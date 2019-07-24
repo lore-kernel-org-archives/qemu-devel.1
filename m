@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EE1C76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA135C76186
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C120021911
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C120021911
+	by mail.kernel.org (Postfix) with ESMTPS id A181E21911
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 17:14:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A181E21911
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqKqJ-0000ah-ET
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 13:14:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49635)
+	id 1hqKqR-0001Kb-DH
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 13:14:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49815)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hqKp7-0004Mr-Sh
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:06 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hqKpJ-0005EE-Py
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hqKp6-0005Up-N9
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54318)
+ (envelope-from <mreitz@redhat.com>) id 1hqKpI-0006AS-Gw
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 13:13:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41850)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hqKp4-0005Hm-8i; Wed, 24 Jul 2019 13:13:02 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hqKpG-0005xZ-3M; Wed, 24 Jul 2019 13:13:14 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 994F9C03D478;
- Wed, 24 Jul 2019 17:13:01 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5E5D930B1AD1;
+ Wed, 24 Jul 2019 17:13:12 +0000 (UTC)
 Received: from localhost (ovpn-204-115.brq.redhat.com [10.40.204.115])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 13AD919C70;
- Wed, 24 Jul 2019 17:13:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA62760BEC;
+ Wed, 24 Jul 2019 17:13:11 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Wed, 24 Jul 2019 19:12:34 +0200
-Message-Id: <20190724171239.8764-7-mreitz@redhat.com>
+Date: Wed, 24 Jul 2019 19:12:37 +0200
+Message-Id: <20190724171239.8764-10-mreitz@redhat.com>
 In-Reply-To: <20190724171239.8764-1-mreitz@redhat.com>
 References: <20190724171239.8764-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 24 Jul 2019 17:13:01 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Wed, 24 Jul 2019 17:13:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 06/11] qcow2: Fix .bdrv_has_zero_init()
+Subject: [Qemu-devel] [PATCH v2 09/11] iotests: Convert to preallocated
+ encrypted qcow2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,72 +73,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a qcow2 file is preallocated, it can no longer guarantee that it
-initially appears as filled with zeroes.
+Add a test case for converting an empty image (which only returns zeroes
+when read) to a preallocated encrypted qcow2 image.
+qcow2_has_zero_init() should return 0 then, thus forcing qemu-img
+convert to create zero clusters.
 
-So implement .bdrv_has_zero_init() by checking whether the file is
-preallocated; if so, forward the call to the underlying storage node,
-except for when it is encrypted: Encrypted preallocated images always
-return effectively random data, so .bdrv_has_zero_init() must always
-return 0 for them.
-
-.bdrv_has_zero_init_truncate() can remain bdrv_has_zero_init_1(),
-because it presupposes PREALLOC_MODE_OFF.
-
-Reported-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Tested-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- block/qcow2.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+ tests/qemu-iotests/188     | 20 +++++++++++++++++++-
+ tests/qemu-iotests/188.out |  4 ++++
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 5c40f54d64..b4e73aa443 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4631,6 +4631,33 @@ static ImageInfoSpecific *qcow2_get_specific_info(=
-BlockDriverState *bs,
-     return spec_info;
- }
+diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
+index be7278aa65..afca44df54 100755
+--- a/tests/qemu-iotests/188
++++ b/tests/qemu-iotests/188
+@@ -48,7 +48,7 @@ SECRETALT=3D"secret,id=3Dsec0,data=3Dplatypus"
 =20
-+static int qcow2_has_zero_init(BlockDriverState *bs)
-+{
-+    BDRVQcow2State *s =3D bs->opaque;
-+    bool preallocated;
-+
-+    if (qemu_in_coroutine()) {
-+        qemu_co_mutex_lock(&s->lock);
-+    }
-+    /*
-+     * Check preallocation status: Preallocated images have all L2
-+     * tables allocated, nonpreallocated images have none.  It is
-+     * therefore enough to check the first one.
-+     */
-+    preallocated =3D s->l1_size > 0 && s->l1_table[0] !=3D 0;
-+    if (qemu_in_coroutine()) {
-+        qemu_co_mutex_unlock(&s->lock);
-+    }
-+
-+    if (!preallocated) {
-+        return 1;
-+    } else if (bs->encrypted) {
-+        return 0;
-+    } else {
-+        return bdrv_has_zero_init(s->data_file->bs);
-+    }
-+}
-+
- static int qcow2_save_vmstate(BlockDriverState *bs, QEMUIOVector *qiov,
-                               int64_t pos)
- {
-@@ -5186,7 +5213,7 @@ BlockDriver bdrv_qcow2 =3D {
-     .bdrv_child_perm      =3D bdrv_format_default_perms,
-     .bdrv_co_create_opts  =3D qcow2_co_create_opts,
-     .bdrv_co_create       =3D qcow2_co_create,
--    .bdrv_has_zero_init =3D bdrv_has_zero_init_1,
-+    .bdrv_has_zero_init   =3D qcow2_has_zero_init,
-     .bdrv_has_zero_init_truncate =3D bdrv_has_zero_init_1,
-     .bdrv_co_block_status =3D qcow2_co_block_status,
+ _make_test_img --object $SECRET -o "encrypt.format=3Dluks,encrypt.key-se=
+cret=3Dsec0,encrypt.iter-time=3D10" $size
 =20
+-IMGSPEC=3D"driver=3D$IMGFMT,file.filename=3D$TEST_IMG,encrypt.key-secret=
+=3Dsec0"
++IMGSPEC=3D"driver=3D$IMGFMT,encrypt.key-secret=3Dsec0,file.filename=3D$T=
+EST_IMG"
+=20
+ QEMU_IO_OPTIONS=3D$QEMU_IO_OPTIONS_NO_FMT
+=20
+@@ -68,6 +68,24 @@ echo
+ echo "=3D=3D verify open failure with wrong password =3D=3D"
+ $QEMU_IO --object $SECRETALT -c "read -P 0xa 0 $size" --image-opts $IMGS=
+PEC | _filter_qemu_io | _filter_testdir
+=20
++_cleanup_test_img
++
++echo
++echo "=3D=3D verify that has_zero_init returns false when preallocating =
+=3D=3D"
++
++# Empty source file
++if [ -n "$TEST_IMG_FILE" ]; then
++    TEST_IMG_FILE=3D"${TEST_IMG_FILE}.orig" _make_test_img $size
++else
++    TEST_IMG=3D"${TEST_IMG}.orig" _make_test_img $size
++fi
++
++$QEMU_IMG convert -O "$IMGFMT" --object $SECRET \
++    -o "encrypt.format=3Dluks,encrypt.key-secret=3Dsec0,encrypt.iter-tim=
+e=3D10,preallocation=3Dmetadata" \
++    "${TEST_IMG}.orig" "$TEST_IMG"
++
++$QEMU_IMG compare --object $SECRET --image-opts "${IMGSPEC}.orig" "$IMGS=
+PEC"
++
+=20
+ # success, all done
+ echo "*** done"
+diff --git a/tests/qemu-iotests/188.out b/tests/qemu-iotests/188.out
+index 97b1402671..c568ef3701 100644
+--- a/tests/qemu-iotests/188.out
++++ b/tests/qemu-iotests/188.out
+@@ -15,4 +15,8 @@ read 16777216/16777216 bytes at offset 0
+=20
+ =3D=3D verify open failure with wrong password =3D=3D
+ qemu-io: can't open: Invalid password, cannot unlock any keyslot
++
++=3D=3D verify that has_zero_init returns false when preallocating =3D=3D
++Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=3DIMGFMT size=3D16777216
++Images are identical.
+ *** done
 --=20
 2.21.0
 
