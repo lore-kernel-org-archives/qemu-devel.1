@@ -2,65 +2,91 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E07DC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8B9C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39DA2218D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:48:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39DA2218D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B4401218DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:57:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4401218DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hq9CB-0002F8-HC
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 00:48:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60090)
+	id 1hq9LF-0004My-WE
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 00:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34934)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hq9C0-0001iy-Iq
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:47:57 -0400
+ (envelope-from <yi.l.liu@intel.com>) id 1hq9L4-0003yY-RD
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:57:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hq9Bz-0005Ud-DM
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:47:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49452)
+ (envelope-from <yi.l.liu@intel.com>) id 1hq9L3-0003gI-He
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:57:18 -0400
+Received: from mga12.intel.com ([192.55.52.136]:49137)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hq9Bw-0005Rv-St; Wed, 24 Jul 2019 00:47:53 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3CF223086262;
- Wed, 24 Jul 2019 04:47:51 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-30.ams2.redhat.com
- [10.36.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0807219C58;
- Wed, 24 Jul 2019 04:47:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7610E113865F; Wed, 24 Jul 2019 06:47:44 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-References: <20190717173937.18747-1-jsnow@redhat.com>
-Date: Wed, 24 Jul 2019 06:47:44 +0200
-In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com> (John Snow's message of
- "Wed, 17 Jul 2019 13:39:37 -0400")
-Message-ID: <87imrsqbrj.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1hq9L3-0003dx-9s
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:57:17 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 23 Jul 2019 21:57:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,300,1559545200"; d="scan'208";a="369176618"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+ by fmsmga006.fm.intel.com with ESMTP; 23 Jul 2019 21:57:09 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 23 Jul 2019 21:57:09 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 23 Jul 2019 21:57:08 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 23 Jul 2019 21:57:08 -0700
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.110]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.55]) with mapi id 14.03.0439.000;
+ Wed, 24 Jul 2019 12:57:07 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Thread-Topic: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
+Thread-Index: AQHVM+ylZdJ7a+KBXU2HFFh5qj+Ya6bKg4OAgAJ3NWCAALChAIAIjcJAgADufICAAiiQ4A==
+Date: Wed, 24 Jul 2019 04:57:06 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0160C9@SHSMSX104.ccr.corp.intel.com>
+References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
+ <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
+ <20190715025519.GE3440@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
+ <20190717030640.GG9123@umbus.fritz.box>
+ <A2975661238FB949B60364EF0F2C25743A0140E0@SHSMSX104.ccr.corp.intel.com>
+ <20190723035741.GR25073@umbus.fritz.box>
+In-Reply-To: <20190723035741.GR25073@umbus.fritz.box>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzVhMzY1NDctZjIyNy00ODc4LTliNTItMmM1OTc0MDBkNjFkIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiRUFRQTJPMFRZSE84cytjbDRTTndudldZaXlwelwvOWFNTHg5MzQ1SjZHcWNjSGFjb3J0R2RvRkMzUzlERVJcL1hoIn0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 24 Jul 2019 04:47:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
- query-named-block-nodes result
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.136
+Subject: Re: [Qemu-devel] [RFC v1 05/18] vfio/pci: add pasid alloc/free
+ implementation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,118 +98,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Beh=
+alf
+> Of David Gibson
+> Sent: Tuesday, July 23, 2019 11:58 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
+>=20
+> On Mon, Jul 22, 2019 at 07:02:51AM +0000, Liu, Yi L wrote:
+> > > From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
+> > > On Behalf Of David Gibson
+> > > Sent: Wednesday, July 17, 2019 11:07 AM
+> > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
+> > > implementation
+> > >
+> > > On Tue, Jul 16, 2019 at 10:25:55AM +0000, Liu, Yi L wrote:
+> > > > > From: kvm-owner@vger.kernel.org
+> > > > > [mailto:kvm-owner@vger.kernel.org] On
+> > > Behalf
+> > > > > Of David Gibson
+> > > > > Sent: Monday, July 15, 2019 10:55 AM
+> > > > > To: Liu, Yi L <yi.l.liu@intel.com>
+> > > > > Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
+> > > > > implementation
+> > > > >
+> > > > > On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
+> > > > > > This patch adds vfio implementation PCIPASIDOps.alloc_pasid/fre=
+e_pasid().
+> > > > > > These two functions are used to propagate guest pasid
+> > > > > > allocation and free requests to host via vfio container ioctl.
+> > > > >
+> > > > > As I said in an earlier comment, I think doing this on the
+> > > > > device is conceptually incorrect.  I think we need an explcit
+> > > > > notion of an SVM context (i.e. the namespace in which all the
+> > > > > PASIDs live) - which will IIUC usually be shared amongst
+> > > > > multiple devices.  The create and free PASID requests should be o=
+n that object.
+> > > >
+> > > > Actually, the allocation is not doing on this device. System wide,
+> > > > it is done on a container. So not sure if it is the API interface
+> > > > gives you a sense that this is done on device.
+> > >
+> > > Sorry, I should have been clearer.  I can see that at the VFIO level
+> > > it is done on the container.  However the function here takes a bus
+> > > and devfn, so this qemu internal interface is per-device, which
+> > > doesn't really make sense.
+> >
+> > Got it. The reason here is to pass the bus and devfn info, so that
+> > VFIO can figure out a container for the operation. So far in QEMU,
+> > there is no good way to connect the vIOMMU emulator and VFIO regards
+> > to SVM.
+>=20
+> Right, and I think that's an indication that we're not modelling somethin=
+g in qemu
+> that we should be.
+>=20
+> > hw/pci layer is a choice based on some previous discussion. But yes, I
+> > agree with you that we may need to have an explicit notion for SVM. Do
+> > you think it is good to introduce a new abstract layer for SVM (may
+> > name as SVMContext).
+>=20
+> I think so, yes.
+>=20
+> If nothing else, I expect we'll need this concept if we ever want to be a=
+ble to
+> implement SVM for emulated devices (which could be useful for debugging, =
+even if
+> it's not something you'd do in production).
+>=20
+> > The idea would be that vIOMMU maintain the SVMContext instances and
+> > expose explicit interface for VFIO to get it. Then VFIO register
+> > notifiers on to the SVMContext. When vIOMMU emulator wants to do PASID
+> > alloc/free, it fires the corresponding notifier. After call into VFIO,
+> > the notifier function itself figure out the container it is bound. In
+> > this way, it's the duty of vIOMMU emulator to figure out a proper
+> > notifier to fire. From interface point of view, it is no longer
+> > per-device.
+>=20
+> Exactly.
 
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->
-> Let's add a possibility to query dirty-bitmaps not only on root nodes.
-> It is useful when dealing both with snapshots and incremental backups.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> [Added deprecation information. --js]
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/qapi.c         |  5 +++++
->  qapi/block-core.json |  6 +++++-
->  qemu-deprecated.texi | 12 ++++++++++++
->  3 files changed, 22 insertions(+), 1 deletion(-)
->
-> diff --git a/block/qapi.c b/block/qapi.c
-> index 917435f022..15f1030264 100644
-> --- a/block/qapi.c
-> +++ b/block/qapi.c
-> @@ -79,6 +79,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
->          info->backing_file = g_strdup(bs->backing_file);
->      }
->  
-> +    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
-> +        info->has_dirty_bitmaps = true;
-> +        info->dirty_bitmaps = bdrv_query_dirty_bitmaps(bs);
-> +    }
-> +
->      info->detect_zeroes = bs->detect_zeroes;
->  
->      if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0d43d4f37c..9210ae233d 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -360,6 +360,9 @@
->  # @write_threshold: configured write threshold for the device.
->  #                   0 if disabled. (Since 2.3)
->  #
-> +# @dirty-bitmaps: dirty bitmaps information (only present if node
-> +#                 has one or more dirty bitmaps) (Since 4.2)
-> +#
->  # Since: 0.14.0
->  #
->  ##
-> @@ -378,7 +381,7 @@
->              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
-> -            'write_threshold': 'int' } }
-> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo'] } }
->  
->  ##
->  # @BlockDeviceIoStatus:
-> @@ -656,6 +659,7 @@
->  #
->  # @dirty-bitmaps: dirty bitmaps information (only present if the
->  #                 driver has one or more dirty bitmaps) (Since 2.0)
-> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
->  #
->  # @io-status: @BlockDeviceIoStatus. Only present if the device
->  #             supports it and the VM is configured to stop on errors
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index c90b08d553..6374b66546 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -134,6 +134,18 @@ The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
->  the query-block command is deprecated. Two new boolean fields,
->  ``recording'' and ``busy'' effectively replace it.
->  
-> +@subsection query-block result field dirty-bitmaps (Since 4.2)
-> +
-> +The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
-> +the query-block command is itself now deprecated. The ``dirty-bitmaps``
-> +field of the ``BlockDeviceInfo`` struct should be used instead, which is the
-> +type of the ``inserted`` field in query-block replies, as well as the
-> +type of array items in query-named-block-nodes.
+Cool, let me prepare another version with the ideas. Thanks for your
+review. :-)
 
-Would the text be clearer if it talked only about commands, not about
-types?
+Regards,
+Yi Liu
 
-Here's my (laconic) try:
+> > Also, it leaves the PASID management details to vIOMMU emulator as it
+> > can be vendor specific. Does it make sense?
+> > Also, I'd like to know if you have any other idea on it. That would
+> > surely be helpful. :-)
+> >
+> > > > Also, curious on the SVM context
+> > > > concept, do you mean it a per-VM context or a per-SVM usage context=
+?
+> > > > May you elaborate a little more. :-)
+> > >
+> > > Sorry, I'm struggling to find a good term for this.  By "context" I
+> > > mean a namespace containing a bunch of PASID address spaces, those
+> > > PASIDs are then visible to some group of devices.
+> >
+> > I see. May be the SVMContext instance above can include multiple PASID
+> > address spaces. And again, I think this relationship should be
+> > maintained in vIOMMU emulator.
 
-   @subsection query-block result field dirty-bitmaps (Since 4.2)
-
-   In the result of query-block, member ``dirty-bitmaps'' has been moved
-   into member ``inserted''.
-
-Aside: same for existing @subsection query-block result field
-dirty-bitmaps[i].status (since 4.0).
-
-> +Since the ``dirty-bitmaps`` field is optionally present in both the old and
-> +new locations, clients must use introspection to learn where to anticipate
-> +the field if/when it does appear in command output.
-> +
-
-I find this hint a bit confusing.  Do we need it?
-
-If yes, laconic me again:
-
-   Clients should use introspection to learn whether ``dirty-bitmaps'' is
-   in the new location.
-
->  @subsection query-cpus (since 2.12.0)
->  
->  The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
 
