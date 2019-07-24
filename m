@@ -2,59 +2,63 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25217C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC42C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:01:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEF9F22387
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:00:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF9F22387
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 71DA322387
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:01:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DA322387
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqF0X-0006yG-SY
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:00:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45951)
+	id 1hqF1S-0007ry-Hq
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:01:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46236)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hqF0J-0006QS-Om
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:00:16 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hqF1C-0007TU-Hg
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:01:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hqF0I-0001Uq-Aq
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:00:15 -0400
-Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:35904)
+ (envelope-from <dgilbert@redhat.com>) id 1hqF1A-00022O-Tj
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:01:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hqF0I-0001TO-5K
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:00:14 -0400
-Received: from player770.ha.ovh.net (unknown [10.109.159.159])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id DEDFC1141AC
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 13:00:11 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player770.ha.ovh.net (Postfix) with ESMTPSA id 1B2F08448905;
- Wed, 24 Jul 2019 11:00:06 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 24 Jul 2019 13:00:01 +0200
-Message-Id: <20190724110001.17553-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hqF1A-000220-KQ
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:01:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id E802D30BD1CA;
+ Wed, 24 Jul 2019 11:01:07 +0000 (UTC)
+Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B997600C7;
+ Wed, 24 Jul 2019 11:01:05 +0000 (UTC)
+Date: Wed, 24 Jul 2019 12:01:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Message-ID: <20190724110103.GC2717@work-vm>
+References: <20190724095523.1527-1-quintela@redhat.com>
+ <20190724095523.1527-4-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 4195947481003494374
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrkedtgdefudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190724095523.1527-4-quintela@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Wed, 24 Jul 2019 11:01:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.74.148
-Subject: [Qemu-devel] [PATCH v2] ppc/pnv: Introduce PowerNV machines with
- fixed CPU models
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] migration: Make explicit that we are
+ quitting multifd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,164 +70,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the current "powernv" machine an abstract type and derive from it
-new machines with specific CPU models: power8 and power9.
+* Juan Quintela (quintela@redhat.com) wrote:
+> We add a bool to indicate that.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-The "powernv" machine is now an alias on the "powernv9" machine.
+OK, similar to send.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
 
- Changes since v1:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
- - removed power8e and power8nvl machines
- - added a pnv_match_cpu() helper to check compatibility of the
-   specified CPU with the machine default
-
- hw/ppc/pnv.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 63 insertions(+), 7 deletions(-)
-
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 4570ce8afe6a..18602b9e9bcd 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -602,9 +602,20 @@ static void pnv_chip_power9_pic_print_info(PnvChip *=
-chip, Monitor *mon)
-     pnv_psi_pic_print_info(&chip9->psi, mon);
- }
-=20
-+static bool pnv_match_cpu(const char *default_type, const char *cpu_type=
-)
-+{
-+    PowerPCCPUClass *ppc_default =3D
-+        POWERPC_CPU_CLASS(object_class_by_name(default_type));
-+    PowerPCCPUClass *ppc =3D
-+        POWERPC_CPU_CLASS(object_class_by_name(cpu_type));
-+
-+    return ppc_default->pvr_match(ppc_default, ppc->pvr);
-+}
-+
- static void pnv_init(MachineState *machine)
- {
-     PnvMachineState *pnv =3D PNV_MACHINE(machine);
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     MemoryRegion *ram;
-     char *fw_filename;
-     long fw_size;
-@@ -664,13 +675,23 @@ static void pnv_init(MachineState *machine)
-         }
-     }
-=20
-+    /*
-+     * Check compatibility of the specified CPU with the machine
-+     * default.
-+     */
-+    if (!pnv_match_cpu(mc->default_cpu_type, machine->cpu_type)) {
-+        error_report("invalid CPU model '%s' for %s machine",
-+                     machine->cpu_type, mc->name);
-+        exit(1);
-+    }
-+
-     /* Create the processor chips */
-     i =3D strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
-     chip_typename =3D g_strdup_printf(PNV_CHIP_TYPE_NAME("%.*s"),
-                                     i, machine->cpu_type);
-     if (!object_class_by_name(chip_typename)) {
--        error_report("invalid CPU model '%.*s' for %s machine",
--                     i, machine->cpu_type, MACHINE_GET_CLASS(machine)->n=
-ame);
-+        error_report("invalid chip model '%.*s' for %s machine",
-+                     i, machine->cpu_type, mc->name);
-         exit(1);
-     }
-=20
-@@ -1348,25 +1369,43 @@ static void pnv_machine_class_props_init(ObjectCl=
-ass *oc)
-                               NULL);
- }
-=20
--static void pnv_machine_class_init(ObjectClass *oc, void *data)
-+static void pnv_machine_power8_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-     XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-+
-+    mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER8";
-+    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-+
-+    xic->icp_get =3D pnv_icp_get;
-+    xic->ics_get =3D pnv_ics_get;
-+    xic->ics_resend =3D pnv_ics_resend;
-+}
-+
-+static void pnv_machine_power9_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER9";
-+    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
-+
-+    mc->alias =3D "powernv";
-+}
-+
-+static void pnv_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-     InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
-(oc);
-=20
-     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
-     mc->init =3D pnv_init;
-     mc->reset =3D pnv_reset;
-     mc->max_cpus =3D MAX_CPUS;
--    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
-                                       * storage */
-     mc->no_parallel =3D 1;
-     mc->default_boot_order =3D NULL;
-     mc->default_ram_size =3D 2 * GiB;
--    xic->icp_get =3D pnv_icp_get;
--    xic->ics_get =3D pnv_ics_get;
--    xic->ics_resend =3D pnv_ics_resend;
-     ispc->print_info =3D pnv_pic_print_info;
-=20
-     pnv_machine_class_props_init(oc);
-@@ -1386,10 +1425,27 @@ static void pnv_machine_class_init(ObjectClass *o=
-c, void *data)
-         .parent        =3D TYPE_PNV9_CHIP,          \
-     }
-=20
-+#define DEFINE_PNV_MACHINE_TYPE(cpu, class_initfn)      \
-+    {                                                   \
-+        .name          =3D MACHINE_TYPE_NAME(cpu),        \
-+        .parent        =3D TYPE_PNV_MACHINE,              \
-+        .instance_size =3D sizeof(PnvMachineState),       \
-+        .instance_init =3D pnv_machine_instance_init,     \
-+        .class_init    =3D class_initfn,                  \
-+        .interfaces =3D (InterfaceInfo[]) {               \
-+            { TYPE_XICS_FABRIC },                       \
-+            { TYPE_INTERRUPT_STATS_PROVIDER },          \
-+            { },                                        \
-+        },                                              \
-+    }
-+
- static const TypeInfo types[] =3D {
-+    DEFINE_PNV_MACHINE_TYPE("powernv8", pnv_machine_power8_class_init),
-+    DEFINE_PNV_MACHINE_TYPE("powernv9", pnv_machine_power9_class_init),
-     {
-         .name          =3D TYPE_PNV_MACHINE,
-         .parent        =3D TYPE_MACHINE,
-+        .abstract       =3D true,
-         .instance_size =3D sizeof(PnvMachineState),
-         .instance_init =3D pnv_machine_instance_init,
-         .class_init    =3D pnv_machine_class_init,
---=20
-2.21.0
-
+> ---
+>  migration/ram.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 87bb7da8e2..eb6716710e 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -677,6 +677,8 @@ typedef struct {
+>      QemuMutex mutex;
+>      /* is this channel thread running */
+>      bool running;
+> +    /* should this thread finish */
+> +    bool quit;
+>      /* array of pages to receive */
+>      MultiFDPages_t *pages;
+>      /* packet allocated len */
+> @@ -1266,6 +1268,7 @@ static void multifd_recv_terminate_threads(Error *err)
+>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>  
+>          qemu_mutex_lock(&p->mutex);
+> +        p->quit = true;
+>          /* We could arrive here for two reasons:
+>             - normal quit, i.e. everything went fine, just finished
+>             - error quit: We close the channels so the channel threads
+> @@ -1288,6 +1291,7 @@ int multifd_load_cleanup(Error **errp)
+>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>  
+>          if (p->running) {
+> +            p->quit = true;
+>              qemu_thread_join(&p->thread);
+>          }
+>          object_unref(OBJECT(p->c));
+> @@ -1351,6 +1355,10 @@ static void *multifd_recv_thread(void *opaque)
+>          uint32_t used;
+>          uint32_t flags;
+>  
+> +        if (p->quit) {
+> +            break;
+> +        }
+> +
+>          ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
+>                                         p->packet_len, &local_err);
+>          if (ret == 0) {   /* EOF */
+> @@ -1422,6 +1430,7 @@ int multifd_load_setup(void)
+>  
+>          qemu_mutex_init(&p->mutex);
+>          qemu_sem_init(&p->sem_sync, 0);
+> +        p->quit = false;
+>          p->id = i;
+>          p->pages = multifd_pages_init(page_count);
+>          p->packet_len = sizeof(MultiFDPacket_t)
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
