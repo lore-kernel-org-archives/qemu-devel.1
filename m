@@ -2,66 +2,73 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F281DC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 03:29:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AC0C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:30:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C00DE2182B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 03:29:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pUhKA9Zr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C00DE2182B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 868FF20644
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:30:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 868FF20644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hq7yQ-0002wr-EA
-	for qemu-devel@archiver.kernel.org; Tue, 23 Jul 2019 23:29:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42111)
+	id 1hq8vD-0006Qb-Kf
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 00:30:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56577)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hq7y1-0001bC-Iw
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 23:29:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1hq8uy-0005tI-0N
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:30:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hq7y0-0008CH-IW
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 23:29:25 -0400
-Received: from ozlabs.org ([203.11.71.1]:53901)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hq7xz-00084r-BK
- for qemu-devel@nongnu.org; Tue, 23 Jul 2019 23:29:24 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45tgn972pdz9sBF; Wed, 24 Jul 2019 13:29:17 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1563938958;
- bh=zTm2G24Ij5v8/2uJOOJIU7e09DM0So7joxNkd5w0tuI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pUhKA9Zr1snu1gV1Tyc19AJJNOQ7+kTwMgqhMQJxOvjWFuKK3xL6lZnnO8HhHsC5x
- bmKXMEOHEwyqmptti4Q0FA321waK5uXIaEcKnf4AQC9KHh0hzIrySKhu27GWNPNCRC
- BG7XmQCxhUFQkOyMc8KInUJvNVuCUC4VTcvc4v24=
-Date: Wed, 24 Jul 2019 13:18:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20190724031845.GU25073@umbus.fritz.box>
-References: <20190723160859.27250-1-imammedo@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hq8uw-0006WG-Ql
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:30:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46090)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hq8uw-0006Vp-Lc
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:30:18 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hq8uv-0006ie-4Y
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:30:17 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 18F202E806E
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:30:17 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="oP9at/Ymg5VWhwKB"
-Content-Disposition: inline
-In-Reply-To: <20190723160859.27250-1-imammedo@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 24 Jul 2019 04:17:40 -0000
+From: Launchpad Bug Tracker <1585971@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: antonios-dimtsoudis janitor th-huth
+X-Launchpad-Bug-Reporter: TuniTunes (antonios-dimtsoudis)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20160526095955.26642.69942.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156394186091.19185.4265967821136341888.malone@loganberry.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 169bc67d6780951c4c2bebedd2f11701d914b638
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] pc-dimm: fix crash when invalid slot
- number is used
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1585971] Re: Host system crashes on qemu with DMA
+ remapping
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,81 +77,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mst@redhat.com
+Reply-To: Bug 1585971 <1585971@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
---oP9at/Ymg5VWhwKB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On Tue, Jul 23, 2019 at 12:08:59PM -0400, Igor Mammedov wrote:
-> QEMU will crash with:
->   Segmentation fault (core dumped)
-> when negative slot number is used, ex:
->   qemu-system-x86_64 -m 1G,maxmem=3D20G,slots=3D256 \
->       -object memory-backend-ram,id=3Dmem1,size=3D1G \
->       -device pc-dimm,id=3Ddimm1,memdev=3Dmem1,slot=3D-2
->=20
-> fix it by checking that slot number is within valid range.
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+-- =
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1585971
 
-> ---
->  hw/mem/pc-dimm.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index b1239fd0d3..29c785799c 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -38,6 +38,13 @@ void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState=
- *machine,
-> =20
->      slot =3D object_property_get_int(OBJECT(dimm), PC_DIMM_SLOT_PROP,
->                                     &error_abort);
-> +    if ((slot < 0 || slot >=3D machine->ram_slots) &&
-> +         slot !=3D PC_DIMM_UNASSIGNED_SLOT) {
-> +        error_setg(&local_err, "invalid slot number, valid range is [0-%"
-> +                   PRIu64 "]", machine->ram_slots - 1);
-> +        goto out;
-> +    }
-> +
->      slot =3D pc_dimm_get_free_slot(slot =3D=3D PC_DIMM_UNASSIGNED_SLOT ?=
- NULL : &slot,
->                                   machine->ram_slots, &local_err);
->      if (local_err) {
+Title:
+  Host system crashes on qemu with DMA remapping
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Status in QEMU:
+  Expired
 
---oP9at/Ymg5VWhwKB
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  Hy,
 
------BEGIN PGP SIGNATURE-----
+  the host system crashes completely, when i try to pass an physical
+  device without boot option intel_iommu=3Don set. In older kernel
+  versions you didn't have to pass that option.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl03zhIACgkQbDjKyiDZ
-s5KIVw/9Eqc1hsavUnCU9MySGUnW5JsU/hHe8fXJkJZYeyPdbQCAcgb5st9a5XcJ
-xXn4xIDU6LBffo/wciNfggAy/T0M8O81LBEBaeEQua/oQuufHRXCmvw+bze09acn
-FdrCnzZ7tuf9gdvygW3h+EMl4+x9r2ZpDe5rLb3wLhXCbJuiY08j2xb3NSmR08bZ
-8zAVEoKkNkxah9DYpPUcXfNDFJdzj1/ITotl26am28ItoFk+Zi1bV39scmhCNJh8
-dPkGyEK2Tft0B1M91SCN7q4lOoKyXWPX8R+0TkwVXoRXW4O+IS+v09bcV9fsAnUU
-we9FpV8tPcUxea7lBYYdwItpfQNA2P+/L8+rlPpy8bpOffdBqq5BGRbmwCw++KhI
-Bb33cLWOjRaP9MZTqlHSBH+a+tZTD1tvgmdtBcjcWaG5bVoRpov4qypTLvTNEXbp
-EDRbU2johIf9XUukKxTotaftHVudBCsIGVCzdkTA2t9B0p1pKbi7mnibVNUvS9y9
-pl1dbAuRCik+TnFbOl691YPqDrCtAjI84TBUi4r7QeqTeYzDGI25fFMKocpOWNta
-EvMh0g8gPRtbFeVypse15+IMdFgd73EDGddBxnIocs0oSBkp/p2SbHy5QWuMkJLM
-ZjWSP8m2YZ8knpnNMIm8wdMKyjB8MjeGW/UMgg/Jqep7cNVyrtE=
-=P6jx
------END PGP SIGNATURE-----
+  I wonder if this can be easily checked by asking iommu state, avoiding
+  a crash of the complete system.
 
---oP9at/Ymg5VWhwKB--
+  My data:
+  cpu model: Intel(R) Core(TM) i7 CPU
+  qemu version: 2.4.1-r2
+  kernel version: 4.1.2 x86_64
+  command line: =
+
+  qemu-system-x86_64 -enable-kvm -drive file=3D/vms/prod/fw/fw.iso,if=3Dvir=
+tio,format=3Draw -drive file=3D/vms/prod/fw/swap,if=3Dvirtio,format=3Draw -=
+drive file=3D/vms/prod/fw/fwdata.iso,if=3Dvirtio,format=3Draw -m 512 -nogra=
+phic -kernel /data/kernels/vmlinuz-2.6.36-gentoo-r8 -append "root=3D/dev/vd=
+a console=3DttyS0 earlyprintk=3Dserial" -net nic,model=3Dvirtio,macaddr=3DD=
+E:AD:BE:EF:2D:AD -net tap,ifname=3Dtapfw0,script=3D/etc/qemu/qemu-ifup -dev=
+ice pci-assign,host=3D03:00.0
+
+  There are also more detailed informations (if needed) here:
+  https://forums.gentoo.org/viewtopic-p-7923976.html
+
+  Thanks,
+  Antonios.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1585971/+subscriptions
 
