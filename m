@@ -2,58 +2,60 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2B5C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A64D2C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74712190F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:25:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74712190F
+	by mail.kernel.org (Postfix) with ESMTPS id 822422190F
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:26:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 822422190F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqFP4-0000I5-3b
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:25:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55074)
+	id 1hqFPO-0001dR-GY
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55130)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hqFOt-0008Kx-KG
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:40 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hqFP0-0000Bx-LW
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hqFOs-0002DJ-HJ
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34816)
+ (envelope-from <sgarzare@redhat.com>) id 1hqFOz-0002HM-Bg
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36886)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqFOs-0002CX-CB
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:38 -0400
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqFOz-0002Gk-3w
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:25:45 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EAA4B88318;
- Wed, 24 Jul 2019 11:25:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69A38300413A;
+ Wed, 24 Jul 2019 11:25:44 +0000 (UTC)
 Received: from steredhat.redhat.com (ovpn-117-46.ams2.redhat.com
  [10.36.117.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F3E0C19C70;
- Wed, 24 Jul 2019 11:25:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FF7419C70;
+ Wed, 24 Jul 2019 11:25:37 +0000 (UTC)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 24 Jul 2019 13:25:28 +0200
-Message-Id: <20190724112531.232260-1-sgarzare@redhat.com>
+Date: Wed, 24 Jul 2019 13:25:29 +0200
+Message-Id: <20190724112531.232260-2-sgarzare@redhat.com>
+In-Reply-To: <20190724112531.232260-1-sgarzare@redhat.com>
+References: <20190724112531.232260-1-sgarzare@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 24 Jul 2019 11:25:37 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 24 Jul 2019 11:25:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 0/3] pc: mmap kernel (ELF image) and initrd
+Subject: [Qemu-devel] [PATCH v3 1/3] loader: Handle memory-mapped ELFs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,69 +76,146 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In order to reduce the memory footprint when PVH kernel and initrd
-are used, we map them into memory instead of reading them.
-In this way we can share them between multiple instances of QEMU.
+This patch allows handling an ELF memory-mapped, taking care
+the reference count of the GMappedFile* passed through
+rom_add_elf_program().
+In this case, the 'data' pointer is not heap-allocated, so
+we cannot free it.
 
-v3:
-- Added patch 1 to handle memory-mapped ELFs in rom_add_elf_program() [Pa=
-olo]
-- Patch 2:
-  ~ passed the GMappedFile* to rom_add_elf_program() [Paolo]
-  ~ renamed 'GMappedFile *gmf' in 'GMappedFile *mapped_filed' for readabi=
-lity
-  ~ set 'data' pointer only if 'file_size > 0' as the original behaviour
-    [check-qtest-ppc64 fails without it]
-- Patch 3:
-  ~ stored the initrd GMappedFile* in PCMachineState to avoid Coverity
-    issue [Paolo]
-  ~ renamed 'GMappedFile *gmf' in 'GMappedFile *mapped_filed' for readabi=
-lity
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+---
+ hw/core/loader.c     | 37 ++++++++++++++++++++++++++++++-------
+ include/hw/elf_ops.h |  2 +-
+ include/hw/loader.h  |  5 +++--
+ 3 files changed, 34 insertions(+), 10 deletions(-)
 
-v2: https://patchew.org/QEMU/20190723140445.12748-1-sgarzare@redhat.com/
-
-These are the results using a PVH kernel and initrd (cpio):
-- memory footprint (using smem) [MB]
-        QEMU              before                   now
-    # instances        USS      PSS            USS      PSS
-         1           102.0M   105.8M         102.3M   106.2M
-         2            94.6M   101.2M          72.3M    90.1M
-         4            94.1M    98.0M          72.0M    81.5M
-         8            94.0M    96.2M          71.8M    76.9M
-        16            93.9M    95.1M          71.6M    74.3M
-
-    Initrd size: 3.0M
-    Kernel
-        image size: 28M
-        sections size [size -A -d vmlinux]:  18.9M
-
-- boot time [ms]
-                          before                   now
- qemu_init_end:           63.85                   55.91
- linux_start_kernel:      82.11 (+18.26)          74.51 (+18.60)
- linux_start_user:       169.94 (+87.83)         159.06 (+84.56)
-
-QEMU command used:
-./qemu-system-x86_64 -bios /path/to/seabios/out/bios.bin -no-hpet \
-    -machine q35,accel=3Dkvm,kernel_irqchip,nvdimm,sata=3Doff,smbus=3Doff=
-,vmport=3Doff \
-    -cpu host -m 1G -smp 1 -vga none -display none -no-user-config -nodef=
-aults \
-    -kernel /path/to/vmlinux -initrd /path/to/rootfs.cpio \
-    -append 'root=3D/dev/mem0 ro console=3Dhvc0 pci=3Dlastbus=3D0 nosmap'
-
-Stefano Garzarella (3):
-  loader: Handle memory-mapped ELFs
-  elf-ops.h: Map into memory the ELF to load
-  hw/i386/pc: Map into memory the initrd
-
- hw/core/loader.c     | 37 +++++++++++++++++++-----
- hw/i386/pc.c         | 17 ++++++++---
- include/hw/elf_ops.h | 68 ++++++++++++++++++++++++++------------------
- include/hw/i386/pc.h |  1 +
- include/hw/loader.h  |  5 ++--
- 5 files changed, 88 insertions(+), 40 deletions(-)
-
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 425bf69a99..637d448f42 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -836,6 +836,7 @@ struct Rom {
+     int isrom;
+     char *fw_dir;
+     char *fw_file;
++    GMappedFile *mapped_file;
+=20
+     bool committed;
+=20
+@@ -846,10 +847,25 @@ struct Rom {
+ static FWCfgState *fw_cfg;
+ static QTAILQ_HEAD(, Rom) roms =3D QTAILQ_HEAD_INITIALIZER(roms);
+=20
+-/* rom->data must be heap-allocated (do not use with rom_add_elf_program=
+()) */
++/*
++ * rom->data can be heap-allocated or memory-mapped (e.g. when added wit=
+h
++ * rom_add_elf_program())
++ */
++static void rom_free_data(Rom *rom)
++{
++    if (rom->mapped_file) {
++        g_mapped_file_unref(rom->mapped_file);
++        rom->mapped_file =3D NULL;
++    } else {
++        g_free(rom->data);
++    }
++
++    rom->data =3D NULL;
++}
++
+ static void rom_free(Rom *rom)
+ {
+-    g_free(rom->data);
++    rom_free_data(rom);
+     g_free(rom->path);
+     g_free(rom->name);
+     g_free(rom->fw_dir);
+@@ -1057,10 +1073,12 @@ MemoryRegion *rom_add_blob(const char *name, cons=
+t void *blob, size_t len,
+ /* This function is specific for elf program because we don't need to al=
+locate
+  * all the rom. We just allocate the first part and the rest is just zer=
+os. This
+  * is why romsize and datasize are different. Also, this function seize =
+the
+- * memory ownership of "data", so we don't have to allocate and copy the=
+ buffer.
++ * memory ownership of "data", increasing the reference count of "mapped=
+_file",
++ * so we don't have to allocate and copy the buffer.
+  */
+-int rom_add_elf_program(const char *name, void *data, size_t datasize,
+-                        size_t romsize, hwaddr addr, AddressSpace *as)
++int rom_add_elf_program(const char *name, GMappedFile *mapped_file, void=
+ *data,
++                        size_t datasize, size_t romsize, hwaddr addr,
++                        AddressSpace *as)
+ {
+     Rom *rom;
+=20
+@@ -1071,6 +1089,12 @@ int rom_add_elf_program(const char *name, void *da=
+ta, size_t datasize,
+     rom->romsize  =3D romsize;
+     rom->data     =3D data;
+     rom->as       =3D as;
++
++    if (mapped_file && data) {
++        g_mapped_file_ref(mapped_file);
++        rom->mapped_file =3D mapped_file;
++    }
++
+     rom_insert(rom);
+     return 0;
+ }
+@@ -1105,8 +1129,7 @@ static void rom_reset(void *unused)
+         }
+         if (rom->isrom) {
+             /* rom needs to be written only once */
+-            g_free(rom->data);
+-            rom->data =3D NULL;
++            rom_free_data(rom);
+         }
+         /*
+          * The rom loader is really on the same level as firmware in the=
+ guest
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index 690f9238c8..fede37ee9c 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -525,7 +525,7 @@ static int glue(load_elf, SZ)(const char *name, int f=
+d,
+                     snprintf(label, sizeof(label), "phdr #%d: %s", i, na=
+me);
+=20
+                     /* rom_add_elf_program() seize the ownership of 'dat=
+a' */
+-                    rom_add_elf_program(label, data, file_size, mem_size=
+,
++                    rom_add_elf_program(label, NULL, data, file_size, me=
+m_size,
+                                         addr, as);
+                 } else {
+                     address_space_write(as ? as : &address_space_memory,
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 3e1b3a4566..07fd9286e7 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -258,8 +258,9 @@ MemoryRegion *rom_add_blob(const char *name, const vo=
+id *blob, size_t len,
+                            FWCfgCallback fw_callback,
+                            void *callback_opaque, AddressSpace *as,
+                            bool read_only);
+-int rom_add_elf_program(const char *name, void *data, size_t datasize,
+-                        size_t romsize, hwaddr addr, AddressSpace *as);
++int rom_add_elf_program(const char *name, GMappedFile *mapped_file, void=
+ *data,
++                        size_t datasize, size_t romsize, hwaddr addr,
++                        AddressSpace *as);
+ int rom_check_and_register_reset(void);
+ void rom_set_fw(FWCfgState *f);
+ void rom_set_order_override(int order);
 --=20
 2.20.1
 
