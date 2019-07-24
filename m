@@ -6,72 +6,56 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED77C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F66C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:38:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 771EE2147A
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:37:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 771EE2147A
+	by mail.kernel.org (Postfix) with ESMTPS id BB0302147A
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:38:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB0302147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqIOs-0004K0-N2
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:37:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60974)
+	id 1hqIPX-0005Nc-Nt
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:38:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32864)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqIOg-0003vl-Fs
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:37:39 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hqIPK-0004yv-JN
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqIOf-00010q-5I
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:37:38 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53905)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqIOW-0000uj-A6
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:37:30 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x15so42071483wmj.3
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 07:37:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yLaf5lBCiiBPlylKP5yFhx3hq1CXGj9apo/ZNRVP9iw=;
- b=BhK4Eg2jTliWukkpzO0dhsrz1OmScMKt+uFHvCCC6ftq7eoEQri1lUvcWHh7XG/61Q
- PCOuSWlFnhNp5M+7AFe25YpekI75vCarsWo+8FUbVaO+kvMUVSj5ditQGtRMedhUuzfB
- LRCmQXgZOxh9eBmuV1Qtgja6GqmTxHxbGRYRhW/1iB2ug9yz6j6sxxH4P2xli/NGpY+c
- mQv9Q9MjmUEtxtmPh7ipdm7uA3XhC83iwPL/ZFgwrCvUSKvoSfGijmiHJs2KWVb/+LSY
- CviWSKgrUipbHESgRbBSxr8moFafV+ofamk5h0v7+KTHSSYpYVlyPbNPzEHq+3M1J5Sf
- HaNg==
-X-Gm-Message-State: APjAAAVtvz7mKZY186sLYuo2s2+Sl2ynbcbiPx59ifuz5cpjymy8gAZG
- 1coQuJ1ZT1HWwaAJNEsfNDbB2A==
-X-Google-Smtp-Source: APXvYqyAq2PADuogJSvgYchRFM8uVEfvoMvlIbPK36hsnnxOLgp15xDjUg3lG7YtvsNEupqexis1rg==
-X-Received: by 2002:a1c:3:: with SMTP id 3mr75618891wma.6.1563979039477;
- Wed, 24 Jul 2019 07:37:19 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512?
- ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
- by smtp.gmail.com with ESMTPSA id f70sm55259475wme.22.2019.07.24.07.37.18
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 24 Jul 2019 07:37:18 -0700 (PDT)
-To: Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org
+ (envelope-from <dgilbert@redhat.com>) id 1hqIPH-0002Md-BC
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:38:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36502)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hqIPE-000200-Qt
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:38:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B867430833C1;
+ Wed, 24 Jul 2019 14:38:09 +0000 (UTC)
+Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A84A31001B09;
+ Wed, 24 Jul 2019 14:38:02 +0000 (UTC)
+Date: Wed, 24 Jul 2019 15:38:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Message-ID: <20190724143800.GI2717@work-vm>
 References: <20190724143105.307042-1-sgarzare@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <8a03b88f-db64-1873-04e0-397aa0fdd78f@redhat.com>
-Date: Wed, 24 Jul 2019 16:37:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20190724143105.307042-1-sgarzare@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Wed, 24 Jul 2019 14:38:09 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v4 0/3] pc: mmap kernel (ELF image) and
  initrd
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,13 +72,13 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Peter Maydell <peter.maydell@linaro.org>,
  Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/07/19 16:31, Stefano Garzarella wrote:
+* Stefano Garzarella (sgarzare@redhat.com) wrote:
 > In order to reduce the memory footprint when PVH kernel and initrd
 > are used, we map them into memory instead of reading them.
 > In this way we can share them between multiple instances of QEMU.
@@ -107,6 +91,18 @@ On 24/07/19 16:31, Stefano Garzarella wrote:
 > 
 > v3: https://patchew.org/QEMU/20190724112531.232260-1-sgarzare@redhat.com/
 > v2: https://patchew.org/QEMU/20190723140445.12748-1-sgarzare@redhat.com/
+
+Two high level questions:
+   a) What happens if someone tries to migrate the VM - I don't think
+it's too unusual for people to run with -kernel/-initrd in situations
+where they migrate.
+
+   b) Are there situations where you can't mmap but you can validly
+read it?  For example, running with an ELF built for 4k page alignment
+on a host with 64k host pages?
+
+Dave
+
 > 
 > These are the results using a PVH kernel and initrd (cpio):
 > - memory footprint (using smem) [MB]
@@ -148,8 +144,9 @@ On 24/07/19 16:31, Stefano Garzarella wrote:
 >  include/hw/loader.h  |  5 ++--
 >  5 files changed, 89 insertions(+), 43 deletions(-)
 > 
-
-Queued, thanks.
-
-Paolo
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
