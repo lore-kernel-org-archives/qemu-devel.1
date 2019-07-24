@@ -2,92 +2,67 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE4EC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D63C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96313229FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:48:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96313229FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 503DC229FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:51:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 503DC229FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqGgj-0006pZ-Q2
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 08:48:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54878)
+	id 1hqGk6-0008L7-Cq
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 08:51:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55986)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sbhat@linux.ibm.com>) id 1hqGgU-0006HA-Uj
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:47:56 -0400
+ (envelope-from <eric.auger@redhat.com>) id 1hqGjn-0007df-JY
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sbhat@linux.ibm.com>) id 1hqGgT-0001Zi-KT
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:47:54 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49490
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sbhat@linux.ibm.com>) id 1hqGgT-0001Yr-Dp
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:47:53 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6OClEib087623
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 08:47:51 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2txnju5v95-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 08:47:50 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <sbhat@linux.ibm.com>;
- Wed, 24 Jul 2019 13:47:49 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 24 Jul 2019 13:47:47 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6OClkqI50397192
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 24 Jul 2019 12:47:46 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 81ADE42047;
- Wed, 24 Jul 2019 12:47:46 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F3B1B4203F;
- Wed, 24 Jul 2019 12:47:45 +0000 (GMT)
-Received: from lep8c.aus.stglabs.ibm.com (unknown [9.40.192.207])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 24 Jul 2019 12:47:45 +0000 (GMT)
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
-Date: Wed, 24 Jul 2019 07:47:45 -0500
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <eric.auger@redhat.com>) id 1hqGjl-0003cl-PT
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:51:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33034)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1hqGjh-0003ZK-B9; Wed, 24 Jul 2019 08:51:13 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 35C483E2BB;
+ Wed, 24 Jul 2019 12:51:12 +0000 (UTC)
+Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF4725C25A;
+ Wed, 24 Jul 2019 12:51:09 +0000 (UTC)
+To: Andrew Jones <drjones@redhat.com>
+References: <20190621163422.6127-1-drjones@redhat.com>
+ <20190621163422.6127-4-drjones@redhat.com>
+ <fec0d7af-a25f-2395-64df-79f2de9579d9@redhat.com>
+ <20190626132627.oh2d3qteemgqb6u2@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <848513be-d5c1-7eda-cfc8-bd9836c2ed1d@redhat.com>
+Date: Wed, 24 Jul 2019 14:51:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190626132627.oh2d3qteemgqb6u2@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19072412-0016-0000-0000-00000295B0DE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072412-0017-0000-0000-000032F3A5A0
-Message-Id: <156397239821.79647.2790800099666109879.stgit@lep8c.aus.stglabs.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-24_05:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907240144
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: [Qemu-devel] [PATCH v6] ppc: remove idle_timer logic
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Wed, 24 Jul 2019 12:51:12 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 03/14] target/arm/monitor: Introduce
+ qmp_query_cpu_model_expansion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,150 +74,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, armbru@redhat.com, qemu-arm@nongnu.org,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The KVM_CAP_PPC_IRQ_LEVEL is part of the kernel now since 2.6.37.
-Drop the redundant logic which is not excercised on new the kernels anymore.
-Exit with error on older kernels.
+Hi Drew,
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- v5: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05301.html
- Changes from v5:
-   - exit with error if KVM_CAP_PPC_IRQ_LEVEL is not there.
+On 6/26/19 3:26 PM, Andrew Jones wrote:
+> On Wed, Jun 26, 2019 at 09:43:09AM +0200, Auger Eric wrote:
+>> Hi Drew,
+>>
+>> On 6/21/19 6:34 PM, Andrew Jones wrote:
+>>> Add support for the query-cpu-model-expansion QMP command to Arm. We
+>>> do this selectively, only exposing CPU properties which represent
+>>> optional CPU features which the user may want to enable/disable. Also,
+>>> for simplicity, we restrict the list of queryable cpu models to 'max',
+>>> 'host', or the current type when KVM is in use, even though there
+>>> may exist KVM hosts where other types would also work. For example on a
+>>> seattle you could use 'host' for the current type, but then attempt to
+>>> query 'cortex-a57', which is also a valid CPU type to use with KVM on
+>>> seattle hosts, but that query will fail with our simplifications. This
+>>> shouldn't be an issue though as management layers and users have been
+>>> preferring the 'host' CPU type for use with KVM for quite some time.
+>>> Additionally, if the KVM-enabled QEMU instance running on a seattle
+>>> host is using the cortex-a57 CPU type, then querying 'cortex-a57' will
+>>> work. Finally, we only implement expansion type 'full', as Arm does not
+>>> yet have a "base" CPU type. Below are some example calls and results
+>>> (to save character clutter they're not in json, but are still json-ish
+>>> to give the idea)
+>>>
+>>>  # expand the 'max' CPU model
+>>>  query-cpu-model-expansion: type:full, model:{ name:max }
+>>>
+>>>  return: model:{ name:max, props:{ 'aarch64': true, 'pmu': true }}
+>>>
+>>>  # attempt to expand the 'max' CPU model with pmu=off
+>>>  query-cpu-model-expansion:
+>>>    type:full, model:{ name:max, props:{ 'pmu': false }}
+>>>
+>>>  return: model:{ name:max, props:{ 'aarch64': true, 'pmu': false }}
+>>>
+>>>  # attempt to expand the 'max' CPU model with aarch64=off
+>>>  query-cpu-model-expansion:
+>>>    type:full, model:{ name:max, props:{ 'aarch64': false }}
+>>>
+>>>  error: "'aarch64' feature cannot be disabled unless KVM is enabled
+>>>          and 32-bit EL1 is supported"
+>>>
+>>> In the last example KVM was not in use so an error was returned.
+>>>
+>>> Note1: It's possible for features to have dependencies on other
+>>> features. I.e. it may be possible to change one feature at a time
+>>> without error, but when attempting to change all features at once
+>>> an error could occur depending on the order they are processed. It's
+>>> also possible changing all at once doesn't generate an error, because
+>>> a feature's dependencies are satisfied with other features, but the
+>>> same feature cannot be changed independently without error. For these
+>>> reasons callers should always attempt to make their desired changes
+>>> all at once in order to ensure the collection is valid.
+>>>
+>>> Note2: Certainly more features may be added to the list of
+>>> advertised features, e.g. 'vfp' and 'neon'. The only requirement
+>>> is that their property set accessors fail when invalid
+>>> configurations are detected. For vfp we would need something like
+>>>
+>>>  set_vfp()
+>>>  {
+>>>    if (arm_feature(env, ARM_FEATURE_AARCH64) &&
+>>>        cpu->has_vfp != cpu->has_neon)
+>>>        error("AArch64 CPUs must have both VFP and Neon or neither")
+>>>
+>>> in its set accessor, and the same for neon, rather than doing that
+>>> check at realize time, which isn't executed at qmp query time.
+>>>
+>>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+>>> ---
+>>>  qapi/target.json     |   6 +-
+>>>  target/arm/monitor.c | 132 +++++++++++++++++++++++++++++++++++++++++++
+>>>  2 files changed, 135 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/qapi/target.json b/qapi/target.json
+>>> index 1d4d54b6002e..edfa2f82b916 100644
+>>> --- a/qapi/target.json
+>>> +++ b/qapi/target.json
+>>> @@ -408,7 +408,7 @@
+>>>  ##
+>>>  { 'struct': 'CpuModelExpansionInfo',
+>>>    'data': { 'model': 'CpuModelInfo' },
+>>> -  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
+>>> +  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
+>>>  
+>>>  ##
+>>>  # @query-cpu-model-expansion:
+>>> @@ -433,7 +433,7 @@
+>>>  #   query-cpu-model-expansion while using these is not advised.
+>>>  #
+>>>  # Some architectures may not support all expansion types. s390x supports
+>>> -# "full" and "static".
+>>> +# "full" and "static". Arm only supports "full".
+>>>  #
+>>>  # Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU models is
+>>>  #          not supported, if the model cannot be expanded, if the model contains
+>>> @@ -447,7 +447,7 @@
+>>>    'data': { 'type': 'CpuModelExpansionType',
+>>>              'model': 'CpuModelInfo' },
+>>>    'returns': 'CpuModelExpansionInfo',
+>>> -  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
+>>> +  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
+>>>  
+>>>  ##
+>>>  # @CpuDefinitionInfo:
+>>> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
+>>> index 41b32b94b258..19e3120eef95 100644
+>>> --- a/target/arm/monitor.c
+>>> +++ b/target/arm/monitor.c
+>>> @@ -23,7 +23,13 @@
+>>>  #include "qemu/osdep.h"
+>>>  #include "hw/boards.h"
+>>>  #include "kvm_arm.h"
+>>> +#include "qapi/error.h"
+>>> +#include "qapi/visitor.h"
+>>> +#include "qapi/qobject-input-visitor.h"
+>>>  #include "qapi/qapi-commands-target.h"
+>>> +#include "qapi/qmp/qerror.h"
+>>> +#include "qapi/qmp/qdict.h"
+>>> +#include "qom/qom-qobject.h"
+>>>  
+>>>  static GICCapability *gic_cap_new(int version)
+>>>  {
+>>> @@ -82,3 +88,129 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
+>>>  
+>>>      return head;
+>>>  }
+>>> +
+>>> +static const char *cpu_model_advertised_features[] = {
+>>> +    "aarch64", "pmu",
+>>> +    NULL
+>>> +};
+>>> +
+>>> +CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
+>>> +                                                     CpuModelInfo *model,
+>>> +                                                     Error **errp)
+>>> +{
+>>> +    CpuModelExpansionInfo *expansion_info;
+>>> +    const QDict *qdict_in = NULL;
+>>> +    QDict *qdict_out;
+>>> +    ObjectClass *oc;
+>>> +    Object *obj;
+>>> +    const char *name;
+>>> +    int i;
+>>> +
+>>> +    if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
+>>> +        error_setg(errp, "The requested expansion type is not supported.");
+>>> +        return NULL;
+>>> +    }
+>>> +
+>>> +    if (!kvm_enabled() && !strcmp(model->name, "host")) {
+>>> +        error_setg(errp, "The CPU definition '%s' requires KVM", model->name);
+>>> +        return NULL;
+>>> +    }
+>>> +
+>>> +    oc = cpu_class_by_name(TYPE_ARM_CPU, model->name);
+>>> +    if (!oc) {
+>>> +        error_setg(errp, "The CPU definition '%s' is unknown.", model->name);
+>>> +        return NULL;
+>>> +    }
+>>> +
+>>> +    if (kvm_enabled()) {
+>>> +        const char *cpu_type = current_machine->cpu_type;
+>>> +        int len = strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
+>>> +        bool supported = false;
+>>> +
+>>> +        if (!strcmp(model->name, "host") || !strcmp(model->name, "max")) {
+>>> +            /* These are kvmarm's recommended cpu types */
+>>> +            supported = true;
+>>> +        } else if (strlen(model->name) == len &&
+>>> +                   !strncmp(model->name, cpu_type, len)) {
+>>> +            /* KVM is enabled and we're using this type, so it works. */
+>>> +            supported = true;
+>>> +        }
+>>> +        if (!supported) {
+>>> +            error_setg(errp, "The CPU definition '%s' cannot "
+>> use model name instead of CPU definition?
+> 
+> I took that wording from s390x, but maybe I prefer "The CPU type..."
+> better. I'll change it for v3.
+This CPU type is not recognized as an ARM CPU type?
+> 
+>>> +                             "be used with KVM on this host", model->name);
+>>
+>> According to your commit mesg doesn't it mean that we fall into the
+>> simplification you mentionned and not necessarily that the model name
+>> cannot be used along with KVM?
+> 
+> There's no way to know that. The simplification is meant to avoid having
+> to know which models will work with KVM, because most don't, but some do.
+> Can you suggest wording you'd prefer if you don't want to make the error
+> message so absolute? I think I prefer keeping it simple like this and
+> just saying it doesn't work.
+Something like:
+"We cannot guarantee the CPU type %s works with KVM on this host"
+> 
+>>
+>>> seattle you could use 'host' for the current type, but then attempt to
+>>> query 'cortex-a57', which is also a valid CPU type to use with KVM on
+>>> seattle hosts, but that query will fail with our simplifications
+>>> +            return NULL;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    if (model->props) {
+>>> +        qdict_in = qobject_to(QDict, model->props);
+>>> +        if (!qdict_in) {
+>>> +            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict");
+>>> +            return NULL;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    obj = object_new(object_class_get_name(oc));
+>>> +
+>>> +    if (qdict_in) {
+>>> +        Visitor *visitor;
+>>> +
+>>> +        visitor = qobject_input_visitor_new(model->props);
+>>> +        visit_start_struct(visitor, NULL, NULL, 0, errp);
+>>> +        if (*errp) {
+>> Normally we shouldn't do that as errp can be NULL. see /include/qapi/error.h
+>> I see the same in cpu_model_from_info() by the way (s390x/cpu_models.c)
+>> Maybe you can guarantee that errp isn't NULL but ...
+> 
+> Yeah, I know about the errp NULL thing, which is why I use local_err
+> elsewhere. I decided to follow s390x here though because I'm guessing
+> our QMP function will never be called with a NULL errp, it just
+> wouldn't work that way. Would you be satisfied with an assert(errp)
+> at the top of the function? Or should I switch all these to local_err
+> and then propagate?
+well up to maintainers. If it is not that much a pain, just propagate ;-)
+> 
+>>> +            object_unref(obj);
+>>> +            return NULL;
+>>> +        }
+>>> +
+>>> +        i = 0;
+>>> +        while ((name = cpu_model_advertised_features[i++]) != NULL) {
+>>> +            if (qdict_get(qdict_in, name)) {
+>>> +                object_property_set(obj, visitor, name, errp);
+>>> +                if (*errp) {> +                    break;
+>> I don't really get why we don't continue here instead of break. I see
+>> that later we read the props back and populate the qdict_out object
+> 
+> If we get an error here we're done and want to report it. If we continued
+> we'd lose that error with the next object_property_set() call. See a few
+> lines below where we free memory and return NULL due to this error.
+I get it now.
 
- target/ppc/kvm.c |   75 ++++--------------------------------------------------
- 1 file changed, 5 insertions(+), 70 deletions(-)
+Thanks
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 8a06d3171e..4a3f36f0d5 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -56,7 +56,6 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
- };
- 
- static int cap_interrupt_unset;
--static int cap_interrupt_level;
- static int cap_segstate;
- static int cap_booke_sregs;
- static int cap_ppc_smt;
-@@ -87,25 +86,6 @@ static int cap_large_decr;
- 
- static uint32_t debug_inst_opcode;
- 
--/*
-- * XXX We have a race condition where we actually have a level triggered
-- *     interrupt, but the infrastructure can't expose that yet, so the guest
-- *     takes but ignores it, goes to sleep and never gets notified that there's
-- *     still an interrupt pending.
-- *
-- *     As a quick workaround, let's just wake up again 20 ms after we injected
-- *     an interrupt. That way we can assure that we're always reinjecting
-- *     interrupts in case the guest swallowed them.
-- */
--static QEMUTimer *idle_timer;
--
--static void kvm_kick_cpu(void *opaque)
--{
--    PowerPCCPU *cpu = opaque;
--
--    qemu_cpu_kick(CPU(cpu));
--}
--
- /*
-  * Check whether we are running with KVM-PR (instead of KVM-HV).  This
-  * should only be used for fallback tests - generally we should use
-@@ -125,7 +105,6 @@ static int kvmppc_get_dec_bits(void);
- int kvm_arch_init(MachineState *ms, KVMState *s)
- {
-     cap_interrupt_unset = kvm_check_extension(s, KVM_CAP_PPC_UNSET_IRQ);
--    cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
-     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
-     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
-     cap_ppc_smt_possible = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
-@@ -161,9 +140,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     cap_ppc_pvr_compat = false;
- 
--    if (!cap_interrupt_level) {
--        fprintf(stderr, "KVM: Couldn't find level irq capability. Expect the "
--                        "VM to stall at times!\n");
-+    if (!kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL)) {
-+        fprintf(stderr, "KVM: Host kernel doesn't have level irq capability\n");
-+        exit(1);
-     }
- 
-     kvm_ppc_register_host_cpu_type(ms);
-@@ -491,8 +470,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         return ret;
-     }
- 
--    idle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, kvm_kick_cpu, cpu);
--
-     switch (cenv->mmu_model) {
-     case POWERPC_MMU_BOOKE206:
-         /* This target supports access to KVM's guest TLB */
-@@ -1332,7 +1309,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
-         return 0;
-     }
- 
--    if (!kvm_enabled() || !cap_interrupt_unset || !cap_interrupt_level) {
-+    if (!kvm_enabled() || !cap_interrupt_unset) {
-         return 0;
-     }
- 
-@@ -1349,49 +1326,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
- 
- void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
- {
--    PowerPCCPU *cpu = POWERPC_CPU(cs);
--    CPUPPCState *env = &cpu->env;
--    int r;
--    unsigned irq;
--
--    qemu_mutex_lock_iothread();
--
--    /*
--     * PowerPC QEMU tracks the various core input pins (interrupt,
--     * critical interrupt, reset, etc) in PPC-specific
--     * env->irq_input_state.
--     */
--    if (!cap_interrupt_level &&
--        run->ready_for_interrupt_injection &&
--        (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
--        (env->irq_input_state & (1 << PPC_INPUT_INT)))
--    {
--        /*
--         * For now KVM disregards the 'irq' argument. However, in the
--         * future KVM could cache it in-kernel to avoid a heavyweight
--         * exit when reading the UIC.
--         */
--        irq = KVM_INTERRUPT_SET;
--
--        trace_kvm_injected_interrupt(irq);
--        r = kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &irq);
--        if (r < 0) {
--            printf("cpu %d fail inject %x\n", cs->cpu_index, irq);
--        }
--
--        /* Always wake up soon in case the interrupt was level based */
--        timer_mod(idle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
--                       (NANOSECONDS_PER_SECOND / 50));
--    }
--
--    /*
--     * We don't know if there are more interrupts pending after
--     * this. However, the guest will return to userspace in the course
--     * of handling this one anyways, so we will get a chance to
--     * deliver the rest.
--     */
--
--    qemu_mutex_unlock_iothread();
-+    return;
- }
- 
- MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
-
+Eric
+> 
+>>> +                }
+>>> +            }
+>>> +        }
+>>> +
+>>> +        if (!*errp) {> +            visit_check_struct(visitor, errp);
+>>> +        }
+>>> +        visit_end_struct(visitor, NULL);
+>>> +        visit_free(visitor);
+>>> +        if (*errp) {
+>>> +            object_unref(obj);
+>>> +            return NULL;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    expansion_info = g_new0(CpuModelExpansionInfo, 1);
+>>> +    expansion_info->model = g_malloc0(sizeof(*expansion_info->model));
+>>> +    expansion_info->model->name = g_strdup(model->name);
+>>> +
+>>> +    qdict_out = qdict_new();
+>>> +
+>>> +    i = 0;
+>>> +    while ((name = cpu_model_advertised_features[i++]) != NULL) {
+>>> +        ObjectProperty *prop = object_property_find(obj, name, NULL);
+>>> +        if (prop) {
+>>> +            QObject *value;
+>>> +
+>>> +            assert(prop->get);
+>>> +            value = object_property_get_qobject(obj, name, errp);
+>>> +            assert(!*errp);
+>>> +
+>>> +            qdict_put_obj(qdict_out, name, value);
+>>> +        }
+>>> +    }
+>>> +
+>>> +    if (!qdict_size(qdict_out)) {
+>>> +        qobject_unref(qdict_out);
+>>> +    } else {
+>>> +        expansion_info->model->props = QOBJECT(qdict_out);
+>>> +        expansion_info->model->has_props = true;
+>>> +    }> +
+>>> +    object_unref(obj);
+>>> +
+>>> +    return expansion_info;
+>>> +}
+>>>
+>> Thanks
+>>
+>> Eric
+>>
 
