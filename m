@@ -2,76 +2,81 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F9FC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60527C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:08:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99E0F22ADB
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:04:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E0F22ADB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3802221738
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:08:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3802221738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqGw6-0002Kr-Mn
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 09:04:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60083)
+	id 1hqGzz-0003YC-DF
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 09:08:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33015)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <julio.montes@intel.com>) id 1hqGvs-0001fJ-4F
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:03:49 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqGzp-00039d-1t
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <julio.montes@intel.com>) id 1hqGvq-0003OJ-Rs
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:03:47 -0400
-Received: from mga03.intel.com ([134.134.136.65]:11643)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <julio.montes@intel.com>)
- id 1hqGvo-0003Na-Un
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:03:46 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 24 Jul 2019 06:03:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,303,1559545200"; d="scan'208";a="189093040"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by fmsmga001.fm.intel.com with ESMTP; 24 Jul 2019 06:03:43 -0700
-Received: from fmsmsx114.amr.corp.intel.com (10.18.116.8) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 24 Jul 2019 06:03:42 -0700
-Received: from fmsmsx107.amr.corp.intel.com ([169.254.6.32]) by
- FMSMSX114.amr.corp.intel.com ([169.254.6.168]) with mapi id 14.03.0439.000;
- Wed, 24 Jul 2019 06:03:42 -0700
-From: "Montes, Julio" <julio.montes@intel.com>
-To: "sgarzare@redhat.com" <sgarzare@redhat.com>
-Thread-Topic: [PATCH v2 0/2] pc: mmap kernel (ELF image) and initrd
-Thread-Index: AQHVQV+knRdUYEW73kipO69Yq/lGUabY7R2AgADqoYCAAFtJgA==
-Date: Wed, 24 Jul 2019 13:03:42 +0000
-Message-ID: <e548f60000894db2404eaaa77657b1ed551a8099.camel@intel.com>
-References: <20190723140445.12748-1-sgarzare@redhat.com>
- <4d2967a1637b3ab93ff79fa016fd4a42f5638204.camel@intel.com>
- <20190724073657.ldisme6i4u55axga@steredhat>
-In-Reply-To: <20190724073657.ldisme6i4u55axga@steredhat>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.252.205.60]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3A3ADFE4B98DAA45BF8B2BD84905F01F@intel.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <pbonzini@redhat.com>) id 1hqGzo-00056A-5p
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:07:52 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:36889)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqGzn-00054b-W9
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:07:52 -0400
+Received: by mail-wm1-f67.google.com with SMTP id f17so41560619wme.2
+ for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 06:07:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XRmRK7otL0PTNFK2R4uXOUWmEVsFSY93MXqz0Z73PdM=;
+ b=eiaOEgDzfZ9qZj7+i9qVBbXux8bqUJ0PfL9VE6i4sSh940JfBxCtUV4gZtP9TT86HS
+ k/cYwiK6rtXFVgV3iSgBz1kEMsUaN5uZ+E6Ok/PEV/VbaxAsB0hdgV2i+961tyP+iSa6
+ thi9qQlkgf5Ip8OUVmOabzKrWUHVTRn70rimzofZEXRchea0r+DXZMw+8r8HQYJsmTzL
+ wzBrcpw6GqtoOKX7fufuxUYvXBToHrapSgKyEoGMi0EZeDxihkCnJ/20q93TTwv+qyNv
+ 27xWYehcUpYPGjnf56zgTMY2EVuqjtE1Z0nMY1S3ltNdOxWyjzhklEorrbVqDYoqHAxq
+ 8xnQ==
+X-Gm-Message-State: APjAAAWurAko/6sB5BQGEzWM4hYSCx547qtBinyPNQboMxSFUZezEJSr
+ dh4EFmRsKGQCKMJN0U3L1YVeIQ==
+X-Google-Smtp-Source: APXvYqz2He7MIVLTlexvDwyBrbce/kTp9QVgaUqbklZ5sMFfovK04dCgGy0BQ6HgptLwRRngukb0Xg==
+X-Received: by 2002:a7b:ce95:: with SMTP id q21mr75727449wmj.65.1563973670835; 
+ Wed, 24 Jul 2019 06:07:50 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:10f7:67c8:abb4:8512?
+ ([2001:b07:6468:f312:10f7:67c8:abb4:8512])
+ by smtp.gmail.com with ESMTPSA id z25sm50749700wmf.38.2019.07.24.06.07.49
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 24 Jul 2019 06:07:50 -0700 (PDT)
+To: Stefano Garzarella <sgarzare@redhat.com>
+References: <20190724112531.232260-1-sgarzare@redhat.com>
+ <20190724112531.232260-3-sgarzare@redhat.com>
+ <08e22ee6-8216-8563-e35a-8c02fc201fc9@redhat.com>
+ <20190724123527.7jfmoisbcogoiqex@steredhat>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2620e7b3-af94-1f96-6968-dd1d7a1e378d@redhat.com>
+Date: Wed, 24 Jul 2019 15:07:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] pc: mmap kernel (ELF image) and
- initrd
+In-Reply-To: <20190724123527.7jfmoisbcogoiqex@steredhat>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] elf-ops.h: Map into memory the ELF
+ to load
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,28 +88,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "slp@redhat.com" <slp@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julio Montes <julio.montes@intel.com>,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGkgU3RlZmFubw0KDQpPbiBXZWQsIDIwMTktMDctMjQgYXQgMDk6MzYgKzAyMDAsIFN0ZWZhbm8g
-R2FyemFyZWxsYSB3cm90ZToNCj4gT24gVHVlLCBKdWwgMjMsIDIwMTkgYXQgMDU6Mzc6MThQTSAr
-MDAwMCwgTW9udGVzLCBKdWxpbyB3cm90ZToNCj4gPiBTdGVmYW5vLCBCcmlsbGlhbnQgam9iIQ0K
-PiA+IA0KPiA+IEkgY2FuIGNvbmZpcm0gdGhhdCB3aXRoIHRoZXNlIHBhdGNoZXMgdGhlIG1lbW9y
-eSBmb290cHJpbnQgaXMNCj4gPiBzbWFsbGVyDQo+ID4gYW5kIHRoZSBib290IHRpbWUgaXMgdGhl
-IHNhbWUgZm9yIGthdGENCj4gPiANCj4gPiBIZXJlIHRoZSByZXN1bHRzIHVzaW5nIGthdGEgbWV0
-cmljcw0KPiA+IA0KPiA+IGh0dHBzOi8vcGFzdGVib2FyZC5jby9JcGwwNlEwLnBuZw0KPiA+IGh0
-dHBzOi8vcGFzdGVib2FyZC5jby9JcGwzcDRkLnBuZw0KPiA+IA0KPiANCj4gSGkgSnVsaW8sDQo+
-IHRoYW5rIHlvdSB2ZXJ5IG11Y2ggZm9yIHRlc3RpbmcgOikNCj4gDQo+IFdoZW4geW91IG1lYXN1
-cmUgdGhlIFBQUywgaG93IG1hbnkgUUVNVSBpbnN0YW5jZXMgZGlkIHlvdSBzdGFydD8NCj4gRGlk
-IHlvdSB1c2UgYWxzbyB0aGUgaW5pdHJkPw0KDQo1MCBWTXMgd2l0aCBhIG52ZGltbS9wbWVtIGRl
-dmljZSBhcyByb290ZnMsIEkgd2lsbCB0ZXN0IHlvdXIgdjMgd2l0aA0KaW5pdHJkIDopDQoNCj4g
-DQo+IFRoYW5rcywNCj4gU3RlZmFubw0K
+On 24/07/19 14:35, Stefano Garzarella wrote:
+>> Isn't the success case missing a g_mapped_file_unref?  It has to be done
+>> unconditionally since now rom_add_elf_program adds a separate reference.
+> Sure, I had this in mind, since I initialized mapped_file to NULL, but
+> I didn't see the return before "fail:" label!
+> Maybe I'll change the end of load_elf() in this way:
+> 
+> -    g_free(phdr);
+>      if (lowaddr)
+>          *lowaddr = (uint64_t)(elf_sword)low;
+>      if (highaddr)
+>          *highaddr = (uint64_t)(elf_sword)high;
+> -    return total_size;
+> +    ret = total_size;
+>   fail:
+> -    g_free(data);
+> +    g_mapped_file_unref(mapped_file);
+>      g_free(phdr);
+>      return ret;
+>  }
+> 
+> 
+
+Yes, this looks better!
+
+Paolo
 
