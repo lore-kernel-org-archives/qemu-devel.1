@@ -2,66 +2,121 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44635C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:05:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D905AC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:09:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C74E22CD0
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:05:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C74E22CD0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A5E6422ADA
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 14:09:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WXjuwKIS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5E6422ADA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqHtj-0001Un-6M
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:05:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51427)
+	id 1hqHxT-0004Dp-Sm
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 10:09:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52447)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <drjones@redhat.com>) id 1hqHtP-0000Pr-KJ
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:05:21 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hqHxH-0003pd-9b
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1hqHtN-0005fe-F1
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:05:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56186)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1hqHtJ-0005cc-B3; Wed, 24 Jul 2019 10:05:13 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9644330C4B16;
- Wed, 24 Jul 2019 14:05:12 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A431610A3937;
- Wed, 24 Jul 2019 14:05:04 +0000 (UTC)
-Date: Wed, 24 Jul 2019 16:05:02 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190724140502.3ipk2ekr4nyyop2z@kamzik.brq.redhat.com>
-References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-4-drjones@redhat.com>
- <fec0d7af-a25f-2395-64df-79f2de9579d9@redhat.com>
- <20190626132627.oh2d3qteemgqb6u2@kamzik.brq.redhat.com>
- <848513be-d5c1-7eda-cfc8-bd9836c2ed1d@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hqHxG-0000CC-8J
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:09:19 -0400
+Received: from mail-eopbgr00122.outbound.protection.outlook.com
+ ([40.107.0.122]:40280 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hqHxF-00006s-MF
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 10:09:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JjZhnPg/HTDeySJ3avXOVCTJB43xks9L+mt41iQSytEglZ1Xk1Fud51It5uyhr6fAiUDTNA6L1JBGxdEl722i7M3O31NwfEGS4tXLjr++bRpRmk55cdpH9Hp9ng6NCUvXNr2G8O0QkmQxbA/2VGrcoKstIaYQ8dG2LLzddNQztPLAYcaIsUVPX0JdZ+8bdoLKjcHcftUUh58L+bVY883w7mSHbOJRLfuONDjDo6HO9KZ0oHP/6bOJ7KbEGYRmnx844JZqsNWKWvDSrW4DTQy09nQN7mXzsUelqvlXQEpnVC+vGDFDYKckPTEYg+vFJ2G/p1tTso6bbLsDQmsCdRJDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ENpAcQPsZ++lOf8l6olt8mi2UN09BpBA6Uu9bNjnO98=;
+ b=mXmMEVg4JHptlJYYUxOaIyNJ/4Nbng8Glvh3NmvM2eCj4iEBOiqhcnshNOc3nepK8CWzUTkJqp4Jp3VRhTCmzHCpiOpcx0lMAsWqBSG455ZeCGvUWRP1ABd5b23bPfs88lyUpYAUb63MaN7nl6Y0mZV9PpQe6b0u6t8CGhq2Zbp5AU/sPG33Hya+dcUWF5lpaQK+rIP0TGEmN0y/dAcxNcchooE/2VQ1pZFishidtSBir5iWAMG0PwU/09vdEcaT7rBIK6MdGkIniLQEJSS5wmHN9+G8cGRUEgeEfg45pW4ZgzKYyiBKP0xLpoY+0+Ezt3Sfbrg//rEB8bRd3rqA8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ENpAcQPsZ++lOf8l6olt8mi2UN09BpBA6Uu9bNjnO98=;
+ b=WXjuwKISie2+TbSVQv8VB5QivvUik0HoabwbpsxD0h8ZvrKLyPqZi8sutmgh/cT7wKZBRBfABfnYXSNJ9QzOIfa/K7JJp+Qne8fZ1DC8ManJAVTw20F7fBrJEr/M1JPKb0RuA1XkmaTFsxjem6bZtcrJtqglP1cH0o2TvXAAGGk=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5466.eurprd08.prod.outlook.com (52.133.242.83) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2094.16; Wed, 24 Jul 2019 14:09:15 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2115.005; Wed, 24 Jul 2019
+ 14:09:15 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Thread-Topic: [Qemu-devel] [PATCH v3] qapi: Add InetSocketAddress member
+ keep-alive
+Thread-Index: AQHVItcM3wOm9AhbYkaUVWyUUHH336asbz0VgCYsUgCAB3F/AA==
+Date: Wed, 24 Jul 2019 14:09:15 +0000
+Message-ID: <6a1109d2-4afd-a68f-27eb-200724bb9f47@virtuozzo.com>
+References: <20190614173140.19159-1-vsementsov@virtuozzo.com>
+ <87v9wtn634.fsf@dusky.pond.sub.org>
+ <548af442-ed15-3065-ddbd-a3728a4e752c@redhat.com>
+In-Reply-To: <548af442-ed15-3065-ddbd-a3728a4e752c@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR07CA0027.eurprd07.prod.outlook.com
+ (2603:10a6:7:66::13) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190724170912667
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6bf89aa3-cdea-4cd5-15fb-08d71040827d
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5466; 
+x-ms-traffictypediagnostic: DB8PR08MB5466:
+x-microsoft-antispam-prvs: <DB8PR08MB54663A6CA8448B5CEF40E948C1C60@DB8PR08MB5466.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2201;
+x-forefront-prvs: 0108A997B2
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(39850400004)(396003)(376002)(366004)(136003)(189003)(199004)(66066001)(71200400001)(71190400001)(25786009)(76176011)(26005)(386003)(36756003)(53546011)(6116002)(186003)(3846002)(6436002)(68736007)(486006)(6246003)(102836004)(6506007)(53936002)(8676002)(31686004)(478600001)(305945005)(52116002)(446003)(11346002)(2616005)(476003)(7736002)(110136005)(4326008)(14454004)(6512007)(86362001)(6486002)(66446008)(66946007)(5660300002)(81166006)(81156014)(64756008)(256004)(31696002)(66476007)(66556008)(54906003)(8936002)(316002)(229853002)(99286004)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5466;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 8paJidY5uh7O2ZMtx2KYpiAqR9az/BNNZEQeQTO9O4C6JCNDbw70ajWs2uqSjNZ7BKxSJftzE4X9VVynBkDNxHxAuh1Ne1sGYEj/sv9fCVEJSKLs+4rLnU4lukIeJkGDxrP1cdHSUJjRLpU9lTvVCdCmGjU5bOfpQd42OZ0D2Jl62uHKHi+OnC7VvLW1C050QMZfW4h1kIqK7eBcNL7oRJe/6G/yXkoEeQmKrVWRlDQOqECosPCcQr2yiFizT0Osdn6MXXpw0eU57m8Bq7BWu5Ch2lvh6hm9laXMJH63IsqO9+2H8bgSD91sNCAsw4bRYyfHxrQ3Iut019vF7ssM57tbS0ervW5JkXlp9jMGnp0HfWRyLAZzmL/FcOVR3UC9hRL/FDZMxnvBWRtjsfXmoSQqFs/L6Mty9ZqC/TfWFPY=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <1449D65CE1DF8B47A4FAB9B2AB87D452@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <848513be-d5c1-7eda-cfc8-bd9836c2ed1d@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 24 Jul 2019 14:05:12 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 03/14] target/arm/monitor: Introduce
- qmp_query_cpu_model_expansion
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6bf89aa3-cdea-4cd5-15fb-08d71040827d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2019 14:09:15.1262 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5466
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.122
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: Add InetSocketAddress member
+ keep-alive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,263 +128,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, armbru@redhat.com, qemu-arm@nongnu.org,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "kraxel@redhat.com" <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 02:51:08PM +0200, Auger Eric wrote:
-> Hi Drew,
-> 
-> On 6/26/19 3:26 PM, Andrew Jones wrote:
-> > On Wed, Jun 26, 2019 at 09:43:09AM +0200, Auger Eric wrote:
-> >> Hi Drew,
-> >>
-> >> On 6/21/19 6:34 PM, Andrew Jones wrote:
-> >>> Add support for the query-cpu-model-expansion QMP command to Arm. We
-> >>> do this selectively, only exposing CPU properties which represent
-> >>> optional CPU features which the user may want to enable/disable. Also,
-> >>> for simplicity, we restrict the list of queryable cpu models to 'max',
-> >>> 'host', or the current type when KVM is in use, even though there
-> >>> may exist KVM hosts where other types would also work. For example on a
-> >>> seattle you could use 'host' for the current type, but then attempt to
-> >>> query 'cortex-a57', which is also a valid CPU type to use with KVM on
-> >>> seattle hosts, but that query will fail with our simplifications. This
-> >>> shouldn't be an issue though as management layers and users have been
-> >>> preferring the 'host' CPU type for use with KVM for quite some time.
-> >>> Additionally, if the KVM-enabled QEMU instance running on a seattle
-> >>> host is using the cortex-a57 CPU type, then querying 'cortex-a57' will
-> >>> work. Finally, we only implement expansion type 'full', as Arm does not
-> >>> yet have a "base" CPU type. Below are some example calls and results
-> >>> (to save character clutter they're not in json, but are still json-ish
-> >>> to give the idea)
-> >>>
-> >>>  # expand the 'max' CPU model
-> >>>  query-cpu-model-expansion: type:full, model:{ name:max }
-> >>>
-> >>>  return: model:{ name:max, props:{ 'aarch64': true, 'pmu': true }}
-> >>>
-> >>>  # attempt to expand the 'max' CPU model with pmu=off
-> >>>  query-cpu-model-expansion:
-> >>>    type:full, model:{ name:max, props:{ 'pmu': false }}
-> >>>
-> >>>  return: model:{ name:max, props:{ 'aarch64': true, 'pmu': false }}
-> >>>
-> >>>  # attempt to expand the 'max' CPU model with aarch64=off
-> >>>  query-cpu-model-expansion:
-> >>>    type:full, model:{ name:max, props:{ 'aarch64': false }}
-> >>>
-> >>>  error: "'aarch64' feature cannot be disabled unless KVM is enabled
-> >>>          and 32-bit EL1 is supported"
-> >>>
-> >>> In the last example KVM was not in use so an error was returned.
-> >>>
-> >>> Note1: It's possible for features to have dependencies on other
-> >>> features. I.e. it may be possible to change one feature at a time
-> >>> without error, but when attempting to change all features at once
-> >>> an error could occur depending on the order they are processed. It's
-> >>> also possible changing all at once doesn't generate an error, because
-> >>> a feature's dependencies are satisfied with other features, but the
-> >>> same feature cannot be changed independently without error. For these
-> >>> reasons callers should always attempt to make their desired changes
-> >>> all at once in order to ensure the collection is valid.
-> >>>
-> >>> Note2: Certainly more features may be added to the list of
-> >>> advertised features, e.g. 'vfp' and 'neon'. The only requirement
-> >>> is that their property set accessors fail when invalid
-> >>> configurations are detected. For vfp we would need something like
-> >>>
-> >>>  set_vfp()
-> >>>  {
-> >>>    if (arm_feature(env, ARM_FEATURE_AARCH64) &&
-> >>>        cpu->has_vfp != cpu->has_neon)
-> >>>        error("AArch64 CPUs must have both VFP and Neon or neither")
-> >>>
-> >>> in its set accessor, and the same for neon, rather than doing that
-> >>> check at realize time, which isn't executed at qmp query time.
-> >>>
-> >>> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> >>> ---
-> >>>  qapi/target.json     |   6 +-
-> >>>  target/arm/monitor.c | 132 +++++++++++++++++++++++++++++++++++++++++++
-> >>>  2 files changed, 135 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/qapi/target.json b/qapi/target.json
-> >>> index 1d4d54b6002e..edfa2f82b916 100644
-> >>> --- a/qapi/target.json
-> >>> +++ b/qapi/target.json
-> >>> @@ -408,7 +408,7 @@
-> >>>  ##
-> >>>  { 'struct': 'CpuModelExpansionInfo',
-> >>>    'data': { 'model': 'CpuModelInfo' },
-> >>> -  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-> >>> +  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
-> >>>  
-> >>>  ##
-> >>>  # @query-cpu-model-expansion:
-> >>> @@ -433,7 +433,7 @@
-> >>>  #   query-cpu-model-expansion while using these is not advised.
-> >>>  #
-> >>>  # Some architectures may not support all expansion types. s390x supports
-> >>> -# "full" and "static".
-> >>> +# "full" and "static". Arm only supports "full".
-> >>>  #
-> >>>  # Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU models is
-> >>>  #          not supported, if the model cannot be expanded, if the model contains
-> >>> @@ -447,7 +447,7 @@
-> >>>    'data': { 'type': 'CpuModelExpansionType',
-> >>>              'model': 'CpuModelInfo' },
-> >>>    'returns': 'CpuModelExpansionInfo',
-> >>> -  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-> >>> +  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
-> >>>  
-> >>>  ##
-> >>>  # @CpuDefinitionInfo:
-> >>> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-> >>> index 41b32b94b258..19e3120eef95 100644
-> >>> --- a/target/arm/monitor.c
-> >>> +++ b/target/arm/monitor.c
-> >>> @@ -23,7 +23,13 @@
-> >>>  #include "qemu/osdep.h"
-> >>>  #include "hw/boards.h"
-> >>>  #include "kvm_arm.h"
-> >>> +#include "qapi/error.h"
-> >>> +#include "qapi/visitor.h"
-> >>> +#include "qapi/qobject-input-visitor.h"
-> >>>  #include "qapi/qapi-commands-target.h"
-> >>> +#include "qapi/qmp/qerror.h"
-> >>> +#include "qapi/qmp/qdict.h"
-> >>> +#include "qom/qom-qobject.h"
-> >>>  
-> >>>  static GICCapability *gic_cap_new(int version)
-> >>>  {
-> >>> @@ -82,3 +88,129 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
-> >>>  
-> >>>      return head;
-> >>>  }
-> >>> +
-> >>> +static const char *cpu_model_advertised_features[] = {
-> >>> +    "aarch64", "pmu",
-> >>> +    NULL
-> >>> +};
-> >>> +
-> >>> +CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-> >>> +                                                     CpuModelInfo *model,
-> >>> +                                                     Error **errp)
-> >>> +{
-> >>> +    CpuModelExpansionInfo *expansion_info;
-> >>> +    const QDict *qdict_in = NULL;
-> >>> +    QDict *qdict_out;
-> >>> +    ObjectClass *oc;
-> >>> +    Object *obj;
-> >>> +    const char *name;
-> >>> +    int i;
-> >>> +
-> >>> +    if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
-> >>> +        error_setg(errp, "The requested expansion type is not supported.");
-> >>> +        return NULL;
-> >>> +    }
-> >>> +
-> >>> +    if (!kvm_enabled() && !strcmp(model->name, "host")) {
-> >>> +        error_setg(errp, "The CPU definition '%s' requires KVM", model->name);
-> >>> +        return NULL;
-> >>> +    }
-> >>> +
-> >>> +    oc = cpu_class_by_name(TYPE_ARM_CPU, model->name);
-> >>> +    if (!oc) {
-> >>> +        error_setg(errp, "The CPU definition '%s' is unknown.", model->name);
-> >>> +        return NULL;
-> >>> +    }
-> >>> +
-> >>> +    if (kvm_enabled()) {
-> >>> +        const char *cpu_type = current_machine->cpu_type;
-> >>> +        int len = strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
-> >>> +        bool supported = false;
-> >>> +
-> >>> +        if (!strcmp(model->name, "host") || !strcmp(model->name, "max")) {
-> >>> +            /* These are kvmarm's recommended cpu types */
-> >>> +            supported = true;
-> >>> +        } else if (strlen(model->name) == len &&
-> >>> +                   !strncmp(model->name, cpu_type, len)) {
-> >>> +            /* KVM is enabled and we're using this type, so it works. */
-> >>> +            supported = true;
-> >>> +        }
-> >>> +        if (!supported) {
-> >>> +            error_setg(errp, "The CPU definition '%s' cannot "
-> >> use model name instead of CPU definition?
-> > 
-> > I took that wording from s390x, but maybe I prefer "The CPU type..."
-> > better. I'll change it for v3.
-> This CPU type is not recognized as an ARM CPU type?
-
-That's not what this error message is stating. The CPU type may well be an
-ARM CPU type, but it's not one you can expect to use with KVM enabled. I
-currently have
-
-  "The CPU type '%s' cannot "
-  "be used with KVM on this host", model->name)
-
-queued up for v3.
-
-> > 
-> >>> +                             "be used with KVM on this host", model->name);
-> >>
-> >> According to your commit mesg doesn't it mean that we fall into the
-> >> simplification you mentionned and not necessarily that the model name
-> >> cannot be used along with KVM?
-> > 
-> > There's no way to know that. The simplification is meant to avoid having
-> > to know which models will work with KVM, because most don't, but some do.
-> > Can you suggest wording you'd prefer if you don't want to make the error
-> > message so absolute? I think I prefer keeping it simple like this and
-> > just saying it doesn't work.
-> Something like:
-> "We cannot guarantee the CPU type %s works with KVM on this host"
-
-OK, I can change to this one.
-
-> > 
-> >>
-> >>> seattle you could use 'host' for the current type, but then attempt to
-> >>> query 'cortex-a57', which is also a valid CPU type to use with KVM on
-> >>> seattle hosts, but that query will fail with our simplifications
-> >>> +            return NULL;
-> >>> +        }
-> >>> +    }
-> >>> +
-> >>> +    if (model->props) {
-> >>> +        qdict_in = qobject_to(QDict, model->props);
-> >>> +        if (!qdict_in) {
-> >>> +            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict");
-> >>> +            return NULL;
-> >>> +        }
-> >>> +    }
-> >>> +
-> >>> +    obj = object_new(object_class_get_name(oc));
-> >>> +
-> >>> +    if (qdict_in) {
-> >>> +        Visitor *visitor;
-> >>> +
-> >>> +        visitor = qobject_input_visitor_new(model->props);
-> >>> +        visit_start_struct(visitor, NULL, NULL, 0, errp);
-> >>> +        if (*errp) {
-> >> Normally we shouldn't do that as errp can be NULL. see /include/qapi/error.h
-> >> I see the same in cpu_model_from_info() by the way (s390x/cpu_models.c)
-> >> Maybe you can guarantee that errp isn't NULL but ...
-> > 
-> > Yeah, I know about the errp NULL thing, which is why I use local_err
-> > elsewhere. I decided to follow s390x here though because I'm guessing
-> > our QMP function will never be called with a NULL errp, it just
-> > wouldn't work that way. Would you be satisfied with an assert(errp)
-> > at the top of the function? Or should I switch all these to local_err
-> > and then propagate?
-> well up to maintainers. If it is not that much a pain, just propagate ;-)
-> > 
-
-OK, I'll just propagate.
-
-Thanks,
-drew
+MTkuMDcuMjAxOSAyMzoyOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gNi8yNS8xOSA4OjMyIEFN
+LCBNYXJrdXMgQXJtYnJ1c3RlciB3cm90ZToNCj4+IEkgYXBvbG9naXplIGZvciBkcmFnZ2luZyBt
+eSBmZWV0IG9uIHRoaXMgcmV2aWV3Lg0KPj4NCj4+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
+aXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPj4NCj4+PiBJdCdzIG5lZWRl
+ZCB0byBwcm92aWRlIGtlZXBhbGl2ZSBmb3IgbmJkIGNsaWVudCB0byB0cmFjayBzZXJ2ZXINCj4+
+PiBhdmFpbGFiaWxpdHkuDQo+Pj4NCj4+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRz
+b3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+Pj4gLS0tDQo+Pj4NCj4g
+DQo+Pj4gKysrIGIvcWFwaS9zb2NrZXRzLmpzb24NCj4+PiBAQCAtNTMsNiArNTMsOSBAQA0KPj4+
+ICAgIw0KPj4+ICAgIyBAaXB2Njogd2hldGhlciB0byBhY2NlcHQgSVB2NiBhZGRyZXNzZXMsIGRl
+ZmF1bHQgdHJ5IGJvdGggSVB2NCBhbmQgSVB2Ng0KPj4+ICAgIw0KPj4+ICsjIEBrZWVwLWFsaXZl
+OiBlbmFibGUga2VlcC1hbGl2ZSB3aGVuIGNvbm5lY3RpbmcgdG8gdGhpcyBzb2NrZXQuIE5vdCBz
+dXBwb3J0ZWQNCj4+PiArIyAgICAgICAgICAgICAgZm9yIHNlcnZlci1zaWRlIGNvbm5lY3Rpb25z
+LiAoU2luY2UgNC4xKQ0KPiANCj4gSXQgbG9va3MgbGlrZSB0aGlzIG1pc3NlZCA0LjEuICBBcmUg
+eW91IHBsYW5uaW5nIG9uIHNlbmRpbmcgdjQsIHRvIGFkZHJlc3MNCj4gDQo+Pj4gKyMNCj4+DQo+
+PiBJcyAic2VydmVyLXNpZGUgY29ubmVjdGlvbiIgaXMgYW4gZXN0YWJsaXNoZWQgdGVybT8NCj4+
+DQo+PiBGb3Igd2hhdCBpdCdzIHdvcnRoLCAicGFzc2l2ZSBzb2NrZXQiIGlzLCBzZWUgbGlzdGVu
+KDIpLg0KPj4NCj4+PiAgICMgU2luY2U6IDEuMw0KPj4+ICAgIyMNCj4+PiAgIHsgJ3N0cnVjdCc6
+ICdJbmV0U29ja2V0QWRkcmVzcycsDQo+Pj4gQEAgLTYxLDcgKzY0LDggQEANCj4+PiAgICAgICAn
+Km51bWVyaWMnOiAgJ2Jvb2wnLA0KPj4+ICAgICAgICcqdG8nOiAndWludDE2JywNCj4+PiAgICAg
+ICAnKmlwdjQnOiAnYm9vbCcsDQo+Pj4gLSAgICAnKmlwdjYnOiAnYm9vbCcgfSB9DQo+Pj4gKyAg
+ICAnKmlwdjYnOiAnYm9vbCcsDQo+Pj4gKyAgICAnKmtlZXAtYWxpdmUnOiAnYm9vbCcgfSB9DQo+
+Pj4gICANCj4+PiAgICMjDQo+Pj4gICAjIEBVbml4U29ja2V0QWRkcmVzczoNCj4+PiBkaWZmIC0t
+Z2l0IGEvdXRpbC9xZW11LXNvY2tldHMuYyBiL3V0aWwvcWVtdS1zb2NrZXRzLmMNCj4+PiBpbmRl
+eCA4ODUwYTI4MGE4Li44MTMwNjM3NjFiIDEwMDY0NA0KPj4+IC0tLSBhL3V0aWwvcWVtdS1zb2Nr
+ZXRzLmMNCj4+PiArKysgYi91dGlsL3FlbXUtc29ja2V0cy5jDQo+Pj4gQEAgLTQzOCw2ICs0Mzgs
+MTIgQEAgaW50IGluZXRfY29ubmVjdF9zYWRkcihJbmV0U29ja2V0QWRkcmVzcyAqc2FkZHIsIEVy
+cm9yICoqZXJycCkNCj4+PiAgICAgICBzdHJ1Y3QgYWRkcmluZm8gKnJlcywgKmU7DQo+Pj4gICAg
+ICAgaW50IHNvY2sgPSAtMTsNCj4+PiAgIA0KPj4+ICsgICAgaWYgKHNhZGRyLT5rZWVwX2FsaXZl
+KSB7DQo+Pj4gKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAia2VlcC1hbGl2ZSBvcHRpb25zIGlz
+IG5vdCBzdXBwb3J0ZWQgZm9yIHNlcnZlci1zaWRlICINCj4+PiArICAgICAgICAgICAgICAgICAg
+ICJjb25uZWN0aW9uIik7DQo+Pj4gKyAgICAgICAgcmV0dXJuIC0xOw0KPj4+ICsgICAgfQ0KPj4+
+ICsNCj4+PiAgICAgICByZXMgPSBpbmV0X3BhcnNlX2Nvbm5lY3Rfc2FkZHIoc2FkZHIsIGVycnAp
+Ow0KPj4+ICAgICAgIGlmICghcmVzKSB7DQo+Pj4gICAgICAgICAgIHJldHVybiAtMTsNCj4+DQo+
+PiBJJ20gYWZyYWlkIHlvdSBhZGRlZCB0aGlzIHRvIHRoZSB3cm9uZyBmdW5jdGlvbjsgLi4uDQo+
+Pg0KPj4+IEBAIC00NTcsNiArNDYzLDE5IEBAIGludCBpbmV0X2Nvbm5lY3Rfc2FkZHIoSW5ldFNv
+Y2tldEFkZHJlc3MgKnNhZGRyLCBFcnJvciAqKmVycnApDQo+Pj4gICAgICAgfQ0KPj4+ICAgDQo+
+Pj4gICAgICAgZnJlZWFkZHJpbmZvKHJlcyk7DQo+Pj4gKw0KPj4+ICsgICAgaWYgKHNhZGRyLT5r
+ZWVwX2FsaXZlKSB7DQo+Pg0KPj4gLi4uIGl0IHJlbmRlcnMgdGhpcyBjb2RlIHVucmVhY2hhYmxl
+Lg0KPj4NCj4+IEkgZ3Vlc3MgdGhlICJub3Qgc3VwcG9ydGVkIGZvciBwYXNzaXZlIHNvY2tldHMi
+IGNoZWNrIHNob3VsZCBnbyBpbnRvDQo+PiBpbmV0X2xpc3Rlbl9zYWRkcigpIGluc3RlYWQuDQo+
+IA0KPiB0aGlzIGNvbW1lbnQ/DQo+IA0KDQpTb3JyeSBmb3IgYmlnIGRlbGF5LCB3aWxsIHJlc2Vu
+ZCBmb3IgNC4yIHNvb24uDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
 
