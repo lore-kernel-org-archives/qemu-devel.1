@@ -2,92 +2,56 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F0FC7618F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C235FC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7A4421901
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:01:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zuzzlE5e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7A4421901
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 97D3221901
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 13:03:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97D3221901
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=computer.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqGtv-0000Rp-6m
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 09:01:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59506)
+	id 1hqGvr-0001Vz-RB
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 09:03:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60035)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hqGtk-0008Ub-Gl
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:01:37 -0400
+ (envelope-from <M.Cerveny@computer.org>) id 1hqGve-00017b-Bx
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hqGti-0002N1-3o
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:01:36 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37080)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hqGth-0002Lx-RT
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:01:34 -0400
-Received: by mail-wm1-x343.google.com with SMTP id f17so41538966wme.2
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 06:01:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Tv4HXhIRYf8Gj1SWPIDUawXNWVBhncRbI5lmaZxoVsQ=;
- b=zuzzlE5eBDitPMK6O8f5YlhTfiUbF30jOTYJ97r3hcZY5Wj11Tf6ZcoyjDXZ2HYbv4
- pivhKf4qN/b8ikrotrCVFYG9z326aeIO4YcJF8wA4APukTcM/eEeezxeAZuBZ6twUbc6
- JPDPOCEHyJ3kn/Iih+VU1amrjVVGNUbKdz4/XVr2B4LvUEVXR/ujzd1/A1KZB2YoRB9G
- CwuXQxhR3rM4htVdXjVz8iLSwKJTjN6TS1585ZFD6W6Q3lNMFbxq2iHjlko7j8N8PLU1
- 7+Xg6PupzE12PXDIU/v1MiPrr6pj/AeDGakfIxfmIJmSL4SB0ABdpQC46SehZl29Z5pb
- FUjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Tv4HXhIRYf8Gj1SWPIDUawXNWVBhncRbI5lmaZxoVsQ=;
- b=cSPaNED1HRRLVOinrOqLqJLX9uH7Wh2ArTebvgLt3UYRP1TH+QKVRL+eOQGIH/th/7
- Js9HDf8Z5NJLcDG3W2YSoVIwoSxrxZIjb2wrVI5tLAT6gMs3ZpljitdXRwG15eLBU3o5
- f7qAruz3uBMdYCGLAdTbfEf4Zywl9S6mZfXVFNlQysrxEa2bfmh9JUyHnG43BFRvNqBb
- DJN0hv6mrQrU9Du3pfxHwjI0XhII8Oi72WgRqUSMDfgjNs8A5Ray5Gpt1UT003ReCZ7I
- 2f/IrQwNF6T6V4yuukXBsDRUVzFMCG5pruS3zL8zhTlgOdSJ80Dvl7jrkI7SCCvS6XkA
- TpAA==
-X-Gm-Message-State: APjAAAXzuJZz7yEvGuoSK45fgBdHpszJjVx6AH/wtpzyeWY4mIddR44B
- SCKaoBQdszo5L+YjMWuahc+wxg==
-X-Google-Smtp-Source: APXvYqyJ1aQjdzw70nC6MFeOTV/VWfIoDt3J6TnZLhzAKA74vPhTZVpO0N4+/ZNgrh1bppv3gPJvTA==
-X-Received: by 2002:a05:600c:1007:: with SMTP id
- c7mr71216278wmc.161.1563973292780; 
- Wed, 24 Jul 2019 06:01:32 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id t15sm39753093wrx.84.2019.07.24.06.01.31
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 24 Jul 2019 06:01:31 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 41C5C1FF87;
- Wed, 24 Jul 2019 14:01:31 +0100 (BST)
-References: <20190719210326.15466-1-richard.henderson@linaro.org>
- <20190719210326.15466-8-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190719210326.15466-8-richard.henderson@linaro.org>
-Date: Wed, 24 Jul 2019 14:01:31 +0100
-Message-ID: <878ssn1t90.fsf@linaro.org>
+ (envelope-from <M.Cerveny@computer.org>) id 1hqGvc-0003L8-R9
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:03:34 -0400
+Received: from 2001-1ae9-0158-5901-ecc0-4afa-64c0-20f1.ip6.tmcz.cz
+ ([2001:1ae9:158:5901:ecc0:4afa:64c0:20f1]:49888 helo=xen3.c-home.cz)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <M.Cerveny@computer.org>)
+ id 1hqGvc-0003Kb-EJ
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 09:03:32 -0400
+Received: from xen3.c-home.cz (localhost [127.0.0.1])
+ by xen3.c-home.cz (8.15.2/8.15.2) with ESMTP id x6OD3TQk018953;
+ Wed, 24 Jul 2019 15:03:29 +0200
+From: Martin Cerveny <M.Cerveny@computer.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 24 Jul 2019 15:03:06 +0200
+Message-Id: <20190724130307.18668-1-M.Cerveny@computer.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by xen3.c-home.cz id
+ x6OD3TQk018953
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH for-4.2 07/24] target/arm: Enable HCR_E2H
- for VHE
+X-Received-From: 2001:1ae9:158:5901:ecc0:4afa:64c0:20f1
+Subject: [Qemu-devel] [PATCH 0/1] USB: bugfix on interrupt xfers with
+ usb-redir
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,71 +63,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
+Cc: qemu-devel@nongnu.org, Martin Cerveny <M.Cerveny@computer.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+I have problem in xen with qemu xhci with usbredir backend.
+Windows bluetooth (BCM20703) driver does not work without proposed patch.
+Interrupt EP does not work as expected and described in USB spec.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+usb_20.pdf/5.7.3 Interrupt Transfer Packet Size Constraint:
+----
+An endpoint must always transmit data payloads with a data field less tha=
+n or equal to the endpoint=E2=80=99s
+wMaxPacketSize value. A device can move data via an interrupt pipe that i=
+s larger than wMaxPacketSize.
+A software client can accept this data via an IRP for the interrupt trans=
+fer that requires multiple bus
+transactions without requiring an IRP-complete notification per transacti=
+on. This can be achieved by
+specifying a buffer that can hold the desired data size. The size of the =
+buffer is a multiple of
+wMaxPacketSize with some remainder. The endpoint must transfer each trans=
+action except the last as
+wMaxPacketSize and the last transaction is the remainder. The multiple da=
+ta transactions are moved over
+the bus at the period established for the pipe.
+When an interrupt transfer involves more data than can fit in one data pa=
+yload of the currently established
+maximum size, all data payloads are required to be maximum-sized except f=
+or the last data payload, which
+will contain the remaining data. An interrupt transfer is complete when t=
+he endpoint does one of the
+following:
+=E2=80=A2 Has transferred exactly the amount of data expected
+=E2=80=A2 Transfers a packet with a payload size less than wMaxPacketSize=
+ or transfers a zero-length packet
+----
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Examples of affected device on windows usbpcap decoded with wireshark:
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/cpu.h    | 7 -------
->  target/arm/helper.c | 6 +++++-
->  2 files changed, 5 insertions(+), 8 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index e6a76d14c6..e37008a4f7 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1366,13 +1366,6 @@ static inline void xpsr_write(CPUARMState *env, ui=
-nt32_t val, uint32_t mask)
->  #define HCR_ATA       (1ULL << 56)
->  #define HCR_DCT       (1ULL << 57)
->
-> -/*
-> - * When we actually implement ARMv8.1-VHE we should add HCR_E2H to
-> - * HCR_MASK and then clear it again if the feature bit is not set in
-> - * hcr_write().
-> - */
-> -#define HCR_MASK      ((1ULL << 34) - 1)
-> -
->  #define SCR_NS                (1U << 0)
->  #define SCR_IRQ               (1U << 1)
->  #define SCR_FIQ               (1U << 2)
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 3a9f35bf4b..0a55096770 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -4623,7 +4623,8 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[=
-] =3D {
->  static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t=
- value)
->  {
->      ARMCPU *cpu =3D env_archcpu(env);
-> -    uint64_t valid_mask =3D HCR_MASK;
-> +    /* Begin with bits defined in base ARMv8.0.  */
-> +    uint64_t valid_mask =3D MAKE_64BIT_MASK(0, 34);
->
->      if (arm_feature(env, ARM_FEATURE_EL3)) {
->          valid_mask &=3D ~HCR_HCD;
-> @@ -4637,6 +4638,9 @@ static void hcr_write(CPUARMState *env, const ARMCP=
-RegInfo *ri, uint64_t value)
->           */
->          valid_mask &=3D ~HCR_TSC;
->      }
-> +    if (cpu_isar_feature(aa64_vh, cpu)) {
-> +        valid_mask |=3D HCR_E2H;
-> +    }
->      if (cpu_isar_feature(aa64_lor, cpu)) {
->          valid_mask |=3D HCR_TLOR;
->      }
+- snip of configuration descriptor:
+----
+ENDPOINT DESCRIPTOR
+    bLength: 7
+    bDescriptorType: 0x05 (ENDPOINT)
+    bEndpointAddress: 0x81  IN  Endpoint:1
+        1... .... =3D Direction: IN Endpoint
+        .... 0001 =3D Endpoint Number: 0x1
+    bmAttributes: 0x03
+        .... ..11 =3D Transfertype: Interrupt-Transfer (0x3)
+    wMaxPacketSize: 16
+        ...0 0... .... .... =3D Transactions per microframe: 1 (0)
+        .... ..00 0001 0000 =3D Maximum Packet Size: 16
+    bInterval: 1
+----
 
 
---
-Alex Benn=C3=A9e
+- snip of two correct URB interrupts (len 70 and len 16) from non-virtual=
+ized communication and patched qemu:
+----
+USB URB
+    [Source: 1.6.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffa901ed380050
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 6
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 70
+    [Request in: 43377]
+    [Time from request: 0.006005000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: 0e4401021000ffffff03ccffefffffffec1ff20fe8fe3ff7...
+USB URB
+    [Source: 1.6.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffa901ed380050
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 6
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 16
+    [Request in: 43405]
+    [Time from request: 0.002952000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: 0e0e0104100001020000000000000000
+----
+
+
+- snip of the same two (more URB 70=3D16+16+16+16+6, 16=3D16+0) in actual=
+ qemu:
+----
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 16
+    [Request in: 72930]
+    [Time from request: 0.004881000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: 0e4401021000ffffff03ccffefffffff
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 16
+    [Request in: 72947]
+    [Time from request: 0.004244000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: ec1ff20fe8fe3ff78fff1c00040061f7
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 16
+    [Request in: 72957]
+    [Time from request: 0.000073000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: ffff7ff8ffffff3f0000000000000000
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 16
+    [Request in: 72959]
+    [Time from request: 0.001875000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: 00000000000000000000000000000000
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 6
+    [Request in: 72967]
+    [Time from request: 0.000144000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: 000000000000
+
+
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 16
+    [Request in: 73298]
+    [Time from request: 0.005657000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+Leftover Capture Data: 0e0e0104100001020700000000000000
+USB URB
+    [Source: 1.4.1]
+    [Destination: host]
+    USBPcap pseudoheader length: 27
+    IRP ID: 0xffffc5062ede69f0
+    IRP USBD_STATUS: USBD_STATUS_SUCCESS (0x00000000)
+    URB Function: URB_FUNCTION_BULK_OR_INTERRUPT_TRANSFER (0x0009)
+    IRP information: 0x01, Direction: PDO -> FDO
+        0000 000. =3D Reserved: 0x00
+        .... ...1 =3D Direction: PDO -> FDO (0x1)
+    URB bus id: 1
+    Device address: 4
+    Endpoint: 0x81, Direction: IN
+        1... .... =3D Direction: IN (1)
+        .... 0001 =3D Endpoint number: 1
+    URB transfer type: URB_INTERRUPT (0x01)
+    Packet Data Length: 0
+    [Request in: 73314]
+    [Time from request: 0.001614000 seconds]
+    [bInterfaceClass: Vendor Specific (0xff)]
+----
+
+I am not regular contributor. Maintainers should check and correct code o=
+r propose different solution.
+Code is tested with qemu-xen (qemu-xen-4.12.0).
+
+Regards,=20
+
+Martin=20
+
+Martin Cerveny (1):
+  usb-redir: merge interrupt packets
+
+ hw/usb/redirect.c | 69 ++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 48 insertions(+), 21 deletions(-)
+
+--=20
+2.20.1
+
 
