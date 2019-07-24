@@ -6,69 +6,101 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7C3C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE45EC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9E8F21926
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:33:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9E8F21926
+	by mail.kernel.org (Postfix) with ESMTPS id 948FD21926
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 09:34:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 948FD21926
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqDeP-0004xF-0o
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 05:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47475)
+	id 1hqDfH-00061S-M1
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 05:34:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47688)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hqDeE-0004Yu-2r
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:33:23 -0400
+ (envelope-from <thuth@redhat.com>) id 1hqDf7-0005Yh-J0
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hqDeC-00007c-Q9
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:33:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51198)
+ (envelope-from <thuth@redhat.com>) id 1hqDf6-0000Tp-IY
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:34:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51412)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hqDeC-000079-H9
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 05:33:20 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hqDf4-0000SD-BB; Wed, 24 Jul 2019 05:34:14 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8736030860D1;
- Wed, 24 Jul 2019 09:33:18 +0000 (UTC)
-Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C14110018F9;
- Wed, 24 Jul 2019 09:33:08 +0000 (UTC)
-To: "Liu, Yi L" <yi.l.liu@intel.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <1562324511-2910-1-git-send-email-yi.l.liu@intel.com>
- <1562324511-2910-6-git-send-email-yi.l.liu@intel.com>
- <20190715025519.GE3440@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A00D8BB@SHSMSX104.ccr.corp.intel.com>
- <20190717030640.GG9123@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A0140E0@SHSMSX104.ccr.corp.intel.com>
- <20190723035741.GR25073@umbus.fritz.box>
- <A2975661238FB949B60364EF0F2C25743A0160C9@SHSMSX104.ccr.corp.intel.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <abf336b6-4c51-7742-44aa-5b51c8ea4af7@redhat.com>
-Date: Wed, 24 Jul 2019 11:33:06 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 8D32330860DD;
+ Wed, 24 Jul 2019 09:34:13 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 19B1910018F9;
+ Wed, 24 Jul 2019 09:34:08 +0000 (UTC)
+To: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <f95cecc3-9ba2-0aed-9b17-fb76c6558929@redhat.com>
+Date: Wed, 24 Jul 2019 11:34:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0160C9@SHSMSX104.ccr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 24 Jul 2019 09:33:18 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 24 Jul 2019 09:34:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC v1 05/18] vfio/pci: add pasid alloc/free
- implementation
+Subject: [Qemu-devel] qemu-iotests 069 and 111 are failing on NetBSD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,129 +112,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- Jacob Pan <jacob.jun.pan@linux.intel.com>, Yi Sun <yi.y.sun@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
+Cc: Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yi, David,
+In case somebody is interested, two of the "auto" iotests are failing
+on NetBSD due to non-matching output:
 
-On 7/24/19 6:57 AM, Liu, Yi L wrote:
->> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf
->> Of David Gibson
->> Sent: Tuesday, July 23, 2019 11:58 AM
->> To: Liu, Yi L <yi.l.liu@intel.com>
->> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free implementation
->>
->> On Mon, Jul 22, 2019 at 07:02:51AM +0000, Liu, Yi L wrote:
->>>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
->>>> On Behalf Of David Gibson
->>>> Sent: Wednesday, July 17, 2019 11:07 AM
->>>> To: Liu, Yi L <yi.l.liu@intel.com>
->>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
->>>> implementation
->>>>
->>>> On Tue, Jul 16, 2019 at 10:25:55AM +0000, Liu, Yi L wrote:
->>>>>> From: kvm-owner@vger.kernel.org
->>>>>> [mailto:kvm-owner@vger.kernel.org] On
->>>> Behalf
->>>>>> Of David Gibson
->>>>>> Sent: Monday, July 15, 2019 10:55 AM
->>>>>> To: Liu, Yi L <yi.l.liu@intel.com>
->>>>>> Subject: Re: [RFC v1 05/18] vfio/pci: add pasid alloc/free
->>>>>> implementation
->>>>>>
->>>>>> On Fri, Jul 05, 2019 at 07:01:38PM +0800, Liu Yi L wrote:
->>>>>>> This patch adds vfio implementation PCIPASIDOps.alloc_pasid/free_pasid().
->>>>>>> These two functions are used to propagate guest pasid
->>>>>>> allocation and free requests to host via vfio container ioctl.
->>>>>>
->>>>>> As I said in an earlier comment, I think doing this on the
->>>>>> device is conceptually incorrect.  I think we need an explcit
->>>>>> notion of an SVM context (i.e. the namespace in which all the
->>>>>> PASIDs live) - which will IIUC usually be shared amongst
->>>>>> multiple devices.  The create and free PASID requests should be on that object.
->>>>>
->>>>> Actually, the allocation is not doing on this device. System wide,
->>>>> it is done on a container. So not sure if it is the API interface
->>>>> gives you a sense that this is done on device.
->>>>
->>>> Sorry, I should have been clearer.  I can see that at the VFIO level
->>>> it is done on the container.  However the function here takes a bus
->>>> and devfn, so this qemu internal interface is per-device, which
->>>> doesn't really make sense.
->>>
->>> Got it. The reason here is to pass the bus and devfn info, so that
->>> VFIO can figure out a container for the operation. So far in QEMU,
->>> there is no good way to connect the vIOMMU emulator and VFIO regards
->>> to SVM.
->>
->> Right, and I think that's an indication that we're not modelling something in qemu
->> that we should be.
->>
->>> hw/pci layer is a choice based on some previous discussion. But yes, I
->>> agree with you that we may need to have an explicit notion for SVM. Do
->>> you think it is good to introduce a new abstract layer for SVM (may
->>> name as SVMContext).
->>
->> I think so, yes.
->>
->> If nothing else, I expect we'll need this concept if we ever want to be able to
->> implement SVM for emulated devices (which could be useful for debugging, even if
->> it's not something you'd do in production).
->>
->>> The idea would be that vIOMMU maintain the SVMContext instances and
->>> expose explicit interface for VFIO to get it. Then VFIO register
->>> notifiers on to the SVMContext. When vIOMMU emulator wants to do PASID
->>> alloc/free, it fires the corresponding notifier. After call into VFIO,
->>> the notifier function itself figure out the container it is bound. In
->>> this way, it's the duty of vIOMMU emulator to figure out a proper
->>> notifier to fire. From interface point of view, it is no longer
->>> per-device.
->>
->> Exactly.
-> 
-> Cool, let me prepare another version with the ideas. Thanks for your
-> review. :-)
-> 
-> Regards,
-> Yi Liu
-> 
->>> Also, it leaves the PASID management details to vIOMMU emulator as it
->>> can be vendor specific. Does it make sense?
->>> Also, I'd like to know if you have any other idea on it. That would
->>> surely be helpful. :-)
->>>
->>>>> Also, curious on the SVM context
->>>>> concept, do you mean it a per-VM context or a per-SVM usage context?
->>>>> May you elaborate a little more. :-)
->>>>
->>>> Sorry, I'm struggling to find a good term for this.  By "context" I
->>>> mean a namespace containing a bunch of PASID address spaces, those
->>>> PASIDs are then visible to some group of devices.
->>>
->>> I see. May be the SVMContext instance above can include multiple PASID
->>> address spaces. And again, I think this relationship should be
->>> maintained in vIOMMU emulator.
-> 
-So if I understand we now head towards introducing new notifiers taking
-a "SVMContext" as argument instead of an IOMMUMemoryRegion.
+  TEST    iotest-qcow2: 069 [fail]
+--- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out        2019-07-2=
+4 09:19:22.000000000 +0000
++++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out.bad    2019-07-2=
+4 09:21:34.000000000 +0000
+@@ -4,5 +4,5 @@
+=20
+ Formatting 'TEST_DIR/t.IMGFMT.base', fmt=3DIMGFMT size=3D131072
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D131072 backing_file=3D=
+TEST_DIR/t.IMGFMT.base
+-qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing fil=
+e: Could not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
++qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing fil=
+e: TEST_DIR/t.IMGFMT.base: stat failed: No such file or directory
+ *** done
 
-I think we need to be clear about how both abstractions (SVMContext and
-IOMMUMemoryRegion) differ. I would also need "SVMContext" abstraction
-for 2stage SMMU integration (to notify stage 1 config changes and MSI
-bindings) so I would need this new object to be not too much tied to SVM
-use case.
+and:
 
-Thanks
+  TEST    iotest-qcow2: 111 [fail]
+--- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out        2019-07-2=
+4 09:19:22.000000000 +0000
++++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out.bad    2019-07-2=
+4 09:21:40.000000000 +0000
+@@ -1,4 +1,4 @@
+ QA output created by 111
+-qemu-img: TEST_DIR/t.IMGFMT: Could not open 'TEST_DIR/t.IMGFMT.inexisten=
+t': No such file or directory
++qemu-img: TEST_DIR/t.IMGFMT: TEST_DIR/t.IMGFMT.inexistent: stat failed: =
+No such file or directory
+ Could not open backing image to determine size.
+ *** done
 
-Eric
+It's currently not a problem yet since we're not running the
+iotests on NetBSD yet (since our netbsd VM image does not have
+bash and gsed installed yet), but if somebody has some spare
+minutes, it would be great if this could be fixed so that we
+can enable the iotests on NetBSD, too, one day...
 
+ Thomas
 
