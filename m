@@ -2,62 +2,69 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75AAEC7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F144C7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:05:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51827229ED
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 11:59:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51827229ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 554C3229ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 12:05:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 554C3229ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqFvW-0000T9-DW
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 07:59:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36608)
+	id 1hqG1s-0002XZ-HT
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 08:05:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38778)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hqFuh-0005YJ-It
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:58:32 -0400
+ (envelope-from <jing2.liu@linux.intel.com>) id 1hqG1h-00029N-W9
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hqFug-0004cw-LE
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:58:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49926)
+ (envelope-from <jing2.liu@linux.intel.com>) id 1hqG1g-0000yy-Ua
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:05:45 -0400
+Received: from mga02.intel.com ([134.134.136.20]:65209)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hqFug-0004cX-FD
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 07:58:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C7F3533645;
- Wed, 24 Jul 2019 11:58:29 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-117-166.ams2.redhat.com
- [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF62A600D1;
- Wed, 24 Jul 2019 11:58:28 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	pbonzini@redhat.com,
-	pavel.dovgaluk@ispras.ru
-Date: Wed, 24 Jul 2019 12:58:22 +0100
-Message-Id: <20190724115823.4199-4-dgilbert@redhat.com>
-In-Reply-To: <20190724115823.4199-1-dgilbert@redhat.com>
-References: <20190724115823.4199-1-dgilbert@redhat.com>
+ (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+ id 1hqG1g-0000xY-Kj
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 08:05:44 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Jul 2019 05:05:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,302,1559545200"; d="scan'208";a="174864086"
+Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.129.22])
+ ([10.238.129.22])
+ by orsmga006.jf.intel.com with ESMTP; 24 Jul 2019 05:05:40 -0700
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1562823509-13072-1-git-send-email-jing2.liu@linux.intel.com>
+ <c572cdd2-d0f4-2e06-99f8-302b798a04dd@linux.intel.com>
+ <0f9763fe-af69-e057-9fb1-00527e636fe4@redhat.com>
+ <0ffa32db-3615-16e0-71bf-a8c552c2fcfb@linux.intel.com>
+ <757b193f-90c6-0516-9372-74463ec4d117@redhat.com>
+ <4e381ae0-78d5-afb6-9a4d-b58d0daa60ba@linux.intel.com>
+ <3bc3b6f0-a6f8-39a7-b7d4-39b18916cc44@redhat.com>
+From: Jing Liu <jing2.liu@linux.intel.com>
+Message-ID: <85ea4a12-0aa3-5433-f1c1-97406b7836ef@linux.intel.com>
+Date: Wed, 24 Jul 2019 20:05:38 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 24 Jul 2019 11:58:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [for 4.2 PATCH v2 3/4] replay: Remove host_clock_last
+In-Reply-To: <3bc3b6f0-a6f8-39a7-b7d4-39b18916cc44@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.20
+Subject: Re: [Qemu-devel] [PATCH v1] x86: Intel AVX512_BF16 feature enabling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,61 +80,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Now we're not using the 'last' field in the timer, remove it from
-replay.
 
-Bump the version number of the replay structure since we've
-removed the field.
+On 7/22/2019 7:50 PM, Paolo Bonzini wrote:
+> On 22/07/19 04:59, Jing Liu wrote:
+>>
+>>
+>> On 7/19/2019 4:10 PM, Paolo Bonzini wrote:
+>>> On 19/07/19 09:20, Jing Liu wrote:
+>>>>> Then CPUID[7,0].EAX is set automatically to 0 or 1 depending on whether
+>>>>> BF16 is enabled or not.
+>>>>
+>>>> Could I ask why don't we directly check BF16 enabling when
+>>>> cpu_x86_cpuid(env, 7, 0, ...) during kvm_arch_init_vcpu ?
+>>>
+>>> Because the code for setting CPUID is common for all accelerators (there
+>>> are five supported: KVM, HAX, HVF, TCG, WHPX).
+>>>
+>>>> What is the use of the two new properties? Are they used for users
+>>>> setting parameters when boot up guest, and why we need users setting
+>>>> func7 level?
+>>>
+>>> For example to test guests with CPUID[7,0].EAX==1, even if the host does
+>>> not have BF16.
+>>
+>> Thanks. :)
+>>>
+>>>
+>>>> @@ -5075,6 +5101,10 @@ static void x86_cpu_expand_features(X86CPU *cpu,
+>>>> Error **errp)
+>>>>            x86_cpu_adjust_feat_level(cpu, FEAT_SVM);
+>>>>            x86_cpu_adjust_feat_level(cpu, FEAT_XSAVE);
+>>>>
+>>>> +       if ((env->features[FEAT_7_1_EAX] & CPUID_7_1_EAX_AVX512_BF16) &&
+>>>> +            kvm_enabled()) {
+>>>
+>>> No need to check KVM.  You could also do just
+>>> x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX) and set
+>>> cpu->min_level_func7 in x86_cpu_adjust_feat_level with something like
+>>>
+>>>       if (eax == 7) {
+>>>           x86_cpu_adjust_level(cpu, &env->cpu_min_level_func7,
+>>>                                fi->cpuid.ecx);
+>>>       }
+>>>
+>>
+>> Got it. One question I'm wondering is, is it possible for users setting
+>> an invalid property like level-func7=2? Do we need some protection?
+> 
+> No, it's still not found in Intel silicon, but in principle you could
+> have higher indices than 1.  So it's okay, if something breaks it's the
+> fault of whoever set the option!
+> 
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- replay/replay-snapshot.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Thanks very much. So would you like me to update the patch with v2 now?
 
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index 756f48bc02..3a58734b9a 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -24,7 +24,6 @@ static int replay_pre_save(void *opaque)
- {
-     ReplayState *state =3D opaque;
-     state->file_offset =3D ftell(replay_file);
--    state->host_clock_last =3D qemu_clock_get_last(QEMU_CLOCK_HOST);
-=20
-     return 0;
- }
-@@ -34,7 +33,6 @@ static int replay_post_load(void *opaque, int version_i=
-d)
-     ReplayState *state =3D opaque;
-     if (replay_mode =3D=3D REPLAY_MODE_PLAY) {
-         fseek(replay_file, state->file_offset, SEEK_SET);
--        qemu_clock_set_last(QEMU_CLOCK_HOST, state->host_clock_last);
-         /* If this was a vmstate, saved in recording mode,
-            we need to initialize replay data fields. */
-         replay_fetch_data_kind();
-@@ -50,8 +48,8 @@ static int replay_post_load(void *opaque, int version_i=
-d)
-=20
- static const VMStateDescription vmstate_replay =3D {
-     .name =3D "replay",
--    .version_id =3D 1,
--    .minimum_version_id =3D 1,
-+    .version_id =3D 2,
-+    .minimum_version_id =3D 2,
-     .pre_save =3D replay_pre_save,
-     .post_load =3D replay_post_load,
-     .fields =3D (VMStateField[]) {
-@@ -62,7 +60,6 @@ static const VMStateDescription vmstate_replay =3D {
-         VMSTATE_UINT32(has_unread_data, ReplayState),
-         VMSTATE_UINT64(file_offset, ReplayState),
-         VMSTATE_UINT64(block_request_id, ReplayState),
--        VMSTATE_UINT64(host_clock_last, ReplayState),
-         VMSTATE_INT32(read_event_kind, ReplayState),
-         VMSTATE_UINT64(read_event_id, ReplayState),
-         VMSTATE_INT32(read_event_checkpoint, ReplayState),
---=20
-2.21.0
+Jing
 
 
