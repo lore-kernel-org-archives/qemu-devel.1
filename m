@@ -2,74 +2,68 @@ Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 197D2C7618B
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E07DC7618B
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:48:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E41FC20644
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:30:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41FC20644
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 39DA2218D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 04:48:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39DA2218D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hq8va-0007Os-78
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 00:30:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56620)
+	id 1hq9CB-0002F8-HC
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 00:48:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60090)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hq8vM-0006zm-KY
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:30:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1hq9C0-0001iy-Iq
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:47:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hq8vK-0006jQ-So
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47136)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hq8vK-0006iG-Mo
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:30:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hq8vJ-0007CD-6G
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 27CA02E80C7
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 04:30:41 +0000 (UTC)
+ (envelope-from <armbru@redhat.com>) id 1hq9Bz-0005Ud-DM
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 00:47:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49452)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>)
+ id 1hq9Bw-0005Rv-St; Wed, 24 Jul 2019 00:47:53 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3CF223086262;
+ Wed, 24 Jul 2019 04:47:51 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-30.ams2.redhat.com
+ [10.36.116.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0807219C58;
+ Wed, 24 Jul 2019 04:47:45 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7610E113865F; Wed, 24 Jul 2019 06:47:44 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>
+References: <20190717173937.18747-1-jsnow@redhat.com>
+Date: Wed, 24 Jul 2019 06:47:44 +0200
+In-Reply-To: <20190717173937.18747-1-jsnow@redhat.com> (John Snow's message of
+ "Wed, 17 Jul 2019 13:39:37 -0400")
+Message-ID: <87imrsqbrj.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 24 Jul 2019 04:17:37 -0000
-From: Launchpad Bug Tracker <599958@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Wishlist;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: 8-roothorick-gmail-com andcycle-launchpad-net
- anthony-codemonkey janitor lmr th-huth
-X-Launchpad-Bug-Reporter: Lucas Meneghel Rodrigues (lmr)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20100629211802.16137.10587.malonedeb@soybean.canonical.com>
-Message-Id: <156394185725.19185.5884143965764649343.malone@loganberry.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: e12e4347903431db273eb176eb7c5dde252d80fb
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Wed, 24 Jul 2019 04:47:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 599958] Re: Timedrift problems with Win7: hpet
- missing time drift fixups
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
+ query-named-block-nodes result
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,75 +72,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 599958 <599958@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+John Snow <jsnow@redhat.com> writes:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> Let's add a possibility to query dirty-bitmaps not only on root nodes.
+> It is useful when dealing both with snapshots and incremental backups.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> [Added deprecation information. --js]
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/qapi.c         |  5 +++++
+>  qapi/block-core.json |  6 +++++-
+>  qemu-deprecated.texi | 12 ++++++++++++
+>  3 files changed, 22 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/qapi.c b/block/qapi.c
+> index 917435f022..15f1030264 100644
+> --- a/block/qapi.c
+> +++ b/block/qapi.c
+> @@ -79,6 +79,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
+>          info->backing_file = g_strdup(bs->backing_file);
+>      }
+>  
+> +    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
+> +        info->has_dirty_bitmaps = true;
+> +        info->dirty_bitmaps = bdrv_query_dirty_bitmaps(bs);
+> +    }
+> +
+>      info->detect_zeroes = bs->detect_zeroes;
+>  
+>      if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 0d43d4f37c..9210ae233d 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -360,6 +360,9 @@
+>  # @write_threshold: configured write threshold for the device.
+>  #                   0 if disabled. (Since 2.3)
+>  #
+> +# @dirty-bitmaps: dirty bitmaps information (only present if node
+> +#                 has one or more dirty bitmaps) (Since 4.2)
+> +#
+>  # Since: 0.14.0
+>  #
+>  ##
+> @@ -378,7 +381,7 @@
+>              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
+> -            'write_threshold': 'int' } }
+> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo'] } }
+>  
+>  ##
+>  # @BlockDeviceIoStatus:
+> @@ -656,6 +659,7 @@
+>  #
+>  # @dirty-bitmaps: dirty bitmaps information (only present if the
+>  #                 driver has one or more dirty bitmaps) (Since 2.0)
+> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
+>  #
+>  # @io-status: @BlockDeviceIoStatus. Only present if the device
+>  #             supports it and the VM is configured to stop on errors
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index c90b08d553..6374b66546 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -134,6 +134,18 @@ The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
+>  the query-block command is deprecated. Two new boolean fields,
+>  ``recording'' and ``busy'' effectively replace it.
+>  
+> +@subsection query-block result field dirty-bitmaps (Since 4.2)
+> +
+> +The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
+> +the query-block command is itself now deprecated. The ``dirty-bitmaps``
+> +field of the ``BlockDeviceInfo`` struct should be used instead, which is the
+> +type of the ``inserted`` field in query-block replies, as well as the
+> +type of array items in query-named-block-nodes.
 
--- =
+Would the text be clearer if it talked only about commands, not about
+types?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/599958
+Here's my (laconic) try:
 
-Title:
-  Timedrift problems with Win7: hpet missing time drift fixups
+   @subsection query-block result field dirty-bitmaps (Since 4.2)
 
-Status in QEMU:
-  Expired
+   In the result of query-block, member ``dirty-bitmaps'' has been moved
+   into member ``inserted''.
 
-Bug description:
-  We've been finding timedrift issues witth Win7 under qemu-kvm on our
-  daily testing
+Aside: same for existing @subsection query-block result field
+dirty-bitmaps[i].status (since 4.0).
 
-  kvm.qemu-kvm-git.smp2.Win7.64.timedrift.with_load	FAIL	1	Time drift too l=
-arge after rest period: 38.63%
-  kvm.qemu-kvm-git.smp2.Win7.64.timedrift.with_reboot	FAIL	1	Time drift too=
- large at iteration 1: 17.77 seconds
-  kvm.qemu-kvm-git.smp2.Win7.64.timedrift.with_migration	FAIL	1	Time drift =
-too large at iteration 2: 3.08 seconds
+> +Since the ``dirty-bitmaps`` field is optionally present in both the old and
+> +new locations, clients must use introspection to learn where to anticipate
+> +the field if/when it does appear in command output.
+> +
 
-  Steps to reproduce:
+I find this hint a bit confusing.  Do we need it?
 
-  timedrift.with_load
+If yes, laconic me again:
 
-  1) Log into a guest.
-  2) Take a time reading from the guest and host.
-  3) Run load on the guest and host.
-  4) Take a second time reading.
-  5) Stop the load and rest for a while.
-  6) Take a third time reading.
-  7) If the drift immediately after load is higher than a user-
-      specified value (in %), fail.
-      If the drift after the rest period is higher than a user-specified va=
-lue,
-      fail.
+   Clients should use introspection to learn whether ``dirty-bitmaps'' is
+   in the new location.
 
-  timedrift.with_migration
-
-  1) Log into a guest.
-  2) Take a time reading from the guest and host.
-  3) Migrate the guest.
-  4) Take a second time reading.
-  5) If the drift (in seconds) is higher than a user specified value, fail.
-
-  timedrift.with_reboot
-
-  1) Log into a guest.
-  2) Take a time reading from the guest and host.
-  3) Reboot the guest.
-  4) Take a second time reading.
-  5) If the drift (in seconds) is higher than a user specified value, fail.
-
-  This bug is to register those issues and keep an eye on them.
-
-  Attached, some logs from the autotest tests executed on the guest
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/599958/+subscriptions
+>  @subsection query-cpus (since 2.12.0)
+>  
+>  The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
 
