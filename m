@@ -2,67 +2,81 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24CAC76190
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 20:00:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE07C76190
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 20:31:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70BA32190F
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 20:00:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70BA32190F
+	by mail.kernel.org (Postfix) with ESMTPS id 71F7F218EA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 20:31:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F7F218EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqjuE-0002mj-Fe
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 16:00:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48880)
+	id 1hqkOT-0002s4-KH
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 16:31:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42212)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hqju4-0002GZ-FM
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 15:59:53 -0400
+ (envelope-from <mst@redhat.com>) id 1hqkOI-0002SW-Kl
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 16:31:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hqju0-0007c7-Um
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 15:59:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54222)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hqju0-0007b4-Oh
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 15:59:48 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DDE9E4ACDF;
- Thu, 25 Jul 2019 19:59:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-30.ams2.redhat.com
- [10.36.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2032D5D71A;
- Thu, 25 Jul 2019 19:59:43 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 81107113865F; Thu, 25 Jul 2019 21:59:42 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-References: <20190725094937.32454-1-vsementsov@virtuozzo.com>
- <877e86gmof.fsf@dusky.pond.sub.org>
- <5579a1f8-2518-0cd3-3b0c-47cb4adcee73@redhat.com>
-Date: Thu, 25 Jul 2019 21:59:42 +0200
-In-Reply-To: <5579a1f8-2518-0cd3-3b0c-47cb4adcee73@redhat.com> (Eric Blake's
- message of "Thu, 25 Jul 2019 11:38:56 -0500")
-Message-ID: <87wog5evgx.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <mst@redhat.com>) id 1hqkOH-0000Sx-5q
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 16:31:06 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:40381)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqkOG-0000NX-U7
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 16:31:05 -0400
+Received: by mail-qt1-f193.google.com with SMTP id a15so50377968qtn.7
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 13:30:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=LcKAIQaE7rY0SLRL9gx2w/QqyGgwEEgyEDElE1CgGDU=;
+ b=uUnCR4amsVWWles03t3L4EsJSE1PHhUxkcMABGNBJ+FREMC02vD2hoLwB6Gn41TlSp
+ sBccBY1b54VLad/DrZ/GJLPVIjKw9S6riLFuG7+aZtYux6bfA80TyfkRoNg6eDC+oQa4
+ 95pzd/0o2VBxbuxo8CmXGM8O4PJW6bzXnVd+YkBZlbTcqGJYOjlr9XPlHRF5bjnVZ/IS
+ S4lZyTPbPLynOJNjbNDPVYWkvFHALpYreh+5jBhnmN2AOaKrLq4nsb5jN1Hk20ns40Uy
+ jbILsoA5hlhznFmjcdzKB9JKVGdzc3b6Wv4sqOzvxbjrlcARt1a8eJbGrh/IcXXv/oDd
+ abFA==
+X-Gm-Message-State: APjAAAWetXLIS4oac/alTPVgQlXfBPjAmZVD+5cDc3C/1LDxV3ewHyP8
+ Zy2yhjUazpxkvcad+PReSSIhWQ==
+X-Google-Smtp-Source: APXvYqzlo6pb1n33BCHjkq6x7aPwwo1qes6T7nuQdmyOcUo4a5LVTSdUuVIqbxyNU15WYoZtoeJTSA==
+X-Received: by 2002:ac8:43d8:: with SMTP id w24mr63643322qtn.25.1564086650712; 
+ Thu, 25 Jul 2019 13:30:50 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ u18sm21559439qkj.98.2019.07.25.13.30.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 13:30:49 -0700 (PDT)
+Date: Thu, 25 Jul 2019 16:30:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190725161646-mutt-send-email-mst@kernel.org>
+References: <20190719102915.GG18585@stefanha-x1.localdomain>
+ <8736j2p22w.fsf@redhat.com>
+ <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
+ <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
+ <87tvbdrvin.fsf@redhat.com>
+ <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
+ <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
+ <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
+ <20190725104331-mutt-send-email-mst@kernel.org>
+ <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 25 Jul 2019 19:59:47 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4] qapi: Add InetSocketAddress member
- keep-alive
+ [fuzzy]
+X-Received-From: 209.85.160.193
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,28 +88,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- berrange@redhat.com, qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "maran.wilson@oracle.com" <maran.wilson@oracle.com>, "Montes,
+ Julio" <julio.montes@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On Thu, Jul 25, 2019 at 05:35:01PM +0200, Paolo Bonzini wrote:
+> On 25/07/19 16:46, Michael S. Tsirkin wrote:
+> > Actually, I think I have a better idea.
+> > At the moment we just get an exit on these reads and return all-ones.
+> > Yes, in theory there could be a UR bit set in a bunch of
+> > registers but in practice no one cares about these,
+> > and I don't think we implement them.
+> > So how about mapping a single page, read-only, and filling it
+> > with all-ones?
+> 
+> Yes, that's nice indeed. :)  But it does have some cost, in terms of
+> either number of VMAs or QEMU RSS since the MMCONFIG area is large.
+> 
+> What breaks if we return all zeroes?  Zero is not a valid vendor ID.
+> 
+> Paolo
 
-> On 7/25/19 10:26 AM, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->> 
->>> It's needed to provide keepalive for nbd client to track server
->>> availability.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> 
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->
-> It looks like this could go in any number of ways (Markus since it
-> touches qapi, Dan since it touches sockets, or me since it was written
-> for use with NBD); but unless anyone complains, I'm happy to queue this
-> through my NBD tree for 4.2.
+I think I know what you are thinking of doing:
+map /dev/zero so we get a single VMA but all mapped to
+a single zero pte?
 
-Go right ahead.
+We could start with that, at least as an experiment.
+Further:
+
+- we can limit the amount of fragmentation and simply
+  unmap everything if we exceed a specific limit:
+  with more than X devices it's no longer a lightweight
+  VM anyway :)
+
+- we can implement /dev/ones. in fact, we can implement
+  /dev/byteXX for each possible value, the cost will
+  be only 1M on a 4k page system.
+  it might come in handy for e.g. free page hinting:
+  at the moment if guest memory is poisoned
+  we can not unmap it, with this trick we can
+  map it to /dev/byteXX.
+
+Note that the kvm memory array is still fragmented.
+Again, we can fallback on disabling the optimization
+if there are too many devices.
+
+
+-- 
+MST
 
