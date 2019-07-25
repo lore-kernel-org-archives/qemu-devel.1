@@ -2,82 +2,82 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE42C76190
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:39:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FEF2C76190
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:40:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A07B22BE8
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:39:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A07B22BE8
+	by mail.kernel.org (Postfix) with ESMTPS id 7A78F22BE8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:40:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A78F22BE8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqhhu-0003RE-7g
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 13:39:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44747)
+	id 1hqhj7-0004yD-O6
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 13:40:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45815)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hqhhj-00032L-Mc
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:39:00 -0400
+ (envelope-from <philmd@redhat.com>) id 1hqhiv-0004SW-Ga
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:40:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hqhhh-0002DL-GW
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:38:59 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:41021)
+ (envelope-from <philmd@redhat.com>) id 1hqhit-0002iz-Cx
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:40:13 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39465)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqhhf-0002CP-LG
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:38:56 -0400
-Received: by mail-qk1-f193.google.com with SMTP id v22so37056519qkj.8
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 10:38:54 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hqhir-0002dt-AG
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:40:09 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x4so51617705wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 10:40:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=u8BGMNY950ZO23qVBakK9/iI50jRXoU9AN/FrrQgGBY=;
- b=oKSQVSxcsqAmXpjvlI5fl27rczR33uUlOPmXsPVWJxSgE0sy4j/GMQU6lsmHiEC8M7
- 4SO7YwYNTG/MfJo62XKnkApJmqLltR4Duuw1OQTa8yTdO52PrFjhv7KtC5j/9pD1uuPg
- ZLVC1+16Jqtav8IP43Xx0sWS5kWM22dlZ9aSgVt9Rb/msG9ARkIfP2wEJ9eGgjM5/xl8
- oN8okp63ARRYbrery/fCHoGlq3/wjaJ0Rc1fALLpuDm4h8xdModPIMBuW7VYKUf3Y+Ef
- 5Pb2axXOq8ttFnnNJ57kR3hTrBvbREYUJukCPyFqEtQoqrZsLjnNl7lZx8xHLEQnFfF8
- HtMQ==
-X-Gm-Message-State: APjAAAWO3RILCzOhtGxAdig8MyW0rJ45ZxZnFudHi4ZLwvJSRhk6bz7M
- XkFGH4n7itpR/xgPcYyb8moEFg==
-X-Google-Smtp-Source: APXvYqw8OjpvVtSU1yYVmiAmQmjMmo5zF76k6+9Jtz4Z/5w6RmzO0Kt8/O2SvBoD7iYqOvC9Rf5J6g==
-X-Received: by 2002:a37:62ca:: with SMTP id
- w193mr21076934qkb.363.1564076334400; 
- Thu, 25 Jul 2019 10:38:54 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- c192sm22287085qkg.33.2019.07.25.10.38.50
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 10:38:53 -0700 (PDT)
-Date: Thu, 25 Jul 2019 13:38:48 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190725133500-mutt-send-email-mst@kernel.org>
-References: <87pnlymm47.fsf@redhat.com>
- <d48da49f-c8d8-00f7-1634-569e8d924b8a@redhat.com>
- <CAJSP0QUJCh-SaZ9NQ+Wr8vr7R+gBsfhYmBrx45B4z2G9v9L=1A@mail.gmail.com>
- <20190725080556-mutt-send-email-mst@kernel.org>
- <CAJSP0QVvnXV8Ha0yaO84qLL6unVroV5GqcuL-x9ruB7o_24WBA@mail.gmail.com>
- <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
- <87muh2mazh.fsf@redhat.com>
- <20190725104721-mutt-send-email-mst@kernel.org>
- <20190725110114-mutt-send-email-mst@kernel.org>
- <cdc6e86c-ce05-fd48-c8a3-0e6cec894d4e@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=s5UdlQNRFngjQD7uV15tjCwUpVV8erqhBJBgdAU/8Ts=;
+ b=p7cXly6h0jMwnqeANOQHcjlCOLikL+QGkP/Fco7RT/3kqUXV1nPAS5mlQn/D5fHrw+
+ EDzUXnG8yRyXKdKv0n88jkh64FVA+9oYMFyZDkCPmvKQiz16wI2BaVTId7JpCgZlS/xg
+ TWAOXY2uRP2lsokZURwzH3ItRlDIeilnjqHk+nxanYY9Ht4Wg38grEM4WR5Ss9bVE7KU
+ i/yAff6AYE65p5GQFj3FIgqQ94Qf7zHlKBSmSZ0EhTPu3Ik75WX9Wx5wvgZ+I5MB9kYJ
+ qpV1yLW5rv2I6KuSq+Tjr4cT61+Oipc24LfWX6RMY8n8UwO+LsG+ilOh+mKrJZGVD0lg
+ KhKw==
+X-Gm-Message-State: APjAAAUsXb13F2s0kKk8f1txkmRyVxsd3bpPepCGRZ+5zru8uyClwgpj
+ /1TeIfLfCKvUqDOVan3cfLrSUQ==
+X-Google-Smtp-Source: APXvYqwIWvfbxKW1aI7OEcKMHY3826wPIeSAaNoI+1NoqGalgwdpfnJSz7c1bd3Q0wQgaRP6vDF5JA==
+X-Received: by 2002:adf:efd2:: with SMTP id i18mr94300869wrp.145.1564076405313; 
+ Thu, 25 Jul 2019 10:40:05 -0700 (PDT)
+Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.190])
+ by smtp.gmail.com with ESMTPSA id v204sm52408968wma.20.2019.07.25.10.40.04
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 25 Jul 2019 10:40:04 -0700 (PDT)
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190725163710.11703-1-peter.maydell@linaro.org>
+ <20190725163710.11703-2-peter.maydell@linaro.org>
+ <20190725170228.GL2656@work-vm>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c5a0799e-2ebe-5a79-915a-af52d471a589@redhat.com>
+Date: Thu, 25 Jul 2019 19:40:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cdc6e86c-ce05-fd48-c8a3-0e6cec894d4e@redhat.com>
+In-Reply-To: <20190725170228.GL2656@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.222.193
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH for-4.1? 1/2] stellaris_input: Fix vmstate
+ description of buttons field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,42 +89,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 25, 2019 at 05:39:39PM +0200, Paolo Bonzini wrote:
-> On 25/07/19 17:01, Michael S. Tsirkin wrote:
-> >> It would be educational to try to enable ACPI core but disable all
-> >> optional features.
+On 7/25/19 7:02 PM, Dr. David Alan Gilbert wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> gamepad_state::buttons is a pointer to an array of structs,
+>> not an array of structs, so should be declared in the vmstate
+>> with VMSTATE_STRUCT_VARRAY_POINTER_INT32; otherwise we
+>> corrupt memory on incoming migration.
+>>
+>> We bump the vmstate version field as the easiest way to
+>> deal with the migration break, since migration wouldn't have
+>> worked reliably before anyway.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > 
-> A lot of them are select'ed so it's not easy.
+> OK, it would be great to change num_buttons to uint32_t and make that a
+> UINT32 at some point;  it's hard to press negative buttons.
+
+Since the version is incremented, now seems to be a good time.
+
 > 
-> > Trying with ACPI_REDUCED_HARDWARE_ONLY would also be educational.
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
 > 
-> That's what the NEMU guys experimented with.  It's not supported by our
-> DSDT since it uses ACPI GPE,
-
-Well there are two GPE blocks in FADT. We could just switch to
-these if necesary I think.
-
-> and the reduction in code size is small
-> (about 15000 lines of code in ACPICA, perhaps 100k if you're lucky?).
+>> ---
+>>  hw/input/stellaris_input.c | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/input/stellaris_input.c b/hw/input/stellaris_input.c
+>> index 20c87d86f40..3a666d61d47 100644
+>> --- a/hw/input/stellaris_input.c
+>> +++ b/hw/input/stellaris_input.c
+>> @@ -60,12 +60,14 @@ static const VMStateDescription vmstate_stellaris_button = {
+>>  
+>>  static const VMStateDescription vmstate_stellaris_gamepad = {
+>>      .name = "stellaris_gamepad",
+>> -    .version_id = 1,
+>> -    .minimum_version_id = 1,
+>> +    .version_id = 2,
+>> +    .minimum_version_id = 2,
+>>      .fields = (VMStateField[]) {
+>>          VMSTATE_INT32(extension, gamepad_state),
+>> -        VMSTATE_STRUCT_VARRAY_INT32(buttons, gamepad_state, num_buttons, 0,
+>> -                              vmstate_stellaris_button, gamepad_button),
+>> +        VMSTATE_STRUCT_VARRAY_POINTER_INT32(buttons, gamepad_state,
+>> +                                            num_buttons,
+>> +                                            vmstate_stellaris_button,
+>> +                                            gamepad_button),
+>>          VMSTATE_END_OF_LIST()
+>>      }
+>>  };
+>> -- 
+>> 2.20.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 > 
-> Paolo
-
-Well ACPI is 150k loc I think, right?
-
-linux]$ wc -l `find drivers/acpi/ -name '*.c' `|tail -1
- 145926 total
-
-So 100k wouldn't be too shabby.
-
--- 
-MST
 
