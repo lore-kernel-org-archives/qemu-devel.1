@@ -2,60 +2,96 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15AD5C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83215C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5D1F217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:28:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D1F217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 4AB5922C7B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:34:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AB5922C7B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqgbX-0007oU-UN
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 12:28:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36993)
+	id 1hqghQ-0002qz-7R
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 12:34:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44950)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hqgad-0004BT-KG
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:27:37 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hqghC-0002Ca-RE
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hqgaX-0003xz-Cd
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:27:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57154)
+ (envelope-from <mreitz@redhat.com>) id 1hqghB-0003xG-CZ
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:34:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45616)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hqgaS-0003tL-Ev; Thu, 25 Jul 2019 12:27:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hqgh8-0003qk-60; Thu, 25 Jul 2019 12:34:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2E96C300CB0E;
- Thu, 25 Jul 2019 16:27:23 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-146.ams2.redhat.com
- [10.36.117.146])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A1405D772;
- Thu, 25 Jul 2019 16:27:21 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu, 25 Jul 2019 18:27:04 +0200
-Message-Id: <20190725162704.12622-5-kwolf@redhat.com>
-In-Reply-To: <20190725162704.12622-1-kwolf@redhat.com>
-References: <20190725162704.12622-1-kwolf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id B9A5A30A884C;
+ Thu, 25 Jul 2019 16:34:16 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-225.ams2.redhat.com
+ [10.36.117.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CFE8917B0E;
+ Thu, 25 Jul 2019 16:34:14 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-31-mreitz@redhat.com>
+ <5fb4108f-eb50-d076-4e1a-d59de96ef3a7@virtuozzo.com>
+ <9a90cab8-6738-5e20-8350-12965e240c5a@redhat.com>
+ <d086a736-6a4d-754d-74a4-f244a577d848@virtuozzo.com>
+ <650837b5-1fb8-3995-348c-77ab55020585@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6ab14c4a-5460-12f4-da65-ef55511a2e44@redhat.com>
+Date: Thu, 25 Jul 2019 18:34:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <650837b5-1fb8-3995-348c-77ab55020585@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Rx0Cl8KuScvW4b2WgoghhwFMcEw2xkN6J"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 25 Jul 2019 16:27:23 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.42]); Thu, 25 Jul 2019 16:34:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 4/4] block-backend: Queue requests while drained
+Subject: Re: [Qemu-devel] [PATCH v5 30/42] qemu-img: Use child access
+ functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,390 +103,267 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, dplotnikov@virtuozzo.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes device like IDE that can still start new requests from I/O
-handlers in the CPU thread while the block backend is drained.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Rx0Cl8KuScvW4b2WgoghhwFMcEw2xkN6J
+Content-Type: multipart/mixed; boundary="jFKmQZew5IfcmMqopK9IGD5Gkx9kjIQBT";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <6ab14c4a-5460-12f4-da65-ef55511a2e44@redhat.com>
+Subject: Re: [PATCH v5 30/42] qemu-img: Use child access functions
+References: <20190612221004.2317-1-mreitz@redhat.com>
+ <20190612221004.2317-31-mreitz@redhat.com>
+ <5fb4108f-eb50-d076-4e1a-d59de96ef3a7@virtuozzo.com>
+ <9a90cab8-6738-5e20-8350-12965e240c5a@redhat.com>
+ <d086a736-6a4d-754d-74a4-f244a577d848@virtuozzo.com>
+ <650837b5-1fb8-3995-348c-77ab55020585@virtuozzo.com>
+In-Reply-To: <650837b5-1fb8-3995-348c-77ab55020585@virtuozzo.com>
 
-The basic assumption is that in a drain section, no new requests should
-be allowed through a BlockBackend (blk_drained_begin/end don't exist,
-we get drain sections only on the node level). However, there are two
-special cases where requests should not be queued:
+--jFKmQZew5IfcmMqopK9IGD5Gkx9kjIQBT
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-1. Block jobs: We already make sure that block jobs are paused in a
-   drain section, so they won't start new requests. However, if the
-   drain_begin is called on the job's BlockBackend first, it can happen
-   that we deadlock because the job stays busy until it reaches a pause
-   point - which it can't if it's requests aren't processed any more.
+On 24.07.19 11:54, Vladimir Sementsov-Ogievskiy wrote:
+> 21.06.2019 16:15, Vladimir Sementsov-Ogievskiy wrote:
+>> 19.06.2019 18:49, Max Reitz wrote:
+>>> On 19.06.19 11:18, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 13.06.2019 1:09, Max Reitz wrote:
+>>>>> This changes iotest 204's output, because blkdebug on top of a COW =
+node
+>>>>> used to make qemu-img map disregard the rest of the backing chain (=
+the
+>>>>> backing chain was broken by the filter).=C2=A0 With this patch, the=
 
-   The proper solution here would be to make all requests through the
-   job's filter node instead of using a BlockBackend. For now, just
-   disabling request queuin on the job BlockBackend is simpler.
+>>>>> allocation in the base image is reported correctly.
+>>>>>
+>>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>>> ---
+>>>>> =C2=A0=C2=A0 qemu-img.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 36 ++++++++++++++++=
+++++----------------
+>>>>> =C2=A0=C2=A0 tests/qemu-iotests/204.out |=C2=A0 1 +
+>>>>> =C2=A0=C2=A0 2 files changed, 21 insertions(+), 16 deletions(-)
+>>>>>
+>>>>> diff --git a/qemu-img.c b/qemu-img.c
+>>>>> index 07b6e2a808..7bfa6e5d40 100644
+>>>>> --- a/qemu-img.c
+>>>>> +++ b/qemu-img.c
+>>>>> @@ -992,7 +992,7 @@ static int img_commit(int argc, char **argv)
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!blk) {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return=
+ 1;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>> -=C2=A0=C2=A0=C2=A0 bs =3D blk_bs(blk);
+>>>>> +=C2=A0=C2=A0=C2=A0 bs =3D bdrv_skip_implicit_filters(blk_bs(blk));=
 
-2. In test cases where making requests through bdrv_* would be
-   cumbersome because we'd need a BdrvChild. As we already got the
-   functionality to disable request queuing from 1., use it in tests,
-   too, for convenience.
+>>>>
+>>>> if filename is json, describing explicit filter over normal node, bs=
+ will be
+>>>> explicit filter ...
+>>>>
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_progress_init(progress, 1=
+=2Ef);
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_progress_print(0.f, 100);=
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/sysemu/block-backend.h | 11 +++---
- block/backup.c                 |  1 +
- block/block-backend.c          | 69 +++++++++++++++++++++++++++++-----
- block/commit.c                 |  2 +
- block/mirror.c                 |  6 ++-
- blockjob.c                     |  3 ++
- tests/test-bdrv-drain.c        |  1 +
- 7 files changed, 76 insertions(+), 17 deletions(-)
+>>>>> @@ -1009,7 +1009,7 @@ static int img_commit(int argc, char **argv)
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Thi=
+s is different from QMP, which by default uses the deepest file in
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+* the backing chain (i.e., the very base); however, the traditional
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+* behavior of qemu-img commit is using the immediate backing file. */
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 base_bs =3D backing_bs(=
+bs);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 base_bs =3D bdrv_filter=
+ed_cow_bs(bs);
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!b=
+ase_bs) {
+>>>>
+>>>> and here we'll fail.
+>>>
+>>> Right, will change to bdrv_backing_chain_next().
+>>>
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 error_setg(&local_err, "Image does not have a backing fil=
+e");
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 goto done;
+>>>>> @@ -1626,19 +1626,18 @@ static int convert_iteration_sectors(ImgCon=
+vertState *s, int64_t sector_num)
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->sector_next_status <=3D=
+ sector_num) {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_=
+t count =3D n * BDRV_SECTOR_SIZE;
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *src_b=
+s =3D blk_bs(s->src[src_cur]);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverState *base;=
 
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
-d.h
-index 7320b58467..d453a4e9a1 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -104,6 +104,7 @@ void blk_get_perm(BlockBackend *blk, uint64_t *perm, =
-uint64_t *shared_perm);
-=20
- void blk_set_allow_write_beyond_eof(BlockBackend *blk, bool allow);
- void blk_set_allow_aio_context_change(BlockBackend *blk, bool allow);
-+void blk_set_disable_request_queuing(BlockBackend *blk, bool disable);
- void blk_iostatus_enable(BlockBackend *blk);
- bool blk_iostatus_is_enabled(const BlockBackend *blk);
- BlockDeviceIoStatus blk_iostatus(const BlockBackend *blk);
-@@ -119,10 +120,10 @@ BlockBackend *blk_by_qdev_id(const char *id, Error =
-**errp);
- void blk_set_dev_ops(BlockBackend *blk, const BlockDevOps *ops, void *op=
-aque);
- int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-                                unsigned int bytes, QEMUIOVector *qiov,
--                               BdrvRequestFlags flags);
-+                               BdrvRequestFlags flags, bool wait_while_d=
-rained);
- int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
--                               unsigned int bytes, QEMUIOVector *qiov,
--                               BdrvRequestFlags flags);
-+                                unsigned int bytes, QEMUIOVector *qiov,
-+                                BdrvRequestFlags flags, bool wait_while_=
-drained);
-=20
- static inline int coroutine_fn blk_co_pread(BlockBackend *blk, int64_t o=
-ffset,
-                                             unsigned int bytes, void *bu=
-f,
-@@ -130,7 +131,7 @@ static inline int coroutine_fn blk_co_pread(BlockBack=
-end *blk, int64_t offset,
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s-=
+>target_has_backing) {
+>>>>> -
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ ret =3D bdrv_block_status(blk_bs(s->src[src_cur]),
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (se=
+ctor_num - src_cur_offset) *
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDR=
+V_SECTOR_SIZE,
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cou=
+nt, &count, NULL, NULL);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ base =3D bdrv_backing_chain_next(src_bs);
+>>>>
+>>>> As you described in another patch, will not we here get allocated in=
+ base as allocated, because of
+>>>> counting filters above base?
+>>>
+>>> Damn, yes.=C2=A0 So
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 base =3D bdrv_filtered_cow_bs(bdrv_skip_rw_f=
+ilters(src_bs));
+>>>
+>>> I suppose.
+>>>
+>>>> Hmm. I now think, why filters don't report everything as unallocated=
+, would not it be more correct
+>>>> than fallthrough to child?
+>>>
+>>> I don=E2=80=99t know, actually.=C2=A0 Maybe, maybe not.
+>>>
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else=
  {
-     QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-=20
--    return blk_co_preadv(blk, offset, bytes, &qiov, flags);
-+    return blk_co_preadv(blk, offset, bytes, &qiov, flags, true);
- }
-=20
- static inline int coroutine_fn blk_co_pwrite(BlockBackend *blk, int64_t =
-offset,
-@@ -139,7 +140,7 @@ static inline int coroutine_fn blk_co_pwrite(BlockBac=
-kend *blk, int64_t offset,
- {
-     QEMUIOVector qiov =3D QEMU_IOVEC_INIT_BUF(qiov, buf, bytes);
-=20
--    return blk_co_pwritev(blk, offset, bytes, &qiov, flags);
-+    return blk_co_pwritev(blk, offset, bytes, &qiov, flags, true);
- }
-=20
- int blk_pwrite_zeroes(BlockBackend *blk, int64_t offset,
-diff --git a/block/backup.c b/block/backup.c
-index 715e1d3be8..f66b2f4ee7 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -635,6 +635,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
-DriverState *bs,
-     if (ret < 0) {
-         goto error;
-     }
-+    blk_set_disable_request_queuing(job->target, true);
-=20
-     job->on_source_error =3D on_source_error;
-     job->on_target_error =3D on_target_error;
-diff --git a/block/block-backend.c b/block/block-backend.c
-index fdd6b01ecf..603b281743 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -79,6 +79,9 @@ struct BlockBackend {
-     QLIST_HEAD(, BlockBackendAioNotifier) aio_notifiers;
-=20
-     int quiesce_counter;
-+    CoQueue queued_requests;
-+    bool disable_request_queuing;
-+
-     VMChangeStateEntry *vmsh;
-     bool force_allow_inactivate;
-=20
-@@ -339,6 +342,7 @@ BlockBackend *blk_new(AioContext *ctx, uint64_t perm,=
- uint64_t shared_perm)
-=20
-     block_acct_init(&blk->stats);
-=20
-+    qemu_co_queue_init(&blk->queued_requests);
-     notifier_list_init(&blk->remove_bs_notifiers);
-     notifier_list_init(&blk->insert_bs_notifiers);
-     QLIST_INIT(&blk->aio_notifiers);
-@@ -1096,6 +1100,11 @@ void blk_set_allow_aio_context_change(BlockBackend=
- *blk, bool allow)
-     blk->allow_aio_context_change =3D allow;
- }
-=20
-+void blk_set_disable_request_queuing(BlockBackend *blk, bool disable)
-+{
-+    blk->disable_request_queuing =3D disable;
-+}
-+
- static int blk_check_byte_request(BlockBackend *blk, int64_t offset,
-                                   size_t size)
- {
-@@ -1127,13 +1136,26 @@ static int blk_check_byte_request(BlockBackend *b=
-lk, int64_t offset,
-     return 0;
- }
-=20
-+static void blk_wait_while_drained(BlockBackend *blk)
-+{
-+    if (blk->quiesce_counter && !blk->disable_request_queuing) {
-+        qemu_co_queue_wait(&blk->queued_requests, NULL);
-+    }
-+}
-+
- int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-                                unsigned int bytes, QEMUIOVector *qiov,
--                               BdrvRequestFlags flags)
-+                               BdrvRequestFlags flags, bool wait_while_d=
-rained)
- {
-     int ret;
--    BlockDriverState *bs =3D blk_bs(blk);
-+    BlockDriverState *bs;
-=20
-+    if (wait_while_drained) {
-+        blk_wait_while_drained(blk);
-+    }
-+
-+    /* Call blk_bs() only after waiting, the graph may have changed */
-+    bs =3D blk_bs(blk);
-     trace_blk_co_preadv(blk, bs, offset, bytes, flags);
-=20
-     ret =3D blk_check_byte_request(blk, offset, bytes);
-@@ -1156,11 +1178,17 @@ int coroutine_fn blk_co_preadv(BlockBackend *blk,=
- int64_t offset,
-=20
- int coroutine_fn blk_co_pwritev(BlockBackend *blk, int64_t offset,
-                                 unsigned int bytes, QEMUIOVector *qiov,
--                                BdrvRequestFlags flags)
-+                                BdrvRequestFlags flags, bool wait_while_=
-drained)
- {
-     int ret;
--    BlockDriverState *bs =3D blk_bs(blk);
-+    BlockDriverState *bs;
-+
-+    if (wait_while_drained) {
-+        blk_wait_while_drained(blk);
-+    }
-=20
-+    /* Call blk_bs() only after waiting, the graph may have changed */
-+    bs =3D blk_bs(blk);
-     trace_blk_co_pwritev(blk, bs, offset, bytes, flags);
-=20
-     ret =3D blk_check_byte_request(blk, offset, bytes);
-@@ -1198,7 +1226,7 @@ static void blk_read_entry(void *opaque)
-     QEMUIOVector *qiov =3D rwco->iobuf;
-=20
-     rwco->ret =3D blk_co_preadv(rwco->blk, rwco->offset, qiov->size,
--                              qiov, rwco->flags);
-+                              qiov, rwco->flags, true);
-     aio_wait_kick();
- }
-=20
-@@ -1208,7 +1236,7 @@ static void blk_write_entry(void *opaque)
-     QEMUIOVector *qiov =3D rwco->iobuf;
-=20
-     rwco->ret =3D blk_co_pwritev(rwco->blk, rwco->offset, qiov->size,
--                               qiov, rwco->flags);
-+                               qiov, rwco->flags, true);
-     aio_wait_kick();
- }
-=20
-@@ -1349,9 +1377,15 @@ static void blk_aio_read_entry(void *opaque)
-     BlkRwCo *rwco =3D &acb->rwco;
-     QEMUIOVector *qiov =3D rwco->iobuf;
-=20
-+    if (rwco->blk->quiesce_counter) {
-+        blk_dec_in_flight(rwco->blk);
-+        blk_wait_while_drained(rwco->blk);
-+        blk_inc_in_flight(rwco->blk);
-+    }
-+
-     assert(qiov->size =3D=3D acb->bytes);
-     rwco->ret =3D blk_co_preadv(rwco->blk, rwco->offset, acb->bytes,
--                              qiov, rwco->flags);
-+                              qiov, rwco->flags, false);
-     blk_aio_complete(acb);
- }
-=20
-@@ -1361,9 +1395,15 @@ static void blk_aio_write_entry(void *opaque)
-     BlkRwCo *rwco =3D &acb->rwco;
-     QEMUIOVector *qiov =3D rwco->iobuf;
-=20
-+    if (rwco->blk->quiesce_counter) {
-+        blk_dec_in_flight(rwco->blk);
-+        blk_wait_while_drained(rwco->blk);
-+        blk_inc_in_flight(rwco->blk);
-+    }
-+
-     assert(!qiov || qiov->size =3D=3D acb->bytes);
-     rwco->ret =3D blk_co_pwritev(rwco->blk, rwco->offset, acb->bytes,
--                               qiov, rwco->flags);
-+                               qiov, rwco->flags, false);
-     blk_aio_complete(acb);
- }
-=20
-@@ -1482,6 +1522,8 @@ void blk_aio_cancel_async(BlockAIOCB *acb)
-=20
- int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf)
- {
-+    blk_wait_while_drained(blk);
-+
-     if (!blk_is_available(blk)) {
-         return -ENOMEDIUM;
-     }
-@@ -1522,7 +1564,11 @@ BlockAIOCB *blk_aio_ioctl(BlockBackend *blk, unsig=
-ned long int req, void *buf,
-=20
- int blk_co_pdiscard(BlockBackend *blk, int64_t offset, int bytes)
- {
--    int ret =3D blk_check_byte_request(blk, offset, bytes);
-+    int ret;
-+
-+    blk_wait_while_drained(blk);
-+
-+    ret =3D blk_check_byte_request(blk, offset, bytes);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2004,7 +2050,7 @@ int coroutine_fn blk_co_pwrite_zeroes(BlockBackend =
-*blk, int64_t offset,
-                                       int bytes, BdrvRequestFlags flags)
- {
-     return blk_co_pwritev(blk, offset, bytes, NULL,
--                          flags | BDRV_REQ_ZERO_WRITE);
-+                          flags | BDRV_REQ_ZERO_WRITE, true);
- }
-=20
- int blk_pwrite_compressed(BlockBackend *blk, int64_t offset, const void =
-*buf,
-@@ -2232,6 +2278,9 @@ static void blk_root_drained_end(BdrvChild *child, =
-int *drained_end_counter)
-         if (blk->dev_ops && blk->dev_ops->drained_end) {
-             blk->dev_ops->drained_end(blk->dev_opaque);
-         }
-+        while (qemu_co_enter_next(&blk->queued_requests, NULL)) {
-+            /* Resume all queued requests */
-+        }
-     }
- }
-=20
-diff --git a/block/commit.c b/block/commit.c
-index 2c5a6d4ebc..408ae15389 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -350,6 +350,7 @@ void commit_start(const char *job_id, BlockDriverStat=
-e *bs,
-     if (ret < 0) {
-         goto fail;
-     }
-+    blk_set_disable_request_queuing(s->base, true);
-     s->base_bs =3D base;
-=20
-     /* Required permissions are already taken with block_job_add_bdrv() =
-*/
-@@ -358,6 +359,7 @@ void commit_start(const char *job_id, BlockDriverStat=
-e *bs,
-     if (ret < 0) {
-         goto fail;
-     }
-+    blk_set_disable_request_queuing(s->top, true);
-=20
-     s->backing_file_str =3D g_strdup(backing_file_str);
-     s->on_error =3D on_error;
-diff --git a/block/mirror.c b/block/mirror.c
-index 7483051f8d..8d0a3a987d 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -231,7 +231,8 @@ static void coroutine_fn mirror_read_complete(MirrorO=
-p *op, int ret)
-         return;
-     }
-=20
--    ret =3D blk_co_pwritev(s->target, op->offset, op->qiov.size, &op->qi=
-ov, 0);
-+    ret =3D blk_co_pwritev(s->target, op->offset, op->qiov.size, &op->qi=
-ov, 0,
-+                         false);
-     mirror_write_complete(op, ret);
- }
-=20
-@@ -1237,7 +1238,7 @@ do_sync_target_write(MirrorBlockJob *job, MirrorMet=
-hod method,
-         switch (method) {
-         case MIRROR_METHOD_COPY:
-             ret =3D blk_co_pwritev(job->target, dirty_offset, dirty_byte=
-s,
--                                 qiov ? &target_qiov : NULL, flags);
-+                                 qiov ? &target_qiov : NULL, flags, fals=
-e);
-             break;
-=20
-         case MIRROR_METHOD_ZERO:
-@@ -1624,6 +1625,7 @@ static BlockJob *mirror_start_job(
-         blk_set_force_allow_inactivate(s->target);
-     }
-     blk_set_allow_aio_context_change(s->target, true);
-+    blk_set_disable_request_queuing(s->target, true);
-=20
-     s->replaces =3D g_strdup(replaces);
-     s->on_source_error =3D on_source_error;
-diff --git a/blockjob.c b/blockjob.c
-index 20b7f557da..73d9f1ba2b 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -445,6 +445,9 @@ void *block_job_create(const char *job_id, const Bloc=
-kJobDriver *driver,
-=20
-     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
-=20
-+    /* Disable request queuing in the BlockBackend to avoid deadlocks on=
- drain:
-+     * The job reports that it's busy until it reaches a pause point. */
-+    blk_set_disable_request_queuing(blk, true);
-     blk_set_allow_aio_context_change(blk, true);
-=20
-     /* Only set speed when necessary to avoid NotSupported error */
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 03fa1142a1..3fcf7c1c95 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -677,6 +677,7 @@ static void test_iothread_common(enum drain_type drai=
-n_type, int drain_thread)
-                               &error_abort);
-     s =3D bs->opaque;
-     blk_insert_bs(blk, bs, &error_abort);
-+    blk_set_disable_request_queuing(blk, true);
-=20
-     blk_set_aio_context(blk, ctx_a, &error_abort);
-     aio_context_acquire(ctx_a);
---=20
-2.20.1
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ ret =3D bdrv_block_status_above(blk_bs(s->src[src_cur]), NULL,
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (sector_num - src_cur_offset) *
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRV_SECTOR_SIZE,
+>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 count, &count, NULL, NULL);
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ base =3D NULL;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_block_stat=
+us_above(src_bs, base,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 (sector_num - src_cur_offset) *
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 BDRV_SECTOR_SIZE,
+>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 count, &count, NULL, NULL);
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (re=
+t < 0) {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 error_report("error while reading block status of sector =
+%" PRId64
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 ": %s", sector_num, strerror(-ret));
+>>>
+>>> [...]
+>>>
+>>>>> @@ -2949,7 +2950,7 @@ static int img_map(int argc, char **argv)
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!blk) {
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return=
+ 1;
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>> -=C2=A0=C2=A0=C2=A0 bs =3D blk_bs(blk);
+>>>>> +=C2=A0=C2=A0=C2=A0 bs =3D bdrv_skip_implicit_filters(blk_bs(blk));=
 
+>>>>
+>>>> Hmm, another thought about implicit filters, how they could be here =
+in qemu-img?
+>>>
+>>> Hm, I don=E2=80=99t think they can.
+>>>
+>>>> If implicit are only
+>>>> job filters. Do you prepared it for implicit COR? But we discussed w=
+ith Kevin that we'd better deprecate
+>>>> copy-on-read option..
+>>>>
+>>>> So, if implicit filters are for compatibility, we'll have them only =
+in block-jobs. So, seems no reason to support
+>>>> them in qemu-img.
+>>>
+>>> Seems reasonable, yes.
+>>>
+>>>> Also, in block-jobs, we can abandon creating implicit filters above =
+any filter nodes, as well as abandon creating any
+>>>> filter nodes above implicit filters. This will still support old sce=
+narios, but gives very simple and well defined scope
+>>>> of using implicit filters and how to work with them. What do you thi=
+nk?
+>>>
+>>> Hm, in what way would that make things simpler?
+>>>
+>>
+>> This question was in my mind while I've finishing this paragraph) At l=
+east such restriction answer the question, where
+>> should new filters be added: below or under implicit filters.. With su=
+ch restriction we always can have only one implicit filter
+>> over non-filter node, and above it should be explicit filter or non-fi=
+lter node. But this need huge work to be done with small
+>> benefit, so, forget it)
+
+OK.  I should have read the last part first, then I could have replied
+sooner. :-)
+
+> Strange, I have this mail automatically returned back. Did you receive =
+it?
+
+No, I didn=E2=80=99t.  (Nor any of the other mails you resent.)  Weird.
+
+Also, welcome back, congratulations, and all the best to your family! :-)=
+
+
+Max
+
+
+--jFKmQZew5IfcmMqopK9IGD5Gkx9kjIQBT--
+
+--Rx0Cl8KuScvW4b2WgoghhwFMcEw2xkN6J
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl052gQACgkQ9AfbAGHV
+z0BTpQf+NDwHq2HZMjxRU9siTiLtf/QvJbmHl1RKJwgStgYbTzOc+cGEb9+uhzKe
+B7uoZQGom7XzdvEgazmQVD0dsI4Urz1kaAU8Pr8jq8YT6qhuWV3mfGQIzex2JmPf
+VipVGoMSJXLwBHKVhouFqyrDbOIX0aFChdgOYdZuChsBRLpyjDckjcueIWRgLPzD
+FLzfZriHrxA7elv1rtCn4uVw8wyWUzJYq3BuUbyaXx3X1rKW4rooYUtmSBj3VpWS
+4MGmbvzm/KMZa9vs7lPJkl6ndP+x7/M1qXgs40UDCf8K6lR/ZSOQ87fb24YRT5kS
+yXweNdHg5R0Mwu04Nbgxq+5+8ke6SQ==
+=jCjt
+-----END PGP SIGNATURE-----
+
+--Rx0Cl8KuScvW4b2WgoghhwFMcEw2xkN6J--
 
