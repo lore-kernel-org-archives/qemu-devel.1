@@ -2,75 +2,65 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3392DC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D4DC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0911422BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:13:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0911422BED
+	by mail.kernel.org (Postfix) with ESMTPS id AC94E22BEF
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:16:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC94E22BEF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqYsq-00076M-80
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:13:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40159)
+	id 1hqYvW-0008Hj-U5
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:16:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40656)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hqYse-0006dK-Tn
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:13:42 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hqYvK-0007nh-SF
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:16:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hqYsd-0005oj-7B
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:13:40 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40825)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqYsc-0005oF-UO
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:13:39 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r1so49697516wrl.7
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 01:13:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=0W8Dzoq3ItSc4alZZ6ywCwxZ5qMCtt8ZX2ujbrqZ7bY=;
- b=rhX30X/EeREz6R1CmLQHPDOOrm+Gpmf3nq9j3/wi/68R4IlPR9AXk9vF9UuboqnwvL
- +zW3s8Mg85uBXw6n4XgKpbddvzLmf4bkTpVDRTHZ6txTgVckynt3JplRJIT1yUUqEGIX
- sqLxNYV8UK8MWnfGBhbhw8HONr3Lcgky7CD/U8AuBBJyyhSDBeDXVMFklWJw3yeQyylq
- Y90HHwBcyDRTwu73Nc4nv8EnfvvI9NXj3QPWZ/cmT2tCj+Cr4ezKFeN7qYrfKzIyCI+t
- kn22y5VRKBlh/0TzSvvnXMl9H6f7Mj0GkzoSuKRZk9eOd8jCi5hKb0hJ5kRPABMuymY7
- 9nPg==
-X-Gm-Message-State: APjAAAVnIuq1TYckUFV67n4wRkD94KOSD3PE6WyyQ8cSSMvhgc80dRsE
- wrzVqjSilZW/QDER4Y9NAEMmgA==
-X-Google-Smtp-Source: APXvYqw/Hr+vQyRWkKY/jj6MRWbLtp3VJ39xdF8BFcj911S9KIfcO9Ek2+PT5qzxV/FCwtbw1SfkCQ==
-X-Received: by 2002:a05:6000:1148:: with SMTP id
- d8mr80518610wrx.354.1564042417859; 
- Thu, 25 Jul 2019 01:13:37 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id g8sm53015268wme.20.2019.07.25.01.13.36
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 01:13:37 -0700 (PDT)
-Date: Thu, 25 Jul 2019 10:13:34 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: dillaman@redhat.com
-Message-ID: <20190725081334.s2btvq3zdorj7lb5@steredhat>
-References: <20190723071342.383909-1-sgarzare@redhat.com>
- <CA+aFP1BMUitx40WDT-fcWDjO62j3EsoSdg=3HF2b6c1EdwzUxg@mail.gmail.com>
+ (envelope-from <dgilbert@redhat.com>) id 1hqYvJ-0006ib-6u
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:16:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36298)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
+ id 1hqYvF-0006gm-Vr; Thu, 25 Jul 2019 04:16:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 049258F02B;
+ Thu, 25 Jul 2019 08:16:21 +0000 (UTC)
+Received: from work-vm (ovpn-117-187.ams2.redhat.com [10.36.117.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DD8265DD8E;
+ Thu, 25 Jul 2019 08:16:14 +0000 (UTC)
+Date: Thu, 25 Jul 2019 09:16:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <20190725081612.GA2656@work-vm>
+References: <20190724143553.21557-1-damien.hedde@greensocs.com>
+ <543de194-b4e9-de7b-3dab-55fcc0976bc2@redhat.com>
+ <20190724163812.GJ2717@work-vm>
+ <e66cc73d-d185-c52a-b9fd-5081f960f0d8@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CA+aFP1BMUitx40WDT-fcWDjO62j3EsoSdg=3HF2b6c1EdwzUxg@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <e66cc73d-d185-c52a-b9fd-5081f960f0d8@greensocs.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 25 Jul 2019 08:16:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: add preallocation support
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for 4.1?] pl330: fix vmstate description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,225 +72,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 01:48:42PM -0400, Jason Dillaman wrote:
-> On Tue, Jul 23, 2019 at 3:13 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> >
-> > This patch adds the support of preallocation (off/full) for the RBD
-> > block driver.
-> > If rbd_writesame() is available and supports zeroed buffers, we use
-> > it to quickly fill the image when full preallocation is required.
-> >
-> > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > ---
-> > v3:
-> >  - rebased on master
-> >  - filled with zeroed buffer [Max]
-> >  - used rbd_writesame() only when we can disable the discard of zeroed
-> >    buffers
-> >  - added 'since: 4.2' in qapi/block-core.json [Max]
-> >  - used buffer as large as the "stripe unit"
-> > ---
-> >  block/rbd.c          | 202 ++++++++++++++++++++++++++++++++++++++++---
-> >  qapi/block-core.json |   5 +-
-> >  2 files changed, 192 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/block/rbd.c b/block/rbd.c
-> > index 59757b3120..d923a5a26c 100644
-> > --- a/block/rbd.c
-> > +++ b/block/rbd.c
-> > @@ -64,6 +64,7 @@
-> >  #define OBJ_MAX_SIZE (1UL << OBJ_DEFAULT_OBJ_ORDER)
-> >
-> >  #define RBD_MAX_SNAPS 100
-> > +#define RBD_DEFAULT_CONCURRENT_OPS 10
-> >
-> >  /* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
-> >  #ifdef LIBRBD_SUPPORTS_IOVEC
-> > @@ -104,6 +105,7 @@ typedef struct BDRVRBDState {
-> >      char *image_name;
-> >      char *snap;
-> >      uint64_t image_size;
-> > +    bool ws_zero_supported; /* rbd_writesame() supports zeroed buffers */
-> >  } BDRVRBDState;
-> >
-> >  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-> > @@ -333,6 +335,155 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-> >      }
-> >  }
-> >
-> > +static int qemu_rbd_get_max_concurrent_ops(rados_t cluster)
-> > +{
-> > +    char buf[16];
-> > +    int ret, max_concurrent_ops;
-> > +
-> > +    ret = rados_conf_get(cluster, "rbd_concurrent_management_ops", buf,
-> > +                         sizeof(buf));
-> > +    if (ret < 0) {
-> > +        return RBD_DEFAULT_CONCURRENT_OPS;
-> > +    }
-> > +
-> > +    ret = qemu_strtoi(buf, NULL, 10, &max_concurrent_ops);
-> > +    if (ret < 0) {
-> > +        return RBD_DEFAULT_CONCURRENT_OPS;
-> > +    }
-> > +
-> > +    return max_concurrent_ops;
-> > +}
-> > +
-> > +static int qemu_rbd_do_truncate(rados_t cluster, rbd_image_t image,
-> > +                                int64_t offset, PreallocMode prealloc,
-> > +                                bool ws_zero_supported, Error **errp)
-> > +{
-> > +    uint64_t current_length;
-> > +    char *buf = NULL;
-> > +    int ret;
-> > +
-> > +    ret = rbd_get_size(image, &current_length);
-> > +    if (ret < 0) {
-> > +        error_setg_errno(errp, -ret, "Failed to get file length");
-> > +        goto out;
-> > +    }
-> > +
-> > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-> > +        error_setg(errp, "Cannot use preallocation for shrinking files");
-> > +        ret = -ENOTSUP;
-> > +        goto out;
-> > +    }
-> > +
-> > +    switch (prealloc) {
-> > +    case PREALLOC_MODE_FULL: {
-> > +        uint64_t buf_size, current_offset = current_length;
-> > +        ssize_t bytes;
-> > +
-> > +        ret = rbd_get_stripe_unit(image, &buf_size);
-> > +        if (ret < 0) {
-> > +            error_setg_errno(errp, -ret, "Failed to get stripe unit");
-> > +            goto out;
-> > +        }
-> > +
-> > +        ret = rbd_resize(image, offset);
-> > +        if (ret < 0) {
-> > +            error_setg_errno(errp, -ret, "Failed to resize file");
-> > +            goto out;
-> > +        }
-> > +
-> > +        buf = g_malloc0(buf_size);
-> > +
-> > +#ifdef LIBRBD_SUPPORTS_WRITESAME
-> > +        if (ws_zero_supported) {
-> > +            uint64_t writesame_max_size;
-> > +            int max_concurrent_ops;
-> > +
-> > +            max_concurrent_ops = qemu_rbd_get_max_concurrent_ops(cluster);
-> > +            /*
-> > +             * We limit the rbd_writesame() size to avoid to spawn more then
-> > +             * 'rbd_concurrent_management_ops' concurrent operations.
-> > +             */
-> > +            writesame_max_size = MIN(buf_size * max_concurrent_ops, INT_MAX);
-> 
-> In the most efficient world, the 'buf_size' would be some small, fixed
-> power of 2 value (like 512 bytes) since there isn't much need to send
-> extra zeroes. You would then want to writesame the full stripe period
-> (if possible), where a stripe period is the data block object size
-> (defaults to 4MiB and is availble via 'rbd_stat') * the stripe count.
-> In this case, the stripe count becomes the number of in-flight IOs.
-> Therefore, you could substitute its value w/ the max_concurrent_ops to
-> ensure you are issuing exactly max_concurrent_ops IOs per
-> rbd_writesame call.
-> 
+* Damien Hedde (damien.hedde@greensocs.com) wrote:
+>=20
+>=20
+> On 7/24/19 6:38 PM, Dr. David Alan Gilbert wrote:
+> > * Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> >> On 7/24/19 4:35 PM, Damien Hedde wrote:
+> >>> Fix the pl330 main and queue vmstate description.
+> >>> There were missing POINTER flags causing crashes during
+> >>> incoming migration because:
+> >>> + PL330State chan field is a pointer to an array
+> >>> + PL330Queue queue field is a pointer to an array
+> >>>
+> >>> Also bump corresponding vmsd version numbers.
+> >>>
+> >>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> >>> ---
+> >>>
+> >>> I found this while working on reset with xilinx-zynq machine.
+> >>>
+> >>> I'm not sure what's the vmsd version policy in such cases (for
+> >>> backward compatibility). I've simply bumped them since migration
+> >>> was not working anyway (vmstate_load_state was erasing critical par=
+t
+> >>> of PL330State and causing segfaults while loading following fields)=
+.
+> >>
+> >> I still not understand versioning and migration
+> >=20
+> > Incrementing the version (and minimum) is the right thing
+> > to do if you conclude the old one was hopelessly broken.
+> > Migration to and from old qemu breaks, but who cares since it was toa=
+st
+> > anyway.
+> > As far as I can tell pl330 is only on our zynq and exynos models
+> > so wont break our versioned 'virt' type.
+> > So from a migration point of view:
+>=20
+> Since switching from VARRAY to VARRAY_POINTER does not change the size
+> of what's migrated, it should be possible to accept migration from old
+> qemu if we can ignore the data in such cases and default to something
+> (but what ? put the pl330 in reset state ?)
 
-Initially, I had a fixed buffer size to 4 KiB, but I noted that, when
-we didn't use writesame, the rbd_write() was very slow, so I used the
-stripe unit as a buffer size.
-
-Do you think is better to have a small buffer (512 byte) when we use
-writesame or a 'stripe unit' buffer when we can't use it?
+I don't think it's worth worrying about doing that unless you need to
+preserve migration compatibility - which is less important for
+stuff where it's used for dev rather than VMs
 
 
-> > +
-> > +            while (offset - current_offset > buf_size) {
-> > +                bytes = MIN(offset - current_offset, writesame_max_size);
-> > +                /*
-> > +                 * rbd_writesame() supports only request where the size of the
-> > +                 * operation is multiple of buffer size.
-> > +                 */
-> > +                bytes -= bytes % buf_size;
-> > +
-> > +                bytes = rbd_writesame(image, current_offset, bytes, buf,
-> > +                                      buf_size, 0);
-> 
-> If the RBD in-memory cache is enabled during this operation, the
-> writesame will effectively just be turned into a write. Therefore,
-> when pre-allocating, you will want to disable the cache.
-> 
+Dave
 
-During the creation, when preallocation is often used, we disable the cache:
-
-static int qemu_rbd_do_create(BlockdevCreateOptions *options,
-                              const char *keypairs, const char *password_secret,
-                              Error **errp)
-{
-    ...
-
-    ret = qemu_rbd_connect(&cluster, &io_ctx, opts->location, false, keypairs,
-                                                              ^^ cache param
-    ...
-}
-
-
-Do you think I should disable it in any case during the preallocation?
-
-
-
-> > +                if (bytes < 0) {
-> > +                    ret = bytes;
-> > +                    error_setg_errno(errp, -ret,
-> > +                                     "Failed to write for preallocation");
-> > +                    goto out;
-> > +                }
-> > +
-> > +                current_offset += bytes;
-> > +            }
-> > +        }
-> > +#endif /* LIBRBD_SUPPORTS_WRITESAME */
-> > +
-> > +        while (current_offset < offset) {
-> > +            bytes = rbd_write(image, current_offset,
-> > +                              MIN(offset - current_offset, buf_size), buf);
-> > +            if (bytes < 0) {
-> > +                ret = bytes;
-> > +                error_setg_errno(errp, -ret,
-> > +                                 "Failed to write for preallocation");
-> > +                goto out;
-> > +            }
-> > +
-> > +            current_offset += bytes;
-> > +        }
-> > +
-> > +        ret = rbd_flush(image);
-> > +        if (ret < 0) {
-> > +            error_setg_errno(errp, -ret, "Failed to flush the file");
-> > +            goto out;
-> > +        }
-> > +
-> > +        break;
-> > +    }
-> > +    case PREALLOC_MODE_OFF:
-> > +        ret = rbd_resize(image, offset);
-> 
-> I'm not familiar enough w/ the QEMU block code, but why would the
-> PREALLOC_MODE_FULL case not need to resize the image?
-
-PREALLOC_MODE_FULL need too, I did it just before the g_malloc0() in
-this patch :-)
-
-Thanks,
-Stefano
+> Thanks,
+> Damien
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
