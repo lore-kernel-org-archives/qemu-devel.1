@@ -2,91 +2,89 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5714C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2E0C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82521217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 14C2A217F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:04:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s2UacVA4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82521217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e4IfEept"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14C2A217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqeKZ-0003WG-Og
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:02:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56999)
+	id 1hqeMM-0004dP-9m
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:04:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57518)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hqeKO-00035X-0V
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:02:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqeMC-0004E3-Bx
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hqeKM-0000Zt-MX
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:02:39 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39855)
+ (envelope-from <peter.maydell@linaro.org>) id 1hqeMB-0001Vf-Ai
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:04:32 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46611)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hqeKM-0000Yx-F1
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:02:38 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x4so50882748wrt.6
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 07:02:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqeMB-0001Uw-4D
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:04:31 -0400
+Received: by mail-ot1-x341.google.com with SMTP id z23so23403850ote.13
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 07:04:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=xSDgG0s7XnWZGyacS82hd548+Kl0PWqfw0mCiRLZT4Y=;
- b=s2UacVA4plzlCOi/okmf2SlUFv/vDyOosEU8TdZjVTYQ5FubFHmxS3xxjJOFfmJ5uy
- JPFisc49YnDnauXVGBqHRMkOMpUSA91FUWbbPEQM95Id3X6G+QmsfFXJDr82DiWxhrst
- FcQXZK4YaO0vDJsue2JHOYkUpO8nLem8RmUfICqxZo2vEQjK37VCPo7AJgz1Am8nOuGh
- oqOZM60UgnFV/tyH7g+bvEJ0OYfhC+K1KQIV5XSVia0pTq1t7X/wK1CbCtXxrc4xKLwl
- KmJJfqn46XOIuwMTsPINuK69TLG0wAAAALCqbgBP/+TMmbv0RjQHF0Jn3j1yxrdAHKnc
- LbAw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=exWLwmzWzTgwuOT1U/bctrzD7f3MX89ZgJpXpNn5CO8=;
+ b=e4IfEeptM/k3r0PLW6hPmXL4W0WIUME2SXVNAM2d6u2vlFXUKYsQMPnSy8nscxWYf8
+ JXP4+1//ixdbnkr87rSLGSGpbsmgzclRhxJrEcCc1u+UjfbTK5+KPQ1V2iib0fBmANMV
+ X6VzN1asPSRbzBg9Z647M2c8jU4TaXEFN3LBr8O0Sx+fSDNaVKWUVsvSa8CWee4pCMyn
+ HjyIzN+uFgG+C4XbKF2Dd51XoLQ3VDGy+pflvafnjRtV43Ba/pvUB4NKxAbO8ATTrCMZ
+ MLHvZACA/EQbptSb5oEGDtDBPTSIHRQZ6UQY1+hSNpoLozD5Hkbm9y/inm5MCUQKgw7f
+ NW5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=xSDgG0s7XnWZGyacS82hd548+Kl0PWqfw0mCiRLZT4Y=;
- b=Qhwpbtxs/8WaTt7t1MDLd7PdFlumDwhEfJHMVLWoccBWuGWw6nfNAAhJV0whIAAw6V
- QhXx5tDLrMulXVPYfgNk4FOS1vlzW7+i4J03yzYCGyiriVV4uwdAlVWlaPWaP9eouBMe
- hm3t4Mo+8EscTV7bwOycHkppLOmDYnHd8fdhokke9dPnGiQT71tEWl2/j8xKYfh6b583
- uyt/1113Nx/MdF6TwHy8Dfegbs8z3VhoJoFMUkFq2Po7CPKpzRaQWmi9C0Z0MQHq6LNV
- hImnqJJhqj3BipSbODioFFYjje4YilRQiN0i0iMS3yNuD664u1oXpcLCblCmUaXG0lwm
- aCUw==
-X-Gm-Message-State: APjAAAW8jergX2xEc26GYpBXqvW5E8qkeLb/40SyhRkin2J+VbaxGXzx
- Upo1PbeMbp2VM9mIKksG0VpI74QJmVk=
-X-Google-Smtp-Source: APXvYqyv/wV2kUSF2A75nsMrqKtTsqkQB1XW+6yDF8A7oxJnkQ69zS0WH0hDR2YJtKyj2pdWB7+Lnw==
-X-Received: by 2002:adf:cd90:: with SMTP id q16mr13323783wrj.118.1564063357268; 
- Thu, 25 Jul 2019 07:02:37 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x129sm47661040wmg.44.2019.07.25.07.02.36
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 07:02:36 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5AE601FF87;
- Thu, 25 Jul 2019 15:02:36 +0100 (BST)
-References: <20190719210326.15466-1-richard.henderson@linaro.org>
- <20190719210326.15466-14-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190719210326.15466-14-richard.henderson@linaro.org>
-Date: Thu, 25 Jul 2019 15:02:36 +0100
-Message-ID: <87zhl2yzyb.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=exWLwmzWzTgwuOT1U/bctrzD7f3MX89ZgJpXpNn5CO8=;
+ b=bzGTDrYRhN2Zg02TGWABg8j0pO7oeAjquo7JIBXa+6KkQB897C6+Ft/yefhW7K9Yfz
+ pdAbflNAtrjjDdCS9gfxTJmzVFzpP9gLhDWt70WRrYPXIpiYVtrMJV2yP7+9crWMpa9G
+ AjZN5fcQVtfYY1Yl3DOher7T1ZXQzm/AALBA9z6gE+ruzLj6TuOkPmeycN/LhLd7mq9P
+ 6ecLLxXfWi8efHSsH1VeZ+cg4IDxEvGOseD67CfrhiqGiZ5gATlEbf6kWZjcIJjtCIfI
+ mRRLSQoT0xlmSLwFrCHnMDz9clhmaTPFZ0NV/eaRTHeRCGk94IbEDvRx5HPe90doMNj3
+ Q5SA==
+X-Gm-Message-State: APjAAAXwFrINO0muEGXNTajuh2QZwUkegtGLyFzo36tn6tWhAwSwTknj
+ KSnt0xnAVcIUNfUHB/paVXJ1ZVt6pzm2zkYXiCeHZA==
+X-Google-Smtp-Source: APXvYqyFu62bspEZsaGgdhWXsKzUO63VZbNzXq1FzAenetYWarnom4linSwVDoq3EUtTHoXWHno7vs8S7pQa3hrD4HY=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr61609827otj.97.1564063470068; 
+ Thu, 25 Jul 2019 07:04:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20190702121106.28374-1-slp@redhat.com>
+ <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
+ <87a7dwnxwj.fsf@redhat.com>
+ <CAFEAcA_XfRS1b-4ANmR5WLL=19Md6Dp7+M_FAK8pQAJn2MaCOA@mail.gmail.com>
+ <20190702220400.GA13923@localhost>
+ <20190725055908-mutt-send-email-mst@kernel.org>
+ <CAFEAcA-uDtTFOyTwMY5KtWeqvirxDejQdvnx5OCZ8pyUhKhE+w@mail.gmail.com>
+ <87pnlymm47.fsf@redhat.com> <d48da49f-c8d8-00f7-1634-569e8d924b8a@redhat.com>
+ <CAJSP0QUJCh-SaZ9NQ+Wr8vr7R+gBsfhYmBrx45B4z2G9v9L=1A@mail.gmail.com>
+ <20190725080556-mutt-send-email-mst@kernel.org>
+ <CAJSP0QVvnXV8Ha0yaO84qLL6unVroV5GqcuL-x9ruB7o_24WBA@mail.gmail.com>
+ <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
+In-Reply-To: <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jul 2019 15:04:19 +0100
+Message-ID: <CAFEAcA-zBb0mXX1JLoWxz46JDAZFySUZpdONo5uw=KLgJqJ94w@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH for-4.2 13/24] target/arm: Split out
- vae1_tlbmask, vmalle1_tlbmask
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,228 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 25 Jul 2019 at 14:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> To me *maintainability is the biggest consideration* when introducing a
+> new feature.  "We can do just as well with q35" is a good reason to
+> deprecate and delete microvm, but not a good reason to reject it now as
+> long as microvm is good enough in terms of maintainability.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+I think maintainability matters, but also important is "are
+we going in the right direction in the first place?".
+virtio-mmio is (variously deliberately and accidentally)
+quite a long way behind virtio-pci, and certain kinds of things
+(hotplug, extensibility beyond a certain number of endpoints)
+are not going to be possible (either ever, or without a lot
+of extra design and implementation work to reimplement stuff
+we have already today with PCI). Are we sure we're not going
+to end up with a stream of "oh, now we need to implement X for
+virtio-mmio (that virtio-pci already has)", "users want Y now
+(that virtio-pci already has)", etc?
 
-> No functional change, but unify code sequences.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+The other thing is that once we've introduced something we're
+stuck with whatever it does, because we don't like breaking
+backwards compatibility. So I think getting the virtio-legacy
+vs virtio-1 story sorted out before we land microvm is
+important, at least to the point where we know we haven't
+backed ourselves into a corner or required a lot of extra
+effort on transitional-device support that we could have
+avoided.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Which isn't to say that I'm against the microvm approach;
+just that I'd like us to consider and make a decision on
+these issues before landing it, rather than just saying
+"the patches in themselves look good, let's merge it".
 
-> ---
->  target/arm/helper.c | 118 ++++++++++++++------------------------------
->  1 file changed, 37 insertions(+), 81 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 9a9809ff4f..7adbf51479 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3901,70 +3901,61 @@ static CPAccessResult aa64_cacheop_access(CPUARMS=
-tate *env,
->   * Page D4-1736 (DDI0487A.b)
->   */
->
-> +static int vae1_tlbmask(CPUARMState *env)
-> +{
-> +    if (arm_is_secure_below_el3(env)) {
-> +        return ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0;
-> +    } else {
-> +        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
-> +    }
-> +}
-> +
->  static void tlbi_aa64_vmalle1is_write(CPUARMState *env, const ARMCPRegIn=
-fo *ri,
->                                        uint64_t value)
->  {
->      CPUState *cs =3D env_cpu(env);
-> -    bool sec =3D arm_is_secure_below_el3(env);
-> +    int mask =3D vae1_tlbmask(env);
->
-> -    if (sec) {
-> -        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-> -                                            ARMMMUIdxBit_S1SE1 |
-> -                                            ARMMMUIdxBit_S1SE0);
-> -    } else {
-> -        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-> -                                            ARMMMUIdxBit_S12NSE1 |
-> -                                            ARMMMUIdxBit_S12NSE0);
-> -    }
-> +    tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
->  }
->
->  static void tlbi_aa64_vmalle1_write(CPUARMState *env, const ARMCPRegInfo=
- *ri,
->                                      uint64_t value)
->  {
->      CPUState *cs =3D env_cpu(env);
-> +    int mask =3D vae1_tlbmask(env);
->
->      if (tlb_force_broadcast(env)) {
->          tlbi_aa64_vmalle1is_write(env, NULL, value);
->          return;
->      }
->
-> +    tlb_flush_by_mmuidx(cs, mask);
-> +}
-> +
-> +static int vmalle1_tlbmask(CPUARMState *env)
-> +{
-> +    /*
-> +     * Note that the 'ALL' scope must invalidate both stage 1 and
-> +     * stage 2 translations, whereas most other scopes only invalidate
-> +     * stage 1 translations.
-> +     */
->      if (arm_is_secure_below_el3(env)) {
-> -        tlb_flush_by_mmuidx(cs,
-> -                            ARMMMUIdxBit_S1SE1 |
-> -                            ARMMMUIdxBit_S1SE0);
-> +        return ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0;
-> +    } else if (arm_feature(env, ARM_FEATURE_EL2)) {
-> +        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0 | ARMMMUIdxBi=
-t_S2NS;
->      } else {
-> -        tlb_flush_by_mmuidx(cs,
-> -                            ARMMMUIdxBit_S12NSE1 |
-> -                            ARMMMUIdxBit_S12NSE0);
-> +        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
->      }
->  }
->
->  static void tlbi_aa64_alle1_write(CPUARMState *env, const ARMCPRegInfo *=
-ri,
->                                    uint64_t value)
->  {
-> -    /* Note that the 'ALL' scope must invalidate both stage 1 and
-> -     * stage 2 translations, whereas most other scopes only invalidate
-> -     * stage 1 translations.
-> -     */
-> -    ARMCPU *cpu =3D env_archcpu(env);
-> -    CPUState *cs =3D CPU(cpu);
-> +    CPUState *cs =3D env_cpu(env);
-> +    int mask =3D vmalle1_tlbmask(env);
->
-> -    if (arm_is_secure_below_el3(env)) {
-> -        tlb_flush_by_mmuidx(cs,
-> -                            ARMMMUIdxBit_S1SE1 |
-> -                            ARMMMUIdxBit_S1SE0);
-> -    } else {
-> -        if (arm_feature(env, ARM_FEATURE_EL2)) {
-> -            tlb_flush_by_mmuidx(cs,
-> -                                ARMMMUIdxBit_S12NSE1 |
-> -                                ARMMMUIdxBit_S12NSE0 |
-> -                                ARMMMUIdxBit_S2NS);
-> -        } else {
-> -            tlb_flush_by_mmuidx(cs,
-> -                                ARMMMUIdxBit_S12NSE1 |
-> -                                ARMMMUIdxBit_S12NSE0);
-> -        }
-> -    }
-> +    tlb_flush_by_mmuidx(cs, mask);
->  }
->
->  static void tlbi_aa64_alle2_write(CPUARMState *env, const ARMCPRegInfo *=
-ri,
-> @@ -3988,28 +3979,10 @@ static void tlbi_aa64_alle3_write(CPUARMState *en=
-v, const ARMCPRegInfo *ri,
->  static void tlbi_aa64_alle1is_write(CPUARMState *env, const ARMCPRegInfo=
- *ri,
->                                      uint64_t value)
->  {
-> -    /* Note that the 'ALL' scope must invalidate both stage 1 and
-> -     * stage 2 translations, whereas most other scopes only invalidate
-> -     * stage 1 translations.
-> -     */
->      CPUState *cs =3D env_cpu(env);
-> -    bool sec =3D arm_is_secure_below_el3(env);
-> -    bool has_el2 =3D arm_feature(env, ARM_FEATURE_EL2);
-> +    int mask =3D vmalle1_tlbmask(env);
->
-> -    if (sec) {
-> -        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-> -                                            ARMMMUIdxBit_S1SE1 |
-> -                                            ARMMMUIdxBit_S1SE0);
-> -    } else if (has_el2) {
-> -        tlb_flush_by_mmuidx_all_cpus_synced(cs,
-> -                                            ARMMMUIdxBit_S12NSE1 |
-> -                                            ARMMMUIdxBit_S12NSE0 |
-> -                                            ARMMMUIdxBit_S2NS);
-> -    } else {
-> -          tlb_flush_by_mmuidx_all_cpus_synced(cs,
-> -                                              ARMMMUIdxBit_S12NSE1 |
-> -                                              ARMMMUIdxBit_S12NSE0);
-> -    }
-> +    tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
->  }
->
->  static void tlbi_aa64_alle2is_write(CPUARMState *env, const ARMCPRegInfo=
- *ri,
-> @@ -4059,20 +4032,11 @@ static void tlbi_aa64_vae3_write(CPUARMState *env=
-, const ARMCPRegInfo *ri,
->  static void tlbi_aa64_vae1is_write(CPUARMState *env, const ARMCPRegInfo =
-*ri,
->                                     uint64_t value)
->  {
-> -    ARMCPU *cpu =3D env_archcpu(env);
-> -    CPUState *cs =3D CPU(cpu);
-> -    bool sec =3D arm_is_secure_below_el3(env);
-> +    CPUState *cs =3D env_cpu(env);
-> +    int mask =3D vae1_tlbmask(env);
->      uint64_t pageaddr =3D sextract64(value << 12, 0, 56);
->
-> -    if (sec) {
-> -        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-> -                                                 ARMMMUIdxBit_S1SE1 |
-> -                                                 ARMMMUIdxBit_S1SE0);
-> -    } else {
-> -        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr,
-> -                                                 ARMMMUIdxBit_S12NSE1 |
-> -                                                 ARMMMUIdxBit_S12NSE0);
-> -    }
-> +    tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr, mask);
->  }
->
->  static void tlbi_aa64_vae1_write(CPUARMState *env, const ARMCPRegInfo *r=
-i,
-> @@ -4083,8 +4047,8 @@ static void tlbi_aa64_vae1_write(CPUARMState *env, =
-const ARMCPRegInfo *ri,
->       * since we don't support flush-for-specific-ASID-only or
->       * flush-last-level-only.
->       */
-> -    ARMCPU *cpu =3D env_archcpu(env);
-> -    CPUState *cs =3D CPU(cpu);
-> +    CPUState *cs =3D env_cpu(env);
-> +    int mask =3D vae1_tlbmask(env);
->      uint64_t pageaddr =3D sextract64(value << 12, 0, 56);
->
->      if (tlb_force_broadcast(env)) {
-> @@ -4092,15 +4056,7 @@ static void tlbi_aa64_vae1_write(CPUARMState *env,=
- const ARMCPRegInfo *ri,
->          return;
->      }
->
-> -    if (arm_is_secure_below_el3(env)) {
-> -        tlb_flush_page_by_mmuidx(cs, pageaddr,
-> -                                 ARMMMUIdxBit_S1SE1 |
-> -                                 ARMMMUIdxBit_S1SE0);
-> -    } else {
-> -        tlb_flush_page_by_mmuidx(cs, pageaddr,
-> -                                 ARMMMUIdxBit_S12NSE1 |
-> -                                 ARMMMUIdxBit_S12NSE0);
-> -    }
-> +    tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
->  }
->
->  static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo =
-*ri,
-
-
---
-Alex Benn=C3=A9e
+thanks
+-- PMM
 
