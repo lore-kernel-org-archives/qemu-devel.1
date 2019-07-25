@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F10EC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1685CC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:33:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7897A229F3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:33:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7897A229F3
+	by mail.kernel.org (Postfix) with ESMTPS id DFFC0229F3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:33:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFFC0229F3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqfju-000751-4n
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:33:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48986)
+	id 1hqfkC-00089o-H8
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:33:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49224)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hqfiW-0002rh-MH
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:31:41 -0400
+ (envelope-from <mst@redhat.com>) id 1hqfj9-00054B-4o
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hqfiV-0001sB-Jh
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:31:40 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:46901)
+ (envelope-from <mst@redhat.com>) id 1hqfj6-0002HF-RY
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:32:18 -0400
+Received: from mail-qt1-f175.google.com ([209.85.160.175]:34087)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqfiV-0001rt-GS
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:31:39 -0400
-Received: by mail-qt1-f195.google.com with SMTP id h21so49427550qtn.13
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 08:31:39 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqfj3-00027j-8s
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:32:14 -0400
+Received: by mail-qt1-f175.google.com with SMTP id k10so49553532qtq.1
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 08:32:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=GDp8j9NviBwiadQVNh7husgN8Q3GImxt9I1Zswm0kPk=;
- b=jf3v6H0dLr8w5bGdVMiByLJhOfnlY/DtUIrH9hO+7mAahseErn2J1/D23Hxss7cr85
- Bbvs636J1xgT/eyUzeouPjtfDMpNvnCRgnXudH6E/gX5zwl9l+/zdKrAo1UYq34nceJy
- aXzWrP5KTFhCzO4oG8s3hhGcpn4A6vSU99HupxIS1WCkDJUBUqO0y5C/r6+pB7IfJyPi
- 82UFI9PyPY8et+9vZxcN4qxmD1lVH01x8kZ2LV/brtoXrPm/3qtZrXJYD5EPISyLtdez
- tMMPW7vgiyab3z5B5AYmNAmQutBSrZxni8tKZIL7Ug/cNXpgezoH7AcroVkyqN/xVuMC
- Q2rQ==
-X-Gm-Message-State: APjAAAXOD/jia/+HWtpiJlCCGtCKweHX/KBPfj54oOhCGT6mXRbXOBoY
- H9f98kei/1+s48Uge/7U/sWQhlibNWanIw==
-X-Google-Smtp-Source: APXvYqw99hI9kPNmINbA0Y0Su/xjM2Zm5om9x5ZyQpkyC72LVHfDhTpcSKLcBeELTI1vu9G8vldWyQ==
-X-Received: by 2002:a0c:b999:: with SMTP id v25mr64792777qvf.36.1564068698775; 
- Thu, 25 Jul 2019 08:31:38 -0700 (PDT)
+ bh=/hrcl/m7AfRfxAabgjr0nGL2uw+WOg+32XDf093oxBo=;
+ b=iy1GiWlqOa9SOupkrJHyM40CVf4SvlXY6soE0zbPl1FBWS/QByn9n7vGP5WC3apD4u
+ 7j+Zef9ZOqCvDlyK/dXMvSLFdNBJ6NjNlU4c1W6pQUu8PSpfmO7wo66yee+9ggSPJhJC
+ ycX4+FEHfV67OD7dEKISvJUIppixn3bxjcxLaYHzCq7cP8RD6L+iJkF8AgapG+IqdoNh
+ ez2fYjApy0lC5/VRjBAQrW7cG4TXKvjzntF0RmtnNC6JNBSAXEDjcSMUnEJuWIXTvjJ+
+ edBoI3G1S5RBe40dDSL2jVSpasJwuowS7tPvB6MYeRVqSYtQ02BVSpddCy+lbyrqVeJp
+ a5xg==
+X-Gm-Message-State: APjAAAX/rYn2XsM2cEwm+wZAQ1nwyJ3jN1/PDyNCPA4uihYTev0aUbqu
+ 4gLLUpvc6uuzNe0IY3wh3M5jtb/703Inaw==
+X-Google-Smtp-Source: APXvYqzRq9g5v37UH6i9NTuyNepc7XCuaUkfipDFnkWEyW29Y5OwMxXnMyP9gcZHcMf22/a/R5K78w==
+X-Received: by 2002:aed:22f2:: with SMTP id q47mr63734786qtc.106.1564068724236; 
+ Thu, 25 Jul 2019 08:32:04 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
  by smtp.gmail.com with ESMTPSA id
- w80sm24007737qka.74.2019.07.25.08.31.35
+ n5sm28211627qta.29.2019.07.25.08.32.02
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 08:31:38 -0700 (PDT)
-Date: Thu, 25 Jul 2019 11:31:33 -0400
+ Thu, 25 Jul 2019 08:32:03 -0700 (PDT)
+Date: Thu, 25 Jul 2019 11:32:00 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <1563466463-26012-1-git-send-email-wrfsh@yandex-team.ru>
+Message-ID: <20190722134108.22151-4-david@redhat.com>
 References: <20190725153059.7313-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -68,9 +68,8 @@ X-Mailer: git-send-email 2.22.0.678.g13338e74b8
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.160.195
-Subject: [Qemu-devel] [PULL 02/12] i386/acpi: fix gint overflow in
- crs_range_compare
+X-Received-From: 209.85.160.175
+Subject: [Qemu-devel] [PULL 07/12] virtio-balloon: Simplify deflate with pbp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,61 +82,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-stable@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Evgeny Yakovlev <wrfsh@yandex-team.ru>, Richard Henderson <rth@twiddle.net>
+ David Gibson <david@gibson.dropbear.id.au>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190725153133.eU3mDvXveKuSELmitdCtIC6MQ4mqK9UKWHcI2j8aTI4@z>
+Message-ID: <20190725153200.NertaDcoBPgQu47aBB_ekDX62mzzjtcCRsREVlxDizU@z>
 
-From: Evgeny Yakovlev <wrfsh@yandex-team.ru>
+From: David Hildenbrand <david@redhat.com>
 
-When very large regions (32GB sized in our case, PCI pass-through of GPUs)
-are compared substraction result does not fit into gint.
+Let's simplify this - the case we are optimizing for is very hard to
+trigger and not worth the effort. If we're switching from inflation to
+deflation, let's reset the pbp.
 
-As a result crs_replace_with_free_ranges does not get sorted ranges and
-incorrectly computes PCI64 free space regions. Which then makes linux
-guest complain about device and PCI64 hole intersection and device
-becomes unusable.
-
-Fix that by returning exactly fitting ranges.
-
-Also fix indentation of an entire crs_replace_with_free_ranges to make
-checkpatch happy.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
-Message-Id: <1563466463-26012-1-git-send-email-wrfsh@yandex-team.ru>
-Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20190722134108.22151-4-david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/acpi-build.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ hw/virtio/virtio-balloon.c | 26 +++++---------------------
+ 1 file changed, 5 insertions(+), 21 deletions(-)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index d281ffa89e..e7b756b51b 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -755,10 +755,16 @@ static void crs_range_set_free(CrsRangeSet *range_set)
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index a78d2d2184..04a7e6c772 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -117,7 +117,7 @@ static void balloon_deflate_page(VirtIOBalloon *balloon,
+     void *addr = memory_region_get_ram_ptr(mr) + offset;
+     RAMBlock *rb;
+     size_t rb_page_size;
+-    ram_addr_t ram_offset, host_page_base;
++    ram_addr_t ram_offset;
+     void *host_addr;
+     int ret;
  
- static gint crs_range_compare(gconstpointer a, gconstpointer b)
- {
--     CrsRangeEntry *entry_a = *(CrsRangeEntry **)a;
--     CrsRangeEntry *entry_b = *(CrsRangeEntry **)b;
-+    CrsRangeEntry *entry_a = *(CrsRangeEntry **)a;
-+    CrsRangeEntry *entry_b = *(CrsRangeEntry **)b;
+@@ -125,27 +125,11 @@ static void balloon_deflate_page(VirtIOBalloon *balloon,
+      * host address? */
+     rb = qemu_ram_block_from_host(addr, false, &ram_offset);
+     rb_page_size = qemu_ram_pagesize(rb);
+-    host_page_base = ram_offset & ~(rb_page_size - 1);
+-
+-    if (balloon->pbp
+-        && rb == balloon->pbp->rb
+-        && host_page_base == balloon->pbp->base) {
+-        int subpages = rb_page_size / BALLOON_PAGE_SIZE;
  
--     return (int64_t)entry_a->base - (int64_t)entry_b->base;
-+    if (entry_a->base < entry_b->base) {
-+        return -1;
-+    } else if (entry_a->base > entry_b->base) {
-+        return 1;
-+    } else {
-+        return 0;
-+    }
- }
+-        /*
+-         * This means the guest has asked to discard some of the 4kiB
+-         * subpages of a host page, but then changed its mind and
+-         * asked to keep them after all.  It's exceedingly unlikely
+-         * for a guest to do this in practice, but handle it anyway,
+-         * since getting it wrong could mean discarding memory the
+-         * guest is still using. */
+-        clear_bit((ram_offset - balloon->pbp->base) / BALLOON_PAGE_SIZE,
+-                  balloon->pbp->bitmap);
+-
+-        if (bitmap_empty(balloon->pbp->bitmap, subpages)) {
+-            g_free(balloon->pbp);
+-            balloon->pbp = NULL;
+-        }
++    if (balloon->pbp) {
++        /* Let's play safe and always reset the pbp on deflation requests. */
++        g_free(balloon->pbp);
++        balloon->pbp = NULL;
+     }
  
- /*
+     host_addr = (void *)((uintptr_t)addr & ~(rb_page_size - 1));
 -- 
 MST
 
