@@ -2,52 +2,116 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DA6C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 445A0C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:08:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BF4E218DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:07:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BF4E218DA
+	by mail.kernel.org (Postfix) with ESMTPS id 0EF492080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:08:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZfkPv+w6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF492080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaeN-0000wn-La
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 06:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49320)
+	id 1hqafM-00027m-Du
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 06:08:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49874)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hqadO-0005WJ-9D
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:06:03 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hqafB-0001gm-DC
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:07:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hqadN-0006R5-65
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:06:02 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45726)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hqafA-00079o-Cv
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:07:53 -0400
+Received: from mail-eopbgr00104.outbound.protection.outlook.com
+ ([40.107.0.104]:8545 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hqadJ-0006O5-JR; Thu, 25 Jul 2019 06:05:57 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1hqadD-0001mQ-2y; Thu, 25 Jul 2019 13:05:51 +0300
+ id 1hqaf7-00078y-PI; Thu, 25 Jul 2019 06:07:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OJWz+lMwOV7QGeDNIV7t9PA218LXVM1+kAB4q5eBM5i5kkh2Mk72ZlNwc+WiuEGzuL6ZV0XQtuBSIekeBiDpNFoSKGZcKsz0PTtDha/azHJheB33G4iAbYJ680m7B62SMVJwaObtOisjRActaROQp+AFv8tEr7GWTM5DuzBe9D5KY0RrUIIJ7guIncqsetX2QSygSBdAxCaAkTz990nRkoMLSNiTlDbjn3U8uL9Vwuggh6Hw2cgczFAl3ywQTc7SeBQF9tvMFNeZQFd57UxOWquaQQp+nSUqOsVoSYCGfRn7+DJDhAeLTR5LOQ80kXIiRHpVQLawwqk7XyUx8IJ1cQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=34Zco+i0Y3yYPNMXdvjXFKEoWWm5lXmIBncztaw3a1c=;
+ b=dnC53gnnTd22MqU72X/3Pz0u+mQu5H1s+FgbLj1zUxntiRLcRgkYTOaEddKgooKj9ahGgfyCnwM+8dibc+JKX02niNeXXb6FUvSNOfVxSwNlnGTov2awiqRsQ6MuNHasRSj05Nxe2JU4JEcpUJ2cHtnmNLGLOUanBxAhFPidg4c2jaMcQm0o4xUomVv/vwMP6o0MAl8yZxYnv1XGMwHRWQr9GDHOy1vOP7tBEz6dHwL6CqeOsG+k7ed9TMoFdjxm1oibyW9oGrAY8cRZ7Y/ZCVgBqMPzCKQrgPbv9CEPsJjIpu+KsSFsTiupf3s+/OKMjDkBGkRpYILLgkZKpDIIZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=34Zco+i0Y3yYPNMXdvjXFKEoWWm5lXmIBncztaw3a1c=;
+ b=ZfkPv+w6pV0+rLYuyaYOhCzBJeNgsC5hvOiLYCFezfriXddrrhGQ78e8w9fUD7K3WRcWW+xDxOVR1TPBODXHVnjDCj/o5ZOPDL22ZuzAQ85AlAJ7BozD7MGH4gE9y5ALhwqO+I7ILUJ13A+VT6e/XH62V2upqaA7LBVnzCjwOms=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB5371.eurprd08.prod.outlook.com (52.133.240.199) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.13; Thu, 25 Jul 2019 10:07:38 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2115.005; Thu, 25 Jul 2019
+ 10:07:38 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Thu, 25 Jul 2019 13:05:50 +0300
-Message-Id: <20190725100550.33801-4-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190725100550.33801-1-vsementsov@virtuozzo.com>
-References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v3 3/3] nbd: improve CMD_CACHE: use
- BDRV_REQ_PREFETCH
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Thread-Topic: [PATCH v7 0/9] NBD reconnect
+Thread-Index: AQHVJcsR0Ob9vQwVFUSX/gqgFfzT4KbbVfgA
+Date: Thu, 25 Jul 2019 10:07:38 +0000
+Message-ID: <e66505eb-78e1-612d-6742-4774c3167412@virtuozzo.com>
+References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190618114328.55249-1-vsementsov@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR06CA0131.eurprd06.prod.outlook.com
+ (2603:10a6:7:16::18) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190725130734741
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d0269021-5b2c-4197-8ad6-08d710e7ec2a
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB5371; 
+x-ms-traffictypediagnostic: DB8PR08MB5371:
+x-microsoft-antispam-prvs: <DB8PR08MB537195F48FAA70C9DD36C03BC1C10@DB8PR08MB5371.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 0109D382B0
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(396003)(366004)(39850400004)(376002)(346002)(189003)(199004)(53754006)(6246003)(66946007)(66476007)(66556008)(64756008)(86362001)(316002)(53936002)(2906002)(31696002)(66446008)(71190400001)(71200400001)(31686004)(25786009)(4326008)(52116002)(81156014)(81166006)(8676002)(6506007)(386003)(6436002)(76176011)(68736007)(99286004)(2501003)(54906003)(8936002)(110136005)(3846002)(107886003)(6116002)(229853002)(6486002)(102836004)(256004)(5024004)(305945005)(66066001)(478600001)(5660300002)(36756003)(26005)(2616005)(186003)(446003)(7736002)(486006)(476003)(11346002)(14454004)(6512007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5371;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: DwISXu9Ec5FfzzBOPFS2vUnzEOI+7zKge48cVflaeSPLGaoRyeq1Y0+1AVNJxha70vZQXZ/w3qtldFGmPqniArdk8cPymshgEP2eWT0atGZE9kH4ghu6tWJP1PRRAZEVl8ZhI6jL1OEfNRtoJpn1++/6AIdRS8hBLoIHWcecDh6BzfJtzhmgnWTyfKsveERwjwtvTsgA3w5VA6fOf+9u4PK8rywBeU+rCk6wURX/kULVvhKO2X7OyPz0y7GZoWN53+9b8JVK9L3t5wXY2J1AyKPAEuhQSxivxN6x117cpCD6OPVbBiE4M8JoqYFfSXi3361WR0F5EvvYLp0bMSc5VhCnuCaM2KqXRujxtmu52U5yMuXHTFu7zaj0cbIuRh4vQGvyAsVPa6B1nm8IjH89An+ohnYZxeILQ253jtRqDnQ=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0BC7D3B168CEA7468BE6DF9DE06BC730@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0269021-5b2c-4197-8ad6-08d710e7ec2a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2019 10:07:38.4317 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5371
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.104
+Subject: Re: [Qemu-devel] [PATCH v7 0/9] NBD reconnect
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,114 +123,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This helps to avoid extra io, allocations and memory copying.
-We assume here that CMD_CACHE is always used with copy-on-read, as
-otherwise it's a noop.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- nbd/server.c | 43 +++++++++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 8 deletions(-)
-
-diff --git a/nbd/server.c b/nbd/server.c
-index 10faedcfc5..a2cf085f76 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2104,12 +2104,15 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
-             return -EINVAL;
-         }
- 
--        req->data = blk_try_blockalign(client->exp->blk, request->len);
--        if (req->data == NULL) {
--            error_setg(errp, "No memory");
--            return -ENOMEM;
-+        if (request->type != NBD_CMD_CACHE) {
-+            req->data = blk_try_blockalign(client->exp->blk, request->len);
-+            if (req->data == NULL) {
-+                error_setg(errp, "No memory");
-+                return -ENOMEM;
-+            }
-         }
-     }
-+
-     if (request->type == NBD_CMD_WRITE) {
-         if (nbd_read(client->ioc, req->data, request->len, "CMD_WRITE data",
-                      errp) < 0)
-@@ -2194,7 +2197,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     int ret;
-     NBDExport *exp = client->exp;
- 
--    assert(request->type == NBD_CMD_READ || request->type == NBD_CMD_CACHE);
-+    assert(request->type == NBD_CMD_READ);
- 
-     /* XXX: NBD Protocol only documents use of FUA with WRITE */
-     if (request->flags & NBD_CMD_FLAG_FUA) {
-@@ -2206,7 +2209,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     }
- 
-     if (client->structured_reply && !(request->flags & NBD_CMD_FLAG_DF) &&
--        request->len && request->type != NBD_CMD_CACHE)
-+        request->len)
-     {
-         return nbd_co_send_sparse_read(client, request->handle, request->from,
-                                        data, request->len, errp);
-@@ -2214,7 +2217,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
- 
-     ret = blk_pread(exp->blk, request->from + exp->dev_offset, data,
-                     request->len);
--    if (ret < 0 || request->type == NBD_CMD_CACHE) {
-+    if (ret < 0) {
-         return nbd_send_generic_reply(client, request->handle, ret,
-                                       "reading from file failed", errp);
-     }
-@@ -2233,6 +2236,28 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
-     }
- }
- 
-+/*
-+ * nbd_do_cmd_cache
-+ *
-+ * Handle NBD_CMD_CACHE request.
-+ * Return -errno if sending fails. Other errors are reported directly to the
-+ * client as an error reply.
-+ */
-+static coroutine_fn int nbd_do_cmd_cache(NBDClient *client, NBDRequest *request,
-+                                         Error **errp)
-+{
-+    int ret;
-+    NBDExport *exp = client->exp;
-+
-+    assert(request->type == NBD_CMD_CACHE);
-+
-+    ret = blk_co_preadv(exp->blk, request->from + exp->dev_offset, request->len,
-+                        NULL, BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
-+
-+    return nbd_send_generic_reply(client, request->handle, ret,
-+                                  "caching data failed", errp);
-+}
-+
- /* Handle NBD request.
-  * Return -errno if sending fails. Other errors are reported directly to the
-  * client as an error reply. */
-@@ -2246,8 +2271,10 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-     char *msg;
- 
-     switch (request->type) {
--    case NBD_CMD_READ:
-     case NBD_CMD_CACHE:
-+        return nbd_do_cmd_cache(client, request, errp);
-+
-+    case NBD_CMD_READ:
-         return nbd_do_cmd_read(client, request, data, errp);
- 
-     case NBD_CMD_WRITE:
--- 
-2.18.0
-
+cGluZw0KDQoxOC4wNi4yMDE5IDE0OjQzLCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
+b3RlOg0KPiBIaSBhbGwhDQo+IEhlcmUgaXMgTkJEIHJlY29ubmVjdC4gUHJldmlvdXNseSwgaWYg
+Y29ubmVjdGlvbiBmYWlsZWQgYWxsIGN1cnJlbnQNCj4gYW5kIGZ1dHVyZSByZXF1ZXN0cyB3aWxs
+IGZhaWwuIEFmdGVyIHRoZSBzZXJpZXMsIG5iZC1jbGllbnQgZHJpdmVyDQo+IHdpbGwgdHJ5IHRv
+IHJlY29ubmVjdCB1bmxpbWl0ZWQgdGltZXMuIER1cmluZyBmaXJzdCBAcmVjb25uZWN0LWRlbGF5
+DQo+IHNlY29uZHMgb2YgcmVjb25uZWN0aW5nIGFsbCByZXF1ZXN0cyB3aWxsIHdhaXQgZm9yIHRo
+ZSBjb25uZWN0aW9uLA0KPiBhbmQgaWYgaXQgaXMgZXN0YWJsaXNoZWQgcmVxdWVzdHMgd2lsbCBi
+ZSByZXNlbnQuIEFmdGVyDQo+IEByZWNvbm5lY3QtZGVsYXkgcGVyaW9kIGFsbCByZXF1ZXN0cyB3
+aWxsIGJlIGZhaWxlZCAodW50aWwgc3VjY2Vzc2Z1bA0KPiByZWNvbm5lY3QpLg0KPiANCj4gdjc6
+DQo+IGFsbW9zdCBhbGw6IHJlYmFzZWQgb24gbWVyZ2VkIG5iZC5jIGFuZCBuYmQtY2xpZW50LmMg
+KGluY2x1ZGluZyBwYXRjaCBzdWJqZWN0KQ0KPiAwMS0wNDogYWRkIEVyaWMncyByLWINCj4gMDQ6
+IHdvcmRpbmcNCj4gMDU6IG5ldw0KPiAwNjogcmV3cml0ZSB0byByZW1vdmUgdGltZXIgZWFybGll
+cg0KPiAwNzogbmV3DQo+IDA4Og0KPiAgIC0gcmViYXNlIG9uIDA1IGFuZCAwNw0KPiAgIC0gZHJv
+cCAiQWxsIHJpZ2h0cyByZXNlcnZlZCINCj4gICAtIGhhbmRsZSBkcmFpbg0KPiAgIC0gaW1wcm92
+ZSBoYW5kbGluZyBhaW8gY29udGV4dCBhdHRhY2gNCj4gMDk6IG1vdmUgMjQ5IC0+IDI1Nw0KPiAN
+Cj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSAoOSk6DQo+ICAgIGJsb2NrL25iZDogc3Bs
+aXQgY29ubmVjdGlvbl9jbyBzdGFydCBvdXQgb2YgbmJkX2NsaWVudF9jb25uZWN0DQo+ICAgIGJs
+b2NrL25iZDogdXNlIG5vbi1ibG9ja2luZyBpbyBjaGFubmVsIGZvciBuYmQgbmVnb3RpYXRpb24N
+Cj4gICAgYmxvY2svbmJkOiBtb3ZlIGZyb20gcXVpdCB0byBzdGF0ZQ0KPiAgICBibG9jay9uYmQ6
+IGFkZCBjbWRsaW5lIGFuZCBxYXBpIHBhcmFtZXRlciByZWNvbm5lY3QtZGVsYXkNCj4gICAgYmxv
+Y2svbmJkOiByZWZhY3RvciBuYmQgY29ubmVjdGlvbiBwYXJhbWV0ZXJzDQo+ICAgIHFlbXUtY29y
+b3V0aW5lLXNsZWVwOiBpbnRyb2R1Y2UgcWVtdV9jb19zbGVlcF93YWtlDQo+ICAgIHFlbXUvdW5p
+dHM6IGFkZCBTSSBkZWNpbWFsIHVuaXRzDQo+ICAgIGJsb2NrL25iZDogbmJkIHJlY29ubmVjdA0K
+PiAgICBpb3Rlc3RzOiB0ZXN0IG5iZCByZWNvbm5lY3QNCj4gDQo+ICAgcWFwaS9ibG9jay1jb3Jl
+Lmpzb24gICAgICAgICAgfCAgMTEgKy0NCj4gICBpbmNsdWRlL2Jsb2NrL25iZC5oICAgICAgICAg
+ICB8ICAgMyArLQ0KPiAgIGluY2x1ZGUvcWVtdS9jb3JvdXRpbmUuaCAgICAgIHwgIDE3ICstDQo+
+ICAgaW5jbHVkZS9xZW11L3VuaXRzLmggICAgICAgICAgfCAgIDcgKw0KPiAgIGJsb2NrL25iZC5j
+ICAgICAgICAgICAgICAgICAgIHwgNTMxICsrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0t
+LS0NCj4gICBibG9jay9udWxsLmMgICAgICAgICAgICAgICAgICB8ICAgMiArLQ0KPiAgIGJsb2Nr
+L3NoZWVwZG9nLmMgICAgICAgICAgICAgIHwgICAyICstDQo+ICAgbmJkL2NsaWVudC5jICAgICAg
+ICAgICAgICAgICAgfCAgMTYgKy0NCj4gICBxZW11LW5iZC5jICAgICAgICAgICAgICAgICAgICB8
+ICAgMiArLQ0KPiAgIHRlc3RzL3Rlc3QtYmRydi1kcmFpbi5jICAgICAgIHwgICA2ICstDQo+ICAg
+dGVzdHMvdGVzdC1ibG9jay1pb3RocmVhZC5jICAgfCAgIDIgKy0NCj4gICB1dGlsL3FlbXUtY29y
+b3V0aW5lLXNsZWVwLmMgICB8ICA0NyArKy0NCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjU3ICAg
+ICAgICB8ICA2MyArKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI1Ny5vdXQgICAgfCAgMTAg
+Kw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0cy9ncm91cCAgICAgIHwgICAxICsNCj4gICB0ZXN0cy9x
+ZW11LWlvdGVzdHMvaW90ZXN0cy5weSB8ICAgNCArDQo+ICAgMTYgZmlsZXMgY2hhbmdlZCwgNTUx
+IGluc2VydGlvbnMoKyksIDE3MyBkZWxldGlvbnMoLSkNCj4gICBjcmVhdGUgbW9kZSAxMDA3NTUg
+dGVzdHMvcWVtdS1pb3Rlc3RzLzI1Nw0KPiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xZW11
+LWlvdGVzdHMvMjU3Lm91dA0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
