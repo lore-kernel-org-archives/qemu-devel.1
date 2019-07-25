@@ -6,46 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F76C76186
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A90C76186
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:28:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AFB021855
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:27:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFB021855
+	by mail.kernel.org (Postfix) with ESMTPS id 2743D21855
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:28:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2743D21855
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqRbm-0003sJ-Nr
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:27:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41227)
+	id 1hqRcm-000525-8I
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:28:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41474)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hqRbW-00039e-DZ
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:27:31 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hqRcX-0004NM-5X
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hqRbV-00041Y-Dk
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:27:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46170)
+ (envelope-from <jsnow@redhat.com>) id 1hqRcW-0004hG-8j
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:28:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38992)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hqRbT-0003yC-6V; Wed, 24 Jul 2019 20:27:27 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hqRcU-0004gJ-5U; Wed, 24 Jul 2019 20:28:30 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 50F7585365;
- Thu, 25 Jul 2019 00:27:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3444F3082B44;
+ Thu, 25 Jul 2019 00:28:29 +0000 (UTC)
 Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 087F35D9DE;
- Thu, 25 Jul 2019 00:27:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F2F560BEC;
+ Thu, 25 Jul 2019 00:28:25 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190719131425.10835-1-philmd@redhat.com>
- <20190719131425.10835-4-philmd@redhat.com>
- <6ff431d9-36bd-27a1-077b-b2cb1331750d@redhat.com>
+ <20190719131425.10835-7-philmd@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,22 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <bc3dc756-23a8-48a3-02ca-abaae6d0db96@redhat.com>
-Date: Wed, 24 Jul 2019 20:27:20 -0400
+Message-ID: <78c49015-d60a-04c2-4cd7-9bf265f980cb@redhat.com>
+Date: Wed, 24 Jul 2019 20:28:25 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6ff431d9-36bd-27a1-077b-b2cb1331750d@redhat.com>
+In-Reply-To: <20190719131425.10835-7-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 25 Jul 2019 00:27:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Thu, 25 Jul 2019 00:28:29 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH-for-4.1 3/7]
- hw/block/pflash_cfi02: Rewrite a fall through comment
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH-for-4.1? 6/7] vl: Rewrite a
+ fall through comment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -162,54 +161,44 @@ Sender: "Qemu-devel"
 
 
 
-On 7/22/19 7:43 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 7/19/19 3:14 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> GCC9 is confused by this comment when building with CFLAG
->> -Wimplicit-fallthrough=3D2:
->>
->>   hw/block/pflash_cfi02.c: In function =E2=80=98pflash_write=E2=80=99:
->>   hw/block/pflash_cfi02.c:574:16: error: this statement may fall throu=
-gh [-Werror=3Dimplicit-fallthrough=3D]
->>     574 |             if (boff =3D=3D 0x55 && cmd =3D=3D 0x98) {
->>         |                ^
->>   hw/block/pflash_cfi02.c:581:9: note: here
->>     581 |         default:
->>         |         ^~~~~~~
->>   cc1: all warnings being treated as errors
->>
->> Rewrite the comment using 'fall through' which is recognized by
->> GCC and static analyzers.
->>
->> Reported-by: Stefan Weil <sw@weilnetz.de>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  hw/block/pflash_cfi02.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
->> index f68837a449..42886f6af5 100644
->> --- a/hw/block/pflash_cfi02.c
->> +++ b/hw/block/pflash_cfi02.c
->> @@ -577,7 +577,7 @@ static void pflash_write(void *opaque, hwaddr offs=
-et, uint64_t value,
->>                  pfl->cmd =3D 0x98;
->>                  return;
->>              }
->> -            /* No break here */
->> +            /* fall through */
->>          default:
->>              DPRINTF("%s: invalid write for command %02x\n",
->>                      __func__, pfl->cmd);
->>
+On 7/19/19 9:14 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> GCC9 is confused by this comment when building with CFLAG
+> -Wimplicit-fallthrough=3D2:
 >=20
-> Queued to pflash/next, thanks.
+>   vl.c: In function =E2=80=98qemu_ref_timedate=E2=80=99:
+>   vl.c:773:15: error: this statement may fall through [-Werror=3Dimplic=
+it-fallthrough=3D]
+>     773 |         value -=3D rtc_realtime_clock_offset;
+>         |         ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>   vl.c:775:5: note: here
+>     775 |     case QEMU_CLOCK_VIRTUAL:
+>         |     ^~~~
+>   cc1: all warnings being treated as errors
+>=20
+> Rewrite the comment using 'fall through' which is recognized by
+> GCC and static analyzers.
+>=20
+> Reported-by: Stefan Weil <sw@weilnetz.de>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  vl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/vl.c b/vl.c
+> index a5808f9a02..f5cf71e3b4 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -771,7 +771,7 @@ static time_t qemu_ref_timedate(QEMUClockType clock=
+)
+>      switch (clock) {
+>      case QEMU_CLOCK_REALTIME:
+>          value -=3D rtc_realtime_clock_offset;
+> -        /* no break */
+> +        /* fall through */
+>      case QEMU_CLOCK_VIRTUAL:
+>          value +=3D rtc_ref_start_datetime;
+>          break;
 >=20
 
-Are you queueing everything or just this one patch? It would be a little
-inconvenient to split a series up like that.
-
-(Most other maintainers will, I believe, expect that with an "ACK" or
-similar that someone else will stage the series.)
-
---js
+Reviewed-by: John Snow <jsnow@redhat.com>
 
