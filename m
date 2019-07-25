@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0352C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C78C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB8F820840
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:57:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8F820840
+	by mail.kernel.org (Postfix) with ESMTPS id 64A3B2190F
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:58:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A3B2190F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaVE-0002pp-1L
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:57:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46235)
+	id 1hqaVe-0003u1-KF
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:58:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46432)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqaV3-0002NW-JY
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:57:26 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hqaVU-0003QE-7C
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:57:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqaV2-000225-Cn
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:57:25 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.77]:45331)
+ (envelope-from <tony.nguyen@bt.com>) id 1hqaVS-0002M7-J8
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:57:52 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.73]:25347)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hqaUq-0001r1-SK; Thu, 25 Jul 2019 05:57:13 -0400
+ id 1hqaVE-00028U-8O; Thu, 25 Jul 2019 05:57:36 -0400
 Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
- BWP09926082.bt.com (10.36.82.113) with Microsoft SMTP Server (version=TLS1_2, 
+ BWP09926078.bt.com (10.36.82.109) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 25
- Jul 2019 10:57:10 +0100
+ Jul 2019 10:57:30 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
  tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 10:57:10 +0100
+ Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 10:57:33 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
- 2019 10:57:10 +0100
+ 2019 10:57:33 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v4 13/15] cputlb: Byte swap memory
- transaction attribute
-Thread-Index: AQHVQs9TV3Ksh5mCZEubSX87RH7OKg==
-Date: Thu, 25 Jul 2019 09:57:10 +0000
-Message-ID: <1564048630378.78008@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v4 14/15] target/sparc: Add TLB entry with
+ attributes
+Thread-Index: AQHVQs9hBFfZMu5Us0GGh3/qvweb5w==
+Date: Thu, 25 Jul 2019 09:57:33 +0000
+Message-ID: <1564048653059.38024@bt.com>
 References: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -60,12 +60,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.42]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.77
+X-Received-From: 213.121.35.73
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v4 13/15] cputlb: Byte swap memory transaction
- attribute
+Subject: [Qemu-devel] [PATCH v4 14/15] target/sparc: Add TLB entry with
+ attributes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,73 +91,143 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Notice new attribute, byte swap, and force the transaction through the
-memory slow path.
-
-Required by architectures that can invert endianness of memory
-transaction, e.g. SPARC64 has the Invert Endian TTE bit.
+Append MemTxAttrs to interfaces so we can pass along up coming Invert
+Endian TTE bit on SPARC64.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- accel/tcg/cputlb.c      | 11 +++++++++++
- include/exec/memattrs.h |  2 ++
- 2 files changed, 13 insertions(+)
+ target/sparc/mmu_helper.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index e61b1eb..f292a87 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -738,6 +738,9 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulon=
-g vaddr,
-          */
-         address |=3D TLB_RECHECK;
-     }
-+    if (attrs.byte_swap) {
-+        address |=3D TLB_FORCE_SLOW;
-+    }
-     if (!memory_region_is_ram(section->mr) &&
-         !memory_region_is_romd(section->mr)) {
-         /* IO memory case */
-@@ -891,6 +894,10 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEn=
-try *iotlbentry,
-     bool locked =3D false;
-     MemTxResult r;
+diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+index cbd1e91..826e14b 100644
+--- a/target/sparc/mmu_helper.c
++++ b/target/sparc/mmu_helper.c
+@@ -88,7 +88,7 @@ static const int perm_table[2][8] =3D {
+ };
 
-+    if (iotlbentry->attrs.byte_swap) {
-+        op ^=3D MO_BSWAP;
-+    }
-+
-     section =3D iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs)=
-;
-     mr =3D section->mr;
-     mr_offset =3D (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-@@ -933,6 +940,10 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry=
- *iotlbentry,
-     bool locked =3D false;
-     MemTxResult r;
+ static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
+-                                int *prot, int *access_index,
++                                int *prot, int *access_index, MemTxAttrs *=
+attrs,
+                                 target_ulong address, int rw, int mmu_idx,
+                                 target_ulong *page_size)
+ {
+@@ -219,6 +219,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, in=
+t size,
+     target_ulong vaddr;
+     target_ulong page_size;
+     int error_code =3D 0, prot, access_index;
++    MemTxAttrs attrs =3D {};
 
-+    if (iotlbentry->attrs.byte_swap) {
-+        op ^=3D MO_BSWAP;
-+    }
-+
-     section =3D iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs)=
-;
-     mr =3D section->mr;
-     mr_offset =3D (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
-index d4a3477..a0644eb 100644
---- a/include/exec/memattrs.h
-+++ b/include/exec/memattrs.h
-@@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
-     unsigned int user:1;
-     /* Requester ID (for MSI for example) */
-     unsigned int requester_id:16;
-+    /* SPARC64: TTE invert endianness */
-+    unsigned int byte_swap:1;
      /*
-      * The following are target-specific page-table bits.  These are not
-      * related to actual memory transactions at all.  However, this struct=
-ure
+      * TODO: If we ever need tlb_vaddr_to_host for this target,
+@@ -229,7 +230,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, in=
+t size,
+     assert(!probe);
+
+     address &=3D TARGET_PAGE_MASK;
+-    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,
++    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,=
+ &attrs,
+                                       address, access_type,
+                                       mmu_idx, &page_size);
+     vaddr =3D address;
+@@ -490,8 +491,8 @@ static inline int ultrasparc_tag_match(SparcTLBEntry *t=
+lb,
+     return 0;
+ }
+
+-static int get_physical_address_data(CPUSPARCState *env,
+-                                     hwaddr *physical, int *prot,
++static int get_physical_address_data(CPUSPARCState *env, hwaddr *physical,
++                                     int *prot, MemTxAttrs *attrs,
+                                      target_ulong address, int rw, int mmu=
+_idx)
+ {
+     CPUState *cs =3D env_cpu(env);
+@@ -608,8 +609,8 @@ static int get_physical_address_data(CPUSPARCState *env=
+,
+     return 1;
+ }
+
+-static int get_physical_address_code(CPUSPARCState *env,
+-                                     hwaddr *physical, int *prot,
++static int get_physical_address_code(CPUSPARCState *env, hwaddr *physical,
++                                     int *prot, MemTxAttrs *attrs,
+                                      target_ulong address, int mmu_idx)
+ {
+     CPUState *cs =3D env_cpu(env);
+@@ -686,7 +687,7 @@ static int get_physical_address_code(CPUSPARCState *env=
+,
+ }
+
+ static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
+-                                int *prot, int *access_index,
++                                int *prot, int *access_index, MemTxAttrs *=
+attrs,
+                                 target_ulong address, int rw, int mmu_idx,
+                                 target_ulong *page_size)
+ {
+@@ -716,11 +717,11 @@ static int get_physical_address(CPUSPARCState *env, h=
+waddr *physical,
+     }
+
+     if (rw =3D=3D 2) {
+-        return get_physical_address_code(env, physical, prot, address,
++        return get_physical_address_code(env, physical, prot, attrs, addre=
+ss,
+                                          mmu_idx);
+     } else {
+-        return get_physical_address_data(env, physical, prot, address, rw,
+-                                         mmu_idx);
++        return get_physical_address_data(env, physical, prot, attrs, addre=
+ss,
++                                         rw, mmu_idx);
+     }
+ }
+
+@@ -734,10 +735,11 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, =
+int size,
+     target_ulong vaddr;
+     hwaddr paddr;
+     target_ulong page_size;
++    MemTxAttrs attrs =3D {};
+     int error_code =3D 0, prot, access_index;
+
+     address &=3D TARGET_PAGE_MASK;
+-    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,
++    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,=
+ &attrs,
+                                       address, access_type,
+                                       mmu_idx, &page_size);
+     if (likely(error_code =3D=3D 0)) {
+@@ -747,7 +749,8 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, in=
+t size,
+                                    env->dmmu.mmu_primary_context,
+                                    env->dmmu.mmu_secondary_context);
+
+-        tlb_set_page(cs, vaddr, paddr, prot, mmu_idx, page_size);
++        tlb_set_page_with_attrs(cs, vaddr, paddr, attrs, prot, mmu_idx,
++                                page_size);
+         return true;
+     }
+     if (probe) {
+@@ -849,9 +852,10 @@ static int cpu_sparc_get_phys_page(CPUSPARCState *env,=
+ hwaddr *phys,
+ {
+     target_ulong page_size;
+     int prot, access_index;
++    MemTxAttrs attrs =3D {};
+
+-    return get_physical_address(env, phys, &prot, &access_index, addr, rw,
+-                                mmu_idx, &page_size);
++    return get_physical_address(env, phys, &prot, &access_index, &attrs, a=
+ddr,
++                                rw, mmu_idx, &page_size);
+ }
+
+ #if defined(TARGET_SPARC64)
 --
 1.8.3.1
 
