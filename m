@@ -6,77 +6,66 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F8AC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 13:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BB7C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:00:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA2BC218F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 13:54:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA2BC218F0
+	by mail.kernel.org (Postfix) with ESMTPS id 119CE2075E
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:00:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 119CE2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqeCT-0006mM-SH
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 09:54:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55046)
+	id 1hqeIQ-0001YT-Mg
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:00:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56362)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hqeCJ-0006Mr-VQ
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:54:21 -0400
+ (envelope-from <alex.williamson@redhat.com>) id 1hqeIF-00015v-2J
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:00:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hqeCI-0003xI-Ra
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:54:19 -0400
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:41192)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqeCI-0003wz-NK
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:54:18 -0400
-Received: by mail-qk1-f195.google.com with SMTP id v22so36447042qkj.8
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 06:54:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/E71BZIb+jh/GZEIRucOCuQ+V3aBDD4v9txMUAqPg6c=;
- b=h6f4BChC/nJ3M3td3Hm5/tp0vF84gZm9agY9ar7GqZdVuubu1GeY4T5mN9+/0G5TML
- EW283GAIDWT64brK5Ie8+1bGVlfviBQIe4mEzRxIgsW7NTVr/FXa9KkD/ZHKaqgl/xej
- MosM88oTIWnIORNjYX8MZYtAxn6W7D97I6kYjsMiST37pX1Tp3iWgGex/L9MneIMgofk
- VUbrwHKUtfdoSlOE9RqfxrbiK9jdxfdIH9ppk3PiDKM99uW92n/+zo//zBMLUmn8/je6
- p8g2mIxqHzfKS1gIzZs7WII4v/pM+0xxkes5Z6MED7iPF0EFwfxYf6mZGBXOoBs6Fju/
- 9Pnw==
-X-Gm-Message-State: APjAAAXlHEQoy93rKo840S8heBVeNEDNbCCUnBryA9OGbZmTgwK3FjRg
- FyIYMXx0q6rU9uBo90AypMYM2g==
-X-Google-Smtp-Source: APXvYqyau5tB5GpOQmJqCs/WH/wL0/biYoXKXc4fKk8/Glo7bGAuzdXe9paO0q78QOJIPoIuZkvlAw==
-X-Received: by 2002:a37:b843:: with SMTP id i64mr56200664qkf.77.1564062858244; 
- Thu, 25 Jul 2019 06:54:18 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- b13sm30572380qtk.55.2019.07.25.06.54.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 06:54:17 -0700 (PDT)
-Date: Thu, 25 Jul 2019 09:54:11 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190725094837-mutt-send-email-mst@kernel.org>
-References: <CAFEAcA_XfRS1b-4ANmR5WLL=19Md6Dp7+M_FAK8pQAJn2MaCOA@mail.gmail.com>
- <20190702220400.GA13923@localhost>
- <20190725055908-mutt-send-email-mst@kernel.org>
- <CAFEAcA-uDtTFOyTwMY5KtWeqvirxDejQdvnx5OCZ8pyUhKhE+w@mail.gmail.com>
- <87pnlymm47.fsf@redhat.com>
- <d48da49f-c8d8-00f7-1634-569e8d924b8a@redhat.com>
- <CAJSP0QUJCh-SaZ9NQ+Wr8vr7R+gBsfhYmBrx45B4z2G9v9L=1A@mail.gmail.com>
- <20190725080556-mutt-send-email-mst@kernel.org>
- <CAJSP0QVvnXV8Ha0yaO84qLL6unVroV5GqcuL-x9ruB7o_24WBA@mail.gmail.com>
- <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
+ (envelope-from <alex.williamson@redhat.com>) id 1hqeIE-0007oE-4v
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:00:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:22836)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1hqeID-0007nx-Vc
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:00:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B102EC057F88;
+ Thu, 25 Jul 2019 14:00:24 +0000 (UTC)
+Received: from x1.home (ovpn-116-99.phx2.redhat.com [10.3.116.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E48705C22F;
+ Thu, 25 Jul 2019 14:00:23 +0000 (UTC)
+Date: Thu, 25 Jul 2019 08:00:23 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190725080023.24de0d82@x1.home>
+In-Reply-To: <20190725064244-mutt-send-email-mst@kernel.org>
+References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
+ <20190329104904.450fefef@x1.home>
+ <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
+ <20190723112618.0efafa8d@x1.home> <20190724071439.GB18771@xz-x1>
+ <20190724040837-mutt-send-email-mst@kernel.org>
+ <20190724100331.GA14454@xz-x1> <20190724084355.627d44cf@x1.home>
+ <20190725063733.GH14454@xz-x1>
+ <20190725064244-mutt-send-email-mst@kernel.org>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Thu, 25 Jul 2019 14:00:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.195
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
+ device IOMMU address space
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,71 +77,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "Singh, Brijesh" <brijesh.singh@amd.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <zhexu@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>, "Suthikulpanit,
+ Suravee" <Suravee.Suthikulpanit@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 25, 2019 at 03:43:12PM +0200, Paolo Bonzini wrote:
-> On 25/07/19 15:26, Stefan Hajnoczi wrote:
-> > The microvm design has a premise and it can be answered definitively
-> > through performance analysis.
-> > 
-> > If I had to explain to someone why PCI or ACPI significantly slows
-> > things down, I couldn't honestly do so.  I say significantly because
-> > PCI init definitely requires more vmexits but can it be a small
-> > number?  For ACPI I have no idea why it would consume significant
-> > amounts of time.
-> 
-> My guess is that it's just a lot of code that has to run. :(
-> 
-> > Until we have this knowledge, the premise of microvm is unproven and
-> > merging it would be premature because maybe we can get into the same
-> > ballpark by optimizing existing code.
-> > 
-> > I'm sorry for being a pain.  I actually think the analysis will
-> > support microvm, but it still needs to be done in order to justify it.
-> 
-> No, you're not a pain, you're explaining your reasoning and that helps.
-> 
-> To me *maintainability is the biggest consideration* when introducing a
-> new feature.  "We can do just as well with q35" is a good reason to
-> deprecate and delete microvm, but not a good reason to reject it now as
-> long as microvm is good enough in terms of maintainability.  Keeping it
-> out of tree only makes it harder to do this kind of experiment.  virtio
-> 1 seems to be the biggest remaining blocker and I think it'd be a good
-> thing to have even for the ARM virt machine type.
+On Thu, 25 Jul 2019 06:43:04 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Yep. E.g. virtio-iommu guys wanted that too.
+> On Thu, Jul 25, 2019 at 02:37:33PM +0800, Peter Xu wrote:
+> > After re-read Michael's reply, I feel like what Michael suggested is
+> > that we can simply ignore the bus-number-change case by the guest OS
+> > for now, but I might be wrong.  
+> That's what I suggested, yes.
 
-> FWIW the "PCI tax" seems to be ~10 ms in QEMU, ~10 ms in the firmware(*)
-> and ~25 ms in the kernel.
+"by the guest OS", yes, that's the part that's beyond the scope of this
+effort.  If we deem it necessary to support IVHD DMA alias though, it's
+the guest firmware that determines the initial bus numbers, which is
+part of the DeviceID used to defined IVHD entries and we would not be
+able to ignore that initial programming.  Everything related to the
+guest OS renumber PCI buses is out of scope, the guest firmware
+programming initial bus numbers is not.  Thanks,
 
-How did you measure the qemu time btw?
-
->  I must say that's pretty good, but it's still
-> 30% of the whole boot time and reducing it is the hardest part.  If
-> having microvm in tree can help reducing it, good.  Yes, it will get
-> users, but most likely they will have to support pc or q35 as a fallback
-> so we could still delete microvm at any time with the due deprecation
-> period if it turns out to be a failed experiment.
-> 
-> Whether to use qboot or SeaBIOS for microvm is another story, but it's
-> an implementation detail as long as the ROM size doesn't change and/or
-> we don't do versioned machine types.  So we can switch from one to the
-> other at any time; we can also include qboot directly in QEMU's tree,
-> without going through a submodule, which also reduces the infrastructure
-> needed (mirrors, etc.) and makes it easier to delete it.
-> 
-> Paolo
-> 
-> (*) I measured 15ms in SeaBIOS and 5ms in qboot from the first to the
-> last write to 0xcf8.  I suspect part of qboot's 10ms boot time actually
-> end up measured as PCI in SeaBIOS, due to different init order, so the
-> real firmware cost of PAM and PCI initialization should be 5ms for qboot
-> and 10ms for SeaBIOS.
+Alex
 
