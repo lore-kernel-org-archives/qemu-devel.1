@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B97C76186
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40AECC76186
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:51:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9AC121901
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:47:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9AC121901
+	by mail.kernel.org (Postfix) with ESMTPS id 0ED9821901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:51:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ED9821901
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqRux-0000bM-OE
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:47:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44142)
+	id 1hqRyG-000231-4g
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:51:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44529)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hqRum-00007o-C8
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:47:25 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hqRy4-0001cD-87
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:50:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hqRul-0001mL-B5
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:47:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49646)
+ (envelope-from <jsnow@redhat.com>) id 1hqRy3-0002QA-Ac
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:50:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51816)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hqRuj-0001lh-3I; Wed, 24 Jul 2019 20:47:21 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hqRy1-0002Pi-7B; Wed, 24 Jul 2019 20:50:45 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0DD7981DF0;
- Thu, 25 Jul 2019 00:47:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7FC648553D;
+ Thu, 25 Jul 2019 00:50:44 +0000 (UTC)
 Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 236A21001DD7;
- Thu, 25 Jul 2019 00:47:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E39B460A35;
+ Thu, 25 Jul 2019 00:50:38 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
 To: Sam Eiderman <shmuel.eiderman@oracle.com>, Kevin Wolf <kwolf@redhat.com>, 
  Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
  philmd@redhat.com
@@ -50,7 +51,7 @@ References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
  <EB5E5E3C-CCA1-4138-9623-89ECA7335F88@oracle.com>
  <20190717194623.GF6471@localhost.localdomain>
  <65B72D23-26BE-4C3B-B298-A6231D08BF6C@oracle.com>
-From: John Snow <jsnow@redhat.com>
+ <63344112-c84b-f239-3c34-ad3a613910f7@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -126,17 +127,17 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <63344112-c84b-f239-3c34-ad3a613910f7@redhat.com>
-Date: Wed, 24 Jul 2019 20:47:12 -0400
+Message-ID: <3ecc13e7-097f-7e8c-347d-443020c944d2@redhat.com>
+Date: Wed, 24 Jul 2019 20:50:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <65B72D23-26BE-4C3B-B298-A6231D08BF6C@oracle.com>
+In-Reply-To: <63344112-c84b-f239-3c34-ad3a613910f7@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 25 Jul 2019 00:47:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Thu, 25 Jul 2019 00:50:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
@@ -163,32 +164,41 @@ Sender: "Qemu-devel"
 
 
 
-On 7/19/19 6:10 AM, Sam Eiderman wrote:
-> Well, this patch introduces 3 command line parameters (=E2=80=9Clcyls=E2=
+On 7/24/19 8:47 PM, John Snow wrote:
+>=20
+>=20
+> On 7/19/19 6:10 AM, Sam Eiderman wrote:
+>> Well, this patch introduces 3 command line parameters (=E2=80=9Clcyls=E2=
 =80=9D, =E2=80=9Clheads=E2=80=9D, =E2=80=9Clsecs=E2=80=9D)
-> to =E2=80=9Cscsi-hd=E2=80=9D =E2=80=9Cide-hd=E2=80=9D and =E2=80=9Cvirt=
-io-pci-blk=E2=80=9D so this somehow has something to do with
-> block.
+>> to =E2=80=9Cscsi-hd=E2=80=9D =E2=80=9Cide-hd=E2=80=9D and =E2=80=9Cvir=
+tio-pci-blk=E2=80=9D so this somehow has something to do with
+>> block.
+>>
+>> This patch also adds fw_cfg interface to send these parameters to SeaB=
+IOS.
+>>
+>> "scripts/get_maintainer.pl -f hw/nvram/fw_cfg.c=E2=80=9D gives
+>>
+>> "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> (supporter:Firmware =
+configur...)
+>> Laszlo Ersek <lersek@redhat.com> (reviewer:Firmware configur...)
+>> Gerd Hoffmann <kraxel@redhat.com> (reviewer:Firmware configur=E2=80=A6=
+)
+>>
+>> And this was already Reviewed-by Gerd.
+>>
+>> How should I proceed?
+>>
+>> Sam
+>>
 >=20
-> This patch also adds fw_cfg interface to send these parameters to SeaBI=
-OS.
->=20
-> "scripts/get_maintainer.pl -f hw/nvram/fw_cfg.c=E2=80=9D gives
->=20
-> "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> (supporter:Firmware c=
-onfigur...)
-> Laszlo Ersek <lersek@redhat.com> (reviewer:Firmware configur...)
-> Gerd Hoffmann <kraxel@redhat.com> (reviewer:Firmware configur=E2=80=A6)
->=20
-> And this was already Reviewed-by Gerd.
->=20
-> How should I proceed?
->=20
-> Sam
+> I feel like it would be up to Gerd as the general SeaBIOS point of cont=
+act?
 >=20
 
-I feel like it would be up to Gerd as the general SeaBIOS point of contac=
-t?
+...ah, who is offline for vacation.
 
---js
+We're in freeze right now anyway, so I would think that Gerd and/or
+Kevin can work out who ought to stage this for a PR when the tree opens
+again.
 
