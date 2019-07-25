@@ -2,81 +2,115 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737D3C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E92BC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:36:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC012084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:35:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC012084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D92002080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:36:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D92002080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaA6-0007pg-H4
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:35:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39879)
+	id 1hqaAj-0000Im-4F
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:36:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40034)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hqa9v-0007Q7-4d
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:35:36 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hqaAY-0008JF-TR
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hqa9t-0006Yb-KF
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:35:35 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34038)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hqa9t-0006Y5-DC
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:35:33 -0400
-Received: by mail-wr1-f65.google.com with SMTP id 31so50044268wrm.1
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 02:35:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=Ntmdf2d/F+FKRdeZIN+l51HgwuVWLbble7/laCiWoEk=;
- b=eozok3boIHjAtYtqIfo/iCxAxZJIkFp9qYtXXf3JzvP01TXB8bNZaggZg/U5hma+bW
- JTQNwXFG+7m/3eWoZukeDzMNDZi/nez0mAP9BZpoF+lJIUY95HQxGzaHJI+aXnV2Etrz
- HYftqBNBugBqH9Y8pxCp/7VqrNdY+2cqOoceI685cr3CTSs3TPESZ8WoMl+NNik8NImG
- ovnXGb1OI+IMZpAvGkxEjiRvpylfYZdDcf24EgrNwl7fRhgQVHLSvNlrUD6peKVn2zk7
- R9vlwTSo3tVmoB0+GqkPn8PNP+VoJZDcq+1yO48HNbWYDyFqBaPHMdjT9pY68Kf92UBg
- J2Jw==
-X-Gm-Message-State: APjAAAX83wro1/3b3Xb8U2FpvQmzMQ1fb36bumXPjclTfHf6WIF1BtaT
- 8sQP4BppKjgu9PDBz2mIxiHhDA==
-X-Google-Smtp-Source: APXvYqw8sLvBsnal0I9VhS3+AR9IZhQdrdjB2TiXuHcUE8HXDZMAaz7QvpiawE1+OBwjafN6lTJfpQ==
-X-Received: by 2002:adf:fdcc:: with SMTP id i12mr13649404wrs.88.1564047331669; 
- Thu, 25 Jul 2019 02:35:31 -0700 (PDT)
-Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
- [83.35.20.18])
- by smtp.gmail.com with ESMTPSA id o24sm54956058wmh.2.2019.07.25.02.35.30
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 02:35:30 -0700 (PDT)
-References: <20190702121106.28374-1-slp@redhat.com>
- <20190703095825.GE11844@stefanha-x1.localdomain> <87d0i7tlkl.fsf@redhat.com>
- <20190719102915.GG18585@stefanha-x1.localdomain> <8736j2p22w.fsf@redhat.com>
- <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
- <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
- <87tvbdrvin.fsf@redhat.com>
- <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
- <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
- <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
-Date: Thu, 25 Jul 2019 11:35:28 +0200
-Message-ID: <87imrqqwwv.fsf@redhat.com>
+ (envelope-from <laurent@vivier.eu>) id 1hqaAY-0006ng-0N
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:36:14 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:59395)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hqaAX-0006nK-OG
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:36:13 -0400
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MjSwu-1iFRJe0VXm-00l05K; Thu, 25 Jul 2019 11:35:56 +0200
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1563977563-29715-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1563977563-29715-3-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Openpgp: preference=signencrypt
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Message-ID: <90d8fed2-6747-ec62-6b49-2dd9321c55f4@vivier.eu>
+Date: Thu, 25 Jul 2019 11:35:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <1563977563-29715-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:h6VOWch/5qtWK4tewa4+bDyRYQspgH/ul6pToqZrbcDhUQAgDwW
+ XB5vTfVoHnsAghIyekBskOTzJj3xAjM8RvP1+Vt9q9/RtCm8zaijjFWi/5R/BQgVTZCh2yD
+ XeqkhPzQNGZS82YkN7UXYD4IVySltfpjlIo9TkBRj1wzRv6NFTmZmwgxKF5Wv9+T0zOcAHH
+ 0eDYPF8fr4pQJUAwCOJdg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8Q2Zuo7stVU=:BJycY3KQAJI4H0A6wT7q+a
+ uDryOdJmZwupO0roJ4gA15MK36FwEgIsEDOcIwEeq1hw1dD8FCFxf6Aftb/uqlW+no6zXEEBe
+ v8bAmGiNAxBcxcQkTZLLbyFe5PE38qPwQkT5V+aCNh83F70ealA/NSG1wagkDMaNaTPqZ6Yf7
+ shR1+j41W2aHjUUGJpvglUA+nqIK7JaS9ZtgDNfcYKO73zpOdA9kxdCXZIkWU0SYVR2Cq7LkQ
+ arOYfuMtxUmetMIF6C382F+apFr9JoSbnI4t+VO1u7ju+Kq5FcT9YD/QkDz2KvBFCByvk6xOh
+ W/5HYfoLfcKgYL3FmmFag/4BiUxg7cHOucV6NJzt1azU8cFDba76zaSjcmqY77n1cC+hQOhGt
+ I6sOMud2seCEilBaDdiV6GoFKaRz8HDDzgpvA79da1Lz9ErfRdS2HAomIi28IJjA2b9bTtHnw
+ fmyUrbFNwoAd4MDyx3AwnfQiNVcWJSIs0e/PVkVD1Iol1xk3s4Sw0vCUXu7+b/XbJ273hcGFo
+ dJbCFaZC4dvIB8cn4Q4UCN2TWvJVTEV1+mXCAXSAa8iF2TCsSo7x1HjEeOCJzlOoJzcxGGIac
+ 7nHeJnJwAwLPLcSzg+Tu0dreVl6tc4rMl+KYrcnVUCJORlz5UZa5yvrjZTdBegjcT1jKG6n/Y
+ oLtBqP6NypZ2vbU66LEcof+vU3ULqss4aIWQ14kj/EAQsLACDuWrI3DhxE+8I0lIXoIsq0G93
+ OOJx8EsZo5ym5aDxsiwib1/RRXvtqNLI+RXO3my+E7uGrT1mCMfCRBVW0P4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 217.72.192.75
+Subject: Re: [Qemu-devel] [PATCH for 4.2 2/3] linux-user: Add support for
+ FDMSGON and FDMSGOFF ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,318 +122,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>, "Montes, Julio" <julio.montes@intel.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- "maran.wilson@oracle.com" <maran.wilson@oracle.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
- "sgarzare@redhat.com" <sgarzare@redhat.com>
+Cc: amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> On 23/07/19 12:01, Paolo Bonzini wrote:
->> The number of buses is determined by the firmware, not by QEMU, so
->> fw_cfg would not be the right interface.  In fact (as I have just
->> learnt) lastbus is an x86-specific option that overrides the last bus
->> returned by SeaBIOS's handle_1ab101.
->>=20
->> So the next step could be to figure out what is the lastbus returned by
->> handle_1ab101 and possibly why it isn't zero.
->
-> Some update:
->
-> - for 64-bit, PCIBIOS (and thus handle_1ab101) is not called.  PCIBIOS is
-> only used by 32-bit kernels.  As a side effect, PCI expander bridges do n=
-ot
-> work on 32-bit kernels with ACPI disabled, because they are located beyond
-> pcibios_last_bus (with ACPI enabled, the DSDT exposes them).
->
-> - for -M pc, pcibios_last_bus in Linux remains -1 and no "legacy scanning=
-" is done.
->
-> - for -M q35, pcibios_last_bus in Linux is set based on the size of the=20
-> MMCONFIG aperture and Linux ends up scanning all 32*255 (bus,dev) pairs=20
-> for buses above 0.
->
-> Here is a patch that only scans devfn=3D=3D0, which should mostly remove =
-the need
-> for pci=3Dlastbus=3D0.  (Testing is welcome).
-
-I just gave it a try. These are the results (avg on 10 consecutive runs):
-
- - Unpatched kernel:
-
-Avg
- qemu_init_end: 75.207386
- linux_start_kernel: 115.056767 (+39.849381)
- linux_start_user: 241.020113 (+125.963346)
-
- - Unpatched kernel with pci=3Dlastbus=3D0:
-
-Avg
- qemu_init_end: 75.468282
- linux_start_kernel: 115.189322 (+39.72104)
- linux_start_user: 192.404823 (+77.215501)
-
- - Patched kernel (without pci=3Dlastbus=3D0):
-
-Avg
- qemu_init_end: 75.605627
- linux_start_kernel: 115.656557 (+40.05093)
- linux_start_user: 192.857655 (+77.201098)
-
-Looks fine to me. There must an extra cost in the patched kernel
-vs. using pci=3Dlastbus=3D0, but it's so low that's hard to catch on the
-average numbers.
-
-> Actually, KVM could probably avoid the scanning altogether.  The only "hi=
-dden" root
-> buses we expect are from PCI expander bridges and if you found an MMCONFI=
-G area
-> through the ACPI MCFG table, you can also use the DSDT to find PCI expand=
-er bridges.
-> However, I am being conservative.
->
-> A possible alternative could be a mechanism whereby the vmlinuz real mode=
- entry
-> point, or the 32-bit PVH entry point, fetch lastbus and they pass it to t=
-he
-> kernel via the vmlinuz or PVH boot information structs.  However, I don't=
- think
-> that's very useful, and there is some risk of breaking real hardware too.
->
-> Paolo
->
-> diff --git a/arch/x86/include/asm/pci_x86.h b/arch/x86/include/asm/pci_x8=
-6.h
-> index 73bb404f4d2a..17012aa60d22 100644
-> --- a/arch/x86/include/asm/pci_x86.h
-> +++ b/arch/x86/include/asm/pci_x86.h
-> @@ -61,6 +61,7 @@ enum pci_bf_sort_state {
->  extern struct pci_ops pci_root_ops;
->=20=20
->  void pcibios_scan_specific_bus(int busn);
-> +void pcibios_scan_bus_by_device(int busn);
->=20=20
->  /* pci-irq.c */
->=20=20
-> @@ -216,8 +217,10 @@ static inline void mmio_config_writel(void __iomem *=
-pos, u32 val)
->  # endif
->  # define x86_default_pci_init_irq	pcibios_irq_init
->  # define x86_default_pci_fixup_irqs	pcibios_fixup_irqs
-> +# define x86_default_pci_scan_bus	pcibios_scan_bus_by_device
->  #else
->  # define x86_default_pci_init		NULL
->  # define x86_default_pci_init_irq	NULL
->  # define x86_default_pci_fixup_irqs	NULL
-> +# define x86_default_pci_scan_bus      NULL
+Le 24/07/2019 à 16:12, Aleksandar Markovic a écrit :
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> FDMSGON and FDMSGOFF switch informational messages of floppy drives
+> on and off.
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  linux-user/ioctls.h       | 2 ++
+>  linux-user/syscall_defs.h | 2 ++
+>  2 files changed, 4 insertions(+)
+> 
+> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+> index 3ade2d2..7fac4fc 100644
+> --- a/linux-user/ioctls.h
+> +++ b/linux-user/ioctls.h
+> @@ -112,6 +112,8 @@
+>       IOCTL(BLKZEROOUT, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 2)))
 >  #endif
-> diff --git a/arch/x86/include/asm/x86_init.h b/arch/x86/include/asm/x86_i=
-nit.h
-> index b85a7c54c6a1..4c3a0a17a600 100644
-> --- a/arch/x86/include/asm/x86_init.h
-> +++ b/arch/x86/include/asm/x86_init.h
-> @@ -251,6 +251,7 @@ struct x86_hyper_runtime {
->   * @save_sched_clock_state:	save state for sched_clock() on suspend
->   * @restore_sched_clock_state:	restore state for sched_clock() on resume
->   * @apic_post_init:		adjust apic if needed
-> + * @pci_scan_bus:		scan a PCI bus
->   * @legacy:			legacy features
->   * @set_legacy_features:	override legacy features. Use of this callback
->   * 				is highly discouraged. You should only need
-> @@ -273,6 +274,7 @@ struct x86_platform_ops {
->  	void (*save_sched_clock_state)(void);
->  	void (*restore_sched_clock_state)(void);
->  	void (*apic_post_init)(void);
-> +	void (*pci_scan_bus)(int busn);
->  	struct x86_legacy_features legacy;
->  	void (*set_legacy_features)(void);
->  	struct x86_hyper_runtime hyper;
-> diff --git a/arch/x86/kernel/jailhouse.c b/arch/x86/kernel/jailhouse.c
-> index 6857b4577f17..b248d7036dd3 100644
-> --- a/arch/x86/kernel/jailhouse.c
-> +++ b/arch/x86/kernel/jailhouse.c
-> @@ -11,12 +11,14 @@
->  #include <linux/acpi_pmtmr.h>
->  #include <linux/kernel.h>
->  #include <linux/reboot.h>
-> +#include <linux/pci.h>
->  #include <asm/apic.h>
->  #include <asm/cpu.h>
->  #include <asm/hypervisor.h>
->  #include <asm/i8259.h>
->  #include <asm/irqdomain.h>
->  #include <asm/pci_x86.h>
-> +#include <asm/pci.h>
->  #include <asm/reboot.h>
->  #include <asm/setup.h>
->  #include <asm/jailhouse_para.h>
-> @@ -136,6 +138,22 @@ static int __init jailhouse_pci_arch_init(void)
->  	return 0;
->  }
->=20=20
-> +static void jailhouse_pci_scan_bus_by_function(int busn)
-> +{
-> +        int devfn;
-> +        u32 l;
-> +
-> +        for (devfn =3D 0; devfn < 256; devfn++) {
-> +                if (!raw_pci_read(0, busn, devfn, PCI_VENDOR_ID, 2, &l) =
-&&
-> +                    l !=3D 0x0000 && l !=3D 0xffff) {
-> +                        DBG("Found device at %02x:%02x [%04x]\n", busn, =
-devfn, l);
-> +                        pr_info("PCI: Discovered peer bus %02x\n", busn);
-> +                        pcibios_scan_root(busn);
-> +                        return;
-> +                }
-> +        }
-> +}
-> +
->  static void __init jailhouse_init_platform(void)
->  {
->  	u64 pa_data =3D boot_params.hdr.setup_data;
-> @@ -153,6 +171,7 @@ static void __init jailhouse_init_platform(void)
->  	x86_platform.legacy.rtc		=3D 0;
->  	x86_platform.legacy.warm_reset	=3D 0;
->  	x86_platform.legacy.i8042	=3D X86_LEGACY_I8042_PLATFORM_ABSENT;
-> +	x86_platform.pci_scan_bus	=3D jailhouse_pci_scan_bus_by_function;
->=20=20
->  	legacy_pic			=3D &null_legacy_pic;
->=20=20
-> diff --git a/arch/x86/kernel/kvm.c b/arch/x86/kernel/kvm.c
-> index 82caf01b63dd..59f7204ed8f3 100644
-> --- a/arch/x86/kernel/kvm.c
-> +++ b/arch/x86/kernel/kvm.c
-> @@ -24,6 +24,7 @@
->  #include <linux/debugfs.h>
->  #include <linux/nmi.h>
->  #include <linux/swait.h>
-> +#include <linux/pci.h>
->  #include <asm/timer.h>
->  #include <asm/cpu.h>
->  #include <asm/traps.h>
-> @@ -33,6 +34,7 @@
->  #include <asm/apicdef.h>
->  #include <asm/hypervisor.h>
->  #include <asm/tlb.h>
-> +#include <asm/pci.h>
->=20=20
->  static int kvmapf =3D 1;
->=20=20
-> @@ -621,10 +623,31 @@ static void kvm_flush_tlb_others(const struct cpuma=
-sk *cpumask,
->  	native_flush_tlb_others(flushmask, info);
->  }
->=20=20
-> +#ifdef CONFIG_PCI
-> +static void kvm_pci_scan_bus(int busn)
-> +{
-> +        u32 l;
-> +
-> +	/*
-> +	 * Assume that there are no "hidden" buses, i.e. all PCI root buses
-> +	 * have a host bridge at device 0, function 0.
-> +	 */
-> +	if (!raw_pci_read(0, busn, 0, PCI_VENDOR_ID, 2, &l) &&
-> +	    l !=3D 0x0000 && l !=3D 0xffff) {
-> +		pr_info("PCI: Discovered peer bus %02x\n", busn);
-> +		pcibios_scan_root(busn);
-> +        }
-> +}
-> +#endif
-> +
->  static void __init kvm_guest_init(void)
->  {
->  	int i;
->=20=20
-> +#ifdef CONFIG_PCI
-> +	x86_platform.pci_scan_bus =3D kvm_pci_scan_bus;
-> +#endif
-> +
->  	if (!kvm_para_available())
->  		return;
->=20=20
-> diff --git a/arch/x86/kernel/x86_init.c b/arch/x86/kernel/x86_init.c
-> index 50a2b492fdd6..19e1cc2cb6e0 100644
-> --- a/arch/x86/kernel/x86_init.c
-> +++ b/arch/x86/kernel/x86_init.c
-> @@ -118,6 +118,7 @@ struct x86_platform_ops x86_platform __ro_after_init =
-=3D {
->  	.get_nmi_reason			=3D default_get_nmi_reason,
->  	.save_sched_clock_state 	=3D tsc_save_sched_clock_state,
->  	.restore_sched_clock_state 	=3D tsc_restore_sched_clock_state,
-> +	.pci_scan_bus			=3D x86_default_pci_scan_bus,
->  	.hyper.pin_vcpu			=3D x86_op_int_noop,
->  };
->=20=20
-> diff --git a/arch/x86/pci/legacy.c b/arch/x86/pci/legacy.c
-> index 467311b1eeea..6214dbce26d3 100644
-> --- a/arch/x86/pci/legacy.c
-> +++ b/arch/x86/pci/legacy.c
-> @@ -36,14 +36,19 @@ int __init pci_legacy_init(void)
->=20=20
->  void pcibios_scan_specific_bus(int busn)
->  {
-> -	int stride =3D jailhouse_paravirt() ? 1 : 8;
-> -	int devfn;
-> -	u32 l;
-> -
->  	if (pci_find_bus(0, busn))
->  		return;
->=20=20
-> -	for (devfn =3D 0; devfn < 256; devfn +=3D stride) {
-> +	x86_platform.pci_scan_bus(busn);
-> +}
-> +EXPORT_SYMBOL_GPL(pcibios_scan_specific_bus);
-> +
-> +void pcibios_scan_bus_by_device(int busn)
-> +{
-> +	int devfn;
-> +	u32 l;
-> +
-> +	for (devfn =3D 0; devfn < 256; devfn +=3D 8) {
->  		if (!raw_pci_read(0, busn, devfn, PCI_VENDOR_ID, 2, &l) &&
->  		    l !=3D 0x0000 && l !=3D 0xffff) {
->  			DBG("Found device at %02x:%02x [%04x]\n", busn, devfn, l);
-> @@ -53,7 +58,6 @@ void pcibios_scan_specific_bus(int busn)
->  		}
->  	}
->  }
-> -EXPORT_SYMBOL_GPL(pcibios_scan_specific_bus);
->=20=20
->  static int __init pci_subsys_init(void)
->  {
+>  
+> +     IOCTL(FDMSGON, 0, TYPE_NULL)
+> +     IOCTL(FDMSGOFF, 0, TYPE_NULL)
+>       IOCTL(FDFLUSH, 0, TYPE_NULL)
+>  
+>  #ifdef FIBMAP
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index 7e22ed7..61c2f3c 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -859,6 +859,8 @@ struct target_pollfd {
+>  
+>  /* From <linux/fd.h> */
+>  
+> +#define TARGET_FDMSGON     TARGET_IO(2, 0x45)
+> +#define TARGET_FDMSGOFF    TARGET_IO(2, 0x46)
+>  #define TARGET_FDFLUSH     TARGET_IO(2, 0x4b)
+>  
+>  #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+> 
 
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl05d+AACgkQ9GknjS8M
-AjW6KQ/+LVInvMtw2Q1gFORhNaXjU2hT8UNySHsiXljN8HEQSbfcQ3Ovs64yLf4s
-PzZ7NM+jxW41Zom7/8SbCQew5peo31X3p/uOtoU+UcMu4RXul+/Ao49MdmxGmKbb
-rEz7ziCQdEAZswsZomIcpv59PSGT2cf6UTqYM7qlVGl5QByeN1gmTQWfJp8Vxd4V
-FdNCuhXc+Y5xHQcQ5nJeibV+cVfHR+5O0aN2+q9oK/eSo01wE4JbJC25aQnasQZ2
-2loSWvzPYl7OiJgTpkbF/zwqIOTIJcgxrK/FBsT5fR9mrEZdi9PpoYZ9pD0R8tvy
-shvcq2vDSQGU4xlbCQ9WEpCr9wUzBRbIeZFJTN4TF3XBUQL0UqdgcQbP73iMwU+5
-QdfIc8GiTIa0Pu1ArpGKT/zUx/SuYVT321yq+PLmrnUw0sYgVlMJ3MlUIVSjmbSq
-fTU/7XS4chxl2fKPOOcXji9WMWhzRt1CCgKIMFJMDQU4gYUY8CieXwjAdm0RquQZ
-+Zz44A8qpkEBy8ZineXC8ZBrfXbSi5g+lrhPdCG4Y2HSf3J4VAY3aH6zIq8a9WUX
-kNmCKr7ZW6RlxDzGtH9axZJrAWfCANUIX7Eiktrk89TNhKIa5Eav31HUq31OKrsA
-I9xBX/QYAlB3T5e5JNcZYQtbzNkdcjZeNW0bUdfFrLvSOk6EFlQ=
-=KQIj
------END PGP SIGNATURE-----
---=-=-=--
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
