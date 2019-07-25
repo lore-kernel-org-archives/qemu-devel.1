@@ -2,63 +2,82 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2A9C76190
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:27:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E315C76190
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:34:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 247A921951
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:27:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247A921951
+	by mail.kernel.org (Postfix) with ESMTPS id D9087229F3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:34:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9087229F3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqhWm-0002HA-Cb
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 13:27:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57360)
+	id 1hqhdB-0005vl-Te
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 13:34:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38074)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hqhWY-0001cQ-2Z
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:27:27 -0400
+ (envelope-from <mst@redhat.com>) id 1hqhcs-0005Dj-UC
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:33:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hqhWW-0001fT-Jf
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:27:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57060)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hqhWO-0001bs-VF; Thu, 25 Jul 2019 13:27:17 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D6EE037F41;
- Thu, 25 Jul 2019 17:27:15 +0000 (UTC)
-Received: from work-vm (ovpn-117-187.ams2.redhat.com [10.36.117.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A82425DA9A;
- Thu, 25 Jul 2019 17:27:14 +0000 (UTC)
-Date: Thu, 25 Jul 2019 18:27:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190725172712.GM2656@work-vm>
-References: <20190725163710.11703-1-peter.maydell@linaro.org>
- <20190725163710.11703-3-peter.maydell@linaro.org>
+ (envelope-from <mst@redhat.com>) id 1hqhcr-0007HJ-JQ
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:33:58 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:36749)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqhcr-0007G9-Dx
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:33:57 -0400
+Received: by mail-qk1-f193.google.com with SMTP id g18so37042031qkl.3
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 10:33:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=wrnrwwipYpAStl3wG0T5xEH4kyINKwE/QX5O+1M0R1E=;
+ b=U6TAFxPMaKiZYYfYBP8fTiKY222gGe8m8b+vvVQ5V7goTv6pWQ5qoHZX+tfoHu7m6u
+ h1Izoiz/hY7Li/aj1ynZZSSP2iCI0WV52Fe08ZLW/KBJPG4adMCTK4py3Jn/DH1qOFsb
+ fnBnxR9X9Le6NfTzveZzafIiwuZQWZMHAvLgDdrW+DhUYfwB7+DF7gBMJQ1vgjHKSFO4
+ mUHhhRXfblWF6a8hLxh7kJQ7F/ZXJtwEkKxOh6reh539r/CB12+PzhNBVKh15Dp2VMdV
+ WXUs9f5bvLcdJZs97pZpp6M/B6PSSCqFxpJxXlAcIqA9YdgBCYxi1aZn1IbAKZsERCyn
+ baXQ==
+X-Gm-Message-State: APjAAAV6J4hXhYRDaBLomYg2HQgl8f9dCetMivi+HgQOiytQtx2lEA+y
+ C00px6qdF+mjfd9ZW/qTPja0xg==
+X-Google-Smtp-Source: APXvYqyy2Pip7ozDIDYAH1WPJbAQLD7M1hVm6RzDkPWgr3KLTMnUjpvYK/PFWD6pJkU2Lok3Un3AgA==
+X-Received: by 2002:a37:b381:: with SMTP id
+ c123mr60950696qkf.349.1564076036425; 
+ Thu, 25 Jul 2019 10:33:56 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ t197sm21921007qke.2.2019.07.25.10.33.52
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 10:33:55 -0700 (PDT)
+Date: Thu, 25 Jul 2019 13:33:49 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <20190725132521-mutt-send-email-mst@kernel.org>
+References: <20190719102915.GG18585@stefanha-x1.localdomain>
+ <8736j2p22w.fsf@redhat.com>
+ <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
+ <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
+ <87tvbdrvin.fsf@redhat.com>
+ <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
+ <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
+ <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
+ <20190725104331-mutt-send-email-mst@kernel.org>
+ <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190725163710.11703-3-peter.maydell@linaro.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 25 Jul 2019 17:27:16 +0000 (UTC)
+In-Reply-To: <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
- VMSTATE_STRUCT_VARRAY macros
+ [fuzzy]
+X-Received-From: 209.85.222.193
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,142 +89,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "maran.wilson@oracle.com" <maran.wilson@oracle.com>, "Montes,
+ Julio" <julio.montes@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> The VMSTATE_STRUCT_VARRAY_UINT32 macro is intended to handle
-> migrating a field which is an array of structs, but where instead of
-> migrating the entire array we only migrate a variable number of
-> elements of it.
+On Thu, Jul 25, 2019 at 05:35:01PM +0200, Paolo Bonzini wrote:
+> On 25/07/19 16:46, Michael S. Tsirkin wrote:
+> > Actually, I think I have a better idea.
+> > At the moment we just get an exit on these reads and return all-ones.
+> > Yes, in theory there could be a UR bit set in a bunch of
+> > registers but in practice no one cares about these,
+> > and I don't think we implement them.
+> > So how about mapping a single page, read-only, and filling it
+> > with all-ones?
 > 
-> The VMSTATE_STRUCT_VARRAY_POINTER_UINT32 macro is intended to handle
-> migrating a field which is of pointer type, and points to a
-> dynamically allocated array of structs of variable size.
+> Yes, that's nice indeed. :)  But it does have some cost, in terms of
+> either number of VMAs or QEMU RSS since the MMCONFIG area is large.
 > 
-> We weren't actually checking that the field passed to
-> VMSTATE_STRUCT_VARRAY_UINT32 really is an array, with the result that
-> accidentally using it where the _POINTER_ macro was intended would
-> compile but silently corrupt memory on migration.
+> What breaks if we return all zeroes?  Zero is not a valid vendor ID.
 > 
-> Add type-checking that enforces that the field passed in is
-> really of the right array type. This applies to all the VMSTATE
-> macros which use flags including VMS_VARRAY_* but not VMS_POINTER.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Paolo
 
-> ---
->  include/migration/vmstate.h | 27 +++++++++++++++++++++------
->  1 file changed, 21 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index ca68584eba4..2df333c3612 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -227,8 +227,19 @@ extern const VMStateInfo vmstate_info_bitmap;
->  extern const VMStateInfo vmstate_info_qtailq;
->  
->  #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
-> +/* Check that t2 is an array of t1 of size n */
->  #define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
+It isn't but that's not what baremetal does. So there's some risk
+there ...
 
-I'd have to admit I don't understand why that does what you say;
-I'd expected something to index a t2 pointer with [n].
+Why is all zeroes better? We still need to map it, right?
 
-However, for the rest of it, from migration I'm happy:
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-given it's just fixing an ARM bug, and given it'll blow up straight away
-I think it's OK for 4.1; the only risk is if we find a compiler we don't
-like.
-
-
->  #define type_check_pointer(t1,t2) ((t1**)0 - (t2*)0)
-> +/*
-> + * type of element 0 of the specified (array) field of the type.
-> + * Note that if the field is a pointer then this will return the
-> + * pointed-to type rather than complaining.
-> + */
-> +#define typeof_elt_of_field(type, field) typeof(((type *)0)->field[0])
-> +/* Check that field f in struct type t2 is an array of t1, of any size */
-> +#define type_check_varray(t1, t2, f)                                 \
-> +    (type_check(t1, typeof_elt_of_field(t2, f))                      \
-> +     + QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(((t2 *)0)->f)))
->  
->  #define vmstate_offset_value(_state, _field, _type)                  \
->      (offsetof(_state, _field) +                                      \
-> @@ -253,6 +264,10 @@ extern const VMStateInfo vmstate_info_qtailq;
->      vmstate_offset_array(_state, _field, uint8_t,                    \
->                           sizeof(typeof_field(_state, _field)))
->  
-> +#define vmstate_offset_varray(_state, _field, _type)                 \
-> +    (offsetof(_state, _field) +                                      \
-> +     type_check_varray(_type, _state, _field))
-> +
->  /* In the macros below, if there is a _version, that means the macro's
->   * field will be processed only if the version being received is >=
->   * the _version specified.  In general, if you add a new field, you
-> @@ -347,7 +362,7 @@ extern const VMStateInfo vmstate_info_qtailq;
->      .info       = &(_info),                                          \
->      .size       = sizeof(_type),                                     \
->      .flags      = VMS_VARRAY_UINT32|VMS_MULTIPLY_ELEMENTS,           \
-> -    .offset     = offsetof(_state, _field),                          \
-> +    .offset     = vmstate_offset_varray(_state, _field, _type),      \
->  }
->  
->  #define VMSTATE_ARRAY_TEST(_field, _state, _num, _test, _info, _type) {\
-> @@ -376,7 +391,7 @@ extern const VMStateInfo vmstate_info_qtailq;
->      .info       = &(_info),                                          \
->      .size       = sizeof(_type),                                     \
->      .flags      = VMS_VARRAY_INT32,                                  \
-> -    .offset     = offsetof(_state, _field),                          \
-> +    .offset     = vmstate_offset_varray(_state, _field, _type),      \
->  }
->  
->  #define VMSTATE_VARRAY_INT32(_field, _state, _field_num, _version, _info, _type) {\
-> @@ -416,7 +431,7 @@ extern const VMStateInfo vmstate_info_qtailq;
->      .info       = &(_info),                                          \
->      .size       = sizeof(_type),                                     \
->      .flags      = VMS_VARRAY_UINT16,                                 \
-> -    .offset     = offsetof(_state, _field),                          \
-> +    .offset     = vmstate_offset_varray(_state, _field, _type),      \
->  }
->  
->  #define VMSTATE_VSTRUCT_TEST(_field, _state, _test, _version, _vmsd, _type, _struct_version) { \
-> @@ -520,7 +535,7 @@ extern const VMStateInfo vmstate_info_qtailq;
->      .vmsd       = &(_vmsd),                                          \
->      .size       = sizeof(_type),                                     \
->      .flags      = VMS_STRUCT|VMS_VARRAY_UINT8,                       \
-> -    .offset     = offsetof(_state, _field),                          \
-> +    .offset     = vmstate_offset_varray(_state, _field, _type),      \
->  }
->  
->  /* a variable length array (i.e. _type *_field) but we know the
-> @@ -573,7 +588,7 @@ extern const VMStateInfo vmstate_info_qtailq;
->      .vmsd       = &(_vmsd),                                          \
->      .size       = sizeof(_type),                                     \
->      .flags      = VMS_STRUCT|VMS_VARRAY_INT32,                       \
-> -    .offset     = offsetof(_state, _field),                          \
-> +    .offset     = vmstate_offset_varray(_state, _field, _type),      \
->  }
->  
->  #define VMSTATE_STRUCT_VARRAY_UINT32(_field, _state, _field_num, _version, _vmsd, _type) { \
-> @@ -583,7 +598,7 @@ extern const VMStateInfo vmstate_info_qtailq;
->      .vmsd       = &(_vmsd),                                          \
->      .size       = sizeof(_type),                                     \
->      .flags      = VMS_STRUCT|VMS_VARRAY_UINT32,                      \
-> -    .offset     = offsetof(_state, _field),                          \
-> +    .offset     = vmstate_offset_varray(_state, _field, _type),      \
->  }
->  
->  #define VMSTATE_STRUCT_VARRAY_ALLOC(_field, _state, _field_num, _version, _vmsd, _type) {\
-> -- 
-> 2.20.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+MST
 
