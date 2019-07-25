@@ -2,139 +2,87 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB977C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5942C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:37:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8702422C7B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:35:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8702422C7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8363A218F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:37:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DjFVat4F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8363A218F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqgi2-0003n3-KU
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 12:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45461)
+	id 1hqgkO-0005nU-Cy
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 12:37:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48366)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hqghq-0003OE-D3
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:35:03 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqgk0-0004bY-H9
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hqghn-0004W8-5w
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:35:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60742)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hqgha-0004KN-6N
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:34:50 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B3F4DC057F88;
- Thu, 25 Jul 2019 16:34:40 +0000 (UTC)
-Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 59B2460C18;
- Thu, 25 Jul 2019 16:34:40 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <976a4589-f836-0f31-b682-f384e22149e9@redhat.com>
- <CAFEAcA8eCsgAeX1--jZubKJ+v1U_ioa2q_Ec7UAQiRU6bKTpLA@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <676de2d8-b7bd-1f16-8270-8bc5f7de8254@redhat.com>
-Date: Thu, 25 Jul 2019 12:34:39 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hqgjz-0007EZ-CJ
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:37:16 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55848)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqgjz-0007DE-68
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:37:15 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a15so45582588wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 09:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=yM6cVpuxn4Ke92kaJ4AKkVK8RWiK/GxhKcUyMJM8z1M=;
+ b=DjFVat4FH98pFLbbLk+slSWzmsHNOwovfvZGBlQivOkRG7faTKI4L17ghY1gr0OT8e
+ dEyxzQp+sEZb3zmxy7p4NEuXHEF7dcSOCLREPlVQlAj4jq2CTp1s8Z7uawZ5Y70Ri3Pt
+ FAJhHPaygvT7rEL4jNOQhJOjPqvDTSIo30Le3qdEd+D1Vkona5/NouCdJx7jMD4A/l9F
+ iVLcDOn56kRqGdAVpTDhCTP7hQBJgih1aaeC011DEupvIoEerSecl/hO2aNq2+/HFQFP
+ FDbau2qt4aMqfbZl/VGXpo/Zfh+LzDy01qmuQ7L+Bo8wrBo+rgFpZ7IWU8Kuz02NG5CZ
+ W4Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=yM6cVpuxn4Ke92kaJ4AKkVK8RWiK/GxhKcUyMJM8z1M=;
+ b=F3PUCcFM2EDAF1DzV+SpxO5J1c/9vVuTeqOWWvA1CIJiUPspjSyrIJ7MZWUobffbzA
+ 9QhaOfZwqf3+mbzE/WHSpwULg7LdvJsQduVryuH8nN6c3sTFKdDKhKCfk9miKmMyvVnz
+ CXyZeHh7G10KULCZH+0ZcBQtECuvMLOpEsh/LUk+6tuTcq2GGuv3/KBtpGruSjijvxaw
+ 2vSmczx6lLsGmLjgwccs82fneKWoUA0ppjZKwFCQJUJb3RI20vu99fosNImtE59/r9Gm
+ 3jjWLGKJ4nHxdDa5uD89LcJsUye8QDXFwdVMgWv0nujDzlIrHZSm35g9A0Hag42GhovB
+ zxBw==
+X-Gm-Message-State: APjAAAUrpVpee70+0Yv08a30J2PfiTAFTwPjGk+XYTELA2NpB0Xz2Mjv
+ znDZXosFX1VTemQUi0Ovsxs9ZRwROtD1NQ==
+X-Google-Smtp-Source: APXvYqzjRObidkUUfzdjentlnvHNZgkWCtmlb67xi5wGU1sjg4idDDa2EPCiD3rTMRScFiWPS8NO5w==
+X-Received: by 2002:a1c:7e85:: with SMTP id z127mr82974403wmc.95.1564072634239; 
+ Thu, 25 Jul 2019 09:37:14 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id c7sm44125140wro.70.2019.07.25.09.37.12
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 09:37:13 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Thu, 25 Jul 2019 17:37:09 +0100
+Message-Id: <20190725163710.11703-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190725163710.11703-1-peter.maydell@linaro.org>
+References: <20190725163710.11703-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8eCsgAeX1--jZubKJ+v1U_ioa2q_Ec7UAQiRU6bKTpLA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 25 Jul 2019 16:34:40 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Sphinx and docs/index.rst: dead code?
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH for-4.1? 1/2] stellaris_input: Fix vmstate
+ description of buttons field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,82 +94,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+gamepad_state::buttons is a pointer to an array of structs,
+not an array of structs, so should be declared in the vmstate
+with VMSTATE_STRUCT_VARRAY_POINTER_INT32; otherwise we
+corrupt memory on incoming migration.
 
+We bump the vmstate version field as the easiest way to
+deal with the migration break, since migration wouldn't have
+worked reliably before anyway.
 
-On 7/25/19 5:08 AM, Peter Maydell wrote:
-> On Thu, 25 Jul 2019 at 00:22, John Snow <jsnow@redhat.com> wrote:
->>
->> Does anything actually use this file? It doesn't appear to be used for
->> generating the HTML manuals.
-> 
-> It's there for if you want to do a "build all the manuals into
-> a single document" -- see the comments at the top of docs/conf.py.
-> Basically this is there because for QEMU's own purposes we want
-> to build several separate manuals (devel, interop, etc) so we
-> can install for the user only the ones that are user-facing
-> (ie "not devel"). But it seemed to me at the time to be worth
-> also supporting the "build a full thing" for the benefit of
-> sites like readthedocs. Currently the only way to use it is
-> if you hand-run an appropriate sphinx-build command.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/input/stellaris_input.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Yup; I think a single point of entry would be nice -- I think we need to
-start hosting our sphinx documentation because it's confusing that we
-have both the traditional manual (hosted by Stefan Weil) and this newer
-one that isn't available anywhere.
+diff --git a/hw/input/stellaris_input.c b/hw/input/stellaris_input.c
+index 20c87d86f40..3a666d61d47 100644
+--- a/hw/input/stellaris_input.c
++++ b/hw/input/stellaris_input.c
+@@ -60,12 +60,14 @@ static const VMStateDescription vmstate_stellaris_button = {
+ 
+ static const VMStateDescription vmstate_stellaris_gamepad = {
+     .name = "stellaris_gamepad",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_INT32(extension, gamepad_state),
+-        VMSTATE_STRUCT_VARRAY_INT32(buttons, gamepad_state, num_buttons, 0,
+-                              vmstate_stellaris_button, gamepad_button),
++        VMSTATE_STRUCT_VARRAY_POINTER_INT32(buttons, gamepad_state,
++                                            num_buttons,
++                                            vmstate_stellaris_button,
++                                            gamepad_button),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+-- 
+2.20.1
 
-The interop manual in particular is crucial to get hosted.
-
-> (The fact that we will need to do some running of other
-> commands to autogenerate .rst input from .hx files might mean
-> that it's not really possible to support this sort of "third party
-> site" docs setup in the end; but for the moment we retain the
-> option to do this.)
-> 
-
-OK, sure -- just wasn't sure if the feature was coming or going. I'll
-consider it "coming" then.
-
-We could perhaps formalize this as follows:
-
-- index.rst, which is an "absolutely everything included" single point
-of entry manual for developers and contributors,
-
-- user.rst, which could be a single point of entry for end users, to be
-bundled in distro packaging.
-
-Then we can build either a single-target dev manual, a single-target
-user manual, or any of the individual component manuals. I'm not sure
-which should be the default, though.
-
-> Doing a top-level build will also complain about a couple
-> random .rst files in docs/ not being in the toc tree --
-> we need to fix this at some point anyway by putting that
-> documentation into its proper place in the manual set.
-> 
->> It looks like we might use it for latex, man and texinfo output from
->> sphinx judging by docs/conf.py, but I don't think we actually use sphinx
->> to generate such output, so I think this is all dead code.
-> 
-> We will generate the manpage output in the same way we do
-> HTML, by invoking sphinx-build on the different manual
-> directories -- nothing in-tree does this today but this
-> patch:
-> https://patchew.org/QEMU/20190618104718.25433-1-peter.maydell@linaro.org/
-> does the conversion of the qemu-ga docs/manpage and should
-> be ready to go in once 4.1 is out the door.
-> 
-> thanks
-> -- PMM
-> 
-
-Nice!
-
-Thanks for the info.
-
---js
 
