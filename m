@@ -2,84 +2,77 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1720C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 584E4C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:59:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D56C20840
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:59:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNtDbLcO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D56C20840
+	by mail.kernel.org (Postfix) with ESMTPS id 302CC20840
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:59:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 302CC20840
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaXA-0007Jh-Ni
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:59:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46929)
+	id 1hqaXV-00088d-Hz
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:59:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46999)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hqaWz-0006uq-Ui
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:59:26 -0400
+ (envelope-from <mst@redhat.com>) id 1hqaXL-0007kD-UH
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:59:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hqaWy-0003HU-Tz
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:59:25 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46693)
+ (envelope-from <mst@redhat.com>) id 1hqaXK-0003NQ-RG
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:59:47 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:37224)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hqaWy-0003Gt-NK
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:59:24 -0400
-Received: by mail-wr1-x444.google.com with SMTP id z1so50051283wru.13
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 02:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=OzlZKSZ0puaqzc/KZY+YYshwgMEAsbAGs4Z9IOdUNaM=;
- b=kNtDbLcOFn462rz8LBONOmpLHcXD933RkP4xYFtIzRevKRLXqcVpNVGCQ+biXlTe4g
- lBelp/CynFLyaIsPZo8hdtsDcz8+Shr5O2pSHn2wtFbwNMS3ThtmZD+GqScJLcAVYQNp
- fg8dRP4Ierjtdl3PsMY1GR8i8JtGq6FpUbR/G1MTOen51U+TPRs9avKNr5T+Uobg+fUx
- 0Hlrh70Iu2l+zdF/wuSxnj6364EhNdK34JbhIrvZ+i6tC6tOP1AezA/KkA3cpCJfX30N
- srrHrEk2/JroDWcURAAL5FAfELSFzGph3Py0IKCfhPMtJunPV9323+6SGtB1SlCCoezR
- OCOw==
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqaXK-0003NJ-Ne
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:59:46 -0400
+Received: by mail-qk1-f193.google.com with SMTP id d15so35930733qkl.4
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 02:59:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=OzlZKSZ0puaqzc/KZY+YYshwgMEAsbAGs4Z9IOdUNaM=;
- b=GQEXXRop5KYutMUWIJNCUwLLV17hAvfqasYnYtlclIfUV7kjwK3amkIfr2iTVpIUYC
- 6ZMP1t+hh6TfQoyRBHPHJxjHZ1h1HKUXEGzOIWaXLRGR2+P1xrZsvq/fCuW0E6Hfl0+R
- dcbR/TEZiP07KhODzo6Z7MGA/es+KUWAVO3/vM8qPrVlViTtu5AeRrTUc2lsLF9SdWkq
- zW0xx70ocG8K+1jqZSAnLzEDgAOCx0A8rBWbbuKQgA40VzU9eUhzAfWcE4yuYfSTZ3P7
- +/p4F5xyClPM3kVFdcxnDT7KH2UFABXXvXYlKTP9waHZLsXZd7H+dRvLsp/WDtM714Pj
- 2Acw==
-X-Gm-Message-State: APjAAAXvPNGvPRRz7Mv4sAG/jzHfhRgOi2JCbofE/aLXbOjdagK7sdhl
- QXFGG5ACkV9mnqD6SKbsxAJTj6/b3Sg=
-X-Google-Smtp-Source: APXvYqwJvBZ3+AO3rpWDSwWrmYw7CsELF4nPJbzclDDu37LfwqqttqBTzUHc2wtx/WL0lRzG7IvpaA==
-X-Received: by 2002:a5d:5450:: with SMTP id w16mr44880272wrv.128.1564048762437; 
- Thu, 25 Jul 2019 02:59:22 -0700 (PDT)
-Received: from localhost.localdomain ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=fiy0NLQy2/WDN9kcMtV2H9/OxpWSLCZqjaNvDKa5rfQ=;
+ b=D1qU1HrrJKOU/QRvqAaT3PxtffnhkWk+8F/JyYwfV41qRCpjyZ1fJaM/xo8TPej4LL
+ Z8E5ifYloKwMPgGZVZGjzg3s9A0q4jMTTP4jE4VGh9/0TQYXNoDIfXfNF3n8h5+I6BOK
+ iLBf38nziNhlQKR13a33MJ65Xr8TDvfLu9EJA6cQIjbmJAZfiozyUfOeOGLr8Wltdl1K
+ +Ozi1GJFXbaDx4CnqJfbu40ifgHjzPdfPQQM/fUVW5KjWRV29M2+3lUMq5xbUoTX//4s
+ eGxc75YOLb2kNlySbHUEICD7OlhQVmL5j8hOcNvtso3NGYY8MxaDrfw0XkjW9V4iSx3+
+ wd3A==
+X-Gm-Message-State: APjAAAXQgvP/32vw+kqHupInRQvhiLCAAikzE+YuOZ9LGdkkXr1CgTl1
+ aqiAgt7LQ5t1xTAvNBQiXWeGSw==
+X-Google-Smtp-Source: APXvYqxPq4EryaOOQ3V80rKQKaIjVjose+y38M8Dxc2Eq4rRQxHU7SFrPr2r2myUDqTSFzwhaY6kEw==
+X-Received: by 2002:a05:620a:14a1:: with SMTP id
+ x1mr60088116qkj.164.1564048786257; 
+ Thu, 25 Jul 2019 02:59:46 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
  by smtp.gmail.com with ESMTPSA id
- d10sm40221726wrx.34.2019.07.25.02.59.21
+ o71sm20544312qke.18.2019.07.25.02.59.42
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 02:59:21 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 25 Jul 2019 11:59:20 +0200
-Message-Id: <20190725095920.28419-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ Thu, 25 Jul 2019 02:59:45 -0700 (PDT)
+Date: Thu, 25 Jul 2019 05:59:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190725055908-mutt-send-email-mst@kernel.org>
+References: <20190702121106.28374-1-slp@redhat.com>
+ <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
+ <87a7dwnxwj.fsf@redhat.com>
+ <CAFEAcA_XfRS1b-4ANmR5WLL=19Md6Dp7+M_FAK8pQAJn2MaCOA@mail.gmail.com>
+ <20190702220400.GA13923@localhost>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH] block: fix NetBSD qemu-iotests failure
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190702220400.GA13923@localhost>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.222.193
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,51 +84,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, maran.wilson@oracle.com,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Opening a block device on NetBSD has an additional step compared to other OSes,
-corresponding to raw_normalize_devicepath.  The error message in that function
-is slightly different from that in raw_open_common and this was causing spurious
-failures in qemu-iotests.  However, in general it is not important to know what
-exact step was failing, for example in the qemu-iotests case the error message
-contains the fairly unequivocal "No such file or directory" text from strerror.
-We can thus fix the failures by standardizing on a single error message for
-both raw_open_common and raw_normalize_devicepath; in fact, we can even
-use error_setg_file_open to make sure the error message is the same as in
-the rest of QEMU.
+On Wed, Jul 03, 2019 at 12:04:00AM +0200, Sergio Lopez wrote:
+> On Tue, Jul 02, 2019 at 07:04:15PM +0100, Peter Maydell wrote:
+> > On Tue, 2 Jul 2019 at 18:34, Sergio Lopez <slp@redhat.com> wrote:
+> > > Peter Maydell <peter.maydell@linaro.org> writes:
+> > > > Could we use virtio-pci instead of virtio-mmio? virtio-mmio is
+> > > > a bit deprecated and tends not to support all the features that
+> > > > virtio-pci does. It was introduced mostly as a stopgap while we
+> > > > didn't have pci support in the aarch64 virt machine, and remains
+> > > > for legacy "we don't like to break existing working setups" rather
+> > > > than as a recommended config for new systems.
+> > >
+> > > Using virtio-pci implies keeping PCI and ACPI support, defeating a
+> > > significant part of microvm's purpose.
+> > >
+> > > What are the issues with the current state of virtio-mmio? Is there a
+> > > way I can help to improve the situation?
+> > 
+> > Off the top of my head:
+> >  * limitations on numbers of devices
+> >  * no hotplug support
+> >  * unlike PCI, it's not probeable, so you have to tell the
+> >    guest where all the transports are using device tree or
+> >    some similar mechanism
+> >  * you need one IRQ line per transport, which restricts how
+> >    many you can have
+> >  * it's only virtio-0.9, it doesn't support any of the new
+> >    virtio-1.0 functionality
+> >  * it is broadly not really maintained in QEMU (and I think
+> >    not really in the kernel either? not sure), because we'd
+> >    rather not have to maintain two mechanisms for doing virtio
+> >    when virtio-pci is clearly better than virtio-mmio
+> 
+> Some of these are design issues, but others can be improved with a bit
+> of work.
+> 
+> As for the maintenance burden, I volunteer myself to help with that, so
+> it won't have an impact on other developers and/or projects.
+> 
+> Sergio.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- block/file-posix.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+OK so please start with adding virtio 1 support. Guest bits
+have been ready for years now.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 73a001ceb7..a2089b1f87 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -217,7 +217,7 @@ static int raw_normalize_devicepath(const char **filename, Error **errp)
-     fname = *filename;
-     dp = strrchr(fname, '/');
-     if (lstat(fname, &sb) < 0) {
--        error_setg_errno(errp, errno, "%s: stat failed", fname);
-+        error_setg_file_open(errp, errno, fname);
-         return -errno;
-     }
- 
-@@ -547,7 +547,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     ret = fd < 0 ? -errno : 0;
- 
-     if (ret < 0) {
--        error_setg_errno(errp, -ret, "Could not open '%s'", filename);
-+        error_setg_file_open(errp, -ret, filename);
-         if (ret == -EROFS) {
-             ret = -EACCES;
-         }
 -- 
-2.21.0
-
+MST
 
