@@ -2,84 +2,63 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33816C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 13:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD71C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 13:22:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0D062238C
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 13:17:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jOoZUSkM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0D062238C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 94D7F2190F
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 13:22:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94D7F2190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqdcG-0006Cw-74
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 09:17:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46257)
+	id 1hqdhx-0000xk-C8
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 09:22:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47633)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hqdc3-0005oI-Q3
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:16:53 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hqdhn-0000Z9-8i
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:22:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hqdc2-0000m8-8G
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:16:51 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39854)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hqdc2-0000lw-0w
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:16:50 -0400
-Received: by mail-wm1-x343.google.com with SMTP id u25so34362139wmc.4
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 06:16:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=awbVXWJ0H/ID3VyhdnpYTxFXtlPEQgwVdKk0JkyiGr0=;
- b=jOoZUSkMmj/j/ogJ+DXzuExrj5flQkoMEBUUMI/CUrVc/GUPlgv/xUxNnnwLJcntKa
- b3D0UrRetimHCtlB8G5EYJbgESo2lE2Q1O9XdeIT0d+8AL7PXcTHNcRtxoLmnjb/0AoY
- COmuDDWv8D88hJ6KqtvsDTcGlfemxzykO1Cetj+lsgxbeKv9iksZbEusgNlDnoDY2G8Y
- WrtF8PW9NReTBdbiWIdkbvBaeJky2Km51YC4KkbP2wrBHTAIEn2QmrO4Awyh+aeEeug7
- hFss4GkCrT27aQrsE6GlO8Oh9STM5Z/cD4oOd2aCRr155q+X2PY5rUs29UIElrpLpv/U
- V4iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=awbVXWJ0H/ID3VyhdnpYTxFXtlPEQgwVdKk0JkyiGr0=;
- b=PWjRzJjvz9TN+Rm/N8a7l79NgXvr6FjF3vjbJIDsaBtdtAkt5SZ7QSQPOXGRz7Bm6q
- O7ewYP5Oq+0ZIVt9SXnO/cUoDjUi1FVpvdDCMtSE67SbR8t0l0kB66Gsm3edEIPimMD0
- GqX29M908PRqPN9vLTJLS/+JnkHsoLly5OKTMM+7FOqB+hsUWu3wDhHY1Gk1uNUgyNfq
- AXb26lwpd5+xOF1SayduAOcaB8FyphkjpoXp6HITtG6cDplUI96npnxG1SS8KNLcEFxr
- UOMoRCCJcECrVIQegaDXms5BhiYVIw99YclRmLSL/RorE3kC/dUCrsmeywagBkBNjLtt
- Milg==
-X-Gm-Message-State: APjAAAWg5+XBo8q1Tp82/Q/CvOX45ojGzpPmgoBaQGBRb9QjiYPux7T/
- hzz1qoLml8tNJzdmjjoGrvyGx+DPrtHctg==
-X-Google-Smtp-Source: APXvYqxxMId0LL7ZwUHEf25SkHDjH9pwlWEmWCExQfn6ZZ66hbpZrnbkLcunjYx71yn8EtLjG0R46w==
-X-Received: by 2002:a1c:ab06:: with SMTP id u6mr78455815wme.125.1564060608558; 
- Thu, 25 Jul 2019 06:16:48 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x185sm38771751wmg.46.2019.07.25.06.16.47
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 06:16:47 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu, 25 Jul 2019 14:16:45 +0100
-Message-Id: <20190725131645.19501-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <dgilbert@redhat.com>) id 1hqdhm-0002gG-CI
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:22:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:31561)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hqdhm-0002fM-6U
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 09:22:46 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D2B43326036A;
+ Thu, 25 Jul 2019 13:22:43 +0000 (UTC)
+Received: from work-vm (ovpn-117-187.ams2.redhat.com [10.36.117.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 726D819C7F;
+ Thu, 25 Jul 2019 13:22:37 +0000 (UTC)
+Date: Thu, 25 Jul 2019 14:22:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Message-ID: <20190725132234.GG2656@work-vm>
+References: <20190725032321.12721-1-alxndr@bu.edu>
+ <20190725032321.12721-6-alxndr@bu.edu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: [Qemu-devel] [PATCH for-4.1] linux-user: Make sigaltstack stacks
- per-thread
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190725032321.12721-6-alxndr@bu.edu>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Thu, 25 Jul 2019 13:22:44 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC 05/19] fuzz: expose qemu_savevm_state & skip
+ state header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,196 +70,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- patches@linaro.org
+Cc: Juan Quintela <quintela@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The alternate signal stack set up by the sigaltstack syscall is
-supposed to be per-thread.  We were incorrectly implementing it as
-process-wide.  This causes problems for guest binaries that rely on
-this.  Notably the Go runtime does, and so we were seeing crashes
-caused by races where two guest threads might incorrectly both
-execute on the same stack simultaneously.
+* Oleinik, Alexander (alxndr@bu.edu) wrote:
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+>  migration/savevm.c | 8 ++++++--
+>  migration/savevm.h | 3 +++
+>  2 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index 79ed44d475..80c00ea560 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -1404,8 +1404,11 @@ void qemu_savevm_state_cleanup(void)
+>          }
+>      }
+>  }
+> -
+> +#ifdef CONFIG_FUZZ
+> +int qemu_savevm_state(QEMUFile *f, Error **errp)
+> +#else
+>  static int qemu_savevm_state(QEMUFile *f, Error **errp)
+> +#endif
 
-Replace the global target_sigaltstack_used with a field
-sigaltstack_used in the TaskState, and make all the references to the
-old global instead get a pointer to the TaskState and use the field.
+If it's useful to you, I'd rather you just dropped the 'static'
+rather than add the ifdef.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1696773
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I've marked this as "for-4.1" but it is quite late in the release
-cycle and I think this could use more testing than I have given it...
+>  {
+>      int ret;
+>      MigrationState *ms = migrate_get_current();
+> @@ -1471,11 +1474,12 @@ void qemu_savevm_live_state(QEMUFile *f)
+>  int qemu_save_device_state(QEMUFile *f)
+>  {
+>      SaveStateEntry *se;
+> -
+> +#ifndef CONFIG_FUZZ
+>      if (!migration_in_colo_state()) {
+>          qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
+>          qemu_put_be32(f, QEMU_VM_FILE_VERSION);
+>      }
+> +#endif
 
-Thanks are due to:
- * the original bug reporter, for providing a nice simple test case
- * rr, for allowing me to capture and forensically examine a single
-   example of the failure
- * the Go project for having a good clear HACKING.md that explained
-   their stack usage and mentioned specifically that signal stacks
-   are per-thread (per-M, in their terms)
- * a colleague, for prodding me into actually spending the necessary
-   two days grovelling through gdb sessions and logs to figure out
-   what was actually going wrong
----
- linux-user/qemu.h          |  2 ++
- linux-user/signal-common.h |  1 -
- linux-user/hppa/signal.c   |  3 ++-
- linux-user/main.c          |  5 +++++
- linux-user/signal.c        | 35 +++++++++++++++++++----------------
- 5 files changed, 28 insertions(+), 18 deletions(-)
+Can you explain why you want to skip the header?
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 4258e4162d2..aac03346270 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -151,6 +151,8 @@ typedef struct TaskState {
-      */
-     int signal_pending;
- 
-+    /* This thread's sigaltstack, if it has one */
-+    struct target_sigaltstack sigaltstack_used;
- } __attribute__((aligned(16))) TaskState;
- 
- extern char *exec_path;
-diff --git a/linux-user/signal-common.h b/linux-user/signal-common.h
-index 51030a93069..1df1068552f 100644
---- a/linux-user/signal-common.h
-+++ b/linux-user/signal-common.h
-@@ -19,7 +19,6 @@
- 
- #ifndef SIGNAL_COMMON_H
- #define SIGNAL_COMMON_H
--extern struct target_sigaltstack target_sigaltstack_used;
- 
- int on_sig_stack(unsigned long sp);
- int sas_ss_flags(unsigned long sp);
-diff --git a/linux-user/hppa/signal.c b/linux-user/hppa/signal.c
-index b6927ee6735..d1a58feeb36 100644
---- a/linux-user/hppa/signal.c
-+++ b/linux-user/hppa/signal.c
-@@ -111,10 +111,11 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
-     abi_ulong frame_addr, sp, haddr;
-     struct target_rt_sigframe *frame;
-     int i;
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
- 
-     sp = get_sp_from_cpustate(env);
-     if ((ka->sa_flags & TARGET_SA_ONSTACK) && !sas_ss_flags(sp)) {
--        sp = (target_sigaltstack_used.ss_sp + 0x7f) & ~0x3f;
-+        sp = (ts->sigaltstack_used.ss_sp + 0x7f) & ~0x3f;
-     }
-     frame_addr = QEMU_ALIGN_UP(sp, 64);
-     sp = frame_addr + PARISC_RT_SIGFRAME_SIZE32;
-diff --git a/linux-user/main.c b/linux-user/main.c
-index a59ae9439de..8ffc5251955 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -180,6 +180,11 @@ void stop_all_tasks(void)
- void init_task_state(TaskState *ts)
- {
-     ts->used = 1;
-+    ts->sigaltstack_used = (struct target_sigaltstack) {
-+        .ss_sp = 0,
-+        .ss_size = 0,
-+        .ss_flags = TARGET_SS_DISABLE,
-+    };
- }
- 
- CPUArchState *cpu_copy(CPUArchState *env)
-diff --git a/linux-user/signal.c b/linux-user/signal.c
-index 5cd237834d9..5ca6d62b15d 100644
---- a/linux-user/signal.c
-+++ b/linux-user/signal.c
-@@ -25,12 +25,6 @@
- #include "trace.h"
- #include "signal-common.h"
- 
--struct target_sigaltstack target_sigaltstack_used = {
--    .ss_sp = 0,
--    .ss_size = 0,
--    .ss_flags = TARGET_SS_DISABLE,
--};
--
- static struct target_sigaction sigact_table[TARGET_NSIG];
- 
- static void host_signal_handler(int host_signum, siginfo_t *info,
-@@ -251,13 +245,17 @@ void set_sigmask(const sigset_t *set)
- 
- int on_sig_stack(unsigned long sp)
- {
--    return (sp - target_sigaltstack_used.ss_sp
--            < target_sigaltstack_used.ss_size);
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+
-+    return (sp - ts->sigaltstack_used.ss_sp
-+            < ts->sigaltstack_used.ss_size);
- }
- 
- int sas_ss_flags(unsigned long sp)
- {
--    return (target_sigaltstack_used.ss_size == 0 ? SS_DISABLE
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+
-+    return (ts->sigaltstack_used.ss_size == 0 ? SS_DISABLE
-             : on_sig_stack(sp) ? SS_ONSTACK : 0);
- }
- 
-@@ -266,17 +264,21 @@ abi_ulong target_sigsp(abi_ulong sp, struct target_sigaction *ka)
-     /*
-      * This is the X/Open sanctioned signal stack switching.
-      */
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+
-     if ((ka->sa_flags & TARGET_SA_ONSTACK) && !sas_ss_flags(sp)) {
--        return target_sigaltstack_used.ss_sp + target_sigaltstack_used.ss_size;
-+        return ts->sigaltstack_used.ss_sp + ts->sigaltstack_used.ss_size;
-     }
-     return sp;
- }
- 
- void target_save_altstack(target_stack_t *uss, CPUArchState *env)
- {
--    __put_user(target_sigaltstack_used.ss_sp, &uss->ss_sp);
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
-+
-+    __put_user(ts->sigaltstack_used.ss_sp, &uss->ss_sp);
-     __put_user(sas_ss_flags(get_sp_from_cpustate(env)), &uss->ss_flags);
--    __put_user(target_sigaltstack_used.ss_size, &uss->ss_size);
-+    __put_user(ts->sigaltstack_used.ss_size, &uss->ss_size);
- }
- 
- /* siginfo conversion */
-@@ -708,12 +710,13 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
- {
-     int ret;
-     struct target_sigaltstack oss;
-+    TaskState *ts = (TaskState *)thread_cpu->opaque;
- 
-     /* XXX: test errors */
-     if(uoss_addr)
-     {
--        __put_user(target_sigaltstack_used.ss_sp, &oss.ss_sp);
--        __put_user(target_sigaltstack_used.ss_size, &oss.ss_size);
-+        __put_user(ts->sigaltstack_used.ss_sp, &oss.ss_sp);
-+        __put_user(ts->sigaltstack_used.ss_size, &oss.ss_size);
-         __put_user(sas_ss_flags(sp), &oss.ss_flags);
-     }
- 
-@@ -760,8 +763,8 @@ abi_long do_sigaltstack(abi_ulong uss_addr, abi_ulong uoss_addr, abi_ulong sp)
-             }
-         }
- 
--        target_sigaltstack_used.ss_sp = ss.ss_sp;
--        target_sigaltstack_used.ss_size = ss.ss_size;
-+        ts->sigaltstack_used.ss_sp = ss.ss_sp;
-+        ts->sigaltstack_used.ss_size = ss.ss_size;
-     }
- 
-     if (uoss_addr) {
--- 
-2.20.1
+Dave
 
+>      cpu_synchronize_all_states();
+>  
+>      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
+> diff --git a/migration/savevm.h b/migration/savevm.h
+> index 51a4b9caa8..30315d0cfd 100644
+> --- a/migration/savevm.h
+> +++ b/migration/savevm.h
+> @@ -64,4 +64,7 @@ void qemu_loadvm_state_cleanup(void);
+>  int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
+>  int qemu_load_device_state(QEMUFile *f);
+>  
+> +#ifdef CONFIG_FUZZ
+> +int qemu_savevm_state(QEMUFile *f, Error **errp);
+> +#endif
+>  #endif
+> -- 
+> 2.20.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
