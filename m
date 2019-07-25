@@ -2,59 +2,59 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02018C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 05:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F233C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:00:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD620204EC
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 05:55:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD620204EC
+	by mail.kernel.org (Postfix) with ESMTPS id 66AD1206DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:00:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66AD1206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqWjD-0004Pc-UF
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 01:55:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37349)
+	id 1hqWnl-0005lT-EO
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 02:00:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38158)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dovgaluk@ispras.ru>) id 1hqWj3-00041P-2R
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 01:55:38 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1hqWnZ-0005Ip-GM
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:00:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1hqWj2-0000Qq-0v
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 01:55:36 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:38922)
+ (envelope-from <dovgaluk@ispras.ru>) id 1hqWnY-0002k4-Ie
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:00:17 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:39442)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <dovgaluk@ispras.ru>) id 1hqWj1-0000Q0-P1
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 01:55:35 -0400
+ (envelope-from <dovgaluk@ispras.ru>) id 1hqWnY-0002jd-BQ
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:00:16 -0400
 Received: from PASHAISP (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id 2A69B54006A;
- Thu, 25 Jul 2019 08:55:33 +0300 (MSK)
+ by mail.ispras.ru (Postfix) with ESMTPSA id 6F9C854006A;
+ Thu, 25 Jul 2019 09:00:15 +0300 (MSK)
 From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
 To: "'Paolo Bonzini'" <pbonzini@redhat.com>,
  "'Pavel Dovgalyuk'" <pavel.dovgaluk@gmail.com>, <qemu-devel@nongnu.org>
 References: <156395778867.510.17588721322993616668.stgit@pasha-Precision-3630-Tower>
- <156395787270.510.3319575187228105326.stgit@pasha-Precision-3630-Tower>
- <968ae3fd-0482-24f2-b24d-459152ff226d@redhat.com>
-In-Reply-To: <968ae3fd-0482-24f2-b24d-459152ff226d@redhat.com>
-Date: Thu, 25 Jul 2019 08:55:35 +0300
-Message-ID: <000601d542ad$947a5c00$bd6f1400$@ru>
+ <156395785017.510.9244716077158313815.stgit@pasha-Precision-3630-Tower>
+ <55b86868-36a1-def1-8ef0-ca00ab273645@redhat.com>
+In-Reply-To: <55b86868-36a1-def1-8ef0-ca00ab273645@redhat.com>
+Date: Thu, 25 Jul 2019 09:00:18 +0300
+Message-ID: <000701d542ae$3cbfc080$b63f4180$@ru>
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Mailer: Microsoft Office Outlook 12.0
 Content-Language: ru
-Thread-Index: AdVCLP0flv9tSH0URxecFvzpJ/zAzwAgDUzQ
+Thread-Index: AdVCLBZ0byq/XMXPTnWJtlKsxh7B/AAgg7yw
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: Re: [Qemu-devel] [PATCH for-4.2 14/14] icount: clean up cpu_can_io
- before jumping to the next block
+Subject: Re: [Qemu-devel] [PATCH for-4.2 10/14] util/qemu-timer: refactor
+ deadline calculation for external timers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,44 +78,51 @@ Sender: "Qemu-devel"
 
 > From: Paolo Bonzini [mailto:pbonzini@redhat.com]
 > On 24/07/19 10:44, Pavel Dovgalyuk wrote:
-> > From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> >
-> > Most of IO instructions can be executed only at the end of the block in
-> > icount mode. Therefore translator can set cpu_can_io flag when translating
-> > the last instruction.
-> > But when the blocks are chained, then this flag is not reset and may
-> > remain set at the beginning of the next block.
-> > This patch resets the flag before "chaining" the translation blocks.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > ---
-> >  accel/tcg/tcg-runtime.c |    2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-> > index 8a1e408e31..fe6b83d0fc 100644
-> > --- a/accel/tcg/tcg-runtime.c
-> > +++ b/accel/tcg/tcg-runtime.c
-> > @@ -151,6 +151,8 @@ void *HELPER(lookup_tb_ptr)(CPUArchState *env)
-> >      target_ulong cs_base, pc;
-> >      uint32_t flags;
-> >
-> > +    /* We are going to jump to the next block. can_do_io should be reset */
-> > +    cpu->can_do_io = !use_icount;
-> >      tb = tb_lookup__cpu_state(cpu, &pc, &cs_base, &flags, curr_cflags());
-> >      if (tb == NULL) {
-> >          return tcg_ctx->code_gen_epilogue;
+> > -int64_t qemu_clock_deadline_ns_all(QEMUClockType type)
+> > +int64_t virtual_clock_deadline_ns(void)
+> >  {
+> >      int64_t deadline = -1;
+> > +    int64_t delta;
+> > +    int64_t expire_time;
+> > +    QEMUTimer *ts;
+> >      QEMUTimerList *timer_list;
+> > -    QEMUClock *clock = qemu_clock_ptr(type);
+> > +    QEMUClock *clock = qemu_clock_ptr(QEMU_CLOCK_VIRTUAL);
+> > +
+> > +    if (!clock->enabled) {
+> > +        return -1;
+> > +    }
+> > +
+> >      QLIST_FOREACH(timer_list, &clock->timerlists, list) {
+> > -        deadline = qemu_soonest_timeout(deadline,
+> > -                                        timerlist_deadline_ns(timer_list));
+> > +        qemu_mutex_lock(&timer_list->active_timers_lock);
+> > +        ts = timer_list->active_timers;
+> > +        /* Skip all external timers */
+> > +        while (ts && (ts->attributes & QEMU_TIMER_ATTR_EXTERNAL)) {
+> > +            ts = ts->next;
+> > +        }
+> > +        if (!ts) {
+> > +            qemu_mutex_unlock(&timer_list->active_timers_lock);
+> > +            continue;
+> > +        }
+> > +        expire_time = ts->expire_time;
+> > +        qemu_mutex_unlock(&timer_list->active_timers_lock);
+> > +
+> > +        delta = expire_time - qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> > +        if (delta <= 0) {
+> > +            delta = 0;
+> > +        }
+> > +        deadline = qemu_soonest_timeout(deadline, delta);
+> >      }
+> >      return deadline;
+> >  }
 > >
 > 
-> This only fixes indirect jumps though.
-> 
-> I think you do not need this patch if you remove the assignment in
-> cpu_tb_exec, and compile a "move 0 to cpu->can_do_io" in gen_tb_start
-> instead.
+> Why would this change be exclusive to QEMU_CLOCK_VIRTUAL?  I don't think
+> it's useful to remove the argument.  Otherwise, the patch makes sense.
 
-"move 0 to cpu->can_do_io" only for icount mode?
-And we'll also need to set can_do_io to 1 somewhere, because it
-is checked in non-icount mode too.
+Ok, I'll rewrite this one and keep the argument.
 
 Pavel Dovgalyuk
 
