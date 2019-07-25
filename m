@@ -6,65 +6,63 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FB6C76186
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 01:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3E3C76186
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 03:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31CC321901
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 01:26:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31CC321901
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF372075C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 03:19:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF372075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqSW9-00016B-B6
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 21:26:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51201)
+	id 1hqUIB-0002xS-KB
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 23:19:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39485)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqSVx-0000gJ-Kw
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 21:25:50 -0400
+ (envelope-from <oscar.zhangbo@huawei.com>) id 1hqUI0-0002ZG-EY
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 23:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqSVw-0006sl-9D
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 21:25:49 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.75]:39779)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1hqSVw-0006sW-0U
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 21:25:48 -0400
-Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
- BWP09926080.bt.com (10.36.82.111) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 25
- Jul 2019 02:25:45 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 02:25:46 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
- 2019 02:25:46 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v3 1/1] configure: Define target access
- alignment in configure
-Thread-Index: AQHVQofiujYHe2Mc4U2PD57tT92UIg==
-Date: Thu, 25 Jul 2019 01:25:45 +0000
-Message-ID: <1564017946033.57669@bt.com>
-References: <8a5c6ca782b64899b7d6fbf47e8e6869@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <8a5c6ca782b64899b7d6fbf47e8e6869@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
+ (envelope-from <oscar.zhangbo@huawei.com>) id 1hqUHz-0007l0-4K
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 23:19:32 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2483 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <oscar.zhangbo@huawei.com>)
+ id 1hqUHy-0007hY-QB
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 23:19:31 -0400
+Received: from DGGEML404-HUB.china.huawei.com (unknown [172.30.72.53])
+ by Forcepoint Email with ESMTP id B3B635D909CA58C79098;
+ Thu, 25 Jul 2019 11:19:23 +0800 (CST)
+Received: from DGGEML421-HUB.china.huawei.com (10.1.199.38) by
+ DGGEML404-HUB.china.huawei.com (10.3.17.39) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Thu, 25 Jul 2019 11:19:21 +0800
+Received: from DGGEML509-MBX.china.huawei.com ([169.254.1.213]) by
+ dggeml421-hub.china.huawei.com ([10.1.199.38]) with mapi id 14.03.0439.000;
+ Thu, 25 Jul 2019 11:19:12 +0800
+From: "Zhangbo (Oscar)" <oscar.zhangbo@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Thread-Topic: CC wangxiongfeng. : RE: [PATCH] pcie: fix device hotplug
+ failure at the meantime of VM boot
+Thread-Index: AdVCl7gS0TqQMz47ToirPvNCaC/XMw==
+Date: Thu, 25 Jul 2019 03:19:11 +0000
+Message-ID: <0259E1C966E8C54AA93AA2B1240828E672DF606C@dggeml509-mbx.china.huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.42]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+x-originating-ip: [10.177.17.158]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.75
-Subject: [Qemu-devel] [PATCH v3 1/1] configure: Define target access
- alignment in configure
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.188
+Subject: [Qemu-devel] CC wangxiongfeng. : RE: [PATCH] pcie: fix device
+ hotplug failure at the meantime of VM boot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,218 +74,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, arikalo@wavecomp.com, mark.cave-ayland@ilande.co.uk,
- jcmvbkbc@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com,
- atar4qemu@gmail.com, rth@twiddle.net
+Cc: fangying <fangying1@huawei.com>,
+ "wangxiongfeng \(C\)" <wangxiongfeng2@huawei.com>,
+ "limingwang \(A\)" <limingwang@huawei.com>,
+ "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename ALIGNED_ONLY to TARGET_ALIGNED_ONLY for clarity and move=0A=
-defines out of target/foo/cpu.h into configure, as we do with=0A=
-TARGET_WORDS_BIGENDIAN, so that it is always defined early.=0A=
-=0A=
-Also, poison the symbol in include/exec/poison.h to prevent use in=0A=
-common code.=0A=
-=0A=
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
-Reviewed-by: Richard Henderson <rth@twiddle.net>=0A=
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>=0A=
----=0A=
- configure             | 10 +++++++++-=0A=
- include/exec/poison.h |  1 +=0A=
- include/qom/cpu.h     |  2 +-=0A=
- target/alpha/cpu.h    |  2 --=0A=
- target/hppa/cpu.h     |  1 -=0A=
- target/mips/cpu.h     |  2 --=0A=
- target/sh4/cpu.h      |  2 --=0A=
- target/sparc/cpu.h    |  2 --=0A=
- target/xtensa/cpu.h   |  2 --=0A=
- tcg/tcg.c             |  2 +-=0A=
- tcg/tcg.h             |  8 +++++---=0A=
- 11 files changed, 17 insertions(+), 17 deletions(-)=0A=
-=0A=
-diff --git a/configure b/configure=0A=
-index 714e7fb..482ba0b 100755=0A=
---- a/configure=0A=
-+++ b/configure=0A=
-@@ -7431,8 +7431,13 @@ for target in $target_list; do=0A=
- target_dir=3D"$target"=0A=
- config_target_mak=3D$target_dir/config-target.mak=0A=
- target_name=3D$(echo $target | cut -d '-' -f 1)=0A=
-+target_aligned_only=3D"no"=0A=
-+case "$target_name" in=0A=
-+  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc=
-|sparc64|sparc32plus|xtensa|xtensaeb)=0A=
-+  target_aligned_only=3D"yes"=0A=
-+  ;;=0A=
-+esac=0A=
- target_bigendian=3D"no"=0A=
--=0A=
- case "$target_name" in=0A=
-   armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1=
-k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)=0A=
-   target_bigendian=3Dyes=0A=
-@@ -7717,6 +7722,9 @@ fi=0A=
- if supported_whpx_target $target; then=0A=
-     echo "CONFIG_WHPX=3Dy" >> $config_target_mak=0A=
- fi=0A=
-+if test "$target_aligned_only" =3D "yes" ; then=0A=
-+  echo "TARGET_ALIGNED_ONLY=3Dy" >> $config_target_mak=0A=
-+fi=0A=
- if test "$target_bigendian" =3D "yes" ; then=0A=
-   echo "TARGET_WORDS_BIGENDIAN=3Dy" >> $config_target_mak=0A=
- fi=0A=
-diff --git a/include/exec/poison.h b/include/exec/poison.h=0A=
-index b862320..955eb86 100644=0A=
---- a/include/exec/poison.h=0A=
-+++ b/include/exec/poison.h=0A=
-@@ -35,6 +35,7 @@=0A=
- #pragma GCC poison TARGET_UNICORE32=0A=
- #pragma GCC poison TARGET_XTENSA=0A=
- =0A=
-+#pragma GCC poison TARGET_ALIGNED_ONLY=0A=
- #pragma GCC poison TARGET_HAS_BFLT=0A=
- #pragma GCC poison TARGET_NAME=0A=
- #pragma GCC poison TARGET_SUPPORTS_MTTCG=0A=
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h=0A=
-index 5ee0046..9b50b73 100644=0A=
---- a/include/qom/cpu.h=0A=
-+++ b/include/qom/cpu.h=0A=
-@@ -89,7 +89,7 @@ struct TranslationBlock;=0A=
-  * @do_unassigned_access: Callback for unassigned access handling.=0A=
-  * (this is deprecated: new targets should use do_transaction_failed inste=
-ad)=0A=
-  * @do_unaligned_access: Callback for unaligned access handling, if=0A=
-- * the target defines #ALIGNED_ONLY.=0A=
-+ * the target defines #TARGET_ALIGNED_ONLY.=0A=
-  * @do_transaction_failed: Callback for handling failed memory transaction=
-s=0A=
-  * (ie bus faults or external aborts; not MMU faults)=0A=
-  * @virtio_is_big_endian: Callback to return %true if a CPU which supports=
-=0A=
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h=0A=
-index b3e8a82..16eb804 100644=0A=
---- a/target/alpha/cpu.h=0A=
-+++ b/target/alpha/cpu.h=0A=
-@@ -23,8 +23,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* Alpha processors have a weak memory model */=0A=
- #define TCG_GUEST_DEFAULT_MO      (0)=0A=
- =0A=
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h=0A=
-index aab251b..2be67c2 100644=0A=
---- a/target/hppa/cpu.h=0A=
-+++ b/target/hppa/cpu.h=0A=
-@@ -30,7 +30,6 @@=0A=
-    basis.  It's probably easier to fall back to a strong memory model.  */=
-=0A=
- #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
- #define MMU_KERNEL_IDX   0=0A=
- #define MMU_USER_IDX     3=0A=
- #define MMU_PHYS_IDX     4=0A=
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h=0A=
-index 21c0615..c13cd4e 100644=0A=
---- a/target/mips/cpu.h=0A=
-+++ b/target/mips/cpu.h=0A=
-@@ -1,8 +1,6 @@=0A=
- #ifndef MIPS_CPU_H=0A=
- #define MIPS_CPU_H=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- #include "fpu/softfloat.h"=0A=
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h=0A=
-index aee733e..ecaa7a1 100644=0A=
---- a/target/sh4/cpu.h=0A=
-+++ b/target/sh4/cpu.h=0A=
-@@ -23,8 +23,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* CPU Subtypes */=0A=
- #define SH_CPU_SH7750  (1 << 0)=0A=
- #define SH_CPU_SH7750S (1 << 1)=0A=
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h=0A=
-index 8ed2250..1406f0b 100644=0A=
---- a/target/sparc/cpu.h=0A=
-+++ b/target/sparc/cpu.h=0A=
-@@ -5,8 +5,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- #if !defined(TARGET_SPARC64)=0A=
- #define TARGET_DPREGS 16=0A=
- #else=0A=
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h=0A=
-index 2c27713..0459243 100644=0A=
---- a/target/xtensa/cpu.h=0A=
-+++ b/target/xtensa/cpu.h=0A=
-@@ -32,8 +32,6 @@=0A=
- #include "exec/cpu-defs.h"=0A=
- #include "xtensa-isa.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* Xtensa processors have a weak memory model */=0A=
- #define TCG_GUEST_DEFAULT_MO      (0)=0A=
- =0A=
-diff --git a/tcg/tcg.c b/tcg/tcg.c=0A=
-index be2c33c..8d23fb0 100644=0A=
---- a/tcg/tcg.c=0A=
-+++ b/tcg/tcg.c=0A=
-@@ -1926,7 +1926,7 @@ static const char * const ldst_name[] =3D=0A=
- };=0A=
- =0A=
- static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] =3D =
-{=0A=
--#ifdef ALIGNED_ONLY=0A=
-+#ifdef TARGET_ALIGNED_ONLY=0A=
-     [MO_UNALN >> MO_ASHIFT]    =3D "un+",=0A=
-     [MO_ALIGN >> MO_ASHIFT]    =3D "",=0A=
- #else=0A=
-diff --git a/tcg/tcg.h b/tcg/tcg.h=0A=
-index b411e17..529acb2 100644=0A=
---- a/tcg/tcg.h=0A=
-+++ b/tcg/tcg.h=0A=
-@@ -333,10 +333,12 @@ typedef enum TCGMemOp {=0A=
-     MO_TE    =3D MO_LE,=0A=
- #endif=0A=
- =0A=
--    /* MO_UNALN accesses are never checked for alignment.=0A=
-+    /*=0A=
-+     * MO_UNALN accesses are never checked for alignment.=0A=
-      * MO_ALIGN accesses will result in a call to the CPU's=0A=
-      * do_unaligned_access hook if the guest address is not aligned.=0A=
--     * The default depends on whether the target CPU defines ALIGNED_ONLY.=
-=0A=
-+     * The default depends on whether the target CPU defines=0A=
-+     * TARGET_ALIGNED_ONLY.=0A=
-      *=0A=
-      * Some architectures (e.g. ARMv8) need the address which is aligned=
-=0A=
-      * to a size more than the size of the memory access.=0A=
-@@ -353,7 +355,7 @@ typedef enum TCGMemOp {=0A=
-      */=0A=
-     MO_ASHIFT =3D 4,=0A=
-     MO_AMASK =3D 7 << MO_ASHIFT,=0A=
--#ifdef ALIGNED_ONLY=0A=
-+#ifdef TARGET_ALIGNED_ONLY=0A=
-     MO_ALIGN =3D 0,=0A=
-     MO_UNALN =3D MO_AMASK,=0A=
- #else=0A=
--- =0A=
-1.8.3.1=0A=
+Pj4gSWYgdGhlIFBDSV9FWFBfTE5LU1RBX0RMTExBIGNhcGFiaWxpdHkgaXMgc2V0IGJ5IGRlZmF1
+bHQsIGxpbnV4IGtlcm5lbCB3aWxsIHNlbmQNCj4+IFBEQyBldmVudCB0byBkZXRlY3Qgd2hldGhl
+ciB0aGVyZSBpcyBhIGRldmljZSBpbiBwY2llIHNsb3QuIElmIGEgZGV2aWNlIGlzIHBsdWdlZA0K
+Pj4gaW4gdGhlIHBjaWUtcm9vdC1wb3J0IGF0IHRoZSBzYW1lIHRpbWUsIGhvdC1wbHVnIGRldmlj
+ZSB3aWxsIHNlbmQgQUJQICsgUERDDQo+PiBldmVudHMgdG8gdGhlIGtlcm5lbC4gVGhlIFZNIGtl
+cm5lbCB3aWxsIHdyb25nbHkgdW5wbHVnIHRoZSBkZXZpY2UgaWYgdHdvIFBEQw0KPj4gZXZlbnRz
+IGdldCB0b28gY2xvc2UuIFRodXMgd2UnZCBiZXR0ZXIgc2V0IHRoZSBQQ0lfRVhQX0xOS1NUQV9E
+TExMQQ0KPj4gY2FwYWJpbGl0eSBvbmx5IGluIGhvdHBsdWcgY2FsbGJhY2suDQo+DQo+Q291bGQg
+eW91IHBsZWFzZSBkZXNjcmliZSBhIHJlcHJvZHVjZXIgaW4gYSBiaXQgbW9yZSBkZXRhaWw/DQo+
+DQpTdGVwMTogc3RhcnQgYSBWTSB3aXRoIHFlbXUsIHRoZSBWTSBib290cyB1cCB3aXRoaW4gNTAw
+bXMuDQogIC9wYXRoL3RvL3FlbXUtMi44LjEvYWFyY2g2NC1zb2Z0bW11L3FlbXUtc3lzdGVtLWFh
+cmNoNjQgXA0KICAtbmFtZSB0ZXN0LWM2NTk2MTY1MjYzOWNjZjljZTBiODQ3NmEzMjU0MjE4MTFk
+NGZkYzg3M2U5MGMyNzE2ODQ5N2JjOWUyMDQ3NzYgXA0KICAtdXVpZCBhOGVkNGE4Ni0zZjQ5LTQ1
+YTMtYThjZS0yOGQ2MWIyZjI5MTQgXA0KICAtbWFjaGluZSB2aXJ0LHVzYj1vZmYsYWNjZWw9a3Zt
+LGdpYy12ZXJzaW9uPTMgXA0KICAtY3B1IGhvc3QgXA0KICAtbSAyMDQ4TSxzbG90cz0xMCxtYXht
+ZW09MjM5NDc3TSBcDQogIC1xbXAgdW5peDovdmFyL3J1bi9xbXAuc29jayxzZXJ2ZXIsbm93YWl0
+IFwNCiAgLWRldmljZSBwY2llLXJvb3QtcG9ydCxwb3J0PTB4OCxjaGFzc2lzPTEsaWQ9cGNpLjEs
+YnVzPXBjaWUuMCxtdWx0aWZ1bmN0aW9uPW9uLGFkZHI9MHgxIFwNCiAgLWRldmljZSBwY2llLXJv
+b3QtcG9ydCxwb3J0PTB4OSxjaGFzc2lzPTIsaWQ9cGNpLjIsYnVzPXBjaWUuMCxhZGRyPTB4MS4w
+eDEgXA0KICAtZGV2aWNlIHBjaWUtcm9vdC1wb3J0LHBvcnQ9MHhhLGNoYXNzaXM9MyxpZD1wY2ku
+MyxidXM9cGNpZS4wLGFkZHI9MHgxLjB4MiBcDQogIC1kZXZpY2UgcGNpZS1yb290LXBvcnQscG9y
+dD0weGIsY2hhc3Npcz00LGlkPXBjaS40LGJ1cz1wY2llLjAsYWRkcj0weDEuMHgzIFwNCiAgLWRl
+dmljZSBwY2llLXJvb3QtcG9ydCxwb3J0PTB4YyxjaGFzc2lzPTUsaWQ9cGNpLjUsYnVzPXBjaWUu
+MCxhZGRyPTB4MS4weDQgXA0KICAtZGV2aWNlIHBjaWUtcm9vdC1wb3J0LHBvcnQ9MHhkLGNoYXNz
+aXM9NixpZD1wY2kuNixidXM9cGNpZS4wLGFkZHI9MHgxLjB4NSBcDQogIC1kZXZpY2UgcGNpZS1y
+b290LXBvcnQscG9ydD0weGUsY2hhc3Npcz03LGlkPXBjaS43LGJ1cz1wY2llLjAsYWRkcj0weDEu
+MHg2IFwNCiAgLWRldmljZSBwY2llLXBjaS1icmlkZ2UsaWQ9cGNpLjgsYnVzPXBjaS4xLGFkZHI9
+MHgwIFwNCiAgLWRldmljZSBwY2llLXJvb3QtcG9ydCxwb3J0PTB4ZixjaGFzc2lzPTksaWQ9cGNp
+LjksYnVzPXBjaWUuMCxhZGRyPTB4MS4weDcgXA0KICAuLi4uLi4uDQogIA0KU3RlcDI6IEltbWVk
+aWF0ZWx5IGhvdHBsdWcgYSBwY2llIGRldmljZToNCiAgcW1wX21zZz0neyAiZXhlY3V0ZSI6ICJx
+bXBfY2FwYWJpbGl0aWVzIiB9DQp7ImFyZ3VtZW50cyI6eyJhZGRyIjoiMHgwIiwiYnVzIjoicGNp
+LjQiLCJkcml2ZXIiOiJ2aXJ0aW8tbmV0LXBjaSIsImlkIjoidmlydGlvLWUxMzU2ODAyLTRiOWYt
+NDRiYi1iOGYwLTVmOThiZjc2NTgyMyIsIm1hYyI6IjAyOjQyOjIwOjZlOmEyOjU5In0sImV4ZWN1
+dGUiOiJkZXZpY2VfZGVsIn0NCnsiYXJndW1lbnRzIjp7ImlkIjoibmV0cG9ydF90ZXN0XzEiLCJp
+Zm5hbWUiOiJuZnNfdGFwIn0sImV4ZWN1dGUiOiJuZXRkZXZfZGVsIn0nDQoNCiAgZWNobyAkcW1w
+X21zZyB8IG5jIC1VIC92YXIvcnVuL3FtcC5zb2NrDQoNClJlc3VsdCBleHBlY3RlZDogIGhvdHBs
+dWcgc3VjY2Vzc2Z1bCwgdGhlIHBjaWUgZGV2aWNlIGNvdWxkIGJlIHNlZW4gaW5zaWRlIHRoZSBW
+TQ0KDQpSZXN1bHQgaW4gZmFjdDogd2UgZm91bmQgYSAiaG90cGx1ZyIgYW5kICJ1bnBsdWciIG1l
+c3NhZ2UgaW5zaWRlIHRoZSBWTSwgaXQgZmFpbGVkIGluIGhvdHBsdWcuDQoNCj4NCj4+DQo+PiBC
+eSB0aGUgd2F5LCB3ZSBzaG91bGQgY2xlYW4gdXAgdGhlIFBDSV9FWFBfTE5LU1RBX0RMTExBIGNh
+cGFiaWxpdHkgZHVyaW5nDQo+PiB1bnBsdWcgdG8gYXZvaWQgVk0gcmVzdGFydCBvciBtaWdyYXRp
+b24gZmFpbHVyZSB3aGljaCB3aWxsIGVudGVyIHRoZSBzYW1lDQo+PiBhYm5vcm1hbCBzY2VuYXJp
+byBhcyBhYm92ZS4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBsaW1pbmd3YW5nQGh1YXdlaS5jb20N
+Cj4+IFNpZ25lZC1vZmYtYnk6IGZhbmd5aW5nMUBodWF3ZWkuY29tDQo+PiBTaWduZWQtb2ZmLWJ5
+OiBvc2Nhci56aGFuZ2JvQGh1YXdlaS5jb20NCj4NCj5TbyBsb29raW5nIGF0IGxpbnV4IEkgc2Vl
+Og0KPg0KPiAqIHBjaWVocF9jYXJkX3ByZXNlbnRfb3JfbGlua19hY3RpdmUoKSAtIHdoZXRoZXIg
+Z2l2ZW4gc2xvdCBpcyBvY2N1cGllZA0KPiAqIEBjdHJsOiBQQ0llIGhvdHBsdWcgY29udHJvbGxl
+cg0KPiAqDQo+ICogVW5saWtlIHBjaWVocF9jYXJkX3ByZXNlbnQoKSwgd2hpY2ggZGV0ZXJtaW5l
+cyBwcmVzZW5jZSBzb2xlbHkgZnJvbSB0aGUNCj4gKiBQcmVzZW5jZSBEZXRlY3QgU3RhdGUgYml0
+LCB0aGlzIGhlbHBlciBhbHNvIHJldHVybnMgdHJ1ZSBpZiB0aGUgTGluayBBY3RpdmUNCj4gKiBi
+aXQgaXMgc2V0LiAgVGhpcyBpcyBhIGNvbmNlc3Npb24gdG8gYnJva2VuIGhvdHBsdWcgcG9ydHMg
+d2hpY2ggaGFyZHdpcmUNCj4gKiBQcmVzZW5jZSBEZXRlY3QgU3RhdGUgdG8gemVybywgc3VjaCBh
+cyBXaWxvY2l0eSdzIFsxYWU5OjAyMDBdLg0KPg0KPnNvIGl0IGxvb2tzIGxpa2UgbGludXggYWN0
+dWFsbHkgbG9va3MgYXQgcHJlc2VuY2UgZGV0ZWN0IHN0YXRlLA0KPmJ1dCB3ZSBoYXZlIGEgYnVn
+IGp1c3QgbGlrZSBXaWxvY2l0eSdzIGFuZCBrZWVwaW5nDQo+bGluayBhY3RpdmUgdXAgZml4ZXMg
+dGhhdC4gQ2FuJ3Qgd2UgZml4IHRoZSBidWcgaW5zdGVhZD8NCj4NCkB3YW5neGlvbmdmZW5nIA0K
+Pj4gLS0tDQo+PiAgaHcvcGNpL3BjaWUuYyB8IDkgKysrKystLS0tDQo+PiAgMSBmaWxlIGNoYW5n
+ZWQsIDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEv
+aHcvcGNpL3BjaWUuYyBiL2h3L3BjaS9wY2llLmMNCj4+IGluZGV4IGE2YmViNTYuLjE3NGYzOTIg
+MTAwNjQ0DQo+PiAtLS0gYS9ody9wY2kvcGNpZS5jDQo+PiArKysgYi9ody9wY2kvcGNpZS5jDQo+
+PiBAQCAtNzUsMTAgKzc1LDYgQEAgcGNpZV9jYXBfdjFfZmlsbChQQ0lEZXZpY2UgKmRldiwgdWlu
+dDhfdCBwb3J0LCB1aW50OF90DQo+dHlwZSwgdWludDhfdCB2ZXJzaW9uKQ0KPj4NCj5RRU1VX1BD
+SV9FWFBfTE5LU1RBX05MVyhRRU1VX1BDSV9FWFBfTE5LX1gxKSB8DQo+Pg0KPlFFTVVfUENJX0VY
+UF9MTktTVEFfQ0xTKFFFTVVfUENJX0VYUF9MTktfMl81R1QpKTsNCj4+DQo+PiAtICAgIGlmIChk
+ZXYtPmNhcF9wcmVzZW50ICYgUUVNVV9QQ0lFX0xOS1NUQV9ETExMQSkgew0KPj4gLSAgICAgICAg
+cGNpX3dvcmRfdGVzdF9hbmRfc2V0X21hc2soZXhwX2NhcCArIFBDSV9FWFBfTE5LU1RBLA0KPj4g
+LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgUENJX0VYUF9MTktTVEFfRExMTEEp
+Ow0KPj4gLSAgICB9DQo+Pg0KPj4gICAgICAvKiBXZSBjaGFuZ2VkIGxpbmsgc3RhdHVzIGJpdHMg
+b3ZlciB0aW1lLCBhbmQgY2hhbmdpbmcgdGhlbSBhY3Jvc3MNCj4+ICAgICAgICogbWlncmF0aW9u
+cyBpcyBnZW5lcmFsbHkgZmluZSBhcyBoYXJkd2FyZSBjaGFuZ2VzIHRoZW0gdG9vLg0KPg0KPkRv
+ZXMgdGhpcyBhY3R1YWxseSBjaGFuZ2UgYW55dGhpbmc/DQo+DQo+SSBkb24ndCBrbm93IHdoeSBk
+byB3ZSBib3RoZXIgc2V0dGluZyBpdCBoZXJlIGJ1dCB3ZSBkbw0KPnNldCBpdCBsYXRlciBpbiBw
+Y2llX2NhcF9zbG90X3BsdWdfY2IsIGNvcnJlY3Q/DQo+DQo+SSdkIGxpa2UgdG8gdW5kZXJzdGFu
+ZCB3aGV0aGVyIHRoaXMgaXMgcGFydCBvZiBmaXggb3INCj5qdXN0IGEgY2xlYW51cC4NCj4NCj4N
+Cj4+IEBAIC00ODQsNiArNDgwLDExIEBAIHZvaWQNCj5wY2llX2NhcF9zbG90X3VucGx1Z19yZXF1
+ZXN0X2NiKEhvdHBsdWdIYW5kbGVyICpob3RwbHVnX2RldiwNCj4+ICAgICAgICAgIHJldHVybjsN
+Cj4+ICAgICAgfQ0KPj4NCj4+ICsgICAgaWYgKHBjaV9kZXYtPmNhcF9wcmVzZW50ICYgUUVNVV9Q
+Q0lFX0xOS1NUQV9ETExMQSkgew0KPj4gKyAgICAgICAgcGNpX3dvcmRfdGVzdF9hbmRfY2xlYXJf
+bWFzayhleHBfY2FwICsgUENJX0VYUF9MTktTVEEsDQo+PiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIFBDSV9FWFBfTE5LU1RBX0RMTExBKTsNCj4+ICsgICAgfQ0KPj4gKw0K
+Pj4gICAgICBwY2llX2NhcF9zbG90X3B1c2hfYXR0ZW50aW9uX2J1dHRvbihQQ0lfREVWSUNFKGhv
+dHBsdWdfZGV2KSk7DQo+PiAgfQ0KPg0KPlNvIHRoaXMgcmVwb3J0cyBkYXRhIGxpbmsgaW5hY3Rp
+dmUgaW1tZWRpYXRlbHkgYWZ0ZXINCj51bnBsdWcgcmVxdWVzdC4gU2VlbXMgYSBiaXQgcXVlc3Rp
+b25hYmxlOiBndWVzdCBkaWQgbm90DQo+cmVzcG9uZCB5ZXQuIEknZCBsaWtlIHRvIHNlZSBhIGNv
+bW1lbnQgZXhwbGFpbmluZyB3aHkNCj50aGlzIG1ha2VzIHNlbnNlLg0KPg0KPg0KPj4gLS0NCj4+
+IDEuOC4zLjENCg==
 
