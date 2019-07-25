@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E315C76190
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE42C76190
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:39:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9087229F3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:34:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9087229F3
+	by mail.kernel.org (Postfix) with ESMTPS id 5A07B22BE8
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 17:39:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A07B22BE8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqhdB-0005vl-Te
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 13:34:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38074)
+	id 1hqhhu-0003RE-7g
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 13:39:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hqhcs-0005Dj-UC
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:33:59 -0400
+ (envelope-from <mst@redhat.com>) id 1hqhhj-00032L-Mc
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:39:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hqhcr-0007HJ-JQ
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:33:58 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:36749)
+ (envelope-from <mst@redhat.com>) id 1hqhhh-0002DL-GW
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:38:59 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:41021)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqhcr-0007G9-Dx
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:33:57 -0400
-Received: by mail-qk1-f193.google.com with SMTP id g18so37042031qkl.3
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 10:33:56 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqhhf-0002CP-LG
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 13:38:56 -0400
+Received: by mail-qk1-f193.google.com with SMTP id v22so37056519qkj.8
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 10:38:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=wrnrwwipYpAStl3wG0T5xEH4kyINKwE/QX5O+1M0R1E=;
- b=U6TAFxPMaKiZYYfYBP8fTiKY222gGe8m8b+vvVQ5V7goTv6pWQ5qoHZX+tfoHu7m6u
- h1Izoiz/hY7Li/aj1ynZZSSP2iCI0WV52Fe08ZLW/KBJPG4adMCTK4py3Jn/DH1qOFsb
- fnBnxR9X9Le6NfTzveZzafIiwuZQWZMHAvLgDdrW+DhUYfwB7+DF7gBMJQ1vgjHKSFO4
- mUHhhRXfblWF6a8hLxh7kJQ7F/ZXJtwEkKxOh6reh539r/CB12+PzhNBVKh15Dp2VMdV
- WXUs9f5bvLcdJZs97pZpp6M/B6PSSCqFxpJxXlAcIqA9YdgBCYxi1aZn1IbAKZsERCyn
- baXQ==
-X-Gm-Message-State: APjAAAV6J4hXhYRDaBLomYg2HQgl8f9dCetMivi+HgQOiytQtx2lEA+y
- C00px6qdF+mjfd9ZW/qTPja0xg==
-X-Google-Smtp-Source: APXvYqyy2Pip7ozDIDYAH1WPJbAQLD7M1hVm6RzDkPWgr3KLTMnUjpvYK/PFWD6pJkU2Lok3Un3AgA==
-X-Received: by 2002:a37:b381:: with SMTP id
- c123mr60950696qkf.349.1564076036425; 
- Thu, 25 Jul 2019 10:33:56 -0700 (PDT)
+ bh=u8BGMNY950ZO23qVBakK9/iI50jRXoU9AN/FrrQgGBY=;
+ b=oKSQVSxcsqAmXpjvlI5fl27rczR33uUlOPmXsPVWJxSgE0sy4j/GMQU6lsmHiEC8M7
+ 4SO7YwYNTG/MfJo62XKnkApJmqLltR4Duuw1OQTa8yTdO52PrFjhv7KtC5j/9pD1uuPg
+ ZLVC1+16Jqtav8IP43Xx0sWS5kWM22dlZ9aSgVt9Rb/msG9ARkIfP2wEJ9eGgjM5/xl8
+ oN8okp63ARRYbrery/fCHoGlq3/wjaJ0Rc1fALLpuDm4h8xdModPIMBuW7VYKUf3Y+Ef
+ 5Pb2axXOq8ttFnnNJ57kR3hTrBvbREYUJukCPyFqEtQoqrZsLjnNl7lZx8xHLEQnFfF8
+ HtMQ==
+X-Gm-Message-State: APjAAAWO3RILCzOhtGxAdig8MyW0rJ45ZxZnFudHi4ZLwvJSRhk6bz7M
+ XkFGH4n7itpR/xgPcYyb8moEFg==
+X-Google-Smtp-Source: APXvYqw8OjpvVtSU1yYVmiAmQmjMmo5zF76k6+9Jtz4Z/5w6RmzO0Kt8/O2SvBoD7iYqOvC9Rf5J6g==
+X-Received: by 2002:a37:62ca:: with SMTP id
+ w193mr21076934qkb.363.1564076334400; 
+ Thu, 25 Jul 2019 10:38:54 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
  by smtp.gmail.com with ESMTPSA id
- t197sm21921007qke.2.2019.07.25.10.33.52
+ c192sm22287085qkg.33.2019.07.25.10.38.50
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 10:33:55 -0700 (PDT)
-Date: Thu, 25 Jul 2019 13:33:49 -0400
+ Thu, 25 Jul 2019 10:38:53 -0700 (PDT)
+Date: Thu, 25 Jul 2019 13:38:48 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190725132521-mutt-send-email-mst@kernel.org>
-References: <20190719102915.GG18585@stefanha-x1.localdomain>
- <8736j2p22w.fsf@redhat.com>
- <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
- <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
- <87tvbdrvin.fsf@redhat.com>
- <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
- <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
- <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
- <20190725104331-mutt-send-email-mst@kernel.org>
- <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
+Message-ID: <20190725133500-mutt-send-email-mst@kernel.org>
+References: <87pnlymm47.fsf@redhat.com>
+ <d48da49f-c8d8-00f7-1634-569e8d924b8a@redhat.com>
+ <CAJSP0QUJCh-SaZ9NQ+Wr8vr7R+gBsfhYmBrx45B4z2G9v9L=1A@mail.gmail.com>
+ <20190725080556-mutt-send-email-mst@kernel.org>
+ <CAJSP0QVvnXV8Ha0yaO84qLL6unVroV5GqcuL-x9ruB7o_24WBA@mail.gmail.com>
+ <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
+ <87muh2mazh.fsf@redhat.com>
+ <20190725104721-mutt-send-email-mst@kernel.org>
+ <20190725110114-mutt-send-email-mst@kernel.org>
+ <cdc6e86c-ce05-fd48-c8a3-0e6cec894d4e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
+In-Reply-To: <cdc6e86c-ce05-fd48-c8a3-0e6cec894d4e@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.85.222.193
@@ -89,37 +89,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "maran.wilson@oracle.com" <maran.wilson@oracle.com>, "Montes,
- Julio" <julio.montes@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
- "sgarzare@redhat.com" <sgarzare@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 25, 2019 at 05:35:01PM +0200, Paolo Bonzini wrote:
-> On 25/07/19 16:46, Michael S. Tsirkin wrote:
-> > Actually, I think I have a better idea.
-> > At the moment we just get an exit on these reads and return all-ones.
-> > Yes, in theory there could be a UR bit set in a bunch of
-> > registers but in practice no one cares about these,
-> > and I don't think we implement them.
-> > So how about mapping a single page, read-only, and filling it
-> > with all-ones?
+On Thu, Jul 25, 2019 at 05:39:39PM +0200, Paolo Bonzini wrote:
+> On 25/07/19 17:01, Michael S. Tsirkin wrote:
+> >> It would be educational to try to enable ACPI core but disable all
+> >> optional features.
 > 
-> Yes, that's nice indeed. :)  But it does have some cost, in terms of
-> either number of VMAs or QEMU RSS since the MMCONFIG area is large.
+> A lot of them are select'ed so it's not easy.
 > 
-> What breaks if we return all zeroes?  Zero is not a valid vendor ID.
+> > Trying with ACPI_REDUCED_HARDWARE_ONLY would also be educational.
+> 
+> That's what the NEMU guys experimented with.  It's not supported by our
+> DSDT since it uses ACPI GPE,
+
+Well there are two GPE blocks in FADT. We could just switch to
+these if necesary I think.
+
+> and the reduction in code size is small
+> (about 15000 lines of code in ACPICA, perhaps 100k if you're lucky?).
 > 
 > Paolo
 
-It isn't but that's not what baremetal does. So there's some risk
-there ...
+Well ACPI is 150k loc I think, right?
 
-Why is all zeroes better? We still need to map it, right?
+linux]$ wc -l `find drivers/acpi/ -name '*.c' `|tail -1
+ 145926 total
+
+So 100k wouldn't be too shabby.
 
 -- 
 MST
