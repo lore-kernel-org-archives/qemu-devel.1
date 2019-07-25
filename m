@@ -2,78 +2,88 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC058C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF7AC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:48:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1FE422BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:43:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1FE422BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55AC522BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:48:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55AC522BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqfuA-0004pX-Vr
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:43:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51850)
+	id 1hqfz3-00014E-Lr
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52650)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqftz-0004R7-BP
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:43:32 -0400
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1hqfyX-0008Up-5H
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:48:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqfty-0006xf-2i
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:43:31 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44005)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqftx-0006xW-Rk
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:43:30 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so51266101wru.10
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 08:43:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ooix8/FJqtST+aidE5Gv1JtNQK7VBm1DtK339Lu67Bg=;
- b=DbEUDhK7Z4FV4SwmRPEAb+F/5hkUhNZ6uRWKYEnPC+/hG+FuOLvbjurYu1IQpNRjju
- lQ/1mxiOUV/vOjICq5K8NDioJuLElqtKcJ6HRU7BV1b5TG8B0IDa1A6hMV4S8asUd9Sa
- hBAiH+FgAIulyGwHJ1d7epDo8Bf4xBnVFSPielx8AYNBurslDiqcOyFHUVyAQwA0NLXV
- GY2aLnkztPCV0LJpBMtfKjGQYyvxCgSTUAy87knhK/j0BbGbXiHDb8y7IpepWmRZGHmj
- EQYUKjnDDMotakcy3jlhoYtv/mFoip4xCjBfJO9sA0tW/jX0cibcgyUnyG1ug0cnsjjj
- EGpw==
-X-Gm-Message-State: APjAAAXH6oAS6s8F7B3ZgPRj7Vq8OciWpAdD8/pefGp45fNKGVvIgHR+
- MP8zZMBMFMsdWw8Moe8tgqmphA==
-X-Google-Smtp-Source: APXvYqwPbPy4Kk8mWwXuQHGZJx55b319SWJOxLlveNKvbkulHHsnsFHFLT+jtAXaE+4h/1cIz7LqmQ==
-X-Received: by 2002:a5d:63c8:: with SMTP id c8mr13410406wrw.21.1564069408486; 
- Thu, 25 Jul 2019 08:43:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
- ([2001:b07:6468:f312:cc23:f353:392:d2ee])
- by smtp.gmail.com with ESMTPSA id j10sm84913736wrd.26.2019.07.25.08.43.27
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 25 Jul 2019 08:43:27 -0700 (PDT)
-To: Li Qiang <liq3ea@163.com>, mtosatti@redhat.com
-References: <20190725151639.21693-1-liq3ea@163.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9ada2330-1f55-20f9-3d60-b888fb127bac@redhat.com>
-Date: Thu, 25 Jul 2019 17:43:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1hqfyW-0001lI-7X
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:48:13 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12288)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1hqfyV-0001kf-VV
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:48:12 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6PFl8Ci141510; Thu, 25 Jul 2019 11:48:09 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tyenra62a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jul 2019 11:48:09 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6PFifrp023338;
+ Thu, 25 Jul 2019 15:48:08 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma03wdc.us.ibm.com with ESMTP id 2tx61mr0vf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 25 Jul 2019 15:48:08 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+ [9.57.199.110])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6PFm7tT23462214
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 25 Jul 2019 15:48:07 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B721DAE099;
+ Thu, 25 Jul 2019 15:48:07 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A1597AE097;
+ Thu, 25 Jul 2019 15:48:07 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 25 Jul 2019 15:48:07 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 25 Jul 2019 11:48:04 -0400
+Message-Id: <20190725154806.1193357-1-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190725151639.21693-1-liq3ea@163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] target-i386: kvm: 'kvm_get_supported_msrs'
- cleanup
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-25_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907250185
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PULL v1 0/2] Merge tpm 2019/07/25 v1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,229 +95,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/07/19 17:16, Li Qiang wrote:
-> Function 'kvm_get_supported_msrs' is only called once
-> now, get rid of the static variable 'kvm_supported_msrs'.
-> 
-> Signed-off-by: Li Qiang <liq3ea@163.com>
+This series of patches improves error handling with the TPM backend.
 
-Queued, thanks.
+   Stefan
 
-Paolo
+The following changes since commit 9d2e1fcd14c2bae5be1992214a03c0ddff714c80:
 
-> ---
->  target/i386/kvm.c | 185 +++++++++++++++++++++++-----------------------
->  1 file changed, 91 insertions(+), 94 deletions(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index dbbb13772a..07c9250f45 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1837,108 +1837,105 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
->  
->  static int kvm_get_supported_msrs(KVMState *s)
->  {
-> -    static int kvm_supported_msrs;
->      int ret = 0;
-> +    struct kvm_msr_list msr_list, *kvm_msr_list;
->  
-> -    /* first time */
-> -    if (kvm_supported_msrs == 0) {
-> -        struct kvm_msr_list msr_list, *kvm_msr_list;
-> +    /*
-> +     *  Obtain MSR list from KVM.  These are the MSRs that we must
-> +     *  save/restore.
-> +     */
-> +    msr_list.nmsrs = 0;
-> +    ret = kvm_ioctl(s, KVM_GET_MSR_INDEX_LIST, &msr_list);
-> +    if (ret < 0 && ret != -E2BIG) {
-> +        return ret;
-> +    }
-> +    /*
-> +     * Old kernel modules had a bug and could write beyond the provided
-> +     * memory. Allocate at least a safe amount of 1K.
-> +     */
-> +    kvm_msr_list = g_malloc0(MAX(1024, sizeof(msr_list) +
-> +                                          msr_list.nmsrs *
-> +                                          sizeof(msr_list.indices[0])));
->  
-> -        kvm_supported_msrs = -1;
-> +    kvm_msr_list->nmsrs = msr_list.nmsrs;
-> +    ret = kvm_ioctl(s, KVM_GET_MSR_INDEX_LIST, kvm_msr_list);
-> +    if (ret >= 0) {
-> +        int i;
->  
-> -        /* Obtain MSR list from KVM.  These are the MSRs that we must
-> -         * save/restore */
-> -        msr_list.nmsrs = 0;
-> -        ret = kvm_ioctl(s, KVM_GET_MSR_INDEX_LIST, &msr_list);
-> -        if (ret < 0 && ret != -E2BIG) {
-> -            return ret;
-> -        }
-> -        /* Old kernel modules had a bug and could write beyond the provided
-> -           memory. Allocate at least a safe amount of 1K. */
-> -        kvm_msr_list = g_malloc0(MAX(1024, sizeof(msr_list) +
-> -                                              msr_list.nmsrs *
-> -                                              sizeof(msr_list.indices[0])));
-> -
-> -        kvm_msr_list->nmsrs = msr_list.nmsrs;
-> -        ret = kvm_ioctl(s, KVM_GET_MSR_INDEX_LIST, kvm_msr_list);
-> -        if (ret >= 0) {
-> -            int i;
-> -
-> -            for (i = 0; i < kvm_msr_list->nmsrs; i++) {
-> -                switch (kvm_msr_list->indices[i]) {
-> -                case MSR_STAR:
-> -                    has_msr_star = true;
-> -                    break;
-> -                case MSR_VM_HSAVE_PA:
-> -                    has_msr_hsave_pa = true;
-> -                    break;
-> -                case MSR_TSC_AUX:
-> -                    has_msr_tsc_aux = true;
-> -                    break;
-> -                case MSR_TSC_ADJUST:
-> -                    has_msr_tsc_adjust = true;
-> -                    break;
-> -                case MSR_IA32_TSCDEADLINE:
-> -                    has_msr_tsc_deadline = true;
-> -                    break;
-> -                case MSR_IA32_SMBASE:
-> -                    has_msr_smbase = true;
-> -                    break;
-> -                case MSR_SMI_COUNT:
-> -                    has_msr_smi_count = true;
-> -                    break;
-> -                case MSR_IA32_MISC_ENABLE:
-> -                    has_msr_misc_enable = true;
-> -                    break;
-> -                case MSR_IA32_BNDCFGS:
-> -                    has_msr_bndcfgs = true;
-> -                    break;
-> -                case MSR_IA32_XSS:
-> -                    has_msr_xss = true;
-> -                    break;
-> -                case HV_X64_MSR_CRASH_CTL:
-> -                    has_msr_hv_crash = true;
-> -                    break;
-> -                case HV_X64_MSR_RESET:
-> -                    has_msr_hv_reset = true;
-> -                    break;
-> -                case HV_X64_MSR_VP_INDEX:
-> -                    has_msr_hv_vpindex = true;
-> -                    break;
-> -                case HV_X64_MSR_VP_RUNTIME:
-> -                    has_msr_hv_runtime = true;
-> -                    break;
-> -                case HV_X64_MSR_SCONTROL:
-> -                    has_msr_hv_synic = true;
-> -                    break;
-> -                case HV_X64_MSR_STIMER0_CONFIG:
-> -                    has_msr_hv_stimer = true;
-> -                    break;
-> -                case HV_X64_MSR_TSC_FREQUENCY:
-> -                    has_msr_hv_frequencies = true;
-> -                    break;
-> -                case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
-> -                    has_msr_hv_reenlightenment = true;
-> -                    break;
-> -                case MSR_IA32_SPEC_CTRL:
-> -                    has_msr_spec_ctrl = true;
-> -                    break;
-> -                case MSR_VIRT_SSBD:
-> -                    has_msr_virt_ssbd = true;
-> -                    break;
-> -                case MSR_IA32_ARCH_CAPABILITIES:
-> -                    has_msr_arch_capabs = true;
-> -                    break;
-> -                case MSR_IA32_CORE_CAPABILITY:
-> -                    has_msr_core_capabs = true;
-> -                    break;
-> -                }
-> +        for (i = 0; i < kvm_msr_list->nmsrs; i++) {
-> +            switch (kvm_msr_list->indices[i]) {
-> +            case MSR_STAR:
-> +                has_msr_star = true;
-> +                break;
-> +            case MSR_VM_HSAVE_PA:
-> +                has_msr_hsave_pa = true;
-> +                break;
-> +            case MSR_TSC_AUX:
-> +                has_msr_tsc_aux = true;
-> +                break;
-> +            case MSR_TSC_ADJUST:
-> +                has_msr_tsc_adjust = true;
-> +                break;
-> +            case MSR_IA32_TSCDEADLINE:
-> +                has_msr_tsc_deadline = true;
-> +                break;
-> +            case MSR_IA32_SMBASE:
-> +                has_msr_smbase = true;
-> +                break;
-> +            case MSR_SMI_COUNT:
-> +                has_msr_smi_count = true;
-> +                break;
-> +            case MSR_IA32_MISC_ENABLE:
-> +                has_msr_misc_enable = true;
-> +                break;
-> +            case MSR_IA32_BNDCFGS:
-> +                has_msr_bndcfgs = true;
-> +                break;
-> +            case MSR_IA32_XSS:
-> +                has_msr_xss = true;
-> +                break;
-> +            case HV_X64_MSR_CRASH_CTL:
-> +                has_msr_hv_crash = true;
-> +                break;
-> +            case HV_X64_MSR_RESET:
-> +                has_msr_hv_reset = true;
-> +                break;
-> +            case HV_X64_MSR_VP_INDEX:
-> +                has_msr_hv_vpindex = true;
-> +                break;
-> +            case HV_X64_MSR_VP_RUNTIME:
-> +                has_msr_hv_runtime = true;
-> +                break;
-> +            case HV_X64_MSR_SCONTROL:
-> +                has_msr_hv_synic = true;
-> +                break;
-> +            case HV_X64_MSR_STIMER0_CONFIG:
-> +                has_msr_hv_stimer = true;
-> +                break;
-> +            case HV_X64_MSR_TSC_FREQUENCY:
-> +                has_msr_hv_frequencies = true;
-> +                break;
-> +            case HV_X64_MSR_REENLIGHTENMENT_CONTROL:
-> +                has_msr_hv_reenlightenment = true;
-> +                break;
-> +            case MSR_IA32_SPEC_CTRL:
-> +                has_msr_spec_ctrl = true;
-> +                break;
-> +            case MSR_VIRT_SSBD:
-> +                has_msr_virt_ssbd = true;
-> +                break;
-> +            case MSR_IA32_ARCH_CAPABILITIES:
-> +                has_msr_arch_capabs = true;
-> +                break;
-> +            case MSR_IA32_CORE_CAPABILITY:
-> +                has_msr_core_capabs = true;
-> +                break;
->              }
->          }
-> -
-> -        g_free(kvm_msr_list);
->      }
->  
-> +    g_free(kvm_msr_list);
-> +
->      return ret;
->  }
->  
-> 
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-07-22 13:20:49 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2019-07-25-1
+
+for you to fetch changes up to 7e095e84ba0b7c0a1ac45bc6824dace2fd352e56:
+
+  tpm_emulator: Translate TPM error codes to strings (2019-07-25 11:37:10 -0400)
+
+----------------------------------------------------------------
+Stefan Berger (2):
+      tpm: Exit in reset when backend indicates failure
+      tpm_emulator: Translate TPM error codes to strings
+
+ hw/tpm/tpm_crb.c      |  4 +++-
+ hw/tpm/tpm_emulator.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++----------
+ hw/tpm/tpm_int.h      | 13 +++++++++++++
+ hw/tpm/tpm_tis.c      |  4 +++-
+ 4 files changed, 69 insertions(+), 12 deletions(-)
+
+-- 
+2.20.1
 
 
