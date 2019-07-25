@@ -2,109 +2,81 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CACD9C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3134C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A33BA22BEF
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:10:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A33BA22BEF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E1C221852
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:13:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v3UZGhJf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E1C221852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqZm4-0003GZ-03
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:10:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60824)
+	id 1hqZoc-0004Dr-RF
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:13:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33096)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hqZlt-0002mm-Si
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:10:46 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqZoS-0003pS-7s
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hqZls-0008DE-RU
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:10:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54040)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hqZls-0008Cm-Hi
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:10:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 84E9231628FA;
- Thu, 25 Jul 2019 09:10:43 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 90C0719D71;
- Thu, 25 Jul 2019 09:10:37 +0000 (UTC)
-To: "Oleinik, Alexander" <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <20190725032321.12721-1-alxndr@bu.edu>
- <20190725032321.12721-12-alxndr@bu.edu>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <bddfc0c3-e530-9ffb-89f7-bca88288f4f4@redhat.com>
-Date: Thu, 25 Jul 2019 11:10:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <peter.maydell@linaro.org>) id 1hqZoR-0000e2-81
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:13:24 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38612)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqZoR-0000dW-2D
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:13:23 -0400
+Received: by mail-ot1-x344.google.com with SMTP id d17so50945775oth.5
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 02:13:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xsb586Ud5tcmlp49yCb/9Z036nOcFfEwPx/jnyoZ/24=;
+ b=v3UZGhJfjo5fSgbzwRLHnFPdLZAPhUkQU2vpihtDcxiUzcGVl8Ene2WkaYP8p63qat
+ uFG22jvSSrtY3+D9lAGESLyAoyCdb0HrIMD3sa0edPEFyeTvqhz0zVVZumq1B2OW+EeX
+ yrOO714Ria1Wo+nRxZDWnLTFU6o6UTpNfEH7kJssXVTAyvbYVmvr88xW6UqFXmQICeCF
+ gul75qx1u5sqQhP5dx07lFI+4zAbESea8TlZcymXZEOOFU6EC9NHVAKhZ5rg39KB1iKi
+ VmKxRd4rWuOhaxcz0TAP1N2CWhrWUykQ59lnf/UR5mCgQz0ehdO9X2Bt8OiGN3ucTBZj
+ pg0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xsb586Ud5tcmlp49yCb/9Z036nOcFfEwPx/jnyoZ/24=;
+ b=FYnkXgnOkpNya2zsv+I4oF3MqeJMcjDEHHWlx5ZlGu/Gurarzk5C94RLLfKVVBZGfx
+ +oI+P4bsHJ2ZN13PRQBKvfbFHa5ttsq7DUsEV3CWIOK8NNVY2ZOYVDvW/yxjCdCtx95p
+ zLoy1+1WBHv97tzbYI2rbHCYfuIzUuOKX1+XAnwR0jhTtro0Fp5xg1m6fcG7cRxmkjpm
+ 0GFtR74rKhxyM3ZwdyaHKD4+3ZBMVHe5HOpXAY8181iRlchm/ICaP8VgVTLhqf10Eybm
+ rtCbyYdbt3vdaCaRxfimBdhBd2eUWw4HHgFgQDmzhX0rU9wEhFnOrjpP4DgA2W+4uxdt
+ hyLw==
+X-Gm-Message-State: APjAAAVdDSTeHwQBtEQi4d3x7IO5w6N0LeVEbI2X0Hk/UuSQUQBof5ls
+ +EAXq1B4X+LpdO4y3oV9UtCbTOP2FiQFtgUiLINUUw==
+X-Google-Smtp-Source: APXvYqz70h9TMJMMbUiMZIHoicW8aQxn3+WbU1IikFaGMGWqQw/V/scrlApw2M+cQPcDiCbDB8zMkcaRnrKu6C2S8CM=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr5946892oti.91.1564046002422; 
+ Thu, 25 Jul 2019 02:13:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190725032321.12721-12-alxndr@bu.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 25 Jul 2019 09:10:43 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC 11/19] fuzz: add direct send/receive in qtest
- client
+References: <20190723154856.17348-1-berrange@redhat.com>
+In-Reply-To: <20190723154856.17348-1-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jul 2019 10:13:11 +0100
+Message-ID: <CAFEAcA-jz2Dsso1cBxEhCu7kq++T1vH--Q_AuBTYzxQxttDNCw@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH for 4.2 0/3] require newer glib2 to enable
+ autofree'ing of stack variables exiting scope
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,39 +88,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, bsd@redhat.com,
- superirishdonkey@gmail.com, stefanha@redhat.com, pbonzini@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/07/2019 05.23, Oleinik, Alexander wrote:
-> Directly interact with tests/libqtest.c functions
-> 
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
->  qtest.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-[...]
-> @@ -748,8 +755,11 @@ static void qtest_event(void *opaque, int event)
->          break;
->      }
->  }
-> -
-> +#ifdef CONFIG_FUZZ
-> +void qtest_init_server(const char *qtest_chrdev, const char *qtest_log, Error **errp)
-> +#else
->  void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp)
-> +#endif
->  {
->      Chardev *chr;
+On Tue, 23 Jul 2019 at 16:49, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+>
+> Both GCC and CLang support a C extension attribute((cleanup)) which
+> allows you to define a function that is invoked when a stack variable
+> exits scope. This typically used to free the memory allocated to it,
+> though you're not restricted to this. For example it could be used to
+> unlock a mutex.
 
-Even without your fuzzer series, it's somewhat confusing that we have a
-qtest_init() function here that is completely different from the
-qtest_init() function in tests/libqtest.c ...
-Maybe you could send a separate patch that renames the qtest_init() here
-always to qtest_init_server() and change the calling of the function in
-vl.c, too?
+Does Coverity handle this? Can it be made to wire up this kind
+of deallocation into checks of use-after-free/memory leaks/etc?
 
- Thomas
+thanks
+- PMM
 
