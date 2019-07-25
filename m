@@ -2,67 +2,57 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D310C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC87C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:09:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 034E32173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:06:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 034E32173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0675420828
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:09:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0675420828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqWth-0007NF-1l
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 02:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39631)
+	id 1hqWwd-00007J-7B
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 02:09:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40111)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hqWtW-0006uE-Q8
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:06:28 -0400
+ (envelope-from <jing2.liu@linux.intel.com>) id 1hqWwS-0008AT-Ng
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hqWtV-000846-Co
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:06:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59002)
+ (envelope-from <jing2.liu@linux.intel.com>) id 1hqWwR-0003C6-5Y
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:09:28 -0400
+Received: from mga12.intel.com ([192.55.52.136]:28605)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hqWtS-00080f-8R; Thu, 25 Jul 2019 02:06:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C80A6A3B5F;
- Thu, 25 Jul 2019 06:06:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-30.ams2.redhat.com
- [10.36.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EDC4A5D71A;
- Thu, 25 Jul 2019 06:06:15 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 62003113865F; Thu, 25 Jul 2019 08:06:14 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: John Snow <jsnow@redhat.com>
-References: <20190717173937.18747-1-jsnow@redhat.com>
- <87imrsqbrj.fsf@dusky.pond.sub.org>
- <f06c477a-0334-f38c-038e-befbaf826ee1@redhat.com>
-Date: Thu, 25 Jul 2019 08:06:14 +0200
-In-Reply-To: <f06c477a-0334-f38c-038e-befbaf826ee1@redhat.com> (John Snow's
- message of "Wed, 24 Jul 2019 18:06:23 -0400")
-Message-ID: <87lfwmk5rd.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Thu, 25 Jul 2019 06:06:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] qapi: add dirty-bitmaps to
- query-named-block-nodes result
+ (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
+ id 1hqWwQ-00038C-OX
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:09:27 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Jul 2019 23:09:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,305,1559545200"; d="scan'208";a="197762169"
+Received: from liujing-dell.bj.intel.com ([10.238.145.70])
+ by fmsmga002.fm.intel.com with ESMTP; 24 Jul 2019 23:09:08 -0700
+From: Jing Liu <jing2.liu@linux.intel.com>
+To: qemu-devel@nongnu.org,
+	pbonzini@redhat.com
+Date: Thu, 25 Jul 2019 14:14:16 +0800
+Message-Id: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.136
+Subject: [Qemu-devel] [PATCH v2] x86: Intel AVX512_BF16 feature enabling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,187 +64,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Jing Liu <jing2.liu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-John Snow <jsnow@redhat.com> writes:
+Intel CooperLake cpu adds AVX512_BF16 instruction, defining as
+CPUID.(EAX=7,ECX=1):EAX[bit 05].
 
-> On 7/24/19 12:47 AM, Markus Armbruster wrote:
->> John Snow <jsnow@redhat.com> writes:
->> 
->>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>
->>> Let's add a possibility to query dirty-bitmaps not only on root nodes.
->>> It is useful when dealing both with snapshots and incremental backups.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> [Added deprecation information. --js]
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  block/qapi.c         |  5 +++++
->>>  qapi/block-core.json |  6 +++++-
->>>  qemu-deprecated.texi | 12 ++++++++++++
->>>  3 files changed, 22 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/block/qapi.c b/block/qapi.c
->>> index 917435f022..15f1030264 100644
->>> --- a/block/qapi.c
->>> +++ b/block/qapi.c
->>> @@ -79,6 +79,11 @@ BlockDeviceInfo *bdrv_block_device_info(BlockBackend *blk,
->>>          info->backing_file = g_strdup(bs->backing_file);
->>>      }
->>>  
->>> +    if (!QLIST_EMPTY(&bs->dirty_bitmaps)) {
->>> +        info->has_dirty_bitmaps = true;
->>> +        info->dirty_bitmaps = bdrv_query_dirty_bitmaps(bs);
->>> +    }
->>> +
->>>      info->detect_zeroes = bs->detect_zeroes;
->>>  
->>>      if (blk && blk_get_public(blk)->throttle_group_member.throttle_state) {
->>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>> index 0d43d4f37c..9210ae233d 100644
->>> --- a/qapi/block-core.json
->>> +++ b/qapi/block-core.json
->>> @@ -360,6 +360,9 @@
->>>  # @write_threshold: configured write threshold for the device.
->>>  #                   0 if disabled. (Since 2.3)
->>>  #
->>> +# @dirty-bitmaps: dirty bitmaps information (only present if node
->>> +#                 has one or more dirty bitmaps) (Since 4.2)
->>> +#
->>>  # Since: 0.14.0
->>>  #
->>>  ##
->>> @@ -378,7 +381,7 @@
->>>              '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->>>              '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->>>              '*iops_size': 'int', '*group': 'str', 'cache': 'BlockdevCacheInfo',
->>> -            'write_threshold': 'int' } }
->>> +            'write_threshold': 'int', '*dirty-bitmaps': ['BlockDirtyInfo'] } }
->>>  
->>>  ##
->>>  # @BlockDeviceIoStatus:
->>> @@ -656,6 +659,7 @@
->>>  #
->>>  # @dirty-bitmaps: dirty bitmaps information (only present if the
->>>  #                 driver has one or more dirty bitmaps) (Since 2.0)
->>> +#                 Deprecated in 4.2; see BlockDirtyInfo instead.
->>>  #
->>>  # @io-status: @BlockDeviceIoStatus. Only present if the device
->>>  #             supports it and the VM is configured to stop on errors
->>> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
->>> index c90b08d553..6374b66546 100644
->>> --- a/qemu-deprecated.texi
->>> +++ b/qemu-deprecated.texi
->>> @@ -134,6 +134,18 @@ The ``status'' field of the ``BlockDirtyInfo'' structure, returned by
->>>  the query-block command is deprecated. Two new boolean fields,
->>>  ``recording'' and ``busy'' effectively replace it.
->>>  
->>> +@subsection query-block result field dirty-bitmaps (Since 4.2)
->>> +
->>> +The ``dirty-bitmaps`` field of the ``BlockInfo`` structure, returned by
->>> +the query-block command is itself now deprecated. The ``dirty-bitmaps``
->>> +field of the ``BlockDeviceInfo`` struct should be used instead, which is the
->>> +type of the ``inserted`` field in query-block replies, as well as the
->>> +type of array items in query-named-block-nodes.
->> 
->> Would the text be clearer if it talked only about commands, not about
->> types?
->> 
->> Here's my (laconic) try:
->> 
->>    @subsection query-block result field dirty-bitmaps (Since 4.2)
->> 
->>    In the result of query-block, member ``dirty-bitmaps'' has been moved
->>    into member ``inserted''.
->> 
->
-> Yeah, that's probably better in terms of strictly what the deprecation
-> is. I was trying to imply that the output will also now be visible in
-> other commands as well, but that's not the deprecation -- that's the new
-> feature.
->
-> ACK
->
->> Aside: same for existing @subsection query-block result field
->> dirty-bitmaps[i].status (since 4.0).
->> 
->
-> (Probably not worth editing deprecation text that was already published.)
+The patch adds a property for setting the subleaf of CPUID leaf 7 in
+case that people would like to specify it.
 
-Maybe, maybe not.  I'm not making demands.
+The release spec link as follows,
+https://software.intel.com/sites/default/files/managed/c5/15/\
+architecture-instruction-set-extensions-programming-reference.pdf
 
->>> +Since the ``dirty-bitmaps`` field is optionally present in both the old and
->>> +new locations, clients must use introspection to learn where to anticipate
->>> +the field if/when it does appear in command output.
->>> +
->> 
->> I find this hint a bit confusing.  Do we need it?
->> 
->
-> I think so, yes: it's nice to inform readers of how to cope with the
-> deprecation.
->
->> If yes, laconic me again:
->> 
->>    Clients should use introspection to learn whether ``dirty-bitmaps'' is
->>    in the new location.
->> 
->
-> Too terse. I want my documentation to greet me in the morning by reading
-> me the local newspaper while I brush my teeth.
->
-> Yours says the "how", but I think a hint should have the "why":
->
-> "Since the ``dirty-bitmaps`` field is not always present in command
-> output, Clients should use introspection to learn the location of this
-> field."
+Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+---
+ target/i386/cpu.c | 39 ++++++++++++++++++++++++++++++++++++++-
+ target/i386/cpu.h |  7 +++++++
+ target/i386/kvm.c |  3 ++-
+ 3 files changed, 47 insertions(+), 2 deletions(-)
 
-This is clearer than the text in Vladimir's patch.  It made me
-understand why you want to talk about optional.  See, I've been peddling
-the introspection kool-aid long enough to take "use introspection to
-detect interface changes" for granted.  The idea that anyone would try
-something like "if what query-block just gave me doesn't have
-dirty-bitmaps in the new location, look for it in the old location" just
-didn't come to me.
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 805ce95..517dedb 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -770,6 +770,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+           /* CPUID_7_0_ECX_OSPKE is dynamic */ \
+           CPUID_7_0_ECX_LA57)
+ #define TCG_7_0_EDX_FEATURES 0
++#define TCG_7_1_EAX_FEATURES 0
+ #define TCG_APM_FEATURES 0
+ #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
+ #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
+@@ -1095,6 +1096,25 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         },
+         .tcg_features = TCG_7_0_EDX_FEATURES,
+     },
++    [FEAT_7_1_EAX] = {
++        .type = CPUID_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, "avx512-bf16", NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid = {
++            .eax = 7,
++            .needs_ecx = true, .ecx = 1,
++            .reg = R_EAX,
++        },
++        .tcg_features = TCG_7_1_EAX_FEATURES,
++    },
+     [FEAT_8000_0007_EDX] = {
+         .type = CPUID_FEATURE_WORD,
+         .feat_names = {
+@@ -4293,13 +4313,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     case 7:
+         /* Structured Extended Feature Flags Enumeration Leaf */
+         if (count == 0) {
+-            *eax = 0; /* Maximum ECX value for sub-leaves */
++            /* Maximum ECX value for sub-leaves */
++            *eax = env->cpuid_level_func7;
+             *ebx = env->features[FEAT_7_0_EBX]; /* Feature flags */
+             *ecx = env->features[FEAT_7_0_ECX]; /* Feature flags */
+             if ((*ecx & CPUID_7_0_ECX_PKU) && env->cr[4] & CR4_PKE_MASK) {
+                 *ecx |= CPUID_7_0_ECX_OSPKE;
+             }
+             *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
++        } else if (count == 1) {
++            *eax = env->features[FEAT_7_1_EAX];
++            *ebx = 0;
++            *ecx = 0;
++            *edx = 0;
+         } else {
+             *eax = 0;
+             *ebx = 0;
+@@ -4949,6 +4975,11 @@ static void x86_cpu_adjust_feat_level(X86CPU *cpu, FeatureWord w)
+         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel2, eax);
+     break;
+     }
++
++    if (eax == 7) {
++        x86_cpu_adjust_level(cpu, &env->cpuid_min_level_func7,
++                             fi->cpuid.ecx);
++    }
+ }
+ 
+ /* Calculate XSAVE components based on the configured CPU feature flags */
+@@ -5067,6 +5098,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+         x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
++        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
+         x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
+@@ -5098,6 +5130,9 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+     }
+ 
+     /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
++    if (env->cpuid_level_func7 == UINT32_MAX) {
++        env->cpuid_level_func7 = env->cpuid_min_level_func7;
++    }
+     if (env->cpuid_level == UINT32_MAX) {
+         env->cpuid_level = env->cpuid_min_level;
+     }
+@@ -5869,6 +5904,8 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
+     DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits_limit, 0),
+     DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
++    DEFINE_PROP_UINT32("level-func7", X86CPU, env.cpuid_level_func7,
++                       UINT32_MAX),
+     DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX),
+     DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_MAX),
+     DEFINE_PROP_UINT32("xlevel2", X86CPU, env.cpuid_xlevel2, UINT32_MAX),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 05393cf..df9106f 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -479,6 +479,7 @@ typedef enum FeatureWord {
+     FEAT_7_0_EBX,       /* CPUID[EAX=7,ECX=0].EBX */
+     FEAT_7_0_ECX,       /* CPUID[EAX=7,ECX=0].ECX */
+     FEAT_7_0_EDX,       /* CPUID[EAX=7,ECX=0].EDX */
++    FEAT_7_1_EAX,       /* CPUID[EAX=7,ECX=1].EAX */
+     FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
+     FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
+     FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
+@@ -692,6 +693,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_CORE_CAPABILITY   (1U << 30)  /*Core Capability*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+ 
++#define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
++
+ #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
+                                                                              do not invalidate cache */
+ #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+@@ -1322,6 +1325,10 @@ typedef struct CPUX86State {
+     /* Fields after this point are preserved across CPU reset. */
+ 
+     /* processor features (e.g. for CPUID insn) */
++    /* Minimum cpuid leaf 7 value */
++    uint32_t cpuid_level_func7;
++    /* Actual cpuid leaf 7 value */
++    uint32_t cpuid_min_level_func7;
+     /* Minimum level/xlevel/xlevel2, based on CPU model + features */
+     uint32_t cpuid_min_level, cpuid_min_xlevel, cpuid_min_xlevel2;
+     /* Maximum level/xlevel/xlevel2 value for auto-assignment: */
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index ec7870c..fd0a447 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1493,6 +1493,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+                 c = &cpuid_data.entries[cpuid_i++];
+             }
+             break;
++        case 0x7:
+         case 0x14: {
+             uint32_t times;
+ 
+@@ -1505,7 +1506,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+             for (j = 1; j <= times; ++j) {
+                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
+                     fprintf(stderr, "cpuid_data is full, no space for "
+-                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
++                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
+                     abort();
+                 }
+                 c = &cpuid_data.entries[cpuid_i++];
+-- 
+1.8.3.1
 
-However, dirty-bitmaps being optional is *not* why you shouldn't do
-that!  In fact, doing it is not even wrong.  It only gets wrong when you
-do it wrongly.
-
-Wrong: if what query-block just gave me doesn't have dirty-bitmaps in
-the new location, only look for it in the old location from now on.
-
-Correct: if what query-block just gave me doesn't have dirty-bitmaps in
-the new location, look for it in the old location this time.  Next time,
-do the same: try the new location first, then the old location.
-
-Also correct: if what query-block just gave me doesn't have
-dirty-bitmaps in the new location, look for it in the old location.
-Once I've found it in either location, keep looking for it only there in
-the future.  But why would I want to do that?  It's more complicated
-than the previous one for no gain.
-
-Correct and preferred: use introspection.  You need to use it anyway to
-detect changes in arguments, so why do something else for changes in
-results.  Have some kool-aid!
-
-> But I'm only willing to give you a self-deprecating joke and a final
-> nudge to keep a more informative hint, and then I'll capitulate and take
-> your suggestion if you give me a stern look.
-
-No, I'm giving you a friendly "use your judgement" instead.  You may
-well be a better judge of what our users need here, because you're less
-deep into introspection than me, and so are our users.
-
-> --js
->
->>>  @subsection query-cpus (since 2.12.0)
->>>  
->>>  The ``query-cpus'' command is replaced by the ``query-cpus-fast'' command.
 
