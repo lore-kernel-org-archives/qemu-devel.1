@@ -2,65 +2,95 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEA0C76190
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 18:00:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A117C76190
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 18:18:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0795F229F3
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 18:00:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0795F229F3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6E6F6218F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 18:18:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O2CmXxxU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E6F6218F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqi2d-0002yM-A2
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 14:00:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45071)
+	id 1hqiJp-0000R3-L0
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 14:18:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45789)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hqi2L-00023S-2Z
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 14:00:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hqiJg-0008Ty-BS
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 14:18:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hqi2J-00014D-MK
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 14:00:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51334)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hqi2G-0000v3-5p; Thu, 25 Jul 2019 14:00:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4DA2A81F0F;
- Thu, 25 Jul 2019 18:00:11 +0000 (UTC)
-Received: from work-vm (ovpn-117-187.ams2.redhat.com [10.36.117.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E93C4145;
- Thu, 25 Jul 2019 18:00:09 +0000 (UTC)
-Date: Thu, 25 Jul 2019 19:00:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190725180007.GN2656@work-vm>
-References: <20190725163710.11703-1-peter.maydell@linaro.org>
- <20190725163710.11703-3-peter.maydell@linaro.org>
- <20190725172712.GM2656@work-vm>
- <CAFEAcA-jGvNS4N4qobLekHYdV82qSUWVQOvTRQbrpcCRF0Yvwg@mail.gmail.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hqiJe-00010l-8l
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 14:18:12 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:39004)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hqiJc-0000yU-4g
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 14:18:08 -0400
+Received: by mail-pg1-x544.google.com with SMTP id u17so23434376pgi.6
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 11:18:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=SAnZsFd6rEFLGj9UFCMIlonlHY8Yx8sFHv65n+Fm788=;
+ b=O2CmXxxUnQJE7ImsM4KavAuB9QUFiVkWCYfJQgDrhAmV26eYowjaLtASYk4bNfZzzJ
+ JflqLNMa3GalWChvNd5x1Lrj2e7ZQaZSCw0pm6lZTXbZ67e9gaDWriDHlXwEHCnettgW
+ FLsWzwWtxD8XiVUdJu4joVz2DJdTQE5AJtyEi1ACDUS2O4ljly9Qgk8LJI/63kd2fB4L
+ fWqpUrlbAYrU004kAo+/nnMKyzkgZ6X3S9M7LTLsUtZzygDMi1YLdC2xXtVPDjDkN75U
+ kZ63mEbU9WVh3QoPsZcR1ZcYbwRfJlSUakQvHtOv0udfYjHLLxoGJDRIiLxgrXbaEmdn
+ cSNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=SAnZsFd6rEFLGj9UFCMIlonlHY8Yx8sFHv65n+Fm788=;
+ b=Uwt5zoEOdfyp+HvB+pmqOXtsvojJvecuRr0epPMXNr7cIxdNQ8ga3gpDo50tcKImD2
+ 844YCP5U0OfZHnBQk8urMyeXXFnWkoJVNvtB/ZIwhoBO+fXMOue2UQFc86no/ysNE5iS
+ CvFTw8XVQ05IPzoIk/wmbyy0D5YSA+eT5ips/ipMhfjg9Vs6K4eq8/Z6WjtC5LvpcFhL
+ G6twIf1BPChU45jZ0B5XH0lNkbGv17C+UJS6qEKpaY6kBNJUfY4M12nmmesQ4eg2Jr8U
+ LcjIKjgnzwl/6mbT9QL+ig46mBvX+x1MA+gaQmMTfW5LAr1a5IRLYecTNzjsX3p7oA31
+ NxoQ==
+X-Gm-Message-State: APjAAAWdrATY8sLAm5fuN7ks/czbO30ko6W6ZU9JCLTp2pC2JAc6ZnnD
+ EKCAVVBaSh5ytIV0pRvISiYdZQ==
+X-Google-Smtp-Source: APXvYqx+VTw6j++VzSSPvbN3F7O3nxg/qi+xjDL7G7570kt+G/hW57mAN+x91cZkaWYkD6tSiEHmWQ==
+X-Received: by 2002:a17:90a:dac3:: with SMTP id
+ g3mr93706684pjx.45.1564078686631; 
+ Thu, 25 Jul 2019 11:18:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
+ by smtp.gmail.com with ESMTPSA id w197sm64584997pfd.41.2019.07.25.11.18.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 25 Jul 2019 11:18:05 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+ <20190719210326.15466-16-richard.henderson@linaro.org>
+ <87wog6yumo.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <75530f99-658c-ed76-d272-48c9b2841337@linaro.org>
+Date: Thu, 25 Jul 2019 11:18:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-jGvNS4N4qobLekHYdV82qSUWVQOvTRQbrpcCRF0Yvwg@mail.gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 25 Jul 2019 18:00:11 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
- VMSTATE_STRUCT_VARRAY macros
+In-Reply-To: <87wog6yumo.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH for-4.2 15/24] target/arm: Reorganize
+ ARMMMUIdx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,83 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Thu, 25 Jul 2019 at 18:27, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> > > The VMSTATE_STRUCT_VARRAY_UINT32 macro is intended to handle
-> > > migrating a field which is an array of structs, but where instead of
-> > > migrating the entire array we only migrate a variable number of
-> > > elements of it.
-> > >
-> > > The VMSTATE_STRUCT_VARRAY_POINTER_UINT32 macro is intended to handle
-> > > migrating a field which is of pointer type, and points to a
-> > > dynamically allocated array of structs of variable size.
-> > >
-> > > We weren't actually checking that the field passed to
-> > > VMSTATE_STRUCT_VARRAY_UINT32 really is an array, with the result that
-> > > accidentally using it where the _POINTER_ macro was intended would
-> > > compile but silently corrupt memory on migration.
-> > >
-> > > Add type-checking that enforces that the field passed in is
-> > > really of the right array type. This applies to all the VMSTATE
-> > > macros which use flags including VMS_VARRAY_* but not VMS_POINTER.
-> > >
-> > > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> >
-> > > ---
-> > >  include/migration/vmstate.h | 27 +++++++++++++++++++++------
-> > >  1 file changed, 21 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> > > index ca68584eba4..2df333c3612 100644
-> > > --- a/include/migration/vmstate.h
-> > > +++ b/include/migration/vmstate.h
-> > > @@ -227,8 +227,19 @@ extern const VMStateInfo vmstate_info_bitmap;
-> > >  extern const VMStateInfo vmstate_info_qtailq;
-> > >
-> > >  #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
-> > > +/* Check that t2 is an array of t1 of size n */
-> > >  #define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
-> >
-> > I'd have to admit I don't understand why that does what you say;
-> > I'd expected something to index a t2 pointer with [n].
+On 7/25/19 8:57 AM, Alex Bennée wrote:
 > 
-> Note that this is just a comment describing what the existing
-> macro does, as a way to distinguish its job from that of the
-> new macro I'm adding.
+> Richard Henderson <richard.henderson@linaro.org> writes:
 > 
-> What happens here is that t2 is a type like "foo [32]", ie
-> it is an array type already. t1 is the base 'foo' type; so the macro
-> is checking that t1[n] matches t2, where n is passed in to us
-> and must match the declared array size of the field (32 in
-> my example). (In C the size of the array is carried around as
-> part of its type, and must match on both sides of the expression;
-> so if you pass in the name of an array field that's the wrong size the
-> type check will fail, which is what we want.)
-
-Ah, OK that makes sense; what it really needs is that example to make
-me realise that t2 was already the array.
-
-Dave
-
-> > However, for the rest of it, from migration I'm happy:
-> >
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >
-> > given it's just fixing an ARM bug, and given it'll blow up straight away
-> > I think it's OK for 4.1; the only risk is if we find a compiler we don't
-> > like.
+>> Prepare for, but do not yet implement, the EL2&0 regime and the
+>> Secure EL2 regime.  Rename all of the a-profile symbols to make
+>> the distictions clearer.
 > 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Perhaps a summary of the renames would be useful here? My head is
+> spinning a little given the number that we have and not being familiar
+> with the naming convention.
+> 
+>   ARMMMUIdx[_StageN]_[M][S]Enn[_nn]
+> 
+>   _StageN - stage N only, otherwise assumed 1+2 lookup?
+
+How about "full", since most of the indicies only have a single stage lookup.
+
+>   M - M profile (interleaved with A profile)
+>   S - Secure
+>   Enn - visible exception level, so E02 is shared EL0 and EL2?
+>   _nn - not sure?
+> 
+> The cpu.h comment is very detailed but doesn't actually give me enough
+> information to decode an ARMMMUIdx when I come across it in the code.
+
+I have wondered if it was worth going back and splitting this patch so that we
+do exactly one rename at at time.  It would mean 9 of these patches...
+
+
+r~
 
