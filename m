@@ -2,79 +2,70 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F57C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:37:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB44C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 07:01:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB3C12173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 06:37:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB3C12173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 87EEA22C97
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 07:01:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EEA22C97
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqXO1-0005Ck-Rs
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 02:37:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46165)
+	id 1hqXl9-0002cq-Pm
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 03:01:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50487)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <zhexu@redhat.com>) id 1hqXNr-0004oU-3m
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:37:48 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hqXky-0002E7-3d
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 03:01:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhexu@redhat.com>) id 1hqXNp-0003h5-LT
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:37:47 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:45054)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zhexu@redhat.com>) id 1hqXNp-0003gO-Eu
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 02:37:45 -0400
-Received: by mail-pg1-f193.google.com with SMTP id i18so22494431pgl.11
- for <qemu-devel@nongnu.org>; Wed, 24 Jul 2019 23:37:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:date:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=yFH9XAQHTL04fowA8sNGAuziUcrHu12d/1VrtDBKAw0=;
- b=KeGht3hoDHxMPnLugTN7lZBjM0D+Ht5z9UTMB/JIrD3XSI/pOEaMfncqGeo+PGI+D1
- G2b8l46metATgGCtUnsmvpLdE4hYxNeHIHNKBuZX3Cd3NjPSy9+iyOToJlSdFOUhqRgm
- J64zYVtmXxGfCFsUNhTYEtKY527CieV5hYRjCz+lJKNcu14cvoAXKds8QZXoarBxPr5r
- U+TzhDY9BcI/oMhgYGzFGCBy219vfKtWmauTrlEqJtyY6D5mnly6wBYbZtHnKqgBCh/t
- /rUg2TGBFJDYNoHSAX6+J0DsaSnKXfpztnIBDJjYixS4jzlcTpMg5wnd5Hm2wTYfJlct
- yHcg==
-X-Gm-Message-State: APjAAAXZqlaEcIUur9+9Yme8UtFajIy7usVnba0X/6tTQuABT4idyZ6Y
- /VCCQ/Wk+Xf7tT/QfcwxZHVLbQ==
-X-Google-Smtp-Source: APXvYqz3ZTRBOw9fORX4LdGiItJ/0GRdVPccbEkm/ITXMKSLQgVVQ1jCia8WD26On2hyXMMuAz4C3g==
-X-Received: by 2002:a63:f13:: with SMTP id e19mr84585952pgl.132.1564036664174; 
- Wed, 24 Jul 2019 23:37:44 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id u69sm59841400pgu.77.2019.07.24.23.37.40
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 24 Jul 2019 23:37:43 -0700 (PDT)
-From: Peter Xu <zhexu@redhat.com>
-X-Google-Original-From: Peter Xu <peterx@redhat.com>
-Date: Thu, 25 Jul 2019 14:37:33 +0800
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190725063733.GH14454@xz-x1>
-References: <155364082689.15803.7062874513041742278.stgit@gimli.home>
- <20190329104904.450fefef@x1.home>
- <dbe614f5-47c8-b05d-dd73-2fbcd1579ae3@amd.com>
- <20190723112618.0efafa8d@x1.home> <20190724071439.GB18771@xz-x1>
- <20190724040837-mutt-send-email-mst@kernel.org>
- <20190724100331.GA14454@xz-x1> <20190724084355.627d44cf@x1.home>
+ (envelope-from <tony.nguyen@bt.com>) id 1hqXkv-0002En-Lw
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 03:01:40 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.74]:58897)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1hqXkb-0001yR-41; Thu, 25 Jul 2019 03:01:17 -0400
+Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ BWP09926079.bt.com (10.36.82.110) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 25
+ Jul 2019 08:01:14 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 08:01:14 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
+ 2019 08:01:14 +0100
+From: <tony.nguyen@bt.com>
+To: <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v3 00/15] Invert Endian bit in SPARCv9 MMU
+ TTE
+Thread-Index: AQHVQrP3RrTfmfnvbEOFfW6KFJKHhQ==
+Date: Thu, 25 Jul 2019 07:01:14 +0000
+Message-ID: <1564038073754.91133@bt.com>
+References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>,
+ <1563810716254.18886@bt.com>
+In-Reply-To: <1563810716254.18886@bt.com>
+Accept-Language: en-AU, en-GB, en-US
+Content-Language: en-AU
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.187.101.42]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190724084355.627d44cf@x1.home>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.215.193
-Subject: Re: [Qemu-devel] [RFC PATCH] pci: Use PCI aliases when determining
- device IOMMU address space
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.74
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: [Qemu-devel] [PATCH v3 00/15] Invert Endian bit in SPARCv9 MMU TTE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,136 +77,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "Suthikulpanit,
- Suravee" <Suravee.Suthikulpanit@amd.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Peter Xu <zhexu@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc: peter.maydell@linaro.org, walling@linux.ibm.com, mst@redhat.com,
+ palmer@sifive.com, mark.cave-ayland@ilande.co.uk, Alistair.Francis@wdc.com,
+ arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
+ ehabkost@redhat.com, sw@weilnetz.de, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
+ cohuck@redhat.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org,
+ amarkovic@wavecomp.com, pbonzini@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 08:43:55AM -0600, Alex Williamson wrote:
-> On Wed, 24 Jul 2019 18:03:31 +0800
-> Peter Xu <zhexu@redhat.com> wrote:
-> 
-> > On Wed, Jul 24, 2019 at 05:39:22AM -0400, Michael S. Tsirkin wrote:
-> > > On Wed, Jul 24, 2019 at 03:14:39PM +0800, Peter Xu wrote:  
-> > > > On Tue, Jul 23, 2019 at 11:26:18AM -0600, Alex Williamson wrote:  
-> > > > > > On 3/29/19 11:49 AM, Alex Williamson wrote:  
-> > > > > > > [Cc +Brijesh]
-> > > > > > > 
-> > > > > > > Hi Brijesh, will the change below require the IVRS to be updated to
-> > > > > > > include aliases for all BDF ranges behind a conventional bridge?  I
-> > > > > > > think the Linux code handles this regardless of the firmware provided
-> > > > > > > aliases, but is it required per spec for the ACPI tables to include
-> > > > > > > bridge aliases?  Thanks,
-> > > > > > >     
-> > > > > > 
-> > > > > > We do need to includes aliases in ACPI table. We need to populate the
-> > > > > > IVHD type 0x43 and 0x4 for alias range start and end. I believe host
-> > > > > > IVRS would contain similar information.
-> > > > > > 
-> > > > > > Suravee, please correct me if I am missing something?  
-> > > > > 
-> > > > > I finally found some time to investigate this a little further, yes the
-> > > > > types mentioned are correct for defining start and end of an alias
-> > > > > range.  The challenge here is that these entries require a DeviceID,
-> > > > > which is defined as a BDF, AIUI.  The IVRS is created in QEMU, but bus
-> > > > > numbers are defined by the guest firmware, and potentially redefined by
-> > > > > the guest OS.  This makes it non-trivial to insert a few IVHDs into the
-> > > > > IVRS to describe alias ranges.  I'm wondering if the solution here is
-> > > > > to define a new linker-loader command that would instruct the guest to
-> > > > > write a bus number byte to a given offset for a described device.
-> > > > > These commands would be inserted before the checksum command, such that
-> > > > > these bus number updates are calculated as part of the checksum.
-> > > > > 
-> > > > > I'm imagining the command format would need to be able to distinguish
-> > > > > between the actual bus number of a described device, the secondary bus
-> > > > > number of the device, and the subordinate bus number of the device.
-> > > > > For describing the device, I'm envisioning stealing from the DMAR
-> > > > > definition, which already includes a bus number invariant mechanism to
-> > > > > describe a device, starting with a segment and root bus, follow a chain
-> > > > > of devfns to get to the target device.  Therefore the guest firmware
-> > > > > would follow the path to the described device, pick the desired bus
-> > > > > number, and write it to the indicated table offset.
-> > > > > 
-> > > > > Does this seem like a reasonable approach?  Better ideas?  I'm not
-> > > > > thrilled with the increased scope demanded by IVRS support, but so long
-> > > > > as we have an AMD IOMMU model, I don't see how to avoid it.  Thanks,  
-> > > > 
-> > > > I don't have a better idea yet, but just want to say that accidentally
-> > > > I was trying to look into this as well starting from this week and I'd
-> > > > say that's mostly what I thought about too (I was still reading a bit
-> > > > seabios when I saw this email)... so at least this idea makes sense to
-> > > > me.
-> > > > 
-> > > > Would the guest OS still change the PCI bus number even after the
-> > > > firmware (BIOS/UEFI)?  Could I ask in what case would that happen?
-> > > > 
-> > > > Thanks,  
-> > > 
-> > > Guest OSes can in theory rebalance resources. Changing bus numbers
-> > > would be useful if new bridges are added by hotplug.
-> > > In practice at least Linux doesn't do the rebalancing.
-> > > I think that if we start reporting PNP OS support in BIOS then windows
-> > > might start doing that more aggressively.  
-> > 
-> > It's surprising me a bit...  IMHO if we allow the bus number to change
-> > then at least many scripts can even fail which might work before.
-> > E.g. , a very common script can run "lspci-like" program to list each
-> > device and then do "lspci-like -vvv" again upon the BDF it fetched
-> > from previous commands.  Any kind of BDF caching would be invalid
-> > since that from either userspace or kernel.
-> > 
-> > Also, obviously the data to be stored in IVRS is closely bound to how
-> > bus number is defined.  Even if we can add a new linker-loader command
-> > to all the open firmwares like seabios or OVMF but still we can't do
-> > that to Windows (or, could we?...).
-> > 
-> > Now one step back, I'm also curious on the reason behind on why AMD
-> > spec required the IVRS with BDF information, rather than the scope
-> > information like what Intel DMAR spec was asking for.
-> 
-> It's a deficiency of the IVRS spec, but it's really out of scope here.
-> It's not the responsibility of the hypervisor to resolve this sort of
-> design issue, we should simply maintain the bare metal behavior and the
-> bare metal limitations of the design.
+This patchset implements the IE (Invert Endian) bit in SPARCv9 MMU TTE.
 
-Yes this is a better perspective.  It's not the first time I totally
-forgot to go back to reference the bare-metal as that's what we're
-emulating and normally that'll have very similar problem.  And the
-"data point" email does give a proper supporting material for this.
+It is an attempt of the instructions outlined by Richard Henderson to Mark
+Cave-Ayland.
 
-> 
-> Michael did invoke some interesting ideas regarding QEMU updating the
-> IRVS table though.  QEMU does know when bus apertures are programmed on
-> devices and the config writes for these updates could trigger IVRS
-> updates.  I think we'd want to allow such updates only between machine
-> reset and the guest firmware writing the table checksum.  This reduces
-> the scope of the necessary changes, though still feels a little messy
-> to have these config writes making table updates.
-> 
-> Another approach, and maybe what Michael was really suggesting, is that
-> we essentially create the ACPI tables twice AFAICT.  Once initially,
-> then again via a select callback in fw_cfg.  For SeaBIOS, it looks like
-> this second generation would be created after the PCI bus has been
-> enumerated and initialized.  I've been trying to see if the same is
-> likely for OVMF, though it's not clear to me that this is a reasonable
-> ordering to rely on.  It would be entirely reasonable that firmware
-> could process ACPI tables in advance of enumerating PCI, even
-> potentially as a prerequisite to enumerating PCI.  So ultimately I'm not
-> sure if there are valid ordering assumptions to use these callbacks
-> this way, though I'd appreciate any further discussion.  Thanks,
+Tested with OpenBSD on sun4u. Solaris 10 is my actual goal, but unfortunate=
+ly a
+separate keyboard issue remains in the way.
 
-After re-read Michael's reply, I feel like what Michael suggested is
-that we can simply ignore the bus-number-change case by the guest OS
-for now, but I might be wrong.  In all cases, this will be a problem
-only if "we still need to fill in the BDF information" somehow, while
-that statement seems to be questionable now.
+On 01/11/17 19:15, Mark Cave-Ayland wrote:
 
-Thanks,
+>On 15/08/17 19:10, Richard Henderson wrote:
+>
+>> [CC Peter re MemTxAttrs below]
+>>
+>> On 08/15/2017 09:38 AM, Mark Cave-Ayland wrote:
+>>> Working through an incorrect endian issue on qemu-system-sparc64, it ha=
+s
+>>> become apparent that at least one OS makes use of the IE (Invert Endian=
+)
+>>> bit in the SPARCv9 MMU TTE to map PCI memory space without the
+>>> programmer having to manually endian-swap accesses.
+>>>
+>>> In other words, to quote the UltraSPARC specification: "if this bit is
+>>> set, accesses to the associated page are processed with inverse
+>>> endianness from what is specified by the instruction (big-for-little an=
+d
+>>> little-for-big)".
 
--- 
-Peter Xu
+A good explanation by Mark why the IE bit is required.
+
+>>>
+>>> Looking through various bits of code, I'm trying to get a feel for the
+>>> best way to implement this in an efficient manner. From what I can see
+>>> this could be solved using an additional MMU index, however I'm not
+>>> overly familiar with the memory and softmmu subsystems.
+>>
+>> No, it can't be solved with an MMU index.
+>>
+>>> Can anyone point me in the right direction as to what would be the best
+>>> way to implement this feature within QEMU?
+>>
+>> It's definitely tricky.
+>>
+>> We definitely need some TLB_FLAGS_MASK bit set so that we're forced thro=
+ugh
+>> the
+>> memory slow path.  There is no other way to bypass the endianness that w=
+e've
+>> already encoded from the target instruction.
+>>
+>> Given the tlb_set_page_with_attrs interface, I would think that we need =
+a new
+>> bit in MemTxAttrs, so that the target/sparc tlb_fill (and subroutines) c=
+an
+>> pass
+>> along the TTE bit for the given page.
+>>
+>> We have an existing problem in softmmu_template.h,
+>>
+>>     /* ??? Note that the io helpers always read data in the target
+>>        byte ordering.  We should push the LE/BE request down into io.  *=
+/
+>>     res =3D glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr);
+>>     res =3D TGT_BE(res);
+>>
+>> We do not want to add a third(!) byte swap along the i/o path.  We need =
+to
+>> collapse the two that we have already before considering this one.
+>>
+>> This probably takes the form of:
+>>
+>> (1) Replacing the "int size" argument with "TCGMemOp memop" for
+>>       a) io_{read,write}x in accel/tcg/cputlb.c,
+>>       b) memory_region_dispatch_{read,write} in memory.c,
+>>       c) adjust_endianness in memory.c.
+>>     This carries size+sign+endianness down to the next level.
+>>
+>> (2) In memory.c, adjust_endianness,
+>>
+>>      if (memory_region_wrong_endianness(mr)) {
+>> -        switch (size) {
+>> +        memop ^=3D MO_BSWAP;
+>> +    }
+>> +    if (memop & MO_BSWAP) {
+>>
+>>     For extra credit, re-arrange memory_region_wrong_endianness
+>>     to something more explicit -- "wrong" isn't helpful.
+>
+>Finally I've had a bit of spare time to experiment with this approach,
+>and from what I can see there are currently 2 issues:
+>
+>
+>1) Using TCGMemOp in memory.c means it is no longer accelerator agnostic
+>
+>For the moment I've defined a separate MemOp in memory.h and provided a
+>mapping function in io_{read,write}x to map from TCGMemOp to MemOp and
+>then pass that into memory_region_dispatch_{read,write}.
+>
+>Other than not referencing TCGMemOp in the memory API, another reason
+>for doing this was that I wasn't convinced that all the MO_ attributes
+>were valid outside of TCG. I do, of course, strongly defer to other
+>people's knowledge in this area though.
+>
+>
+>2) The above changes to adjust_endianness() fail when
+>memory_region_dispatch_{read,write} are called recursively
+>
+>Whilst booting qemu-system-sparc64 I see that
+>memory_region_dispatch_{read,write} get called recursively - once via
+>io_{read,write}x and then again via flatview_read_continue() in exec.c.
+>
+>The net effect of this is that we perform the bswap correctly at the
+>tail of the recursion, but then as we travel back up the stack we hit
+>memory_region_dispatch_{read,write} once again causing a second bswap
+>which means the value is returned with the incorrect endian again.
+>
+>
+>My understanding from your softmmu_template.h comment above is that the
+>memory API should do the endian swapping internally allowing the removal
+>of the final TGT_BE/TGT_LE applied to the result, or did I get this wrong?
+>
+>> (3) In tlb_set_page_with_attrs, notice attrs.byte_swap and set
+>>     a new TLB_FORCE_SLOW bit within TLB_FLAGS_MASK.
+>>
+>> (4) In io_{read,write}x, if iotlbentry->attrs.byte_swap is set,
+>>     then memop ^=3D MO_BSWAP.
+
+Thanks all for the v1 and v2 feedback.
+
+v2:
+- Moved size+sign+endianness attributes from TCGMemOp into MemOp.
+  In v1 TCGMemOp was re-purposed entirely into MemOp.
+- Replaced MemOp MO_{8|16|32|64} with TCGMemOp MO_{UB|UW|UL|UQ} alias.
+  This is to avoid warnings on comparing and coercing different enums.
+- Renamed get_memop to get_tcgmemop for clarity.
+- MEMOP is now SIZE_MEMOP, which is just ctzl(size).
+- Split patch 3/4 so one memory_region_dispatch_{read|write} interface
+  is converted per patch.
+- Do not reuse TLB_RECHECK, use new TLB_FORCE_SLOW instead.
+- Split patch 4/4 so adding the MemTxAddrs parameters and converting
+  tlb_set_page() to tlb_set_page_with_attrs() is separate from usage.
+- CC'd maintainers.
+
+v3:
+- Like v1, the entire TCGMemOp enum is now MemOp.
+- MemOp target dependant attributes are conditional upon NEED_CPU_H
+
+Tony Nguyen (15):
+  tcg: TCGMemOp is now accelerator independent MemOp
+  memory: Access MemoryRegion with MemOp
+  target/mips: Access MemoryRegion with MemOp
+  hw/s390x: Access MemoryRegion with MemOp
+  hw/intc/armv7m_nic: Access MemoryRegion with MemOp
+  hw/virtio: Access MemoryRegion with MemOp
+  hw/vfio: Access MemoryRegion with MemOp
+  exec: Access MemoryRegion with MemOp
+  cputlb: Access MemoryRegion with MemOp
+  memory: Access MemoryRegion with MemOp semantics
+  memory: Single byte swap along the I/O path
+  cpu: TLB_FLAGS_MASK bit to force memory slow path
+  cputlb: Byte swap memory transaction attribute
+  target/sparc: Add TLB entry with attributes
+  target/sparc: sun4u Invert Endian TTE bit
+
+ accel/tcg/cputlb.c                      |  71 +++++++++--------
+ exec.c                                  |   6 +-
+ hw/intc/armv7m_nvic.c                   |  12 ++-
+ hw/s390x/s390-pci-inst.c                |   8 +-
+ hw/vfio/pci-quirks.c                    |   5 +-
+ hw/virtio/virtio-pci.c                  |   7 +-
+ include/exec/cpu-all.h                  |  10 ++-
+ include/exec/memattrs.h                 |   2 +
+ include/exec/memop.h                    | 112 +++++++++++++++++++++++++++
+ include/exec/memory.h                   |   9 ++-
+ memory.c                                |  37 +++++----
+ memory_ldst.inc.c                       |  18 ++---
+ target/alpha/translate.c                |   2 +-
+ target/arm/translate-a64.c              |  48 ++++++------
+ target/arm/translate-a64.h              |   2 +-
+ target/arm/translate-sve.c              |   2 +-
+ target/arm/translate.c                  |  32 ++++----
+ target/arm/translate.h                  |   2 +-
+ target/hppa/translate.c                 |  14 ++--
+ target/i386/translate.c                 | 132 ++++++++++++++++------------=
+----
+ target/m68k/translate.c                 |   2 +-
+ target/microblaze/translate.c           |   4 +-
+ target/mips/op_helper.c                 |   5 +-
+ target/mips/translate.c                 |   8 +-
+ target/openrisc/translate.c             |   4 +-
+ target/ppc/translate.c                  |  12 +--
+ target/riscv/insn_trans/trans_rva.inc.c |   8 +-
+ target/riscv/insn_trans/trans_rvi.inc.c |   4 +-
+ target/s390x/translate.c                |   6 +-
+ target/s390x/translate_vx.inc.c         |  10 +--
+ target/sparc/cpu.h                      |   2 +
+ target/sparc/mmu_helper.c               |  40 ++++++----
+ target/sparc/translate.c                |  14 ++--
+ target/tilegx/translate.c               |  10 +--
+ target/tricore/translate.c              |   8 +-
+ tcg/README                              |   2 +-
+ tcg/aarch64/tcg-target.inc.c            |  26 +++----
+ tcg/arm/tcg-target.inc.c                |  26 +++----
+ tcg/i386/tcg-target.inc.c               |  24 +++---
+ tcg/mips/tcg-target.inc.c               |  16 ++--
+ tcg/optimize.c                          |   2 +-
+ tcg/ppc/tcg-target.inc.c                |  12 +--
+ tcg/riscv/tcg-target.inc.c              |  20 ++---
+ tcg/s390/tcg-target.inc.c               |  14 ++--
+ tcg/sparc/tcg-target.inc.c              |   6 +-
+ tcg/tcg-op.c                            |  38 ++++-----
+ tcg/tcg-op.h                            |  86 ++++++++++-----------
+ tcg/tcg.c                               |   2 +-
+ tcg/tcg.h                               |  99 ++----------------------
+ trace/mem-internal.h                    |   4 +-
+ trace/mem.h                             |   4 +-
+ 51 files changed, 561 insertions(+), 488 deletions(-)
+ create mode 100644 include/exec/memop.h
+
+--
+1.8.3.1
+
+
 
