@@ -6,66 +6,71 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B22C76194
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 410B3C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:58:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01DF621871
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:58:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DF621871
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1A0FD20840
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:58:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A0FD20840
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaVy-00056V-Ag
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:58:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46544)
+	id 1hqaWL-00064y-D6
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:58:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46695)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqaVm-0004UI-Hh
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:58:11 -0400
+ (envelope-from <mst@redhat.com>) id 1hqaWB-0005bE-89
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqaVl-0002dg-8S
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:58:10 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.235]:1120)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hqaVa-0002Rn-2Q; Thu, 25 Jul 2019 05:57:58 -0400
-Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- RDW083A011ED67.bt.com (10.187.98.37) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Thu, 25 Jul 2019 11:03:04 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 10:57:55 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
- 2019 10:57:55 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v4 15/15] target/sparc: sun4u Invert Endian
- TTE bit
-Thread-Index: AQHVQs9uLEMqUZ3ld0+bhrlLpSjQYw==
-Date: Thu, 25 Jul 2019 09:57:55 +0000
-Message-ID: <1564048675499.36136@bt.com>
-References: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.42]
+ (envelope-from <mst@redhat.com>) id 1hqaW9-0002y2-O4
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:58:35 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:41287)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqaW9-0002vE-FS
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:58:33 -0400
+Received: by mail-qk1-f196.google.com with SMTP id v22so35946573qkj.8
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 02:58:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=FeNtfL0wo68RDO0TuROfhiuzTqwTx2GfZEg77is6vuQ=;
+ b=PXxKGT+dYABHjY+LlxHIDcw/yviLhnG8Z7K+R8yHsXRQe+AbUBvyOoqVOj+67ty+tX
+ 3j6vk3c4ZaVSRlyOLNRqY3F9t3YLU/qpliLmlq3g3pTF7fQzAEoJC+TBNkwFPYX32tgS
+ n0wIymFbg9GuuV3fjfHPIPIfsd5/jvHfzqSCKDSYxysXXfK+TRdC0e+Mnb/bGQk1YSjl
+ GnpdRAI8EyRcKcT4kcUel2e/7dIzAacWrZXiyo9JpNQRamVQiWVGCB4x8joxxs4Dj7v0
+ Nt0sgOFASetvtFBmzqEH1Lr6PIEvcRFepQakzSOLrG9zE++VDa6v1Km7bVN837eRCFuU
+ vt8w==
+X-Gm-Message-State: APjAAAWNQl8jk7q4j5qrbcng5YVbWR7+eveu0d6KUChsIYAZfAXLGS06
+ lnYJXw9MohNZXpUmZFo74xenyA==
+X-Google-Smtp-Source: APXvYqxcbdiYz7Z6jvqnf03ibeXdcGUl8HHmB+bxepD6YujWoXN3tr5+GQ00Gf213htUFZFXMg08sg==
+X-Received: by 2002:a37:3c9:: with SMTP id 192mr57161372qkd.37.1564048711804; 
+ Thu, 25 Jul 2019 02:58:31 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ s127sm21728828qkd.107.2019.07.25.02.58.28
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 02:58:30 -0700 (PDT)
+Date: Thu, 25 Jul 2019 05:58:25 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <20190725055523-mutt-send-email-mst@kernel.org>
+References: <20190702121106.28374-1-slp@redhat.com>
+ <20190702121106.28374-2-slp@redhat.com>
+ <aca80a5c-40b9-ca31-2e22-c2bf5005f7e5@oracle.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 62.239.224.235
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v4 15/15] target/sparc: sun4u Invert Endian TTE
- bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aca80a5c-40b9-ca31-2e22-c2bf5005f7e5@oracle.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.222.196
+Subject: Re: [Qemu-devel] [PATCH v3 1/4] hw/virtio: Factorize virtio-mmio
+ headers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,92 +82,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, sagark@eecs.berkeley.edu,
- david@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
- laurent@vivier.eu, Alistair.Francis@wdc.com, edgar.iglesias@gmail.com,
- arikalo@wavecomp.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- rth@twiddle.net, atar4qemu@gmail.com, ehabkost@redhat.com,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, stefanha@redhat.com,
- shorne@gmail.com, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
- kbastian@mail.uni-paderborn.de, cohuck@redhat.com, alex.williamson@redhat.com,
- qemu-ppc@nongnu.org, amarkovic@wavecomp.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: ehabkost@redhat.com, Sergio Lopez <slp@redhat.com>, maran.wilson@oracle.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, pbonzini@redhat.com,
+ sgarzare@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bit configures endianness of PCI MMIO devices. It is used by
-Solaris and OpenBSD sunhme drivers.
+On Thu, Jul 25, 2019 at 10:46:00AM +0100, Liam Merwick wrote:
+> On 02/07/2019 13:11, Sergio Lopez wrote:
+> > Put QOM and main struct definition in a separate header file, so it
+> > can be accesed from other components.
+> 
+> typo: accesed -> accessed
+> 
+> > 
+> > This is needed for the microvm machine type implementation.
+> > 
+> > Signed-off-by: Sergio Lopez <slp@redhat.com>
+> 
+> One nit below, either way
+> 
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
+> 
+> > ---
+> >   hw/virtio/virtio-mmio.c | 35 +-----------------------
+> >   hw/virtio/virtio-mmio.h | 60 +++++++++++++++++++++++++++++++++++++++++
+> >   2 files changed, 61 insertions(+), 34 deletions(-)
+> >   create mode 100644 hw/virtio/virtio-mmio.h
+> > 
+> > diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
+> > index 97b7f35496..87c7fe4d8d 100644
+> > --- a/hw/virtio/virtio-mmio.c
+> > +++ b/hw/virtio/virtio-mmio.c
+> > @@ -26,44 +26,11 @@
+> >   #include "qemu/host-utils.h"
+> >   #include "qemu/module.h"
+> >   #include "sysemu/kvm.h"
+> > -#include "hw/virtio/virtio-bus.h"
+> > +#include "virtio-mmio.h"
+> 
+> 
+> Virtually all the other includes of virtio-xxx.h files in hw/virtio use the
+> full path - e.g. "hw/virtio/virtio-mmio.h" - maybe do the same to be
+> consistent.
 
-Tested working on OpenBSD.
-
-Unfortunately Solaris 10 had a unrelated keyboard issue blocking
-testing... another inch towards Solaris 10 on SPARC64 =3D)
-
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
----
- target/sparc/cpu.h        | 2 ++
- target/sparc/mmu_helper.c | 8 +++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 8ed2250..77e8e07 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -277,6 +277,7 @@ enum {
-
- #define TTE_VALID_BIT       (1ULL << 63)
- #define TTE_NFO_BIT         (1ULL << 60)
-+#define TTE_IE_BIT          (1ULL << 59)
- #define TTE_USED_BIT        (1ULL << 41)
- #define TTE_LOCKED_BIT      (1ULL <<  6)
- #define TTE_SIDEEFFECT_BIT  (1ULL <<  3)
-@@ -293,6 +294,7 @@ enum {
-
- #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
- #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
-+#define TTE_IS_IE(tte)      ((tte) & TTE_IE_BIT)
- #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
- #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
- #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
-diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index 826e14b..77dc86a 100644
---- a/target/sparc/mmu_helper.c
-+++ b/target/sparc/mmu_helper.c
-@@ -537,6 +537,10 @@ static int get_physical_address_data(CPUSPARCState *en=
-v, hwaddr *physical,
-         if (ultrasparc_tag_match(&env->dtlb[i], address, context, physical=
-)) {
-             int do_fault =3D 0;
-
-+            if (TTE_IS_IE(env->dtlb[i].tte)) {
-+                attrs->byte_swap =3D true;
-+            }
-+
-             /* access ok? */
-             /* multiple bits in SFSR.FT may be set on TT_DFAULT */
-             if (TTE_IS_PRIV(env->dtlb[i].tte) && is_user) {
-@@ -792,7 +796,7 @@ void dump_mmu(CPUSPARCState *env)
-             }
-             if (TTE_IS_VALID(env->dtlb[i].tte)) {
-                 qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
--                            ", %s, %s, %s, %s, ctx %" PRId64 " %s\n",
-+                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n=
-",
-                             i,
-                             env->dtlb[i].tag & (uint64_t)~0x1fffULL,
-                             TTE_PA(env->dtlb[i].tte),
-@@ -801,6 +805,8 @@ void dump_mmu(CPUSPARCState *env)
-                             TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
-                             TTE_IS_LOCKED(env->dtlb[i].tte) ?
-                             "locked" : "unlocked",
-+                            TTE_IS_IE(env->dtlb[i].tte) ?
-+                            "yes" : "no",
-                             env->dtlb[i].tag & (uint64_t)0x1fffULL,
-                             TTE_IS_GLOBAL(env->dtlb[i].tte) ?
-                             "global" : "local");
---
-1.8.3.1
+That's for headers under include/.
+Local ones are ok with a short name.
 
 
+> 
+> >   #include "qemu/error-report.h"
+> >   #include "qemu/log.h"
+> >   #include "trace.h"
+> > -/* QOM macros */
+> > -/* virtio-mmio-bus */
+> > -#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+> > -#define VIRTIO_MMIO_BUS(obj) \
+> > -        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+> > -#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+> > -        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+> > -#define VIRTIO_MMIO_BUS_CLASS(klass) \
+> > -        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS)
+> > -
+> > -/* virtio-mmio */
+> > -#define TYPE_VIRTIO_MMIO "virtio-mmio"
+> > -#define VIRTIO_MMIO(obj) \
+> > -        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+> > -
+> > -#define VIRT_MAGIC 0x74726976 /* 'virt' */
+> > -#define VIRT_VERSION 1
+> > -#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+> > -
+> > -typedef struct {
+> > -    /* Generic */
+> > -    SysBusDevice parent_obj;
+> > -    MemoryRegion iomem;
+> > -    qemu_irq irq;
+> > -    /* Guest accessible state needing migration and reset */
+> > -    uint32_t host_features_sel;
+> > -    uint32_t guest_features_sel;
+> > -    uint32_t guest_page_shift;
+> > -    /* virtio-bus */
+> > -    VirtioBusState bus;
+> > -    bool format_transport_address;
+> > -} VirtIOMMIOProxy;
+> > -
+> >   static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
+> >   {
+> >       return kvm_eventfds_enabled();
+> > diff --git a/hw/virtio/virtio-mmio.h b/hw/virtio/virtio-mmio.h
+> > new file mode 100644
+> > index 0000000000..2f3973f8c7
+> > --- /dev/null
+> > +++ b/hw/virtio/virtio-mmio.h
+> > @@ -0,0 +1,60 @@
+> > +/*
+> > + * Virtio MMIO bindings
+> > + *
+> > + * Copyright (c) 2011 Linaro Limited
+> > + *
+> > + * Author:
+> > + *  Peter Maydell <peter.maydell@linaro.org>
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License; either version 2
+> > + * of the License, or (at your option) any later version.
+> > + *
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + * GNU General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License along
+> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#ifndef QEMU_VIRTIO_MMIO_H
+> > +#define QEMU_VIRTIO_MMIO_H
+> > +
+> > +#include "hw/virtio/virtio-bus.h"
+> > +
+> > +/* QOM macros */
+> > +/* virtio-mmio-bus */
+> > +#define TYPE_VIRTIO_MMIO_BUS "virtio-mmio-bus"
+> > +#define VIRTIO_MMIO_BUS(obj) \
+> > +        OBJECT_CHECK(VirtioBusState, (obj), TYPE_VIRTIO_MMIO_BUS)
+> > +#define VIRTIO_MMIO_BUS_GET_CLASS(obj) \
+> > +        OBJECT_GET_CLASS(VirtioBusClass, (obj), TYPE_VIRTIO_MMIO_BUS)
+> > +#define VIRTIO_MMIO_BUS_CLASS(klass) \
+> > +        OBJECT_CLASS_CHECK(VirtioBusClass, (klass), TYPE_VIRTIO_MMIO_BUS)
+> > +
+> > +/* virtio-mmio */
+> > +#define TYPE_VIRTIO_MMIO "virtio-mmio"
+> > +#define VIRTIO_MMIO(obj) \
+> > +        OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
+> > +
+> > +#define VIRT_MAGIC 0x74726976 /* 'virt' */
+> > +#define VIRT_VERSION 1
+> > +#define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
+> > +
+> > +typedef struct {
+> > +    /* Generic */
+> > +    SysBusDevice parent_obj;
+> > +    MemoryRegion iomem;
+> > +    qemu_irq irq;
+> > +    /* Guest accessible state needing migration and reset */
+> > +    uint32_t host_features_sel;
+> > +    uint32_t guest_features_sel;
+> > +    uint32_t guest_page_shift;
+> > +    /* virtio-bus */
+> > +    VirtioBusState bus;
+> > +    bool format_transport_address;
+> > +} VirtIOMMIOProxy;
+
+
+I'm repeating myself, but still: if you insist on virtio mmio, please
+implement virtio 1 and use that with microvm. We can't keep carrying
+legacy interface into every new machine type.
+
+> > +
+> > +#endif
+> > 
 
