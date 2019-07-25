@@ -2,54 +2,54 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDFEC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5DA4C76191
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A208C20840
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A208C20840
+	by mail.kernel.org (Postfix) with ESMTPS id 9CFBB20840
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:57:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CFBB20840
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaU8-00080p-M3
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:56:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45750)
+	id 1hqaUf-0000nO-V0
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:57:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45893)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqaTx-0007U6-8G
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:56:18 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hqaUT-0000DP-Cl
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:56:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqaTw-0001Wi-9K
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:56:17 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.79]:35214)
+ (envelope-from <tony.nguyen@bt.com>) id 1hqaUR-0001fx-6a
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:56:49 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.71]:7761)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hqaTl-0001Kt-H0; Thu, 25 Jul 2019 05:56:07 -0400
+ id 1hqaU9-0001a1-IV; Thu, 25 Jul 2019 05:56:29 -0400
 Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
- BWP09926084.bt.com (10.36.82.115) with Microsoft SMTP Server (version=TLS1_2, 
+ BWP09926076.bt.com (10.36.82.107) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 25
- Jul 2019 10:55:57 +0100
+ Jul 2019 10:56:25 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
  tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 10:55:59 +0100
+ Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 10:56:25 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
- 2019 10:55:59 +0100
+ 2019 10:56:25 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v4 10/15] memory: Access MemoryRegion with
- MemOp semantics
-Thread-Index: AQHVQs8px7kJYyCpkkqn1mCQ3wVnbg==
-Date: Thu, 25 Jul 2019 09:55:59 +0000
-Message-ID: <1564048559228.36766@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v4 11/15] memory: Single byte swap along the
+ I/O path
+Thread-Index: AQHVQs84mhFGsCX+Aki9Mff0U403tw==
+Date: Thu, 25 Jul 2019 09:56:25 +0000
+Message-ID: <1564048584882.52438@bt.com>
 References: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -60,12 +60,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.42]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.79
+X-Received-From: 213.121.35.71
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v4 10/15] memory: Access MemoryRegion with
- MemOp semantics
+Subject: [Qemu-devel] [PATCH v4 11/15] memory: Single byte swap along the
+ I/O path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,34 +91,269 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To convert interfaces of MemoryRegion access, MEMOP_SIZE and
-SIZE_MEMOP no-op stubs were introduced to change syntax while keeping
-the existing semantics.
+Now that MemOp has been pushed down into the memory API, we can
+collapse the two byte swaps adjust_endianness and handle_bswap into
+the former.
 
-Now with interfaces converted, we fill the stubs and use MemOp
-semantics.
+Collapsing byte swaps along the I/O path enables additional endian
+inversion logic, e.g. SPARC64 Invert Endian TTE bit, with redundant
+byte swaps cancelling out.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- include/exec/memop.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ accel/tcg/cputlb.c | 58 +++++++++++++++++++++++++-------------------------=
+----
+ memory.c           | 30 ++++++++++++++++------------
+ 2 files changed, 44 insertions(+), 44 deletions(-)
 
-diff --git a/include/exec/memop.h b/include/exec/memop.h
-index 09c8d20..f2847e8 100644
---- a/include/exec/memop.h
-+++ b/include/exec/memop.h
-@@ -106,8 +106,7 @@ typedef enum MemOp {
-     MO_SSIZE =3D MO_SIZE | MO_SIGN,
- } MemOp;
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index a4a0bf7..e61b1eb 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -881,7 +881,7 @@ static void tlb_fill(CPUState *cpu, target_ulong addr, =
+int size,
 
--/* No-op while memory_region_dispatch_[read|write] is converted to MemOp *=
-/
--#define MEMOP_SIZE(op)  (op)    /* MemOp to size.  */
--#define SIZE_MEMOP(ul)  (ul)    /* Size to MemOp.  */
-+#define MEMOP_SIZE(op)  (1 << ((op) & MO_SIZE)) /* MemOp to size.  */
-+#define SIZE_MEMOP(ul)  (ctzl(ul))              /* Size to MemOp.  */
+ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+                          int mmu_idx, target_ulong addr, uintptr_t retaddr=
+,
+-                         MMUAccessType access_type, int size)
++                         MMUAccessType access_type, MemOp op)
+ {
+     CPUState *cpu =3D env_cpu(env);
+     hwaddr mr_offset;
+@@ -906,14 +906,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBE=
+ntry *iotlbentry,
+         qemu_mutex_lock_iothread();
+         locked =3D true;
+     }
+-    r =3D memory_region_dispatch_read(mr, mr_offset, &val, SIZE_MEMOP(size=
+),
+-                                    iotlbentry->attrs);
++    r =3D memory_region_dispatch_read(mr, mr_offset, &val, op, iotlbentry-=
+>attrs);
+     if (r !=3D MEMTX_OK) {
+         hwaddr physaddr =3D mr_offset +
+             section->offset_within_address_space -
+             section->offset_within_region;
 
+-        cpu_transaction_failed(cpu, physaddr, addr, size, access_type,
++        cpu_transaction_failed(cpu, physaddr, addr, MEMOP_SIZE(op), access=
+_type,
+                                mmu_idx, iotlbentry->attrs, r, retaddr);
+     }
+     if (locked) {
+@@ -925,7 +924,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEnt=
+ry *iotlbentry,
+
+ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+                       int mmu_idx, uint64_t val, target_ulong addr,
+-                      uintptr_t retaddr, int size)
++                      uintptr_t retaddr, MemOp op)
+ {
+     CPUState *cpu =3D env_cpu(env);
+     hwaddr mr_offset;
+@@ -947,15 +946,15 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntr=
+y *iotlbentry,
+         qemu_mutex_lock_iothread();
+         locked =3D true;
+     }
+-    r =3D memory_region_dispatch_write(mr, mr_offset, val, SIZE_MEMOP(size=
+),
+-                                    iotlbentry->attrs);
++    r =3D memory_region_dispatch_write(mr, mr_offset, val, op, iotlbentry-=
+>attrs);
+     if (r !=3D MEMTX_OK) {
+         hwaddr physaddr =3D mr_offset +
+             section->offset_within_address_space -
+             section->offset_within_region;
+
+-        cpu_transaction_failed(cpu, physaddr, addr, size, MMU_DATA_STORE,
+-                               mmu_idx, iotlbentry->attrs, r, retaddr);
++        cpu_transaction_failed(cpu, physaddr, addr, MEMOP_SIZE(op),
++                               MMU_DATA_STORE, mmu_idx, iotlbentry->attrs,=
+ r,
++                               retaddr);
+     }
+     if (locked) {
+         qemu_mutex_unlock_iothread();
+@@ -1210,26 +1209,13 @@ static void *atomic_mmu_lookup(CPUArchState *env, t=
+arget_ulong addr,
  #endif
+
+ /*
+- * Byte Swap Helper
++ * Byte Swap Checker
+  *
+- * This should all dead code away depending on the build host and
+- * access type.
++ * Dead code should all go away depending on the build host and access typ=
+e.
+  */
+-
+-static inline uint64_t handle_bswap(uint64_t val, int size, bool big_endia=
+n)
++static inline bool need_bswap(bool big_endian)
+ {
+-    if ((big_endian && NEED_BE_BSWAP) || (!big_endian && NEED_LE_BSWAP)) {
+-        switch (size) {
+-        case 1: return val;
+-        case 2: return bswap16(val);
+-        case 4: return bswap32(val);
+-        case 8: return bswap64(val);
+-        default:
+-            g_assert_not_reached();
+-        }
+-    } else {
+-        return val;
+-    }
++    return (big_endian && NEED_BE_BSWAP) || (!big_endian && NEED_LE_BSWAP)=
+;
+ }
+
+ /*
+@@ -1260,6 +1246,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCG=
+MemOpIdx oi,
+     unsigned a_bits =3D get_alignment_bits(get_memop(oi));
+     void *haddr;
+     uint64_t res;
++    MemOp op;
+
+     /* Handle CPU specific unaligned behaviour */
+     if (addr & ((1 << a_bits) - 1)) {
+@@ -1305,9 +1292,13 @@ load_helper(CPUArchState *env, target_ulong addr, TC=
+GMemOpIdx oi,
+             }
+         }
+
+-        res =3D io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
+-                       mmu_idx, addr, retaddr, access_type, size);
+-        return handle_bswap(res, size, big_endian);
++        op =3D SIZE_MEMOP(size);
++        if (need_bswap(big_endian)) {
++            op ^=3D MO_BSWAP;
++        }
++
++        return io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
++                       mmu_idx, addr, retaddr, access_type, op);
+     }
+
+     /* Handle slow unaligned access (it spans two pages or IO).  */
+@@ -1508,6 +1499,7 @@ store_helper(CPUArchState *env, target_ulong addr, ui=
+nt64_t val,
+     const size_t tlb_off =3D offsetof(CPUTLBEntry, addr_write);
+     unsigned a_bits =3D get_alignment_bits(get_memop(oi));
+     void *haddr;
++    MemOp op;
+
+     /* Handle CPU specific unaligned behaviour */
+     if (addr & ((1 << a_bits) - 1)) {
+@@ -1553,9 +1545,13 @@ store_helper(CPUArchState *env, target_ulong addr, u=
+int64_t val,
+             }
+         }
+
++        op =3D SIZE_MEMOP(size);
++        if (need_bswap(big_endian)) {
++            op ^=3D MO_BSWAP;
++        }
++
+         io_writex(env, &env_tlb(env)->d[mmu_idx].iotlb[index], mmu_idx,
+-                  handle_bswap(val, size, big_endian),
+-                  addr, retaddr, size);
++                  val, addr, retaddr, op);
+         return;
+     }
+
+diff --git a/memory.c b/memory.c
+index 6982e19..0277d3d 100644
+--- a/memory.c
++++ b/memory.c
+@@ -352,7 +352,7 @@ static bool memory_region_big_endian(MemoryRegion *mr)
+ #endif
+ }
+
+-static bool memory_region_wrong_endianness(MemoryRegion *mr)
++static bool memory_region_endianness_inverted(MemoryRegion *mr)
+ {
+ #ifdef TARGET_WORDS_BIGENDIAN
+     return mr->ops->endianness =3D=3D DEVICE_LITTLE_ENDIAN;
+@@ -361,23 +361,27 @@ static bool memory_region_wrong_endianness(MemoryRegi=
+on *mr)
+ #endif
+ }
+
+-static void adjust_endianness(MemoryRegion *mr, uint64_t *data, unsigned s=
+ize)
++static void adjust_endianness(MemoryRegion *mr, uint64_t *data, MemOp op)
+ {
+-    if (memory_region_wrong_endianness(mr)) {
+-        switch (size) {
+-        case 1:
++    if (memory_region_endianness_inverted(mr)) {
++        op ^=3D MO_BSWAP;
++    }
++
++    if (op & MO_BSWAP) {
++        switch (op & MO_SIZE) {
++        case MO_8:
+             break;
+-        case 2:
++        case MO_16:
+             *data =3D bswap16(*data);
+             break;
+-        case 4:
++        case MO_32:
+             *data =3D bswap32(*data);
+             break;
+-        case 8:
++        case MO_64:
+             *data =3D bswap64(*data);
+             break;
+         default:
+-            abort();
++            g_assert_not_reached();
+         }
+     }
+ }
+@@ -1451,7 +1455,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegion =
+*mr,
+     }
+
+     r =3D memory_region_dispatch_read1(mr, addr, pval, size, attrs);
+-    adjust_endianness(mr, pval, size);
++    adjust_endianness(mr, pval, op);
+     return r;
+ }
+
+@@ -1494,7 +1498,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegion=
+ *mr,
+         return MEMTX_DECODE_ERROR;
+     }
+
+-    adjust_endianness(mr, &data, size);
++    adjust_endianness(mr, &data, op);
+
+     if ((!kvm_eventfds_enabled()) &&
+         memory_region_dispatch_write_eventfds(mr, addr, data, size, attrs)=
+) {
+@@ -2340,7 +2344,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
+     }
+
+     if (size) {
+-        adjust_endianness(mr, &mrfd.data, size);
++        adjust_endianness(mr, &mrfd.data, SIZE_MEMOP(size));
+     }
+     memory_region_transaction_begin();
+     for (i =3D 0; i < mr->ioeventfd_nb; ++i) {
+@@ -2375,7 +2379,7 @@ void memory_region_del_eventfd(MemoryRegion *mr,
+     unsigned i;
+
+     if (size) {
+-        adjust_endianness(mr, &mrfd.data, size);
++        adjust_endianness(mr, &mrfd.data, SIZE_MEMOP(size));
+     }
+     memory_region_transaction_begin();
+     for (i =3D 0; i < mr->ioeventfd_nb; ++i) {
 --
 1.8.3.1
 
