@@ -2,109 +2,87 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA6DC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76106C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:39:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3170D21871
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:34:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3170D21871
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4483B21871
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:39:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n+KjhdwR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4483B21871
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqZD0-0008Uy-G1
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:34:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45667)
+	id 1hqZHE-0002HR-Eg
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:39:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48294)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hqZCo-00082d-LL
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:34:31 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hqZH4-0001sV-45
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:38:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hqZCn-0002XR-GO
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:34:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35186)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hqZCl-0002Wa-3d; Thu, 25 Jul 2019 04:34:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2B698C057F88;
- Thu, 25 Jul 2019 08:34:26 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9795160605;
- Thu, 25 Jul 2019 08:34:22 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <f95cecc3-9ba2-0aed-9b17-fb76c6558929@redhat.com>
- <e5cc1268-428f-b3c0-3eb1-9291a9fe5688@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <5e5822d2-41eb-a4e9-1d47-e29409b14b1e@redhat.com>
-Date: Thu, 25 Jul 2019 10:34:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <stefanha@gmail.com>) id 1hqZH2-00059f-W4
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:38:54 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40427)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hqZH2-000597-PF
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:38:52 -0400
+Received: by mail-wm1-x344.google.com with SMTP id v19so43946699wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 01:38:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=zRIf7orfyRP0cVSioXoY/tEazqKP9Ks0QICO0ikncdc=;
+ b=n+KjhdwRkFcJ3M6W9EA1Pi44CDaUTqTAkSEIClZXOGrFaxsa5ONnXV+B8lQ8npnPmt
+ uYOqcIOtnF2A76b9UI52nBoWZ/H9zlpaMHylQ6sULmjX304jH8WUk/6I1qbRwtzQSKNX
+ jFtyMX11PWfyQ4H/VNQVMa+p5eBxe57yat7UGSiMsgiemBzmdYiJ3DcEiL7p0PvKmtuC
+ iqUtHJXkvr83QOV7CpU1haj/uHH4Mp/VOrWyXQ2I9gyVv/a/NrH0Ov21wCr4sepo2eB6
+ 3AZAOFIL5hhnYBhtgzW6q7rqCF92iL8K+esx+zYLihWJ4ZIITTOlJYUsONTddKewbBSh
+ 5wkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=zRIf7orfyRP0cVSioXoY/tEazqKP9Ks0QICO0ikncdc=;
+ b=GQWrrbfzdhfjv+fs96iBav0t/24Uue7811rmuYRC+Fz0vpBtZycUIzsPxX4JZgeF2d
+ jVvOrJVXcK/vFF2O8svzNbe4EosPzHm8ljKDiU7KgkLRU3+W1n8fMrAtCFryQdyz0F8E
+ Fw/XtZdbh7mq8Sqj0og0Y1UdrLPmp2ZJNMLhY5cViU2zHtsY2eaBPatLWge7JM52rx/y
+ h4JYgMSf0MuxE1kVtZHK9BnliHoF0bSNdZ+fiwh2I0up2cNEqB+I9Juyb/kWmyKin6Tq
+ AA9Bo7H7B6R3UY92ZCDFqOy4z4Vb2Bsp6eXWCfPsLSoVlronASLaifsg35l7Isjj5UI2
+ XTXQ==
+X-Gm-Message-State: APjAAAXdzrcat9Ob7DfBEQo2NQ7bBm7q+Mvp6gLwr4B1na4pcHlxaJDC
+ J9X7gvGm7zjkIJOfmYoadjI=
+X-Google-Smtp-Source: APXvYqwV8zOx8X313z0CmHst5hzVbTbd4/WSN0xIzXEz7GGG9A20qKfzAnm4O0enzZ4kjfa4TAZ0Dg==
+X-Received: by 2002:a1c:ca06:: with SMTP id a6mr532711wmg.48.1564043931228;
+ Thu, 25 Jul 2019 01:38:51 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id f3sm30687869wrt.56.2019.07.25.01.38.50
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 01:38:50 -0700 (PDT)
+Date: Thu, 25 Jul 2019 09:38:49 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190725083849.GC26914@stefanha-x1.localdomain>
+References: <20190723154856.17348-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <e5cc1268-428f-b3c0-3eb1-9291a9fe5688@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Thu, 25 Jul 2019 08:34:26 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] qemu-iotests 069 and 111 are failing on NetBSD
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="UPT3ojh+0CqEDtpF"
+Content-Disposition: inline
+In-Reply-To: <20190723154856.17348-1-berrange@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH for 4.2 0/3] require newer glib2 to enable
+ autofree'ing of stack variables exiting scope
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,66 +94,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/07/2019 18.29, Paolo Bonzini wrote:
-> On 24/07/19 11:34, Thomas Huth wrote:
->> In case somebody is interested, two of the "auto" iotests are failing
->> on NetBSD due to non-matching output:
->>
->>   TEST    iotest-qcow2: 069 [fail]
->> --- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out        2019-07-24 09:19:22.000000000 +0000
->> +++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out.bad    2019-07-24 09:21:34.000000000 +0000
->> @@ -4,5 +4,5 @@
->>  
->>  Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=131072
->>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base
->> -qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing file: Could not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
->> +qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing file: TEST_DIR/t.IMGFMT.base: stat failed: No such file or directory
->>  *** done
->>
->> and:
->>
->>   TEST    iotest-qcow2: 111 [fail]
->> --- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out        2019-07-24 09:19:22.000000000 +0000
->> +++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out.bad    2019-07-24 09:21:40.000000000 +0000
->> @@ -1,4 +1,4 @@
->>  QA output created by 111
->> -qemu-img: TEST_DIR/t.IMGFMT: Could not open 'TEST_DIR/t.IMGFMT.inexistent': No such file or directory
->> +qemu-img: TEST_DIR/t.IMGFMT: TEST_DIR/t.IMGFMT.inexistent: stat failed: No such file or directory
->>  Could not open backing image to determine size.
->>  *** done
->>
->> It's currently not a problem yet since we're not running the
->> iotests on NetBSD yet (since our netbsd VM image does not have
->> bash and gsed installed yet), but if somebody has some spare
->> minutes, it would be great if this could be fixed so that we
->> can enable the iotests on NetBSD, too, one day...
-> 
-> Is this (slightly ridiculous but effective) patch enough?
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 73a001ceb7..ce847f4d62 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -217,7 +217,7 @@ static int raw_normalize_devicepath(const char **filename, Error **errp)
->      fname = *filename;
->      dp = strrchr(fname, '/');
->      if (lstat(fname, &sb) < 0) {
-> -        error_setg_errno(errp, errno, "%s: stat failed", fname);
-> +        error_setg_errno(errp, errno, "Could not open: '%s'", fname);
->          return -errno;
->      }
 
-Yes, good idea! It works after removing the colon after "open"! :-)
+--UPT3ojh+0CqEDtpF
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-With the colon removed:
+On Tue, Jul 23, 2019 at 04:48:53PM +0100, Daniel P. Berrang=E9 wrote:
+> Both GCC and CLang support a C extension attribute((cleanup)) which
+> allows you to define a function that is invoked when a stack variable
+> exits scope. This typically used to free the memory allocated to it,
+> though you're not restricted to this. For example it could be used to
+> unlock a mutex.
+>=20
+> We could use that functionality now, but the syntax is a bit ugly in
+> plain C. Since version 2.44 of GLib, there have been a few macros to
+> make it more friendly to use - g_autofree, g_autoptr and
+> G_DEFINE_AUTOPTR_CLEANUP_FUNC.
+>=20
+>   https://developer.gnome.org/glib/stable/glib-Miscellaneous-Macros.html
+>=20
+>   https://blogs.gnome.org/desrt/2015/01/30/g_autoptr/
+>=20
+> The key selling point is that it simplifies the cleanup code paths,
+> often eliminating the need to goto cleanup labels. This improves
+> the readability of the code and makes it less likely that you'll
+> leak memory accidentally.
+>=20
+> Inspired by seeing it added to glib, and used in systemd, Libvirt
+> finally got around to adopting this in Feb 2019. Overall our
+> experience with it has been favourable/positive, with the code
+> simplification being very nice.
+>=20
+> The main caveats with it are
+>=20
+>  - Only works with GCC or CLang. We don't care as those are
+>    the only two compilers we declare support for.
+>=20
+>  - You must always initialize the variables when declared
+>    to ensure predictable behaviour when they leave scope.
+>    Chances are most methods with goto jumps for cleanup
+>    are doing this already
+>=20
+>  - You must not directly return the value that's assigned
+>    to a auto-cleaned variable. You must steal the pointer
+>    in some way. ie
+>=20
+>     BAD:
+>         g_autofree char *wibble =3D g_strdup("wibble")
+> 	....
+> 	return wibble;
+>=20
+>     GOOD:
+>         g_autofree char *wibble =3D g_strdup("wibble")
+> 	...
+> 	return g_steal_pointer(wibble);
+>=20
+>     g_steal_pointer is an inline function which simply copies
+>     the pointer to a new variable, and sets the original variable
+>     to NULL, thus avoiding cleanup.
+>=20
+> I've illustrated the usage by converting a bunch of the crypto code in
+> QEMU to use auto cleanup.
+>=20
+> Daniel P. Berrang=E9 (3):
+>   glib: bump min required glib library version to 2.48
+>   crypto: define cleanup functions for use with g_autoptr
+>   crypto: use auto cleanup for many stack variables
+>=20
+>  configure                   |  2 +-
+>  crypto/afsplit.c            | 28 ++++----------
+>  crypto/block-luks.c         | 74 +++++++++++--------------------------
+>  crypto/block.c              | 15 +++-----
+>  crypto/hmac-glib.c          |  5 ---
+>  crypto/pbkdf.c              |  5 +--
+>  crypto/secret.c             |  9 ++---
+>  crypto/tlscredsanon.c       | 16 +++-----
+>  crypto/tlscredspsk.c        |  5 +--
+>  crypto/tlscredsx509.c       | 16 +++-----
+>  include/crypto/block.h      |  2 +
+>  include/crypto/cipher.h     |  2 +
+>  include/crypto/hmac.h       |  2 +
+>  include/crypto/ivgen.h      |  2 +
+>  include/crypto/tlssession.h |  2 +
+>  include/glib-compat.h       | 42 +--------------------
+>  16 files changed, 66 insertions(+), 161 deletions(-)
+>=20
+> --=20
+> 2.21.0
+>=20
+>=20
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
- Thomas
+--UPT3ojh+0CqEDtpF
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl05apkACgkQnKSrs4Gr
+c8j1rQgAmB/Tt61AHKbpKcgTrtjHbAdueF/FE9WZcK5MJ7G2kdc97LpOYVx+8hHe
+yhmnEHf6fjXfUTXRvJ91yYsL1e2IEdlP9YUuyNIiUgqvVrXxcXLWxL7nGGwHYzWq
+Lbauur/FQ7vBdRtoqAtsE9vXTxfG0Z/ttgpscXfC7NBwRMT7GZp+/cZm2jD+zNZg
+Z78194ZkclYa01ODpbI1S7eVXxQIRSV4vCrLjO247M0I2k2TUhwqMg2eUWjZvO4h
+H0wxjJWnmIuXDFf2v/mzfKTuhgFX5Dgs0HaGrhp3GF4fh0dPpOuoxXcfTI+L8cR5
+V9EyueZOThZJ7fDh9uTikQhJr4or9g==
+=CU2Z
+-----END PGP SIGNATURE-----
+
+--UPT3ojh+0CqEDtpF--
 
