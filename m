@@ -2,80 +2,77 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F4FAC76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4427C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:29:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2774217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:21:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l9WAuv4J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2774217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8AB7621901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 10:29:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AB7621901
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqase-0008FZ-WF
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 06:21:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54606)
+	id 1hqb0D-0002g8-Pp
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 06:29:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59241)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hqasV-0007qG-9G
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:21:40 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqb03-0002HG-0e
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hqasT-0007zi-LO
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:21:38 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40785)
+ (envelope-from <pbonzini@redhat.com>) id 1hqb01-0004wC-RR
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:29:26 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45892)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hqasT-0007z8-8X
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:21:37 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w196so15947466oie.7
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 03:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=FNn3g7qWnYCH2x9x/5xxjgFDmLnc/jI9f+OqI2GBMMA=;
- b=l9WAuv4JHCAqojgsiN0h2Gtnm9b+lBgI0TUUH7/G9zFeWs87UClemepGi2892LXJNd
- 8qPlielDsGuYyZZlwzGQQmU/SrKpl5tfMwIlx6ltZrDzdubXTPyWBJKfKbz5iuOo4qwo
- CXDs+Uaizdn2aAVjteCoom7RvGapq1BpBbYuueh6IR6IILOQocJTl2bz93mALjws4h/N
- is3f27t5AXXa+QAauf2vA+jLNFB40SmYQDxOxhfckYeqe+nEWF6vRxpJHh5LNZY9a/g0
- DxxIbTeHvBhwiEuuY46y21RUdkPsJOuBoD2viUVIzaRGn9oA6E8MSi4Nx7AiH/kD35nE
- VxBQ==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqb01-0004tS-JF
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 06:29:25 -0400
+Received: by mail-wr1-f65.google.com with SMTP id f9so50136270wre.12
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 03:29:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=FNn3g7qWnYCH2x9x/5xxjgFDmLnc/jI9f+OqI2GBMMA=;
- b=DQmmiCClNtsO+1UDcwnMpKHizIAslm0izzszzzu8aczzJmWm1B8qIS/upVKExLsYXx
- LZC1dLTQeii+q/WbQfnuVk6Ru+Hk6iweO1Do6GLMh/8yXj90DTtfjn6YC4Y2xg+EmyaM
- 3CNGclRj3j0GQap/B+9+VRxuhe22rXme35A6Z4b6gsHe32bC/pkyy7etDSShZI+Wifzg
- oXp7l3quXBR3fBm3ZsIRyDK2nXcer70JTdJydKlRtjaKNBMT8DDNV87PVSiGTQU+p/BF
- /VbzUIPb2Ze4vgsu4bhGxxO4A3UlUa9DdCas5grjH1YfnxbopFYQ5Xwyz5gSj14vaB5D
- aW/Q==
-X-Gm-Message-State: APjAAAVUBSAHemTkcrEW2gpdSLNS3exVfkyGhWPz7HmXSRW9u+rvwG2N
- vJFT3bLmpZApVU1Z06ow30zx+3PcLlYpkzhhBy6B9Q==
-X-Google-Smtp-Source: APXvYqzGZiwmu3mfjHRVXFpee/8LLmdOvsEB2+ywVK19EVsDP+jx5wWVE1RY93dvut8a74mCi3hf3e5Gk9Ud/PAx8eM=
-X-Received: by 2002:aca:5cd7:: with SMTP id
- q206mr39096268oib.146.1564050096196; 
- Thu, 25 Jul 2019 03:21:36 -0700 (PDT)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5TlqZFcDImzQ42NqyCae78vvlbEeWZojRMuY42B3eVM=;
+ b=I7BPhES+DebD5dFG34GhF6k/ie2Yf9Dzg+04WRwjZ/nShQp7IUkEavlcocNj6683P5
+ 2h9Bpa5nuLxTjt0EkIsytwhYal3KusyAzOavzNbaP9gNl3V62TZ9DoN5X6vvaBBDSnFE
+ klrTohbKkvlUKbnhnc1WjyVqcd2Tem8IFiGkntB5SNz8Y/y9ag8YIpi/w29F7sWJiuFh
+ 8Tz1P4xPPL++NHNXbAZ6NXy1ECUbPKMUxxWnqfwS5l3HgbnbrTLZ1e73ovQeOUozaIFm
+ dLGICXfDwdL6y601Y7aBz/X+AMP+cbOxcZyLp1fJtCJvi+DM/e1/UbPWSTgnDeI7AEdK
+ 93og==
+X-Gm-Message-State: APjAAAUZCoGXkCoVX97o9cgKr6EgTh7HALj8GxVKv+NIu3q911DS5CuL
+ z8fVafHTs4Z9I2hVChDdqQophQ==
+X-Google-Smtp-Source: APXvYqx6NcEN0rFxHjmHDZ691TnEbg+JukmS2U/DcTMsNp9FKxKT/4bvAUUZyZqskdB/4Ts4MvMunQ==
+X-Received: by 2002:a5d:43c9:: with SMTP id v9mr21328106wrr.70.1564050562378; 
+ Thu, 25 Jul 2019 03:29:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
+ ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ by smtp.gmail.com with ESMTPSA id c78sm70552068wmd.16.2019.07.25.03.29.21
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 25 Jul 2019 03:29:21 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
 References: <20190725101836.1273-1-pbonzini@redhat.com>
-In-Reply-To: <20190725101836.1273-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jul 2019 11:21:25 +0100
-Message-ID: <CAFEAcA-ta49Qe29zoSzW52OWXYHf+c5t+X3t27Qc3n=harDT=Q@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+ <CAFEAcA-ta49Qe29zoSzW52OWXYHf+c5t+X3t27Qc3n=harDT=Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <821f0761-a159-3cab-7608-ff09705ee4c1@redhat.com>
+Date: Thu, 25 Jul 2019 12:29:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-ta49Qe29zoSzW52OWXYHf+c5t+X3t27Qc3n=harDT=Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
 Subject: Re: [Qemu-devel] [PATCH] 9p: simplify source file selection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,57 +85,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
  QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jul 2019 at 11:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 25/07/19 12:21, Peter Maydell wrote:
+>>  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
+>>  # only pull in the actual 9p backend if we also enabled virtio or xen.
+>> -ifeq ($(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN))),y)
+>> +ifeq ($(CONFIG_FSDEV_9P),y)
+>>  common-obj-y = qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
+>>  else
+>>  common-obj-y = qemu-fsdev-dummy.o
 >
-> Express the complex conditions in Kconfig rather than Makefiles, since Kc=
-onfig
-> is better suited at expressing dependencies and detecting contradictions.
->
-> Cc: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Kconfig.host        | 1 +
->  fsdev/Makefile.objs | 2 +-
->  hw/9pfs/Kconfig     | 5 +++++
->  3 files changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/Kconfig.host b/Kconfig.host
-> index aec95365ff..bb6e116e2a 100644
-> --- a/Kconfig.host
-> +++ b/Kconfig.host
-> @@ -28,6 +28,7 @@ config VHOST_USER
->
->  config XEN
->      bool
-> +    select FSDEV_9P if VIRTFS
->
->  config VIRTFS
->      bool
-> diff --git a/fsdev/Makefile.objs b/fsdev/Makefile.objs
-> index 24bbb3e75c..42cd70c367 100644
-> --- a/fsdev/Makefile.objs
-> +++ b/fsdev/Makefile.objs
-> @@ -1,6 +1,6 @@
->  # Lots of the fsdev/9pcode is pulled in by vl.c via qemu_fsdev_add.
->  # only pull in the actual 9p backend if we also enabled virtio or xen.
-> -ifeq ($(call land,$(CONFIG_VIRTFS),$(call lor,$(CONFIG_VIRTIO_9P),$(CONF=
-IG_XEN))),y)
-> +ifeq ($(CONFIG_FSDEV_9P),y)
->  common-obj-y =3D qemu-fsdev.o 9p-marshal.o 9p-iov-marshal.o
->  else
->  common-obj-y =3D qemu-fsdev-dummy.o
+> Maybe we should update the comment here somehow too now?
 
-Maybe we should update the comment here somehow too now?
+The comment is still accurate, just a bit low level. :)
 
-Patch definitely looks like a good idea, though -- those
-nested land/lor calls are pretty ugly :-)
+> Patch definitely looks like a good idea, though -- those
+> nested land/lor calls are pretty ugly :-)
 
-thanks
--- PMM
+Yeah, FWIW this patch came out of Meson conversion, where the sourceset
+mechanism supports "and", "nand" and "or" very well but has issues with
+"nor".  While I'm open to adding "nor" if it is really needed, it seems
+to me that in general we should not transpose our Make mess to Meson,
+and rely on Kconfig as the better tool for this kind of job.
+
+(For a Meson update, see https://wiki.qemu.org/Features/Meson).
+
+Paolo
 
