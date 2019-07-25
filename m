@@ -2,89 +2,115 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17DD1C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:27:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10ACCC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:31:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE26521901
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:26:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE26521901
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D6CB821901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:31:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IiSA62zx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6CB821901
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqehv-0000hw-6i
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:26:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34233)
+	id 1hqemO-0003Jv-Bg
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:31:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35298)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqehj-0000JC-Js
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:26:48 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hqemB-0002rM-Lo
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:31:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqehi-0005eD-F1
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:26:47 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36946)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqehi-0005dq-8d
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:26:46 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n9so25940787wrr.4
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 07:26:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1P1Mq+XGBHfGILBbSSWOCK0j+10yF7sSQLnFhC61beA=;
- b=gin0KjniE3XagymGRh3OP3UW0rxA+/R5mbtVmF1Y8TwjxPmnJN8CChNNhkPRC+dA5Z
- EA0QG+NRalDerEC+/aVSQ7B1kmqSPKBLyczay7Sb7G9fJ+M1HfwgPgMo+n/UjtKQ5Zxf
- NeHs5UpUNXyxxQoXMv8Kb2NTxpwGfP3KYdJM/d16f7wy/EM4j6cI53OG/ioJ8n4GBox5
- YfZ8W6674veebTkICWTw1Ev1VIuhZjtfg/ngUfm1kRbORm+eY5Lrr6Z5yzEIv6DAK3FR
- vr/QGjQe9XrpP5fB4kOfUFq9nR7CEbmJ8wzpTSRWgkiJtao7J89SR24lIS7JtiKUXedT
- m4dQ==
-X-Gm-Message-State: APjAAAVskGNuKscp55rm8Oeb+Bch94s53k5xsMC+bK0FndD/ZPlYdUy7
- zbZFktPGteQucd4r7NGEDHAPug==
-X-Google-Smtp-Source: APXvYqyRFasOisCLJbvgvWHJqY4e45iGggHqZh/SoMO0aJYQRkmsOsYFrAcVCmktQaPUlk+6ypSNQQ==
-X-Received: by 2002:adf:f286:: with SMTP id k6mr549830wro.320.1564064805123;
- Thu, 25 Jul 2019 07:26:45 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
- ([2001:b07:6468:f312:cc23:f353:392:d2ee])
- by smtp.gmail.com with ESMTPSA id m7sm40378415wrx.65.2019.07.25.07.26.43
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 25 Jul 2019 07:26:44 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190702121106.28374-1-slp@redhat.com>
- <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
- <87a7dwnxwj.fsf@redhat.com>
- <CAFEAcA_XfRS1b-4ANmR5WLL=19Md6Dp7+M_FAK8pQAJn2MaCOA@mail.gmail.com>
- <20190702220400.GA13923@localhost>
- <20190725055908-mutt-send-email-mst@kernel.org>
- <CAFEAcA-uDtTFOyTwMY5KtWeqvirxDejQdvnx5OCZ8pyUhKhE+w@mail.gmail.com>
- <87pnlymm47.fsf@redhat.com> <d48da49f-c8d8-00f7-1634-569e8d924b8a@redhat.com>
- <CAJSP0QUJCh-SaZ9NQ+Wr8vr7R+gBsfhYmBrx45B4z2G9v9L=1A@mail.gmail.com>
- <20190725080556-mutt-send-email-mst@kernel.org>
- <CAJSP0QVvnXV8Ha0yaO84qLL6unVroV5GqcuL-x9ruB7o_24WBA@mail.gmail.com>
- <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
- <CAFEAcA-zBb0mXX1JLoWxz46JDAZFySUZpdONo5uw=KLgJqJ94w@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <af3acd26-f114-5889-182a-7dbd025393b9@redhat.com>
-Date: Thu, 25 Jul 2019 16:26:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-zBb0mXX1JLoWxz46JDAZFySUZpdONo5uw=KLgJqJ94w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hqemA-00081J-Kx
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:31:23 -0400
+Received: from mail-eopbgr30138.outbound.protection.outlook.com
+ ([40.107.3.138]:30582 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1hqem6-0007zC-7i; Thu, 25 Jul 2019 10:31:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bDR1VkoUENFUiPJRRh4bluATQreo24aY4gFjhFlX7TM7QdCLFSOmcPU1r7y/1xo7Ur2U1OuPAMczOPV+oHHAuz5md6rmQixve4FobDBrBEY+zIPAfPsZ9JCqAoRvneS1KQxC6XMfzw2xJu9mmkylf/B2KD+uitxaugGknq9+u1HyfsxCBqy36cTXPa2n0UsC++GPuIhoDM6pjT9171asuC8KRuMM5cyp82ej/blvXCcVfMYmuwmGMftsYZsjgJfgkIipk6/rFiH0RKKLLKoh/6UoW2sBRhbWkfK+HqEGkKEh/YaZ4bD/HvcKmTiDCHOo+dJH8CXQZkFSxGj7HiGGdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z0FqrZ6pVCGirjYscApby3J2D4WDXiqXuPMf9UaVh+M=;
+ b=Zfrtb4Fk7Gcn14a7zrDEhTnoesuTqBgV5MN+EVVjY6mBK4jLKnjpiJe6tV+WgmexUoLa22C7UqejbrAf2SPABOWz3DuM7AdWZV7HmGdxXlc8f+XzU9E9Jshc4Pd3WrtpKgdlfEQvvnxHSwwYO2dFi8Lo3BDzj+B3CdWCG87L6PbehwjXcafkZFJF+8TMO/ZcgIm7WuOIKie/oV0MhZTJEi9jBAT8ct623YSV5xZDpKhgYG/LeypqbWnCBfONV97KkWufnEeWF2+eev5G0BktziViZ6lZ9BgrHW+4RE08VUJs7KFbasOGRABeMMBidVOCfgfOUXkJ4cTSwwbsnniupw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z0FqrZ6pVCGirjYscApby3J2D4WDXiqXuPMf9UaVh+M=;
+ b=IiSA62zx5imuWAJ/q+7MfZ61NW7X3tTMmWPH0+eeAl+rVlYx+Vr0MUAd1M6C9uqyJfW2Yx7cXjOnVEh5M0gB62MNd4AcsbdrXGnHE/9Bxj7V0JHbYKz1bMZr753EToyYQVorsEOhZCv6G8qCDRH5YvbDNkkVGG6rDjTgv8tGwjE=
+Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
+ VI1PR08MB3597.eurprd08.prod.outlook.com (20.177.61.32) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.10; Thu, 25 Jul 2019 14:31:14 +0000
+Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
+ ([fe80::303d:1bb9:76b2:99d7]) by VI1PR08MB4399.eurprd08.prod.outlook.com
+ ([fe80::303d:1bb9:76b2:99d7%6]) with mapi id 15.20.2115.005; Thu, 25 Jul 2019
+ 14:31:14 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Thread-Topic: [PATCH v2] Fixes: add read-zeroes to 051.out
+Thread-Index: AQHVQuClRUlAQMQd/U+a+m99v+bsk6bbY7oAgAABuoA=
+Date: Thu, 25 Jul 2019 14:31:14 +0000
+Message-ID: <fea5fe11-d32b-a16b-1ee1-5198e25486d8@virtuozzo.com>
+References: <1564056050-505695-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <20190725142500.GD8294@linux.fritz.box>
+In-Reply-To: <20190725142500.GD8294@linux.fritz.box>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0902CA0012.eurprd09.prod.outlook.com
+ (2603:10a6:3:e5::22) To VI1PR08MB4399.eurprd08.prod.outlook.com
+ (2603:10a6:803:102::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 300a27d9-f802-4f8c-45b6-08d7110cbf17
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:VI1PR08MB3597; 
+x-ms-traffictypediagnostic: VI1PR08MB3597:
+x-microsoft-antispam-prvs: <VI1PR08MB3597F3DC7F4C42639887656DF4C10@VI1PR08MB3597.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1227;
+x-forefront-prvs: 0109D382B0
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(136003)(346002)(39850400004)(366004)(376002)(189003)(199004)(7736002)(446003)(36756003)(476003)(11346002)(256004)(2906002)(486006)(2616005)(4744005)(68736007)(44832011)(6436002)(14454004)(54906003)(71200400001)(305945005)(6486002)(52116002)(3846002)(6116002)(99286004)(31686004)(76176011)(186003)(71190400001)(81156014)(102836004)(26005)(53936002)(66556008)(4326008)(6916009)(66476007)(86362001)(6246003)(53546011)(8936002)(6512007)(25786009)(229853002)(5660300002)(8676002)(6506007)(386003)(31696002)(478600001)(81166006)(66946007)(66446008)(66066001)(316002)(64756008);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3597;
+ H:VI1PR08MB4399.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 6k4NXm7GrP5ppKQCDQ7teFNwoSBRyZMBgZoXjZq0X5WCAq58jbnQzhwloRfwa7bzvzpCpcaXuLG6BuyFEGuS7FZ0345xMZxjcMiG6iZD4DFDFlinB8OURJuNpM2LxZNlJfomUbT8NMj8qDzBZ+g/5PSZ0VppV2PWz9cx6MRYaIAB5k5vsS+KKj6okzwIUL9l2yclBSjacIvbCmTz3szmVN2YKv6DIc116Ekyg6oVtohHcZyrRYXl9HHD4ouNxK+2q3D9zEsxJPQRclu0DqU2MzgYaCWNvNPQxX4N+LYCU+ggXzo+w0xMCBdPz+z9wUVHywkDzkhbkFTMYzUC2ZOyZwsrTfVqMQ3QpVtbtY4H1ZLTHDwImvgjSwSczWvIKR99ExnhaWYNYorHP1HYc0iQ0iEuHF52KJhXuqpG0lz8Upo=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <49AA498CF05719478FCD217F0AA03461@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 300a27d9-f802-4f8c-45b6-08d7110cbf17
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2019 14:31:14.1456 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: andrey.shinkevich@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3597
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.138
+Subject: Re: [Qemu-devel] [PATCH v2] Fixes: add read-zeroes to 051.out
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,81 +122,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/07/19 16:04, Peter Maydell wrote:
-> On Thu, 25 Jul 2019 at 14:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> To me *maintainability is the biggest consideration* when introducing a
->> new feature.  "We can do just as well with q35" is a good reason to
->> deprecate and delete microvm, but not a good reason to reject it now as
->> long as microvm is good enough in terms of maintainability.
-> 
-> I think maintainability matters, but also important is "are
-> we going in the right direction in the first place?".
-> virtio-mmio is (variously deliberately and accidentally)
-> quite a long way behind virtio-pci, and certain kinds of things
-> (hotplug, extensibility beyond a certain number of endpoints)
-> are not going to be possible (either ever, or without a lot
-> of extra design and implementation work to reimplement stuff
-> we have already today with PCI). Are we sure we're not going
-> to end up with a stream of "oh, now we need to implement X for
-> virtio-mmio (that virtio-pci already has)", "users want Y now
-> (that virtio-pci already has)", etc?
-
-I think this is part of maintainability in a wider sense.  For every
-missing feature there should be a good reason why it's not needed.  And
-if there is already code to do that in QEMU, then there should be an
-excellent reason why it's not being used.  (This was the essence of the
-firmware debate).
-
-So for microvm you could do without hotplug because the idea is that you
-just tear down the VM and restart it.  Lack of MSI is actually what
-worries me the most, but we could say that microvm clients generally
-have little multiprocessing so it's not common to have multiple network
-flows at the same time and so you don't need multiqueue.
-
-For microvm in particular there are two reasons why we can take some
-shortcuts (but with care):
-
-- we won't support versioned machine types for microvm.  microvm guests
-die every time you upgrade QEMU, by design.  So this is not another QED,
-which implemented more features than qcow2 but did so at the wrong place
-of the stack.  In fact it's exactly the opposite (it implements less
-features, so that the implementation of e.g. q35 or PCI is untouched and
-does not need one-off boot time optimization hacks)
-
-- we know that Amazon is using something very similar to microvm in
-production, with virtio-mmio, so the feature set is at least usable for
-something.
-
-> The other thing is that once we've introduced something we're
-> stuck with whatever it does, because we don't like breaking
-> backwards compatibility. So I think getting the virtio-legacy
-> vs virtio-1 story sorted out before we land microvm is
-> important, at least to the point where we know we haven't
-> backed ourselves into a corner or required a lot of extra
-> effort on transitional-device support that we could have
-> avoided.
-
-Even though we won't support versioned machine types, I think there is
-agreement that virtio 0.9 is a bad idea and should be fixed.
-
-Paolo
-
-> Which isn't to say that I'm against the microvm approach;
-> just that I'd like us to consider and make a decision on
-> these issues before landing it, rather than just saying
-> "the patches in themselves look good, let's merge it".
-> 
-> thanks
-> -- PMM
-> 
-
+DQoNCk9uIDI1LzA3LzIwMTkgMTc6MjUsIEtldmluIFdvbGYgd3JvdGU6DQo+IEFtIDI1LjA3LjIw
+MTkgdW0gMTQ6MDAgaGF0IEFuZHJleSBTaGlua2V2aWNoIGdlc2NocmllYmVuOg0KPj4gVGhlIHBh
+dGNoICJpb3Rlc3RzOiBTZXQgcmVhZC16ZXJvZXMgb24gaW4gbnVsbCBibG9jayBkcml2ZXIgZm9y
+IFZhbGdyaW5kIg0KPj4gd2l0aCB0aGUgY29tbWl0IElEIGE2ODYyNDE4ZmVjNDA3MiBuZWVkcyB0
+aGUgY2hhbmdlIGluIDA1MS5vdXQgd2hlbg0KPj4gY29tcGFyZWQgYWdhaW5zdCBvbiB0aGUgczM5
+MCBzeXN0ZW0uDQo+Pg0KPj4gUmVwb3J0ZWQtYnk6IENocmlzdGlhbiBCb3JudHJhZWdlciA8Ym9y
+bnRyYWVnZXJAZGUuaWJtLmNvbT4NCj4+IFNpZ25lZC1vZmYtYnk6IEFuZHJleSBTaGlua2V2aWNo
+IDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29tPg0KPj4gVGVzdGVkLWJ5OiBDaHJpc3Rp
+YW4gQm9ybnRyYWVnZXIgPGJvcm50cmFlZ2VyQGRlLmlibS5jb20+DQo+PiBSZXZpZXdlZC1ieTog
+Sm9obiBTbm93IDxqc25vd0ByZWRoYXQuY29tPg0KPiANCj4gVGhhbmtzLCBhcHBsaWVkIHRvIHRo
+ZSBibG9jayBicmFuY2guDQo+IA0KPiBLZXZpbg0KPiANCg0KVGhhbmsgeW91IGFsbC4NCg0KQW5k
+cmV5DQotLSANCldpdGggdGhlIGJlc3QgcmVnYXJkcywNCkFuZHJleSBTaGlua2V2aWNoDQo=
 
