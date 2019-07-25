@@ -2,74 +2,86 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D8BC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:35:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64AF5C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:35:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5393722BF5
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:35:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5393722BF5
+	by mail.kernel.org (Postfix) with ESMTPS id 3CDB7229F3
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:35:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CDB7229F3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqfm5-0006p2-7I
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:35:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49394)
+	id 1hqfmE-0007LY-38
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:35:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50100)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hqfjK-0005gj-VZ
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:32:32 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqflp-0006D0-Md
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:35:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hqfjJ-0002TO-KN
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:32:30 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:43986)
+ (envelope-from <pbonzini@redhat.com>) id 1hqflo-0003NX-MM
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:35:05 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34853)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqfjJ-0002Sv-G7
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:32:29 -0400
-Received: by mail-qt1-f194.google.com with SMTP id w17so5160976qto.10
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 08:32:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqflo-0003N6-FO
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:35:04 -0400
+Received: by mail-wr1-f66.google.com with SMTP id y4so51293708wrm.2
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 08:35:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uy7D43LDNtcXoOkaLZT/Odnat8nIA2gAKi42aW9mzvA=;
- b=rrEjuMH9Rdiml8EY7a4yyShFsDkGNkmNwEkMLNtKZSHxoTuKfyBxTKmtyAn/GvG4Vv
- BK0ThM7JeAu7CQWvAm6BGgDGmtFAAt6nZerLcujPZDRC2Xge+7DgNpCfkgfV5nW+yWuP
- B6wjJ7EzgR8aa/klqXDpwyMraA4UYYc00ORa2bzaQozaX/j5tonOYa9+An/vrOrDaHaR
- UUTqryMjUkB4U3r7EVOdjfDsqhX+nBeHMfBJSVoG6SY7Xvun0qRgJuHbGiXXstdF9FYM
- d2ApAXacBfUf/Ivp5YfXEdQzLCv2sEUEJy/RHcrIkhoPXxlJIhIWnDgL/5WFjow4RxAm
- lSZQ==
-X-Gm-Message-State: APjAAAVTEEOAhMuLw0WzWHPVnWgqGJjVsKZeanUHFIL2s9Lh4QH/Cbz/
- ruoDlFopVCU4aUWuNTbJbIScH5rwcigV1Q==
-X-Google-Smtp-Source: APXvYqxjMzKmP97n961HbFbu6s6z0vlJ5bWtF4IajeMWO/lFLEj5AzGABxzeYmXdXUxdnqfF0vTiOA==
-X-Received: by 2002:aed:2068:: with SMTP id 95mr62145988qta.265.1564068748624; 
- Thu, 25 Jul 2019 08:32:28 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- y20sm23493524qka.14.2019.07.25.08.32.26
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 08:32:27 -0700 (PDT)
-Date: Thu, 25 Jul 2019 11:32:24 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190725153059.7313-13-mst@redhat.com>
-References: <20190725153059.7313-1-mst@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CWd5IHzsND9B5O27c3cZffVz2+l0mVi333xEt87aVGg=;
+ b=lbfjQHpPbwT006ZFHPiIJ72XfBMcffEtdJ0KBoa0Z9VlfKR+mlLPFt+wJQX3iEpIyD
+ sl7/+r4NYebVGKa1vzY+qbZ9n2yeASuAiJNuAd94XrC2yLgkDMO8uOCBEdcAllEQwSA1
+ HRZ2PlVmOP/nQrWqXWVDABkcshZyibL6shNUBrXiYAYUtgWh/nH/Fo2lKJKGKllyVm+z
+ EC6S96UEaxpXFJcZw8n2CEFh9hc3FyjgfoSV+5YUkgnDIYsS9OiPF9/VqbtkGpWPVXrc
+ xfT/4tGQYziEWQOomcDXZWRxZODC6KNvkCbWFO+nOGBb4cXO3+y4cTbVmaTjyc2QcPcB
+ 3DYQ==
+X-Gm-Message-State: APjAAAWs0oI7ZAxP3Pfk76GMXxmmMzvJTrD6oNbEAcKwtiM8O2GQ9pLp
+ GPuAZZq2nVAqJJd2nnbShKxKBQ==
+X-Google-Smtp-Source: APXvYqxslSrJKN+VrkUH65jndCOptlMZZUGVju4w8YYpC/22dgelBQzchrkLUG16f9uPdef7oPv+mg==
+X-Received: by 2002:a5d:66c5:: with SMTP id k5mr98857468wrw.304.1564068903277; 
+ Thu, 25 Jul 2019 08:35:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
+ ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ by smtp.gmail.com with ESMTPSA id s188sm40667406wmf.40.2019.07.25.08.35.02
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 25 Jul 2019 08:35:02 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190703095825.GE11844@stefanha-x1.localdomain>
+ <87d0i7tlkl.fsf@redhat.com> <20190719102915.GG18585@stefanha-x1.localdomain>
+ <8736j2p22w.fsf@redhat.com>
+ <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
+ <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
+ <87tvbdrvin.fsf@redhat.com>
+ <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
+ <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
+ <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
+ <20190725104331-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
+Date: Thu, 25 Jul 2019 17:35:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190725153059.7313-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+In-Reply-To: <20190725104331-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.160.194
-Subject: [Qemu-devel] [PULL 12/12] virtio-balloon: free pbp more aggressively
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,134 +93,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org,
- David Hildenbrand <david@redhat.com>
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "maran.wilson@oracle.com" <maran.wilson@oracle.com>, "Montes,
+ Julio" <julio.montes@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Previous patches switched to a temporary pbp but that does not go far
-enough: after device uses a buffer, guest is free to reuse it, so
-tracking the page and freeing it later is wrong.
+On 25/07/19 16:46, Michael S. Tsirkin wrote:
+> Actually, I think I have a better idea.
+> At the moment we just get an exit on these reads and return all-ones.
+> Yes, in theory there could be a UR bit set in a bunch of
+> registers but in practice no one cares about these,
+> and I don't think we implement them.
+> So how about mapping a single page, read-only, and filling it
+> with all-ones?
 
-Free and reset the pbp after we push each element.
+Yes, that's nice indeed. :)  But it does have some cost, in terms of
+either number of VMAs or QEMU RSS since the MMCONFIG area is large.
 
-Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size")
-Cc: qemu-stable@nongnu.org #v4.0.0
-Cc: David Hildenbrand <david@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/virtio/virtio-balloon.c | 37 ++++++++++++++++---------------------
- 1 file changed, 16 insertions(+), 21 deletions(-)
+What breaks if we return all zeroes?  Zero is not a valid vendor ID.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index fe9664e42c..25de154307 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -41,22 +41,19 @@ typedef struct PartiallyBalloonedPage {
- 
- static void virtio_balloon_pbp_free(PartiallyBalloonedPage *pbp)
- {
--    if (!pbp) {
-+    if (!pbp->bitmap) {
-         return;
-     }
-     g_free(pbp->bitmap);
--    g_free(pbp);
-+    pbp->bitmap = NULL;
- }
- 
--static PartiallyBalloonedPage *virtio_balloon_pbp_alloc(ram_addr_t base_gpa,
--                                                        long subpages)
-+static void virtio_balloon_pbp_alloc(PartiallyBalloonedPage *pbp,
-+                                     ram_addr_t base_gpa,
-+                                     long subpages)
- {
--    PartiallyBalloonedPage *pbp = g_new0(PartiallyBalloonedPage, 1);
--
-     pbp->base_gpa = base_gpa;
-     pbp->bitmap = bitmap_new(subpages);
--
--    return pbp;
- }
- 
- static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
-@@ -67,7 +64,7 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
- 
- static void balloon_inflate_page(VirtIOBalloon *balloon,
-                                  MemoryRegion *mr, hwaddr mr_offset,
--                                 PartiallyBalloonedPage **pbp)
-+                                 PartiallyBalloonedPage *pbp)
- {
-     void *addr = memory_region_get_ram_ptr(mr) + mr_offset;
-     ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
-@@ -104,22 +101,21 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
-     base_gpa = memory_region_get_ram_addr(mr) + mr_offset -
-                (rb_offset - rb_aligned_offset);
- 
--    if (*pbp && !virtio_balloon_pbp_matches(*pbp, base_gpa)) {
-+    if (pbp->bitmap && !virtio_balloon_pbp_matches(pbp, base_gpa)) {
-         /* We've partially ballooned part of a host page, but now
-          * we're trying to balloon part of a different one.  Too hard,
-          * give up on the old partial page */
--        virtio_balloon_pbp_free(*pbp);
--        *pbp = NULL;
-+        virtio_balloon_pbp_free(pbp);
-     }
- 
--    if (!*pbp) {
--        *pbp = virtio_balloon_pbp_alloc(base_gpa, subpages);
-+    if (!pbp->bitmap) {
-+        virtio_balloon_pbp_alloc(pbp, base_gpa, subpages);
-     }
- 
-     set_bit((rb_offset - rb_aligned_offset) / BALLOON_PAGE_SIZE,
--            (*pbp)->bitmap);
-+            pbp->bitmap);
- 
--    if (bitmap_full((*pbp)->bitmap, subpages)) {
-+    if (bitmap_full(pbp->bitmap, subpages)) {
-         /* We've accumulated a full host page, we can actually discard
-          * it now */
- 
-@@ -127,8 +123,7 @@ static void balloon_inflate_page(VirtIOBalloon *balloon,
-         /* We ignore errors from ram_block_discard_range(), because it
-          * has already reported them, and failing to discard a balloon
-          * page is not fatal */
--        virtio_balloon_pbp_free(*pbp);
--        *pbp = NULL;
-+        virtio_balloon_pbp_free(pbp);
-     }
- }
- 
-@@ -328,13 +323,14 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
- static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
- {
-     VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
--    PartiallyBalloonedPage *pbp = NULL;
-     VirtQueueElement *elem;
-     MemoryRegionSection section;
- 
-     for (;;) {
-+        PartiallyBalloonedPage pbp = {};
-         size_t offset = 0;
-         uint32_t pfn;
-+
-         elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-         if (!elem) {
-             break;
-@@ -379,9 +375,8 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
-         virtqueue_push(vq, elem, offset);
-         virtio_notify(vdev, vq);
-         g_free(elem);
-+        virtio_balloon_pbp_free(&pbp);
-     }
--
--    virtio_balloon_pbp_free(pbp);
- }
- 
- static void virtio_balloon_receive_stats(VirtIODevice *vdev, VirtQueue *vq)
--- 
-MST
-
+Paolo
 
