@@ -2,64 +2,71 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CE5C76190
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 04:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B849CC76190
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 04:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 135C9218DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 04:02:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 135C9218DA
+	by mail.kernel.org (Postfix) with ESMTPS id 839BD218DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 04:43:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839BD218DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqUxA-0002nn-39
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 00:02:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47149)
+	id 1hqVbL-0000Qn-Ho
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 00:43:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52449)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jasowang@redhat.com>) id 1hqUwz-0002PZ-BB
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 00:01:54 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hqVbB-0008TZ-CE
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 00:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1hqUwy-0007xL-F6
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 00:01:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33324)
+ (envelope-from <pagupta@redhat.com>) id 1hqVbA-0007fM-5P
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 00:43:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53084)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hqUwy-0007xB-A2
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 00:01:52 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hqVb8-0007es-UF
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 00:43:23 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A81FB882F2;
- Thu, 25 Jul 2019 04:01:50 +0000 (UTC)
-Received: from [10.72.12.18] (ovpn-12-18.pek2.redhat.com [10.72.12.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 79F7860BFC;
- Thu, 25 Jul 2019 04:01:48 +0000 (UTC)
-To: qemu-devel@nongnu.org, no-reply@patchew.org, ppandit@redhat.com
-References: <156390388086.12764.7714147258543962468@c4a48874b076>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <536a2066-2a06-2a51-baaa-6e146c6dbeec@redhat.com>
-Date: Thu, 25 Jul 2019 12:01:28 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 70C42306647F;
+ Thu, 25 Jul 2019 04:43:20 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 46E36600C4;
+ Thu, 25 Jul 2019 04:43:20 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+ (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 1F0AB41F40;
+ Thu, 25 Jul 2019 04:43:20 +0000 (UTC)
+Date: Thu, 25 Jul 2019 00:43:19 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Wei Yang <richard.weiyang@gmail.com>
+Message-ID: <645457721.4367574.1564029799740.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190724145228.jkcruug5ikhorycv@master>
+References: <20190724070307.12568-1-richardw.yang@linux.intel.com>
+ <127005664.4113094.1563963451244.JavaMail.zimbra@redhat.com>
+ <20190724145228.jkcruug5ikhorycv@master>
 MIME-Version: 1.0
-In-Reply-To: <156390388086.12764.7714147258543962468@c4a48874b076>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.65.16.59, 10.4.195.8]
+Thread-Topic: docs/nvdimm: add example on persistent backend setup
+Thread-Index: 6jlZXNEqYUMNWqRz4bSPSAyVI/uamA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 25 Jul 2019 04:01:50 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.41]); Thu, 25 Jul 2019 04:43:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] restrict bridge interface name to
- IFNAMSIZ
+Subject: Re: [Qemu-devel] [PATCH] docs/nvdimm: add example on persistent
+ backend setup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,28 +78,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liq3ea@gmail.com, berrange@redhat.com, pjp@fedoraproject.org
+Cc: ross zwisler <ross.zwisler@linux.intel.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, mst@redhat.com,
+ qemu-devel@nongnu.org, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2019/7/24 =E4=B8=8A=E5=8D=881:44, no-reply@patchew.org wrote:
-> Patchew URL:https://patchew.org/QEMU/20190723104754.29324-1-ppandit@red=
-hat.com/
->
->
->
-> Hi,
->
-> This series failed the asan build test. Please find the testing command=
-s and
-> their output below. If you have Docker installed, you can probably repr=
-oduce it
-> locally.
+> >
+> >> 
+> >> Persistent backend setup requires some knowledge about nvdimm and ndctl
+> >> tool. Some users report they may struggle to gather these knowledge and
+> >> have difficulty to setup it properly.
+> >> 
+> >> Here we provide two examples for persistent backend and gives the link
+> >> to ndctl. By doing so, user could try it directly and do more
+> >> investigation on persistent backend setup with ndctl.
+> >> 
+> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> >> ---
+> >>  docs/nvdimm.txt | 28 ++++++++++++++++++++++++++++
+> >>  1 file changed, 28 insertions(+)
+> >> 
+> >> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
+> >> index b531cacd35..baba7a940d 100644
+> >> --- a/docs/nvdimm.txt
+> >> +++ b/docs/nvdimm.txt
+> >> @@ -171,6 +171,32 @@ guest software that this vNVDIMM device contains a
+> >> region that cannot
+> >>  accept persistent writes. In result, for example, the guest Linux
+> >>  NVDIMM driver, marks such vNVDIMM device as read-only.
+> >>  
+> >> +Backend File Setup Example
+> >> +..........................
+> >> +
+> >> +Here is two examples for how to setup these persistent backend on
+> >> +linux, which leverages the tool ndctl [3].
+> >> +
+> >> +It is easy to setup DAX device backend file.
+> >> +
+> >> +A. DAX device
+> >> +
+> >> +    ndctl create-namespace -f -e namespace0.0 -m devdax
+> >> +
+> >> +The /dev/dax0.0 could be used directly in "mem-path" option.
+> >> +
+> >> +For DAX file, it is more than creating the proper namespace. The
+> >> +block device should be partitioned and mounted (with dax option).
+> >> +
+> >> +B. DAX file
+> >> +
+> >> +    ndctl create-namespace -f -e namespace0.0 -m fsdax
+> >> +    (partition /dev/pmem0 with name pmem0p1)
+> >> +    mount -o dax /dev/pmem0p1 /mnt
+> >> +    (dd a file with proper size in /mnt)
+> >
+> >This is not clear to me. why 'dd' file is required in /mnt?
+> >You mean for creating a backend file?
+> >
+> 
+> Yes, create a backend file. You need to give a file instead of a directory to
+> qemu command line.
+o.k
 
-Prasad, this looks unrelated to the series? Please double check.
-
-Thanks
-
+Thanks,
+Pankaj 
+> 
+> >> +
+> >> +Then the new file in /mnt could be used in "mem-path" option.
+> >> +
+> >>  NVDIMM Persistence
+> >>  ------------------
+> >>  
+> >> @@ -212,3 +238,5 @@ References
+> >>      https://www.snia.org/sites/default/files/technical_work/final/NVMProgrammingModel_v1.2.pdf
+> >>  [2] Persistent Memory Development Kit (PMDK), formerly known as NVML
+> >>  project, home page:
+> >>      http://pmem.io/pmdk/
+> >> +[3] ndctl-create-namespace - provision or reconfigure a namespace
+> >> +    http://pmem.io/ndctl/ndctl-create-namespace.html
+> >> --
+> >
+> >Looks good to me. Just a small comment above.
+> >Other than that: Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+> >
+> 
+> Thanks
+> 
+> >> 2.17.1
+> >> 
+> >> 
+> >> 
+> 
+> --
+> Wei Yang
+> Help you, Help me
+> 
+> 
 
