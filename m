@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F406CC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B0D8C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:01:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB5C82054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:01:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB5C82054F
+	by mail.kernel.org (Postfix) with ESMTPS id 3F7AA21901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:01:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F7AA21901
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqYgj-0004Z3-WC
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:01:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36740)
+	id 1hqYhD-0005g0-A5
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:01:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36918)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqYgX-000421-KK
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:01:11 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hqYgy-0005H4-HB
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqYgW-0001TH-2J
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:01:09 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.79]:26914)
+ (envelope-from <tony.nguyen@bt.com>) id 1hqYgt-0001nM-4w
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:01:36 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.76]:26385)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hqYgF-0001EN-07; Thu, 25 Jul 2019 04:00:51 -0400
-Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
- BWP09926084.bt.com (10.36.82.115) with Microsoft SMTP Server (version=TLS1_2, 
+ id 1hqYgi-0001hX-HH; Thu, 25 Jul 2019 04:01:20 -0400
+Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
+ BWP09926081.bt.com (10.36.82.112) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Thu, 25
- Jul 2019 09:00:47 +0100
+ Jul 2019 09:01:13 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 09:00:49 +0100
+ tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 09:01:18 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
- 2019 09:00:49 +0100
+ 2019 09:01:18 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v4 02/15] memory: Access MemoryRegion with
- MemOp
-Thread-Index: AQHVQr8SLrJE4y8qW06Prb/pDI1pOQ==
-Date: Thu, 25 Jul 2019 08:00:49 +0000
-Message-ID: <1564041648740.85917@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v4 03/15] target/mips: Access MemoryRegion
+ with MemOp
+Thread-Index: AQHVQr8jfLRZuSvsvEC9GBvzP5Cgsw==
+Date: Thu, 25 Jul 2019 08:01:18 +0000
+Message-ID: <1564041677570.61158@bt.com>
 References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>, 
  <1563810716254.18886@bt.com>, <1564038073754.91133@bt.com>,
  <1564041524365.23360@bt.com>
@@ -62,11 +62,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.42]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.79
+X-Received-From: 213.121.35.76
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v4 02/15] memory: Access MemoryRegion with MemOp
+Subject: [Qemu-devel] [PATCH v4 03/15] target/mips: Access MemoryRegion with
+ MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,113 +91,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replacing size with size+sign+endianness (MemOp) will enable us to
-collapse the two byte swaps, adjust_endianness and handle_bswap, along
-the I/O path.
-
-While interfaces are converted, callers will have existing unsigned
-size coerced into a MemOp, and the callee will use this MemOp as an
-unsigned size.
-
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- include/exec/memop.h  | 4 ++++
- include/exec/memory.h | 9 +++++----
- memory.c              | 7 +++++--
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ target/mips/op_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/memop.h b/include/exec/memop.h
-index ac58066..09c8d20 100644
---- a/include/exec/memop.h
-+++ b/include/exec/memop.h
-@@ -106,4 +106,8 @@ typedef enum MemOp {
-     MO_SSIZE =3D MO_SIZE | MO_SIGN,
- } MemOp;
-
-+/* No-op while memory_region_dispatch_[read|write] is converted to MemOp *=
-/
-+#define MEMOP_SIZE(op)  (op)    /* MemOp to size.  */
-+#define SIZE_MEMOP(ul)  (ul)    /* Size to MemOp.  */
-+
- #endif
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index bb0961d..30b1c58 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -19,6 +19,7 @@
- #include "exec/cpu-common.h"
- #include "exec/hwaddr.h"
- #include "exec/memattrs.h"
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 9e2e02f..dccb8df 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -24,6 +24,7 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
 +#include "exec/memop.h"
- #include "exec/ramlist.h"
- #include "qemu/queue.h"
- #include "qemu/int128.h"
-@@ -1731,13 +1732,13 @@ void mtree_info(bool flatview, bool dispatch_tree, =
-bool owner);
-  * @mr: #MemoryRegion to access
-  * @addr: address within that region
-  * @pval: pointer to uint64_t which the data is written to
-- * @size: size of the access in bytes
-+ * @op: encodes size of the access in bytes
-  * @attrs: memory transaction attributes to use for the access
-  */
- MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
-                                         hwaddr addr,
-                                         uint64_t *pval,
--                                        unsigned size,
-+                                        MemOp op,
-                                         MemTxAttrs attrs);
- /**
-  * memory_region_dispatch_write: perform a write directly to the specified
-@@ -1746,13 +1747,13 @@ MemTxResult memory_region_dispatch_read(MemoryRegio=
-n *mr,
-  * @mr: #MemoryRegion to access
-  * @addr: address within that region
-  * @data: data to write
-- * @size: size of the access in bytes
-+ * @op: encodes size of the access in bytes
-  * @attrs: memory transaction attributes to use for the access
-  */
- MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          hwaddr addr,
-                                          uint64_t data,
--                                         unsigned size,
-+                                         MemOp op,
-                                          MemTxAttrs attrs);
+ #include "sysemu/kvm.h"
 
- /**
-diff --git a/memory.c b/memory.c
-index 5d8c9a9..6982e19 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1439,10 +1439,11 @@ static MemTxResult memory_region_dispatch_read1(Mem=
-oryRegion *mr,
- MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
-                                         hwaddr addr,
-                                         uint64_t *pval,
--                                        unsigned size,
-+                                        MemOp op,
-                                         MemTxAttrs attrs)
- {
-     MemTxResult r;
-+    unsigned size =3D MEMOP_SIZE(op);
-
-     if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
-         *pval =3D unassigned_mem_read(mr, addr, size);
-@@ -1483,9 +1484,11 @@ static bool memory_region_dispatch_write_eventfds(Me=
-moryRegion *mr,
- MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          hwaddr addr,
-                                          uint64_t data,
--                                         unsigned size,
-+                                         MemOp op,
-                                          MemTxAttrs attrs)
- {
-+    unsigned size =3D MEMOP_SIZE(op);
-+
-     if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
-         unassigned_mem_write(mr, addr, data, size);
-         return MEMTX_DECODE_ERROR;
+ /*************************************************************************=
+****/
+@@ -4740,11 +4741,11 @@ void helper_cache(CPUMIPSState *env, target_ulong a=
+ddr, uint32_t op)
+     if (op =3D=3D 9) {
+         /* Index Store Tag */
+         memory_region_dispatch_write(env->itc_tag, index, env->CP0_TagLo,
+-                                     8, MEMTXATTRS_UNSPECIFIED);
++                                     SIZE_MEMOP(8), MEMTXATTRS_UNSPECIFIED=
+);
+     } else if (op =3D=3D 5) {
+         /* Index Load Tag */
+         memory_region_dispatch_read(env->itc_tag, index, &env->CP0_TagLo,
+-                                    8, MEMTXATTRS_UNSPECIFIED);
++                                    SIZE_MEMOP(8), MEMTXATTRS_UNSPECIFIED)=
+;
+     }
+ #endif
+ }
 --
 1.8.3.1
 
