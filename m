@@ -2,66 +2,72 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C93C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 179B1C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:05:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9A5F21901
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:05:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9A5F21901
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DDFBC21901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 08:05:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDFBC21901
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqYkR-0007tS-J0
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:05:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38255)
+	id 1hqYkg-0000Tb-6G
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 04:05:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38309)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hqYkE-00077V-9w
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:04:59 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hqYkL-0007aK-Dj
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hqYkC-0003QV-LB
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:04:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52634)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hqYk8-0003OM-1N; Thu, 25 Jul 2019 04:04:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EE444A836;
- Thu, 25 Jul 2019 08:04:49 +0000 (UTC)
-Received: from [10.36.116.102] (ovpn-116-102.ams2.redhat.com [10.36.116.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A60A1001DE0;
- Thu, 25 Jul 2019 08:04:47 +0000 (UTC)
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20190621163422.6127-1-drjones@redhat.com>
- <20190621163422.6127-4-drjones@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d3f489ac-8e2c-cba7-7c0d-c71e23882b4a@redhat.com>
-Date: Thu, 25 Jul 2019 10:04:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <tony.nguyen@bt.com>) id 1hqYkJ-0003Sg-5k
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 04:05:05 -0400
+Received: from smtpe1.intersmtp.com ([62.239.224.236]:56355)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1hqYkA-0003P2-7o; Thu, 25 Jul 2019 04:04:54 -0400
+Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
+ RDW083A009ED65.bt.com (10.187.98.35) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Thu, 25 Jul 2019 09:01:14 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Thu, 25 Jul 2019 09:04:51 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Thu, 25 Jul
+ 2019 09:04:51 +0100
+From: <tony.nguyen@bt.com>
+To: <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v4 11/15] memory: Single byte swap along the
+ I/O path
+Thread-Index: AQHVQr+iZ7d8llqteEm6WGitpsstMw==
+Date: Thu, 25 Jul 2019 08:04:51 +0000
+Message-ID: <1564041891013.88577@bt.com>
+References: <e9c6e5310b1a4863be45d45bf087fc3d@tpw09926dag18e.domain1.systemhost.net>, 
+ <1563810716254.18886@bt.com>, <1564038073754.91133@bt.com>,
+ <1564041524365.23360@bt.com>
+In-Reply-To: <1564041524365.23360@bt.com>
+Accept-Language: en-AU, en-GB, en-US
+Content-Language: en-AU
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.187.101.42]
 MIME-Version: 1.0
-In-Reply-To: <20190621163422.6127-4-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 25 Jul 2019 08:04:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 03/14] target/arm/monitor: Introduce
- qmp_query_cpu_model_expansion
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 62.239.224.236
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: [Qemu-devel] [PATCH v4 11/15] memory: Single byte swap along the
+ I/O path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,280 +79,283 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: peter.maydell@linaro.org, walling@linux.ibm.com, mst@redhat.com,
+ palmer@sifive.com, mark.cave-ayland@ilande.co.uk, Alistair.Francis@wdc.com,
+ arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
+ ehabkost@redhat.com, sw@weilnetz.de, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
+ cohuck@redhat.com, alex.williamson@redhat.com, qemu-ppc@nongnu.org,
+ amarkovic@wavecomp.com, pbonzini@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Drew,
+Now that MemOp has been pushed down into the memory API, we can
+collapse the two byte swaps adjust_endianness and handle_bswap into
+the former.
 
-On 6/21/19 6:34 PM, Andrew Jones wrote:
-> Add support for the query-cpu-model-expansion QMP command to Arm. We
-> do this selectively, only exposing CPU properties which represent
-> optional CPU features which the user may want to enable/disable. Also,
-> for simplicity, we restrict the list of queryable cpu models to 'max',
-> 'host', or the current type when KVM is in use, even though there
-> may exist KVM hosts where other types would also work. For example on a
-> seattle you could use 'host' for the current type, but then attempt to
-> query 'cortex-a57', which is also a valid CPU type to use with KVM on
-> seattle hosts, but that query will fail with our simplifications. This
-> shouldn't be an issue though as management layers and users have been
-> preferring the 'host' CPU type for use with KVM for quite some time.
-> Additionally, if the KVM-enabled QEMU instance running on a seattle
-> host is using the cortex-a57 CPU type, then querying 'cortex-a57' will
-> work. Finally, we only implement expansion type 'full', as Arm does not
-> yet have a "base" CPU type. Below are some example calls and results
-> (to save character clutter they're not in json, but are still json-ish
-> to give the idea)
-> 
->  # expand the 'max' CPU model
->  query-cpu-model-expansion: type:full, model:{ name:max }
-> 
->  return: model:{ name:max, props:{ 'aarch64': true, 'pmu': true }}
-> 
->  # attempt to expand the 'max' CPU model with pmu=off
->  query-cpu-model-expansion:
->    type:full, model:{ name:max, props:{ 'pmu': false }}
-> 
->  return: model:{ name:max, props:{ 'aarch64': true, 'pmu': false }}
-> 
->  # attempt to expand the 'max' CPU model with aarch64=off
->  query-cpu-model-expansion:
->    type:full, model:{ name:max, props:{ 'aarch64': false }}
-> 
->  error: "'aarch64' feature cannot be disabled unless KVM is enabled
->          and 32-bit EL1 is supported"
+Collapsing byte swaps along the I/O path enables additional endian
+inversion logic, e.g. SPARC64 Invert Endian TTE bit, with redundant
+byte swaps cancelling out.
 
-I struggled quite a lot to get the right syntax to test with qmp-shell
-(which I think is the most user friendly way to run those commands). In
-the commit message, you may add an example such as:
+Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+---
+ accel/tcg/cputlb.c | 58 +++++++++++++++++++++++++-------------------------=
+----
+ memory.c           | 30 ++++++++++++++++------------
+ 2 files changed, 44 insertions(+), 44 deletions(-)
 
-(QEMU) query-cpu-model-expansion type=full
-model={"name":"host","props":{"aarch64":true,"pmu":true}}
-{"return": {"model": {"name": "host", "props": {"aarch64": true, "pmu":
-true}}}}
+diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+index a4a0bf7..e61b1eb 100644
+--- a/accel/tcg/cputlb.c
++++ b/accel/tcg/cputlb.c
+@@ -881,7 +881,7 @@ static void tlb_fill(CPUState *cpu, target_ulong addr, =
+int size,
 
-(QEMU) query-cpu-model-expansion type=full model={"name":"host"}
-{"return": {"model": {"name": "host", "props": {"aarch64": true, "pmu":
-true}}}}
+ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+                          int mmu_idx, target_ulong addr, uintptr_t retaddr=
+,
+-                         MMUAccessType access_type, int size)
++                         MMUAccessType access_type, MemOp op)
+ {
+     CPUState *cpu =3D env_cpu(env);
+     hwaddr mr_offset;
+@@ -906,14 +906,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBE=
+ntry *iotlbentry,
+         qemu_mutex_lock_iothread();
+         locked =3D true;
+     }
+-    r =3D memory_region_dispatch_read(mr, mr_offset, &val, SIZE_MEMOP(size=
+),
+-                                    iotlbentry->attrs);
++    r =3D memory_region_dispatch_read(mr, mr_offset, &val, op, iotlbentry-=
+>attrs);
+     if (r !=3D MEMTX_OK) {
+         hwaddr physaddr =3D mr_offset +
+             section->offset_within_address_space -
+             section->offset_within_region;
 
-Thanks
+-        cpu_transaction_failed(cpu, physaddr, addr, size, access_type,
++        cpu_transaction_failed(cpu, physaddr, addr, MEMOP_SIZE(op), access=
+_type,
+                                mmu_idx, iotlbentry->attrs, r, retaddr);
+     }
+     if (locked) {
+@@ -925,7 +924,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEnt=
+ry *iotlbentry,
 
-Eric
+ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
+                       int mmu_idx, uint64_t val, target_ulong addr,
+-                      uintptr_t retaddr, int size)
++                      uintptr_t retaddr, MemOp op)
+ {
+     CPUState *cpu =3D env_cpu(env);
+     hwaddr mr_offset;
+@@ -947,15 +946,15 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntr=
+y *iotlbentry,
+         qemu_mutex_lock_iothread();
+         locked =3D true;
+     }
+-    r =3D memory_region_dispatch_write(mr, mr_offset, val, SIZE_MEMOP(size=
+),
+-                                    iotlbentry->attrs);
++    r =3D memory_region_dispatch_write(mr, mr_offset, val, op, iotlbentry-=
+>attrs);
+     if (r !=3D MEMTX_OK) {
+         hwaddr physaddr =3D mr_offset +
+             section->offset_within_address_space -
+             section->offset_within_region;
+
+-        cpu_transaction_failed(cpu, physaddr, addr, size, MMU_DATA_STORE,
+-                               mmu_idx, iotlbentry->attrs, r, retaddr);
++        cpu_transaction_failed(cpu, physaddr, addr, MEMOP_SIZE(op),
++                               MMU_DATA_STORE, mmu_idx, iotlbentry->attrs,=
+ r,
++                               retaddr);
+     }
+     if (locked) {
+         qemu_mutex_unlock_iothread();
+@@ -1210,26 +1209,13 @@ static void *atomic_mmu_lookup(CPUArchState *env, t=
+arget_ulong addr,
+ #endif
+
+ /*
+- * Byte Swap Helper
++ * Byte Swap Checker
+  *
+- * This should all dead code away depending on the build host and
+- * access type.
++ * Dead code should all go away depending on the build host and access typ=
+e.
+  */
+-
+-static inline uint64_t handle_bswap(uint64_t val, int size, bool big_endia=
+n)
++static inline bool need_bswap(bool big_endian)
+ {
+-    if ((big_endian && NEED_BE_BSWAP) || (!big_endian && NEED_LE_BSWAP)) {
+-        switch (size) {
+-        case 1: return val;
+-        case 2: return bswap16(val);
+-        case 4: return bswap32(val);
+-        case 8: return bswap64(val);
+-        default:
+-            g_assert_not_reached();
+-        }
+-    } else {
+-        return val;
+-    }
++    return (big_endian && NEED_BE_BSWAP) || (!big_endian && NEED_LE_BSWAP)=
+;
+ }
+
+ /*
+@@ -1260,6 +1246,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCG=
+MemOpIdx oi,
+     unsigned a_bits =3D get_alignment_bits(get_memop(oi));
+     void *haddr;
+     uint64_t res;
++    MemOp op;
+
+     /* Handle CPU specific unaligned behaviour */
+     if (addr & ((1 << a_bits) - 1)) {
+@@ -1305,9 +1292,13 @@ load_helper(CPUArchState *env, target_ulong addr, TC=
+GMemOpIdx oi,
+             }
+         }
+
+-        res =3D io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
+-                       mmu_idx, addr, retaddr, access_type, size);
+-        return handle_bswap(res, size, big_endian);
++        op =3D SIZE_MEMOP(size);
++        if (need_bswap(big_endian)) {
++            op ^=3D MO_BSWAP;
++        }
++
++        return io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
++                       mmu_idx, addr, retaddr, access_type, op);
+     }
+
+     /* Handle slow unaligned access (it spans two pages or IO).  */
+@@ -1508,6 +1499,7 @@ store_helper(CPUArchState *env, target_ulong addr, ui=
+nt64_t val,
+     const size_t tlb_off =3D offsetof(CPUTLBEntry, addr_write);
+     unsigned a_bits =3D get_alignment_bits(get_memop(oi));
+     void *haddr;
++    MemOp op;
+
+     /* Handle CPU specific unaligned behaviour */
+     if (addr & ((1 << a_bits) - 1)) {
+@@ -1553,9 +1545,13 @@ store_helper(CPUArchState *env, target_ulong addr, u=
+int64_t val,
+             }
+         }
+
++        op =3D SIZE_MEMOP(size);
++        if (need_bswap(big_endian)) {
++            op ^=3D MO_BSWAP;
++        }
++
+         io_writex(env, &env_tlb(env)->d[mmu_idx].iotlb[index], mmu_idx,
+-                  handle_bswap(val, size, big_endian),
+-                  addr, retaddr, size);
++                  val, addr, retaddr, op);
+         return;
+     }
+
+diff --git a/memory.c b/memory.c
+index 6982e19..0277d3d 100644
+--- a/memory.c
++++ b/memory.c
+@@ -352,7 +352,7 @@ static bool memory_region_big_endian(MemoryRegion *mr)
+ #endif
+ }
+
+-static bool memory_region_wrong_endianness(MemoryRegion *mr)
++static bool memory_region_endianness_inverted(MemoryRegion *mr)
+ {
+ #ifdef TARGET_WORDS_BIGENDIAN
+     return mr->ops->endianness =3D=3D DEVICE_LITTLE_ENDIAN;
+@@ -361,23 +361,27 @@ static bool memory_region_wrong_endianness(MemoryRegi=
+on *mr)
+ #endif
+ }
+
+-static void adjust_endianness(MemoryRegion *mr, uint64_t *data, unsigned s=
+ize)
++static void adjust_endianness(MemoryRegion *mr, uint64_t *data, MemOp op)
+ {
+-    if (memory_region_wrong_endianness(mr)) {
+-        switch (size) {
+-        case 1:
++    if (memory_region_endianness_inverted(mr)) {
++        op ^=3D MO_BSWAP;
++    }
++
++    if (op & MO_BSWAP) {
++        switch (op & MO_SIZE) {
++        case MO_8:
+             break;
+-        case 2:
++        case MO_16:
+             *data =3D bswap16(*data);
+             break;
+-        case 4:
++        case MO_32:
+             *data =3D bswap32(*data);
+             break;
+-        case 8:
++        case MO_64:
+             *data =3D bswap64(*data);
+             break;
+         default:
+-            abort();
++            g_assert_not_reached();
+         }
+     }
+ }
+@@ -1451,7 +1455,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegion =
+*mr,
+     }
+
+     r =3D memory_region_dispatch_read1(mr, addr, pval, size, attrs);
+-    adjust_endianness(mr, pval, size);
++    adjust_endianness(mr, pval, op);
+     return r;
+ }
+
+@@ -1494,7 +1498,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegion=
+ *mr,
+         return MEMTX_DECODE_ERROR;
+     }
+
+-    adjust_endianness(mr, &data, size);
++    adjust_endianness(mr, &data, op);
+
+     if ((!kvm_eventfds_enabled()) &&
+         memory_region_dispatch_write_eventfds(mr, addr, data, size, attrs)=
+) {
+@@ -2340,7 +2344,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
+     }
+
+     if (size) {
+-        adjust_endianness(mr, &mrfd.data, size);
++        adjust_endianness(mr, &mrfd.data, SIZE_MEMOP(size));
+     }
+     memory_region_transaction_begin();
+     for (i =3D 0; i < mr->ioeventfd_nb; ++i) {
+@@ -2375,7 +2379,7 @@ void memory_region_del_eventfd(MemoryRegion *mr,
+     unsigned i;
+
+     if (size) {
+-        adjust_endianness(mr, &mrfd.data, size);
++        adjust_endianness(mr, &mrfd.data, SIZE_MEMOP(size));
+     }
+     memory_region_transaction_begin();
+     for (i =3D 0; i < mr->ioeventfd_nb; ++i) {
+--
+1.8.3.1
 
 
-> 
-> In the last example KVM was not in use so an error was returned.
-> 
-> Note1: It's possible for features to have dependencies on other
-> features. I.e. it may be possible to change one feature at a time
-> without error, but when attempting to change all features at once
-> an error could occur depending on the order they are processed. It's
-> also possible changing all at once doesn't generate an error, because
-> a feature's dependencies are satisfied with other features, but the
-> same feature cannot be changed independently without error. For these
-> reasons callers should always attempt to make their desired changes
-> all at once in order to ensure the collection is valid.
-> 
-> Note2: Certainly more features may be added to the list of
-> advertised features, e.g. 'vfp' and 'neon'. The only requirement
-> is that their property set accessors fail when invalid
-> configurations are detected. For vfp we would need something like
-> 
->  set_vfp()
->  {
->    if (arm_feature(env, ARM_FEATURE_AARCH64) &&
->        cpu->has_vfp != cpu->has_neon)
->        error("AArch64 CPUs must have both VFP and Neon or neither")
-> 
-> in its set accessor, and the same for neon, rather than doing that
-> check at realize time, which isn't executed at qmp query time.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  qapi/target.json     |   6 +-
->  target/arm/monitor.c | 132 +++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 135 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qapi/target.json b/qapi/target.json
-> index 1d4d54b6002e..edfa2f82b916 100644
-> --- a/qapi/target.json
-> +++ b/qapi/target.json
-> @@ -408,7 +408,7 @@
->  ##
->  { 'struct': 'CpuModelExpansionInfo',
->    'data': { 'model': 'CpuModelInfo' },
-> -  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-> +  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
->  
->  ##
->  # @query-cpu-model-expansion:
-> @@ -433,7 +433,7 @@
->  #   query-cpu-model-expansion while using these is not advised.
->  #
->  # Some architectures may not support all expansion types. s390x supports
-> -# "full" and "static".
-> +# "full" and "static". Arm only supports "full".
->  #
->  # Returns: a CpuModelExpansionInfo. Returns an error if expanding CPU models is
->  #          not supported, if the model cannot be expanded, if the model contains
-> @@ -447,7 +447,7 @@
->    'data': { 'type': 'CpuModelExpansionType',
->              'model': 'CpuModelInfo' },
->    'returns': 'CpuModelExpansionInfo',
-> -  'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-> +  'if': 'defined(TARGET_S390X) || defined(TARGET_I386) || defined(TARGET_ARM)' }
->  
->  ##
->  # @CpuDefinitionInfo:
-> diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-> index 41b32b94b258..19e3120eef95 100644
-> --- a/target/arm/monitor.c
-> +++ b/target/arm/monitor.c
-> @@ -23,7 +23,13 @@
->  #include "qemu/osdep.h"
->  #include "hw/boards.h"
->  #include "kvm_arm.h"
-> +#include "qapi/error.h"
-> +#include "qapi/visitor.h"
-> +#include "qapi/qobject-input-visitor.h"
->  #include "qapi/qapi-commands-target.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qapi/qmp/qdict.h"
-> +#include "qom/qom-qobject.h"
->  
->  static GICCapability *gic_cap_new(int version)
->  {
-> @@ -82,3 +88,129 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
->  
->      return head;
->  }
-> +
-> +static const char *cpu_model_advertised_features[] = {
-> +    "aarch64", "pmu",
-> +    NULL
-> +};
-> +
-> +CpuModelExpansionInfo *qmp_query_cpu_model_expansion(CpuModelExpansionType type,
-> +                                                     CpuModelInfo *model,
-> +                                                     Error **errp)
-> +{
-> +    CpuModelExpansionInfo *expansion_info;
-> +    const QDict *qdict_in = NULL;
-> +    QDict *qdict_out;
-> +    ObjectClass *oc;
-> +    Object *obj;
-> +    const char *name;
-> +    int i;
-> +
-> +    if (type != CPU_MODEL_EXPANSION_TYPE_FULL) {
-> +        error_setg(errp, "The requested expansion type is not supported.");
-> +        return NULL;
-> +    }
-> +
-> +    if (!kvm_enabled() && !strcmp(model->name, "host")) {
-> +        error_setg(errp, "The CPU definition '%s' requires KVM", model->name);
-> +        return NULL;
-> +    }
-> +
-> +    oc = cpu_class_by_name(TYPE_ARM_CPU, model->name);
-> +    if (!oc) {
-> +        error_setg(errp, "The CPU definition '%s' is unknown.", model->name);
-> +        return NULL;
-> +    }
-> +
-> +    if (kvm_enabled()) {
-> +        const char *cpu_type = current_machine->cpu_type;
-> +        int len = strlen(cpu_type) - strlen(ARM_CPU_TYPE_SUFFIX);
-> +        bool supported = false;
-> +
-> +        if (!strcmp(model->name, "host") || !strcmp(model->name, "max")) {
-> +            /* These are kvmarm's recommended cpu types */
-> +            supported = true;
-> +        } else if (strlen(model->name) == len &&
-> +                   !strncmp(model->name, cpu_type, len)) {
-> +            /* KVM is enabled and we're using this type, so it works. */
-> +            supported = true;
-> +        }
-> +        if (!supported) {
-> +            error_setg(errp, "The CPU definition '%s' cannot "
-> +                             "be used with KVM on this host", model->name);
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    if (model->props) {
-> +        qdict_in = qobject_to(QDict, model->props);
-> +        if (!qdict_in) {
-> +            error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "props", "dict");
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    obj = object_new(object_class_get_name(oc));
-> +
-> +    if (qdict_in) {
-> +        Visitor *visitor;
-> +
-> +        visitor = qobject_input_visitor_new(model->props);
-> +        visit_start_struct(visitor, NULL, NULL, 0, errp);
-> +        if (*errp) {
-> +            object_unref(obj);
-> +            return NULL;
-> +        }
-> +
-> +        i = 0;
-> +        while ((name = cpu_model_advertised_features[i++]) != NULL) {
-> +            if (qdict_get(qdict_in, name)) {
-> +                object_property_set(obj, visitor, name, errp);
-> +                if (*errp) {
-> +                    break;
-> +                }
-> +            }
-> +        }
-> +
-> +        if (!*errp) {
-> +            visit_check_struct(visitor, errp);
-> +        }
-> +        visit_end_struct(visitor, NULL);
-> +        visit_free(visitor);
-> +        if (*errp) {
-> +            object_unref(obj);
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    expansion_info = g_new0(CpuModelExpansionInfo, 1);
-> +    expansion_info->model = g_malloc0(sizeof(*expansion_info->model));
-> +    expansion_info->model->name = g_strdup(model->name);
-> +
-> +    qdict_out = qdict_new();
-> +
-> +    i = 0;
-> +    while ((name = cpu_model_advertised_features[i++]) != NULL) {
-> +        ObjectProperty *prop = object_property_find(obj, name, NULL);
-> +        if (prop) {
-> +            QObject *value;
-> +
-> +            assert(prop->get);
-> +            value = object_property_get_qobject(obj, name, errp);
-> +            assert(!*errp);
-> +
-> +            qdict_put_obj(qdict_out, name, value);
-> +        }
-> +    }
-> +
-> +    if (!qdict_size(qdict_out)) {
-> +        qobject_unref(qdict_out);
-> +    } else {
-> +        expansion_info->model->props = QOBJECT(qdict_out);
-> +        expansion_info->model->has_props = true;
-> +    }
-> +
-> +    object_unref(obj);
-> +
-> +    return expansion_info;
-> +}
-> 
 
