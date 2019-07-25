@@ -1,137 +1,81 @@
-Return-Path: <SRS0=qU7A=VV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0016EC76186
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 23:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91CE5C76186
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:12:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAE252189F
-	for <qemu-devel@archiver.kernel.org>; Wed, 24 Jul 2019 23:22:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE252189F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5CF2921851
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:12:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X/XWefTq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CF2921851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqQat-0008Kd-Uf
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 19:22:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60875)
+	id 1hqRN1-0003SS-9p
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:12:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39283)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hqQaj-0007vW-4G
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 19:22:37 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hqRMl-0002q6-QU
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:12:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hqQai-0004sP-9M
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 19:22:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49030)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hqQai-0004s6-14
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 19:22:36 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 493A330860C1;
- Wed, 24 Jul 2019 23:22:35 +0000 (UTC)
-Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D15FF1001281;
- Wed, 24 Jul 2019 23:22:34 +0000 (UTC)
-To: qemu-devel <qemu-devel@nongnu.org>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <976a4589-f836-0f31-b682-f384e22149e9@redhat.com>
-Date: Wed, 24 Jul 2019 19:22:34 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alistair23@gmail.com>) id 1hqRMk-0006Vq-Aw
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:12:15 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:36417)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hqRMk-0006Vk-2h; Wed, 24 Jul 2019 20:12:14 -0400
+Received: by mail-lj1-x242.google.com with SMTP id i21so46236922ljj.3;
+ Wed, 24 Jul 2019 17:12:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=+hU/mP4YRBY/Im7LHw7YXUMtqSmCFaqUYDXdrY804x4=;
+ b=X/XWefTq8gGINX3LULk+H1Bv+dFKF1rXotDjWoriZIokgXzOlqGG+4aVveCFS/Bce8
+ TVmjtxbreVOlBdhq/0hXi+zbiQy8rE5zULxzvl+tIPLodr5BeVXfzKsd8hd3jI1V30Fe
+ J9c4F65aONGfwYwpkvX9CN01BGGufRl6NiRQX1Kenipz6Eb28FTQRTLz9y/TKCnA57lB
+ j9jaH5ZI9Z5niubRa4q0eryCAzbmhzXCuLxAsS3QcZ3RsF31zHh2IKng6RftupnqL8Mw
+ W5MHYM6MnFwAfWjn3VS8WHhouPeVuz31If7WoGWpiazetGuxZm/ayob7nuk+SgbKZ+TE
+ XVkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+hU/mP4YRBY/Im7LHw7YXUMtqSmCFaqUYDXdrY804x4=;
+ b=A28tW7WdPcHSkcd9u/o1SnnUxCiDfaJiytNt46Amujjn5Z/T+Wxz+rQerfNr6dq7PM
+ y6pD8laXNw6sHgaCMOBAyQVlTptxBWrmk+Wpouy1XYq/lBIVnCm8rvRCt0qpxZOpxQRA
+ uoKeYM8Dmyu1hWO4hecjqNl5e0KbJeemewAw00vqRMQKv5PJK0hvKnJQ9Jz1MGOP2P3h
+ 9a84YgRs1mrhTJoVNPQbEgQSgxmTP2jGSI3GSiqEIJWzqkp6CQ+K5uAy3iXbnQ9t8tb1
+ MC6mPxGBe7WpxqMh08GALEWTYL71WLXCZurHDpLvEgOPjyrN5x2WCnSAwUBPj9KQzSOu
+ 53+w==
+X-Gm-Message-State: APjAAAXyxQzrB5iy0dHExC3f1PTH1L40IiTC5oT2vMKC+NLwuiaKFrVO
+ kBTt1zfEXMzV+mA6PAXOS+4FFEHt54n1ZbqbLZ4=
+X-Google-Smtp-Source: APXvYqzOtXtRii9v8xl6tNKs2tg+gfb8oJIeKjEBmasDM6IL+MDaOouVJecNIxBhL0sJ7vMSIIaq6uebC0qJOToBCkc=
+X-Received: by 2002:a2e:b4c9:: with SMTP id r9mr44405931ljm.196.1564013531879; 
+ Wed, 24 Jul 2019 17:12:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 24 Jul 2019 23:22:35 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Sphinx and docs/index.rst: dead code?
+References: <1563950742-22592-1-git-send-email-chihmin.chao@sifive.com>
+In-Reply-To: <1563950742-22592-1-git-send-email-chihmin.chao@sifive.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 24 Jul 2019 17:08:37 -0700
+Message-ID: <CAKmqyKM2-60bn1v+bNsX6H+jZ-gTrsUwqah9yPtAn9VhZ2d1jw@mail.gmail.com>
+To: Chih-Min Chao <chihmin.chao@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH v3] tests/boot_linux_console: add a test
+ for riscv64 + virt
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,19 +87,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Does anything actually use this file? It doesn't appear to be used for
-generating the HTML manuals.
+On Tue, Jul 23, 2019 at 11:46 PM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
+>
+> Similar to the mips + malta test, it boots a Linux kernel on a virt
+> board and verify the serial is working.  Also, it relies on the serial
+> device set by the machine itself.
+>
+> If riscv64 is a target being built, "make check-acceptance" will
+> automatically include this test by the use of the "arch:riscv64" tags.
+>
+> Alternatively, this test can be run using:
+>
+>   $ avocado run -t arch:riscv64 tests/acceptance
+>
+> packages
+>   debian official
+>     binutils-riscv64-linux-gnu_2.32-8
+>     opensbi_0.4-1_all
+>     linux-image-5.0.0-trunk-riscv64 5.0.2-1~exp1
+>   third-party
+>     https://github.com/groeck/linux-build-test/rootfs/riscv64/rootfs.cpio.gz
+>     (the repo is also used in mips target acceptance)
+>
+> Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
+> ---
+>  .travis.yml                            |  2 +-
+>  tests/acceptance/boot_linux_console.py | 67 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 68 insertions(+), 1 deletion(-)
+>
+> diff --git a/.travis.yml b/.travis.yml
+> index caf0a1f..7ba9952 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -232,7 +232,7 @@ matrix:
+>
+>      # Acceptance (Functional) tests
+>      - env:
+> -        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
+> +        - CONFIG="--python=/usr/bin/python3 --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,riscv64-softmmu"
+>          - TEST_CMD="make check-acceptance"
+>        after_failure:
+>          - cat tests/results/latest/job.log
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+> index 3215950..b0569b9 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -354,3 +354,70 @@ class BootLinuxConsole(Test):
+>          self.vm.launch()
+>          console_pattern = 'Kernel command line: %s' % kernel_command_line
+>          self.wait_for_console_pattern(console_pattern)
+> +
+> +    def test_riscv64_virt(self):
+> +        """
+> +        :avocado: tags=arch:riscv64
+> +        :avocado: tags=machine:virt
+> +        """
+> +        deb_url = ('https://snapshot.debian.org/archive/debian/'
+> +                         '20190424T171759Z/pool/main/b/binutils/'
+> +                         'binutils-riscv64-linux-gnu_2.32-8_amd64.deb')
+> +        deb_hash = ('7fe376fd4452696c03acd508d6d613ca553ea15e')
+> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
+> +        objcopy_path = '/usr/bin/riscv64-linux-gnu-objcopy'
+> +        objcopy_path = self.extract_from_deb(deb_path, objcopy_path)
+> +        libbfd_path = '/usr/lib/x86_64-linux-gnu/libbfd-2.32-riscv64.so'
+> +        libbfd_path = self.extract_from_deb(deb_path, libbfd_path)
+> +        process.run('ls -al %s' % (objcopy_path))
 
-It looks like we might use it for latex, man and texinfo output from
-sphinx judging by docs/conf.py, but I don't think we actually use sphinx
-to generate such output, so I think this is all dead code.
+Why do we need objcopy? Won't this not work on non x86 architectures?
 
-Am I mistaken?
+> +
+> +        deb_url = ('https://snapshot.debian.org/archive/debian/'
+> +                   '20190708T032337Z/pool/main/o/opensbi/'
+> +                   'opensbi_0.4-1_all.deb')
+> +        deb_hash = ('2319dcd702958291d323acf5649fd98a11d90112')
+> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
+> +        opensbi_path = ('/usr/lib/riscv64-linux-gnu/opensbi/'
+> +                        'qemu/virt/fw_jump.elf')
+> +        opensbi_path = self.extract_from_deb(deb_path, opensbi_path)
+> +
+> +        deb_url = ('https://snapshot.debian.org/archive/debian-ports/'
+> +                   '20190319T205124Z/pool-riscv64/main/l/linux/'
+> +                   'linux-image-5.0.0-trunk-riscv64_5.0.2-1~exp1_riscv64.deb')
+> +        deb_hash = ('90155ed4b36673cbf7746a37cf3159c8f0b2857a')
+> +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
+> +        kernel_path = '/boot/vmlinux-5.0.0-trunk-riscv64'
 
---js
+I thought we were swapping to using an Image file?
+
+Alistair
+
+> +        kernel_path = self.extract_from_deb(deb_path, kernel_path)
+> +        kimage_path = self.workdir + "/Image"
+> +        env = os.environ
+> +        env['LD_LIBRARY_PATH'] = ('%s:' % (os.path.dirname(libbfd_path)) +
+> +                                 env.get('LD_LIBRARY_PATH', ''))
+> +        process.run(('%s -O binary -O binary -R'
+> +                     '.note -R .note.gnu.build-id -R .comment -S %s %s') %
+> +                     (objcopy_path, kernel_path, kimage_path))
+> +
+> +        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
+> +                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
+> +                      'riscv64/rootfs.cpio.gz')
+> +        initrd_hash = 'f4867d263754961b6f626cdcdc0cb334c47e3b49'
+> +        initrd_path = self.fetch_asset(initrd_url, asset_hash=initrd_hash)
+> +
+> +        self.vm.set_machine('virt')
+> +        self.vm.set_console()
+> +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
+> +                               + 'console=ttyS0 noreboot')
+> +        self.vm.add_args('-bios', "none",
+> +                '-kernel', opensbi_path,
+> +                '-device', 'loader,file=%s,addr=0x80200000' % (kimage_path),
+> +                '-initrd', initrd_path,
+> +                '-append', kernel_command_line,
+> +                '-no-reboot')
+> +
+> +        self.vm.launch()
+> +        self.wait_for_console_pattern('Boot successful.')
+> +
+> +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
+> +                                               'isa')
+> +        self.exec_command_and_wait_for_pattern('uname -a',
+> +                                               'SMP Debian')
+> +        self.exec_command_and_wait_for_pattern('reboot',
+> +                                               'reboot: Restarting system')
+> --
+> 2.7.4
+>
+>
 
