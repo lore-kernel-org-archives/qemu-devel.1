@@ -2,62 +2,73 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-16.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BECA4C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D87BCC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:31:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9798621951
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:31:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9798621951
+	by mail.kernel.org (Postfix) with ESMTPS id B126D21951
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 15:31:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B126D21951
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqfi7-0001WO-RP
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:31:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48847)
+	id 1hqfib-0002nB-CY
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 11:31:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48928)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlevitsk@redhat.com>) id 1hqfho-0000Xe-3V
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:30:57 -0400
+ (envelope-from <mst@redhat.com>) id 1hqfiM-0002D2-4L
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:31:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hqfhn-0001dI-0x
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:30:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50792)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hqfhj-0001cA-Vk; Thu, 25 Jul 2019 11:30:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 498ED3082B4B;
- Thu, 25 Jul 2019 15:30:51 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D897979402;
- Thu, 25 Jul 2019 15:30:49 +0000 (UTC)
-Message-ID: <434009d7c271cdca755cd3db95a4977c9e09f12d.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Thu, 25 Jul 2019 18:30:48 +0300
-In-Reply-To: <20190724171239.8764-11-mreitz@redhat.com>
-References: <20190724171239.8764-1-mreitz@redhat.com>
- <20190724171239.8764-11-mreitz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 25 Jul 2019 15:30:51 +0000 (UTC)
+ (envelope-from <mst@redhat.com>) id 1hqfiL-0001nU-3V
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:31:30 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:37009)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqfiL-0001nE-0J
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 11:31:29 -0400
+Received: by mail-qk1-f193.google.com with SMTP id d15so36707276qkl.4
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 08:31:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=6upyMRWCI0QzgYSVTMkWu1ozaMI3bNy8E6N0+tk0Nsk=;
+ b=MmYqCa+MBiqceuUsxLPHv9vZWJdEpXQh/TerEPZOIgTetCKaCAnbZy78Rs82z2krH0
+ MraXl/OoZZptuwfceUnFkImBrvP20PUDVuOMV6PsA5BfQFY/lAvAVFLh5fGqiYocHwrX
+ BYo+AUXxkOaAsWg4r+nhD00FIpo15R0rKe5XdZiR0FqZUQ4v9r5/i9nRTjTqbJSlGM+c
+ 6VdpIvL5WI0YzQpijDF+o5ojYpMsD68QtmDupC+iJ5w8PxPobjDLmZrIEOawcoCztIWo
+ R/sYesqoRIc2zZTB8RysOEhDXocPeFsQU+y8eKKqHQbMBHqxMvRnENVibul0RV/XK7Qi
+ Sr4Q==
+X-Gm-Message-State: APjAAAX7jQXYXcSbeJCVt8+XGGDPR/8ttxZk7Il6fWbVb7DqTD55LHxQ
+ 8z68+0EP6lCivQR374rumNtxg6LtqWG5LQ==
+X-Google-Smtp-Source: APXvYqzVEQI6485Md32bBBZyKcIhXj2Nx6woPtpoGh4dDn625+WkBhQSSXZjAHnnUmyhWQTUpXMGqQ==
+X-Received: by 2002:a37:a603:: with SMTP id p3mr60883811qke.297.1564068688002; 
+ Thu, 25 Jul 2019 08:31:28 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ b202sm22413250qkg.83.2019.07.25.08.31.26
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 08:31:27 -0700 (PDT)
+Date: Thu, 25 Jul 2019 11:31:24 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190725153059.7313-1-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 10/11] iotests: Test convert -n to
- pre-filled image
+ [fuzzy]
+X-Received-From: 209.85.222.193
+Subject: [Qemu-devel] [PULL 00/12] virtio, pc: fixes, cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,69 +80,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-07-24 at 19:12 +0200, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/122     | 17 +++++++++++++++++
->  tests/qemu-iotests/122.out |  8 ++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-> index 85c3a8d047..059011ebb1 100755
-> --- a/tests/qemu-iotests/122
-> +++ b/tests/qemu-iotests/122
-> @@ -257,6 +257,23 @@ for min_sparse in 4k 8k; do
->      $QEMU_IMG map --output=json "$TEST_IMG".orig | _filter_qemu_img_map
->  done
->  
-> +
-> +echo
-> +echo '=== -n to a non-zero image ==='
-> +echo
-> +
-> +# Keep source zero
-> +_make_test_img 64M
-> +
-> +# Output is not zero, but has bdrv_has_zero_init() == 1
-> +TEST_IMG="$TEST_IMG".orig _make_test_img 64M
-> +$QEMU_IO -c "write -P 42 0 64k" "$TEST_IMG".orig | _filter_qemu_io
-> +
-> +# Convert with -n, which should not assume that the target is zeroed
-> +$QEMU_IMG convert -O $IMGFMT -n "$TEST_IMG" "$TEST_IMG".orig
-> +
-> +$QEMU_IMG compare "$TEST_IMG" "$TEST_IMG".orig
-> +
->  # success, all done
->  echo '*** done'
->  rm -f $seq.full
-> diff --git a/tests/qemu-iotests/122.out b/tests/qemu-iotests/122.out
-> index c576705284..849b6cc2ef 100644
-> --- a/tests/qemu-iotests/122.out
-> +++ b/tests/qemu-iotests/122.out
-> @@ -220,4 +220,12 @@ convert -c -S 8k
->  { "start": 9216, "length": 8192, "depth": 0, "zero": true, "data": false},
->  { "start": 17408, "length": 1024, "depth": 0, "zero": false, "data": true},
->  { "start": 18432, "length": 67090432, "depth": 0, "zero": true, "data": false}]
-> +
-> +=== -n to a non-zero image ===
-> +
-> +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-> +Formatting 'TEST_DIR/t.IMGFMT.orig', fmt=IMGFMT size=67108864
-> +wrote 65536/65536 bytes at offset 0
-> +64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> +Images are identical.
->  *** done
+The following changes since commit bf8b024372bf8abf5a9f40bfa65eeefad23ff988:
 
+  Update version for v4.1.0-rc2 release (2019-07-23 18:28:08 +0100)
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Best regards,
-	Maxim Levitsky
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+
+for you to fetch changes up to 1b47b37c33ec01ae1efc527f4c97f97f93723bc4:
+
+  virtio-balloon: free pbp more aggressively (2019-07-25 11:19:25 -0400)
+
+----------------------------------------------------------------
+virtio, pc: fixes, cleanups
+
+A bunch of fixes all over the place.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+David Hildenbrand (7):
+      virtio-balloon: Fix wrong sign extension of PFNs
+      virtio-balloon: Fix QEMU crashes on pagesize > BALLOON_PAGE_SIZE
+      virtio-balloon: Simplify deflate with pbp
+      virtio-balloon: Better names for offset variables in inflate/deflate code
+      virtio-balloon: Rework pbp tracking data
+      virtio-balloon: Use temporary PBP only
+      virtio-balloon: don't track subpages for the PBP
+
+Evgeny Yakovlev (2):
+      i386/acpi: fix gint overflow in crs_range_compare
+      i386/acpi: show PCI Express bus on pxb-pcie expanders
+
+Jan Kiszka (1):
+      ioapic: kvm: Skip route updates for masked pins
+
+Michael S. Tsirkin (1):
+      virtio-balloon: free pbp more aggressively
+
+Stefan Hajnoczi (1):
+      docs: clarify multiqueue vs multiple virtqueues
+
+ include/hw/virtio/virtio-balloon.h |   3 -
+ hw/i386/acpi-build.c               |  17 ++++--
+ hw/intc/ioapic.c                   |   8 ++-
+ hw/virtio/virtio-balloon.c         | 115 ++++++++++++++++++-------------------
+ docs/interop/vhost-user.rst        |  17 ++++++
+ 5 files changed, 90 insertions(+), 70 deletions(-)
 
 
