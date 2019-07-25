@@ -2,49 +2,54 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A90C76186
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B97C76186
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:47:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2743D21855
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:28:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2743D21855
+	by mail.kernel.org (Postfix) with ESMTPS id A9AC121901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 00:47:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9AC121901
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqRcm-000525-8I
-	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41474)
+	id 1hqRux-0000bM-OE
+	for qemu-devel@archiver.kernel.org; Wed, 24 Jul 2019 20:47:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44142)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hqRcX-0004NM-5X
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:28:34 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hqRum-00007o-C8
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:47:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hqRcW-0004hG-8j
- for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:28:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38992)
+ (envelope-from <jsnow@redhat.com>) id 1hqRul-0001mL-B5
+ for qemu-devel@nongnu.org; Wed, 24 Jul 2019 20:47:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49646)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hqRcU-0004gJ-5U; Wed, 24 Jul 2019 20:28:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1hqRuj-0001lh-3I; Wed, 24 Jul 2019 20:47:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3444F3082B44;
- Thu, 25 Jul 2019 00:28:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0DD7981DF0;
+ Thu, 25 Jul 2019 00:47:20 +0000 (UTC)
 Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7F2F560BEC;
- Thu, 25 Jul 2019 00:28:25 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190719131425.10835-1-philmd@redhat.com>
- <20190719131425.10835-7-philmd@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 236A21001DD7;
+ Thu, 25 Jul 2019 00:47:13 +0000 (UTC)
+To: Sam Eiderman <shmuel.eiderman@oracle.com>, Kevin Wolf <kwolf@redhat.com>, 
+ Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ philmd@redhat.com
+References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
+ <20190701074117.pkmzhon6v7nafq2p@sirius.home.kraxel.org>
+ <424BE97C-7EAF-4B28-B580-AC2B5261197C@oracle.com>
+ <EB5E5E3C-CCA1-4138-9623-89ECA7335F88@oracle.com>
+ <20190717194623.GF6471@localhost.localdomain>
+ <65B72D23-26BE-4C3B-B298-A6231D08BF6C@oracle.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +126,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <78c49015-d60a-04c2-4cd7-9bf265f980cb@redhat.com>
-Date: Wed, 24 Jul 2019 20:28:25 -0400
+Message-ID: <63344112-c84b-f239-3c34-ad3a613910f7@redhat.com>
+Date: Wed, 24 Jul 2019 20:47:12 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190719131425.10835-7-philmd@redhat.com>
+In-Reply-To: <65B72D23-26BE-4C3B-B298-A6231D08BF6C@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 25 Jul 2019 00:28:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Thu, 25 Jul 2019 00:47:20 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH-for-4.1? 6/7] vl: Rewrite a
- fall through comment
+Subject: Re: [Qemu-devel] [Qemu-block] [QEMU] [PATCH v5 0/8] Add Qemu to
+ SeaBIOS LCHS interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,57 +153,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Corey Minyard <minyard@acm.org>, qemu-block@nongnu.org,
- qemu-trivial@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-block@nongnu.org, Arbel Moshe <arbel.moshe@oracle.com>,
+ seabios@seabios.org, QEMU <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Kevin O'Connor <kevin@koconnor.net>,
+ Liran Alon <liran.alon@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 7/19/19 9:14 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> GCC9 is confused by this comment when building with CFLAG
-> -Wimplicit-fallthrough=3D2:
+On 7/19/19 6:10 AM, Sam Eiderman wrote:
+> Well, this patch introduces 3 command line parameters (=E2=80=9Clcyls=E2=
+=80=9D, =E2=80=9Clheads=E2=80=9D, =E2=80=9Clsecs=E2=80=9D)
+> to =E2=80=9Cscsi-hd=E2=80=9D =E2=80=9Cide-hd=E2=80=9D and =E2=80=9Cvirt=
+io-pci-blk=E2=80=9D so this somehow has something to do with
+> block.
 >=20
->   vl.c: In function =E2=80=98qemu_ref_timedate=E2=80=99:
->   vl.c:773:15: error: this statement may fall through [-Werror=3Dimplic=
-it-fallthrough=3D]
->     773 |         value -=3D rtc_realtime_clock_offset;
->         |         ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->   vl.c:775:5: note: here
->     775 |     case QEMU_CLOCK_VIRTUAL:
->         |     ^~~~
->   cc1: all warnings being treated as errors
+> This patch also adds fw_cfg interface to send these parameters to SeaBI=
+OS.
 >=20
-> Rewrite the comment using 'fall through' which is recognized by
-> GCC and static analyzers.
+> "scripts/get_maintainer.pl -f hw/nvram/fw_cfg.c=E2=80=9D gives
 >=20
-> Reported-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  vl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com> (supporter:Firmware c=
+onfigur...)
+> Laszlo Ersek <lersek@redhat.com> (reviewer:Firmware configur...)
+> Gerd Hoffmann <kraxel@redhat.com> (reviewer:Firmware configur=E2=80=A6)
 >=20
-> diff --git a/vl.c b/vl.c
-> index a5808f9a02..f5cf71e3b4 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -771,7 +771,7 @@ static time_t qemu_ref_timedate(QEMUClockType clock=
-)
->      switch (clock) {
->      case QEMU_CLOCK_REALTIME:
->          value -=3D rtc_realtime_clock_offset;
-> -        /* no break */
-> +        /* fall through */
->      case QEMU_CLOCK_VIRTUAL:
->          value +=3D rtc_ref_start_datetime;
->          break;
+> And this was already Reviewed-by Gerd.
+>=20
+> How should I proceed?
+>=20
+> Sam
 >=20
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+I feel like it would be up to Gerd as the general SeaBIOS point of contac=
+t?
+
+--js
 
