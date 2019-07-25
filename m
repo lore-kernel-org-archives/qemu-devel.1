@@ -2,87 +2,91 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD325C76191
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48EE7C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:39:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FA8D2238C
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:37:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BIIE0CQg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FA8D2238C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1F86C218F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 16:39:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F86C218F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqgkR-000618-AG
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 12:37:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48407)
+	id 1hqgm1-0008IF-Bx
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 12:39:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50659)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hqgk1-0004bv-S7
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:37:18 -0400
+ (envelope-from <eblake@redhat.com>) id 1hqglq-0007sc-Lj
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hqgk0-0007GX-Jm
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:37:17 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38907)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hqgk0-0007FA-Af
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:37:16 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s15so23961600wmj.3
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 09:37:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=vYIyeQ8tMXnaOwO0DQZAfFrr4L+yvHcwOrLW+5bk0zY=;
- b=BIIE0CQgSuzQhD5JHhS+DUvDX58ZBtNd/3IMydrGj9GMl5erOtSqeUQiDgup9G7f7H
- jZPsrsDgzOQsBRMSk0u64vW8VoEfiw44RoMj2h9u/sx1SPMTd9VRCoSvbHopi2OSyCOS
- 8ob7cBKA8ZlJe++dzY9xH8y3lMi8IY+74u2NAfrQWPiSiX6ewS3XzE8TW3uT9Xm5l8Ta
- e2oea7RgQHsYdJWuTDCCJJd6fHhlMWuHTtq8QOxk/0q+sIaSBBPenVsAVj/tk0aTdenj
- KixokBmtWXSFayPuuXM6cQfMlkHOjz0UgPvEq2zoVJtA6eNIPtFunUIoPTJioiZGb9mI
- wDcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=vYIyeQ8tMXnaOwO0DQZAfFrr4L+yvHcwOrLW+5bk0zY=;
- b=LejxTIXt0M2+u+GMd5TNZ8F7KLEZP4I5LS7x032E+LH0w42k9hRqZ3Nq0EMYL/8y0K
- 64bhbkiWCtWOg2ffeg3jo6g+/53v65xrxv2hI3g7eEqY4bgSLMXWTf+lA0bqA8R+E+4x
- Jdztm26LOeMpxJC7AxWaWTGS07mcaaubaboG6u4wEkAXWWbeKMmidEOQOUX5qjC5LmNU
- mJepdkflXd2Tm2WQEvn0m9NxSYnto1aA1CmnPXYsYzu6799d2pV1jhBC9GsDFe4wtsy6
- FcZE7jlbyZP+gRvGTd/Wzr0279UFuggT/6MfBicMd4D6BWhu8/KB6UuBNixalV8bBAOv
- wd9Q==
-X-Gm-Message-State: APjAAAX8JSEPP+pANMa1g4L9PDiV4MPi0sTbpB9rVRakgspAkXuLwl3Q
- loC1wvwjjwi8TXb0kd4650eHdQ==
-X-Google-Smtp-Source: APXvYqzl/s5DNtM4udnBAIIshRg4xUpgXXVcC5QkqsUdPjJyVN7fJkdQr6bM0BPzooQoccCCx9nDfQ==
-X-Received: by 2002:a1c:35c2:: with SMTP id c185mr79395234wma.58.1564072635360; 
- Thu, 25 Jul 2019 09:37:15 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id c7sm44125140wro.70.2019.07.25.09.37.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 25 Jul 2019 09:37:14 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Date: Thu, 25 Jul 2019 17:37:10 +0100
-Message-Id: <20190725163710.11703-3-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190725163710.11703-1-peter.maydell@linaro.org>
-References: <20190725163710.11703-1-peter.maydell@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1hqgli-0000j5-OL
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:39:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50048)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hqglh-0000gb-US
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 12:39:02 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 101C73086272;
+ Thu, 25 Jul 2019 16:39:00 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7356A5DE80;
+ Thu, 25 Jul 2019 16:38:57 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20190725094937.32454-1-vsementsov@virtuozzo.com>
+ <877e86gmof.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <5579a1f8-2518-0cd3-3b0c-47cb4adcee73@redhat.com>
+Date: Thu, 25 Jul 2019 11:38:56 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
- VMSTATE_STRUCT_VARRAY macros
+In-Reply-To: <877e86gmof.fsf@dusky.pond.sub.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="3TNhHZbXg9pEmW7NAQL5wy60aPBJsoXj3"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 25 Jul 2019 16:39:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4] qapi: Add InetSocketAddress member
+ keep-alive
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,126 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: den@openvz.org, berrange@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The VMSTATE_STRUCT_VARRAY_UINT32 macro is intended to handle
-migrating a field which is an array of structs, but where instead of
-migrating the entire array we only migrate a variable number of
-elements of it.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3TNhHZbXg9pEmW7NAQL5wy60aPBJsoXj3
+Content-Type: multipart/mixed; boundary="YwzMwqe5b1sIGLGwEIda1d7Ammm72Sohl";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: den@openvz.org, berrange@redhat.com, qemu-devel@nongnu.org,
+ kraxel@redhat.com
+Message-ID: <5579a1f8-2518-0cd3-3b0c-47cb4adcee73@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] qapi: Add InetSocketAddress member
+ keep-alive
+References: <20190725094937.32454-1-vsementsov@virtuozzo.com>
+ <877e86gmof.fsf@dusky.pond.sub.org>
+In-Reply-To: <877e86gmof.fsf@dusky.pond.sub.org>
 
-The VMSTATE_STRUCT_VARRAY_POINTER_UINT32 macro is intended to handle
-migrating a field which is of pointer type, and points to a
-dynamically allocated array of structs of variable size.
+--YwzMwqe5b1sIGLGwEIda1d7Ammm72Sohl
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-We weren't actually checking that the field passed to
-VMSTATE_STRUCT_VARRAY_UINT32 really is an array, with the result that
-accidentally using it where the _POINTER_ macro was intended would
-compile but silently corrupt memory on migration.
+On 7/25/19 10:26 AM, Markus Armbruster wrote:
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>=20
+>> It's needed to provide keepalive for nbd client to track server
+>> availability.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
 
-Add type-checking that enforces that the field passed in is
-really of the right array type. This applies to all the VMSTATE
-macros which use flags including VMS_VARRAY_* but not VMS_POINTER.
+>=20
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/migration/vmstate.h | 27 +++++++++++++++++++++------
- 1 file changed, 21 insertions(+), 6 deletions(-)
+It looks like this could go in any number of ways (Markus since it
+touches qapi, Dan since it touches sockets, or me since it was written
+for use with NBD); but unless anyone complains, I'm happy to queue this
+through my NBD tree for 4.2.
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index ca68584eba4..2df333c3612 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -227,8 +227,19 @@ extern const VMStateInfo vmstate_info_bitmap;
- extern const VMStateInfo vmstate_info_qtailq;
- 
- #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
-+/* Check that t2 is an array of t1 of size n */
- #define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
- #define type_check_pointer(t1,t2) ((t1**)0 - (t2*)0)
-+/*
-+ * type of element 0 of the specified (array) field of the type.
-+ * Note that if the field is a pointer then this will return the
-+ * pointed-to type rather than complaining.
-+ */
-+#define typeof_elt_of_field(type, field) typeof(((type *)0)->field[0])
-+/* Check that field f in struct type t2 is an array of t1, of any size */
-+#define type_check_varray(t1, t2, f)                                 \
-+    (type_check(t1, typeof_elt_of_field(t2, f))                      \
-+     + QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(((t2 *)0)->f)))
- 
- #define vmstate_offset_value(_state, _field, _type)                  \
-     (offsetof(_state, _field) +                                      \
-@@ -253,6 +264,10 @@ extern const VMStateInfo vmstate_info_qtailq;
-     vmstate_offset_array(_state, _field, uint8_t,                    \
-                          sizeof(typeof_field(_state, _field)))
- 
-+#define vmstate_offset_varray(_state, _field, _type)                 \
-+    (offsetof(_state, _field) +                                      \
-+     type_check_varray(_type, _state, _field))
-+
- /* In the macros below, if there is a _version, that means the macro's
-  * field will be processed only if the version being received is >=
-  * the _version specified.  In general, if you add a new field, you
-@@ -347,7 +362,7 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .info       = &(_info),                                          \
-     .size       = sizeof(_type),                                     \
-     .flags      = VMS_VARRAY_UINT32|VMS_MULTIPLY_ELEMENTS,           \
--    .offset     = offsetof(_state, _field),                          \
-+    .offset     = vmstate_offset_varray(_state, _field, _type),      \
- }
- 
- #define VMSTATE_ARRAY_TEST(_field, _state, _num, _test, _info, _type) {\
-@@ -376,7 +391,7 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .info       = &(_info),                                          \
-     .size       = sizeof(_type),                                     \
-     .flags      = VMS_VARRAY_INT32,                                  \
--    .offset     = offsetof(_state, _field),                          \
-+    .offset     = vmstate_offset_varray(_state, _field, _type),      \
- }
- 
- #define VMSTATE_VARRAY_INT32(_field, _state, _field_num, _version, _info, _type) {\
-@@ -416,7 +431,7 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .info       = &(_info),                                          \
-     .size       = sizeof(_type),                                     \
-     .flags      = VMS_VARRAY_UINT16,                                 \
--    .offset     = offsetof(_state, _field),                          \
-+    .offset     = vmstate_offset_varray(_state, _field, _type),      \
- }
- 
- #define VMSTATE_VSTRUCT_TEST(_field, _state, _test, _version, _vmsd, _type, _struct_version) { \
-@@ -520,7 +535,7 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .vmsd       = &(_vmsd),                                          \
-     .size       = sizeof(_type),                                     \
-     .flags      = VMS_STRUCT|VMS_VARRAY_UINT8,                       \
--    .offset     = offsetof(_state, _field),                          \
-+    .offset     = vmstate_offset_varray(_state, _field, _type),      \
- }
- 
- /* a variable length array (i.e. _type *_field) but we know the
-@@ -573,7 +588,7 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .vmsd       = &(_vmsd),                                          \
-     .size       = sizeof(_type),                                     \
-     .flags      = VMS_STRUCT|VMS_VARRAY_INT32,                       \
--    .offset     = offsetof(_state, _field),                          \
-+    .offset     = vmstate_offset_varray(_state, _field, _type),      \
- }
- 
- #define VMSTATE_STRUCT_VARRAY_UINT32(_field, _state, _field_num, _version, _vmsd, _type) { \
-@@ -583,7 +598,7 @@ extern const VMStateInfo vmstate_info_qtailq;
-     .vmsd       = &(_vmsd),                                          \
-     .size       = sizeof(_type),                                     \
-     .flags      = VMS_STRUCT|VMS_VARRAY_UINT32,                      \
--    .offset     = offsetof(_state, _field),                          \
-+    .offset     = vmstate_offset_varray(_state, _field, _type),      \
- }
- 
- #define VMSTATE_STRUCT_VARRAY_ALLOC(_field, _state, _field_num, _version, _vmsd, _type) {\
--- 
-2.20.1
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
+
+--YwzMwqe5b1sIGLGwEIda1d7Ammm72Sohl--
+
+--3TNhHZbXg9pEmW7NAQL5wy60aPBJsoXj3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl052yAACgkQp6FrSiUn
+Q2r+SwgAm4t5m+oiww7+54XGeZsmSjW/HYLZxTk9x7lVLHJTbK0AxWbLuOhWFW6F
+laOt0oh2EhiO5g7Wx+fV8pSqQUiEMZ/bgFSkR6sYLM+27U6pjQrUxlDdAfDx9ssL
+Iz/U1UjQz0R9x/Z+hbutOCqy3MbscZC8BuH5s2sKb4CVtcA28u89gcdzzV7P2jhe
+Bx86cC6AwpiYan5qq0tXuqEC3mqFQ+ZI5zwVgTddCF2wdxFLbo74j4Zoll6yl8Xp
+17m7VsazHnboGI64HGQx49s4r7qMuMCrKwcQAjkX6ex5NhyLsdZtgcvmFu78WVdG
+8R0Vh/F68EyxzPB99brKxjmnDwcQPQ==
+=hAo1
+-----END PGP SIGNATURE-----
+
+--3TNhHZbXg9pEmW7NAQL5wy60aPBJsoXj3--
 
