@@ -6,111 +6,76 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E92BC7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF672C76194
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:38:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D92002080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:36:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D92002080C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 9B66F2190F
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 09:38:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B66F2190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqaAj-0000Im-4F
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:36:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40034)
+	id 1hqaCp-0001dQ-RJ
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 05:38:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40510)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hqaAY-0008JF-TR
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:36:15 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqaCf-0001Dp-JY
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hqaAY-0006ng-0N
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:36:14 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:59395)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hqaAX-0006nK-OG
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:36:13 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MjSwu-1iFRJe0VXm-00l05K; Thu, 25 Jul 2019 11:35:56 +0200
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-References: <1563977563-29715-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1563977563-29715-3-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <pbonzini@redhat.com>) id 1hqaCe-000888-ID
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:38:25 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40026)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqaCe-00087o-9G
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 05:38:24 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so44125294wmj.5
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 02:38:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+eqFSeGd2jTWRbokRoEiK0+Mi+6wvB97fgIZw56Ufv0=;
+ b=WLpHHWSqsMig0agOVwioJy6LZ7u7tAxexJLoT8TUVUpXKtSfMqdObfkWhtQs6gcVWe
+ AarImMvHfHcLtdT3gp/vpauvr+EAAomwNXHuPVOmZSuzdYlOVu5hrntmxM7r7pbHxygx
+ MZYCpLLM0PckN4xwRu62WDNsEWBC/uz0oDG3I8X8IwkX+mq2nAFwLS1QDrl3uxUqjX63
+ FtRKFcwstp0wgDGbiAyhPZiW1/gwntkPtDaDx/u436awUwkMI3txtIJzeX8i7KzXwJJy
+ saHu/F+4EU9M/4YdGMm9kJmUWypHzXkwxbcTUjv+bWlCfDXt/+9Fj4mWR9O0ruRTPGkL
+ f0Hw==
+X-Gm-Message-State: APjAAAUJrVfG8zyqat4jdYyR0VbhPn7x+y7TuJzMQ0OFqfzYoISSMnSe
+ ePs//M4g7D6P79BcZEHinhxOmQ==
+X-Google-Smtp-Source: APXvYqyLu6BW425E+75t4y5vSCU+Dmyv6ZsyYzbfBqsFMDKnaxNke5bm4mY1Sxouw9JSoZ8FD6XvNg==
+X-Received: by 2002:a1c:c188:: with SMTP id r130mr74693871wmf.73.1564047503175; 
+ Thu, 25 Jul 2019 02:38:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
+ ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ by smtp.gmail.com with ESMTPSA id f12sm53517926wrg.5.2019.07.25.02.38.22
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 25 Jul 2019 02:38:22 -0700 (PDT)
+To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190725032321.12721-1-alxndr@bu.edu>
+ <20190725032321.12721-11-alxndr@bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <90d8fed2-6747-ec62-6b49-2dd9321c55f4@vivier.eu>
-Date: Thu, 25 Jul 2019 11:35:55 +0200
+Message-ID: <fad9d12a-39df-e2fa-064b-5132add9daff@redhat.com>
+Date: Thu, 25 Jul 2019 11:38:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1563977563-29715-3-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <20190725032321.12721-11-alxndr@bu.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:h6VOWch/5qtWK4tewa4+bDyRYQspgH/ul6pToqZrbcDhUQAgDwW
- XB5vTfVoHnsAghIyekBskOTzJj3xAjM8RvP1+Vt9q9/RtCm8zaijjFWi/5R/BQgVTZCh2yD
- XeqkhPzQNGZS82YkN7UXYD4IVySltfpjlIo9TkBRj1wzRv6NFTmZmwgxKF5Wv9+T0zOcAHH
- 0eDYPF8fr4pQJUAwCOJdg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8Q2Zuo7stVU=:BJycY3KQAJI4H0A6wT7q+a
- uDryOdJmZwupO0roJ4gA15MK36FwEgIsEDOcIwEeq1hw1dD8FCFxf6Aftb/uqlW+no6zXEEBe
- v8bAmGiNAxBcxcQkTZLLbyFe5PE38qPwQkT5V+aCNh83F70ealA/NSG1wagkDMaNaTPqZ6Yf7
- shR1+j41W2aHjUUGJpvglUA+nqIK7JaS9ZtgDNfcYKO73zpOdA9kxdCXZIkWU0SYVR2Cq7LkQ
- arOYfuMtxUmetMIF6C382F+apFr9JoSbnI4t+VO1u7ju+Kq5FcT9YD/QkDz2KvBFCByvk6xOh
- W/5HYfoLfcKgYL3FmmFag/4BiUxg7cHOucV6NJzt1azU8cFDba76zaSjcmqY77n1cC+hQOhGt
- I6sOMud2seCEilBaDdiV6GoFKaRz8HDDzgpvA79da1Lz9ErfRdS2HAomIi28IJjA2b9bTtHnw
- fmyUrbFNwoAd4MDyx3AwnfQiNVcWJSIs0e/PVkVD1Iol1xk3s4Sw0vCUXu7+b/XbJ273hcGFo
- dJbCFaZC4dvIB8cn4Q4UCN2TWvJVTEV1+mXCAXSAa8iF2TCsSo7x1HjEeOCJzlOoJzcxGGIac
- 7nHeJnJwAwLPLcSzg+Tu0dreVl6tc4rMl+KYrcnVUCJORlz5UZa5yvrjZTdBegjcT1jKG6n/Y
- oLtBqP6NypZ2vbU66LEcof+vU3ULqss4aIWQ14kj/EAQsLACDuWrI3DhxE+8I0lIXoIsq0G93
- OOJx8EsZo5ym5aDxsiwib1/RRXvtqNLI+RXO3my+E7uGrT1mCMfCRBVW0P4=
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
-Subject: Re: [Qemu-devel] [PATCH for 4.2 2/3] linux-user: Add support for
- FDMSGON and FDMSGOFF ioctls
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [RFC 10/19] fuzz: expose real_main (aka regular
+ vl.c:main)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,50 +87,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: amarkovic@wavecomp.com
+Cc: "bsd@redhat.com" <bsd@redhat.com>,
+ "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 24/07/2019 à 16:12, Aleksandar Markovic a écrit :
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+On 25/07/19 05:23, Oleinik, Alexander wrote:
+> Export normal qemu-system main so it can be called from tests/fuzz/fuzz.c
 > 
-> FDMSGON and FDMSGOFF switch informational messages of floppy drives
-> on and off.
-> 
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 > ---
->  linux-user/ioctls.h       | 2 ++
->  linux-user/syscall_defs.h | 2 ++
->  2 files changed, 4 insertions(+)
+>  include/sysemu/sysemu.h |  4 ++++
+>  vl.c                    | 21 ++++++++++++++++++++-
+>  2 files changed, 24 insertions(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-> index 3ade2d2..7fac4fc 100644
-> --- a/linux-user/ioctls.h
-> +++ b/linux-user/ioctls.h
-> @@ -112,6 +112,8 @@
->       IOCTL(BLKZEROOUT, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 2)))
->  #endif
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 984c439ac9..1bb8cf184c 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -184,6 +184,10 @@ QemuOpts *qemu_get_machine_opts(void);
 >  
-> +     IOCTL(FDMSGON, 0, TYPE_NULL)
-> +     IOCTL(FDMSGOFF, 0, TYPE_NULL)
->       IOCTL(FDFLUSH, 0, TYPE_NULL)
+>  bool defaults_enabled(void);
 >  
->  #ifdef FIBMAP
-> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-> index 7e22ed7..61c2f3c 100644
-> --- a/linux-user/syscall_defs.h
-> +++ b/linux-user/syscall_defs.h
-> @@ -859,6 +859,8 @@ struct target_pollfd {
+> +#ifdef CONFIG_FUZZ
+> +int real_main(int argc, char **argv, char **envp);
+> +#endif
+> +
+>  extern QemuOptsList qemu_legacy_drive_opts;
+>  extern QemuOptsList qemu_common_drive_opts;
+>  extern QemuOptsList qemu_drive_opts;
+> diff --git a/vl.c b/vl.c
+> index b426b32134..b71b99b6f8 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -130,6 +130,10 @@ int main(int argc, char **argv)
+>  #include "sysemu/iothread.h"
+>  #include "qemu/guest-random.h"
 >  
->  /* From <linux/fd.h> */
+> +#ifdef CONFIG_FUZZ
+> +#include "tests/libqtest.h"
+> +#endif
+> +
+>  #define MAX_VIRTIO_CONSOLES 1
 >  
-> +#define TARGET_FDMSGON     TARGET_IO(2, 0x45)
-> +#define TARGET_FDMSGOFF    TARGET_IO(2, 0x46)
->  #define TARGET_FDFLUSH     TARGET_IO(2, 0x4b)
+>  static const char *data_dir[16];
+> @@ -2853,8 +2857,11 @@ static void user_register_global_props(void)
+>      qemu_opts_foreach(qemu_find_opts("global"),
+>                        global_init_func, NULL, NULL);
+>  }
+> -
+> +#ifdef CONFIG_FUZZ
+> +int real_main(int argc, char **argv, char **envp)
+> +#else
+>  int main(int argc, char **argv, char **envp)
+> +#endif
+>  {
+>      int i;
+>      int snapshot, linux_boot;
+> @@ -2903,7 +2910,9 @@ int main(int argc, char **argv, char **envp)
+>      atexit(qemu_run_exit_notifiers);
+>      qemu_init_exec_dir(argv[0]);
 >  
->  #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+> +#ifndef CONFIG_FUZZ // QOM is already set up by the fuzzer.
+>      module_call_init(MODULE_INIT_QOM);
+> +#endif
+
+You can modify module_call_init to record the modules that have been
+initialized, and skip the call (i.e. make it idempotent).
+
+>      qemu_add_opts(&qemu_drive_opts);
+>      qemu_add_drive_opts(&qemu_legacy_drive_opts);
+> @@ -4196,9 +4205,11 @@ int main(int argc, char **argv, char **envp)
+>       */
+>      migration_object_init();
+>  
+> +#ifndef CONFIG_FUZZ // Already set up by the fuzzer
+>      if (qtest_chrdev) {
+>          qtest_init(qtest_chrdev, qtest_log, &error_fatal);
+>      }
+> +#endif
+
+Here, I suspect the fuzzing target would have qtest_chrdev == NULL,
+therefore you can assert that qtest_init is only called once.  For
+example, add an
+
+    assert(!test_log_fp)
+
+in the function.
+
+>      machine_opts = qemu_get_machine_opts();
+>      kernel_filename = qemu_opt_get(machine_opts, "kernel");
+> @@ -4470,6 +4481,14 @@ int main(int argc, char **argv, char **envp)
+>      accel_setup_post(current_machine);
+>      os_setup_post();
+>  
+> +/*
+> + * Return to the fuzzer since it will run qtest programs and run the
+> + * main_loop
+> +*/
+> +#ifdef CONFIG_FUZZ
+> +    return 0;
+> +#endif
+
+Just place everything up to this point into a new function qemu_init();
+for CONFIG_FUZZ that's what you call from LLVMFuzzerInitialize, while
+for !CONFIG_FUZZ you can call it from main().  All the functions below
+have no arguments, so the patch is trivial.
+
+Paolo
+
+>      main_loop();
+>  
+>      gdbserver_cleanup();
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
