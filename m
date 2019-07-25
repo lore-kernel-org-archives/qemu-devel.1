@@ -2,89 +2,91 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2E0C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD03C7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14C2A217F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:04:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2780921901
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 14:08:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e4IfEept"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14C2A217F4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xaQ4UYIL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2780921901
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqeMM-0004dP-9m
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57518)
+	id 1hqePp-00066x-9d
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 10:08:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58283)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hqeMC-0004E3-Bx
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:04:33 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hqePf-0005em-8e
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hqeMB-0001Vf-Ai
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:04:32 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46611)
+ (envelope-from <alex.bennee@linaro.org>) id 1hqePe-0005YL-1C
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:08:07 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45906)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hqeMB-0001Uw-4D
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:04:31 -0400
-Received: by mail-ot1-x341.google.com with SMTP id z23so23403850ote.13
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 07:04:31 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hqePd-0005Vg-QY
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 10:08:05 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f9so50907290wre.12
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 07:08:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=exWLwmzWzTgwuOT1U/bctrzD7f3MX89ZgJpXpNn5CO8=;
- b=e4IfEeptM/k3r0PLW6hPmXL4W0WIUME2SXVNAM2d6u2vlFXUKYsQMPnSy8nscxWYf8
- JXP4+1//ixdbnkr87rSLGSGpbsmgzclRhxJrEcCc1u+UjfbTK5+KPQ1V2iib0fBmANMV
- X6VzN1asPSRbzBg9Z647M2c8jU4TaXEFN3LBr8O0Sx+fSDNaVKWUVsvSa8CWee4pCMyn
- HjyIzN+uFgG+C4XbKF2Dd51XoLQ3VDGy+pflvafnjRtV43Ba/pvUB4NKxAbO8ATTrCMZ
- MLHvZACA/EQbptSb5oEGDtDBPTSIHRQZ6UQY1+hSNpoLozD5Hkbm9y/inm5MCUQKgw7f
- NW5g==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=fdON3riPBaP6kngTdwpBKLAeePGqC08Kz2KbBcaqzlo=;
+ b=xaQ4UYIL4H21BUw7s/9sriwpS4Q5tmP5AvQC5ti/hV9B4FFFH7tiLU0iwcQ9alUGaN
+ jF5Jc9Zbyd3vKHOKit1jD7W7ZVe6aR7hRnwJXaCR9dAowc7303qah3Ckude2IuWflMin
+ ZngvT3XH6ItagW95h+BueK+GcXCNL98Uvhd1KALLVkOKyBDGtB6SLSkcO9uSAN0kR9uR
+ U+otS1tjxm677ERMJLutOeNMnlqL+JLCMhujf5pFwDwxt4zgsK2fX5z9zmWb0h/X2Aiz
+ /6axBQRSSNLB51YdeGTXen3gzxvQkINRjrIMLPFR6jifWLAcAtjg4g3ynA1vq5vaPJBB
+ kCmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=exWLwmzWzTgwuOT1U/bctrzD7f3MX89ZgJpXpNn5CO8=;
- b=bzGTDrYRhN2Zg02TGWABg8j0pO7oeAjquo7JIBXa+6KkQB897C6+Ft/yefhW7K9Yfz
- pdAbflNAtrjjDdCS9gfxTJmzVFzpP9gLhDWt70WRrYPXIpiYVtrMJV2yP7+9crWMpa9G
- AjZN5fcQVtfYY1Yl3DOher7T1ZXQzm/AALBA9z6gE+ruzLj6TuOkPmeycN/LhLd7mq9P
- 6ecLLxXfWi8efHSsH1VeZ+cg4IDxEvGOseD67CfrhiqGiZ5gATlEbf6kWZjcIJjtCIfI
- mRRLSQoT0xlmSLwFrCHnMDz9clhmaTPFZ0NV/eaRTHeRCGk94IbEDvRx5HPe90doMNj3
- Q5SA==
-X-Gm-Message-State: APjAAAXwFrINO0muEGXNTajuh2QZwUkegtGLyFzo36tn6tWhAwSwTknj
- KSnt0xnAVcIUNfUHB/paVXJ1ZVt6pzm2zkYXiCeHZA==
-X-Google-Smtp-Source: APXvYqyFu62bspEZsaGgdhWXsKzUO63VZbNzXq1FzAenetYWarnom4linSwVDoq3EUtTHoXWHno7vs8S7pQa3hrD4HY=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr61609827otj.97.1564063470068; 
- Thu, 25 Jul 2019 07:04:30 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=fdON3riPBaP6kngTdwpBKLAeePGqC08Kz2KbBcaqzlo=;
+ b=GTswhKAwfv8Z374sxltthfpV7HKSuWCJpDz31+bq03sQzFcdRJOVhuBi8m3s3U+RzD
+ 7FDk9tsFXRSZs5I7ZdmH4g3Xm9j7Fl/3GHiwSwaY/jdk+bR0JtIISmwsV7zZzI/jJC/m
+ geIUF9Mg5UmU8iYv2i8bKtYYdnRRLNtu3dBAOqybqOPR2QYZOgz9g08/knNgXZ9ip6HO
+ 45Wp9hmaeca+AE4wwnZBLBPnE6D1OFEUsb6ymBbIxXQOk5aCvHPyftwJEKi2jYemW0Ut
+ NalZIi1Cj5rIL/kz0iY3lcGA0/5tGhdeGMrxm1Jc2VGT4TVnuPwljZa/CvI6z6ZtRSeU
+ ilCw==
+X-Gm-Message-State: APjAAAU32U0XeHA5gD/YJvMZKFIRERQIjP/DkrIw98So8/9musOhf29q
+ 6YEVGj8pz6RZ1ywU0HDr1VXY0g==
+X-Google-Smtp-Source: APXvYqwPR+dDHsMDsaLkvE8fmCsA++Xumz6bWuEaUqBZnAibU/jtT4A15BLRa6CzD0g+9azEGjoh3A==
+X-Received: by 2002:adf:c613:: with SMTP id n19mr38445010wrg.109.1564063684360; 
+ Thu, 25 Jul 2019 07:08:04 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id o24sm55704287wmh.2.2019.07.25.07.08.03
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 07:08:03 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 729101FF87;
+ Thu, 25 Jul 2019 15:08:03 +0100 (BST)
+References: <20190719210326.15466-1-richard.henderson@linaro.org>
+ <20190719210326.15466-15-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190719210326.15466-15-richard.henderson@linaro.org>
+Date: Thu, 25 Jul 2019 15:08:03 +0100
+Message-ID: <87y30myzp8.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20190702121106.28374-1-slp@redhat.com>
- <CAFEAcA-k76t9_TJnYSF_kocgba9dYMyf=Q6OBY2VVuhiWsbqrw@mail.gmail.com>
- <87a7dwnxwj.fsf@redhat.com>
- <CAFEAcA_XfRS1b-4ANmR5WLL=19Md6Dp7+M_FAK8pQAJn2MaCOA@mail.gmail.com>
- <20190702220400.GA13923@localhost>
- <20190725055908-mutt-send-email-mst@kernel.org>
- <CAFEAcA-uDtTFOyTwMY5KtWeqvirxDejQdvnx5OCZ8pyUhKhE+w@mail.gmail.com>
- <87pnlymm47.fsf@redhat.com> <d48da49f-c8d8-00f7-1634-569e8d924b8a@redhat.com>
- <CAJSP0QUJCh-SaZ9NQ+Wr8vr7R+gBsfhYmBrx45B4z2G9v9L=1A@mail.gmail.com>
- <20190725080556-mutt-send-email-mst@kernel.org>
- <CAJSP0QVvnXV8Ha0yaO84qLL6unVroV5GqcuL-x9ruB7o_24WBA@mail.gmail.com>
- <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
-In-Reply-To: <ddc31318-dc52-b9f2-5a9d-bd1fc650df5b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 25 Jul 2019 15:04:19 +0100
-Message-ID: <CAFEAcA-zBb0mXX1JLoWxz46JDAZFySUZpdONo5uw=KLgJqJ94w@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH for-4.2 14/24] target/arm: Simplify
+ tlb_force_broadcast alternatives
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,47 +98,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Maran Wilson <maran.wilson@oracle.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, beata.michalska@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 25 Jul 2019 at 14:43, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> To me *maintainability is the biggest consideration* when introducing a
-> new feature.  "We can do just as well with q35" is a good reason to
-> deprecate and delete microvm, but not a good reason to reject it now as
-> long as microvm is good enough in terms of maintainability.
 
-I think maintainability matters, but also important is "are
-we going in the right direction in the first place?".
-virtio-mmio is (variously deliberately and accidentally)
-quite a long way behind virtio-pci, and certain kinds of things
-(hotplug, extensibility beyond a certain number of endpoints)
-are not going to be possible (either ever, or without a lot
-of extra design and implementation work to reimplement stuff
-we have already today with PCI). Are we sure we're not going
-to end up with a stream of "oh, now we need to implement X for
-virtio-mmio (that virtio-pci already has)", "users want Y now
-(that virtio-pci already has)", etc?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-The other thing is that once we've introduced something we're
-stuck with whatever it does, because we don't like breaking
-backwards compatibility. So I think getting the virtio-legacy
-vs virtio-1 story sorted out before we land microvm is
-important, at least to the point where we know we haven't
-backed ourselves into a corner or required a lot of extra
-effort on transitional-device support that we could have
-avoided.
+> Rather than call to a separate function and re-compute any
+> parameters for the flush, simply use the correct flush
+> function directly.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 52 +++++++++++++++++++++------------------------
+>  1 file changed, 24 insertions(+), 28 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 7adbf51479..2b95fc763f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -626,56 +626,54 @@ static void tlbiall_write(CPUARMState *env, const A=
+RMCPRegInfo *ri,
+>                            uint64_t value)
+>  {
+>      /* Invalidate all (TLBIALL) */
+> -    ARMCPU *cpu =3D env_archcpu(env);
+> +    CPUState *cs =3D env_cpu(env);
+>
+>      if (tlb_force_broadcast(env)) {
+> -        tlbiall_is_write(env, NULL, value);
+> -        return;
+> +        tlb_flush_all_cpus_synced(cs);
+> +    } else {
+> +        tlb_flush(cs);
+>      }
+> -
+> -    tlb_flush(CPU(cpu));
+>  }
+>
+>  static void tlbimva_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                            uint64_t value)
+>  {
+>      /* Invalidate single TLB entry by MVA and ASID (TLBIMVA) */
+> -    ARMCPU *cpu =3D env_archcpu(env);
+> +    CPUState *cs =3D env_cpu(env);
+>
+> +    value &=3D TARGET_PAGE_MASK;
 
-Which isn't to say that I'm against the microvm approach;
-just that I'd like us to consider and make a decision on
-these issues before landing it, rather than just saying
-"the patches in themselves look good, let's merge it".
+I'm fairly sure this is superfluous (we certainly mask pages in the
+cputlb code, don't know if we do at the translation end).
 
-thanks
--- PMM
+>      if (tlb_force_broadcast(env)) {
+> -        tlbimva_is_write(env, NULL, value);
+> -        return;
+> +        tlb_flush_page_all_cpus_synced(cs, value);
+> +    } else {
+> +        tlb_flush_page(cs, value);
+>      }
+> -
+> -    tlb_flush_page(CPU(cpu), value & TARGET_PAGE_MASK);
+>  }
+>
+>  static void tlbiasid_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                             uint64_t value)
+>  {
+>      /* Invalidate by ASID (TLBIASID) */
+> -    ARMCPU *cpu =3D env_archcpu(env);
+> +    CPUState *cs =3D env_cpu(env);
+>
+>      if (tlb_force_broadcast(env)) {
+> -        tlbiasid_is_write(env, NULL, value);
+> -        return;
+> +        tlb_flush_all_cpus_synced(cs);
+> +    } else {
+> +        tlb_flush(cs);
+>      }
+> -
+> -    tlb_flush(CPU(cpu));
+>  }
+>
+>  static void tlbimvaa_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                             uint64_t value)
+>  {
+>      /* Invalidate single entry by MVA, all ASIDs (TLBIMVAA) */
+> -    ARMCPU *cpu =3D env_archcpu(env);
+> +    CPUState *cs =3D env_cpu(env);
+>
+> +    value &=3D TARGET_PAGE_MASK;
+>      if (tlb_force_broadcast(env)) {
+> -        tlbimvaa_is_write(env, NULL, value);
+> -        return;
+> +        tlb_flush_page_all_cpus_synced(cs, value);
+> +    } else {
+> +        tlb_flush_page(cs, value);
+>      }
+> -
+> -    tlb_flush_page(CPU(cpu), value & TARGET_PAGE_MASK);
+>  }
+>
+>  static void tlbiall_nsnh_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> @@ -3926,11 +3924,10 @@ static void tlbi_aa64_vmalle1_write(CPUARMState *=
+env, const ARMCPRegInfo *ri,
+>      int mask =3D vae1_tlbmask(env);
+>
+>      if (tlb_force_broadcast(env)) {
+> -        tlbi_aa64_vmalle1is_write(env, NULL, value);
+> -        return;
+> +        tlb_flush_by_mmuidx_all_cpus_synced(cs, mask);
+> +    } else {
+> +        tlb_flush_by_mmuidx(cs, mask);
+>      }
+> -
+> -    tlb_flush_by_mmuidx(cs, mask);
+>  }
+>
+>  static int vmalle1_tlbmask(CPUARMState *env)
+> @@ -4052,11 +4049,10 @@ static void tlbi_aa64_vae1_write(CPUARMState *env=
+, const ARMCPRegInfo *ri,
+>      uint64_t pageaddr =3D sextract64(value << 12, 0, 56);
+>
+>      if (tlb_force_broadcast(env)) {
+> -        tlbi_aa64_vae1is_write(env, NULL, value);
+> -        return;
+> +        tlb_flush_page_by_mmuidx_all_cpus_synced(cs, pageaddr, mask);
+> +    } else {
+> +        tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+>      }
+> -
+> -    tlb_flush_page_by_mmuidx(cs, pageaddr, mask);
+>  }
+>
+>  static void tlbi_aa64_vae2is_write(CPUARMState *env, const ARMCPRegInfo =
+*ri,
+
+Anyway:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
 
