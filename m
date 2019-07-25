@@ -2,80 +2,74 @@ Return-Path: <SRS0=WvtD=VW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB23C7618B
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 11:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA7AC7618B
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 11:53:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 051C52238C
-	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 11:52:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 051C52238C
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8232238C
+	for <qemu-devel@archiver.kernel.org>; Thu, 25 Jul 2019 11:53:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8232238C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqcIP-0008JJ-Ba
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 07:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55118)
+	id 1hqcJL-0001Aj-FW
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 07:53:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55361)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hqcIB-0007fU-KN
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 07:52:17 -0400
+ (envelope-from <mst@redhat.com>) id 1hqcJA-0000dG-67
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 07:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hqcI9-0003RG-Ru
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 07:52:15 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43389)
+ (envelope-from <mst@redhat.com>) id 1hqcJ8-00041d-NN
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 07:53:16 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:34165)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hqcI9-0003QU-Js
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 07:52:13 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p13so50417449wru.10
- for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 04:52:13 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hqcJ8-00041F-Gx
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 07:53:14 -0400
+Received: by mail-qt1-f194.google.com with SMTP id k10so48803305qtq.1
+ for <qemu-devel@nongnu.org>; Thu, 25 Jul 2019 04:53:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TYb+D3MfNU/o6PwwWSLz4bH+LBJ9olL56DTJDlFeh+w=;
- b=PnP1/4igI2xYR2HZrOkHE9WRNFTXwqMD89uz1CnnWnJo/Lg+yGtz1tbziokY+OwG3B
- YY3LTrCQjL48p5I30cAAN0m5yozmF0Okh9s9vrIAZvqIsYjaFtU2jRlgbrcb9FTEOoUy
- vMDlTscngxb3enWrwAew4cYB9hx32cltPGaHTNeHghP+oH/b5qIOUDpRqumkRlPVCSda
- pR0ZpOqsjvGUzgPkcuZ5EjK/9/4WZvtBhBMZczXx86o1DZ5ppgViyhNHgouQHZHa29eV
- Mz8dSJQjtLVBPqYN+ZlNBygb8KnCo/njjVybfx0HTO1GXYIdz9a1nxWqB6VgbFCrc3b3
- 9D0g==
-X-Gm-Message-State: APjAAAVvYI9sS4gTT+dxf1HUrEmWVhd6uD9OWSPogx+Or4NBPZFZ6/w/
- uMY2BJL+Yujp9lMbQvfIB7aM2Q==
-X-Google-Smtp-Source: APXvYqw+yqNtcxz07LbIHEBlTBjFadgHiLrIFkC33Ik7ROpTgvu+qzg0+jaVwRiPe6BQggbIn40m7g==
-X-Received: by 2002:a5d:60c5:: with SMTP id x5mr6797660wrt.253.1564055532637; 
- Thu, 25 Jul 2019 04:52:12 -0700 (PDT)
-Received: from [192.168.1.37] (190.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.190])
- by smtp.gmail.com with ESMTPSA id j10sm83960221wrd.26.2019.07.25.04.52.08
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 25 Jul 2019 04:52:12 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <45d1ebe4b2ed4c039c9da20a738652df@tpw09926dag18e.domain1.systemhost.net>
- <1564048584882.52438@bt.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2f25f546-03c3-620a-61c0-73d146a19b82@redhat.com>
-Date: Thu, 25 Jul 2019 13:52:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Adyr1wZzuqyWr7Zz/x/9o2UvcJ2uxqV0aXQ0xkIp87A=;
+ b=hSi/xYxadxeTvfv0rOZGzZIgPQic+F+9dsHZafY20Z6OlUAe+ZidB6FHyRpFYjplxL
+ xHUP41siuhXkU/NzoDa6cny6K9tKgcjOXiJ90BL/xHW/V3SEV3ny8Il4oQtZtsHpHgv4
+ X1gdkSkuwuphoh79+4Acn9RN9cxUctcqDwEqApVRj+Vy5a6Q3R2DGJib7qy3ENf1HLIG
+ vq46CLUusZFYgP4IMP+Yawnjd9bSL9KAv11pCEAT7Xt7eU2NTAu+bzk+Fq+SVlb+Nmwo
+ 6D/08nB2+M+SSjId0mVlPzKD8/ct71RBgO1Ma1ddlS1kNwCUe+9EyKXRtsDG04zfaKuL
+ f5+g==
+X-Gm-Message-State: APjAAAXH2xTGszNihlJfHvVis1fnnWsOeJugWfEZV9o8gjI8cKXwxf5W
+ oi2nPll8usWB3tzi7KegmFbOOQ==
+X-Google-Smtp-Source: APXvYqwE8HqnAkNR/66lUHbgNyzeuCeOAeiIO89AsIxp9Pcm3fC/eeF+QKL2oYY5O6f84s2OkgOYfQ==
+X-Received: by 2002:ad4:4423:: with SMTP id e3mr50030186qvt.145.1564055593935; 
+ Thu, 25 Jul 2019 04:53:13 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ z1sm25321053qkg.103.2019.07.25.04.53.10
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 25 Jul 2019 04:53:12 -0700 (PDT)
+Date: Thu, 25 Jul 2019 07:53:07 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190725075054-mutt-send-email-mst@kernel.org>
+References: <20190725113638.4702-1-david@redhat.com>
+ <20190725113638.4702-7-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1564048584882.52438@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190725113638.4702-7-david@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v4 11/15] memory: Single byte swap along
- the I/O path
+X-Received-From: 209.85.160.194
+Subject: Re: [Qemu-devel] [PATCH-for-4.1 v4 6/7] virtio-balloon: Use
+ temporary PBP only
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,275 +81,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, sagark@eecs.berkeley.edu,
- david@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
- Alistair.Francis@wdc.com, edgar.iglesias@gmail.com, alex.williamson@redhat.com,
- arikalo@wavecomp.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- rth@twiddle.net, atar4qemu@gmail.com, ehabkost@redhat.com,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org, stefanha@redhat.com,
- shorne@gmail.com, david@gibson.dropbear.id.au, qemu-riscv@nongnu.org,
- kbastian@mail.uni-paderborn.de, cohuck@redhat.com, laurent@vivier.eu,
- qemu-ppc@nongnu.org, amarkovic@wavecomp.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/25/19 11:56 AM, tony.nguyen@bt.com wrote:
-> Now that MemOp has been pushed down into the memory API, we can
-> collapse the two byte swaps adjust_endianness and handle_bswap into
-> the former.
-
-Nice cleanup :)
-
+On Thu, Jul 25, 2019 at 01:36:37PM +0200, David Hildenbrand wrote:
+> We still have multiple issues in the current code
+> - The PBP is not freed during unrealize()
+> - The PBP is not reset on device resets: After a reset, the PBP is stale.
+> - We are not indicating VIRTIO_BALLOON_F_MUST_TELL_HOST, therefore
+>   guests (esp. legacy guests) will reuse pages without deflating,
+>   turning the PBP stale. Adding that would require compat handling.
 > 
-> Collapsing byte swaps along the I/O path enables additional endian
-> inversion logic, e.g. SPARC64 Invert Endian TTE bit, with redundant
-> byte swaps cancelling out.
+> Instead, let's use the PBP only temporarily, when processing one bulk of
+> inflation requests. This will keep guest_page_size > 4k working (with
+> Linux guests). There is nothing to do for deflation requests anymore.
+> The pbp is only used for a limited amount of time.
 > 
-> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> Fixes: ed48c59875b6 ("virtio-balloon: Safely handle BALLOON_PAGE_SIZE <
+>                      host page size")
+> Cc: qemu-stable@nongnu.org #v4.0.0
+> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  accel/tcg/cputlb.c | 58 +++++++++++++++++++++++++-----------------------------
->  memory.c           | 30 ++++++++++++++++------------
->  2 files changed, 44 insertions(+), 44 deletions(-)
+>  hw/virtio/virtio-balloon.c         | 21 +++++++++------------
+>  include/hw/virtio/virtio-balloon.h |  3 ---
+>  2 files changed, 9 insertions(+), 15 deletions(-)
 > 
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index a4a0bf7..e61b1eb 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -881,7 +881,7 @@ static void tlb_fill(CPUState *cpu, target_ulong addr, int size,
-> 
->  static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->                           int mmu_idx, target_ulong addr, uintptr_t retaddr,
-> -                         MMUAccessType access_type, int size)
-> +                         MMUAccessType access_type, MemOp op)
+> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+> index 40d493a31a..a6282d58d4 100644
+> --- a/hw/virtio/virtio-balloon.c
+> +++ b/hw/virtio/virtio-balloon.c
+> @@ -34,11 +34,11 @@
+>  
+>  #define BALLOON_PAGE_SIZE  (1 << VIRTIO_BALLOON_PFN_SHIFT)
+>  
+> -struct PartiallyBalloonedPage {
+> +typedef struct PartiallyBalloonedPage {
+>      ram_addr_t base_gpa;
+>      long subpages;
+>      unsigned long *bitmap;
+> -};
+> +} PartiallyBalloonedPage;
+>  
+>  static void virtio_balloon_pbp_free(PartiallyBalloonedPage *pbp)
 >  {
->      CPUState *cpu = env_cpu(env);
->      hwaddr mr_offset;
-> @@ -906,14 +906,13 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->          qemu_mutex_lock_iothread();
->          locked = true;
->      }
-> -    r = memory_region_dispatch_read(mr, mr_offset, &val, SIZE_MEMOP(size),
-> -                                    iotlbentry->attrs);
-> +    r = memory_region_dispatch_read(mr, mr_offset, &val, op, iotlbentry->attrs);
->      if (r != MEMTX_OK) {
->          hwaddr physaddr = mr_offset +
->              section->offset_within_address_space -
->              section->offset_within_region;
-> 
-> -        cpu_transaction_failed(cpu, physaddr, addr, size, access_type,
-> +        cpu_transaction_failed(cpu, physaddr, addr, MEMOP_SIZE(op), access_type,
->                                 mmu_idx, iotlbentry->attrs, r, retaddr);
-
-Please move this change in "cputlb: Access MemoryRegion with MemOp"
-(patch #9 of this series).
-
->      }
->      if (locked) {
-> @@ -925,7 +924,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
-> 
->  static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->                        int mmu_idx, uint64_t val, target_ulong addr,
-> -                      uintptr_t retaddr, int size)
-> +                      uintptr_t retaddr, MemOp op)
+> @@ -68,11 +68,11 @@ static bool virtio_balloon_pbp_matches(PartiallyBalloonedPage *pbp,
+>  }
+>  
+>  static void balloon_inflate_page(VirtIOBalloon *balloon,
+> -                                 MemoryRegion *mr, hwaddr mr_offset)
+> +                                 MemoryRegion *mr, hwaddr mr_offset,
+> +                                 PartiallyBalloonedPage **pbp)
 >  {
->      CPUState *cpu = env_cpu(env);
->      hwaddr mr_offset;
-> @@ -947,15 +946,15 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->          qemu_mutex_lock_iothread();
->          locked = true;
->      }
-> -    r = memory_region_dispatch_write(mr, mr_offset, val, SIZE_MEMOP(size),
-> -                                    iotlbentry->attrs);
-> +    r = memory_region_dispatch_write(mr, mr_offset, val, op, iotlbentry->attrs);
->      if (r != MEMTX_OK) {
->          hwaddr physaddr = mr_offset +
->              section->offset_within_address_space -
->              section->offset_within_region;
-> 
-> -        cpu_transaction_failed(cpu, physaddr, addr, size, MMU_DATA_STORE,
-> -                               mmu_idx, iotlbentry->attrs, r, retaddr);
-> +        cpu_transaction_failed(cpu, physaddr, addr, MEMOP_SIZE(op),
-> +                               MMU_DATA_STORE, mmu_idx, iotlbentry->attrs, r,
-> +                               retaddr);
-
-Ditto.
-
->      }
->      if (locked) {
->          qemu_mutex_unlock_iothread();
-> @@ -1210,26 +1209,13 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
->  #endif
-> 
->  /*
-> - * Byte Swap Helper
-> + * Byte Swap Checker
->   *
-> - * This should all dead code away depending on the build host and
-> - * access type.
-> + * Dead code should all go away depending on the build host and access type.
->   */
-> -
-> -static inline uint64_t handle_bswap(uint64_t val, int size, bool big_endian)
-> +static inline bool need_bswap(bool big_endian)
->  {
-> -    if ((big_endian && NEED_BE_BSWAP) || (!big_endian && NEED_LE_BSWAP)) {
-> -        switch (size) {
-> -        case 1: return val;
-> -        case 2: return bswap16(val);
-> -        case 4: return bswap32(val);
-> -        case 8: return bswap64(val);
-> -        default:
-> -            g_assert_not_reached();
-> -        }
-> -    } else {
-> -        return val;
+>      void *addr = memory_region_get_ram_ptr(mr) + mr_offset;
+>      ram_addr_t rb_offset, rb_aligned_offset, base_gpa;
+> -    PartiallyBalloonedPage **pbp = &balloon->pbp;
+>      RAMBlock *rb;
+>      size_t rb_page_size;
+>      int subpages;
+> @@ -149,12 +149,6 @@ static void balloon_deflate_page(VirtIOBalloon *balloon,
+>      rb = qemu_ram_block_from_host(addr, false, &rb_offset);
+>      rb_page_size = qemu_ram_pagesize(rb);
+>  
+> -    if (balloon->pbp) {
+> -        /* Let's play safe and always reset the pbp on deflation requests. */
+> -        virtio_balloon_pbp_free(balloon->pbp);
+> -        balloon->pbp = NULL;
 > -    }
-> +    return (big_endian && NEED_BE_BSWAP) || (!big_endian && NEED_LE_BSWAP);
-
-:)
-
->  }
-> 
->  /*
-> @@ -1260,6 +1246,7 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
->      unsigned a_bits = get_alignment_bits(get_memop(oi));
->      void *haddr;
->      uint64_t res;
-> +    MemOp op;
-> 
->      /* Handle CPU specific unaligned behaviour */
->      if (addr & ((1 << a_bits) - 1)) {
-> @@ -1305,9 +1292,13 @@ load_helper(CPUArchState *env, target_ulong addr, TCGMemOpIdx oi,
->              }
->          }
-> 
-> -        res = io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
-> -                       mmu_idx, addr, retaddr, access_type, size);
-> -        return handle_bswap(res, size, big_endian);
-> +        op = SIZE_MEMOP(size);
-> +        if (need_bswap(big_endian)) {
-> +            op ^= MO_BSWAP;
-> +        }
-> +
-> +        return io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
-> +                       mmu_idx, addr, retaddr, access_type, op);
->      }
-> 
->      /* Handle slow unaligned access (it spans two pages or IO).  */
-> @@ -1508,6 +1499,7 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->      const size_t tlb_off = offsetof(CPUTLBEntry, addr_write);
->      unsigned a_bits = get_alignment_bits(get_memop(oi));
->      void *haddr;
-> +    MemOp op;
-> 
->      /* Handle CPU specific unaligned behaviour */
->      if (addr & ((1 << a_bits) - 1)) {
-> @@ -1553,9 +1545,13 @@ store_helper(CPUArchState *env, target_ulong addr, uint64_t val,
->              }
->          }
-> 
-> +        op = SIZE_MEMOP(size);
-> +        if (need_bswap(big_endian)) {
-> +            op ^= MO_BSWAP;
-> +        }
-> +
->          io_writex(env, &env_tlb(env)->d[mmu_idx].iotlb[index], mmu_idx,
-> -                  handle_bswap(val, size, big_endian),
-> -                  addr, retaddr, size);
-> +                  val, addr, retaddr, op);
->          return;
->      }
-> 
-> diff --git a/memory.c b/memory.c
-> index 6982e19..0277d3d 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -352,7 +352,7 @@ static bool memory_region_big_endian(MemoryRegion *mr)
->  #endif
->  }
-> 
-> -static bool memory_region_wrong_endianness(MemoryRegion *mr)
-> +static bool memory_region_endianness_inverted(MemoryRegion *mr)
+> -
+>      host_addr = (void *)((uintptr_t)addr & ~(rb_page_size - 1));
+>  
+>      /* When a page is deflated, we hint the whole host page it lives
+> @@ -336,6 +330,7 @@ static void balloon_stats_set_poll_interval(Object *obj, Visitor *v,
+>  static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
 >  {
->  #ifdef TARGET_WORDS_BIGENDIAN
->      return mr->ops->endianness == DEVICE_LITTLE_ENDIAN;
-> @@ -361,23 +361,27 @@ static bool memory_region_wrong_endianness(MemoryRegion *mr)
->  #endif
->  }
-> 
-> -static void adjust_endianness(MemoryRegion *mr, uint64_t *data, unsigned size)
-> +static void adjust_endianness(MemoryRegion *mr, uint64_t *data, MemOp op)
->  {
-> -    if (memory_region_wrong_endianness(mr)) {
-> -        switch (size) {
-> -        case 1:
-> +    if (memory_region_endianness_inverted(mr)) {
-> +        op ^= MO_BSWAP;
-> +    }
-> +
-> +    if (op & MO_BSWAP) {
-> +        switch (op & MO_SIZE) {
-> +        case MO_8:
->              break;
-> -        case 2:
-> +        case MO_16:
->              *data = bswap16(*data);
->              break;
-> -        case 4:
-> +        case MO_32:
->              *data = bswap32(*data);
->              break;
-> -        case 8:
-> +        case MO_64:
->              *data = bswap64(*data);
->              break;
->          default:
-> -            abort();
-> +            g_assert_not_reached();
+>      VirtIOBalloon *s = VIRTIO_BALLOON(vdev);
+> +    PartiallyBalloonedPage *pbp = NULL;
+>      VirtQueueElement *elem;
+>      MemoryRegionSection section;
+>  
+> @@ -344,7 +339,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>          uint32_t pfn;
+>          elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+>          if (!elem) {
+> -            return;
+> +            break;
 >          }
+>  
+>          while (iov_to_buf(elem->out_sg, elem->out_num, offset, &pfn, 4) == 4) {
+> @@ -373,7 +368,7 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>              if (!qemu_balloon_is_inhibited()) {
+>                  if (vq == s->ivq) {
+>                      balloon_inflate_page(s, section.mr,
+> -                                         section.offset_within_region);
+> +                                         section.offset_within_region, &pbp);
+>                  } else if (vq == s->dvq) {
+>                      balloon_deflate_page(s, section.mr, section.offset_within_region);
+>                  } else {
+> @@ -387,6 +382,8 @@ static void virtio_balloon_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+>          virtio_notify(vdev, vq);
+>          g_free(elem);
 >      }
+> +
+> +    virtio_balloon_pbp_free(pbp);
 >  }
-> @@ -1451,7 +1455,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
->      }
-> 
->      r = memory_region_dispatch_read1(mr, addr, pval, size, attrs);
-> -    adjust_endianness(mr, pval, size);
-> +    adjust_endianness(mr, pval, op);
->      return r;
->  }
-> 
-> @@ -1494,7 +1498,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
->          return MEMTX_DECODE_ERROR;
->      }
-> 
-> -    adjust_endianness(mr, &data, size);
-> +    adjust_endianness(mr, &data, op);
-> 
->      if ((!kvm_eventfds_enabled()) &&
->          memory_region_dispatch_write_eventfds(mr, addr, data, size, attrs)) {
-> @@ -2340,7 +2344,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
->      }
-> 
->      if (size) {
-> -        adjust_endianness(mr, &mrfd.data, size);
-> +        adjust_endianness(mr, &mrfd.data, SIZE_MEMOP(size));
->      }
->      memory_region_transaction_begin();
->      for (i = 0; i < mr->ioeventfd_nb; ++i) {
-> @@ -2375,7 +2379,7 @@ void memory_region_del_eventfd(MemoryRegion *mr,
->      unsigned i;
-> 
->      if (size) {
-> -        adjust_endianness(mr, &mrfd.data, size);
-> +        adjust_endianness(mr, &mrfd.data, SIZE_MEMOP(size));
->      }
->      memory_region_transaction_begin();
->      for (i = 0; i < mr->ioeventfd_nb; ++i) {
-> --
-> 1.8.3.1
-> 
+>  
+>  static void virtio_balloon_receive_stats(VirtIODevice *vdev, VirtQueue *vq)
 
-LGTM!
+Oops this is not early enough.
+We must not track pbp across elements: once we push an element
+guest can reuse the page.
+
+I propose changing virtio_balloon_pbp_free to get
+PartiallyBalloonedPage** and set it to NULL.
+
+Call that within the loop after g_free(elem);
+
+
+
+
+> diff --git a/include/hw/virtio/virtio-balloon.h b/include/hw/virtio/virtio-balloon.h
+> index 5a99293a45..d1c968d237 100644
+> --- a/include/hw/virtio/virtio-balloon.h
+> +++ b/include/hw/virtio/virtio-balloon.h
+> @@ -33,8 +33,6 @@ typedef struct virtio_balloon_stat_modern {
+>         uint64_t val;
+>  } VirtIOBalloonStatModern;
+>  
+> -typedef struct PartiallyBalloonedPage PartiallyBalloonedPage;
+> -
+>  enum virtio_balloon_free_page_report_status {
+>      FREE_PAGE_REPORT_S_STOP = 0,
+>      FREE_PAGE_REPORT_S_REQUESTED = 1,
+> @@ -70,7 +68,6 @@ typedef struct VirtIOBalloon {
+>      int64_t stats_last_update;
+>      int64_t stats_poll_interval;
+>      uint32_t host_features;
+> -    PartiallyBalloonedPage *pbp;
+>  
+>      bool qemu_4_0_config_size;
+>  } VirtIOBalloon;
+> -- 
+> 2.21.0
 
