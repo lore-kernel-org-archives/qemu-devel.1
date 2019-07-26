@@ -2,80 +2,75 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 979D6C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FC4C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:43:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D3B4206DD
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:40:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D3B4206DD
+	by mail.kernel.org (Postfix) with ESMTPS id BB9CB22CE2
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:43:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9CB22CE2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwi5-0008PC-Ke
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:40:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58005)
+	id 1hqwkj-0001DQ-2a
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35376)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqwhr-0007wB-GA
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:40:08 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hqwkT-0000q9-Pq
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:42:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqwhf-0004CF-O6
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:40:06 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:36546)
+ (envelope-from <sgarzare@redhat.com>) id 1hqwkS-0005jx-90
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:42:49 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39707)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqwhf-0003w3-HL
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:39:55 -0400
-Received: by mail-wm1-f65.google.com with SMTP id g67so43012139wme.1
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:39:52 -0700 (PDT)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqwkS-0005ex-15
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:42:48 -0400
+Received: by mail-wr1-f67.google.com with SMTP id x4so577177wrt.6
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:42:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fSfrGrRhjJEug1iM2o0JkpzkU95zBrleqMeDoDm1YlU=;
- b=sdLu0VMxg1fD1xQazTf3hWj27PvjFQCfAjttm0ANuVluGv+ZworMoj0Jb+oeRz7jQO
- YHJPhhIuqjQu44GHfPTYmq4Hc7JC2GIVzxtvPypwsnvXY2IIOa/HLhsSNN53GTGn6nkW
- 8qzS6wox/45IyIiatQLtFwzI2nTbwO0Va2u0hUj7AOOu3muXo7LxqkCAN0MvDsEzDikN
- m3uS+sYe8EAJveQuUh7G0Ev4Px7qJ8yAxOq+cQ3C+RtwPmV+MbHdDNMYWjQlH7vev7c7
- 971JNeqO1Edv9Z8hByuXHK2dGxQDlUKzvfyIituvOdSkYWVqNTpAs/VLbHt7WZR5OY6p
- I1GA==
-X-Gm-Message-State: APjAAAXCEkVeyEiyNXP5atfM65lXLIRLY1IYRGOJN5XHXQqoXbQ3rVnJ
- HNN5qihad7/keIRLJXkMsO2abw==
-X-Google-Smtp-Source: APXvYqzlV/1DKFivxacazGTydJt0YU/GPPbguaon/bVKYgHKpFk955pWjIYP5RnuPKMYMUaSrzjLgg==
-X-Received: by 2002:a1c:228b:: with SMTP id
- i133mr84279148wmi.140.1564133991298; 
- Fri, 26 Jul 2019 02:39:51 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
- ([2001:b07:6468:f312:cc23:f353:392:d2ee])
- by smtp.gmail.com with ESMTPSA id b5sm43505459wru.69.2019.07.26.02.39.49
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 26 Jul 2019 02:39:50 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
- <1564123667210.66446@bt.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <2159ad69-4c4c-24dc-6759-039e39f952d3@redhat.com>
-Date: Fri, 26 Jul 2019 11:39:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=wF43L5ODq82m/aaZH6JvCrqDzt7rrqkx7lANGQIqKSg=;
+ b=UASoRdw9P0Ou1y5AitW7elvZoBuGjRggjCYY83blGXBIpB/ZeyFoA6clkrGWTFwOQH
+ M21n6fcMMIk01mHLJdVEkZUK8E7ptZ97nSWb9GGdF6rBYq7NnEb26GpvMufxEWN+htsr
+ qihQPlny+G4K912Z1E7XvG+A4PT2dcq5Ei+iUsF0ggRjoRkXBv6AeaYLjkI3IQ3B0Qbs
+ HbIP/pAPXv2Ndn+aGzJi+OBrAUuhwDJq1ZNmpomrEwSct58pPCONESXMiP1cjpdPNpqS
+ 2vMaFBSHJ9GyvMhBq4Dyai14GhlrL83HUJga9thb4sx5ZnSoyUaRWjyHZD6Nu0qwBIcX
+ uyTA==
+X-Gm-Message-State: APjAAAU2fYdmSbFyYf5FhV/3ekew2FeXq1kBtmjCbVffyhekemtJ9v+B
+ k77rs+FFZ1RqqBwhIafVZZgcWw==
+X-Google-Smtp-Source: APXvYqzBXC9/ldP7d1AokvgqEW1XvY4ypUX92+Oxc07k2OBsYsm6ty7N8nYut6TpZoONpd0XzLTTMQ==
+X-Received: by 2002:adf:8183:: with SMTP id 3mr101056013wra.181.1564134166819; 
+ Fri, 26 Jul 2019 02:42:46 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id v204sm55312987wma.20.2019.07.26.02.42.45
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 26 Jul 2019 02:42:46 -0700 (PDT)
+Date: Fri, 26 Jul 2019 11:42:44 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190726094244.dyjwewyatjdptmex@steredhat>
+References: <20190724171239.8764-1-mreitz@redhat.com>
+ <20190724171239.8764-5-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1564123667210.66446@bt.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190724171239.8764-5-mreitz@redhat.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH v5 11/15] memory: Single byte swap along
- the I/O path
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2 04/11] block: Implement
+ .bdrv_has_zero_init_truncate()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,75 +82,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, sagark@eecs.berkeley.edu,
- mst@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
- laurent@vivier.eu, Alistair.Francis@wdc.com, edgar.iglesias@gmail.com,
- arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
- ehabkost@redhat.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- stefanha@redhat.com, shorne@gmail.com, david@gibson.dropbear.id.au,
- qemu-riscv@nongnu.org, kbastian@mail.uni-paderborn.de, cohuck@redhat.com,
- alex.williamson@redhat.com, qemu-ppc@nongnu.org, amarkovic@wavecomp.com,
- aurelien@aurel32.net
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/07/19 08:47, tony.nguyen@bt.com wrote:
-> +static bool memory_region_endianness_inverted(MemoryRegion *mr)
->  {
->  #ifdef TARGET_WORDS_BIGENDIAN
->      return mr->ops->endianness == DEVICE_LITTLE_ENDIAN;
-> @@ -361,23 +361,27 @@ static bool
-> memory_region_wrong_endianness(MemoryRegion *mr)
->  #endif
->  }
->  
-> -static void adjust_endianness(MemoryRegion *mr, uint64_t *data,
-> unsigned size)
-> +static void adjust_endianness(MemoryRegion *mr, uint64_t *data, MemOp op)
->  {
-> -    if (memory_region_wrong_endianness(mr)) {
-> -        switch (size) {
-> -        case 1:
-> +    if (memory_region_endianness_inverted(mr)) {
-> +        op ^= MO_BSWAP;
-> +    }
+On Wed, Jul 24, 2019 at 07:12:32PM +0200, Max Reitz wrote:
+> We need to implement .bdrv_has_zero_init_truncate() for every block
+> driver that supports truncation and has a .bdrv_has_zero_init()
+> implementation.
+> 
+> Implement it the same way each driver implements .bdrv_has_zero_init().
+> This is at least not any more unsafe than what we had before.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/file-posix.c | 1 +
+>  block/file-win32.c | 1 +
+>  block/gluster.c    | 4 ++++
+>  block/nfs.c        | 1 +
+>  block/qcow2.c      | 1 +
+>  block/qed.c        | 1 +
+>  block/raw-format.c | 6 ++++++
+>  block/rbd.c        | 1 +
+>  block/sheepdog.c   | 1 +
+>  block/ssh.c        | 1 +
+>  10 files changed, 18 insertions(+)
+> 
 
-Here it should not matter: the caller of memory_region_dispatch_read
-should includes one of MO_TE/MO_LE/MO_BE in the op (or nothing for host
-endianness).  Then memory_region_endianness_inverted can be:
+LGTM.
 
-  if (mr->ops->endianness == DEVICE_NATIVE_ENDIAN)
-    return (op & MO_BSWAP) != MO_TE;
-  else if (mr->ops->endianness == DEVICE_BIG_ENDIAN)
-    return (op & MO_BSWAP) != MO_BE;
-  else if (mr->ops->endianness == DEVICE_LITTLE_ENDIAN)
-    return (op & MO_BSWAP) != MO_LE;
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-and adjust_endianness does
+Thanks,
+Stefano
 
-  if (memory_region_endianness_inverted(mr, op)) {
-    switch (op & MO_SIZE) {
-      ...
-    }
-  }
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 4479cc7ab4..0208006f3c 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2924,6 +2924,7 @@ BlockDriver bdrv_file = {
+>      .bdrv_co_create = raw_co_create,
+>      .bdrv_co_create_opts = raw_co_create_opts,
+>      .bdrv_has_zero_init = bdrv_has_zero_init_1,
+> +    .bdrv_has_zero_init_truncate = bdrv_has_zero_init_1,
+>      .bdrv_co_block_status = raw_co_block_status,
+>      .bdrv_co_invalidate_cache = raw_co_invalidate_cache,
+>      .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+> diff --git a/block/file-win32.c b/block/file-win32.c
+> index 6b2d67b239..41f55dfece 100644
+> --- a/block/file-win32.c
+> +++ b/block/file-win32.c
+> @@ -635,6 +635,7 @@ BlockDriver bdrv_file = {
+>      .bdrv_close         = raw_close,
+>      .bdrv_co_create_opts = raw_co_create_opts,
+>      .bdrv_has_zero_init = bdrv_has_zero_init_1,
+> +    .bdrv_has_zero_init_truncate = bdrv_has_zero_init_1,
+>  
+>      .bdrv_aio_preadv    = raw_aio_preadv,
+>      .bdrv_aio_pwritev   = raw_aio_pwritev,
+> diff --git a/block/gluster.c b/block/gluster.c
+> index f64dc5b01e..64028b2cba 100644
+> --- a/block/gluster.c
+> +++ b/block/gluster.c
+> @@ -1567,6 +1567,7 @@ static BlockDriver bdrv_gluster = {
+>      .bdrv_co_writev               = qemu_gluster_co_writev,
+>      .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
+>      .bdrv_has_zero_init           = qemu_gluster_has_zero_init,
+> +    .bdrv_has_zero_init_truncate  = qemu_gluster_has_zero_init,
+>  #ifdef CONFIG_GLUSTERFS_DISCARD
+>      .bdrv_co_pdiscard             = qemu_gluster_co_pdiscard,
+>  #endif
+> @@ -1598,6 +1599,7 @@ static BlockDriver bdrv_gluster_tcp = {
+>      .bdrv_co_writev               = qemu_gluster_co_writev,
+>      .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
+>      .bdrv_has_zero_init           = qemu_gluster_has_zero_init,
+> +    .bdrv_has_zero_init_truncate  = qemu_gluster_has_zero_init,
+>  #ifdef CONFIG_GLUSTERFS_DISCARD
+>      .bdrv_co_pdiscard             = qemu_gluster_co_pdiscard,
+>  #endif
+> @@ -1629,6 +1631,7 @@ static BlockDriver bdrv_gluster_unix = {
+>      .bdrv_co_writev               = qemu_gluster_co_writev,
+>      .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
+>      .bdrv_has_zero_init           = qemu_gluster_has_zero_init,
+> +    .bdrv_has_zero_init_truncate  = qemu_gluster_has_zero_init,
+>  #ifdef CONFIG_GLUSTERFS_DISCARD
+>      .bdrv_co_pdiscard             = qemu_gluster_co_pdiscard,
+>  #endif
+> @@ -1666,6 +1669,7 @@ static BlockDriver bdrv_gluster_rdma = {
+>      .bdrv_co_writev               = qemu_gluster_co_writev,
+>      .bdrv_co_flush_to_disk        = qemu_gluster_co_flush_to_disk,
+>      .bdrv_has_zero_init           = qemu_gluster_has_zero_init,
+> +    .bdrv_has_zero_init_truncate  = qemu_gluster_has_zero_init,
+>  #ifdef CONFIG_GLUSTERFS_DISCARD
+>      .bdrv_co_pdiscard             = qemu_gluster_co_pdiscard,
+>  #endif
+> diff --git a/block/nfs.c b/block/nfs.c
+> index d93241b3bb..97c815085f 100644
+> --- a/block/nfs.c
+> +++ b/block/nfs.c
+> @@ -863,6 +863,7 @@ static BlockDriver bdrv_nfs = {
+>      .create_opts                    = &nfs_create_opts,
+>  
+>      .bdrv_has_zero_init             = nfs_has_zero_init,
+> +    .bdrv_has_zero_init_truncate    = nfs_has_zero_init,
+>      .bdrv_get_allocated_file_size   = nfs_get_allocated_file_size,
+>      .bdrv_co_truncate               = nfs_file_co_truncate,
+>  
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 039bdc2f7e..5c40f54d64 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -5187,6 +5187,7 @@ BlockDriver bdrv_qcow2 = {
+>      .bdrv_co_create_opts  = qcow2_co_create_opts,
+>      .bdrv_co_create       = qcow2_co_create,
+>      .bdrv_has_zero_init = bdrv_has_zero_init_1,
+> +    .bdrv_has_zero_init_truncate = bdrv_has_zero_init_1,
+>      .bdrv_co_block_status = qcow2_co_block_status,
+>  
+>      .bdrv_co_preadv         = qcow2_co_preadv,
+> diff --git a/block/qed.c b/block/qed.c
+> index 77c7cef175..daaedb6864 100644
+> --- a/block/qed.c
+> +++ b/block/qed.c
+> @@ -1668,6 +1668,7 @@ static BlockDriver bdrv_qed = {
+>      .bdrv_co_create           = bdrv_qed_co_create,
+>      .bdrv_co_create_opts      = bdrv_qed_co_create_opts,
+>      .bdrv_has_zero_init       = bdrv_has_zero_init_1,
+> +    .bdrv_has_zero_init_truncate = bdrv_has_zero_init_1,
+>      .bdrv_co_block_status     = bdrv_qed_co_block_status,
+>      .bdrv_co_readv            = bdrv_qed_co_readv,
+>      .bdrv_co_writev           = bdrv_qed_co_writev,
+> diff --git a/block/raw-format.c b/block/raw-format.c
+> index bffd424dd0..42c28cc29a 100644
+> --- a/block/raw-format.c
+> +++ b/block/raw-format.c
+> @@ -413,6 +413,11 @@ static int raw_has_zero_init(BlockDriverState *bs)
+>      return bdrv_has_zero_init(bs->file->bs);
+>  }
+>  
+> +static int raw_has_zero_init_truncate(BlockDriverState *bs)
+> +{
+> +    return bdrv_has_zero_init_truncate(bs->file->bs);
+> +}
+> +
+>  static int coroutine_fn raw_co_create_opts(const char *filename, QemuOpts *opts,
+>                                             Error **errp)
+>  {
+> @@ -572,6 +577,7 @@ BlockDriver bdrv_raw = {
+>      .bdrv_co_ioctl        = &raw_co_ioctl,
+>      .create_opts          = &raw_create_opts,
+>      .bdrv_has_zero_init   = &raw_has_zero_init,
+> +    .bdrv_has_zero_init_truncate = &raw_has_zero_init_truncate,
+>      .strong_runtime_opts  = raw_strong_runtime_opts,
+>      .mutable_opts         = mutable_opts,
+>  };
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 59757b3120..057af43d48 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -1288,6 +1288,7 @@ static BlockDriver bdrv_rbd = {
+>      .bdrv_co_create         = qemu_rbd_co_create,
+>      .bdrv_co_create_opts    = qemu_rbd_co_create_opts,
+>      .bdrv_has_zero_init     = bdrv_has_zero_init_1,
+> +    .bdrv_has_zero_init_truncate = bdrv_has_zero_init_1,
+>      .bdrv_get_info          = qemu_rbd_getinfo,
+>      .create_opts            = &qemu_rbd_create_opts,
+>      .bdrv_getlength         = qemu_rbd_getlength,
+> diff --git a/block/sheepdog.c b/block/sheepdog.c
+> index 6f402e5d4d..a4e111f981 100644
+> --- a/block/sheepdog.c
+> +++ b/block/sheepdog.c
+> @@ -3228,6 +3228,7 @@ static BlockDriver bdrv_sheepdog = {
+>      .bdrv_co_create               = sd_co_create,
+>      .bdrv_co_create_opts          = sd_co_create_opts,
+>      .bdrv_has_zero_init           = bdrv_has_zero_init_1,
+> +    .bdrv_has_zero_init_truncate  = bdrv_has_zero_init_1,
+>      .bdrv_getlength               = sd_getlength,
+>      .bdrv_get_allocated_file_size = sd_get_allocated_file_size,
+>      .bdrv_co_truncate             = sd_co_truncate,
+> diff --git a/block/ssh.c b/block/ssh.c
+> index 501933b855..84d01e892b 100644
+> --- a/block/ssh.c
+> +++ b/block/ssh.c
+> @@ -1390,6 +1390,7 @@ static BlockDriver bdrv_ssh = {
+>      .bdrv_co_create_opts          = ssh_co_create_opts,
+>      .bdrv_close                   = ssh_close,
+>      .bdrv_has_zero_init           = ssh_has_zero_init,
+> +    .bdrv_has_zero_init_truncate  = ssh_has_zero_init,
+>      .bdrv_co_readv                = ssh_co_readv,
+>      .bdrv_co_writev               = ssh_co_writev,
+>      .bdrv_getlength               = ssh_getlength,
+> -- 
+> 2.21.0
+> 
 
-I think the changes should be split in two parts.  Before this patch,
-you modify all callers of memory_region_dispatch_* so that they already
-pass the right endianness op; however, you leave the existing swap in
-place.  So for example in load_helper you'd have in a previous patch
-
-+        /* FIXME: io_readx ignores MO_BSWAP.  */
-+        op = SIZE_MEMOP(size) | (big_endian ? MO_BE : MO_LE);
-         res = io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
--                       mmu_idx, addr, retaddr, access_type,
-SIZE_MEMOP(size));
-+                       mmu_idx, addr, retaddr, access_type, op);
-         return handle_bswap(res, size, big_endian);
-
-Then, in this patch, you remove the handle_bswap call as well as the
-FIXME comment.
-
-Paolo
+-- 
 
