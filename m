@@ -2,90 +2,84 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 265DFC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E3AC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:24:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA63A22BEF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:19:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA63A22BEF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D79F9229F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:24:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fad+FAn7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D79F9229F9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwNm-0004Qs-Rd
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:19:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55681)
+	id 1hqwSu-00077X-Ry
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:24:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42925)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hqwNW-0003pQ-2F
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:19:07 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqwSg-0006dd-DF
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:24:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hqwNS-00052i-Pp
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:19:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49736)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hqwNQ-0004i4-3P; Fri, 26 Jul 2019 05:19:00 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6559930833A0;
- Fri, 26 Jul 2019 09:18:56 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-164.ams2.redhat.com
- [10.36.116.164])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A158160C62;
- Fri, 26 Jul 2019 09:18:54 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190725162704.12622-1-kwolf@redhat.com>
- <20190725162704.12622-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7af54232-2168-4509-a8e6-5fc712d28cf4@redhat.com>
-Date: Fri, 26 Jul 2019 11:18:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <peter.maydell@linaro.org>) id 1hqwSc-0005qK-CK
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:24:24 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36102)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqwSc-0005lY-4a
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:24:22 -0400
+Received: by mail-oi1-x242.google.com with SMTP id q4so10632820oij.3
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=p0Qrs+wBe+yU3V1LUom8LdVwwr4/B1c5vMUwSH66/qQ=;
+ b=fad+FAn7waqUs7kCfB7g7hq6qY/OzrkmgtoK1I4y6TWPKWFsb1iLDGzvY4Rgxg9hXl
+ LvZvAsf1wEH77aEX99hU69m0yEsFes4OZz3O0XMw/uCSHEAUjXgURzhuuCv6ixQ7g/Ze
+ 330RsObXqlvq68DRa//ztrYZhHujZfDUu0lxWgDchM+VzfMLkNVajkBUh2YSnmcjWZkm
+ s2WyLAJMfz5sqnPIeUgnMMEay4SBX9ba53eKFxsWZx1+vJOokaLqO4JapqXfJMSMj7oI
+ 9y2jcHaMmuXyDNT1vrRDrog/AZCgp4+NDL7cKXgzBi/ivcuQI+zObzgAT+rTtDXJ2QsH
+ 7iVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=p0Qrs+wBe+yU3V1LUom8LdVwwr4/B1c5vMUwSH66/qQ=;
+ b=b1pk64otsfI1wqLaAUiRDVwNEFP4ofmaEJ/dIG/aMvRArdy/Elpa2IyajwGqNl3hqB
+ 6NLeC+GAzZsuWZUhLmtEwKzcE24sIpUkK4BtZaG7zoN7mFXtfUyjKWPHTE49nbJ0D3WB
+ r5Xucft82QbTqurEU7CEqoxN/zVRq7OqDJU3ryP+Byvbwi4fY5cbmeXGUTXtVRD8c2h9
+ n0CoMjvGE0CLAuzPnhFyRLH48rAnN6CcAGAsdrkvP0FTpFNJOfBs6fuW6MZqNpXEV7xr
+ JVDQfh9Wl6M9djASYMd8aNyI7FebjF7TIx5NnAoYbB/j6jViEMmKF74xgHA3tbd0vB9D
+ RC3g==
+X-Gm-Message-State: APjAAAXvDaNx0B6HPGDQzNC1arjHzsJggQWCjCNYBmbKZRwa/oFKbYD9
+ /Rpyz4Rcf6QCe50T+BWNFEH7vTeuJZD48b7IlVomqQKHK0U=
+X-Google-Smtp-Source: APXvYqxUpKEP0Q0gXR2lBVCRZ2qrpoNNxlvvoEmSxXdYljJQf7W5SlGiBOUcO3UPSs/8YlrD+ay1i0PlUgGCZawrpqs=
+X-Received: by 2002:aca:5cd7:: with SMTP id
+ q206mr41721837oib.146.1564133060523; 
+ Fri, 26 Jul 2019 02:24:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190725162704.12622-2-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 26 Jul 2019 09:18:56 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] block: Remove blk_pread_unthrottled()
+References: <20190725163710.11703-1-peter.maydell@linaro.org>
+ <20190725163710.11703-3-peter.maydell@linaro.org>
+ <20190725172712.GM2656@work-vm>
+ <CAFEAcA-jGvNS4N4qobLekHYdV82qSUWVQOvTRQbrpcCRF0Yvwg@mail.gmail.com>
+ <20190725180007.GN2656@work-vm>
+In-Reply-To: <20190725180007.GN2656@work-vm>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jul 2019 10:24:09 +0100
+Message-ID: <CAFEAcA8T25Fq5wj8a-K9KAyXdfj3+HtW=kTJ13zr+-iHFz4-GA@mail.gmail.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
+Subject: Re: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
+ VMSTATE_STRUCT_VARRAY macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,88 +91,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-devel@nongnu.org
+Cc: Damien Hedde <damien.hedde@greensocs.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8
-Content-Type: multipart/mixed; boundary="sk0INQduNfTCFpm9sV98pJhaYQV0XPY2h";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-devel@nongnu.org
-Message-ID: <7af54232-2168-4509-a8e6-5fc712d28cf4@redhat.com>
-Subject: Re: [PATCH 1/4] block: Remove blk_pread_unthrottled()
-References: <20190725162704.12622-1-kwolf@redhat.com>
- <20190725162704.12622-2-kwolf@redhat.com>
-In-Reply-To: <20190725162704.12622-2-kwolf@redhat.com>
+On Thu, 25 Jul 2019 at 19:00, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+>
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+> > On Thu, 25 Jul 2019 at 18:27, Dr. David Alan Gilbert
+> > <dgilbert@redhat.com> wrote:
+> > >
+> > > * Peter Maydell (peter.maydell@linaro.org) wrote:
+> > > >  #define type_check_2darray(t1,t2,n,m) ((t1(*)[n][m])0 - (t2*)0)
+> > > > +/* Check that t2 is an array of t1 of size n */
+> > > >  #define type_check_array(t1,t2,n) ((t1(*)[n])0 - (t2*)0)
+> > >
+> > > I'd have to admit I don't understand why that does what you say;
+> > > I'd expected something to index a t2 pointer with [n].
+> >
+> > Note that this is just a comment describing what the existing
+> > macro does, as a way to distinguish its job from that of the
+> > new macro I'm adding.
+> >
+> > What happens here is that t2 is a type like "foo [32]", ie
+> > it is an array type already. t1 is the base 'foo' type; so the macro
+> > is checking that t1[n] matches t2, where n is passed in to us
+> > and must match the declared array size of the field (32 in
+> > my example). (In C the size of the array is carried around as
+> > part of its type, and must match on both sides of the expression;
+> > so if you pass in the name of an array field that's the wrong size the
+> > type check will fail, which is what we want.)
+>
+> Ah, OK that makes sense; what it really needs is that example to make
+> me realise that t2 was already the array.
 
---sk0INQduNfTCFpm9sV98pJhaYQV0XPY2h
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Would
 
-On 25.07.19 18:27, Kevin Wolf wrote:
-> The functionality offered by blk_pread_unthrottled() goes back to commi=
-t
-> 498e386c584. Then, we couldn't perform I/O throttling with synchronous
-> requests because timers wouldn't be executed in polling loops. So the
-> commit automatically disabled I/O throttling as soon as a synchronous
-> request was issued.
->=20
-> However, for geometry detection during disk initialisation, we always
-> used (and still use) synchronous requests even if guest requests use AI=
-O
-> later. Geometry detection was not wanted to disable I/O throttling, so
-> bdrv_pread_unthrottled() was introduced which disabled throttling only
-> temporarily.
->=20
-> All of this isn't necessary any more because we do run timers in pollin=
-g
-> loop and even synchronous requests are now using coroutine
-> infrastructure internally. For this reason, commit 90c78624f already
-> removed the automatic disabling of I/O throttling.
->=20
-> It's time to get rid of the workaround for the removed code, and its
-> abuse of blk_root_drained_begin()/end(), as well.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  include/sysemu/block-backend.h |  2 --
->  block/block-backend.c          | 16 ----------------
->  hw/block/hd-geometry.c         |  7 +------
->  3 files changed, 1 insertion(+), 24 deletions(-)
+/*
+ * Check that type t2 is an array of type t1 of size n,
+ * eg if t1 is 'foo' and n is 32 then t2 must be 'foo[32]'
+ */
 
-It took me a bit of git blaming to find out more about the history of
-timer execution (and finally arrived at
-https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03060.html),
-but now I=E2=80=99m reasonably confident.
+be clearer ?
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---sk0INQduNfTCFpm9sV98pJhaYQV0XPY2h--
-
---Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl06xXwACgkQ9AfbAGHV
-z0Dy9Af/SXXZLKTOk1AypeK+AFIzr9HnVWaze10bNmO2zUQUMweO/LSPmx+/Dhi2
-sbmGCRe2AhcXwZ2VxTQSe9L2uLmt9yiaByXnkJiudtsnpWD/rgkluU059l+jSTta
-Vunh52R1/FgtaH6ar3fnZKSw618LpM6YAKjVhFSOXMs7SRerDt+04j+eCKc6aukk
-kEK59IS4x5NfCXg614pKpR6JYKNLHFGKyCl3lvb3nyA/UWEDDjEeces7l4t9iHM3
-fxFoGFtlp/BMeu71KE86LqsXCSZvkVPMYdLX6H2G1WvXxToLt08fLfF3Ipy8x3q8
-Qkg9yRYwMj67myQZpNwsGXVSEQeyhQ==
-=j2pV
------END PGP SIGNATURE-----
-
---Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8--
+thanks
+-- PMM
 
