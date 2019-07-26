@@ -8,76 +8,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F4AC7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E21C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F18A22ADA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B4A822ADA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsBNHP00"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F18A22ADA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GgZ2FjrG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B4A822ADA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr6lN-0004xX-HP
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 16:24:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36211)
+	id 1hr6pS-0006ma-JY
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 16:28:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42306)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hr6lC-0004Xn-77
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:24:15 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hr6pH-0006Mu-Rg
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hr6lB-0000ma-6f
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:24:14 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:34007)
+ (envelope-from <alistair23@gmail.com>) id 1hr6pG-0001Ho-Ns
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:28:27 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:36530)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hr6lA-0000kR-Th; Fri, 26 Jul 2019 16:24:13 -0400
-Received: by mail-lf1-x144.google.com with SMTP id b29so30670199lfq.1;
- Fri, 26 Jul 2019 13:24:12 -0700 (PDT)
+ id 1hr6pG-0001FF-BO; Fri, 26 Jul 2019 16:28:26 -0400
+Received: by mail-lf1-x144.google.com with SMTP id q26so37952926lfc.3;
+ Fri, 26 Jul 2019 13:28:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PXPU/+3u/PF1EvWautdMOVSW0hs0VZxvTGJk3krtKXg=;
- b=XsBNHP00PjgCSCbp7vhXTjhYiiO0d8Mex4NT7yyc4R2wgtfnI86maYj+ZQQfO6BO4U
- IE80ETyTO7Y9VWBGtAuyQbayghxAZfgmnTihvJSgPw/TCJgFDS/bdFBtrhwiUDFW/a9F
- TZ4im8vSlgMqAE1QaaLd8wKsROKMhMN6sM/tW7FU4VQXXvQH4g+Uf9OgHAMi85zMlp67
- 2LM+Fz8ocFmQNn7kGnW/tf6knTcsZRIcUCVsRYlN5CMHuIY2w+xNMpbEbUk/KtGQO+rl
- fkgI1SXY9enHn1Re9MT32QqPte+ZV9lBWSRUxN8L5brL9l4fMkQ9CmdEtUQVzvpggjIv
- cKGQ==
+ :cc:content-transfer-encoding;
+ bh=pGy1g6EbkGS9Q9IepH/gSTvQmqyMRD/7i4dSk3cQ3e4=;
+ b=GgZ2FjrG+h3NIlSKZ5lIu4vxhA7IeCI2fq68qjfDZtHWzw/L9RbnE1JdsnNqkTfX3x
+ GQexWO901PqFwA7oPubrI4t3B/YrYjSvoNpW3m2Y2BKP9Wt71wr16mf9KRimmvhS6gTS
+ UahgVsy9gS/DCR878koMwHT1Z1eV/+3WNHlWauP+qHFFhOjkbY5VTRFntRA/b210DY5G
+ MksVto3JYXg8jQ0gE4R46b1Ik4zBEPj9lQI9W9CzCyc+n1HPoNJFkdolELkXtvssVj4r
+ wRQCwruEu6QjdG3iZIngVEyR7x5wnc8seiuWhF/CeQ5mUKOLlFmuD+tN1U/mg96P0IDY
+ kG3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PXPU/+3u/PF1EvWautdMOVSW0hs0VZxvTGJk3krtKXg=;
- b=KUekyOtAv669V0UaVtPtqOx8bSH7Zq07RG2AibEq0WhkQqlR6aEyzdgGdkasvJiCp2
- LGTRvr9QEWt1Tue0IhIxd2Z750MHBucBnHfGOIJZcWDSZ/RakREddrriDPM6dvT4FMs0
- vOZ2kbvH1cM/FcG6wgZ1b2TGOHv9vg55puz+1+hIiob3I96v5UmbkjdvmlwuRmeSKgLv
- pO6OAwTvpZpKdK5O47sfspjP0V3/EL4/ccXjXluAfkgQrqu5ruDL/4XOAnJLSmi2yPkS
- ZIUI74szdHhiJBvdgA52puOHgewxNBe3g2Z0KyzywSV7deW9OGM155bEUHn6r8vK2NRm
- V4Mw==
-X-Gm-Message-State: APjAAAUb5kNWjFCGEWTVNBGrQauy4v1xpZa/TbenY2i4Jk73J01T4JJ3
- WJGj3el2/m4YTxJell0GeSY10it0Xc5Wm6HxMbdIPKx4
-X-Google-Smtp-Source: APXvYqyiaMU5q318h6TYVoZgB5sqKMzzvw1zMtJCj2+hgyta6uvWH/zYTwMAbXfQXzCkXXPAgFBakMv71EObS0ZosNg=
-X-Received: by 2002:a19:6904:: with SMTP id e4mr26517940lfc.156.1564172651710; 
- Fri, 26 Jul 2019 13:24:11 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=pGy1g6EbkGS9Q9IepH/gSTvQmqyMRD/7i4dSk3cQ3e4=;
+ b=KdR03mX+ddUFhw+qq9fD/cJ14VODhg19jn0QrzV0M90L2sFD5e1xyOqdqy0R2oAx6e
+ BZlS2+3CrXiejb8S3FvhWUZ+ABWAlvA+O7gtKOEponNjyBXuEpyAFT29RKwEAgk1wkSC
+ 3ZThVvPHUDN7UFKg042jASMUC4cmbATGKUWpZkIinCA3QQtJ+Qoc8pwlb06/YNZJwYer
+ 5INeG1luBu3owk3iMlXX69QS3J9DS3NRsspoC4lSnm0aZvHaHAHs9XgNL6ijSm427Wj+
+ VpRGwm+2L9hA2FfNMlX/Z37HfPTgw22ZjrsbjyPqafuHgYwNgDi5/P49Otkf3L6JqQTX
+ ko7w==
+X-Gm-Message-State: APjAAAWJkic0mEDpqQ11LEDLntQWjV1QJ3G7sVrxLisjqQb3VNem5E7p
+ ajfiHtWhGE8Z0iN5ba3JG+JUuQ+/ziZWHMMffMA=
+X-Google-Smtp-Source: APXvYqxJlud96LPVCRCla5yshkaU/r1FCnWPbkb15WNXSTqAyUPAXSZnGgGcGqys8ULEcf7imrRnqMmZkN50uQ+yqCU=
+X-Received: by 2002:a19:6a01:: with SMTP id u1mr45203396lfu.141.1564172904656; 
+ Fri, 26 Jul 2019 13:28:24 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1564080680.git.alistair.francis@wdc.com>
- <10db21dad60854653b7b6272a44a63e2473af2b0.1564080680.git.alistair.francis@wdc.com>
- <CAEiOBXV1CfOfpTFFNas0cALjAkhjgDb78GkLusPO2bzoHROrxA@mail.gmail.com>
-In-Reply-To: <CAEiOBXV1CfOfpTFFNas0cALjAkhjgDb78GkLusPO2bzoHROrxA@mail.gmail.com>
+ <b415f5b51e09418760b95e5c73fad5e68b97f173.1564080680.git.alistair.francis@wdc.com>
+ <CANnJOVEyy7wb74eEucj5t=xonOvUFTPWuty9R+-KP0DLc+L7zQ@mail.gmail.com>
+In-Reply-To: <CANnJOVEyy7wb74eEucj5t=xonOvUFTPWuty9R+-KP0DLc+L7zQ@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 26 Jul 2019 13:20:38 -0700
-Message-ID: <CAKmqyKPcC8x2vguti1V_c6LXdTrPQU_T1OFftvpvU1iwuofjjA@mail.gmail.com>
-To: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Fri, 26 Jul 2019 13:24:51 -0700
+Message-ID: <CAKmqyKOh-7LE5ry_RG56-TM0bqj_kckcK74W8kFLiPHrjjx7hw@mail.gmail.com>
+To: Jonathan Behrens <fintelia@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH-4.2 v1 5/6] target/riscv: Update the
- Hypervisor CSRs to v0.4
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH-4.2 v1 2/6] target/riscv:
+ Remove strict perm checking for CSR R/W
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,83 +99,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 26, 2019 at 10:41 AM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
+On Thu, Jul 25, 2019 at 2:48 PM Jonathan Behrens <fintelia@gmail.com> wrote=
+:
 >
->
->
-> On Fri, Jul 26, 2019 at 2:55 AM Alistair Francis <alistair.francis@wdc.com> wrote:
->>
->> Update the Hypervisor CSR addresses to match the v0.4 spec.
->>
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> ---
->>  target/riscv/cpu_bits.h | 35 ++++++++++++++++++-----------------
->>  1 file changed, 18 insertions(+), 17 deletions(-)
->>
->> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
->> index 11f971ad5d..97b96c4e19 100644
->> --- a/target/riscv/cpu_bits.h
->> +++ b/target/riscv/cpu_bits.h
->> @@ -173,6 +173,24 @@
->>  #define CSR_SPTBR           0x180
->>  #define CSR_SATP            0x180
->>
->> +/* Hpervisor CSRs */
->> +#define CSR_HSTATUS         0x600
->> +#define CSR_HEDELEG         0x602
->> +#define CSR_HIDELEG         0x603
->> +#define CSR_HCOUNTERNEN     0x606
->> +#define CSR_HGATP           0x680
->> +
->> +#if defined(TARGET_RISCV32)
->> +#define HGATP_MODE           SATP32_MODE
->> +#define HGATP_ASID           SATP32_ASID
->> +#define HGATP_PPN            SATP32_PPN
->> +#endif
->> +#if defined(TARGET_RISCV64)
->> +#define HGATP_MODE           SATP64_MODE
->> +#define HGATP_ASID           SATP64_ASID
->> +#define HGATP_PPN            SATP64_PPN
->> +#endif
->> +
->
->
-> Basd on spec, is HGATP_VMID  preferable ?
+> Unless I'm missing something, this is the only place that QEMU checks the=
+ privilege level for read and writes to CSRs. The exact computation used he=
+re won't work with the hypervisor extension, but we also can't just get rid=
+ of privilege checking entirely...
 
-Yep, updated.
+The csr_ops struct contains a checker function, so there are still
+some checks occurring. I haven't done negative testing on this patch,
+but the current check doesn't seem to make any sense so it should be
+removed. We can separately discuss adding more checks but this current
+way base don CSR address just seems strange.
 
 Alistair
 
 >
-> chihmin
+> Jonathan
+>
+> On Thu, Jul 25, 2019 at 2:56 PM Alistair Francis <alistair.francis@wdc.co=
+m> wrote:
 >>
->>  /* Physical Memory Protection */
->>  #define CSR_PMPCFG0         0x3a0
->>  #define CSR_PMPCFG1         0x3a1
->> @@ -206,23 +224,6 @@
->>  #define CSR_DPC             0x7b1
->>  #define CSR_DSCRATCH        0x7b2
+>> The privledge check based on the CSR address mask 0x300 doesn't work
+>> when using Hypervisor extensions so remove the check
 >>
->> -/* Hpervisor CSRs */
->> -#define CSR_HSTATUS         0xa00
->> -#define CSR_HEDELEG         0xa02
->> -#define CSR_HIDELEG         0xa03
->> -#define CSR_HGATP           0xa80
->> -
->> -#if defined(TARGET_RISCV32)
->> -#define HGATP_MODE           SATP32_MODE
->> -#define HGATP_ASID           SATP32_ASID
->> -#define HGATP_PPN            SATP32_PPN
->> -#endif
->> -#if defined(TARGET_RISCV64)
->> -#define HGATP_MODE           SATP64_MODE
->> -#define HGATP_ASID           SATP64_ASID
->> -#define HGATP_PPN            SATP64_PPN
->> -#endif
->> -
->>  /* Performance Counters */
->>  #define CSR_MHPMCOUNTER3    0xb03
->>  #define CSR_MHPMCOUNTER4    0xb04
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  target/riscv/csr.c | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+>> index e0d4586760..af3b762c8b 100644
+>> --- a/target/riscv/csr.c
+>> +++ b/target/riscv/csr.c
+>> @@ -797,9 +797,8 @@ int riscv_csrrw(CPURISCVState *env, int csrno, targe=
+t_ulong *ret_value,
+>>
+>>      /* check privileges and return -1 if check fails */
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    int csr_priv =3D get_field(csrno, 0x300);
+>>      int read_only =3D get_field(csrno, 0xC00) =3D=3D 3;
+>> -    if ((write_mask && read_only) || (env->priv < csr_priv)) {
+>> +    if (write_mask && read_only) {
+>>          return -1;
+>>      }
+>>  #endif
 >> --
 >> 2.22.0
 >>
