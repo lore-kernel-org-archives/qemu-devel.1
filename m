@@ -2,70 +2,89 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4428C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:47:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A7FC41514
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:48:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0332238C
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:47:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0332238C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B19D22BEF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:48:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtXGsVOV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B19D22BEF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqzd8-0001L0-Uy
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:47:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51094)
+	id 1hqzdp-0002su-K2
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:48:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51286)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jdillama@redhat.com>) id 1hqzct-0000pq-PW
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:47:13 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hqzdW-0001uG-82
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jdillama@redhat.com>) id 1hqzcr-0002OH-Vc
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:47:11 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:38669)
+ (envelope-from <stefanha@gmail.com>) id 1hqzdU-0003Py-Hz
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:47:49 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38068)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1hqzcr-0002Hm-Lv
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:47:09 -0400
-Received: by mail-ed1-f65.google.com with SMTP id r12so18373217edo.5
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 05:47:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hqzdU-0003OA-B0
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:47:48 -0400
+Received: by mail-wm1-x341.google.com with SMTP id s15so26233002wmj.3
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 05:47:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=3Kz1slM/+SRb0eQiqN6PsjiXMLsLp7e9nE3F3vkRWbs=;
+ b=HtXGsVOVyJrnLRrWcRcdMrTVoan8Q2fAwF1sIMdg3NdQM5Cw++x6M00/xUebAu5vzD
+ ZSYPndu+FfZS5razdIHrOvzoL2MkfZh2xaOeIA2sxAqDUFGA8EItUXFuXaKNFmwNK4I6
+ gF7WCpzdNC8LuKfaGQzVGWW9l9YQswFTQi14M2PiCLFNc/b7pgpHwZy1Xw0S5Qco75gV
+ nCaEOZ6HA9fUWHiUoBi5zf7Gl8BccGSLwueQB53PeQgAuhZLf3BWlVualT4v7OycTJHA
+ KIz6Yhyq/yhoOIPL8DXuaI6KbgC+YuepZ+ldozv64+wJ1gPYyipJNzjSxlhtjOaA+ce3
+ nuvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=O7RI+ANZCHNvgYsg/bz6a/7oVysA3D5CTaFJ3UtCDDA=;
- b=kAyGj+2rCokZG/CEfXG1670vKS5IpSe0CrJZRCQKYWRU7MUKfbVSHoyTpgODSUdpGK
- gbPp+pUrF8CmKZvS7IDAwx4n6yHbo1JOJdBOE0Rs3iOAePseX0mIm3RqhV8LeBXcC+pu
- Z/uniPB/mkhb4B78wRk1hyy8f9GC90ZBmklIHQ0hqS9I63HnoiKbDsMjMu02PiOo6iQ5
- dz0OnNkrsKHY4fiHSER641VYbJP1Dqnb1A8f/Igfe53t7RBtx5hf3S8V8ZUHYj12gPEw
- oPi0JxGD98zkkN7FwSEkRq+S7L9aF57/HQkSMsdBBOcO4VGhOYXorT+I4LozjAiAHdDx
- j3ng==
-X-Gm-Message-State: APjAAAWzllH7XFT2sBYGES4H6XBrAkTaBBusYQq7aoQcWaWvECj0FUDo
- YtYUu9SO5aEnAHIL6VZ/v8MZAOdQ/UeG5Ut6+59nlQ==
-X-Google-Smtp-Source: APXvYqy6eZ7MB/LTida1+Hif5ynLEAtu1BH0PdT2GENSQFHhWtDlOYEa/eVnCqsVADFPTTMy7lyxJQrwFGtmI6VCkME=
-X-Received: by 2002:a50:f05a:: with SMTP id u26mr82533525edl.116.1564145228041; 
- Fri, 26 Jul 2019 05:47:08 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=3Kz1slM/+SRb0eQiqN6PsjiXMLsLp7e9nE3F3vkRWbs=;
+ b=JjGK5mC/Amj2GrgARRCEK72ui8Pd5eTbePBB0hWi4ZDZWiMGCLmochgXTgRuQ3GV4S
+ StOfXNEStAzNkPYJgituX0ii0m+8JObDOcPTneKq0rJEobORrwbf91Vf+NuPOuiafpeq
+ f8LZj2PvqLF5MShud9RO0ISbbaZpLPzTn/eXuCKXYaJYWQsIRS5DotbFdDhLMfncRGZl
+ r0OGRWM0wnK6mrDA62gkjsEouWk6qYgyDZ/KI8CwrCYV7Zv1SinGPBk+TdYgItIs4G25
+ D43FZhbJT1USRS/2RRZZR6/C95UrrPehP4tiUK6BEWGhi+Pa4KcG5aqouyg/LnoJfcoc
+ 5EeA==
+X-Gm-Message-State: APjAAAWH+v/1BoAl0EE80691uyis13z3Ft3Mgw/jKfJzRXpXNgXBAsy0
+ xMK/WHesTB1FEA7/2ThgcqU=
+X-Google-Smtp-Source: APXvYqxpoG3NS8gL2dGUpsjRXFadhtM0XfVMWEdDha4wTbNmXn47IyaxDvj4KQq6w6MEj1MFz2ge+g==
+X-Received: by 2002:a1c:238d:: with SMTP id j135mr34825490wmj.39.1564145267249; 
+ Fri, 26 Jul 2019 05:47:47 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id i12sm61979736wrx.61.2019.07.26.05.47.46
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 26 Jul 2019 05:47:46 -0700 (PDT)
+Date: Fri, 26 Jul 2019 13:47:45 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Message-ID: <20190726124745.GC25977@stefanha-x1.localdomain>
+References: <20190725032321.12721-1-alxndr@bu.edu>
+ <20190725032321.12721-7-alxndr@bu.edu>
 MIME-Version: 1.0
-References: <20190723071342.383909-1-sgarzare@redhat.com>
- <CA+aFP1BMUitx40WDT-fcWDjO62j3EsoSdg=3HF2b6c1EdwzUxg@mail.gmail.com>
- <20190725081334.s2btvq3zdorj7lb5@steredhat>
- <CA+aFP1CjAMdbFOTy125xWLVm6mE35MX+6pOQ-fRq8NYpPkdRjw@mail.gmail.com>
- <20190726084816.buweyjycku5qgl3o@steredhat>
-In-Reply-To: <20190726084816.buweyjycku5qgl3o@steredhat>
-From: Jason Dillaman <jdillama@redhat.com>
-Date: Fri, 26 Jul 2019 08:46:56 -0400
-Message-ID: <CA+aFP1A5khhJj+7Yhwaghhsu7Y-pjiiAAHDN4cB-ZSc6jLtfig@mail.gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.208.65
-Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: add preallocation support
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="zCKi3GIZzVBPywwA"
+Content-Disposition: inline
+In-Reply-To: <20190725032321.12721-7-alxndr@bu.edu>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [RFC 06/19] fuzz: Add ramfile for fast
+ vmstate/vmload
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,298 +96,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: dillaman@redhat.com
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, dillaman <dillaman@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 26, 2019 at 4:48 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> On Thu, Jul 25, 2019 at 09:30:30AM -0400, Jason Dillaman wrote:
-> > On Thu, Jul 25, 2019 at 4:13 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > >
-> > > On Wed, Jul 24, 2019 at 01:48:42PM -0400, Jason Dillaman wrote:
-> > > > On Tue, Jul 23, 2019 at 3:13 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
-> > > > >
-> > > > > This patch adds the support of preallocation (off/full) for the RBD
-> > > > > block driver.
-> > > > > If rbd_writesame() is available and supports zeroed buffers, we use
-> > > > > it to quickly fill the image when full preallocation is required.
-> > > > >
-> > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > > > ---
-> > > > > v3:
-> > > > >  - rebased on master
-> > > > >  - filled with zeroed buffer [Max]
-> > > > >  - used rbd_writesame() only when we can disable the discard of zeroed
-> > > > >    buffers
-> > > > >  - added 'since: 4.2' in qapi/block-core.json [Max]
-> > > > >  - used buffer as large as the "stripe unit"
-> > > > > ---
-> > > > >  block/rbd.c          | 202 ++++++++++++++++++++++++++++++++++++++++---
-> > > > >  qapi/block-core.json |   5 +-
-> > > > >  2 files changed, 192 insertions(+), 15 deletions(-)
-> > > > >
-> > > > > diff --git a/block/rbd.c b/block/rbd.c
-> > > > > index 59757b3120..d923a5a26c 100644
-> > > > > --- a/block/rbd.c
-> > > > > +++ b/block/rbd.c
-> > > > > @@ -64,6 +64,7 @@
-> > > > >  #define OBJ_MAX_SIZE (1UL << OBJ_DEFAULT_OBJ_ORDER)
-> > > > >
-> > > > >  #define RBD_MAX_SNAPS 100
-> > > > > +#define RBD_DEFAULT_CONCURRENT_OPS 10
-> > > > >
-> > > > >  /* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
-> > > > >  #ifdef LIBRBD_SUPPORTS_IOVEC
-> > > > > @@ -104,6 +105,7 @@ typedef struct BDRVRBDState {
-> > > > >      char *image_name;
-> > > > >      char *snap;
-> > > > >      uint64_t image_size;
-> > > > > +    bool ws_zero_supported; /* rbd_writesame() supports zeroed buffers */
-> > > > >  } BDRVRBDState;
-> > > > >
-> > > > >  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-> > > > > @@ -333,6 +335,155 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
-> > > > >      }
-> > > > >  }
-> > > > >
-> > > > > +static int qemu_rbd_get_max_concurrent_ops(rados_t cluster)
-> > > > > +{
-> > > > > +    char buf[16];
-> > > > > +    int ret, max_concurrent_ops;
-> > > > > +
-> > > > > +    ret = rados_conf_get(cluster, "rbd_concurrent_management_ops", buf,
-> > > > > +                         sizeof(buf));
-> > > > > +    if (ret < 0) {
-> > > > > +        return RBD_DEFAULT_CONCURRENT_OPS;
-> > > > > +    }
-> > > > > +
-> > > > > +    ret = qemu_strtoi(buf, NULL, 10, &max_concurrent_ops);
-> > > > > +    if (ret < 0) {
-> > > > > +        return RBD_DEFAULT_CONCURRENT_OPS;
-> > > > > +    }
-> > > > > +
-> > > > > +    return max_concurrent_ops;
-> > > > > +}
-> > > > > +
-> > > > > +static int qemu_rbd_do_truncate(rados_t cluster, rbd_image_t image,
-> > > > > +                                int64_t offset, PreallocMode prealloc,
-> > > > > +                                bool ws_zero_supported, Error **errp)
-> > > > > +{
-> > > > > +    uint64_t current_length;
-> > > > > +    char *buf = NULL;
-> > > > > +    int ret;
-> > > > > +
-> > > > > +    ret = rbd_get_size(image, &current_length);
-> > > > > +    if (ret < 0) {
-> > > > > +        error_setg_errno(errp, -ret, "Failed to get file length");
-> > > > > +        goto out;
-> > > > > +    }
-> > > > > +
-> > > > > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
-> > > > > +        error_setg(errp, "Cannot use preallocation for shrinking files");
-> > > > > +        ret = -ENOTSUP;
-> > > > > +        goto out;
-> > > > > +    }
-> > > > > +
-> > > > > +    switch (prealloc) {
-> > > > > +    case PREALLOC_MODE_FULL: {
-> > > > > +        uint64_t buf_size, current_offset = current_length;
-> > > > > +        ssize_t bytes;
-> > > > > +
-> > > > > +        ret = rbd_get_stripe_unit(image, &buf_size);
-> > > > > +        if (ret < 0) {
-> > > > > +            error_setg_errno(errp, -ret, "Failed to get stripe unit");
-> > > > > +            goto out;
-> > > > > +        }
-> > > > > +
-> > > > > +        ret = rbd_resize(image, offset);
-> > > > > +        if (ret < 0) {
-> > > > > +            error_setg_errno(errp, -ret, "Failed to resize file");
-> > > > > +            goto out;
-> > > > > +        }
-> > > > > +
-> > > > > +        buf = g_malloc0(buf_size);
-> > > > > +
-> > > > > +#ifdef LIBRBD_SUPPORTS_WRITESAME
-> > > > > +        if (ws_zero_supported) {
-> > > > > +            uint64_t writesame_max_size;
-> > > > > +            int max_concurrent_ops;
-> > > > > +
-> > > > > +            max_concurrent_ops = qemu_rbd_get_max_concurrent_ops(cluster);
-> > > > > +            /*
-> > > > > +             * We limit the rbd_writesame() size to avoid to spawn more then
-> > > > > +             * 'rbd_concurrent_management_ops' concurrent operations.
-> > > > > +             */
-> > > > > +            writesame_max_size = MIN(buf_size * max_concurrent_ops, INT_MAX);
-> > > >
-> > > > In the most efficient world, the 'buf_size' would be some small, fixed
-> > > > power of 2 value (like 512 bytes) since there isn't much need to send
-> > > > extra zeroes. You would then want to writesame the full stripe period
-> > > > (if possible), where a stripe period is the data block object size
-> > > > (defaults to 4MiB and is availble via 'rbd_stat') * the stripe count.
-> > > > In this case, the stripe count becomes the number of in-flight IOs.
-> > > > Therefore, you could substitute its value w/ the max_concurrent_ops to
-> > > > ensure you are issuing exactly max_concurrent_ops IOs per
-> > > > rbd_writesame call.
-> > > >
-> > >
-> > > Initially, I had a fixed buffer size to 4 KiB, but I noted that, when
-> > > we didn't use writesame, the rbd_write() was very slow, so I used the
-> > > stripe unit as a buffer size.
-> > >
-> > > Do you think is better to have a small buffer (512 byte) when we use
-> > > writesame or a 'stripe unit' buffer when we can't use it?
-> >
-> > I'd use a small buffer for rbd_writesame and then just reallocate the
->
-> My idea was to allocate a small buffer for rbd_writesame and use the
-> same to write the remaining bytes that should be a few.
-> If the buffer was not allocated (so we didn't use the rbd_writesame),
-> I'll allocate the big one:
->
->         if (ws_zero_supported) {
->             buf_size = 512;
->             buf = g_malloc0(buf_size);
->             ...
->         }
->
->         if (!buf) {
->             buf_size = object_size * max_concurrent_ops;
->             buf = g_malloc0(buf_size);
->         }
->
->         while (current_offset < offset) {
->             bytes = rbd_write(...)
->             ...
->         }
->
-> > buffer to a larger size for "rbd_write". It would be most efficient to
-> > allocate a "object size * max concurrent ops" -sized buffer (up to
->
-> Why "object size * max concurrent ops" and not
-> "stripe_unit * max concurrent ops"?
-> IIUC stripe_unit can be smaller than object size.
 
-Correct, stripe unit *must* be smaller than the object size (and both
-are powers of two). However, it's more efficient to send fewer larger
-writes to a backing object than sending more small writes --
-especially in the case of writesame where you don't have the network
-overhead of transferring a large zeroed buffer. Replacing the full
-backing object is even more efficient since it will just need to
-perform a single backing disk allocation that will be continuous
-instead of fragmented.
+--zCKi3GIZzVBPywwA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > some reasonable maximum) for the standard rbd_write. Just make sure
-> > your "rbd_writes" offsets / length is aligned to the stripe period for
-> > the most efficient IO (i.e. the initial write might be smaller than
-> > the stripe period if the starting offset is unaligned).
-> >
->
-> Okay, I'll do the first small write to align the next writes to the
-> stripe period (obj size * stripe_count).
->
-> > > > > +
-> > > > > +            while (offset - current_offset > buf_size) {
-> > > > > +                bytes = MIN(offset - current_offset, writesame_max_size);
-> > > > > +                /*
-> > > > > +                 * rbd_writesame() supports only request where the size of the
-> > > > > +                 * operation is multiple of buffer size.
-> > > > > +                 */
-> > > > > +                bytes -= bytes % buf_size;
-> > > > > +
-> > > > > +                bytes = rbd_writesame(image, current_offset, bytes, buf,
-> > > > > +                                      buf_size, 0);
-> > > >
-> > > > If the RBD in-memory cache is enabled during this operation, the
-> > > > writesame will effectively just be turned into a write. Therefore,
-> > > > when pre-allocating, you will want to disable the cache.
-> > > >
-> > >
-> > > During the creation, when preallocation is often used, we disable the cache:
-> > >
-> > > static int qemu_rbd_do_create(BlockdevCreateOptions *options,
-> > >                               const char *keypairs, const char *password_secret,
-> > >                               Error **errp)
-> > > {
-> > >     ...
-> > >
-> > >     ret = qemu_rbd_connect(&cluster, &io_ctx, opts->location, false, keypairs,
-> > >                                                               ^^ cache param
-> > >     ...
-> > > }
-> > >
-> > >
-> > > Do you think I should disable it in any case during the preallocation?
-> >
-> > Assuming you can grow an image w/ full preallocation, I would
-> > definitely want to ensure that the cache is disabled since otherwise
-> > you would just be performing regular (non-offloaded) writes.
-> >
->
-> Yes, make sense, I'll disable the cache.
->
-> > >
-> > >
-> > > > > +                if (bytes < 0) {
-> > > > > +                    ret = bytes;
-> > > > > +                    error_setg_errno(errp, -ret,
-> > > > > +                                     "Failed to write for preallocation");
-> > > > > +                    goto out;
-> > > > > +                }
-> > > > > +
-> > > > > +                current_offset += bytes;
-> > > > > +            }
-> > > > > +        }
-> > > > > +#endif /* LIBRBD_SUPPORTS_WRITESAME */
-> > > > > +
-> > > > > +        while (current_offset < offset) {
-> > > > > +            bytes = rbd_write(image, current_offset,
-> > > > > +                              MIN(offset - current_offset, buf_size), buf);
-> > > > > +            if (bytes < 0) {
-> > > > > +                ret = bytes;
-> > > > > +                error_setg_errno(errp, -ret,
-> > > > > +                                 "Failed to write for preallocation");
-> > > > > +                goto out;
-> > > > > +            }
-> > > > > +
-> > > > > +            current_offset += bytes;
-> > > > > +        }
-> > > > > +
-> > > > > +        ret = rbd_flush(image);
-> > > > > +        if (ret < 0) {
-> > > > > +            error_setg_errno(errp, -ret, "Failed to flush the file");
-> > > > > +            goto out;
-> > > > > +        }
-> > > > > +
-> > > > > +        break;
-> > > > > +    }
-> > > > > +    case PREALLOC_MODE_OFF:
-> > > > > +        ret = rbd_resize(image, offset);
-> > > >
-> > > > I'm not familiar enough w/ the QEMU block code, but why would the
-> > > > PREALLOC_MODE_FULL case not need to resize the image?
-> > >
-> > > PREALLOC_MODE_FULL need too, I did it just before the g_malloc0() in
-> > > this patch :-)
-> >
-> > Sorry I missed it. Would it make more sense to just do it before the
-> > switch statement so that you don't duplicate the code and resulting
-> > error handling? I guess just validate that the prealloc mode is
-> > supported before issuing the resize.
-> >
->
-> Sure, it's more robust in this way.
->
-> Thanks,
-> Stefano
+On Thu, Jul 25, 2019 at 03:23:49AM +0000, Oleinik, Alexander wrote:
+> The ramfile allows vmstate to be saved and restored directly onto the
+> heap.
+>=20
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+>  tests/fuzz/ramfile.c | 127 +++++++++++++++++++++++++++++++++++++++++++
+>  tests/fuzz/ramfile.h |  20 +++++++
+>  2 files changed, 147 insertions(+)
+>  create mode 100644 tests/fuzz/ramfile.c
+>  create mode 100644 tests/fuzz/ramfile.h
+>=20
+> diff --git a/tests/fuzz/ramfile.c b/tests/fuzz/ramfile.c
+> new file mode 100644
+> index 0000000000..8da242e9ee
+> --- /dev/null
+> +++ b/tests/fuzz/ramfile.c
 
+Please put this in migration/.  This code doesn't do fuzzing and is
+general-purpose enough to be used by other parts of QEMU dealing with
+live migration.
 
+> @@ -0,0 +1,127 @@
+> +/*
+> + * =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> + *
+> + *       Filename:  ramfile.c
+> + *
+> + *    Description:  QEMUFile stored in dynamically allocated RAM for fas=
+t VMRestore
+> + *
+> + *         Author:  Alexander Oleinik (), alxndr@bu.edu
+> + *   Organization: =20
+> + *
+> + * =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> + */
 
--- 
-Jason
+Please use license headers with all new files that are created.
+Fine-grained filename and authorship information is already kept by git
+so it's not necessary to duplicate it here.
+
+> +#include <stdlib.h>
+> +#include "qemu/osdep.h"
+
+osdep.h already includes stdlib.h.
+
+> +#include "qemu-common.h"
+> +#include "exec/memory.h"
+> +#include "migration/qemu-file.h"
+> +#include "migration/migration.h"
+> +#include "migration/savevm.h"
+> +#include "ramfile.h"
+> +
+> +#define INCREMENT 10240
+> +#define IO_BUF_SIZE 32768
+> +#define MAX_IOV_SIZE MIN(IOV_MAX, 64)
+> +
+> +struct QEMUFile {
+> +    const QEMUFileOps *ops;
+> +    const QEMUFileHooks *hooks;
+> +    void *opaque;
+> +
+> +    int64_t bytes_xfer;
+> +    int64_t xfer_limit;
+> +
+> +    int64_t pos; /* start of buffer when writing, end of buffer
+> +                    when reading */
+> +    int buf_index;
+> +    int buf_size; /* 0 when writing */
+> +    uint8_t buf[IO_BUF_SIZE];
+> +
+> +    DECLARE_BITMAP(may_free, MAX_IOV_SIZE);
+> +    struct iovec iov[MAX_IOV_SIZE];
+> +    unsigned int iovcnt;
+> +
+> +    int last_error;
+> +};
+
+Wait, what?! :)
+
+Please add the ram file to qemu-file.c instead of duplicating QEMUFile.
+
+--zCKi3GIZzVBPywwA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl069nEACgkQnKSrs4Gr
+c8h9TQf/aGVUMv3VXnlG3c1/sMBniy1Njm2jiy8+rUCqdYkXq1IoJ8AK6GkPCI3p
+aw6I+W/6H1+HRCagkCtjxC1H6QjHRUqRrWikX3BCF0UJLY47O05nJOgMxKbQ2jbr
+S8sQICVmVvMzQNgvolr99q0z1pLvXqj4W1sEGvrg/IGQP8NmUjDd2qkqNXjVug45
+5kaPujcHAPcp2IZPpsIhVVRrFPP5KqfRoc+bjC2gJGZcXPQh3rJT4j5Fg17lV7IB
+1im2Z89ThhvKuxRXUJ6C+crMjz4IRzN0nV6UP6Iqb3u4cwUwZZsGj4CeBD0FmpBN
+hUR8a/Nyee8esMZRSEOYXM0Mh0B0uQ==
+=brrB
+-----END PGP SIGNATURE-----
+
+--zCKi3GIZzVBPywwA--
 
