@@ -7,81 +7,83 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1543EC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 15:20:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4EDDC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 15:20:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D136E216B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 15:20:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87203216B7
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 15:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pL+dJWWD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D136E216B7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sxX5HRgd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87203216B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr21J-0002Qf-LX
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 11:20:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37502)
+	id 1hr21L-0002aw-Bz
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 11:20:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37523)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hr20k-0000ld-QP
+ (envelope-from <peter.maydell@linaro.org>) id 1hr20l-0000lk-4e
  for qemu-devel@nongnu.org; Fri, 26 Jul 2019 11:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hr20j-0006v2-AM
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 11:19:58 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:37231)
+ (envelope-from <peter.maydell@linaro.org>) id 1hr20k-0006xA-0S
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 11:19:59 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45604)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hr20j-0006sK-2Q
+ id 1hr20j-0006u6-Oi
  for qemu-devel@nongnu.org; Fri, 26 Jul 2019 11:19:57 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id n9so29755678wrr.4
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 08:19:56 -0700 (PDT)
+Received: by mail-wr1-x444.google.com with SMTP id f9so54799355wre.12
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 08:19:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=T/xJHFrQoJ4wgCuUOjNgn0AYtE8Gq7pDtEMvN4Sp0P4=;
- b=pL+dJWWDO8lSq/SXLv2N5NtGOC3c4Uf04s1lDZjWUJJaCiP2zGoiqpaL/SC4l2g5vY
- ITP52zeWDOQ7CiJFsubb9Euteuh4aZj91isGqLzv9cOUL1T2npE88Ij7HuAEFbYTPpmC
- EZdwb38m57hzQS8ZM1ciDZJ296aJTMK33iTkNgQDayD+I6v/QqFaeSnB2ZnHGsUOvjM7
- 0kv05HhABn9dLf1FNuvO8FNkLYOwyeCKVxzkAg1KwxQ67w93wZwLY8V4ar+aQFBkhAPo
- N5Mbm1B2mZvlI2pn4W+fFWCcMei4fWSS62UK5Iu+P2t5GSHWfmC6tR6wj/UXiOPAY3HX
- L+eQ==
+ bh=Za/0QQNRcEYp14wTAGlfMqArIpeP/+fVrLhYpi/aXKo=;
+ b=sxX5HRgdTWO/NTfywZMnJHz76vwBHIMqrxWN2WKCseCjmRK1ILIrP3W2Gmtd2Ii1O1
+ F+hytU+j9wDlHaumWML1uKbyT3n6aKu565k5zFJv+BsTXTWusJUQbtfsfAInnPVeWdBl
+ RsUy/0yDlZwgyLPMohKXK53HlARzzRUthpM3p44/ITJ0CKHPHpZcfEpQA9RDvsM+a25T
+ I744GIdL8oG0px7l1Quuh2aKBSg1hPkS9FzD7POHj/Rx8990QJjUkpVNPMCn6j20POb4
+ Q8bWSMZOmtBLcbt3bfesGxQ1cXCC2P6IS8Q5PPMZ3SerqR8s5/VR2Rek+7kRLrjoS//j
+ vJlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=T/xJHFrQoJ4wgCuUOjNgn0AYtE8Gq7pDtEMvN4Sp0P4=;
- b=d4tOwZuVm6wspFs3eROucuVXpXs0Cer/xVtmNBTsPXG/vsDRnVOWkvGyHPrJRYPu2R
- qcZACSJ1N6Q9Cat/5X/52FasXoNIwi1a9GnaYD8F+MhZA6b96+MpwFh1SuqOz0xBR0O7
- KJOXMcoSPuTOJFaKDdBR/AEpfRsXq25zj2ldcL98Jbvtw1lk8SwAnvVx5XFFcvmq6jYd
- EyX2iG81k2FLOl6BEIJpfhaH1NrBw8XjvpxdM/L972vRqem89umCmtNRVi4d2eiu6Oyq
- y25SvwI+OonbPPJVfaxNfE1XjV//694cF37HWyDRW3u2E2W2QpaZVBd3rpYU3SiDnMMp
- BCsg==
-X-Gm-Message-State: APjAAAU5Aj0mBV+rLb3jhEO0av+bxy5+FTKFWAqLGzIgDSj+V1DmRhpk
- ugIhdYnswHSisC8eeZqj7h8bu+aykM1ufQ==
-X-Google-Smtp-Source: APXvYqxEq3otlCLAUDxob5yEP3gYI1a3UfpbOojkOTATUHI3OCwW4SILIiCdlH/rPdbRVhcvTn+qcw==
-X-Received: by 2002:a5d:4041:: with SMTP id w1mr91050824wrp.199.1564154395815; 
- Fri, 26 Jul 2019 08:19:55 -0700 (PDT)
+ bh=Za/0QQNRcEYp14wTAGlfMqArIpeP/+fVrLhYpi/aXKo=;
+ b=c+YCm8AHL4Yavhm3/Jlf7GxmJpdAsZfQcDY6alutLD/kaeMgHd3oI7RXIKD9i5tiD5
+ rLChV5QgSlU2G0xtrLQMMWFKZ1q18jEDJspqaX3QiX4CeylcvwuQ0JJvI/RfXGK0agy9
+ vOZ5J8unzlk9BOXKFE9aYa4fZbIzUWgtFcYiRxFzw+jXr0JOtx0vSWvE68qhFuKy6daR
+ 7iM4dQe3CZKymhSZYiD9sasDNYB5bzBQdTJrVSRvoGxNG0ksSa1R1ukhPX6pgj9otvYU
+ h9GbDCqODcw8pMFFJ992v2IDgm80iYV9tmn67fSwYPJ8IW2fLPftzB00MXFyIeHCYNWV
+ VorA==
+X-Gm-Message-State: APjAAAVjCrbo7q2m0wAeyXPNtMfgGUpRroib3WDjJP9UlKpbmfb50/Hk
+ EJOMa7iYR3vVYJ0IYyV8cXu8Q57sRJC5Lg==
+X-Google-Smtp-Source: APXvYqztAKgud2AK8jEVn/uM0V+/Er70pDUmafpVpB04i0kbrgbfD+zIERwauAY+wyDcOKJo5bt7DA==
+X-Received: by 2002:adf:f348:: with SMTP id e8mr997139wrp.76.1564154396609;
+ Fri, 26 Jul 2019 08:19:56 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v16sm32746844wrn.28.2019.07.26.08.19.54
+ by smtp.gmail.com with ESMTPSA id v16sm32746844wrn.28.2019.07.26.08.19.55
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 08:19:55 -0700 (PDT)
+ Fri, 26 Jul 2019 08:19:56 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 16:19:48 +0100
-Message-Id: <20190726151952.1932-2-peter.maydell@linaro.org>
+Date: Fri, 26 Jul 2019 16:19:49 +0100
+Message-Id: <20190726151952.1932-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190726151952.1932-1-peter.maydell@linaro.org>
 References: <20190726151952.1932-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
-Subject: [Qemu-devel] [PULL 1/5] pl330: fix vmstate description
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PULL 2/5] stellaris_input: Fix vmstate description of
+ buttons field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,63 +99,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Damien Hedde <damien.hedde@greensocs.com>
+gamepad_state::buttons is a pointer to an array of structs,
+not an array of structs, so should be declared in the vmstate
+with VMSTATE_STRUCT_VARRAY_POINTER_INT32; otherwise we
+corrupt memory on incoming migration.
 
-Fix the pl330 main and queue vmstate description.
-There were missing POINTER flags causing crashes during
-incoming migration because:
-+ PL330State chan field is a pointer to an array
-+ PL330Queue queue field is a pointer to an array
+We bump the vmstate version field as the easiest way to
+deal with the migration break, since migration wouldn't have
+worked reliably before anyway.
 
-Also bump corresponding vmsd version numbers.
-
-Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daude <philmd@redhat.com>
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-id: 20190724143553.21557-1-damien.hedde@greensocs.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+Message-id: 20190725163710.11703-2-peter.maydell@linaro.org
 ---
- hw/dma/pl330.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ hw/input/stellaris_input.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-index 58df965a468..a56a3e77713 100644
---- a/hw/dma/pl330.c
-+++ b/hw/dma/pl330.c
-@@ -218,11 +218,12 @@ typedef struct PL330Queue {
+diff --git a/hw/input/stellaris_input.c b/hw/input/stellaris_input.c
+index 20c87d86f40..3a666d61d47 100644
+--- a/hw/input/stellaris_input.c
++++ b/hw/input/stellaris_input.c
+@@ -60,12 +60,14 @@ static const VMStateDescription vmstate_stellaris_button = {
  
- static const VMStateDescription vmstate_pl330_queue = {
-     .name = "pl330_queue",
+ static const VMStateDescription vmstate_stellaris_gamepad = {
+     .name = "stellaris_gamepad",
 -    .version_id = 1,
 -    .minimum_version_id = 1,
 +    .version_id = 2,
 +    .minimum_version_id = 2,
      .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_VARRAY_UINT32(queue, PL330Queue, queue_size, 1,
--                                 vmstate_pl330_queue_entry, PL330QueueEntry),
-+        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(queue, PL330Queue, queue_size,
-+                                             vmstate_pl330_queue_entry,
-+                                             PL330QueueEntry),
+         VMSTATE_INT32(extension, gamepad_state),
+-        VMSTATE_STRUCT_VARRAY_INT32(buttons, gamepad_state, num_buttons, 0,
+-                              vmstate_stellaris_button, gamepad_button),
++        VMSTATE_STRUCT_VARRAY_POINTER_INT32(buttons, gamepad_state,
++                                            num_buttons,
++                                            vmstate_stellaris_button,
++                                            gamepad_button),
          VMSTATE_END_OF_LIST()
      }
  };
-@@ -278,12 +279,12 @@ struct PL330State {
- 
- static const VMStateDescription vmstate_pl330 = {
-     .name = "pl330",
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_STRUCT(manager, PL330State, 0, vmstate_pl330_chan, PL330Chan),
--        VMSTATE_STRUCT_VARRAY_UINT32(chan, PL330State, num_chnls, 0,
--                                     vmstate_pl330_chan, PL330Chan),
-+        VMSTATE_STRUCT_VARRAY_POINTER_UINT32(chan, PL330State, num_chnls,
-+                                             vmstate_pl330_chan, PL330Chan),
-         VMSTATE_VBUFFER_UINT32(lo_seqn, PL330State, 1, NULL, num_chnls),
-         VMSTATE_VBUFFER_UINT32(hi_seqn, PL330State, 1, NULL, num_chnls),
-         VMSTATE_STRUCT(fifo, PL330State, 0, vmstate_pl330_fifo, PL330Fifo),
 -- 
 2.20.1
 
