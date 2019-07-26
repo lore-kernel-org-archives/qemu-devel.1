@@ -6,50 +6,49 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E792FC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 06:49:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE0BC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 06:50:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C097E218B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 06:49:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C097E218B8
+	by mail.kernel.org (Postfix) with ESMTPS id 57B04218B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 06:50:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B04218B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqu3B-0001eg-Uh
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 02:49:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
+	id 1hqu3M-0002JA-DK
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 02:50:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35966)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqu2l-0000SE-Ua
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 02:49:33 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hqu2w-00011g-CY
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 02:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqu2h-00007K-6V
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 02:49:31 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.74]:39597)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <tony.nguyen@bt.com>) id 1hqu2t-0000kZ-UC
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 02:49:42 -0400
+Received: from smtpe1.intersmtp.com ([62.239.224.234]:31151)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hqu2I-00078I-Ra; Fri, 26 Jul 2019 02:49:04 -0400
+ id 1hqu2f-00087t-Ql; Fri, 26 Jul 2019 02:49:26 -0400
 Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- BWP09926079.bt.com (10.36.82.110) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 26
- Jul 2019 07:48:54 +0100
+ RDW083A012ED68.bt.com (10.187.98.38) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Fri, 26 Jul 2019 07:48:41 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
  tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 26 Jul 2019 07:48:56 +0100
+ Server (TLS) id 15.0.1395.4; Fri, 26 Jul 2019 07:49:19 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 26 Jul
- 2019 07:48:56 +0100
+ 2019 07:49:19 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v5 14/15] target/sparc: Add TLB entry with
- attributes
-Thread-Index: AQHVQ34yAoE6XDuWCEGtQerlTUUr8w==
-Date: Fri, 26 Jul 2019 06:48:56 +0000
-Message-ID: <1564123735589.34363@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v5 15/15] target/sparc: sun4u Invert Endian
+ TTE bit
+Thread-Index: AQHVQ34/izZ9UnNjhk+VqYg3zB4dlw==
+Date: Fri, 26 Jul 2019 06:49:19 +0000
+Message-ID: <1564123758372.45776@bt.com>
 References: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -59,13 +58,14 @@ X-MS-TNEF-Correlator:
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.42]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 62.239.224.234
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v5 14/15] target/sparc: Add TLB entry with
- attributes
+Subject: [Qemu-devel] [PATCH v5 15/15] target/sparc: sun4u Invert Endian TTE
+ bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,143 +91,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Append MemTxAttrs to interfaces so we can pass along up coming Invert
-Endian TTE bit on SPARC64.
+This bit configures endianness of PCI MMIO devices. It is used by
+Solaris and OpenBSD sunhme drivers.
+
+Tested working on OpenBSD.
+
+Unfortunately Solaris 10 had a unrelated keyboard issue blocking
+testing... another inch towards Solaris 10 on SPARC64 =3D)
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- target/sparc/mmu_helper.c | 32 ++++++++++++++++++--------------
- 1 file changed, 18 insertions(+), 14 deletions(-)
+ target/sparc/cpu.h        | 2 ++
+ target/sparc/mmu_helper.c | 8 +++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 8ed2250..77e8e07 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -277,6 +277,7 @@ enum {
+
+ #define TTE_VALID_BIT       (1ULL << 63)
+ #define TTE_NFO_BIT         (1ULL << 60)
++#define TTE_IE_BIT          (1ULL << 59)
+ #define TTE_USED_BIT        (1ULL << 41)
+ #define TTE_LOCKED_BIT      (1ULL <<  6)
+ #define TTE_SIDEEFFECT_BIT  (1ULL <<  3)
+@@ -293,6 +294,7 @@ enum {
+
+ #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
+ #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
++#define TTE_IS_IE(tte)      ((tte) & TTE_IE_BIT)
+ #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
+ #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
+ #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
 diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index cbd1e91..826e14b 100644
+index 826e14b..77dc86a 100644
 --- a/target/sparc/mmu_helper.c
 +++ b/target/sparc/mmu_helper.c
-@@ -88,7 +88,7 @@ static const int perm_table[2][8] =3D {
- };
+@@ -537,6 +537,10 @@ static int get_physical_address_data(CPUSPARCState *en=
+v, hwaddr *physical,
+         if (ultrasparc_tag_match(&env->dtlb[i], address, context, physical=
+)) {
+             int do_fault =3D 0;
 
- static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
--                                int *prot, int *access_index,
-+                                int *prot, int *access_index, MemTxAttrs *=
-attrs,
-                                 target_ulong address, int rw, int mmu_idx,
-                                 target_ulong *page_size)
- {
-@@ -219,6 +219,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, in=
-t size,
-     target_ulong vaddr;
-     target_ulong page_size;
-     int error_code =3D 0, prot, access_index;
-+    MemTxAttrs attrs =3D {};
-
-     /*
-      * TODO: If we ever need tlb_vaddr_to_host for this target,
-@@ -229,7 +230,7 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, in=
-t size,
-     assert(!probe);
-
-     address &=3D TARGET_PAGE_MASK;
--    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,
-+    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,=
- &attrs,
-                                       address, access_type,
-                                       mmu_idx, &page_size);
-     vaddr =3D address;
-@@ -490,8 +491,8 @@ static inline int ultrasparc_tag_match(SparcTLBEntry *t=
-lb,
-     return 0;
- }
-
--static int get_physical_address_data(CPUSPARCState *env,
--                                     hwaddr *physical, int *prot,
-+static int get_physical_address_data(CPUSPARCState *env, hwaddr *physical,
-+                                     int *prot, MemTxAttrs *attrs,
-                                      target_ulong address, int rw, int mmu=
-_idx)
- {
-     CPUState *cs =3D env_cpu(env);
-@@ -608,8 +609,8 @@ static int get_physical_address_data(CPUSPARCState *env=
-,
-     return 1;
- }
-
--static int get_physical_address_code(CPUSPARCState *env,
--                                     hwaddr *physical, int *prot,
-+static int get_physical_address_code(CPUSPARCState *env, hwaddr *physical,
-+                                     int *prot, MemTxAttrs *attrs,
-                                      target_ulong address, int mmu_idx)
- {
-     CPUState *cs =3D env_cpu(env);
-@@ -686,7 +687,7 @@ static int get_physical_address_code(CPUSPARCState *env=
-,
- }
-
- static int get_physical_address(CPUSPARCState *env, hwaddr *physical,
--                                int *prot, int *access_index,
-+                                int *prot, int *access_index, MemTxAttrs *=
-attrs,
-                                 target_ulong address, int rw, int mmu_idx,
-                                 target_ulong *page_size)
- {
-@@ -716,11 +717,11 @@ static int get_physical_address(CPUSPARCState *env, h=
-waddr *physical,
-     }
-
-     if (rw =3D=3D 2) {
--        return get_physical_address_code(env, physical, prot, address,
-+        return get_physical_address_code(env, physical, prot, attrs, addre=
-ss,
-                                          mmu_idx);
-     } else {
--        return get_physical_address_data(env, physical, prot, address, rw,
--                                         mmu_idx);
-+        return get_physical_address_data(env, physical, prot, attrs, addre=
-ss,
-+                                         rw, mmu_idx);
-     }
- }
-
-@@ -734,10 +735,11 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, =
-int size,
-     target_ulong vaddr;
-     hwaddr paddr;
-     target_ulong page_size;
-+    MemTxAttrs attrs =3D {};
-     int error_code =3D 0, prot, access_index;
-
-     address &=3D TARGET_PAGE_MASK;
--    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,
-+    error_code =3D get_physical_address(env, &paddr, &prot, &access_index,=
- &attrs,
-                                       address, access_type,
-                                       mmu_idx, &page_size);
-     if (likely(error_code =3D=3D 0)) {
-@@ -747,7 +749,8 @@ bool sparc_cpu_tlb_fill(CPUState *cs, vaddr address, in=
-t size,
-                                    env->dmmu.mmu_primary_context,
-                                    env->dmmu.mmu_secondary_context);
-
--        tlb_set_page(cs, vaddr, paddr, prot, mmu_idx, page_size);
-+        tlb_set_page_with_attrs(cs, vaddr, paddr, attrs, prot, mmu_idx,
-+                                page_size);
-         return true;
-     }
-     if (probe) {
-@@ -849,9 +852,10 @@ static int cpu_sparc_get_phys_page(CPUSPARCState *env,=
- hwaddr *phys,
- {
-     target_ulong page_size;
-     int prot, access_index;
-+    MemTxAttrs attrs =3D {};
-
--    return get_physical_address(env, phys, &prot, &access_index, addr, rw,
--                                mmu_idx, &page_size);
-+    return get_physical_address(env, phys, &prot, &access_index, &attrs, a=
-ddr,
-+                                rw, mmu_idx, &page_size);
- }
-
- #if defined(TARGET_SPARC64)
++            if (TTE_IS_IE(env->dtlb[i].tte)) {
++                attrs->byte_swap =3D true;
++            }
++
+             /* access ok? */
+             /* multiple bits in SFSR.FT may be set on TT_DFAULT */
+             if (TTE_IS_PRIV(env->dtlb[i].tte) && is_user) {
+@@ -792,7 +796,7 @@ void dump_mmu(CPUSPARCState *env)
+             }
+             if (TTE_IS_VALID(env->dtlb[i].tte)) {
+                 qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
+-                            ", %s, %s, %s, %s, ctx %" PRId64 " %s\n",
++                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n=
+",
+                             i,
+                             env->dtlb[i].tag & (uint64_t)~0x1fffULL,
+                             TTE_PA(env->dtlb[i].tte),
+@@ -801,6 +805,8 @@ void dump_mmu(CPUSPARCState *env)
+                             TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
+                             TTE_IS_LOCKED(env->dtlb[i].tte) ?
+                             "locked" : "unlocked",
++                            TTE_IS_IE(env->dtlb[i].tte) ?
++                            "yes" : "no",
+                             env->dtlb[i].tag & (uint64_t)0x1fffULL,
+                             TTE_IS_GLOBAL(env->dtlb[i].tte) ?
+                             "global" : "local");
 --
 1.8.3.1
 
