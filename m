@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A230C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 18:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01231C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 18:04:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD7DA21842
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 18:04:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C48AA21842
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 18:04:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yQ3jutNB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7DA21842
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cQRG/J8w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C48AA21842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr4Zm-0005F4-Hv
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 14:04:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59456)
+	id 1hr4aK-0007Fa-Iz
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 14:04:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59946)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hr4Nr-0007DA-Hp
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:52:00 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hr4O8-0008Do-5O
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hr4Nl-0001CH-Ec
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:51:57 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39975)
+ (envelope-from <richard.henderson@linaro.org>) id 1hr4Nu-0001Pj-88
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:52:13 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39246)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hr4Nk-00011l-1d
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:51:53 -0400
-Received: by mail-pg1-x541.google.com with SMTP id w10so25119044pgj.7
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:51:41 -0700 (PDT)
+ id 1hr4Nu-00017Y-0H
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:52:02 -0400
+Received: by mail-pf1-x441.google.com with SMTP id f17so20864591pfn.6
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:51:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=qeYs/8P06sT88x1fm+VX2RboOfuM1870Y9rpmWOvTNY=;
- b=yQ3jutNBhJLz4jBCk1TzF98u6da0i8ITj42pLZcF/8tNMCnmPEK/FGue1OrihmFZzA
- wRMe4XhlTsudTRVI05ErFLXxAz+QvaxTWFX1IXDFdhgYghGQNWS/k1DWBJ3SfGFWIdRj
- eGEZJuixaTHCGaelA6nYHa3q0VtOyBpgblzUNZ9F0B49DAcTlkOhfvs+cK85hPrrG0xm
- rDrg/ZlN+CVVN3vD38GbYwA5hxY8dvMb4/gJeEVWeMz79Ifhm/ZHaA1Sg+OjOYAJBluB
- odItBAJ8OqixFNdVmPKEczhf+HWQ7BcQlF5k9TRB3BWqHztzn6NT8mQglN/kOpVLtg1r
- H1+A==
+ bh=p0rmZulySAyfFLpagWq7oUqjHQLoiP7mX2YCEOpaKkw=;
+ b=cQRG/J8wdaeIQa1d78ZU1v82b4g3H1w2EnWaY/CpFqWTbdNYoY4OjkLDuT/d1JKiqD
+ BZO1NxsAwKo7LmfcyZA6zG4QTX75+laq6A0w8/6Ofx1xKfE1HVqh0D6XIN59O7vfEitv
+ 8PUIe5fSiibdNIL4cHZfRJ8LqTCcjdGzi5EmOK+VtPe/1dHgh0Nias4XzXVJ5jOxFCMS
+ TNyYOMuyseQuRppiv8JCvnmus0kwTGNV53LXWryDDtBkkseOtqN+aLskoVfKfenpedoJ
+ hTtFjF4J+UYTQ0LNF834xnFsv+vRsyPzQFp1/D+GJj7WcosPr8cGgY1qAzBrQq/jvdw4
+ gV/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=qeYs/8P06sT88x1fm+VX2RboOfuM1870Y9rpmWOvTNY=;
- b=rcnByn3W3kL+sZCW5TxwO1wRc9LMVIlmZ5yjTs2Rh7/m5jH9NkVN2pAHZwShsQlDuh
- x6gi3pCQPfOpQdv368loPHCvNhD5B9Z1BCcXcmDOIYLsWJ+Y/gg5dcZz+3M7RWGshzPR
- fApB/Q2o5Tdn+/mp5xJHlev+QwKK7GeSQfBY+Q5kg9bFozOtybbMrU4+f7P86lBfFIEU
- MDH7LpJMxr5bS/kujq05mxY4wkN7nYxXOmsKvqOrP7rC9ZHAOTnZCcwtYom/Ct8NYQX8
- dUUBqj+AQjMwsKVqH5tON+l6n9hoQWtt+1EUU0ewksdZACstBUBYcSB1c90EsXj5cnG4
- IiEA==
-X-Gm-Message-State: APjAAAXL3rrVd+gcnVP/5GCaGN1o2Y/bwx4hJA5P1CYg8+EvDN+DL6dm
- JREKVHWS2vPeKmbWcoMA80PTZbDE22Q=
-X-Google-Smtp-Source: APXvYqxKJDbn7SwD0+5ZWTdy4GmoIFg0GR78Yzy0RBwVJPjYxL2TKRTeDtC6Q/pi8eEvRGgn55czUA==
-X-Received: by 2002:a17:90a:30aa:: with SMTP id
- h39mr99848190pjb.32.1564163500297; 
- Fri, 26 Jul 2019 10:51:40 -0700 (PDT)
+ bh=p0rmZulySAyfFLpagWq7oUqjHQLoiP7mX2YCEOpaKkw=;
+ b=jjTH76XLHs7aoteGwWJXbd8p8+lfqLQLFLHQcjek8awLSLdz1ELDbWq5vvelj6+DYc
+ KWe00zTPbeKIK6/weIWV0VpkSVD44nxSrglQUIRIyGwLZH9AGMLHMYYTXvblRmAkcB9T
+ ADekhEiWnI7RiIhkqE0t8OgwynIjLOF5m11gt+d//MVGE/+ItHUyEXwSgDZRdcbvg5AK
+ sjBiLIFEngiR8oOlZNmSYQJSLFBuLjy7QfXxP3XhaUkWb3iCoAdhk7P+Kp8ZpqD9ePZc
+ pd/UFUYwYyWDL8lS6bfSjDb7pzrdVDIwbems7sMfs6SoGU/YvL9CKXgMSo04FZvB48iz
+ qjgQ==
+X-Gm-Message-State: APjAAAWy2WO0tlf2OIVggzDIFTeTDICDPQYfyWYcINonP5gZ2nH1syNh
+ MdfG4iizluMhxbP06iq3jV/TTLHbz6w=
+X-Google-Smtp-Source: APXvYqwyV4ssXD5XBnpkN0d44Pjw31q0galkVm2aDIJ9LQqyOSSHCSbjMJJc+bxnzppbWU02Oi0Hfw==
+X-Received: by 2002:a63:c442:: with SMTP id m2mr93954716pgg.286.1564163508292; 
+ Fri, 26 Jul 2019 10:51:48 -0700 (PDT)
 Received: from localhost.localdomain (97-126-117-207.tukw.qwest.net.
  [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id o24sm104287919pfp.135.2019.07.26.10.51.39
+ by smtp.gmail.com with ESMTPSA id o24sm104287919pfp.135.2019.07.26.10.51.47
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 10:51:39 -0700 (PDT)
+ Fri, 26 Jul 2019 10:51:47 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 10:50:20 -0700
-Message-Id: <20190726175032.6769-56-richard.henderson@linaro.org>
+Date: Fri, 26 Jul 2019 10:50:27 -0700
+Message-Id: <20190726175032.6769-63-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190726175032.6769-1-richard.henderson@linaro.org>
 References: <20190726175032.6769-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PATCH 55/67] target/arm: Convert T16,
- Change processor state
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH 62/67] target/arm: Convert T16, load (literal)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,154 +97,110 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 85 ++++++++++++++++++++----------------------
- target/arm/t16.decode  | 12 ++++++
- 2 files changed, 52 insertions(+), 45 deletions(-)
+ target/arm/translate.c | 42 ++----------------------------------------
+ target/arm/t16.decode  |  4 ++++
+ 2 files changed, 6 insertions(+), 40 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9c8e11bd3a..8f2adbbc7d 100644
+index f9022fe65c..f1cab437e0 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -7531,6 +7531,11 @@ static int negate(DisasContext *s, int x)
-     return -x;
+@@ -1011,14 +1011,6 @@ static inline void gen_aa32_ld##SUFF(DisasContext *s, TCGv_i32 val,      \
+                                      TCGv_i32 a32, int index)            \
+ {                                                                        \
+     gen_aa32_ld_i32(s, val, a32, index, OPC | s->be_data);               \
+-}                                                                        \
+-static inline void gen_aa32_ld##SUFF##_iss(DisasContext *s,              \
+-                                           TCGv_i32 val,                 \
+-                                           TCGv_i32 a32, int index,      \
+-                                           ISSInfo issinfo)              \
+-{                                                                        \
+-    gen_aa32_ld##SUFF(s, val, a32, index);                               \
+-    disas_set_da_iss(s, OPC, issinfo);                                   \
  }
  
-+static int plus_2(DisasContext *s, int x)
-+{
-+    return x + 2;
-+}
-+
- static int times_2(DisasContext *s, int x)
- {
-     return x * 2;
-@@ -10163,6 +10168,9 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
- {
-     uint32_t mask, val;
- 
-+    if (ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M)) {
-+        return false;
-+    }
-     if (IS_USER(s)) {
-         /* Implemented as NOP in user mode.  */
-         return true;
-@@ -10193,6 +10201,36 @@ static bool trans_CPS(DisasContext *s, arg_CPS *a)
-     return true;
+ #define DO_GEN_ST(SUFF, OPC)                                             \
+@@ -1026,14 +1018,6 @@ static inline void gen_aa32_st##SUFF(DisasContext *s, TCGv_i32 val,      \
+                                      TCGv_i32 a32, int index)            \
+ {                                                                        \
+     gen_aa32_st_i32(s, val, a32, index, OPC | s->be_data);               \
+-}                                                                        \
+-static inline void gen_aa32_st##SUFF##_iss(DisasContext *s,              \
+-                                           TCGv_i32 val,                 \
+-                                           TCGv_i32 a32, int index,      \
+-                                           ISSInfo issinfo)              \
+-{                                                                        \
+-    gen_aa32_st##SUFF(s, val, a32, index);                               \
+-    disas_set_da_iss(s, OPC, issinfo | ISSIsWrite);                      \
  }
  
-+static bool trans_CPS_v6m(DisasContext *s, arg_CPS_v6m *a)
-+{
-+    TCGv_i32 tmp, addr;
-+
-+    if (!(ENABLE_ARCH_6 && arm_dc_feature(s, ARM_FEATURE_M))) {
-+        return false;
-+    }
-+    if (IS_USER(s)) {
-+        /* Implemented as NOP in user mode.  */
-+        return true;
-+    }
-+
-+    tmp = tcg_const_i32(a->im);
-+    /* FAULTMASK */
-+    if (a->F) {
-+        addr = tcg_const_i32(19);
-+        gen_helper_v7m_msr(cpu_env, addr, tmp);
-+        tcg_temp_free_i32(addr);
-+    }
-+    /* PRIMASK */
-+    if (a->I) {
-+        addr = tcg_const_i32(16);
-+        gen_helper_v7m_msr(cpu_env, addr, tmp);
-+        tcg_temp_free_i32(addr);
-+    }
-+    tcg_temp_free_i32(tmp);
-+    gen_lookup_tb(s);
-+    return true;
-+}
-+
- /*
-  * Clear-Exclusive, Barriers
-  */
-@@ -10793,51 +10831,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             break;
-         }
+ static inline void gen_aa32_frob64(DisasContext *s, TCGv_i64 val)
+@@ -1082,9 +1066,7 @@ static inline void gen_aa32_st64(DisasContext *s, TCGv_i64 val,
+     gen_aa32_st_i64(s, val, a32, index, MO_Q | s->be_data);
+ }
  
--        case 6:
--            switch ((insn >> 5) & 7) {
--            case 2:
--                /* setend */
--                ARCH(6);
--                if (((insn >> 3) & 1) != !!(s->be_data == MO_BE)) {
--                    gen_helper_setend(cpu_env);
--                    s->base.is_jmp = DISAS_UPDATE;
--                }
--                break;
--            case 3:
--                /* cps */
--                ARCH(6);
--                if (IS_USER(s)) {
--                    break;
--                }
--                if (arm_dc_feature(s, ARM_FEATURE_M)) {
--                    tmp = tcg_const_i32((insn & (1 << 4)) != 0);
--                    /* FAULTMASK */
--                    if (insn & 1) {
--                        addr = tcg_const_i32(19);
--                        gen_helper_v7m_msr(cpu_env, addr, tmp);
--                        tcg_temp_free_i32(addr);
--                    }
--                    /* PRIMASK */
--                    if (insn & 2) {
--                        addr = tcg_const_i32(16);
--                        gen_helper_v7m_msr(cpu_env, addr, tmp);
--                        tcg_temp_free_i32(addr);
--                    }
--                    tcg_temp_free_i32(tmp);
--                    gen_lookup_tb(s);
--                } else {
--                    if (insn & (1 << 4)) {
--                        shift = CPSR_A | CPSR_I | CPSR_F;
--                    } else {
--                        shift = 0;
--                    }
--                    gen_set_psr_im(s, ((insn & 7) << 6), 0, shift);
--                }
--                break;
--            default:
--                goto undef;
--            }
+-DO_GEN_LD(8s, MO_SB)
+ DO_GEN_LD(8u, MO_UB)
+-DO_GEN_LD(16s, MO_SW)
+ DO_GEN_LD(16u, MO_UW)
+ DO_GEN_LD(32u, MO_UL)
+ DO_GEN_ST(8, MO_UB)
+@@ -10657,11 +10639,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+ 
+ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+ {
+-    uint32_t val, rd;
++    uint32_t val;
+     int32_t offset;
+     TCGv_i32 tmp;
+     TCGv_i32 tmp2;
+-    TCGv_i32 addr;
+ 
+     if (disas_t16(s, insn)) {
+         return;
+@@ -10671,26 +10652,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+     switch (insn >> 12) {
+     case 0: case 1: /* add/sub (3reg, 2reg imm), shift imm; in decodetree */
+     case 2: case 3: /* add, sub, cmp, mov (reg, imm), in decodetree */
+-        goto illegal_op;
+-    case 4:
+-        if (insn & (1 << 11)) {
+-            rd = (insn >> 8) & 7;
+-            /* load pc-relative.  Bit 1 of PC is ignored.  */
+-            addr = add_reg_for_lit(s, 15, (insn & 0xff) * 4);
+-            tmp = tcg_temp_new_i32();
+-            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s),
+-                               rd | ISSIs16Bit);
+-            tcg_temp_free_i32(addr);
+-            store_reg(s, rd, tmp);
 -            break;
-+        case 6: /* setend, cps; in decodetree */
-+            goto illegal_op;
- 
-         default:
-             goto undef;
+-        }
+-
+-        /*
+-         * - Data-processing (two low registers), in decodetree
+-         * - data processing extended, branch and exchange, in decodetree
+-         */
+-        goto illegal_op;
+-
++    case 4: /* ldr lit, data proc (2reg), data proc ext, bx; in decodetree */
+     case 5: /* load/store register offset, in decodetree */
+     case 6: /* load/store word immediate offset, in decodetree */
+     case 7: /* load/store byte immediate offset, in decodetree */
 diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-index 1b47e804bf..f43ea6ce20 100644
+index ddffd073a2..c18d146a84 100644
 --- a/target/arm/t16.decode
 +++ b/target/arm/t16.decode
-@@ -29,6 +29,8 @@
- &ldst_rr         !extern p w u rn rt rm shimm shtype
- &ldst_ri         !extern p w u rn rt imm
- &ldst_block      !extern rn i b u w list
-+&setend          !extern E
-+&cps             !extern mode imod M A I F
+@@ -113,6 +113,10 @@ LDRH_ri         10001 ..... ... ...             @ldst_ri_2
+ STR_ri          10010 ... ........              @ldst_spec_i rn=13
+ LDR_ri          10011 ... ........              @ldst_spec_i rn=13
  
- # Set S if the instruction is outside of an IT block.
- %s               !function=t16_setflags
-@@ -183,3 +185,13 @@ SXTAH           1011 0010 00 ... ...            @extend
- SXTAB           1011 0010 01 ... ...            @extend
- UXTAH           1011 0010 10 ... ...            @extend
- UXTAB           1011 0010 11 ... ...            @extend
++# Load (PC-relative)
 +
-+# Change processor state
++LDR_ri          01001 ... ........              @ldst_spec_i rn=15
 +
-+%imod           4:1 !function=plus_2
-+
-+SETEND          1011 0110 010 1 E:1 000         &setend
-+{
-+  CPS_v6m       1011 0110 011 im:1 00 I:1 F:1
-+  CPS           1011 0110 011 . 0 A:1 I:1 F:1   &cps mode=0 M=0 %imod
-+}
+ # Add PC/SP (immediate)
+ 
+ ADR             10100 rd:3 ........             imm=%imm8_0x4
 -- 
 2.17.1
 
