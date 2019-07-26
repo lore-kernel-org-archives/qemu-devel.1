@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7CFC7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B72C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:52:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0BE422BF5
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEA6A218B8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:52:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gLloNoZO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0BE422BF5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HsnHg8Za"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEA6A218B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr4O2-0007LJ-GH
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 13:52:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57120)
+	id 1hr4O6-0007dF-IP
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 13:52:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57076)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hr4Md-0001pV-Up
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:44 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hr4Mc-0007Ok-Rt
+ (envelope-from <richard.henderson@linaro.org>) id 1hr4Mc-0001mQ-Tj
  for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:43 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43171)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <richard.henderson@linaro.org>) id 1hr4Mb-0007Me-RM
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:42 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38137)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hr4Mc-0007Hs-Lk
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:42 -0400
-Received: by mail-pl1-x643.google.com with SMTP id 4so18030133pld.10
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:50:40 -0700 (PDT)
+ id 1hr4Mb-0007LC-Ln
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:41 -0400
+Received: by mail-pl1-x644.google.com with SMTP id az7so25001434plb.5
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:50:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=hX3AW17o2PIgWW1hwgb4F4i9rjNSXrxFa91FWtRbpGo=;
- b=gLloNoZOxtLByK/MTAwGv6CqokWdIJ7gMXXF9egTgTBWUsY6ZOo5ryePADqYcs71y4
- GEmlszug5YpaT4L+LTC6lFAofXr2J8Vnb1w+80oi8P0WfwcFBLeMN95dIr7IHKsSp5QU
- dXi5YcfuRUs3UvRJamcM+bSv72P9koioiekJg1/5gI+mzfdDCHLJA7KIMvDbC2IOAhI4
- ldJRiPTDMBoynB2mBsKBu+y79Ro2DUABd4M2m6s2K3TceLQh2f9FVJOiWcwfYUl2qIf6
- KDE4rvwKc78uHf8ygfhD+xBBpBDuTbFiYKSVZkKRiC0FmGRgHkHcSnmVBH/tl6nwonq8
- vWYA==
+ bh=7qMkBV6xIInqYLHQbsNGGIckvY18Pfy+zYd9EjT4q5E=;
+ b=HsnHg8ZaUxSGLCpbuDc4pmqUNrk330qSqmCO7NJTJx3m/vp85OhDyq2sIfoOQMvEbC
+ zwJTp6aCdSb8Vzb5I3MzM/8NsArcdkXmTDaputpA722tHqznS9eORwuHooib+qqP6QPX
+ i4jgNJnIHUVe00Xv060oFeiZXLFCKKhZWa5JReNbzYgaAUay+JlIWvlmRee4OYAushcY
+ 4plOVDzEuzXkEswad/+xa69p7Z7piLmNqV87qxYkjE+jbdyvH9bjbZxUdW5Y5JYhJ+3Y
+ kEciIOkrHb7VL37Qaa59SQ0V+Er9+A7aybjUXqZYyK8jIcVNVueuEv6o3qiwkRkNOKkv
+ wNmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=hX3AW17o2PIgWW1hwgb4F4i9rjNSXrxFa91FWtRbpGo=;
- b=OUOVDFhwx8TnD3ugpGTKkhYl1m1UCMxP2wiB+bY9bW4qv7YA7Tz4z5wLtBrpsHsAoL
- BXqsj/o2H5BZqq83A757iGh1z4xYsrL35MKLcCSYkTuXjAGc/hqK1ia1eDwECd6qzVzA
- FyhYOL/NjHOzqOZaFHRCpObvgtQ+ku/EWrUbFlaUkFZbK56llwuGiRo3jG2D97n0AoNj
- Xa0+BnC2m/73LPsnOpZCdEsG58ZHxoRL2VTR39aLCeL1MMFuokztTd/pNrKtawxrRsom
- cNbsH3UmqxSNm6laVvaaTkmrYYh6g89EHkoyJCBGOxZiT2kdpK60jMs/p0ePM6LB03G5
- sljA==
-X-Gm-Message-State: APjAAAVTZlUNyWz37rbj7HhmSu7mnT3i8qwo0u3rInjD1QzSZkvM8yQj
- /M+QdWZ+aHGFjPbLjzho+/jwgfWk6C4=
-X-Google-Smtp-Source: APXvYqz/OoR1VHD8vyYiMB/yal0X+HBsVEoIEs9z2KKuafOWq7xy8mxS8eP4/Fsp4gntkB9nr0RnFQ==
-X-Received: by 2002:a17:902:2ac8:: with SMTP id
- j66mr93064289plb.273.1564163439414; 
- Fri, 26 Jul 2019 10:50:39 -0700 (PDT)
+ bh=7qMkBV6xIInqYLHQbsNGGIckvY18Pfy+zYd9EjT4q5E=;
+ b=Myr/zzSA4NqkVChSo8NuqX9ct8Ff6dxoBjTt49ei+Xe3pVPBgfABOq40dhFcAWrTVj
+ Pea5JmwdfKFXK19jQ5ekTPYmpuZ70E4kFNyZwZhsrWflSL/h1kJpo25u89tspI1GrCUl
+ 2U116H9I76FGyGgJbi5h8cxsGkDo5SL0FJ3AfBryG3F4bek27dleUN8vjUI6e7ocpmaa
+ 017kzFnjOp2yu2+9J3W16bTT6avrQjNz70Cui46ydJR14Tcfcy2DnJBaaG0vtacU8JUT
+ cLcPY4INIfZn2JpZqn6W4VI0eKXgl2d3Ez6MEfjafJrzT3Yb/u10DzIbIXfzfdw/KvHv
+ mP0g==
+X-Gm-Message-State: APjAAAU2rKZseSAH0O2scxPtUJkV4tAIfxkR0iodlgJrZx3qWZ5ZLm7n
+ UYPtOxZpqrX44eBbA4qgSqzMXH87DdI=
+X-Google-Smtp-Source: APXvYqw18BMzHqaWf3+n90CKJsgnhA1xy0JEpmQCJSX0Yq+s1T/pPXMgG7loi9NQgF0Gzd8kbGhBQg==
+X-Received: by 2002:a17:902:4201:: with SMTP id
+ g1mr97729634pld.300.1564163440520; 
+ Fri, 26 Jul 2019 10:50:40 -0700 (PDT)
 Received: from localhost.localdomain (97-126-117-207.tukw.qwest.net.
  [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id o24sm104287919pfp.135.2019.07.26.10.50.38
+ by smtp.gmail.com with ESMTPSA id o24sm104287919pfp.135.2019.07.26.10.50.39
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 10:50:38 -0700 (PDT)
+ Fri, 26 Jul 2019 10:50:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 10:49:29 -0700
-Message-Id: <20190726175032.6769-5-richard.henderson@linaro.org>
+Date: Fri, 26 Jul 2019 10:49:30 -0700
+Message-Id: <20190726175032.6769-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190726175032.6769-1-richard.henderson@linaro.org>
 References: <20190726175032.6769-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PATCH 04/67] target/arm: Remove offset argument to
- gen_exception_internal_insn
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: [Qemu-devel] [PATCH 05/67] target/arm: Use the saved value of the
+ insn address
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,48 +97,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The actual argument is 0 for all callers.
+The address of the current insn is still available in s->base.pc_next,
+and need not be recomputed from s->pc - 4.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/arm/translate.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 19b126d4f3..0848fb933a 100644
+index 0848fb933a..595385e1b1 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -1239,10 +1239,10 @@ static inline void gen_smc(DisasContext *s)
-     s->base.is_jmp = DISAS_SMC;
- }
+@@ -1212,7 +1212,7 @@ static inline void gen_hvc(DisasContext *s, int imm16)
+      * as an undefined insn by runtime configuration (ie before
+      * the insn really executes).
+      */
+-    gen_set_pc_im(s, s->pc - 4);
++    gen_set_pc_im(s, s->base.pc_next);
+     gen_helper_pre_hvc(cpu_env);
+     /* Otherwise we will treat this as a real exception which
+      * happens after execution of the insn. (The distinction matters
+@@ -1231,7 +1231,7 @@ static inline void gen_smc(DisasContext *s)
+      */
+     TCGv_i32 tmp;
  
--static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
-+static void gen_exception_internal_insn(DisasContext *s, int excp)
- {
+-    gen_set_pc_im(s, s->pc - 4);
++    gen_set_pc_im(s, s->base.pc_next);
+     tmp = tcg_const_i32(syn_aa32_smc());
+     gen_helper_pre_smc(cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+@@ -3190,7 +3190,7 @@ static void gen_msr_banked(DisasContext *s, int r, int sysm, int rn)
+ 
+     /* Sync state because msr_banked() can raise exceptions */
      gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - offset);
-+    gen_set_pc_im(s, s->pc);
-     gen_exception_internal(excp);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -1294,7 +1294,7 @@ static inline void gen_hlt(DisasContext *s, int imm)
-         s->current_el != 0 &&
- #endif
-         (imm == (s->thumb ? 0x3c : 0xf000))) {
--        gen_exception_internal_insn(s, 0, EXCP_SEMIHOST);
-+        gen_exception_internal_insn(s, EXCP_SEMIHOST);
-         return;
-     }
+-    gen_set_pc_im(s, s->pc - 4);
++    gen_set_pc_im(s, s->base.pc_next);
+     tcg_reg = load_reg(s, rn);
+     tcg_tgtmode = tcg_const_i32(tgtmode);
+     tcg_regno = tcg_const_i32(regno);
+@@ -3212,7 +3212,7 @@ static void gen_mrs_banked(DisasContext *s, int r, int sysm, int rn)
  
-@@ -11984,7 +11984,7 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-         /* End the TB early; it's likely not going to be executed */
-         dc->base.is_jmp = DISAS_TOO_MANY;
-     } else {
--        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
-+        gen_exception_internal_insn(dc, EXCP_DEBUG);
-         /* The address covered by the breakpoint must be
-            included in [tb->pc, tb->pc + tb->size) in order
-            to for it to be properly cleared -- thus we
+     /* Sync state because mrs_banked() can raise exceptions */
+     gen_set_condexec(s);
+-    gen_set_pc_im(s, s->pc - 4);
++    gen_set_pc_im(s, s->base.pc_next);
+     tcg_reg = tcg_temp_new_i32();
+     tcg_tgtmode = tcg_const_i32(tgtmode);
+     tcg_regno = tcg_const_i32(regno);
+@@ -7219,7 +7219,7 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+             }
+ 
+             gen_set_condexec(s);
+-            gen_set_pc_im(s, s->pc - 4);
++            gen_set_pc_im(s, s->base.pc_next);
+             tmpptr = tcg_const_ptr(ri);
+             tcg_syn = tcg_const_i32(syndrome);
+             tcg_isread = tcg_const_i32(isread);
+@@ -7629,7 +7629,7 @@ static void gen_srs(DisasContext *s,
+     tmp = tcg_const_i32(mode);
+     /* get_r13_banked() will raise an exception if called from System mode */
+     gen_set_condexec(s);
+-    gen_set_pc_im(s, s->pc - 4);
++    gen_set_pc_im(s, s->base.pc_next);
+     gen_helper_get_r13_banked(addr, cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+     switch (amode) {
 -- 
 2.17.1
 
