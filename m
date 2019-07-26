@@ -2,94 +2,63 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BB1C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 14:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F12C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 14:46:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7021B20651
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 14:45:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7021B20651
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 76CD520651
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 14:46:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76CD520651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr1Tm-0006bj-23
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 10:45:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45547)
+	id 1hr1U3-0007zx-Cp
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 10:46:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47097)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hr1Ss-0003hq-0g
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 10:44:59 -0400
+ (envelope-from <ptoscano@redhat.com>) id 1hr1TZ-0006QF-3t
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 10:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hr1Sr-0000Bb-1J
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 10:44:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31220)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hr1Sq-0000AO-Q8
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 10:44:56 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6QEiBRe140352
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:44:56 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2u02a0v18r-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:44:55 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Fri, 26 Jul 2019 15:44:53 +0100
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 26 Jul 2019 15:44:51 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6QEioq911272316
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 26 Jul 2019 14:44:50 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3582C42041;
- Fri, 26 Jul 2019 14:44:50 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0677B4203F;
- Fri, 26 Jul 2019 14:44:50 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.15.116])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 26 Jul 2019 14:44:49 +0000 (GMT)
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 26 Jul 2019 16:44:49 +0200
-In-Reply-To: <156415227297.1064338.9181963275184520284.stgit@bahia.lan>
-References: <156415227297.1064338.9181963275184520284.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <ptoscano@redhat.com>) id 1hr1TX-0001Aq-1X
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 10:45:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43817)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ptoscano@redhat.com>)
+ id 1hr1TT-00015n-HA; Fri, 26 Jul 2019 10:45:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1CD4DC0AF07F;
+ Fri, 26 Jul 2019 14:45:34 +0000 (UTC)
+Received: from lindworm.usersys.redhat.com (unknown [10.43.2.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3BFEB7A00C;
+ Fri, 26 Jul 2019 14:45:19 +0000 (UTC)
+From: Pino Toscano <ptoscano@redhat.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Date: Fri, 26 Jul 2019 16:45:03 +0200
+Message-ID: <4422965.dTeGc4fl6G@lindworm.usersys.redhat.com>
+Organization: Red Hat
+In-Reply-To: <20190726142710.GY3888@redhat.com>
+References: <20190726140954.31921-1-ptoscano@redhat.com>
+ <20190726142710.GY3888@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19072614-0016-0000-0000-0000029677A7
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072614-0017-0000-0000-000032F478EE
-Message-Id: <156415228966.1064338.190189424190233355.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-26_10:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1034 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907260181
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [PATCH 3/3] spapr/irq: Drop spapr_irq_msi_reset()
+Content-Type: multipart/signed; boundary="nextPart16494040.0sQhf7Hk5G";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Fri, 26 Jul 2019 14:45:34 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/2] ssh: add password and privkey auth
+ methods
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,74 +70,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PHBs already take care of clearing the MSIs from the bitmap during reset
-or unplug. No need to do this globally from the machine code. Rather add
-an assert to ensure that PHBs have acted as expected.
+--nextPart16494040.0sQhf7Hk5G
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c             |    4 ----
- hw/ppc/spapr_irq.c         |    7 ++-----
- include/hw/ppc/spapr_irq.h |    1 -
- 3 files changed, 2 insertions(+), 10 deletions(-)
+On Friday, 26 July 2019 16:27:11 CEST Richard W.M. Jones wrote:
+> On Fri, Jul 26, 2019 at 04:09:52PM +0200, Pino Toscano wrote:
+> > These two patches add the password and private key authentication
+> > methods to the ssh block driver, using secure objects for
+> > passwords/passphrases.
+> 
+> I was attempting to test this but couldn't work out the full command
+> line to use it (with qemu-img).  I got as far as:
+> 
+> $ ./qemu-img convert -p 'json:{ "file.driver": "ssh", "file.host": "devr7", "file.path": "/var/tmp/root", "file.password-secret": "..." }' /var/tmp/root
+> 
+> I guess the secret should be specified using --object, but at that
+> point I gave up.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5894329f29a9..855e9fbd9805 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1739,10 +1739,6 @@ static void spapr_machine_reset(MachineState *machine)
-         ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_fatal);
-     }
- 
--    if (!SPAPR_MACHINE_GET_CLASS(spapr)->legacy_irq_allocation) {
--        spapr_irq_msi_reset(spapr);
--    }
--
-     /*
-      * NVLink2-connected GPU RAM needs to be placed on a separate NUMA node.
-      * We assign a new numa ID per GPU in spapr_pci_collect_nvgpu() which is
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index d07aed8ca9f9..c72d8433681d 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -57,11 +57,6 @@ void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num)
-     bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
- }
- 
--void spapr_irq_msi_reset(SpaprMachineState *spapr)
--{
--    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
--}
--
- static void spapr_irq_init_kvm(SpaprMachineState *spapr,
-                                   SpaprIrq *irq, Error **errp)
- {
-@@ -729,6 +724,8 @@ int spapr_irq_post_load(SpaprMachineState *spapr, int version_id)
- 
- void spapr_irq_reset(SpaprMachineState *spapr, Error **errp)
- {
-+    assert(bitmap_empty(spapr->irq_map, spapr->irq_map_nr));
-+
-     if (spapr->irq->reset) {
-         spapr->irq->reset(spapr, errp);
-     }
-diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-index f965a58f8954..44fe4f9e0e2e 100644
---- a/include/hw/ppc/spapr_irq.h
-+++ b/include/hw/ppc/spapr_irq.h
-@@ -28,7 +28,6 @@ void spapr_irq_msi_init(SpaprMachineState *spapr, uint32_t nr_msis);
- int spapr_irq_msi_alloc(SpaprMachineState *spapr, uint32_t num, bool align,
-                         Error **errp);
- void spapr_irq_msi_free(SpaprMachineState *spapr, int irq, uint32_t num);
--void spapr_irq_msi_reset(SpaprMachineState *spapr);
- 
- typedef struct SpaprIrq {
-     uint32_t    nr_irqs;
+Almost there :) add e.g.
+  --object 'secret,id=sec0,file=passwd'
+as parameter for the convert command (so after it, not before), and then
+set 'sec0' as value for file.password-secret.  Of course 'sec0' is
+arbitrary, any other QEMU id will do.
+
+A long helpful comment in include/crypto/secret.h explains the basics
+of the crypto objects.
+
+-- 
+Pino Toscano
+--nextPart16494040.0sQhf7Hk5G
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEbjdOQa52nq0tQalew9FMLZhkN80FAl07Ee8ACgkQw9FMLZhk
+N812ig//fZ2HnxytEP2NI69POcSDe9rhKugoPB3wdCNK9pv+SppFdRP8rgQdWFwu
+a9MezwlwoQStX2f3fuq5NaTJm9tzVBqGkHtne0c5X7K5GlkClmDPZGq46sldfnm/
+vmSVtxDovRZqrY/UDlpk2U/k8QNIJDcdrCBeH2e33yT0UYJAUHnGV8vc0eVqPYsK
+2tnChBNkNgXNftoDS/2np0gl4ME0A6GrbuOZ6huZivUSoR0llQKjHn6/n8sDR+fc
+/migDjoqUVAun8EVwFmjam30dGmmg89j7QnCXPrhgZy6AdbZesgPZqobEkuA12sw
+rYy0jbi2GaYEO4F9TFncgrtzxEu/gKMUP6U/CbDyC2CPW4B4+W28asuojrHxoMqY
+vPwkhwEyhZsUOhaxd6Z2uxIAj6vEZJafiLj5mdClSvkpwETKq6djqCJuA+kOXY/o
+sQbM1TKqp1cTbmBVplEeo3CI9OTgV3FhK0bvAcHeP9QREvsynlfHJxQZB3L4jn34
+tZowCLSQX03A/LsMswBrTxLCQ2UCoFA63E2utJm/awGD1PdwdHdCVzxtZw9tinw3
+3zI7StwPMJCU2icQKpNJPa+G4cCS7ZkZucqzEfAn2Ndw66JjAEdIcAK9zAoU202c
+aG78hCEXqzkUNThWoVdZ+mQGmoAibranGK4g8WEHB6VkYkAvGac=
+=WflM
+-----END PGP SIGNATURE-----
+
+--nextPart16494040.0sQhf7Hk5G--
+
+
 
 
