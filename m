@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EBFC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E91FC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C998B206BA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C998B206BA
+	by mail.kernel.org (Postfix) with ESMTPS id E3BD3206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BD3206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqxm2-0004AZ-TB
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:48:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43463)
+	id 1hqxmB-0004kU-G1
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:48:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43323)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkm-0008U6-SH
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:14 -0400
+ id 1hqxkZ-0007cy-7I
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkk-00078n-Lf
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:12 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:37100 helo=huawei.com)
+ id 1hqxkK-0006lc-TS
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:46:51 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:51650 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkO-0006b4-Uc; Fri, 26 Jul 2019 06:46:53 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 3F6F065647E06F766090;
- Fri, 26 Jul 2019 18:46:41 +0800 (CST)
+ id 1hqxkF-0005uE-6k; Fri, 26 Jul 2019 06:46:39 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 16BE47F54068DBC17FAD;
+ Fri, 26 Jul 2019 18:46:31 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 26 Jul 2019 18:46:33 +0800
+ 14.3.439.0; Fri, 26 Jul 2019 18:46:22 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Date: Fri, 26 Jul 2019 11:45:18 +0100
-Message-ID: <20190726104519.23812-9-shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 26 Jul 2019 11:45:15 +0100
+Message-ID: <20190726104519.23812-6-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
@@ -53,9 +53,9 @@ Content-Type: text/plain
 X-Originating-IP: [10.202.227.237]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: [Qemu-devel] [PATCH-for-4.2 v8 8/9] hw/acpi: Add system power down
- support to GED
+X-Received-From: 45.249.212.32
+Subject: [Qemu-devel] [PATCH-for-4.2 v8 5/9] hw/arm/virt: Add 4.2 machine
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,60 +74,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds support to use GED for system power down event.
+This is in preparation to create ACPI GED device as we
+need to disable it for <4.2 for migration to work.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
- hw/acpi/generic_event_device.c         | 6 ++++++
- include/hw/acpi/generic_event_device.h | 3 +++
- 2 files changed, 9 insertions(+)
+ hw/arm/virt.c       | 9 ++++++++-
+ hw/core/machine.c   | 3 +++
+ include/hw/boards.h | 3 +++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-index 7902e9d706..0b3214eff4 100644
---- a/hw/acpi/generic_event_device.c
-+++ b/hw/acpi/generic_event_device.c
-@@ -19,6 +19,7 @@
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 907fb64bb9..bbe156dc35 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -2095,10 +2095,17 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
  
- static const uint32_t ged_supported_events[] = {
-     ACPI_GED_MEM_HOTPLUG_EVT,
-+    ACPI_GED_PWR_DOWN_EVT,
- };
- 
- /*
-@@ -103,6 +104,11 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
-                 aml_append(if_ctx, aml_call0(MEMORY_DEVICES_CONTAINER "."
-                                              MEMORY_SLOT_SCAN_METHOD));
-                 break;
-+            case ACPI_GED_PWR_DOWN_EVT:
-+                aml_append(if_ctx,
-+                           aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
-+                                      aml_int(0x80)));
-+                break;
-             default:
-                 /*
-                  * Please make sure all the events in ged_supported_events[]
-diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
-index f0152b0018..63104f1344 100644
---- a/include/hw/acpi/generic_event_device.h
-+++ b/include/hw/acpi/generic_event_device.h
-@@ -61,6 +61,8 @@
- 
- #include "hw/acpi/memory_hotplug.h"
- 
-+#define ACPI_POWER_BUTTON_DEVICE "PWRB"
++static void virt_machine_4_2_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
 +
- #define TYPE_ACPI_GED "acpi-ged"
- #define ACPI_GED(obj) \
-     OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
-@@ -78,6 +80,7 @@
-  * through GED.
-  */
- #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
-+#define ACPI_GED_PWR_DOWN_EVT      0x2
+ static void virt_machine_4_1_options(MachineClass *mc)
+ {
++    virt_machine_4_2_options(mc);
++    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
++DEFINE_VIRT_MACHINE(4, 1)
  
- typedef struct GEDState {
-     MemoryRegion io;
+ static void virt_machine_4_0_options(MachineClass *mc)
+ {
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index c58a8e594e..a79d4ad740 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -27,6 +27,9 @@
+ #include "hw/pci/pci.h"
+ #include "hw/mem/nvdimm.h"
+ 
++GlobalProperty hw_compat_4_1[] = {};
++const size_t hw_compat_4_1_len = G_N_ELEMENTS(hw_compat_4_1);
++
+ GlobalProperty hw_compat_4_0[] = {
+     { "VGA",            "edid", "false" },
+     { "secondary-vga",  "edid", "false" },
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a71d1a53a5..d9ec37d807 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -317,6 +317,9 @@ struct MachineState {
+     } \
+     type_init(machine_initfn##_register_types)
+ 
++extern GlobalProperty hw_compat_4_1[];
++extern const size_t hw_compat_4_1_len;
++
+ extern GlobalProperty hw_compat_4_0[];
+ extern const size_t hw_compat_4_0_len;
+ 
 -- 
 2.17.1
 
