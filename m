@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 334B9C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6565BC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:28:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F3CA229F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:28:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3CA229F9
+	by mail.kernel.org (Postfix) with ESMTPS id 35F9B229F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:28:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35F9B229F9
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqxSP-0001k5-MV
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:28:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34476)
+	id 1hqxSg-0003AT-5Y
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:28:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35011)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hqxRt-0000FL-QL
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:27:44 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hqxS8-0000u3-GV
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hqxRp-0005zt-O9
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:27:39 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:34053 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hqxS4-0006zN-Ay
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:27:54 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:37684 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hqxRp-0001Qx-Fj
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:27:37 -0400
+ id 1hqxS4-0001yz-2c
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:27:52 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id CDC271A21A8;
- Fri, 26 Jul 2019 12:26:27 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id EDF581A1545;
+ Fri, 26 Jul 2019 12:26:44 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 63D791A2289;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 8CA931A2294;
  Fri, 26 Jul 2019 12:23:21 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 12:23:09 +0200
-Message-Id: <1564136594-23628-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri, 26 Jul 2019 12:23:12 +0200
+Message-Id: <1564136594-23628-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564136594-23628-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564136594-23628-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v2 1/6] linux user: Add support for
- FDFLUSH ioctl
+Subject: [Qemu-devel] [PATCH for 4.2 v2 4/6] linux-user: Add support for
+ FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,61 +68,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yunqiang Su <ysu@wavecomp.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-FDFLUSH is used for flushing buffers of floppy drives. Support in
-QEMU is needed because some of Debian packages use this ioctl while
-running post-build tests. One such example is 'tar' package.
+FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls provide means for controlling
+formatting of a floppy drive.
 
-Signed-off-by: Yunqiang Su <ysu@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall.c      | 1 +
- linux-user/syscall_defs.h | 4 ++++
- 3 files changed, 7 insertions(+)
+ linux-user/ioctls.h        | 3 +++
+ linux-user/syscall_defs.h  | 9 +++++++++
+ linux-user/syscall_types.h | 5 +++++
+ 3 files changed, 17 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 5e84dc7..3ade2d2 100644
+index 7c14b93..0e15fe1 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -112,6 +112,8 @@
-      IOCTL(BLKZEROOUT, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 2)))
- #endif
+@@ -114,6 +114,9 @@
  
-+     IOCTL(FDFLUSH, 0, TYPE_NULL)
-+
- #ifdef FIBMAP
-      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
- #endif
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d2c9817..89e4651 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -86,6 +86,7 @@
- #include <linux/kd.h>
- #include <linux/mtio.h>
- #include <linux/fs.h>
-+#include <linux/fd.h>
- #if defined(CONFIG_FIEMAP)
- #include <linux/fiemap.h>
- #endif
+      IOCTL(FDMSGON, 0, TYPE_NULL)
+      IOCTL(FDMSGOFF, 0, TYPE_NULL)
++     IOCTL(FDFMTBEG, 0, TYPE_NULL)
++     IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
++     IOCTL(FDFMTEND, 0, TYPE_NULL)
+      IOCTL(FDFLUSH, 0, TYPE_NULL)
+      IOCTL(FDRESET, 0, TYPE_NULL)
+      IOCTL(FDRAWCMD, 0, TYPE_NULL)
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 3175440..6696563 100644
+index 4b9f159..a8fc943 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -857,6 +857,10 @@ struct target_pollfd {
- #define TARGET_BLKROTATIONAL TARGET_IO(0x12, 126)
- #define TARGET_BLKZEROOUT TARGET_IO(0x12, 127)
+@@ -859,8 +859,17 @@ struct target_pollfd {
  
-+/* From <linux/fd.h> */
-+
-+#define TARGET_FDFLUSH       TARGET_IO(2, 0x4b)
-+
- #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
- #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
+ /* From <linux/fd.h> */
  
++struct target_format_descr {
++    abi_uint        device;
++    abi_uint        head;
++    abi_uint        track;
++};
++
+ #define TARGET_FDMSGON       TARGET_IO(2, 0x45)
+ #define TARGET_FDMSGOFF      TARGET_IO(2, 0x46)
++#define TARGET_FDFMTBEG      TARGET_IO(2, 0x47)
++#define TARGET_FDFMTTRK     TARGET_IOW(2, 0x48, struct target_format_descr)
++#define TARGET_FDFMTEND      TARGET_IO(2, 0x49)
+ #define TARGET_FDFLUSH       TARGET_IO(2, 0x4b)
+ #define TARGET_FDRESET       TARGET_IO(2, 0x54)
+ #define TARGET_FDRAWCMD      TARGET_IO(2, 0x58)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index b98a23b..57cd9e5 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -267,6 +267,11 @@ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* datalen */
+        TYPE_PTRVOID) /* data */
+ 
++STRUCT(format_descr,
++       TYPE_INT,     /* device */
++       TYPE_INT,     /* head */
++       TYPE_INT)     /* track */
++
+ #if defined(CONFIG_USBFS)
+ /* usb device ioctls */
+ STRUCT(usbdevfs_ctrltransfer,
 -- 
 2.7.4
 
