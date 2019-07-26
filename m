@@ -2,88 +2,79 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C21BC41517
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C7BC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1573422CED
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5DDE22CBA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:51:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U6rMdZ5W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1573422CED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H1gqulCT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5DDE22CBA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwq6-0004su-Ez
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:48:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46673)
+	id 1hqwsw-0006Gy-1X
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:51:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55439)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hqwpt-0004Tq-48
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:48:26 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqwsi-0005uT-2S
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:51:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hqwpr-0007G3-2S
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:48:24 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36126)
+ (envelope-from <peter.maydell@linaro.org>) id 1hqwsg-0001XW-3S
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:51:18 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:36981)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hqwpl-000756-26
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:48:17 -0400
-Received: by mail-wr1-x441.google.com with SMTP id n4so53820611wrs.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:48:08 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqwsf-0001EQ-Uu
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:51:18 -0400
+Received: by mail-ot1-x341.google.com with SMTP id s20so54735703otp.4
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:51:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WP9TNtIq8AQ768qefR0XP58fo9jH6KyHrm9DYwaaZig=;
- b=U6rMdZ5WOQSoWAtiKiiBA+JA2K0JAyP388XpcKB77kiSY14SWBHV0zPQ05Mh5PioH3
- H5N+EAbNtW8TGJttq33QP36uZ8SACDzCUDq3/mm6k+7CdKfKN0ptof7Bw3aLc/aIc5Ft
- RWx+9ppNjd1Ym1yy3mZhaicLkqc+/h6SIokaO9zwK4l8VJnbo/7+OROGSNYN8XQxSTFa
- 6eD8BmY7zZ8G/zltd8SMwyGxc1K/1mfgUUGAo/zm1YIj7/9KpG1hxV6yTu11LIHDhF7A
- G2ghsbrDkFjqAPW6YIthiEi7q+DzPup7QBCxAsk1tbporwU0LsqehohEri7CYVIB1QZa
- wegQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2PCiGOH2vGt3268bPGg5gjlycDePgi+EMiOCq8SixbU=;
+ b=H1gqulCTeptLH3/sG/ZRPrpRqjytKhBmEzZnhXl+/kYCvmf0A7v01NNdAfmphjvQ+v
+ i6GjiWH33h5s8KeMF+ovRlqomWsocvA0sYU1s38AsPOO7lWWY35XJO+5cJTHw8YuKbbg
+ l555MlIl+4PJqKVRO2hkBNHUa58SweSZWLX2JPuFnVdLMniyaHWbcbCZGLIOOcOX4PmO
+ WmoX8JtO0uVs1Ot4T7VmjheEQkoP+iuY4htm4iUhtqeB0fxb/5kvZvLvbfLYSwAty7vd
+ /lNeEksd2LVMQehOCVZzJ44qHy9hoBOtkG93cp6EZ0YtLlMrAAxosEk8JIXX0CXCEVBr
+ DXmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WP9TNtIq8AQ768qefR0XP58fo9jH6KyHrm9DYwaaZig=;
- b=fERR1kYEcW0s0Kj8yWamcMF7AYRBVaFwOp4lwY+WsHdjMdJcOi1BZH0rPE4ShJAQcy
- MmPKJfbPsqOL98JpClTU3t2bTt51g6OpNZZwg2CElmWWiaTB4H+q1WqMANiacgATtSzk
- 14L/rZ5eeR7W68/MkQintswm5LrUL3RKls/GGD6xP7MR6GblUjrPqHEEcGkM11A6J3UE
- 72yCKubETG+KZY3A45MEfBCfydlPGGImAQ3aJLonFta3KnRG7NoMxK9OVfwWrUQT/Wsa
- atMItfJxHD4WNmvVNf9V6mATCbSFlZvmY1gv/E9z9uO60DxMvBsZ3Hnl97adHcohX/yu
- 2MRw==
-X-Gm-Message-State: APjAAAUIVHfzRFanDtwwOa1O4tqoYLRHK8vMDnRn6OOF/2g2BeHceOQ6
- Lyo5lC5Ht25JhSkgv+ZatqATTg==
-X-Google-Smtp-Source: APXvYqwWwZsMm+EKGuJa+XI/vz72W51AE+fNs9nbKHdoQaiPA/vfuuvuzqEkEPNg+IdL8+nrpS8GIA==
-X-Received: by 2002:adf:f046:: with SMTP id t6mr1459921wro.307.1564134487467; 
- Fri, 26 Jul 2019 02:48:07 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id c1sm113646151wrh.1.2019.07.26.02.48.06
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 02:48:06 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 356B41FF87;
- Fri, 26 Jul 2019 10:48:06 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 10:47:57 +0100
-Message-Id: <20190726094757.17779-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2PCiGOH2vGt3268bPGg5gjlycDePgi+EMiOCq8SixbU=;
+ b=uAAlebgtOh2FLbgBnRy29fwnMWxjtCmmYivUw6izwKZFhz2JRFbGNtukj7hrdDovKk
+ NSDwbph4F+vu21k//YkKnp1dPJ1FjyG9G4ooR5+kmZvtoXq+a1EUELw5TyX3Psuw4pfR
+ 0P/rrt80uG1L/VWvChgaH3apCB33BUe6nxvAaWoOzFH79VFHyuvgjLhe5adlEZ05PAMv
+ sAIMWWLH1ihVnfirZ4FvFoaPLq5/gRE7MkLRpceupUArrZF0UaFw7YWFKE9SBCQ4GJ/T
+ tvUrjCOPfJwhdpoxQNFWTDLFl/tYWPeiVsfSkhHZ55UQNr5ZL4sd/uwuXc1ydC+1opAY
+ Ga4Q==
+X-Gm-Message-State: APjAAAWUVUWiTWaNmzZ4AO4of8/LpeTKHbrF/3VSNhhdZg6pQFFsj5f8
+ A8ABxfIRhvQ9X2r3CCbmww93TkCIaROHnwzpIiwwEzqnK2Y=
+X-Google-Smtp-Source: APXvYqw5W/g3TVU2isZ8O48K8plfBrTfHTMMIH1afgOGs8HHmSFG0Barg7Vvg/ZogyCS4+O2cNmmforYoytJUnIe+2U=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr21050879otk.221.1564134672931; 
+ Fri, 26 Jul 2019 02:51:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20190724143553.21557-1-damien.hedde@greensocs.com>
+ <CAFEAcA_KW329Hzi-fm7RnxZsjdUDz=qmCd69YeO6ar9i+MZTJA@mail.gmail.com>
+In-Reply-To: <CAFEAcA_KW329Hzi-fm7RnxZsjdUDz=qmCd69YeO6ar9i+MZTJA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jul 2019 10:51:01 +0100
+Message-ID: <CAFEAcA_jQEpNrNPq-6ysmY+v4ZhVgy9kwdwxC-=SNgGKFNguuw@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH v3] target/arm: generate a custom MIDR for -cpu
- max
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH for 4.1?] pl330: fix vmstate description
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,79 +86,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While most features are now detected by probing the ID_* registers
-kernels can (and do) use MIDR_EL1 for working out of they have to
-apply errata. This can trip up warnings in the kernel as it tries to
-work out if it should apply workarounds to features that don't
-actually exist in the reported CPU type.
+On Thu, 25 Jul 2019 at 17:14, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Wed, 24 Jul 2019 at 15:36, Damien Hedde <damien.hedde@greensocs.com> wrote:
+> >
+> > Fix the pl330 main and queue vmstate description.
+> > There were missing POINTER flags causing crashes during
+> > incoming migration because:
+> > + PL330State chan field is a pointer to an array
+> > + PL330Queue queue field is a pointer to an array
+> >
+> > Also bump corresponding vmsd version numbers.
+> >
+> > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> > ---
+> >
+> > I found this while working on reset with xilinx-zynq machine.
+> >
+> > I'm not sure what's the vmsd version policy in such cases (for
+> > backward compatibility). I've simply bumped them since migration
+> > was not working anyway (vmstate_load_state was erasing critical part
+> > of PL330State and causing segfaults while loading following fields).
+> >
+> > Tested doing migration with the xilinx-zynq-a9 machine.
+>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Avoid this problem by synthesising our own MIDR value.
+and applied to target-arm.next for 4.1.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
----
-v2
-  - don't leak QEMU version into ID reg
-v3
-  - move comment into one block
-  - explicit setting of more fields
----
- target/arm/cpu.h   |  6 ++++++
- target/arm/cpu64.c | 17 +++++++++++++++++
- 2 files changed, 23 insertions(+)
-
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 94c990cddbd..67f2af0e169 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1611,6 +1611,12 @@ FIELD(V7M_FPCCR, ASPEN, 31, 1)
- /*
-  * System register ID fields.
-  */
-+FIELD(MIDR_EL1, REVISION, 0, 4)
-+FIELD(MIDR_EL1, PARTNUM, 4, 12)
-+FIELD(MIDR_EL1, ARCHITECTURE, 16, 4)
-+FIELD(MIDR_EL1, VARIANT, 20, 4)
-+FIELD(MIDR_EL1, IMPLEMENTER, 24, 8)
-+
- FIELD(ID_ISAR0, SWAP, 0, 4)
- FIELD(ID_ISAR0, BITCOUNT, 4, 4)
- FIELD(ID_ISAR0, BITFIELD, 8, 4)
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1901997a064..f99008d7da1 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -296,6 +296,23 @@ static void aarch64_max_initfn(Object *obj)
-         uint32_t u;
-         aarch64_a57_initfn(obj);
- 
-+        /*
-+         * Reset MIDR so the guest doesn't mistake our 'max' CPU type for a real
-+         * one and try to apply errata workarounds or use impdef features we
-+         * don't provide.
-+         * An IMPLEMENTER field of 0 means "reserved for software use";
-+         * ARCHITECTURE must be 0xf indicating "v7 or later, check ID registers
-+         * to see which features are present";
-+         * the VARIANT, PARTNUM and REVISION fields are all implementation
-+         * defined and we choose to set VARIANT and leave the versions at zero.
-+         */
-+        t = FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0);
-+        t = FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf);
-+        t = FIELD_DP64(t, MIDR_EL1, PARTNUM, 'Q');
-+        t = FIELD_DP64(t, MIDR_EL1, VARIANT, 0);
-+        t = FIELD_DP64(t, MIDR_EL1, REVISION, 0);
-+        cpu->midr = t;
-+
-         t = cpu->isar.id_aa64isar0;
-         t = FIELD_DP64(t, ID_AA64ISAR0, AES, 2); /* AES + PMULL */
-         t = FIELD_DP64(t, ID_AA64ISAR0, SHA1, 1);
--- 
-2.20.1
-
+thanks
+-- PMM
 
