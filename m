@@ -2,58 +2,60 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC0BC41514
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB010C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:49:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 101A7208C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:49:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 101A7208C0
+	by mail.kernel.org (Postfix) with ESMTPS id BF1C7206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:49:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1C7206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqxmm-00072T-Us
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:49:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43302)
+	id 1hqxn5-0008Is-0S
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:49:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43432)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkZ-0007YN-5W
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:02 -0400
+ id 1hqxkl-0008LI-LR
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkL-0006m7-1W
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:46:53 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2241 helo=huawei.com)
+ id 1hqxkg-00073a-4i
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:08 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2179 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxk4-0004qv-0Q; Fri, 26 Jul 2019 06:46:28 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id E0E9BF0D0223E0E7695C;
- Fri, 26 Jul 2019 18:46:15 +0800 (CST)
+ id 1hqxkJ-0006Fv-V7; Fri, 26 Jul 2019 06:46:44 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 2B978ED77BC9CF22929E;
+ Fri, 26 Jul 2019 18:46:36 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 26 Jul 2019 18:46:05 +0800
+ 14.3.439.0; Fri, 26 Jul 2019 18:46:29 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Date: Fri, 26 Jul 2019 11:45:10 +0100
-Message-ID: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 26 Jul 2019 11:45:17 +0100
+Message-ID: <20190726104519.23812-8-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
+In-Reply-To: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
+References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.202.227.237]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: [Qemu-devel] [PATCH-for-4.2 v8 0/9] ARM virt: ACPI memory hotplug
- support
+X-Received-From: 45.249.212.190
+Subject: [Qemu-devel] [PATCH-for-4.2 v8 7/9] hw/arm/virt-acpi-build: Add
+ PC-DIMM in SRAT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,125 +74,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series is an attempt to provide device memory hotplug support 
-on ARM virt platform. This is based on Eric's recent works here[1]
-and carries some of the pc-dimm related patches dropped from his
-series.
+Generate Memory Affinity Structures for PC-DIMM ranges.
 
-The kernel support for arm64 memory hot add was added recently by
-Robin and hence the guest kernel should be => 5.0-rc1.
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hw/arm/virt-acpi-build.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-NVDIM support is not included currently as we still have an unresolved
-issue while hot adding NVDIMM[2]. However NVDIMM cold plug patches
-can be included, but not done for now, for keeping it simple.
-
-This makes use of GED device to sent hotplug ACPI events to the
-Guest. GED code is based on Nemu. Thanks to the efforts of Samuel and
-Sebastien to add the hardware-reduced support to Nemu using GED
-device[3]. (Please shout if I got the author/signed-off wrong for
-those patches or missed any names).
-
-This is sanity tested on a HiSilicon ARM64 platform and appreciate
-any further testing.
-
-Note:
-Attempted adding dimm_pxm test case to bios-tables-test for arm/virt.
-But noticed the issue decribed here[5]. This is under investigation 
-now.
-
-Thanks,
-Shameer
-
-[1] https://patchwork.kernel.org/cover/10837565/
-[2] https://patchwork.kernel.org/cover/10783589/
-[3] https://github.com/intel/nemu/blob/topic/virt-x86/hw/acpi/ged.c
-[4] http://lists.infradead.org/pipermail/linux-arm-kernel/2019-May/651763.html
-[5] https://www.mail-archive.com/qemu-devel@nongnu.org/msg632651.html
-
-v7 --> v8
- -Addressed comments from Igor.Please see individual patches.
- -Updated bios-tables-test-allowed-diff.h to avoid "make check"
-  failure (patch #6) and dropped patch #10
- -Added Igor's R-by to patches 4 & 5.
- -Dropped Erics's R-by from patch #9 for now.
-
-v6 --> v7
-- Added 4.2 machine support and restricted GED creation for < 4.2
-  This is to address the migration test fail reported by Eric.
-- Included "tests: Update DSDT ACPI table.." patch(#10) from Eric
-  to fix the "make check" bios-tables-test failure.
-  
-v5 --> v6
-
--Addressed comments from Eric.
--Added R-by from Eric and Igor.
-
-v4 --> v5
--Removed gsi/ged-irq routing in virt.
--Added Migration support.
--Dropped support for DT coldplug case based on the discussions
- here[4]
--Added system_powerdown support through GED.
-
-v3 --> v4
-Addressed comments from Igor and Eric,
--Renamed "virt-acpi" to "acpi-ged".
--Changed ged device parent to TYPE_DEVICE.
--Introduced DT memory node property "hotpluggable" to resolve device
- memory being treated as early boot memory issue(patch #7).
--Combined patches #3 and #9 from v3 into #3.
-
-v2 --> v3
-
-Addressed comments from Igor and Eric,
--Made virt acpi device platform independent and moved
- to hw/acpi/generic_event_device.c
--Moved ged specific code into hw/acpi/generic_event_device.c
--Introduced an opt-in feature "fdt" to resolve device-memory being
- treated as early boot memory.
--Dropped patch #1 from v2.
-
-RFC --> v2
-
--Use GED device instead of GPIO for ACPI hotplug events.
--Removed NVDIMM support for now.
--Includes dropped patches from Eric's v9 series.
-
-Eric Auger (1):
-  hw/arm/virt: Add memory hotplug framework
-
-Samuel Ortiz (2):
-  hw/acpi: Do not create memory hotplug method when handler is not
-    defined
-  hw/acpi: Add ACPI Generic Event Device Support
-
-Shameer Kolothum (6):
-  hw/acpi: Make ACPI IO address space configurable
-  hw/arm/virt: Add 4.2 machine type
-  hw/arm/virt: Enable device memory cold/hot plug with ACPI boot
-  hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
-  hw/acpi: Add system power down support to GED
-  hw/arm: Use GED for system_powerdown event
-
- hw/acpi/Kconfig                        |   4 +
- hw/acpi/Makefile.objs                  |   1 +
- hw/acpi/generic_event_device.c         | 330 +++++++++++++++++++++++++
- hw/acpi/memory_hotplug.c               |  35 +--
- hw/arm/Kconfig                         |   4 +
- hw/arm/virt-acpi-build.c               |  29 ++-
- hw/arm/virt.c                          | 125 +++++++++-
- hw/core/machine.c                      |   3 +
- hw/i386/acpi-build.c                   |   3 +-
- include/hw/acpi/acpi_dev_interface.h   |   1 +
- include/hw/acpi/generic_event_device.h | 103 ++++++++
- include/hw/acpi/memory_hotplug.h       |   9 +-
- include/hw/arm/virt.h                  |   5 +
- include/hw/boards.h                    |   3 +
- tests/bios-tables-test-allowed-diff.h  |   1 +
- 15 files changed, 623 insertions(+), 33 deletions(-)
- create mode 100644 hw/acpi/generic_event_device.c
- create mode 100644 include/hw/acpi/generic_event_device.h
-
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 018b1e326d..75657caa36 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -518,6 +518,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     int i, srat_start;
+     uint64_t mem_base;
+     MachineClass *mc = MACHINE_GET_CLASS(vms);
++    MachineState *ms = MACHINE(vms);
+     const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
+ 
+     srat_start = table_data->len;
+@@ -543,6 +544,14 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         }
+     }
+ 
++    if (ms->device_memory) {
++        numamem = acpi_data_push(table_data, sizeof *numamem);
++        build_srat_memory(numamem, ms->device_memory->base,
++                          memory_region_size(&ms->device_memory->mr),
++                          nb_numa_nodes - 1,
++                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
++    }
++
+     build_header(linker, table_data, (void *)(table_data->data + srat_start),
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+ }
 -- 
 2.17.1
 
