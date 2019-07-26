@@ -2,75 +2,80 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2AFC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979D6C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:40:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F6B6229F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F6B6229F9
+	by mail.kernel.org (Postfix) with ESMTPS id 6D3B4206DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:40:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D3B4206DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqweu-0006qn-SZ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:37:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49058)
+	id 1hqwi5-0008PC-Ke
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:40:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58005)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hqwef-0006F5-R1
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:36:51 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqwhr-0007wB-GA
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:40:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hqwea-0008Be-SI
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:36:46 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43171)
+ (envelope-from <pbonzini@redhat.com>) id 1hqwhf-0004CF-O6
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:40:06 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36546)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqwea-0007sC-Km
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:36:44 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p13so53669138wru.10
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:36:41 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqwhf-0003w3-HL
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:39:55 -0400
+Received: by mail-wm1-f65.google.com with SMTP id g67so43012139wme.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:39:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=KIcaoz8fRZh2eK5EjfDl5HCqLyQdsOWYcGjNeYxRgrI=;
- b=gIIb+9OFLzGRb67szUUDoqk8CglH0GhDX5KT3lXUQTn7VDKFb0PfBMms0eVIKce3Ev
- q7SoJhYMS/PxAS3/AoXnxaEN9vQgFw50yxL+Up1Mtb1fj6E0lHipPeMP7U3xZK2VeA1T
- F+UPyQZCta5un7iO4riswkAuLTLjVECNY5NoYQ419selsInWZXIuK+UC/uuwFGOVepEC
- U1NB/wqwnAl8eonZ+jWagF6aSM2dxPTASguY9snI9zpB9V0Zm2YOm2X8rF7IoD9c9HIL
- ytk0rg3muD/6SCbBUb+YanVEQRQNke/G76kwGXKbrMrLdPfMXYmPOhU7x7mWsrrNnajz
- iDCg==
-X-Gm-Message-State: APjAAAV+3h3TLvSRWFqKx10tdS8CbDj11OpdUnHfF97majby+bX1LS8k
- AHE06TfYHSXR3lzunTu+iixpLg==
-X-Google-Smtp-Source: APXvYqxXsX2gga74IicmqqCfSsMUieJhrIx+ez/3RJOmWoMr9yPkkilIfV7qz9XvZ7UdIDGuAXiMbw==
-X-Received: by 2002:adf:f68b:: with SMTP id v11mr34841822wrp.116.1564133800483; 
- Fri, 26 Jul 2019 02:36:40 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id v23sm45680831wmj.32.2019.07.26.02.36.39
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 02:36:39 -0700 (PDT)
-Date: Fri, 26 Jul 2019 11:36:37 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190726093637.yv3w4ynkoyvzahq6@steredhat>
-References: <20190724171239.8764-1-mreitz@redhat.com>
- <20190724171239.8764-2-mreitz@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fSfrGrRhjJEug1iM2o0JkpzkU95zBrleqMeDoDm1YlU=;
+ b=sdLu0VMxg1fD1xQazTf3hWj27PvjFQCfAjttm0ANuVluGv+ZworMoj0Jb+oeRz7jQO
+ YHJPhhIuqjQu44GHfPTYmq4Hc7JC2GIVzxtvPypwsnvXY2IIOa/HLhsSNN53GTGn6nkW
+ 8qzS6wox/45IyIiatQLtFwzI2nTbwO0Va2u0hUj7AOOu3muXo7LxqkCAN0MvDsEzDikN
+ m3uS+sYe8EAJveQuUh7G0Ev4Px7qJ8yAxOq+cQ3C+RtwPmV+MbHdDNMYWjQlH7vev7c7
+ 971JNeqO1Edv9Z8hByuXHK2dGxQDlUKzvfyIituvOdSkYWVqNTpAs/VLbHt7WZR5OY6p
+ I1GA==
+X-Gm-Message-State: APjAAAXCEkVeyEiyNXP5atfM65lXLIRLY1IYRGOJN5XHXQqoXbQ3rVnJ
+ HNN5qihad7/keIRLJXkMsO2abw==
+X-Google-Smtp-Source: APXvYqzlV/1DKFivxacazGTydJt0YU/GPPbguaon/bVKYgHKpFk955pWjIYP5RnuPKMYMUaSrzjLgg==
+X-Received: by 2002:a1c:228b:: with SMTP id
+ i133mr84279148wmi.140.1564133991298; 
+ Fri, 26 Jul 2019 02:39:51 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
+ ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ by smtp.gmail.com with ESMTPSA id b5sm43505459wru.69.2019.07.26.02.39.49
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 26 Jul 2019 02:39:50 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
+References: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
+ <1564123667210.66446@bt.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2159ad69-4c4c-24dc-6759-039e39f952d3@redhat.com>
+Date: Fri, 26 Jul 2019 11:39:49 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724171239.8764-2-mreitz@redhat.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <1564123667210.66446@bt.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v2 01/11] qemu-img: Fix
- bdrv_has_zero_init() use in convert
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v5 11/15] memory: Single byte swap along
+ the I/O path
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,62 +87,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, walling@linux.ibm.com, sagark@eecs.berkeley.edu,
+ mst@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
+ laurent@vivier.eu, Alistair.Francis@wdc.com, edgar.iglesias@gmail.com,
+ arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
+ ehabkost@redhat.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ stefanha@redhat.com, shorne@gmail.com, david@gibson.dropbear.id.au,
+ qemu-riscv@nongnu.org, kbastian@mail.uni-paderborn.de, cohuck@redhat.com,
+ alex.williamson@redhat.com, qemu-ppc@nongnu.org, amarkovic@wavecomp.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 07:12:29PM +0200, Max Reitz wrote:
-> bdrv_has_zero_init() only has meaning for newly created images or image
-> areas.  If qemu-img convert did not create the image itself, it cannot
-> rely on bdrv_has_zero_init()'s result to carry any meaning.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qemu-img.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/qemu-img.c b/qemu-img.c
-> index 79983772de..0f4be80c10 100644
-> --- a/qemu-img.c
-> +++ b/qemu-img.c
-> @@ -1578,6 +1578,7 @@ typedef struct ImgConvertState {
->      bool has_zero_init;
->      bool compressed;
->      bool unallocated_blocks_are_zero;
-> +    bool target_is_new;
->      bool target_has_backing;
->      int64_t target_backing_sectors; /* negative if unknown */
->      bool wr_in_order;
-> @@ -1975,9 +1976,11 @@ static int convert_do_copy(ImgConvertState *s)
->      int64_t sector_num = 0;
->  
->      /* Check whether we have zero initialisation or can get it efficiently */
-> -    s->has_zero_init = s->min_sparse && !s->target_has_backing
-> -                     ? bdrv_has_zero_init(blk_bs(s->target))
-> -                     : false;
-> +    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
-> +        s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
-> +    } else {
-> +        s->has_zero_init = false;
-> +    }
->  
->      if (!s->has_zero_init && !s->target_has_backing &&
->          bdrv_can_write_zeroes_with_unmap(blk_bs(s->target)))
-> @@ -2423,6 +2426,8 @@ static int img_convert(int argc, char **argv)
->          }
->      }
->  
-> +    s.target_is_new = !skip_create;
-> +
->      flags = s.min_sparse ? (BDRV_O_RDWR | BDRV_O_UNMAP) : BDRV_O_RDWR;
->      ret = bdrv_parse_cache_mode(cache, &flags, &writethrough);
->      if (ret < 0) {
+On 26/07/19 08:47, tony.nguyen@bt.com wrote:
+> +static bool memory_region_endianness_inverted(MemoryRegion *mr)
+>  {
+>  #ifdef TARGET_WORDS_BIGENDIAN
+>      return mr->ops->endianness == DEVICE_LITTLE_ENDIAN;
+> @@ -361,23 +361,27 @@ static bool
+> memory_region_wrong_endianness(MemoryRegion *mr)
+>  #endif
+>  }
+>  
+> -static void adjust_endianness(MemoryRegion *mr, uint64_t *data,
+> unsigned size)
+> +static void adjust_endianness(MemoryRegion *mr, uint64_t *data, MemOp op)
+>  {
+> -    if (memory_region_wrong_endianness(mr)) {
+> -        switch (size) {
+> -        case 1:
+> +    if (memory_region_endianness_inverted(mr)) {
+> +        op ^= MO_BSWAP;
+> +    }
 
-Make sense!
+Here it should not matter: the caller of memory_region_dispatch_read
+should includes one of MO_TE/MO_LE/MO_BE in the op (or nothing for host
+endianness).  Then memory_region_endianness_inverted can be:
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+  if (mr->ops->endianness == DEVICE_NATIVE_ENDIAN)
+    return (op & MO_BSWAP) != MO_TE;
+  else if (mr->ops->endianness == DEVICE_BIG_ENDIAN)
+    return (op & MO_BSWAP) != MO_BE;
+  else if (mr->ops->endianness == DEVICE_LITTLE_ENDIAN)
+    return (op & MO_BSWAP) != MO_LE;
 
-Thanks,
-Stefano
+and adjust_endianness does
+
+  if (memory_region_endianness_inverted(mr, op)) {
+    switch (op & MO_SIZE) {
+      ...
+    }
+  }
+
+I think the changes should be split in two parts.  Before this patch,
+you modify all callers of memory_region_dispatch_* so that they already
+pass the right endianness op; however, you leave the existing swap in
+place.  So for example in load_helper you'd have in a previous patch
+
++        /* FIXME: io_readx ignores MO_BSWAP.  */
++        op = SIZE_MEMOP(size) | (big_endian ? MO_BE : MO_LE);
+         res = io_readx(env, &env_tlb(env)->d[mmu_idx].iotlb[index],
+-                       mmu_idx, addr, retaddr, access_type,
+SIZE_MEMOP(size));
++                       mmu_idx, addr, retaddr, access_type, op);
+         return handle_bswap(res, size, big_endian);
+
+Then, in this patch, you remove the handle_bswap call as well as the
+FIXME comment.
+
+Paolo
 
