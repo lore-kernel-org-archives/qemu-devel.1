@@ -2,87 +2,88 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134A4C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59FEC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 08:25:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE9842166E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:58:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9842166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7AE8A216C8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 08:25:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="zEVfJHq0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE8A216C8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqv7K-0006Pt-4Q
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 03:58:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36265)
+	id 1hqvXs-0008P9-Nn
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 04:25:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37352)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqv75-00061Q-4Y
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:58:06 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hqvXi-0007yt-PC
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqv6z-0000F7-0R
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:57:59 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37382)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqv6y-0008Uu-Op
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:57:56 -0400
-Received: by mail-wm1-f67.google.com with SMTP id f17so46831491wme.2
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 00:57:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LfHzuMB3s+eGpvlfmGqfkmXev6wwXwHOdRrX3ziCCvY=;
- b=JNkQ02Yjp+uA5qaCbZZO8isM7sIvFVEWIGoQ0ZAniOuPx+vw5SKDPjP5OKBGrM3yyz
- 4uZ5bgrxW9iQaRl2UmUHQ1vsk0dwaY4HAOmCqzYmIUc5Svf+rOaQl4YF1aYwWCWCNzOq
- ee0zcS/UJlYTNjv8zS8/NXJPBL43WMU/Bxaj5Z5fw2qeqeMCXztFTQBYLQJCcHYULtMz
- FNFcBvQBIKC5hnTAPSR/JUwVkdtBs3kE5WyNqEa4O7tw3q542wXgMZK4ZL2YFa23efXG
- FjYhKX0p5ZBR2UQWkojUHO3rUqc48f/2LI8sLoacXy28lbCX+I/7A8Rbh8LHrogVQzyG
- aNUw==
-X-Gm-Message-State: APjAAAVrb7JVeZE0LRczRx09i2RZscMtFti16BYps51GHfZUkHlLQBm7
- rkrAvMMWlHu2nYXiIXYVnbsyYQ==
-X-Google-Smtp-Source: APXvYqwfmbWlN6Kl5bwaAXzlPUS3VjOV0buwgIHiPnkovfz4SOE/ZNxE/JlbAYjbzKOaBu8bCWUuuw==
-X-Received: by 2002:a7b:ce01:: with SMTP id m1mr3263070wmc.1.1564127873216;
- Fri, 26 Jul 2019 00:57:53 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
- ([2001:b07:6468:f312:cc23:f353:392:d2ee])
- by smtp.gmail.com with ESMTPSA id s63sm42176038wme.17.2019.07.26.00.57.52
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 26 Jul 2019 00:57:52 -0700 (PDT)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190719102915.GG18585@stefanha-x1.localdomain>
- <8736j2p22w.fsf@redhat.com>
- <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
- <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
- <87tvbdrvin.fsf@redhat.com>
- <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
- <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
- <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
- <20190725104331-mutt-send-email-mst@kernel.org>
- <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
- <20190725161646-mutt-send-email-mst@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <65d0458b-02bf-0e40-2851-b4becc911e4f@redhat.com>
-Date: Fri, 26 Jul 2019 09:57:51 +0200
+ (envelope-from <damien.hedde@greensocs.com>) id 1hqvXf-00028O-HK
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:25:33 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:50668)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hqvXZ-0001H6-A5; Fri, 26 Jul 2019 04:25:25 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 50B2696F52;
+ Fri, 26 Jul 2019 08:25:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1564129517;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7uhW//7NlF6/8uxZp9/haXV+K5W2WJaZQenevO7YlQs=;
+ b=zEVfJHq0vxcOBY5OxuxL/n16bD1NMzkNWt1y2ptn4yLJIP5fABAOkhIu+1cWQete8sTu2c
+ jqEwHb0cXtpct1LuyBiGjOoq6MtCS26aFBDBJgi/4BHBISMXZZPCABKgfTq8k6AUlv7/b5
+ q/CFR0R4WQinLv5oOB2AU4T+o+d08oA=
+To: Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20190725163710.11703-1-peter.maydell@linaro.org>
+ <20190725163710.11703-2-peter.maydell@linaro.org>
+ <20190725170228.GL2656@work-vm>
+ <CAFEAcA9RQBz=t8F_nOTH9FZu_jKD0XVMJtPwmdnJBfnFR4G9oA@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <9631a4e2-80da-9369-038a-45f3b0399bc4@greensocs.com>
+Date: Fri, 26 Jul 2019 10:25:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190725161646-mutt-send-email-mst@kernel.org>
+In-Reply-To: <CAFEAcA9RQBz=t8F_nOTH9FZu_jKD0XVMJtPwmdnJBfnFR4G9oA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: en-US-large
 Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1564129518;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7uhW//7NlF6/8uxZp9/haXV+K5W2WJaZQenevO7YlQs=;
+ b=ARfkxlVVu+UQcCGqXwKWtS5w4Q0Fu2Unx6kKZh2bTpejR498TJwEO+dorcwA7RtMqx+9w4
+ 88Am0TeXJfIvuovqL5yJ4tW7TAzQHefUk+O8U8fFpPZZcafp+qTvFaEMtIZR/WZ/x5Marx
+ 8/xpRPebX9r5MOMH0DH/cLDTcUuyVzI=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564129518; a=rsa-sha256; cv=none;
+ b=FO77mzVqNdj/4ViDHbOWdCPPQPoKVQPFaqDEALlPhkDZiEa4ASd06GQifyDw+HBAlKNzeC
+ KH6RqqvLjMk0vNTFAjNBCCUQ24rv0YMDTPpoBV3HaGqBH2D+M8tBhayq1V7PldY9jDaal0
+ TcM5exGH2DsqehlnrGUPsJ/Wn4y68ow=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH for-4.1? 1/2] stellaris_input: Fix vmstate
+ description of buttons field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,55 +95,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
- "maran.wilson@oracle.com" <maran.wilson@oracle.com>, "Montes,
- Julio" <julio.montes@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
- "sgarzare@redhat.com" <sgarzare@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/07/19 22:30, Michael S. Tsirkin wrote:
-> On Thu, Jul 25, 2019 at 05:35:01PM +0200, Paolo Bonzini wrote:
->> On 25/07/19 16:46, Michael S. Tsirkin wrote:
->>> Actually, I think I have a better idea.
->>> At the moment we just get an exit on these reads and return all-ones.
->>> Yes, in theory there could be a UR bit set in a bunch of
->>> registers but in practice no one cares about these,
->>> and I don't think we implement them.
->>> So how about mapping a single page, read-only, and filling it
->>> with all-ones?
+
+
+On 7/25/19 7:59 PM, Peter Maydell wrote:
+> On Thu, 25 Jul 2019 at 18:02, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
 >>
->> Yes, that's nice indeed. :)  But it does have some cost, in terms of
->> either number of VMAs or QEMU RSS since the MMCONFIG area is large.
->>
->> What breaks if we return all zeroes?  Zero is not a valid vendor ID.
->>
->> Paolo
-> 
-> I think I know what you are thinking of doing:
-> map /dev/zero so we get a single VMA but all mapped to
-> a single zero pte?
+>> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>>> gamepad_state::buttons is a pointer to an array of structs,
+>>> not an array of structs, so should be declared in the vmstate
+>>> with VMSTATE_STRUCT_VARRAY_POINTER_INT32; otherwise we
+>>> corrupt memory on incoming migration.
+>>>
+>>> We bump the vmstate version field as the easiest way to
+>>> deal with the migration break, since migration wouldn't have
+>>> worked reliably before anyway.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Yes, exactly.  You absolutely need to share the page because the guest
-could easily touch 32*256 pages just to scan function 0 on every bus and
-device, even if the VM has just 4 or 5 devices and all of them on the
-root complex.  And that causes fragmentation so you have to map bigger
-areas.
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
 
-> - we can implement /dev/ones. in fact, we can implement
->   /dev/byteXX for each possible value, the cost will
->   be only 1M on a 4k page system.
->   it might come in handy for e.g. free page hinting:
->   at the moment if guest memory is poisoned
->   we can not unmap it, with this trick we can
->   map it to /dev/byteXX.
+> As an aside, I'm surprised also the macro doesn't complain
+> that we said the num_buttons field is int32 but it's really "int"...
+> arguably a different kind of missing type check.
 
-I also thought of /dev/ones, not sure how it would be accepted. :)  Also
-you cannot map lazily on page fault, otherwise you get a vmexit and it's
-slow again.  So /dev/ones needs to be written to use a huge page, possibly.
+We would need to compile on a host with int size not being 32bit to
+catch this kind of problem I think.
 
-Paolo
+--
+Damien
 
