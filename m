@@ -2,82 +2,79 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9BDC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F69FC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:33:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BEE42184E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:31:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="po6VEKvI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BEE42184E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D8AD022BE8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:33:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8AD022BE8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqxVc-0008QW-5W
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:31:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41365)
+	id 1hqxXo-0001Ap-W6
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45126)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hqxVN-0007uo-Bl
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:31:18 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqxXa-0000ng-S6
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:33:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hqxVM-0001cc-9Z
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:31:17 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35377)
+ (envelope-from <pbonzini@redhat.com>) id 1hqxXX-0001Hl-RQ
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:33:32 -0400
+Received: from mail-wr1-f52.google.com ([209.85.221.52]:44880)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hqxVL-0001Hk-W1
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:31:16 -0400
-Received: by mail-oi1-x241.google.com with SMTP id a127so39892590oii.2
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:31:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Js57P2GxEMkXfeB66CfbhBeEc4bvSPCyOyQZRR3vLy4=;
- b=po6VEKvIy26QR07pGgN1flfJ8l9sLtMJ3vo7gMJlfRZkcfw16HbFQ+g/hconvcsO4L
- RYVNdWp8/hM0BA99+LWqVPSvOqa0u4umow1hcn9b8LrlAzKzdaeD0Woc4sxq/gnQZ8R1
- ohfvgISzVcomizMSSlWDbOuQudFGwJfpQJZOUNFCdU+hfiG2ukQ1Ehwa8xEjcePzBCII
- WE6WIFyoZ81nPJT9KQIJBkfUeZ3qDL5+8qNwFN+R0riDYEHvXa08Xx1LC9pVnIe+aUji
- FYqDL384gIe9mnudwS7psZ0lY9BIsXIa6QBOirKqCw+Fwco6IuupIZNs1cIINRQsZ6s+
- sVgw==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqxXX-00012n-Gx
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:33:31 -0400
+Received: by mail-wr1-f52.google.com with SMTP id p17so53870057wrf.11
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:33:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Js57P2GxEMkXfeB66CfbhBeEc4bvSPCyOyQZRR3vLy4=;
- b=Z8YUs/tqCgU55V6ofzimjFNMN7dmlKy8GjzssYQo1wKahfPnsGGiflQMMdaH9WInTJ
- 5g8pouJS+uKkBMGtGPN0aRPNLKLjwubY5ZuFkOlkg/ZT66/jG24M5LZueuccuzbKWO0q
- ZLnfXoqoWfvaw/RjQcfURuFoUN6ogh41A66r8H2C7fvypqJqOkOhUmCJpYDJWa381Lvt
- pSjtnulM34XW/UX5QlwrGlXzZbPj2k25X53hfN604SO67uPjvVrCFl79uDjaD/p0kB7g
- EKK+2jDEMRSmT0fRaOVCNvSY2Y2d9ehwo4OhoqUI4nbiWSP5v0q2M+dk5cj6H1YNCgL0
- 1Nxw==
-X-Gm-Message-State: APjAAAVfVbgWKDIwn9iHV/4tHqS8XeoOUL1/mnmoWR12XYUKZNyo7Gms
- gOcO80On/GClfgpsfDcBtAZKUUEAwEhWuj6lXoRKBA==
-X-Google-Smtp-Source: APXvYqz6/MwwkpRocL7QGNHFowlWkbxA6h04m6MXYMJk0xb6B1MlhmyGJST6pPXPJJYz/BhMXyLv3RPsu9vghIasVkU=
-X-Received: by 2002:aca:6185:: with SMTP id
- v127mr47521352oib.163.1564137070904; 
- Fri, 26 Jul 2019 03:31:10 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WEZZ/cBY8h7ri+PPBFXP50LbjKsNtDJvH8IqQZGVd1o=;
+ b=o5ixlZRSQ6IZzDtMquNXr9v4Zj/dWcfVMC0gIE2rIC/IpYEifz/s3ljqg5mOPUwetV
+ LMdF3+Y0PJTG6yvlhDvD5VrYebsDRx057oaZZaQG5hix0YSyV6/gaFPYqmodY1bbpBlH
+ /AzkOQwy/3S3X2HOHa6NQXHlnIArHOv4M2oNVJSX2+iSitjuhNGjxj89c6r0QreD6emc
+ KhIMVBi8OqhDh9A6kJW23948KToW3rCpwMMz8JtclCNNDdLpgY0TXqnp2TzBVhJIu4k4
+ 97d95wlvpWbryUtcjaUuPujpRY1p7cg+cELWuOkFlUmoGycdMy96tCWJqFq7ANcxXX75
+ EJHA==
+X-Gm-Message-State: APjAAAWGDrjt5CquLup9CsjGIQDNjabFWOcxIvZT5FMd57DCXmEWW/NO
+ YKlM8oPZ/vWxYY7nyZXM+2uEHA==
+X-Google-Smtp-Source: APXvYqzRuxTVjNdABALIyZUwU3MXJSynNgTQBtAk6gCn6SPIshAi9qJzo8IDf8+Y+tpo13gIkkLOgg==
+X-Received: by 2002:adf:e552:: with SMTP id z18mr103608356wrm.45.1564137208047; 
+ Fri, 26 Jul 2019 03:33:28 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
+ ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ by smtp.gmail.com with ESMTPSA id h14sm50110654wrs.66.2019.07.26.03.33.26
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 26 Jul 2019 03:33:27 -0700 (PDT)
+To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20190725032321.12721-1-alxndr@bu.edu>
+ <20190725032321.12721-4-alxndr@bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <9c699f01-7c2c-668f-2efb-dd8a3f59aff3@redhat.com>
+Date: Fri, 26 Jul 2019 12:33:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190726103010.31741-1-alex.bennee@linaro.org>
-In-Reply-To: <20190726103010.31741-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 26 Jul 2019 11:30:59 +0100
-Message-ID: <CAFEAcA9ioE_XcSuU_MXZAW=v-7Me6Nq_z9A830i+RswfNxGjcA@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v4] target/arm: generate a custom MIDR for
- -cpu max
+In-Reply-To: <20190725032321.12721-4-alxndr@bu.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.52
+Subject: Re: [Qemu-devel] [RFC 03/19] fuzz: add fuzz accelerator
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,48 +86,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "bsd@redhat.com" <bsd@redhat.com>,
+ "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jul 2019 at 11:30, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->
-> While most features are now detected by probing the ID_* registers
-> kernels can (and do) use MIDR_EL1 for working out of they have to
-> apply errata. This can trip up warnings in the kernel as it tries to
-> work out if it should apply workarounds to features that don't
-> actually exist in the reported CPU type.
->
-> Avoid this problem by synthesising our own MIDR value.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+On 25/07/19 05:23, Oleinik, Alexander wrote:
+> +#ifdef CONFIG_FUZZ
+> +/* Both the client and the server have qtest_init's, Rename on of them... */
+> +void qtest_init_server(const char *qtest_chrdev, const char *qtest_log, Error **errp);
 
-> +        /*
-> +         * Reset MIDR so the guest doesn't mistake our 'max' CPU type fo=
-r a real
-> +         * one and try to apply errata workarounds or use impdef feature=
-s we
-> +         * don't provide.
-> +         * An IMPLEMENTER field of 0 means "reserved for software use";
-> +         * ARCHITECTURE must be 0xf indicating "v7 or later, check ID re=
-gisters
-> +         * to see which features are present";
-> +         * the VARIANT, PARTNUM and REVISION fields are all implementati=
-on
-> +         * defined and we choose to define VARIANT and set the others to=
- zero.
-> +         */
-> +        t =3D FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0);
-> +        t =3D FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf);
-> +        t =3D FIELD_DP64(t, MIDR_EL1, PARTNUM, 'Q');
-> +        t =3D FIELD_DP64(t, MIDR_EL1, VARIANT, 0);
-> +        t =3D FIELD_DP64(t, MIDR_EL1, REVISION, 0);
+Just rename it in qtest.c and vl.c.
 
-Comment still says we set VARIANT but code says we set PARTNUM...
+> +void qtest_server_recv(GString *inbuf); /* Client sends commands using this */
 
-thanks
--- PMM
+Please define this in this patch already.
+
+> +#else
+>  void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp);
+> +#endif
+>  
+
 
