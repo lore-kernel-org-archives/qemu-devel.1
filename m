@@ -2,60 +2,87 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 881BBC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22936C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:13:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FE1022BEF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:12:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE1022BEF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E141F22BE8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:12:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="4h9Y2gCf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E141F22BE8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwH8-00005c-OP
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:12:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60706)
+	id 1hqwHa-00017D-5u
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:12:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35645)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1hqwGG-0004l7-IM
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:11:38 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hqwHI-0000c0-2n
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:12:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1hqwGB-0005Ap-EJ
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:11:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37012)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hqwHA-0000DE-Tt
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:12:35 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:52306)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hqwGB-0004zg-7K
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:11:31 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 19B14B2CD
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 09:11:28 +0000 (UTC)
-Received: from localhost (ovpn-117-212.ams2.redhat.com [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A048360C18;
- Fri, 26 Jul 2019 09:11:27 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: virtio-fs@redhat.com,
-	qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 10:11:02 +0100
-Message-Id: <20190726091103.23503-5-stefanha@redhat.com>
-In-Reply-To: <20190726091103.23503-1-stefanha@redhat.com>
-References: <20190726091103.23503-1-stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hqwH4-000848-A1; Fri, 26 Jul 2019 05:12:26 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 1212A96F52;
+ Fri, 26 Jul 2019 09:12:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1564132339;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q1772vBXvapvSD5tbTLGT/zlBP9h+P1My+8HFMiZbZU=;
+ b=4h9Y2gCfVxerZjhL7dIqFOv7QT5SI9PURUVWgehWMre0D55B8DP9BprIivQ/iF73OKwsrO
+ myQvoeqPx7DDigv5jm0Y0TIh/hEPUgF8MkpV78K44wcsOSfOSVTY3sljsPHuHfgmaUzs0V
+ nB3n8+fi5lwHoGU5+YxpGRqB6yxpZL4=
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190725163710.11703-1-peter.maydell@linaro.org>
+ <20190725163710.11703-3-peter.maydell@linaro.org>
+ <20190725172712.GM2656@work-vm>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <fa5590b1-2d62-a9c4-c54e-957c9bac9ed1@greensocs.com>
+Date: Fri, 26 Jul 2019 11:12:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 26 Jul 2019 09:11:28 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190725172712.GM2656@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1564132341;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q1772vBXvapvSD5tbTLGT/zlBP9h+P1My+8HFMiZbZU=;
+ b=x5W7Ttm4B9zzWvUWtw3E+2EkJqSl7j9wk3QRp0wET0+xpMaZUDTMojbk22B7rjbfHEoebj
+ s8fQ0PWga3j/Jqkt6ErP8FD6nZMK1vKG84yP7rmNI7MTm8w2+FdWyZ/Bwtv8WOU0yygMLM
+ RYhVJxoNW8oFYI0HmI67swWZ0u/Cdp4=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564132341; a=rsa-sha256; cv=none;
+ b=4skvJs4Hvt2V0mLTB2pAitZPom/JUS7YzOC74fxYnGfh5wNK+pJR7eunjoWcuWOmseMZ/h
+ GuK8Zj/QH6sWxpJ3z2MXxvtDNGQ2+Lreh/BDzUr0FRLzSagmFywdyFOOXJOYiLlinHfMCi
+ 3ipAvasPQ0PRr8AgbTepiE8OtmvF2qc=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 4/5] virtiofsd: drop lo_dirp->fd field
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
+ VMSTATE_STRUCT_VARRAY macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,76 +94,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fdopendir(3) takes ownership of the file descriptor.  The presence of
-the lo_dirp->fd field could lead to someone incorrectly adding a
-close(d->fd) cleanup call in the future.
 
-Do not store the file descriptor in struct lo_dirp since it is unused.
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- contrib/virtiofsd/passthrough_ll.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+On 7/25/19 7:27 PM, Dr. David Alan Gilbert wrote:
+> * Peter Maydell (peter.maydell@linaro.org) wrote:
+>> The VMSTATE_STRUCT_VARRAY_UINT32 macro is intended to handle
+>> migrating a field which is an array of structs, but where instead of
+>> migrating the entire array we only migrate a variable number of
+>> elements of it.
+>>
+>> The VMSTATE_STRUCT_VARRAY_POINTER_UINT32 macro is intended to handle
+>> migrating a field which is of pointer type, and points to a
+>> dynamically allocated array of structs of variable size.
+>>
+>> We weren't actually checking that the field passed to
+>> VMSTATE_STRUCT_VARRAY_UINT32 really is an array, with the result that
+>> accidentally using it where the _POINTER_ macro was intended would
+>> compile but silently corrupt memory on migration.
+>>
+>> Add type-checking that enforces that the field passed in is
+>> really of the right array type. This applies to all the VMSTATE
+>> macros which use flags including VMS_VARRAY_* but not VMS_POINTER.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> However, for the rest of it, from migration I'm happy:
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> 
 
-diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passt=
-hrough_ll.c
-index c1500e092d..ad3abdd532 100644
---- a/contrib/virtiofsd/passthrough_ll.c
-+++ b/contrib/virtiofsd/passthrough_ll.c
-@@ -1293,7 +1293,6 @@ static void lo_readlink(fuse_req_t req, fuse_ino_t =
-ino)
- }
-=20
- struct lo_dirp {
--	int fd;
- 	DIR *dp;
- 	struct dirent *entry;
- 	off_t offset;
-@@ -1319,16 +1318,17 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t=
- ino, struct fuse_file_info *fi
- 	struct lo_data *lo =3D lo_data(req);
- 	struct lo_dirp *d;
- 	ssize_t fh;
-+	int fd =3D -1;
-=20
- 	d =3D calloc(1, sizeof(struct lo_dirp));
- 	if (d =3D=3D NULL)
- 		goto out_err;
-=20
--	d->fd =3D openat(lo_fd(req, ino), ".", O_RDONLY);
--	if (d->fd =3D=3D -1)
-+	fd =3D openat(lo_fd(req, ino), ".", O_RDONLY);
-+	if (fd =3D=3D -1)
- 		goto out_errno;
-=20
--	d->dp =3D fdopendir(d->fd);
-+	d->dp =3D fdopendir(fd);
- 	if (d->dp =3D=3D NULL)
- 		goto out_errno;
-=20
-@@ -1348,11 +1348,12 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t=
- ino, struct fuse_file_info *fi
- out_errno:
- 	error =3D errno;
- out_err:
-+	if (fd !=3D -1) {
-+		close(fd);
-+	}
- 	if (d) {
- 		if (d->dp)
- 			closedir(d->dp);
--		if (d->fd !=3D -1)
--			close(d->fd);
- 		free(d);
- 	}
- 	fuse_reply_err(req, error);
---=20
-2.21.0
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+Tested-by: Damien Hedde <damien.hedde@greensocs.com>
 
+Damien
 
