@@ -2,88 +2,84 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0617EC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1FFC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C989F22ADA
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E711521951
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:39:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nP/KIGyp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C989F22ADA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eN+NvlKZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E711521951
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqzRb-0002t6-51
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:35:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46819)
+	id 1hqzVn-0005V8-1T
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:39:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48678)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hqzRQ-0002TJ-2p
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:35:20 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqzVb-00053t-MR
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:39:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hqzRO-0007R3-6k
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:35:19 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33611)
+ (envelope-from <peter.maydell@linaro.org>) id 1hqzVa-0006Zg-Oj
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:39:39 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46379)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hqzRM-0007AL-H5
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:35:17 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n9so54375098wru.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 05:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=wdbUOyu6KgD3lG6WhbE++LKeyv2JLJBQT8esjyiuNfU=;
- b=nP/KIGyp2ubCe0NwWXK6qJiou0RKGCBLWwDse9VE3t5kp0JE4NmTGFZ7nw1QckusUC
- LjGEBBBz9okBE3EQfabJSRjeQgFkI1lUofamAozKuMvoPDJsypSp6WloGBa/fN4937Rc
- 4nBLFr+892W2h3iGbkmbQ/iPSqKSL0pd4qCN0hUoma7aEth3ii7Jg/X32uZFFl/i9amz
- IqX6WFA2djZx38GW/UIr3XYvaI445O1ebLigFmVE7QjjQWsDw6emzbbYgHTSXFv+Hy1/
- S1wTqVidwUwC6TDGCXkeIPNvP14yTAJXmp60CrXhavgu7jBYB53Qh7i52OrmB8z1y1LA
- xtIw==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqzVa-0006Xv-J6
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:39:38 -0400
+Received: by mail-ot1-x343.google.com with SMTP id z23so26837079ote.13
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 05:39:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7oY1OmwYSBXmtrtrGQg3aJRQtWKlkBxlgour/ZnR7gU=;
+ b=eN+NvlKZO+1wB/GxfPvkpgwZ7crff5gjv6yw8NuvfN7ieFzVXvkHGTHvRTLxVRGUz1
+ mNBvssdtENVb7gmgozMRfOQZ8oZqiL6tyiAFjtHjucufb8g1EUFQkwq48BuHYbwCLKAP
+ Q8lw9Xgq98lECYnetbNn4GQFjSXjSVWj40z/F31EJp41qtoaG3YkVaRnprf5usvm4QOS
+ jI+tmFGT6boK1O9OB8JZLSc5sYnrM+dMvJhIkmATcYOYCqro+4QVxIR7is9sLyOx8RNU
+ b4MdPe9U4strqsc5wHmE3Kiu69+I4E90bmw/Re1X5YuaSNeubuHmXirrZkJwy7x4PaX9
+ T7JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=wdbUOyu6KgD3lG6WhbE++LKeyv2JLJBQT8esjyiuNfU=;
- b=GPHs35PQorf9nRmKwVrTMCcIM4TVnABxKPdSc3Fgh2jDE0Fydlj9R/YXiMITrK9dAy
- eukFA6Y2cqmmEb2JLvxhP3rdFyNPRWNQgO14c9izRMxoWTnKKhE3vK35+CIB6M5OnVnQ
- UUxqXAJuz/DizQzNstt2hd1JyT0lBoilIswIEe1iFu220mZYd2Va8HpRZz+se543nzhJ
- ul3VDElq21jhQ1qW0oNMyn5D9sagT6dsHi4F9goV+G+YSgQglMG9av3nk5i8irpfyNX2
- rdj3ZN/2OAZcYPGSeNcD/zvtrRUA9a3g6IzQZ08qtTz1LijIZUstkXD6e2Zn6YkLS2El
- rFaA==
-X-Gm-Message-State: APjAAAUG0B8AvF2eJ2YPC8Wzt3yu0ANUd518DyS2DwN3VB2irg1cFYh0
- H265xzEM2Gt6f/qs46htdw8=
-X-Google-Smtp-Source: APXvYqyfiCHUfrGcUTkpt8ZTGymaPxZISf4PJk/SXfQPRTLWHFsuWXWhkPuIArCSg42kg88JMo0mTA==
-X-Received: by 2002:adf:dd03:: with SMTP id a3mr56574590wrm.87.1564144515253; 
- Fri, 26 Jul 2019 05:35:15 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id k17sm60135450wrq.83.2019.07.26.05.35.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 05:35:14 -0700 (PDT)
-Date: Fri, 26 Jul 2019 13:35:13 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190726123513.GB25977@stefanha-x1.localdomain>
-References: <20190725032321.12721-1-alxndr@bu.edu>
- <20190725032321.12721-4-alxndr@bu.edu>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7oY1OmwYSBXmtrtrGQg3aJRQtWKlkBxlgour/ZnR7gU=;
+ b=CcG54hn0/ZVjAg0ZxBSVji4ZCe+7b2YzCYjXt2krUOI6BCZpK6I86JGMQLXL5s9PRn
+ qF+8R2XhOYu2xGz0e3744nshl6CiG3h6qEh4LCG3y3jWjNREPQeF5Ojf7BAt6mGO9jcf
+ CprnvXvFV7PZBNm1N5kwIaTqJlEa7AJ0lDzECSuerpXqFDZUrhPoc7/HdFhkB7+UJeO6
+ Umi7biBWSsQYRy69Y98fXfXTxNQhlV7W74yLsI6/fNeafPcLt9r7uDnqhvZ6viuiD2LT
+ 1gix8ePLCySXlF6ZETDBMERGbTPzKZHXUGwdxXJbw3Mr4+ZDpzALTnMtaYLYSWdQva7x
+ Ux2g==
+X-Gm-Message-State: APjAAAVeaxB98/yHWKuTbXgz3arNR95gNV5gAXAK0UZWC8mnXOhOmoVc
+ 2so9XY0YzzEM9sVGq3UPfWQQAYgKp8DYcuikijE9Cg==
+X-Google-Smtp-Source: APXvYqx9D27sH/kDjAz90LalWhJqXRpfNgtZDAD6R0tW6Khv1vf4yc42E15FcbaqrEDzYXO98dguGE3K580ov+Qa+qQ=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr11220298oti.91.1564144777276; 
+ Fri, 26 Jul 2019 05:39:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bCsyhTFzCvuiizWE"
-Content-Disposition: inline
-In-Reply-To: <20190725032321.12721-4-alxndr@bu.edu>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+References: <20190702150606.24851-1-mst@redhat.com>
+ <CAFEAcA-Qcq1ZmfDO_dkh_H9-aeQVU83ceLKU1NXM3VpW8g5sPQ@mail.gmail.com>
+ <20190702124823-mutt-send-email-mst@kernel.org>
+ <CAFEAcA-UFks7CmtcMT15KzK3TzRqGjwXWtFa8K6XZ=Bks92CJw@mail.gmail.com>
+ <20190702142058-mutt-send-email-mst@kernel.org>
+ <CAFEAcA_c3UXPVy_rXR_FxyXRw5ZE1-QgumPr9B-j+pmvBGWgpQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA_c3UXPVy_rXR_FxyXRw5ZE1-QgumPr9B-j+pmvBGWgpQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jul 2019 13:39:26 +0100
+Message-ID: <CAFEAcA8EQPdNTDf_t2aFDkfBj8iSevYpVCxTjjuX9NFGJJbTkg@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [RFC 03/19] fuzz: add fuzz accelerator
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PULL 00/22] virtio, pc, pci: features, fixes,
+ cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,67 +91,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 2 Jul 2019 at 19:27, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Tue, 2 Jul 2019 at 19:22, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Tue, Jul 02, 2019 at 06:20:01PM +0100, Peter Maydell wrote:
+> > > On Tue, 2 Jul 2019 at 18:01, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > This isn't from mainline. We have a bit of a deadlock with linux merge
+> > > > window opening soon. I think it's reasonable temporarily
+> > > > and then before release either virtio-pmem gets there or I will
+> > > > revert it and drop the header.
+> > >
+> > > It's definitely not ideal: until the headers are actually
+> > > upstream there's no guarantee that they won't change ABI.
+> >
+> > But then I'm watching it, if I see that I'll drop the device from qemu for
+> > now.
+>
+> OK; I guess we can take this for now if we make sure we revert
+> if the headers aren't upstream by the time we get to say rc2
+> (23rd July). (That is, we'd want to do any revert shortly after
+> rc2, since rc3 might be the last rc before release.)
 
---bCsyhTFzCvuiizWE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ping for status update -- have the headers hit the mainline
+kernel yet? Do they match the versions we put into QEMU?
 
-On Thu, Jul 25, 2019 at 03:23:46AM +0000, Oleinik, Alexander wrote:
-> Much like the qtest accelerator, the fuzz accelerator skips the CPU
-> emulation
->=20
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
->  include/sysemu/qtest.h | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/sysemu/qtest.h b/include/sysemu/qtest.h
-> index cd114b8d80..adfbd10d20 100644
-> --- a/include/sysemu/qtest.h
-> +++ b/include/sysemu/qtest.h
-> @@ -23,7 +23,12 @@ static inline bool qtest_enabled(void)
->  }
-> =20
->  bool qtest_driver(void);
-> -
-> +#ifdef CONFIG_FUZZ
-> +/* Both the client and the server have qtest_init's, Rename on of them..=
-=2E */
-
-s/on/one/
-
-> +void qtest_init_server(const char *qtest_chrdev, const char *qtest_log, =
-Error **errp);
-> +void qtest_server_recv(GString *inbuf); /* Client sends commands using t=
-his */
-
-qtest_server_init() is more consistent since the other function is
-called qtest_server_recv().
-
---bCsyhTFzCvuiizWE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0684EACgkQnKSrs4Gr
-c8gI6QgAoJqFLCJ41F6q6ehFqHP2seAitgu3LViEobJUCrk3y9ofIIpSvWPyW0fx
-nlktdm1DBqzKTsO/GMoRgzVQnuioCHG2D62T/B54LN1Y4ljfKDzvGa8v4z1dF5HM
-q7/hoQTfxTG6+g0KNzS1rnLpl/zx95RQiQqoJD30DhIggsxahoYUehHUbnHDSH2+
-bqmn+t3W9I6cbX0u6mGZSWxVAUBJNS3gaCWxDnwefCZd60LH1dcOTSYOF3nFTkBW
-1vWzk3cFsOI4R3JqwnZGx6yprzOOV9ibaRxCDxbdEEyy1b8LKadXqfDP8dsm/9sz
-qbEnqbXz6+UTG324Q59BpJMOK5iOwg==
-=0AEW
------END PGP SIGNATURE-----
-
---bCsyhTFzCvuiizWE--
+thanks
+-- PMM
 
