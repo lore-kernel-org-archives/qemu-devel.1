@@ -2,82 +2,66 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D46FC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:13:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7143C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:16:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 150D221734
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:13:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="at5xVy5D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150D221734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0A1A21734
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:16:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0A1A21734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr3mP-00025z-5l
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 13:13:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34602)
+	id 1hr3pG-0003f1-Uo
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 13:16:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38630)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <chihmin.chao@sifive.com>) id 1hr3mA-0001fr-PG
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:13:04 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hr3p4-0003AD-OT
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chihmin.chao@sifive.com>) id 1hr3m8-0006wA-N3
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:13:02 -0400
-Received: from mail-io1-xd30.google.com ([2607:f8b0:4864:20::d30]:37375)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
- id 1hr3m8-0006qQ-HS
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:13:00 -0400
-Received: by mail-io1-xd30.google.com with SMTP id q22so106233086iog.4
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bqM3mkPEES4v1h+Nq3Fu1VTCum+0IA+veBCNr8iZyuo=;
- b=at5xVy5DSEvlipZwFGefUvLfe9I3mtUzD3ZTqAE8RtND9wDKceRMutl8gtkXYbSEEq
- 8kir75w/jC0kXMGpaeiazepiAcW5/KTWo96Zk0vLBkcZ/LlVLpa5hs33+sJTUw2ZbFzN
- Kl1wSQiUU5PixB2+I+lGloXl59ONbfDuPx0PIvedb0lcDliRicKlRvwAM0y8NKnwEfnd
- 840QZtFkvHv2NNJZs9wPROU9McQ+fPMQG6Raw2/FS6u50XeHhRF+wLgnopci9uMiwNwH
- zWX9zpP9jtLBe5xpJFvlt9MrzNwsx2pKgJRYFz8T2jXjAZya20lqCw+S0HvYfZa5wp2A
- rZqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=bqM3mkPEES4v1h+Nq3Fu1VTCum+0IA+veBCNr8iZyuo=;
- b=dBKpHXVEsCNXLQhWXEiPZepqrHB4Z6RAz3eTrha/Gi0twA1PAIL4E3j0VmiGpClqCV
- zY832VpcZJ9PTLG1TlhsYnEI+nIc/6lRiZMEwU13Z5omPEIJqxuFsgFIIpMgtNonxY4/
- 0V7PUBgqxz/KL7au999rgXopS5Re9SWdNpAJV8WaOP2zpBLSC4a5QuJUZDHkcyCpZBeA
- c8EykJFEfL9lPmpr/kOJwLVlSh4G19PrIZVU8McjBsHJ6NIRn2sCqThR3cPNqk0u3F1H
- FCNk43sYpyuTLgknSYTAaGn+0zz0e/p0BA3uYLl+hc2uy70GRZreieGbdi3fXm/wenGP
- qu3g==
-X-Gm-Message-State: APjAAAVjfJzIbqed3Q7Wykx7P1y98jn8hH/qxvDDrmG5slG2N0ggCvd/
- Hd05E6oPtoK3CqOf1Llv0vmX/GdbWEDVohK85maHrg==
-X-Google-Smtp-Source: APXvYqwLu5EZ2L6hevycate7iRLMMT7DSU0DYcIQVwarBZ6KAG/RVG1K62QVCQzRZx1udJQJANtL9A66/hi94uYJTso=
-X-Received: by 2002:a02:a703:: with SMTP id k3mr30197480jam.12.1564161177889; 
- Fri, 26 Jul 2019 10:12:57 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1hr3p1-0005NW-27
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:16:00 -0400
+Resent-Date: Fri, 26 Jul 2019 13:16:00 -0400
+Resent-Message-Id: <E1hr3p1-0005NW-27@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21531)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hr3ox-0005Dt-Hs; Fri, 26 Jul 2019 13:15:55 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1564161344; cv=none; d=zoho.com; s=zohoarc; 
+ b=EVJ4p29J597uCbUmNwgw7USFZb4LBrJWdMPAYcE0oWdoAn067ekUFnrkgmUu3NFCxOxjwpbKz1C2jOCDhNJnsoD6G3BbkW0jWkOI7I0PueLNjWUx1JYwO3TDySWuJJAcO5sy3s9x6D5xD5LwW9YlIUNP3tRPCDrK2+2Dq04bYq8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1564161344;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=K7NERL0nlfn6eAAoZotlWnfNc+hTCc4apnPUB1wD5KQ=; 
+ b=Lg5pox7U//aqHBrDgjFlFZVNmTz4cu/ZkONlVpzQCJD79ImiwqsBf1SgDLi5+i+0AUuVyAA+SML2igXBsTMZznz8EF/a4jUMh3vopUJYx1fZtT4s/hN0t80XqVufJhSUPHRnFfRwDh5xHttk/XXXaHJaWVPTyoawxvUL2IH9Y4Y=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156416134345672.91113524966806;
+ Fri, 26 Jul 2019 10:15:43 -0700 (PDT)
+Message-ID: <156416134230.31055.7175670319941969077@c4a48874b076>
+In-Reply-To: <20190726164921.1655115-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-References: <1563950742-22592-1-git-send-email-chihmin.chao@sifive.com>
- <CAKmqyKM2-60bn1v+bNsX6H+jZ-gTrsUwqah9yPtAn9VhZ2d1jw@mail.gmail.com>
-In-Reply-To: <CAKmqyKM2-60bn1v+bNsX6H+jZ-gTrsUwqah9yPtAn9VhZ2d1jw@mail.gmail.com>
-From: Chih-Min Chao <chihmin.chao@sifive.com>
-Date: Sat, 27 Jul 2019 01:12:47 +0800
-Message-ID: <CAEiOBXXqF4qkOsQX=wdt92ice5UUZGsubVEc-5qryLdFSesUjg@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d30
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v3] tests/boot_linux_console: add a test
- for riscv64 + virt
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: stefanb@linux.vnet.ibm.com
+Date: Fri, 26 Jul 2019 10:15:43 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH for-3.1.1 0/2] tpm: Improve on error
+ handling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,179 +73,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, stefanb@linux.vnet.ibm.com, qemu-stable@nongnu.org,
+ mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 25, 2019 at 8:12 AM Alistair Francis <alistair23@gmail.com>
-wrote:
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcyNjE2NDkyMS4xNjU1
+MTE1LTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0g
+W1BBVENIIGZvci0zLjEuMSAwLzJdIHRwbTogSW1wcm92ZSBvbiBlcnJvciBoYW5kbGluZwpNZXNz
+YWdlLWlkOiAyMDE5MDcyNjE2NDkyMS4xNjU1MTE1LTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5j
+b20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBi
+YXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVs
+aW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVh
+OWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN1Ym1vZHVsZSAnY2Fwc3RvbmUnICho
+dHRwczovL2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdjYXBzdG9uZScKU3VibW9kdWxlICdkdGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZHRj
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpTdWJtb2R1bGUgJ3JvbXMvUWVtdU1hY0Ry
+aXZlcnMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvUWVtdU1hY0RyaXZlcnMuZ2l0KSByZWdp
+c3RlcmVkIGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJwpTdWJtb2R1bGUgJ3JvbXMvU0xP
+RicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9GLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
+aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvZWRrMicgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9lZGsyLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9lZGsyJwpTdWJtb2R1bGUg
+J3JvbXMvaXB4ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJl
+ZCBmb3IgcGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRwczov
+L2dpdC5xZW11Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
+L29wZW5iaW9zJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQucWVt
+dS5vcmcvZ2l0L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3Bl
+bmhhY2t3YXJlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbnNiaScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9vcGVuc2JpLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuc2JpJwpTdWJt
+b2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3FlbXUt
+cGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJwpTdWJt
+b2R1bGUgJ3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLmdp
+dC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdyb21zL3Nl
+YWJpb3MtaHBwYScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLWhwcGEuZ2l0KSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScKU3VibW9kdWxlICdyb21zL3Nn
+YWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlvcy5naXQpIHJlZ2lzdGVyZWQg
+Zm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21zL3NraWJvb3QnIChodHRwczov
+L2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMv
+c2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dp
+dC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdCcKU3VibW9kdWxl
+ICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3Qt
+c2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCcK
+U3VibW9kdWxlICdzbGlycCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9saWJzbGlycC5naXQp
+IHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3NsaXJwJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5
+LXNvZnRmbG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2JlcmtlbGV5LXNvZnRmbG9h
+dC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0
+LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dp
+dC5xZW11Lm9yZy9naXQvYmVya2VsZXktdGVzdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBw
+YXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2Rl
+bWFwZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0
+ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4u
+LgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1
+MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1
+Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1
+bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNoZWNrZWQgb3V0ICc5MGM0ODhkNWY0YTQw
+NzM0MjI0N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNrZWQgb3V0ICdiYTFhYjM2MGVlYmU2MzM4
+YmI4ZDdkODNhOTIyMGNjZjdlMjEzYWYzJwpDbG9uaW5nIGludG8gJ3JvbXMvZWRrMicuLi4KU3Vi
+bW9kdWxlIHBhdGggJ3JvbXMvZWRrMic6IGNoZWNrZWQgb3V0ICcyMGQyZTVhMTI1ZTM0ZmM4NTAx
+MDI2NjEzYTcxNTQ5YjJhMWEzZTU0JwpTdWJtb2R1bGUgJ1NvZnRGbG9hdCcgKGh0dHBzOi8vZ2l0
+aHViLmNvbS91Y2ItYmFyL2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAnQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0z
+JwpTdWJtb2R1bGUgJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcgKGh0dHBz
+Oi8vZ2l0aHViLmNvbS9vcGVuc3NsL29wZW5zc2wpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ0NyeXB0
+b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcKQ2xvbmluZyBpbnRvICdBcm1Qa2cvTGli
+cmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBw
+YXRoICdyb21zL2VkazIvQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNv
+ZnRmbG9hdC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2
+YjljODgwMzcnCkNsb25pbmcgaW50byAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVu
+c3NsJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5z
+c2xMaWIvb3BlbnNzbCc6IGNoZWNrZWQgb3V0ICc1MGVhYWM5ZjMzMzc2NjcyNTlkZTcyNTQ1MWYy
+MDFlNzg0NTk5Njg3JwpTdWJtb2R1bGUgJ2JvcmluZ3NzbCcgKGh0dHBzOi8vYm9yaW5nc3NsLmdv
+b2dsZXNvdXJjZS5jb20vYm9yaW5nc3NsKSByZWdpc3RlcmVkIGZvciBwYXRoICdib3Jpbmdzc2wn
+ClN1Ym1vZHVsZSAna3JiNScgKGh0dHBzOi8vZ2l0aHViLmNvbS9rcmI1L2tyYjUpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ2tyYjUnClN1Ym1vZHVsZSAncHljYS5jcnlwdG9ncmFwaHknIChodHRwczov
+L2dpdGh1Yi5jb20vcHljYS9jcnlwdG9ncmFwaHkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdw
+eWNhLWNyeXB0b2dyYXBoeScKQ2xvbmluZyBpbnRvICdib3Jpbmdzc2wnLi4uClN1Ym1vZHVsZSBw
+YXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2Jvcmlu
+Z3NzbCc6IGNoZWNrZWQgb3V0ICcyMDcwZjhhZDkxNTFkYzhmM2E3M2JmZmFhMTQ2YjVlNjkzN2E1
+ODNmJwpDbG9uaW5nIGludG8gJ2tyYjUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5
+cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2tyYjUnOiBjaGVja2VkIG91dCAnYjlh
+ZDZjNDk1MDVjOTZhMDg4MzI2YjYyYTUyNTY4ZTM0ODRmMjE2OCcKQ2xvbmluZyBpbnRvICdweWNh
+LWNyeXB0b2dyYXBoeScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGli
+cmFyeS9PcGVuc3NsTGliL29wZW5zc2wvcHljYS1jcnlwdG9ncmFwaHknOiBjaGVja2VkIG91dCAn
+MDk0MDMxMDBkZTJmNmYxY2RkMGQ0ODRkY2I4ZTYyMGYxYzMzNWM4ZicKQ2xvbmluZyBpbnRvICdy
+b21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91dCAnZGU0
+NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRvICdyb21z
+L29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNrZWQgb3V0
+ICdjNzllMGVjYjg0ZjRmMWVlM2Y3M2Y1MjE2MjJlMjY0ZWRkMWJmMTc0JwpDbG9uaW5nIGludG8g
+J3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUn
+OiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1NDZmNScK
+Q2xvbmluZyBpbnRvICdyb21zL29wZW5zYmknLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5z
+YmknOiBjaGVja2VkIG91dCAnY2UyMjhlZTA5MTlkZWI5OTU3MTkyZDcyM2VlY2M4YWFhZTI2OTdj
+NicKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGggJ3Jv
+bXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJ2JmMGUxMzY5ODg3MjQ1MDE2NGZhNzA0MGRh
+MzZhOTVkMmQ0YjMyNmYnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1bGUg
+cGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E1Y2FiNThlOWEzZmI2ZTE2OGFiYTkx
+OWM1NjY5YmVhNDA2NTczYjQnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4uClN1
+Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcwZjRmZTg0NjU4
+MTY1ZTk2Y2UzNTg3MGZkMTlmYzYzNGUxODJlNzdiJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dhYmlv
+cycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFlZTUy
+Mjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMvc2tp
+Ym9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICcyNjFj
+YThlNzc5ZTUxMzg4NjlhNDVmMTc0Y2FhNDliZTZhMjc0NTAxJwpDbG9uaW5nIGludG8gJ3JvbXMv
+dS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAnZDM2
+ODkyNjdmOTJjNTk1NmUwOWNjN2QxYmFhNDcwMDE0MTY2MmJmZicKQ2xvbmluZyBpbnRvICdyb21z
+L3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4
+JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1ODgn
+CkNsb25pbmcgaW50byAnc2xpcnAnLi4uClN1Ym1vZHVsZSBwYXRoICdzbGlycCc6IGNoZWNrZWQg
+b3V0ICdmMGRhNjcyNjIwN2I3NDBmNjEwMTAyOGIyOTkyZjkxODQ3N2E0YjA4JwpDbG9uaW5nIGlu
+dG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVz
+dHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3
+ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxl
+eS10ZXN0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3Rm
+bG9hdC0zJzogY2hlY2tlZCBvdXQgJzVhNTlkY2VjMTkzMjczOTZhMDExYTE3ZmQ5MjRhZWQ0ZmVj
+NDE2YjMnCkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0aCAn
+dWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMyMjA1
+NTIyODBlZjNkODMyY2UnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09CmNoZWNrcGF0Y2gucGw6IG5vIHJldmlzaW9ucyByZXR1cm5lZCBmb3IgcmV2
+bGlzdCAnMScKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29k
+ZTogMjU1CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
+bG9ncy8yMDE5MDcyNjE2NDkyMS4xNjU1MTE1LTEtc3RlZmFuYkBsaW51eC52bmV0LmlibS5jb20v
+dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-> On Tue, Jul 23, 2019 at 11:46 PM Chih-Min Chao <chihmin.chao@sifive.com>
-> wrote:
-> >
-> > Similar to the mips + malta test, it boots a Linux kernel on a virt
-> > board and verify the serial is working.  Also, it relies on the serial
-> > device set by the machine itself.
-> >
-> > If riscv64 is a target being built, "make check-acceptance" will
-> > automatically include this test by the use of the "arch:riscv64" tags.
-> >
-> > Alternatively, this test can be run using:
-> >
-> >   $ avocado run -t arch:riscv64 tests/acceptance
-> >
-> > packages
-> >   debian official
-> >     binutils-riscv64-linux-gnu_2.32-8
-> >     opensbi_0.4-1_all
-> >     linux-image-5.0.0-trunk-riscv64 5.0.2-1~exp1
-> >   third-party
-> >
-> https://github.com/groeck/linux-build-test/rootfs/riscv64/rootfs.cpio.gz
-> >     (the repo is also used in mips target acceptance)
-> >
-> > Signed-off-by: Chih-Min Chao <chihmin.chao@sifive.com>
-> > ---
-> >  .travis.yml                            |  2 +-
-> >  tests/acceptance/boot_linux_console.py | 67
-> ++++++++++++++++++++++++++++++++++
-> >  2 files changed, 68 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/.travis.yml b/.travis.yml
-> > index caf0a1f..7ba9952 100644
-> > --- a/.travis.yml
-> > +++ b/.travis.yml
-> > @@ -232,7 +232,7 @@ matrix:
-> >
-> >      # Acceptance (Functional) tests
-> >      - env:
-> > -        - CONFIG="--python=/usr/bin/python3
-> --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
-> > +        - CONFIG="--python=/usr/bin/python3
-> --target-list=x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu,riscv64-softmmu"
-> >          - TEST_CMD="make check-acceptance"
-> >        after_failure:
-> >          - cat tests/results/latest/job.log
-> > diff --git a/tests/acceptance/boot_linux_console.py
-> b/tests/acceptance/boot_linux_console.py
-> > index 3215950..b0569b9 100644
-> > --- a/tests/acceptance/boot_linux_console.py
-> > +++ b/tests/acceptance/boot_linux_console.py
-> > @@ -354,3 +354,70 @@ class BootLinuxConsole(Test):
-> >          self.vm.launch()
-> >          console_pattern = 'Kernel command line: %s' %
-> kernel_command_line
-> >          self.wait_for_console_pattern(console_pattern)
-> > +
-> > +    def test_riscv64_virt(self):
-> > +        """
-> > +        :avocado: tags=arch:riscv64
-> > +        :avocado: tags=machine:virt
-> > +        """
-> > +        deb_url = ('https://snapshot.debian.org/archive/debian/'
-> > +                         '20190424T171759Z/pool/main/b/binutils/'
-> > +                         'binutils-riscv64-linux-gnu_2.32-8_amd64.deb')
-> > +        deb_hash = ('7fe376fd4452696c03acd508d6d613ca553ea15e')
-> > +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> > +        objcopy_path = '/usr/bin/riscv64-linux-gnu-objcopy'
-> > +        objcopy_path = self.extract_from_deb(deb_path, objcopy_path)
-> > +        libbfd_path = '/usr/lib/x86_64-linux-gnu/libbfd-2.32-riscv64.so
-> '
-> > +        libbfd_path = self.extract_from_deb(deb_path, libbfd_path)
-> > +        process.run('ls -al %s' % (objcopy_path))
->
-> Why do we need objcopy? Won't this not work on non x86 architectures?
->
-> > +
-> > +        deb_url = ('https://snapshot.debian.org/archive/debian/'
-> > +                   '20190708T032337Z/pool/main/o/opensbi/'
-> > +                   'opensbi_0.4-1_all.deb')
-> > +        deb_hash = ('2319dcd702958291d323acf5649fd98a11d90112')
-> > +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> > +        opensbi_path = ('/usr/lib/riscv64-linux-gnu/opensbi/'
-> > +                        'qemu/virt/fw_jump.elf')
-> > +        opensbi_path = self.extract_from_deb(deb_path, opensbi_path)
-> > +
-> > +        deb_url = ('https://snapshot.debian.org/archive/debian-ports/'
-> > +                   '20190319T205124Z/pool-riscv64/main/l/linux/'
-> > +
->  'linux-image-5.0.0-trunk-riscv64_5.0.2-1~exp1_riscv64.deb')
-> > +        deb_hash = ('90155ed4b36673cbf7746a37cf3159c8f0b2857a')
-> > +        deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> > +        kernel_path = '/boot/vmlinux-5.0.0-trunk-riscv64'
->
-> I thought we were swapping to using an Image file?
->
-> Alistair
->
->
-  For objcopy,
-         Philippe had the same question in PATCH v2 thread.  Debian
-linux-kernel package only has vmlinux and riscv vmlinux  ELF header doesn't
-contain the correct physical loading address 0x8020_0000.
-          What I think is to extract the Image from vmlinux by objcopy.
-This is what kernel do when generating  arch/riscv/boot/Image.
 
-  For swapping to using an image file,
-         I think what you talk about is we have included opensbi.bin into
-qemu master ?
-         The reason is the test use -initrd and -append to pass rootfs and
-kernel command line option and the two options requires using of -kernel
-option.
-         But -kernel option can't load the opensbi.bin to expected address.
-
-chihmin
-
-
-> > +        kernel_path = self.extract_from_deb(deb_path, kernel_path)
-> > +        kimage_path = self.workdir + "/Image"
-> > +        env = os.environ
-> > +        env['LD_LIBRARY_PATH'] = ('%s:' %
-> (os.path.dirname(libbfd_path)) +
-> > +                                 env.get('LD_LIBRARY_PATH', ''))
-> > +        process.run(('%s -O binary -O binary -R'
-> > +                     '.note -R .note.gnu.build-id -R .comment -S %s
-> %s') %
-> > +                     (objcopy_path, kernel_path, kimage_path))
-> > +
-> > +        initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-> > +                      '8584a59ed9e5eb5ee7ca91f6d74bbb06619205b8/rootfs/'
-> > +                      'riscv64/rootfs.cpio.gz')
-> > +        initrd_hash = 'f4867d263754961b6f626cdcdc0cb334c47e3b49'
-> > +        initrd_path = self.fetch_asset(initrd_url,
-> asset_hash=initrd_hash)
-> > +
-> > +        self.vm.set_machine('virt')
-> > +        self.vm.set_console()
-> > +        kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE
-> > +                               + 'console=ttyS0 noreboot')
-> > +        self.vm.add_args('-bios', "none",
-> > +                '-kernel', opensbi_path,
-> > +                '-device', 'loader,file=%s,addr=0x80200000' %
-> (kimage_path),
-> > +                '-initrd', initrd_path,
-> > +                '-append', kernel_command_line,
-> > +                '-no-reboot')
-> > +
-> > +        self.vm.launch()
-> > +        self.wait_for_console_pattern('Boot successful.')
-> > +
-> > +        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
-> > +                                               'isa')
-> > +        self.exec_command_and_wait_for_pattern('uname -a',
-> > +                                               'SMP Debian')
-> > +        self.exec_command_and_wait_for_pattern('reboot',
-> > +                                               'reboot: Restarting
-> system')
-> > --
-> > 2.7.4
-> >
-> >
->
