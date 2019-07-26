@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15332C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D75E5C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:11:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76354229F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:11:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76354229F9
+	by mail.kernel.org (Postfix) with ESMTPS id A3D81229F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:11:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D81229F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqz3r-0000kZ-Dy
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:10:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58963)
+	id 1hqz44-0001jk-RQ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:11:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59154)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hqyz4-0005oD-4f
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:06:12 -0400
+ (envelope-from <armbru@redhat.com>) id 1hqyz9-00067q-TN
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:06:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hqyys-00087A-R9
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:06:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40574)
+ (envelope-from <armbru@redhat.com>) id 1hqyyv-0008Kc-Sd
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:06:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56452)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hqyys-00080k-8X
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hqyyv-00081T-DQ
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:53 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3F1F2C025019
+ by mx1.redhat.com (Postfix) with ESMTPS id 61196C049598
  for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 12:05:49 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-30.ams2.redhat.com
  [10.36.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DA1A60606
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 12:05:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A73B55DE6F;
+ Fri, 26 Jul 2019 12:05:48 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 43B091146430; Fri, 26 Jul 2019 14:05:43 +0200 (CEST)
+ id 5959F114643C; Fri, 26 Jul 2019 14:05:43 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 14:05:40 +0200
-Message-Id: <20190726120542.9894-27-armbru@redhat.com>
+Date: Fri, 26 Jul 2019 14:05:42 +0200
+Message-Id: <20190726120542.9894-29-armbru@redhat.com>
 In-Reply-To: <20190726120542.9894-1-armbru@redhat.com>
 References: <20190726120542.9894-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 26 Jul 2019 12:05:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Fri, 26 Jul 2019 12:05:49 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 26/28] Clean up inclusion of sysemu/sysemu.h
+Subject: [Qemu-devel] [PATCH 28/28] Include sysemu/sysemu.h a lot less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,6 +69,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -77,1627 +78,971 @@ In my "build everything" tree, changing sysemu/sysemu.h triggers a
 recompile of some 5400 out of 6600 objects (not counting tests and
 objects that don't depend on qemu/osdep.h).
 
-119 of 380 #include directives are actually superfluous.  Delete them.
-Downgrade two more to qapi/qapi-types-run-state.h, and move one from
-char/serial.h to char/serial.c.
+hw/qdev-core.h includes sysemu/sysemu.h since recent commit e965ffa70a
+"qdev: add qdev_add_vm_change_state_handler()".  This is a bad idea:
+hw/qdev-core.h is widely included, and sysemu/sysemu.h pulls in some
+100 headers.
 
-This doesn't reduce actual use much, as it's still included into
-widely included headers.  The next commits will tackle that.
+Collect everything related to vm_state_notify() in new
+sysemu/vmstate-notify.h, and drop the problematic include from
+hw/qdev-core.h.
 
+Touching sysemu/sysemu.h now recompiles some 1100 objects.
+qemu/uuid.h also drops from 5400 to 1100.  A few more headers show
+smaller improvement: qemu/notify.h drops from 5600 to 5200,
+qemu/timer.h from 5600 to 4400, and qapi/qapi-types-run-state.h from
+5500 to 4400.
+
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- accel/tcg/tcg-all.c                 | 1 -
- block/nfs.c                         | 1 -
- blockdev-nbd.c                      | 1 -
- dump/win_dump.c                     | 1 -
- hw/acpi/pcihp.c                     | 1 -
- hw/acpi/vmgenid.c                   | 1 -
- hw/alpha/pci.c                      | 1 -
- hw/alpha/typhoon.c                  | 1 -
- hw/arm/nrf51_soc.c                  | 1 -
- hw/arm/smmu-common.c                | 1 -
- hw/arm/smmuv3.c                     | 1 -
- hw/arm/sysbus-fdt.c                 | 1 -
- hw/arm/z2.c                         | 1 -
- hw/char/exynos4210_uart.c           | 1 -
- hw/char/imx_serial.c                | 1 -
- hw/char/serial.c                    | 1 +
- hw/core/loader-fit.c                | 1 -
- hw/core/platform-bus.c              | 1 -
- hw/core/qdev.c                      | 1 -
- hw/display/ramfb-standalone.c       | 1 -
- hw/display/ramfb.c                  | 1 -
- hw/dma/xlnx-zynq-devcfg.c           | 1 -
- hw/hppa/dino.c                      | 1 -
- hw/hppa/pci.c                       | 1 -
- hw/i2c/smbus_ich9.c                 | 1 -
- hw/ide/cmd646.c                     | 1 -
- hw/ide/ioport.c                     | 1 -
- hw/ide/piix.c                       | 1 -
- hw/ide/via.c                        | 1 -
- hw/input/adb-kbd.c                  | 1 -
- hw/intc/allwinner-a10-pic.c         | 1 -
- hw/intc/mips_gic.c                  | 1 -
- hw/intc/xics_pnv.c                  | 1 -
- hw/ipmi/ipmi_bmc_extern.c           | 1 -
- hw/isa/vt82c686.c                   | 1 -
- hw/misc/armsse-cpuid.c              | 1 -
- hw/misc/armsse-mhu.c                | 1 -
- hw/misc/imx6_src.c                  | 1 -
- hw/misc/imx7_gpr.c                  | 1 -
- hw/misc/iotkit-sysinfo.c            | 1 -
- hw/misc/mips_cmgcr.c                | 1 -
- hw/misc/mos6522.c                   | 1 -
- hw/misc/sga.c                       | 1 -
- hw/misc/zynq-xadc.c                 | 1 -
- hw/net/fsl_etsec/etsec.c            | 1 -
- hw/net/lan9118.c                    | 1 -
- hw/net/ne2000.c                     | 1 -
- hw/net/opencores_eth.c              | 1 -
- hw/net/pcnet.c                      | 1 -
- hw/nios2/generic_nommu.c            | 1 -
- hw/pci-host/pam.c                   | 1 -
- hw/ppc/pnv_bmc.c                    | 1 -
- hw/ppc/pnv_core.c                   | 1 -
- hw/ppc/pnv_lpc.c                    | 1 -
- hw/ppc/pnv_occ.c                    | 1 -
- hw/ppc/ppce500_spin.c               | 1 -
- hw/ppc/spapr_rng.c                  | 1 -
- hw/ppc/spapr_vio.c                  | 1 -
- hw/s390x/event-facility.c           | 1 -
- hw/s390x/sclpcpu.c                  | 1 -
- hw/s390x/virtio-ccw.c               | 1 -
- hw/scsi/scsi-disk.c                 | 1 -
- hw/sd/milkymist-memcard.c           | 1 -
- hw/ssi/aspeed_smc.c                 | 1 -
- hw/ssi/imx_spi.c                    | 1 -
- hw/ssi/xilinx_spi.c                 | 1 -
- hw/ssi/xilinx_spips.c               | 1 -
- hw/timer/allwinner-a10-pit.c        | 1 -
- hw/timer/altera_timer.c             | 1 -
- hw/timer/exynos4210_rtc.c           | 1 -
- hw/tricore/tricore_testboard.c      | 1 -
- hw/usb/hcd-ehci.h                   | 1 -
- hw/vfio/ap.c                        | 1 -
- hw/vfio/platform.c                  | 1 -
- hw/xen/xen_pt_load_rom.c            | 1 -
- hw/xtensa/xtensa_memory.c           | 1 -
- include/hw/arm/allwinner-a10.h      | 1 -
- include/hw/char/serial.h            | 1 -
- include/hw/i386/pc.h                | 1 -
- include/hw/riscv/riscv_htif.h       | 1 -
- include/hw/timer/stm32f2xx_timer.h  | 1 -
- include/hw/virtio/virtio-bus.h      | 1 -
- include/hw/xen/xen-legacy-backend.h | 1 -
- include/migration/global_state.h    | 2 +-
- include/sysemu/kvm_int.h            | 1 -
- include/sysemu/replay.h             | 2 +-
- include/ui/spice-display.h          | 1 -
- net/netmap.c                        | 1 -
- net/tap-bsd.c                       | 1 -
- net/tap-linux.c                     | 1 -
- net/tap-solaris.c                   | 1 -
- net/tap-win32.c                     | 1 -
- qemu-img.c                          | 1 -
- qom/cpu.c                           | 1 -
- replay/replay-audio.c               | 1 -
- replay/replay-char.c                | 1 -
- replay/replay-net.c                 | 1 -
- replay/replay-snapshot.c            | 1 -
- stubs/replay.c                      | 1 -
- target/arm/cpu64.c                  | 1 -
- target/arm/helper-a64.c             | 1 -
- target/arm/helper.c                 | 1 -
- target/arm/kvm32.c                  | 1 -
- target/arm/kvm64.c                  | 1 -
- target/arm/m_helper.c               | 1 -
- target/i386/hvf/x86_task.c          | 1 -
- target/lm32/helper.c                | 1 -
- target/m68k/m68k-semi.c             | 1 -
- target/nios2/nios2-semi.c           | 1 -
- target/ppc/kvm.c                    | 1 -
- target/sparc/helper.c               | 1 -
- target/xtensa/translate.c           | 1 -
- target/xtensa/xtensa-semi.c         | 1 -
- tests/migration-test.c              | 1 -
- ui/input-keymap.c                   | 1 -
- ui/input-legacy.c                   | 1 -
- ui/input-linux.c                    | 1 -
- ui/keymaps.c                        | 1 -
- ui/sdl2-2d.c                        | 1 -
- ui/sdl2-gl.c                        | 1 -
- ui/sdl2-input.c                     | 1 -
- ui/spice-display.c                  | 1 -
- util/qemu-timer.c                   | 1 -
- 123 files changed, 3 insertions(+), 122 deletions(-)
+ accel/kvm/kvm-all.c               |  1 +
+ audio/audio.c                     |  2 +-
+ backends/hostmem.c                |  1 +
+ block/block-backend.c             |  1 +
+ cpus.c                            |  2 ++
+ gdbstub.c                         |  1 +
+ hw/arm/allwinner-a10.c            |  1 +
+ hw/arm/aspeed_soc.c               |  1 +
+ hw/arm/kzm.c                      |  1 +
+ hw/arm/msf2-soc.c                 |  1 +
+ hw/arm/stm32f205_soc.c            |  1 +
+ hw/block/pflash_cfi01.c           |  2 +-
+ hw/block/vhost-user-blk.c         |  2 ++
+ hw/block/virtio-blk.c             |  2 ++
+ hw/char/serial-isa.c              |  1 +
+ hw/char/xen_console.c             |  1 +
+ hw/core/numa.c                    |  1 +
+ hw/core/vm-change-state-handler.c |  1 +
+ hw/display/qxl-render.c           |  1 +
+ hw/display/qxl.c                  |  1 +
+ hw/display/virtio-gpu.c           |  1 +
+ hw/i386/kvm/clock.c               |  1 +
+ hw/i386/kvm/i8254.c               |  1 +
+ hw/i386/kvmvapic.c                |  1 +
+ hw/i386/xen/xen-hvm.c             |  2 ++
+ hw/i386/xen/xen-mapcache.c        |  1 +
+ hw/ide/core.c                     |  2 +-
+ hw/ide/qdev.c                     |  1 +
+ hw/intc/ioapic.c                  |  1 +
+ hw/misc/macio/macio.c             |  1 +
+ hw/net/e1000e_core.c              |  2 +-
+ hw/net/virtio-net.c               |  1 +
+ hw/nvram/spapr_nvram.c            |  1 +
+ hw/pci/pci.c                      |  1 +
+ hw/ppc/ppc_booke.c                |  1 +
+ hw/ppc/spapr.c                    |  1 +
+ hw/riscv/sifive_e.c               |  1 +
+ hw/riscv/sifive_u.c               |  1 +
+ hw/riscv/spike.c                  |  1 +
+ hw/riscv/virt.c                   |  1 +
+ hw/s390x/s390-ccw.c               |  1 +
+ hw/s390x/s390-virtio-ccw.c        |  1 +
+ hw/scsi/scsi-bus.c                |  2 ++
+ hw/scsi/vhost-scsi.c              |  1 +
+ hw/scsi/vhost-user-scsi.c         |  1 +
+ hw/sparc64/niagara.c              |  2 +-
+ hw/usb/hcd-ehci.c                 |  1 +
+ hw/usb/host-libusb.c              |  1 +
+ hw/usb/redirect.c                 |  1 +
+ hw/virtio/virtio-rng.c            |  2 ++
+ hw/virtio/virtio.c                |  2 ++
+ hw/xen/xen-common.c               |  1 +
+ hw/xen/xen_devconfig.c            |  1 +
+ hw/xenpv/xen_machine_pv.c         |  1 +
+ include/hw/qdev-core.h            |  5 -----
+ include/sysemu/sysemu.h           |  8 --------
+ include/sysemu/vmstate-notify.h   | 18 ++++++++++++++++++
+ memory.c                          |  1 +
+ migration/global_state.c          |  1 +
+ migration/migration.c             |  1 +
+ migration/savevm.c                |  1 +
+ net/net.c                         |  2 ++
+ stubs/change-state-handler.c      |  2 +-
+ target/i386/kvm.c                 |  1 +
+ target/i386/sev.c                 |  1 +
+ ui/gtk.c                          |  1 +
+ ui/spice-core.c                   |  2 +-
+ vl.c                              |  1 +
+ 68 files changed, 91 insertions(+), 20 deletions(-)
+ create mode 100644 include/sysemu/vmstate-notify.h
 
-diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-index c92d4c82ed..c59d5b0024 100644
---- a/accel/tcg/tcg-all.c
-+++ b/accel/tcg/tcg-all.c
-@@ -25,7 +25,6 @@
-=20
- #include "qemu/osdep.h"
- #include "sysemu/accel.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
- #include "qom/object.h"
- #include "cpu.h"
-diff --git a/block/nfs.c b/block/nfs.c
-index a1fe004c61..ed0cce63bb 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -37,7 +37,6 @@
- #include "qemu/option.h"
- #include "qemu/uri.h"
- #include "qemu/cutils.h"
--#include "sysemu/sysemu.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 66eebab318..7a71da447f 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -15,7 +15,6 @@
- #include "hw/block/block.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-block.h"
--#include "sysemu/sysemu.h"
- #include "block/nbd.h"
- #include "io/channel-socket.h"
- #include "io/net-listener.h"
-diff --git a/dump/win_dump.c b/dump/win_dump.c
-index 0142655d3d..eda2a48974 100644
---- a/dump/win_dump.c
-+++ b/dump/win_dump.c
-@@ -17,7 +17,6 @@
- #include "monitor/monitor.h"
- #include "sysemu/kvm.h"
- #include "sysemu/dump.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/memory_mapping.h"
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index db4d215e0c..423a215266 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -29,6 +29,7 @@
+ #include "exec/gdbstub.h"
+ #include "sysemu/kvm_int.h"
  #include "sysemu/cpus.h"
++#include "sysemu/sysemu.h"
+ #include "qemu/bswap.h"
+ #include "exec/memory.h"
+ #include "exec/ram_addr.h"
+diff --git a/audio/audio.c b/audio/audio.c
+index b9b2d07e54..e8b752dafe 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -30,10 +30,10 @@
  #include "qapi/error.h"
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index ac49a5a77b..82d295b6e8 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -31,7 +31,6 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/acpi/acpi.h"
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qapi-visit-audio.h"
 -#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "hw/pci/pci_bus.h"
- #include "migration/vmstate.h"
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index 4eae426969..6e11b0fa9b 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -21,7 +21,6 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "sysemu/reset.h"
--#include "sysemu/sysemu.h"
-=20
- void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *g=
-uid,
-                         BIOSLinker *linker)
-diff --git a/hw/alpha/pci.c b/hw/alpha/pci.c
-index fb902bb92d..72251fcdf0 100644
---- a/hw/alpha/pci.c
-+++ b/hw/alpha/pci.c
-@@ -9,7 +9,6 @@
- #include "qemu/osdep.h"
- #include "alpha_sys.h"
- #include "qemu/log.h"
--#include "sysemu/sysemu.h"
+ #include "qemu/cutils.h"
+ #include "qemu/module.h"
+ #include "sysemu/replay.h"
++#include "sysemu/vmstate-notify.h"
  #include "trace.h"
 =20
+ #define AUDIO_CAP "audio"
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 463102aa15..6d333dc23c 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -12,6 +12,7 @@
 =20
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index 1c0565acc1..179e1f7658 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -13,7 +13,6 @@
- #include "cpu.h"
+ #include "qemu/osdep.h"
+ #include "sysemu/hostmem.h"
++#include "sysemu/sysemu.h"
  #include "hw/boards.h"
- #include "hw/irq.h"
--#include "sysemu/sysemu.h"
- #include "alpha_sys.h"
- #include "exec/address-spaces.h"
-=20
-diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-index d9e54fefbb..74029169d0 100644
---- a/hw/arm/nrf51_soc.c
-+++ b/hw/arm/nrf51_soc.c
-@@ -14,7 +14,6 @@
- #include "hw/sysbus.h"
- #include "hw/misc/unimp.h"
- #include "exec/address-spaces.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "cpu.h"
-=20
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 717d22bcbe..956ebe32c8 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -17,7 +17,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "trace.h"
- #include "exec/target_page.h"
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 0ccc772390..2eaf07fb5f 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -18,7 +18,6 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/irq.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-builtin-visit.h"
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 4991ab5574..e4f43a0293 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -17,6 +17,7 @@
+ #include "block/throttle-groups.h"
  #include "hw/qdev-core.h"
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index 57f94e6581..022fc97ecd 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -31,7 +31,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/device_tree.h"
- #include "hw/platform-bus.h"
--#include "sysemu/sysemu.h"
- #include "hw/vfio/vfio-platform.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 1e3db425ef..3923b87e4c 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -19,7 +19,6 @@
- #include "hw/ssi/ssi.h"
- #include "migration/vmstate.h"
- #include "hw/boards.h"
--#include "sysemu/sysemu.h"
- #include "hw/block/flash.h"
- #include "ui/console.h"
- #include "hw/audio/wm8750.h"
-diff --git a/hw/char/exynos4210_uart.c b/hw/char/exynos4210_uart.c
-index 49e279d5df..d6b6b62366 100644
---- a/hw/char/exynos4210_uart.c
-+++ b/hw/char/exynos4210_uart.c
-@@ -24,7 +24,6 @@
- #include "migration/vmstate.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/vmstate-notify.h"
+ #include "sysemu/sysemu.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-block.h"
+diff --git a/cpus.c b/cpus.c
+index e70cc58e31..cd98d1c166 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -41,6 +41,8 @@
+ #include "sysemu/kvm.h"
+ #include "sysemu/hax.h"
+ #include "sysemu/hvf.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "sysemu/whpx.h"
+ #include "exec/exec-all.h"
+=20
+diff --git a/gdbstub.c b/gdbstub.c
+index b470aec8ea..66d80a1b22 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -38,6 +38,7 @@
+ #include "chardev/char.h"
  #include "chardev/char-fe.h"
- #include "chardev/char-serial.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "exec/gdbstub.h"
+ #include "hw/cpu/cluster.h"
+ #include "hw/boards.h"
+diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
+index 3b0d3eccdd..73810a4440 100644
+--- a/hw/arm/allwinner-a10.c
++++ b/hw/arm/allwinner-a10.c
+@@ -23,6 +23,7 @@
+ #include "hw/sysbus.h"
+ #include "hw/arm/allwinner-a10.h"
+ #include "hw/misc/unimp.h"
++#include "sysemu/sysemu.h"
 =20
-diff --git a/hw/char/imx_serial.c b/hw/char/imx_serial.c
-index e49baa994c..fddde9b43d 100644
---- a/hw/char/imx_serial.c
-+++ b/hw/char/imx_serial.c
-@@ -23,7 +23,6 @@
+ static void aw_a10_init(Object *obj)
+ {
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index c6fb3700f2..9ee8104832 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -22,6 +22,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/i2c/aspeed_i2c.h"
+ #include "net/net.h"
++#include "sysemu/sysemu.h"
+=20
+ #define ASPEED_SOC_IOMEM_SIZE       0x00200000
+=20
+diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
+index 59d2102dc5..2f052e1f8c 100644
+--- a/hw/arm/kzm.c
++++ b/hw/arm/kzm.c
+@@ -24,6 +24,7 @@
+ #include "hw/net/lan9118.h"
+ #include "hw/char/serial.h"
+ #include "sysemu/qtest.h"
++#include "sysemu/sysemu.h"
+=20
+ /* Memory map for Kzm Emulation Baseboard:
+  * 0x00000000-0x7fffffff See i.MX31 SOC for support
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+index 8ae763f99f..76cc3e09b0 100644
+--- a/hw/arm/msf2-soc.c
++++ b/hw/arm/msf2-soc.c
+@@ -30,6 +30,7 @@
  #include "hw/irq.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
+ #include "hw/arm/msf2-soc.h"
+ #include "hw/misc/unimp.h"
++#include "sysemu/sysemu.h"
 =20
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 4d54163a62..72580f19d0 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
+ #define MSF2_TIMER_BASE       0x40004000
+ #define MSF2_SYSREG_BASE      0x40038000
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index be8b7df679..f5a5c2d80c 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -29,6 +29,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/arm/stm32f205_soc.h"
+ #include "hw/qdev-properties.h"
++#include "sysemu/sysemu.h"
+=20
+ /* At the moment only Timer 2 to 5 are modelled */
+ static const uint32_t timer_addr[STM_NUM_TIMERS] =3D { 0x40000000, 0x400=
+00400,
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index a406e75242..6da00c5bfc 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -52,7 +52,7 @@
+ #include "hw/sysbus.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/blockdev.h"
+-#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "trace.h"
+=20
+ /* #define PFLASH_DEBUG */
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 7b44cca6d9..ce64b05abd 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -28,6 +28,8 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+=20
+ static const int user_feature_bits[] =3D {
+     VIRTIO_BLK_F_SIZE_MAX,
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 8cc2a232e0..8fe7540675 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -20,6 +20,8 @@
+ #include "hw/block/block.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "hw/virtio/virtio-blk.h"
+ #include "dataplane/virtio-blk.h"
+ #include "scsi/constants.h"
+diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
+index 5a0ae02ee7..9e31c51bb6 100644
+--- a/hw/char/serial-isa.c
++++ b/hw/char/serial-isa.c
+@@ -26,6 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu/module.h"
++#include "sysemu/sysemu.h"
+ #include "hw/char/serial.h"
+ #include "hw/isa/isa.h"
+ #include "hw/qdev-properties.h"
+diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
+index 8cc9328b3f..63153dfde4 100644
+--- a/hw/char/xen_console.c
++++ b/hw/char/xen_console.c
+@@ -24,6 +24,7 @@
+ #include <termios.h>
+=20
+ #include "qapi/error.h"
++#include "sysemu/sysemu.h"
+ #include "chardev/char-fe.h"
+ #include "hw/xen/xen-legacy-backend.h"
+=20
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 450c522dd8..7a63ddc4c6 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -25,6 +25,7 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/hostmem.h"
+ #include "sysemu/numa.h"
++#include "sysemu/sysemu.h"
+ #include "exec/cpu-common.h"
+ #include "exec/ramlist.h"
+ #include "qemu/bitmap.h"
+diff --git a/hw/core/vm-change-state-handler.c b/hw/core/vm-change-state-=
+handler.c
+index e27ea45977..e184ec5e0e 100644
+--- a/hw/core/vm-change-state-handler.c
++++ b/hw/core/vm-change-state-handler.c
+@@ -17,6 +17,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "hw/qdev-core.h"
++#include "sysemu/vmstate-notify.h"
+=20
+ static int qdev_get_dev_tree_depth(DeviceState *dev)
+ {
+diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
+index 14ad2b352d..473e333475 100644
+--- a/hw/display/qxl-render.c
++++ b/hw/display/qxl-render.c
+@@ -21,6 +21,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qxl.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
+=20
+ static void qxl_blit(PCIQXLDevice *qxl, QXLRect *rect)
+diff --git a/hw/display/qxl.c b/hw/display/qxl.c
+index 971c2d0568..3a1d2bb6a7 100644
+--- a/hw/display/qxl.c
++++ b/hw/display/qxl.c
+@@ -30,6 +30,7 @@
+ #include "qemu/module.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/qdev-properties.h"
++#include "sysemu/vmstate-notify.h"
+ #include "migration/blocker.h"
+ #include "migration/vmstate.h"
+ #include "trace.h"
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 6de9689a30..28e868c021 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -17,6 +17,7 @@
+ #include "ui/console.h"
+ #include "trace.h"
+ #include "sysemu/dma.h"
++#include "sysemu/sysemu.h"
+ #include "hw/virtio/virtio.h"
+ #include "migration/qemu-file-types.h"
+ #include "hw/virtio/virtio-gpu.h"
+diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
+index d6a5325f0b..f6dd14f0ee 100644
+--- a/hw/i386/kvm/clock.c
++++ b/hw/i386/kvm/clock.c
+@@ -20,6 +20,7 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hw_accel.h"
++#include "sysemu/vmstate-notify.h"
+ #include "kvm_i386.h"
+ #include "migration/vmstate.h"
+ #include "hw/sysbus.h"
+diff --git a/hw/i386/kvm/i8254.c b/hw/i386/kvm/i8254.c
+index 27e36a2abf..456bdb4966 100644
+--- a/hw/i386/kvm/i8254.c
++++ b/hw/i386/kvm/i8254.c
+@@ -30,6 +30,7 @@
+ #include "qemu/module.h"
+ #include "qemu/timer.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "hw/timer/i8254.h"
+ #include "hw/timer/i8254_internal.h"
+ #include "sysemu/kvm.h"
+diff --git a/hw/i386/kvmvapic.c b/hw/i386/kvmvapic.c
+index 44e40478c8..5602aa41c4 100644
+--- a/hw/i386/kvmvapic.c
++++ b/hw/i386/kvmvapic.c
+@@ -16,6 +16,7 @@
+ #include "sysemu/cpus.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/vmstate-notify.h"
+ #include "hw/i386/apic_internal.h"
+ #include "hw/sysbus.h"
+ #include "hw/boards.h"
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 3e15ffc828..b25da4cf9d 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -25,6 +25,8 @@
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/range.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "sysemu/xen-mapcache.h"
+ #include "trace.h"
+ #include "exec/address-spaces.h"
+diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
+index dc73c86c61..09656f9f11 100644
+--- a/hw/i386/xen/xen-mapcache.c
++++ b/hw/i386/xen/xen-mapcache.c
+@@ -17,6 +17,7 @@
+ #include "hw/xen/xen-legacy-backend.h"
+ #include "qemu/bitmap.h"
+=20
++#include "sysemu/sysemu.h"
+ #include "sysemu/xen-mapcache.h"
+ #include "trace.h"
+=20
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 61cb3b26ab..b12118d268 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -37,7 +37,7 @@
+ #include "qapi/error.h"
+ #include "qemu/cutils.h"
+ #include "sysemu/replay.h"
+-
++#include "sysemu/vmstate-notify.h"
+ #include "hw/ide/internal.h"
+ #include "trace.h"
+=20
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index 39957dd39f..d08a7c5de0 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -30,6 +30,7 @@
+ #include "sysemu/blockdev.h"
+ #include "hw/block/block.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "qapi/visitor.h"
+=20
+ /* --------------------------------- */
+diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+index f89677174a..8f2165801a 100644
+--- a/hw/intc/ioapic.c
++++ b/hw/intc/ioapic.c
+@@ -30,6 +30,7 @@
+ #include "hw/pci/msi.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/kvm.h"
++#include "sysemu/sysemu.h"
+ #include "hw/i386/apic-msidef.h"
+ #include "hw/i386/x86-iommu.h"
+ #include "trace.h"
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index b59df4e3b8..50f20d8206 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -35,6 +35,7 @@
+ #include "hw/char/escc.h"
+ #include "hw/misc/macio/macio.h"
+ #include "hw/intc/heathrow_pic.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
+=20
+ /* Note: this code is strongly inspirated from the corresponding code
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index 40e41fdd92..cb3f2e4c59 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -34,12 +34,12 @@
+ */
+=20
+ #include "qemu/osdep.h"
+-#include "sysemu/sysemu.h"
+ #include "net/net.h"
+ #include "net/tap.h"
+ #include "hw/hw.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/msix.h"
++#include "sysemu/vmstate-notify.h"
+=20
+ #include "net_tx_pkt.h"
+ #include "net_rx_pkt.h"
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 4113729fcf..9f11422337 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -31,6 +31,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/misc.h"
+ #include "standard-headers/linux/ethtool.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
+=20
+ #define VIRTIO_NET_VM_VERSION    11
+diff --git a/hw/nvram/spapr_nvram.c b/hw/nvram/spapr_nvram.c
+index c7bcd29e15..fe685a42b3 100644
+--- a/hw/nvram/spapr_nvram.c
++++ b/hw/nvram/spapr_nvram.c
+@@ -31,6 +31,7 @@
+=20
+ #include "sysemu/block-backend.h"
+ #include "sysemu/device_tree.h"
++#include "sysemu/vmstate-notify.h"
+ #include "hw/sysbus.h"
+ #include "migration/vmstate.h"
+ #include "hw/nvram/chrp_nvram.h"
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 4b6ffab13d..aa05c2b9b2 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -35,6 +35,7 @@
+ #include "monitor/monitor.h"
+ #include "net/net.h"
+ #include "sysemu/numa.h"
++#include "sysemu/sysemu.h"
+ #include "hw/loader.h"
+ #include "qemu/error-report.h"
+ #include "qemu/range.h"
+diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
+index ce0e1406e1..344267019c 100644
+--- a/hw/ppc/ppc_booke.c
++++ b/hw/ppc/ppc_booke.c
+@@ -28,6 +28,7 @@
+ #include "qemu/timer.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "qemu/log.h"
+ #include "hw/loader.h"
+ #include "kvm_ppc.h"
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 4044e61a0c..f32bdcbb65 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -33,6 +33,7 @@
+ #include "sysemu/numa.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/reset.h"
++#include "sysemu/vmstate-notify.h"
+ #include "qemu/log.h"
+ #include "hw/fw-path-provider.h"
+ #include "elf.h"
+diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+index 862903d6b5..792d75a1a3 100644
+--- a/hw/riscv/sifive_e.c
++++ b/hw/riscv/sifive_e.c
+@@ -46,6 +46,7 @@
+ #include "hw/riscv/boot.h"
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
++#include "sysemu/sysemu.h"
+ #include "exec/address-spaces.h"
+=20
+ static const struct MemmapEntry {
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 0b3c5dff97..9910fa6708 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -44,6 +44,7 @@
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
++#include "sysemu/sysemu.h"
+ #include "exec/address-spaces.h"
+=20
+ #include <libfdt.h>
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index 9cc786b6b6..7c04bd554f 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -40,6 +40,7 @@
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/qtest.h"
++#include "sysemu/sysemu.h"
+ #include "exec/address-spaces.h"
+=20
+ #include <libfdt.h>
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index c72198b720..9bced28486 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -37,6 +37,7 @@
+ #include "chardev/char.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/device_tree.h"
++#include "sysemu/sysemu.h"
+ #include "exec/address-spaces.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci-host/gpex.h"
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+index 22c6878b84..0c5a5b60bd 100644
+--- a/hw/s390x/s390-ccw.c
++++ b/hw/s390x/s390-ccw.c
+@@ -19,6 +19,7 @@
+ #include "hw/s390x/css.h"
+ #include "hw/s390x/css-bridge.h"
+ #include "hw/s390x/s390-ccw.h"
++#include "sysemu/sysemu.h"
+=20
+ IOInstEnding s390_ccw_cmd_request(SubchDev *sch)
+ {
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index a543b64e56..434d933ec9 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -40,6 +40,7 @@
+ #include "hw/nmi.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/s390x/tod.h"
++#include "sysemu/sysemu.h"
+=20
+ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+ {
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index db785e6001..034f2ba9ba 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -10,6 +10,8 @@
+ #include "scsi/constants.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "trace.h"
+ #include "sysemu/dma.h"
+ #include "qemu/cutils.h"
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index fc25fb87a2..eaf6866490 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -30,6 +30,7 @@
+ #include "hw/fw-path-provider.h"
+ #include "hw/qdev-properties.h"
+ #include "qemu/cutils.h"
++#include "sysemu/sysemu.h"
+=20
+ /* Features supported by host kernel. */
+ static const int kernel_feature_bits[] =3D {
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index 0bb8e0dfdd..8f18c1475a 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -28,6 +28,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "chardev/char-fe.h"
++#include "sysemu/sysemu.h"
+=20
+ /* Features supported by the host application */
+ static const int user_feature_bits[] =3D {
+diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
+index 1efcff628a..167143bffe 100644
+--- a/hw/sparc64/niagara.c
++++ b/hw/sparc64/niagara.c
+@@ -35,7 +35,7 @@
+ #include "sysemu/block-backend.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/qtest.h"
+-
++#include "sysemu/sysemu.h"
+=20
+ typedef struct NiagaraBoardState {
+     MemoryRegion hv_ram;
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index d7d1ecd45d..75c0de9120 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -35,6 +35,7 @@
+ #include "trace.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
++#include "sysemu/vmstate-notify.h"
+=20
+ #define FRAME_TIMER_FREQ 1000
+ #define FRAME_TIMER_NS   (NANOSECONDS_PER_SECOND / FRAME_TIMER_FREQ)
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index 80fd1e9a80..ca12d308ca 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -46,6 +46,7 @@
+ #include "qemu/main-loop.h"
+ #include "qemu/module.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "trace.h"
+=20
+ #include "hw/qdev-properties.h"
+diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+index 8db2c68a1e..ecaf53d19e 100644
+--- a/hw/usb/redirect.c
++++ b/hw/usb/redirect.c
 @@ -31,6 +31,7 @@
  #include "qapi/error.h"
  #include "qemu/timer.h"
- #include "sysemu/reset.h"
-+#include "sysemu/sysemu.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "qapi/qmp/qerror.h"
  #include "qemu/error-report.h"
+ #include "qemu/iov.h"
+diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+index 34b4619fd3..b4bb28d8ba 100644
+--- a/hw/virtio/virtio-rng.c
++++ b/hw/virtio/virtio-rng.c
+@@ -17,6 +17,8 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/virtio/virtio-rng.h"
+ #include "sysemu/rng.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "qom/object_interfaces.h"
  #include "trace.h"
 =20
-diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-index f27b6af942..953b16bc82 100644
---- a/hw/core/loader-fit.c
-+++ b/hw/core/loader-fit.c
-@@ -26,7 +26,6 @@
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
- #include "sysemu/device_tree.h"
--#include "sysemu/sysemu.h"
-=20
- #include <libfdt.h>
- #include <zlib.h>
-diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-index 9c9a9c271f..edb0da1de8 100644
---- a/hw/core/platform-bus.c
-+++ b/hw/core/platform-bus.c
-@@ -24,7 +24,6 @@
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 721dcccc96..fb7a184d2e 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -26,6 +26,8 @@
  #include "hw/qdev-properties.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
-=20
+ #include "hw/virtio/virtio-access.h"
+ #include "sysemu/dma.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
 =20
  /*
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 8c055df1cb..60d66c2f39 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -26,7 +26,6 @@
-    this API directly.  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qapi/qapi-events-qdev.h"
- #include "qapi/qmp/qerror.h"
-diff --git a/hw/display/ramfb-standalone.c b/hw/display/ramfb-standalone.=
-c
-index ebd623a669..1f72450303 100644
---- a/hw/display/ramfb-standalone.c
-+++ b/hw/display/ramfb-standalone.c
-@@ -6,7 +6,6 @@
- #include "hw/isa/isa.h"
- #include "hw/display/ramfb.h"
- #include "ui/console.h"
--#include "sysemu/sysemu.h"
-=20
- #define RAMFB(obj) OBJECT_CHECK(RAMFBStandaloneState, (obj), TYPE_RAMFB_=
-DEVICE)
-=20
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index 6026a35b11..cd94940223 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -18,7 +18,6 @@
- #include "hw/display/ramfb.h"
- #include "ui/console.h"
- #include "sysemu/reset.h"
--#include "sysemu/sysemu.h"
-=20
- struct QEMU_PACKED RAMFBCfg {
-     uint64_t addr;
-diff --git a/hw/dma/xlnx-zynq-devcfg.c b/hw/dma/xlnx-zynq-devcfg.c
-index 89200ff15d..e33112b6f0 100644
---- a/hw/dma/xlnx-zynq-devcfg.c
-+++ b/hw/dma/xlnx-zynq-devcfg.c
-@@ -29,7 +29,6 @@
- #include "hw/irq.h"
- #include "migration/vmstate.h"
- #include "qemu/bitops.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index bb9d0e033c..e0466ee055 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -16,7 +16,6 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "hw/irq.h"
--#include "sysemu/sysemu.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bus.h"
- #include "migration/vmstate.h"
-diff --git a/hw/hppa/pci.c b/hw/hppa/pci.c
-index b6606d9719..32609aba63 100644
---- a/hw/hppa/pci.c
-+++ b/hw/hppa/pci.c
-@@ -6,7 +6,6 @@
- #include "qemu/osdep.h"
- #include "hppa_sys.h"
- #include "qemu/log.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
-=20
-=20
-diff --git a/hw/i2c/smbus_ich9.c b/hw/i2c/smbus_ich9.c
-index 564198dae9..fd50fb851a 100644
---- a/hw/i2c/smbus_ich9.c
-+++ b/hw/i2c/smbus_ich9.c
-@@ -25,7 +25,6 @@
- #include "hw/pci/pci.h"
- #include "migration/vmstate.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
-=20
- #include "hw/i386/ich9.h"
-=20
-diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
-index 3fbfc5ea45..f3ccd11c79 100644
---- a/hw/ide/cmd646.c
-+++ b/hw/ide/cmd646.c
-@@ -29,7 +29,6 @@
- #include "migration/vmstate.h"
- #include "qemu/module.h"
- #include "hw/isa/isa.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
- #include "sysemu/reset.h"
-=20
-diff --git a/hw/ide/ioport.c b/hw/ide/ioport.c
-index e6085612d4..ab1f4e5d9c 100644
---- a/hw/ide/ioport.c
-+++ b/hw/ide/ioport.c
-@@ -27,7 +27,6 @@
- #include "hw/isa/isa.h"
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/dma.h"
- #include "hw/block/block.h"
-diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-index bcfd119a8e..fba6bc8bff 100644
---- a/hw/ide/piix.c
-+++ b/hw/ide/piix.c
-@@ -28,7 +28,6 @@
- #include "migration/vmstate.h"
- #include "qemu/module.h"
- #include "sysemu/block-backend.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/dma.h"
- #include "sysemu/reset.h"
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 45f929395f..7087dc676e 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -28,7 +28,6 @@
- #include "hw/pci/pci.h"
- #include "migration/vmstate.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
- #include "sysemu/reset.h"
-=20
-diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
-index b3c4aeded1..0ba8207589 100644
---- a/hw/input/adb-kbd.c
-+++ b/hw/input/adb-kbd.c
-@@ -28,7 +28,6 @@
- #include "qemu/module.h"
- #include "ui/input.h"
- #include "hw/input/adb-keys.h"
--#include "sysemu/sysemu.h"
- #include "adb-internal.h"
- #include "trace.h"
-=20
-diff --git a/hw/intc/allwinner-a10-pic.c b/hw/intc/allwinner-a10-pic.c
-index 79959a4d23..8cca124807 100644
---- a/hw/intc/allwinner-a10-pic.c
-+++ b/hw/intc/allwinner-a10-pic.c
-@@ -18,7 +18,6 @@
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "hw/intc/allwinner-a10-pic.h"
- #include "hw/irq.h"
- #include "qemu/log.h"
-diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
-index 524cc3ca45..54b3059f3f 100644
---- a/hw/intc/mips_gic.c
-+++ b/hw/intc/mips_gic.c
-@@ -15,7 +15,6 @@
- #include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "exec/memory.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "sysemu/reset.h"
- #include "kvm_mips.h"
-diff --git a/hw/intc/xics_pnv.c b/hw/intc/xics_pnv.c
-index 67f2702e52..35f3811264 100644
---- a/hw/intc/xics_pnv.c
-+++ b/hw/intc/xics_pnv.c
-@@ -19,7 +19,6 @@
-=20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "hw/ppc/xics.h"
-diff --git a/hw/ipmi/ipmi_bmc_extern.c b/hw/ipmi/ipmi_bmc_extern.c
-index 4405aa634e..573428eca1 100644
---- a/hw/ipmi/ipmi_bmc_extern.c
-+++ b/hw/ipmi/ipmi_bmc_extern.c
-@@ -33,7 +33,6 @@
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "chardev/char-fe.h"
--#include "sysemu/sysemu.h"
- #include "hw/ipmi/ipmi.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 1bc915405b..50bd28fa82 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -24,7 +24,6 @@
- #include "hw/acpi/acpi.h"
- #include "hw/i2c/pm_smbus.h"
- #include "sysemu/reset.h"
--#include "sysemu/sysemu.h"
- #include "qemu/module.h"
- #include "qemu/timer.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/misc/armsse-cpuid.c b/hw/misc/armsse-cpuid.c
-index 5f225096f6..8ab15fea81 100644
---- a/hw/misc/armsse-cpuid.c
-+++ b/hw/misc/armsse-cpuid.c
-@@ -23,7 +23,6 @@
- #include "qemu/module.h"
- #include "trace.h"
- #include "qapi/error.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "hw/registerfields.h"
- #include "hw/misc/armsse-cpuid.h"
-diff --git a/hw/misc/armsse-mhu.c b/hw/misc/armsse-mhu.c
-index 34b6205f11..a45d97fada 100644
---- a/hw/misc/armsse-mhu.c
-+++ b/hw/misc/armsse-mhu.c
-@@ -20,7 +20,6 @@
- #include "qemu/module.h"
- #include "trace.h"
- #include "qapi/error.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
- #include "hw/registerfields.h"
-diff --git a/hw/misc/imx6_src.c b/hw/misc/imx6_src.c
-index b9d86fe530..8ab18967b5 100644
---- a/hw/misc/imx6_src.c
-+++ b/hw/misc/imx6_src.c
-@@ -11,7 +11,6 @@
- #include "qemu/osdep.h"
- #include "hw/misc/imx6_src.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "qemu/bitops.h"
- #include "qemu/log.h"
- #include "qemu/main-loop.h"
-diff --git a/hw/misc/imx7_gpr.c b/hw/misc/imx7_gpr.c
-index 09d57d4710..b03341a2eb 100644
---- a/hw/misc/imx7_gpr.c
-+++ b/hw/misc/imx7_gpr.c
-@@ -16,7 +16,6 @@
- #include "hw/misc/imx7_gpr.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
-=20
- #include "trace.h"
-=20
-diff --git a/hw/misc/iotkit-sysinfo.c b/hw/misc/iotkit-sysinfo.c
-index 0106fa48d3..783e613959 100644
---- a/hw/misc/iotkit-sysinfo.c
-+++ b/hw/misc/iotkit-sysinfo.c
-@@ -22,7 +22,6 @@
- #include "qemu/module.h"
- #include "trace.h"
- #include "qapi/error.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "hw/registerfields.h"
- #include "hw/misc/iotkit-sysinfo.h"
-diff --git a/hw/misc/mips_cmgcr.c b/hw/misc/mips_cmgcr.c
-index 0feab092f1..8176d91c0c 100644
---- a/hw/misc/mips_cmgcr.c
-+++ b/hw/misc/mips_cmgcr.c
-@@ -14,7 +14,6 @@
- #include "qemu/module.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "hw/misc/mips_cmgcr.h"
- #include "hw/misc/mips_cpc.h"
- #include "hw/qdev-properties.h"
-diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
-index 4d99350e22..57f13db266 100644
---- a/hw/misc/mos6522.c
-+++ b/hw/misc/mos6522.c
-@@ -31,7 +31,6 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
- #include "qemu/cutils.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-diff --git a/hw/misc/sga.c b/hw/misc/sga.c
-index da04924f5f..6866bf72cb 100644
---- a/hw/misc/sga.c
-+++ b/hw/misc/sga.c
-@@ -29,7 +29,6 @@
- #include "hw/isa/isa.h"
- #include "hw/loader.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
-=20
- #define SGABIOS_FILENAME "sgabios.bin"
-=20
-diff --git a/hw/misc/zynq-xadc.c b/hw/misc/zynq-xadc.c
-index 7745df4c85..7b1972ce06 100644
---- a/hw/misc/zynq-xadc.c
-+++ b/hw/misc/zynq-xadc.c
-@@ -18,7 +18,6 @@
- #include "hw/misc/zynq-xadc.h"
- #include "migration/vmstate.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-=20
-diff --git a/hw/net/fsl_etsec/etsec.c b/hw/net/fsl_etsec/etsec.c
-index e1556236b0..8451c17fb8 100644
---- a/hw/net/fsl_etsec/etsec.c
-+++ b/hw/net/fsl_etsec/etsec.c
-@@ -27,7 +27,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "hw/irq.h"
- #include "hw/ptimer.h"
-diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
-index e7662f0575..8bba2a8056 100644
---- a/hw/net/lan9118.c
-+++ b/hw/net/lan9118.c
-@@ -18,7 +18,6 @@
- #include "hw/hw.h"
- #include "hw/irq.h"
- #include "hw/net/lan9118.h"
--#include "sysemu/sysemu.h"
- #include "hw/ptimer.h"
- #include "hw/qdev-properties.h"
- #include "qemu/log.h"
-diff --git a/hw/net/ne2000.c b/hw/net/ne2000.c
-index a1a1046494..6c17ee1ae2 100644
---- a/hw/net/ne2000.c
-+++ b/hw/net/ne2000.c
-@@ -29,7 +29,6 @@
- #include "hw/irq.h"
- #include "migration/vmstate.h"
- #include "ne2000.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
-=20
- /* debug NE2000 card */
-diff --git a/hw/net/opencores_eth.c b/hw/net/opencores_eth.c
-index aa13159464..84a95da1d5 100644
---- a/hw/net/opencores_eth.c
-+++ b/hw/net/opencores_eth.c
-@@ -39,7 +39,6 @@
- #include "net/net.h"
- #include "qemu/module.h"
- #include "net/eth.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
-=20
- /* RECSMALL is not used because it breaks tap networking in linux:
-diff --git a/hw/net/pcnet.c b/hw/net/pcnet.c
-index 107ac680b2..f3f18d8598 100644
---- a/hw/net/pcnet.c
-+++ b/hw/net/pcnet.c
-@@ -43,7 +43,6 @@
- #include "net/net.h"
- #include "net/eth.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
-=20
- #include "pcnet.h"
-diff --git a/hw/nios2/generic_nommu.c b/hw/nios2/generic_nommu.c
-index 2ec91e899b..19899e2c1e 100644
---- a/hw/nios2/generic_nommu.c
-+++ b/hw/nios2/generic_nommu.c
-@@ -33,7 +33,6 @@
-=20
- #include "hw/sysbus.h"
- #include "hw/char/serial.h"
--#include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "exec/memory.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/pci-host/pam.c b/hw/pci-host/pam.c
-index aa5ecfd0c2..45c4333cd3 100644
---- a/hw/pci-host/pam.c
-+++ b/hw/pci-host/pam.c
-@@ -29,7 +29,6 @@
-=20
- #include "qemu/osdep.h"
- #include "qom/object.h"
--#include "sysemu/sysemu.h"
- #include "hw/pci-host/pam.h"
-=20
- void init_pam(DeviceState *dev, MemoryRegion *ram_memory,
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-index a27776aa99..e5eb6e5a70 100644
---- a/hw/ppc/pnv_bmc.c
-+++ b/hw/ppc/pnv_bmc.c
-@@ -17,7 +17,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "target/ppc/cpu.h"
- #include "qemu/log.h"
- #include "hw/ipmi/ipmi.h"
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index c6b0fee56f..b1a7489e7a 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -19,7 +19,6 @@
-=20
- #include "qemu/osdep.h"
- #include "sysemu/reset.h"
--#include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-index d4433d73e1..9466d4a1be 100644
---- a/hw/ppc/pnv_lpc.c
-+++ b/hw/ppc/pnv_lpc.c
-@@ -18,7 +18,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "target/ppc/cpu.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
-diff --git a/hw/ppc/pnv_occ.c b/hw/ppc/pnv_occ.c
-index 6120405379..8bead2c930 100644
---- a/hw/ppc/pnv_occ.c
-+++ b/hw/ppc/pnv_occ.c
-@@ -17,7 +17,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "target/ppc/cpu.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
-diff --git a/hw/ppc/ppce500_spin.c b/hw/ppc/ppce500_spin.c
-index 0060fcb43f..66c1065db2 100644
---- a/hw/ppc/ppce500_spin.c
-+++ b/hw/ppc/ppce500_spin.c
-@@ -33,7 +33,6 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "sysemu/hw_accel.h"
--#include "sysemu/sysemu.h"
- #include "e500.h"
-=20
- #define MAX_CPUS 32
-diff --git a/hw/ppc/spapr_rng.c b/hw/ppc/spapr_rng.c
-index 27198e0ced..954e4aec4b 100644
---- a/hw/ppc/spapr_rng.c
-+++ b/hw/ppc/spapr_rng.c
-@@ -23,7 +23,6 @@
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/rng.h"
- #include "hw/ppc/spapr.h"
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index 910c57fce5..0803649658 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -25,7 +25,6 @@
- #include "qapi/visitor.h"
- #include "hw/irq.h"
- #include "qemu/log.h"
--#include "sysemu/sysemu.h"
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/sysbus.h"
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 056f0711fa..797ecbb7a9 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -18,7 +18,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
-=20
- #include "hw/s390x/sclp.h"
- #include "migration/vmstate.h"
-diff --git a/hw/s390x/sclpcpu.c b/hw/s390x/sclpcpu.c
-index a4aab7df51..62806d3273 100644
---- a/hw/s390x/sclpcpu.c
-+++ b/hw/s390x/sclpcpu.c
-@@ -14,7 +14,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "hw/s390x/sclp.h"
- #include "qemu/module.h"
- #include "hw/s390x/event-facility.h"
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index a371370221..6580ce5907 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -12,7 +12,6 @@
-=20
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "net/net.h"
- #include "hw/virtio/virtio.h"
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 2f30f4b206..1086339016 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -30,7 +30,6 @@
- #include "migration/vmstate.h"
- #include "hw/scsi/emulation.h"
- #include "scsi/constants.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "hw/block/block.h"
-diff --git a/hw/sd/milkymist-memcard.c b/hw/sd/milkymist-memcard.c
-index 79a9a5c52c..926e1af475 100644
---- a/hw/sd/milkymist-memcard.c
-+++ b/hw/sd/milkymist-memcard.c
-@@ -26,7 +26,6 @@
- #include "qemu/module.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
- #include "qapi/error.h"
- #include "sysemu/block-backend.h"
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index b8332150f1..9f3cff5fb6 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -25,7 +25,6 @@
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "qemu/error-report.h"
-diff --git a/hw/ssi/imx_spi.c b/hw/ssi/imx_spi.c
-index c918e8cac8..2dd9a631e1 100644
---- a/hw/ssi/imx_spi.c
-+++ b/hw/ssi/imx_spi.c
-@@ -12,7 +12,6 @@
- #include "hw/irq.h"
- #include "hw/ssi/imx_spi.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-=20
-diff --git a/hw/ssi/xilinx_spi.c b/hw/ssi/xilinx_spi.c
-index 24280dfeab..a1be0de039 100644
---- a/hw/ssi/xilinx_spi.c
-+++ b/hw/ssi/xilinx_spi.c
-@@ -27,7 +27,6 @@
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "qemu/fifo8.h"
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index 1605fa102b..a309c712ca 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -24,7 +24,6 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
--#include "sysemu/sysemu.h"
- #include "hw/irq.h"
- #include "hw/ptimer.h"
- #include "hw/qdev-properties.h"
-diff --git a/hw/timer/allwinner-a10-pit.c b/hw/timer/allwinner-a10-pit.c
-index 1e1f74f1a1..ca5a905059 100644
---- a/hw/timer/allwinner-a10-pit.c
-+++ b/hw/timer/allwinner-a10-pit.c
-@@ -19,7 +19,6 @@
- #include "hw/irq.h"
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
--#include "sysemu/sysemu.h"
- #include "hw/timer/allwinner-a10-pit.h"
- #include "migration/vmstate.h"
- #include "qemu/log.h"
-diff --git a/hw/timer/altera_timer.c b/hw/timer/altera_timer.c
-index c9988f67ac..936b31311d 100644
---- a/hw/timer/altera_timer.c
-+++ b/hw/timer/altera_timer.c
-@@ -24,7 +24,6 @@
- #include "qapi/error.h"
-=20
- #include "hw/sysbus.h"
--#include "sysemu/sysemu.h"
- #include "hw/irq.h"
- #include "hw/ptimer.h"
- #include "hw/qdev-properties.h"
-diff --git a/hw/timer/exynos4210_rtc.c b/hw/timer/exynos4210_rtc.c
-index 5c954cfa01..ea68904229 100644
---- a/hw/timer/exynos4210_rtc.c
-+++ b/hw/timer/exynos4210_rtc.c
-@@ -37,7 +37,6 @@
- #include "hw/ptimer.h"
-=20
- #include "hw/irq.h"
--#include "sysemu/sysemu.h"
-=20
- #include "hw/arm/exynos4210.h"
-=20
-diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboar=
-d.c
-index c6305dcdf1..aef3289f8c 100644
---- a/hw/tricore/tricore_testboard.c
-+++ b/hw/tricore/tricore_testboard.c
-@@ -23,7 +23,6 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "net/net.h"
--#include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index fdbcfdcbeb..0298238f0b 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -21,7 +21,6 @@
- #include "qemu/timer.h"
- #include "hw/usb.h"
- #include "sysemu/dma.h"
--#include "sysemu/sysemu.h"
- #include "hw/pci/pci.h"
- #include "hw/sysbus.h"
-=20
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index d53453aad6..da6a20669d 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -25,7 +25,6 @@
- #include "cpu.h"
- #include "kvm_s390x.h"
- #include "migration/vmstate.h"
--#include "sysemu/sysemu.h"
- #include "hw/qdev-properties.h"
- #include "hw/s390x/ap-bridge.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index d14f6b4a7a..d7598c6152 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -25,7 +25,6 @@
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "qemu/range.h"
--#include "sysemu/sysemu.h"
- #include "exec/memory.h"
- #include "exec/address-spaces.h"
- #include "qemu/queue.h"
-diff --git a/hw/xen/xen_pt_load_rom.c b/hw/xen/xen_pt_load_rom.c
-index d111ecaf7e..307a5c93e2 100644
---- a/hw/xen/xen_pt_load_rom.c
-+++ b/hw/xen/xen_pt_load_rom.c
-@@ -9,7 +9,6 @@
- #include "hw/loader.h"
- #include "monitor/monitor.h"
- #include "qemu/range.h"
--#include "sysemu/sysemu.h"
- #include "hw/pci/pci.h"
- #include "xen_pt.h"
-=20
-diff --git a/hw/xtensa/xtensa_memory.c b/hw/xtensa/xtensa_memory.c
-index 40334db441..1c5f62b014 100644
---- a/hw/xtensa/xtensa_memory.c
-+++ b/hw/xtensa/xtensa_memory.c
-@@ -28,7 +28,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
--#include "sysemu/sysemu.h"
- #include "exec/memory.h"
- #include "qemu/error-report.h"
- #include "xtensa_memory.h"
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a1=
-0.h
-index 101b72a71d..7d2d215630 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -9,7 +9,6 @@
- #include "hw/net/allwinner_emac.h"
- #include "hw/ide/ahci.h"
-=20
--#include "sysemu/sysemu.h"
- #include "target/arm/cpu.h"
-=20
-=20
-diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-index bfcbbb6e19..8be3d8a4f9 100644
---- a/include/hw/char/serial.h
-+++ b/include/hw/char/serial.h
-@@ -26,7 +26,6 @@
- #ifndef HW_SERIAL_H
- #define HW_SERIAL_H
-=20
--#include "sysemu/sysemu.h"
- #include "chardev/char-fe.h"
- #include "exec/memory.h"
- #include "qemu/fifo8.h"
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 859b64c51d..4bb9e29114 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -12,7 +12,6 @@
- #include "qemu/range.h"
- #include "qemu/bitmap.h"
- #include "qemu/module.h"
--#include "sysemu/sysemu.h"
- #include "hw/pci/pci.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
-diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/riscv/riscv_htif.=
-h
-index aabc059f32..fb9452cf51 100644
---- a/include/hw/riscv/riscv_htif.h
-+++ b/include/hw/riscv/riscv_htif.h
-@@ -22,7 +22,6 @@
-=20
+  * The alignment to use between consumer and producer parts of vring.
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 32503cfc1c..9d407ed2da 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -14,6 +14,7 @@
+ #include "hw/xen/xen-legacy-backend.h"
  #include "chardev/char.h"
- #include "chardev/char-fe.h"
--#include "sysemu/sysemu.h"
- #include "exec/memory.h"
- #include "target/riscv/cpu.h"
-=20
-diff --git a/include/hw/timer/stm32f2xx_timer.h b/include/hw/timer/stm32f=
-2xx_timer.h
-index e6a83237a5..a96bc08b1b 100644
---- a/include/hw/timer/stm32f2xx_timer.h
-+++ b/include/hw/timer/stm32f2xx_timer.h
-@@ -27,7 +27,6 @@
-=20
- #include "hw/sysbus.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
-=20
- #define TIM_CR1      0x00
- #define TIM_CR2      0x04
-diff --git a/include/hw/virtio/virtio-bus.h b/include/hw/virtio/virtio-bu=
-s.h
-index 8c9cc25b16..38c9399cd4 100644
---- a/include/hw/virtio/virtio-bus.h
-+++ b/include/hw/virtio/virtio-bus.h
-@@ -25,7 +25,6 @@
- #ifndef VIRTIO_BUS_H
- #define VIRTIO_BUS_H
-=20
--#include "sysemu/sysemu.h"
- #include "hw/qdev-core.h"
- #include "hw/virtio/virtio.h"
-=20
-diff --git a/include/hw/xen/xen-legacy-backend.h b/include/hw/xen/xen-leg=
-acy-backend.h
-index 07d4176ac1..5e6c56c4d6 100644
---- a/include/hw/xen/xen-legacy-backend.h
-+++ b/include/hw/xen/xen-legacy-backend.h
-@@ -3,7 +3,6 @@
-=20
- #include "hw/xen/xen_common.h"
- #include "hw/xen/xen_pvdev.h"
--#include "sysemu/sysemu.h"
- #include "net/net.h"
-=20
- #define TYPE_XENSYSDEV "xen-sysdev"
-diff --git a/include/migration/global_state.h b/include/migration/global_=
-state.h
-index d307de8350..945eb35d5b 100644
---- a/include/migration/global_state.h
-+++ b/include/migration/global_state.h
-@@ -13,7 +13,7 @@
- #ifndef QEMU_MIGRATION_GLOBAL_STATE_H
- #define QEMU_MIGRATION_GLOBAL_STATE_H
-=20
--#include "sysemu/sysemu.h"
-+#include "qapi/qapi-types-run-state.h"
-=20
- void register_global_state(void);
- int global_state_store(void);
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 5d341cc29b..72b2d1b3ae 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -10,7 +10,6 @@
- #define QEMU_KVM_INT_H
-=20
- #include "exec/memory.h"
--#include "sysemu/sysemu.h"
  #include "sysemu/accel.h"
- #include "sysemu/kvm.h"
++#include "sysemu/vmstate-notify.h"
+ #include "migration/misc.h"
+ #include "migration/global_state.h"
 =20
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 3a7c58e423..2f2ccdbc98 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -12,8 +12,8 @@
-  *
-  */
+diff --git a/hw/xen/xen_devconfig.c b/hw/xen/xen_devconfig.c
+index 315dbc9c51..46ee4a7f02 100644
+--- a/hw/xen/xen_devconfig.c
++++ b/hw/xen/xen_devconfig.c
+@@ -2,6 +2,7 @@
+ #include "hw/xen/xen-legacy-backend.h"
+ #include "qemu/option.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/sysemu.h"
 =20
--#include "sysemu.h"
- #include "qapi/qapi-types-misc.h"
-+#include "qapi/qapi-types-run-state.h"
- #include "qapi/qapi-types-ui.h"
+ /* ------------------------------------------------------------- */
 =20
- /* replay clock kinds */
-diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
-index 58bb5b4c53..4a47ffdd4c 100644
---- a/include/ui/spice-display.h
-+++ b/include/ui/spice-display.h
-@@ -26,7 +26,6 @@
- #include "qemu/thread.h"
- #include "ui/qemu-pixman.h"
- #include "ui/console.h"
--#include "sysemu/sysemu.h"
-=20
- #if defined(CONFIG_OPENGL_DMABUF)
- # if SPICE_SERVER_VERSION >=3D 0x000d01 /* release 0.13.1 */
-diff --git a/net/netmap.c b/net/netmap.c
-index 0cc8f545c5..e8e54c62d4 100644
---- a/net/netmap.c
-+++ b/net/netmap.c
-@@ -33,7 +33,6 @@
- #include "net/net.h"
- #include "net/tap.h"
- #include "clients.h"
--#include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu/iov.h"
-diff --git a/net/tap-bsd.c b/net/tap-bsd.c
-index 5695e3dd1f..a5c3707f80 100644
---- a/net/tap-bsd.c
-+++ b/net/tap-bsd.c
-@@ -27,7 +27,6 @@
- #include "qapi/error.h"
- #include "tap_int.h"
- #include "qemu/cutils.h"
--#include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
-=20
- #if defined(__NetBSD__) || defined(__FreeBSD__)
-diff --git a/net/tap-linux.c b/net/tap-linux.c
-index 941a45d7c3..e0dd442ee3 100644
---- a/net/tap-linux.c
-+++ b/net/tap-linux.c
-@@ -32,7 +32,6 @@
- #include <net/if.h>
- #include <sys/ioctl.h>
-=20
--#include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/cutils.h"
-diff --git a/net/tap-solaris.c b/net/tap-solaris.c
-index 0e3f3e0a9b..4725d2314e 100644
---- a/net/tap-solaris.c
-+++ b/net/tap-solaris.c
-@@ -25,7 +25,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "tap_int.h"
--#include "sysemu/sysemu.h"
- #include "qemu/ctype.h"
- #include "qemu/cutils.h"
-=20
-diff --git a/net/tap-win32.c b/net/tap-win32.c
-index 9cdef47286..2b5dcda36e 100644
---- a/net/tap-win32.c
-+++ b/net/tap-win32.c
-@@ -33,7 +33,6 @@
- #include "clients.h"            /* net_init_tap */
- #include "net/net.h"
- #include "net/tap.h"            /* tap_has_ufo, ... */
--#include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
- #include <windows.h>
-diff --git a/qemu-img.c b/qemu-img.c
-index a398fd44d6..31c72dc746 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -42,7 +42,6 @@
- #include "qemu/module.h"
- #include "qemu/units.h"
- #include "qom/object_interfaces.h"
--#include "sysemu/sysemu.h"
+diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
+index 524d608eab..3a8af1a1e0 100644
+--- a/hw/xenpv/xen_machine_pv.c
++++ b/hw/xenpv/xen_machine_pv.c
+@@ -28,6 +28,7 @@
+ #include "hw/xen/xen-legacy-backend.h"
+ #include "hw/xen/xen-bus.h"
  #include "sysemu/block-backend.h"
- #include "block/block_int.h"
- #include "block/blockjob.h"
-diff --git a/qom/cpu.c b/qom/cpu.c
-index cdb8c71b6b..aeb34f8c67 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -28,7 +28,6 @@
- #include "exec/log.h"
- #include "qemu/error-report.h"
- #include "qemu/qemu-print.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
- #include "hw/boards.h"
- #include "hw/qdev-properties.h"
-diff --git a/replay/replay-audio.c b/replay/replay-audio.c
-index b113836de4..178094e601 100644
---- a/replay/replay-audio.c
-+++ b/replay/replay-audio.c
-@@ -13,7 +13,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/replay.h"
- #include "replay-internal.h"
--#include "sysemu/sysemu.h"
- #include "audio/audio.h"
++#include "sysemu/sysemu.h"
 =20
- void replay_audio_out(int *played)
-diff --git a/replay/replay-char.c b/replay/replay-char.c
-index 736cc8c2e6..dc0002367e 100644
---- a/replay/replay-char.c
-+++ b/replay/replay-char.c
-@@ -13,7 +13,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/replay.h"
- #include "replay-internal.h"
--#include "sysemu/sysemu.h"
- #include "chardev/char.h"
-=20
- /* Char drivers that generate qemu_chr_be_write events
-diff --git a/replay/replay-net.c b/replay/replay-net.c
-index 80b7054156..3b70f71cf1 100644
---- a/replay/replay-net.c
-+++ b/replay/replay-net.c
-@@ -13,7 +13,6 @@
- #include "qemu/error-report.h"
- #include "sysemu/replay.h"
- #include "replay-internal.h"
--#include "sysemu/sysemu.h"
- #include "net/net.h"
- #include "net/filter.h"
- #include "qemu/iov.h"
-diff --git a/replay/replay-snapshot.c b/replay/replay-snapshot.c
-index 756f48bc02..5dd8680480 100644
---- a/replay/replay-snapshot.c
-+++ b/replay/replay-snapshot.c
-@@ -13,7 +13,6 @@
- #include "qapi/error.h"
- #include "sysemu/replay.h"
- #include "replay-internal.h"
--#include "sysemu/sysemu.h"
- #include "monitor/monitor.h"
- #include "qapi/qmp/qstring.h"
- #include "qemu/error-report.h"
-diff --git a/stubs/replay.c b/stubs/replay.c
-index 4ac607895d..10b3925e2f 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -1,6 +1,5 @@
- #include "qemu/osdep.h"
- #include "sysemu/replay.h"
--#include "sysemu/sysemu.h"
-=20
- ReplayMode replay_mode;
-=20
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 1901997a06..e4edff548e 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -25,7 +25,6 @@
- #if !defined(CONFIG_USER_ONLY)
- #include "hw/loader.h"
- #endif
--#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
- #include "qapi/visitor.h"
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index 616d62c7fc..bca80bdc38 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -24,7 +24,6 @@
- #include "qemu/host-utils.h"
- #include "qemu/log.h"
- #include "qemu/main-loop.h"
--#include "sysemu/sysemu.h"
- #include "qemu/bitops.h"
- #include "internals.h"
- #include "qemu/crc32c.h"
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index ffe56696dd..12afe9b0a5 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -16,7 +16,6 @@
- #include "exec/helper-proto.h"
- #include "qemu/host-utils.h"
- #include "qemu/main-loop.h"
--#include "sysemu/sysemu.h"
- #include "qemu/bitops.h"
- #include "qemu/crc32c.h"
- #include "qemu/qemu-print.h"
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 51f78f722b..2451a2d4bb 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -16,7 +16,6 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
- #include "internals.h"
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 22d19c9aec..2e5d8cbd29 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -22,7 +22,6 @@
- #include "qemu/error-report.h"
- #include "qemu/host-utils.h"
- #include "exec/gdbstub.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
- #include "kvm_arm.h"
- #include "internals.h"
-diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
-index cde5195d28..884d35d2b0 100644
---- a/target/arm/m_helper.c
-+++ b/target/arm/m_helper.c
-@@ -16,7 +16,6 @@
- #include "exec/helper-proto.h"
- #include "qemu/host-utils.h"
- #include "qemu/main-loop.h"
--#include "sysemu/sysemu.h"
- #include "qemu/bitops.h"
- #include "qemu/crc32c.h"
- #include "qemu/qemu-print.h"
-diff --git a/target/i386/hvf/x86_task.c b/target/i386/hvf/x86_task.c
-index 73cd5d2817..1daac6cc2b 100644
---- a/target/i386/hvf/x86_task.c
-+++ b/target/i386/hvf/x86_task.c
-@@ -29,7 +29,6 @@
- #include "hw/i386/apic_internal.h"
- #include "qemu/main-loop.h"
- #include "sysemu/accel.h"
--#include "sysemu/sysemu.h"
- #include "target/i386/cpu.h"
-=20
- // TODO: taskswitch handling
-diff --git a/target/lm32/helper.c b/target/lm32/helper.c
-index 9f3b107474..1130fc8884 100644
---- a/target/lm32/helper.c
-+++ b/target/lm32/helper.c
-@@ -21,7 +21,6 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "qemu/host-utils.h"
--#include "sysemu/sysemu.h"
- #include "hw/semihosting/semihost.h"
- #include "exec/log.h"
-=20
-diff --git a/target/m68k/m68k-semi.c b/target/m68k/m68k-semi.c
-index 01627b42c9..8e5fbfc8fa 100644
---- a/target/m68k/m68k-semi.c
-+++ b/target/m68k/m68k-semi.c
-@@ -28,7 +28,6 @@
- #include "exec/softmmu-semi.h"
- #endif
- #include "qemu/log.h"
--#include "sysemu/sysemu.h"
-=20
- #define HOSTED_EXIT  0
- #define HOSTED_INIT_SIM 1
-diff --git a/target/nios2/nios2-semi.c b/target/nios2/nios2-semi.c
-index cc2777d2f8..d7a80dd303 100644
---- a/target/nios2/nios2-semi.c
-+++ b/target/nios2/nios2-semi.c
-@@ -32,7 +32,6 @@
- #include "exec/softmmu-semi.h"
- #endif
- #include "qemu/log.h"
--#include "sysemu/sysemu.h"
-=20
- #define HOSTED_EXIT  0
- #define HOSTED_INIT_SIM 1
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index dbe125bd31..c407e9fb71 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -27,7 +27,6 @@
- #include "cpu.h"
- #include "cpu-models.h"
- #include "qemu/timer.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/hw_accel.h"
- #include "kvm_ppc.h"
- #include "sysemu/cpus.h"
-diff --git a/target/sparc/helper.c b/target/sparc/helper.c
-index 1a52061fbf..07d87efa4e 100644
---- a/target/sparc/helper.c
-+++ b/target/sparc/helper.c
-@@ -22,7 +22,6 @@
- #include "exec/exec-all.h"
- #include "qemu/host-utils.h"
- #include "exec/helper-proto.h"
--#include "sysemu/sysemu.h"
-=20
- void cpu_raise_exception_ra(CPUSPARCState *env, int tt, uintptr_t ra)
+ static void xen_init_pv(MachineState *machine)
  {
-diff --git a/target/xtensa/translate.c b/target/xtensa/translate.c
-index 6f1da87875..fa12a576b2 100644
---- a/target/xtensa/translate.c
-+++ b/target/xtensa/translate.c
-@@ -36,7 +36,6 @@
- #include "tcg-op.h"
- #include "qemu/log.h"
- #include "qemu/qemu-print.h"
--#include "sysemu/sysemu.h"
- #include "exec/cpu_ldst.h"
- #include "hw/semihosting/semihost.h"
- #include "exec/translator.h"
-diff --git a/target/xtensa/xtensa-semi.c b/target/xtensa/xtensa-semi.c
-index 8862985e56..25f57a6500 100644
---- a/target/xtensa/xtensa-semi.c
-+++ b/target/xtensa/xtensa-semi.c
-@@ -32,7 +32,6 @@
- #include "hw/semihosting/semihost.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 80fdb38d94..7f6a6ed2d9 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -5,7 +5,6 @@
+ #include "qemu/bitmap.h"
+ #include "qom/object.h"
+ #include "hw/hotplug.h"
 -#include "sysemu/sysemu.h"
 =20
  enum {
-     TARGET_SYS_exit =3D 1,
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index a4feb9545d..225e661726 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -20,7 +20,6 @@
- #include "qemu/range.h"
- #include "qemu/sockets.h"
- #include "chardev/char.h"
--#include "sysemu/sysemu.h"
- #include "qapi/qapi-visit-sockets.h"
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qobject-output-visitor.h"
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index db5ccff5ad..c4301851bd 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -1,5 +1,4 @@
- #include "qemu/osdep.h"
--#include "sysemu/sysemu.h"
- #include "keymaps.h"
- #include "ui/input.h"
+     DEV_NVECTORS_UNSPECIFIED =3D -1,
+@@ -448,8 +447,4 @@ static inline bool qbus_is_hotpluggable(BusState *bus=
+)
+ void device_listener_register(DeviceListener *listener);
+ void device_listener_unregister(DeviceListener *listener);
 =20
-diff --git a/ui/input-legacy.c b/ui/input-legacy.c
-index 549654e26a..9fc78a639b 100644
---- a/ui/input-legacy.c
-+++ b/ui/input-legacy.c
-@@ -24,7 +24,6 @@
+-VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
+-                                                     VMChangeStateHandle=
+r *cb,
+-                                                     void *opaque);
+-
+ #endif
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 7e445e0683..ceeef1ff8a 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -22,14 +22,6 @@ void runstate_set(RunState new_state);
+ int runstate_is_running(void);
+ bool runstate_needs_reset(void);
+ bool runstate_store(char *str, size_t size);
+-typedef void VMChangeStateHandler(void *opaque, int running, RunState st=
+ate);
+-
+-VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+-                                                     void *opaque);
+-VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
+-        VMChangeStateHandler *cb, void *opaque, int priority);
+-void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
+-void vm_state_notify(int running, RunState state);
 =20
- #include "qemu/osdep.h"
- #include "qapi/qapi-commands-ui.h"
--#include "sysemu/sysemu.h"
- #include "ui/console.h"
- #include "keymaps.h"
- #include "ui/input.h"
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index e3fa799c34..59456fe765 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -10,7 +10,6 @@
- #include "qemu/main-loop.h"
- #include "qemu/module.h"
- #include "qemu/sockets.h"
--#include "sysemu/sysemu.h"
- #include "ui/input.h"
- #include "qom/object_interfaces.h"
- #include "sysemu/iothread.h"
-diff --git a/ui/keymaps.c b/ui/keymaps.c
-index 6e8a321971..4e5fca57a8 100644
---- a/ui/keymaps.c
-+++ b/ui/keymaps.c
-@@ -25,7 +25,6 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "keymaps.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
- #include "qemu/ctype.h"
- #include "qemu/error-report.h"
-diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
-index db191aaa79..a2ea85127d 100644
---- a/ui/sdl2-2d.c
-+++ b/ui/sdl2-2d.c
-@@ -27,7 +27,6 @@
- #include "ui/console.h"
- #include "ui/input.h"
- #include "ui/sdl2.h"
--#include "sysemu/sysemu.h"
-=20
- void sdl2_2d_update(DisplayChangeListener *dcl,
-                     int x, int y, int w, int h)
-diff --git a/ui/sdl2-gl.c b/ui/sdl2-gl.c
-index 7a37e7c995..c73d273bf8 100644
---- a/ui/sdl2-gl.c
-+++ b/ui/sdl2-gl.c
-@@ -29,7 +29,6 @@
- #include "ui/console.h"
- #include "ui/input.h"
- #include "ui/sdl2.h"
--#include "sysemu/sysemu.h"
-=20
- static void sdl2_set_scanout_mode(struct sdl2_console *scon, bool scanou=
-t)
+ static inline bool shutdown_caused_by_guest(ShutdownCause cause)
  {
-diff --git a/ui/sdl2-input.c b/ui/sdl2-input.c
-index b1daae4111..1f9fe831b3 100644
---- a/ui/sdl2-input.c
-+++ b/ui/sdl2-input.c
-@@ -27,7 +27,6 @@
- #include "ui/console.h"
- #include "ui/input.h"
- #include "ui/sdl2.h"
--#include "sysemu/sysemu.h"
+diff --git a/include/sysemu/vmstate-notify.h b/include/sysemu/vmstate-not=
+ify.h
+new file mode 100644
+index 0000000000..09f9d4194b
+--- /dev/null
++++ b/include/sysemu/vmstate-notify.h
+@@ -0,0 +1,18 @@
++#ifndef SYSEMU_VMSTATE_NOTIFY_H
++#define SYSEMU_VMSTATE_NOTIFY_H
++
++#include "qapi/qapi-types-run-state.h"
++
++typedef void VMChangeStateHandler(void *opaque, int running, RunState st=
+ate);
++
++VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
++                                                     void *opaque);
++VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
++        VMChangeStateHandler *cb, void *opaque, int priority);
++VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
++                                                     VMChangeStateHandle=
+r *cb,
++                                                     void *opaque);
++void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
++void vm_state_notify(int running, RunState state);
++
++#endif
+diff --git a/memory.c b/memory.c
+index e5683eed91..8b4e42c54d 100644
+--- a/memory.c
++++ b/memory.c
+@@ -30,6 +30,7 @@
+ #include "exec/ram_addr.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "sysemu/tcg.h"
+ #include "migration/vmstate.h"
 =20
- void sdl2_process_key(struct sdl2_console *scon,
-                       SDL_KeyboardEvent *ev)
-diff --git a/ui/spice-display.c b/ui/spice-display.c
-index 0c65ae2fe3..6babe24909 100644
---- a/ui/spice-display.c
-+++ b/ui/spice-display.c
-@@ -22,7 +22,6 @@
- #include "qemu/option.h"
- #include "qemu/queue.h"
- #include "ui/console.h"
--#include "sysemu/sysemu.h"
- #include "trace.h"
-=20
- #include "ui/spice-display.h"
-diff --git a/util/qemu-timer.c b/util/qemu-timer.c
-index 1cc1b2f2c3..b0e40a9087 100644
---- a/util/qemu-timer.c
-+++ b/util/qemu-timer.c
-@@ -26,7 +26,6 @@
- #include "qemu/main-loop.h"
- #include "qemu/timer.h"
+diff --git a/migration/global_state.c b/migration/global_state.c
+index 2c8c447239..7cba868979 100644
+--- a/migration/global_state.c
++++ b/migration/global_state.c
+@@ -13,6 +13,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
++#include "sysemu/sysemu.h"
+ #include "qapi/error.h"
+ #include "migration.h"
+ #include "migration/global_state.h"
+diff --git a/migration/migration.c b/migration/migration.c
+index 3a6340f602..2986b8b164 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -21,6 +21,7 @@
+ #include "exec.h"
+ #include "fd.h"
+ #include "socket.h"
++#include "sysemu/sysemu.h"
+ #include "rdma.h"
+ #include "ram.h"
+ #include "migration/global_state.h"
+diff --git a/migration/savevm.c b/migration/savevm.c
+index b8f734537a..33da39f0ea 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -57,6 +57,7 @@
+ #include "io/channel-buffer.h"
+ #include "io/channel-file.h"
  #include "sysemu/replay.h"
--#include "sysemu/sysemu.h"
- #include "sysemu/cpus.h"
++#include "sysemu/sysemu.h"
+ #include "qjson.h"
+ #include "migration/colo.h"
+ #include "qemu/bitmap.h"
+diff --git a/net/net.c b/net/net.c
+index 11b505a6fd..44bdf4d079 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -50,6 +50,8 @@
+ #include "qapi/opts-visitor.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/qtest.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "net/filter.h"
+ #include "qapi/string-output-visitor.h"
 =20
- #ifdef CONFIG_POSIX
+diff --git a/stubs/change-state-handler.c b/stubs/change-state-handler.c
+index d14194b36b..655ffefe01 100644
+--- a/stubs/change-state-handler.c
++++ b/stubs/change-state-handler.c
+@@ -1,5 +1,5 @@
+ #include "qemu/osdep.h"
+-#include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+=20
+ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+                                                      void *opaque)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index e568ff6671..e23a050949 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -25,6 +25,7 @@
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm_int.h"
+ #include "sysemu/reset.h"
++#include "sysemu/vmstate-notify.h"
+ #include "kvm_i386.h"
+ #include "hyperv.h"
+ #include "hyperv-proto.h"
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 5ba1384ea1..3c4d824e16 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -25,6 +25,7 @@
+ #include "sysemu/kvm.h"
+ #include "sev_i386.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "trace.h"
+ #include "migration/blocker.h"
+=20
+diff --git a/ui/gtk.c b/ui/gtk.c
+index ad6963d4f5..73d0dd147e 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -48,6 +48,7 @@
+ #include "trace.h"
+ #include "ui/input.h"
+ #include "sysemu/sysemu.h"
++#include "sysemu/vmstate-notify.h"
+ #include "keymaps.h"
+ #include "chardev/char.h"
+ #include "qom/object.h"
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index a395d7ccd4..83d18b4150 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -19,7 +19,7 @@
+ #include <spice.h>
+=20
+ #include "sysemu/sysemu.h"
+-
++#include "sysemu/vmstate-notify.h"
+ #include "ui/qemu-spice.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+diff --git a/vl.c b/vl.c
+index 91255acf71..a70f6221aa 100644
+--- a/vl.c
++++ b/vl.c
+@@ -76,6 +76,7 @@ int main(int argc, char **argv)
+ #include "ui/input.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
++#include "sysemu/vmstate-notify.h"
+ #include "exec/gdbstub.h"
+ #include "qemu/timer.h"
+ #include "chardev/char.h"
 --=20
 2.21.0
 
