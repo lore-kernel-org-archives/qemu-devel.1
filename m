@@ -2,92 +2,87 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB7CC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 134A4C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F0352166E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:53:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F0352166E
+	by mail.kernel.org (Postfix) with ESMTPS id DE9842166E
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:58:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9842166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqv2e-0004yC-JZ
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 03:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41447)
+	id 1hqv7K-0006Pt-4Q
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 03:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36265)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hqv2Q-0004WV-Ey
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:53:17 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hqv75-00061Q-4Y
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hqv2N-0000zO-R3
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:53:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43550)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hqv2K-0000h4-Rl; Fri, 26 Jul 2019 03:53:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F01E6307D88D;
- Fri, 26 Jul 2019 07:52:58 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-164.ams2.redhat.com
- [10.36.116.164])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E7355DE80;
- Fri, 26 Jul 2019 07:52:57 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-8-mreitz@redhat.com>
- <c1a6b9bc-0b5e-4b1c-38a7-6d498d10a56a@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hqv6z-0000F7-0R
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:57:59 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37382)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqv6y-0008Uu-Op
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:57:56 -0400
+Received: by mail-wm1-f67.google.com with SMTP id f17so46831491wme.2
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 00:57:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LfHzuMB3s+eGpvlfmGqfkmXev6wwXwHOdRrX3ziCCvY=;
+ b=JNkQ02Yjp+uA5qaCbZZO8isM7sIvFVEWIGoQ0ZAniOuPx+vw5SKDPjP5OKBGrM3yyz
+ 4uZ5bgrxW9iQaRl2UmUHQ1vsk0dwaY4HAOmCqzYmIUc5Svf+rOaQl4YF1aYwWCWCNzOq
+ ee0zcS/UJlYTNjv8zS8/NXJPBL43WMU/Bxaj5Z5fw2qeqeMCXztFTQBYLQJCcHYULtMz
+ FNFcBvQBIKC5hnTAPSR/JUwVkdtBs3kE5WyNqEa4O7tw3q542wXgMZK4ZL2YFa23efXG
+ FjYhKX0p5ZBR2UQWkojUHO3rUqc48f/2LI8sLoacXy28lbCX+I/7A8Rbh8LHrogVQzyG
+ aNUw==
+X-Gm-Message-State: APjAAAVrb7JVeZE0LRczRx09i2RZscMtFti16BYps51GHfZUkHlLQBm7
+ rkrAvMMWlHu2nYXiIXYVnbsyYQ==
+X-Google-Smtp-Source: APXvYqwfmbWlN6Kl5bwaAXzlPUS3VjOV0buwgIHiPnkovfz4SOE/ZNxE/JlbAYjbzKOaBu8bCWUuuw==
+X-Received: by 2002:a7b:ce01:: with SMTP id m1mr3263070wmc.1.1564127873216;
+ Fri, 26 Jul 2019 00:57:53 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
+ ([2001:b07:6468:f312:cc23:f353:392:d2ee])
+ by smtp.gmail.com with ESMTPSA id s63sm42176038wme.17.2019.07.26.00.57.52
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 26 Jul 2019 00:57:52 -0700 (PDT)
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20190719102915.GG18585@stefanha-x1.localdomain>
+ <8736j2p22w.fsf@redhat.com>
+ <CAJSP0QXTSwk4eJteC0wTB7LGoHY3=7t4G-eNfgREQ6k+GzV2_w@mail.gmail.com>
+ <904248411098104fcf7db22382172057e50db76c.camel@intel.com>
+ <87tvbdrvin.fsf@redhat.com>
+ <CAJSP0QW1NrYwC6a61jj_vgJOJO7ofJOVUcz6Bf4z720OiN_0rw@mail.gmail.com>
+ <c1464003-38f9-95ee-c42a-fb1d370df0ab@redhat.com>
+ <c9c811f4-6108-f5b1-31f5-3f757f51cf3c@redhat.com>
+ <20190725104331-mutt-send-email-mst@kernel.org>
+ <6d318abf-4afa-a1dc-a4e8-3a2d0a6de297@redhat.com>
+ <20190725161646-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c4a77844-2043-1449-9e21-ca15de2110dc@redhat.com>
-Date: Fri, 26 Jul 2019 09:52:54 +0200
+Message-ID: <65d0458b-02bf-0e40-2851-b4becc911e4f@redhat.com>
+Date: Fri, 26 Jul 2019 09:57:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <c1a6b9bc-0b5e-4b1c-38a7-6d498d10a56a@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="pb61SGXslW27elhQgezEZNv0sRuc0Lgc0"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 26 Jul 2019 07:52:59 +0000 (UTC)
+In-Reply-To: <20190725161646-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Disable 126 for some vmdk
- subformats
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Introduce the microvm machine type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,87 +94,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "maran.wilson@oracle.com" <maran.wilson@oracle.com>, "Montes,
+ Julio" <julio.montes@intel.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "kraxel@redhat.com" <kraxel@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pb61SGXslW27elhQgezEZNv0sRuc0Lgc0
-Content-Type: multipart/mixed; boundary="Pvp0sD7qerLJ0V8bwiX9a2ar5IGBBgHcx";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <c4a77844-2043-1449-9e21-ca15de2110dc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/7] iotests: Disable 126 for some vmdk
- subformats
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-8-mreitz@redhat.com>
- <c1a6b9bc-0b5e-4b1c-38a7-6d498d10a56a@redhat.com>
-In-Reply-To: <c1a6b9bc-0b5e-4b1c-38a7-6d498d10a56a@redhat.com>
-
---Pvp0sD7qerLJ0V8bwiX9a2ar5IGBBgHcx
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 25.07.19 19:00, Eric Blake wrote:
-> On 7/25/19 10:57 AM, Max Reitz wrote:
->> Several vmdk subformats do not work with iotest 126, so disable them.
+On 25/07/19 22:30, Michael S. Tsirkin wrote:
+> On Thu, Jul 25, 2019 at 05:35:01PM +0200, Paolo Bonzini wrote:
+>> On 25/07/19 16:46, Michael S. Tsirkin wrote:
+>>> Actually, I think I have a better idea.
+>>> At the moment we just get an exit on these reads and return all-ones.
+>>> Yes, in theory there could be a UR bit set in a bunch of
+>>> registers but in practice no one cares about these,
+>>> and I don't think we implement them.
+>>> So how about mapping a single page, read-only, and filling it
+>>> with all-ones?
 >>
->> (twoGbMaxExtentSparse actually should work, but fixing that is a bit
->> difficult.  The problem is that the vmdk descriptor file will contain =
-a
->> referenc to "image:base.vmdk", which the block layer cannot open becau=
-se
->=20
-> reference
->=20
->> it does not know the protocol "image".  This is not trivial to solve,
->> because I suppose real protocols like "http://" should be supported.
->> Making vmdk treat all paths with a potential protocol prefix that the
->> block layer does not recognize as plain files seems a bit weird,
->> though.  Ignoring this problem does not seem too bad.)
+>> Yes, that's nice indeed. :)  But it does have some cost, in terms of
+>> either number of VMAs or QEMU RSS since the MMCONFIG area is large.
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/126 | 6 ++++++
->>  1 file changed, 6 insertions(+)
->=20
-> Are you aiming to get any of this series in -rc3, or is it firmly 4.2
-> material?
+>> What breaks if we return all zeroes?  Zero is not a valid vendor ID.
+>>
+>> Paolo
+> 
+> I think I know what you are thinking of doing:
+> map /dev/zero so we get a single VMA but all mapped to
+> a single zero pte?
 
-No bug fix is ever firmly -next material.  However, the bugs aren=E2=80=99=
-t
-regressions and not dramatic, so we don=E2=80=99t need to force it into 4=
-=2E1.
+Yes, exactly.  You absolutely need to share the page because the guest
+could easily touch 32*256 pages just to scan function 0 on every bus and
+device, even if the VM has just 4 or 5 devices and all of them on the
+root complex.  And that causes fragmentation so you have to map bigger
+areas.
 
-If I had a strong opinion myself on where to place this series, I=E2=80=99=
-d have
-given it a for-4.x tag.  I didn=E2=80=99t, because I don=E2=80=99t.
+> - we can implement /dev/ones. in fact, we can implement
+>   /dev/byteXX for each possible value, the cost will
+>   be only 1M on a 4k page system.
+>   it might come in handy for e.g. free page hinting:
+>   at the moment if guest memory is poisoned
+>   we can not unmap it, with this trick we can
+>   map it to /dev/byteXX.
 
-Max
+I also thought of /dev/ones, not sure how it would be accepted. :)  Also
+you cannot map lazily on page fault, otherwise you get a vmexit and it's
+slow again.  So /dev/ones needs to be written to use a huge page, possibly.
 
-
---Pvp0sD7qerLJ0V8bwiX9a2ar5IGBBgHcx--
-
---pb61SGXslW27elhQgezEZNv0sRuc0Lgc0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl06sVYACgkQ9AfbAGHV
-z0BWqgf9F0N5A84L3pLkdKVvpDg+j0jzuVc7Yzv4bdnlg/8IXnxivXFK9FcX2DE1
-Gv8/egh8fd8L7LtNeEfDShnU9u/IAK2wODbdUM1Zfbz9WtlOzzUMfav1Ijwhw9T7
-v1RHtyKOtCyPma+B2QDRnJIC6JUdL3BdhrHgPaEiyNLmLCBUUoi0WcytpYAcTAn8
-DV80T+Rh+imjcBAcNH99QB3bNSkR6+csDlyzzM+689swCoJ2A6AvoaWNiHE8VwHR
-jTLRuvg3/Nb0/hhqFnb1+ymvhK6vRx1TWFNYnfwt2K3ns14Bdm4fenzPaCmS+wP5
-mAcYQEj3f2EV2FeBx5EboKmC6j08HA==
-=SJEW
------END PGP SIGNATURE-----
-
---pb61SGXslW27elhQgezEZNv0sRuc0Lgc0--
+Paolo
 
