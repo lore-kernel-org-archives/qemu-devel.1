@@ -2,66 +2,66 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51F21C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 11:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91522C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 11:52:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2634F229F3
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 11:50:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2634F229F3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55B45218DA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 11:52:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55B45218DA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqyjb-0005TG-CF
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 07:50:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51688)
+	id 1hqylo-0007GB-Gn
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 07:52:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58728)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hqyjP-000518-V2
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 07:49:53 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hqyld-0006r1-Ky
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 07:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hqyjK-0004o2-Q3
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 07:49:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47740)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hqyjF-0004Qq-26; Fri, 26 Jul 2019 07:49:41 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4171230917AA;
- Fri, 26 Jul 2019 11:49:36 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-109.ams2.redhat.com
- [10.36.116.109])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79EFC101E24B;
- Fri, 26 Jul 2019 11:49:32 +0000 (UTC)
-Date: Fri, 26 Jul 2019 13:49:30 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190726114930.GD6295@localhost.localdomain>
-References: <20190725162704.12622-1-kwolf@redhat.com>
- <20190725162704.12622-5-kwolf@redhat.com>
- <6c00ea43-5b9f-5fb7-3e52-86bcf3933668@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1hqyla-0005Jk-QZ
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 07:52:08 -0400
+Resent-Date: Fri, 26 Jul 2019 07:52:08 -0400
+Resent-Message-Id: <E1hqyla-0005Jk-QZ@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21581)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hqyla-00057a-GA; Fri, 26 Jul 2019 07:52:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1564141922; cv=none; d=zoho.com; s=zohoarc; 
+ b=oRUT/lfjtFsrf/nrAtbZUHPouhxpxHVkLW70BWPUi2VCRzAycYRQHcMVyfya0KD2bbamkGMtjQ3vD0tTqmBO6uQqVT/t71R1UMffbn9se7xduynHXd9sNNO3Oflf6Yf+jR9H6mO96ci1J82vco3aSw8hmrbz1vcKv4FdwQO0Bjs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1564141922;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=jv8+aFe3V8RbWgWfhtQv2Zqw2A1cY3s5HCrw9hyOzFY=; 
+ b=c6Jl6gV6x1NDqg86tgPm/JEtdRT5BjDhvgfPoVajggt4yKD4v3unRYBQDYBFll9RjencntqYpVfXhMagYRiGZsTuxZK8VGqyGESPXYUHeXiyuy70BaH3RF/jDb2Xwi9bD1l/AoLKYFZr9qAyovHeXjatuYXL+z6LIzn+5K1wfs0=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 156414192022265.31635305755935;
+ Fri, 26 Jul 2019 04:52:00 -0700 (PDT)
+Message-ID: <156414191886.26760.16305845264725165967@c4a48874b076>
+In-Reply-To: <20190726113950.7499-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="gj572EiMnwbLXET9"
-Content-Disposition: inline
-In-Reply-To: <6c00ea43-5b9f-5fb7-3e52-86bcf3933668@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Fri, 26 Jul 2019 11:49:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alex.bennee@linaro.org
+Date: Fri, 26 Jul 2019 04:52:00 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/4] block-backend: Queue requests while
- drained
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v5] target/arm: generate a custom MIDR for
+ -cpu max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,179 +73,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDcyNjExMzk1MC43NDk5
+LTEtYWxleC5iZW5uZWVAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0gg
+djVdIHRhcmdldC9hcm06IGdlbmVyYXRlIGEgY3VzdG9tIE1JRFIgZm9yIC1jcHUgbWF4Ck1lc3Nh
+Z2UtaWQ6IDIwMTkwNzI2MTEzOTUwLjc0OTktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
+ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
+ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
+LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwNzI2MTEzOTUw
+Ljc0OTktMS1hbGV4LmJlbm5lZUBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxOTA3MjYxMTM5NTAu
+NzQ5OS0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKU3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBz
+Oi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBzdG9uZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2Nh
+cHN0b25lJwpTdWJtb2R1bGUgJ2R0YycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdkdGMnClN1Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVy
+cycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9RZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1hY0RyaXZlcnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAo
+aHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L1NMT0YuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL1NMT0YnClN1Ym1vZHVsZSAncm9tcy9lZGsyJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
+L2VkazIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2VkazInClN1Ym1vZHVsZSAncm9t
+cy9pcHhlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZv
+ciBwYXRoICdyb21zL2lweGUnClN1Ym1vZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0
+LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3Bl
+bmJpb3MnClN1Ym1vZHVsZSAncm9tcy9vcGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9y
+Zy9naXQvb3BlbmhhY2t3YXJlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFj
+a3dhcmUnClN1Ym1vZHVsZSAncm9tcy9vcGVuc2JpJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
+L29wZW5zYmkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5zYmknClN1Ym1vZHVs
+ZSAncm9tcy9xZW11LXBhbGNvZGUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxj
+b2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVs
+ZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0Lykg
+cmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlv
+cy1ocHBhJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MtaHBwYS5naXQpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcy1ocHBhJwpTdWJtb2R1bGUgJ3JvbXMvc2dhYmlv
+cycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZ2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2tpYm9vdCcgKGh0dHBzOi8vZ2l0
+LnFlbXUub3JnL2dpdC9za2lib290LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9za2li
+b290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3Ut
+Ym9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290JwpTdWJtb2R1bGUgJ3Jv
+bXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC1zYW00
+NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JwpTdWJt
+b2R1bGUgJ3NsaXJwJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2xpYnNsaXJwLmdpdCkgcmVn
+aXN0ZXJlZCBmb3IgcGF0aCAnc2xpcnAnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29m
+dGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvYmVya2VsZXktc29mdGZsb2F0LTMu
+Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycK
+U3VibW9kdWxlICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0LnFl
+bXUub3JnL2dpdC9iZXJrZWxleS10ZXN0ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGgg
+J3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBk
+YicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVk
+IGZvciBwYXRoICd1aS9rZXljb2RlbWFwZGInCkNsb25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1
+Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6IGNoZWNrZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1
+NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpDbG9uaW5nIGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBh
+dGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4OGYxODkwOWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRl
+NDQ5NTM2JwpDbG9uaW5nIGludG8gJ3JvbXMvUWVtdU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBw
+YXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJzogY2hlY2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQy
+MjQ3YjllYTg2OWRmMWMyZDljOGUyNjYnCkNsb25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJt
+b2R1bGUgcGF0aCAncm9tcy9TTE9GJzogY2hlY2tlZCBvdXQgJ2JhMWFiMzYwZWViZTYzMzhiYjhk
+N2Q4M2E5MjIwY2NmN2UyMTNhZjMnCkNsb25pbmcgaW50byAncm9tcy9lZGsyJy4uLgpTdWJtb2R1
+bGUgcGF0aCAncm9tcy9lZGsyJzogY2hlY2tlZCBvdXQgJzIwZDJlNWExMjVlMzRmYzg1MDEwMjY2
+MTNhNzE1NDliMmExYTNlNTQnClN1Ym1vZHVsZSAnU29mdEZsb2F0JyAoaHR0cHM6Ly9naXRodWIu
+Y29tL3VjYi1iYXIvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnClN1
+Ym1vZHVsZSAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJyAoaHR0cHM6Ly9n
+aXRodWIuY29tL29wZW5zc2wvb3BlbnNzbCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQ3J5cHRvUGtn
+L0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJwpDbG9uaW5nIGludG8gJ0FybVBrZy9MaWJyYXJ5
+L0FybVNvZnRGbG9hdExpYi9iZXJrZWxleS1zb2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvZWRrMi9Bcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZs
+b2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4
+ODAzNycKQ2xvbmluZyBpbnRvICdDcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wn
+Li4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExp
+Yi9vcGVuc3NsJzogY2hlY2tlZCBvdXQgJzUwZWFhYzlmMzMzNzY2NzI1OWRlNzI1NDUxZjIwMWU3
+ODQ1OTk2ODcnClN1Ym1vZHVsZSAnYm9yaW5nc3NsJyAoaHR0cHM6Ly9ib3Jpbmdzc2wuZ29vZ2xl
+c291cmNlLmNvbS9ib3Jpbmdzc2wpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2JvcmluZ3NzbCcKU3Vi
+bW9kdWxlICdrcmI1JyAoaHR0cHM6Ly9naXRodWIuY29tL2tyYjUva3JiNSkgcmVnaXN0ZXJlZCBm
+b3IgcGF0aCAna3JiNScKU3VibW9kdWxlICdweWNhLmNyeXB0b2dyYXBoeScgKGh0dHBzOi8vZ2l0
+aHViLmNvbS9weWNhL2NyeXB0b2dyYXBoeS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3B5Y2Et
+Y3J5cHRvZ3JhcGh5JwpDbG9uaW5nIGludG8gJ2JvcmluZ3NzbCcuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wvYm9yaW5nc3Ns
+JzogY2hlY2tlZCBvdXQgJzIwNzBmOGFkOTE1MWRjOGYzYTczYmZmYWExNDZiNWU2OTM3YTU4M2Yn
+CkNsb25pbmcgaW50byAna3JiNScuLi4KZmF0YWw6IHVuYWJsZSB0byBhY2Nlc3MgJ2h0dHBzOi8v
+Z2l0aHViLmNvbS9rcmI1L2tyYjUvJzogQ291bGQgbm90IHJlc29sdmUgaG9zdDogZ2l0aHViLmNv
+bTsgTmFtZSBvciBzZXJ2aWNlIG5vdCBrbm93bgpDbG9uZSBvZiAnaHR0cHM6Ly9naXRodWIuY29t
+L2tyYjUva3JiNScgaW50byBzdWJtb2R1bGUgcGF0aCAna3JiNScgZmFpbGVkCkZhaWxlZCB0byBy
+ZWN1cnNlIGludG8gc3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9P
+cGVuc3NsTGliL29wZW5zc2wnCkNsb25pbmcgaW50byAncm9tcy9pcHhlJy4uLgpTdWJtb2R1bGUg
+cGF0aCAncm9tcy9pcHhlJzogY2hlY2tlZCBvdXQgJ2RlNDU2NWNiZTc2ZWE5Zjc5MTNhMDFmMzMx
+YmUzZWU5MDFiYjZlMTcnCkNsb25pbmcgaW50byAncm9tcy9vcGVuYmlvcycuLi4KU3VibW9kdWxl
+IHBhdGggJ3JvbXMvb3BlbmJpb3MnOiBjaGVja2VkIG91dCAnYzc5ZTBlY2I4NGY0ZjFlZTNmNzNm
+NTIxNjIyZTI2NGVkZDFiZjE3NCcKQ2xvbmluZyBpbnRvICdyb21zL29wZW5oYWNrd2FyZScuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJzogY2hlY2tlZCBvdXQgJ2M1NTlkYTdj
+OGVlYzVlNDVlZjFmNjc5Nzg4MjdhZjZmMGI5NTQ2ZjUnCkNsb25pbmcgaW50byAncm9tcy9vcGVu
+c2JpJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuc2JpJzogY2hlY2tlZCBvdXQgJ2NlMjI4
+ZWUwOTE5ZGViOTk1NzE5MmQ3MjNlZWNjOGFhYWUyNjk3YzYnCkNsb25pbmcgaW50byAncm9tcy9x
+ZW11LXBhbGNvZGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3FlbXUtcGFsY29kZSc6IGNoZWNr
+ZWQgb3V0ICdiZjBlMTM2OTg4NzI0NTAxNjRmYTcwNDBkYTM2YTk1ZDJkNGIzMjZmJwpDbG9uaW5n
+IGludG8gJ3JvbXMvc2VhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcyc6IGNo
+ZWNrZWQgb3V0ICdhNWNhYjU4ZTlhM2ZiNmUxNjhhYmE5MTljNTY2OWJlYTQwNjU3M2I0JwpDbG9u
+aW5nIGludG8gJ3JvbXMvc2VhYmlvcy1ocHBhJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFi
+aW9zLWhwcGEnOiBjaGVja2VkIG91dCAnMGY0ZmU4NDY1ODE2NWU5NmNlMzU4NzBmZDE5ZmM2MzRl
+MTgyZTc3YicKQ2xvbmluZyBpbnRvICdyb21zL3NnYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdy
+b21zL3NnYWJpb3MnOiBjaGVja2VkIG91dCAnY2JhZWU1MjI4N2U1ZjMyMzczMTgxY2ZmNTBhMDBi
+NmM0YWM5MDE1YScKQ2xvbmluZyBpbnRvICdyb21zL3NraWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRo
+ICdyb21zL3NraWJvb3QnOiBjaGVja2VkIG91dCAnMjYxY2E4ZTc3OWU1MTM4ODY5YTQ1ZjE3NGNh
+YTQ5YmU2YTI3NDUwMScKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9vdCcuLi4KU3VibW9kdWxlIHBh
+dGggJ3JvbXMvdS1ib290JzogY2hlY2tlZCBvdXQgJ2QzNjg5MjY3ZjkyYzU5NTZlMDljYzdkMWJh
+YTQ3MDAxNDE2NjJiZmYnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3Qtc2FtNDYwZXgnLi4uClN1
+Ym1vZHVsZSBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCc6IGNoZWNrZWQgb3V0ICc2MGIzOTE2
+ZjMzZTYxN2E4MTU5NzNjNWE2ZGY3NzA1NWIyZTNhNTg4JwpDbG9uaW5nIGludG8gJ3NsaXJwJy4u
+LgpTdWJtb2R1bGUgcGF0aCAnc2xpcnAnOiBjaGVja2VkIG91dCAnZjBkYTY3MjYyMDdiNzQwZjYx
+MDEwMjhiMjk5MmY5MTg0NzdhNGIwOCcKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS1z
+b2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9h
+dC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgw
+MzcnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnLi4uClN1Ym1v
+ZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICc1
+YTU5ZGNlYzE5MzI3Mzk2YTAxMWExN2ZkOTI0YWVkNGZlYzQxNmIzJwpDbG9uaW5nIGludG8gJ3Vp
+L2tleWNvZGVtYXBkYicuLi4KU3VibW9kdWxlIHBhdGggJ3VpL2tleWNvZGVtYXBkYic6IGNoZWNr
+ZWQgb3V0ICc2YjNkNzE2ZTJiNjQ3MmViNzE4OWQzMjIwNTUyMjgwZWYzZDgzMmNlJwpGYWlsZWQg
+dG8gcmVjdXJzZSBpbnRvIHN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazInClRyYWNlYmFjayAobW9z
+dCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICIuL3BhdGNoZXctY2xpIiwgbGluZSA1MDQsIGlu
+IHRlc3Rfb25lCiAgICBnaXRfY2xvbmVfcmVwbyhjbG9uZSwgclsicmVwbyJdLCByWyJoZWFkIl0s
+IGxvZ2YpCiAgRmlsZSAiLi9wYXRjaGV3LWNsaSIsIGxpbmUgNTAsIGluIGdpdF9jbG9uZV9yZXBv
+CiAgICBzdGRlcnI9bG9nZiwgc3Rkb3V0PWxvZ2YpCiAgRmlsZSAiL3Vzci9saWI2NC9weXRob24z
+LjQvc3VicHJvY2Vzcy5weSIsIGxpbmUgNTU4LCBpbiBjaGVja19jYWxsCiAgICByYWlzZSBDYWxs
+ZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJv
+cjogQ29tbWFuZCAnWydnaXQnLCAnY2xvbmUnLCAnLXEnLCAnLS1yZWN1cnNpdmUnLCAnL2hvbWUv
+cGF0Y2hldy8uY2FjaGUvcGF0Y2hldy1naXQtY2FjaGUvaHR0cHNnaXRodWJjb21wYXRjaGV3cHJv
+amVjdHFlbXUtM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NCcsICcvdmFy
+L3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtMTN1M196MG0vc3JjJ10nIHJldHVybmVkIG5vbi16ZXJv
+IGV4aXQgc3RhdHVzIDEKCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
+Y2hldy5vcmcvbG9ncy8yMDE5MDcyNjExMzk1MC43NDk5LTEtYWxleC5iZW5uZWVAbGluYXJvLm9y
+Zy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
+bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
---gj572EiMnwbLXET9
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 26.07.2019 um 12:50 hat Max Reitz geschrieben:
-> On 25.07.19 18:27, Kevin Wolf wrote:
-> > This fixes device like IDE that can still start new requests from I/O
->=20
-> *devices
->=20
-> > handlers in the CPU thread while the block backend is drained.
-> >=20
-> > The basic assumption is that in a drain section, no new requests should
-> > be allowed through a BlockBackend (blk_drained_begin/end don't exist,
-> > we get drain sections only on the node level). However, there are two
-> > special cases where requests should not be queued:
-> >=20
-> > 1. Block jobs: We already make sure that block jobs are paused in a
-> >    drain section, so they won't start new requests. However, if the
-> >    drain_begin is called on the job's BlockBackend first, it can happen
-> >    that we deadlock because the job stays busy until it reaches a pause
-> >    point - which it can't if it's requests aren't processed any more.
-> >=20
-> >    The proper solution here would be to make all requests through the
-> >    job's filter node instead of using a BlockBackend. For now, just
-> >    disabling request queuin on the job BlockBackend is simpler.
->=20
-> Yep, seems reasonable.
->=20
-> (We=E2=80=99d need a relationship that a BB is owned by some job, and the=
-n pause
-> the job when the BB is drained, I suppose.  But that=E2=80=99s exactly
-> accomplished by not making the job use a BB, but its BdrvChild
-> references instead.)
-
-We actually had this before commit ad90feba, when we changed it to use
-the job's BdrvChild objects instead. All block jobs have both currently,
-they just don't use their BdrvChild objects much.
-
-> > 2. In test cases where making requests through bdrv_* would be
-> >    cumbersome because we'd need a BdrvChild. As we already got the
-> >    functionality to disable request queuing from 1., use it in tests,
-> >    too, for convenience.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  include/sysemu/block-backend.h | 11 +++---
-> >  block/backup.c                 |  1 +
-> >  block/block-backend.c          | 69 +++++++++++++++++++++++++++++-----
-> >  block/commit.c                 |  2 +
-> >  block/mirror.c                 |  6 ++-
-> >  blockjob.c                     |  3 ++
-> >  tests/test-bdrv-drain.c        |  1 +
-> >  7 files changed, 76 insertions(+), 17 deletions(-)
->=20
-> [...]
->=20
-> > diff --git a/block/block-backend.c b/block/block-backend.c
-> > index fdd6b01ecf..603b281743 100644
-> > --- a/block/block-backend.c
-> > +++ b/block/block-backend.c
->=20
-> [...]
->=20
-> > @@ -1127,13 +1136,26 @@ static int blk_check_byte_request(BlockBackend =
-*blk, int64_t offset,
-> >      return 0;
-> >  }
-> > =20
-> > +static void blk_wait_while_drained(BlockBackend *blk)
->=20
-> +coroutine_fn?  (Maybe even blk_co_wait...)
->=20
-> > +{
-> > +    if (blk->quiesce_counter && !blk->disable_request_queuing) {
-> > +        qemu_co_queue_wait(&blk->queued_requests, NULL);
-> > +    }
-> > +}
-> > +
-> >  int coroutine_fn blk_co_preadv(BlockBackend *blk, int64_t offset,
-> >                                 unsigned int bytes, QEMUIOVector *qiov,
-> > -                               BdrvRequestFlags flags)
-> > +                               BdrvRequestFlags flags, bool wait_while=
-_drained)
->=20
-> What=E2=80=99s the purpose of this parameter?  How would it hurt to always
-> wait_while_drained?
->=20
-> I see the following callers of blk_co_p{read,write}v() that call it with
-> wait_while_drained=3Dfalse:
->=20
-> 1. blk_aio_{read,write}_entry(): They wait themselves, so they don=E2=80=
-=99t
->    need these functions to wait.  But OTOH, because they have waited, we
->    know that the BB is not quiesced here, so we won=E2=80=99t wait here a=
-nyway.
->    (These functions should be coroutine_fn, too, by the way)
-
-I think I was worried that the coroutine might yield between the two
-places. Later I noticed that blk_wait_while_drained() must be the very
-first thing anyway, so maybe it doesn't matter any more now.
-
-If we did yield here for requests coming from blk_aio_prwv(), in_flight
-would be increased and drain would deadlock.
-
-Would you prefer if I just unconditionally wait if we're drained?
-
-> 2. mirror: It disables request queuing anyway, so wait_while_drained
->    doesn=E2=80=99t have any effect.
-
-Yes, I wasn't sure what to use there. false seemed like it would be
-less likely to cause misunderstandings because it just repeats what
-would happen anyway.
-
-> >  {
-> >      int ret;
-> > -    BlockDriverState *bs =3D blk_bs(blk);
-> > +    BlockDriverState *bs;
-> > =20
-> > +    if (wait_while_drained) {
-> > +        blk_wait_while_drained(blk);
-> > +    }
->=20
-> [...]
->=20
-> What about blk_co_flush()?  Should that wait, too?
-
-Hm, probably, yes.
-
-> > @@ -2232,6 +2278,9 @@ static void blk_root_drained_end(BdrvChild *child=
-, int *drained_end_counter)
-> >          if (blk->dev_ops && blk->dev_ops->drained_end) {
-> >              blk->dev_ops->drained_end(blk->dev_opaque);
-> >          }
-> > +        while (qemu_co_enter_next(&blk->queued_requests, NULL)) {
-> > +            /* Resume all queued requests */
-> > +        }
->=20
-> Wouldn=E2=80=99t qemu_co_queue_restart_all(&blk->queued_requests) achieve=
- the same?
-
-It would fail an assertion because we're not in coroutine context.
-(Guess what my first attempt was!)
-
-Kevin
-
---gj572EiMnwbLXET9
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdOujKAAoJEH8JsnLIjy/W82gP/2F5ibqvFudTIN4gkvpo9ClH
-y4ArINshlt9WVE5OxOk1u6dHstnE4iQPPau/8id16Tu0Pyi2OQ0X91bispW+3sxF
-9Qszdv584q/dvQM2jcFKqNnSyS5wRSdZj7Yyrk8AsswIpjDQXweU16NR8Q5E5VVY
-+btpNLstEA+rM54cu7jeE6gBZmXU28m+q88UwXd7AbruTk70aNJJJt7OwJJMWfF2
-JwG44RDhxZ/RaGLG7ziq/BXzQ1qd9gnE+HKxqVdK5uZwhzuTxjiy/QCNWjf1tpsN
-XD/e6qJnDDjMpMVJQZCtTU2feV98x7QOhMTSe0V1V/KbWUatAGLTMYXeMPCqjcJQ
-+rWHCWqP3+qIiSCF8v8iLfNia7jQ0aXGRtGkDeh5K6dTIt2B5cBMxQfEc1P0Nc7J
-1leyix0OyC83C43KltuMN3lQUoO26doYrpyZxWpKVTNg2K8YJ/nnZOqV+8rPKSSe
-4MPCgL6rBmCR6gAAX0sedGR5AqDnKdZw99riBqoQuo2moYjdD8xlsrCS7Xeqr9x2
-bc/BuPsI4KnwEdTwBHEYf8maf2H6CkE/EGdzDvBSe7dt82SFHk1J9ACnqT4uPxNI
-dGxC19+/4vwiLXVs75QGVyoFjMOI+6MY4/dBpDGqcvBcISKcDKHg+56bya6fpNlN
-WRvr/GrGml3y6S5U0Uvi
-=VSO9
------END PGP SIGNATURE-----
-
---gj572EiMnwbLXET9--
 
