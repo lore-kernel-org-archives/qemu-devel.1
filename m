@@ -8,84 +8,86 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93F9C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 044ACC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:09:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2A22218D4
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6642218D4
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:09:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+S0bJzL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2A22218D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6Nq0E4V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6642218D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqzto-0005uG-M5
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 09:04:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56508)
+	id 1hqzyM-0008RT-U5
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 09:09:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57391)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hqztb-0005Vy-Vs
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:04:29 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hqzyC-0007vF-8E
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:09:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hqztZ-0005iQ-KU
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:04:26 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52418)
+ (envelope-from <stefanha@gmail.com>) id 1hqzyB-0003Fl-5L
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:09:12 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34158)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hqztT-0005Xa-6G
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:04:21 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s3so47944330wms.2
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 06:04:18 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hqzyA-0003F6-UO
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:09:11 -0400
+Received: by mail-wm1-x344.google.com with SMTP id w9so37991545wmd.1
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 06:09:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=N0CTKjNKza51sjyIp7lnGv+7HmTfTrmUCccrgk0AS3E=;
- b=O+S0bJzLh0DTUC+tuBxIOx1ntfgwwFZKjMxHPuK9EINX7007D8EYO/ootpe5xzGPaj
- yTcKCa/16pYslg4RQbJJkCWRwO9CtaprBdGiY14US1OB3veogsZ1EIQaSYZK3XcTj14B
- kfYY2kdwDYVppa8FrbvIA7rbET4AMQGYdGfMV3BanFqyoARHXzl28dNuOJsgK3eA5vy5
- tosEsZOLLwkNV4PhFSbwUIqhuBadFOOU2c19QDzo9cat2Kbu8AJSAaApIQOws8x2CnS8
- S6KbL78rILhyAXldqmvVLAfJZ8tuRkj0mILLulmscAXeEzlVNelQ69TCb+JWrc3V8F/c
- 4TsQ==
+ bh=uhpZBgs7xvhNOcj1Wre9kWc7PQN5uPOX886KjVXN7/s=;
+ b=j6Nq0E4VqW0wgf6nWTWe15IOf/fSd4wW/QauCIGPGKHFkb0oq+uC18okGiy6GAdWKd
+ dxg82XMqpRPCnGanUC1/Tvx90GVteB9WOXzXbjcg26s+dZcQtpm8NiB38S52jzsIKcS+
+ daPNT3oO7M2Ox4avGzQ9f8ym3V48CR2sAsiYL7I5K/eKr45tbxRKufY/3aBtT5pehfsd
+ n57lOa/uZw7AjZ2rsqmk7hzT42aue1WR5mwsHryp3imddtQf8W3q75BLeLxGZHRUee9H
+ y4PJlKE0H7OIfgLTTcHgFDOJmEVCoh3t9BWFHSVpqYw5VT0ZL8ytbrnWh8y7VxeSu8nr
+ ZHOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=N0CTKjNKza51sjyIp7lnGv+7HmTfTrmUCccrgk0AS3E=;
- b=DBHnO+PQrx87MIXADYK9d5LjF984Yuzg3ZzB1qsjgRqqmt7lGmzaAh0mFSfcQuRHaK
- jhrkPEjLlv5snfM0WOqEfoFhcZCS8eB/ffnDbHy3SphcLFOWzF09S8iJLbL0QBBOsy9s
- O1HXugz8cR7k4y1mkvIQq5/CT8/9rDDYYXYPp2gBJCOwkEr1rnaFPHH5qvWmuX6reDQd
- 8q3EZ9Uf+d4TNLn+RAK1OHqy3YwRYSHr6Pr2/TycbovhZnZ46ZWtoQB+rbtWxHJkNtOz
- xYZREiAsyPtthM7dDPWQhcJiB5jzFV258uNUAqENPQJ4ShdKWzEhuJDiEwXhQxGLXNFg
- 8iSA==
-X-Gm-Message-State: APjAAAUjb+i/exo5G0laKpDUYMLMlrqNuwJBBweQnE9i1sM4Ap4bAyVO
- +zAkmEXZPC+C13h90irloRA=
-X-Google-Smtp-Source: APXvYqzSDvebbIwfkpNERzfLEvt2rajUQ9Q/PU/rWxjcNZJQF2tmMBpVnlAD4UEGWdbnc8oYuypgWQ==
-X-Received: by 2002:a1c:cfc3:: with SMTP id
- f186mr80035057wmg.134.1564146256811; 
- Fri, 26 Jul 2019 06:04:16 -0700 (PDT)
+ bh=uhpZBgs7xvhNOcj1Wre9kWc7PQN5uPOX886KjVXN7/s=;
+ b=RD2FSHY3+1Rn8HsQ+NwdXRSHc6sHiizhJUgOKFa+j3Dyn4+DXe6cM6O7L7jrf+GvY+
+ j3vwf27yWreP5y6SrPB9fXCP2H+IiFpAWgS6wQnJtvtUjWhjYjqB2tzoS3w1Nd3FTGNO
+ 65QppT9t9t6ocQw7e5dJEsQ2QkkhaSt/NOz2xXGZ+i4G8hkuptg8n20sg4sBsdTRPxMR
+ 5BuZWQV/fbGl4xGRaYRzOSXgnDJfRPPZVo9d9ha4tHNu1izgF3OKeEUx6PssX7uE6V9o
+ R18tkxFkfhN2L5XUI+h8IJvPlz2CpmOtXje9gPlhiOk0HXrUU7W2h0MoYm7piAgSfk9l
+ MqIw==
+X-Gm-Message-State: APjAAAXPLSTGZHQirtPQj5sc6GMR5N67b8RoZaUD7+O0+YTsVx8hu740
+ DsYDTSR4JrBXDNXys91y8tA=
+X-Google-Smtp-Source: APXvYqw2K7SjhXDh7n8pjki/S8eZc2tDBjwoXXM0btxOcd92dzp8GPiRdefYw/UdPK+XUh70WihvqA==
+X-Received: by 2002:a1c:a584:: with SMTP id
+ o126mr87056826wme.147.1564146549692; 
+ Fri, 26 Jul 2019 06:09:09 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id g19sm60119830wmg.10.2019.07.26.06.04.15
+ by smtp.gmail.com with ESMTPSA id x83sm55615771wmb.42.2019.07.26.06.09.08
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 06:04:15 -0700 (PDT)
-Date: Fri, 26 Jul 2019 14:04:14 +0100
+ Fri, 26 Jul 2019 06:09:08 -0700 (PDT)
+Date: Fri, 26 Jul 2019 14:09:07 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
 To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190726130414.GG25977@stefanha-x1.localdomain>
+Message-ID: <20190726130907.GH25977@stefanha-x1.localdomain>
 References: <20190725032321.12721-1-alxndr@bu.edu>
- <20190725032321.12721-10-alxndr@bu.edu>
+ <20190725032321.12721-14-alxndr@bu.edu>
+ <51cc86ad-0dda-ada0-1c44-a6ac365bc4cf@redhat.com>
+ <b2503c69ad82bd13c1bab518154c6168e7eeb1cc.camel@bu.edu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FwyhczKCDPOVeYh6"
+ protocol="application/pgp-signature"; boundary="nOM8ykUjac0mNN89"
 Content-Disposition: inline
-In-Reply-To: <20190725032321.12721-10-alxndr@bu.edu>
+In-Reply-To: <b2503c69ad82bd13c1bab518154c6168e7eeb1cc.camel@bu.edu>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [RFC 09/19] fuzz: use mtree_info to find mapped
- addresses
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [RFC 13/19] fuzz: add ctrl vq support to
+ virtio-net in libqos
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,119 +99,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ "thuth@redhat.com" <thuth@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>,
  "stefanha@redhat.com" <stefanha@redhat.com>,
- "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---FwyhczKCDPOVeYh6
+--nOM8ykUjac0mNN89
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 25, 2019 at 03:23:51AM +0000, Oleinik, Alexander wrote:
-> Locate mmio and port i/o addresses that are mapped to devices so we can
-> limit the fuzzer to only these addresses. This should be replaced with
-> a sane way of enumaring these memory regions.
+On Thu, Jul 25, 2019 at 05:05:25PM +0000, Oleinik, Alexander wrote:
+> On Thu, 2019-07-25 at 12:25 -0400, John Snow wrote:
+> >=20
+> > On 7/24/19 11:23 PM, Oleinik, Alexander wrote:
+> > > Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> >=20
+> > Is there some explanation for why the below patch does what the
+> > subject
+> > line claims for the uninitiated?
+> When multiqueue mode (VIRTIO_NET_F_MQ) is disabled, virtio-net sets up
+> three queues. 0:receiveq, 1:transmitq and 2:controlq.=20
+> > I don't know why increasing the number of queues from 2 to 3 here is
+> > correct in the general case, OR why it would "add ctrl vq support".
+> > (Or what it has to do with fuzzing, in general.)
 >=20
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
->  memory.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
+> Prior to the change, accessing the ctrl vq through QOS, would trigger a
+> segfault, since only two queues were allocated to QVirtioDevice*
+> interface->queues.
 >=20
-> diff --git a/memory.c b/memory.c
-> index 5d8c9a9234..fa6cbe4f1d 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -34,6 +34,11 @@
->  #include "hw/qdev-properties.h"
->  #include "hw/boards.h"
->  #include "migration/vmstate.h"
-> +#ifdef CONFIG_FUZZ
-> +#include "tests/fuzz/fuzz.h"
-> +#include "tests/fuzz/qos_fuzz.h"
-> +#endif
-> +
-> =20
->  //#define DEBUG_UNASSIGNED
-> =20
-> @@ -3016,12 +3021,20 @@ static void mtree_print_flatview(gpointer key, gp=
-ointer value,
->      int n =3D view->nr;
->      int i;
->      AddressSpace *as;
-> +#ifdef CONFIG_FUZZ
-> +    bool io=3Dfalse;
-> +#endif
-> +
-> =20
->      qemu_printf("FlatView #%d\n", fvi->counter);
->      ++fvi->counter;
-> =20
->      for (i =3D 0; i < fv_address_spaces->len; ++i) {
->          as =3D g_array_index(fv_address_spaces, AddressSpace*, i);
-> +#ifdef CONFIG_FUZZ
-> +        if(strcmp("I/O",as->name) =3D=3D 0)
-> +            io =3D true;
-> +#endif
->          qemu_printf(" AS \"%s\", root: %s",
->                      as->name, memory_region_name(as->root));
->          if (as->root->alias) {
-> @@ -3062,6 +3075,27 @@ static void mtree_print_flatview(gpointer key, gpo=
-inter value,
->                          range->readonly ? "rom" : memory_region_type(mr),
->                          memory_region_name(mr));
->          }
-> +#ifdef CONFIG_FUZZ
-> +        if(strcmp("i/o", memory_region_type(mr))=3D=3D0 && strcmp("io", =
-memory_region_name(mr))){
-> +            fuzz_memory_region *fmr =3D g_new0(fuzz_memory_region, 1);
-> +            if(!fuzz_memory_region_head)
-> +            {
-> +                fuzz_memory_region_head =3D fmr;
-> +                fuzz_memory_region_tail =3D fmr;
-> +            }
-> +            fmr->io =3D io;
-> +            fmr->start =3D int128_get64(range->addr.start);
-> +            fmr->length =3D MR_SIZE(range->addr.size);
-> +            fmr->next =3D fuzz_memory_region_head;
-> +            fuzz_memory_region_tail->next =3D fmr;
-> +            fuzz_memory_region_tail =3D fmr;
-> +            if(io =3D=3D true){
-> +                total_io_mem +=3D MR_SIZE(range->addr.size)+1;
-> +            } else {
-> +                total_ram_mem +=3D MR_SIZE(range->addr.size)+1;
-> +            }
-> +        }
-> +#endif
+> Also, when VIRTIO_NET_F_MQ is enabled, the number of queues is 2*N + 1,
+> so I think in that case n->n_queues is also short by one in the code
+> below.
 
-Why is this patch modifying a print function?  I think the goal is to
-build the fuzz_memory_region list and calculate
-total_io_mem/total_ram_mem.  This should be done by a separate function.
+I think the patch could be changed to:
 
-Can you use memory_region_is_ram() instead of the string compares?
+> > [Only responding because this landed in tests/libqos, which I do try
+> > to
+> > keep an eye on, but this patch is opaque to me. --js]
+> >=20
+> > > ---
+> > >  tests/libqos/virtio-net.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/tests/libqos/virtio-net.c b/tests/libqos/virtio-net.c
+> > > index 66405b646e..247a0a17a8 100644
+> > > --- a/tests/libqos/virtio-net.c
+> > > +++ b/tests/libqos/virtio-net.c
+> > > @@ -51,7 +51,7 @@ static void virtio_net_setup(QVirtioNet
+> > > *interface)
+> > >      if (features & (1u << VIRTIO_NET_F_MQ)) {
+> > >          interface->n_queues =3D qvirtio_config_readw(vdev, 8) * 2;
+> > >      } else {
+> > > -        interface->n_queues =3D 2;
+> > > +        interface->n_queues =3D 3;
+> > >      }
 
-Stefan
+interface->n_queues++; /* ctrl vq */
 
---FwyhczKCDPOVeYh6
+And a comment added to the QVirtQueue::n_queues field definition:
+
+  /* total number of virtqueues (rx, tx, ctrl) */
+
+This will prevent confusion about whether the ctrl queue is counted or
+not.
+
+--nOM8ykUjac0mNN89
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl06+k4ACgkQnKSrs4Gr
-c8iaJAgAhxAHw2esg4sjB6CZoGlaTMmiCHe4vdw44HXUNuFsrgQUfbBHfgqnOIPO
-BIPJWh85npVTpGn4SaYsoWecybIFwzUt6DQtq3OKi6mTKTpQeNVlqr8aFOOcTbL8
-PraMavegcwg5qVd3mi9eLa0i/FpvCHOS1YaTR7BFoZYmPeRVzeF320WecopS9ScG
-IsdJb07G/HVLqUfNTzS2JUiORUq5+lGiGX5Xb/SLuvRES4de11qIzACDl600g94n
-6aG1giZVPaxLuZX1eygQoCupiPjzMU2Guxr4cLy3a/+zh0HPDYfP9nwHk3BoVSKt
-Zg6M4Yvepwt8h4hJdJOpDS+5EwwpMA==
-=SKw9
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl06+3MACgkQnKSrs4Gr
+c8j5nAgAo3aN3gdWaKUXOfbi90RvYuuh7QvbgpZhb3ToTnPUIPNidAFcMk3JnPv8
+zW6j8oAKeVt5n/PPQoyPg8r6nwweYjEhL25cqrURkIz6AqaIdft+KeeL62KdsO3C
+l/IMLuup0WK8MYm1aT7PUc0b2gBq+Nl5Inl+COa/JUiYw2A1lY/Hb/H2DwPe5U6Q
+B7v36AdjgCBmlEHJG/K6sASqm3uU0ByOJdQv0zgUxIehR+9a1uPbt0GkN3xBTsAx
+/b7bdhV/nEINRdhxVpEg5rKRMUe49YMGEql+snCuEDTS5CopBQuWhqlcvF55bUzq
+tkB2swwpyKw82UgVBOa5Kv/AQZh4hA==
+=iL8y
 -----END PGP SIGNATURE-----
 
---FwyhczKCDPOVeYh6--
+--nOM8ykUjac0mNN89--
 
