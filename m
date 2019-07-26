@@ -2,63 +2,83 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DATE_IN_PAST_24_48,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32913C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDCFC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF7D4206BF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:31:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 665E52189F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:37:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WLpnDttT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7D4206BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bSVFyeFz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 665E52189F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hquh2-0005d4-PD
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 03:31:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37589)
+	id 1hqunP-00007A-LZ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 03:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48981)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hqufa-0000dI-R4
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:29:40 -0400
+ (envelope-from <laurent.desnogues@gmail.com>) id 1hqunC-0008AI-Ub
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hqufX-00052T-1Q
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:29:36 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:58407)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hqufV-0004YO-ML; Fri, 26 Jul 2019 03:29:34 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45w11J2VR1z9sLt; Fri, 26 Jul 2019 17:29:24 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1564126164;
- bh=nfZJi7O1wINOim8jTSMpkpYki+r5BOAXW1ykalUgiN4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=WLpnDttT/fRPANG+91uGagM+fha55+g+p6btDQIHVoDjL0X6Ec4/vg2RYwMR9db4J
- 5JpnBleaHP7SghqWTwQzIxbSLTixJJz+dv30opi1tUnJVZ28EcWbWQhuwZE1L6ZsL2
- ZGrvvaJXIqWRWE1CbaYE6y0DPRDtluSM2+P21uI8=
-Date: Thu, 25 Jul 2019 13:34:44 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-Message-ID: <20190725033444.GD28601@umbus>
-References: <156397239821.79647.2790800099666109879.stgit@lep8c.aus.stglabs.ibm.com>
+ (envelope-from <laurent.desnogues@gmail.com>) id 1hqun6-0003Kz-VE
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:37:26 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:44771)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+ id 1hqun2-0002w9-IQ; Fri, 26 Jul 2019 03:37:20 -0400
+Received: by mail-io1-xd44.google.com with SMTP id s7so102751766iob.11;
+ Fri, 26 Jul 2019 00:37:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=j8K0Ad6jbY/ZDFZrzoCMpFV+gdACtgN/1HWWCc6ETVY=;
+ b=bSVFyeFzQYV13GWYYaQpZq4BDCTL1+tx7RO2FE1uu9zKCIPq6azEEo9mCBbP9p5Yaj
+ h5DNBxg6CU9t2HouoST309KkCxEStXyEmepSIij7hyT3IwM90wOcaqzH70aIYWPOrHAF
+ Ikc5yNfhJt5YcXKhHTPjtTlCtshSuk5lxjqTwooogbcnUYsrDTIncVy1US4Z4n9sgkx/
+ +MpLs6NDMJtdm1CF3MijBTfmtTz1WhUhyh6V0nR2uiUCG7iilXfOnXyhMjIcUNav45a2
+ a4wruIEz3RNgRrLm93uazeEN6RKNgC68mCSFsZJCp7GsLo4+RDiewNjGpg/PisASMRUi
+ rbWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=j8K0Ad6jbY/ZDFZrzoCMpFV+gdACtgN/1HWWCc6ETVY=;
+ b=Ekw4DW0C2E8vm45wIRrxkrC9IQ955VtMaJj+vNJWcVtGS4sPOPCUlgJhkiecnIJ4mP
+ yBDLdMdax4tBKhcig6iraQXQvgY/MT+5sT4D6WaiqQJJCYzLOOEqpeE8uFDLGLaTohbI
+ 1wno0+N1BhxoHyCiI3w4UlE5OoKQZ6j6Dxr6kj13Z4H7iEFMFRe3Krt56GSD5TrTWGbl
+ /slT+ZPebXw90ZXK6ELC/+bChzQtrMPz/rDZSL2fMQPR7x6o0PufIbxTPK3EVjjOREQc
+ ZA1yyJl41/VfOHlxvXirE4LnjqP/y7C5zUo25Dm+w+/7l7M1UExHlBBxbwdTkUziPKbI
+ XWMA==
+X-Gm-Message-State: APjAAAWvom0JGU9bh9CqKJpyWUrjzAlAeuP+Lq0AkSZKs4cWcsA7cUAo
+ H09RAtgHMmnbq8mFvwKyWC/D1YEENPtmzHf9bns=
+X-Google-Smtp-Source: APXvYqz/SkKYw/Q4g5ptbO+K6Nh4Xruww9CvBsp4U3opBWQyi+ng59gPpHAIL603zYoUCO6xwFFa8elchpH9AzQJdg0=
+X-Received: by 2002:a5d:9752:: with SMTP id c18mr16658845ioo.22.1564126635250; 
+ Fri, 26 Jul 2019 00:37:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="oj4kGyHlBMXGt3Le"
-Content-Disposition: inline
-In-Reply-To: <156397239821.79647.2790800099666109879.stgit@lep8c.aus.stglabs.ibm.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+References: <20190723113301.16867-1-alex.bennee@linaro.org>
+ <CAFEAcA9CP0cUkDR4qOKVgM1b2U1KNot=A-5OPEAOKu3=KpMyuw@mail.gmail.com>
+ <8736iti7hn.fsf@linaro.org>
+In-Reply-To: <8736iti7hn.fsf@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Fri, 26 Jul 2019 09:37:02 +0200
+Message-ID: <CABoDooPYw5JccST8f9gVSmtA8ijeqmaVrqoDcqucbbctt5QvyA@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v6] ppc: remove idle_timer logic
+X-Received-From: 2607:f8b0:4864:20::d44
+Subject: Re: [Qemu-devel] [PATCH for 4.2] target/arm: generate a custom MIDR
+ for -cpu max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,206 +90,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Jul 26, 2019 at 9:24 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+> > On Tue, 23 Jul 2019 at 12:33, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+[...]
+> >  /*
+> >   * Reset MIDR so the guest doesn't mistake our 'max' CPU type for a re=
+al
+> >   * one and try to apply errata workarounds or use impdef features we
+> >   * don't provide.
+> >   * An IMPLEMENTER field of 0 means "reserved for software use";
+> >   * ARCHITECTURE must be 0xf indicating "v7 or later, check ID register=
+s
+> >   * to see which features are present";
+> >   * the VARIANT, PARTNUM and REVISION fields are all implementation
+> >   * defined and we choose to leave them all at zero.
+> >   */
+> >
+> > It's also a bit inconsistent to do an explicit deposit of 0
+> > for the IMPLEMENTER field but not for the VARIANT/PARTNUM/REVISION.
+> >
+> > I wonder if we should put 0x51 (ascii 'Q') in the PARTNUM field;
+> > then if somebody really needs to distinguish QEMU from random
+> > other software-models they have a way to do it.
+>
+> Q is reserved for Qualcomm - It would be nice if ARM could assign QEMU a
+> code but I suspect that's not part of the business model.
 
---oj4kGyHlBMXGt3Le
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+That was my reaction at first too, but that Q is reserved for the
+Implementer field, while Peter is proposing to put it in the PartNum
+field :-)
 
-On Wed, Jul 24, 2019 at 07:47:45AM -0500, Shivaprasad G Bhat wrote:
-> The KVM_CAP_PPC_IRQ_LEVEL is part of the kernel now since 2.6.37.
-> Drop the redundant logic which is not excercised on new the kernels anymo=
-re.
-> Exit with error on older kernels.
->=20
-> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-
-Applied, although..
-
-> ---
->  v5: https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05301.html
->  Changes from v5:
->    - exit with error if KVM_CAP_PPC_IRQ_LEVEL is not there.
->=20
->  target/ppc/kvm.c |   75 ++++--------------------------------------------=
-------
->  1 file changed, 5 insertions(+), 70 deletions(-)
->=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 8a06d3171e..4a3f36f0d5 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -56,7 +56,6 @@ const KVMCapabilityInfo kvm_arch_required_capabilities[=
-] =3D {
->  };
-> =20
->  static int cap_interrupt_unset;
-> -static int cap_interrupt_level;
->  static int cap_segstate;
->  static int cap_booke_sregs;
->  static int cap_ppc_smt;
-> @@ -87,25 +86,6 @@ static int cap_large_decr;
-> =20
->  static uint32_t debug_inst_opcode;
-> =20
-> -/*
-> - * XXX We have a race condition where we actually have a level triggered
-> - *     interrupt, but the infrastructure can't expose that yet, so the g=
-uest
-> - *     takes but ignores it, goes to sleep and never gets notified that =
-there's
-> - *     still an interrupt pending.
-> - *
-> - *     As a quick workaround, let's just wake up again 20 ms after we in=
-jected
-> - *     an interrupt. That way we can assure that we're always reinjecting
-> - *     interrupts in case the guest swallowed them.
-> - */
-> -static QEMUTimer *idle_timer;
-> -
-> -static void kvm_kick_cpu(void *opaque)
-> -{
-> -    PowerPCCPU *cpu =3D opaque;
-> -
-> -    qemu_cpu_kick(CPU(cpu));
-> -}
-> -
->  /*
->   * Check whether we are running with KVM-PR (instead of KVM-HV).  This
->   * should only be used for fallback tests - generally we should use
-> @@ -125,7 +105,6 @@ static int kvmppc_get_dec_bits(void);
->  int kvm_arch_init(MachineState *ms, KVMState *s)
->  {
->      cap_interrupt_unset =3D kvm_check_extension(s, KVM_CAP_PPC_UNSET_IRQ=
-);
-> -    cap_interrupt_level =3D kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL=
-);
->      cap_segstate =3D kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
->      cap_booke_sregs =3D kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
->      cap_ppc_smt_possible =3D kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_P=
-OSSIBLE);
-> @@ -161,9 +140,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->       */
->      cap_ppc_pvr_compat =3D false;
-> =20
-> -    if (!cap_interrupt_level) {
-> -        fprintf(stderr, "KVM: Couldn't find level irq capability. Expect=
- the "
-> -                        "VM to stall at times!\n");
-> +    if (!kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL)) {
-> +        fprintf(stderr, "KVM: Host kernel doesn't have level irq capabil=
-ity\n");
-
-
-=2E. I've changed this to an error_report() instead of a raw fprintf.
-
-> +        exit(1);
->      }
-> =20
->      kvm_ppc_register_host_cpu_type(ms);
-> @@ -491,8 +470,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
->          return ret;
->      }
-> =20
-> -    idle_timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, kvm_kick_cpu, cpu);
-> -
->      switch (cenv->mmu_model) {
->      case POWERPC_MMU_BOOKE206:
->          /* This target supports access to KVM's guest TLB */
-> @@ -1332,7 +1309,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, =
-int level)
->          return 0;
->      }
-> =20
-> -    if (!kvm_enabled() || !cap_interrupt_unset || !cap_interrupt_level) {
-> +    if (!kvm_enabled() || !cap_interrupt_unset) {
->          return 0;
->      }
-> =20
-> @@ -1349,49 +1326,7 @@ int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq,=
- int level)
-> =20
->  void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
->  {
-> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -    CPUPPCState *env =3D &cpu->env;
-> -    int r;
-> -    unsigned irq;
-> -
-> -    qemu_mutex_lock_iothread();
-> -
-> -    /*
-> -     * PowerPC QEMU tracks the various core input pins (interrupt,
-> -     * critical interrupt, reset, etc) in PPC-specific
-> -     * env->irq_input_state.
-> -     */
-> -    if (!cap_interrupt_level &&
-> -        run->ready_for_interrupt_injection &&
-> -        (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-> -        (env->irq_input_state & (1 << PPC_INPUT_INT)))
-> -    {
-> -        /*
-> -         * For now KVM disregards the 'irq' argument. However, in the
-> -         * future KVM could cache it in-kernel to avoid a heavyweight
-> -         * exit when reading the UIC.
-> -         */
-> -        irq =3D KVM_INTERRUPT_SET;
-> -
-> -        trace_kvm_injected_interrupt(irq);
-> -        r =3D kvm_vcpu_ioctl(cs, KVM_INTERRUPT, &irq);
-> -        if (r < 0) {
-> -            printf("cpu %d fail inject %x\n", cs->cpu_index, irq);
-> -        }
-> -
-> -        /* Always wake up soon in case the interrupt was level based */
-> -        timer_mod(idle_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
-> -                       (NANOSECONDS_PER_SECOND / 50));
-> -    }
-> -
-> -    /*
-> -     * We don't know if there are more interrupts pending after
-> -     * this. However, the guest will return to userspace in the course
-> -     * of handling this one anyways, so we will get a chance to
-> -     * deliver the rest.
-> -     */
-> -
-> -    qemu_mutex_unlock_iothread();
-> +    return;
->  }
-> =20
->  MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---oj4kGyHlBMXGt3Le
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl05I1QACgkQbDjKyiDZ
-s5Kygg//XtSQpTBDAQm3ZVBzoIvNantn4Q+0zUd81fPIGJo1ILN5cBn1frOg4s91
-CA1KtJrmtuwmDsxU+QF1E6cFtULnZu8wPN82IHHm6KjiVsGVW24uuEJalvZtxoKq
-kTS5vldbKx6KSpJq3b5G+ORwwx5BHJLcw+y31KD+8W6/ZFAHDCSmRfFQhrP7v6pq
-GLxPcHaRzkE1Noz+b1rX76RY45xRhrxGaS+Fw+odNw0C3dtviYmw4OhzEY16uUN4
-+H4aNjoUB9De7m8gFn3kFimO5EiqvmKSABpkFlnz7TFKB35/x5ID/BrcfxW6I2gI
-jsmOJIIrLK1k6bfzqzbGiBCXxbmnNW6yjaMkrJbllyaiqjYRn8mZRfLTggWUqUMB
-fZbHU+Vr/e5WTNfnpMmGPtISM/Zz9iI5U+N2EWvQLEA2lOnhSYSZ74I0WCtn+FYz
-MWjgybieEHkG5Cg9MOafBfEXMkQ6TKeodpXj2Noy0GN96vCJRErhAQCIDKwskoIe
-KnDQV9dd9kfD98vjXBMf2xcSHK6V6I0HnVr8S3M7K8qXbqvDXOEMQx6wky99UFTb
-+mcEIYXleO0u2DBk+3R4+4fSiQC6DOr+Xltt3+fMKR281/LexS8/OACA/HdCBWbo
-fBt9IPrUAx8udo/Y6UU12wXTuygQdePu31nKrp5HlIotNL3ZnTU=
-=/3/B
------END PGP SIGNATURE-----
-
---oj4kGyHlBMXGt3Le--
+Laurent
 
