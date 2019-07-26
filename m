@@ -5,80 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E16C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FAAC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:54:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 393C620869
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:52:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 751D520869
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:54:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1Dktue4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393C620869
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TsQyRSfW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 751D520869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr3SE-0005XW-IX
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 12:52:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34969)
+	id 1hr3Tu-0006oc-O3
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 12:54:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36948)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hr3Rv-0004uU-9n
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:52:11 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hr3Te-0006Jd-34
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hr3Rq-0002Tq-Pr
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:52:07 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:36768)
+ (envelope-from <alistair23@gmail.com>) id 1hr3TY-0006on-W7
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:53:54 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:36958)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hr3Rm-0002NF-Ps
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:52:00 -0400
-Received: by mail-lj1-x243.google.com with SMTP id i21so52136245ljj.3
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 09:51:55 -0700 (PDT)
+ id 1hr3TV-0006ew-6E
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:53:47 -0400
+Received: by mail-lj1-x241.google.com with SMTP id z28so52201676ljn.4
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 09:53:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=/JnsYTAShxoRtNJwu5f4Ef0AxUuO2mpBSQi2Akzu09E=;
- b=U1Dktue438olO/8iWT2jT2I+Lf77UTBZzxoo2Lw4G6ORxFaL9KE11tZAqpo0GwArFt
- CvVevRQFjJNkm/ft8kHBMkLC0Mfp/ezjaN46OwZugQbzZkrNcQL052RlY1B+yEDgu13i
- zkiTSu7e8SfwJ3U535Smw0fq11NN2qhUWqS2YExVj3agRqXKVuRprEBX3geHNPEOwtgi
- g0ktzSsD7EktlyRVR3FPhDD5fgsnP0XWYHcRwk4UkSS9kK0kn3xdVwZ4FmRyxjp9OQRb
- yOALDqPUXNvRt16duQkBGRRAVM3d1kyJmr8WhiBKWD1pz+xXjX2fcujlAzaWkQhpNDnW
- 3R4w==
+ :cc; bh=poRUGUdKbPHHetedQqVMjjDY9gAlGApLHZJ3Jq4OfcU=;
+ b=TsQyRSfW/S7fpGQkj8lgQ6jIU2e2QGiu3zNrXzsyJrOFdJaV4kl96WJTB4G6h6PxZ3
+ aLquQDd0SoN+PkoLmKN3CRsvl9PNX2CwJRZoamxCTK1opUjCBPrQd3TcoE/R3LNlcybu
+ nJMyOhvCDmVSo0NF58Zzsgb51S2h55SR/o9D5rRJpANIej979rit5CrYcOAP6O0UqCPh
+ Xu0dMH4jxSFdRHJUPrszA3//3Tc/3bWVjN4YG4d7p7i2pHDECB5HYoISnjarsqqaT6/d
+ 1ls7+X6f/zHETJKJkW834XnHh1fsY6HmXHAAS8srM9Iod/CvnqBlu3ELFZ1RdRIwDQ71
+ 9pTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=/JnsYTAShxoRtNJwu5f4Ef0AxUuO2mpBSQi2Akzu09E=;
- b=DBfl+1YVjcfkmHLxlWAHNN/YNEMs7tb6lhKlncgMeui57UkB8u45vF9dCOBvw/RVVm
- wg8vEErumwsoXaCu3GxymSko6Z+ZczvaR5g/XnaN8cJ2lWegQpk27IlagYGuWk63xM8a
- FM24ZR4/+NNoPVcyHsnlsIAEAO9xXmAP/Sf8JornhDwuXfuZBuA4j/DZ7n+1xM2rfPU9
- 9lWl4XtTsWBV0XUbsqvaQIxpXHilWzuGiHvjy+tJka2XJ/eUEuqyQoO0hBrrqd0j/4At
- LPEA7qEVrYaHigL/IYR97GTNQgfMBoi01Q01qvFO5FgHCg6BXMQnc6jOdRocDNmTUYmJ
- S6gg==
-X-Gm-Message-State: APjAAAWHzd10yAM+obB7VPiv4AvtE1rgSCLUOz3RIYEMVxTtD+h7CDt+
- 6EELPcQPoU65U4nBng/ySNJmUh+VuFHIHDPeT+o=
-X-Google-Smtp-Source: APXvYqzIvMaYlD8jAKTusctNOkJQ/EZwCIPaGDlTp7kPp03Ijw+Gn15QJh2XWbOpchFEgxOOPlbrYzjDwqiB5KQxdLM=
-X-Received: by 2002:a2e:86cc:: with SMTP id n12mr25480509ljj.146.1564159913459; 
- Fri, 26 Jul 2019 09:51:53 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=poRUGUdKbPHHetedQqVMjjDY9gAlGApLHZJ3Jq4OfcU=;
+ b=hoPPPSNaEW3mL4Q2czswEazGR9lAF8rfWl8Ft2MJX3I067ORPgNO40qRkMB7GNmMRq
+ zF3dLiEumOmcY9X1shAY9O3b3DxaX/8BYruXbmt7iVM1lOyrKchcVbR4yajguMLGml0j
+ 7pWBhEtVpRVOvW0rjz9l2P+6FfXZ7Q3VUYJgxzScPQM5HLhAPLMN1p1R414yGMYLWp1O
+ PN7WKkAmFOokNgUTXGnygv0/0RZZM7xlKGjvOA1HSVNmqeDGfv8eM+3k8PAB0x+DnCJy
+ vIf/JAYDCzVYOo0CetMCleg1q7ov1NzHPyRGNCdP8hTtQdjsG/q8obK4Uh75jcjpYRCZ
+ L7Hw==
+X-Gm-Message-State: APjAAAW9/akb+541NfDL+Pg0F74Ld44ZhUQf6JdhFE1LGUUGkmIN4tqC
+ d8mvEloLFBCHEBg+0wL1dcy4KcwhxlRpf7N9xzw=
+X-Google-Smtp-Source: APXvYqw3s9T4Kwdk+G/kTknV2KD7SqQfgJLppdpfTZPNdDL1kONLoVJxXEMj67kTs0+UnBHIsyr5IaoTRHZakYCUtyo=
+X-Received: by 2002:a2e:86cc:: with SMTP id n12mr25485655ljj.146.1564160022439; 
+ Fri, 26 Jul 2019 09:53:42 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-9-armbru@redhat.com>
- <f5b23902-0153-5f5b-e97c-250cfb29efc1@redhat.com>
-In-Reply-To: <f5b23902-0153-5f5b-e97c-250cfb29efc1@redhat.com>
+ <20190726120542.9894-2-armbru@redhat.com>
+In-Reply-To: <20190726120542.9894-2-armbru@redhat.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 26 Jul 2019 09:48:20 -0700
-Message-ID: <CAKmqyKMExDK0UL7iQHV0J9qJnDaPMsA7k1kDmzRoHzkUKYWF6w@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 26 Jul 2019 09:50:09 -0700
+Message-ID: <CAKmqyKM9dGygzv=gz5oZ_L9PR-AYWiinhD5N4JVo0UT7Esca-g@mail.gmail.com>
+To: Markus Armbruster <armbru@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH 08/28] Include sysemu/reset.h a lot less
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH 01/28] include: Make headers more
+ self-contained
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,1373 +89,1503 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 26, 2019 at 9:03 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
+On Fri, Jul 26, 2019 at 5:08 AM Markus Armbruster <armbru@redhat.com> wrote:
 >
-> On 7/26/19 2:05 PM, Markus Armbruster wrote:
-> > In my "build everything" tree, changing sysemu/reset.h triggers a
-> > recompile of some 2600 out of 6600 objects (not counting tests and
-> > objects that don't depend on qemu/osdep.h).
-> >
-> > The main culprit is hw/hw.h, which supposedly includes it for
-> > convenience.
-> >
-> > Include sysemu/reset.h only where it's needed.  Touching it now
-> > recompiles less than 200 objects.
-> >
-> > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Back in 2016, we discussed[1] rules for headers, and these were
+> generally liked:
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> 1. Have a carefully curated header that's included everywhere first.  We
+>    got that already thanks to Peter: osdep.h.
+>
+> 2. Headers should normally include everything they need beyond osdep.h.
+>    If exceptions are needed for some reason, they must be documented in
+>    the header.  If all that's needed from a header is typedefs, put
+>    those into qemu/typedefs.h instead of including the header.
+>
+> 3. Cyclic inclusion is forbidden.
+>
+> This patch gets include/ closer to obeying 2.
+>
+> It's actually extracted from my "[RFC] Baby steps towards saner
+> headers" series[2], which demonstrates a possible path towards
+> checking 2 automatically.  It passes the RFC test there.
+>
+> [1] Message-ID: <87h9g8j57d.fsf@blackfin.pond.sub.org>
+>     https://lists.nongnu.org/archive/html/qemu-devel/2016-03/msg03345.html
+> [2] Message-Id: <20190711122827.18970-1-armbru@redhat.com>
+>     https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg02715.html
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
+>  include/block/raw-aio.h               | 1 +
+>  include/block/write-threshold.h       | 1 +
+>  include/disas/disas.h                 | 1 +
+>  include/exec/cputlb.h                 | 2 ++
+>  include/exec/exec-all.h               | 1 +
+>  include/exec/ioport.h                 | 2 ++
+>  include/exec/memory-internal.h        | 2 ++
+>  include/exec/ram_addr.h               | 1 +
+>  include/exec/softmmu-semi.h           | 2 ++
+>  include/exec/tb-hash.h                | 2 ++
+>  include/exec/user/thunk.h             | 1 +
+>  include/fpu/softfloat-macros.h        | 2 ++
+>  include/hw/acpi/pci.h                 | 2 ++
+>  include/hw/acpi/tco.h                 | 2 ++
+>  include/hw/adc/stm32f2xx_adc.h        | 2 ++
+>  include/hw/arm/allwinner-a10.h        | 1 +
+>  include/hw/arm/aspeed_soc.h           | 1 +
+>  include/hw/arm/bcm2836.h              | 1 +
+>  include/hw/arm/exynos4210.h           | 2 +-
+>  include/hw/arm/fsl-imx25.h            | 1 +
+>  include/hw/arm/fsl-imx31.h            | 1 +
+>  include/hw/arm/sharpsl.h              | 2 ++
+>  include/hw/arm/xlnx-zynqmp.h          | 1 +
+>  include/hw/block/fdc.h                | 2 ++
+>  include/hw/block/flash.h              | 1 +
+>  include/hw/char/escc.h                | 1 +
+>  include/hw/char/xilinx_uartlite.h     | 2 ++
+>  include/hw/core/generic-loader.h      | 1 +
+>  include/hw/cris/etraxfs.h             | 1 +
+>  include/hw/cris/etraxfs_dma.h         | 3 +++
+>  include/hw/display/i2c-ddc.h          | 1 +
+>  include/hw/empty_slot.h               | 2 ++
+>  include/hw/gpio/bcm2835_gpio.h        | 1 +
+>  include/hw/i2c/aspeed_i2c.h           | 1 +
+>  include/hw/i386/apic_internal.h       | 1 +
+>  include/hw/i386/ioapic_internal.h     | 1 +
+>  include/hw/intc/allwinner-a10-pic.h   | 2 ++
+>  include/hw/intc/heathrow_pic.h        | 2 ++
+>  include/hw/intc/mips_gic.h            | 1 +
+>  include/hw/isa/vt82c686.h             | 2 ++
+>  include/hw/mips/cps.h                 | 1 +
+>  include/hw/misc/macio/cuda.h          | 2 ++
+>  include/hw/misc/macio/gpio.h          | 3 +++
+>  include/hw/misc/macio/macio.h         | 2 ++
+>  include/hw/misc/macio/pmu.h           | 3 +++
+>  include/hw/misc/mips_cmgcr.h          | 2 ++
+>  include/hw/misc/mips_cpc.h            | 2 ++
+>  include/hw/misc/pvpanic.h             | 2 ++
+>  include/hw/net/allwinner_emac.h       | 1 +
+>  include/hw/net/lance.h                | 1 +
+>  include/hw/nvram/chrp_nvram.h         | 2 ++
+>  include/hw/pci-host/sabre.h           | 2 ++
+>  include/hw/pci-host/uninorth.h        | 2 +-
+>  include/hw/pci/pcie_aer.h             | 1 +
+>  include/hw/ppc/pnv_core.h             | 1 +
+>  include/hw/ppc/ppc4xx.h               | 4 ++++
+>  include/hw/ppc/spapr_irq.h            | 3 +++
+>  include/hw/ppc/spapr_vio.h            | 1 +
+>  include/hw/ppc/spapr_xive.h           | 2 ++
+>  include/hw/ppc/xive_regs.h            | 3 +++
+>  include/hw/riscv/boot.h               | 2 ++
+>  include/hw/riscv/riscv_hart.h         | 3 +++
+>  include/hw/riscv/sifive_clint.h       | 2 ++
+>  include/hw/riscv/sifive_e.h           | 1 +
+>  include/hw/riscv/sifive_plic.h        | 2 +-
+>  include/hw/riscv/sifive_prci.h        | 2 ++
+>  include/hw/riscv/sifive_test.h        | 2 ++
+>  include/hw/riscv/sifive_u.h           | 1 +
+>  include/hw/riscv/sifive_uart.h        | 3 +++
+>  include/hw/riscv/spike.h              | 3 +++
+>  include/hw/riscv/virt.h               | 3 +++
+>  include/hw/s390x/ap-device.h          | 2 ++
+>  include/hw/s390x/css-bridge.h         | 3 ++-
+>  include/hw/s390x/css.h                | 1 +
+>  include/hw/s390x/tod.h                | 2 +-
+>  include/hw/semihosting/console.h      | 2 ++
+>  include/hw/sh4/sh_intc.h              | 1 +
+>  include/hw/sparc/sparc64.h            | 2 ++
+>  include/hw/ssi/aspeed_smc.h           | 1 +
+>  include/hw/ssi/xilinx_spips.h         | 1 +
+>  include/hw/timer/allwinner-a10-pit.h  | 1 +
+>  include/hw/timer/i8254_internal.h     | 1 +
+>  include/hw/timer/m48t59.h             | 2 ++
+>  include/hw/timer/mc146818rtc_regs.h   | 2 ++
+>  include/hw/timer/xlnx-zynqmp-rtc.h    | 1 +
+>  include/hw/virtio/virtio-access.h     | 1 +
+>  include/hw/virtio/virtio-gpu-bswap.h  | 1 +
+>  include/hw/virtio/virtio-rng.h        | 1 +
+>  include/hw/watchdog/wdt_aspeed.h      | 1 +
+>  include/libdecnumber/decNumberLocal.h | 1 +
+>  include/migration/cpu.h               | 2 ++
+>  include/monitor/hmp-target.h          | 2 ++
+>  include/qemu/atomic128.h              | 2 ++
+>  include/qemu/ratelimit.h              | 2 ++
+>  include/qemu/thread-win32.h           | 2 +-
+>  include/sysemu/balloon.h              | 1 +
+>  include/sysemu/cryptodev-vhost-user.h | 2 ++
+>  include/sysemu/hvf.h                  | 1 +
+>  include/sysemu/iothread.h             | 1 +
+>  include/sysemu/kvm_int.h              | 2 ++
+>  include/sysemu/memory_mapping.h       | 2 ++
+>  include/sysemu/xen-mapcache.h         | 2 ++
+>  include/ui/egl-helpers.h              | 3 +++
+>  include/ui/input.h                    | 1 +
+>  include/ui/spice-display.h            | 1 +
+>  target/hppa/cpu.h                     | 2 +-
+>  106 files changed, 171 insertions(+), 7 deletions(-)
 >
-> > ---
-> >  hw/acpi/ich9.c             | 2 ++
-> >  hw/acpi/piix4.c            | 2 ++
-> >  hw/acpi/vmgenid.c          | 1 +
-> >  hw/arm/armv7m.c            | 1 +
-> >  hw/arm/boot.c              | 1 +
-> >  hw/arm/nseries.c           | 1 +
-> >  hw/arm/omap1.c             | 1 +
-> >  hw/arm/omap2.c             | 1 +
-> >  hw/arm/virt-acpi-build.c   | 1 +
-> >  hw/char/parallel.c         | 1 +
-> >  hw/char/serial.c           | 1 +
-> >  hw/core/generic-loader.c   | 1 +
-> >  hw/core/loader.c           | 1 +
-> >  hw/cris/boot.c             | 1 +
-> >  hw/display/cirrus_vga.c    | 1 +
-> >  hw/display/ramfb.c         | 2 ++
-> >  hw/display/vga.c           | 2 ++
-> >  hw/hppa/machine.c          | 1 +
-> >  hw/i386/acpi-build.c       | 1 +
-> >  hw/i386/pc.c               | 1 +
-> >  hw/ide/cmd646.c            | 1 +
-> >  hw/ide/piix.c              | 1 +
-> >  hw/ide/sii3112.c           | 1 +
-> >  hw/ide/via.c               | 1 +
-> >  hw/input/lm832x.c          | 1 +
-> >  hw/input/pckbd.c           | 2 ++
-> >  hw/input/ps2.c             | 2 ++
-> >  hw/input/tsc2005.c         | 1 +
-> >  hw/input/tsc210x.c         | 1 +
-> >  hw/intc/mips_gic.c         | 1 +
-> >  hw/intc/pnv_xive.c         | 1 +
-> >  hw/intc/spapr_xive.c       | 1 +
-> >  hw/intc/xics.c             | 1 +
-> >  hw/intc/xive.c             | 1 +
-> >  hw/isa/piix4.c             | 1 +
-> >  hw/isa/vt82c686.c          | 1 +
-> >  hw/lm32/lm32_boards.c      | 1 +
-> >  hw/lm32/milkymist.c        | 1 +
-> >  hw/microblaze/boot.c       | 1 +
-> >  hw/mips/cps.c              | 1 +
-> >  hw/mips/mips_fulong2e.c    | 1 +
-> >  hw/mips/mips_jazz.c        | 1 +
-> >  hw/mips/mips_malta.c       | 1 +
-> >  hw/mips/mips_mipssim.c     | 2 ++
-> >  hw/mips/mips_r4k.c         | 2 ++
-> >  hw/misc/vmcoreinfo.c       | 1 +
-> >  hw/moxie/moxiesim.c        | 2 ++
-> >  hw/net/eepro100.c          | 1 +
-> >  hw/nios2/boot.c            | 1 +
-> >  hw/nvram/fw_cfg.c          | 1 +
-> >  hw/openrisc/openrisc_sim.c | 1 +
-> >  hw/pci-host/bonito.c       | 1 +
-> >  hw/pci-host/piix.c         | 1 +
-> >  hw/ppc/e500.c              | 1 +
-> >  hw/ppc/mac_newworld.c      | 1 +
-> >  hw/ppc/mac_oldworld.c      | 1 +
-> >  hw/ppc/pnv.c               | 1 +
-> >  hw/ppc/pnv_core.c          | 1 +
-> >  hw/ppc/pnv_psi.c           | 1 +
-> >  hw/ppc/ppc405_boards.c     | 2 ++
-> >  hw/ppc/ppc405_uc.c         | 2 ++
-> >  hw/ppc/ppc440_bamboo.c     | 1 +
-> >  hw/ppc/ppc440_uc.c         | 1 +
-> >  hw/ppc/ppc4xx_devs.c       | 2 ++
-> >  hw/ppc/ppc4xx_pci.c        | 1 +
-> >  hw/ppc/ppc_booke.c         | 2 ++
-> >  hw/ppc/prep.c              | 2 ++
-> >  hw/ppc/sam460ex.c          | 1 +
-> >  hw/ppc/spapr.c             | 1 +
-> >  hw/ppc/spapr_cpu_core.c    | 2 ++
-> >  hw/ppc/spapr_drc.c         | 1 +
-> >  hw/ppc/virtex_ml507.c      | 1 +
-> >  hw/riscv/riscv_hart.c      | 1 +
-> >  hw/s390x/ipl.c             | 1 +
-> >  hw/s390x/s390-virtio-ccw.c | 1 +
-> >  hw/sh4/r2d.c               | 1 +
-> >  hw/sparc/leon3.c           | 2 ++
-> >  hw/sparc/sun4m.c           | 2 ++
-> >  hw/sparc64/sparc64.c       | 1 +
-> >  hw/timer/etraxfs_timer.c   | 1 +
-> >  hw/timer/mc146818rtc.c     | 1 +
-> >  hw/tpm/tpm_ppi.c           | 1 -
-> >  hw/vfio/common.c           | 1 +
-> >  hw/watchdog/wdt_diag288.c  | 1 +
-> >  hw/xtensa/sim.c            | 1 +
-> >  hw/xtensa/xtfpga.c         | 1 +
-> >  include/hw/hw.h            | 1 -
-> >  target/i386/cpu.c          | 1 +
-> >  target/i386/hax-all.c      | 1 +
-> >  target/i386/kvm.c          | 1 +
-> >  target/s390x/cpu.c         | 1 +
-> >  vl.c                       | 1 +
-> >  92 files changed, 107 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-> > index e53dfe1ee3..b4d987c811 100644
-> > --- a/hw/acpi/ich9.c
-> > +++ b/hw/acpi/ich9.c
-> > @@ -23,6 +23,7 @@
-> >   * Contributions after 2012-01-13 are licensed under the terms of the
-> >   * GNU GPL, version 2 or (at your option) any later version.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "hw/hw.h"
-> >  #include "qapi/error.h"
-> > @@ -30,6 +31,7 @@
-> >  #include "hw/i386/pc.h"
-> >  #include "hw/pci/pci.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/acpi/acpi.h"
-> >  #include "hw/acpi/tco.h"
-> > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> > index ec4e186cec..a59e58d937 100644
-> > --- a/hw/acpi/piix4.c
-> > +++ b/hw/acpi/piix4.c
-> > @@ -18,6 +18,7 @@
-> >   * Contributions after 2012-01-13 are licensed under the terms of the
-> >   * GNU GPL, version 2 or (at your option) any later version.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/i386/pc.h"
-> > @@ -25,6 +26,7 @@
-> >  #include "hw/i2c/pm_smbus.h"
-> >  #include "hw/pci/pci.h"
-> >  #include "hw/acpi/acpi.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/range.h"
-> > diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> > index b891df375f..ed92ccc4b8 100644
-> > --- a/hw/acpi/vmgenid.c
-> > +++ b/hw/acpi/vmgenid.c
-> > @@ -18,6 +18,7 @@
-> >  #include "hw/acpi/aml-build.h"
-> >  #include "hw/acpi/vmgenid.h"
-> >  #include "hw/nvram/fw_cfg.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >
-> >  void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray =
-*guid,
-> > diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> > index b9efad6bac..4b2d8b6574 100644
-> > --- a/hw/arm/armv7m.c
-> > +++ b/hw/arm/armv7m.c
-> > @@ -16,6 +16,7 @@
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/module.h"
-> >  #include "exec/address-spaces.h"
-> > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> > index 1fb24fbef2..7123fba777 100644
-> > --- a/hw/arm/boot.c
-> > +++ b/hw/arm/boot.c
-> > @@ -18,6 +18,7 @@
-> >  #include "sysemu/kvm.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/numa.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> > diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-> > index 4a79f5c88b..3f3eca52e2 100644
-> > --- a/hw/arm/nseries.c
-> > +++ b/hw/arm/nseries.c
-> > @@ -23,6 +23,7 @@
-> >  #include "cpu.h"
-> >  #include "qemu/cutils.h"
-> >  #include "qemu/bswap.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/arm/omap.h"
-> >  #include "hw/arm/boot.h"
-> > diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-> > index 28fbe275a8..beaddaf11f 100644
-> > --- a/hw/arm/omap1.c
-> > +++ b/hw/arm/omap1.c
-> > @@ -29,6 +29,7 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/arm/soc_dma.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/range.h"
-> >  #include "hw/sysbus.h"
-> >  #include "qemu/cutils.h"
-> > diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-> > index 87ced7f3a2..7d4cac1f46 100644
-> > --- a/hw/arm/omap2.c
-> > +++ b/hw/arm/omap2.c
-> > @@ -23,6 +23,7 @@
-> >  #include "qapi/error.h"
-> >  #include "cpu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/arm/boot.h"
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index 0afb372769..ad54d65ea0 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -44,6 +44,7 @@
-> >  #include "hw/pci/pci.h"
-> >  #include "hw/arm/virt.h"
-> >  #include "sysemu/numa.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_arm.h"
-> >
-> >  #define ARM_SPI_BASE 32
-> > diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-> > index 1cd4c54a02..fed15dc548 100644
-> > --- a/hw/char/parallel.c
-> > +++ b/hw/char/parallel.c
-> > @@ -31,6 +31,7 @@
-> >  #include "chardev/char-fe.h"
-> >  #include "hw/isa/isa.h"
-> >  #include "hw/char/parallel.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "trace.h"
-> >
-> > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> > index 7c42a2abfc..a9e42f7d97 100644
-> > --- a/hw/char/serial.c
-> > +++ b/hw/char/serial.c
-> > @@ -28,6 +28,7 @@
-> >  #include "chardev/char-serial.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/error-report.h"
-> >  #include "trace.h"
-> >
-> > diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-> > index 79a493e577..579fe5ed32 100644
-> > --- a/hw/core/generic-loader.c
-> > +++ b/hw/core/generic-loader.c
-> > @@ -34,6 +34,7 @@
-> >  #include "qom/cpu.h"
-> >  #include "hw/sysbus.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/loader.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/module.h"
-> > diff --git a/hw/core/loader.c b/hw/core/loader.c
-> > index 425bf69a99..830845dd73 100644
-> > --- a/hw/core/loader.c
-> > +++ b/hw/core/loader.c
-> > @@ -48,6 +48,7 @@
-> >  #include "hw/hw.h"
-> >  #include "disas/disas.h"
-> >  #include "monitor/monitor.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "uboot_image.h"
-> >  #include "hw/loader.h"
-> > diff --git a/hw/cris/boot.c b/hw/cris/boot.c
-> > index 602f538ef6..d44fdec43f 100644
-> > --- a/hw/cris/boot.c
-> > +++ b/hw/cris/boot.c
-> > @@ -29,6 +29,7 @@
-> >  #include "elf.h"
-> >  #include "boot.h"
-> >  #include "qemu/cutils.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  static void main_cpu_reset(void *opaque)
-> >  {
-> > diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-> > index 2e4911a1e3..4ccf5b4f18 100644
-> > --- a/hw/display/cirrus_vga.c
-> > +++ b/hw/display/cirrus_vga.c
-> > @@ -35,6 +35,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/module.h"
-> >  #include "qemu/units.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qapi/error.h"
-> >  #include "trace.h"
-> >  #include "hw/hw.h"
-> > diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-> > index b4eb283ef8..6026a35b11 100644
-> > --- a/hw/display/ramfb.c
-> > +++ b/hw/display/ramfb.c
-> > @@ -10,12 +10,14 @@
-> >   * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> >   * See the COPYING file in the top-level directory.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/option.h"
-> >  #include "hw/loader.h"
-> >  #include "hw/display/ramfb.h"
-> >  #include "ui/console.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >
-> >  struct QEMU_PACKED RAMFBCfg {
-> > diff --git a/hw/display/vga.c b/hw/display/vga.c
-> > index 910a23c12e..4d3572891a 100644
-> > --- a/hw/display/vga.c
-> > +++ b/hw/display/vga.c
-> > @@ -21,8 +21,10 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qapi/error.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/display/vga.h"
-> > diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-> > index 662838d83b..bc74438496 100644
-> > --- a/hw/hppa/machine.c
-> > +++ b/hw/hppa/machine.c
-> > @@ -11,6 +11,7 @@
-> >  #include "hw/loader.h"
-> >  #include "hw/boards.h"
-> >  #include "qemu/error-report.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/timer/mc146818rtc.h"
-> >  #include "hw/ide.h"
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index d281ffa89e..53a41ace46 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -48,6 +48,7 @@
-> >  #include "hw/timer/mc146818rtc_regs.h"
-> >  #include "hw/mem/memory-device.h"
-> >  #include "sysemu/numa.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  /* Supported chipsets: */
-> >  #include "hw/acpi/piix4.h"
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 549c437050..73b55500b0 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -54,6 +54,7 @@
-> >  #include "sysemu/numa.h"
-> >  #include "sysemu/kvm.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_i386.h"
-> >  #include "hw/xen/xen.h"
-> >  #include "hw/xen/start_info.h"
-> > diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
-> > index ed23aabf21..e5542c9811 100644
-> > --- a/hw/ide/cmd646.c
-> > +++ b/hw/ide/cmd646.c
-> > @@ -30,6 +30,7 @@
-> >  #include "hw/isa/isa.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  #include "hw/ide/pci.h"
-> >  #include "trace.h"
-> > diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-> > index b97e555072..c4c6d4b760 100644
-> > --- a/hw/ide/piix.c
-> > +++ b/hw/ide/piix.c
-> > @@ -31,6 +31,7 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/blockdev.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  #include "hw/ide/pci.h"
-> >  #include "trace.h"
-> > diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-> > index d7590d4ba4..2181260531 100644
-> > --- a/hw/ide/sii3112.c
-> > +++ b/hw/ide/sii3112.c
-> > @@ -15,6 +15,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "hw/ide/pci.h"
-> >  #include "qemu/module.h"
-> > +#include "sysemu/reset.h"
-> >  #include "trace.h"
-> >
-> >  #define TYPE_SII3112_PCI "sii3112"
-> > diff --git a/hw/ide/via.c b/hw/ide/via.c
-> > index c3bda909f9..6d54ac55f0 100644
-> > --- a/hw/ide/via.c
-> > +++ b/hw/ide/via.c
-> > @@ -30,6 +30,7 @@
-> >  #include "qemu/module.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  #include "hw/ide/pci.h"
-> >  #include "trace.h"
-> > diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
-> > index 5203da2bcf..ebb72c6590 100644
-> > --- a/hw/input/lm832x.c
-> > +++ b/hw/input/lm832x.c
-> > @@ -23,6 +23,7 @@
-> >  #include "hw/i2c/i2c.h"
-> >  #include "qemu/module.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "ui/console.h"
-> >
-> >  #define TYPE_LM8323 "lm8323"
-> > diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-> > index 47a606f5e3..5d06a53362 100644
-> > --- a/hw/input/pckbd.c
-> > +++ b/hw/input/pckbd.c
-> > @@ -21,6 +21,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/log.h"
-> >  #include "hw/hw.h"
-> > @@ -28,6 +29,7 @@
-> >  #include "hw/i386/pc.h"
-> >  #include "hw/input/ps2.h"
-> >  #include "hw/input/i8042.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >
-> >  #include "trace.h"
-> > diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-> > index d3161f1e7c..8d922b05c9 100644
-> > --- a/hw/input/ps2.c
-> > +++ b/hw/input/ps2.c
-> > @@ -21,12 +21,14 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/log.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/input/ps2.h"
-> >  #include "ui/console.h"
-> >  #include "ui/input.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >
-> >  #include "trace.h"
-> > diff --git a/hw/input/tsc2005.c b/hw/input/tsc2005.c
-> > index f82771e7a7..0a0431744c 100644
-> > --- a/hw/input/tsc2005.c
-> > +++ b/hw/input/tsc2005.c
-> > @@ -22,6 +22,7 @@
-> >  #include "qemu/log.h"
-> >  #include "hw/hw.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "ui/console.h"
-> >  #include "hw/input/tsc2xxx.h"
-> >  #include "trace.h"
-> > diff --git a/hw/input/tsc210x.c b/hw/input/tsc210x.c
-> > index f94cb4683b..d2486f4b4e 100644
-> > --- a/hw/input/tsc210x.c
-> > +++ b/hw/input/tsc210x.c
-> > @@ -23,6 +23,7 @@
-> >  #include "hw/hw.h"
-> >  #include "audio/audio.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "ui/console.h"
-> >  #include "hw/arm/omap.h"            /* For I2SCodec */
-> >  #include "hw/input/tsc2xxx.h"
-> > diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
-> > index 33ab51c5b8..e27e333766 100644
-> > --- a/hw/intc/mips_gic.c
-> > +++ b/hw/intc/mips_gic.c
-> > @@ -18,6 +18,7 @@
-> >  #include "exec/memory.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_mips.h"
-> >  #include "hw/intc/mips_gic.h"
-> >
-> > diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> > index 4dc92ef1e3..63b0f461ec 100644
-> > --- a/hw/intc/pnv_xive.c
-> > +++ b/hw/intc/pnv_xive.c
-> > @@ -14,6 +14,7 @@
-> >  #include "target/ppc/cpu.h"
-> >  #include "sysemu/cpus.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >  #include "monitor/monitor.h"
-> >  #include "hw/ppc/fdt.h"
-> >  #include "hw/ppc/pnv.h"
-> > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> > index 3ae311d9ff..2e39cc1e47 100644
-> > --- a/hw/intc/spapr_xive.c
-> > +++ b/hw/intc/spapr_xive.c
-> > @@ -14,6 +14,7 @@
-> >  #include "qemu/error-report.h"
-> >  #include "target/ppc/cpu.h"
-> >  #include "sysemu/cpus.h"
-> > +#include "sysemu/reset.h"
-> >  #include "monitor/monitor.h"
-> >  #include "hw/ppc/fdt.h"
-> >  #include "hw/ppc/spapr.h"
-> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > index faa976e2f8..9ed224ce5f 100644
-> > --- a/hw/intc/xics.c
-> > +++ b/hw/intc/xics.c
-> > @@ -38,6 +38,7 @@
-> >  #include "monitor/monitor.h"
-> >  #include "hw/intc/intc.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  void icp_pic_print_info(ICPState *icp, Monitor *mon)
-> >  {
-> > diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> > index cf77bdb7d3..b27d6b8646 100644
-> > --- a/hw/intc/xive.c
-> > +++ b/hw/intc/xive.c
-> > @@ -14,6 +14,7 @@
-> >  #include "target/ppc/cpu.h"
-> >  #include "sysemu/cpus.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/qdev-properties.h"
-> >  #include "monitor/monitor.h"
-> >  #include "hw/ppc/xive.h"
-> > diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-> > index 6b8bc3faf0..3677976ef7 100644
-> > --- a/hw/isa/piix4.c
-> > +++ b/hw/isa/piix4.c
-> > @@ -28,6 +28,7 @@
-> >  #include "hw/pci/pci.h"
-> >  #include "hw/isa/isa.h"
-> >  #include "hw/sysbus.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  PCIDevice *piix4_dev;
-> >
-> > diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-> > index 12c460590f..81bffb1fb9 100644
-> > --- a/hw/isa/vt82c686.c
-> > +++ b/hw/isa/vt82c686.c
-> > @@ -22,6 +22,7 @@
-> >  #include "hw/isa/apm.h"
-> >  #include "hw/acpi/acpi.h"
-> >  #include "hw/i2c/pm_smbus.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/module.h"
-> >  #include "qemu/timer.h"
-> > diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-> > index fb9d52d54f..e075ebc8a6 100644
-> > --- a/hw/lm32/lm32_boards.c
-> > +++ b/hw/lm32/lm32_boards.c
-> > @@ -30,6 +30,7 @@
-> >  #include "lm32_hwsetup.h"
-> >  #include "lm32.h"
-> >  #include "exec/address-spaces.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >
-> >  typedef struct {
-> > diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-> > index 689e633199..33669ee19b 100644
-> > --- a/hw/lm32/milkymist.c
-> > +++ b/hw/lm32/milkymist.c
-> > @@ -27,6 +27,7 @@
-> >  #include "hw/block/flash.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> > diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-> > index a7af4c0704..bade4d22c0 100644
-> > --- a/hw/microblaze/boot.c
-> > +++ b/hw/microblaze/boot.c
-> > @@ -31,6 +31,7 @@
-> >  #include "qemu/config-file.h"
-> >  #include "qemu/error-report.h"
-> >  #include "sysemu/device_tree.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> > diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-> > index 0d459c4141..aea6bcd7fe 100644
-> > --- a/hw/mips/cps.c
-> > +++ b/hw/mips/cps.c
-> > @@ -24,6 +24,7 @@
-> >  #include "hw/mips/mips.h"
-> >  #include "hw/mips/cpudevs.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  qemu_irq get_cps_irq(MIPSCPSState *s, int pin_number)
-> >  {
-> > diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-> > index 5dbaa3bfcc..0a1bf5ef5c 100644
-> > --- a/hw/mips/mips_fulong2e.c
-> > +++ b/hw/mips/mips_fulong2e.c
-> > @@ -44,6 +44,7 @@
-> >  #include "hw/timer/i8254.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/error-report.h"
-> >
-> >  #define DEBUG_FULONG2E_INIT
-> > diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-> > index fa8775d428..6ea25cd5f4 100644
-> > --- a/hw/mips/mips_jazz.c
-> > +++ b/hw/mips/mips_jazz.c
-> > @@ -48,6 +48,7 @@
-> >  #include "hw/sysbus.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/help_option.h"
-> > diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-> > index 20e019bf66..29bc8de5cf 100644
-> > --- a/hw/mips/mips_malta.c
-> > +++ b/hw/mips/mips_malta.c
-> > @@ -51,6 +51,7 @@
-> >  #include "hw/sysbus.h"             /* SysBusDevice */
-> >  #include "qemu/host-utils.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/error-report.h"
-> >  #include "hw/empty_slot.h"
-> > diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> > index 824abda657..280e76a482 100644
-> > --- a/hw/mips/mips_mipssim.c
-> > +++ b/hw/mips/mips_mipssim.c
-> > @@ -24,6 +24,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu-common.h"
-> > @@ -43,6 +44,7 @@
-> >  #include "exec/address-spaces.h"
-> >  #include "qemu/error-report.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  static struct _loaderparams {
-> >      int ram_size;
-> > diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-> > index 93dbf76bb4..191047826d 100644
-> > --- a/hw/mips/mips_r4k.c
-> > +++ b/hw/mips/mips_r4k.c
-> > @@ -7,6 +7,7 @@
-> >   * All peripherial devices are attached to this "bus" with
-> >   * the standard PC ISA addresses.
-> >  */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> >  #include "qapi/error.h"
-> > @@ -33,6 +34,7 @@
-> >  #include "hw/timer/i8254.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/error-report.h"
-> >
-> >  #define MAX_IDE_BUS 2
-> > diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
-> > index 987d6f52af..49e87d462b 100644
-> > --- a/hw/misc/vmcoreinfo.c
-> > +++ b/hw/misc/vmcoreinfo.c
-> > @@ -13,6 +13,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/module.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/nvram/fw_cfg.h"
-> >  #include "hw/misc/vmcoreinfo.h"
-> >
-> > diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-> > index d771d393c2..16a7d58274 100644
-> > --- a/hw/moxie/moxiesim.c
-> > +++ b/hw/moxie/moxiesim.c
-> > @@ -24,6 +24,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qapi/error.h"
-> > @@ -31,6 +32,7 @@
-> >  #include "hw/sysbus.h"
-> >  #include "hw/hw.h"
-> >  #include "net/net.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/loader.h"
-> > diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-> > index 6607c9142d..e0cf0c46d7 100644
-> > --- a/hw/net/eepro100.c
-> > +++ b/hw/net/eepro100.c
-> > @@ -49,6 +49,7 @@
-> >  #include "hw/nvram/eeprom93xx.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/bitops.h"
-> >  #include "qemu/module.h"
-> >  #include "qapi/error.h"
-> > diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-> > index 276068c842..d78bc9ed0e 100644
-> > --- a/hw/nios2/boot.c
-> > +++ b/hw/nios2/boot.c
-> > @@ -36,6 +36,7 @@
-> >  #include "qemu/config-file.h"
-> >  #include "qemu/error-report.h"
-> >  #include "sysemu/device_tree.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> > index dcfd6d2ed3..3032f1c65f 100644
-> > --- a/hw/nvram/fw_cfg.c
-> > +++ b/hw/nvram/fw_cfg.c
-> > @@ -27,6 +27,7 @@
-> >  #include "hw/hw.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/dma.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/nvram/fw_cfg.h"
-> >  #include "hw/sysbus.h"
-> > diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-> > index b85f0df323..cb2fc5ba78 100644
-> > --- a/hw/openrisc/openrisc_sim.c
-> > +++ b/hw/openrisc/openrisc_sim.c
-> > @@ -32,6 +32,7 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/sysbus.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >
-> >  #define KERNEL_LOAD_ADDR 0x100
-> >
-> > diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-> > index dde4437595..36c7ca45ad 100644
-> > --- a/hw/pci-host/bonito.c
-> > +++ b/hw/pci-host/bonito.c
-> > @@ -44,6 +44,7 @@
-> >  #include "hw/i386/pc.h"
-> >  #include "hw/mips/mips.h"
-> >  #include "hw/pci/pci_host.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "exec/address-spaces.h"
-> >
-> > diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-> > index d9c70f7ce6..f3671d28b7 100644
-> > --- a/hw/pci-host/piix.c
-> > +++ b/hw/pci-host/piix.c
-> > @@ -33,6 +33,7 @@
-> >  #include "qemu/range.h"
-> >  #include "hw/xen/xen.h"
-> >  #include "hw/pci-host/pam.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/i386/ioapic.h"
-> >  #include "qapi/visitor.h"
-> > diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> > index a3eac7f057..566f179bb1 100644
-> > --- a/hw/ppc/e500.c
-> > +++ b/hw/ppc/e500.c
-> > @@ -28,6 +28,7 @@
-> >  #include "hw/boards.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_ppc.h"
-> >  #include "sysemu/device_tree.h"
-> >  #include "hw/ppc/openpic.h"
-> > diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> > index 09bc6068f3..0f9f351eb1 100644
-> > --- a/hw/ppc/mac_newworld.c
-> > +++ b/hw/ppc/mac_newworld.c
-> > @@ -68,6 +68,7 @@
-> >  #include "elf.h"
-> >  #include "qemu/error-report.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_ppc.h"
-> >  #include "hw/usb.h"
-> >  #include "exec/address-spaces.h"
-> > diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> > index 9ffde5b6f7..6640057473 100644
-> > --- a/hw/ppc/mac_oldworld.c
-> > +++ b/hw/ppc/mac_oldworld.c
-> > @@ -47,6 +47,7 @@
-> >  #include "elf.h"
-> >  #include "qemu/error-report.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_ppc.h"
-> >  #include "exec/address-spaces.h"
-> >
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index bd4531c822..96608883aa 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -23,6 +23,7 @@
-> >  #include "qapi/error.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/numa.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/cpus.h"
-> >  #include "sysemu/device_tree.h"
-> >  #include "hw/hw.h"
-> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> > index c6411ecc1d..ff477ba6c9 100644
-> > --- a/hw/ppc/pnv_core.c
-> > +++ b/hw/ppc/pnv_core.c
-> > @@ -18,6 +18,7 @@
-> >   */
-> >
-> >  #include "qemu/osdep.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/log.h"
-> > diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-> > index d7b6f5d75b..6b26d0f6bc 100644
-> > --- a/hw/ppc/pnv_psi.c
-> > +++ b/hw/ppc/pnv_psi.c
-> > @@ -22,6 +22,7 @@
-> >  #include "target/ppc/cpu.h"
-> >  #include "qemu/log.h"
-> >  #include "qemu/module.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qapi/error.h"
-> >  #include "monitor/monitor.h"
-> >
-> > diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-> > index 13318a9faf..5b278e7791 100644
-> > --- a/hw/ppc/ppc405_boards.c
-> > +++ b/hw/ppc/ppc405_boards.c
-> > @@ -21,6 +21,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> >  #include "qapi/error.h"
-> > @@ -33,6 +34,7 @@
-> >  #include "hw/block/flash.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/block-backend.h"
-> >  #include "hw/boards.h"
-> >  #include "qemu/log.h"
-> > diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-> > index edb6b2d190..f9d98fe71e 100644
-> > --- a/hw/ppc/ppc405_uc.c
-> > +++ b/hw/ppc/ppc405_uc.c
-> > @@ -21,6 +21,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> >  #include "qapi/error.h"
-> > @@ -32,6 +33,7 @@
-> >  #include "ppc405.h"
-> >  #include "hw/char/serial.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/log.h"
-> >  #include "exec/address-spaces.h"
-> > diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-> > index b4da099e3e..1bd92aa749 100644
-> > --- a/hw/ppc/ppc440_bamboo.c
-> > +++ b/hw/ppc/ppc440_bamboo.c
-> > @@ -31,6 +31,7 @@
-> >  #include "ppc405.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/sysbus.h"
-> >
-> >  #define BINARY_DEVICE_TREE_FILE "bamboo.dtb"
-> > diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-> > index 5c1a53d6e7..7329cfe651 100644
-> > --- a/hw/ppc/ppc440_uc.c
-> > +++ b/hw/ppc/ppc440_uc.c
-> > @@ -21,6 +21,7 @@
-> >  #include "hw/ppc/ppc.h"
-> >  #include "hw/pci/pci.h"
-> >  #include "sysemu/block-backend.h"
-> > +#include "sysemu/reset.h"
-> >  #include "ppc440.h"
-> >
-> >  /*********************************************************************=
-********/
-> > diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-> > index fdfeb67e65..e62bef3b8d 100644
-> > --- a/hw/ppc/ppc4xx_devs.c
-> > +++ b/hw/ppc/ppc4xx_devs.c
-> > @@ -21,8 +21,10 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> > +#include "sysemu/reset.h"
-> >  #include "cpu.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/ppc/ppc.h"
-> > diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-> > index e7cf8d50a5..b013319c60 100644
-> > --- a/hw/ppc/ppc4xx_pci.c
-> > +++ b/hw/ppc/ppc4xx_pci.c
-> > @@ -24,6 +24,7 @@
-> >  #include "hw/ppc/ppc.h"
-> >  #include "hw/ppc/ppc4xx.h"
-> >  #include "qemu/module.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/pci/pci.h"
-> >  #include "hw/pci/pci_host.h"
-> >  #include "exec/address-spaces.h"
-> > diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-> > index 18d1457581..ba5f513ca5 100644
-> > --- a/hw/ppc/ppc_booke.c
-> > +++ b/hw/ppc/ppc_booke.c
-> > @@ -21,11 +21,13 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "cpu.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/ppc/ppc.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/log.h"
-> >  #include "hw/loader.h"
-> > diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> > index ab3c1df1fc..84e968e28c 100644
-> > --- a/hw/ppc/prep.c
-> > +++ b/hw/ppc/prep.c
-> > @@ -22,6 +22,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "cpu.h"
-> >  #include "hw/hw.h"
-> > @@ -45,6 +46,7 @@
-> >  #include "sysemu/arch_init.h"
-> >  #include "sysemu/kvm.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "trace.h"
-> >  #include "elf.h"
-> > diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> > index fbcddc5b00..c1d6f74d5b 100644
-> > --- a/hw/ppc/sam460ex.c
-> > +++ b/hw/ppc/sam460ex.c
-> > @@ -31,6 +31,7 @@
-> >  #include "hw/block/flash.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/sysbus.h"
-> >  #include "hw/char/serial.h"
-> >  #include "hw/i2c/ppc4xx_i2c.h"
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 821f0d4a49..5cade1a374 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -31,6 +31,7 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/numa.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/hw.h"
-> >  #include "qemu/log.h"
-> >  #include "hw/fw-path-provider.h"
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 5621fb9a3d..ccc8970c7c 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -6,6 +6,7 @@
-> >   * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> >   * See the COPYING file in the top-level directory.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "hw/cpu/core.h"
-> >  #include "hw/ppc/spapr_cpu_core.h"
-> > @@ -19,6 +20,7 @@
-> >  #include "hw/ppc/ppc.h"
-> >  #include "target/ppc/mmu-hash64.h"
-> >  #include "sysemu/numa.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/hw_accel.h"
-> >  #include "qemu/error-report.h"
-> >
-> > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> > index bacadfcac5..678493a9c5 100644
-> > --- a/hw/ppc/spapr_drc.c
-> > +++ b/hw/ppc/spapr_drc.c
-> > @@ -23,6 +23,7 @@
-> >  #include "hw/ppc/spapr.h" /* for RTAS return codes */
-> >  #include "hw/pci-host/spapr.h" /* spapr_phb_remove_pci_device_cb callb=
-ack */
-> >  #include "sysemu/device_tree.h"
-> > +#include "sysemu/reset.h"
-> >  #include "trace.h"
-> >
-> >  #define DRC_CONTAINER_PATH "/dr-connector"
-> > diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-> > index 834053a7d2..06f5a28601 100644
-> > --- a/hw/ppc/virtex_ml507.c
-> > +++ b/hw/ppc/virtex_ml507.c
-> > @@ -32,6 +32,7 @@
-> >  #include "hw/block/flash.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/boards.h"
-> >  #include "sysemu/device_tree.h"
-> >  #include "hw/loader.h"
-> > diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-> > index ca69a1bcd8..61bd4d5170 100644
-> > --- a/hw/riscv/riscv_hart.c
-> > +++ b/hw/riscv/riscv_hart.c
-> > @@ -21,6 +21,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qapi/error.h"
-> >  #include "qemu/module.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/sysbus.h"
-> >  #include "target/riscv/cpu.h"
-> >  #include "hw/riscv/riscv_hart.h"
-> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > index 60bd081d3e..2e5ce11a6b 100644
-> > --- a/hw/s390x/ipl.c
-> > +++ b/hw/s390x/ipl.c
-> > @@ -14,6 +14,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qemu-common.h"
-> >  #include "qapi/error.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/tcg.h"
-> >  #include "cpu.h"
-> > diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> > index 5b6a9a4e55..4ffdd53a85 100644
-> > --- a/hw/s390x/s390-virtio-ccw.c
-> > +++ b/hw/s390x/s390-virtio-ccw.c
-> > @@ -27,6 +27,7 @@
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/option.h"
-> >  #include "s390-pci-bus.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/s390x/storage-keys.h"
-> >  #include "hw/s390x/storage-attributes.h"
-> >  #include "hw/s390x/event-facility.h"
-> > diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-> > index f22c79c867..da79bf0337 100644
-> > --- a/hw/sh4/r2d.c
-> > +++ b/hw/sh4/r2d.c
-> > @@ -30,6 +30,7 @@
-> >  #include "hw/sysbus.h"
-> >  #include "hw/hw.h"
-> >  #include "hw/sh4/sh.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/pci/pci.h"
-> > diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-> > index 19cedebd16..c7ddfa2cfe 100644
-> > --- a/hw/sparc/leon3.c
-> > +++ b/hw/sparc/leon3.c
-> > @@ -21,6 +21,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> >  #include "qemu/error-report.h"
-> > @@ -32,6 +33,7 @@
-> >  #include "hw/ptimer.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/qtest.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> > diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-> > index b2342f2a89..93a69c12fb 100644
-> > --- a/hw/sparc/sun4m.c
-> > +++ b/hw/sparc/sun4m.c
-> > @@ -21,6 +21,7 @@
-> >   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALI=
-NGS IN
-> >   * THE SOFTWARE.
-> >   */
-> > +
-> >  #include "qemu/osdep.h"
-> >  #include "qemu/units.h"
-> >  #include "qapi/error.h"
-> > @@ -33,6 +34,7 @@
-> >  #include "hw/timer/m48t59.h"
-> >  #include "hw/sparc/sparc32_dma.h"
-> >  #include "hw/block/fdc.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "net/net.h"
-> >  #include "hw/boards.h"
-> > diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-> > index 689801f37d..100b2fab17 100644
-> > --- a/hw/sparc64/sparc64.c
-> > +++ b/hw/sparc64/sparc64.c
-> > @@ -28,6 +28,7 @@
-> >  #include "hw/char/serial.h"
-> >  #include "hw/sparc/sparc64.h"
-> >  #include "qemu/timer.h"
-> > +#include "sysemu/reset.h"
-> >  #include "trace.h"
-> >
-> >
-> > diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
-> > index 53834e197f..18887b2be2 100644
-> > --- a/hw/timer/etraxfs_timer.c
-> > +++ b/hw/timer/etraxfs_timer.c
-> > @@ -24,6 +24,7 @@
-> >
-> >  #include "qemu/osdep.h"
-> >  #include "hw/sysbus.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/module.h"
-> >  #include "qemu/timer.h"
-> > diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-> > index ce4550b6f2..21fcba5e3a 100644
-> > --- a/hw/timer/mc146818rtc.c
-> > +++ b/hw/timer/mc146818rtc.c
-> > @@ -31,6 +31,7 @@
-> >  #include "qemu/timer.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/replay.h"
-> > +#include "sysemu/reset.h"
-> >  #include "hw/timer/mc146818rtc.h"
-> >  #include "qapi/error.h"
-> >  #include "qapi/qapi-commands-misc-target.h"
-> > diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-> > index cd8205f212..ff314592b4 100644
-> > --- a/hw/tpm/tpm_ppi.c
-> > +++ b/hw/tpm/tpm_ppi.c
-> > @@ -16,7 +16,6 @@
-> >  #include "qapi/error.h"
-> >  #include "cpu.h"
-> >  #include "sysemu/memory_mapping.h"
-> > -#include "sysemu/reset.h"
-> >  #include "migration/vmstate.h"
-> >  #include "tpm_ppi.h"
-> >  #include "trace.h"
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index a859298fda..a363b4495f 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -34,6 +34,7 @@
-> >  #include "qemu/range.h"
-> >  #include "sysemu/balloon.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "trace.h"
-> >  #include "qapi/error.h"
-> >
-> > diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
-> > index 29e5b5dcf6..fec046ef09 100644
-> > --- a/hw/watchdog/wdt_diag288.c
-> > +++ b/hw/watchdog/wdt_diag288.c
-> > @@ -12,6 +12,7 @@
-> >   */
-> >
-> >  #include "qemu/osdep.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/watchdog.h"
-> >  #include "hw/sysbus.h"
-> >  #include "qemu/timer.h"
-> > diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-> > index 09165b6f4d..981dbb7bbe 100644
-> > --- a/hw/xtensa/sim.c
-> > +++ b/hw/xtensa/sim.c
-> > @@ -28,6 +28,7 @@
-> >  #include "qemu/osdep.h"
-> >  #include "qapi/error.h"
-> >  #include "cpu.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/loader.h"
-> > diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-> > index f7f3e11e93..0a2cce3c64 100644
-> > --- a/hw/xtensa/xtfpga.c
-> > +++ b/hw/xtensa/xtfpga.c
-> > @@ -41,6 +41,7 @@
-> >  #include "hw/block/flash.h"
-> >  #include "chardev/char.h"
-> >  #include "sysemu/device_tree.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/option.h"
-> >  #include "bootparam.h"
-> > diff --git a/include/hw/hw.h b/include/hw/hw.h
-> > index b1b79964b5..a4fb2390e8 100644
-> > --- a/include/hw/hw.h
-> > +++ b/include/hw/hw.h
-> > @@ -12,7 +12,6 @@
-> >  #include "hw/irq.h"
-> >  #include "migration/vmstate.h"
-> >  #include "migration/qemu-file-types.h"
-> > -#include "sysemu/reset.h"
-> >
-> >  void QEMU_NORETURN hw_error(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 805ce95247..97405186ba 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -26,6 +26,7 @@
-> >  #include "cpu.h"
-> >  #include "exec/exec-all.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/hvf.h"
-> >  #include "sysemu/cpus.h"
-> >  #include "kvm_i386.h"
-> > diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> > index 9e7b77965d..bcacdd1d8f 100644
-> > --- a/target/i386/hax-all.c
-> > +++ b/target/i386/hax-all.c
-> > @@ -30,6 +30,7 @@
-> >  #include "qemu-common.h"
-> >  #include "hax-i386.h"
-> >  #include "sysemu/accel.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "qemu/main-loop.h"
-> >  #include "hw/boards.h"
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index ec7870c6af..38be57f2da 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -24,6 +24,7 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/hw_accel.h"
-> >  #include "sysemu/kvm_int.h"
-> > +#include "sysemu/reset.h"
-> >  #include "kvm_i386.h"
-> >  #include "hyperv.h"
-> >  #include "hyperv-proto.h"
-> > diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> > index 736a7903e2..3caba8d5e1 100644
-> > --- a/target/s390x/cpu.c
-> > +++ b/target/s390x/cpu.c
-> > @@ -26,6 +26,7 @@
-> >  #include "internal.h"
-> >  #include "kvm_s390x.h"
-> >  #include "sysemu/kvm.h"
-> > +#include "sysemu/reset.h"
-> >  #include "qemu/timer.h"
-> >  #include "qemu/error-report.h"
-> >  #include "qemu/module.h"
-> > diff --git a/vl.c b/vl.c
-> > index 53335a5470..ed2589817e 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -30,6 +30,7 @@
-> >  #include "qemu/cutils.h"
-> >  #include "qemu/help_option.h"
-> >  #include "qemu/uuid.h"
-> > +#include "sysemu/reset.h"
-> >  #include "sysemu/seccomp.h"
-> >  #include "sysemu/tcg.h"
-> >
-> >
+> diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
+> index 0cb7cc74a2..264e3eb10e 100644
+> --- a/include/block/raw-aio.h
+> +++ b/include/block/raw-aio.h
+> @@ -15,6 +15,7 @@
+>  #ifndef QEMU_RAW_AIO_H
+>  #define QEMU_RAW_AIO_H
+>
+> +#include "block/aio.h"
+>  #include "qemu/coroutine.h"
+>  #include "qemu/iov.h"
+>
+> diff --git a/include/block/write-threshold.h b/include/block/write-threshold.h
+> index 80d8aab5d0..25c71b7374 100644
+> --- a/include/block/write-threshold.h
+> +++ b/include/block/write-threshold.h
+> @@ -12,6 +12,7 @@
+>  #ifndef BLOCK_WRITE_THRESHOLD_H
+>  #define BLOCK_WRITE_THRESHOLD_H
+>
+> +#include "block/block_int.h"
+>
+>  /*
+>   * bdrv_write_threshold_set:
+> diff --git a/include/disas/disas.h b/include/disas/disas.h
+> index 15da511f49..ba47e9197c 100644
+> --- a/include/disas/disas.h
+> +++ b/include/disas/disas.h
+> @@ -1,6 +1,7 @@
+>  #ifndef QEMU_DISAS_H
+>  #define QEMU_DISAS_H
+>
+> +#include "exec/hwaddr.h"
+>
+>  #ifdef NEED_CPU_H
+>  #include "cpu.h"
+> diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+> index 5373188be3..23abd71579 100644
+> --- a/include/exec/cputlb.h
+> +++ b/include/exec/cputlb.h
+> @@ -19,6 +19,8 @@
+>  #ifndef CPUTLB_H
+>  #define CPUTLB_H
+>
+> +#include "exec/cpu-common.h"
+> +
+>  #if !defined(CONFIG_USER_ONLY)
+>  /* cputlb.c */
+>  void tlb_protect_code(ram_addr_t ram_addr);
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 16034ee651..135aeaab0d 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -20,6 +20,7 @@
+>  #ifndef EXEC_ALL_H
+>  #define EXEC_ALL_H
+>
+> +#include "cpu.h"
+>  #include "exec/tb-context.h"
+>  #include "sysemu/cpus.h"
+>
+> diff --git a/include/exec/ioport.h b/include/exec/ioport.h
+> index a298b89ce1..97feb296d2 100644
+> --- a/include/exec/ioport.h
+> +++ b/include/exec/ioport.h
+> @@ -24,6 +24,8 @@
+>  #ifndef IOPORT_H
+>  #define IOPORT_H
+>
+> +#include "exec/memory.h"
+> +
+>  #define MAX_IOPORTS     (64 * 1024)
+>  #define IOPORTS_MASK    (MAX_IOPORTS - 1)
+>
+> diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+> index d1a9dd1ec8..ef4fb92371 100644
+> --- a/include/exec/memory-internal.h
+> +++ b/include/exec/memory-internal.h
+> @@ -20,6 +20,8 @@
+>  #ifndef MEMORY_INTERNAL_H
+>  #define MEMORY_INTERNAL_H
+>
+> +#include "cpu.h"
+> +
+>  #ifndef CONFIG_USER_ONLY
+>  static inline AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv)
+>  {
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index b7b2e60ff6..a327a80cfe 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -20,6 +20,7 @@
+>  #define RAM_ADDR_H
+>
+>  #ifndef CONFIG_USER_ONLY
+> +#include "cpu.h"
+>  #include "hw/xen/xen.h"
+>  #include "sysemu/tcg.h"
+>  #include "exec/ramlist.h"
+> diff --git a/include/exec/softmmu-semi.h b/include/exec/softmmu-semi.h
+> index 970837992e..fbcae88f4b 100644
+> --- a/include/exec/softmmu-semi.h
+> +++ b/include/exec/softmmu-semi.h
+> @@ -10,6 +10,8 @@
+>  #ifndef SOFTMMU_SEMI_H
+>  #define SOFTMMU_SEMI_H
+>
+> +#include "cpu.h"
+> +
+>  static inline uint64_t softmmu_tget64(CPUArchState *env, target_ulong addr)
+>  {
+>      uint64_t val;
+> diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
+> index 4f3a37d927..805235d321 100644
+> --- a/include/exec/tb-hash.h
+> +++ b/include/exec/tb-hash.h
+> @@ -20,6 +20,8 @@
+>  #ifndef EXEC_TB_HASH_H
+>  #define EXEC_TB_HASH_H
+>
+> +#include "exec/cpu-defs.h"
+> +#include "exec/exec-all.h"
+>  #include "qemu/xxhash.h"
+>
+>  #ifdef CONFIG_SOFTMMU
+> diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+> index 8d3af5a3be..d05a8a4dab 100644
+> --- a/include/exec/user/thunk.h
+> +++ b/include/exec/user/thunk.h
+> @@ -20,6 +20,7 @@
+>  #define THUNK_H
+>
+>  #include "cpu.h"
+> +#include "exec/user/abitypes.h"
+>
+>  /* types enums definitions */
+>
+> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macros.h
+> index c55aa6d174..be83a833ec 100644
+> --- a/include/fpu/softfloat-macros.h
+> +++ b/include/fpu/softfloat-macros.h
+> @@ -82,6 +82,8 @@ this code that are retained.
+>  #ifndef FPU_SOFTFLOAT_MACROS_H
+>  #define FPU_SOFTFLOAT_MACROS_H
+>
+> +#include "fpu/softfloat.h"
+> +
+>  /*----------------------------------------------------------------------------
+>  | Shifts `a' right by the number of bits given in `count'.  If any nonzero
+>  | bits are shifted off, they are ``jammed'' into the least significant bit of
+> diff --git a/include/hw/acpi/pci.h b/include/hw/acpi/pci.h
+> index 8bbd32cf45..4594d7dc62 100644
+> --- a/include/hw/acpi/pci.h
+> +++ b/include/hw/acpi/pci.h
+> @@ -25,6 +25,8 @@
+>  #ifndef HW_ACPI_PCI_H
+>  #define HW_ACPI_PCI_H
+>
+> +#include "hw/acpi/bios-linker-loader.h"
+> +
+>  typedef struct AcpiMcfgInfo {
+>      uint64_t base;
+>      uint32_t size;
+> diff --git a/include/hw/acpi/tco.h b/include/hw/acpi/tco.h
+> index d19dd59353..8adb7a0d20 100644
+> --- a/include/hw/acpi/tco.h
+> +++ b/include/hw/acpi/tco.h
+> @@ -9,6 +9,8 @@
+>  #ifndef HW_ACPI_TCO_H
+>  #define HW_ACPI_TCO_H
+>
+> +#include "exec/memory.h"
+> +#include "migration/vmstate.h"
+>
+>  /* As per ICH9 spec, the internal timer has an error of ~0.6s on every tick */
+>  #define TCO_TICK_NSEC 600000000LL
+> diff --git a/include/hw/adc/stm32f2xx_adc.h b/include/hw/adc/stm32f2xx_adc.h
+> index a72f734eb1..663b79f4f3 100644
+> --- a/include/hw/adc/stm32f2xx_adc.h
+> +++ b/include/hw/adc/stm32f2xx_adc.h
+> @@ -25,6 +25,8 @@
+>  #ifndef HW_STM32F2XX_ADC_H
+>  #define HW_STM32F2XX_ADC_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define ADC_SR    0x00
+>  #define ADC_CR1   0x04
+>  #define ADC_CR2   0x08
+> diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a10.h
+> index e99fe2ea2e..7182ce5c4b 100644
+> --- a/include/hw/arm/allwinner-a10.h
+> +++ b/include/hw/arm/allwinner-a10.h
+> @@ -11,6 +11,7 @@
+>  #include "hw/ide/ahci.h"
+>
+>  #include "sysemu/sysemu.h"
+> +#include "target/arm/cpu.h"
+>
+>
+>  #define AW_A10_PIC_REG_BASE     0x01c20400
+> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+> index cef605ad6b..976fd6be93 100644
+> --- a/include/hw/arm/aspeed_soc.h
+> +++ b/include/hw/arm/aspeed_soc.h
+> @@ -22,6 +22,7 @@
+>  #include "hw/ssi/aspeed_smc.h"
+>  #include "hw/watchdog/wdt_aspeed.h"
+>  #include "hw/net/ftgmac100.h"
+> +#include "target/arm/cpu.h"
+>
+>  #define ASPEED_SPIS_NUM  2
+>  #define ASPEED_WDTS_NUM  3
+> diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
+> index a2cb8454de..97187f72be 100644
+> --- a/include/hw/arm/bcm2836.h
+> +++ b/include/hw/arm/bcm2836.h
+> @@ -13,6 +13,7 @@
+>
+>  #include "hw/arm/bcm2835_peripherals.h"
+>  #include "hw/intc/bcm2836_control.h"
+> +#include "target/arm/cpu.h"
+>
+>  #define TYPE_BCM283X "bcm283x"
+>  #define BCM283X(obj) OBJECT_CHECK(BCM283XState, (obj), TYPE_BCM283X)
+> diff --git a/include/hw/arm/exynos4210.h b/include/hw/arm/exynos4210.h
+> index aa137271c0..358f4619de 100644
+> --- a/include/hw/arm/exynos4210.h
+> +++ b/include/hw/arm/exynos4210.h
+> @@ -25,7 +25,7 @@
+>  #ifndef EXYNOS4210_H
+>  #define EXYNOS4210_H
+>
+> -#include "exec/memory.h"
+> +#include "hw/sysbus.h"
+>  #include "target/arm/cpu-qom.h"
+>
+>  #define EXYNOS4210_NCPUS                    2
+> diff --git a/include/hw/arm/fsl-imx25.h b/include/hw/arm/fsl-imx25.h
+> index 3280ab1fb0..241efb52ae 100644
+> --- a/include/hw/arm/fsl-imx25.h
+> +++ b/include/hw/arm/fsl-imx25.h
+> @@ -27,6 +27,7 @@
+>  #include "hw/i2c/imx_i2c.h"
+>  #include "hw/gpio/imx_gpio.h"
+>  #include "exec/memory.h"
+> +#include "target/arm/cpu.h"
+>
+>  #define TYPE_FSL_IMX25 "fsl,imx25"
+>  #define FSL_IMX25(obj) OBJECT_CHECK(FslIMX25State, (obj), TYPE_FSL_IMX25)
+> diff --git a/include/hw/arm/fsl-imx31.h b/include/hw/arm/fsl-imx31.h
+> index e68a81efd7..ac5ca9826a 100644
+> --- a/include/hw/arm/fsl-imx31.h
+> +++ b/include/hw/arm/fsl-imx31.h
+> @@ -26,6 +26,7 @@
+>  #include "hw/i2c/imx_i2c.h"
+>  #include "hw/gpio/imx_gpio.h"
+>  #include "exec/memory.h"
+> +#include "target/arm/cpu.h"
+>
+>  #define TYPE_FSL_IMX31 "fsl,imx31"
+>  #define FSL_IMX31(obj) OBJECT_CHECK(FslIMX31State, (obj), TYPE_FSL_IMX31)
+> diff --git a/include/hw/arm/sharpsl.h b/include/hw/arm/sharpsl.h
+> index 5bf6db1fa2..a5ef797a67 100644
+> --- a/include/hw/arm/sharpsl.h
+> +++ b/include/hw/arm/sharpsl.h
+> @@ -6,6 +6,8 @@
+>  #ifndef QEMU_SHARPSL_H
+>  #define QEMU_SHARPSL_H
+>
+> +#include "exec/hwaddr.h"
+> +
+>  #define zaurus_printf(format, ...)     \
+>      fprintf(stderr, "%s: " format, __func__, ##__VA_ARGS__)
+>
+> diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+> index 35804ea80a..6cb65e7537 100644
+> --- a/include/hw/arm/xlnx-zynqmp.h
+> +++ b/include/hw/arm/xlnx-zynqmp.h
+> @@ -32,6 +32,7 @@
+>  #include "hw/intc/xlnx-zynqmp-ipi.h"
+>  #include "hw/timer/xlnx-zynqmp-rtc.h"
+>  #include "hw/cpu/cluster.h"
+> +#include "target/arm/cpu.h"
+>
+>  #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+>  #define XLNX_ZYNQMP(obj) OBJECT_CHECK(XlnxZynqMPState, (obj), \
+> diff --git a/include/hw/block/fdc.h b/include/hw/block/fdc.h
+> index 8cece84326..f4fe2f471b 100644
+> --- a/include/hw/block/fdc.h
+> +++ b/include/hw/block/fdc.h
+> @@ -1,6 +1,8 @@
+>  #ifndef HW_FDC_H
+>  #define HW_FDC_H
+>
+> +#include "exec/hwaddr.h"
+> +#include "hw/irq.h"
+>  #include "qapi/qapi-types-block.h"
+>
+>  /* fdc.c */
+> diff --git a/include/hw/block/flash.h b/include/hw/block/flash.h
+> index 1acaf7de80..83a75f3170 100644
+> --- a/include/hw/block/flash.h
+> +++ b/include/hw/block/flash.h
+> @@ -4,6 +4,7 @@
+>  /* NOR flash devices */
+>
+>  #include "exec/memory.h"
+> +#include "migration/vmstate.h"
+>
+>  /* pflash_cfi01.c */
+>
+> diff --git a/include/hw/char/escc.h b/include/hw/char/escc.h
+> index 42aca83611..d5196c53e6 100644
+> --- a/include/hw/char/escc.h
+> +++ b/include/hw/char/escc.h
+> @@ -3,6 +3,7 @@
+>
+>  #include "chardev/char-fe.h"
+>  #include "chardev/char-serial.h"
+> +#include "hw/sysbus.h"
+>  #include "ui/input.h"
+>
+>  /* escc.c */
+> diff --git a/include/hw/char/xilinx_uartlite.h b/include/hw/char/xilinx_uartlite.h
+> index 634086b657..99d8bbf405 100644
+> --- a/include/hw/char/xilinx_uartlite.h
+> +++ b/include/hw/char/xilinx_uartlite.h
+> @@ -15,6 +15,8 @@
+>  #ifndef XILINX_UARTLITE_H
+>  #define XILINX_UARTLITE_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  static inline DeviceState *xilinx_uartlite_create(hwaddr addr,
+>                                          qemu_irq irq,
+>                                          Chardev *chr)
+> diff --git a/include/hw/core/generic-loader.h b/include/hw/core/generic-loader.h
+> index dd27c42ab0..9ffce1c5a3 100644
+> --- a/include/hw/core/generic-loader.h
+> +++ b/include/hw/core/generic-loader.h
+> @@ -19,6 +19,7 @@
+>  #define GENERIC_LOADER_H
+>
+>  #include "elf.h"
+> +#include "hw/qdev-core.h"
+>
+>  typedef struct GenericLoaderState {
+>      /* <private> */
+> diff --git a/include/hw/cris/etraxfs.h b/include/hw/cris/etraxfs.h
+> index 8da965addb..494222d315 100644
+> --- a/include/hw/cris/etraxfs.h
+> +++ b/include/hw/cris/etraxfs.h
+> @@ -27,6 +27,7 @@
+>
+>  #include "net/net.h"
+>  #include "hw/cris/etraxfs_dma.h"
+> +#include "hw/sysbus.h"
+>
+>  /* Instantiate an ETRAXFS Ethernet MAC.  */
+>  static inline DeviceState *
+> diff --git a/include/hw/cris/etraxfs_dma.h b/include/hw/cris/etraxfs_dma.h
+> index f6f33e0980..31ae360611 100644
+> --- a/include/hw/cris/etraxfs_dma.h
+> +++ b/include/hw/cris/etraxfs_dma.h
+> @@ -1,6 +1,9 @@
+>  #ifndef HW_ETRAXFS_DMA_H
+>  #define HW_ETRAXFS_DMA_H
+>
+> +#include "exec/hwaddr.h"
+> +#include "hw/irq.h"
+> +
+>  struct dma_context_metadata {
+>         /* data descriptor md */
+>         uint16_t metadata;
+> diff --git a/include/hw/display/i2c-ddc.h b/include/hw/display/i2c-ddc.h
+> index c29443c5af..1cf53a0c8d 100644
+> --- a/include/hw/display/i2c-ddc.h
+> +++ b/include/hw/display/i2c-ddc.h
+> @@ -20,6 +20,7 @@
+>  #define I2C_DDC_H
+>
+>  #include "hw/display/edid.h"
+> +#include "hw/i2c/i2c.h"
+>
+>  /* A simple I2C slave which just returns the contents of its EDID blob. */
+>  struct I2CDDCState {
+> diff --git a/include/hw/empty_slot.h b/include/hw/empty_slot.h
+> index 123a9f8989..cb9a221aa6 100644
+> --- a/include/hw/empty_slot.h
+> +++ b/include/hw/empty_slot.h
+> @@ -1,6 +1,8 @@
+>  #ifndef HW_EMPTY_SLOT_H
+>  #define HW_EMPTY_SLOT_H
+>
+> +#include "exec/hwaddr.h"
+> +
+>  /* empty_slot.c */
+>  void empty_slot_init(hwaddr addr, uint64_t slot_size);
+>
+> diff --git a/include/hw/gpio/bcm2835_gpio.h b/include/hw/gpio/bcm2835_gpio.h
+> index 9f8e0c720c..b0de0a3c74 100644
+> --- a/include/hw/gpio/bcm2835_gpio.h
+> +++ b/include/hw/gpio/bcm2835_gpio.h
+> @@ -15,6 +15,7 @@
+>  #define BCM2835_GPIO_H
+>
+>  #include "hw/sd/sd.h"
+> +#include "hw/sysbus.h"
+>
+>  typedef struct BCM2835GpioState {
+>      SysBusDevice parent_obj;
+> diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
+> index f9020acdef..f742936175 100644
+> --- a/include/hw/i2c/aspeed_i2c.h
+> +++ b/include/hw/i2c/aspeed_i2c.h
+> @@ -21,6 +21,7 @@
+>  #define ASPEED_I2C_H
+>
+>  #include "hw/i2c/i2c.h"
+> +#include "hw/sysbus.h"
+>
+>  #define TYPE_ASPEED_I2C "aspeed.i2c"
+>  #define ASPEED_I2C(obj) \
+> diff --git a/include/hw/i386/apic_internal.h b/include/hw/i386/apic_internal.h
+> index 1209eb483a..b04bdd947f 100644
+> --- a/include/hw/i386/apic_internal.h
+> +++ b/include/hw/i386/apic_internal.h
+> @@ -24,6 +24,7 @@
+>  #include "cpu.h"
+>  #include "exec/memory.h"
+>  #include "qemu/timer.h"
+> +#include "target/i386/cpu-qom.h"
+>
+>  /* APIC Local Vector Table */
+>  #define APIC_LVT_TIMER                  0
+> diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_internal.h
+> index 07002f9662..3d2eec2aa7 100644
+> --- a/include/hw/i386/ioapic_internal.h
+> +++ b/include/hw/i386/ioapic_internal.h
+> @@ -24,6 +24,7 @@
+>
+>  #include "hw/hw.h"
+>  #include "exec/memory.h"
+> +#include "hw/i386/ioapic.h"
+>  #include "hw/sysbus.h"
+>  #include "qemu/notify.h"
+>
+> diff --git a/include/hw/intc/allwinner-a10-pic.h b/include/hw/intc/allwinner-a10-pic.h
+> index 1d314a70d9..a5895401d1 100644
+> --- a/include/hw/intc/allwinner-a10-pic.h
+> +++ b/include/hw/intc/allwinner-a10-pic.h
+> @@ -1,6 +1,8 @@
+>  #ifndef ALLWINNER_A10_PIC_H
+>  #define ALLWINNER_A10_PIC_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define TYPE_AW_A10_PIC  "allwinner-a10-pic"
+>  #define AW_A10_PIC(obj) OBJECT_CHECK(AwA10PICState, (obj), TYPE_AW_A10_PIC)
+>
+> diff --git a/include/hw/intc/heathrow_pic.h b/include/hw/intc/heathrow_pic.h
+> index 6c91ec91bb..b163e27ab9 100644
+> --- a/include/hw/intc/heathrow_pic.h
+> +++ b/include/hw/intc/heathrow_pic.h
+> @@ -26,6 +26,8 @@
+>  #ifndef HW_INTC_HEATHROW_PIC_H
+>  #define HW_INTC_HEATHROW_PIC_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define TYPE_HEATHROW "heathrow"
+>  #define HEATHROW(obj) OBJECT_CHECK(HeathrowState, (obj), TYPE_HEATHROW)
+>
+> diff --git a/include/hw/intc/mips_gic.h b/include/hw/intc/mips_gic.h
+> index 902a12b178..8428287bf9 100644
+> --- a/include/hw/intc/mips_gic.h
+> +++ b/include/hw/intc/mips_gic.h
+> @@ -13,6 +13,7 @@
+>
+>  #include "qemu/units.h"
+>  #include "hw/timer/mips_gictimer.h"
+> +#include "hw/sysbus.h"
+>  #include "cpu.h"
+>  /*
+>   * GIC Specific definitions
+> diff --git a/include/hw/isa/vt82c686.h b/include/hw/isa/vt82c686.h
+> index c3c2b6e786..a54c3fe60a 100644
+> --- a/include/hw/isa/vt82c686.h
+> +++ b/include/hw/isa/vt82c686.h
+> @@ -1,6 +1,8 @@
+>  #ifndef HW_VT82C686_H
+>  #define HW_VT82C686_H
+>
+> +#include "hw/irq.h"
+> +
+>  #define TYPE_VT82C686B_SUPERIO "vt82c686b-superio"
+>
+>  /* vt82c686.c */
+> diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
+> index aab1af926d..a941c55f27 100644
+> --- a/include/hw/mips/cps.h
+> +++ b/include/hw/mips/cps.h
+> @@ -25,6 +25,7 @@
+>  #include "hw/intc/mips_gic.h"
+>  #include "hw/misc/mips_cpc.h"
+>  #include "hw/misc/mips_itu.h"
+> +#include "target/mips/cpu.h"
+>
+>  #define TYPE_MIPS_CPS "mips-cps"
+>  #define MIPS_CPS(obj) OBJECT_CHECK(MIPSCPSState, (obj), TYPE_MIPS_CPS)
+> diff --git a/include/hw/misc/macio/cuda.h b/include/hw/misc/macio/cuda.h
+> index 7dad469142..5768075ac5 100644
+> --- a/include/hw/misc/macio/cuda.h
+> +++ b/include/hw/misc/macio/cuda.h
+> @@ -26,6 +26,8 @@
+>  #ifndef CUDA_H
+>  #define CUDA_H
+>
+> +#include "hw/misc/mos6522.h"
+> +
+>  /* CUDA commands (2nd byte) */
+>  #define CUDA_WARM_START                0x0
+>  #define CUDA_AUTOPOLL                  0x1
+> diff --git a/include/hw/misc/macio/gpio.h b/include/hw/misc/macio/gpio.h
+> index 2838ae5fde..24a4364b39 100644
+> --- a/include/hw/misc/macio/gpio.h
+> +++ b/include/hw/misc/macio/gpio.h
+> @@ -26,6 +26,9 @@
+>  #ifndef MACIO_GPIO_H
+>  #define MACIO_GPIO_H
+>
+> +#include "hw/ppc/openpic.h"
+> +#include "hw/sysbus.h"
+> +
+>  #define TYPE_MACIO_GPIO "macio-gpio"
+>  #define MACIO_GPIO(obj) OBJECT_CHECK(MacIOGPIOState, (obj), TYPE_MACIO_GPIO)
+>
+> diff --git a/include/hw/misc/macio/macio.h b/include/hw/misc/macio/macio.h
+> index 970058b6ed..070a694eb5 100644
+> --- a/include/hw/misc/macio/macio.h
+> +++ b/include/hw/misc/macio/macio.h
+> @@ -27,10 +27,12 @@
+>  #define MACIO_H
+>
+>  #include "hw/char/escc.h"
+> +#include "hw/ide/internal.h"
+>  #include "hw/intc/heathrow_pic.h"
+>  #include "hw/misc/macio/cuda.h"
+>  #include "hw/misc/macio/gpio.h"
+>  #include "hw/misc/macio/pmu.h"
+> +#include "hw/ppc/mac.h"
+>  #include "hw/ppc/mac_dbdma.h"
+>  #include "hw/ppc/openpic.h"
+>
+> diff --git a/include/hw/misc/macio/pmu.h b/include/hw/misc/macio/pmu.h
+> index d10895ba5f..7ef83dee4c 100644
+> --- a/include/hw/misc/macio/pmu.h
+> +++ b/include/hw/misc/macio/pmu.h
+> @@ -10,6 +10,9 @@
+>  #ifndef PMU_H
+>  #define PMU_H
+>
+> +#include "hw/misc/mos6522.h"
+> +#include "hw/misc/macio/gpio.h"
+> +
+>  /*
+>   * PMU commands
+>   */
+> diff --git a/include/hw/misc/mips_cmgcr.h b/include/hw/misc/mips_cmgcr.h
+> index c9dfcb4b84..3e6e223273 100644
+> --- a/include/hw/misc/mips_cmgcr.h
+> +++ b/include/hw/misc/mips_cmgcr.h
+> @@ -10,6 +10,8 @@
+>  #ifndef MIPS_CMGCR_H
+>  #define MIPS_CMGCR_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define TYPE_MIPS_GCR "mips-gcr"
+>  #define MIPS_GCR(obj) OBJECT_CHECK(MIPSGCRState, (obj), TYPE_MIPS_GCR)
+>
+> diff --git a/include/hw/misc/mips_cpc.h b/include/hw/misc/mips_cpc.h
+> index 72c834e039..3f670578b0 100644
+> --- a/include/hw/misc/mips_cpc.h
+> +++ b/include/hw/misc/mips_cpc.h
+> @@ -20,6 +20,8 @@
+>  #ifndef MIPS_CPC_H
+>  #define MIPS_CPC_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define CPC_ADDRSPACE_SZ    0x6000
+>
+>  /* CPC blocks offsets relative to base address */
+> diff --git a/include/hw/misc/pvpanic.h b/include/hw/misc/pvpanic.h
+> index 1ee071a703..840bf4ec09 100644
+> --- a/include/hw/misc/pvpanic.h
+> +++ b/include/hw/misc/pvpanic.h
+> @@ -14,6 +14,8 @@
+>  #ifndef HW_MISC_PVPANIC_H
+>  #define HW_MISC_PVPANIC_H
+>
+> +#include "qom/object.h"
+> +
+>  #define TYPE_PVPANIC "pvpanic"
+>
+>  #define PVPANIC_IOPORT_PROP "ioport"
+> diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner_emac.h
+> index 905a43deb4..5013207d15 100644
+> --- a/include/hw/net/allwinner_emac.h
+> +++ b/include/hw/net/allwinner_emac.h
+> @@ -27,6 +27,7 @@
+>  #include "net/net.h"
+>  #include "qemu/fifo8.h"
+>  #include "hw/net/mii.h"
+> +#include "hw/sysbus.h"
+>
+>  #define TYPE_AW_EMAC "allwinner-emac"
+>  #define AW_EMAC(obj) OBJECT_CHECK(AwEmacState, (obj), TYPE_AW_EMAC)
+> diff --git a/include/hw/net/lance.h b/include/hw/net/lance.h
+> index ffdd35c4d7..0357f5f65c 100644
+> --- a/include/hw/net/lance.h
+> +++ b/include/hw/net/lance.h
+> @@ -31,6 +31,7 @@
+>
+>  #include "net/net.h"
+>  #include "hw/net/pcnet.h"
+> +#include "hw/sysbus.h"
+>
+>  #define TYPE_LANCE "lance"
+>  #define SYSBUS_PCNET(obj) \
+> diff --git a/include/hw/nvram/chrp_nvram.h b/include/hw/nvram/chrp_nvram.h
+> index b4f5b2b104..09941a9be4 100644
+> --- a/include/hw/nvram/chrp_nvram.h
+> +++ b/include/hw/nvram/chrp_nvram.h
+> @@ -18,6 +18,8 @@
+>  #ifndef CHRP_NVRAM_H
+>  #define CHRP_NVRAM_H
+>
+> +#include "qemu/bswap.h"
+> +
+>  /* OpenBIOS NVRAM partition */
+>  typedef struct {
+>      uint8_t signature;
+> diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
+> index 9afa4938fd..99b5aefbec 100644
+> --- a/include/hw/pci-host/sabre.h
+> +++ b/include/hw/pci-host/sabre.h
+> @@ -1,6 +1,8 @@
+>  #ifndef HW_PCI_HOST_SABRE_H
+>  #define HW_PCI_HOST_SABRE_H
+>
+> +#include "hw/pci/pci.h"
+> +#include "hw/pci/pci_host.h"
+>  #include "hw/sparc/sun4u_iommu.h"
+>
+>  #define MAX_IVEC 0x40
+> diff --git a/include/hw/pci-host/uninorth.h b/include/hw/pci-host/uninorth.h
+> index 060324536a..9a5cabd4c5 100644
+> --- a/include/hw/pci-host/uninorth.h
+> +++ b/include/hw/pci-host/uninorth.h
+> @@ -26,7 +26,7 @@
+>  #define UNINORTH_H
+>
+>  #include "hw/hw.h"
+> -
+> +#include "hw/pci/pci_host.h"
+>  #include "hw/ppc/openpic.h"
+>
+>  /* UniNorth version */
+> diff --git a/include/hw/pci/pcie_aer.h b/include/hw/pci/pcie_aer.h
+> index 729a9439c8..502dcd7eba 100644
+> --- a/include/hw/pci/pcie_aer.h
+> +++ b/include/hw/pci/pcie_aer.h
+> @@ -22,6 +22,7 @@
+>  #define QEMU_PCIE_AER_H
+>
+>  #include "hw/hw.h"
+> +#include "hw/pci/pci_regs.h"
+>
+>  /* definitions which PCIExpressDevice uses */
+>
+> diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+> index d0926454a9..bfbd2ec42a 100644
+> --- a/include/hw/ppc/pnv_core.h
+> +++ b/include/hw/ppc/pnv_core.h
+> @@ -21,6 +21,7 @@
+>  #define PPC_PNV_CORE_H
+>
+>  #include "hw/cpu/core.h"
+> +#include "target/ppc/cpu.h"
+>
+>  #define TYPE_PNV_CORE "powernv-cpu-core"
+>  #define PNV_CORE(obj) \
+> diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+> index 39a7ba1ce6..90f8866138 100644
+> --- a/include/hw/ppc/ppc4xx.h
+> +++ b/include/hw/ppc/ppc4xx.h
+> @@ -25,6 +25,10 @@
+>  #ifndef PPC4XX_H
+>  #define PPC4XX_H
+>
+> +#include "hw/ppc/ppc.h"
+> +#include "exec/cpu-common.h"
+> +#include "exec/memory.h"
+> +
+>  /* PowerPC 4xx core initialization */
+>  PowerPCCPU *ppc4xx_init(const char *cpu_model,
+>                          clk_setup_t *cpu_clk, clk_setup_t *tb_clk,
+> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> index f965a58f89..cd6e18b05e 100644
+> --- a/include/hw/ppc/spapr_irq.h
+> +++ b/include/hw/ppc/spapr_irq.h
+> @@ -10,6 +10,9 @@
+>  #ifndef HW_SPAPR_IRQ_H
+>  #define HW_SPAPR_IRQ_H
+>
+> +#include "hw/irq.h"
+> +#include "target/ppc/cpu-qom.h"
+> +
+>  /*
+>   * IRQ range offsets per device type
+>   */
+> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
+> index 04609f214e..875be28cdd 100644
+> --- a/include/hw/ppc/spapr_vio.h
+> +++ b/include/hw/ppc/spapr_vio.h
+> @@ -22,6 +22,7 @@
+>   * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>
+> +#include "hw/ppc/spapr.h"
+>  #include "sysemu/dma.h"
+>
+>  #define TYPE_VIO_SPAPR_DEVICE "vio-spapr-device"
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index 7197144265..a39e672f27 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -10,7 +10,9 @@
+>  #ifndef PPC_SPAPR_XIVE_H
+>  #define PPC_SPAPR_XIVE_H
+>
+> +#include "hw/ppc/spapr_irq.h"
+>  #include "hw/ppc/xive.h"
+> +#include "sysemu/sysemu.h"
+>
+>  #define TYPE_SPAPR_XIVE "spapr-xive"
+>  #define SPAPR_XIVE(obj) OBJECT_CHECK(SpaprXive, (obj), TYPE_SPAPR_XIVE)
+> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+> index 1a8c5b5e64..b0c68ab5f7 100644
+> --- a/include/hw/ppc/xive_regs.h
+> +++ b/include/hw/ppc/xive_regs.h
+> @@ -16,6 +16,9 @@
+>  #ifndef PPC_XIVE_REGS_H
+>  #define PPC_XIVE_REGS_H
+>
+> +#include "qemu/bswap.h"
+> +#include "qemu/host-utils.h"
+> +
+>  /*
+>   * Interrupt source number encoding on PowerBUS
+>   */
+> diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+> index d56f2ae3eb..1f21c2bef1 100644
+> --- a/include/hw/riscv/boot.h
+> +++ b/include/hw/riscv/boot.h
+> @@ -20,6 +20,8 @@
+>  #ifndef RISCV_BOOT_H
+>  #define RISCV_BOOT_H
+>
+> +#include "exec/cpu-defs.h"
+> +
+>  void riscv_find_and_load_firmware(MachineState *machine,
+>                                    const char *default_machine_firmware,
+>                                    hwaddr firmware_load_addr);
+> diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
+> index 0671d88a44..3b52b50571 100644
+> --- a/include/hw/riscv/riscv_hart.h
+> +++ b/include/hw/riscv/riscv_hart.h
+> @@ -21,6 +21,9 @@
+>  #ifndef HW_RISCV_HART_H
+>  #define HW_RISCV_HART_H
+>
+> +#include "hw/sysbus.h"
+> +#include "target/riscv/cpu.h"
+> +
+>  #define TYPE_RISCV_HART_ARRAY "riscv.hart_array"
+>
+>  #define RISCV_HART_ARRAY(obj) \
+> diff --git a/include/hw/riscv/sifive_clint.h b/include/hw/riscv/sifive_clint.h
+> index e2865be1d1..ae8286c884 100644
+> --- a/include/hw/riscv/sifive_clint.h
+> +++ b/include/hw/riscv/sifive_clint.h
+> @@ -20,6 +20,8 @@
+>  #ifndef HW_SIFIVE_CLINT_H
+>  #define HW_SIFIVE_CLINT_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define TYPE_SIFIVE_CLINT "riscv.sifive.clint"
+>
+>  #define SIFIVE_CLINT(obj) \
+> diff --git a/include/hw/riscv/sifive_e.h b/include/hw/riscv/sifive_e.h
+> index d175b24cb2..9c868dd7f9 100644
+> --- a/include/hw/riscv/sifive_e.h
+> +++ b/include/hw/riscv/sifive_e.h
+> @@ -19,6 +19,7 @@
+>  #ifndef HW_SIFIVE_E_H
+>  #define HW_SIFIVE_E_H
+>
+> +#include "hw/riscv/riscv_hart.h"
+>  #include "hw/riscv/sifive_gpio.h"
+>
+>  #define TYPE_RISCV_E_SOC "riscv.sifive.e.soc"
+> diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+> index ce8907f6aa..b0edba2884 100644
+> --- a/include/hw/riscv/sifive_plic.h
+> +++ b/include/hw/riscv/sifive_plic.h
+> @@ -21,7 +21,7 @@
+>  #ifndef HW_SIFIVE_PLIC_H
+>  #define HW_SIFIVE_PLIC_H
+>
+> -#include "hw/irq.h"
+> +#include "hw/sysbus.h"
+>
+>  #define TYPE_SIFIVE_PLIC "riscv.sifive.plic"
+>
+> diff --git a/include/hw/riscv/sifive_prci.h b/include/hw/riscv/sifive_prci.h
+> index bd51c4af3c..8b7de134f8 100644
+> --- a/include/hw/riscv/sifive_prci.h
+> +++ b/include/hw/riscv/sifive_prci.h
+> @@ -19,6 +19,8 @@
+>  #ifndef HW_SIFIVE_PRCI_H
+>  #define HW_SIFIVE_PRCI_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  enum {
+>      SIFIVE_PRCI_HFROSCCFG   = 0x0,
+>      SIFIVE_PRCI_HFXOSCCFG   = 0x4,
+> diff --git a/include/hw/riscv/sifive_test.h b/include/hw/riscv/sifive_test.h
+> index 71d4c9fad7..3a603a6ead 100644
+> --- a/include/hw/riscv/sifive_test.h
+> +++ b/include/hw/riscv/sifive_test.h
+> @@ -19,6 +19,8 @@
+>  #ifndef HW_SIFIVE_TEST_H
+>  #define HW_SIFIVE_TEST_H
+>
+> +#include "hw/sysbus.h"
+> +
+>  #define TYPE_SIFIVE_TEST "riscv.sifive.test"
+>
+>  #define SIFIVE_TEST(obj) \
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 892f0eee21..be021ce256 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -20,6 +20,7 @@
+>  #define HW_SIFIVE_U_H
+>
+>  #include "hw/net/cadence_gem.h"
+> +#include "hw/riscv/riscv_hart.h"
+>
+>  #define TYPE_RISCV_U_SOC "riscv.sifive.u.soc"
+>  #define RISCV_U_SOC(obj) \
+> diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/riscv/sifive_uart.h
+> index c8dc1c57fd..65668825a3 100644
+> --- a/include/hw/riscv/sifive_uart.h
+> +++ b/include/hw/riscv/sifive_uart.h
+> @@ -20,6 +20,9 @@
+>  #ifndef HW_SIFIVE_UART_H
+>  #define HW_SIFIVE_UART_H
+>
+> +#include "chardev/char-fe.h"
+> +#include "hw/sysbus.h"
+> +
+>  enum {
+>      SIFIVE_UART_TXFIFO        = 0,
+>      SIFIVE_UART_RXFIFO        = 4,
+> diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+> index 641b70da67..03d870363c 100644
+> --- a/include/hw/riscv/spike.h
+> +++ b/include/hw/riscv/spike.h
+> @@ -19,6 +19,9 @@
+>  #ifndef HW_RISCV_SPIKE_H
+>  #define HW_RISCV_SPIKE_H
+>
+> +#include "hw/riscv/riscv_hart.h"
+> +#include "hw/sysbus.h"
+> +
+>  typedef struct {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+> index d01a1a85c4..6e5fbe5d3b 100644
+> --- a/include/hw/riscv/virt.h
+> +++ b/include/hw/riscv/virt.h
+> @@ -19,6 +19,9 @@
+>  #ifndef HW_RISCV_VIRT_H
+>  #define HW_RISCV_VIRT_H
+>
+> +#include "hw/riscv/riscv_hart.h"
+> +#include "hw/sysbus.h"
+> +
+>  typedef struct {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+> index 765e9082a3..1aa89c36be 100644
+> --- a/include/hw/s390x/ap-device.h
+> +++ b/include/hw/s390x/ap-device.h
+> @@ -10,6 +10,8 @@
+>  #ifndef HW_S390X_AP_DEVICE_H
+>  #define HW_S390X_AP_DEVICE_H
+>
+> +#include "hw/qdev-core.h"
+> +
+>  #define AP_DEVICE_TYPE       "ap-device"
+>
+>  typedef struct APDevice {
+> diff --git a/include/hw/s390x/css-bridge.h b/include/hw/s390x/css-bridge.h
+> index 5a0203be5f..f7ed2d9a03 100644
+> --- a/include/hw/s390x/css-bridge.h
+> +++ b/include/hw/s390x/css-bridge.h
+> @@ -12,8 +12,9 @@
+>
+>  #ifndef HW_S390X_CSS_BRIDGE_H
+>  #define HW_S390X_CSS_BRIDGE_H
+> +
+>  #include "qom/object.h"
+> -#include "hw/qdev-core.h"
+> +#include "hw/sysbus.h"
+>
+>  /* virtual css bridge */
+>  typedef struct VirtualCssBridge {
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index d033387fba..f46bcafb16 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -17,6 +17,7 @@
+>  #include "hw/s390x/s390_flic.h"
+>  #include "hw/s390x/ioinst.h"
+>  #include "sysemu/kvm.h"
+> +#include "target/s390x/cpu-qom.h"
+>
+>  /* Channel subsystem constants. */
+>  #define MAX_DEVNO 65535
+> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
+> index 9c4a6000c3..d71f4ea8a7 100644
+> --- a/include/hw/s390x/tod.h
+> +++ b/include/hw/s390x/tod.h
+> @@ -12,7 +12,7 @@
+>  #define HW_S390_TOD_H
+>
+>  #include "hw/qdev.h"
+> -#include "s390-tod.h"
+> +#include "target/s390x/s390-tod.h"
+>
+>  typedef struct S390TOD {
+>      uint8_t high;
+> diff --git a/include/hw/semihosting/console.h b/include/hw/semihosting/console.h
+> index cfab572c0c..9be9754bcd 100644
+> --- a/include/hw/semihosting/console.h
+> +++ b/include/hw/semihosting/console.h
+> @@ -9,6 +9,8 @@
+>  #ifndef SEMIHOST_CONSOLE_H
+>  #define SEMIHOST_CONSOLE_H
+>
+> +#include "cpu.h"
+> +
+>  /**
+>   * qemu_semihosting_console_outs:
+>   * @env: CPUArchState
+> diff --git a/include/hw/sh4/sh_intc.h b/include/hw/sh4/sh_intc.h
+> index b7c2404334..3d3efde059 100644
+> --- a/include/hw/sh4/sh_intc.h
+> +++ b/include/hw/sh4/sh_intc.h
+> @@ -1,6 +1,7 @@
+>  #ifndef SH_INTC_H
+>  #define SH_INTC_H
+>
+> +#include "exec/memory.h"
+>  #include "hw/irq.h"
+>
+>  typedef unsigned char intc_enum;
+> diff --git a/include/hw/sparc/sparc64.h b/include/hw/sparc/sparc64.h
+> index 21ab79e343..4ced36fb5a 100644
+> --- a/include/hw/sparc/sparc64.h
+> +++ b/include/hw/sparc/sparc64.h
+> @@ -1,6 +1,8 @@
+>  #ifndef HW_SPARC_SPARC64_H
+>  #define HW_SPARC_SPARC64_H
+>
+> +#include "target/sparc/cpu-qom.h"
+> +
+>  #define IVEC_MAX             0x40
+>
+>  SPARCCPU *sparc64_cpu_devinit(const char *cpu_type, uint64_t prom_addr);
+> diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+> index 591279ba1f..aa07dac4fe 100644
+> --- a/include/hw/ssi/aspeed_smc.h
+> +++ b/include/hw/ssi/aspeed_smc.h
+> @@ -26,6 +26,7 @@
+>  #define ASPEED_SMC_H
+>
+>  #include "hw/ssi/ssi.h"
+> +#include "hw/sysbus.h"
+>
+>  typedef struct AspeedSegments {
+>      hwaddr addr;
+> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+> index a0a0ae7584..6a39b55a7b 100644
+> --- a/include/hw/ssi/xilinx_spips.h
+> +++ b/include/hw/ssi/xilinx_spips.h
+> @@ -28,6 +28,7 @@
+>  #include "hw/ssi/ssi.h"
+>  #include "qemu/fifo32.h"
+>  #include "hw/stream.h"
+> +#include "hw/sysbus.h"
+>
+>  typedef struct XilinxSPIPS XilinxSPIPS;
+>
+> diff --git a/include/hw/timer/allwinner-a10-pit.h b/include/hw/timer/allwinner-a10-pit.h
+> index c0cc3e2169..871c95b512 100644
+> --- a/include/hw/timer/allwinner-a10-pit.h
+> +++ b/include/hw/timer/allwinner-a10-pit.h
+> @@ -2,6 +2,7 @@
+>  #define ALLWINNER_A10_PIT_H
+>
+>  #include "hw/ptimer.h"
+> +#include "hw/sysbus.h"
+>
+>  #define TYPE_AW_A10_PIT "allwinner-A10-timer"
+>  #define AW_A10_PIT(obj) OBJECT_CHECK(AwA10PITState, (obj), TYPE_AW_A10_PIT)
+> diff --git a/include/hw/timer/i8254_internal.h b/include/hw/timer/i8254_internal.h
+> index c37a438f82..e611c6f227 100644
+> --- a/include/hw/timer/i8254_internal.h
+> +++ b/include/hw/timer/i8254_internal.h
+> @@ -27,6 +27,7 @@
+>
+>  #include "hw/hw.h"
+>  #include "hw/isa/isa.h"
+> +#include "hw/timer/i8254.h"
+>  #include "qemu/timer.h"
+>
+>  typedef struct PITChannelState {
+> diff --git a/include/hw/timer/m48t59.h b/include/hw/timer/m48t59.h
+> index 43efc91f56..d3fb50e08c 100644
+> --- a/include/hw/timer/m48t59.h
+> +++ b/include/hw/timer/m48t59.h
+> @@ -1,6 +1,8 @@
+>  #ifndef HW_M48T59_H
+>  #define HW_M48T59_H
+>
+> +#include "exec/hwaddr.h"
+> +#include "hw/irq.h"
+>  #include "qom/object.h"
+>
+>  #define TYPE_NVRAM "nvram"
+> diff --git a/include/hw/timer/mc146818rtc_regs.h b/include/hw/timer/mc146818rtc_regs.h
+> index c62f17bf2d..bfbb57e570 100644
+> --- a/include/hw/timer/mc146818rtc_regs.h
+> +++ b/include/hw/timer/mc146818rtc_regs.h
+> @@ -25,6 +25,8 @@
+>  #ifndef MC146818RTC_REGS_H
+>  #define MC146818RTC_REGS_H
+>
+> +#include "qemu/timer.h"
+> +
+>  #define RTC_ISA_IRQ 8
+>
+>  #define RTC_SECONDS             0
+> diff --git a/include/hw/timer/xlnx-zynqmp-rtc.h b/include/hw/timer/xlnx-zynqmp-rtc.h
+> index 6e9134edf6..97e32322ed 100644
+> --- a/include/hw/timer/xlnx-zynqmp-rtc.h
+> +++ b/include/hw/timer/xlnx-zynqmp-rtc.h
+> @@ -28,6 +28,7 @@
+>  #define HW_TIMER_XLNX_ZYNQMP_RTC_H
+>
+>  #include "hw/register.h"
+> +#include "hw/sysbus.h"
+>
+>  #define TYPE_XLNX_ZYNQMP_RTC "xlnx-zynmp.rtc"
+>
+> diff --git a/include/hw/virtio/virtio-access.h b/include/hw/virtio/virtio-access.h
+> index bdf58f3119..6818a23a2d 100644
+> --- a/include/hw/virtio/virtio-access.h
+> +++ b/include/hw/virtio/virtio-access.h
+> @@ -16,6 +16,7 @@
+>  #ifndef QEMU_VIRTIO_ACCESS_H
+>  #define QEMU_VIRTIO_ACCESS_H
+>
+> +#include "exec/hwaddr.h"
+>  #include "hw/virtio/virtio.h"
+>  #include "hw/virtio/virtio-bus.h"
+>
+> diff --git a/include/hw/virtio/virtio-gpu-bswap.h b/include/hw/virtio/virtio-gpu-bswap.h
+> index 38d12160f6..203f9e1718 100644
+> --- a/include/hw/virtio/virtio-gpu-bswap.h
+> +++ b/include/hw/virtio/virtio-gpu-bswap.h
+> @@ -15,6 +15,7 @@
+>  #define HW_VIRTIO_GPU_BSWAP_H
+>
+>  #include "qemu/bswap.h"
+> +#include "standard-headers/linux/virtio_gpu.h"
+>
+>  static inline void
+>  virtio_gpu_ctrl_hdr_bswap(struct virtio_gpu_ctrl_hdr *hdr)
+> diff --git a/include/hw/virtio/virtio-rng.h b/include/hw/virtio/virtio-rng.h
+> index 922dce7cac..ff699335e3 100644
+> --- a/include/hw/virtio/virtio-rng.h
+> +++ b/include/hw/virtio/virtio-rng.h
+> @@ -12,6 +12,7 @@
+>  #ifndef QEMU_VIRTIO_RNG_H
+>  #define QEMU_VIRTIO_RNG_H
+>
+> +#include "hw/virtio/virtio.h"
+>  #include "sysemu/rng.h"
+>  #include "sysemu/rng-random.h"
+>  #include "standard-headers/linux/virtio_rng.h"
+> diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
+> index daef0c0e23..8c5691ce20 100644
+> --- a/include/hw/watchdog/wdt_aspeed.h
+> +++ b/include/hw/watchdog/wdt_aspeed.h
+> @@ -10,6 +10,7 @@
+>  #ifndef WDT_ASPEED_H
+>  #define WDT_ASPEED_H
+>
+> +#include "hw/misc/aspeed_scu.h"
+>  #include "hw/sysbus.h"
+>
+>  #define TYPE_ASPEED_WDT "aspeed.wdt"
+> diff --git a/include/libdecnumber/decNumberLocal.h b/include/libdecnumber/decNumberLocal.h
+> index 12cf1d8b6f..4d53c077f2 100644
+> --- a/include/libdecnumber/decNumberLocal.h
+> +++ b/include/libdecnumber/decNumberLocal.h
+> @@ -44,6 +44,7 @@
+>    #define DECNLAUTHOR  "Mike Cowlishaw"              /* Who to blame */
+>
+>    #include "libdecnumber/dconfig.h"
+> +  #include "libdecnumber/decContext.h"
+>
+>    /* Conditional code flag -- set this to match hardware platform     */
+>    /* 1=little-endian, 0=big-endian                                   */
+> diff --git a/include/migration/cpu.h b/include/migration/cpu.h
+> index a40bd3549f..8424f1631a 100644
+> --- a/include/migration/cpu.h
+> +++ b/include/migration/cpu.h
+> @@ -2,6 +2,8 @@
+>  #ifndef MIGRATION_CPU_H
+>  #define MIGRATION_CPU_H
+>
+> +#include "exec/cpu-defs.h"
+> +
+>  #if TARGET_LONG_BITS == 64
+>  #define qemu_put_betl qemu_put_be64
+>  #define qemu_get_betl qemu_get_be64
+> diff --git a/include/monitor/hmp-target.h b/include/monitor/hmp-target.h
+> index 454e8ed155..8b7820a3ad 100644
+> --- a/include/monitor/hmp-target.h
+> +++ b/include/monitor/hmp-target.h
+> @@ -25,6 +25,8 @@
+>  #ifndef MONITOR_HMP_TARGET_H
+>  #define MONITOR_HMP_TARGET_H
+>
+> +#include "cpu.h"
+> +
+>  #define MD_TLONG 0
+>  #define MD_I32   1
+>
+> diff --git a/include/qemu/atomic128.h b/include/qemu/atomic128.h
+> index ddd0d55d31..6b34484e15 100644
+> --- a/include/qemu/atomic128.h
+> +++ b/include/qemu/atomic128.h
+> @@ -13,6 +13,8 @@
+>  #ifndef QEMU_ATOMIC128_H
+>  #define QEMU_ATOMIC128_H
+>
+> +#include "qemu/int128.h"
+> +
+>  /*
+>   * GCC is a house divided about supporting large atomic operations.
+>   *
+> diff --git a/include/qemu/ratelimit.h b/include/qemu/ratelimit.h
+> index 1b38291823..01da8d63f1 100644
+> --- a/include/qemu/ratelimit.h
+> +++ b/include/qemu/ratelimit.h
+> @@ -14,6 +14,8 @@
+>  #ifndef QEMU_RATELIMIT_H
+>  #define QEMU_RATELIMIT_H
+>
+> +#include "qemu/timer.h"
+> +
+>  typedef struct {
+>      int64_t slice_start_time;
+>      int64_t slice_end_time;
+> diff --git a/include/qemu/thread-win32.h b/include/qemu/thread-win32.h
+> index 50af5dd7ab..d0a1a9597e 100644
+> --- a/include/qemu/thread-win32.h
+> +++ b/include/qemu/thread-win32.h
+> @@ -47,6 +47,6 @@ struct QemuThread {
+>  };
+>
+>  /* Only valid for joinable threads.  */
+> -HANDLE qemu_thread_get_handle(QemuThread *thread);
+> +HANDLE qemu_thread_get_handle(struct QemuThread *thread);
+>
+>  #endif
+> diff --git a/include/sysemu/balloon.h b/include/sysemu/balloon.h
+> index c8f6145257..aea0c44985 100644
+> --- a/include/sysemu/balloon.h
+> +++ b/include/sysemu/balloon.h
+> @@ -14,6 +14,7 @@
+>  #ifndef QEMU_BALLOON_H
+>  #define QEMU_BALLOON_H
+>
+> +#include "exec/cpu-common.h"
+>  #include "qapi/qapi-types-misc.h"
+>
+>  typedef void (QEMUBalloonEvent)(void *opaque, ram_addr_t target);
+> diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
+> index 6debf53fc5..2c0a0a1cd8 100644
+> --- a/include/sysemu/cryptodev-vhost-user.h
+> +++ b/include/sysemu/cryptodev-vhost-user.h
+> @@ -23,6 +23,8 @@
+>  #ifndef CRYPTODEV_VHOST_USER_H
+>  #define CRYPTODEV_VHOST_USER_H
+>
+> +#include "sysemu/cryptodev-vhost.h"
+> +
+>  #define VHOST_USER_MAX_AUTH_KEY_LEN    512
+>  #define VHOST_USER_MAX_CIPHER_KEY_LEN  64
+>
+> diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
+> index d275b5a843..dd1722f2df 100644
+> --- a/include/sysemu/hvf.h
+> +++ b/include/sysemu/hvf.h
+> @@ -13,6 +13,7 @@
+>  #ifndef HVF_H
+>  #define HVF_H
+>
+> +#include "cpu.h"
+>  #include "qemu/bitops.h"
+>  #include "exec/memory.h"
+>  #include "sysemu/accel.h"
+> diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+> index 5f6240d5cb..6181486401 100644
+> --- a/include/sysemu/iothread.h
+> +++ b/include/sysemu/iothread.h
+> @@ -16,6 +16,7 @@
+>
+>  #include "block/aio.h"
+>  #include "qemu/thread.h"
+> +#include "qom/object.h"
+>
+>  #define TYPE_IOTHREAD "iothread"
+>
+> diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+> index 31df465fdc..787dbc7770 100644
+> --- a/include/sysemu/kvm_int.h
+> +++ b/include/sysemu/kvm_int.h
+> @@ -9,6 +9,8 @@
+>  #ifndef QEMU_KVM_INT_H
+>  #define QEMU_KVM_INT_H
+>
+> +#include "exec/cpu-common.h"
+> +#include "exec/memory.h"
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/accel.h"
+>  #include "sysemu/kvm.h"
+> diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapping.h
+> index 58452457ce..1b440df486 100644
+> --- a/include/sysemu/memory_mapping.h
+> +++ b/include/sysemu/memory_mapping.h
+> @@ -15,6 +15,8 @@
+>  #define MEMORY_MAPPING_H
+>
+>  #include "qemu/queue.h"
+> +#include "exec/cpu-common.h"
+> +#include "exec/cpu-defs.h"
+>  #include "exec/memory.h"
+>
+>  typedef struct GuestPhysBlock {
+> diff --git a/include/sysemu/xen-mapcache.h b/include/sysemu/xen-mapcache.h
+> index a03e2f1878..c8e7c2f6cf 100644
+> --- a/include/sysemu/xen-mapcache.h
+> +++ b/include/sysemu/xen-mapcache.h
+> @@ -9,6 +9,8 @@
+>  #ifndef XEN_MAPCACHE_H
+>  #define XEN_MAPCACHE_H
+>
+> +#include "exec/cpu-common.h"
+> +
+>  typedef hwaddr (*phys_offset_to_gaddr_t)(hwaddr phys_offset,
+>                                           ram_addr_t size);
+>  #ifdef CONFIG_XEN
+> diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
+> index d714127799..58bd3a1ec4 100644
+> --- a/include/ui/egl-helpers.h
+> +++ b/include/ui/egl-helpers.h
+> @@ -4,6 +4,9 @@
+>  #include <epoxy/gl.h>
+>  #include <epoxy/egl.h>
+>  #include <gbm.h>
+> +#include "qapi/qapi-types-ui.h"
+> +#include "ui/console.h"
+> +#include "ui/shader.h"
+>
+>  extern EGLDisplay *qemu_egl_display;
+>  extern EGLConfig qemu_egl_config;
+> diff --git a/include/ui/input.h b/include/ui/input.h
+> index 8c8ccb999f..c86219a1c1 100644
+> --- a/include/ui/input.h
+> +++ b/include/ui/input.h
+> @@ -2,6 +2,7 @@
+>  #define INPUT_H
+>
+>  #include "qapi/qapi-types-ui.h"
+> +#include "qemu/notify.h"
+>
+>  #define INPUT_EVENT_MASK_KEY   (1<<INPUT_EVENT_KIND_KEY)
+>  #define INPUT_EVENT_MASK_BTN   (1<<INPUT_EVENT_KIND_BTN)
+> diff --git a/include/ui/spice-display.h b/include/ui/spice-display.h
+> index eed60e4fae..58bb5b4c53 100644
+> --- a/include/ui/spice-display.h
+> +++ b/include/ui/spice-display.h
+> @@ -18,6 +18,7 @@
+>  #ifndef UI_SPICE_DISPLAY_H
+>  #define UI_SPICE_DISPLAY_H
+>
+> +#include <spice.h>
+>  #include <spice/ipc_ring.h>
+>  #include <spice/enums.h>
+>  #include <spice/qxl_dev.h>
+> diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+> index aab251bc4b..e9fba96be9 100644
+> --- a/target/hppa/cpu.h
+> +++ b/target/hppa/cpu.h
+> @@ -22,7 +22,7 @@
+>
+>  #include "cpu-qom.h"
+>  #include "exec/cpu-defs.h"
+> -
+> +#include "exec/memory.h"
+>
+>  /* PA-RISC 1.x processors have a strong memory model.  */
+>  /* ??? While we do not yet implement PA-RISC 2.0, those processors have
+> --
+> 2.21.0
+>
 >
 
