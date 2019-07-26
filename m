@@ -2,79 +2,82 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F69FC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE050C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:34:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8AD022BE8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:33:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8AD022BE8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7BD1E22BE8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:34:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iM0KPVuq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BD1E22BE8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38183 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqxXo-0001Ap-W6
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:33:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45126)
+	id 1hqxYd-0002EY-Hs
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:34:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47053)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hqxXa-0000ng-S6
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:33:36 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hqxYL-0001jC-Di
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hqxXX-0001Hl-RQ
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:33:32 -0400
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:44880)
+ (envelope-from <peter.maydell@linaro.org>) id 1hqxYJ-0004Vi-Bd
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:34:21 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43939)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hqxXX-00012n-Gx
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:33:31 -0400
-Received: by mail-wr1-f52.google.com with SMTP id p17so53870057wrf.11
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:33:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hqxYJ-00046J-3K
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:34:19 -0400
+Received: by mail-ot1-x343.google.com with SMTP id j11so30589204otp.10
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:34:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=OoLRuocXcyae0c39AfRGFFWkG6eGTv2vwCCtYPEVV7Y=;
+ b=iM0KPVuqOXCUwMVOHQkNDQk0jL1aDjxuz2N3JNymmtzQiM/c0suNjHmhtpfZH9hYHb
+ LKXdpfo2vm4jpFEjBSu4TUi915Df6hIfUdowOgrtF//o9LuKSbKnq/cOGcH/FT1ksey0
+ 5idTtyr35a4sB+pbZqttCzBSZtLT1Pfo/BSwPxAKrdpIZezDl5WwyIBGKxCr2ZyG+5rA
+ XCDxojeXbPQDksG3mwZgfoKqNEXCVLMq1lxtA6gU0HwmPO1cLajftGKG6sp3DohgmEEU
+ xVy9WpGL3V+B36xbZZY7+20HNN122D1OyTCP+aBsyKGyzeDPsMoRvw5UhNH1Au4smYpl
+ A6xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WEZZ/cBY8h7ri+PPBFXP50LbjKsNtDJvH8IqQZGVd1o=;
- b=o5ixlZRSQ6IZzDtMquNXr9v4Zj/dWcfVMC0gIE2rIC/IpYEifz/s3ljqg5mOPUwetV
- LMdF3+Y0PJTG6yvlhDvD5VrYebsDRx057oaZZaQG5hix0YSyV6/gaFPYqmodY1bbpBlH
- /AzkOQwy/3S3X2HOHa6NQXHlnIArHOv4M2oNVJSX2+iSitjuhNGjxj89c6r0QreD6emc
- KhIMVBi8OqhDh9A6kJW23948KToW3rCpwMMz8JtclCNNDdLpgY0TXqnp2TzBVhJIu4k4
- 97d95wlvpWbryUtcjaUuPujpRY1p7cg+cELWuOkFlUmoGycdMy96tCWJqFq7ANcxXX75
- EJHA==
-X-Gm-Message-State: APjAAAWGDrjt5CquLup9CsjGIQDNjabFWOcxIvZT5FMd57DCXmEWW/NO
- YKlM8oPZ/vWxYY7nyZXM+2uEHA==
-X-Google-Smtp-Source: APXvYqzRuxTVjNdABALIyZUwU3MXJSynNgTQBtAk6gCn6SPIshAi9qJzo8IDf8+Y+tpo13gIkkLOgg==
-X-Received: by 2002:adf:e552:: with SMTP id z18mr103608356wrm.45.1564137208047; 
- Fri, 26 Jul 2019 03:33:28 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:cc23:f353:392:d2ee?
- ([2001:b07:6468:f312:cc23:f353:392:d2ee])
- by smtp.gmail.com with ESMTPSA id h14sm50110654wrs.66.2019.07.26.03.33.26
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 26 Jul 2019 03:33:27 -0700 (PDT)
-To: "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190725032321.12721-1-alxndr@bu.edu>
- <20190725032321.12721-4-alxndr@bu.edu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9c699f01-7c2c-668f-2efb-dd8a3f59aff3@redhat.com>
-Date: Fri, 26 Jul 2019 12:33:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OoLRuocXcyae0c39AfRGFFWkG6eGTv2vwCCtYPEVV7Y=;
+ b=fpXbc3UrKLu45B1OlGNwcXIxeolgF+wEfjgXkRUdvykhvBDb4Mxuf/7yyxgDHNWyfD
+ dw5KKepKHV+Tu++9UfR8ozqJ7H/SHPD8jWp7qE3z2vzjGP3d0P+RzARYXDfBGM/RsJK9
+ qou1Kb7Efh7jyvLYBQPsI6gVfBTI3+8xfLOEYDp0GoQz9yTpxKA9luJx5e01FG/RoXol
+ uHNTOrkzXzlhF/9uBblIy6lXncF6P4SIcHnitOXAlTaesjazThraXMoCYuFfeXnRhYZX
+ 0fSTGuS+9+Ft7w437dIze6zcKH5TMbrlvoK9UjK50LFCzbozIFSofpZgMZEisrr/A8cb
+ V/Vw==
+X-Gm-Message-State: APjAAAWofAnSEeWQrxcOvR+G8S64CGuvYcSoZMZwyahxwQgR2bQ3+X6B
+ Dn2MLjQTDGDDmvKXhx6lQFIvfeAPlFBmVQ3NzmNP2g==
+X-Google-Smtp-Source: APXvYqw5MARY2qQ8WkEFlLREabgLfbbvcsqXA+W8g4Iy+qm5lQyVqZT0uzwcZvOA7UApbezemJl6zrK10BSvS5exFkA=
+X-Received: by 2002:a9d:4d81:: with SMTP id u1mr21177301otk.221.1564137253030; 
+ Fri, 26 Jul 2019 03:34:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190725032321.12721-4-alxndr@bu.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.52
-Subject: Re: [Qemu-devel] [RFC 03/19] fuzz: add fuzz accelerator
+References: <20190726103010.31741-1-alex.bennee@linaro.org>
+ <CAFEAcA9ioE_XcSuU_MXZAW=v-7Me6Nq_z9A830i+RswfNxGjcA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9ioE_XcSuU_MXZAW=v-7Me6Nq_z9A830i+RswfNxGjcA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 26 Jul 2019 11:34:02 +0100
+Message-ID: <CAFEAcA9q1=_faoFSJ0QFWuiN6h4WsOCK5LGfeo=OwO65vW6SSA@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v4] target/arm: generate a custom MIDR for
+ -cpu max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,27 +89,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "bsd@redhat.com" <bsd@redhat.com>,
- "superirishdonkey@gmail.com" <superirishdonkey@gmail.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 25/07/19 05:23, Oleinik, Alexander wrote:
-> +#ifdef CONFIG_FUZZ
-> +/* Both the client and the server have qtest_init's, Rename on of them... */
-> +void qtest_init_server(const char *qtest_chrdev, const char *qtest_log, Error **errp);
+On Fri, 26 Jul 2019 at 11:30, Peter Maydell <peter.maydell@linaro.org> wrot=
+e:
+>
+> On Fri, 26 Jul 2019 at 11:30, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+> >
+> > While most features are now detected by probing the ID_* registers
+> > kernels can (and do) use MIDR_EL1 for working out of they have to
+> > apply errata. This can trip up warnings in the kernel as it tries to
+> > work out if it should apply workarounds to features that don't
+> > actually exist in the reported CPU type.
+> >
+> > Avoid this problem by synthesising our own MIDR value.
+> >
+> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> > +        /*
+> > +         * Reset MIDR so the guest doesn't mistake our 'max' CPU type =
+for a real
+> > +         * one and try to apply errata workarounds or use impdef featu=
+res we
+> > +         * don't provide.
+> > +         * An IMPLEMENTER field of 0 means "reserved for software use"=
+;
+> > +         * ARCHITECTURE must be 0xf indicating "v7 or later, check ID =
+registers
+> > +         * to see which features are present";
+> > +         * the VARIANT, PARTNUM and REVISION fields are all implementa=
+tion
+> > +         * defined and we choose to define VARIANT and set the others =
+to zero.
+> > +         */
+> > +        t =3D FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0);
+> > +        t =3D FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf);
+> > +        t =3D FIELD_DP64(t, MIDR_EL1, PARTNUM, 'Q');
+> > +        t =3D FIELD_DP64(t, MIDR_EL1, VARIANT, 0);
+> > +        t =3D FIELD_DP64(t, MIDR_EL1, REVISION, 0);
+>
+> Comment still says we set VARIANT but code says we set PARTNUM...
 
-Just rename it in qtest.c and vl.c.
+I guess we might also briefly mention why we set PARTNUM
+("just in case guest code needs to distinguish this QEMU CPU from
+other software implementations, though this shouldn't be needed",
+or some such.)
 
-> +void qtest_server_recv(GString *inbuf); /* Client sends commands using this */
-
-Please define this in this patch already.
-
-> +#else
->  void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp);
-> +#endif
->  
-
+thanks
+-- PMM
 
