@@ -2,63 +2,62 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBE1C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B1FC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 748A1229F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:08:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748A1229F9
+	by mail.kernel.org (Postfix) with ESMTPS id 12E2D229F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 12:08:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12E2D229F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqz11-0005G2-CH
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:08:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58525)
+	id 1hqz16-0005gP-QV
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 08:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58528)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hqyyv-0005Vl-7u
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:59 -0400
+ (envelope-from <armbru@redhat.com>) id 1hqyyu-0005Vm-AE
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hqyyq-0007vV-AP
+ (envelope-from <armbru@redhat.com>) id 1hqyys-00083o-0z
  for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59172)
+Received: from mx1.redhat.com ([209.132.183.28]:44922)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hqyyp-0007qx-VK
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hqyyr-0007tX-JC
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 08:05:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E7026859FE
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 12:05:45 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BF5A94628B
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 12:05:47 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-30.ams2.redhat.com
  [10.36.116.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A07736FB
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 12:05:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 646D35DE6F;
+ Fri, 26 Jul 2019 12:05:45 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 86DD71132C38; Fri, 26 Jul 2019 14:05:42 +0200 (CEST)
+ id 5B9A81132DDB; Fri, 26 Jul 2019 14:05:42 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 14:05:23 +0200
-Message-Id: <20190726120542.9894-10-armbru@redhat.com>
+Date: Fri, 26 Jul 2019 14:05:20 +0200
+Message-Id: <20190726120542.9894-7-armbru@redhat.com>
 In-Reply-To: <20190726120542.9894-1-armbru@redhat.com>
 References: <20190726120542.9894-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 26 Jul 2019 12:05:45 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Fri, 26 Jul 2019 12:05:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 09/28] Include migration/qemu-file-types.h a
- lot less
+Subject: [Qemu-devel] [PATCH 06/28] trace: Eliminate use of TARGET_FMT_plx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,403 +69,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In my "build everything" tree, changing migration/qemu-file-types.h
-triggers a recompile of some 2600 out of 6600 objects (not counting
-tests and objects that don't depend on qemu/osdep.h).
+hw/tpm/trace-events uses TARGET_FMT_plx formats with uint64_t
+arguments.  That's wrong, TARGET_FMT_plx takes hwaddr.  Since hwaddr
+happens to be uint64_t, it works anyway.  Messed up in commit
+ec427498da5, v2.12.0.  Clean up by replacing TARGET_FMT_plx with its
+macro expansion.
 
-The culprit is again hw/hw.h, which supposedly includes it for
-convenience.
+scripts/tracetool/format/log_stap.py (commit 62dd1048c0b, v4.0.0) has
+a special case for TARGET_FMT_plx.  Delete it.
 
-Include migration/qemu-file-types.h only where it's needed.  Touching
-it now recompiles less than 200 objects.
-
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/acpi/piix4.c             | 1 +
- hw/block/virtio-blk.c       | 1 +
- hw/char/virtio-serial-bus.c | 1 +
- hw/display/virtio-gpu.c     | 1 +
- hw/intc/apic_common.c       | 1 +
- hw/nvram/eeprom93xx.c       | 1 +
- hw/nvram/fw_cfg.c           | 1 +
- hw/pci-host/piix.c          | 1 +
- hw/pci/msix.c               | 1 +
- hw/pci/pci.c                | 1 +
- hw/pci/shpc.c               | 1 +
- hw/ppc/spapr.c              | 1 +
- hw/s390x/s390-skeys.c       | 1 +
- hw/s390x/tod.c              | 1 +
- hw/s390x/virtio-ccw.c       | 1 +
- hw/scsi/mptsas.c            | 1 +
- hw/scsi/scsi-bus.c          | 1 +
- hw/scsi/scsi-disk.c         | 1 +
- hw/scsi/scsi-generic.c      | 1 +
- hw/scsi/virtio-scsi.c       | 1 +
- hw/timer/i8254_common.c     | 1 +
- hw/timer/twl92230.c         | 1 +
- hw/usb/redirect.c           | 1 +
- hw/virtio/vhost.c           | 1 +
- hw/virtio/virtio-mmio.c     | 1 +
- hw/virtio/virtio-pci.c      | 1 +
- hw/virtio/virtio.c          | 1 +
- include/hw/hw.h             | 1 -
- include/migration/cpu.h     | 1 +
- 29 files changed, 28 insertions(+), 1 deletion(-)
+ hw/tpm/trace-events                  | 4 ++--
+ scripts/tracetool/format/log_stap.py | 3 ---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index a59e58d937..0d8c821f37 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -40,6 +40,7 @@
- #include "hw/acpi/memory_hotplug.h"
- #include "hw/acpi/acpi_dev_interface.h"
- #include "hw/xen/xen.h"
-+#include "migration/qemu-file-types.h"
- #include "qom/cpu.h"
- #include "trace.h"
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index 0b94aa1526..25e47a595a 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -1,8 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
 =20
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index cbb3729158..1f40834d27 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -26,6 +26,7 @@
- # include <scsi/sg.h>
- #endif
- #include "hw/virtio/virtio-bus.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/virtio/virtio-access.h"
+ # tpm_crb.c
+-tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read =
+0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+-tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB writ=
+e 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
++tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read =
+0x016%" PRIx64 " len:%u val: 0x%" PRIx32
++tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB writ=
+e 0x%016" PRIx64 " len:%u val: 0x%" PRIx32
 =20
- /* Config size before the discard support (hide associated config fields=
-) */
-diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-index f7a54f261b..b868e54d72 100644
---- a/hw/char/virtio-serial-bus.c
-+++ b/hw/char/virtio-serial-bus.c
-@@ -22,6 +22,7 @@
- #include "qapi/error.h"
- #include "qemu/iov.h"
- #include "qemu/module.h"
-+#include "migration/qemu-file-types.h"
- #include "monitor/monitor.h"
- #include "qemu/error-report.h"
- #include "qemu/queue.h"
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 25d9e327fc..ed92071963 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -18,6 +18,7 @@
- #include "trace.h"
- #include "sysemu/dma.h"
- #include "hw/virtio/virtio.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/virtio/virtio-gpu.h"
- #include "hw/virtio/virtio-gpu-bswap.h"
- #include "hw/virtio/virtio-gpu-pixman.h"
-diff --git a/hw/intc/apic_common.c b/hw/intc/apic_common.c
-index e764a2bb03..7045761281 100644
---- a/hw/intc/apic_common.c
-+++ b/hw/intc/apic_common.c
-@@ -31,6 +31,7 @@
- #include "sysemu/kvm.h"
- #include "hw/qdev.h"
- #include "hw/sysbus.h"
-+#include "migration/qemu-file-types.h"
+ # tpm_passthrough.c
+ tpm_passthrough_handle_request(void *cmd) "processing command %p"
+diff --git a/scripts/tracetool/format/log_stap.py b/scripts/tracetool/for=
+mat/log_stap.py
+index 3ccbc09d61..9ab0cf2cce 100644
+--- a/scripts/tracetool/format/log_stap.py
++++ b/scripts/tracetool/format/log_stap.py
+@@ -30,9 +30,6 @@ def c_macro_to_format(macro):
+     if macro.startswith("PRI"):
+         return macro[3]
 =20
- static int apic_irq_delivered;
- bool apic_report_tpr_access;
-diff --git a/hw/nvram/eeprom93xx.c b/hw/nvram/eeprom93xx.c
-index 2db3d7cce6..5fc23df1d4 100644
---- a/hw/nvram/eeprom93xx.c
-+++ b/hw/nvram/eeprom93xx.c
-@@ -38,6 +38,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/nvram/eeprom93xx.h"
-+#include "migration/qemu-file-types.h"
+-    if macro =3D=3D "TARGET_FMT_plx":
+-        return "%016x"
+-
+     raise Exception("Unhandled macro '%s'" % macro)
 =20
- /* Debug EEPROM emulation. */
- //~ #define DEBUG_EEPROM
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 3032f1c65f..8db0297d59 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -31,6 +31,7 @@
- #include "hw/boards.h"
- #include "hw/nvram/fw_cfg.h"
- #include "hw/sysbus.h"
-+#include "migration/qemu-file-types.h"
- #include "trace.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index f3671d28b7..e5955457ab 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -32,6 +32,7 @@
- #include "qapi/error.h"
- #include "qemu/range.h"
- #include "hw/xen/xen.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/pci-host/pam.h"
- #include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/pci/msix.c b/hw/pci/msix.c
-index d39dcf32e8..ebe804b473 100644
---- a/hw/pci/msix.c
-+++ b/hw/pci/msix.c
-@@ -20,6 +20,7 @@
- #include "hw/pci/msix.h"
- #include "hw/pci/pci.h"
- #include "hw/xen/xen.h"
-+#include "migration/qemu-file-types.h"
- #include "qemu/range.h"
- #include "qapi/error.h"
- #include "trace.h"
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 8076a80ab3..43a3cac138 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -29,6 +29,7 @@
- #include "hw/pci/pci_bridge.h"
- #include "hw/pci/pci_bus.h"
- #include "hw/pci/pci_host.h"
-+#include "migration/qemu-file-types.h"
- #include "monitor/monitor.h"
- #include "net/net.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/pci/shpc.c b/hw/pci/shpc.c
-index 5a10c6e9a5..7f0aa28e44 100644
---- a/hw/pci/shpc.c
-+++ b/hw/pci/shpc.c
-@@ -4,6 +4,7 @@
- #include "qemu/range.h"
- #include "qemu/error-report.h"
- #include "hw/pci/shpc.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bus.h"
- #include "hw/pci/msi.h"
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 5cade1a374..76e815ceee 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -42,6 +42,7 @@
- #include "sysemu/hw_accel.h"
- #include "kvm_ppc.h"
- #include "migration/misc.h"
-+#include "migration/qemu-file-types.h"
- #include "migration/global_state.h"
- #include "migration/register.h"
- #include "mmu-hash64.h"
-diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
-index e5bd92c0c7..d4807f7777 100644
---- a/hw/s390x/s390-skeys.c
-+++ b/hw/s390x/s390-skeys.c
-@@ -18,6 +18,7 @@
- #include "qapi/qmp/qdict.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "migration/qemu-file-types.h"
- #include "migration/register.h"
-=20
- #define S390_SKEYS_BUFFER_SIZE (128 * KiB)  /* Room for 128k storage key=
-s */
-diff --git a/hw/s390x/tod.c b/hw/s390x/tod.c
-index a9fca8eb0b..1bf0875afa 100644
---- a/hw/s390x/tod.c
-+++ b/hw/s390x/tod.c
-@@ -14,6 +14,7 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "sysemu/kvm.h"
-+#include "migration/qemu-file-types.h"
- #include "migration/register.h"
-=20
- void s390_init_tod(void)
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 43d3a1b029..fa537bfba3 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -17,6 +17,7 @@
- #include "sysemu/kvm.h"
- #include "net/net.h"
- #include "hw/virtio/virtio.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/virtio/virtio-net.h"
- #include "hw/sysbus.h"
- #include "qemu/bitops.h"
-diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
-index 3f94d5ab55..6d2c15a2bc 100644
---- a/hw/scsi/mptsas.c
-+++ b/hw/scsi/mptsas.c
-@@ -34,6 +34,7 @@
- #include "trace.h"
- #include "qapi/error.h"
- #include "mptsas.h"
-+#include "migration/qemu-file-types.h"
- #include "mpi.h"
-=20
- #define NAA_LOCALLY_ASSIGNED_ID 0x3ULL
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index fdc3a0e4e0..81fe7c3301 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -5,6 +5,7 @@
- #include "qemu/module.h"
- #include "qemu/option.h"
- #include "hw/scsi/scsi.h"
-+#include "migration/qemu-file-types.h"
- #include "scsi/constants.h"
- #include "hw/qdev.h"
- #include "sysemu/block-backend.h"
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 8e95e3e38d..b5af00e1a4 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -25,6 +25,7 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "hw/scsi/scsi.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/scsi/emulation.h"
- #include "scsi/constants.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/scsi/scsi-generic.c b/hw/scsi/scsi-generic.c
-index f07891b3f6..6883cbb0ca 100644
---- a/hw/scsi/scsi-generic.c
-+++ b/hw/scsi/scsi-generic.c
-@@ -17,6 +17,7 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "hw/scsi/scsi.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/scsi/emulation.h"
- #include "sysemu/block-backend.h"
- #include "trace.h"
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 61ce365fe9..06a3cbcbda 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -17,6 +17,7 @@
- #include "qapi/error.h"
- #include "standard-headers/linux/virtio_ids.h"
- #include "hw/virtio/virtio-scsi.h"
-+#include "migration/qemu-file-types.h"
- #include "qemu/error-report.h"
- #include "qemu/iov.h"
- #include "qemu/module.h"
-diff --git a/hw/timer/i8254_common.c b/hw/timer/i8254_common.c
-index 76ca6ec444..3e980f2dee 100644
---- a/hw/timer/i8254_common.c
-+++ b/hw/timer/i8254_common.c
-@@ -30,6 +30,7 @@
- #include "qemu/timer.h"
- #include "hw/timer/i8254.h"
- #include "hw/timer/i8254_internal.h"
-+#include "migration/qemu-file-types.h"
-=20
- /* val must be 0 or 1 */
- void pit_set_gate(ISADevice *dev, int channel, int val)
-diff --git a/hw/timer/twl92230.c b/hw/timer/twl92230.c
-index 0ef4fc1fc1..91ae7bf203 100644
---- a/hw/timer/twl92230.c
-+++ b/hw/timer/twl92230.c
-@@ -24,6 +24,7 @@
- #include "hw/hw.h"
- #include "qemu/timer.h"
- #include "hw/i2c/i2c.h"
-+#include "migration/qemu-file-types.h"
- #include "sysemu/sysemu.h"
- #include "ui/console.h"
- #include "qemu/bcd.h"
-diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
-index 998fc6e4b0..846e60f3bb 100644
---- a/hw/usb/redirect.c
-+++ b/hw/usb/redirect.c
-@@ -41,6 +41,7 @@
- #include <usbredirfilter.h>
-=20
- #include "hw/usb.h"
-+#include "migration/qemu-file-types.h"
-=20
- /* ERROR is defined below. Remove any previous definition. */
- #undef ERROR
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index bc899fc60e..ba1006ad96 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -26,6 +26,7 @@
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
- #include "migration/blocker.h"
-+#include "migration/qemu-file-types.h"
- #include "sysemu/dma.h"
- #include "trace.h"
-=20
-diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-index 97b7f35496..d4c0997074 100644
---- a/hw/virtio/virtio-mmio.c
-+++ b/hw/virtio/virtio-mmio.c
-@@ -23,6 +23,7 @@
- #include "standard-headers/linux/virtio_mmio.h"
- #include "hw/sysbus.h"
- #include "hw/virtio/virtio.h"
-+#include "migration/qemu-file-types.h"
- #include "qemu/host-utils.h"
- #include "qemu/module.h"
- #include "sysemu/kvm.h"
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index ce928f2429..1769a70721 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -19,6 +19,7 @@
-=20
- #include "standard-headers/linux/virtio_pci.h"
- #include "hw/virtio/virtio.h"
-+#include "migration/qemu-file-types.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bus.h"
- #include "qapi/error.h"
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index a94ea18a9c..79c7a910cc 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -19,6 +19,7 @@
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "hw/virtio/virtio.h"
-+#include "migration/qemu-file-types.h"
- #include "qemu/atomic.h"
- #include "hw/virtio/virtio-bus.h"
- #include "hw/virtio/virtio-access.h"
-diff --git a/include/hw/hw.h b/include/hw/hw.h
-index a4fb2390e8..b399627cbe 100644
---- a/include/hw/hw.h
-+++ b/include/hw/hw.h
-@@ -11,7 +11,6 @@
- #include "exec/memory.h"
- #include "hw/irq.h"
- #include "migration/vmstate.h"
--#include "migration/qemu-file-types.h"
-=20
- void QEMU_NORETURN hw_error(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-=20
-diff --git a/include/migration/cpu.h b/include/migration/cpu.h
-index 8424f1631a..21c4fc9eab 100644
---- a/include/migration/cpu.h
-+++ b/include/migration/cpu.h
-@@ -3,6 +3,7 @@
- #define MIGRATION_CPU_H
-=20
- #include "exec/cpu-defs.h"
-+#include "migration/qemu-file-types.h"
-=20
- #if TARGET_LONG_BITS =3D=3D 64
- #define qemu_put_betl qemu_put_be64
+ def c_fmt_to_stap(fmt):
 --=20
 2.21.0
 
