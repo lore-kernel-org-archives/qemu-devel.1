@@ -2,69 +2,75 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 614D1C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB2AFC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:37:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 397F222C7E
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:35:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 397F222C7E
+	by mail.kernel.org (Postfix) with ESMTPS id 9F6B6229F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:37:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F6B6229F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwdQ-0005Ym-FF
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:35:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45188)
+	id 1hqweu-0006qn-SZ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:37:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49058)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hqwdA-00056r-D4
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:35:18 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hqwef-0006F5-R1
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:36:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hqwd5-0001iF-Jn
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:35:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36010)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hqwcz-0000x7-2Y; Fri, 26 Jul 2019 05:35:05 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B34A9C04959E;
- Fri, 26 Jul 2019 09:35:02 +0000 (UTC)
-Received: from work-vm (ovpn-117-185.ams2.redhat.com [10.36.117.185])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BE55600C4;
- Fri, 26 Jul 2019 09:35:01 +0000 (UTC)
-Date: Fri, 26 Jul 2019 10:34:59 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190726093459.GD2657@work-vm>
-References: <20190725163710.11703-1-peter.maydell@linaro.org>
- <20190725163710.11703-3-peter.maydell@linaro.org>
- <20190725172712.GM2656@work-vm>
- <CAFEAcA-jGvNS4N4qobLekHYdV82qSUWVQOvTRQbrpcCRF0Yvwg@mail.gmail.com>
- <20190725180007.GN2656@work-vm>
- <CAFEAcA8T25Fq5wj8a-K9KAyXdfj3+HtW=kTJ13zr+-iHFz4-GA@mail.gmail.com>
- <20190726093208.GC2657@work-vm>
- <CAFEAcA9G1RmT-Ot4rYfqTa-xHfTPVq+RJ2A_EB9ufNrEhzyBCw@mail.gmail.com>
+ (envelope-from <sgarzare@redhat.com>) id 1hqwea-0008Be-SI
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:36:46 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:43171)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqwea-0007sC-Km
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:36:44 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p13so53669138wru.10
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:36:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=KIcaoz8fRZh2eK5EjfDl5HCqLyQdsOWYcGjNeYxRgrI=;
+ b=gIIb+9OFLzGRb67szUUDoqk8CglH0GhDX5KT3lXUQTn7VDKFb0PfBMms0eVIKce3Ev
+ q7SoJhYMS/PxAS3/AoXnxaEN9vQgFw50yxL+Up1Mtb1fj6E0lHipPeMP7U3xZK2VeA1T
+ F+UPyQZCta5un7iO4riswkAuLTLjVECNY5NoYQ419selsInWZXIuK+UC/uuwFGOVepEC
+ U1NB/wqwnAl8eonZ+jWagF6aSM2dxPTASguY9snI9zpB9V0Zm2YOm2X8rF7IoD9c9HIL
+ ytk0rg3muD/6SCbBUb+YanVEQRQNke/G76kwGXKbrMrLdPfMXYmPOhU7x7mWsrrNnajz
+ iDCg==
+X-Gm-Message-State: APjAAAV+3h3TLvSRWFqKx10tdS8CbDj11OpdUnHfF97majby+bX1LS8k
+ AHE06TfYHSXR3lzunTu+iixpLg==
+X-Google-Smtp-Source: APXvYqxXsX2gga74IicmqqCfSsMUieJhrIx+ez/3RJOmWoMr9yPkkilIfV7qz9XvZ7UdIDGuAXiMbw==
+X-Received: by 2002:adf:f68b:: with SMTP id v11mr34841822wrp.116.1564133800483; 
+ Fri, 26 Jul 2019 02:36:40 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id v23sm45680831wmj.32.2019.07.26.02.36.39
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 26 Jul 2019 02:36:39 -0700 (PDT)
+Date: Fri, 26 Jul 2019 11:36:37 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Message-ID: <20190726093637.yv3w4ynkoyvzahq6@steredhat>
+References: <20190724171239.8764-1-mreitz@redhat.com>
+ <20190724171239.8764-2-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9G1RmT-Ot4rYfqTa-xHfTPVq+RJ2A_EB9ufNrEhzyBCw@mail.gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 26 Jul 2019 09:35:02 +0000 (UTC)
+In-Reply-To: <20190724171239.8764-2-mreitz@redhat.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
- VMSTATE_STRUCT_VARRAY macros
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v2 01/11] qemu-img: Fix
+ bdrv_has_zero_init() use in convert
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,36 +82,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Fri, 26 Jul 2019 at 10:32, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> >
-> > * Peter Maydell (peter.maydell@linaro.org) wrote:
-> > > Would
-> > >
-> > > /*
-> > >  * Check that type t2 is an array of type t1 of size n,
-> > >  * eg if t1 is 'foo' and n is 32 then t2 must be 'foo[32]'
-> > >  */
-> > >
-> > > be clearer ?
-> >
-> > Yep.
+On Wed, Jul 24, 2019 at 07:12:29PM +0200, Max Reitz wrote:
+> bdrv_has_zero_init() only has meaning for newly created images or image
+> areas.  If qemu-img convert did not create the image itself, it cannot
+> rely on bdrv_has_zero_init()'s result to carry any meaning.
 > 
-> OK, I'll fold that in. Are you happy for me to take this
-> via the target-arm tree for 4.1, given the two dependent
-> patches are both for arm devices?
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qemu-img.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 79983772de..0f4be80c10 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -1578,6 +1578,7 @@ typedef struct ImgConvertState {
+>      bool has_zero_init;
+>      bool compressed;
+>      bool unallocated_blocks_are_zero;
+> +    bool target_is_new;
+>      bool target_has_backing;
+>      int64_t target_backing_sectors; /* negative if unknown */
+>      bool wr_in_order;
+> @@ -1975,9 +1976,11 @@ static int convert_do_copy(ImgConvertState *s)
+>      int64_t sector_num = 0;
+>  
+>      /* Check whether we have zero initialisation or can get it efficiently */
+> -    s->has_zero_init = s->min_sparse && !s->target_has_backing
+> -                     ? bdrv_has_zero_init(blk_bs(s->target))
+> -                     : false;
+> +    if (s->target_is_new && s->min_sparse && !s->target_has_backing) {
+> +        s->has_zero_init = bdrv_has_zero_init(blk_bs(s->target));
+> +    } else {
+> +        s->has_zero_init = false;
+> +    }
+>  
+>      if (!s->has_zero_init && !s->target_has_backing &&
+>          bdrv_can_write_zeroes_with_unmap(blk_bs(s->target)))
+> @@ -2423,6 +2426,8 @@ static int img_convert(int argc, char **argv)
+>          }
+>      }
+>  
+> +    s.target_is_new = !skip_create;
+> +
+>      flags = s.min_sparse ? (BDRV_O_RDWR | BDRV_O_UNMAP) : BDRV_O_RDWR;
+>      ret = bdrv_parse_cache_mode(cache, &flags, &writethrough);
+>      if (ret < 0) {
 
-Yep
+Make sense!
 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks,
+Stefano
 
