@@ -2,140 +2,80 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659CDC7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBF8C7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:20:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36A4722BE8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:19:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36A4722BE8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6427A22BE8
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:20:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2LDzBZf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6427A22BE8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr6gH-0001Zl-8e
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 16:19:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57141)
+	id 1hr6hQ-0002i4-Hs
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 16:20:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58445)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hr6g4-00016i-Ey
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:18:57 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hr6hF-0002Bl-7V
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:20:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hr6g3-0006Ta-7v
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:18:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46706)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hr6g0-0006Lm-9y; Fri, 26 Jul 2019 16:18:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 218E083F3C;
- Fri, 26 Jul 2019 20:18:50 +0000 (UTC)
-Received: from [10.18.17.211] (dhcp-17-211.bos.redhat.com [10.18.17.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0EB3D1001B07;
- Fri, 26 Jul 2019 20:18:46 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: shaju.abraham@nutanix.com, qemu-devel@nongnu.org
-References: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
- <087e6cb5-b24d-b144-744c-d74defeadb86@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <34a8030e-a173-162d-6786-3dafa5a1d4ed@redhat.com>
-Date: Fri, 26 Jul 2019 16:18:46 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alistair23@gmail.com>) id 1hr6hE-0008LG-4J
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:20:09 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45181)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hr6hA-0008CZ-Ok; Fri, 26 Jul 2019 16:20:05 -0400
+Received: by mail-lf1-x143.google.com with SMTP id u10so37889636lfm.12;
+ Fri, 26 Jul 2019 13:20:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=i8GhjrgZ/1A+wzeMJutEsi+NVp4LvJ6MVmjlXTFeXPw=;
+ b=i2LDzBZfGZD0YxVpQOFlr+7yfQWwRNuf9p5DpgCOzWFYbXSzs6LmPPv5T7SLWexbJy
+ lbc5vUONLDEA6Dnk1fjPYYiPA45DB5lLwzxeWB3vbAmtzDofwcQzUMVvafToTnJeN0Zy
+ xv7tUtdIzneYavlssRRnOuGiPBWRyjnBkJb5ClAeob07oN3bKH1756KoDPsVsaUmXwQP
+ RjQYCtVXQw0eAUPtDaRuqVAbpsqQxKs5tAl/bQSJjwYdzB6Hg6WtnWotFLSaNY9NGASp
+ uOPVuJXDWLdq/E8Vxa7EbYqXQurXKD+Z588Atz/l3z4mtbHqBX1Z9re+KYCIHcHaT+JE
+ EhNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=i8GhjrgZ/1A+wzeMJutEsi+NVp4LvJ6MVmjlXTFeXPw=;
+ b=ZPIEWZwHSg30H1cOHOLiwz5zsXZx59UecSo+Kb4Ry+hKVXPNyPkW2wwEF/AL4MPBOb
+ oUvtA4udvylLIwGuPvjQE59yjkYdC2RXE20dCk5HMaXmYxxkWy/IX+PR1ydO82kdKv/P
+ 2nZM3Pu3GOz/EAfrza6YFCJWC/CgPVgDWFIwq9yyZZqRRVmFRtnrtWPTnOTc+GWKbGxP
+ BoCRL1NwOAGACFHk/BgwvU5RYqLwQJIv4bPBY+0wLs/DqUnbGSiVBvEHu1crQJwxcbZr
+ 8/CU3aSC+dfIu1S/C0Y9Q+ZPLHsDQfR19NfsaTlnIHtRmKZ0BoEPhWSctahic/ckqZQG
+ qQAg==
+X-Gm-Message-State: APjAAAXkIy9uzkgF8Tlje7mbNl+C6+t+kNdJfmfBS2vV0Ukb6BAOV2iM
+ HIO6wOKaFWO6xoiabbBfUNJklfJ4bvMauvwpUeA=
+X-Google-Smtp-Source: APXvYqxB90UowXWnTyucmFk4E/tRWRaoR5DuZchbg2RcDVrb3/rdfEeWQrZzbFysxeDEY+/efXZdthG/TMMQADFcygo=
+X-Received: by 2002:ac2:563c:: with SMTP id b28mr32403184lff.93.1564172403043; 
+ Fri, 26 Jul 2019 13:20:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <087e6cb5-b24d-b144-744c-d74defeadb86@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 26 Jul 2019 20:18:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] Fix Guest VM crash due to iSCSI Sense Key
- error
+References: <1563543645-20804-1-git-send-email-linux@roeck-us.net>
+ <1563543645-20804-2-git-send-email-linux@roeck-us.net>
+In-Reply-To: <1563543645-20804-2-git-send-email-linux@roeck-us.net>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 26 Jul 2019 13:16:30 -0700
+Message-ID: <CAKmqyKMEjj7xprsgbYkiPrZic+DQHjNpoc=2N1mzc13M1VZCwA@mail.gmail.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH 2/3] riscv: sivive_u: Add dummy serial
+ clock and aliases entry for uart
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,91 +87,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo, Stefan and Kevin: can I loop you in here? I'm quite uncertain
-about this and I'd like to clear this up quickly if it's possible:
+On Fri, Jul 19, 2019 at 6:41 AM Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> The riscv uart needs valid clocks. This requires a refereence
+> to the clock node. Since the SOC clock is not emulated by qemu,
+> add a reference to a fixed clock instead. The clock-frequency
+> entry in the uart node does not seem to be necessary, so drop it.
+>
+> In addition to a reference to the clock, the driver also needs
+> an aliases entry for the serial node. Add it as well.
+>
+> Without this patch, the serial driver fails to instantiate with
+> the following error message.
+>
+> sifive-serial 10013000.uart: unable to find controller clock
+> sifive-serial: probe of 10013000.uart failed with error -2
+>
+> when trying to boot Linux.
+>
+> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 
-On 7/25/19 8:58 PM, John Snow wrote:
-> 
-> 
-> On 7/7/19 10:55 PM, shaju.abraham@nutanix.com wrote:
->> From: Shaju Abraham <shaju.abraham@nutanix.com>
->>
->> During the  IDE DMA transfer for a ISCSI target,when libiscsi encounters
->> a SENSE KEY error, it sets the task->sense to  the value "COMMAND ABORTED".
->> The function iscsi_translate_sense() later translaters this error to -ECANCELED
->> and this value is passed to the callback function. In the case of  IDE DMA read
->> or write, the callback function returns immediately if the value of the ret
->> argument is -ECANCELED.
->> Later when ide_cancel_dma_sync() function is invoked  the assertion
->> "s->bus->dma->aiocb == ((void *)0)" fails and the qemu process gets terminated.
->> Fix the issue by making the value of s->bus->dma->aiocb = NULL when
->> -ECANCELED is passed to the callback.
->>
->> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
->> ---
->>  hw/ide/core.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/ide/core.c b/hw/ide/core.c
->> index 6afadf8..78ea357 100644
->> --- a/hw/ide/core.c
->> +++ b/hw/ide/core.c
->> @@ -841,6 +841,7 @@ static void ide_dma_cb(void *opaque, int ret)
->>      bool stay_active = false;
->>  
->>      if (ret == -ECANCELED) {
->> +        s->bus->dma->aiocb = NULL;
->>          return;
->>      }
->>  
->>
-> 
-> The part that makes me nervous here is that I can't remember why we do
-> NO cleanup whatsoever for the ECANCELED case.
-> 
-> commit 0d910cfeaf2076b116b4517166d5deb0fea76394
-> Author: Fam Zheng <famz@redhat.com>
-> Date:   Thu Sep 11 13:41:07 2014 +0800
-> 
->     ide/ahci: Check for -ECANCELED in aio callbacks
-> 
-> 
-> ... This looks like we never expected the aio callbacks to ever get
-> called with ECANCELED, so we treat this as a QEMU-internal signal.
-> 
-> It looks like we expect these callbacks to do NOTHING in this case; but
-> I'm not sure where the IDE state machine does its cleanup otherwise.
-> (The DMA might have been canceled, but the DMA and IDE state machines
-> still need to exit their loop.)
-> 
-> If you take a look at this patch from 2014 though, there are many other
-> spots where we have littered ECANCELED checks that might also cause
-> problems if we're receiving error codes we thought we couldn't get normally.
-> 
-> I am worried this patch papers over something worse.
-> 
-I'm not clear why Fam's patch adds a do-nothing return to the ide_dma_cb
-if it's invoked with ECANCELED: shouldn't it be the case that the IDE
-state machine needs to know that a transfer it was relying on to service
-an ATA command was canceled and treat it like an error?
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Why was it ever correct to ignore these? Is it because we only ever
-canceled DMA during reset/shutdown/etc?
+Alistair
 
-It appears as if iscsi requests can actually genuinely return an
-ECANCELED errno, so there are likely several places in the IDE code that
-need to accommodate this from happening.
-
-The easiest fix LOOKS like just deleting the special-casing of ECANCELED
-altogether and letting the error pathways handle things as normal.
-
-Am I mistaken?
-
---js
+> ---
+>  hw/riscv/sifive_u.c | 19 +++++++++++++++++--
+>  1 file changed, 17 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 0657046..5a221c6 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -76,6 +76,7 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      char *nodename;
+>      char ethclk_names[] = "pclk\0hclk\0tx_clk";
+>      uint32_t plic_phandle, ethclk_phandle, phandle = 1;
+> +    uint32_t uartclk_phandle;
+>
+>      fdt = s->fdt = create_device_tree(&s->fdt_size);
+>      if (!fdt) {
+> @@ -226,6 +227,17 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x0);
+>      g_free(nodename);
+>
+> +    uartclk_phandle = phandle++;
+> +    nodename = g_strdup_printf("/soc/uartclk");
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "fixed-clock");
+> +    qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x0);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", uartclk_phandle);
+> +    qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", uartclk_phandle);
+> +    uartclk_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> +    g_free(nodename);
+> +
+>      nodename = g_strdup_printf("/soc/uart@%lx",
+>          (long)memmap[SIFIVE_U_UART0].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+> @@ -233,8 +245,7 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+>          0x0, memmap[SIFIVE_U_UART0].base,
+>          0x0, memmap[SIFIVE_U_UART0].size);
+> -    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+> -                          SIFIVE_U_CLOCK_FREQ / 2);
+> +    qemu_fdt_setprop_cells(fdt, nodename, "clocks", uartclk_phandle);
+>      qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
+>      qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_UART0_IRQ);
+>
+> @@ -243,6 +254,10 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      if (cmdline) {
+>          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+>      }
+> +
+> +    qemu_fdt_add_subnode(fdt, "/aliases");
+> +    qemu_fdt_setprop_string(fdt, "/aliases", "serial0", nodename);
+> +
+>      g_free(nodename);
+>
+>      return fdt;
+> --
+> 2.7.4
+>
+>
 
