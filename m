@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46529C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E3CC7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:56:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 023A7217D9
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:56:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE67321842
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 17:56:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMX8tfFk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023A7217D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aWUgNkmd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE67321842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr4S8-0000Za-Ms
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 13:56:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58917)
+	id 1hr4SB-0000fU-KQ
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 13:56:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57582)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hr4NR-0005Lb-Nm
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:51:34 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hr4Mq-0002id-Hs
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hr4NQ-0000p1-I4
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:51:33 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33410)
+ (envelope-from <richard.henderson@linaro.org>) id 1hr4Mo-0007wV-Ul
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:56 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:46158)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hr4NQ-0000if-CO
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:51:32 -0400
-Received: by mail-pg1-x544.google.com with SMTP id f20so15878106pgj.0
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:51:30 -0700 (PDT)
+ id 1hr4Mo-0007nI-Nm
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 13:50:54 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id k189so6067897pgk.13
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 10:50:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=DJdrX3hGPWd+nibN4wc0pBIHsM6KUMw+bIbJb3gnsWg=;
- b=SMX8tfFkoYwIcv28vMhG4MahozdMyw8XYZvQYpm8lIsJRiHb2YmyH0RHZXRjuDqG8h
- aNaPPkmq5W0/5pVAmjCWfTw3wz9bM+uMD8/wWAd7UTVSZcmT3E1EswqaoFFdThQENjXW
- m6/AdnpmZt44SLMTqMHuS/1Ygct9wrRViSSX1T/N16/h31A7MIrgfc+3VctsYstZwYBF
- binQlAKZEC9FHXAt+6B1htgh6+w9laFYIrPMfNyZu/up+pEGglfJE8rnNYlPcS1VZbOD
- Tb+UqKL8bN/1z/8zfK4TddcX6zacp/nRkYa/T+205DTcD+r2xOL0uRy/6kbL+3xOLaUi
- +eSQ==
+ bh=oJFhsjTpA90uLnkSb8PliACzOJvjF9fpzncu9tcD1hw=;
+ b=aWUgNkmdWXEo6kR8q9PDUyX+wB7jKa/AFdJ6Jys42PvIqwzqopjF/6h/6ieaYqWvPv
+ bmS1gdB5b93+PUfkw0nJgufPFpswf78rQdYN9LIvGkoAdmj+miV5T/IL/RofwvNzG1mq
+ TBUX9h3WqEy6u9bcZZuKKmTj+17EmcuRn9f+3DqOo4ehAxSN03XEF2XU/AtEE8Mai4k+
+ 7n8TOPiHRtNuEWVnqcumd1oKgu2ISQ0OBpQba//8e3Hu8SuRnum7CLgbqZm2cpvzKuJY
+ BUCu/4Fgdb5zcTH8BfxbXOv8926Gaw6SlnUIJa98zBOu7OTGOOCkvc65+GkvYPrlBAqF
+ OOZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=DJdrX3hGPWd+nibN4wc0pBIHsM6KUMw+bIbJb3gnsWg=;
- b=FA2fHL1YvejWdllZ2nh8lcPtWMf0iiD2GX74OkmgzkrRa6eKE+vdRF5lr8zlGEy1Af
- cSZOigovVA4ATU59zKLa1whbLXCPDNk2UbN1VkNMkacfMZOVquiclyqo6htuzoJZOySU
- BQIBXRhsBsO5EaYFXVs825Gs8xUE8pe+mDeebD1tNEK1444pzyyuDHffMeBYDMia1hca
- eScGN6GXYbsdDbo+dmnx2LnmLRH8KJx0UjkGEHrX4x5OLTOAeZM/5XEEL8S94L14WzPj
- X/3MqVcl35IzBUldglo83n47TR2s6ktv2PalHeSJGZqwWTlBy/YzTe+933+9zgwcHARO
- 7dlA==
-X-Gm-Message-State: APjAAAVs3hwH7U1DJjCCxNanArryV7kUEi6wCGmeBhBwm9GWKzbZ6ItX
- TFUcaEiH2szJE8ZVn+sWgQeEpbNgthc=
-X-Google-Smtp-Source: APXvYqxt5OeXyTqlms/fhyEnWqA7BM19XAhuclm4VyzXPMYj4CgieR1zEPJaoVEaJ23TsrDFfI/G/g==
-X-Received: by 2002:a63:5823:: with SMTP id m35mr93897621pgb.329.1564163489154; 
- Fri, 26 Jul 2019 10:51:29 -0700 (PDT)
+ bh=oJFhsjTpA90uLnkSb8PliACzOJvjF9fpzncu9tcD1hw=;
+ b=AvoEht9Vqntz2+A6ZYoZ4+G/Y9dlzeRLKZHSOvTaHTwSvXqXFpatNvRRaHbcr8CyO+
+ Q0AYEGt7ulesUC1WzrYvZlxxAbTm/lfJV5bKl3BCXi1kebNMw1Ys5WvnWjdSf2wR7Ln3
+ 09ogLQReBNVuVcpKh/cQcKrhX8aY9D2umZ2i2PJALU8D6sByXZUmTGz/+8QFaErw/WxS
+ pU1qZ+EsOfgf7iMmsDBl5wNrA/vN3gdqA8KeXDwENd89NB4nAM9tnfjPY2h6Ao3XUzmK
+ jaRPEnTuTs9DBqwZ+/sTuPt16GJlsBjPZyhrNI53FeNnhcesCfeDCd/hGcaU8DVbtC1x
+ Axrw==
+X-Gm-Message-State: APjAAAVWgelOjOC7gZerAmE0glVfek1QRAofbGbt8O2rJMPD3HKwj/72
+ xVxh4H9xPvYFhB8+I0YUcjEFaCNFf28=
+X-Google-Smtp-Source: APXvYqwJzYMvqv4bmdcamzzmdTgWeG6TVMBHmDX5h5qRMb6yDbO5i8S4ee4+siw9TboP4O5IobLzcQ==
+X-Received: by 2002:a17:90a:2023:: with SMTP id
+ n32mr95173627pjc.3.1564163451357; 
+ Fri, 26 Jul 2019 10:50:51 -0700 (PDT)
 Received: from localhost.localdomain (97-126-117-207.tukw.qwest.net.
  [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id o24sm104287919pfp.135.2019.07.26.10.51.28
+ by smtp.gmail.com with ESMTPSA id o24sm104287919pfp.135.2019.07.26.10.50.50
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 10:51:28 -0700 (PDT)
+ Fri, 26 Jul 2019 10:50:50 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 26 Jul 2019 10:50:10 -0700
-Message-Id: <20190726175032.6769-46-richard.henderson@linaro.org>
+Date: Fri, 26 Jul 2019 10:49:40 -0700
+Message-Id: <20190726175032.6769-16-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190726175032.6769-1-richard.henderson@linaro.org>
 References: <20190726175032.6769-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: [Qemu-devel] [PATCH 45/67] target/arm: Convert T16 load/store
- (register offset)
+X-Received-From: 2607:f8b0:4864:20::52d
+Subject: [Qemu-devel] [PATCH 15/67] target/arm: Convert Saturating addition
+ and subtraction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,102 +99,206 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 51 ++----------------------------------------
- target/arm/t16.decode  | 15 +++++++++++++
- 2 files changed, 17 insertions(+), 49 deletions(-)
+ target/arm/helper.h    |  1 -
+ target/arm/op_helper.c | 15 ---------
+ target/arm/translate.c | 74 +++++++++++++++++++++++++++---------------
+ target/arm/a32.decode  | 10 ++++++
+ target/arm/t32.decode  |  9 +++++
+ 5 files changed, 66 insertions(+), 43 deletions(-)
 
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 132aa1682e..1fb2cb5a77 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -6,7 +6,6 @@ DEF_HELPER_3(add_saturate, i32, env, i32, i32)
+ DEF_HELPER_3(sub_saturate, i32, env, i32, i32)
+ DEF_HELPER_3(add_usaturate, i32, env, i32, i32)
+ DEF_HELPER_3(sub_usaturate, i32, env, i32, i32)
+-DEF_HELPER_2(double_saturate, i32, env, s32)
+ DEF_HELPER_FLAGS_2(sdiv, TCG_CALL_NO_RWG_SE, s32, s32, s32)
+ DEF_HELPER_FLAGS_2(udiv, TCG_CALL_NO_RWG_SE, i32, i32, i32)
+ DEF_HELPER_FLAGS_1(rbit, TCG_CALL_NO_RWG_SE, i32, i32)
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 1ab91f915e..142239b03a 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -135,21 +135,6 @@ uint32_t HELPER(sub_saturate)(CPUARMState *env, uint32_t a, uint32_t b)
+     return res;
+ }
+ 
+-uint32_t HELPER(double_saturate)(CPUARMState *env, int32_t val)
+-{
+-    uint32_t res;
+-    if (val >= 0x40000000) {
+-        res = ~SIGNBIT;
+-        env->QF = 1;
+-    } else if (val <= (int32_t)0xc0000000) {
+-        res = SIGNBIT;
+-        env->QF = 1;
+-    } else {
+-        res = val << 1;
+-    }
+-    return res;
+-}
+-
+ uint32_t HELPER(add_usaturate)(CPUARMState *env, uint32_t a, uint32_t b)
+ {
+     uint32_t res = a + b;
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 17a0eea425..7b87621315 100644
+index 354a52d36c..85f829c1bb 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -10754,55 +10754,8 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-         goto illegal_op;
+@@ -8174,6 +8174,47 @@ static bool trans_UMAAL(DisasContext *s, arg_UMAAL *a)
+     return true;
+ }
  
-     case 5:
--        /* load/store register offset.  */
--        rd = insn & 7;
--        rn = (insn >> 3) & 7;
--        rm = (insn >> 6) & 7;
--        op = (insn >> 9) & 7;
--        addr = load_reg(s, rn);
--        tmp = load_reg(s, rm);
--        tcg_gen_add_i32(addr, addr, tmp);
--        tcg_temp_free_i32(tmp);
--
--        if (op < 3) { /* store */
--            tmp = load_reg(s, rd);
--        } else {
--            tmp = tcg_temp_new_i32();
--        }
--
--        switch (op) {
--        case 0: /* str */
--            gen_aa32_st32_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 1: /* strh */
--            gen_aa32_st16_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 2: /* strb */
--            gen_aa32_st8_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 3: /* ldrsb */
--            gen_aa32_ld8s_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 4: /* ldr */
--            gen_aa32_ld32u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 5: /* ldrh */
--            gen_aa32_ld16u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 6: /* ldrb */
--            gen_aa32_ld8u_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        case 7: /* ldrsh */
--            gen_aa32_ld16s_iss(s, tmp, addr, get_mem_index(s), rd | ISSIs16Bit);
--            break;
--        }
--        if (op >= 3) { /* load */
++/*
++ * Saturating addition and subtraction
++ */
++
++static bool op_qaddsub(DisasContext *s, arg_rrr *a, bool add, bool doub)
++{
++    TCGv_i32 t0, t1;
++
++    if (s->thumb
++        ? !arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)
++        : !ENABLE_ARCH_5TE) {
++        return false;
++    }
++
++    t0 = load_reg(s, a->rm);
++    t1 = load_reg(s, a->rn);
++    if (doub) {
++        gen_helper_add_saturate(t1, cpu_env, t1, t1);
++    }
++    if (add) {
++        gen_helper_add_saturate(t0, cpu_env, t0, t1);
++    } else {
++        gen_helper_sub_saturate(t0, cpu_env, t0, t1);
++    }
++    tcg_temp_free_i32(t1);
++    store_reg(s, a->rd, t0);
++    return true;
++}
++
++#define DO_QADDSUB(NAME, ADD, DOUB) \
++static bool trans_##NAME(DisasContext *s, arg_rrr *a)    \
++{                                                        \
++    return op_qaddsub(s, a, ADD, DOUB);                  \
++}
++
++DO_QADDSUB(QADD, true, false)
++DO_QADDSUB(QSUB, false, false)
++DO_QADDSUB(QDADD, true, true)
++DO_QADDSUB(QDSUB, false, true)
++
++#undef DO_QADDSUB
+ 
+ /*
+  * Legacy decoder.
+@@ -8582,21 +8623,10 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             store_reg(s, rd, tmp);
+             break;
+         }
+-        case 0x5: /* saturating add/subtract */
+-            ARCH(5TE);
+-            rd = (insn >> 12) & 0xf;
+-            rn = (insn >> 16) & 0xf;
+-            tmp = load_reg(s, rm);
+-            tmp2 = load_reg(s, rn);
+-            if (op1 & 2)
+-                gen_helper_double_saturate(tmp2, cpu_env, tmp2);
+-            if (op1 & 1)
+-                gen_helper_sub_saturate(tmp, cpu_env, tmp, tmp2);
+-            else
+-                gen_helper_add_saturate(tmp, cpu_env, tmp, tmp2);
+-            tcg_temp_free_i32(tmp2);
 -            store_reg(s, rd, tmp);
--        } else {
--            tcg_temp_free_i32(tmp);
--        }
--        tcg_temp_free_i32(addr);
--        break;
-+        /* load/store register offset, in decodetree */
-+        goto illegal_op;
+-            break;
++        case 0x5:
++            /* Saturating addition and subtraction.  */
++            /* All done in decodetree.  Reach here for illegal ops.  */
++            goto illegal_op;
+         case 0x6: /* ERET */
+             if (op1 != 3) {
+                 goto illegal_op;
+@@ -10070,18 +10100,8 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             op = ((insn >> 17) & 0x38) | ((insn >> 4) & 7);
+             if (op < 4) {
+                 /* Saturating add/subtract.  */
+-                if (!arm_dc_feature(s, ARM_FEATURE_THUMB_DSP)) {
+-                    goto illegal_op;
+-                }
+-                tmp = load_reg(s, rn);
+-                tmp2 = load_reg(s, rm);
+-                if (op & 1)
+-                    gen_helper_double_saturate(tmp, cpu_env, tmp);
+-                if (op & 2)
+-                    gen_helper_sub_saturate(tmp, cpu_env, tmp2, tmp);
+-                else
+-                    gen_helper_add_saturate(tmp, cpu_env, tmp, tmp2);
+-                tcg_temp_free_i32(tmp2);
++                /* All done in decodetree.  Reach here for illegal ops.  */
++                goto illegal_op;
+             } else {
+                 switch (op) {
+                 case 0x0a: /* rbit */
+diff --git a/target/arm/a32.decode b/target/arm/a32.decode
+index 71846b79fd..af6712a9e8 100644
+--- a/target/arm/a32.decode
++++ b/target/arm/a32.decode
+@@ -27,6 +27,7 @@
+ &s_rri_rot       s rn rd imm rot
+ &s_rrrr          s rd rn rm ra
+ &rrrr            rd rn rm ra
++&rrr             rd rn rm
  
-     case 6:
-         /* load/store word immediate offset */
-diff --git a/target/arm/t16.decode b/target/arm/t16.decode
-index 9833fc97e7..567c5005d6 100644
---- a/target/arm/t16.decode
-+++ b/target/arm/t16.decode
-@@ -23,6 +23,7 @@
- &s_rrr_shr       !extern s rn rd rm rs shty
+ # Data-processing (register)
+ 
+@@ -122,3 +123,12 @@ UMULL            .... 0000 100 . .... .... .... 1001 ....     @s_rdamn
+ UMLAL            .... 0000 101 . .... .... .... 1001 ....     @s_rdamn
+ SMULL            .... 0000 110 . .... .... .... 1001 ....     @s_rdamn
+ SMLAL            .... 0000 111 . .... .... .... 1001 ....     @s_rdamn
++
++# Saturating addition and subtraction
++
++@rndm            ---- .... .... rn:4 rd:4 .... .... rm:4      &rrr
++
++QADD             .... 0001 0000 .... .... 0000 0101 ....      @rndm
++QSUB             .... 0001 0010 .... .... 0000 0101 ....      @rndm
++QDADD            .... 0001 0100 .... .... 0000 0101 ....      @rndm
++QDSUB            .... 0001 0110 .... .... 0000 0101 ....      @rndm
+diff --git a/target/arm/t32.decode b/target/arm/t32.decode
+index 8e301ed2a1..7a27b5cc5c 100644
+--- a/target/arm/t32.decode
++++ b/target/arm/t32.decode
+@@ -24,6 +24,7 @@
  &s_rri_rot       !extern s rn rd imm rot
  &s_rrrr          !extern s rd rn rm ra
-+&ldst_rr         !extern p w u rn rt rm shimm shtype
+ &rrrr            !extern rd rn rm ra
++&rrr             !extern rd rn rm
  
- # Set S if the instruction is outside of an IT block.
- %s               !function=t16_setflags
-@@ -54,3 +55,17 @@ ORR_rrri         010000 1100 ... ...            @lll_noshr
- MUL              010000 1101 rn:3 rd:3          &s_rrrr %s rm=%reg_0 ra=0
- BIC_rrri         010000 1110 ... ...            @lll_noshr
- MVN_rrri         010000 1111 ... ...            @lll_noshr
+ # Data-processing (register-shifted register)
+ 
+@@ -117,6 +118,7 @@ RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
+ @s0_rnadm        .... .... .... rn:4 ra:4 rd:4 .... rm:4      &s_rrrr s=0
+ @s0_rn0dm        .... .... .... rn:4 .... rd:4 .... rm:4      &s_rrrr ra=0 s=0
+ @rnadm           .... .... .... rn:4 ra:4 rd:4 .... rm:4      &rrrr
++@rndm            .... .... .... rn:4 .... rd:4 .... rm:4      &rrr
+ 
+ {
+   MUL            1111 1011 0000 .... 1111 .... 0000 ....      @s0_rn0dm
+@@ -128,3 +130,10 @@ UMULL            1111 1011 1010 .... .... .... 0000 ....      @s0_rnadm
+ SMLAL            1111 1011 1100 .... .... .... 0000 ....      @s0_rnadm
+ UMLAL            1111 1011 1110 .... .... .... 0000 ....      @s0_rnadm
+ UMAAL            1111 1011 1110 .... .... .... 0110 ....      @rnadm
 +
-+# Load/store (register offset)
++# Data-processing (two source registers)
 +
-+@ldst_rr         ....... rm:3 rn:3 rt:3 \
-+                 &ldst_rr p=1 w=0 u=1 shimm=0 shtype=0
-+
-+STR_rr           0101 000 ... ... ...           @ldst_rr
-+STRH_rr          0101 001 ... ... ...           @ldst_rr
-+STRB_rr          0101 010 ... ... ...           @ldst_rr
-+LDRSB_rr         0101 011 ... ... ...           @ldst_rr
-+LDR_rr           0101 100 ... ... ...           @ldst_rr
-+LDRH_rr          0101 101 ... ... ...           @ldst_rr
-+LDRB_rr          0101 110 ... ... ...           @ldst_rr
-+LDRSH_rr         0101 111 ... ... ...           @ldst_rr
++QADD             1111 1010 1000 .... 1111 .... 1000 ....      @rndm
++QSUB             1111 1010 1000 .... 1111 .... 1010 ....      @rndm
++QDADD            1111 1010 1000 .... 1111 .... 1001 ....      @rndm
++QDSUB            1111 1010 1000 .... 1111 .... 1011 ....      @rndm
 -- 
 2.17.1
 
