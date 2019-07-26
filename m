@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A738C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 08:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2ABC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 08:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1168E21951
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 08:34:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1168E21951
+	by mail.kernel.org (Postfix) with ESMTPS id 08F3321951
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 08:34:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F3321951
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqvfx-0000sl-Rt
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 04:34:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43761)
+	id 1hqvgJ-0002JP-4C
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 04:34:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45231)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1hqvfS-0007t6-FA
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:33:35 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hqvfl-0000Rh-0H
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:33:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1hqvfR-0001J6-8o
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:33:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47934)
+ (envelope-from <stefanha@redhat.com>) id 1hqvfh-0002Xr-Js
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:33:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45480)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hqvfQ-00018r-Sm
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:33:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hqvfh-0002Tl-DY
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 04:33:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C689A3086208
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 08:33:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B011030C583B
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 08:33:48 +0000 (UTC)
 Received: from localhost (ovpn-117-212.ams2.redhat.com [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C49E5C46C;
- Fri, 26 Jul 2019 08:33:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FC8A5D719;
+ Fri, 26 Jul 2019 08:33:38 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org,
 	virtio-fs@redhat.com
-Date: Fri, 26 Jul 2019 09:33:20 +0100
-Message-Id: <20190726083322.13637-2-stefanha@redhat.com>
+Date: Fri, 26 Jul 2019 09:33:22 +0100
+Message-Id: <20190726083322.13637-4-stefanha@redhat.com>
 In-Reply-To: <20190726083322.13637-1-stefanha@redhat.com>
 References: <20190726083322.13637-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 26 Jul 2019 08:33:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Fri, 26 Jul 2019 08:33:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/3] virtiofsd: sync up fuse.h Linux 5.1 header
+Subject: [Qemu-devel] [PATCH 3/3] virtiofsd: implement FUSE_INIT
+ map_alignment field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,141 +74,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Communicate the host page size to the FUSE client so that
+FUSE_SETUPMAPPING/FUSE_REMOVEMAPPING requests are aware of our alignment
+constraints.
+
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- contrib/virtiofsd/fuse_kernel.h | 51 ++++++++++++++++++++++-----------
- 1 file changed, 34 insertions(+), 17 deletions(-)
+ contrib/virtiofsd/fuse_lowlevel.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/contrib/virtiofsd/fuse_kernel.h b/contrib/virtiofsd/fuse_ker=
-nel.h
-index 3186efbed6..7722e0ac23 100644
---- a/contrib/virtiofsd/fuse_kernel.h
-+++ b/contrib/virtiofsd/fuse_kernel.h
-@@ -119,6 +119,12 @@
-  *
-  *  7.28
-  *  - add FUSE_COPY_FILE_RANGE
-+ *  - add FOPEN_CACHE_DIR
-+ *  - add FUSE_MAX_PAGES, add max_pages to init_out
-+ *  - add FUSE_CACHE_SYMLINKS
-+ *
-+ *  7.29
-+ *  - add FUSE_NO_OPENDIR_SUPPORT flag
-  */
+diff --git a/contrib/virtiofsd/fuse_lowlevel.c b/contrib/virtiofsd/fuse_l=
+owlevel.c
+index dbbfda78bf..452dd6b2b0 100644
+--- a/contrib/virtiofsd/fuse_lowlevel.c
++++ b/contrib/virtiofsd/fuse_lowlevel.c
+@@ -2131,6 +2131,12 @@ static void do_init(fuse_req_t req, fuse_ino_t nod=
+eid,
+ 	}
+ 	if (se->conn.proto_minor >=3D 23)
+ 		outarg.time_gran =3D se->conn.time_gran;
++	if (arg->flags & FUSE_MAP_ALIGNMENT) {
++		outarg.flags |=3D FUSE_MAP_ALIGNMENT;
++
++		/* This constraint comes from mmap(2) and munmap(2) */
++		outarg.map_alignment =3D sysconf(_SC_PAGE_SIZE);
++	}
 =20
- #ifndef _LINUX_FUSE_H
-@@ -154,7 +160,7 @@
- #define FUSE_KERNEL_VERSION 7
-=20
- /** Minor version number of this interface */
--#define FUSE_KERNEL_MINOR_VERSION 27
-+#define FUSE_KERNEL_MINOR_VERSION 29
-=20
- /** The node ID of the root inode */
- #define FUSE_ROOT_ID 1
-@@ -222,10 +228,12 @@ struct fuse_file_lock {
-  * FOPEN_DIRECT_IO: bypass page cache for this open file
-  * FOPEN_KEEP_CACHE: don't invalidate the data cache on open
-  * FOPEN_NONSEEKABLE: the file is not seekable
-+ * FOPEN_CACHE_DIR: allow caching this directory
-  */
- #define FOPEN_DIRECT_IO		(1 << 0)
- #define FOPEN_KEEP_CACHE	(1 << 1)
- #define FOPEN_NONSEEKABLE	(1 << 2)
-+#define FOPEN_CACHE_DIR		(1 << 3)
-=20
- /**
-  * INIT request/reply flags
-@@ -252,6 +260,9 @@ struct fuse_file_lock {
-  * FUSE_HANDLE_KILLPRIV: fs handles killing suid/sgid/cap on write/chown=
-/trunc
-  * FUSE_POSIX_ACL: filesystem supports posix acls
-  * FUSE_ABORT_ERROR: reading the device after abort returns ECONNABORTED
-+ * FUSE_MAX_PAGES: init_out.max_pages contains the max number of req pag=
-es
-+ * FUSE_CACHE_SYMLINKS: cache READLINK responses
-+ * FUSE_NO_OPENDIR_SUPPORT: kernel supports zero-message opendir
-  */
- #define FUSE_ASYNC_READ		(1 << 0)
- #define FUSE_POSIX_LOCKS	(1 << 1)
-@@ -275,6 +286,9 @@ struct fuse_file_lock {
- #define FUSE_HANDLE_KILLPRIV	(1 << 19)
- #define FUSE_POSIX_ACL		(1 << 20)
- #define FUSE_ABORT_ERROR	(1 << 21)
-+#define FUSE_MAX_PAGES		(1 << 22)
-+#define FUSE_CACHE_SYMLINKS	(1 << 23)
-+#define FUSE_NO_OPENDIR_SUPPORT (1 << 24)
-=20
- /**
-  * CUSE INIT request/reply flags
-@@ -385,8 +399,8 @@ enum fuse_opcode {
- 	FUSE_RENAME2		=3D 45,
- 	FUSE_LSEEK		=3D 46,
- 	FUSE_COPY_FILE_RANGE	=3D 47,
--        FUSE_SETUPMAPPING       =3D 48,
--        FUSE_REMOVEMAPPING      =3D 49,
-+	FUSE_SETUPMAPPING       =3D 48,
-+	FUSE_REMOVEMAPPING      =3D 49,
-=20
- 	/* CUSE specific operations */
- 	CUSE_INIT		=3D 4096,
-@@ -621,7 +635,9 @@ struct fuse_init_out {
- 	uint16_t	congestion_threshold;
- 	uint32_t	max_write;
- 	uint32_t	time_gran;
--	uint32_t	unused[9];
-+	uint16_t	max_pages;
-+	uint16_t	padding;
-+	uint32_t	unused[8];
- };
-=20
- #define CUSE_INIT_INFO_MAX 4096
-@@ -814,31 +830,32 @@ struct fuse_copy_file_range_in {
- };
-=20
- #define FUSE_SETUPMAPPING_FLAG_WRITE (1ull << 0)
-+#define FUSE_SETUPMAPPING_FLAG_READ (1ull << 1)
- struct fuse_setupmapping_in {
--        /* An already open handle */
-+	/* An already open handle */
- 	uint64_t	fh;
--        /* Offset into the file to start the mapping */
--        uint64_t        foffset;
--        /* Length of mapping required */
--        uint64_t        len;
--        /* Flags, FUSE_SETUPMAPPING_FLAG_* */
--        uint64_t        flags;
--        /* memory offset in to dax window */
--        uint64_t        moffset;
-+	/* Offset into the file to start the mapping */
-+	uint64_t	foffset;
-+	/* Length of mapping required */
-+	uint64_t	len;
-+	/* Flags, FUSE_SETUPMAPPING_FLAG_* */
-+	uint64_t	flags;
-+	/* Offset in Memory Window */
-+	uint64_t	moffset;
- };
-=20
- struct fuse_removemapping_in {
-         /* An already open handle */
--	uint64_t	fh;
-+        uint64_t	fh;
- 	/* number of fuse_removemapping_one follows */
- 	uint32_t        count;
- };
-=20
- struct fuse_removemapping_one {
--        /* Offset into the dax to start the unmapping */
-+	/* Offset into the dax window start the unmapping */
- 	uint64_t        moffset;
--	/* Length of mapping required */
--	uint64_t        len;
-+        /* Length of mapping required */
-+        uint64_t	len;
- };
-=20
- #endif /* _LINUX_FUSE_H */
+ 	if (se->debug) {
+ 		fuse_debug("   INIT: %u.%u\n", outarg.major, outarg.minor);
+@@ -2144,6 +2150,8 @@ static void do_init(fuse_req_t req, fuse_ino_t node=
+id,
+ 			   outarg.congestion_threshold);
+ 		fuse_debug("   time_gran=3D%u\n",
+ 			   outarg.time_gran);
++		fuse_debug("   map_alignment=3D%u\n",
++			   outarg.map_alignment);
+ 	}
+ 	if (arg->minor < 5)
+ 		outargsize =3D FUSE_COMPAT_INIT_OUT_SIZE;
 --=20
 2.21.0
 
