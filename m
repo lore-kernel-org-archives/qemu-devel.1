@@ -2,92 +2,78 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F736C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB10C76191
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D180722CD0
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:43:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cXcheX8C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D180722CD0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E0B0C22CD0
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 13:43:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B0C22CD0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr0VK-0000vN-Rt
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 09:43:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40566)
+	id 1hr0VV-0001i4-0P
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 09:43:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40738)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hr0V6-0000MA-Ky
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:43:13 -0400
+ (envelope-from <mst@redhat.com>) id 1hr0VE-0000n2-2o
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:43:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hr0V5-0006vi-LO
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:43:12 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44282)
+ (envelope-from <mst@redhat.com>) id 1hr0VD-00074U-03
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:43:19 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:32957)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hr0V5-0006uD-8b
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:43:11 -0400
-Received: by mail-pg1-x544.google.com with SMTP id i18so24819501pgl.11
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 06:43:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=AmS7UDuS3zEcCE4IUO/TDmWCbBzA+qKCEdMP7YkyQYw=;
- b=cXcheX8CHjDS73QfCxqveu+PZaEoxZziSuO7L8ZSY+BUBL9HL+0e8rEixQ2/gaS6H+
- UAVhuzF1bOLgX6fKEl2c3ae3yLXbZWoDIkvKX367vLmjhRq7AboyK2uuEFMzDQfgaWcq
- I5PnWijEVMM/Dh9TKmziKmtXN92X+T8i/nGfh8K8GCXpllbZD4PVykSBXzIzJ9eSTlfm
- ZfCt79n9I7G0Eq55f/TOnSujCiBUhul1/fyHTCYeoNTJB4jf+ph1MsOFW6+Cj9qBlKR1
- vlU/GhNRnpd2NUqQRXcQuEUMxiICXVXxA/Ca9YjtPzb9d+SJ+clmVVj2mT30uacHSuZQ
- jnSA==
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hr0VC-000740-RH
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 09:43:18 -0400
+Received: by mail-qt1-f194.google.com with SMTP id r6so48380552qtt.0
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 06:43:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=AmS7UDuS3zEcCE4IUO/TDmWCbBzA+qKCEdMP7YkyQYw=;
- b=YT95dfkfrClqZ3brSsfiCSw7hx71UwF2xzjb1RmhR8mCllxL4sPi+In8vCMrnQpPbZ
- y8V/OwMfWwVm4AtXH7hsRoXeOCYOtIa4mR9uREaIAzNv1vnYiXodpHhNgWC+D0xjwbea
- /3fw7ygxVIXAlwxJZsvY5hgXq4hEyFRFS8S9bvfSrBrWoY1nbUtE3ZtnrC/HNXKQCoIc
- MTG7YL45dfCO4TOX1bamIFadpAhP98yV/C+xJvNdlmUEgzfC7ChoXRONvNMb4id7lE7E
- ZocZxeAiydkscLncDEpCns9GF+XZL+3TmfGd0pd4IPwu8XwxkWB8yFJFc+xwxR8FkifJ
- vTnw==
-X-Gm-Message-State: APjAAAVfq9k0oa9ihzp8yPFiuCsesI/BL1JRYKVwkpId6YcfRVAAsW5k
- 4i0VjZHd9aN+d6t5QUO8bAjPWA==
-X-Google-Smtp-Source: APXvYqztq+3CG1P5MAxWuPcr8bGAHZPxxab8VSMoYbRu1vN3hBlc2Q5mmd6fTBjrGJj70xR0Y2t9vA==
-X-Received: by 2002:a65:5c4b:: with SMTP id v11mr48696434pgr.62.1564148590262; 
- Fri, 26 Jul 2019 06:43:10 -0700 (PDT)
-Received: from [192.168.1.11] (97-126-117-207.tukw.qwest.net. [97.126.117.207])
- by smtp.gmail.com with ESMTPSA id v184sm49410033pgd.34.2019.07.26.06.43.08
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 26 Jul 2019 06:43:09 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
- <1564123519581.61197@bt.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <5105ad51-98c5-ec01-b869-c32f69ec0e6f@linaro.org>
-Date: Fri, 26 Jul 2019 06:43:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Tpz0o0HtptiqWAbyMgcqjARVOPDVa2onb/Cwo4qFEWc=;
+ b=ab3LWVlrxj9JyfL9S+BOhOFEIsosIly8t1ENn18Q1rbSw5FgMFYLXVH++Jn37+v2eS
+ 4gukVRsvV1El+iObqkaxrFnPfI5/j3vunTNITd4yvQEFh92vzumC1S8I8BVo0+SjBuLd
+ RJK0k9wYiyGUkwYLx1l40sitmu6PkkjKf3WP87hTqFmP838wbpARD5AY054RXQY6kXMX
+ eVKWN836RO8gkZwrwB/3k4uGxQQCRU04IvxPXd11GwGhQkvY8uRVShOLiPx7SxxjG23t
+ HTL199AfFf4unj9xidVqufVQUiEOtCr2S4Z6YkgHU5/AUAtkdq0Ex8ZFi+LiJaOVgzMV
+ nv4w==
+X-Gm-Message-State: APjAAAVhU6zDBJKf3j42WRyvm8RCP+IbBePn21oJj96bzeyViQi1Ocgt
+ k45nJAaLGRRRJ+chtVj9XygSgw==
+X-Google-Smtp-Source: APXvYqx2i1owEavULFhYd7NwT9gUGptScRiUFymPV4s+qGuDDDGw7l9IODhtjXc0uUD/8Chy68RLTA==
+X-Received: by 2002:a0c:afbd:: with SMTP id s58mr68457919qvc.217.1564148597984; 
+ Fri, 26 Jul 2019 06:43:17 -0700 (PDT)
+Received: from redhat.com ([212.92.104.165])
+ by smtp.gmail.com with ESMTPSA id x23sm21612349qtp.37.2019.07.26.06.43.15
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 26 Jul 2019 06:43:17 -0700 (PDT)
+Date: Fri, 26 Jul 2019 09:43:12 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190726093727-mutt-send-email-mst@kernel.org>
+References: <20190702150606.24851-1-mst@redhat.com>
+ <CAFEAcA-Qcq1ZmfDO_dkh_H9-aeQVU83ceLKU1NXM3VpW8g5sPQ@mail.gmail.com>
+ <20190702124823-mutt-send-email-mst@kernel.org>
+ <CAFEAcA-UFks7CmtcMT15KzK3TzRqGjwXWtFa8K6XZ=Bks92CJw@mail.gmail.com>
+ <20190702142058-mutt-send-email-mst@kernel.org>
+ <CAFEAcA_c3UXPVy_rXR_FxyXRw5ZE1-QgumPr9B-j+pmvBGWgpQ@mail.gmail.com>
+ <CAFEAcA8EQPdNTDf_t2aFDkfBj8iSevYpVCxTjjuX9NFGJJbTkg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1564123519581.61197@bt.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH v5 05/15] hw/intc/armv7m_nic: Access
- MemoryRegion with MemOp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8EQPdNTDf_t2aFDkfBj8iSevYpVCxTjjuX9NFGJJbTkg@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.160.194
+Subject: Re: [Qemu-devel] [PULL 00/22] virtio, pc, pci: features, fixes,
+ cleanups
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,35 +85,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, sagark@eecs.berkeley.edu,
- mst@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
- Alistair.Francis@wdc.com, edgar.iglesias@gmail.com, alex.williamson@redhat.com,
- arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
- ehabkost@redhat.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- stefanha@redhat.com, shorne@gmail.com, david@gibson.dropbear.id.au,
- qemu-riscv@nongnu.org, kbastian@mail.uni-paderborn.de, cohuck@redhat.com,
- laurent@vivier.eu, qemu-ppc@nongnu.org, amarkovic@wavecomp.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/25/19 11:45 PM, tony.nguyen@bt.com wrote:
-> No-op SIZE_MEMOP macro allows us to later easily convert
-> memory_region_dispatch_{read|write} paramter "unsigned size" into a
-> size+sign+endianness encoded "MemOp op".
+On Fri, Jul 26, 2019 at 01:39:26PM +0100, Peter Maydell wrote:
+> On Tue, 2 Jul 2019 at 19:27, Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Tue, 2 Jul 2019 at 19:22, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Tue, Jul 02, 2019 at 06:20:01PM +0100, Peter Maydell wrote:
+> > > > On Tue, 2 Jul 2019 at 18:01, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > This isn't from mainline. We have a bit of a deadlock with linux merge
+> > > > > window opening soon. I think it's reasonable temporarily
+> > > > > and then before release either virtio-pmem gets there or I will
+> > > > > revert it and drop the header.
+> > > >
+> > > > It's definitely not ideal: until the headers are actually
+> > > > upstream there's no guarantee that they won't change ABI.
+> > >
+> > > But then I'm watching it, if I see that I'll drop the device from qemu for
+> > > now.
+> >
+> > OK; I guess we can take this for now if we make sure we revert
+> > if the headers aren't upstream by the time we get to say rc2
+> > (23rd July). (That is, we'd want to do any revert shortly after
+> > rc2, since rc3 might be the last rc before release.)
 > 
-> Being a no-op macro, this patch does not introduce any logical change.
+> Ping for status update -- have the headers hit the mainline
+> kernel yet? Do they match the versions we put into QEMU?
 > 
-> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  hw/intc/armv7m_nvic.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+> thanks
+> -- PMM
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Yes they do: here's the diff:
 
 
-r~
+diff --git a/include/standard-headers/linux/virtio_pmem.h b/include/standard-headers/linux/virtio_pmem.h
+index 7e3d43b121..c5f610ed6b 100644
+--- a/include/standard-headers/linux/virtio_pmem.h
++++ b/include/standard-headers/linux/virtio_pmem.h
+@@ -7,8 +7,8 @@
+  * Author(s): Pankaj Gupta <pagupta@redhat.com>
+  */
+ 
+-#ifndef _UAPI_LINUX_VIRTIO_PMEM_H
+-#define _UAPI_LINUX_VIRTIO_PMEM_H
++#ifndef _LINUX_VIRTIO_PMEM_H
++#define _LINUX_VIRTIO_PMEM_H
+ 
+ #include "standard-headers/linux/types.h"
+ #include "standard-headers/linux/virtio_ids.h"
+
+Didn't decide whether I want to update it now or after the pull,
+but it shouldn't matter. If you want to do an update now, go ahead.
+
+-- 
+MST
 
