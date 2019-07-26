@@ -2,75 +2,88 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F6AC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C21BC41517
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:48:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7F5D22CED
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:43:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7F5D22CED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1573422CED
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:48:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U6rMdZ5W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1573422CED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwl4-0002Gf-1J
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:43:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36630)
+	id 1hqwq6-0004su-Ez
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:48:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46673)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sgarzare@redhat.com>) id 1hqwkt-0001oS-Bv
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:43:16 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hqwpt-0004Tq-48
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sgarzare@redhat.com>) id 1hqwkr-0007hq-12
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:43:14 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:37338)
+ (envelope-from <alex.bennee@linaro.org>) id 1hqwpr-0007G3-2S
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:48:24 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36126)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hqwkq-0007YD-P0
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:43:12 -0400
-Received: by mail-wr1-f66.google.com with SMTP id n9so28646346wrr.4
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:43:11 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hqwpl-000756-26
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:48:17 -0400
+Received: by mail-wr1-x441.google.com with SMTP id n4so53820611wrs.3
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 02:48:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WP9TNtIq8AQ768qefR0XP58fo9jH6KyHrm9DYwaaZig=;
+ b=U6rMdZ5WOQSoWAtiKiiBA+JA2K0JAyP388XpcKB77kiSY14SWBHV0zPQ05Mh5PioH3
+ H5N+EAbNtW8TGJttq33QP36uZ8SACDzCUDq3/mm6k+7CdKfKN0ptof7Bw3aLc/aIc5Ft
+ RWx+9ppNjd1Ym1yy3mZhaicLkqc+/h6SIokaO9zwK4l8VJnbo/7+OROGSNYN8XQxSTFa
+ 6eD8BmY7zZ8G/zltd8SMwyGxc1K/1mfgUUGAo/zm1YIj7/9KpG1hxV6yTu11LIHDhF7A
+ G2ghsbrDkFjqAPW6YIthiEi7q+DzPup7QBCxAsk1tbporwU0LsqehohEri7CYVIB1QZa
+ wegQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=pejRmaXQT5QUmRslU30uo6WM/z8jJfWeLMmUB4fC/Ag=;
- b=hua46SCx66qe6R0ViSIvM0mCtXYBz0opY5KbOE9PA8tPr70gQ1R3AYsNl/TI4tgYmq
- HsoF+9QGS0EX3hqnP0ixTbVJcY8CWHbVvz1978D1T3kisWy+jeAd1DYQ6TAvoeFcUf9Q
- z66jiKpmDMc+fwnGIh3gsiS7krT9eZT8pddntKvOrQvOyjaDw5bVEJOWY6R6oHPKdJPX
- udvt7yXSGjMCbDeuzNM/G1kQIZ4NjoUYwYTww/nytFNdHMODp+dKOwi7upzgnqzZMNWg
- hzw8JvUbOXEYG6nv2T+dyJIlCmnXvff+Tvax8+TXVsd33Il17qJ41osEKPW4fLXpnBKh
- GrTQ==
-X-Gm-Message-State: APjAAAUu2ZSKlbNy2O3H0AZMtNv0pQQTj1hEJHw1GD0xqaZop3Gczr3r
- JpkshXR5SOy4eo/NfPBVY9WWzu7Qw6U=
-X-Google-Smtp-Source: APXvYqwWTjEv4juSehf9C06WLs8SERqXulkf85bRfRDHrWBx1TxL8xQtJIIF6My3MwRxBhMIq9G6AA==
-X-Received: by 2002:a5d:5607:: with SMTP id l7mr105549161wrv.228.1564134190762; 
- Fri, 26 Jul 2019 02:43:10 -0700 (PDT)
-Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
- [79.13.201.122])
- by smtp.gmail.com with ESMTPSA id t15sm45336986wrx.84.2019.07.26.02.43.09
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WP9TNtIq8AQ768qefR0XP58fo9jH6KyHrm9DYwaaZig=;
+ b=fERR1kYEcW0s0Kj8yWamcMF7AYRBVaFwOp4lwY+WsHdjMdJcOi1BZH0rPE4ShJAQcy
+ MmPKJfbPsqOL98JpClTU3t2bTt51g6OpNZZwg2CElmWWiaTB4H+q1WqMANiacgATtSzk
+ 14L/rZ5eeR7W68/MkQintswm5LrUL3RKls/GGD6xP7MR6GblUjrPqHEEcGkM11A6J3UE
+ 72yCKubETG+KZY3A45MEfBCfydlPGGImAQ3aJLonFta3KnRG7NoMxK9OVfwWrUQT/Wsa
+ atMItfJxHD4WNmvVNf9V6mATCbSFlZvmY1gv/E9z9uO60DxMvBsZ3Hnl97adHcohX/yu
+ 2MRw==
+X-Gm-Message-State: APjAAAUIVHfzRFanDtwwOa1O4tqoYLRHK8vMDnRn6OOF/2g2BeHceOQ6
+ Lyo5lC5Ht25JhSkgv+ZatqATTg==
+X-Google-Smtp-Source: APXvYqwWwZsMm+EKGuJa+XI/vz72W51AE+fNs9nbKHdoQaiPA/vfuuvuzqEkEPNg+IdL8+nrpS8GIA==
+X-Received: by 2002:adf:f046:: with SMTP id t6mr1459921wro.307.1564134487467; 
+ Fri, 26 Jul 2019 02:48:07 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id c1sm113646151wrh.1.2019.07.26.02.48.06
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 02:43:10 -0700 (PDT)
-Date: Fri, 26 Jul 2019 11:43:07 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190726094307.x3rm5tvpsh3s4vp4@steredhat>
-References: <20190724171239.8764-1-mreitz@redhat.com>
- <20190724171239.8764-6-mreitz@redhat.com>
+ Fri, 26 Jul 2019 02:48:06 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 356B41FF87;
+ Fri, 26 Jul 2019 10:48:06 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 26 Jul 2019 10:47:57 +0100
+Message-Id: <20190726094757.17779-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190724171239.8764-6-mreitz@redhat.com>
-User-Agent: NeoMutt/20180716
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v2 05/11] block: Use
- bdrv_has_zero_init_truncate()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v3] target/arm: generate a custom MIDR for -cpu
+ max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,54 +95,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 24, 2019 at 07:12:33PM +0200, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  block/parallels.c | 2 +-
->  block/vhdx.c      | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/parallels.c b/block/parallels.c
-> index 00fae125d1..7cd2714b69 100644
-> --- a/block/parallels.c
-> +++ b/block/parallels.c
-> @@ -835,7 +835,7 @@ static int parallels_open(BlockDriverState *bs, QDict *options, int flags,
->          goto fail_options;
->      }
->  
-> -    if (!bdrv_has_zero_init(bs->file->bs)) {
-> +    if (!bdrv_has_zero_init_truncate(bs->file->bs)) {
->          s->prealloc_mode = PRL_PREALLOC_MODE_FALLOCATE;
->      }
->  
-> diff --git a/block/vhdx.c b/block/vhdx.c
-> index d6070b6fa8..a02d1c99a7 100644
-> --- a/block/vhdx.c
-> +++ b/block/vhdx.c
-> @@ -1282,7 +1282,7 @@ static coroutine_fn int vhdx_co_writev(BlockDriverState *bs, int64_t sector_num,
->                  /* Queue another write of zero buffers if the underlying file
->                   * does not zero-fill on file extension */
->  
-> -                if (bdrv_has_zero_init(bs->file->bs) == 0) {
-> +                if (bdrv_has_zero_init_truncate(bs->file->bs) == 0) {
->                      use_zero_buffers = true;
->  
->                      /* zero fill the front, if any */
-> -- 
-> 2.21.0
-> 
+While most features are now detected by probing the ID_* registers
+kernels can (and do) use MIDR_EL1 for working out of they have to
+apply errata. This can trip up warnings in the kernel as it tries to
+work out if it should apply workarounds to features that don't
+actually exist in the reported CPU type.
 
-What about describing in the commit message why we are using
-bdrv_has_zero_init_truncate() like in the cover letter?
+Avoid this problem by synthesising our own MIDR value.
 
-With or without:
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Thanks,
-Stefano
+---
+v2
+  - don't leak QEMU version into ID reg
+v3
+  - move comment into one block
+  - explicit setting of more fields
+---
+ target/arm/cpu.h   |  6 ++++++
+ target/arm/cpu64.c | 17 +++++++++++++++++
+ 2 files changed, 23 insertions(+)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 94c990cddbd..67f2af0e169 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1611,6 +1611,12 @@ FIELD(V7M_FPCCR, ASPEN, 31, 1)
+ /*
+  * System register ID fields.
+  */
++FIELD(MIDR_EL1, REVISION, 0, 4)
++FIELD(MIDR_EL1, PARTNUM, 4, 12)
++FIELD(MIDR_EL1, ARCHITECTURE, 16, 4)
++FIELD(MIDR_EL1, VARIANT, 20, 4)
++FIELD(MIDR_EL1, IMPLEMENTER, 24, 8)
++
+ FIELD(ID_ISAR0, SWAP, 0, 4)
+ FIELD(ID_ISAR0, BITCOUNT, 4, 4)
+ FIELD(ID_ISAR0, BITFIELD, 8, 4)
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 1901997a064..f99008d7da1 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -296,6 +296,23 @@ static void aarch64_max_initfn(Object *obj)
+         uint32_t u;
+         aarch64_a57_initfn(obj);
+ 
++        /*
++         * Reset MIDR so the guest doesn't mistake our 'max' CPU type for a real
++         * one and try to apply errata workarounds or use impdef features we
++         * don't provide.
++         * An IMPLEMENTER field of 0 means "reserved for software use";
++         * ARCHITECTURE must be 0xf indicating "v7 or later, check ID registers
++         * to see which features are present";
++         * the VARIANT, PARTNUM and REVISION fields are all implementation
++         * defined and we choose to set VARIANT and leave the versions at zero.
++         */
++        t = FIELD_DP64(0, MIDR_EL1, IMPLEMENTER, 0);
++        t = FIELD_DP64(t, MIDR_EL1, ARCHITECTURE, 0xf);
++        t = FIELD_DP64(t, MIDR_EL1, PARTNUM, 'Q');
++        t = FIELD_DP64(t, MIDR_EL1, VARIANT, 0);
++        t = FIELD_DP64(t, MIDR_EL1, REVISION, 0);
++        cpu->midr = t;
++
+         t = cpu->isar.id_aa64isar0;
+         t = FIELD_DP64(t, ID_AA64ISAR0, AES, 2); /* AES + PMULL */
+         t = FIELD_DP64(t, ID_AA64ISAR0, SHA1, 1);
+-- 
+2.20.1
+
 
