@@ -6,84 +6,84 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 748CEC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB41C7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:16:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3DBE2086D
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:04:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 991FD22ADA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="obJaKR9l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3DBE2086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wzTVZHaW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 991FD22ADA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqx5n-00006s-1J
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:04:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35348)
+	id 1hqxH5-00038J-T5
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:16:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36285)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hqx5Y-0007yI-Bv
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:04:37 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hqxGm-0002hd-7o
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hqx5P-0005Mf-2v
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:04:28 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33883)
+ (envelope-from <alex.bennee@linaro.org>) id 1hqxGi-0007Ba-1t
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:16:10 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39857)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hqx5N-00057a-2W
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:04:26 -0400
-Received: by mail-wr1-x444.google.com with SMTP id 31so53851968wrm.1
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:04:20 -0700 (PDT)
+ id 1hqxGg-0006rQ-PA
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:16:07 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x4so689376wrt.6
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:16:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
  bh=A8c7FBmQXbxBQU4P/pA8IP6ZkMx8Vsd6UVTL0vHFK6c=;
- b=obJaKR9lUi46r5KstPz4huq63FxrsWJ8eYpZGjp+OikXuDX1evQLGD3TBMi1Olf8D6
- 5jor4DTUn/Xy1Qiqwu2C99gmPe7mU06oOMxoj2une4mtEgPCRzR13dKG4CR5U8ESfRdG
- nVAizwVESsjzY8kDOK/NCWa5zbMTYaxYbYTH6lXWvgKOvLo0yqLl3KnWhBMg+cZIjast
- ftKb3ZZHel/bGMFfE4/6ocR4ZeN6k+fiuiGkTX/Wojjgvvb8N0Ix4qDfEY+XGs4PNzC5
- D//VBvpo9IJuWxu2+YCgOPJidAFFSFlTdI+CNlWpyEEAQc8RNF0wM4BUJtBTzyIP1XWl
- /xTA==
+ b=wzTVZHaW33vrI7WV8r62yizLdAB4V0461nVb9uOiJ3cyLrxDEviMlLjFyV9CZInII+
+ EsdmWj33Lx5acd0a+vD9YqouO63H3HkHIn0L8/8ikOApaDjllcMX6Nno1u3G7LBoI2Vy
+ svDMr7iTVKEcynZ8888vJ5haFKcCuTyadh3KxDsuT5cfLrZmsQePo3xglpeygVhEY6o2
+ /RGUqV0IwdDqdleQY7FSpWr/zUxWDhUzpHndtAz9rn0nWSJ7YS/qSX4kocFZsj6u4R0w
+ 4ypY5ZkxqA8sE4WR4UN/jK1LVz+g2Cjq9b7u15VfAG6uRjDaeBKobutXxK0WyRIbTXjo
+ Dmsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
  bh=A8c7FBmQXbxBQU4P/pA8IP6ZkMx8Vsd6UVTL0vHFK6c=;
- b=Lw3duapGfNS4fzglwuCFzU8wfQEl0HW5zwkX2gaOIMN2y1HPybptrybwaB9USda4KO
- eIlv4F2B98NRzZsYHeuMi7z0LoUMEcHlh8Uz6QCKqKEcqOihaG/AkdbhBBDXEUvwj/dd
- TuWQeY7prBIfphXE73Mu6k93+3cm6rFiGng0w0uzds9eP2iyQ04mXyf+YFIAj8m3FNbA
- 9A3Ex1UZPs6/ZZQXnjUPSnoZY52UhCqP+HJUDSyAI6JkuoHa9iDlRkUBiRA8fdrJmmRe
- JOUHwyJB24v6lcxbC12lzofuPpXI4vgT+sC0FlrkPGitJ4akR3EB1dQaohy4c9D6UrFW
- kotw==
-X-Gm-Message-State: APjAAAUmQQkSmHyB91vYlFOu8mGs4KWBvDvbI1KCl7NsWC4Z2Qt92WSe
- erXcX28KnjlOFhd4bat8FC4blg==
-X-Google-Smtp-Source: APXvYqwQk39TqK8PmN9MbLqVYl1MrYXzDpNPGJNbyu/8qARx/7TGaOFB0c20txmCvIwDxim0FB7IpQ==
-X-Received: by 2002:adf:e84a:: with SMTP id d10mr12027178wrn.316.1564135458783; 
- Fri, 26 Jul 2019 03:04:18 -0700 (PDT)
+ b=Ejzk5w8bVe7luvSTnIMAzeD7ihZs1lwXV6hcUndsUdLC3ud2IlWM+4ey8TIfs/mbg0
+ lh9hPXKDAs2FzGkr5hzFoNXOfC4a9ZcjtdsNYiq9Mj31LNA0QuymHfHakUPdbReXD6Cb
+ mliAXtyDgrp8Tl6fpatFe9Lgic1jxgOYSTQ22LYo3qlm9gonfMN697sJYwAeynLDFRDk
+ /Xeu9xCzjHnx9lDXWkSQGyLSB5UQdiqlq0Z77XGg40OnAwkI268Fu+IwPB5lUwHmDt6c
+ 6qsXpLK3qMm6JMhnNdPsPQ3sXf11Tyd27JEdfR4sFP9tIft2JKnp5lHSvNLMcHczGycw
+ UZFw==
+X-Gm-Message-State: APjAAAWZvpIgrErr8/AFjr/WXgMmn12iLlzO5xr/VNfgB6HU0IRERRSw
+ OWEU3EkXZqtS2Yl05OZoM3W8Ig==
+X-Google-Smtp-Source: APXvYqzWU4FbM7J6Pgi5WXZvzuqMaZ+FTuTD2a8SCY9BP1AulLPd2Z3z+MQE2juVD9AsK/YKyMABdA==
+X-Received: by 2002:adf:f046:: with SMTP id t6mr1689754wro.307.1564136163223; 
+ Fri, 26 Jul 2019 03:16:03 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id z5sm36048241wmf.48.2019.07.26.03.04.18
+ by smtp.gmail.com with ESMTPSA id t15sm45454776wrx.84.2019.07.26.03.16.02
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 03:04:18 -0700 (PDT)
+ Fri, 26 Jul 2019 03:16:02 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id CC6FD1FF87;
- Fri, 26 Jul 2019 11:04:17 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 642621FF87;
+ Fri, 26 Jul 2019 11:16:02 +0100 (BST)
 References: <20190722151804.25467-1-peter.maydell@linaro.org>
  <20190722151804.25467-2-peter.maydell@linaro.org>
 User-agent: mu4e 1.3.3; emacs 27.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-arm@nongnu.org
 In-reply-to: <20190722151804.25467-2-peter.maydell@linaro.org>
-Date: Fri, 26 Jul 2019 11:04:17 +0100
-Message-ID: <87zhl1gli6.fsf@linaro.org>
+Date: Fri, 26 Jul 2019 11:16:02 +0100
+Message-ID: <87y30lgkyl.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::441
 Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH for-4.1? 1/2] hw/arm/boot:
  Rename elf_{low, high}_addr to image_{low, high}_addr
 X-BeenThere: qemu-devel@nongnu.org
