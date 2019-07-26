@@ -2,70 +2,92 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE0BC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 06:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D150CC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:18:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57B04218B8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 06:50:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B04218B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8C9321852
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 07:18:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C9321852
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqu3M-0002JA-DK
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 02:50:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35966)
+	id 1hquUZ-000309-9k
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 03:18:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47791)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hqu2w-00011g-CY
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 02:49:44 -0400
+ (envelope-from <sathnaga@linux.vnet.ibm.com>) id 1hquUM-0002Vk-AH
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hqu2t-0000kZ-UC
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 02:49:42 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.234]:31151)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hqu2f-00087t-Ql; Fri, 26 Jul 2019 02:49:26 -0400
-Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- RDW083A012ED68.bt.com (10.187.98.38) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Fri, 26 Jul 2019 07:48:41 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 26 Jul 2019 07:49:19 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 26 Jul
- 2019 07:49:19 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v5 15/15] target/sparc: sun4u Invert Endian
- TTE bit
-Thread-Index: AQHVQ34/izZ9UnNjhk+VqYg3zB4dlw==
-Date: Fri, 26 Jul 2019 06:49:19 +0000
-Message-ID: <1564123758372.45776@bt.com>
-References: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <3106a3c959c4498fad13a5799c89ba7b@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.42]
+ (envelope-from <sathnaga@linux.vnet.ibm.com>) id 1hquUJ-0006Fb-Ay
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:18:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41898)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sathnaga@linux.vnet.ibm.com>)
+ id 1hquUJ-00064R-2q
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 03:17:59 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6Q7HWEH137450
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:17:54 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2tytnjwe7s-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 03:17:54 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <sathnaga@linux.vnet.ibm.com>;
+ Fri, 26 Jul 2019 08:17:52 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 26 Jul 2019 08:17:50 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6Q7Hn1G52035790
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 26 Jul 2019 07:17:49 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6AB0EA405F;
+ Fri, 26 Jul 2019 07:17:49 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3C259A4064;
+ Fri, 26 Jul 2019 07:17:48 +0000 (GMT)
+Received: from sathnaga86.in.ibm.com (unknown [9.193.110.61])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 26 Jul 2019 07:17:48 +0000 (GMT)
+From: sathnaga@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Date: Fri, 26 Jul 2019 12:47:37 +0530
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 62.239.224.234
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v5 15/15] target/sparc: sun4u Invert Endian TTE
- bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19072607-0028-0000-0000-000003880808
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19072607-0029-0000-0000-0000244849D7
+Message-Id: <20190726071737.32298-1-sathnaga@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-26_04:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=638 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907260096
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH 0/2] Add support for powerpc acceptance test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,92 +99,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, walling@linux.ibm.com, sagark@eecs.berkeley.edu,
- mst@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
- laurent@vivier.eu, Alistair.Francis@wdc.com, edgar.iglesias@gmail.com,
- arikalo@wavecomp.com, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, rth@twiddle.net, atar4qemu@gmail.com,
- ehabkost@redhat.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- stefanha@redhat.com, shorne@gmail.com, david@gibson.dropbear.id.au,
- qemu-riscv@nongnu.org, kbastian@mail.uni-paderborn.de, cohuck@redhat.com,
- alex.williamson@redhat.com, qemu-ppc@nongnu.org, amarkovic@wavecomp.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bit configures endianness of PCI MMIO devices. It is used by
-Solaris and OpenBSD sunhme drivers.
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 
-Tested working on OpenBSD.
+This series attempt to add support for avocado acceptance
+test for powerpc and adds linux console boot test.
 
-Unfortunately Solaris 10 had a unrelated keyboard issue blocking
-testing... another inch towards Solaris 10 on SPARC64 =3D)
+avocado run boot_linux_console.py:BootLinuxConsole.test_ppc64le_pseries version.py vnc.py 
+JOB ID     : 918ed65e5e8bc1370c84c166a2c41936a700571e
+JOB LOG    : /home/sath/tests/results/job-2019-07-26T03.08-918ed65/job.log
+ (1/6) boot_linux_console.py:BootLinuxConsole.test_ppc64le_pseries: PASS (3.98 s)
+ (2/6) version.py:Version.test_qmp_human_info_version: PASS (0.15 s)
+ (3/6) vnc.py:Vnc.test_no_vnc: PASS (0.14 s)
+ (4/6) vnc.py:Vnc.test_no_vnc_change_password: PASS (0.13 s)
+ (5/6) vnc.py:Vnc.test_vnc_change_password_requires_a_password: PASS (0.14 s)
+ (6/6) vnc.py:Vnc.test_vnc_change_password: PASS (0.14 s)
+RESULTS    : PASS 6 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+JOB TIME   : 5.68 s
 
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
----
- target/sparc/cpu.h        | 2 ++
- target/sparc/mmu_helper.c | 8 +++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 8ed2250..77e8e07 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -277,6 +277,7 @@ enum {
+Satheesh Rajendran (2):
+  tests.acceptance.avocado_qemu: Add support for powerpc
+  tests.acceptance.boot_linux_console: Add pseries linux boot console
+    test
 
- #define TTE_VALID_BIT       (1ULL << 63)
- #define TTE_NFO_BIT         (1ULL << 60)
-+#define TTE_IE_BIT          (1ULL << 59)
- #define TTE_USED_BIT        (1ULL << 41)
- #define TTE_LOCKED_BIT      (1ULL <<  6)
- #define TTE_SIDEEFFECT_BIT  (1ULL <<  3)
-@@ -293,6 +294,7 @@ enum {
+ tests/acceptance/avocado_qemu/__init__.py |  4 ++++
+ tests/acceptance/boot_linux_console.py    | 20 ++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
- #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
- #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
-+#define TTE_IS_IE(tte)      ((tte) & TTE_IE_BIT)
- #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
- #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
- #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
-diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
-index 826e14b..77dc86a 100644
---- a/target/sparc/mmu_helper.c
-+++ b/target/sparc/mmu_helper.c
-@@ -537,6 +537,10 @@ static int get_physical_address_data(CPUSPARCState *en=
-v, hwaddr *physical,
-         if (ultrasparc_tag_match(&env->dtlb[i], address, context, physical=
-)) {
-             int do_fault =3D 0;
-
-+            if (TTE_IS_IE(env->dtlb[i].tte)) {
-+                attrs->byte_swap =3D true;
-+            }
-+
-             /* access ok? */
-             /* multiple bits in SFSR.FT may be set on TT_DFAULT */
-             if (TTE_IS_PRIV(env->dtlb[i].tte) && is_user) {
-@@ -792,7 +796,7 @@ void dump_mmu(CPUSPARCState *env)
-             }
-             if (TTE_IS_VALID(env->dtlb[i].tte)) {
-                 qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
--                            ", %s, %s, %s, %s, ctx %" PRId64 " %s\n",
-+                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n=
-",
-                             i,
-                             env->dtlb[i].tag & (uint64_t)~0x1fffULL,
-                             TTE_PA(env->dtlb[i].tte),
-@@ -801,6 +805,8 @@ void dump_mmu(CPUSPARCState *env)
-                             TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
-                             TTE_IS_LOCKED(env->dtlb[i].tte) ?
-                             "locked" : "unlocked",
-+                            TTE_IS_IE(env->dtlb[i].tte) ?
-+                            "yes" : "no",
-                             env->dtlb[i].tag & (uint64_t)0x1fffULL,
-                             TTE_IS_GLOBAL(env->dtlb[i].tte) ?
-                             "global" : "local");
---
-1.8.3.1
-
+-- 
+2.21.0
 
 
