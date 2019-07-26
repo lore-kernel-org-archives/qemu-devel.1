@@ -4,78 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02451C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38255C76191
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:07:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6A5721852
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:05:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A5721852
+	by mail.kernel.org (Postfix) with ESMTPS id 0CB8721852
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:07:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB8721852
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr2iN-00007H-0s
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 12:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50439)
+	id 1hr2kL-0002EV-8L
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 12:07:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52916)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hr2iD-00082N-Ee
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:04:54 -0400
+ (envelope-from <philmd@redhat.com>) id 1hr2kA-0001qT-9J
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hr2iB-0003wC-IQ
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:04:52 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39627)
+ (envelope-from <philmd@redhat.com>) id 1hr2k9-0002im-2X
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:06:54 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43031)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hr2iB-0003tA-Ac
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:04:51 -0400
-Received: by mail-wr1-f68.google.com with SMTP id x4so1829421wrt.6
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 09:04:51 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hr2k5-0002a2-7m
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:06:50 -0400
+Received: by mail-wr1-f66.google.com with SMTP id p13so54949547wru.10
+ for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 09:06:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=DF1Sx9D0OJ3IK7QMgOVSvOk2Wc38MyP0pYUxIQxIkIQ=;
- b=rTyaSY2oMJdHaXqZKJ7aJg166/ONpPRSYZ7JwSj8gawU3yJ6QeLEFR4IFqMIhkwPQ9
- 2VzbijmpuimEB3LsYeyI6fp9xXsA2GDqk7pIl0IHGcpzemPp62RbyzMvWn71V6g7hCm/
- 03S1lUjyOTYFiMsWsPHK/73EYTk+IPG9NS9aC/gmWIGgLy7JuEZHJj9x0aom741Km3NM
- 2xI2RGieiWOAZGSYrqIcufCknun0vNha3hUKFkBmVol2PWR7x4RUEjiWsvfTfKBMjEiC
- jDgCZKI3jrQHyXCAYLdMnPZr39qPFso8R0qlK+z/46hVKlR+MLyqdsEyRQ/kEz0gH/Pw
- 1z9Q==
-X-Gm-Message-State: APjAAAVKUpGpz6eSWQakfWAhrTeZY8dvZY9scYy8KDCRirBbujgIqh7J
- X1GZ9+cb7kbourA76quKRcfAXQ==
-X-Google-Smtp-Source: APXvYqxnHvvvBsDHS9vm6Ym3OXzVlYEXQrr5Zc+XzVSq7yip+UwiNMFhIu16osaN6K8HErUC5yWaww==
-X-Received: by 2002:adf:b60c:: with SMTP id f12mr67426349wre.231.1564157090313; 
- Fri, 26 Jul 2019 09:04:50 -0700 (PDT)
+ bh=zJp80MIjtF/+M6t+gwJWbVpXZkmatZkqR+o4H07SCAQ=;
+ b=i6Maha50IYSvk+d19OpQFHgQrxM1T6PutuL2SMn8QyMN1/G1OH8xoNuhrgQ0acRY1U
+ 0u2wDfeCkwHV7iaJghVtDsNxGbQq2utSL+Mmp4uITiewOIqg3ThQwme8WUTt6lMDF62I
+ 5qB+uYq/h+WPx8v+q4FXowj1uJQfa7wwtYm89rtxX41aI/OgT6Whh2Z+CTl4Azlej+Jh
+ f65BVbr82Yu6A+ZK9N03MXYgrk4P0DhgEtFJySP7MCQqGGbh5wHzty2U8wjD1iDgKu+y
+ c86331vIFwm9mn1SNnw4OKyw4My5h7jRaJIlJfNiizsQHVL9gCMB9RyzBDz9BB3Jexxf
+ +fvA==
+X-Gm-Message-State: APjAAAVLvAb1Ew2Bwh+8VY8wjejj0X8rvf6bMvUopFIwWtsyJPLLbiya
+ yil/lVuHM1MbmHNapfdLfZkAEw==
+X-Google-Smtp-Source: APXvYqz2OX72weLI8cUBss4JAcmKZjHVMsbe7L9x8Eakb7T072r308NXOIzlyPrWreuUS7Doo/EUvA==
+X-Received: by 2002:adf:a344:: with SMTP id d4mr26587106wrb.237.1564157206189; 
+ Fri, 26 Jul 2019 09:06:46 -0700 (PDT)
 Received: from [192.168.1.37] (190.red-81-40-121.staticip.rima-tde.net.
  [81.40.121.190])
- by smtp.gmail.com with ESMTPSA id d16sm45977944wrv.55.2019.07.26.09.04.49
+ by smtp.gmail.com with ESMTPSA id e7sm48724309wmd.0.2019.07.26.09.06.45
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 26 Jul 2019 09:04:49 -0700 (PDT)
+ Fri, 26 Jul 2019 09:06:45 -0700 (PDT)
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-7-armbru@redhat.com>
+ <20190726120542.9894-5-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <47d9768f-794d-fe37-c7e0-9dbe204bd419@redhat.com>
-Date: Fri, 26 Jul 2019 18:04:49 +0200
+Message-ID: <9f0af600-736c-2f6b-9aa8-1113f9fdf02a@redhat.com>
+Date: Fri, 26 Jul 2019 18:06:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190726120542.9894-7-armbru@redhat.com>
+In-Reply-To: <20190726120542.9894-5-armbru@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH 06/28] trace: Eliminate use of
- TARGET_FMT_plx
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 04/28] memory: Fix type of
+ IOMMUMemoryRegionClass member @parent_class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,60 +87,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 7/26/19 2:05 PM, Markus Armbruster wrote:
-> hw/tpm/trace-events uses TARGET_FMT_plx formats with uint64_t
-> arguments.  That's wrong, TARGET_FMT_plx takes hwaddr.  Since hwaddr
-> happens to be uint64_t, it works anyway.  Messed up in commit
-> ec427498da5, v2.12.0.  Clean up by replacing TARGET_FMT_plx with its
-> macro expansion.
+> TYPE_IOMMU_MEMORY_REGION is a direct subtype of TYPE_MEMORY_REGION.
+> Its instance struct is IOMMUMemoryRegion, and its first member is a
+> MemoryRegion.  Correct.  Its class struct is IOMMUMemoryRegionClass,
+> and its first member is a DeviceClass.  Wrong.  Messed up when commit
+> 1221a474676 introduced the QOM type.  It even included hw/qdev-core.h
+> just for that.
 > 
-> scripts/tracetool/format/log_stap.py (commit 62dd1048c0b, v4.0.0) has
-> a special case for TARGET_FMT_plx.  Delete it.
+> TYPE_MEMORY_REGION doesn't bother to define a class struct.  This is
+> fine, it simply defaults to its super-type TYPE_OBJECT's class struct
+> ObjectClass.  Changing IOMMUMemoryRegionClass's first member's type to
+> ObjectClass would be a minimal fix, if a bit brittle: if
+> TYPE_MEMORY_REGION ever acquired own class struct, we'd have to update
+> IOMMUMemoryRegionClass to use it.
 > 
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Fix it the clean and robust way instead: give TYPE_MEMORY_REGION its
+> own class struct MemoryRegionClass now, and use it for
+> IOMMUMemoryRegionClass's first member.
+> 
+> Revert the include of hw/qdev-core.h, and fix the few files that have
+> come to rely on it.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/display/vga-isa-mm.c | 1 +
+>  hw/net/pcnet.h          | 1 +
+>  include/exec/memory.h   | 9 +++++++--
+>  memory.c                | 1 +
+>  4 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
+> index 215e649719..a790f69b6d 100644
+> --- a/hw/display/vga-isa-mm.c
+> +++ b/hw/display/vga-isa-mm.c
+> @@ -22,6 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/bitops.h"
+>  #include "qemu/units.h"
+>  #include "hw/hw.h"
+>  #include "hw/display/vga.h"
+> diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
+> index 40831a7845..28d19a5c6f 100644
+> --- a/hw/net/pcnet.h
+> +++ b/hw/net/pcnet.h
+> @@ -8,6 +8,7 @@
+>  #define PCNET_LOOPTEST_NOCRC	2
+>  
+>  #include "exec/memory.h"
+> +#include "hw/irq.h"
+>  
+>  /* BUS CONFIGURATION REGISTERS */
+>  #define BCR_MSRDA    0
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index bb0961ddb9..238370a2ff 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -25,7 +25,6 @@
+>  #include "qemu/notify.h"
+>  #include "qom/object.h"
+>  #include "qemu/rcu.h"
+> -#include "hw/qdev-core.h"
+>  
+>  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+>  
+> @@ -205,6 +204,12 @@ struct MemoryRegionOps {
+>      } impl;
+>  };
+>  
+> +typedef struct MemoryRegionClass {
+> +    /* private */
+> +    ObjectClass parent_class;
+> +} MemoryRegionClass;
+> +
+> +
+>  enum IOMMUMemoryRegionAttr {
+>      IOMMU_ATTR_SPAPR_TCE_FD
+>  };
+> @@ -237,7 +242,7 @@ enum IOMMUMemoryRegionAttr {
+>   */
+>  typedef struct IOMMUMemoryRegionClass {
+>      /* private */
+> -    struct DeviceClass parent_class;
+> +    MemoryRegionClass parent_class;
+>  
+>      /*
+>       * Return a TLB entry that contains a given address.
+> diff --git a/memory.c b/memory.c
+> index d4579bbaec..bf108b596e 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -3223,6 +3223,7 @@ void memory_region_init_rom_device(MemoryRegion *mr,
+>  static const TypeInfo memory_region_info = {
+>      .parent             = TYPE_OBJECT,
+>      .name               = TYPE_MEMORY_REGION,
+> +    .class_size         = sizeof(MemoryRegionClass),
+>      .instance_size      = sizeof(MemoryRegion),
+>      .instance_init      = memory_region_initfn,
+>      .instance_finalize  = memory_region_finalize,
+> 
 
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> ---
->  hw/tpm/trace-events                  | 4 ++--
->  scripts/tracetool/format/log_stap.py | 3 ---
->  2 files changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 0b94aa1526..25e47a595a 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -1,8 +1,8 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->  
->  # tpm_crb.c
-> -tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> -tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> +tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read 0x016%" PRIx64 " len:%u val: 0x%" PRIx32
-> +tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB write 0x%016" PRIx64 " len:%u val: 0x%" PRIx32
->  
->  # tpm_passthrough.c
->  tpm_passthrough_handle_request(void *cmd) "processing command %p"
-> diff --git a/scripts/tracetool/format/log_stap.py b/scripts/tracetool/format/log_stap.py
-> index 3ccbc09d61..9ab0cf2cce 100644
-> --- a/scripts/tracetool/format/log_stap.py
-> +++ b/scripts/tracetool/format/log_stap.py
-> @@ -30,9 +30,6 @@ def c_macro_to_format(macro):
->      if macro.startswith("PRI"):
->          return macro[3]
->  
-> -    if macro == "TARGET_FMT_plx":
-> -        return "%016x"
-> -
->      raise Exception("Unhandled macro '%s'" % macro)
->  
->  def c_fmt_to_stap(fmt):
-> 
 
