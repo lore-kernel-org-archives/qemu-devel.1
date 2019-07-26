@@ -2,87 +2,90 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22936C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265DFC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E141F22BE8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:12:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="4h9Y2gCf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E141F22BE8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA63A22BEF
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 09:19:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA63A22BEF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqwHa-00017D-5u
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:12:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35645)
+	id 1hqwNm-0004Qs-Rd
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 05:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55681)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hqwHI-0000c0-2n
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:12:43 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hqwNW-0003pQ-2F
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hqwHA-0000DE-Tt
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:12:35 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:52306)
+ (envelope-from <mreitz@redhat.com>) id 1hqwNS-00052i-Pp
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 05:19:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49736)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hqwH4-000848-A1; Fri, 26 Jul 2019 05:12:26 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 1212A96F52;
- Fri, 26 Jul 2019 09:12:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564132339;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Q1772vBXvapvSD5tbTLGT/zlBP9h+P1My+8HFMiZbZU=;
- b=4h9Y2gCfVxerZjhL7dIqFOv7QT5SI9PURUVWgehWMre0D55B8DP9BprIivQ/iF73OKwsrO
- myQvoeqPx7DDigv5jm0Y0TIh/hEPUgF8MkpV78K44wcsOSfOSVTY3sljsPHuHfgmaUzs0V
- nB3n8+fi5lwHoGU5+YxpGRqB6yxpZL4=
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190725163710.11703-1-peter.maydell@linaro.org>
- <20190725163710.11703-3-peter.maydell@linaro.org>
- <20190725172712.GM2656@work-vm>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <fa5590b1-2d62-a9c4-c54e-957c9bac9ed1@greensocs.com>
-Date: Fri, 26 Jul 2019 11:12:18 +0200
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hqwNQ-0004i4-3P; Fri, 26 Jul 2019 05:19:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6559930833A0;
+ Fri, 26 Jul 2019 09:18:56 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-164.ams2.redhat.com
+ [10.36.116.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A158160C62;
+ Fri, 26 Jul 2019 09:18:54 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190725162704.12622-1-kwolf@redhat.com>
+ <20190725162704.12622-2-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7af54232-2168-4509-a8e6-5fc712d28cf4@redhat.com>
+Date: Fri, 26 Jul 2019 11:18:52 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190725172712.GM2656@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564132341;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Q1772vBXvapvSD5tbTLGT/zlBP9h+P1My+8HFMiZbZU=;
- b=x5W7Ttm4B9zzWvUWtw3E+2EkJqSl7j9wk3QRp0wET0+xpMaZUDTMojbk22B7rjbfHEoebj
- s8fQ0PWga3j/Jqkt6ErP8FD6nZMK1vKG84yP7rmNI7MTm8w2+FdWyZ/Bwtv8WOU0yygMLM
- RYhVJxoNW8oFYI0HmI67swWZ0u/Cdp4=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564132341; a=rsa-sha256; cv=none;
- b=4skvJs4Hvt2V0mLTB2pAitZPom/JUS7YzOC74fxYnGfh5wNK+pJR7eunjoWcuWOmseMZ/h
- GuK8Zj/QH6sWxpJ3z2MXxvtDNGQ2+Lreh/BDzUr0FRLzSagmFywdyFOOXJOYiLlinHfMCi
- 3ipAvasPQ0PRr8AgbTepiE8OtmvF2qc=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+In-Reply-To: <20190725162704.12622-2-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 26 Jul 2019 09:18:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH for-4.1? 2/2] vmstate.h: Type check
- VMSTATE_STRUCT_VARRAY macros
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/4] block: Remove blk_pread_unthrottled()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,42 +97,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Juan Quintela <quintela@redhat.com>
+Cc: dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8
+Content-Type: multipart/mixed; boundary="sk0INQduNfTCFpm9sV98pJhaYQV0XPY2h";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-devel@nongnu.org
+Message-ID: <7af54232-2168-4509-a8e6-5fc712d28cf4@redhat.com>
+Subject: Re: [PATCH 1/4] block: Remove blk_pread_unthrottled()
+References: <20190725162704.12622-1-kwolf@redhat.com>
+ <20190725162704.12622-2-kwolf@redhat.com>
+In-Reply-To: <20190725162704.12622-2-kwolf@redhat.com>
+
+--sk0INQduNfTCFpm9sV98pJhaYQV0XPY2h
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 25.07.19 18:27, Kevin Wolf wrote:
+> The functionality offered by blk_pread_unthrottled() goes back to commi=
+t
+> 498e386c584. Then, we couldn't perform I/O throttling with synchronous
+> requests because timers wouldn't be executed in polling loops. So the
+> commit automatically disabled I/O throttling as soon as a synchronous
+> request was issued.
+>=20
+> However, for geometry detection during disk initialisation, we always
+> used (and still use) synchronous requests even if guest requests use AI=
+O
+> later. Geometry detection was not wanted to disable I/O throttling, so
+> bdrv_pread_unthrottled() was introduced which disabled throttling only
+> temporarily.
+>=20
+> All of this isn't necessary any more because we do run timers in pollin=
+g
+> loop and even synchronous requests are now using coroutine
+> infrastructure internally. For this reason, commit 90c78624f already
+> removed the automatic disabling of I/O throttling.
+>=20
+> It's time to get rid of the workaround for the removed code, and its
+> abuse of blk_root_drained_begin()/end(), as well.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/sysemu/block-backend.h |  2 --
+>  block/block-backend.c          | 16 ----------------
+>  hw/block/hd-geometry.c         |  7 +------
+>  3 files changed, 1 insertion(+), 24 deletions(-)
+
+It took me a bit of git blaming to find out more about the history of
+timer execution (and finally arrived at
+https://lists.nongnu.org/archive/html/qemu-devel/2013-08/msg03060.html),
+but now I=E2=80=99m reasonably confident.
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-On 7/25/19 7:27 PM, Dr. David Alan Gilbert wrote:
-> * Peter Maydell (peter.maydell@linaro.org) wrote:
->> The VMSTATE_STRUCT_VARRAY_UINT32 macro is intended to handle
->> migrating a field which is an array of structs, but where instead of
->> migrating the entire array we only migrate a variable number of
->> elements of it.
->>
->> The VMSTATE_STRUCT_VARRAY_POINTER_UINT32 macro is intended to handle
->> migrating a field which is of pointer type, and points to a
->> dynamically allocated array of structs of variable size.
->>
->> We weren't actually checking that the field passed to
->> VMSTATE_STRUCT_VARRAY_UINT32 really is an array, with the result that
->> accidentally using it where the _POINTER_ macro was intended would
->> compile but silently corrupt memory on migration.
->>
->> Add type-checking that enforces that the field passed in is
->> really of the right array type. This applies to all the VMSTATE
->> macros which use flags including VMS_VARRAY_* but not VMS_POINTER.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> However, for the rest of it, from migration I'm happy:
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> 
+--sk0INQduNfTCFpm9sV98pJhaYQV0XPY2h--
 
-Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
-Tested-by: Damien Hedde <damien.hedde@greensocs.com>
+--Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Damien
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl06xXwACgkQ9AfbAGHV
+z0Dy9Af/SXXZLKTOk1AypeK+AFIzr9HnVWaze10bNmO2zUQUMweO/LSPmx+/Dhi2
+sbmGCRe2AhcXwZ2VxTQSe9L2uLmt9yiaByXnkJiudtsnpWD/rgkluU059l+jSTta
+Vunh52R1/FgtaH6ar3fnZKSw618LpM6YAKjVhFSOXMs7SRerDt+04j+eCKc6aukk
+kEK59IS4x5NfCXg614pKpR6JYKNLHFGKyCl3lvb3nyA/UWEDDjEeces7l4t9iHM3
+fxFoGFtlp/BMeu71KE86LqsXCSZvkVPMYdLX6H2G1WvXxToLt08fLfF3Ipy8x3q8
+Qkg9yRYwMj67myQZpNwsGXVSEQeyhQ==
+=j2pV
+-----END PGP SIGNATURE-----
+
+--Bl9HitvGTHy0NjgOJGskD0k6hNWJNxdT8--
 
