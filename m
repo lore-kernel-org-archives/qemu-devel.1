@@ -5,77 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CBF8C7618F
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F4AC7618F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6427A22BE8
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F18A22ADA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 20:24:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2LDzBZf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6427A22BE8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsBNHP00"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F18A22ADA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr6hQ-0002i4-Hs
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 16:20:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58445)
+	id 1hr6lN-0004xX-HP
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 16:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36211)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hr6hF-0002Bl-7V
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:20:10 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hr6lC-0004Xn-77
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:24:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hr6hE-0008LG-4J
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:20:09 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:45181)
+ (envelope-from <alistair23@gmail.com>) id 1hr6lB-0000ma-6f
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 16:24:14 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:34007)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hr6hA-0008CZ-Ok; Fri, 26 Jul 2019 16:20:05 -0400
-Received: by mail-lf1-x143.google.com with SMTP id u10so37889636lfm.12;
- Fri, 26 Jul 2019 13:20:04 -0700 (PDT)
+ id 1hr6lA-0000kR-Th; Fri, 26 Jul 2019 16:24:13 -0400
+Received: by mail-lf1-x144.google.com with SMTP id b29so30670199lfq.1;
+ Fri, 26 Jul 2019 13:24:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=i8GhjrgZ/1A+wzeMJutEsi+NVp4LvJ6MVmjlXTFeXPw=;
- b=i2LDzBZfGZD0YxVpQOFlr+7yfQWwRNuf9p5DpgCOzWFYbXSzs6LmPPv5T7SLWexbJy
- lbc5vUONLDEA6Dnk1fjPYYiPA45DB5lLwzxeWB3vbAmtzDofwcQzUMVvafToTnJeN0Zy
- xv7tUtdIzneYavlssRRnOuGiPBWRyjnBkJb5ClAeob07oN3bKH1756KoDPsVsaUmXwQP
- RjQYCtVXQw0eAUPtDaRuqVAbpsqQxKs5tAl/bQSJjwYdzB6Hg6WtnWotFLSaNY9NGASp
- uOPVuJXDWLdq/E8Vxa7EbYqXQurXKD+Z588Atz/l3z4mtbHqBX1Z9re+KYCIHcHaT+JE
- EhNQ==
+ :cc; bh=PXPU/+3u/PF1EvWautdMOVSW0hs0VZxvTGJk3krtKXg=;
+ b=XsBNHP00PjgCSCbp7vhXTjhYiiO0d8Mex4NT7yyc4R2wgtfnI86maYj+ZQQfO6BO4U
+ IE80ETyTO7Y9VWBGtAuyQbayghxAZfgmnTihvJSgPw/TCJgFDS/bdFBtrhwiUDFW/a9F
+ TZ4im8vSlgMqAE1QaaLd8wKsROKMhMN6sM/tW7FU4VQXXvQH4g+Uf9OgHAMi85zMlp67
+ 2LM+Fz8ocFmQNn7kGnW/tf6knTcsZRIcUCVsRYlN5CMHuIY2w+xNMpbEbUk/KtGQO+rl
+ fkgI1SXY9enHn1Re9MT32QqPte+ZV9lBWSRUxN8L5brL9l4fMkQ9CmdEtUQVzvpggjIv
+ cKGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=i8GhjrgZ/1A+wzeMJutEsi+NVp4LvJ6MVmjlXTFeXPw=;
- b=ZPIEWZwHSg30H1cOHOLiwz5zsXZx59UecSo+Kb4Ry+hKVXPNyPkW2wwEF/AL4MPBOb
- oUvtA4udvylLIwGuPvjQE59yjkYdC2RXE20dCk5HMaXmYxxkWy/IX+PR1ydO82kdKv/P
- 2nZM3Pu3GOz/EAfrza6YFCJWC/CgPVgDWFIwq9yyZZqRRVmFRtnrtWPTnOTc+GWKbGxP
- BoCRL1NwOAGACFHk/BgwvU5RYqLwQJIv4bPBY+0wLs/DqUnbGSiVBvEHu1crQJwxcbZr
- 8/CU3aSC+dfIu1S/C0Y9Q+ZPLHsDQfR19NfsaTlnIHtRmKZ0BoEPhWSctahic/ckqZQG
- qQAg==
-X-Gm-Message-State: APjAAAXkIy9uzkgF8Tlje7mbNl+C6+t+kNdJfmfBS2vV0Ukb6BAOV2iM
- HIO6wOKaFWO6xoiabbBfUNJklfJ4bvMauvwpUeA=
-X-Google-Smtp-Source: APXvYqxB90UowXWnTyucmFk4E/tRWRaoR5DuZchbg2RcDVrb3/rdfEeWQrZzbFysxeDEY+/efXZdthG/TMMQADFcygo=
-X-Received: by 2002:ac2:563c:: with SMTP id b28mr32403184lff.93.1564172403043; 
- Fri, 26 Jul 2019 13:20:03 -0700 (PDT)
+ bh=PXPU/+3u/PF1EvWautdMOVSW0hs0VZxvTGJk3krtKXg=;
+ b=KUekyOtAv669V0UaVtPtqOx8bSH7Zq07RG2AibEq0WhkQqlR6aEyzdgGdkasvJiCp2
+ LGTRvr9QEWt1Tue0IhIxd2Z750MHBucBnHfGOIJZcWDSZ/RakREddrriDPM6dvT4FMs0
+ vOZ2kbvH1cM/FcG6wgZ1b2TGOHv9vg55puz+1+hIiob3I96v5UmbkjdvmlwuRmeSKgLv
+ pO6OAwTvpZpKdK5O47sfspjP0V3/EL4/ccXjXluAfkgQrqu5ruDL/4XOAnJLSmi2yPkS
+ ZIUI74szdHhiJBvdgA52puOHgewxNBe3g2Z0KyzywSV7deW9OGM155bEUHn6r8vK2NRm
+ V4Mw==
+X-Gm-Message-State: APjAAAUb5kNWjFCGEWTVNBGrQauy4v1xpZa/TbenY2i4Jk73J01T4JJ3
+ WJGj3el2/m4YTxJell0GeSY10it0Xc5Wm6HxMbdIPKx4
+X-Google-Smtp-Source: APXvYqyiaMU5q318h6TYVoZgB5sqKMzzvw1zMtJCj2+hgyta6uvWH/zYTwMAbXfQXzCkXXPAgFBakMv71EObS0ZosNg=
+X-Received: by 2002:a19:6904:: with SMTP id e4mr26517940lfc.156.1564172651710; 
+ Fri, 26 Jul 2019 13:24:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <1563543645-20804-1-git-send-email-linux@roeck-us.net>
- <1563543645-20804-2-git-send-email-linux@roeck-us.net>
-In-Reply-To: <1563543645-20804-2-git-send-email-linux@roeck-us.net>
+References: <cover.1564080680.git.alistair.francis@wdc.com>
+ <10db21dad60854653b7b6272a44a63e2473af2b0.1564080680.git.alistair.francis@wdc.com>
+ <CAEiOBXV1CfOfpTFFNas0cALjAkhjgDb78GkLusPO2bzoHROrxA@mail.gmail.com>
+In-Reply-To: <CAEiOBXV1CfOfpTFFNas0cALjAkhjgDb78GkLusPO2bzoHROrxA@mail.gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 26 Jul 2019 13:16:30 -0700
-Message-ID: <CAKmqyKMEjj7xprsgbYkiPrZic+DQHjNpoc=2N1mzc13M1VZCwA@mail.gmail.com>
-To: Guenter Roeck <linux@roeck-us.net>
+Date: Fri, 26 Jul 2019 13:20:38 -0700
+Message-ID: <CAKmqyKPcC8x2vguti1V_c6LXdTrPQU_T1OFftvpvU1iwuofjjA@mail.gmail.com>
+To: Chih-Min Chao <chihmin.chao@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH 2/3] riscv: sivive_u: Add dummy serial
- clock and aliases entry for uart
+X-Received-From: 2a00:1450:4864:20::144
+Subject: Re: [Qemu-devel] [PATCH-4.2 v1 5/6] target/riscv: Update the
+ Hypervisor CSRs to v0.4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,96 +90,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 19, 2019 at 6:41 AM Guenter Roeck <linux@roeck-us.net> wrote:
+On Fri, Jul 26, 2019 at 10:41 AM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
 >
-> The riscv uart needs valid clocks. This requires a refereence
-> to the clock node. Since the SOC clock is not emulated by qemu,
-> add a reference to a fixed clock instead. The clock-frequency
-> entry in the uart node does not seem to be necessary, so drop it.
 >
-> In addition to a reference to the clock, the driver also needs
-> an aliases entry for the serial node. Add it as well.
 >
-> Without this patch, the serial driver fails to instantiate with
-> the following error message.
+> On Fri, Jul 26, 2019 at 2:55 AM Alistair Francis <alistair.francis@wdc.com> wrote:
+>>
+>> Update the Hypervisor CSR addresses to match the v0.4 spec.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  target/riscv/cpu_bits.h | 35 ++++++++++++++++++-----------------
+>>  1 file changed, 18 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+>> index 11f971ad5d..97b96c4e19 100644
+>> --- a/target/riscv/cpu_bits.h
+>> +++ b/target/riscv/cpu_bits.h
+>> @@ -173,6 +173,24 @@
+>>  #define CSR_SPTBR           0x180
+>>  #define CSR_SATP            0x180
+>>
+>> +/* Hpervisor CSRs */
+>> +#define CSR_HSTATUS         0x600
+>> +#define CSR_HEDELEG         0x602
+>> +#define CSR_HIDELEG         0x603
+>> +#define CSR_HCOUNTERNEN     0x606
+>> +#define CSR_HGATP           0x680
+>> +
+>> +#if defined(TARGET_RISCV32)
+>> +#define HGATP_MODE           SATP32_MODE
+>> +#define HGATP_ASID           SATP32_ASID
+>> +#define HGATP_PPN            SATP32_PPN
+>> +#endif
+>> +#if defined(TARGET_RISCV64)
+>> +#define HGATP_MODE           SATP64_MODE
+>> +#define HGATP_ASID           SATP64_ASID
+>> +#define HGATP_PPN            SATP64_PPN
+>> +#endif
+>> +
 >
-> sifive-serial 10013000.uart: unable to find controller clock
-> sifive-serial: probe of 10013000.uart failed with error -2
 >
-> when trying to boot Linux.
->
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> Basd on spec, is HGATP_VMID  preferable ?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Yep, updated.
 
 Alistair
 
-> ---
->  hw/riscv/sifive_u.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 0657046..5a221c6 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -76,6 +76,7 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      char *nodename;
->      char ethclk_names[] = "pclk\0hclk\0tx_clk";
->      uint32_t plic_phandle, ethclk_phandle, phandle = 1;
-> +    uint32_t uartclk_phandle;
->
->      fdt = s->fdt = create_device_tree(&s->fdt_size);
->      if (!fdt) {
-> @@ -226,6 +227,17 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x0);
->      g_free(nodename);
->
-> +    uartclk_phandle = phandle++;
-> +    nodename = g_strdup_printf("/soc/uartclk");
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "fixed-clock");
-> +    qemu_fdt_setprop_cell(fdt, nodename, "#clock-cells", 0x0);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", uartclk_phandle);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", uartclk_phandle);
-> +    uartclk_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> +    g_free(nodename);
-> +
->      nodename = g_strdup_printf("/soc/uart@%lx",
->          (long)memmap[SIFIVE_U_UART0].base);
->      qemu_fdt_add_subnode(fdt, nodename);
-> @@ -233,8 +245,7 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      qemu_fdt_setprop_cells(fdt, nodename, "reg",
->          0x0, memmap[SIFIVE_U_UART0].base,
->          0x0, memmap[SIFIVE_U_UART0].size);
-> -    qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
-> -                          SIFIVE_U_CLOCK_FREQ / 2);
-> +    qemu_fdt_setprop_cells(fdt, nodename, "clocks", uartclk_phandle);
->      qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
->      qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_UART0_IRQ);
->
-> @@ -243,6 +254,10 @@ static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      if (cmdline) {
->          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
->      }
-> +
-> +    qemu_fdt_add_subnode(fdt, "/aliases");
-> +    qemu_fdt_setprop_string(fdt, "/aliases", "serial0", nodename);
-> +
->      g_free(nodename);
->
->      return fdt;
-> --
-> 2.7.4
->
->
+> chihmin
+>>
+>>  /* Physical Memory Protection */
+>>  #define CSR_PMPCFG0         0x3a0
+>>  #define CSR_PMPCFG1         0x3a1
+>> @@ -206,23 +224,6 @@
+>>  #define CSR_DPC             0x7b1
+>>  #define CSR_DSCRATCH        0x7b2
+>>
+>> -/* Hpervisor CSRs */
+>> -#define CSR_HSTATUS         0xa00
+>> -#define CSR_HEDELEG         0xa02
+>> -#define CSR_HIDELEG         0xa03
+>> -#define CSR_HGATP           0xa80
+>> -
+>> -#if defined(TARGET_RISCV32)
+>> -#define HGATP_MODE           SATP32_MODE
+>> -#define HGATP_ASID           SATP32_ASID
+>> -#define HGATP_PPN            SATP32_PPN
+>> -#endif
+>> -#if defined(TARGET_RISCV64)
+>> -#define HGATP_MODE           SATP64_MODE
+>> -#define HGATP_ASID           SATP64_ASID
+>> -#define HGATP_PPN            SATP64_PPN
+>> -#endif
+>> -
+>>  /* Performance Counters */
+>>  #define CSR_MHPMCOUNTER3    0xb03
+>>  #define CSR_MHPMCOUNTER4    0xb04
+>> --
+>> 2.22.0
+>>
+>>
 
