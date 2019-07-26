@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58303C7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EBFC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 317AD22BEF
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 317AD22BEF
+	by mail.kernel.org (Postfix) with ESMTPS id C998B206BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 10:48:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C998B206BA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hqxlZ-0002gG-7x
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:48:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43367)
+	id 1hqxm2-0004AZ-TB
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 06:48:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43463)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkj-0007yV-1N
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:10 -0400
+ id 1hqxkm-0008U6-SH
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkY-0006wj-24
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:02 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2180 helo=huawei.com)
+ id 1hqxkk-00078n-Lf
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 06:47:12 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:37100 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hqxkH-0006G7-2z; Fri, 26 Jul 2019 06:46:41 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 31EB8C7323097E830689;
- Fri, 26 Jul 2019 18:46:36 +0800 (CST)
+ id 1hqxkO-0006b4-Uc; Fri, 26 Jul 2019 06:46:53 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 3F6F065647E06F766090;
+ Fri, 26 Jul 2019 18:46:41 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.202.227.237) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 26 Jul 2019 18:46:26 +0800
+ 14.3.439.0; Fri, 26 Jul 2019 18:46:33 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Date: Fri, 26 Jul 2019 11:45:16 +0100
-Message-ID: <20190726104519.23812-7-shameerali.kolothum.thodi@huawei.com>
+Date: Fri, 26 Jul 2019 11:45:18 +0100
+Message-ID: <20190726104519.23812-9-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
@@ -53,9 +53,9 @@ Content-Type: text/plain
 X-Originating-IP: [10.202.227.237]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: [Qemu-devel] [PATCH-for-4.2 v8 6/9] hw/arm/virt: Enable device
- memory cold/hot plug with ACPI boot
+X-Received-From: 45.249.212.35
+Subject: [Qemu-devel] [PATCH-for-4.2 v8 8/9] hw/acpi: Add system power down
+ support to GED
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,247 +74,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This initializes the GED device with base memory and irq, configures
-ged memory hotplug event and builds the corresponding aml code. With
-this, both hot and cold plug of device memory is enabled now for Guest
-with ACPI boot.
-
-Memory cold plug support with Guest DT boot is not yet supported.
+This adds support to use GED for system power down event.
 
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
- -Changed no_acpi_dev to no_ged.
- -Fixed 'dev' reference leak by object_new().
- -Updated bios-tables-test-allowed-diff.h to avoid "make check"
-  failure.
+ hw/acpi/generic_event_device.c         | 6 ++++++
+ include/hw/acpi/generic_event_device.h | 3 +++
+ 2 files changed, 9 insertions(+)
 
----
- hw/arm/Kconfig                        |  2 +
- hw/arm/virt-acpi-build.c              | 14 +++++++
- hw/arm/virt.c                         | 54 +++++++++++++++++++++++----
- include/hw/arm/virt.h                 |  4 ++
- tests/bios-tables-test-allowed-diff.h |  1 +
- 5 files changed, 68 insertions(+), 7 deletions(-)
-
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index 84961c17ab..ad7f7c089b 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -22,6 +22,8 @@ config ARM_VIRT
-     select ACPI_PCI
-     select MEM_DEVICE
-     select DIMM
-+    select ACPI_MEMORY_HOTPLUG
-+    select ACPI_HW_REDUCED
+diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+index 7902e9d706..0b3214eff4 100644
+--- a/hw/acpi/generic_event_device.c
++++ b/hw/acpi/generic_event_device.c
+@@ -19,6 +19,7 @@
  
- config CHEETAH
-     bool
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 0afb372769..018b1e326d 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -40,6 +40,8 @@
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/utils.h"
- #include "hw/acpi/pci.h"
-+#include "hw/acpi/memory_hotplug.h"
-+#include "hw/acpi/generic_event_device.h"
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci.h"
- #include "hw/arm/virt.h"
-@@ -705,6 +707,7 @@ static void
- build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     Aml *scope, *dsdt;
-+    MachineState *ms = MACHINE(vms);
-     const MemMapEntry *memmap = vms->memmap;
-     const int *irqmap = vms->irqmap;
- 
-@@ -729,6 +732,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                       vms->highmem, vms->highmem_ecam);
-     acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
-                        (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
-+    if (vms->acpi_dev) {
-+        build_ged_aml(scope, "\\_SB."GED_DEVICE,
-+                      HOTPLUG_HANDLER(vms->acpi_dev),
-+                      irqmap[VIRT_ACPI_GED] + ARM_SPI_BASE, AML_SYSTEM_MEMORY);
-+    }
-+
-+    if (vms->acpi_dev && ms->ram_slots) {
-+        build_memory_hotplug_aml(scope, ms->ram_slots, "\\_SB", NULL,
-+                                 AML_SYSTEM_MEMORY);
-+    }
-+
-     acpi_dsdt_add_power_button(scope);
- 
-     aml_append(dsdt, scope);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index bbe156dc35..41386a6eb7 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -66,6 +66,7 @@
- #include "target/arm/internals.h"
- #include "hw/mem/pc-dimm.h"
- #include "hw/mem/nvdimm.h"
-+#include "hw/acpi/generic_event_device.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -136,6 +137,8 @@ static const MemMapEntry base_memmap[] = {
-     [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
-     [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
-     [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-+    [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
-+    [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
-     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
-     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
-     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-@@ -171,6 +174,7 @@ static const int a15irqmap[] = {
-     [VIRT_PCIE] = 3, /* ... to 6 */
-     [VIRT_GPIO] = 7,
-     [VIRT_SECURE_UART] = 8,
-+    [VIRT_ACPI_GED] = 9,
-     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
-     [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
-     [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
-@@ -520,6 +524,27 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
-     }
- }
- 
-+static inline DeviceState *create_acpi_ged(VirtMachineState *vms, qemu_irq *pic)
-+{
-+    DeviceState *dev;
-+    int irq = vms->irqmap[VIRT_ACPI_GED];
-+    uint32_t event = ACPI_GED_MEM_HOTPLUG_EVT;
-+
-+    dev = DEVICE(object_new(TYPE_ACPI_GED));
-+    qdev_prop_set_uint64(dev, "memhp-base",
-+                         vms->memmap[VIRT_PCDIMM_ACPI].base);
-+    qdev_prop_set_uint64(dev, "ged-base", vms->memmap[VIRT_ACPI_GED].base);
-+    qdev_prop_set_uint32(dev, "ged-event", event);
-+    object_property_add_child(qdev_get_machine(), "acpi-ged",
-+                              OBJECT(dev), NULL);
-+    qdev_init_nofail(dev);
-+    qdev_connect_gpio_out_named(dev, "ged-irq", 0, pic[irq]);
-+
-+    object_unref(OBJECT(dev));
-+
-+    return dev;
-+}
-+
- static void create_its(VirtMachineState *vms, DeviceState *gicdev)
- {
-     const char *itsclass = its_class_name();
-@@ -1483,6 +1508,7 @@ static void machvirt_init(MachineState *machine)
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded;
-     bool aarch64 = true;
-+    bool has_ged = !vmc->no_ged;
-     unsigned int smp_cpus = machine->smp.cpus;
-     unsigned int max_cpus = machine->smp.max_cpus;
- 
-@@ -1697,6 +1723,10 @@ static void machvirt_init(MachineState *machine)
- 
-     create_gpio(vms, pic);
- 
-+    if (has_ged && aarch64 && firmware_loaded && acpi_enabled) {
-+        vms->acpi_dev = create_acpi_ged(vms, pic);
-+    }
-+
-     /* Create mmio transports, so the user can create virtio backends
-      * (which will be automatically plugged in to the transports). If
-      * no backend is created the transport will just sit harmlessly idle.
-@@ -1876,27 +1906,34 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
- static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                  Error **errp)
- {
-+    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
- 
--    /*
--     * The device memory is not yet exposed to the Guest either through
--     * DT or ACPI and hence both cold/hot plug of memory is explicitly
--     * disabled for now.
--     */
--    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        error_setg(errp, "memory cold/hot plug is not yet supported");
-+    if (is_nvdimm) {
-+        error_setg(errp, "nvdimm is not yet supported");
-         return;
-     }
- 
-+    if (!vms->acpi_dev) {
-+        error_setg(errp, "memory hotplug is not enabled: missing acpi device");
-+        return;
-+    }
-+
-+    hotplug_handler_pre_plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, errp);
-+
-     pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
- }
- 
- static void virt_memory_plug(HotplugHandler *hotplug_dev,
-                              DeviceState *dev, Error **errp)
- {
-+    HotplugHandlerClass *hhc;
-     VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
- 
-     pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);
- 
-+    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
-+    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, NULL);
- }
- 
- static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-@@ -2102,8 +2139,11 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
- 
- static void virt_machine_4_1_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_4_2_options(mc);
-     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-+    vmc->no_ged = true;
- }
- DEFINE_VIRT_MACHINE(4, 1)
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index a72094204e..577ee49b4b 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -77,6 +77,8 @@ enum {
-     VIRT_GPIO,
-     VIRT_SECURE_UART,
-     VIRT_SECURE_MEM,
-+    VIRT_PCDIMM_ACPI,
-+    VIRT_ACPI_GED,
-     VIRT_LOWMEMMAP_LAST,
+ static const uint32_t ged_supported_events[] = {
+     ACPI_GED_MEM_HOTPLUG_EVT,
++    ACPI_GED_PWR_DOWN_EVT,
  };
  
-@@ -106,6 +108,7 @@ typedef struct {
-     bool claim_edge_triggered_timers;
-     bool smbios_old_sys_ver;
-     bool no_highmem_ecam;
-+    bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
- } VirtMachineClass;
+ /*
+@@ -103,6 +104,11 @@ void build_ged_aml(Aml *table, const char *name, HotplugHandler *hotplug_dev,
+                 aml_append(if_ctx, aml_call0(MEMORY_DEVICES_CONTAINER "."
+                                              MEMORY_SLOT_SCAN_METHOD));
+                 break;
++            case ACPI_GED_PWR_DOWN_EVT:
++                aml_append(if_ctx,
++                           aml_notify(aml_name(ACPI_POWER_BUTTON_DEVICE),
++                                      aml_int(0x80)));
++                break;
+             default:
+                 /*
+                  * Please make sure all the events in ged_supported_events[]
+diff --git a/include/hw/acpi/generic_event_device.h b/include/hw/acpi/generic_event_device.h
+index f0152b0018..63104f1344 100644
+--- a/include/hw/acpi/generic_event_device.h
++++ b/include/hw/acpi/generic_event_device.h
+@@ -61,6 +61,8 @@
  
- typedef struct {
-@@ -133,6 +136,7 @@ typedef struct {
-     uint32_t iommu_phandle;
-     int psci_conduit;
-     hwaddr highest_gpa;
-+    DeviceState *acpi_dev;
- } VirtMachineState;
+ #include "hw/acpi/memory_hotplug.h"
  
- #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
-index dfb8523c8b..7b4adbc822 100644
---- a/tests/bios-tables-test-allowed-diff.h
-+++ b/tests/bios-tables-test-allowed-diff.h
-@@ -1 +1,2 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/virt/DSDT",
++#define ACPI_POWER_BUTTON_DEVICE "PWRB"
++
+ #define TYPE_ACPI_GED "acpi-ged"
+ #define ACPI_GED(obj) \
+     OBJECT_CHECK(AcpiGedState, (obj), TYPE_ACPI_GED)
+@@ -78,6 +80,7 @@
+  * through GED.
+  */
+ #define ACPI_GED_MEM_HOTPLUG_EVT   0x1
++#define ACPI_GED_PWR_DOWN_EVT      0x2
+ 
+ typedef struct GEDState {
+     MemoryRegion io;
 -- 
 2.17.1
 
