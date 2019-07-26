@@ -2,91 +2,100 @@ Return-Path: <SRS0=FTQm=VX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BBBC7618B
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6266BC7618B
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:49:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D870B21901
-	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:20:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wSG0LZIU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D870B21901
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3A69A2189F
+	for <qemu-devel@archiver.kernel.org>; Fri, 26 Jul 2019 16:49:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A69A2189F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hr2xf-000101-UM
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 12:20:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37687)
+	id 1hr3Pj-000280-T9
+	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 12:49:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59428)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hr2xV-0000c1-9F
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:20:42 -0400
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1hr3PR-0001I8-Jc
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hr2xT-0007Ua-4H
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:20:41 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42851)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hr2xS-0007QQ-R4
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:20:39 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x1so5123957wrr.9
- for <qemu-devel@nongnu.org>; Fri, 26 Jul 2019 09:20:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=QArzoDZVmokDybgWBo/hqHbqqcaJ2VBHt4qs2Buywkg=;
- b=wSG0LZIUseJ9WoMUyDI4dm4vBnECNI4aaktLT0aj23/UiEKN4I5VHoUKTqLV3DW65R
- bsZRlPOTsMCOg/jtt1IYXbE8bLFlK3383/uZmNIMghccDsYpi70DUsoj3TxOjj61bBBZ
- QhXAygXTpA835iVkeK2m6TVvhyXMBpVpVFArZ0vuHo+smCvZJ92owO6Y6gvKHny1O/UR
- 6JRYl1SsciB2VLrQPZ6w75swk5A+29aGmqwAD6Rh93LZvLOi7qagI2cXNnMFJzSg2Jfm
- jFlL6S8N6ISzlpSInvA2iRS+YqHbEoGDtuusnLU0nm0SSgtcXmdtKiInp6b1KHcnirBM
- /QZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=QArzoDZVmokDybgWBo/hqHbqqcaJ2VBHt4qs2Buywkg=;
- b=lHR2gYmYMX8hIHWbUpzrLreUgBQkvkzaIUfdMYK5oXCWR8W5OKCeTCBUxo64gj0jUa
- 8upBnHitwDpLuqIsZlZzFjehFD/5hsQMem8QOb71V7CKlOTI3I1F9zu+sY3TzWXhyRLm
- kza059TmCQX5Am9y8ugydoFmVavjIOk+x9vJUXbBzzVZfAc10BvhKNneORKovJSqTz5h
- 15olnUiDgHBsPdBdFgOBXbZYxcMq334RLvTsJXLqme6X65uj9lURbqGLCP2oVQPJ/daN
- 4TV1PdITSKg50hhe0x9t0gO9pIsY9E9Csb17LQsr7Nm4XuwlI9pGHLvVyuin+PsK4vYl
- qIwA==
-X-Gm-Message-State: APjAAAXunGc3XJ2nQ/CsOuLvXF0glKc4XbXhh14Y7QQ1qB5kErBnlvUK
- n8/WaZb8N9+BGDyZczip2bJ5ew==
-X-Google-Smtp-Source: APXvYqy7sbVQ73+q79HCLbn1MhusUnf3cv53mi4toTO7kfjfs+v2uF0QWnDHhvAp+Z7CiTJu5jIHlQ==
-X-Received: by 2002:a5d:6911:: with SMTP id t17mr1046401wru.268.1564158037229; 
- Fri, 26 Jul 2019 09:20:37 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id i66sm85648564wmi.11.2019.07.26.09.20.36
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 26 Jul 2019 09:20:36 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3D9CB1FF87;
- Fri, 26 Jul 2019 17:20:36 +0100 (BST)
-References: <20190720010235.32444-1-vandersonmr2@gmail.com>
- <20190720010235.32444-6-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190720010235.32444-6-vandersonmr2@gmail.com>
-Date: Fri, 26 Jul 2019 17:20:36 +0100
-Message-ID: <87o91ghinf.fsf@linaro.org>
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1hr3PP-0004Vk-T6
+ for qemu-devel@nongnu.org; Fri, 26 Jul 2019 12:49:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42202
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+ id 1hr3PP-0004Qh-Ni; Fri, 26 Jul 2019 12:49:31 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6QGlUHL114234; Fri, 26 Jul 2019 12:49:30 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u03aqpxft-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jul 2019 12:49:29 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x6QGnTH6118778;
+ Fri, 26 Jul 2019 12:49:29 -0400
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
+ [169.53.41.122])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u03aqpxf5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jul 2019 12:49:29 -0400
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+ by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x6QGij6O014061;
+ Fri, 26 Jul 2019 16:49:28 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma04dal.us.ibm.com with ESMTP id 2tymfenu77-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 26 Jul 2019 16:49:28 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6QGnRBY52953396
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 26 Jul 2019 16:49:27 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EF1AFBE051;
+ Fri, 26 Jul 2019 16:49:26 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6278BBE04F;
+ Fri, 26 Jul 2019 16:49:26 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 26 Jul 2019 16:49:26 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com
+Date: Fri, 26 Jul 2019 12:49:21 -0400
+Message-Id: <20190726164921.1655115-3-stefanb@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190726164921.1655115-1-stefanb@linux.vnet.ibm.com>
+References: <20190726164921.1655115-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-26_12:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907260205
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH v4 5/7] log: adding -d tb_stats to control
- tbstats
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0b-001b2d01.pphosted.com id x6QGlUHL114234
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH for-3.1.1 2/2] tpm_emulator: Translate TPM
+ error codes to strings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,115 +107,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vandersonmr <vandersonmr2@gmail.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>, qemu-devel@nongnu.org,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Implement a function to translate TPM error codes to strings so that
+at least the most common error codes can be translated to human
+readable strings.
 
-vandersonmr <vandersonmr2@gmail.com> writes:
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+(git cherry-pick 7e095e84ba0b7c0a1ac45bc6824dace2fd352e56)
+---
+ hw/tpm/tpm_emulator.c | 60 +++++++++++++++++++++++++++++++++++--------
+ hw/tpm/tpm_int.h      | 13 ++++++++++
+ 2 files changed, 63 insertions(+), 10 deletions(-)
 
-> Adding -d tb_stats:[limit:[all|jit|exec]] to control TBStatistics
-> collection. "limit" is used to limit the number of TBStats in the
-> linux-user dump. [all|jit|exec] control the profilling level used
-> by the TBStats: all, only jit stats or only execution count stats.
->
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
-> ---
->  include/qemu/log.h |  1 +
->  util/log.c         | 34 ++++++++++++++++++++++++++++++++++
->  2 files changed, 35 insertions(+)
->
-> diff --git a/include/qemu/log.h b/include/qemu/log.h
-> index 8cdfc268ca..93642603e5 100644
-> --- a/include/qemu/log.h
-> +++ b/include/qemu/log.h
-> @@ -45,6 +45,7 @@ static inline bool qemu_log_separate(void)
->  /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
->  #define CPU_LOG_TB_OP_IND  (1 << 16)
->  #define CPU_LOG_TB_FPU     (1 << 17)
-> +#define CPU_LOG_TB_STATS   (1 << 18)
->
->  /* Lock output for a series of related logs.  Since this is not needed
->   * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-> diff --git a/util/log.c b/util/log.c
-> index f81653d712..8109d19afb 100644
-> --- a/util/log.c
-> +++ b/util/log.c
-> @@ -30,6 +30,7 @@ FILE *qemu_logfile;
->  int qemu_loglevel;
->  static int log_append =3D 0;
->  static GArray *debug_regions;
-> +int32_t max_num_hot_tbs_to_dump;
->
->  /* Return the number of characters emitted.  */
->  int qemu_log(const char *fmt, ...)
-> @@ -273,6 +274,8 @@ const QEMULogItem qemu_log_items[] =3D {
->      { CPU_LOG_TB_NOCHAIN, "nochain",
->        "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
->        "complete traces" },
-> +    { CPU_LOG_TB_STATS, "tb_stats[:limit:(all,jit,exec)]",
-> +      "show TBs statistics (until given a limit) ordered by their hotnes=
-s.\n" },
->      { 0, NULL, NULL },
->  };
->
-> @@ -294,6 +297,37 @@ int qemu_str_to_log_mask(const char *str)
->              trace_enable_events((*tmp) + 6);
->              mask |=3D LOG_TRACE;
->  #endif
-> +        } else if (g_str_has_prefix(*tmp, "tb_stats")) {
-> +            if (g_str_has_prefix(*tmp, "tb_stats:") && (*tmp)[9] !=3D '\=
-0') {
-> +
-> +                if (!g_ascii_isdigit(*((*tmp) + 9))) {
-> +                    fprintf(stderr,
-> +                            "should be a number follow by [all|jit|exec]=
-, as tb_stats:10:all\n");
-> +                    exit(1);
-> +                }
-> +                /* get limit */
-> +                max_num_hot_tbs_to_dump =3D atoi((*tmp) + 9);
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 70f4b10284..58894dc320 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -81,6 +81,40 @@ typedef struct TPMEmulator {
+     TPMBlobBuffers state_blobs;
+ } TPMEmulator;
+=20
++struct tpm_error {
++    uint32_t tpm_result;
++    const char *string;
++};
++
++static const struct tpm_error tpm_errors[] =3D {
++    /* TPM 1.2 error codes */
++    { TPM_BAD_PARAMETER   , "a parameter is bad" },
++    { TPM_FAIL            , "operation failed" },
++    { TPM_KEYNOTFOUND     , "key could not be found" },
++    { TPM_BAD_PARAM_SIZE  , "bad parameter size"},
++    { TPM_ENCRYPT_ERROR   , "encryption error" },
++    { TPM_DECRYPT_ERROR   , "decryption error" },
++    { TPM_BAD_KEY_PROPERTY, "bad key property" },
++    { TPM_BAD_MODE        , "bad (encryption) mode" },
++    { TPM_BAD_VERSION     , "bad version identifier" },
++    { TPM_BAD_LOCALITY    , "bad locality" },
++    /* TPM 2 error codes */
++    { TPM_RC_FAILURE     , "operation failed" },
++    { TPM_RC_LOCALITY    , "bad locality"     },
++    { TPM_RC_INSUFFICIENT, "insufficient amount of data" },
++};
++
++static const char *tpm_emulator_strerror(uint32_t tpm_result)
++{
++    size_t i;
++
++    for (i =3D 0; i < ARRAY_SIZE(tpm_errors); i++) {
++        if (tpm_errors[i].tpm_result =3D=3D tpm_result) {
++            return tpm_errors[i].string;
++        }
++    }
++    return "";
++}
+=20
+ static int tpm_emulator_ctrlcmd(TPMEmulator *tpm, unsigned long cmd, voi=
+d *msg,
+                                 size_t msg_len_in, size_t msg_len_out)
+@@ -263,7 +297,8 @@ static int tpm_emulator_stop_tpm(TPMBackend *tb)
+=20
+     res =3D be32_to_cpu(res);
+     if (res) {
+-        error_report("tpm-emulator: TPM result for CMD_STOP: 0x%x", res)=
+;
++        error_report("tpm-emulator: TPM result for CMD_STOP: 0x%x %s", r=
+es,
++                     tpm_emulator_strerror(res));
+         return -1;
+     }
+=20
+@@ -292,8 +327,9 @@ static int tpm_emulator_set_buffer_size(TPMBackend *t=
+b,
+=20
+     psbs.u.resp.tpm_result =3D be32_to_cpu(psbs.u.resp.tpm_result);
+     if (psbs.u.resp.tpm_result !=3D 0) {
+-        error_report("tpm-emulator: TPM result for set buffer size : 0x%=
+x",
+-                     psbs.u.resp.tpm_result);
++        error_report("tpm-emulator: TPM result for set buffer size : 0x%=
+x %s",
++                     psbs.u.resp.tpm_result,
++                     tpm_emulator_strerror(psbs.u.resp.tpm_result));
+         return -1;
+     }
+=20
+@@ -338,7 +374,8 @@ static int tpm_emulator_startup_tpm_resume(TPMBackend=
+ *tb, size_t buffersize,
+=20
+     res =3D be32_to_cpu(init.u.resp.tpm_result);
+     if (res) {
+-        error_report("tpm-emulator: TPM result for CMD_INIT: 0x%x", res)=
+;
++        error_report("tpm-emulator: TPM result for CMD_INIT: 0x%x %s", r=
+es,
++                     tpm_emulator_strerror(res));
+         goto err_exit;
+     }
+     return 0;
+@@ -398,8 +435,9 @@ static int tpm_emulator_reset_tpm_established_flag(TP=
+MBackend *tb,
+=20
+     res =3D be32_to_cpu(reset_est.u.resp.tpm_result);
+     if (res) {
+-        error_report("tpm-emulator: TPM result for rest establixhed flag=
+: 0x%x",
+-                     res);
++        error_report(
++            "tpm-emulator: TPM result for rest established flag: 0x%x %s=
+",
++            res, tpm_emulator_strerror(res));
+         return -1;
+     }
+=20
+@@ -637,7 +675,8 @@ static int tpm_emulator_get_state_blob(TPMEmulator *t=
+pm_emu,
+     res =3D be32_to_cpu(pgs.u.resp.tpm_result);
+     if (res !=3D 0 && (res & 0x800) =3D=3D 0) {
+         error_report("tpm-emulator: Getting the stateblob (type %d) fail=
+ed "
+-                     "with a TPM error 0x%x", type, res);
++                     "with a TPM error 0x%x %s", type, res,
++                     tpm_emulator_strerror(res));
+         return -1;
+     }
+=20
+@@ -757,7 +796,8 @@ static int tpm_emulator_set_state_blob(TPMEmulator *t=
+pm_emu,
+     tpm_result =3D be32_to_cpu(pss.u.resp.tpm_result);
+     if (tpm_result !=3D 0) {
+         error_report("tpm-emulator: Setting the stateblob (type %d) fail=
+ed "
+-                     "with a TPM error 0x%x", type, tpm_result);
++                     "with a TPM error 0x%x %s", type, tpm_result,
++                     tpm_emulator_strerror(tpm_result));
+         return -1;
+     }
+=20
+@@ -887,8 +927,8 @@ static void tpm_emulator_shutdown(TPMEmulator *tpm_em=
+u)
+         error_report("tpm-emulator: Could not cleanly shutdown the TPM: =
+%s",
+                      strerror(errno));
+     } else if (res !=3D 0) {
+-        error_report("tpm-emulator: TPM result for sutdown: 0x%x",
+-                     be32_to_cpu(res));
++        error_report("tpm-emulator: TPM result for shutdown: 0x%x %s",
++                     be32_to_cpu(res), tpm_emulator_strerror(be32_to_cpu=
+(res)));
+     }
+ }
+=20
+diff --git a/hw/tpm/tpm_int.h b/hw/tpm/tpm_int.h
+index a4c77fbd7e..3fb28a9d6c 100644
+--- a/hw/tpm/tpm_int.h
++++ b/hw/tpm/tpm_int.h
+@@ -39,7 +39,16 @@ struct tpm_resp_hdr {
+ #define TPM_TAG_RSP_AUTH1_COMMAND 0xc5
+ #define TPM_TAG_RSP_AUTH2_COMMAND 0xc6
+=20
++#define TPM_BAD_PARAMETER         3
+ #define TPM_FAIL                  9
++#define TPM_KEYNOTFOUND           13
++#define TPM_BAD_PARAM_SIZE        25
++#define TPM_ENCRYPT_ERROR         32
++#define TPM_DECRYPT_ERROR         33
++#define TPM_BAD_KEY_PROPERTY      40
++#define TPM_BAD_MODE              44
++#define TPM_BAD_VERSION           46
++#define TPM_BAD_LOCALITY          61
+=20
+ #define TPM_ORD_ContinueSelfTest  0x53
+ #define TPM_ORD_GetTicks          0xf1
+@@ -59,4 +68,8 @@ struct tpm_resp_hdr {
+=20
+ #define TPM2_PT_MAX_COMMAND_SIZE  0x11e
+=20
++#define TPM_RC_INSUFFICIENT       0x9a
++#define TPM_RC_FAILURE            0x101
++#define TPM_RC_LOCALITY           0x907
++
+ #endif /* TPM_TPM_INT_H */
+--=20
+2.20.1
 
-We probably want to handle -d tb_stats:[all|jit|exec] as well because we
-might be doing interactive exploration for softmmu. I'd suggest
-splitting the number processing off to a new patch and merging the exit
-processing part of the later patches with it. As you don't have a HMP
-for linux-user you can make the number required for linux-user or only
-optional for softmmu.
-
-> +
-> +                /* get profilling level */
-> +                char *s =3D (*tmp) + 9;
-> +                while (*s !=3D '\0') {
-> +                    if (*s++ =3D=3D ':') {
-> +                        break;
-> +                    }
-> +                }
-> +                if (g_str_equal(s, "jit") =3D=3D 0) {
-> +                    set_default_tbstats_flag(TB_JIT_STATS);
-> +                } else if (g_str_equal(s, "exec") =3D=3D 0) {
-> +                    set_default_tbstats_flag(TB_EXEC_STATS);
-> +                } else {
-> +                    set_default_tbstats_flag(TB_JIT_STATS | TB_EXEC_STAT=
-S);
-> +                }
-
-If additional stats types get added we shall want to be additive:
-
-  -d host_tbs:jit,exec
-
-> +            } else {
-> +                set_default_tbstats_flag(TB_JIT_STATS | TB_EXEC_STATS);
-> +            }
-> +
-> +            mask |=3D CPU_LOG_TB_STATS;
-> +            enable_collect_tb_stats();
->          } else {
->              for (item =3D qemu_log_items; item->mask !=3D 0; item++) {
->                  if (g_str_equal(*tmp, item->name)) {
-
-
---
-Alex Benn=C3=A9e
 
