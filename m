@@ -2,63 +2,73 @@ Return-Path: <SRS0=iAYr=VY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F54C7618F
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 01:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBF7C76186
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 04:30:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6827722C7E
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 01:12:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6827722C7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6DA9F21738
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 04:30:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA9F21738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrBFw-0006NU-I6
-	for qemu-devel@archiver.kernel.org; Fri, 26 Jul 2019 21:12:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49918)
+	id 1hrEMB-0005sg-CF
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jul 2019 00:30:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58145)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bo.liu@linux.alibaba.com>) id 1hr819-0003oo-Rc
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 17:44:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1hrEM0-0005QV-5I
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 00:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bo.liu@linux.alibaba.com>) id 1hr80n-00018O-AD
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 17:44:36 -0400
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:59467)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bo.liu@linux.alibaba.com>)
- id 1hr80h-0006hr-05
- for qemu-devel@nongnu.org; Fri, 26 Jul 2019 17:44:21 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R771e4; CH=green; DM=||false|;
- FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e04420; MF=bo.liu@linux.alibaba.com; NM=1;
- PH=DS; RN=3; SR=0; TI=SMTPD_---0TXrnCxE_1564176941; 
-Received: from US-160370MP2.local(mailfrom:bo.liu@linux.alibaba.com
- fp:SMTPD_---0TXrnCxE_1564176941) by smtp.aliyun-inc.com(127.0.0.1);
- Sat, 27 Jul 2019 05:35:42 +0800
-Date: Fri, 26 Jul 2019 14:35:40 -0700
-From: Liu Bo <bo.liu@linux.alibaba.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190726213540.mpqdzjrtn6mbcst6@US-160370MP2.local>
-References: <20190726091103.23503-1-stefanha@redhat.com>
- <20190726091103.23503-2-stefanha@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hrELw-0002t7-5d
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 00:30:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33450)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hrELu-0001vE-2D
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 00:30:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hrELH-0002Zv-E7
+ for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 04:29:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5CFD92E80D1
+ for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 04:29:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190726091103.23503-2-stefanha@redhat.com>
-User-Agent: NeoMutt/20180323
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 115.124.30.45
-X-Mailman-Approved-At: Fri, 26 Jul 2019 21:11:54 -0400
-Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH 1/5] virtiofsd: skip
-	unnecessary	vu_queue_get_avail_bytes()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 27 Jul 2019 04:17:26 -0000
+From: Launchpad Bug Tracker <1590322@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor sayantan-bhowmik94 th-huth
+X-Launchpad-Bug-Reporter: sayantan (sayantan-bhowmik94)
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+References: <20160608085308.24358.59591.malonedeb@gac.canonical.com>
+Message-Id: <156420104655.24883.17447081818121226307.malone@loganberry.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 5d666f744017450699712f53a62ad39d0d5b408c
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1590322] Re: mouse_button 0 takes back to initial
+ position
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -67,70 +77,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: bo.liu@linux.alibaba.com
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
+Reply-To: Bug 1590322 <1590322@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 26, 2019 at 10:10:59AM +0100, Stefan Hajnoczi wrote:
-> When debug output is disabled there is no need to calculate the number
-> of in/out bytes available.
-> 
-> There is also no need to skip a request if there are 0 out bytes.  The
-> request parsing code already handles invalid requests.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  contrib/virtiofsd/fuse_virtio.c | 13 +++++--------
->  1 file changed, 5 insertions(+), 8 deletions(-)
-> 
-> diff --git a/contrib/virtiofsd/fuse_virtio.c b/contrib/virtiofsd/fuse_virtio.c
-> index 083e4fc317..d543c6d30f 100644
-> --- a/contrib/virtiofsd/fuse_virtio.c
-> +++ b/contrib/virtiofsd/fuse_virtio.c
-> @@ -507,18 +507,16 @@ static void *fv_queue_thread(void *opaque)
->                 ret = pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock);
->                 assert(ret == 0); /* there is no possible error case */
->  
-> -               /* out is from guest, in is too guest */
-> -               unsigned int in_bytes, out_bytes;
-> -               vu_queue_get_avail_bytes(dev, q, &in_bytes, &out_bytes, ~0, ~0);
-> +               if (se->debug) {
-> +                       /* out is from guest, in is too guest */
-> +                       unsigned int in_bytes, out_bytes;
-> +                       vu_queue_get_avail_bytes(dev, q, &in_bytes, &out_bytes, ~0, ~0);
->  
-> -               if (se->debug)
->                         fuse_debug("%s: Queue %d gave evalue: %zx available: in: %u out: %u\n",
->  				  __func__, qi->qidx, (size_t)evalue, in_bytes,
->  				  out_bytes);
-> -
-> -               if (!out_bytes) {
-> -                       goto next;
->                 }
-> +
->                 while (1) {
->                         bool allocated_bufv = false;
->                         struct fuse_bufvec bufv;
-> @@ -708,7 +706,6 @@ static void *fv_queue_thread(void *opaque)
->                         elem = NULL;
->                  }
->  
-> -next:
->                  pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
->          }
->          pthread_mutex_destroy(&ch.lock);
-> -- 
-> 2.21.0
-> 
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
+[Expired for QEMU because there has been no activity for 60 days.]
 
-Reviewed-by: Liu Bo <bo.liu@linux.alibaba.com>
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-thanks,
--liubo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1590322
+
+Title:
+  mouse_button 0 takes back to initial position
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  i wrote a python script to perform some drag function in the Qemu simulat=
+or.
+  mouse_move x , y
+  mouse_button 1
+  mouse_move new_x,new_y
+  mouse_move 0
+
+  =
+
+  The mouse_move 0 doesn't release the mouse in the position new_x,new_y in=
+stead it takes  it back to the point x,y and then releases the mouse
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1590322/+subscriptions
 
