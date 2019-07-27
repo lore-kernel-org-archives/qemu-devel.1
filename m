@@ -2,73 +2,66 @@ Return-Path: <SRS0=iAYr=VY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641DDC76186
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 04:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B60FCC7618B
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 06:10:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3791720679
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 04:31:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3791720679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 83F4D206DD
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 06:10:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83F4D206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrEN4-0006lh-As
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jul 2019 00:31:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58342)
+	id 1hrFuc-0003TL-PU
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jul 2019 02:10:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52363)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hrEMt-0006Mx-Uz
- for qemu-devel@nongnu.org; Sat, 27 Jul 2019 00:31:40 -0400
+ (envelope-from <longpeng2@huawei.com>) id 1hrFuS-00030n-Cp
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 02:10:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hrEMq-0004FT-KJ
- for qemu-devel@nongnu.org; Sat, 27 Jul 2019 00:31:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33472)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hrEMe-0001ym-PK
- for qemu-devel@nongnu.org; Sat, 27 Jul 2019 00:31:28 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hrELH-0002aF-TJ
- for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 04:29:59 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DC0332E80D2
- for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 04:29:59 +0000 (UTC)
+ (envelope-from <longpeng2@huawei.com>) id 1hrFuR-0008Dz-3O
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 02:10:24 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:57722 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <longpeng2@huawei.com>)
+ id 1hrFuQ-0007ke-Kq
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 02:10:23 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 5CEF0B9AFE3F9C280ED4;
+ Sat, 27 Jul 2019 14:10:11 +0800 (CST)
+Received: from [127.0.0.1] (10.177.246.209) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0;
+ Sat, 27 Jul 2019 14:10:04 +0800
+To: Jason Wang <jasowang@redhat.com>
+References: <785B5B0623C08241B2D0E6E7D8FA6B181E0A8FFF@DGGEMM506-MBX.china.huawei.com>
+ <20190708094750.GE2746@work-vm>
+ <fb1d9412-d017-3a74-012b-2bcd88271160@redhat.com>
+ <83ba270d-5302-3ffe-2663-8adc36e9f079@huawei.com>
+ <2c37ed34-7cd9-8962-c4bd-d55b91336bd5@redhat.com>
+From: "Longpeng (Mike)" <longpeng2@huawei.com>
+Message-ID: <6d8edb97-1fa8-c55c-b449-d53df918d39a@huawei.com>
+Date: Sat, 27 Jul 2019 14:10:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <2c37ed34-7cd9-8962-c4bd-d55b91336bd5@redhat.com>
 Content-Type: text/plain; charset="utf-8"
+X-Originating-IP: [10.177.246.209]
+X-CFilter-Loop: Reflected
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 27 Jul 2019 04:17:29 -0000
-From: Launchpad Bug Tracker <1585533@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: cache-miss-rate json xbzrlecachestats
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bonzini eblake janitor ma-brothier th-huth
-X-Launchpad-Bug-Reporter: Marc Brothier (ma-brothier)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <20160525084629.27127.82209.malonedeb@gac.canonical.com>
-Message-Id: <156420104915.24883.12588088971354778297.malone@loganberry.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 4e4bac326ffa26999123f7aa3c28f7eb02e92165
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1585533] Re: cache-miss-rate / Invalid JSON
+X-Received-From: 45.249.212.35
+Subject: Re: [Qemu-devel] [BUG] VM abort after migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,59 +70,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1585533 <1585533@bugs.launchpad.net>
+Cc: "quintela@redhat.com" <quintela@redhat.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "v.maffione@gmail.com" <v.maffione@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+=E5=9C=A8 2019/7/10 11:57, Jason Wang =E5=86=99=E9=81=93:
+>=20
+> On 2019/7/10 =E4=B8=8A=E5=8D=8811:36, Longpeng (Mike) wrote:
+>> =E5=9C=A8 2019/7/10 11:25, Jason Wang =E5=86=99=E9=81=93:
+>>> On 2019/7/8 =E4=B8=8B=E5=8D=885:47, Dr. David Alan Gilbert wrote:
+>>>> * longpeng (longpeng2@huawei.com) wrote:
+>>>>> Hi guys,
+>>>>>
+>>>>> We found a qemu core in our testing environment, the assertion
+>>>>> 'assert(bus->irq_count[i] =3D=3D 0)' in pcibus_reset() was triggere=
+d and
+>>>>> the bus->irq_count[i] is '-1'.
+>>>>>
+>>>>> Through analysis, it was happened after VM migration and we think
+>>>>> it was caused by the following sequence:
+>>>>>
+>>>>> *Migration Source*
+>>>>> 1. save bus pci.0 state, including irq_count[x] ( =3D0 , old )
+>>>>> 2. save E1000:
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0 e1000_pre_save
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 e1000_mit_timer
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_interrupt_cause
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pci_set_irq --> update p=
+ci_dev->irq_state to 1 and
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 update bus->irq_count[x] to=
+ 1 ( new )
+>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the irq_state sent to dest.
+>>>>>
+>>>>> *Migration Dest*
+>>>>> 1. Receive the irq_count[x] of pci.0 is 0 , but the irq_state of e1=
+000 is 1.
+>>>>> 2. If the e1000 need change irqline , it would call to pci_irq_hand=
+ler(),
+>>>>> =C2=A0=C2=A0=C2=A0 the irq_state maybe change to 0 and bus->irq_cou=
+nt[x] will become
+>>>>> =C2=A0=C2=A0=C2=A0 -1 in this situation.
+>>>>> 3. do VM reboot then the assertion will be triggered.
+>>>>>
+>>>>> We also found some guys faced the similar problem:
+>>>>> [1] https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02525.=
+html
+>>>>> [2] https://bugs.launchpad.net/qemu/+bug/1702621
+>>>>>
+>>>>> Is there some patches to fix this problem ?
+>>>> I don't remember any.
+>>>>
+>>>>> Can we save pcibus state after all the pci devs are saved ?
+>>>> Does this problem only happen with e1000? I think so.
+>>>> If it's only e1000 I think we should fix it - I think once the VM is
+>>>> stopped for doing the device migration it shouldn't be raising
+>>>> interrupts.
+>>>
+>>> I wonder maybe we can simply fix this by no setting ICS on pre_save()=
+ but
+>>> scheduling mit timer unconditionally in post_load().
+>>>
+>> I also think this is a bug of e1000 because we find more cores with th=
+e same
+>> frame thease days.
+>>
+>> I'm not familiar with e1000 so hope someone could fix it, thanks. :)
+>>
+>=20
+> Draft a path in attachment, please test.
+>=20
+Hi Jason,
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+We've tested the patch for about two weeks, everything went well, thanks!
 
--- =
+Feel free to add my:
+Reported-and-tested-by: Longpeng <longpeng2@huawei.com>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1585533
+> Thanks
+>=20
+>=20
+>>> Thanks
+>>>
+>>>
+>>>> Dave
+>>>>
+>>>>> Thanks,
+>>>>> Longpeng(Mike)
+>>>> --=C2=A0
+>>>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>> .
+>>>
 
-Title:
-  cache-miss-rate / Invalid JSON
+--=20
+Regards,
+Longpeng(Mike)
 
-Status in QEMU:
-  Expired
-
-Bug description:
-  Hi,
-
-  We have VMs which were started with an older version than qemu 2.1
-  which added "cache-miss-rate" property for XBZRLECacheStats. While
-  trying to migrate the VM to a new host which is running a higher
-  version (2.3) of Qemu we got an exception:
-
-  virJSONValueFromString:1642 : internal error: cannot parse json {"return"=
-: {"expected-downtime": 1, "xbzrle-cache": {"bytes": 0, "cache-size": 67108=
-864, "cache-miss-rate": -nan, "pages": 0, "overflow": 0, "cache-miss": 8933=
-}, "status": "active", "disk": {"total": 429496729600, "dirty-sync-count": =
-0, "remaining": 193896382464, "mbps": 0, "transferred": 235600347136, "dupl=
-icate": 0, "dirty-pages-rate": 0, "skipped": 0, "normal-bytes": 0, "normal"=
-: 0}, "setup-time": 13, "total-time": 1543124, "ram": {"total": 8599183360,=
- "dirty-sync-count": 4, "remaining": 30695424, "mbps": 830.636997, "transfe=
-rred": 3100448901, "duplicate": 1358341, "dirty-pages-rate": 7, "skipped": =
-0, "normal-bytes": 3082199040, "normal": 752490}}, "id": "libvirt-186200"}:=
- lexical error: malformed number, a digit is required after the minus sign.
-            67108864, "cache-miss-rate": -nan, "pages": 0, "overflow": 0
-                       (right here) ------^
-
-  virNetClientStreamRaiseError:191 : stream aborted at client request
-
-  =
-
-  Would it be possible to improve the JSON parser to skip the key if the va=
-lue is incorrect instead of throwing an exception? Then hopefully qemu 2.3 =
-or higher is able to handle the data without this property, falling back to=
- its default.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1585533/+subscriptions
 
