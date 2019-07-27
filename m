@@ -2,73 +2,87 @@ Return-Path: <SRS0=iAYr=VY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBB7C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 13:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E77AC433FF
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 18:20:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 499EE2075C
-	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 13:30:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 499EE2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id EB30F20840
+	for <qemu-devel@archiver.kernel.org>; Sat, 27 Jul 2019 18:20:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xYHcBG53"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB30F20840
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrMmf-0004SJ-5i
-	for qemu-devel@archiver.kernel.org; Sat, 27 Jul 2019 09:30:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34244)
+	id 1hrRJ9-0001EM-TT
+	for qemu-devel@archiver.kernel.org; Sat, 27 Jul 2019 14:20:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41268)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hrMmU-000448-7c
- for qemu-devel@nongnu.org; Sat, 27 Jul 2019 09:30:39 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hrRIy-0000ms-Fw
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 14:20:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hrMmT-0008R9-1K
- for qemu-devel@nongnu.org; Sat, 27 Jul 2019 09:30:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56438)
+ (envelope-from <peter.maydell@linaro.org>) id 1hrRIx-00040K-Jv
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 14:20:28 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:32834)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hrMmS-0008Pq-S2
- for qemu-devel@nongnu.org; Sat, 27 Jul 2019 09:30:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hrMmR-00037b-HP
- for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 13:30:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7BF7B2E8047
- for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 13:30:35 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hrRIx-0003zQ-EP
+ for qemu-devel@nongnu.org; Sat, 27 Jul 2019 14:20:27 -0400
+Received: by mail-ot1-x341.google.com with SMTP id q20so58517167otl.0
+ for <qemu-devel@nongnu.org>; Sat, 27 Jul 2019 11:20:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UpclXlUPZEzYYqxICeZWZd2LGKN5CHZUBjXcJy6XWcM=;
+ b=xYHcBG53CnUIcMv/J7qU2MY2iWAInOJiESqNsBKPZXxUTErlHa2D7szylBwx6aCwFa
+ W7RudQXkaFxILQobBs20hJc7o0mm8qiP+byJ7muLnYd/mxwnlJo90o+eUszcrP/Z6PCT
+ yyrHB2/49OXhBNvqWWkZi/yIFqHx1grolFccaE5gNOwvok6zfnnotdeAo3lHYz8oleF8
+ YONSaYZgM7K2l8bLHFXxLChquG8ieyg1VXVBfcLsvyVkrmjEzbIP+LoetfNSR1eWuF8h
+ Twh1jqn8IBIdTvsXDOWXp7P+hUWbyYxZNPxWJ//VhSiwabwNsJyZOiiv+nfixpJWyeDP
+ nF5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UpclXlUPZEzYYqxICeZWZd2LGKN5CHZUBjXcJy6XWcM=;
+ b=GTDSnkvNm1iQJYEodX5hWthu5U9Fl9/ifpurU6k88roRB//HCARwqNXQVHlW6D1IWn
+ 32Y0dnyWBa3/iSWq9Nk8bD3RPkTWluqv6ISLb07EdcLbFbAbYhBKLhwKc34S0zKy2wou
+ Ts/r+rgAAnlyFmIxTdL2BbbCZB4dv1EU/LV1Uce8L1fjwJcsS+PEWHtCclw3e24tVjfN
+ ZGiQ4XFDETI0QHSYegF85QbyaluyZJZmUhKS7CmnKry3lS+UGKJUzxJKrdJrnp1nbeFG
+ sSlhQBj/nMgR4dEe9F1kQ5CfanfhGMnz8EEIT9hvv6n4KY81BFOtw8U7LJwfkopWLwJq
+ FeDQ==
+X-Gm-Message-State: APjAAAWaLjF1lnGFHpmTRkvs4I3cOI//GkTPwf3drKT0JKeC1dJVMVLz
+ x9n3QB129DM4vb6bV0kihRO8amiX+rof8ZMCVMm1zA==
+X-Google-Smtp-Source: APXvYqx3a70oAVpMoH/6eHHHag+xsKUTgttqcB+OeRiR2EqYhO8iVJpKyZhGgse7R+d/RILoq1q2sBJhcxcCx3aw0VI=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr19849541otr.232.1564251626202; 
+ Sat, 27 Jul 2019 11:20:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 27 Jul 2019 13:24:19 -0000
-From: "Steffen \(Daode\) Nurpmeso" <1838066@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: sdaoden xanclic
-X-Launchpad-Bug-Reporter: Steffen (Daode) Nurpmeso (sdaoden)
-X-Launchpad-Bug-Modifier: Steffen (Daode) Nurpmeso (sdaoden)
-References: <156416003866.5869.12093759540682814562.malonedeb@soybean.canonical.com>
- <156422889569.6195.8735825632650411110.malone@soybean.canonical.com>
-Message-Id: <20190727132419.VsB7Z%steffen@sdaoden.eu>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 594ad5a80a94b532369ec5f9eb30c81ed2027865
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: Re: [Qemu-devel] [Bug 1838066] Re: unexpected error:
- raw_reconfigure_getfd(): qemu-system-x86_64: Could not reopen file
+References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
+ <1562775267-1222-5-git-send-email-pbonzini@redhat.com>
+ <87d0ie58cj.fsf@dusky.pond.sub.org>
+ <78c3bba3-3e85-682b-b4ce-fc4809add90e@redhat.com>
+ <87sgqsx7zp.fsf@dusky.pond.sub.org>
+ <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
+In-Reply-To: <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 27 Jul 2019 19:20:15 +0100
+Message-ID: <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 4/8] convert libqemuutil to meson
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,89 +91,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838066 <1838066@bugs.launchpad.net>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello!
+On Sat, 27 Jul 2019 at 13:24, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 27/07/19 09:16, Markus Armbruster wrote:
+> > We started with a single trace-events.  That wasn't good, so we split it
+> > up into one per directory.  That isn't good, so what about splitting it
+> > up into one per source file?  Pass -DTRACE_HEADER='"trace-DIR-FOO.h"
+> > instead of -DTRACE_HEADER='"trace-DIR.h"' when compiling DIR/FOO.c.
+>
+> For Make this would all work great, however not for Meson because it
+> doesn't allow per-file compile flags.
 
-Max Reitz wrote in <156422889569.6195.8735825632650411110.malone@soybean\
-.canonical.com>:
- |Hi,
- |
- |Can you retry with any 4.1 release candidate (like 4.1.0-rc2)?  (Or wait
- |for the 4.1.0 release in hopefully about a week?)  The error message
- |sounds like it should be fixed by https://lists.nongnu.org/archive/html
- |/qemu-block/2019-05/msg00775.html .
+Apologies for randomly parachuting into this email thread, but if
+Meson doesn't support per-file compile flags then what's the plan
+for handling the cases where we currently need per-file compile flags ?
+(This is one of the things that I thought was quite a nice move
+forward in our make infrastructure -- we now have clean syntax
+for saying "these files need to be built with these warnings disabled
+or these extra include paths or whatever" and also "these files
+imply we're going to need to link against library X".)
 
-Ok?  Great news, i will wait until then, it does not really hurt
-me (i do not even see it when now setting up a new VM with debug
-and thus -display enabled).
-
-Thanks!!
-
- |Though I have no idea why you would hit that if you didn=E2=80=99t add an=
-y block
- |devices.
-
-Was missing a line in the ps output, i see.
-Yeah, sorry. ^_^
-A nice weekend if at all possible i wish!
-
---steffen
-|
-|Der Kragenbaer,                The moon bear,
-|der holt sich munter           he cheerfully and one by one
-|einen nach dem anderen runter  wa.ks himself off
-|(By Robert Gernhardt)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838066
-
-Title:
-  unexpected error: raw_reconfigure_getfd(): qemu-system-x86_64: Could
-  not reopen file
-
-Status in QEMU:
-  New
-
-Bug description:
-    Unexpected error in raw_reconfigure_getfd() at block/file-posix.c:923:
-    qemu-system-x86_64: Could not reopen file: Permission denied
-    Aborted
-
-  Is what i sometimes (only) get, mostly for Linux guests i'd say (Arch jus=
-t a few moments ago).
-  This is on CRUX-Linux, thus a self-compiled qemu 4.0.0 with default recip=
-e, without special compiler flags (-O2 -march=3Dx86-64 -pipe) on an Intel i=
-5 laptop.
-  But what i do is running this via sudo:
-
-       sudo=3D'sudo --preserve-env=3DVMNAME,VMADDR' runas=3D'-runas vm -chr=
-oot .'
-    fi
-
-    VMADDR=3D$addr VMNAME=3D$vmname
-    export VMADDR VMNAME
-    eval exec $sudo qemu-system-x86_64 -name $vmname $runas \
-        $host $accel $display $net $vmcustom $vmimg $redir
-
-  the last run ends up like (via sudo)
-
-    qemu-system-x86_64 -name arch-2019 -runas vm -chroot . -cpu host -m
-  size=3D1984 -smp cpus=3D2 -enable-kvm -accel accel=3Dkvm,thread=3Dmulti
-  -display curses -net nic,netdev=3Dnet0,macaddr=3D..  -netdev
-  tap,id=3Dnet0,script=3D./.ifup.sh,downscript=3D./.ifdown.sh,ifname=3Dvm_a=
-rch-2019
-
-  vm is a user effectively living in the chroot only without any rights any=
-where.
-  Hope this helps, thanks a lot for qemu!!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838066/+subscriptions
+thanks
+-- PMM
 
