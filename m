@@ -2,51 +2,54 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8031CC76186
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE72C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:30:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F6712070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:30:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F6712070B
+	by mail.kernel.org (Postfix) with ESMTPS id 447132070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 447132070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzAe-0002Ae-4H
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53584)
+	id 1hrzAl-0002Vd-Hl
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:30:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53600)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzA2-0001DY-9V
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:31 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzA5-0001GF-KV
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzA1-00076H-5W
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:30 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36646)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzA4-0007AN-FQ
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:33 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:36656)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzA0-000733-TY
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:29 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzA4-00079g-86
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:32 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id C767A54006A;
- Mon, 29 Jul 2019 09:29:25 +0300 (MSK)
+ by mail.ispras.ru (Postfix) with ESMTPSA id 6854E54006A;
+ Mon, 29 Jul 2019 09:29:31 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 09:29:25 +0300
-Message-ID: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
+Date: Mon, 29 Jul 2019 09:29:31 +0300
+Message-ID: <156438177124.22071.8809966409278401240.stgit@pasha-Precision-3630-Tower>
+In-Reply-To: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
+References: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay fixes
+Subject: [Qemu-devel] [for-4.2 PATCH 1/6] block: implement
+ bdrv_snapshot_goto for blkreplay
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,49 +72,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The set of patches include the block-related updates
-of the record/replay icount feature:
- - application of 'snapshot' option on the file layer instead of
-   the top one: command line and documentation fix
- - implementation of bdrv_snapshot_goto for blkreplay driver
- - start/stop fix in replay mode with attached block devices
- - record/replay of bh oneshot events, used in the block layer
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-These patches are rebased upon the following series:
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05568.html
+This patch enables making snapshots with blkreplay used in
+block devices.
+This function is required to make bdrv_snapshot_goto without
+calling .bdrv_open which is not implemented.
 
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+Acked-by: Kevin Wolf <kwolf@redhat.com>
 ---
+ block/blkreplay.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Pavel Dovgalyuk (6):
-      block: implement bdrv_snapshot_goto for blkreplay
-      replay: disable default snapshot for record/replay
-      replay: update docs for record/replay with block devices
-      replay: don't drain/flush bdrv queue while RR is working
-      replay: finish record/replay before closing the disks
-      replay: add BH oneshot event for block layer
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index 2b7931b940..c96ac8f4bc 100644
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -126,6 +126,12 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
+     return ret;
+ }
+ 
++static int blkreplay_snapshot_goto(BlockDriverState *bs,
++                                   const char *snapshot_id)
++{
++    return bdrv_snapshot_goto(bs->file->bs, snapshot_id, NULL);
++}
++
+ static BlockDriver bdrv_blkreplay = {
+     .format_name            = "blkreplay",
+     .instance_size          = 0,
+@@ -140,6 +146,8 @@ static BlockDriver bdrv_blkreplay = {
+     .bdrv_co_pwrite_zeroes  = blkreplay_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkreplay_co_pdiscard,
+     .bdrv_co_flush          = blkreplay_co_flush,
++
++    .bdrv_snapshot_goto     = blkreplay_snapshot_goto,
+ };
+ 
+ static void bdrv_blkreplay_init(void)
 
-
- block/blkreplay.c        |    8 ++++++++
- block/block-backend.c    |    8 +++++---
- block/io.c               |   32 ++++++++++++++++++++++++++++++--
- block/iscsi.c            |    5 +++--
- block/nfs.c              |    5 +++--
- block/null.c             |    4 +++-
- block/nvme.c             |    6 ++++--
- block/rbd.c              |    5 +++--
- block/vxhs.c             |    5 +++--
- cpus.c                   |    2 --
- docs/replay.txt          |   12 +++++++++---
- include/sysemu/replay.h  |    3 +++
- replay/replay-events.c   |   16 ++++++++++++++++
- replay/replay-internal.h |    1 +
- replay/replay.c          |    4 +++-
- stubs/Makefile.objs      |    1 +
- stubs/replay-user.c      |    9 +++++++++
- vl.c                     |   11 +++++++++--
- 18 files changed, 113 insertions(+), 24 deletions(-)
- create mode 100644 stubs/replay-user.c
-
--- 
-Pavel Dovgalyuk
 
