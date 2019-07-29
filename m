@@ -2,87 +2,62 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B92C76191
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE5EC7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:25:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3E9320693
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:22:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bf8Ieapp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3E9320693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3243020693
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:25:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3243020693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs1rR-0003l9-6K
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:22:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56919)
+	id 1hs1uY-0005c0-4J
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:25:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57401)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hs1r3-0003Mb-GW
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:22:06 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hs1u6-0005CP-Gk
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hs1r2-0005Nx-Lz
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:22:05 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46539)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hs1r2-0005Km-F0
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:22:04 -0400
-Received: by mail-oi1-x242.google.com with SMTP id 65so44739508oid.13
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 02:22:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uzGS3Zm8Gq+ewBjn3bRqGFjKSDzhWTw2y+NLYBVeNhw=;
- b=Bf8Ieappe/zEr6iTbcsSXZpTL5XvZEB/pQgRkw0bN1rpEPRZA/uTkboXaLY2iT3BiM
- vzwNhMJZ64hpmM+ifHmWmI7rlWzdn7eenDCJqtRMx5nyA8Rgi87CB0pvjz1r8POGg4pz
- fyUvx9lkn/MuAnDGnwq4QAZ6Ua1G+UnvO/tydund7YtW1D3yneEjM3WAkuyOg9sEaJ9t
- MbRGu6wjfg2HldhGA4imtE7AME6kqbVzLDNoiX7rQ8ZFX25g+VL6Qx7HCOl08iZWSqP/
- eiCCkWZFciYLPOnMbgRyJfwX6mC4rXqE7y94bcbk66X5S0esrfpvQ/QsXv+SLQKbxQgJ
- Ty4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uzGS3Zm8Gq+ewBjn3bRqGFjKSDzhWTw2y+NLYBVeNhw=;
- b=LepNwbEBMg+zZxsqZyA8oiCimVwNqiTn4LdswMnMOr4vAnULqvyLn+al1Gpkx0l18V
- urPXYvZ60vSNbjDdfeiSeFFc7jxL3TQH9hW1Urmz1K5w/PsOmnaXN2r+Qt87qr1YkvWQ
- jU8lvroyGTJ+GBh5QKiGHkH8YaI5RAmcC3ghw8OKt448xBUyq12h7g8Nkd/xhP4FTHCm
- HCqjpfLrg373s4r/g5RDK8PvIGHaoj6sRvAzGFWphAYc9b3Owh2Nlz8dIkZu14U2YtUM
- jiuScV8t2t0/QyPrQ92mbH9UWPt7hHlV5G7rbJCnRWV3//BIE5R0CKn74sFFFfOPLJWY
- 6vnw==
-X-Gm-Message-State: APjAAAUDuFLJV9cdDoZ/Omvni0+/IDEMIOmuI0UuLQ8ybd/l5bD+78q7
- O2ZVbiu4UMi00DgjnzVkGLGI/CS4rJ339eenak5PVA==
-X-Google-Smtp-Source: APXvYqzJ9Sl+YdxZ0a0ZIPLCKZ2s5XeKSf8j4TOBiXupk5a/27/OeQl3sME/C+HD1iyJGZAfTRzBYS1QL0+GvjSsLLM=
-X-Received: by 2002:a05:6808:8c2:: with SMTP id
- k2mr51547320oij.98.1564392123407; 
- Mon, 29 Jul 2019 02:22:03 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1hs1u5-0000RQ-L7
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:25:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57230)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hs1u5-0000Qf-GJ
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:25:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 87923368E3
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 09:25:11 +0000 (UTC)
+Received: from work-vm (ovpn-117-222.ams2.redhat.com [10.36.117.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 40FF21000329;
+ Mon, 29 Jul 2019 09:25:04 +0000 (UTC)
+Date: Mon, 29 Jul 2019 10:25:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190729092502.GA2756@work-vm>
+References: <20190726083322.13637-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
- <1562775267-1222-5-git-send-email-pbonzini@redhat.com>
- <87d0ie58cj.fsf@dusky.pond.sub.org>
- <78c3bba3-3e85-682b-b4ce-fc4809add90e@redhat.com>
- <87sgqsx7zp.fsf@dusky.pond.sub.org>
- <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
- <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
- <87ftmptiyq.fsf@dusky.pond.sub.org>
- <41165962-2d61-697f-d17a-d5fa7516e8cc@redhat.com>
-In-Reply-To: <41165962-2d61-697f-d17a-d5fa7516e8cc@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jul 2019 10:21:52 +0100
-Message-ID: <CAFEAcA-Egqpz3MwC2Kk-h_iCP4U74rYh66Nb2oaK5rdjD=7JMQ@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH 4/8] convert libqemuutil to meson
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190726083322.13637-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Mon, 29 Jul 2019 09:25:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] virtiofsd: add FUSE_INIT map_alignment
+ field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,23 +69,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 29 Jul 2019 at 09:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> There is no case where we're using per-.o file CFLAGS for anything other
-> than dependencies.
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> The client must know the server's alignment constraints for FUSE_SETUPMAPPING
+> and FUSE_REMOVEMAPPING.  This is necessary because mmap(2)/munmap(2) have
+> alignment constraints and the guest may have a different page size from the
+> host.  The new FUSE_INIT map_alignment field communicates this information to
+> the client.
 
-disas/libvixl is a counterexample -- we use per-.o-file CFLAGS for:
- * suppressing warnings in third-party code we don't want to
-   carry local modifications to
- * dealing with a NetBSD weirdness about header inclusion order
+OK, merged into my local world.
 
-thanks
--- PMM
+DAve
+
+> Stefan Hajnoczi (3):
+>   virtiofsd: sync up fuse.h Linux 5.1 header
+>   virtiofsd: add map_alignment to fuse_kernel.h
+>   virtiofsd: implement FUSE_INIT map_alignment field
+> 
+>  contrib/virtiofsd/fuse_kernel.h   | 56 +++++++++++++++++++++----------
+>  contrib/virtiofsd/fuse_lowlevel.c |  8 +++++
+>  2 files changed, 47 insertions(+), 17 deletions(-)
+> 
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
