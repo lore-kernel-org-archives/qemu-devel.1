@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1A33C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30964C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAEC02070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:14:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAEC02070B
+	by mail.kernel.org (Postfix) with ESMTPS id 01A7C2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:14:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01A7C2070B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs5UG-0001KN-2v
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 09:14:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40785)
+	id 1hs5UI-0001PT-7X
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 09:14:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40812)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hs5Qq-0003KY-4Y
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:11:16 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hs5Qs-0003RG-AZ
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hs5Qp-0003O5-7L
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:11:16 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:49393 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hs5Qr-0003Qd-Cc
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:11:18 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:49889 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hs5Qp-0001VT-16
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:11:15 -0400
+ id 1hs5Qr-0001Y1-6K
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:11:17 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 335091A2150;
- Mon, 29 Jul 2019 15:10:12 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 557E51A2199;
+ Mon, 29 Jul 2019 15:10:14 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 198C51A20A2;
- Mon, 29 Jul 2019 15:10:12 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 3CA981A20A2;
+ Mon, 29 Jul 2019 15:10:14 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 15:09:46 +0200
-Message-Id: <1564405791-9147-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 29 Jul 2019 15:09:47 +0200
+Message-Id: <1564405791-9147-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564405791-9147-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564405791-9147-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.1 v2 2/7] linux-user: Add support for
- FDMSGON and FDMSGOFF ioctls
+Subject: [Qemu-devel] [PATCH for 4.1 v2 3/7] linux-user: Add support for
+ FDRESET, FDRAWCMD, FDTWADDLE, and FDEJECT ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,42 +70,45 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-FDMSGON and FDMSGOFF switch informational messages of floppy drives
-on and off.
+FDRESET, FDRAWCMD, FDTWADDLE, and FDEJECT ioctls are misc commands
+for controlling a floppy drive.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/ioctls.h       | 4 ++++
+ linux-user/syscall_defs.h | 4 ++++
+ 2 files changed, 8 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index fb7b014..9978163 100644
+index 9978163..ab4ef2e 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -112,6 +112,8 @@
-      IOCTL(BLKZEROOUT, IOC_W, MK_PTR(MK_ARRAY(TYPE_ULONGLONG, 2)))
- #endif
- 
-+     IOCTL(FDMSGON, 0, TYPE_NULL)
-+     IOCTL(FDMSGOFF, 0, TYPE_NULL)
+@@ -115,6 +115,10 @@
+      IOCTL(FDMSGON, 0, TYPE_NULL)
+      IOCTL(FDMSGOFF, 0, TYPE_NULL)
       IOCTL(FDFLUSH, 0, TYPE_NULL)
++     IOCTL(FDRESET, 0, TYPE_NULL)
++     IOCTL(FDRAWCMD, 0, TYPE_NULL)
++     IOCTL(FDTWADDLE, 0, TYPE_NULL)
++     IOCTL(FDEJECT, 0, TYPE_NULL)
  
  #ifdef FIBMAP
+      IOCTL(FIBMAP, IOC_W | IOC_R, MK_PTR(TYPE_LONG))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index fb30bce..cd97e9b 100644
+index cd97e9b..4185391 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -885,6 +885,8 @@ struct target_pollfd {
- 
- /* From <linux/fd.h> */
- 
-+#define TARGET_FDMSGON        TARGET_IO(2, 0x45)
-+#define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
+@@ -888,6 +888,10 @@ struct target_pollfd {
+ #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
+ #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
  #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
++#define TARGET_FDRESET        TARGET_IO(2, 0x54)
++#define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
++#define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
++#define TARGET_FDEJECT        TARGET_IO(2, 0x5a)
  
  #define TARGET_FIBMAP     TARGET_IO(0x00,1)  /* bmap access */
+ #define TARGET_FIGETBSZ   TARGET_IO(0x00,2)  /* get the block size used for bmap */
 -- 
 2.7.4
 
