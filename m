@@ -2,117 +2,89 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A98E4C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD94C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E447206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:30:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E447206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 253F9206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:36:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 253F9206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs5jc-0000lO-8h
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 09:30:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43609)
+	id 1hs5p3-0002TI-FG
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 09:36:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44655)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hs5jC-0000HL-4i
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:30:15 -0400
+ (envelope-from <eblake@redhat.com>) id 1hs5ob-0001vH-4y
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hs5jB-00011y-75
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:30:14 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:53987)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hs5jA-00010F-UR
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:30:13 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MpUpW-1iAbZA13Rk-00pxs4; Mon, 29 Jul 2019 15:29:56 +0200
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-References: <1564405791-9147-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1564405791-9147-8-git-send-email-aleksandar.markovic@rt-rk.com>
- <CAL1e-=jCQ_Fe++XQh7jYoZqAxro9rH6Mo0jj7FZV_Pd7ezCHYA@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <eblake@redhat.com>) id 1hs5oZ-0006DU-Rb
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:35:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59052)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hs5oX-0006AU-6T; Mon, 29 Jul 2019 09:35:45 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 853A93082141;
+ Mon, 29 Jul 2019 13:35:43 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CBF1C5D70D;
+ Mon, 29 Jul 2019 13:35:39 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190729105343.19250-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <8b484eaa-8246-691e-ee8e-e2d53085a476@vivier.eu>
-Date: Mon, 29 Jul 2019 15:29:53 +0200
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <816934c1-419d-10c0-4b13-c6304e832cbb@redhat.com>
+Date: Mon, 29 Jul 2019 08:35:38 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jCQ_Fe++XQh7jYoZqAxro9rH6Mo0jj7FZV_Pd7ezCHYA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:TfB2lQjGsJ2tr1gi/MiQXf/wGVtNaXqjIguXyDQNxepGJeQuqSp
- BpzHE4cSDgU162CdpvNr25aBHaF5X73La54jJBe616NILnqdk0rIEMwy8n2yTzwlhsBwWXW
- +nPv+Mrkz7prwGLIMCOJltbpCTq/u8iCP/PmXuBLswY8v0n5O2fZxzEuzBRUQeMLgewtqoW
- 0gxRPJwgPPuv44z6Z8BfQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:rIMOgOQ9D2s=:3hCDN/cRf5hNahO1vEZEq8
- zK9LGYMYN6oRLIpC8ElCO/1ZlKn9m1zzCCOHz2IjOS64TVSgvKufDWr7Xv95cUvesf13tLyQM
- C+YolgDS4PzIZVZRvxIYTHQqP0x7VfgCkqrbaY47af28IhAyamPx4mBzbokeIx76HHqgoUrZL
- pochRih1aa5venRHqXcf41NLyl5ao0AjjzQOblMcBj67QqP42zxWPxchiAIt/jxAALwCScwmv
- TOALuFSS33YbBI4WNhr6Oy1jwjRmEX9V00gDfQna1RgmctxKIYEL0S1zdfKfqKgieuxfc2wO3
- UcBOKYbCYm5Fnpj+XelIgj+UCITuriKp7gTY73oOqxRh7jdFrb2E6yvAQZFF3bf7FR3j6NFEB
- dyu9eOoBvjSISli8iVJWj+bX9mx51P8OAvKqNq3OcyOP25FBiELb425zsL2oZbCWQrOploWqq
- SWfrdZ3JbYSyEdS2YV4y9KksFKC1+6Jgcf4MdVmockBlfXsXGgXh8O+fcdlQr8GCgEwLb+v5w
- 4rkHY67ostaOX72aj5h/BRyE1XPYnkHapO8GkadOzhEk7ebAGY3STkf548K14+AwAaRnHioEO
- LI8WSd6neVnbg8hyytW1hZIT/aOmo001IpQG9TsNSx8UXojpslcdV/kABdd5gJSxZdgWrlj/e
- +UmrY4W4tcGuoxVzFdeqmgJhyiH6s+zojnn1UKODmoMXKqzlUqnbxtGWv9DqQKr4StKPvx85y
- sz5bD6RJRU6vmTGeJIPS+JR6J2A8+/Je4GqilAQ6wB3Fi21wQ0naYN5cu5w=
+In-Reply-To: <20190729105343.19250-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="xbXoJAgpa9inZuxHGvlaKP0a2s1u570VO"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 29 Jul 2019 13:35:43 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.17.10
-Subject: Re: [Qemu-devel] [PATCH for 4.1 v2 7/7] linux-user: Add support for
- semtimedop() syscall
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1] block/copy-on-read: Fix
+ permissions for inactive node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,55 +96,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/07/2019 à 15:26, Aleksandar Markovic a écrit :
-> 
-> 
-> On Mon, Jul 29, 2019 at 3:11 PM Aleksandar Markovic
-> <aleksandar.markovic@rt-rk.com <mailto:aleksandar.markovic@rt-rk.com>>
-> wrote:
-> 
->     From: Aleksandar Rikalo <arikalo@wavecomp.com
->     <mailto:arikalo@wavecomp.com>>
-> 
->     Add support for semtimedop() emulation. It is based on invocation
->     of safe_semtimedop().
-> 
->     Conversion is left out of safe_semtimedop(), since other safe_xxx()
->     usually don't contain similar conversions.
-> 
->     Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com
->     <mailto:arikalo@wavecomp.com>>
->     Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com
->     <mailto:amarkovic@wavecomp.com>>
->     ---
-> 
-> 
-> Aleksandar R., Laurent,
-> 
-> Please note that I just rebased the patch compared to its last
-> incarnation - no code change.
-> 
-> Laurent's hints were as follows last time:
-> 
-> "To avoid duplicate code (and cleanup the stack allocation), you should
-> 
-> remove do_semop()  and call do_semtimedop(..., NULL) from IPCOP_semop
-> and TARGET_NR_semop.
-> 
-> Thanks, Laurent"
-> 
->  I guess they are still valid.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xbXoJAgpa9inZuxHGvlaKP0a2s1u570VO
+Content-Type: multipart/mixed; boundary="Rtgieef7EMHoe5cFD0WzctcmFul8vv4uD";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <816934c1-419d-10c0-4b13-c6304e832cbb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-4.1] block/copy-on-read: Fix permissions
+ for inactive node
+References: <20190729105343.19250-1-kwolf@redhat.com>
+In-Reply-To: <20190729105343.19250-1-kwolf@redhat.com>
 
-Yes, I didn't remember my comment and do the same again...
+--Rtgieef7EMHoe5cFD0WzctcmFul8vv4uD
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Laurent
+On 7/29/19 5:53 AM, Kevin Wolf wrote:
+> The copy-on-read drive must not request the WRITE_UNCHANGED permission
+> for its child if the node is inactive, otherwise starting a migration
+> destination with -incoming will fail because the child cannot provide
+> write access yet:
+>=20
+>   qemu-system-x86_64: -blockdev copy-on-read,file=3Dimg,node-name=3Dcor=
+: Block node is read-only
+>=20
+> Earlier QEMU versions additionally ran into an abort() on the migration=
 
+> source side: bdrv_inactivate_recurse() failed to update permissions.
+> This is silently ignored today because it was only supposed to loosen
+> restrictions. This is the symptom that was originally reported here:
+>=20
+>   https://bugzilla.redhat.com/show_bug.cgi?id=3D1733022
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/copy-on-read.c | 16 +++++++---------
+>  1 file changed, 7 insertions(+), 9 deletions(-)
+
+Do any of the iotests cover this?  Should they, especially if you are
+trying to get this in for -rc3 tomorrow?
+
+>=20
+> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+> index 22f24fd0db..6631f30205 100644
+> --- a/block/copy-on-read.c
+> +++ b/block/copy-on-read.c
+> @@ -56,16 +56,14 @@ static void cor_child_perm(BlockDriverState *bs, Bd=
+rvChild *c,
+>                             uint64_t perm, uint64_t shared,
+>                             uint64_t *nperm, uint64_t *nshared)
+>  {
+> -    if (c =3D=3D NULL) {
+> -        *nperm =3D (perm & PERM_PASSTHROUGH) | BLK_PERM_WRITE_UNCHANGE=
+D;
+> -        *nshared =3D (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
+> -        return;
+> -    }
+> +    *nperm =3D perm & PERM_PASSTHROUGH;
+> +    *nshared =3D (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
+> =20
+> -    *nperm =3D (perm & PERM_PASSTHROUGH) |
+> -             (c->perm & PERM_UNCHANGED);
+> -    *nshared =3D (shared & PERM_PASSTHROUGH) |
+> -               (c->shared_perm & PERM_UNCHANGED);
+
+The old code unconditionally returned one set of permissions when c =3D=3D=
+
+NULL, or made a choice based on c's existing permissions on whether to
+pass in those two bits.
+
+> +    /* We must not request write permissions for an inactive node, the=
+ child
+> +     * cannot provide it. */
+> +    if (!(bs->open_flags & BDRV_O_INACTIVE)) {
+> +        *nperm |=3D BLK_PERM_WRITE_UNCHANGED;
+> +    }
+
+The new code changes the condition for or'ing in WRITE_UNCHANGED to
+*nperm (it is no longer dependent on whether c =3D=3D NULL, but whether t=
+he
+drive is inactive), which matches your commit message.
+
+But the new code also changes to always pass in the PERM_UNCHANGED to
+*nshared; that used to be skipped if c was non-NULL and did not already
+have the permission.  I don't follow that change from the commit
+message, am I missing something?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--Rtgieef7EMHoe5cFD0WzctcmFul8vv4uD--
+
+--xbXoJAgpa9inZuxHGvlaKP0a2s1u570VO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0+9ioACgkQp6FrSiUn
+Q2rptAgAnBECWiJ/VeCE7wWPDbcBdoCItz73oBkBfhvHQ/fncfGJhDaBmq2vND9o
+ECduT3qW/F9sXmAg2CM4i/KzNpgKu1vbuOQF1Ls4/AW4eWjG4S2Jq30pZoQbHRHN
+7VdOyBuJPaBRK/ALFV/JhsnKBMgugYxk0Q/vDIUtPs/kJujZNeRUtYMs5jkjKqYx
+IdtxQfFytt5f6l57oozE3l0qaibKpAKYayvR4CeJLcFyzJmcr7fFCWU0K8Ybc9yQ
+KABA3pcQs3f2m5wvT5/kAVugLZDCFn4EMJ9i7XDGL4QaGcwqJsre+c9eU4UsDcc9
+JmQSEcsUSfmejig1u8V+zirnulLasg==
+=yLbk
+-----END PGP SIGNATURE-----
+
+--xbXoJAgpa9inZuxHGvlaKP0a2s1u570VO--
 
