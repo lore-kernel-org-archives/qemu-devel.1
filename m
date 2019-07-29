@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4529C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC378C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:37:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0231206BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:37:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0231206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 9F933206BA
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:37:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F933206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzHn-00050B-SV
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:37:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54249)
+	id 1hrzHw-0005Sr-Ux
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:37:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54171)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hrzCg-0005OO-DD
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:16 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hrzCY-0005K7-Qs
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hrzCe-0001tn-8e
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:14 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hrzCV-0001jY-Aw
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:05 -0400
 Received: from mga11.intel.com ([192.55.52.93]:47122)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hrzCe-0001HA-0k
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:12 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hrzCR-0001HA-OX
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:01 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Jul 2019 23:31:55 -0700
+ 28 Jul 2019 23:31:38 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="370357324"
+X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="370357233"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2019 23:31:52 -0700
+ by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2019 23:31:36 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Mon, 29 Jul 2019 14:31:27 +0800
-Message-Id: <20190729063127.2801-12-tao3.xu@intel.com>
+Date: Mon, 29 Jul 2019 14:31:19 +0800
+Message-Id: <20190729063127.2801-4-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190729063127.2801-1-tao3.xu@intel.com>
 References: <20190729063127.2801-1-tao3.xu@intel.com>
@@ -55,8 +55,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v8 11/11] tests/bios-tables-test: add test
- cases for ACPI HMAT
+Subject: [Qemu-devel] [PATCH v8 03/11] numa: move numa global variable
+ have_numa_distance into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,94 +68,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <Jingqi.liu@intel.com>, tao3.xu@intel.com, fan.du@intel.com,
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
  qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
-Heterogeneous Memory with boot option '-numa node'.
+Move existing numa global have_numa_distance into NumaState.
 
-Add test cases on PC and Q35 machines with 2 numa nodes.
-Because HMAT is generated when system enable numa, the
-following tables need to be added for this test:
-  tests/acpi-test-data/pc/*.acpihmat
-  tests/acpi-test-data/pc/HMAT.*
-  tests/acpi-test-data/q35/*.acpihmat
-  tests/acpi-test-data/q35/HMAT.*
-
-Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
 Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 No changes in v8.
 ---
- tests/bios-tables-test.c | 43 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ hw/arm/sbsa-ref.c        | 2 +-
+ hw/arm/virt-acpi-build.c | 2 +-
+ hw/arm/virt.c            | 2 +-
+ hw/core/numa.c           | 5 ++---
+ hw/i386/acpi-build.c     | 2 +-
+ include/sysemu/numa.h    | 4 ++--
+ 6 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index a356ac3489..53ffc8081a 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -871,6 +871,47 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
-     test_acpi_tcg_dimm_pxm(MACHINE_PC);
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 22847909bf..7e4c471717 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -158,7 +158,7 @@ static void create_fdt(SBSAMachineState *sms)
+     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
+ 
+-    if (have_numa_distance) {
++    if (ms->numa_state->have_numa_distance) {
+         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
+         uint32_t *matrix = g_malloc0(size);
+         int idx, i, j;
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index a2cc4b84fe..461a44b5b0 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -797,7 +797,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     if (ms->numa_state->num_nodes > 0) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, vms);
+-        if (have_numa_distance) {
++        if (ms->numa_state->have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, ms);
+         }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index c72b8fd3a7..6f0170cf1d 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -232,7 +232,7 @@ static void create_fdt(VirtMachineState *vms)
+                                 "clk24mhz");
+     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
+ 
+-    if (have_numa_distance) {
++    if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
+         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
+         uint32_t *matrix = g_malloc0(size);
+         int idx, i, j;
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 4d5e308bf1..2142ec29e8 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -50,7 +50,6 @@ static int have_mem;
+ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+                              * For all nodes, nodeid < max_numa_nodeid
+                              */
+-bool have_numa_distance;
+ NodeInfo numa_info[MAX_NODES];
+ 
+ 
+@@ -168,7 +167,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
+     }
+ 
+     numa_info[src].distance[dst] = val;
+-    have_numa_distance = true;
++    ms->numa_state->have_numa_distance = true;
  }
  
-+static void test_acpi_tcg_acpi_hmat(const char *machine)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = machine;
-+    data.variant = ".acpihmat";
-+    test_acpi_one(" -smp 2,sockets=2"
-+                  " -m 128M,slots=2,maxmem=1G"
-+                  " -object memory-backend-ram,size=64M,id=m0"
-+                  " -object memory-backend-ram,size=64M,id=m1"
-+                  " -numa node,nodeid=0,memdev=m0"
-+                  " -numa node,nodeid=1,memdev=m1,initiator=0"
-+                  " -numa cpu,node-id=0,socket-id=0"
-+                  " -numa cpu,node-id=0,socket-id=1"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-latency,base-lat=10,latency=5"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-bandwidth,base-bw=20,bandwidth=5"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-latency,base-lat=10,latency=10"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-bandwidth,base-bw=20,bandwidth=10"
-+                  " -numa hmat-cache,node-id=0,size=0x20000,total=1,level=1"
-+                  ",assoc=direct,policy=write-back,line=8"
-+                  " -numa hmat-cache,node-id=1,size=0x20000,total=1,level=1"
-+                  ",assoc=direct,policy=write-back,line=8",
-+                  &data);
-+    free_test_data(&data);
-+}
-+
-+static void test_acpi_q35_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
-+}
-+
-+static void test_acpi_piix4_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_PC);
-+}
-+
- static void test_acpi_virt_tcg(void)
- {
-     test_data data = {
-@@ -915,6 +956,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
-         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
-         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-+        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
-+        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
-     } else if (strcmp(arch, "aarch64") == 0) {
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-     }
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+@@ -441,7 +440,7 @@ void numa_complete_configuration(MachineState *ms)
+          * asymmetric. In this case, the distances for both directions
+          * of all node pairs are required.
+          */
+-        if (have_numa_distance) {
++        if (ms->numa_state->have_numa_distance) {
+             /* Validate enough NUMA distance information was provided. */
+             validate_numa_distance(ms);
+ 
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index d4c092358d..081a8fc116 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -2692,7 +2692,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     if (pcms->numa_nodes) {
+         acpi_add_table(table_offsets, tables_blob);
+         build_srat(tables_blob, tables->linker, machine);
+-        if (have_numa_distance) {
++        if (machine->numa_state->have_numa_distance) {
+             acpi_add_table(table_offsets, tables_blob);
+             build_slit(tables_blob, tables->linker, machine);
+         }
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 3e8dbf20c1..2e5e998adb 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -6,8 +6,6 @@
+ #include "sysemu/hostmem.h"
+ #include "hw/boards.h"
+ 
+-extern bool have_numa_distance;
+-
+ struct NodeInfo {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+@@ -26,6 +24,8 @@ struct NumaState {
+     /* Number of NUMA nodes */
+     int num_nodes;
+ 
++    /* Allow setting NUMA distance for different NUMA nodes */
++    bool have_numa_distance;
+ };
+ typedef struct NumaState NumaState;
+ 
 -- 
 2.20.1
 
