@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D95BC76186
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79020C76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:18:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50A242073F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:17:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A242073F
+	by mail.kernel.org (Postfix) with ESMTPS id 4DDEB2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:18:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DDEB2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsD1T-00073u-JV
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:17:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56705)
+	id 1hsD1s-00084m-Km
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:18:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56719)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hsD0D-0005ko-1n
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:18 -0400
+ (envelope-from <mst@redhat.com>) id 1hsD0H-0005uD-Qq
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hsD0B-0003i7-Gb
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:16 -0400
-Received: from mail-qt1-f179.google.com ([209.85.160.179]:36842)
+ (envelope-from <mst@redhat.com>) id 1hsD0G-0003jl-Mj
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:21 -0400
+Received: from mail-qt1-f173.google.com ([209.85.160.173]:43668)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hsD0B-0003hy-BU
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:15 -0400
-Received: by mail-qt1-f179.google.com with SMTP id z4so60997890qtc.3
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 14:16:15 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hsD0G-0003jZ-JD
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:20 -0400
+Received: by mail-qt1-f173.google.com with SMTP id w17so16623080qto.10
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 14:16:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=QdMWtHmweOrWAhdEfsuivxg5RVP7OHshZr5ulNpkUmM=;
- b=B1JH5DfblYY7jT7itl3Ms+jRL7QTPqL/RN2hyZvg+nv/d+ssJBiSbjWFHQf/5LVnkN
- ii+ptThOyH/Ru8AN+lptkrwNnO749FX6R9fZRM/rVg874KURD2bZk13YJARZbdJ2Pmtl
- BkbVk4TToscDdulaIHsrSEm3BZvI8MI9ZfKtD9vTV4GFLTNj7Q4ciVh2bW+vhOooS0LH
- ITz6exEdp9XWnngFMduMb5N6bRzPYtfQ3TK2mOM6JUtGBqMs8wdyn35iM7hn4eDRH6BI
- E9Jix2qDCQMF7qoSMWcl4r4O1jsl2O6VWoKdPim1/2jzEhT8f1lyaxZ5Ys36vG8q/uJ2
- Ugcw==
-X-Gm-Message-State: APjAAAVxsw5siV8LOlhA2uJzm8etlb+Y8DGV8INHz3IJy5GoomFqGJQW
- nLwqo4yYyB+zOootXOlUZjJfw6rPBhvX3w==
-X-Google-Smtp-Source: APXvYqyHmMPKL7Y0ZhvyQBEF47iyaeFt6PDuCfyHeCqTqbZHg0PoWHK+uqOiiVz3+CrTqv0idCUc0A==
-X-Received: by 2002:ac8:3908:: with SMTP id s8mr33336794qtb.224.1564434974381; 
- Mon, 29 Jul 2019 14:16:14 -0700 (PDT)
+ bh=qNyxluckYNXjX0PviQMIN4Hjjd/tW1RorHrzwXKNic0=;
+ b=YXCabN4v+vFndbgr3CdIbguu2YmQ5vZkpdoxFr3rCZv5S6nRK7fZky6Cn8GU96lNOk
+ khYBw42Akt4UYBWbAaPsMgtYj6qlq6NFhYbuJ8FqA5fuEQCnmgjrpuFC/Q8Qebn4T6Yy
+ R/3eHnjXTkty5CDepES3agQW5zh82IEgcRedW88UPAfqgXaBuYknvE9kmkfFiVmexrzp
+ wwdT1PiT72rqfrrlVbRSX9GiDxLvbiByzz2gfsInC3/NLhLRvX5l6K9AkjpjjEKuyRa5
+ Or/M23B3BILNC9sxrkJtD/xAx1yqqxrY+d+QadrTDowpEem99baO5WjeySa44yByAdYL
+ 8afw==
+X-Gm-Message-State: APjAAAXp+4IcGu1VDxfOf8aqOa85+KxzXzliiitINXbaPPB3yYLLLvT2
+ Vlm+xEmRm9ZtvvogJ68O2JnkAoLx5IcGPA==
+X-Google-Smtp-Source: APXvYqwoU/egkdex8u6mxc9FsYJMsUwNUUJAJoao73k/ZNmzDvjN/rmkCY5pjfiiTN0jOI0myzeT/A==
+X-Received: by 2002:a0c:ad7a:: with SMTP id v55mr78346444qvc.130.1564434979765; 
+ Mon, 29 Jul 2019 14:16:19 -0700 (PDT)
 Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
  by smtp.gmail.com with ESMTPSA id
- l19sm35708677qtb.6.2019.07.29.14.16.11
+ g2sm27478762qkf.32.2019.07.29.14.16.16
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 29 Jul 2019 14:16:13 -0700 (PDT)
-Date: Mon, 29 Jul 2019 17:16:08 -0400
+ Mon, 29 Jul 2019 14:16:19 -0700 (PDT)
+Date: Mon, 29 Jul 2019 17:16:14 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Message-ID: <20190729162903.4489-3-dgilbert@redhat.com>
+Message-ID: <20190723160859.27250-1-imammedo@redhat.com>
 References: <20190729211404.1533-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
@@ -70,9 +70,9 @@ X-Mailer: git-send-email 2.22.0.678.g13338e74b8
 X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.160.179
-Subject: [Qemu-devel] [PULL 2/3] Revert "hw: report invalid
- disable-legacy|modern usage for virtio-1-only devs"
+X-Received-From: 209.85.160.173
+Subject: [Qemu-devel] [PULL 3/3] pc-dimm: fix crash when invalid slot number
+ is used
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,244 +84,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Pankaj Gupta <pagupta@redhat.com>,
+ Li Qiang <liq3ea@gmail.com>, &lt@redhat.com, Mammedov@redhat.com,
+ Igor Mammedov <imammedo@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190729211608.j57kv1jqNNjOsfJEm_LmlVB3biso8X2J8prGPb-wV6U@z>
+Message-ID: <20190729211614.e_nKAiNoJDhFUCrBz2F3QmB-D-U_dpE2MFddBp6-Tng@z>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-This reverts commit f2784eed306449c3d04a71a05ed6463b8289aedf
-since that accidentally removes the PCIe capabilities from virtio
-devices because virtio_pci_dc_realize is called before the new 'mode'
-flag is set.
+QEMU will crash with:
+  Segmentation fault (core dumped)
+when negative slot number is used, ex:
+  qemu-system-x86_64 -m 1G,maxmem=20G,slots=256 \
+      -object memory-backend-ram,id=mem1,size=1G \
+      -device pc-dimm,id=dimm1,memdev=mem1,slot=-2
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20190729162903.4489-3-dgilbert@redhat.com>
+fix it by checking that slot number is within valid range.
+
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20190723160859.27250-1-imammedo@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Signed-off-by: Igor Mammedov &lt;<a href="mailto:imammedo@redhat.com" target="_blank">imammedo@redhat.com</a>&gt;<br></blockquote><div><br></div><div>Reviewed-by: Li Qiang &lt;<a href="mailto:liq3ea@gmail.com">liq3ea@gmail.com</a>&gt;<br></div><div> </div><blockquote class="gmail_quote" style="margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 ---
- hw/core/machine.c             | 23 +++--------------------
- hw/display/virtio-gpu-pci.c   |  4 +---
- hw/display/virtio-vga.c       |  4 +---
- hw/virtio/virtio-crypto-pci.c |  4 +---
- hw/virtio/virtio-input-pci.c  |  4 +---
- hw/virtio/virtio-pci.c        | 26 ++++++++++----------------
- hw/virtio/virtio-pci.h        | 31 ++++++-------------------------
- 7 files changed, 23 insertions(+), 73 deletions(-)
+ hw/mem/pc-dimm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index c58a8e594e..c4a2ab2282 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -115,26 +115,9 @@ const size_t hw_compat_2_7_len = G_N_ELEMENTS(hw_compat_2_7);
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index b1239fd0d3..29c785799c 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -38,6 +38,13 @@ void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
  
- GlobalProperty hw_compat_2_6[] = {
-     { "virtio-mmio", "format_transport_address", "off" },
--    /*
--     * don't include devices which are modern-only
--     * ie keyboard, mouse, tablet, gpu, vga & crypto
--     */
--    { "virtio-9p-pci", "disable-modern", "on" },
--    { "virtio-9p-pci", "disable-legacy", "off" },
--    { "virtio-balloon-pci", "disable-modern", "on" },
--    { "virtio-balloon-pci", "disable-legacy", "off" },
--    { "virtio-blk-pci", "disable-modern", "on" },
--    { "virtio-blk-pci", "disable-legacy", "off" },
--    { "virtio-input-host-pci", "disable-modern", "on" },
--    { "virtio-input-host-pci", "disable-legacy", "off" },
--    { "virtio-net-pci", "disable-modern", "on" },
--    { "virtio-net-pci", "disable-legacy", "off" },
--    { "virtio-rng-pci", "disable-modern", "on" },
--    { "virtio-rng-pci", "disable-legacy", "off" },
--    { "virtio-scsi-pci", "disable-modern", "on" },
--    { "virtio-scsi-pci", "disable-legacy", "off" },
--    { "virtio-serial-pci", "disable-modern", "on" },
--    { "virtio-serial-pci", "disable-legacy", "off" },
-+    /* Optional because not all virtio-pci devices support legacy mode */
-+    { "virtio-pci", "disable-modern", "on",  .optional = true },
-+    { "virtio-pci", "disable-legacy", "off", .optional = true },
- };
- const size_t hw_compat_2_6_len = G_N_ELEMENTS(hw_compat_2_6);
- 
-diff --git a/hw/display/virtio-gpu-pci.c b/hw/display/virtio-gpu-pci.c
-index d6f01b4a98..e4c7eb6193 100644
---- a/hw/display/virtio-gpu-pci.c
-+++ b/hw/display/virtio-gpu-pci.c
-@@ -33,9 +33,7 @@ static void virtio_gpu_pci_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     Error *local_error = NULL;
- 
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    if (!virtio_pci_force_virtio_1(vpci_dev, errp)) {
--        return;
--    }
-+    virtio_pci_force_virtio_1(vpci_dev);
-     object_property_set_bool(OBJECT(vdev), true, "realized", &local_error);
- 
-     if (local_error) {
-diff --git a/hw/display/virtio-vga.c b/hw/display/virtio-vga.c
-index 416e7fec87..79a145e284 100644
---- a/hw/display/virtio-vga.c
-+++ b/hw/display/virtio-vga.c
-@@ -137,9 +137,7 @@ static void virtio_vga_base_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- 
-     /* init virtio bits */
-     qdev_set_parent_bus(DEVICE(g), BUS(&vpci_dev->bus));
--    if (!virtio_pci_force_virtio_1(vpci_dev, errp)) {
--        return;
--    }
-+    virtio_pci_force_virtio_1(vpci_dev);
-     object_property_set_bool(OBJECT(g), true, "realized", &err);
-     if (err) {
-         error_propagate(errp, err);
-diff --git a/hw/virtio/virtio-crypto-pci.c b/hw/virtio/virtio-crypto-pci.c
-index c8a2317a10..91d4446080 100644
---- a/hw/virtio/virtio-crypto-pci.c
-+++ b/hw/virtio/virtio-crypto-pci.c
-@@ -53,9 +53,7 @@ static void virtio_crypto_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     }
- 
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    if (!virtio_pci_force_virtio_1(vpci_dev, errp)) {
--        return;
--    }
-+    virtio_pci_force_virtio_1(vpci_dev);
-     object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-     object_property_set_link(OBJECT(vcrypto),
-                  OBJECT(vcrypto->vdev.conf.cryptodev), "cryptodev",
-diff --git a/hw/virtio/virtio-input-pci.c b/hw/virtio/virtio-input-pci.c
-index 1c40292abc..ad7774e93e 100644
---- a/hw/virtio/virtio-input-pci.c
-+++ b/hw/virtio/virtio-input-pci.c
-@@ -49,9 +49,7 @@ static void virtio_input_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     DeviceState *vdev = DEVICE(&vinput->vdev);
- 
-     qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
--    if (!virtio_pci_force_virtio_1(vpci_dev, errp)) {
--        return;
--    }
-+    virtio_pci_force_virtio_1(vpci_dev);
-     object_property_set_bool(OBJECT(vdev), true, "realized", errp);
- }
- 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index ce928f2429..f6d2223e78 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1723,22 +1723,16 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
-                        /* PCI BAR regions must be powers of 2 */
-                        pow2ceil(proxy->notify.offset + proxy->notify.size));
- 
--    if ((proxy->disable_legacy == ON_OFF_AUTO_ON) ||
--        ((proxy->disable_legacy == ON_OFF_AUTO_AUTO) && pcie_port)) {
--        if (proxy->disable_modern) {
--            error_setg(errp, "device cannot work as neither modern nor "
--                       "legacy mode is enabled");
--            error_append_hint(errp, "Set either disable-modern or "
--                              "disable-legacy to off\n");
--            return;
--        }
--        proxy->mode = VIRTIO_PCI_MODE_MODERN;
--    } else {
--        if (proxy->disable_modern) {
--            proxy->mode = VIRTIO_PCI_MODE_LEGACY;
--        } else {
--            proxy->mode = VIRTIO_PCI_MODE_TRANSITIONAL;
--        }
-+    if (proxy->disable_legacy == ON_OFF_AUTO_AUTO) {
-+        proxy->disable_legacy = pcie_port ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
+     slot = object_property_get_int(OBJECT(dimm), PC_DIMM_SLOT_PROP,
+                                    &error_abort);
++    if ((slot < 0 || slot >= machine->ram_slots) &&
++         slot != PC_DIMM_UNASSIGNED_SLOT) {
++        error_setg(&local_err, "invalid slot number, valid range is [0-%"
++                   PRIu64 "]", machine->ram_slots - 1);
++        goto out;
 +    }
 +
-+    if (!virtio_pci_modern(proxy) && !virtio_pci_legacy(proxy)) {
-+        error_setg(errp, "device cannot work as neither modern nor legacy mode"
-+                   " is enabled");
-+        error_append_hint(errp, "Set either disable-modern or disable-legacy"
-+                          " to off\n");
-+        return;
-     }
- 
-     if (pcie_port && pci_is_express(pci_dev)) {
-diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-index 619d9098c1..292275acb1 100644
---- a/hw/virtio/virtio-pci.h
-+++ b/hw/virtio/virtio-pci.h
-@@ -15,7 +15,6 @@
- #ifndef QEMU_VIRTIO_PCI_H
- #define QEMU_VIRTIO_PCI_H
- 
--#include "qapi/error.h"
- #include "hw/pci/msi.h"
- #include "hw/virtio/virtio-bus.h"
- 
-@@ -119,12 +118,6 @@ typedef struct VirtIOPCIQueue {
-   uint32_t used[2];
- } VirtIOPCIQueue;
- 
--typedef enum {
--    VIRTIO_PCI_MODE_LEGACY,
--    VIRTIO_PCI_MODE_TRANSITIONAL,
--    VIRTIO_PCI_MODE_MODERN,
--} VirtIOPCIMode;
--
- struct VirtIOPCIProxy {
-     PCIDevice pci_dev;
-     MemoryRegion bar;
-@@ -149,7 +142,6 @@ struct VirtIOPCIProxy {
-     bool disable_modern;
-     bool ignore_backend_features;
-     OnOffAuto disable_legacy;
--    VirtIOPCIMode mode;
-     uint32_t class_code;
-     uint32_t nvectors;
-     uint32_t dfselect;
-@@ -164,34 +156,23 @@ struct VirtIOPCIProxy {
- 
- static inline bool virtio_pci_modern(VirtIOPCIProxy *proxy)
- {
--    return proxy->mode != VIRTIO_PCI_MODE_LEGACY;
-+    return !proxy->disable_modern;
- }
- 
- static inline bool virtio_pci_legacy(VirtIOPCIProxy *proxy)
- {
--    return proxy->mode != VIRTIO_PCI_MODE_MODERN;
-+    return proxy->disable_legacy == ON_OFF_AUTO_OFF;
- }
- 
--static inline bool virtio_pci_force_virtio_1(VirtIOPCIProxy *proxy,
--                                             Error **errp)
-+static inline void virtio_pci_force_virtio_1(VirtIOPCIProxy *proxy)
- {
--    if (proxy->disable_legacy == ON_OFF_AUTO_OFF) {
--        error_setg(errp, "Unable to set disable-legacy=off on a virtio-1.0 "
--                   "only device");
--        return false;
--    }
--    if (proxy->disable_modern == true) {
--        error_setg(errp, "Unable to set disable-modern=on on a virtio-1.0 "
--                   "only device");
--        return false;
--    }
--    proxy->mode = VIRTIO_PCI_MODE_MODERN;
--    return true;
-+    proxy->disable_modern = false;
-+    proxy->disable_legacy = ON_OFF_AUTO_ON;
- }
- 
- static inline void virtio_pci_disable_modern(VirtIOPCIProxy *proxy)
- {
--    proxy->mode = VIRTIO_PCI_MODE_LEGACY;
-+    proxy->disable_modern = true;
- }
- 
- /*
+     slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+                                  machine->ram_slots, &local_err);
+     if (local_err) {
 -- 
 MST
 
