@@ -2,79 +2,82 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 597B0C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 17:18:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3BA9C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 17:33:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31B272070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 17:18:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31B272070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 72B34206DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 17:33:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Jt8bmjjD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B34206DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs9I9-0004Os-A8
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 13:18:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40255)
+	id 1hs9WD-0008MN-QB
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 13:33:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42569)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hs9Hf-0003pi-JH
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 13:18:04 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1hs9VU-0007tf-2Q
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 13:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hs9He-0004mr-7f
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 13:18:03 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38361)
+ (envelope-from <chihmin.chao@sifive.com>) id 1hs9VS-000861-U8
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 13:32:20 -0400
+Received: from mail-io1-xd36.google.com ([2607:f8b0:4864:20::d36]:45082)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hs9He-0004mV-20
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 13:18:02 -0400
-Received: by mail-wr1-f66.google.com with SMTP id g17so62709457wrr.5
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 10:18:01 -0700 (PDT)
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1hs9VS-00083O-NJ
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 13:32:18 -0400
+Received: by mail-io1-xd36.google.com with SMTP id g20so121811018ioc.12
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 10:32:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=O2HTUKYvHlRqmkm0dGzs7uXFFIWYFCO+j7nCy0iZr+Y=;
+ b=Jt8bmjjDBUyPEIQDTjb3JJUwMG4vN3vCLFDnLSQXlygo6NIfinEp3cLjInQU7r9g2u
+ CZJkWjKNbSYPov8R/Es667P/7DWMJVKwN45nRnWYKa0u992sQ4lAA2uQHa/ZW5wu6cgr
+ l/ooypM/dGlhGqv8YeneBCHCQJtP+5XdTYnajGfyYq8EPwiRVFofO5eEN6ub3W1SvG4j
+ ctcJnP2K0oLsrY1LqB9G5/TrenahRHec4seVp5QA8syh59JCzmFcFykFbBOg9jYp9iSW
+ t98w2ZQjd2eXsYNkXbP+qXfUgp1Xi3NpNOpArMapoTCV7lluA8OMI/CEI/sY/8AK5h3z
+ /rag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UcsNsSJDDwl7yjQ6N+DrqE0hqb6n2RsdQKDnQsVTWY8=;
- b=JvmFErOplGICdzWA+rCFClyXq8RihRDGhs3wun4T/9kUo81ZFjaejR/D0dkT8CMfFx
- R9+tEBwbUkOR29fijrR96AtC32KSc58aBNrtemT1Nos8w6KvnbtLmiFsda3Vt6igPEiT
- XOH4GlFyRDOXHp8pticEr8dodaCnaZUsEXtll/u0DWXh4KL5uBwtVxUhOTGpe/4Qe5EJ
- CL9/4vXyVwt/JxTGa/8D1hsaJXt9nT8UWv7r9wZAKTzArXcuVcRblz4fPbSD2WhZG+4X
- 79mLgqJUV+pbE4AcqpR4s4n58gTJGlOgQCzhcaRVJKnZGVXWb8EDiHKxo/sToQR7eJGg
- kvFA==
-X-Gm-Message-State: APjAAAVIl/9HCgQic3urqR817/XEaWZZ1Fay6msZxMZzuEwe2jK/axXz
- 1FwZHSXyA9vbF15803eIjEfC8Q==
-X-Google-Smtp-Source: APXvYqxe8LJHBvegGMrzuqVx4RWXWrvjJJHjkBsqzoBN6n4IprapVsZSl+/2mrOqHK0C27l97ti5zw==
-X-Received: by 2002:a5d:5446:: with SMTP id w6mr46420318wrv.164.1564420680979; 
- Mon, 29 Jul 2019 10:18:00 -0700 (PDT)
-Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
- [81.40.121.190])
- by smtp.gmail.com with ESMTPSA id x8sm51991696wmc.5.2019.07.29.10.18.00
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 29 Jul 2019 10:18:00 -0700 (PDT)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190729164234.11573-1-kwolf@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <83185706-7584-e583-e917-5e05d1d27e25@redhat.com>
-Date: Mon, 29 Jul 2019 19:17:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O2HTUKYvHlRqmkm0dGzs7uXFFIWYFCO+j7nCy0iZr+Y=;
+ b=lWlD2gL8wT/LV64n0mNpm7v4DY5ntHb6riSFEQ3NOCCf/PnA9etjueFwROWNbxpGlU
+ dSIcQs2U0/q/g7RHSNUYFvWJdmtmR7I0E4XucZYvS+2DPn0U9hLGwU0S5PEAcfTMZbis
+ fAQnd1BfgmlI0kbnZMdvUN4pHczqqqOCSb65TLUyNnPq2V5Opq/Kw3Erz+nfefQ8TbSc
+ sS7746cbmy8h4On+CpWl1SiNcGvIrlFqZUVMASzgaW+gw0zfF5Y+iawlfDFinnmVXC1T
+ +0DbeUguuqJhSN1TiIExJdxWWEpH4QF90cuWYZEpPJjIxyn/b/IlpNWFcPkHc+BEIC1B
+ Y6Ug==
+X-Gm-Message-State: APjAAAXPPAAUCkK+4uJp/sAn/h7lhIFXgzVm4XanTFq1Jun5vxzDvPY7
+ 1ZuKnR5CwZWjcwE4w+l0iM/A59MC5+fI0Oxl9OuAhA==
+X-Google-Smtp-Source: APXvYqx7vQww1lnLSXxVrSaztwX3rwhtlgRsyRFAHjX26zQblXRZh4Wo/Bbm/m2yUPiZC8yClhN3qURtTla4uIFgYcY=
+X-Received: by 2002:a05:6638:5:: with SMTP id z5mr43147299jao.58.1564421537790; 
+ Mon, 29 Jul 2019 10:32:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190729164234.11573-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH for-4.1] scsi-cd: Fix inserting read-only
- media in empty drive
+References: <cover.1564080680.git.alistair.francis@wdc.com>
+ <50c1c6a3ace8b40f7b9d5395a2c3457cf1852721.1564080680.git.alistair.francis@wdc.com>
+In-Reply-To: <50c1c6a3ace8b40f7b9d5395a2c3457cf1852721.1564080680.git.alistair.francis@wdc.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Tue, 30 Jul 2019 01:32:06 +0800
+Message-ID: <CAEiOBXVO1W1p_K_ETC_x==9t0pZ2sctvp820M8FYwpXsXGuFgQ@mail.gmail.com>
+To: Alistair Francis <alistair.francis@wdc.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d36
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH-4.2 v1 3/6] riscv: plic: Remove unused
+ interrupt functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,62 +89,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/29/19 6:42 PM, Kevin Wolf wrote:
-> scsi-disks decides whether it has a read-only device by looking at
-> whether the BlockBackend specified as drive=... is read-only. In the
-> case of an anonymous BlockBackend (with a node name specified in
-> drive=...), this is the read-only flag of the attached node. In the case
-> of an empty anonymous BlockBackend, it's always read-write because
-> nothing prevented it from being read-write.
-> 
-> This is a problem because scsi-cd would take write permissions on the
-> anonymous BlockBackend of an empty drive created without a drive=...
-> option. Using blockdev-insert-medium with a read-only node fails then
-> with the error message "Block node is read-only".
-> 
-> Fix scsi_realize() so that scsi-cd devices always take read-only
-> permissions on their BlockBackend instead.
-> 
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1733920
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On Fri, Jul 26, 2019 at 2:55 AM Alistair Francis <alistair.francis@wdc.com>
+wrote:
+
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/scsi/scsi-disk.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 8e95e3e38d..af3e622dc5 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -2318,6 +2318,7 @@ static void scsi_disk_unit_attention_reported(SCSIDevice *dev)
->  static void scsi_realize(SCSIDevice *dev, Error **errp)
+>  hw/riscv/sifive_plic.c         | 12 ------------
+>  include/hw/riscv/sifive_plic.h |  3 ---
+>  2 files changed, 15 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+> index 0950e89e15..864a1bed42 100644
+> --- a/hw/riscv/sifive_plic.c
+> +++ b/hw/riscv/sifive_plic.c
+> @@ -161,18 +161,6 @@ static void sifive_plic_update(SiFivePLICState *plic)
+>      }
+>  }
+>
+> -void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq)
+> -{
+> -    sifive_plic_set_pending(plic, irq, true);
+> -    sifive_plic_update(plic);
+> -}
+> -
+> -void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq)
+> -{
+> -    sifive_plic_set_pending(plic, irq, false);
+> -    sifive_plic_update(plic);
+> -}
+> -
+>  static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
 >  {
->      SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-> +    bool read_only;
->  
->      if (!s->qdev.conf.blk) {
->          error_setg(errp, "drive property not set");
-> @@ -2351,8 +2352,13 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
->              return;
->          }
->      }
-> -    if (!blkconf_apply_backend_options(&dev->conf,
-> -                                       blk_is_read_only(s->qdev.conf.blk),
-> +
-> +    read_only = blk_is_read_only(s->qdev.conf.blk);
-> +    if (dev->type == TYPE_ROM) {
-> +        read_only = true;
-> +    }
-> +
-> +    if (!blkconf_apply_backend_options(&dev->conf, read_only,
->                                         dev->type == TYPE_DISK, errp)) {
->          return;
->      }
-> 
-
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+>      int i, j;
+> diff --git a/include/hw/riscv/sifive_plic.h
+> b/include/hw/riscv/sifive_plic.h
+> index ce8907f6aa..3b8a623919 100644
+> --- a/include/hw/riscv/sifive_plic.h
+> +++ b/include/hw/riscv/sifive_plic.h
+> @@ -69,9 +69,6 @@ typedef struct SiFivePLICState {
+>      uint32_t aperture_size;
+>  } SiFivePLICState;
+>
+> -void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq);
+> -void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq);
+> -
+>  DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+>      uint32_t num_sources, uint32_t num_priorities,
+>      uint32_t priority_base, uint32_t pending_base,
+> --
+> 2.22.0
+>
+>
+Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
