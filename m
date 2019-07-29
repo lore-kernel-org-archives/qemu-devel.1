@@ -2,62 +2,142 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22BF9C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 19:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE16EC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 19:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE5E521849
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 19:44:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE5E521849
+	by mail.kernel.org (Postfix) with ESMTPS id 9636B2054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 19:46:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9636B2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsBZg-00033u-6X
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 15:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38466)
+	id 1hsBb3-0004J1-Oc
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 15:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38712)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hsBZH-0002cs-Vs
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 15:44:25 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hsBaZ-0003qk-WF
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 15:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hsBZG-0000Of-Nc
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 15:44:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54296)
+ (envelope-from <jsnow@redhat.com>) id 1hsBaY-0002Va-Ji
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 15:45:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54096)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hsBZG-0000ML-EU
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 15:44:22 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hsBaV-0002SV-9x; Mon, 29 Jul 2019 15:45:39 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 783893082A8D;
- Mon, 29 Jul 2019 19:44:21 +0000 (UTC)
-Received: from localhost (ovpn-116-75.gru2.redhat.com [10.97.116.75])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C297D5E7C4;
- Mon, 29 Jul 2019 19:44:16 +0000 (UTC)
-Date: Mon, 29 Jul 2019 16:44:14 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190729194414.GG4313@habkost.net>
-References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-24-armbru@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8685F745A1;
+ Mon, 29 Jul 2019 19:45:38 +0000 (UTC)
+Received: from [10.18.17.74] (dhcp-17-74.bos.redhat.com [10.18.17.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C1CF25E7A8;
+ Mon, 29 Jul 2019 19:45:15 +0000 (UTC)
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
+ <087e6cb5-b24d-b144-744c-d74defeadb86@redhat.com>
+ <34a8030e-a173-162d-6786-3dafa5a1d4ed@redhat.com>
+ <20190729100946.GC3369@stefanha-x1.localdomain>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <9c34e70f-5ead-309c-865c-4a64d8a28724@redhat.com>
+Date: Mon, 29 Jul 2019 15:45:15 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190726120542.9894-24-armbru@redhat.com>
+In-Reply-To: <20190729100946.GC3369@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 29 Jul 2019 19:44:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Mon, 29 Jul 2019 19:45:38 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 23/28] numa: Don't include hw/boards.h into
- sysemu/numa.h
+Subject: Re: [Qemu-devel] [PATCH] Fix Guest VM crash due to iSCSI Sense Key
+ error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,144 +149,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ shaju.abraham@nutanix.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Jul 26, 2019 at 02:05:37PM +0200, Markus Armbruster wrote:
-> sysemu/numa.h includes hw/boards.h just for the CPUArchId typedef, at
-> the cost of pulling in more than two dozen extra headers indirectly.
+
+
+On 7/29/19 6:09 AM, Stefan Hajnoczi wrote:
+> On Fri, Jul 26, 2019 at 04:18:46PM -0400, John Snow wrote:
+>> Paolo, Stefan and Kevin: can I loop you in here? I'm quite uncertain
+>> about this and I'd like to clear this up quickly if it's possible:
+>>
+>> On 7/25/19 8:58 PM, John Snow wrote:
+>>>
+>>>
+>>> On 7/7/19 10:55 PM, shaju.abraham@nutanix.com wrote:
+>>>> From: Shaju Abraham <shaju.abraham@nutanix.com>
+>>>>
+>>>> During the  IDE DMA transfer for a ISCSI target,when libiscsi encounters
+>>>> a SENSE KEY error, it sets the task->sense to  the value "COMMAND ABORTED".
+>>>> The function iscsi_translate_sense() later translaters this error to -ECANCELED
+>>>> and this value is passed to the callback function. In the case of  IDE DMA read
+>>>> or write, the callback function returns immediately if the value of the ret
+>>>> argument is -ECANCELED.
+>>>> Later when ide_cancel_dma_sync() function is invoked  the assertion
+>>>> "s->bus->dma->aiocb == ((void *)0)" fails and the qemu process gets terminated.
+>>>> Fix the issue by making the value of s->bus->dma->aiocb = NULL when
+>>>> -ECANCELED is passed to the callback.
+>>>>
+>>>> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
+>>>> ---
+>>>>  hw/ide/core.c | 1 +
+>>>>  1 file changed, 1 insertion(+)
+>>>>
+>>>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>>>> index 6afadf8..78ea357 100644
+>>>> --- a/hw/ide/core.c
+>>>> +++ b/hw/ide/core.c
+>>>> @@ -841,6 +841,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>>>>      bool stay_active = false;
+>>>>  
+>>>>      if (ret == -ECANCELED) {
+>>>> +        s->bus->dma->aiocb = NULL;
+>>>>          return;
+>>>>      }
+>>>>  
+>>>>
+>>>
+>>> The part that makes me nervous here is that I can't remember why we do
+>>> NO cleanup whatsoever for the ECANCELED case.
+>>>
+>>> commit 0d910cfeaf2076b116b4517166d5deb0fea76394
+>>> Author: Fam Zheng <famz@redhat.com>
+>>> Date:   Thu Sep 11 13:41:07 2014 +0800
+>>>
+>>>     ide/ahci: Check for -ECANCELED in aio callbacks
+>>>
+>>>
+>>> ... This looks like we never expected the aio callbacks to ever get
+>>> called with ECANCELED, so we treat this as a QEMU-internal signal.
+>>>
+>>> It looks like we expect these callbacks to do NOTHING in this case; but
+>>> I'm not sure where the IDE state machine does its cleanup otherwise.
+>>> (The DMA might have been canceled, but the DMA and IDE state machines
+>>> still need to exit their loop.)
+>>>
+>>> If you take a look at this patch from 2014 though, there are many other
+>>> spots where we have littered ECANCELED checks that might also cause
+>>> problems if we're receiving error codes we thought we couldn't get normally.
+>>>
+>>> I am worried this patch papers over something worse.
+>>>
+>> I'm not clear why Fam's patch adds a do-nothing return to the ide_dma_cb
+>> if it's invoked with ECANCELED: shouldn't it be the case that the IDE
+>> state machine needs to know that a transfer it was relying on to service
+>> an ATA command was canceled and treat it like an error?
+>>
+>> Why was it ever correct to ignore these? Is it because we only ever
+>> canceled DMA during reset/shutdown/etc?
+>>
+>> It appears as if iscsi requests can actually genuinely return an
+>> ECANCELED errno, so there are likely several places in the IDE code that
+>> need to accommodate this from happening.
+>>
+>> The easiest fix LOOKS like just deleting the special-casing of ECANCELED
+>> altogether and letting the error pathways handle things as normal.
+>>
+>> Am I mistaken?
 > 
-> I could move the typedef from hw/boards.h to qemu/typedefs.h.  But
-> it's used in just two headers: boards.h and numa.h.
-> 
-> I could move it to another header both its users include.
-> exec/cpu-common.h seems to be the least bad fit.
-> 
-> But I'm keeping this simple & stupid: declare the struct tag in
-> numa.h.
-> 
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  exec.c                     | 1 +
->  hw/core/machine-qmp-cmds.c | 1 +
->  hw/core/machine.c          | 1 +
->  hw/mem/pc-dimm.c           | 1 +
->  include/hw/boards.h        | 2 +-
->  include/sysemu/numa.h      | 9 +++++++--
->  6 files changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index 6d60fdfb1f..4d9e146c79 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -41,6 +41,7 @@
->  #if defined(CONFIG_USER_ONLY)
->  #include "qemu.h"
->  #else /* !CONFIG_USER_ONLY */
-> +#include "hw/boards.h"
->  #include "exec/memory.h"
->  #include "exec/ioport.h"
->  #include "sysemu/dma.h"
-> diff --git a/hw/core/machine-qmp-cmds.c b/hw/core/machine-qmp-cmds.c
-> index c83e8954e1..d8284671f0 100644
-> --- a/hw/core/machine-qmp-cmds.c
-> +++ b/hw/core/machine-qmp-cmds.c
-> @@ -9,6 +9,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "cpu.h"
-> +#include "hw/boards.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-commands-machine.h"
->  #include "qapi/qmp/qerror.h"
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 2c9c93983a..901f3fa905 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -23,6 +23,7 @@
->  #include "sysemu/numa.h"
->  #include "qemu/error-report.h"
->  #include "sysemu/qtest.h"
-> +#include "hw/boards.h"
->  #include "hw/pci/pci.h"
->  #include "hw/mem/nvdimm.h"
->  
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 0c83dcd61e..fa90d4fc6c 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -19,6 +19,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "hw/boards.h"
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/qdev-properties.h"
->  #include "migration/vmstate.h"
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 67e551636a..739d109fe1 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -86,7 +86,7 @@ void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type);
->   * @props - CPU object properties, initialized by board
->   * #vcpus_count - number of threads provided by @cpu object
->   */
-> -typedef struct {
-> +typedef struct CPUArchId {
->      uint64_t arch_id;
->      int64_t vcpus_count;
->      CpuInstanceProperties props;
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 01a263eba2..4c4c1dee9b 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -4,7 +4,10 @@
->  #include "qemu/bitmap.h"
->  #include "sysemu/sysemu.h"
->  #include "sysemu/hostmem.h"
-> -#include "hw/boards.h"
-> +#include "qapi/qapi-types-machine.h"
-
-This seems to be needed because of NodeInfo.
-
-> +#include "exec/cpu-common.h"
-
-This seems to be needed because of ram_addr_t.
-
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-
-> +
-> +struct CPUArchId;
->  
-
-I wonder if we should do the same for other struct types like
-NodeInfo.
-
-Why is it bad to require the inclusion of hw/boards.h just
-because of CPUArchId, but acceptable to require the inclusion of
-qapi-types-machine.h just to be able to write "NodeInfo *nodes"
-instead of "struct NodeInfo *nodes" below?
-
->  extern int nb_numa_nodes;   /* Number of NUMA nodes */
->  extern bool have_numa_distance;
-> @@ -32,5 +35,7 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
->                                   int nb_nodes, ram_addr_t size);
->  void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
->                                    int nb_nodes, ram_addr_t size);
-> -void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp);
-> +void numa_cpu_pre_plug(const struct CPUArchId *slot, DeviceState *dev,
-> +                       Error **errp);
-> +
->  #endif
-> -- 
-> 2.21.0
+> I think your instincts are right that there are deeper issues.  The
+> first step would be test cases, then you can be sure various scenarios
+> have been handled correctly.
 > 
 
--- 
-Eduardo
+Suggestions? I'm not sure what's supposed to work and in what way here.
+I guess this stuff was introduced for bdrv_aio_cancel_async, but it's
+not immediately clear what's supposed to happen when you call that.
+
+> I noticed that ide_sector_read_cb(), ide_sector_write_cb(), and
+> ide_flush_cb() all differ in whether they reset s->pio_aiocb and
+> s->status before returning early due to -ECANCELED.  That must be a bug.
+> 
+> I didn't look at the ide_dma_cb() code path.
+> 
+> Stefan
+> 
+
+Hm ...
+
+It looks like canceling the ide_dma_cb AIOCB objects doesn't do anything
+too useful?
+
+dma_blk_io and friends will establish dma_aio_cancel as the async cancel
+callback. So if we do cancel these objects, we're going to call this
+function:
+
+static void dma_aio_cancel(BlockAIOCB *acb)
+{
+    DMAAIOCB *dbs = container_of(acb, DMAAIOCB, common);
+
+    trace_dma_aio_cancel(dbs);
+
+    if (dbs->acb) {
+        blk_aio_cancel_async(dbs->acb);
+    }
+    if (dbs->bh) {
+        cpu_unregister_map_client(dbs->bh);
+        qemu_bh_delete(dbs->bh);
+        dbs->bh = NULL;
+    }
+}
+
+but there's no cancel callback for the lower layer in dbs->acb, so
+that's just a nop, I think -- blk_aio_prwv doesn't offer an asynchronous
+cancel mechanism.
+
+Next, we'll unschedule the BH if there is one. I think the only case
+where there is one is the reschedule_dma case of dma_blk_cb. (I'm not
+too familiar with these DMA helpers: in what cases do we expect the iov
+to be empty?)
+
+So it looks like this cancellation will produce one of two effects,
+depending on when it's invoked:
+
+1) We'll stall the DMA permanently by deleting that BH, because
+dma_complete will never get invoked and therefore nobody will ever call
+ide_dma_cb with any return value of any kind. The IDE state machine
+likely just hangs waiting for the DMA to finish until the guest OS
+decides to reset the errant controller.
+
+2) The DMA will continue blissfully unaware it was canceled, because the
+lower AIOCB has no cancel method, and so will finish, call back to
+dma_blk_cb, and continue the transfer loop unaware.
+
+
+... Does your reading align with mine?
+
+
+If it does -- if there are indeed no places in the code today that
+artificially inject -ECANCELED -- I need to remove these special stanzas
+from the IDE code and allow the IDE state machine to handle these errors
+as true errors.
+
+I'm just not confident enough in my unwinding of the DMA callback
+spaghetti, though.
+
+--js
 
