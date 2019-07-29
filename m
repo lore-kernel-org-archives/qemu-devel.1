@@ -2,73 +2,65 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCEEC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F291C76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:12:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1430204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:12:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1430204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4A48F204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:12:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cul/qQ42"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A48F204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrytZ-0006Jg-2N
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:12:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50164)
+	id 1hrytp-0006n2-I9
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:12:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50204)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hrysr-0005hk-Jh
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:11:46 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hryt3-0005vE-NI
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hrysq-000293-An
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:11:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37542)
+ (envelope-from <dgibson@ozlabs.org>) id 1hryt2-0002MN-A5
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:11:57 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:38239 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hrysq-00025c-3R
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:11:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0F9E63083394;
- Mon, 29 Jul 2019 06:11:42 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-51.ams2.redhat.com
- [10.36.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DAF65D6A9;
- Mon, 29 Jul 2019 06:11:37 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 858CB1138619; Mon, 29 Jul 2019 08:11:35 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?= <dirty.ice.hu@gmail.com>
-References: <cover.1563224628.git.DirtY.iCE.hu@gmail.com>
- <8245dab2e59b99b55f3f7773fd39dc920ae48951.1563224628.git.DirtY.iCE.hu@gmail.com>
- <878ssyqyyu.fsf@dusky.pond.sub.org>
- <b8009305-9e17-97e5-a57d-f78dd111f55b@gmail.com>
- <87lfwqywsa.fsf@dusky.pond.sub.org>
- <59720be5-241e-be50-2b0f-be611cff7dbc@gmail.com>
- <58139154-2d7c-2eb0-f1a7-c5f57868f657@gmail.com>
-Date: Mon, 29 Jul 2019 08:11:35 +0200
-In-Reply-To: <58139154-2d7c-2eb0-f1a7-c5f57868f657@gmail.com>
- (=?utf-8?B?IlpvbHTDoW4JS8WRdsOhZ8OzIidz?= message of "Sun, 28 Jul 2019
- 17:08:29 +0200")
-Message-ID: <87sgqptlns.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hryt0-0002BW-Hp; Mon, 29 Jul 2019 02:11:55 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45xq8H5m3hz9sMQ; Mon, 29 Jul 2019 16:11:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1564380703;
+ bh=kLoindXVCUcYpOpBNte7tUr+KLgqfhCiCxGQnRw2cgU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=cul/qQ42drikmGOpvm/FdX1zz254+prXqnFeo69Bog7PMK6Msta3w1ZgMjuuO+68T
+ Ky/rDbQvYmThjHsiVfnDC1LA4feuJa0Yh6sR1BoirZ1k4O28pg5O79mKW02jLafBAD
+ /Dt1lemsZewT1epkMMmbbQ42YyDncxt1nuu0XXp0=
+Date: Mon, 29 Jul 2019 16:11:31 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190729061131.GA8687@umbus>
+References: <20190718115420.19919-1-clg@kaod.org>
+ <20190718115420.19919-10-clg@kaod.org>
+ <20190728074602.GF5110@umbus>
+ <024c66ef-b622-54ce-1ed3-3716cf6102f1@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 29 Jul 2019 06:11:42 +0000 (UTC)
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="9jxsPFA5p3P2qPhR"
+Content-Disposition: inline
+In-Reply-To: <024c66ef-b622-54ce-1ed3-3716cf6102f1@kaod.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 03/14] audio: add audiodev property to
- vnc and wav_capture
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH v2 09/17] ppc/xive: Extend XiveTCTX with a
+ XiveRouter pointer
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,119 +72,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
 
-> On 2019-07-28 15:42, Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3 wrote:
->> On 2019-07-22 16:21, Markus Armbruster wrote:
->>> "Zolt=C3=A1n K=C5=91v=C3=A1g=C3=B3" <dirty.ice.hu@gmail.com> writes:
->>>
->>>> On 2019-07-16 08:23, Markus Armbruster wrote:
-[...]
->>>>>> diff --git a/hmp-commands.hx b/hmp-commands.hx
->>>>>> index bfa5681dd2..fa7f009268 100644
->>>>>> --- a/hmp-commands.hx
->>>>>> +++ b/hmp-commands.hx
->>>>>> @@ -819,16 +819,19 @@ ETEXI
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D "wavcapture",
->>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .args_type=C2=A0 =3D "pa=
-th:F,freq:i?,bits:i?,nchannels:i?",
->>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .params=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D "path [frequency [bits [channels]]]",
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .args_type=C2=A0 =3D
->>>>>> "path:F,freq:i?,bits:i?,nchannels:i?,audiodev:s?",
->>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .params=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D "path [frequency [bits [channels
->>>>>> [audiodev]]]]",
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .help=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D "capture audio to a wave file (def=
-ault
->>>>>> frequency=3D44100 bits=3D16 channels=3D2)",
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .cmd=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D hmp_wavcapture,
->>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
->>>>>> =C2=A0=C2=A0 STEXI
->>>>>> -@item wavcapture @var{filename} [@var{frequency} [@var{bits}
->>>>>> [@var{channels}]]]
->>>>>> +@item wavcapture @var{filename} [@var{frequency} [@var{bits}
->>>>>> [@var{channels} [@var{audiodev}]]]]
->>>>>> =C2=A0=C2=A0 @findex wavcapture
->>>>>> -Capture audio into @var{filename}. Using sample rate @var{frequency}
->>>>>> -bits per sample @var{bits} and number of channels @var{channels}.
->>>>>> +Capture audio into @var{filename} from @var{audiodev}, using
->>>>>> sample rate
->>>>>> +@var{frequency} bits per sample @var{bits} and number of channels
->>>>>> +@var{channels}. When not using an -audiodev argument on command lin=
-e,
->>>>>> +@var{audiodev} must be omitted, otherwise is must specify a valid
->>>>>> +audiodev.
->>>>>
->>>>> I can see the code for "must specify a valid audiodev" in
->>>>> hmp_wavcapture().=C2=A0 Where is "must be omitted" checked?
->>>>
->>>> It's not checked right now, but if the user specifies audiodev, it
->>>> must be a valid audiodev id.=C2=A0 So if the user can guess the id (wh=
-ich
->>>> is not too hard ATM, it's simply the driver's name), it will work even
->>>> in this case.
->>>>
->>>>> Preexisting: the list "sample rate @var{frequency} bits per sample
->>>>> @var{bits} and number of channels @var{channels}" lacks a comma after
->>>>> @var{frequency}, please fix that.=C2=A0 I'd put one after @var{bits}
->>>>> as well,
->>>>> but that's a matter of taste[*]
->>>>>
->>>>> The sentence is of the form "if not COND then A else B".=C2=A0 The
->>>>> less-negated form "if COND then B else A" is commonly easier to read.
->>>>>
->>>>> Documentation says "from @var{audiodev}".=C2=A0 But when "not using an
->>>>> -audiodev argument on command line, +@var{audiodev} must be omitted".
->>>>> Where does it sample from then?=C2=A0 I figure from some default audio
->>>>> device.=C2=A0 Where is that default audio device explained?=C2=A0 I s=
-kimmed the
->>>>> -audiodev documentation in qemu-options.hx, but couldn't see it there.
->>>>
->>>> Currently there are two ways to specify audio options, the legacy ones
->>>> using the QEMU_AUDIO_* environment variables, and the new one using
->>>> -audiodev arguments.=C2=A0 The two formats cannot be mixed, and eventu=
-ally
->>>> we should remove the legacy ones (IIRC my previous patch series
->>>> already deprecated them), then we can get rid of this madness.=C2=A0 M=
-aybe
->>>> something like "When using the legacy environment variable based audio
->>>> config, @var{audiodev} must be omitted." would be better?
->>>
->>> What about effectively de-documenting the deprecated method?=C2=A0 I.e.=
- write
->>> as if it was already gone.=C2=A0 This should result in more readable
->>> documentation.
->>
->> Makes sense.=C2=A0 User will less likely use deprecated methods that way
->> and it simplifies the documentation.
->>
->>> Double-checking: will audiodev become mandatory once the deprecated
->>> method is gone?
->>
->> Yes.
->
-> Actually, now that I took a second look at the params, it might be
-> problematic.  Currently audiodev is the last parameter, so if it
-> becomes mandatory, that will effectively mean other parameters will
-> become mandatory too.  And if I were to change the order and move
-> audiodev first, that would break backward compatibility during the
-> deprecation period.
+--9jxsPFA5p3P2qPhR
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-HMP is not a stable interface.  We can break compatibility there when we
-have a reason.
+On Sun, Jul 28, 2019 at 11:06:27AM +0200, C=E9dric Le Goater wrote:
+> On 28/07/2019 09:46, David Gibson wrote:
+> > On Thu, Jul 18, 2019 at 01:54:12PM +0200, C=E9dric Le Goater wrote:
+> >> This is to perform lookups in the NVT table when a vCPU is dispatched
+> >> and possibily resend interrupts.
+> >>
+> >> Future XIVE chip will use a different class for the model of the
+> >> interrupt controller and we might need to change the type of
+> >> 'XiveRouter *' to 'Object *'
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > Hrm.  This still bothers me.=20
+>=20
+> Your feeling is right. There should be a good reason to link two objects=
+=20
+> together as it can be an issue later on (such P10). It should not be an=
+=20
+> hidden parameter to function calls. this is more or less the case.=20
+> =20
+> See below for more explanation.
+>=20
+> > AIUI there can be multiple XiveRouters in the system, yes? =20
+>=20
+> yes and it works relatively well with 4 chips. I say relatively because=
+=20
+> the presenter model is taking a shortcut we should fix.=20
+>=20
+> > And at least theoretically can present irqs from multiple routers?=20
+>=20
+> Yes. the console being the most simple example. We only have one device=
+=20
+> per system on the LPC bus of chip 0.=20
+> =20
+> > In which case what's the rule for which one should be associated with=
+=20
+> > a specific.
+> > I guess it's the one on the same chip, but that needs to be explained
+> > up front, with some justification of why that's the relevant one.
+>=20
+> Yes. we try to minimize the traffic on the PowerBUS so generally CPU=20
+> targets are on the same IC. The EAT on POWER10 should be on the same
+> HW chip.
+>=20
+>=20
+> I think we can address the proposed changes from another perspective,=20
+> from the presenter one. this is cleaner and reflects better the HW design=
+=2E=20
+>=20
+> The thread contexts are owned by the presenter. It can scan its list=20
+> when doing CAM matching and when the thread context registers are being=
+=20
+> accessed by a CPU. Adding a XiveRouter parameter to all the TIMA=20
+> operations seems like a better option and solves the problem.
+> =20
+>=20
+> The thread context registers are modeled under the CPU object today=20
+> because it was practical for sPAPR but on HW, these are SRAM entries,
+> one for each HW thread of the chip. So may be, we should have introduced
+> an other table under the XiveRouter to model the contexts but there
+> was no real need for the XIVE POWER9 IC of the pseries machine. This=20
+> design might be reaching its limits with PowerNV and POWER10. =20
+>=20
+>=20
+> Looking at :
+> =20
+>   [PATCH v2 15/17] ppc/pnv: Grab the XiveRouter object from XiveTCTX in p=
+nv_xive_get_tctx()
+>=20
+> we see that the code adds an extra check on the THREAD_ENABLE registers=
+=20
+> and for that, its needs the IC to which belongs the thread context. This=
+=20
+> code is wrong. We should not be need to find a XiveRouter object from a=
+=20
+> XiveRouter handler.
+>=20
+> This is because the xive_presenter_match() routine does:
+>                       =20
+>     CPU_FOREACH(cs) {
+>         XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+> =20
+> we should be, instead, looping on the different IC of the system=20
+> looking for a match. Something else to fix. I think I will use the
+> PIR to match the CPU of a chip.
+>=20
+>=20
+> Looking at POWER10, XIVE internal structures have changed and we will
+> need to introduce new IC models, one for PowerNV obviously but surely=20
+> also one for pseries. A third one ... yes, sorry about that. If we go=20
+> in that direction, it would be good to have a common XiveTCTX and not=20
+> link it to a specific XiveRouter (P9 or P10). Another good reason not
+> to use that link.
+>=20
+>=20
+> So I will rework the end of that patchset. Thanks for having given me=20
+> time to think more about it before merging. I did more experiments and
+> the models are now more precise, specially with guest and multichip
+> support.
 
-In this case, we can either break it right away (insert audiodev before
-the other optional parameters), or later (insert it last, move it when
-it becomes mandatory).  Matter of taste.  I'd break it right away.
+Ok, good to hear.  I will wait for the respin.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--9jxsPFA5p3P2qPhR
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl0+jhEACgkQbDjKyiDZ
+s5LWRQ//UvltZJYiKNmM7GMO9uALnkCE3ctC+lGsBN+DLZFKDajyzkS+6a5PVWEM
+pfgA4EmAhOTha0pjIg3sVf1iZ4cT+80AdmA4tZfxRs5Od08Se17xQaETBXvMwTVT
+K02sx7dFGmhdReW03xbFxpty0HGDZnC1dqKbPw0Y0cWsBvIOO0pA2biutSYaY+Cn
+YeMhA2lk7BCot5DWBLZ4bvU71Nv8SxSJDuXUSoRKYaLNbl2O6mo67X4NVAhUnK4a
+89unkhVq4FomVNin3uWbHsjG8q4hLuXpvIlYxfqWqVtfSXIaa8Xo3tDOg/81C3+n
+mnXi02pvqqk1VrTc+Y8LZLIC5BfHOjPl5HDmD6sXuefOmORTqr9OTgpSJ4rVQOe/
+gFUTjTUfMlElcPL9pjx5Cz7erDMHauvzHTwwqkhqKs1v3kU6r80VqUOdu9ndZ0Xz
+5vsa4UpMdAw0pI9KwAlUwCHvuqDImJcBw2JTA8uat9OLhyYH8hEA6s6D/f683v+D
+CafYIV3hZz+z0Rz4m3zy2cm+8AB2fS18Lvn1FEo0ad2QSvKqGifhk9jtXc66SXFB
+Q64NL5KvPGl8667NzR+W4S+k21sypIDCF3i1ekFHZxyXzQgnMlSfzRhETEUhbgk0
+CW2C0pdkyxrtBt9M+egPsPpgCuakhvbWWdOSglNcY8y7FiHQG5k=
+=ufNS
+-----END PGP SIGNATURE-----
+
+--9jxsPFA5p3P2qPhR--
 
