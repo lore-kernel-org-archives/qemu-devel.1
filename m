@@ -5,73 +5,73 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB26C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BD1C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:30:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CED92216C8
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9174206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:30:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1G6OjQE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED92216C8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UA1sQSbD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9174206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7au-0005VE-6C
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:29:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44159)
+	id 1hs7bs-0007Fo-3l
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:30:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43904)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hs7Qf-0000Sd-BK
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:19:14 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hs7Q5-0007dN-1Y
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:18:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hs7Qe-000298-2C
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:19:13 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38384)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hs7Q3-0000Fu-DQ
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:18:36 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45809)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hs7Qd-00026N-RX; Mon, 29 Jul 2019 11:19:11 -0400
-Received: by mail-pg1-x541.google.com with SMTP id f5so19605898pgu.5;
- Mon, 29 Jul 2019 08:19:11 -0700 (PDT)
+ id 1hs7Q3-0000BZ-6d; Mon, 29 Jul 2019 11:18:35 -0400
+Received: by mail-pf1-x441.google.com with SMTP id r1so28194353pfq.12;
+ Mon, 29 Jul 2019 08:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gOorbCfkOfD5hZ9Ne/IGI2m869VvMpyg8Fi+6sPnwi8=;
- b=F1G6OjQEueVHGDuOxyiPHc/6rCXIpTHvBUxDKg/GCcSs7LIom8AHRKoVzpeGTt0kl1
- AHwgGNguLmZQbE/2H+3CvRrKuWgippajWFoUFLlIKFstyGEp649gMHswlVcEvyglMk0Y
- /+Bf3gd2t4SI8uNc/bxPrP/E9c3UOX3u5PklkDRcPsm24HnJzVsXqblo4OJmLKI2hnuq
- RudvuXeFWtylYu4MuACDcIlSO0g/Nn5Ez9tAPT/Bo2pOcTE7gZfKNzr83sWXAtPhfc28
- drWwByGMWHse3DXertNDAmDXXdco0VKkqgXSvTABuResxGzV9mot+7fXOkWdly4PVpYS
- vKJw==
+ bh=CsviC0H5kxruu2nLsmjsEXhYUXVsWAJ6x54pOSbsHRI=;
+ b=UA1sQSbD0BgpnzosE2aBx6h50xVsRxYAyBmrVJAqvm4/r5nBCUp2mnMoNbOwF65Uxj
+ PcOE8KTYHJLgfU7wsn6fKEovnGkJEPz3mOaiHZ5DbTLP+GtX3gMqKu5ombKdrfmPcpbu
+ Bw3dzf0toAW6dFB+dGWTBND7RkLbl9w2Gq8cgRtOqGjhOdeSdNeRuDfBdhS3CmVuWzmd
+ 3lF2kCykgyKmlorn7qoG5BifniuSjTKet8Q0nJSCUz2R/6CypW1NKIRYGcyr4G3p9H/K
+ 4VFTwnDn/r4CWOgBIXmiVP+YQdbWV4R0EEQSFb/11NrLnAoIlI8YYJDTkusv7fFiyvYi
+ 5pXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gOorbCfkOfD5hZ9Ne/IGI2m869VvMpyg8Fi+6sPnwi8=;
- b=Angjjw8uxKZb3t6E1n1WZuL4uWU8X6EEXkki+kHcxX8+kDBMkxrIthAW6J/uzmSZOL
- /M+bcwxmL+gfNqqppcwOnzNQ1tknMMA1LyQAV3sP1zRwDT1GFvBxY5eirNTPbQY5g1FA
- XY1bRXU1AImfj7chtfKmVTHZhdps1hDgByf3VHdn7F3m5LoftGUs9YF6U4bL8R565rNK
- jfY+WOLFMnCi4u3KOSzcgIn2vgEV69dPVaC7dd4qZvEwLFjZ7wMbIYD9PDhzYvr6ScpU
- GrFwo/G+RqP05xf7lKteXCOKufShSiMy4upiTBlO/uJVHKutUrxvnHunHC0BxNnimrpc
- ZLbQ==
-X-Gm-Message-State: APjAAAUEmk6s5lusdlJvRm/NcQTAjU01b7v9y1MW81B+qbrgV3iVsq6a
- iwdhzCGmooC+BUy1I5ehcI8Dtz5rlo4iGQ==
-X-Google-Smtp-Source: APXvYqx7ATTByWezOb6rtvkEfSN65BlA2JSe7DJoZbU+CNhr2MziYjNcj2wbP/ZRlbiUTdg1kapMYw==
-X-Received: by 2002:a63:c50f:: with SMTP id f15mr5133443pgd.372.1564413550517; 
- Mon, 29 Jul 2019 08:19:10 -0700 (PDT)
+ bh=CsviC0H5kxruu2nLsmjsEXhYUXVsWAJ6x54pOSbsHRI=;
+ b=Ml/htjH8J9GrZWv/s0UDKV5563BY24L+Qu0cI1QnS1gkNpaXd3mBsJlZ6sZDrxBR6y
+ bFvBBeXE8pD1ypS3of6b4Qcr70CoAwz65Hq/wqp9wGrHc0/st+QCbRJX+O0Wycp7GH0+
+ 8AHJjz+FoKa8SLgPEEDQCU0wIjTg3H/wWG25p0+O7AU7AmQzpZPt9s7gArCRMId8bza2
+ BdZ2dB88UpkMvNZUcxVOtXpxoig7Ss2ZA8xoTCvoO5CKXCim3mn9L0KyejqF0JJgYNmi
+ fozBaPze8vWV3kAbhL619vP/+NZAKAUI3cHatnrf4TqpLvY8RJuSKfe9xwJdfxjZoHdy
+ ev/g==
+X-Gm-Message-State: APjAAAVx/+Q75tYYzP9yTwZWmZ/1te3CzhdJREeV32QB3VvSC3YXL0BA
+ JchJrsE1LJlPJsHMyOWbFTJlMeEop67cUg==
+X-Google-Smtp-Source: APXvYqwhfc8cf11gHszg58e12d9z9XNipulSiZOpcPHjdGpkRXhow6dgx4fA06qABMo3PKEGvDP2/w==
+X-Received: by 2002:a63:6f41:: with SMTP id k62mr58949394pgc.32.1564413513477; 
+ Mon, 29 Jul 2019 08:18:33 -0700 (PDT)
 Received: from localhost.localdomain ([136.233.9.97])
- by smtp.gmail.com with ESMTPSA id h129sm58693941pfb.110.2019.07.29.08.19.04
+ by smtp.gmail.com with ESMTPSA id h129sm58693941pfb.110.2019.07.29.08.18.27
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 29 Jul 2019 08:19:09 -0700 (PDT)
+ Mon, 29 Jul 2019 08:18:32 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 20:46:50 +0530
-Message-Id: <20190729151651.21306-15-mehta.aaru20@gmail.com>
+Date: Mon, 29 Jul 2019 20:46:45 +0530
+Message-Id: <20190729151651.21306-10-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190729151651.21306-1-mehta.aaru20@gmail.com>
 References: <20190729151651.21306-1-mehta.aaru20@gmail.com>
@@ -79,9 +79,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PATCH v7 14/15] tests/qemu-iotests: enable testing
- with aio options
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH v7 09/15] block: add trace events for io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,149 +104,139 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/qemu-iotests/check      | 15 ++++++++++++++-
- tests/qemu-iotests/common.rc  | 14 ++++++++++++++
- tests/qemu-iotests/iotests.py |  9 ++++++++-
- 3 files changed, 36 insertions(+), 2 deletions(-)
+ block/io_uring.c   | 22 +++++++++++++++++++---
+ block/trace-events | 12 ++++++++++++
+ 2 files changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-index c24874ff4a..1e398923fd 100755
---- a/tests/qemu-iotests/check
-+++ b/tests/qemu-iotests/check
-@@ -132,6 +132,7 @@ sortme=false
- expunge=true
- have_test_arg=false
- cachemode=false
-+aiomode=false
+diff --git a/block/io_uring.c b/block/io_uring.c
+index d33e554862..c7b2b0a9e2 100644
+--- a/block/io_uring.c
++++ b/block/io_uring.c
+@@ -17,6 +17,7 @@
+ #include "block/raw-aio.h"
+ #include "qemu/coroutine.h"
+ #include "qapi/error.h"
++#include "trace.h"
  
- tmp="${TEST_DIR}"/$$
- rm -f $tmp.list $tmp.tmp $tmp.sed
-@@ -141,6 +142,7 @@ export IMGFMT_GENERIC=true
- export IMGPROTO=file
- export IMGOPTS=""
- export CACHEMODE="writeback"
-+export AIOMODE="threads"
- export QEMU_IO_OPTIONS=""
- export QEMU_IO_OPTIONS_NO_FMT=""
- export CACHEMODE_IS_DEFAULT=true
-@@ -225,6 +227,11 @@ s/ .*//p
-         CACHEMODE_IS_DEFAULT=false
-         cachemode=false
-         continue
-+    elif $aiomode
-+    then
-+        AIOMODE="$r"
-+        aiomode=false
-+        continue
-     fi
+ #define MAX_EVENTS 128
  
-     xpand=true
-@@ -269,6 +276,7 @@ other options
-     -n                  show me, do not run tests
-     -o options          -o options to pass to qemu-img create/convert
-     -c mode             cache mode
-+    -i mode             AIO mode
-     -makecheck          pretty print output for make check
+@@ -93,6 +94,8 @@ static void luring_resubmit_short_read(LuringState *s, LuringAIOCB *luringcb,
+     QEMUIOVector *resubmit_qiov;
+     size_t remaining;
  
- testlist options
-@@ -433,10 +441,13 @@ testlist options
-             cachemode=true
-             xpand=false
-             ;;
-+        -i)
-+            aiomode=true
-+            xpand=false
-+            ;;
-         -T)        # deprecated timestamp option
-             xpand=false
-             ;;
--
-         -v)
-             verbose=true
-             xpand=false
-@@ -515,6 +526,8 @@ done
- 
- # Set qemu-io cache mode with $CACHEMODE we have
- QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
-+# Set qemu-io aio mode with $AIOMODE we have
-+QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --aio $AIOMODE"
- 
- QEMU_IO_OPTIONS_NO_FMT="$QEMU_IO_OPTIONS"
- if [ "$IMGOPTSSYNTAX" != "true" ]; then
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 5502c3da2f..03f4a1cd7f 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -490,6 +490,20 @@ _default_cache_mode()
-         return
-     fi
- }
-+_supported_aio_modes()
-+{
-+    for mode; do
-+        if [ "$mode" = "$AIOMODE" ]; then
-+            return
-+        fi
-+    done
-+    _notrun "not suitable for aio mode: $AIOMODE"
-+}
-+_default_aio_mode()
-+{
-+    AIOMODE="$1"
-+    QEMU_IO="$QEMU_IO --aio $1"
-+}
- 
- _unsupported_imgopts()
- {
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index ce74177ab1..76f1ab0945 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -58,6 +58,7 @@ imgproto = os.environ.get('IMGPROTO', 'file')
- test_dir = os.environ.get('TEST_DIR')
- output_dir = os.environ.get('OUTPUT_DIR', '.')
- cachemode = os.environ.get('CACHEMODE')
-+aiomode = os.environ.get('AIOMODE')
- qemu_default_machine = os.environ.get('QEMU_DEFAULT_MACHINE')
- 
- socket_scm_helper = os.environ.get('SOCKET_SCM_HELPER', 'socket_scm_helper')
-@@ -457,6 +458,7 @@ class VM(qtest.QEMUQtestMachine):
-             options.append('file=%s' % path)
-             options.append('format=%s' % format)
-             options.append('cache=%s' % cachemode)
-+            options.append('aio=%s' % aiomode)
- 
-         if opts:
-             options.append(opts)
-@@ -799,6 +801,10 @@ def verify_cache_mode(supported_cache_modes=[]):
-     if supported_cache_modes and (cachemode not in supported_cache_modes):
-         notrun('not suitable for this cache mode: %s' % cachemode)
- 
-+def verify_aio_mode(supported_aio_modes=[]):
-+    if supported_aio_modes and (aiomode not in supported_aio_modes):
-+        notrun('not suitable for this aio mode: %s' % aiomode)
++    trace_luring_resubmit_short_read(s, luringcb, nread);
 +
- def supports_quorum():
-     return 'quorum' in qemu_img_pipe('--help')
+     /* Update read position */
+     luringcb->total_read = nread;
+     remaining = luringcb->qiov->size - luringcb->total_read;
+@@ -163,6 +166,7 @@ static void luring_process_completions(LuringState *s)
  
-@@ -843,7 +849,7 @@ def skip_if_unsupported(required_formats=[], read_only=False):
-     return skip_test_decorator
+         /* Change counters one-by-one because we can be nested. */
+         s->io_q.in_flight--;
++        trace_luring_process_completion(s, luringcb, ret);
  
- def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
--         unsupported_fmts=[]):
-+        supported_aio_modes=[], unsupported_fmts=[]):
-     '''Run tests'''
+         /* total_read is non-zero only for resubmitted read requests */
+         total_bytes = ret + luringcb->total_read;
+@@ -263,6 +267,7 @@ static int ioq_submit(LuringState *s)
+             QSIMPLEQ_REMOVE_HEAD(&s->io_q.submit_queue, next);
+         }
+         ret = io_uring_submit(&s->ring);
++        trace_luring_io_uring_submit(s, ret);
+         /* Prevent infinite loop if submission is refused */
+         if (ret <= 0) {
+             if (ret == -EAGAIN) {
+@@ -287,12 +292,15 @@ static int ioq_submit(LuringState *s)
  
-     global debug
-@@ -861,6 +867,7 @@ def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
-     verify_image_format(supported_fmts, unsupported_fmts)
-     verify_platform(supported_oses)
-     verify_cache_mode(supported_cache_modes)
-+    verify_aio_mode(supported_aio_modes)
+ void luring_io_plug(BlockDriverState *bs, LuringState *s)
+ {
++    trace_luring_io_plug(s);
+     s->io_q.plugged++;
+ }
  
-     if debug:
-         output = sys.stdout
+ void luring_io_unplug(BlockDriverState *bs, LuringState *s)
+ {
+     assert(s->io_q.plugged);
++    trace_luring_io_unplug(s, s->io_q.blocked, s->io_q.plugged,
++                           s->io_q.in_queue, s->io_q.in_flight);
+     if (--s->io_q.plugged == 0 &&
+         !s->io_q.blocked && s->io_q.in_queue > 0) {
+         ioq_submit(s);
+@@ -313,6 +321,7 @@ void luring_io_unplug(BlockDriverState *bs, LuringState *s)
+ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
+                             uint64_t offset, int type)
+ {
++    int ret;
+     struct io_uring_sqe *sqes = &luringcb->sqeq;
+ 
+     switch (type) {
+@@ -336,11 +345,14 @@ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
+ 
+     QSIMPLEQ_INSERT_TAIL(&s->io_q.submit_queue, luringcb, next);
+     s->io_q.in_queue++;
+-
++    trace_luring_do_submit(s, s->io_q.blocked, s->io_q.plugged,
++                           s->io_q.in_queue, s->io_q.in_flight);
+     if (!s->io_q.blocked &&
+         (!s->io_q.plugged ||
+          s->io_q.in_flight + s->io_q.in_queue >= MAX_EVENTS)) {
+-        return ioq_submit(s);
++        ret = ioq_submit(s);
++        trace_luring_do_submit_done(s, ret);
++        return ret;
+     }
+     return 0;
+ }
+@@ -355,8 +367,10 @@ int coroutine_fn luring_co_submit(BlockDriverState *bs, LuringState *s, int fd,
+         .qiov       = qiov,
+         .is_read    = (type == QEMU_AIO_READ),
+     };
+-
++    trace_luring_co_submit(bs, s, &luringcb, fd, offset, qiov ? qiov->size : 0,
++                           type);
+     ret = luring_do_submit(fd, &luringcb, s, offset, type);
++
+     if (ret < 0) {
+         return ret;
+     }
+@@ -388,6 +402,7 @@ LuringState *luring_init(Error **errp)
+     int rc;
+     LuringState *s;
+     s = g_new0(LuringState, 1);
++    trace_luring_init_state(s, sizeof(*s));
+     struct io_uring *ring = &s->ring;
+     rc = io_uring_queue_init(MAX_EVENTS, ring, 0);
+     if (rc < 0) {
+@@ -405,4 +420,5 @@ void luring_cleanup(LuringState *s)
+ {
+     io_uring_queue_exit(&s->ring);
+     g_free(s);
++    trace_luring_cleanup_state(s);
+ }
+diff --git a/block/trace-events b/block/trace-events
+index d724df0117..66aaf8352b 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -60,6 +60,18 @@ qmp_block_stream(void *bs) "bs %p"
+ file_paio_submit(void *acb, void *opaque, int64_t offset, int count, int type) "acb %p opaque %p offset %"PRId64" count %d type %d"
+ file_copy_file_range(void *bs, int src, int64_t src_off, int dst, int64_t dst_off, int64_t bytes, int flags, int64_t ret) "bs %p src_fd %d offset %"PRIu64" dst_fd %d offset %"PRIu64" bytes %"PRIu64" flags %d ret %"PRId64
+ 
++#io_uring.c
++luring_init_state(void *s, size_t size) "s %p size %zu"
++luring_cleanup_state(void *s) "%p freed"
++luring_io_plug(void *s) "LuringState %p plug"
++luring_io_unplug(void *s, int blocked, int plugged, int queued, int inflight) "LuringState %p blocked %d plugged %d queued %d inflight %d"
++luring_do_submit(void *s, int blocked, int plugged, int queued, int inflight) "LuringState %p blocked %d plugged %d queued %d inflight %d"
++luring_do_submit_done(void *s, int ret) "LuringState %p submitted to kernel %d"
++luring_co_submit(void *bs, void *s, void *luringcb, int fd, uint64_t offset, size_t nbytes, int type) "bs %p s %p luringcb %p fd %d offset %" PRId64 " nbytes %zd type %d"
++luring_process_completion(void *s, void *aiocb, int ret) "LuringState %p luringcb %p ret %d"
++luring_io_uring_submit(void *s, int ret) "LuringState %p ret %d"
++luring_resubmit_short_read(void *s, void *luringcb, int nread) "LuringState %p luringcb %p nread %d"
++
+ # qcow2.c
+ qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
+ qcow2_writev_done_req(void *co, int ret) "co %p ret %d"
 -- 
 2.21.0
 
