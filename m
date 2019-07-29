@@ -2,63 +2,67 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A7FEC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC98FC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:43:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74912073F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:42:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74912073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C414C206BA
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:43:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C414C206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzMu-00051g-7A
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:42:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56645)
+	id 1hrzNz-0005u8-2N
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:43:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57310)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hrzKm-0002GQ-2E
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:40:37 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hrzN9-0005V4-T7
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:43:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hrzKj-0007do-RJ
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:40:36 -0400
-Received: from mga01.intel.com ([192.55.52.88]:18302)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hrzKj-0007bq-IT
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:40:33 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Jul 2019 23:40:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="346504568"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga005.jf.intel.com with ESMTP; 28 Jul 2019 23:40:30 -0700
-Date: Mon, 29 Jul 2019 14:40:08 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Ivan Ren <renyime@gmail.com>
-Message-ID: <20190729064008.GB21091@richard>
-References: <1564367573-6327-1-git-send-email-ivanren@tencent.com>
- <1564367573-6327-3-git-send-email-ivanren@tencent.com>
+ (envelope-from <no-reply@patchew.org>) id 1hrzN8-0002xv-NE
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:43:03 -0400
+Resent-Date: Mon, 29 Jul 2019 02:43:03 -0400
+Resent-Message-Id: <E1hrzN8-0002xv-NE@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21546)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hrzN8-0002oW-Dl
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:43:02 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1564382550; cv=none; d=zoho.com; s=zohoarc; 
+ b=NpLjPqf6Kgz/3pfIne6z2olWJ5+KR5lUmjxjxHnO+BqnL4aUf/s81jNKKm4rLS6ZJ4sVKo0emiEKmt24smPbVVJYTUiVeTELFu+iuDW+7klum/Qldd+9HzSYr1GYt72zjDeCqXrLfj8mVF1FHiCTJybK29pjuTfx9Z25PhhsILI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1564382550;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=Ct6p9+pEGnmq6LAyPZVcE9QWuwAiC+o05gbDp+lrxQQ=; 
+ b=JEyPz6hG9TpZxXdOz6i4Yk9hKYdN8+S0fcUsFBJ1FpluWLxzyfUA+dsX74ENM1typqX0V+ZtKklKH4UCZeejS7ZQEQk6+Rz/4Hu8yKbmwEQHdiVn6Z16/Ln+zhWA5H5Tgacn9mi7Jq0vYClQ3tfRDAy170YfRO8dKOUFYsZlnrs=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1564382549497550.4488257715047;
+ Sun, 28 Jul 2019 23:42:29 -0700 (PDT)
+Message-ID: <156438254685.32054.9613015311594217315@c4a48874b076>
+In-Reply-To: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1564367573-6327-3-git-send-email-ivanren@tencent.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.88
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: add speed limit for multifd
- migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pavel.dovgaluk@gmail.com
+Date: Sun, 28 Jul 2019 23:42:29 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [for-4.2 PATCH 0/6] Block-related record/replay
+ fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,141 +74,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, boost.lists@gmail.com,
+ artem.k.pisarenko@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com,
+ jasowang@redhat.com, crosthwaite.peter@gmail.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, dovgaluk@ispras.ru, maria.klimushenkova@ispras.ru,
+ mst@redhat.com, kraxel@redhat.com, pavel.dovgaluk@ispras.ru,
+ thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com,
+ alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 29, 2019 at 10:32:53AM +0800, Ivan Ren wrote:
->Limit the speed of multifd migration through common speed limitation
->qemu file.
->
->Signed-off-by: Ivan Ren <ivanren@tencent.com>
->---
-> migration/ram.c | 22 ++++++++++++----------
-> 1 file changed, 12 insertions(+), 10 deletions(-)
->
->diff --git a/migration/ram.c b/migration/ram.c
->index 889148dd84..e3fde16776 100644
->--- a/migration/ram.c
->+++ b/migration/ram.c
->@@ -922,7 +922,7 @@ struct {
->  * false.
->  */
-> 
->-static int multifd_send_pages(void)
->+static int multifd_send_pages(RAMState *rs)
-> {
->     int i;
->     static int next_channel;
->@@ -954,6 +954,7 @@ static int multifd_send_pages(void)
->     multifd_send_state->pages = p->pages;
->     p->pages = pages;
->     transferred = ((uint64_t) pages->used) * TARGET_PAGE_SIZE + p->packet_len;
->+    qemu_file_update_rate_transfer(rs->f, transferred);
->     ram_counters.multifd_bytes += transferred;
->     ram_counters.transferred += transferred;;
->     qemu_mutex_unlock(&p->mutex);
->@@ -962,7 +963,7 @@ static int multifd_send_pages(void)
->     return 1;
-> }
-> 
->-static int multifd_queue_page(RAMBlock *block, ram_addr_t offset)
->+static int multifd_queue_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
-> {
->     MultiFDPages_t *pages = multifd_send_state->pages;
-> 
->@@ -981,12 +982,12 @@ static int multifd_queue_page(RAMBlock *block, ram_addr_t offset)
->         }
->     }
-> 
->-    if (multifd_send_pages() < 0) {
->+    if (multifd_send_pages(rs) < 0) {
->         return -1;
->     }
-> 
->     if (pages->block != block) {
->-        return  multifd_queue_page(block, offset);
->+        return  multifd_queue_page(rs, block, offset);
->     }
-> 
->     return 1;
->@@ -1054,7 +1055,7 @@ void multifd_save_cleanup(void)
->     multifd_send_state = NULL;
-> }
-> 
->-static void multifd_send_sync_main(void)
->+static void multifd_send_sync_main(RAMState *rs)
-> {
->     int i;
-> 
->@@ -1062,7 +1063,7 @@ static void multifd_send_sync_main(void)
->         return;
->     }
->     if (multifd_send_state->pages->used) {
->-        if (multifd_send_pages() < 0) {
->+        if (multifd_send_pages(rs) < 0) {
->             error_report("%s: multifd_send_pages fail", __func__);
->             return;
->         }
->@@ -1083,6 +1084,7 @@ static void multifd_send_sync_main(void)
->         p->packet_num = multifd_send_state->packet_num++;
->         p->flags |= MULTIFD_FLAG_SYNC;
->         p->pending_job++;
->+        qemu_file_update_rate_transfer(rs->f, p->packet_len);
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY0MzgxNzY1NTUuMjIwNzEu
+MTA1MjMxMjAwNDczMTg4OTAxMzYuc3RnaXRAcGFzaGEtUHJlY2lzaW9uLTM2MzAtVG93ZXIvCgoK
+CkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxkIHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNl
+IGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hl
+Y2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNo
+ZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNldCAtZQoKZWNobwplY2hvICI9
+PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8gIj09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKCmVj
+aG8KZWNobyAiPT09IFVOQU1FID09PSIKdW5hbWUgLWEKCkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxM
+PSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxkCm1rZGlyIC1wICRCVUlMRCAkSU5TVEFMTApT
+UkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1cmUgLS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RB
+TEwKbWFrZSAtajQKIyBYWFg6IHdlIG5lZWQgcmVsaWFibGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNr
+IC1qNCBWPTEKbWFrZSBpbnN0YWxsCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAg
+cmVwbGF5L3JlcGxheS1zbmFwc2hvdC5vCiAgQ0MgICAgICByZXBsYXkvcmVwbGF5LW5ldC5vCi92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC16MmdmZzdhbC9zcmMvcmVwbGF5L3JlcGxheS1ldmVu
+dHMuYzogSW4gZnVuY3Rpb24g4oCYcmVwbGF5X2JoX3NjaGVkdWxlX29uZXNob3RfZXZlbnTigJk6
+Ci92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC16MmdmZzdhbC9zcmMvcmVwbGF5L3JlcGxheS1l
+dmVudHMuYzoxNDE6MjM6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDi
+gJhyZXBsYXlfZ2V0X2N1cnJlbnRfaWNvdW504oCZOyBkaWQgeW91IG1lYW4g4oCYcmVwbGF5X2dl
+dF9jdXJyZW50X3N0ZXDigJk/IFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9u
+XQogIDE0MSB8ICAgICAgICAgdWludDY0X3QgaWQgPSByZXBsYXlfZ2V0X2N1cnJlbnRfaWNvdW50
+KCk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgcmVwbGF5X2dldF9jdXJyZW50X3N0ZXAK
+L3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLXoyZ2ZnN2FsL3NyYy9yZXBsYXkvcmVwbGF5LWV2
+ZW50cy5jOjE0MToyMzogZXJyb3I6IG5lc3RlZCBleHRlcm4gZGVjbGFyYXRpb24gb2Yg4oCYcmVw
+bGF5X2dldF9jdXJyZW50X2ljb3VudOKAmSBbLVdlcnJvcj1uZXN0ZWQtZXh0ZXJuc10KY2MxOiBh
+bGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZTogKioqIFsvdmFyL3RtcC9w
+YXRjaGV3LXRlc3Rlci10bXAtejJnZmc3YWwvc3JjL3J1bGVzLm1hazo2OTogcmVwbGF5L3JlcGxh
+eS1ldmVudHMub10gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
+Li4uLgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xv
+Z3MvMTU2NDM4MTc2NTU1LjIyMDcxLjEwNTIzMTIwMDQ3MzE4ODkwMTM2LnN0Z2l0QHBhc2hhLVBy
+ZWNpc2lvbi0zNjMwLVRvd2VyL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
+IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-The original code seems forget to update 
-
-    ram_counters.multifd_bytes
-    ram_counters.transferred
-
-Sounds we need to update these counters here too.
-
->         qemu_mutex_unlock(&p->mutex);
->         qemu_sem_post(&p->sem);
->     }
->@@ -2079,7 +2081,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
-> static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
->                                  ram_addr_t offset)
-> {
->-    if (multifd_queue_page(block, offset) < 0) {
->+    if (multifd_queue_page(rs, block, offset) < 0) {
->         return -1;
->     }
->     ram_counters.normal++;
->@@ -3482,7 +3484,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->     ram_control_before_iterate(f, RAM_CONTROL_SETUP);
->     ram_control_after_iterate(f, RAM_CONTROL_SETUP);
-> 
->-    multifd_send_sync_main();
->+    multifd_send_sync_main(*rsp);
->     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
->     qemu_fflush(f);
-> 
->@@ -3570,7 +3572,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
->     ram_control_after_iterate(f, RAM_CONTROL_ROUND);
-> 
-> out:
->-    multifd_send_sync_main();
->+    multifd_send_sync_main(rs);
->     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
->     qemu_fflush(f);
->     ram_counters.transferred += 8;
->@@ -3629,7 +3631,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
-> 
->     rcu_read_unlock();
-> 
->-    multifd_send_sync_main();
->+    multifd_send_sync_main(rs);
->     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
->     qemu_fflush(f);
-> 
->-- 
->2.17.2 (Apple Git-113)
->
-
--- 
-Wei Yang
-Help you, Help me
 
