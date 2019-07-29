@@ -2,61 +2,59 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D2D0C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD027C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E775E206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:34:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E775E206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 95ABF206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:34:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95ABF206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs17D-0005XR-8S
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 04:34:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47991)
+	id 1hs17F-0005ce-TJ
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 04:34:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48005)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jasowang@redhat.com>) id 1hs16N-0004QH-RM
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:33:53 -0400
+ (envelope-from <jasowang@redhat.com>) id 1hs16P-0004QO-Fc
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:33:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1hs16M-0003Cv-RG
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:33:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43448)
+ (envelope-from <jasowang@redhat.com>) id 1hs16O-0003E6-GL
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:33:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38618)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hs16M-0003CP-MA
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:33:50 -0400
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1hs16O-0003Dh-BL
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:33:52 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE085308FB93;
- Mon, 29 Jul 2019 08:33:49 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A0D68A3B46;
+ Mon, 29 Jul 2019 08:33:51 +0000 (UTC)
 Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-203.pek2.redhat.com
  [10.72.12.203])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6003C10190AA;
- Mon, 29 Jul 2019 08:33:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 45CC710190AA;
+ Mon, 29 Jul 2019 08:33:50 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Date: Mon, 29 Jul 2019 16:33:41 +0800
-Message-Id: <1564389226-4489-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Date: Mon, 29 Jul 2019 16:33:42 +0800
+Message-Id: <1564389226-4489-2-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1564389226-4489-1-git-send-email-jasowang@redhat.com>
+References: <1564389226-4489-1-git-send-email-jasowang@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 29 Jul 2019 08:33:49 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.30]); Mon, 29 Jul 2019 08:33:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 0/5] Net patches
+Subject: [Qemu-devel] [PULL 1/5] e1000: don't raise interrupt in pre_save()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,39 +71,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit fff3159900d2b95613a9cb75fc3703e67a6747=
-29:
+We should not raise any interrupt after VM has been stopped but this
+is what e1000 currently did when mit timer is active in
+pre_save(). Fixing this by scheduling a timer in post_load() which can
+make sure the interrupt was raised when VM is running.
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
-90726' into staging (2019-07-26 16:23:07 +0100)
+Reported-and-tested-by: Longpeng <longpeng2@huawei.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/net/e1000.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-are available in the git repository at:
-
-  https://github.com/jasowang/qemu.git tags/net-pull-request
-
-for you to fetch changes up to f77bed14f01557596727c4eea042e9818c242049:
-
-  net/colo-compare.c: Fix memory leak and code style issue. (2019-07-29 1=
-6:29:30 +0800)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-Jason Wang (1):
-      e1000: don't raise interrupt in pre_save()
-
-Prasad J Pandit (3):
-      qemu-bridge-helper: restrict interface name to IFNAMSIZ
-      qemu-bridge-helper: move repeating code in parse_acl_file
-      net: tap: replace snprintf with g_strdup_printf calls
-
-Zhang Chen (1):
-      net/colo-compare.c: Fix memory leak and code style issue.
-
- hw/net/e1000.c       |  8 ++------
- net/colo-compare.c   | 27 ++++++++++++++++++++-------
- net/tap.c            | 19 +++++++++++--------
- qemu-bridge-helper.c | 24 +++++++++++++++++-------
- 4 files changed, 50 insertions(+), 28 deletions(-)
+diff --git a/hw/net/e1000.c b/hw/net/e1000.c
+index 1dc1466..a023ceb 100644
+--- a/hw/net/e1000.c
++++ b/hw/net/e1000.c
+@@ -1381,11 +1381,6 @@ static int e1000_pre_save(void *opaque)
+     E1000State *s = opaque;
+     NetClientState *nc = qemu_get_queue(s->nic);
+ 
+-    /* If the mitigation timer is active, emulate a timeout now. */
+-    if (s->mit_timer_on) {
+-        e1000_mit_timer(s);
+-    }
+-
+     /*
+      * If link is down and auto-negotiation is supported and ongoing,
+      * complete auto-negotiation immediately. This allows us to look
+@@ -1423,7 +1418,8 @@ static int e1000_post_load(void *opaque, int version_id)
+         s->mit_irq_level = false;
+     }
+     s->mit_ide = 0;
+-    s->mit_timer_on = false;
++    s->mit_timer_on = true;
++    timer_mod(s->mit_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 1);
+ 
+     /* nc.link_down can't be migrated, so infer link_down according
+      * to link status bit in mac_reg[STATUS].
+-- 
+2.5.0
 
 
