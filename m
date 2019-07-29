@@ -2,82 +2,81 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4E5C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 14:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6F3C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 14:29:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DACE206DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 14:28:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y/q1rwsS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DACE206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AC059206DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 14:29:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC059206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs6dp-0002ek-NC
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 10:28:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58974)
+	id 1hs6ek-0003Xw-Bt
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 10:29:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59276)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hs6dE-0002AI-Pb
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:28:09 -0400
+ (envelope-from <philmd@redhat.com>) id 1hs6dy-00032l-Bk
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:28:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hs6dD-0007xe-Q6
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:28:08 -0400
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:36637)
+ (envelope-from <philmd@redhat.com>) id 1hs6dx-0000CJ-Es
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:28:54 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36617)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hs6dD-0007wi-Lb
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:28:07 -0400
-Received: by mail-oi1-x244.google.com with SMTP id q4so16208491oij.3
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 07:28:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=G/BuWzqNtq5jAyvfb8olfDJnA/QVrRW3asuSmhAdjVk=;
- b=y/q1rwsSc1GgE6sPP+McQtxnVvMxtv/pmc7hx4RgUCz1BhaG8GxI99e0eBjHTd3HFG
- AI49eVzL/YT3B2bku/0QLYfcvgF9g19QVrBkKntfgMfrIoRwuHlwoeHyk4e8zAufVmE5
- b/CrKmFIZENIk3AhGRlWJ9O/2W1EyuKgqQFKfP64UjYPbrCzEubmzUnuoe33ONwU/idW
- 36l22JQ4PXhJ7eNu1WJ8gcdnTcLcbiTJ+kH+aMJIzT1I9EYya7nncVYzv1JMIlDranVl
- sW9eUA2tAu4lfBmG6U4+qTP2maPhvCRFXx4VS52NEwIG/T+7sY62nrA3WIej8XLrXIcg
- 92LQ==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hs6dx-0000Bm-9A
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:28:53 -0400
+Received: by mail-wm1-f66.google.com with SMTP id g67so49567621wme.1
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 07:28:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=G/BuWzqNtq5jAyvfb8olfDJnA/QVrRW3asuSmhAdjVk=;
- b=rprxa066zGD56M7T7LDTY4tzOb258wlWo3Ih7abh5jCHqT+6vO49H3vJMsS5dvYDQv
- GyxDFXGKAOYkfVxy7LKEYfHT4vZg2dj2r6YVC33+h8bu00WX38tI9mh3kaKzlcCRjMOF
- CizFr4X/OFwIx/j7uhUuv8H242JGeeFAHqnz5ENxQAB7N3U79lpFYdkFsWT4pGAz49sB
- RdgK+tvKkWQotnyHbqKWoBZa1MAboyK+rzbGW1yXZeF/IUdoBkluDsZ+KKf3ae932JNN
- HBUx618CXGLGWOIDqIboMs/6dBwxQQrJOHD0dy/y6wQ4YT2mvwIPsk41upZH+V9PF6xo
- 34jg==
-X-Gm-Message-State: APjAAAWQwS1q1FzJPDfXgTS/QY7Pn8EZXF4Pix11Bs/X8sbk4qOhdJZm
- jDI8pCVyqRXJsL/deu/IGwtMioTgbPYtPE4ZqRKfsQ==
-X-Google-Smtp-Source: APXvYqxBsYHtIwQHZcthHeTtum77cnojxokSbK5cLQ2JxwOoOixjI3jSICIA4pyfoW3kLJjMJ0PStRsFRHlRJie4qGs=
-X-Received: by 2002:aca:6185:: with SMTP id
- v127mr55776444oib.163.1564410486916; 
- Mon, 29 Jul 2019 07:28:06 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JCeT5mas/pn+qBD9p6HWZmZbl0APWuylrfio7g+sDlg=;
+ b=GUUhFQxGvquot/MFpYTxNZnzsUY5iZkLxpN/VLcI4r+AlOYGcsOhL55dKaJh99/cDk
+ 4W4m4hrdqlNS01iA+DxdlurZamzgZgObw8GebS6uVWGSG7QwoRNjLX5BFjQ6NWG8SSJ1
+ hBmLkZXPfa1UN/zTHYGh5NQWKa/EwwJWZadQ05SIwYTOwOZ5yZ25YntvY0fC7zJxv0r/
+ vmV3SYUEuZWd5JKifzHpmU26hMGVXmZrJpvLqIqifIC9iWkEKBp0aJlNvKvl3LPwXNwK
+ kdO+rZpQvBKkSNDZWzd+dM9P80QqBswrY08KD47Bo292cuxUlAo2lA4dVQ5Z3Ozl1q7j
+ DpfQ==
+X-Gm-Message-State: APjAAAWAKoMfYR8XG6Jwyvm7qCVhwiRMMYEic+gtrkBcmCXnakn3jR9l
+ /2KL07574j6W/NI1c+pQXSTnXA==
+X-Google-Smtp-Source: APXvYqzy2Cx+dZxrRLl/A5XSNfnBbMePNYcIH2OH6gcxH58zTBR9iXIduTITDLoR543nvyeJSR1y0A==
+X-Received: by 2002:a1c:3:: with SMTP id 3mr101046321wma.6.1564410531916;
+ Mon, 29 Jul 2019 07:28:51 -0700 (PDT)
+Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.190])
+ by smtp.gmail.com with ESMTPSA id d10sm73102016wro.18.2019.07.29.07.28.51
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 29 Jul 2019 07:28:51 -0700 (PDT)
+To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+References: <cover.1564080680.git.alistair.francis@wdc.com>
+ <50c1c6a3ace8b40f7b9d5395a2c3457cf1852721.1564080680.git.alistair.francis@wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <6384a0f9-4b24-13b2-bcb7-053fefcaa1a5@redhat.com>
+Date: Mon, 29 Jul 2019 16:28:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190726175032.6769-1-richard.henderson@linaro.org>
- <20190726175032.6769-10-richard.henderson@linaro.org>
-In-Reply-To: <20190726175032.6769-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jul 2019 15:27:56 +0100
-Message-ID: <CAFEAcA-H-EsfZHHBp9Q6aFRWA2oK27AihTQDSGO4g_gWudC4wQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
-Subject: Re: [Qemu-devel] [PATCH 09/67] target/arm: Fold a pc load into
- load_reg
+In-Reply-To: <50c1c6a3ace8b40f7b9d5395a2c3457cf1852721.1564080680.git.alistair.francis@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH-4.2 v1 3/6] riscv: plic: Remove unused
+ interrupt functions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,43 +88,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: alistair23@gmail.com, palmer@sifive.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jul 2019 at 18:50, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 7/25/19 8:52 PM, Alistair Francis wrote:
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  target/arm/translate.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index e316eeb312..53c46fcdc4 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -9161,11 +9161,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
->                              }
->                          } else {
->                              /* store */
-> -                            if (i == 15) {
-> -                                /* special case: r15 = PC + 8 */
-> -                                tmp = tcg_temp_new_i32();
-> -                                tcg_gen_movi_i32(tmp, s->pc_read);
-> -                            } else if (user) {
-> +                            if (user && i != 15) {
->                                  tmp = tcg_temp_new_i32();
->                                  tmp2 = tcg_const_i32(i);
->                                  gen_helper_get_user_reg(tmp, cpu_env, tmp2);
-> --
-> 2.17.1
+>  hw/riscv/sifive_plic.c         | 12 ------------
+>  include/hw/riscv/sifive_plic.h |  3 ---
+>  2 files changed, 15 deletions(-)
+> 
+> diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+> index 0950e89e15..864a1bed42 100644
+> --- a/hw/riscv/sifive_plic.c
+> +++ b/hw/riscv/sifive_plic.c
+> @@ -161,18 +161,6 @@ static void sifive_plic_update(SiFivePLICState *plic)
+>      }
+>  }
+>  
+> -void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq)
+> -{
+> -    sifive_plic_set_pending(plic, irq, true);
+> -    sifive_plic_update(plic);
+> -}
+> -
+> -void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq)
+> -{
+> -    sifive_plic_set_pending(plic, irq, false);
+> -    sifive_plic_update(plic);
+> -}
+> -
+>  static uint32_t sifive_plic_claim(SiFivePLICState *plic, uint32_t addrid)
+>  {
+>      int i, j;
+> diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+> index ce8907f6aa..3b8a623919 100644
+> --- a/include/hw/riscv/sifive_plic.h
+> +++ b/include/hw/riscv/sifive_plic.h
+> @@ -69,9 +69,6 @@ typedef struct SiFivePLICState {
+>      uint32_t aperture_size;
+>  } SiFivePLICState;
+>  
+> -void sifive_plic_raise_irq(SiFivePLICState *plic, uint32_t irq);
+> -void sifive_plic_lower_irq(SiFivePLICState *plic, uint32_t irq);
+> -
+>  DeviceState *sifive_plic_create(hwaddr addr, char *hart_config,
+>      uint32_t num_sources, uint32_t num_priorities,
+>      uint32_t priority_base, uint32_t pending_base,
+> 
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
