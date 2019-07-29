@@ -2,90 +2,87 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47768C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 088A4C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 254F82070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:32:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 254F82070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C90D32171F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:32:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Em/cuWMm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C90D32171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7dI-00015W-7z
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:32:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47471)
+	id 1hs7dS-0001ME-1u
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:32:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44053)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hs7cI-00084e-L4
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:31:15 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hs7QP-0008Eu-EV
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:18:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hs7cH-00066I-JY
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:31:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37922)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hs7cB-00062p-GD; Mon, 29 Jul 2019 11:31:09 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 73D9B87642;
- Mon, 29 Jul 2019 15:31:05 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-55.ams2.redhat.com
- [10.36.117.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EAA95D6A0;
- Mon, 29 Jul 2019 15:31:04 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190729105343.19250-1-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <81bbb801-6e73-253c-7e21-24cc17daae01@redhat.com>
-Date: Mon, 29 Jul 2019 17:31:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hs7QO-0001PE-9w
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:18:57 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46720)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
+ id 1hs7QO-0001O9-2Q; Mon, 29 Jul 2019 11:18:56 -0400
+Received: by mail-pg1-x541.google.com with SMTP id k189so9382771pgk.13;
+ Mon, 29 Jul 2019 08:18:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=WSpSTIHXOrvOaCUkGHFuQSPMR43SBs+6E3PxPGPC7o8=;
+ b=Em/cuWMmFKQc6ZdVMU/a859hLnYCxrqXRu9c/c5uEVt9nQy5Dq5uzXlfC1YXLXhNil
+ m/y+Hvdn0iZ/HgEVYH3jSOfVpPXGG6pTFVKdUUwo4SqBJJDk2++Gj0p2ZPeD5u9hFiAp
+ 4nJkTvTlgusOQqSj/YH1yseHo8g3DvjNYMTm/bfwW0MHUGq96vjzNfxX83B5FcYWPho0
+ FEeD8Glf3MhUE9E0sFOtdDd3Lcai025kKzkNU+PE7tXWeBcQlfhh6bFBpvhcXfkWdiSa
+ +HBy08W3YuTB9+2M3nd01RwYO79yifgeHAK0ckIzW75bOcA6CVstTPJ4+RlACpSkn+/t
+ ukwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=WSpSTIHXOrvOaCUkGHFuQSPMR43SBs+6E3PxPGPC7o8=;
+ b=DZN3koz8Vk55qnZoXj/1A/gJVWjGr55coXmLD25QqZlE4mt9/ZLsjzB3ft0qRumc4c
+ ww35+hB9FyML7kgOVfyRTlbzjgo4HsUZB8wUQPkYi7x0pYA7rhnjPhw30CInIiRaKgcy
+ PRIm+7d38GnpP83uC5vP+7e2RvDRQRd/YT0Z/J6jarUCVAovKhYloMInQwb1mU549bfI
+ zTUU93zpgaY340c7pxLoYAJ4d436AcBYIwd74G1xcRcknnFiSF6Ll8LDm3Gv5+a8eCXf
+ tMYa+cOc3HT1GhSxRAQmd9nr5IJ1fsCUN5gcDXOY4N4/ALtPg/nQDZTxWYICper6gbp4
+ rnsw==
+X-Gm-Message-State: APjAAAXFW2RF7ei5OcAtqcc+LJBkHqWEdxOKIxHLO/Z2nFAdXuc+x/oj
+ X9inJIFqlf0h9U1NtAEguJE2yhVj4wh0cg==
+X-Google-Smtp-Source: APXvYqx7EaXu3DwiEMu5ofLpR/FxsqgM3Etvw/oGp7nOtyz03NXfz97sumOI3HmqSwCpVMn8zwQ9mw==
+X-Received: by 2002:a62:1ccd:: with SMTP id
+ c196mr37507676pfc.102.1564413534801; 
+ Mon, 29 Jul 2019 08:18:54 -0700 (PDT)
+Received: from localhost.localdomain ([136.233.9.97])
+ by smtp.gmail.com with ESMTPSA id h129sm58693941pfb.110.2019.07.29.08.18.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 29 Jul 2019 08:18:54 -0700 (PDT)
+From: Aarushi Mehta <mehta.aaru20@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 29 Jul 2019 20:46:48 +0530
+Message-Id: <20190729151651.21306-13-mehta.aaru20@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190729151651.21306-1-mehta.aaru20@gmail.com>
+References: <20190729151651.21306-1-mehta.aaru20@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190729105343.19250-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="lGMOLHcBrJzpybCqpv8WQTSA4Wy5csRWc"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Mon, 29 Jul 2019 15:31:05 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] block/copy-on-read: Fix
- permissions for inactive node
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v7 12/15] qemu-img: adds option to use aio
+ engine for benchmarking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,72 +94,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lGMOLHcBrJzpybCqpv8WQTSA4Wy5csRWc
-Content-Type: multipart/mixed; boundary="G20Za4ZnHuui5jSjODV84iaWxJnISq827";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <81bbb801-6e73-253c-7e21-24cc17daae01@redhat.com>
-Subject: Re: [PATCH for-4.1] block/copy-on-read: Fix permissions for inactive
- node
-References: <20190729105343.19250-1-kwolf@redhat.com>
-In-Reply-To: <20190729105343.19250-1-kwolf@redhat.com>
+Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+---
+ qemu-img.c    | 10 +++++++++-
+ qemu-img.texi |  5 ++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
---G20Za4ZnHuui5jSjODV84iaWxJnISq827
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+diff --git a/qemu-img.c b/qemu-img.c
+index 79983772de..3fc8dac0b1 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4192,7 +4192,8 @@ static int img_bench(int argc, char **argv)
+             {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:wU", long_options, NULL);
++        c = getopt_long(argc, argv, ":hc:d:f:ni:o:qs:S:t:wU", long_options,
++                        NULL);
+         if (c == -1) {
+             break;
+         }
+@@ -4234,6 +4235,13 @@ static int img_bench(int argc, char **argv)
+             break;
+         case 'n':
+             flags |= BDRV_O_NATIVE_AIO;
++        case 'i':
++            ret = bdrv_parse_aio(optarg, &flags);
++            if (ret < 0) {
++                error_report("Invalid aio option: %s", optarg);
++                ret = -1;
++                goto out;
++            }
+             break;
+         case 'o':
+         {
+diff --git a/qemu-img.texi b/qemu-img.texi
+index c8e9bba515..0a2eccea85 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -206,7 +206,7 @@ Command description:
+ Amends the image format specific @var{options} for the image file
+ @var{filename}. Not all file formats support this operation.
+ 
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [-i @var{aio}][--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
+ 
+ Run a simple sequential I/O benchmark on the specified image. If @code{-w} is
+ specified, a write test is performed, otherwise a read test is performed.
+@@ -227,6 +227,9 @@ If @code{-n} is specified, the native AIO backend is used if possible. On
+ Linux, this option only works if @code{-t none} or @code{-t directsync} is
+ specified as well.
+ 
++If @code{-i} is specified, aio option can be used to specify different AIO
++backends: @var{threads}, @var{native} or @var{io_uring}.
++
+ For write tests, by default a buffer filled with zeros is written. This can be
+ overridden with a pattern byte specified by @var{pattern}.
+ 
+-- 
+2.21.0
 
-On 29.07.19 12:53, Kevin Wolf wrote:
-> The copy-on-read drive must not request the WRITE_UNCHANGED permission
-> for its child if the node is inactive, otherwise starting a migration
-> destination with -incoming will fail because the child cannot provide
-> write access yet:
->=20
->   qemu-system-x86_64: -blockdev copy-on-read,file=3Dimg,node-name=3Dcor=
-: Block node is read-only
->=20
-> Earlier QEMU versions additionally ran into an abort() on the migration=
-
-> source side: bdrv_inactivate_recurse() failed to update permissions.
-> This is silently ignored today because it was only supposed to loosen
-> restrictions. This is the symptom that was originally reported here:
->=20
->   https://bugzilla.redhat.com/show_bug.cgi?id=3D1733022
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block/copy-on-read.c | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---G20Za4ZnHuui5jSjODV84iaWxJnISq827--
-
---lGMOLHcBrJzpybCqpv8WQTSA4Wy5csRWc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl0/ETYACgkQ9AfbAGHV
-z0BfZQgAotulPoxKc6dLD+gmR7L5cdbuiCfYf5recwRe0SzSpiWJUU9UxF3kzPC4
-hshxaELjtFabiLsMzPVciAohnpUWcizIK1kWnwrIOFd9OUdNWFg4oVGqvmjYBlpT
-oXYcCk8YQw5gdhAnd8xUs2e8qTo+b+NX2UwkqDkXgjT07eQjDmTaM+ot+IcfIqzh
-13kYJZEDsI6ZAYa+hOwXl9de0azD7s1lhYPfNAuoKUWJSWx/cC1YGq9J4IIsmXzD
-h9IC+CSmbiVswF8ROsD2r9IBMkLQlf1KNCQSs0lQNABG9+izGq1fJ43IugV38UpQ
-iLZ/+IF4Tc9WCSX+0I1ZPn4JfaoUBg==
-=4q6i
------END PGP SIGNATURE-----
-
---lGMOLHcBrJzpybCqpv8WQTSA4Wy5csRWc--
 
