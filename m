@@ -2,42 +2,44 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171B4C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A98E4C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:30:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1890206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:29:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1890206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 3E447206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 13:30:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E447206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs5iR-0008AK-6A
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 09:29:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43438)
+	id 1hs5jc-0000lO-8h
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 09:30:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43609)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <laurent@vivier.eu>) id 1hs5i1-0007lZ-Em
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:29:02 -0400
+ (envelope-from <laurent@vivier.eu>) id 1hs5jC-0000HL-4i
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1hs5i0-0008GD-CH
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:29:01 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:45891)
+ (envelope-from <laurent@vivier.eu>) id 1hs5jB-00011y-75
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:30:14 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:53987)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hs5i0-0008Et-3e
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:29:00 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1hs5jA-00010F-UR
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 09:30:13 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N3KDM-1iZIdd067O-010Jnm; Mon, 29 Jul 2019 15:28:43 +0200
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+ 1MpUpW-1iAbZA13Rk-00pxs4; Mon, 29 Jul 2019 15:29:56 +0200
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 References: <1564405791-9147-1-git-send-email-aleksandar.markovic@rt-rk.com>
  <1564405791-9147-8-git-send-email-aleksandar.markovic@rt-rk.com>
+ <CAL1e-=jCQ_Fe++XQh7jYoZqAxro9rH6Mo0jj7FZV_Pd7ezCHYA@mail.gmail.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Openpgp: preference=signencrypt
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
@@ -82,33 +84,33 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <8037526d-a8c3-bea4-2733-48ed82178c98@vivier.eu>
-Date: Mon, 29 Jul 2019 15:28:39 +0200
+Message-ID: <8b484eaa-8246-691e-ee8e-e2d53085a476@vivier.eu>
+Date: Mon, 29 Jul 2019 15:29:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1564405791-9147-8-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <CAL1e-=jCQ_Fe++XQh7jYoZqAxro9rH6Mo0jj7FZV_Pd7ezCHYA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iUmmdtly50l6M/STnKUZDOoQyZkIY7y642rEpO04f+CC5H2c6+3
- gFkcO/eV3XlbM2gojiGLzvqSYTQt2G9Y+myebFZo4WH3RE5fM6sKQPeyIUNdXGTyanzC76n
- jt81BA7cqrCRW5BGo9GXdkjCF5CfJe2XEqyaJ79FHrKCTbifM2timmoMeNZoaInDa5pDONo
- ldf7DMWie5P6LuKWZdWUA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:mTfj+ZOkDOk=:/lQLSY2gkHJG/F4AhK0qF+
- ocDOJGm7b/xqfA48mGYm9cUJbvndtcNcoVQIcVZSP++emd70ZfQ8swVfowftQ4gwz0Wl5U/AG
- EY/5xYp3VlO34clvwjvfl2YVhGha0McPE/R4m9i6riHrq9nje8Ukn7BBnDd6gd1iBXg1el0Dj
- Vdr2aZqkg0y6T97Ai1+vwb1K1L7sN8wGgAPav6dPaYetQIrSn4v6vIpr7TTgOz7lOYaa6InEf
- 7Lqx+PD3dMvv6hN4ngEkBYNTeoYBJYkOG848C38YToVmk4BYP92knloq2LDkqzRgIIDLrx1pd
- ckjlbYRx9NizyanrkG+7pTvjYMtEh8Bx3vwSonpTdM0do+9HWZFDtHEKv1XCC44y79ukI416E
- gPNPJQ6GNSq+wQZsJyozf4bCnAipP7jBln8FtvdC8EU7WjnOdu1JegJIBxTEBpDTfGQlOwx7J
- pMvP5ZnZQ4AlA6V3sEmeLUPvL6oCsv8U+V8Wv6RwB52vWn0Nq5IMDwDkAfTI8giE7S0OT7mYe
- V8IHul+SAWHfmjQzpcKYc/uqUkvHdcoSbGVPfnSmwf+PpDbl4+k7LiTRL/LCyZeaPlNgRkAQA
- 6N+KIM0vTlISF6cYWg5sRDOqA5u9SfnBhES5gUJBdNvTnqgwPCqjD+Mz8TINj58RDmvy5nT+U
- tNVZfwtaWqGjbNiEXHu3p0Uc9q7HCegg4Ap15BDRvwbV3pz5DqdwLbfnOQw6RWIm7G4WrCy8C
- raqXhWonzgWN7M/hMxEPKvcs77sDePHLu3IZHWFg3VrrSXtYoS1VxEnjCNs=
+X-Provags-ID: V03:K1:TfB2lQjGsJ2tr1gi/MiQXf/wGVtNaXqjIguXyDQNxepGJeQuqSp
+ BpzHE4cSDgU162CdpvNr25aBHaF5X73La54jJBe616NILnqdk0rIEMwy8n2yTzwlhsBwWXW
+ +nPv+Mrkz7prwGLIMCOJltbpCTq/u8iCP/PmXuBLswY8v0n5O2fZxzEuzBRUQeMLgewtqoW
+ 0gxRPJwgPPuv44z6Z8BfQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rIMOgOQ9D2s=:3hCDN/cRf5hNahO1vEZEq8
+ zK9LGYMYN6oRLIpC8ElCO/1ZlKn9m1zzCCOHz2IjOS64TVSgvKufDWr7Xv95cUvesf13tLyQM
+ C+YolgDS4PzIZVZRvxIYTHQqP0x7VfgCkqrbaY47af28IhAyamPx4mBzbokeIx76HHqgoUrZL
+ pochRih1aa5venRHqXcf41NLyl5ao0AjjzQOblMcBj67QqP42zxWPxchiAIt/jxAALwCScwmv
+ TOALuFSS33YbBI4WNhr6Oy1jwjRmEX9V00gDfQna1RgmctxKIYEL0S1zdfKfqKgieuxfc2wO3
+ UcBOKYbCYm5Fnpj+XelIgj+UCITuriKp7gTY73oOqxRh7jdFrb2E6yvAQZFF3bf7FR3j6NFEB
+ dyu9eOoBvjSISli8iVJWj+bX9mx51P8OAvKqNq3OcyOP25FBiELb425zsL2oZbCWQrOploWqq
+ SWfrdZ3JbYSyEdS2YV4y9KksFKC1+6Jgcf4MdVmockBlfXsXGgXh8O+fcdlQr8GCgEwLb+v5w
+ 4rkHY67ostaOX72aj5h/BRyE1XPYnkHapO8GkadOzhEk7ebAGY3STkf548K14+AwAaRnHioEO
+ LI8WSd6neVnbg8hyytW1hZIT/aOmo001IpQG9TsNSx8UXojpslcdV/kABdd5gJSxZdgWrlj/e
+ +UmrY4W4tcGuoxVzFdeqmgJhyiH6s+zojnn1UKODmoMXKqzlUqnbxtGWv9DqQKr4StKPvx85y
+ sz5bD6RJRU6vmTGeJIPS+JR6J2A8+/Je4GqilAQ6wB3Fi21wQ0naYN5cu5w=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.72.192.75
+X-Received-From: 212.227.17.10
 Subject: Re: [Qemu-devel] [PATCH for 4.1 v2 7/7] linux-user: Add support for
  semtimedop() syscall
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,90 +124,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, amarkovic@wavecomp.com
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/07/2019 à 15:09, Aleksandar Markovic a écrit :
-> From: Aleksandar Rikalo <arikalo@wavecomp.com>
+Le 29/07/2019 à 15:26, Aleksandar Markovic a écrit :
 > 
-> Add support for semtimedop() emulation. It is based on invocation
-> of safe_semtimedop().
 > 
-> Conversion is left out of safe_semtimedop(), since other safe_xxx()
-> usually don't contain similar conversions.
+> On Mon, Jul 29, 2019 at 3:11 PM Aleksandar Markovic
+> <aleksandar.markovic@rt-rk.com <mailto:aleksandar.markovic@rt-rk.com>>
+> wrote:
 > 
-> Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
-> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  linux-user/syscall.c | 36 ++++++++++++++++++++++++++++++++++++
->  1 file changed, 36 insertions(+)
+>     From: Aleksandar Rikalo <arikalo@wavecomp.com
+>     <mailto:arikalo@wavecomp.com>>
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index ee80175..c7b08f5 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6650,7 +6650,39 @@ static inline abi_long host_to_target_statx(struct target_statx *host_stx,
->      return 0;
->  }
->  #endif
-> +#ifdef TARGET_NR_semtimedop
-> +static inline abi_long do_semtimedop(int semid, abi_long ptr, unsigned nsops,
-> +                                     abi_long timeout)
-> +{
-> +    struct sembuf *sops;
-> +    struct timespec ts, *pts;
-> +    abi_long ret;
-> +
-> +    if (timeout) {
-> +        pts = &ts;
-> +        if (target_to_host_timespec(pts, timeout)) {
-> +            return -TARGET_EFAULT;
-> +        }
-> +    } else {
-> +        pts = NULL;
-> +    }
->  
-> +    sops = g_malloc(sizeof(struct sembuf) * nsops);
-> +    if (sops == NULL) {
-> +        return -TARGET_EFAULT;
-> +    }
-> +
-> +    if (target_to_host_sembuf(sops, ptr, nsops)) {
-> +        g_free(sops);
-> +        return -TARGET_EFAULT;
-> +    }
-> +
-> +    ret = get_errno(safe_semtimedop(semid, sops, nsops, pts));
-> +    g_free(sops);
-> +
-> +    return ret;
-> +}
-> +#endif
+>     Add support for semtimedop() emulation. It is based on invocation
+>     of safe_semtimedop().
+> 
+>     Conversion is left out of safe_semtimedop(), since other safe_xxx()
+>     usually don't contain similar conversions.
+> 
+>     Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com
+>     <mailto:arikalo@wavecomp.com>>
+>     Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com
+>     <mailto:amarkovic@wavecomp.com>>
+>     ---
+> 
+> 
+> Aleksandar R., Laurent,
+> 
+> Please note that I just rebased the patch compared to its last
+> incarnation - no code change.
+> 
+> Laurent's hints were as follows last time:
+> 
+> "To avoid duplicate code (and cleanup the stack allocation), you should
+> 
+> remove do_semop()  and call do_semtimedop(..., NULL) from IPCOP_semop
+> and TARGET_NR_semop.
+> 
+> Thanks, Laurent"
+> 
+>  I guess they are still valid.
 
-As we have a "#ifdef__NR_semtimedop" around the definition of
-safe_semtimedop() you need the same #ifdef around its use:
-perhaps you can update the existing do_semop() to implement do_semtimedop().
-
->  
->  /* ??? Using host futex calls even when target atomic operations
->     are not really atomic probably breaks things.  However implementing
-> @@ -9194,6 +9226,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
->      case TARGET_NR_semop:
->          return do_semop(arg1, arg2, arg3);
->  #endif
-> +#ifdef TARGET_NR_semtimedop
-> +    case TARGET_NR_semtimedop:
-> +        return do_semtimedop(arg1, arg2, arg3, arg4);
-> +#endif
->  #ifdef TARGET_NR_semctl
->      case TARGET_NR_semctl:
->          return do_semctl(arg1, arg2, arg3, arg4);
-> 
-
-You should also implement in do_ipc() the IPCOP_semtimedop operation.
+Yes, I didn't remember my comment and do the same again...
 
 Thanks,
 Laurent
+
 
