@@ -2,79 +2,88 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DABB0C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1393CC7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:20:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6A42206DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D172C2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="itEl3xP5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6A42206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B5EVXEJM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D172C2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs1jv-00019L-Ue
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:14:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55533)
+	id 1hs1pc-0002d0-3y
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:20:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56550)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hs1jW-0000kx-I9
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:14:19 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hs1pE-0002D4-NX
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hs1jV-00057R-H2
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:14:18 -0400
-Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:40839)
+ (envelope-from <peter.maydell@linaro.org>) id 1hs1pD-0001Ph-S9
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:20:12 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45760)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hs1jV-00055g-BJ
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:14:17 -0400
-Received: by mail-ot1-x335.google.com with SMTP id l15so4579264oth.7
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 02:14:16 -0700 (PDT)
+ id 1hs1pD-0001N4-LR
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:20:11 -0400
+Received: by mail-ot1-x342.google.com with SMTP id x21so23379780otq.12
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 02:20:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WfwmneNpdYSmSj1xK8RigfohyWd4Vq0IkEKZeWpChiA=;
- b=itEl3xP5dthsrRdj+GQMw/tCsoCtOdQ+GTZFDy3kFx3ZR6LBD1vsTOg9ZvUvO7r4oz
- eDf7thYGUlgmUqj0hCqlsuyrSVrXAs2Pu75cHmxncPD2oXM9ECvuYYl/k3QCfA73WNCu
- vsYQdd9/1pHMPp+QpQJE+VpHwLRFdRHDO8AyL7IZD6iI/3jU1DeFPDNOSehDX7utngMe
- G2e3cpk7wwZSyrikaI0M7E3EMUOldFMdJySm/ywZaW2liWaY+qIERmVWYUp/U9EgD77I
- yr8t60ehosxjFrOf/i9TlUGfCWT6TqXYcBHC4GOdEugqdoldV6bXRpcJ4sn6is6lBDP4
- EJoQ==
+ :cc:content-transfer-encoding;
+ bh=SMFHbqWoJAUJvOkkcizf/Dx31wgfv4RnyxZ6fZ6kMpo=;
+ b=B5EVXEJMqy1AlEXnsYp6CjebScKaUYFQaNoSDDhltLG346QpMr0nSAxevBaCGVjEgc
+ njuKPWR8tK44FYkmPfHvNuPyTsfcIW2wW0fG885fNKM1vdE8WE/SUoUFRro5rrdIe1y2
+ 1OtYsfAsq5BRICMvMm6WE64Y5rSvvqg4FTdWrZNd6v+/xUWK6YxTXqPS1++yLrPTdE2F
+ ImbEKKQDRwCfziDkTMalZrPHjLIq5ks45+5PSK9TACRp9vXXKmhvtxUuNz93aEMAxuz2
+ 2ZiLfE828uxVLKxlUIpQsSd2K2/26g0gt91ACAjT7/qlkaM3MfMHAaaQORlIkk9eQ8GE
+ UI+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WfwmneNpdYSmSj1xK8RigfohyWd4Vq0IkEKZeWpChiA=;
- b=cEhcWy+QtcWG3CHaY9vF/Ne29GO/VLF0FZp8m5Y+C4Q6opeCKpUv2Pl/cvH66jIWuC
- 5qStNbyyWApPhLJRfXblWkUL3DKFGxLLjgLmWX9IsOuNP6XFSR297Xfq0gK5JD5CTTIm
- UVsp+slC8R/YWFWMqeTtJrQdyhoSaQh8QKHNx+oU4ZupkQSpbkedLUrYlCwJEQRkJ+M8
- qKxvyoa3W1L1pG5P+eSKPAJBOtw595ZqHscCVItgXekteDiQKfRoiyuNkK6X+lCJtFhy
- GpaueLhxZUO8Suw/OvZtjx4mpwhk1+YfuPbR7TcL05B7LGfX5pUCZW87MS9yXRGDEbO8
- LOpg==
-X-Gm-Message-State: APjAAAUKwYEqJ+/q241yXrpww0kgNVMSUNGRQd7t4vG/aegwcGtldCKt
- kAhKFUrPyW4foE7WPDHESx4GLZTSXHkrKl4vXsyYXg==
-X-Google-Smtp-Source: APXvYqzh53XaAEzBgN51bBS98U6s4sN8/riCNUXSl57Ynv/KffBkxTCkwSI7uOiBbnnvSKBr9fTSs/Fx48WMu/AwBjI=
-X-Received: by 2002:a9d:4d81:: with SMTP id u1mr31804154otk.221.1564391655439; 
- Mon, 29 Jul 2019 02:14:15 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=SMFHbqWoJAUJvOkkcizf/Dx31wgfv4RnyxZ6fZ6kMpo=;
+ b=AteajkDRwAmD5oLy08XwRpyx+/Xj4w3ZxwRgYSmznRsJ6TJl5ExvlELjwO2Bp9dtav
+ Rq4h3dy+41NZLZRZAJiGvmi6CnzLnR1JWK0p/wQZ0pRYinsRUOB+9VhaXEBJ4yHxH08a
+ N8b353qobiilnZPTZyEaLvyD9qsf8iCnw8DDj0zKFOrSf/pvmbg1295l17SFuKRDvi7o
+ JP7nlXNu47bhMbuN4EHE+99A48XmSWoPSUadJVrOUHznE0O/dBv02TLI48A32A/NNfst
+ os0DQ9dUcEQ2ufPhuLSa4vgjaITB8W39s9zB5E1VINPyEIURnVDHZgT380l3FumkHERg
+ tgWA==
+X-Gm-Message-State: APjAAAUwbkAMFmRKb6qDNsAMMsVACk6ud4XemNmXlVuY4RmPnOISD2NY
+ ycFKSJ4i84o1vXQRChlAeSMR5KZ/nkCwSW55193Iww==
+X-Google-Smtp-Source: APXvYqytr+E4V5YWwdXaoRvSL/ZSuE/IefhUcKsIy/LfNK6TjE47N0eZJ0cmwuBNF5R/B7Kk2NJsfgJ4ynK5R1+Q/F8=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr25874204otr.232.1564392010685; 
+ Mon, 29 Jul 2019 02:20:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190726173502.17172-1-laurent@vivier.eu>
-In-Reply-To: <20190726173502.17172-1-laurent@vivier.eu>
+References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
+ <1562775267-1222-5-git-send-email-pbonzini@redhat.com>
+ <87d0ie58cj.fsf@dusky.pond.sub.org>
+ <78c3bba3-3e85-682b-b4ce-fc4809add90e@redhat.com>
+ <87sgqsx7zp.fsf@dusky.pond.sub.org>
+ <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
+ <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
+ <20190729082115.GB32718@redhat.com>
+In-Reply-To: <20190729082115.GB32718@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jul 2019 10:14:04 +0100
-Message-ID: <CAFEAcA8ZGA2LOixnBy31LUick1xu0=weaHwqfk0oHx2UXipxag@mail.gmail.com>
-To: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 29 Jul 2019 10:19:59 +0100
+Message-ID: <CAFEAcA_k8q5NEBG8PXw4pc_JFokNijVqR7-4QosW9TSPG=1T2w@mail.gmail.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::335
-Subject: Re: [Qemu-devel] [PULL 0/1] Linux user for 4.1 patches
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH 4/8] convert libqemuutil to meson
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,35 +95,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jul 2019 at 18:35, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit fff3159900d2b95613a9cb75fc3703e67a674729:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190726' into staging (2019-07-26 16:23:07 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-4.1-pull-request
->
-> for you to fetch changes up to 5bfce0b74fbd5d53089bb866919d685c47edad9e:
->
->   linux-user: Make sigaltstack stacks per-thread (2019-07-26 19:24:33 +0200)
->
-> ----------------------------------------------------------------
-> Fix multi-threaded go runtime crash
->
-> ----------------------------------------------------------------
+On Mon, 29 Jul 2019 at 09:21, Daniel P. Berrang=C3=A9 <berrange@redhat.com>=
+ wrote:
+> You can disable warnings selectively per file using a Pragma in the
+> source.
 
+In at least one of these cases (libvixl) the point of using
+the per-file flags is that the source files are third
+party upstream ones which we don't want to carry local
+modifications to. Otherwise we'd just change the source
+to suppress the warnings the way we do for other files.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
-for any user-visible changes.
-
+thanks
 -- PMM
 
