@@ -4,72 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B6B9C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDD5C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:17:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EED0F21655
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABDEB21655
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:17:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="cskjG/Wi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EED0F21655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="HlNjKQcM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABDEB21655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7Nt-0002oh-9t
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:16:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39828)
+	id 1hs7P2-0005XT-0T
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:17:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39613)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs79E-0007UV-8n
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:13 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs799-0007HI-HC
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs79C-0006fc-RP
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:12 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:49070)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs798-0006Xk-6s
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:07 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:49064)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hs78x-0005ZJ-64; Mon, 29 Jul 2019 11:00:55 -0400
+ id 1hs78x-0005ZH-3s; Mon, 29 Jul 2019 11:00:55 -0400
 Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id 675B297030;
- Mon, 29 Jul 2019 14:59:28 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 8950E9702D;
+ Mon, 29 Jul 2019 14:59:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564412369;
+ s=mail; t=1564412366;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CuK0R1yEmIw3ue/ncT8aMu/7cio9gA+aFOL7xtl6KDw=;
- b=cskjG/WiG5xmo0EZ5ctOjAYEAz9/P3DtnpxcAWXvok8IT6V/FhQIzeru61jdcrryhbixyQ
- atYYSt3cwsd7JJ406AbQeeGVdpM5g1illutRlpexX3b0Wz0qrOyMGlNzFbl6TeRZpy6zhh
- qguG3ljV7Im2cpbDwK9UsFepxoaw2lM=
+ bh=ktiT63C3qh5TZrbCabCo/OpHpi9eQGkR5JjcE/VjSh4=;
+ b=HlNjKQcMc27bLTChaJLKPVXWY7hoAiNPxnOIZviZO4qyPAWpfu6QADe5fwW7nRDPLG9zHs
+ fd3jdqwGFaNxH7c0fqo7IQoHzEutW00kV5+XAWFwAtjUmC6q0FaDY+f/pd6cVxylcw1M8Z
+ Ql8PO6UxQz3r4KvLhco3pDo3DkUDfgc=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 16:56:49 +0200
-Message-Id: <20190729145654.14644-29-damien.hedde@greensocs.com>
+Date: Mon, 29 Jul 2019 16:56:47 +0200
+Message-Id: <20190729145654.14644-27-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190729145654.14644-1-damien.hedde@greensocs.com>
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564412369;
+ s=mail; t=1564412366;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CuK0R1yEmIw3ue/ncT8aMu/7cio9gA+aFOL7xtl6KDw=;
- b=gcfzcXQO8gkMIyW+3VrA6ezPHFaNLe/3LfG7unKflwxesGP9AkN5FoEGj0Twiyzmb/7PuX
- 4lAGRJ1jW35yYMHVWyI3Qff+Etf03JPiandTm8dH4dyyN3mdcPL3kyNMg70JdxxUzkptSS
- 1WGpVTiCt1yXArDQVLnny2G7FO9XSCE=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412369; a=rsa-sha256; cv=none;
- b=fbsfWrUIatX6lxuQoJRaFMOj+zbSPCsSlLQ4lGkibvRYbaBy/DTSjsVWEWaAErj7nap7x9
- PTE3R62B40fokyR9jFphjQNC0qt0ZdkVgyzJFh33Nw91lrNf3pkD58qwk/E7ksOWPDJTyC
- gg8/KOSxDPWYc4SzGjViy69UxnPeUgw=
+ bh=ktiT63C3qh5TZrbCabCo/OpHpi9eQGkR5JjcE/VjSh4=;
+ b=Gt/EhTEZrrDQHDkdpyzEL8/qepLHd1f4VuZho0yLvzVK9x6gINTuwF3YyDcjdy0k+KUjLD
+ K7w/U9uOWqqBksxcOZ29HWZ9NX7msRR33WRswJcuhBNFMTZGvNiHNwJYe7ey/h+64DkM4D
+ Gz0uSUmqFwkOlBG8+24ZDb64kzlyi0w=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412366; a=rsa-sha256; cv=none;
+ b=QmGwgVvFK2E2KgNlIQn/U7wMhdi7n22WLjek7SR52yo/XXP0Vqvp3qmgyCCVhYtGln3GYW
+ FbQEyhI6+LOvRwNka/nCuvtiHIVv/c+hGD6kPozXKI4vjbh2qj/IB8m3to5xuLfGwkgpIh
+ 1gjyC6ea+c2tIaTDlIM8mwsWotmvJ+o=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -77,8 +77,8 @@ X-Spam: Yes
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH v3 28/33] qdev: Remove unused deprecated reset
- functions
+Subject: [Qemu-devel] [PATCH v3 26/33] hw/s390x/s390-pci-inst.c: remove
+ device_legacy_reset call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,119 +104,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the functions now they are unused:
-+ device_legacy_reset
-+ qdev_reset_all[_fn]
-+ qbus_reset_all[_fn]
+Replace S390PCIBusDevice legacy reset by device_reset_warm.
+
+The new function propagates also the reset to the sub-buses tree.
+I'm not sure whether S390PCIBusDevice has bus children or not.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/core/qdev.c         | 30 ------------------------------
- include/hw/qdev-core.h | 29 -----------------------------
- 2 files changed, 59 deletions(-)
+ hw/s390x/s390-pci-inst.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 11a4de55ea..896b55f7ba 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -322,27 +322,6 @@ static void device_foreach_reset_child(Object *obj, =
-void (*func)(Object *))
-     }
- }
-=20
--void qdev_reset_all(DeviceState *dev)
--{
--    device_reset(dev, false);
--}
--
--void qdev_reset_all_fn(void *opaque)
--{
--    qdev_reset_all(DEVICE(opaque));
--}
--
--void qbus_reset_all(BusState *bus)
--{
--    bus_reset(bus, false);
--}
--
--void qbus_reset_all_fn(void *opaque)
--{
--    BusState *bus =3D opaque;
--    qbus_reset_all(bus);
--}
--
- /* can be used as ->unplug() callback for the simple cases */
- void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-                                   DeviceState *dev, Error **errp)
-@@ -1223,15 +1202,6 @@ void device_class_set_parent_unrealize(DeviceClass=
- *dc,
-     dc->unrealize =3D dev_unrealize;
- }
-=20
--void device_legacy_reset(DeviceState *dev)
--{
--    DeviceClass *klass =3D DEVICE_GET_CLASS(dev);
--
--    if (klass->reset) {
--        klass->reset(dev);
--    }
--}
--
- Object *qdev_get_machine(void)
- {
-     static Object *dev;
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index f724ddc8f4..eb6370970e 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -518,25 +518,6 @@ bool bus_is_resetting(BusState *bus);
-  */
- bool bus_is_reset_cold(BusState *bus);
-=20
--/**
-- * qbus/qdev_reset_all:
-- * @bus/dev: Bus/Device to be reset.
-- *
-- * Reset @bus/dev and perform a bus-level reset of all devices/buses con=
-nected
-- * to it, including recursive processing of all buses below @bus itself.=
-  A
-- * hard reset means that qbus_reset_all will reset all state of the devi=
-ce.
-- * For PCI devices, for example, this will include the base address regi=
-sters
-- * or configuration space.
-- *
-- * Theses functions are deprecated, please use device/bus_reset or
-- * resettable_reset_* instead
-- * TODO: remove them when all occurence are removed
-- */
--void qdev_reset_all(DeviceState *dev);
--void qdev_reset_all_fn(void *opaque);
--void qbus_reset_all(BusState *bus);
--void qbus_reset_all_fn(void *opaque);
--
- /* This should go away once we get rid of the NULL bus hack */
- BusState *sysbus_get_default(void);
-=20
-@@ -551,16 +532,6 @@ char *qdev_get_own_fw_dev_path_from_handler(BusState=
- *bus, DeviceState *dev);
-  */
- void qdev_machine_init(void);
-=20
--/**
-- * device_legacy_reset:
-- *
-- * Reset a single device (by calling the reset method).
-- *
-- * This function is deprecated, please use device_reset() instead.
-- * TODO: remove the function when all occurences are removed.
-- */
--void device_legacy_reset(DeviceState *dev);
--
- /**
-  * device_class_set_parent_reset:
-  * TODO: remove the function when DeviceClass's reset method
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 93cda37c27..d7bca68245 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -242,7 +242,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintpt=
+r_t ra)
+                 stw_p(&ressetpci->hdr.rsp, CLP_RC_SETPCIFN_FHOP);
+                 goto out;
+             }
+-            device_legacy_reset(DEVICE(pbdev));
++            device_reset_warm(DEVICE(pbdev));
+             pbdev->fh &=3D ~FH_MASK_ENABLE;
+             pbdev->state =3D ZPCI_FS_DISABLED;
+             stl_p(&ressetpci->fh, pbdev->fh);
 --=20
 2.22.0
 
