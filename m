@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA47EC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 866FAC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:50:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2710206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:46:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2710206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF14206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:50:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF14206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs0Mo-0004zy-2I
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 03:46:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39410)
+	id 1hs0Q4-00067f-JI
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 03:50:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40033)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hs0Lb-0004X0-Tq
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:45:32 -0400
+ (envelope-from <david@redhat.com>) id 1hs0Pf-0005gi-MA
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:49:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hs0Lb-000218-0P
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:45:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41238)
+ (envelope-from <david@redhat.com>) id 1hs0Pe-00065Q-Q5
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:49:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53962)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1hs0La-0001xi-Ns
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:45:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1hs0Pe-00063l-Hx
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:49:42 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E02385546;
- Mon, 29 Jul 2019 07:45:29 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B176D3082E57;
+ Mon, 29 Jul 2019 07:49:41 +0000 (UTC)
 Received: from [10.36.117.139] (ovpn-117-139.ams2.redhat.com [10.36.117.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C068210190A8;
- Mon, 29 Jul 2019 07:45:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 529375D6A9;
+ Mon, 29 Jul 2019 07:49:38 +0000 (UTC)
 To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
 References: <20190728131304.1282-1-richardw.yang@linux.intel.com>
- <20190728131304.1282-3-richardw.yang@linux.intel.com>
+ <20190728131304.1282-4-richardw.yang@linux.intel.com>
 From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,22 +90,22 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <07a5431d-1928-d1ab-a0a2-7be21b411742@redhat.com>
-Date: Mon, 29 Jul 2019 09:45:24 +0200
+Message-ID: <690fd825-3553-6dee-5ff4-2ad7652afe46@redhat.com>
+Date: Mon, 29 Jul 2019 09:49:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190728131304.1282-3-richardw.yang@linux.intel.com>
+In-Reply-To: <20190728131304.1282-4-richardw.yang@linux.intel.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Mon, 29 Jul 2019 07:45:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.46]); Mon, 29 Jul 2019 07:49:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] memory-device: break the loop if no
- hint is provided
+Subject: Re: [Qemu-devel] [PATCH 3/3] memory-device: break the loop if tmp
+ exceed the hinted range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,46 +123,37 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 28.07.19 15:13, Wei Yang wrote:
-> When there is no hint, the first un-overlapped range is the proper one.
-> Just break the loop instead of iterate the whole list.
->=20
+> The memory-device list built by memory_device_build_list is ordered by
+> its address, this means if the tmp range exceed the hinted range, all
+> the following range will not overlap with it.
+> 
 > Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 > ---
->  hw/mem/memory-device.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
+>  hw/mem/memory-device.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 > diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index df3261b32a..413b514586 100644
+> index 413b514586..aea47ab3e8 100644
 > --- a/hw/mem/memory-device.c
 > +++ b/hw/mem/memory-device.c
-> @@ -180,6 +180,8 @@ static uint64_t memory_device_get_free_addr(Machine=
-State *ms,
+> @@ -180,7 +180,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
 >                  range_make_empty(&new);
 >                  break;
 >              }
-> +        } else if (!hint) {
-> +            break;
+> -        } else if (!hint) {
+> +        } else if (!hint || range_lob(&tmp) > range_upb(&new)) {
+>              break;
 >          }
 >      }
-> =20
->=20
+> 
 
-I think
+Lower bound is inclusive, upper bound is exclusive. Shouldn't this be
 
-a) This is fine. I was not able to construct a counter-example where
-this would not work. Whenever we modify the range, we check against the
-next one in the sorted list. If there is no overlap, it fits. And, it
-won't overlap with any other range (and therefore never be changed again)
+range_lob(&tmp) >= range_upb(&new)
 
-b) This should therefore not change the assignment order / break migratio=
-n.
+Also, I wonder if patch #2 is now really needed?
 
-Maybe mention that this will not change the assigned addresses compared
-to old code in all scenarios.
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
---=20
+-- 
 
 Thanks,
 
