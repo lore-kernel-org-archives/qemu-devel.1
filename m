@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F6BC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C1DC7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4535C21655
+	by mail.kernel.org (Postfix) with ESMTPS id EF85A21655
 	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:21:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Ea3nNUHB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4535C21655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="dLSGNwEp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF85A21655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7SN-00047r-Hv
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:20:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39847)
+	id 1hs7SO-00048y-7V
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:21:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39906)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs79E-0007Vr-Qs
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:14 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs79G-0007ZR-BZ
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs79C-0006fi-TC
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:12 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:49068)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs79E-0006i4-EP
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:14 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:49076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hs78x-0005ZI-5J; Mon, 29 Jul 2019 11:00:55 -0400
+ id 1hs78x-0005a0-SV; Mon, 29 Jul 2019 11:00:56 -0400
 Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id 9260497064;
- Mon, 29 Jul 2019 14:59:31 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 63F0997069;
+ Mon, 29 Jul 2019 14:59:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564412372;
+ s=mail; t=1564412375;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N5wnMQEiMoszMl9iY43hRAj3emLdaJgse3RhUORv7mA=;
- b=Ea3nNUHBhop4jRADSkdTGq8pqTrpXz8GjNAW2XOEMWXYWs4wr6y+Azhd+x6TyzmtaUIa0f
- fgu1C6oh+49Zae93jKY13Chv48FFAG3Hs8IcWm1SPNlfFxrUNTNdC2Y2qBXqIs5eoB5Aql
- U8JHbKOijurENUbWe5wZMFcIbObAerg=
+ bh=fki3DuRgk6JFE9a+j7+oWH+U0r34bgS+MNXGIekQZnU=;
+ b=dLSGNwEpQa/20qyXIqWQDLdcESAX96U400gNwEvfr9wsyJaqlZ1ZFDYmyXCnomRQRkaJuX
+ pVXUXsUeCJAysigd1Zp0xXi4EQ/RxGRA1VoD+coayzrqG9GP4INO3Py4NyuqorliAO3RQY
+ XbJ321Te7+zsfFU8YdjTaUZ0zgo9aI4=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 16:56:51 +0200
-Message-Id: <20190729145654.14644-31-damien.hedde@greensocs.com>
+Date: Mon, 29 Jul 2019 16:56:53 +0200
+Message-Id: <20190729145654.14644-33-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190729145654.14644-1-damien.hedde@greensocs.com>
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564412372;
+ s=mail; t=1564412375;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N5wnMQEiMoszMl9iY43hRAj3emLdaJgse3RhUORv7mA=;
- b=WvAtHFZsfTFPAyXrEStEy1QIY3iaOPPwetox0EZF1ouGR0iZA29+tV6sRjebYFOKLBM57J
- ERM5gqfvLMean5HO212vrYh/lF0WaUMObYwSA6zV0lo4Lujk1Y4YMrytvg7FPQJZD2FcFs
- x4N1AhQyvYa7aPdtUtQX/lfy7Hiuxb4=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412372; a=rsa-sha256; cv=none;
- b=yqKxTNzhj6/OkXaMKs3th7yRmN8RS62X4Voqti9rlDfKpu/d7N7Kgr3wUUWvZGqQx7x4hi
- l52Z15Xyv0LQzYmMskkshTZNNPaqY3YL/Bt+Bc5Tx19zVqit+2xIay0hRixEs7vchqGlf2
- Cas3a3jnxOwoJBCjeOsNz1N+84QeNVE=
+ bh=fki3DuRgk6JFE9a+j7+oWH+U0r34bgS+MNXGIekQZnU=;
+ b=D3Ba5CNsHloxQE/7q2Fo6MTt+nJj9RM2dg4sE5BGFGVQ4quJWStDjweXmmpYueaNXYRmPP
+ WZfiJ34rcbt1bxEDxidnnAf1pJJ7WHPdM6Q9Oita8ymDVlSf+R5C0eysA8ra7G4hhVeefb
+ ph/qxeiId+jQ+W+dvuJPNsPJKDrPZyU=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412375; a=rsa-sha256; cv=none;
+ b=T73fGYf+yfutNEO7kxdcE9AfaozDM7e+6TvG0gA00+Aa6/ONj7WYHbUZhIoFyBFWV6ueG1
+ 9jZgB5qBJSSZBDRKT68BGnv4oS3f+mPYhlYOSodCU/FXkObcTKrcRypku/dqrarlzGm2HZ
+ rUtQrp4q4sQU8zwI4DknmdWMvgvhicw=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -77,7 +77,7 @@ X-Spam: Yes
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH v3 30/33] convert cadence_uart to 3-phases reset
+Subject: [Qemu-devel] [PATCH v3 32/33] Add uart reset support in zynq_slcr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,184 +103,104 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Split the existing reset procedure into 3 phases.
-Test the resetting flag to discard register accesses
-and character reception.
-Also adds a active high reset io.
+Add two gpio outputs to control the uart resets.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/char/cadence_uart.c | 77 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 73 insertions(+), 4 deletions(-)
+ hw/misc/zynq_slcr.c | 36 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
-diff --git a/hw/char/cadence_uart.c b/hw/char/cadence_uart.c
-index fa25fe24da..d7bacc44fe 100644
---- a/hw/char/cadence_uart.c
-+++ b/hw/char/cadence_uart.c
-@@ -39,6 +39,18 @@
-     #define DB_PRINT(...)
- #endif
+diff --git a/hw/misc/zynq_slcr.c b/hw/misc/zynq_slcr.c
+index 6fcdbce4f0..b6c9a281c2 100644
+--- a/hw/misc/zynq_slcr.c
++++ b/hw/misc/zynq_slcr.c
+@@ -97,6 +97,10 @@ REG32(SPI_RST_CTRL, 0x21c)
+ REG32(CAN_RST_CTRL, 0x220)
+ REG32(I2C_RST_CTRL, 0x224)
+ REG32(UART_RST_CTRL, 0x228)
++    FIELD(UART_RST_CTRL, UART0_CPU1X_RST, 0, 1)
++    FIELD(UART_RST_CTRL, UART1_CPU1X_RST, 1, 1)
++    FIELD(UART_RST_CTRL, UART0_REF_RST, 2, 1)
++    FIELD(UART_RST_CTRL, UART1_REF_RST, 3, 1)
+ REG32(GPIO_RST_CTRL, 0x22c)
+ REG32(LQSPI_RST_CTRL, 0x230)
+ REG32(SMC_RST_CTRL, 0x234)
+@@ -190,8 +194,14 @@ typedef struct ZynqSLCRState {
+     MemoryRegion iomem;
 =20
-+#define CADENCE_UART_CLASS(class) \
-+    OBJECT_CLASS_CHECK(CadenceUartClass, (class), TYPE_CADENCE_UART)
-+#define CADENCE_UART_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(CadenceUartClass, (obj), TYPE_CADENCE_UART)
+     uint32_t regs[ZYNQ_SLCR_NUM_REGS];
 +
-+typedef struct CadenceUartClass {
-+    /*< private >*/
-+    SysBusDeviceClass parent_class;
-+
-+    struct ResettablePhases parent_reset_phases;
-+} CadenceUartClass;
-+
- #define UART_SR_INTR_RTRIG     0x00000001
- #define UART_SR_INTR_REMPTY    0x00000002
- #define UART_SR_INTR_RFUL      0x00000004
-@@ -223,6 +235,10 @@ static int uart_can_receive(void *opaque)
-     int ret =3D MAX(CADENCE_UART_RX_FIFO_SIZE, CADENCE_UART_TX_FIFO_SIZE=
-);
-     uint32_t ch_mode =3D s->r[R_MR] & UART_MR_CHMODE;
++    qemu_irq uart0_rst;
++    qemu_irq uart1_rst;
+ } ZynqSLCRState;
 =20
-+    if (device_is_resetting((DeviceState *) opaque)) {
-+        return 0;
-+    }
++#define ZYNQ_SLCR_REGFIELD_TO_OUT(state, irq, reg, field) \
++    qemu_set_irq((state)->irq, ARRAY_FIELD_EX32((state)->regs, reg, fiel=
+d) !=3D 0)
 +
-     if (ch_mode =3D=3D NORMAL_MODE || ch_mode =3D=3D ECHO_MODE) {
-         ret =3D MIN(ret, CADENCE_UART_RX_FIFO_SIZE - s->rx_count);
-     }
-@@ -338,6 +354,10 @@ static void uart_receive(void *opaque, const uint8_t=
- *buf, int size)
-     CadenceUARTState *s =3D opaque;
-     uint32_t ch_mode =3D s->r[R_MR] & UART_MR_CHMODE;
-=20
-+    if (device_is_resetting((DeviceState *) opaque)) {
-+        return;
-+    }
-+
-     if (ch_mode =3D=3D NORMAL_MODE || ch_mode =3D=3D ECHO_MODE) {
-         uart_write_rx_fifo(opaque, buf, size);
-     }
-@@ -351,6 +371,10 @@ static void uart_event(void *opaque, int event)
-     CadenceUARTState *s =3D opaque;
-     uint8_t buf =3D '\0';
-=20
-+    if (device_is_resetting((DeviceState *) opaque)) {
-+        return;
-+    }
-+
-     if (event =3D=3D CHR_EVENT_BREAK) {
-         uart_write_rx_fifo(opaque, &buf, 1);
-     }
-@@ -383,6 +407,10 @@ static void uart_write(void *opaque, hwaddr offset,
+ static void zynq_slcr_reset_init(Object *obj)
  {
-     CadenceUARTState *s =3D opaque;
-=20
-+    if (device_is_resetting((DeviceState *)opaque)) {
-+        return;
-+    }
-+
-     DB_PRINT(" offset:%x data:%08x\n", (unsigned)offset, (unsigned)value=
-);
-     offset >>=3D 2;
-     if (offset >=3D CADENCE_UART_R_MAX) {
-@@ -441,6 +469,10 @@ static uint64_t uart_read(void *opaque, hwaddr offse=
-t,
-     CadenceUARTState *s =3D opaque;
-     uint32_t c =3D 0;
-=20
-+    if (device_is_resetting((DeviceState *)opaque)) {
-+        return 0;
-+    }
-+
-     offset >>=3D 2;
-     if (offset >=3D CADENCE_UART_R_MAX) {
-         c =3D 0;
-@@ -460,9 +492,14 @@ static const MemoryRegionOps uart_ops =3D {
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
- };
-=20
--static void cadence_uart_reset(DeviceState *dev)
-+static void cadence_uart_reset_init(Object *obj)
- {
--    CadenceUARTState *s =3D CADENCE_UART(dev);
-+    CadenceUARTState *s =3D CADENCE_UART(obj);
-+    CadenceUartClass *cc =3D CADENCE_UART_GET_CLASS(obj);
-+
-+    if (cc->parent_reset_phases.init) {
-+        cc->parent_reset_phases.init(obj);
-+    }
-=20
-     s->r[R_CR] =3D 0x00000128;
-     s->r[R_IMR] =3D 0;
-@@ -471,6 +508,28 @@ static void cadence_uart_reset(DeviceState *dev)
-     s->r[R_BRGR] =3D 0x0000028B;
-     s->r[R_BDIV] =3D 0x0000000F;
-     s->r[R_TTRIG] =3D 0x00000020;
-+}
-+
-+static void cadence_uart_reset_hold(Object *obj)
-+{
-+    CadenceUARTState *s =3D CADENCE_UART(obj);
-+    CadenceUartClass *cc =3D CADENCE_UART_GET_CLASS(obj);
-+
-+    if (cc->parent_reset_phases.hold) {
-+        cc->parent_reset_phases.hold(obj);
-+    }
-+
-+    qemu_set_irq(s->irq, 0);
-+}
-+
-+static void cadence_uart_reset_exit(Object *obj)
-+{
-+    CadenceUARTState *s =3D CADENCE_UART(obj);
-+    CadenceUartClass *cc =3D CADENCE_UART_GET_CLASS(obj);
-+
-+    if (cc->parent_reset_phases.exit) {
-+        cc->parent_reset_phases.exit(obj);
-+    }
-=20
-     uart_rx_reset(s);
-     uart_tx_reset(s);
-@@ -499,6 +558,8 @@ static void cadence_uart_init(Object *obj)
-     sysbus_init_irq(sbd, &s->irq);
-=20
-     s->char_tx_time =3D (NANOSECONDS_PER_SECOND / 9600) * 10;
-+
-+    qdev_init_warm_reset_gpio(DEVICE(obj), "rst", DEVICE_RESET_ACTIVE_HI=
-GH);
+     ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
+@@ -293,6 +303,24 @@ static void zynq_slcr_reset_init(Object *obj)
+     s->regs[R_DDRIOB + 12] =3D 0x00000021;
  }
 =20
- static int cadence_uart_post_load(void *opaque, int version_id)
-@@ -544,12 +605,19 @@ static Property cadence_uart_properties[] =3D {
- static void cadence_uart_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
-+    CadenceUartClass *cc =3D CADENCE_UART_CLASS(klass);
-=20
-     dc->realize =3D cadence_uart_realize;
-     dc->vmsd =3D &vmstate_cadence_uart;
--    dc->reset =3D cadence_uart_reset;
-     dc->props =3D cadence_uart_properties;
--  }
-+
-+    resettable_class_set_parent_reset_phases(rc,
-+                                             cadence_uart_reset_init,
-+                                             cadence_uart_reset_hold,
-+                                             cadence_uart_reset_exit,
-+                                             &cc->parent_reset_phases);
++static void zynq_slcr_compute_uart_reset(ZynqSLCRState *s)
++{
++    ZYNQ_SLCR_REGFIELD_TO_OUT(s, uart0_rst, UART_RST_CTRL, UART0_REF_RST=
+);
++    ZYNQ_SLCR_REGFIELD_TO_OUT(s, uart1_rst, UART_RST_CTRL, UART1_REF_RST=
+);
 +}
++
++static void zynq_slcr_reset_hold(Object *obj)
++{
++    ZynqSLCRState *s =3D ZYNQ_SLCR(obj);
++    ZynqSLCRClass *zc =3D ZYNQ_SLCR_GET_CLASS(obj);
++
++    if (zc->parent_reset_phases.hold) {
++        zc->parent_reset_phases.hold(obj);
++    }
++
++    zynq_slcr_compute_uart_reset(s);
++}
++
+ static bool zynq_slcr_check_offset(hwaddr offset, bool rnw)
+ {
+     switch (offset) {
+@@ -432,6 +460,9 @@ static void zynq_slcr_write(void *opaque, hwaddr offs=
+et,
+             qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+         }
+         break;
++    case R_UART_RST_CTRL:
++        zynq_slcr_compute_uart_reset(s);
++        break;
+     }
+ }
 =20
- static const TypeInfo cadence_uart_info =3D {
-     .name          =3D TYPE_CADENCE_UART,
-@@ -557,6 +625,7 @@ static const TypeInfo cadence_uart_info =3D {
-     .instance_size =3D sizeof(CadenceUARTState),
-     .instance_init =3D cadence_uart_init,
-     .class_init    =3D cadence_uart_class_init,
-+    .class_size =3D sizeof(CadenceUartClass),
- };
+@@ -448,6 +479,9 @@ static void zynq_slcr_init(Object *obj)
+     memory_region_init_io(&s->iomem, obj, &slcr_ops, s, "slcr",
+                           ZYNQ_SLCR_MMIO_SIZE);
+     sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
++
++    qdev_init_gpio_out_named(DEVICE(obj), &s->uart0_rst, "uart0_rst", 1)=
+;
++    qdev_init_gpio_out_named(DEVICE(obj), &s->uart1_rst, "uart1_rst", 1)=
+;
+ }
 =20
- static void cadence_uart_register_types(void)
+ static const VMStateDescription vmstate_zynq_slcr =3D {
+@@ -470,7 +504,7 @@ static void zynq_slcr_class_init(ObjectClass *klass, =
+void *data)
+=20
+     resettable_class_set_parent_reset_phases(rc,
+                                              zynq_slcr_reset_init,
+-                                             NULL,
++                                             zynq_slcr_reset_hold,
+                                              NULL,
+                                              &zc->parent_reset_phases);
+ }
 --=20
 2.22.0
 
