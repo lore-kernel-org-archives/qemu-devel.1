@@ -2,88 +2,62 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EE7C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 14:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E6D8C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:00:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08A652067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 14:59:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdvOnHVo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08A652067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 461052067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:00:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 461052067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs77m-0003kA-Qn
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 10:59:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37337)
+	id 1hs78B-0004wx-4c
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:00:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37369)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hs76g-00037l-Ni
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:58:35 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hs76q-0003JZ-1F
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hs76f-000482-RP
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:58:34 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39365)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hs76f-00046h-Kw
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:58:33 -0400
-Received: by mail-wr1-x443.google.com with SMTP id x4so9049069wrt.6
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 07:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=Ikutog3/szr3RMqowT2g+qNbsyWnISYtND6etPKFdfg=;
- b=XdvOnHVobDGvq5Oc327Th+yVB3przSMfFmI1oL7799UyBk5O1gL4fuEc21PKnmXtll
- NCd10PFV2NQkKmuxm6ReNCl0JSoTb49SXTOJRIwXvFy/x6HVaLBT+gss3ih+MMdbTb46
- FvxHWAJvbI+u6fKmSRHgzSRYjXisB0vAuDGhEIhCHNr26FwYtyC2Cx45YLyaZgnv1jZt
- UzsW48958jwkU2f+ToiydzHHDbxaBJgKf9USXEII0UUjvCj79iMtQ/15B6x8TsWLbKjm
- hJcYPZvm5f9gYviegMcw985G2FCv4oeQATZeoZYhGK1usKdlqEEs/UZDmWSJLN5+12QY
- 8l+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=Ikutog3/szr3RMqowT2g+qNbsyWnISYtND6etPKFdfg=;
- b=TqeOq2O6sRCOq15r3xBZEeD3fR77sIyv4u183PgH9zUQezhVhZzMsp6hyFjTT3jFv0
- daiPhONosbofultzLJ45yT0ms7uUXA83Ttw9RIDoLFkxkfLxZS6SRjNWIAXl9N2fNEci
- Dk+jBomR9eXRQQdKerAd4Fk8FqFGUeB7C64ay5g3Ie6ETAkBVn7hnqTl4IN5l+oOabCQ
- g+hyBxTcyuC/2l/Mzq8v4F8eEP8sNZyTl4bk7agVqOsBGTlJP0+z4Nvm/BVMnGLdcTRI
- 4Dzbx2tqGqKz3N30vLytXIYV7GgxDl+blheEzf+Wo7UC8hs97fBYSyf+vFeEcFDMR3bP
- oW3A==
-X-Gm-Message-State: APjAAAWTJ4AFJvNF8Me9FQ1KTLo6LT5kYatbXuZgSWYOIXWhP6ovdSEP
- e/7LEJpu1HVyU2QI1jgjSrU=
-X-Google-Smtp-Source: APXvYqxvd36UjU2TSrgw9ZCJp4a1IS6BrCBAJa6f/av6/ydrQZ9hKqNEmaofmLWO4Is+cogo2a4mLQ==
-X-Received: by 2002:adf:d4c6:: with SMTP id w6mr7914955wrk.98.1564412312367;
- Mon, 29 Jul 2019 07:58:32 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id t140sm55720345wmt.0.2019.07.29.07.58.31
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 29 Jul 2019 07:58:31 -0700 (PDT)
-Date: Mon, 29 Jul 2019 15:58:30 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Message-ID: <20190729145830.GE6771@stefanha-x1.localdomain>
-References: <20190725084341.8287-1-berrange@redhat.com>
- <20190725084341.8287-4-berrange@redhat.com>
+ (envelope-from <cohuck@redhat.com>) id 1hs76p-0004HK-0b
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:58:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56964)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hs76o-0004GA-RU; Mon, 29 Jul 2019 10:58:42 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B280E30A7C63;
+ Mon, 29 Jul 2019 14:58:40 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A23325C21A;
+ Mon, 29 Jul 2019 14:58:29 +0000 (UTC)
+Date: Mon, 29 Jul 2019 16:58:27 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20190729165827.565d6265.cohuck@redhat.com>
+In-Reply-To: <20190729145229.4333-1-imammedo@redhat.com>
+References: <20190729145229.4333-1-imammedo@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="J4XPiPrVK1ev6Sgr"
-Content-Disposition: inline
-In-Reply-To: <20190725084341.8287-4-berrange@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] crypto: use auto cleanup for many
- stack variables
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 29 Jul 2019 14:58:40 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH RFC 0/2] s390: stop abusing
+ memory_region_allocate_system_memory()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,49 +69,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-devel@nongnu.org, dgilbert@redhat.com,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, 29 Jul 2019 10:52:27 -0400
+Igor Mammedov <imammedo@redhat.com> wrote:
 
---J4XPiPrVK1ev6Sgr
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+cc:ing some folks for awareness.
 
-On Thu, Jul 25, 2019 at 09:43:41AM +0100, Daniel P. Berrang=E9 wrote:
-> Simplify cleanup paths by using glib's auto cleanup macros for stack
-> variables, allowing several goto jumps / labels to be eliminated.
->=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> ---
->  crypto/afsplit.c      | 28 +++++-----------
->  crypto/block-luks.c   | 74 +++++++++++++------------------------------
->  crypto/block.c        | 15 +++------
->  crypto/pbkdf.c        |  5 +--
->  crypto/secret.c       | 38 ++++++++++------------
->  crypto/tlscredsanon.c | 16 ++++------
->  crypto/tlscredspsk.c  |  5 ++-
->  crypto/tlscredsx509.c | 16 +++-------
->  8 files changed, 65 insertions(+), 132 deletions(-)
+> While looking into unifying guest RAM allocation to use hostmem backends
+> for initial RAM (especially when -mempath is used) and retiring
+> memory_region_allocate_system_memory() API, leaving only single hostmem backend,
+> I was inspecting how currently it is used by boards and it turns out several
+> boards abuse it by calling the function several times (despite documented contract
+> forbiding it).
+> 
+> s390 is one of such boards where KVM limitation on memslot size got propagated
+> to board design and memory_region_allocate_system_memory() was abused to satisfy
+> KVM requirement for max RAM chunk where memory region alias would suffice.
+> 
+> Unfortunately, memory_region_allocate_system_memory() usage created migration
+> dependency where guest RAM is transferred in migration stream as several RAMBlocks
+> if it's more than KVM_SLOT_MAX_BYTES.
+> 
+> In order to replace these several RAM chunks with a single memdev and keep it
+> working with KVM memslot size limit and migration compatible, following was done:
+>    * [2/2] use memory region aliases to partition hostmem backend RAM on
+>            KVM_SLOT_MAX_BYTES chunks, which should keep KVM side working
+>    * [1/2] hacked memory region aliases (to ram memory regions only) to have
+>            its own RAMBlocks pointing to RAM chunks owned by aliased memory
+>            region. While it's admittedly a hack, but it's relatively simple and
+>            allows board code rashape migration stream as necessary
+> 
+>            I haven't tried to use migratable aliases on x86 machines, but with it
+>            it could be possible to drop legacy RAM allocation and compat knob
+>            (cd5ff8333a) dropping '-numa node,mem' completely even for old machines.
+> 
+> PS:
+>    Tested with ping pong cross version migration on s390 machine 
+>    (with reduced KVM_SLOT_MAX_BYTES since I don't have access to large
+>     enough host)
+>      
+> 
+> Igor Mammedov (2):
+>   memory: make MemoryRegion alias migratable
+>   s390: do not call memory_region_allocate_system_memory() multiple
+>     times
+> 
+>  exec.c                     |  7 ++++---
+>  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
+>  memory.c                   |  5 +++++
+>  3 files changed, 24 insertions(+), 8 deletions(-)
+> 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---J4XPiPrVK1ev6Sgr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0/CZUACgkQnKSrs4Gr
-c8hAFQf2PgxyT9qIGLhgUViBUv6lejAoofEuEbDn/UXNvhCsHv3xdmkpmJTJuXDY
-Y7XlvZO6uTxQ++UKSnmKMiig9wplmFzWh1UBLtETulVMQOfKVHacnfFpyLNmsT2f
-phuUi37FlSwxasjhCKuc/TLIMNYzCqgcl5iL0jt3fSfNCDl+G1GMPUAV7yHgR//2
-xYYEOVrirU0JRQNYotxBeqb+BQc2GYn0JmJYTYaCqt95JaVSHUbStHMUAkzubDzr
-N8zODe0EmR2xI51LAy1Qt5aty0ZwGJ/ynKC3TMPzrwWvW1rg/NeXgD+SU/PSngnL
-m1qjh7t1Eadp4XdnGEhFoJxzDMRd
-=F+9p
------END PGP SIGNATURE-----
-
---J4XPiPrVK1ev6Sgr--
 
