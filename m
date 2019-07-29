@@ -2,112 +2,85 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8462FC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16743C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AB0320693
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:43:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AB0320693
+	by mail.kernel.org (Postfix) with ESMTPS id E102D20693
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:52:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E102D20693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs1G6-0002wz-HX
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 04:43:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49969)
+	id 1hs1Ny-0004hp-67
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 04:52:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51642)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1hs1FG-0002ET-0j
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:43:02 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hs1NY-0004Fh-B8
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:51:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hs1FF-0003HB-08
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:43:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33102)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1hs1FE-0003Fy-OM
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:43:00 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2871B5AFE9;
- Mon, 29 Jul 2019 08:42:59 +0000 (UTC)
-Received: from [10.36.117.139] (ovpn-117-139.ams2.redhat.com [10.36.117.139])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF11B10246E1;
- Mon, 29 Jul 2019 08:42:55 +0000 (UTC)
-To: Wei Yang <richardw.yang@linux.intel.com>
-References: <20190728131304.1282-1-richardw.yang@linux.intel.com>
- <20190728131304.1282-4-richardw.yang@linux.intel.com>
- <690fd825-3553-6dee-5ff4-2ad7652afe46@redhat.com>
- <20190729083019.GC2255@richard>
-From: David Hildenbrand <david@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hs1NW-0001ic-Rx
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:51:36 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38169)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hs1NW-0001hp-LE
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:51:34 -0400
+Received: by mail-wr1-f67.google.com with SMTP id g17so60875572wrr.5
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 01:51:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3An3uGAr2mF6V3RndlfunQrxe21IcMOMAeh3Y6GTuFo=;
+ b=BmtQgfvkO9FXf7x1Lxzym251RYCXsWVpCpClZsSmLV11I+cQGIwtcRzkTFTGC3rb1Y
+ cR47bocmtfCFf8U9xs6p9U3GEgqKosPNcP1FopCFMSpQBREWktj/23eeT4qT58QXHkdV
+ eeOD7gpZ1nGUVyQJfTOqu62Fx5Fg42ZqGWsMdMkEItgJN3wyYnn7dPyCoYemvqeJCEbK
+ 6xxlBPxglfpVyjSdWtgPVBoONoKDsheTFpZnYnTye6tTO9+JEjmXuYLuYumqdUao+kcZ
+ 2UrfJ2p+3ljJKzN4HVx+WqdOhvpbYCpHQQba/ov21GtTQKsC5ttLUIzHkMvRkhpNdJdz
+ 7uww==
+X-Gm-Message-State: APjAAAUQihTEjv6Ekp/24QFCyoKrAUhokihgLpHY7fPbsETq7BXtMYvK
+ AYoG9GaU/LNZqIJdkJ0FtdFA+hM53I0=
+X-Google-Smtp-Source: APXvYqw4NYAC+cU7XOoCE3bGq87dsgTOGTmvbqz0sk+dhzPssnjRJ95v2TXczq3oJU4VE4kps4XuOw==
+X-Received: by 2002:a5d:4a46:: with SMTP id v6mr10032602wrs.105.1564390292651; 
+ Mon, 29 Jul 2019 01:51:32 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:29d3:6123:6d5f:2c04?
+ ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
+ by smtp.gmail.com with ESMTPSA id e19sm83421860wra.71.2019.07.29.01.51.31
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 29 Jul 2019 01:51:31 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
+ <1562775267-1222-5-git-send-email-pbonzini@redhat.com>
+ <87d0ie58cj.fsf@dusky.pond.sub.org>
+ <78c3bba3-3e85-682b-b4ce-fc4809add90e@redhat.com>
+ <87sgqsx7zp.fsf@dusky.pond.sub.org>
+ <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
+ <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
+ <87ftmptiyq.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <1b286489-87e3-f418-8ad4-0716b8fe645e@redhat.com>
-Date: Mon, 29 Jul 2019 10:42:55 +0200
+Message-ID: <41165962-2d61-697f-d17a-d5fa7516e8cc@redhat.com>
+Date: Mon, 29 Jul 2019 10:51:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190729083019.GC2255@richard>
+In-Reply-To: <87ftmptiyq.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Mon, 29 Jul 2019 08:42:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] memory-device: break the loop if tmp
- exceed the hinted range
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH 4/8] convert libqemuutil to meson
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,79 +92,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, qemu-devel@nongnu.org, mst@redhat.com
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.07.19 10:30, Wei Yang wrote:
-> On Mon, Jul 29, 2019 at 09:49:37AM +0200, David Hildenbrand wrote:
->> On 28.07.19 15:13, Wei Yang wrote:
->>> The memory-device list built by memory_device_build_list is ordered by
->>> its address, this means if the tmp range exceed the hinted range, all
->>> the following range will not overlap with it.
+On 29/07/19 09:09, Markus Armbruster wrote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+> 
+>> On Sat, 27 Jul 2019 at 13:24, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >>>
->>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->>> ---
->>>  hw/mem/memory-device.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>> On 27/07/19 09:16, Markus Armbruster wrote:
+>>>> We started with a single trace-events.  That wasn't good, so we split it
+>>>> up into one per directory.  That isn't good, so what about splitting it
+>>>> up into one per source file?  Pass -DTRACE_HEADER='"trace-DIR-FOO.h"
+>>>> instead of -DTRACE_HEADER='"trace-DIR.h"' when compiling DIR/FOO.c.
 >>>
->>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
->>> index 413b514586..aea47ab3e8 100644
->>> --- a/hw/mem/memory-device.c
->>> +++ b/hw/mem/memory-device.c
->>> @@ -180,7 +180,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->>>                  range_make_empty(&new);
->>>                  break;
->>>              }
->>> -        } else if (!hint) {
->>> +        } else if (!hint || range_lob(&tmp) > range_upb(&new)) {
->>>              break;
->>>          }
->>>      }
->>>
+>>> For Make this would all work great, however not for Meson because it
+>>> doesn't allow per-file compile flags.
 >>
->> Lower bound is inclusive, upper bound is exclusive. Shouldn't this be
->>
->> range_lob(&tmp) >= range_upb(&new)
->>
+>> Apologies for randomly parachuting into this email thread, but if
+>> Meson doesn't support per-file compile flags then what's the plan
+>> for handling the cases where we currently need per-file compile flags ?
+>> (This is one of the things that I thought was quite a nice move
+>> forward in our make infrastructure -- we now have clean syntax
+>> for saying "these files need to be built with these warnings disabled
+>> or these extra include paths or whatever" and also "these files
+>> imply we're going to need to link against library X".)
 > 
-> Per my understanding, a range with start = 0, size = 0x10000, is represented
+> I vaguely remember from my review that Meson lets us express "these
+> files imply we're going to need to link against library X" even more
+> clearly.  I can't point you to an example, though.
+
+Yes, you can do just
+
+   common_ss.add(when: curl, if_true: files('curl.c'))
+
+as a replacement for
+
+   common-obj-$(CONFIG_CURL) += curl.c
+   curl.c-cflags = $(CURL_CFLAGS)
+   curl.c-libs = $(CURL_LIBS)
+
+
+If conditional compilation is handled inside the file, i.e the same but
+with common-obj-y, you can instead do
+
+   common_ss.add(files('vl.c'), sdl)
+
+
+In both cases, the cflags from the dependency are applied to the whole
+target, rather than just to repectively curl.c and vl.c.  So you do lose
+the possibility of specifying cflags only for a file.
+
+There is no case where we're using per-.o file CFLAGS for anything other
+than dependencies.  I was using per-file -f... options in the
+(not-yet-applied) CET series though.  I would have to check whether
+pragmas work in that case (if they do, I feel they are superior to
+specifying CFLAGS in the Makefile).
+
+>>> Meson maintainers suggest building a static library for each special set
+>>> of compile flags; we could do that automatically per-directory(*) but it
+>>> would be harder to scale that to per-file.
 > 
->     [0, 0xffff]
+> This is clearly not "minimal fuss", not even per directory, let alone
+> per file.
 > 
-> So if I have another range [0xffff, 0x1ffff], they seems to overlap. The range
-> [0x10000, 0x1ffff] doesn't overlap with [0, 0xffff].
+> It's pretty lame even for the large sets we have (per target,
+> target-independent): I guess we'd either throw away the .a unused, or
+> link with --wholearchive.
+
+> For me, forwarding headers are just fine for a PoC, quite tolerable
+> while a conversion is in progress, and perhaps even tolerable as a
+> permanent work-around.  My *actual* question is how we could do per-file
+> rather than per-directory trace.h with Meson.  Quoting myself:
 > 
-> My original comparison looks right. Do I miss some point?
-
-I guess you saw my other reply by now. :)
-
+>     We have trace-events with hundreds of tracepoints for tens of source
+>     files.  The generated trace.h clock in at hundreds of KiB for me.
+>     Messing with tracepoints in one source file recompiles most of the
+>     directory.  This is so much better than it used to be, but clearly not
+>     as good as it could be.
 > 
->> Also, I wonder if patch #2 is now really needed?
->>
+>     The worst of the lot is trace-root.h, which gets included for >1300 .o
+>     in my "build everything" tree, mostly because it contains tracepoints
+>     for static inline functions in widely included headers.  See also
+>     "[PATCH 07/28] trace: Do not include qom/cpu.h into generated trace.h",
+>     Message-Id: <20190726120542.9894-8-armbru@redhat.com>.
 > 
-> Hmm... I think you are right.
+>     We started with a single trace-events.  That wasn't good, so we split it
+>     up into one per directory.  That isn't good, so what about splitting it
+>     up into one per source file?
 > 
-> I am afraid without Patch #2, the condition check is not that intuitive. Would
-> this bring some confusion for audience and maintenance?
+> Any ideas?
 
-Less checks, less confusion :)
+Per-file (really per-device) would really be easier than per-directory,
+I think, because with fine-grained trace-events there is a point in
+including a specific header like
 
-> 
-> I am not sure the percentage of occurrence when hint is provided, while the
-> generated code for check NULL is less than compare two values.
+   #include "trace-mptsas.h"
 
-Nobody should care about that performance difference here.
+or even
 
-I guess it is fine to just drop patch #2.
+   #include "trace/trace-mptsas.h"
 
-Thanks!
+(possibly generated from trace-events-mptsas).  The only constraint
+would be that the subsystem names would have to be global across all of
+QEMU.  If it's per-directory as it is now, instead, you'd have something
+like
 
+   #include "trace/trace-hw_scsi.h"
 
--- 
+which is really ugly and then forwarding headers look better.
 
-Thanks,
-
-David / dhildenb
+Paolo
 
