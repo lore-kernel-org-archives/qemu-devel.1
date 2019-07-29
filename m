@@ -2,74 +2,94 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E970C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D040C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 188002070D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:35:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 188002070D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 666E32067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:39:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 666E32067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7gP-0006nk-EB
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47391)
+	id 1hs7kE-0008UL-NO
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:39:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49194)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hs7bj-0007KZ-Uk
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:30:41 -0400
+ (envelope-from <eblake@redhat.com>) id 1hs7jp-00081B-3h
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:39:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hs7bi-0005pW-Ti
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:30:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35456)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hs7bi-0005ox-ON
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:30:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hs7bh-0001uI-BV
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 15:30:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4BD232E80C7
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 15:30:37 +0000 (UTC)
+ (envelope-from <eblake@redhat.com>) id 1hs7jn-0006k6-TX
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:39:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52820)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hs7jl-0006fR-95; Mon, 29 Jul 2019 11:38:57 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 8C7083083392;
+ Mon, 29 Jul 2019 15:38:56 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 14F6B6012A;
+ Mon, 29 Jul 2019 15:38:53 +0000 (UTC)
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
+ <20190729150041.GF6771@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <1634fa73-a1bf-59cf-204d-b1115c912ea1@redhat.com>
+Date: Mon, 29 Jul 2019 10:38:52 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jul 2019 15:23:53 -0000
-From: =?utf-8?b?RWxvdWFuIEFwcMOpcsOp?= <1838277@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: elouan-appere
-X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
- =?utf-8?q?e=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
- =?utf-8?q?e=29?=
-References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
-Message-Id: <156441383340.10274.11763799810880630893.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c89ebccfc6bb965f15183be8d63f758e50f2575c
+In-Reply-To: <20190729150041.GF6771@stefanha-x1.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="vdXwoLcrgumIgKngxB3tAGPkgiSxGoJpC"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Mon, 29 Jul 2019 15:38:56 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression: msr
- vbar_el2, xN not working in EL2
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 for-4.2 0/3] block:
+ BDRV_REQ_PREFETCH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,54 +98,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838277 <1838277@bugs.launchpad.net>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Err, my bad. The following code does seem to work fine (somehow?), but
-the bug in my code is currently being caused by a JIT failure in mov sp,
-x8 (aligned value), causing a crash (with the same version
-considerations).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vdXwoLcrgumIgKngxB3tAGPkgiSxGoJpC
+Content-Type: multipart/mixed; boundary="6pQ2qVjR6BetJBQsRKwarw47ycgjIZFTg";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: kwolf@redhat.com, fam@euphon.net, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Message-ID: <1634fa73-a1bf-59cf-204d-b1115c912ea1@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v3 for-4.2 0/3] block:
+ BDRV_REQ_PREFETCH
+References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
+ <20190729150041.GF6771@stefanha-x1.localdomain>
+In-Reply-To: <20190729150041.GF6771@stefanha-x1.localdomain>
 
--- =
+--6pQ2qVjR6BetJBQsRKwarw47ycgjIZFTg
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838277
+On 7/29/19 10:00 AM, Stefan Hajnoczi wrote:
+> On Thu, Jul 25, 2019 at 01:05:47PM +0300, Vladimir Sementsov-Ogievskiy =
+wrote:
+>> Hi all!
+>>
+>> Here is small new read flag: BDRV_REQ_PREFETCH, which in combination w=
+ith
+>> BDRV_REQ_COPY_ON_READ does copy-on-read without
+>> extra buffer for read data. This means that only parts that needs COR
+>> will be actually read and only corresponding buffers allocated, no mor=
+e.
+>>
+>> This allows to improve a bit block-stream and NBD_CMD_CACHE
+>>
+>> v3: rebase 02 on master, fix commit message of 03.
+>>
+>> v2: change interface to be just one flag BDRV_REQ_PREFETCH
+>>
+>> v1 was "[PATCH 0/3] block: blk_co_pcache"
+>>    https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01047.html=
 
-Title:
-  qemu-system-aarch64: regression: msr vbar_el2, xN not working in EL2
+>>
+>> Vladimir Sementsov-Ogievskiy (3):
+>>   block: implement BDRV_REQ_PREFETCH
+>>   block/stream: use BDRV_REQ_PREFETCH
+>>   nbd: improve CMD_CACHE: use BDRV_REQ_PREFETCH
+>>
+>>  include/block/block.h |  8 +++++++-
+>>  block/io.c            | 18 ++++++++++++------
+>>  block/stream.c        | 20 +++++++-------------
+>>  nbd/server.c          | 43 +++++++++++++++++++++++++++++++++++-------=
+-
+>>  4 files changed, 61 insertions(+), 28 deletions(-)
+>>
+>> --=20
+>> 2.18.0
+>>
+>>
+>=20
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
 
-Status in QEMU:
-  New
+I'm happy to queue this one through my NBD tree for 4.2.
 
-Bug description:
-  Affects 3.1.0 (latest stable release) and latest commit
-  (893dc8300c80e3dc32f31e968cf7aa0904da50c3) but did *not* affect 2.11
-  (qemu from bionic ubuntu LTS).
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-  With the following code and shell commands:
 
-  test.s:
+--6pQ2qVjR6BetJBQsRKwarw47ycgjIZFTg--
 
-  .text
-  mov x0, #0x60000000
-  msr vbar_el2, x0
-  dsb sy
-  isb sy
+--vdXwoLcrgumIgKngxB3tAGPkgiSxGoJpC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  $ aarch64-none-elf-as test.s -o test.o
-  $ aarch64-none-elf-objcopy -S -O binary test.o test.bin
-  $ qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -cpu c=
-ortex-a57 -kernel test.bin -s -S
+-----BEGIN PGP SIGNATURE-----
 
-  vbar_el2 is still 0 after the code, instead of being the expected
-  0x60000000. (see screenshot).
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0/EwwACgkQp6FrSiUn
+Q2ocDAgAmWCuJPb5dYQZNHs1y3PYqNs1rlLQNE4wXn2d6Wdb3VJ/uZkI4QHJeFAf
+TgjMgWEgK7TSFoNo7VD8Swuj7mpjKrvqvTy9px4ykI9W1OKigqR9DkdySyEuyYx1
+zaeWKjmoP86REd8xjajptdhLqsi+VCFjnfo/R6+NhRMpn37Aqcd+tO04dA5eIHmr
+cIoDhiFCME6tBWhvVCP50gXudnt6hC5qxhLbTO5uD9UKMc3ITxUXw6mBq5ABiAb7
+utRNyrKvKOsWrP4tabVRL7LdbBjfqcu8QYUHcCfRaSjq1m9oJdSHbgCNjUdmY6Me
+eplcxTUwv7pAqmiz2yaYqJYQHQ8rdg==
+=2kTI
+-----END PGP SIGNATURE-----
 
-  This regression doesn't seem to happen for vbar_el1 &
-  virtualization=3Doff.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838277/+subscriptions
+--vdXwoLcrgumIgKngxB3tAGPkgiSxGoJpC--
 
