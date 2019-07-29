@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DC4C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 16:47:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C412C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 16:47:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A174206A2
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 16:47:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A174206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 5949D206A2
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 16:47:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5949D206A2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs8nc-00084X-FH
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 12:47:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33743)
+	id 1hs8nf-000882-Jq
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 12:47:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33766)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hs8mG-0007II-HD
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 12:45:37 -0400
+ (envelope-from <bounces@canonical.com>) id 1hs8mJ-0007IU-0N
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 12:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hs8mF-0000Wm-1v
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 12:45:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35268)
+ (envelope-from <bounces@canonical.com>) id 1hs8mH-0000Yz-Id
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 12:45:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35354)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hs8mE-0000WU-Sb
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 12:45:35 -0400
+ id 1hs8mH-0000YT-CU
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 12:45:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hs8mD-0006pZ-ND
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 16:45:33 +0000
+ id 1hs8mG-0006qR-Bv
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 16:45:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A20312E80C9
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 16:45:33 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 51CAF2E80D3
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 16:45:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 29 Jul 2019 16:36:42 -0000
-From: Hans Peter <1838312@bugs.launchpad.net>
+Date: Mon, 29 Jul 2019 16:37:34 -0000
+From: Daniel Berrange <1838312@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
@@ -56,15 +56,15 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: green-world78
 X-Launchpad-Bug-Reporter: Hans Peter (green-world78)
-X-Launchpad-Bug-Modifier: Hans Peter (green-world78)
+X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
 References: <156441781649.17826.2889969380137011138.malonedeb@gac.canonical.com>
-Message-Id: <156441820261.10930.5778161335094382184.malone@wampee.canonical.com>
+Message-Id: <156441825491.11302.3530391521388377915.launchpad@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a1f051db1c0daae54899ccb083d6db245dc412c8
+X-Launchpad-Hash: f0385a6d833884ee91f8f8b034a57d845a6d08f4
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1838312] Re: Qemu virt-manager Segmentation fault
@@ -83,12 +83,12 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-syslog:
+** Also affects: virt-manager (Ubuntu)
+   Importance: Undecided
+       Status: New
 
-kernel: [ 2003.888116] virt-manager[16014]: segfault at 32d0 ip
-00000000000032d0 sp 00007ffeb09ac658 error 14 in python3.7[400000+21000]
-
-kernel: [ 2003.888124] Code: Bad RIP value.
+** Changed in: qemu
+       Status: New =3D> Invalid
 
 -- =
 
