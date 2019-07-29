@@ -6,60 +6,107 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63246C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C593C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38FEC206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:51:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FEC206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13DEC20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:54:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DEC20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs0Rd-0000X8-Ib
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 03:51:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40276)
+	id 1hs0U7-0001so-CQ
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 03:54:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40626)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hs0Qv-0007jP-RC
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:51:02 -0400
+ (envelope-from <david@redhat.com>) id 1hs0TR-0001QB-G6
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:53:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hs0Qu-0008Of-Ra
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:51:01 -0400
-Received: from mga04.intel.com ([192.55.52.120]:18589)
+ (envelope-from <david@redhat.com>) id 1hs0TQ-0004LR-GX
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:53:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35882)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hs0Qu-0008Ma-IH
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:51:00 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 29 Jul 2019 00:50:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="162099284"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga007.jf.intel.com with ESMTP; 29 Jul 2019 00:50:57 -0700
-Date: Mon, 29 Jul 2019 15:50:35 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <20190729075035.GB2255@richard>
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1hs0TQ-0004Io-8e
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:53:36 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DAE923084295;
+ Mon, 29 Jul 2019 07:53:34 +0000 (UTC)
+Received: from [10.36.117.139] (ovpn-117-139.ams2.redhat.com [10.36.117.139])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2462C5C21A;
+ Mon, 29 Jul 2019 07:53:28 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
 References: <20190728131304.1282-1-richardw.yang@linux.intel.com>
- <20190728131304.1282-3-richardw.yang@linux.intel.com>
- <07a5431d-1928-d1ab-a0a2-7be21b411742@redhat.com>
+ <20190728131304.1282-4-richardw.yang@linux.intel.com>
+ <690fd825-3553-6dee-5ff4-2ad7652afe46@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <20dabeb0-c3e8-5fff-c407-bf7db9b99081@redhat.com>
+Date: Mon, 29 Jul 2019 09:53:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07a5431d-1928-d1ab-a0a2-7be21b411742@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
-Subject: Re: [Qemu-devel] [PATCH 2/3] memory-device: break the loop if no
- hint is provided
+In-Reply-To: <690fd825-3553-6dee-5ff4-2ad7652afe46@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 29 Jul 2019 07:53:34 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] memory-device: break the loop if tmp
+ exceed the hinted range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,62 +118,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: imammedo@redhat.com, mst@redhat.com,
- Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Jul 29, 2019 at 09:45:24AM +0200, David Hildenbrand wrote:
->On 28.07.19 15:13, Wei Yang wrote:
->> When there is no hint, the first un-overlapped range is the proper one.
->> Just break the loop instead of iterate the whole list.
->> 
+On 29.07.19 09:49, David Hildenbrand wrote:
+> On 28.07.19 15:13, Wei Yang wrote:
+>> The memory-device list built by memory_device_build_list is ordered by
+>> its address, this means if the tmp range exceed the hinted range, all
+>> the following range will not overlap with it.
+>>
 >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
 >> ---
->>  hw/mem/memory-device.c | 2 ++
->>  1 file changed, 2 insertions(+)
->> 
+>>  hw/mem/memory-device.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
 >> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
->> index df3261b32a..413b514586 100644
+>> index 413b514586..aea47ab3e8 100644
 >> --- a/hw/mem/memory-device.c
 >> +++ b/hw/mem/memory-device.c
->> @@ -180,6 +180,8 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>> @@ -180,7 +180,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
 >>                  range_make_empty(&new);
 >>                  break;
 >>              }
->> +        } else if (!hint) {
->> +            break;
+>> -        } else if (!hint) {
+>> +        } else if (!hint || range_lob(&tmp) > range_upb(&new)) {
+>>              break;
 >>          }
 >>      }
->>  
->> 
->
->I think
->
->a) This is fine. I was not able to construct a counter-example where
->this would not work. Whenever we modify the range, we check against the
->next one in the sorted list. If there is no overlap, it fits. And, it
->won't overlap with any other range (and therefore never be changed again)
->
->b) This should therefore not change the assignment order / break migration.
->
->Maybe mention that this will not change the assigned addresses compared
->to old code in all scenarios.
->
+>>
+> 
+> Lower bound is inclusive, upper bound is exclusive. Shouldn't this be
+> 
+> range_lob(&tmp) >= range_upb(&new)
 
-Thanks, let me add this in change log.
+Confused by the description of range_set_bounds1().
 
->Reviewed-by: David Hildenbrand <david@redhat.com>
->
->-- 
->
->Thanks,
->
->David / dhildenb
+Both bounds are inclusive and this is correct.
+
+> 
+> Also, I wonder if patch #2 is now really needed?
+> 
+
 
 -- 
-Wei Yang
-Help you, Help me
+
+Thanks,
+
+David / dhildenb
 
