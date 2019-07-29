@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB688C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFAD7C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:35:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8262E2073F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:35:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8262E2073F
+	by mail.kernel.org (Postfix) with ESMTPS id C767E2070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:35:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C767E2070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49869 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzG2-0001er-QV
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:35:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54208)
+	id 1hrzGC-00021j-2J
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:35:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54166)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hrzCd-0005Lu-Qf
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:14 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hrzCY-0005K1-5n
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hrzCc-0001r7-7U
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:11 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hrzCV-0001jw-E9
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:05 -0400
 Received: from mga11.intel.com ([192.55.52.93]:47119)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hrzCZ-0001Ef-9o
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:08 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hrzCS-0001Ef-FA
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:01 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Jul 2019 23:31:46 -0700
+ 28 Jul 2019 23:31:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="370357281"
+X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="370357253"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2019 23:31:44 -0700
+ by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2019 23:31:40 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Mon, 29 Jul 2019 14:31:23 +0800
-Message-Id: <20190729063127.2801-8-tao3.xu@intel.com>
+Date: Mon, 29 Jul 2019 14:31:21 +0800
+Message-Id: <20190729063127.2801-6-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190729063127.2801-1-tao3.xu@intel.com>
 References: <20190729063127.2801-1-tao3.xu@intel.com>
@@ -55,8 +55,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v8 07/11] hmat acpi: Build System Locality
- Latency and Bandwidth Information Structure(s)
+Subject: [Qemu-devel] [PATCH v8 05/11] numa: Extend CLI to provide initiator
+ information for numa nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,262 +68,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- dan.j.williams@intel.com
+Cc: Jingqi Liu <Jingqi.liu@intel.com>, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),
+The initiator represents processor which access to memory. And in 5.2.27.3
+Memory Proximity Domain Attributes Structure, the attached initiator is
+defined as where the memory controller responsible for a memory proximity
+domain. With attached initiator information, the topology of heterogeneous
+memory can be described.
 
-This structure describes the memory access latency and bandwidth
-information from various memory access initiator proximity domains.
-The latency and bandwidth numbers represented in this structure
-correspond to rated latency and bandwidth for the platform.
-The software could use this information as hint for optimization.
+Extend CLI of "-numa node" option to indicate the initiator numa node-id.
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables.
 
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
+Suggested-by: Dan Williams <dan.j.williams@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 No changes in v8.
 ---
- hw/acpi/hmat.c          | 95 ++++++++++++++++++++++++++++++++++++++++-
- hw/acpi/hmat.h          | 41 ++++++++++++++++++
- include/qemu/typedefs.h |  1 +
- include/sysemu/numa.h   |  3 ++
- include/sysemu/sysemu.h | 21 +++++++++
- 5 files changed, 160 insertions(+), 1 deletion(-)
+ hw/core/machine.c     | 24 ++++++++++++++++++++++++
+ hw/core/numa.c        | 13 +++++++++++++
+ include/sysemu/numa.h |  3 +++
+ qapi/machine.json     |  6 +++++-
+ qemu-options.hx       | 27 +++++++++++++++++++++++----
+ 5 files changed, 68 insertions(+), 5 deletions(-)
 
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index abf99b1adc..431818dc82 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -67,11 +67,81 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
-     build_append_int_noprefix(table_data, 0, 8);
- }
- 
-+/*
-+ * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-+ * Structure: Table 5-142
-+ */
-+static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-+                          uint32_t num_initiator, uint32_t num_target,
-+                          uint32_t *initiator_pxm, int type)
-+{
-+    uint32_t s = num_initiator;
-+    uint32_t t = num_target;
-+    uint8_t m, n;
-+    uint8_t mask = 0x0f;
-+    int i;
-+
-+    /* Type */
-+    build_append_int_noprefix(table_data, 1, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);
-+    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
-+    build_append_int_noprefix(table_data, hmat_lb->hierarchy & mask, 1);
-+    /* Data Type */
-+    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Number of Initiator Proximity Domains (s) */
-+    build_append_int_noprefix(table_data, s, 4);
-+    /* Number of Target Proximity Domains (t) */
-+    build_append_int_noprefix(table_data, t, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+
-+    /* Entry Base Unit */
-+    if (HMAT_IS_LATENCY(type)) {
-+        build_append_int_noprefix(table_data, hmat_lb->base_lat, 8);
-+    } else {
-+        build_append_int_noprefix(table_data, hmat_lb->base_bw, 8);
-+    }
-+
-+    /* Initiator Proximity Domain List */
-+    for (i = 0; i < s; i++) {
-+        build_append_int_noprefix(table_data, initiator_pxm[i], 4);
-+    }
-+
-+    /* Target Proximity Domain List */
-+    for (i = 0; i < t; i++) {
-+        build_append_int_noprefix(table_data, i, 4);
-+    }
-+
-+    /* Latency or Bandwidth Entries */
-+    for (i = 0; i < s; i++) {
-+        m = initiator_pxm[i];
-+        for (n = 0; n < t; n++) {
-+            uint16_t entry;
-+
-+            if (HMAT_IS_LATENCY(type)) {
-+                entry = hmat_lb->latency[m][n];
-+            } else {
-+                entry = hmat_lb->bandwidth[m][n];
-+            }
-+
-+            build_append_int_noprefix(table_data, entry, 2);
-+        }
-+    }
-+}
-+
- /* Build HMAT sub table structures */
- static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 1b6a304e1c..a2b88b4fb3 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -656,6 +656,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                                const CpuInstanceProperties *props, Error **errp)
  {
-     uint16_t flags;
--    int i;
-+    uint32_t num_initiator = 0;
-+    uint32_t initiator_pxm[MAX_NODES];
-+    int i, hrchy, type;
-+    HMAT_LB_Info *numa_hmat_lb;
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
++    NodeInfo *numa_info = machine->numa_state->nodes;
+     bool match = false;
+     int i;
  
-     for (i = 0; i < nstat->num_nodes; i++) {
-         flags = 0;
-@@ -82,6 +152,29 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
+@@ -725,6 +726,16 @@ void machine_set_cpu_numa_node(MachineState *machine,
+         match = true;
+         slot->props.node_id = props->node_id;
+         slot->props.has_node_id = props->has_node_id;
++
++        if (numa_info[props->node_id].initiator_valid &&
++            (props->node_id != numa_info[props->node_id].initiator)) {
++            error_setg(errp, "The initiator of CPU NUMA node %" PRId64
++                       " should be itself.", props->node_id);
++            return;
++        }
++        numa_info[props->node_id].initiator_valid = true;
++        numa_info[props->node_id].has_cpu = true;
++        numa_info[props->node_id].initiator = props->node_id;
+     }
  
-         build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
+     if (!match) {
+@@ -1066,6 +1077,7 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
+     GString *s = g_string_new(NULL);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
++    NodeInfo *numa_info = machine->numa_state->nodes;
+ 
+     assert(machine->numa_state->num_nodes);
+     for (i = 0; i < possible_cpus->len; i++) {
+@@ -1099,6 +1111,18 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
+             machine_set_cpu_numa_node(machine, &props, &error_fatal);
+         }
      }
 +
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        if (nstat->nodes[i].has_cpu) {
-+            initiator_pxm[num_initiator++] = i;
++    for (i = 0; i < machine->numa_state->num_nodes; i++) {
++        if (numa_info[i].initiator_valid &&
++            !numa_info[numa_info[i].initiator].has_cpu) {
++            error_report("The initiator-id %"PRIu16 " of NUMA node %d"
++                         " does not exist.", numa_info[i].initiator, i);
++            error_printf("\n");
++
++            exit(1);
 +        }
 +    }
 +
-+    /*
-+     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-+     * Structure: Table 5-142
-+     */
-+    for (hrchy = HMAT_LB_MEM_MEMORY;
-+         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
-+        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
-+             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-+            numa_hmat_lb = nstat->hmat_lb[hrchy][type];
+     if (s->len && !qtest_enabled()) {
+         warn_report("CPU(s) not present in any NUMA nodes: %s",
+                     s->str);
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 8fcbba05d6..cfb6339810 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -128,6 +128,19 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+         numa_info[nodenr].node_mem = object_property_get_uint(o, "size", NULL);
+         numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
+     }
 +
-+            if (numa_hmat_lb) {
-+                build_hmat_lb(table_data, numa_hmat_lb, num_initiator,
-+                              nstat->num_nodes, initiator_pxm, type);
-+            }
++    if (node->has_initiator) {
++        if (numa_info[nodenr].initiator_valid &&
++            (node->initiator != numa_info[nodenr].initiator)) {
++            error_setg(errp, "The initiator of NUMA node %" PRIu16 " has been "
++                       "set to node %" PRIu16, nodenr,
++                       numa_info[nodenr].initiator);
++            return;
 +        }
++
++        numa_info[nodenr].initiator_valid = true;
++        numa_info[nodenr].initiator = node->initiator;
 +    }
- }
- 
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-index 574cfba60a..5f050781e6 100644
---- a/hw/acpi/hmat.h
-+++ b/hw/acpi/hmat.h
-@@ -40,6 +40,47 @@
-  */
- #define HMAT_PROX_INIT_VALID 0x1
- 
-+#define HMAT_IS_LATENCY(type) (type <= HMAT_LB_DATA_WRITE_LATENCY)
-+
-+struct HMAT_LB_Info {
-+    /*
-+     * Indicates total number of Proximity Domains
-+     * that can initiate memory access requests.
-+     */
-+    uint32_t    num_initiator;
-+    /*
-+     * Indicates total number of Proximity Domains
-+     * that can act as target.
-+     */
-+    uint32_t    num_target;
-+    /*
-+     * Indicates it's memory or
-+     * the specified level memory side cache.
-+     */
-+    uint8_t     hierarchy;
-+    /*
-+     * Present the type of data,
-+     * access/read/write latency or bandwidth.
-+     */
-+    uint8_t     data_type;
-+    /* The base unit for latency in nanoseconds. */
-+    uint64_t    base_lat;
-+    /* The base unit for bandwidth in megabytes per second(MB/s). */
-+    uint64_t    base_bw;
-+    /*
-+     * latency[i][j]:
-+     * Indicates the latency based on base_lat
-+     * from Initiator Proximity Domain i to Target Proximity Domain j.
-+     */
-+    uint16_t    latency[MAX_NODES][MAX_NODES];
-+    /*
-+     * bandwidth[i][j]:
-+     * Indicates the bandwidth based on base_bw
-+     * from Initiator Proximity Domain i to Target Proximity Domain j.
-+     */
-+    uint16_t    bandwidth[MAX_NODES][MAX_NODES];
-+};
-+
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
- 
- #endif
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index fcdaae58c4..c0257e936b 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -33,6 +33,7 @@ typedef struct FWCfgEntry FWCfgEntry;
- typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
-+typedef struct HMAT_LB_Info HMAT_LB_Info;
- typedef struct HVFX86EmulatorState HVFX86EmulatorState;
- typedef struct I2CBus I2CBus;
- typedef struct I2SCodec I2SCodec;
+     numa_info[nodenr].present = true;
+     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+     ms->numa_state->num_nodes++;
 diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 46ad06e000..85ddad99b4 100644
+index 76da3016db..46ad06e000 100644
 --- a/include/sysemu/numa.h
 +++ b/include/sysemu/numa.h
-@@ -30,6 +30,9 @@ struct NumaState {
- 
-     /* NUMA nodes information */
-     NodeInfo nodes[MAX_NODES];
-+
-+    /* NUMA modes HMAT Locality Latency and Bandwidth Information */
-+    HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
+@@ -10,6 +10,9 @@ struct NodeInfo {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+     bool present;
++    bool has_cpu;
++    bool initiator_valid;
++    uint16_t initiator;
+     uint8_t distance[MAX_NODES];
  };
- typedef struct NumaState NumaState;
  
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 984c439ac9..fc638f06cd 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -126,6 +126,27 @@ extern int mem_prealloc;
- #define NUMA_DISTANCE_MAX         254
- #define NUMA_DISTANCE_UNREACHABLE 255
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 6db8a7e2ec..05e367d26a 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -414,6 +414,9 @@
+ # @memdev: memory backend object.  If specified for one node,
+ #          it must be specified for all nodes.
+ #
++# @initiator: the initiator numa nodeid that is closest (as in directly
++#             attached) to this numa node (since 4.2)
++#
+ # Since: 2.1
+ ##
+ { 'struct': 'NumaNodeOptions',
+@@ -421,7 +424,8 @@
+    '*nodeid': 'uint16',
+    '*cpus':   ['uint16'],
+    '*mem':    'size',
+-   '*memdev': 'str' }}
++   '*memdev': 'str',
++   '*initiator': 'uint16' }}
  
-+/* the value of AcpiHmatLBInfo flags */
-+enum {
-+    HMAT_LB_MEM_MEMORY           = 0,
-+    HMAT_LB_MEM_CACHE_1ST_LEVEL  = 1,
-+    HMAT_LB_MEM_CACHE_2ND_LEVEL  = 2,
-+    HMAT_LB_MEM_CACHE_3RD_LEVEL  = 3,
-+};
+ ##
+ # @NumaDistOptions:
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9621e934c0..c480781992 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -161,14 +161,14 @@ If any on the three values is given, the total number of CPUs @var{n} can be omi
+ ETEXI
+ 
+ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+-    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+-    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
++    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
++    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
+     "-numa dist,src=source,dst=destination,val=distance\n"
+     "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+-@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+-@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
++@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
++@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+ @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+ @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
+ @findex -numa
+@@ -215,6 +215,25 @@ split equally between them.
+ @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+ if one node uses @samp{memdev}, all of them have to use it.
+ 
++@samp{initiator} indicate the initiator NUMA @var{initiator} that is
++closest (as in directly attached) to this NUMA @var{node}.
 +
-+/* the value of AcpiHmatLBInfo data type */
-+enum {
-+    HMAT_LB_DATA_ACCESS_LATENCY   = 0,
-+    HMAT_LB_DATA_READ_LATENCY     = 1,
-+    HMAT_LB_DATA_WRITE_LATENCY    = 2,
-+    HMAT_LB_DATA_ACCESS_BANDWIDTH = 3,
-+    HMAT_LB_DATA_READ_BANDWIDTH   = 4,
-+    HMAT_LB_DATA_WRITE_BANDWIDTH  = 5,
-+};
++For example, the following option assigns 2 NUMA nodes, node 0 has CPU.
++node 1 has only memory, and its' initiator is node 0. Note that because
++node 0 has CPU, by default the initiator of node 0 is itself and must be
++itself.
++@example
++-M pc \
++-m 2G,slots=2,maxmem=4G \
++-object memory-backend-ram,size=1G,id=m0 \
++-object memory-backend-ram,size=1G,id=m1 \
++-numa node,nodeid=0,memdev=m0 \
++-numa node,nodeid=1,memdev=m1,initiator=0 \
++-smp 2,sockets=2,maxcpus=2  \
++-numa cpu,node-id=0,socket-id=0 \
++-numa cpu,node-id=0,socket-id=1 \
++@end example
 +
-+#define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
-+#define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
-+
- #define MAX_OPTION_ROMS 16
- typedef struct QEMUOptionRom {
-     const char *name;
+ @var{source} and @var{destination} are NUMA node IDs.
+ @var{distance} is the NUMA distance from @var{source} to @var{destination}.
+ The distance from a node to itself is always 10. If any pair of nodes is
 -- 
 2.20.1
 
