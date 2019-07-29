@@ -8,80 +8,80 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA3BC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 152B6C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:02:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E0252070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7BD92070B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 08:02:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IiD1UQQt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E0252070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OtvxHNYs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7BD92070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs0cF-0005ni-DS
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 04:02:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41942)
+	id 1hs0cI-0005vp-4S
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 04:02:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41918)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <renyime@gmail.com>) id 1hs0b8-00048H-IR
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:01:35 -0400
+ (envelope-from <renyime@gmail.com>) id 1hs0b6-00045r-F0
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:01:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <renyime@gmail.com>) id 1hs0b7-0006DK-Kw
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:01:34 -0400
-Received: from mail-pf1-x431.google.com ([2607:f8b0:4864:20::431]:38301)
+ (envelope-from <renyime@gmail.com>) id 1hs0b5-0006Ax-Fq
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:01:32 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36771)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1hs0b7-0006Cg-F2
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:01:33 -0400
-Received: by mail-pf1-x431.google.com with SMTP id y15so27603735pfn.5
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 01:01:33 -0700 (PDT)
+ (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1hs0b5-0006AL-AI
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 04:01:31 -0400
+Received: by mail-pf1-x441.google.com with SMTP id r7so27602150pfl.3
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 01:01:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=FoQXJ5qQTi3p24A9fozZ2RVCDQjx8oTJ1oBTH1twvYw=;
- b=IiD1UQQtVt0z2XjhzKu9rvUaLJtu0/G5tr97sts5CJ2rj+Ch0Wcx2N1ET8jOT/OKd6
- FBO1OR6yP5aSda+SmgeOOSUvsPWLBkpvLjnWPX5KF9fqzIrf3+2vPwcrxLBz+p9pM4jd
- Lv07Lb24uZJLRSiwjC5yicJXzqB6pxxD+sMEXDeQLYtCgA1yGjVPuR0JGktFEjTW560L
- QbOZ0mVb0ROP8/yQOxrMpD1kwNDr6qw29zF/Razpb16zVWBq/OLZeH5DtqkL9KYOyOw0
- z6ZwZlGZgQgqM6/vmNewe/swHyFPtl+bWV5HALaoKQ9PepPY/xG0IPQK4oWJV/xeyVw0
- g00Q==
+ bh=RCALnrmVXGRwrTMkjZOW8FAYp4R1oPgBYpPgRrkRIeQ=;
+ b=OtvxHNYshIwKyLp6bqEllZBPUv/f2gJUPIYxYGcG0whyCzu4b5JBBDicSzrzLITFqR
+ dCjlGx3McaIvIM6VayhYMNI3wac62nyvMMYOW7TQaR7xfJgH+VStzZgUnJ2jBZL30IUC
+ fOtWYdi3JFIH9zn7lV7nbEbJsRb84YYeO88d4pd2314zASR9W8pylG3YiP3ROMHHhdTQ
+ UyvOCQ3At1MS3Me0U1ZZEe5paFLXEIYX+/Xr1s/npjhk9dZG60g5wVQd15hhYXrZXR9e
+ xr27eSR1tBXfiV9vzjvOw5q+Vn95YDXHvfimzylKcVJC9luK1tmcG7lqjO80GhzDJ7R7
+ BYaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=FoQXJ5qQTi3p24A9fozZ2RVCDQjx8oTJ1oBTH1twvYw=;
- b=BF7v6Sf3qdR99Ca+Z49LpheEkiw+ZF9PhVyzkIHIBhtsAHTC8asA7nQbx4YzIvwW0i
- oLilN9aFCCMVi1k0lTKhQCOXITupOb0CWphdJ5KlPGH4MBoVSg/uLs17baxppDXPcqeO
- m3TRSgJguZ0MqjWl/oTIHZ/QjySrS0RME8pwJNOY6FPnLgIzk95A3SvH1ZRK69IyuEWj
- sX5ThlR4xuShD0HElWRfuIxPYA9vXN0ZWTOAgp47+j1InWrhXLtjP9zK8EPXsNoe3Iej
- KIbD1E9H+D1qQK8+hN8tWyrSwrCvX0wgjmsTQQpUYswIedieFd4puVrEi10OAZjdv46L
- qZ6g==
-X-Gm-Message-State: APjAAAV221jzLiyZJ/GsSNxRIVjPDimeuYGE6QwVVogGuaSnMcds1t1M
- O/i8B41Rm7SDayE9ILOzwDJeUMI6UE4XZA==
-X-Google-Smtp-Source: APXvYqx9Q37agfd6Z7hoUXtZCivulxpitndCAFDgdXHis2uICmt/aKJ2hBFXtzMzuAoWIVPkQ3wftQ==
-X-Received: by 2002:a17:90a:21ac:: with SMTP id
- q41mr112772605pjc.31.1564387292669; 
- Mon, 29 Jul 2019 01:01:32 -0700 (PDT)
+ bh=RCALnrmVXGRwrTMkjZOW8FAYp4R1oPgBYpPgRrkRIeQ=;
+ b=L1xTicSOR12aDZZJ1LxkJepTwEnxAHGYFHhq6QT48kwaHZoMgbVN1hhyW0gsxGPzQs
+ xerff7ssipTlnI0OtxqSG7DFPhFApDOFFZh7Az8hrFyUA9wTjdGNg9GaxlFE73GsntcG
+ cOwjQ7cCUG2SdAywzOGRTau6tnGtKp6g0ikaL0pZOcWZc19UQ4iQ9I39WitgmnaboWpc
+ 5kFvOp+LZiqQIZuQ9ti4ODqVf5IEACW6T4eECY4eET7mCB/h1OOdNB9C14uDyO9WY/jx
+ tC+lppaDdXVUwhrqT6feAJ9SAP0tQ0qg9bx/+Djxnwlg9MJIopqmKtT+PTkVVqTKDi+8
+ pIDg==
+X-Gm-Message-State: APjAAAUMALjr1h0b+l2FQsBX1MlrvS5tP2OStgjZkpuDslkPnafmbC00
+ fDdbIMNWGkdbJQOmFto8WZW512DKKF8t3A==
+X-Google-Smtp-Source: APXvYqySLEyYUiRHbqBhjnUkKPn7VegDKew6qVCNtglRnOHOg5Y6gxqPhr0qnj++bhbX7sFEqoCxoA==
+X-Received: by 2002:a17:90a:cf8f:: with SMTP id
+ i15mr58694851pju.110.1564387290275; 
+ Mon, 29 Jul 2019 01:01:30 -0700 (PDT)
 Received: from VM_85_204_centos.localdomain ([129.226.55.250])
- by smtp.gmail.com with ESMTPSA id l6sm61237035pga.72.2019.07.29.01.01.31
+ by smtp.gmail.com with ESMTPSA id l6sm61237035pga.72.2019.07.29.01.01.29
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 29 Jul 2019 01:01:32 -0700 (PDT)
+ Mon, 29 Jul 2019 01:01:29 -0700 (PDT)
 From: Ivan Ren <renyime@gmail.com>
 X-Google-Original-From: Ivan Ren <ivanren@tencent.com>
 To: quintela@redhat.com,
 	dgilbert@redhat.com
-Date: Mon, 29 Jul 2019 16:01:21 +0800
-Message-Id: <1564387281-12321-4-git-send-email-ivanren@tencent.com>
+Date: Mon, 29 Jul 2019 16:01:19 +0800
+Message-Id: <1564387281-12321-2-git-send-email-ivanren@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1564387281-12321-1-git-send-email-ivanren@tencent.com>
 References: <1564387281-12321-1-git-send-email-ivanren@tencent.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::431
-Subject: [Qemu-devel] [PATCH v2 3/3] migration: update ram_counters for
- multifd sync packet
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH v2 1/3] migration: add
+ qemu_file_update_transfer interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,27 +98,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Multifd sync will send MULTIFD_FLAG_SYNC flag info to destination, add
-these bytes to ram_counters record.
+Add qemu_file_update_transfer for just update bytes_xfer for speed
+limitation. This will be used for further migration feature such as
+multifd migration.
 
 Signed-off-by: Ivan Ren <ivanren@tencent.com>
 ---
- migration/ram.c | 2 ++
- 1 file changed, 2 insertions(+)
+ migration/qemu-file.c | 5 +++++
+ migration/qemu-file.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 88ddd2bbe2..20b6eebb7c 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1085,6 +1085,8 @@ static void multifd_send_sync_main(RAMState *rs)
-         p->flags |= MULTIFD_FLAG_SYNC;
-         p->pending_job++;
-         qemu_file_update_transfer(rs->f, p->packet_len);
-+        ram_counters.multifd_bytes += p->packet_len;
-+        ram_counters.transferred += p->packet_len;
-         qemu_mutex_unlock(&p->mutex);
-         qemu_sem_post(&p->sem);
-     }
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index 0431585502..18f480529a 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -615,6 +615,11 @@ void qemu_file_reset_rate_limit(QEMUFile *f)
+     f->bytes_xfer = 0;
+ }
+ 
++void qemu_file_update_transfer(QEMUFile *f, int64_t len)
++{
++    f->bytes_xfer += len;
++}
++
+ void qemu_put_be16(QEMUFile *f, unsigned int v)
+ {
+     qemu_put_byte(f, v >> 8);
+diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+index 13baf896bd..5de9fa2e96 100644
+--- a/migration/qemu-file.h
++++ b/migration/qemu-file.h
+@@ -147,6 +147,7 @@ int qemu_peek_byte(QEMUFile *f, int offset);
+ void qemu_file_skip(QEMUFile *f, int size);
+ void qemu_update_position(QEMUFile *f, size_t size);
+ void qemu_file_reset_rate_limit(QEMUFile *f);
++void qemu_file_update_transfer(QEMUFile *f, int64_t len);
+ void qemu_file_set_rate_limit(QEMUFile *f, int64_t new_rate);
+ int64_t qemu_file_get_rate_limit(QEMUFile *f);
+ void qemu_file_set_error(QEMUFile *f, int ret);
 -- 
 2.17.2 (Apple Git-113)
 
