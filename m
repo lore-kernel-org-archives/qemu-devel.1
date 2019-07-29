@@ -2,86 +2,80 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 150EBC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBDBCC7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:28:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D75EB216C8
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:28:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97E26206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:28:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDjKgQ00"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D75EB216C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oLP8Eq80"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97E26206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53919 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7ZF-0002PO-Pr
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:28:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44006)
+	id 1hs7a1-0003wx-Sb
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:28:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45629)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hs7QH-0007yL-JK
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:18:50 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hs7WY-0005Sa-D1
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hs7QG-0000vr-GJ
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:18:49 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36908)
+ (envelope-from <peter.maydell@linaro.org>) id 1hs7WX-0007aP-6z
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:25:18 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39347)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hs7QG-0000uj-AF; Mon, 29 Jul 2019 11:18:48 -0400
-Received: by mail-pf1-x442.google.com with SMTP id 19so28198437pfa.4;
- Mon, 29 Jul 2019 08:18:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=BVYr/4pg99TlxLJVHvYszPgNvVkW6Z+EpbJ9hRlTzFI=;
- b=bDjKgQ00T+8PMCE5hDNRKI9eCk8wLWrxaGUOXC2DELJ1BAsGDo174Djz2pa/eXa4M8
- VcZylvNEUx7a67cBGofgRlVMWXNDtKcuaSmkEknhEbCNG5leAf1uaN6Qg05MUCTz/w42
- 2/kxwjtnqLvxSfRpDkaKeYIRaGr2myjFJwk+pZCyoTOgVqwY1K3BVdSxEcGHZl25t0bd
- xYGdu5xOrnuvdt7/Lf2BSj5c0WfDS4HwohRXG58fz50Kq51gzSFTrkJ7kzc+MIvNqY3n
- RDHlVgnFY2ol+c0fS/T8+7TJ3hgJA9JXz3DCmVKGtz5aIjXwlQ8CefhCgvEW7WucaurP
- qZGA==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hs7WU-0007XC-Kd
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:25:16 -0400
+Received: by mail-ot1-x344.google.com with SMTP id r21so56911443otq.6
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 08:25:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tQYiCRtH26Y87PUAK+IaWA2wqa2SPbVQTyBd7IRKLsk=;
+ b=oLP8Eq80zZ+LtAyH1PCXM4arflZobiuSFbfAxFMA8wz06KiI3xl7e8uVB/szZKrndI
+ C5jFQZLvTZaRylFFXQUt9qw+4tvafpEYLa5pcAq+a9fh5rKY/k7h/MeFYvcfAsHL8MyE
+ yVnNwDxhZApMmFWrCUpmGr9HxhU6+MEs2VcmSg08fpCrUpsi8TkigS19ElxZksTeeou5
+ yTRS5s5eyT7TdyLDtA+sOwZUWBsnnbd7CcmPFNNYKpSrz0mEGAyodPRmNBJ9nHpnsJH0
+ rRPZJQtLNskj0QvfvSai22kSLrzzxrmrea2wt2eKbN3B532VMVYAHbGxaBBfkE7rehs1
+ mNFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=BVYr/4pg99TlxLJVHvYszPgNvVkW6Z+EpbJ9hRlTzFI=;
- b=fC91AxhorPYe+pmgZr0PVBjWs/zUzYy029EtW1IV4s4UVfFMyVLgj28n3xpJRy/CGi
- dZP8DRORzB5urGOMoQKF26zkb55tBVUCCYkxVPkIFxT3HjOXmr7p6/NHZKusHlGLxrwG
- mLFSfbwXdooSOEIJU2Mx3kj0PZJr+C3U8WyMMB//Giq6MSnTPg2815AWIXBzZyskDRzz
- FIRZbYKouvf4Ms0w3dK4dhU2ZeomQrk8yPsT0VeypAqBs040gZcm6lrtjRf0/P38f/92
- 3cMNn6pHEfxZFhXLvfCXl993vg5Z/afcgE4noDhz3z6vJ54ZMGSWnexwoIVhjKdOYZ8m
- cpTw==
-X-Gm-Message-State: APjAAAWcdhFv/DGh35s2ppDD/InL1aTstsZMNVMtKIgN3Od5DhPCq9OP
- VZ9bvu0IwsGBe+7S/1F+VogsdIL37Luu8Q==
-X-Google-Smtp-Source: APXvYqwlDBdmo52sqKsmBRdBCq8JZVXRa0gTzUUJfscl1iLHpvEd1yxDSSkjRP5jz1/M81XaKEdqOA==
-X-Received: by 2002:a63:eb51:: with SMTP id
- b17mr101771750pgk.384.1564413526870; 
- Mon, 29 Jul 2019 08:18:46 -0700 (PDT)
-Received: from localhost.localdomain ([136.233.9.97])
- by smtp.gmail.com with ESMTPSA id h129sm58693941pfb.110.2019.07.29.08.18.40
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 29 Jul 2019 08:18:46 -0700 (PDT)
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 20:46:47 +0530
-Message-Id: <20190729151651.21306-12-mehta.aaru20@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190729151651.21306-1-mehta.aaru20@gmail.com>
-References: <20190729151651.21306-1-mehta.aaru20@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tQYiCRtH26Y87PUAK+IaWA2wqa2SPbVQTyBd7IRKLsk=;
+ b=lzRrGxDyWUp9tYuUPDrMtiLtjvSMepdI4OUBiQ1kOeIAkkZNotMUgGl5KO/hAu5aqg
+ dWepeAhWqSFFIU/g8idma6TybclvZoKzgPb6fWPmqegIMZI2QjhSfRFB/V4TgOm6terw
+ BTRBEhm6YluaZKLFYQvYMlE2h3G+rh0B39mINqNkb1ortpNAc7nEKCOte+FjzwaQSkaY
+ wsYQuHQjmalgXXrVf4RWujyXCjJsKLWHtSlQKQ4+/CwTJ6kAtBviva7ORu0rRZSm9hcR
+ wIpRMWmohdwz0HA3lgqpI9Zjj0FwV6aoySouHvS3kPn5dn67yT6cqZESGpFDXhuRVGoA
+ csrA==
+X-Gm-Message-State: APjAAAVXn5YiIMElr5ZEvCFpNwdpZC11CIaygHAevar/nad20P6FR2u5
+ wxrIxdSuxEfsYA/8/RIzZHIz6ynfjRMLlb3Mk65fQw==
+X-Google-Smtp-Source: APXvYqyHGBy0o1S+GW/fiyxYO7K36GVf7P4Iggb0dnhOpWtUkK04b1dVFS6YyhoBhvKRlGlRspj1Bffsxx9heghLtWo=
+X-Received: by 2002:a9d:711e:: with SMTP id n30mr76836544otj.97.1564413913114; 
+ Mon, 29 Jul 2019 08:25:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190726175032.6769-1-richard.henderson@linaro.org>
+ <20190726175032.6769-14-richard.henderson@linaro.org>
+In-Reply-To: <20190726175032.6769-14-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 29 Jul 2019 16:25:02 +0100
+Message-ID: <CAFEAcA-DG5JXVTT5tz7eJa03VWMxmq4RrujbQTk0R7KO-TAa6w@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v7 11/15] qemu-io: adds option to use aio engine
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH 13/67] target/arm: Convert Data Processing
+ (reg, reg-shifted-reg, imm)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,100 +87,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Sergio Lopez <slp@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
----
- qemu-io.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
+On Fri, 26 Jul 2019 at 18:50, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Do these all in one lump because these are all logically intertwined.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/translate.c | 747 ++++++++++++++++++++---------------------
+>  target/arm/a32.decode  |  84 +++++
+>  target/arm/t32.decode  |  91 +++++
+>  3 files changed, 536 insertions(+), 386 deletions(-
 
-diff --git a/qemu-io.c b/qemu-io.c
-index f64eca6940..6568f0c369 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -130,7 +130,8 @@ static void open_help(void)
- " -C, -- use copy-on-read\n"
- " -n, -- disable host cache, short for -t none\n"
- " -U, -- force shared permissions\n"
--" -k, -- use kernel AIO implementation (on Linux only)\n"
-+" -k, -- use kernel AIO implementation (Linux only, prefer use of -i)\n"
-+" -i, -- use AIO mode (threads, native or io_uring)"
- " -t, -- use the given cache mode for the image\n"
- " -d, -- use the given discard mode for the image\n"
- " -o, -- options to be given to the block driver"
-@@ -172,7 +173,7 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     QDict *opts;
-     bool force_share = false;
- 
--    while ((c = getopt(argc, argv, "snCro:kt:d:U")) != -1) {
-+    while ((c = getopt(argc, argv, "snCro:kit:d:U")) != -1) {
-         switch (c) {
-         case 's':
-             flags |= BDRV_O_SNAPSHOT;
-@@ -204,6 +205,13 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-                 return -EINVAL;
-             }
-             break;
-+        case 'i':
-+            if (bdrv_parse_aio(optarg, &flags) < 0) {
-+                error_report("Invalid aio option: %s", optarg);
-+                qemu_opts_reset(&empty_opts);
-+                return -EINVAL;
-+            }
-+            break;
-         case 'o':
-             if (imageOpts) {
-                 printf("--image-opts and 'open -o' are mutually exclusive\n");
-@@ -291,7 +299,9 @@ static void usage(const char *name)
- "  -n, --nocache        disable host cache, short for -t none\n"
- "  -C, --copy-on-read   enable copy-on-read\n"
- "  -m, --misalign       misalign allocations for O_DIRECT\n"
--"  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"
-+"  -k, --native-aio     use kernel AIO implementation\n"
-+"                       (Linux only, prefer use of -i)\n"
-+"  -i, --aio=MODE       use AIO mode (threads, native or io_uring)\n"
- "  -t, --cache=MODE     use the given cache mode for the image\n"
- "  -d, --discard=MODE   use the given discard mode for the image\n"
- "  -T, --trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
-@@ -489,7 +499,7 @@ static QemuOptsList file_opts = {
- int main(int argc, char **argv)
- {
-     int readonly = 0;
--    const char *sopt = "hVc:d:f:rsnCmkt:T:U";
-+    const char *sopt = "hVc:d:f:rsnCmki:t:T:U";
-     const struct option lopt[] = {
-         { "help", no_argument, NULL, 'h' },
-         { "version", no_argument, NULL, 'V' },
-@@ -501,6 +511,7 @@ int main(int argc, char **argv)
-         { "copy-on-read", no_argument, NULL, 'C' },
-         { "misalign", no_argument, NULL, 'm' },
-         { "native-aio", no_argument, NULL, 'k' },
-+        { "aio", required_argument, NULL, 'i' },
-         { "discard", required_argument, NULL, 'd' },
-         { "cache", required_argument, NULL, 't' },
-         { "trace", required_argument, NULL, 'T' },
-@@ -567,6 +578,11 @@ int main(int argc, char **argv)
-             break;
-         case 'k':
-             flags |= BDRV_O_NATIVE_AIO;
-+        case 'i':
-+            if (bdrv_parse_aio(optarg, &flags) < 0) {
-+                error_report("Invalid aio option: %s", optarg);
-+                exit(1);
-+            }
-             break;
-         case 't':
-             if (bdrv_parse_cache_mode(optarg, &flags, &writethrough) < 0) {
--- 
-2.21.0
+I'm afraid this patch is too big for me to digest :-(
 
+I just spent about half an hour trying to figure out whether
+the changes just to the thumb dp-immediate insns were right
+and didn't manage to work through it all.
+
+> +
+> +# Data-processing (immediate)
+> +
+> +%t32extrot       26:1 12:3 0:8  !function=t32_expandimm_rot
+> +%t32extimm       26:1 12:3 0:8  !function=t32_expandimm_imm
+> +
+> +@s_rri_rot       ....... .... s:1 rn:4 . ... rd:4 ........ \
+> +                 &s_rri_rot imm=%t32extimm rot=%t32extrot
+> +@s_rxi_rot       ....... .... s:1 .... . ... rd:4 ........ \
+> +                 &s_rri_rot imm=%t32extimm rot=%t32extrot rn=0
+> +@S_xri_rot       ....... .... .   rn:4 . ... .... ........ \
+> +                 &s_rri_rot imm=%t32extimm rot=%t32extrot s=1 rd=0
+> +
+> +{
+> +  TST_rri        1111 0.0 0000 1 .... 0 ... 1111 ........     @S_xri_rot
+> +  AND_rri        1111 0.0 0000 . .... 0 ... .... ........     @s_rri_rot
+> +}
+> +BIC_rri          1111 0.0 0001 . .... 0 ... .... ........     @s_rri_rot
+> +{
+> +  MOV_rri        1111 0.0 0010 . 1111 0 ... .... ........     @s_rxi_rot
+> +  ORR_rri        1111 0.0 0010 . .... 0 ... .... ........     @s_rri_rot
+> +}
+> +{
+> +  MVN_rri        1111 0.0 0011 . 1111 0 ... .... ........     @s_rxi_rot
+> +  ORN_rri        1111 0.0 0011 . .... 0 ... .... ........     @s_rri_rot
+> +}
+> +{
+> +  TEQ_rri        1111 0.0 0100 1 .... 0 ... 1111 ........     @S_xri_rot
+> +  EOR_rri        1111 0.0 0100 . .... 0 ... .... ........     @s_rri_rot
+> +}
+> +{
+> +  CMN_rri        1111 0.0 1000 1 .... 0 ... 1111 ........     @S_xri_rot
+> +  ADD_rri        1111 0.0 1000 . .... 0 ... .... ........     @s_rri_rot
+> +}
+> +ADC_rri          1111 0.0 1010 . .... 0 ... .... ........     @s_rri_rot
+> +SBC_rri          1111 0.0 1011 . .... 0 ... .... ........     @s_rri_rot
+> +{
+> +  CMP_rri        1111 0.0 1101 1 .... 0 ... 1111 ........     @S_xri_rot
+> +  SUB_rri        1111 0.0 1101 . .... 0 ... .... ........     @s_rri_rot
+> +}
+> +RSB_rri          1111 0.0 1110 . .... 0 ... .... ........     @s_rri_rot
+> --
+
+Why do we split it up into all these different kinds of patterns
+where some insns have special cases for rn==15 and some have
+special cases for rd==15 ?
+The legacy decoder doesn't seem to do that -- it treats everything
+the same.
+
+thanks
+-- PMM
 
