@@ -2,90 +2,73 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D5DC76186
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC712C76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:16:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA3CF2073F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:13:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3CF2073F
+	by mail.kernel.org (Postfix) with ESMTPS id 819842073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:16:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819842073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsCxt-0004iY-6b
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:13:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56183)
+	id 1hsD0q-0006Jt-Qr
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:16:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56673)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsCxR-0004C6-E0
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:13:26 -0400
+ (envelope-from <mst@redhat.com>) id 1hsD01-0005ZG-2u
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsCxQ-0001OC-Cq
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:13:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42592)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hsCxO-0001Mt-5q; Mon, 29 Jul 2019 17:13:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 22D68C04B946;
- Mon, 29 Jul 2019 21:13:21 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 145525D6A5;
- Mon, 29 Jul 2019 21:13:15 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
- <20190725100550.33801-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <7651c617-f53c-c4b4-4d24-e49cfdcf2f3b@redhat.com>
-Date: Mon, 29 Jul 2019 16:13:14 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <mst@redhat.com>) id 1hsD00-0003T3-1n
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:05 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:35836)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hsCzz-0003RA-TU
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:03 -0400
+Received: by mail-qt1-f193.google.com with SMTP id d23so60974337qto.2
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 14:16:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=56Kq6/bdO7dXYH2sn1ZzlSC7sP2/lMfBCKvfK33VPho=;
+ b=A5ri3Mz8Jj2NwbVcF+X7bnHSMB1oREGdzA1MnpZJrVD+2CqOkANinw+vNTzn84dZ0o
+ 3q16BuOFnHnTe99anmIPQqJFRXaYzxy1/Fp2X+7PksZNG6oNORPVAjUnVnhJ+0wvS4Lh
+ 2ht+ow38u8X450h6c5xtAhXzgEAz3sUz5LR+ufGbekmLlL5o2Krs28xPl4dUMAyxbF3x
+ X2uRq3OAONKXZG3kjhPLAHLRaXWIXfhYiTRoejDPuDB+0GpEESdQx6XOPhX8MylidCsm
+ 7lQLedbs8C97NQKbUZ48hbODEVvZW2tyrn9F7d1yOm9J1U8DajiQYQfUVnloha6SxZ32
+ arnQ==
+X-Gm-Message-State: APjAAAVbuHvSmJ82Pgmwhmnbj3JYzuKKB+IwnGN96PRJs314V6wnOUnM
+ CqQ8jkwxninzGESUPAQGPVvQ66p2qTQidg==
+X-Google-Smtp-Source: APXvYqwJuRU5+9o59y/WtlhdhNuNoUSW1YLO9pgPf9saSYeFJ2CR9OfhGVK+Vf7Us3kCitjFr8wN0Q==
+X-Received: by 2002:a0c:e588:: with SMTP id t8mr80511092qvm.179.1564434962910; 
+ Mon, 29 Jul 2019 14:16:02 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ j8sm27068122qki.85.2019.07.29.14.16.00
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 29 Jul 2019 14:16:02 -0700 (PDT)
+Date: Mon, 29 Jul 2019 17:15:58 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Message-ID: <20190729211404.1533-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190725100550.33801-2-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 29 Jul 2019 21:13:21 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] block: implement BDRV_REQ_PREFETCH
+ [fuzzy]
+X-Received-From: 209.85.160.193
+Subject: [Qemu-devel] [PULL 0/3] virtio, pc: fixes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,103 +80,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, mreitz@redhat.com, stefanha@redhat.com,
- den@openvz.org, jsnow@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6
-Content-Type: multipart/mixed; boundary="YJCPKUxNUmoQN0QPYwr70tJjST60BByF2";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net,
- stefanha@redhat.com, den@openvz.org
-Message-ID: <7651c617-f53c-c4b4-4d24-e49cfdcf2f3b@redhat.com>
-Subject: Re: [PATCH v3 1/3] block: implement BDRV_REQ_PREFETCH
-References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
- <20190725100550.33801-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190725100550.33801-2-vsementsov@virtuozzo.com>
-
---YJCPKUxNUmoQN0QPYwr70tJjST60BByF2
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 7/25/19 5:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Do effective copy-on-read request when we don't need data actually. It
-> will be used for block-stream and NBD_CMD_CACHE.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  include/block/block.h |  8 +++++++-
->  block/io.c            | 18 ++++++++++++------
->  2 files changed, 19 insertions(+), 7 deletions(-)
->=20
-> diff --git a/include/block/block.h b/include/block/block.h
-> index 50a07c1c33..73c3fc4daa 100644
-> --- a/include/block/block.h
-> +++ b/include/block/block.h
-> @@ -88,8 +88,14 @@ typedef enum {
->       * fallback. */
->      BDRV_REQ_NO_FALLBACK        =3D 0x100,
-> =20
-> +    /*
-> +     * BDRV_REQ_PREFETCH may be used only together with BDRV_REQ_COPY_=
-ON_READ
-> +     * on read request and means that caller don't really need data to=
- be
-
-doesn't
-
-can fix up while staging.
+I'm sending this out now as these patches are ready,
+but it seems likely we'll need another patch for pci,
+and as it deals with migration compat it might be a blocker.
+Will know more tomorrow :(
 
 
-> +++ b/block/io.c
-> @@ -1167,7 +1167,8 @@ bdrv_driver_pwritev_compressed(BlockDriverState *=
-bs, uint64_t offset,
->  }
-> =20
->  static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
-> -        int64_t offset, unsigned int bytes, QEMUIOVector *qiov)
-> +        int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
-> +        int flags)
+The following changes since commit fff3159900d2b95613a9cb75fc3703e67a674729:
 
-We're bad about this, but 'int flags' does not play well with the C
-language and well-defined behavior when it comes to 1<<31 (bit
-operations and unsigned types have guaranteed behavior, bit operations
-and negative signed types can cause the compiler to do differently than
-you expect).  Not a problem for uses where we don't have 32 flags to OR
-together, so I won't change it, so much as point it out for a bigger
-task of auditing the entire code base if we are worried.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20190726' into staging (2019-07-26 16:23:07 +0100)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
---YJCPKUxNUmoQN0QPYwr70tJjST60BByF2--
+for you to fetch changes up to 22235bb609c18547cf6b215bad1f9d2ec56ad371:
 
---zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  pc-dimm: fix crash when invalid slot number is used (2019-07-29 16:57:27 -0400)
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+virtio, pc: fixes
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0/YWoACgkQp6FrSiUn
-Q2qY2gf/RfO4aBLECf8MuZrclsILinAfHkoB6eDl5qsK9FSb608tXnDT/o3IO88k
-1nq5fFggxieaU8Ay3AaIGqUxfZ8f5xCowf/5cNCMSiDubC0zWnxDELvKIyzLKXlI
-eFPpn0fc9Aq9KWdRf++Uurdb2u7QOIYEB+X/QAxgUQYSNFnv2z6NAFg/3fbQ9e/X
-d0VnUBcA3VegDUpATqJNXg0r+af192RfR3v4iKrdYPNbFXnJl2PhSCSa7f4I4N+a
-MyjW3+LztRb7ygXoF6WbkfDvjAVKIhfzzNlSwhF+r9uJG5km2rOwOfiU2iP5VyPO
-pjSmXhZ63GDZjzAGOTgzvM6arx6Xeg==
-=Ff/g
------END PGP SIGNATURE-----
+A couple of last minute bugfixes.
 
---zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6--
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Dr. David Alan Gilbert (2):
+      Revert "Revert "globals: Allow global properties to be optional""
+      Revert "hw: report invalid disable-legacy|modern usage for virtio-1-only devs"
+
+Igor Mammedov (1):
+      pc-dimm: fix crash when invalid slot number is used
+
+ hw/virtio/virtio-pci.h        | 31 ++++++-------------------------
+ include/hw/qdev-core.h        |  3 +++
+ hw/core/machine.c             | 23 +++--------------------
+ hw/display/virtio-gpu-pci.c   |  4 +---
+ hw/display/virtio-vga.c       |  4 +---
+ hw/mem/pc-dimm.c              |  7 +++++++
+ hw/virtio/virtio-crypto-pci.c |  4 +---
+ hw/virtio/virtio-input-pci.c  |  4 +---
+ hw/virtio/virtio-pci.c        | 26 ++++++++++----------------
+ qom/object.c                  |  3 +++
+ 10 files changed, 36 insertions(+), 73 deletions(-)
+
 
