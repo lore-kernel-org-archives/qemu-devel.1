@@ -2,54 +2,61 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DFDC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB688C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:35:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3B9B2070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:34:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3B9B2070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8262E2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:35:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8262E2073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzFA-0007qs-5Q
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:34:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53692)
+	id 1hrzG2-0001er-QV
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:35:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54208)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAY-0002PO-SF
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:30:04 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hrzCd-0005Lu-Qf
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAX-0007i3-1P
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:30:02 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36754)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAW-0007hF-Gr
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:30:00 -0400
-Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id A3D0F54006A;
- Mon, 29 Jul 2019 09:29:59 +0300 (MSK)
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 09:29:59 +0300
-Message-ID: <156438179945.22071.2373604847832316840.stgit@pasha-Precision-3630-Tower>
-In-Reply-To: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
-References: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
-User-Agent: StGit/0.17.1-dirty
+ (envelope-from <tao3.xu@intel.com>) id 1hrzCc-0001r7-7U
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:11 -0400
+Received: from mga11.intel.com ([192.55.52.93]:47119)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hrzCZ-0001Ef-9o
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:08 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 28 Jul 2019 23:31:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="370357281"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
+ by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2019 23:31:44 -0700
+From: Tao Xu <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Mon, 29 Jul 2019 14:31:23 +0800
+Message-Id: <20190729063127.2801-8-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190729063127.2801-1-tao3.xu@intel.com>
+References: <20190729063127.2801-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [for-4.2 PATCH 6/6] replay: add BH oneshot event for
- block layer
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.93
+Subject: [Qemu-devel] [PATCH v8 07/11] hmat acpi: Build System Locality
+ Latency and Bandwidth Information Structure(s)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,351 +68,263 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, pavel.dovgaluk@ispras.ru,
- pbonzini@redhat.com, quintela@redhat.com, ciro.santilli@gmail.com,
- jasowang@redhat.com, crosthwaite.peter@gmail.com, armbru@redhat.com,
- mreitz@redhat.com, alex.bennee@linaro.org, maria.klimushenkova@ispras.ru,
- mst@redhat.com, kraxel@redhat.com, boost.lists@gmail.com,
- thomas.dullien@googlemail.com, dovgaluk@ispras.ru, artem.k.pisarenko@gmail.com,
- dgilbert@redhat.com, rth@twiddle.net
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Replay is capable of recording normal BH events, but sometimes
-there are single use callbacks scheduled with aio_bh_schedule_oneshot
-function. This patch enables recording and replaying such callbacks.
-Block layer uses these events for calling the completion function.
-Replaying these calls makes the execution deterministic.
+This structure describes the memory access latency and bandwidth
+information from various memory access initiator proximity domains.
+The latency and bandwidth numbers represented in this structure
+correspond to rated latency and bandwidth for the platform.
+The software could use this information as hint for optimization.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- block/block-backend.c    |    8 +++++---
- block/io.c               |    4 ++--
- block/iscsi.c            |    5 +++--
- block/nfs.c              |    5 +++--
- block/null.c             |    4 +++-
- block/nvme.c             |    6 ++++--
- block/rbd.c              |    5 +++--
- block/vxhs.c             |    5 +++--
- include/sysemu/replay.h  |    3 +++
- replay/replay-events.c   |   16 ++++++++++++++++
- replay/replay-internal.h |    1 +
- replay/replay.c          |    2 +-
- stubs/Makefile.objs      |    1 +
- stubs/replay-user.c      |    9 +++++++++
- 14 files changed, 57 insertions(+), 17 deletions(-)
- create mode 100644 stubs/replay-user.c
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0056b526b8..b8b45e9e82 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -17,6 +17,7 @@
- #include "block/throttle-groups.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/replay.h"
- #include "qapi/error.h"
- #include "qapi/qapi-events-block.h"
- #include "qemu/id.h"
-@@ -1296,7 +1297,8 @@ BlockAIOCB *blk_abort_aio_request(BlockBackend *blk,
-     acb->blk = blk;
-     acb->ret = ret;
- 
--    aio_bh_schedule_oneshot(blk_get_aio_context(blk), error_callback_bh, acb);
-+    replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-+                                     error_callback_bh, acb);
-     return &acb->common;
+No changes in v8.
+---
+ hw/acpi/hmat.c          | 95 ++++++++++++++++++++++++++++++++++++++++-
+ hw/acpi/hmat.h          | 41 ++++++++++++++++++
+ include/qemu/typedefs.h |  1 +
+ include/sysemu/numa.h   |  3 ++
+ include/sysemu/sysemu.h | 21 +++++++++
+ 5 files changed, 160 insertions(+), 1 deletion(-)
+
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index abf99b1adc..431818dc82 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -67,11 +67,81 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
+     build_append_int_noprefix(table_data, 0, 8);
  }
  
-@@ -1352,8 +1354,8 @@ static BlockAIOCB *blk_aio_prwv(BlockBackend *blk, int64_t offset, int bytes,
- 
-     acb->has_returned = true;
-     if (acb->rwco.ret != NOT_DONE) {
--        aio_bh_schedule_oneshot(blk_get_aio_context(blk),
--                                blk_aio_complete_bh, acb);
-+        replay_bh_schedule_oneshot_event(blk_get_aio_context(blk),
-+                                         blk_aio_complete_bh, acb);
-     }
- 
-     return &acb->common;
-diff --git a/block/io.c b/block/io.c
-index 2e71bcb8d6..ebff47e6e1 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -367,8 +367,8 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
-     if (bs) {
-         bdrv_inc_in_flight(bs);
-     }
--    aio_bh_schedule_oneshot(bdrv_get_aio_context(bs),
--                            bdrv_co_drain_bh_cb, &data);
-+    replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
-+                                     bdrv_co_drain_bh_cb, &data);
- 
-     qemu_coroutine_yield();
-     /* If we are resumed from some other event (such as an aio completion or a
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 506bf5f875..2ced15066a 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -40,6 +40,7 @@
- #include "qemu/module.h"
- #include "qemu/option.h"
- #include "qemu/uuid.h"
-+#include "sysemu/replay.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qmp/qdict.h"
-@@ -280,8 +281,8 @@ iscsi_co_generic_cb(struct iscsi_context *iscsi, int status,
-     }
- 
-     if (iTask->co) {
--        aio_bh_schedule_oneshot(iTask->iscsilun->aio_context,
--                                 iscsi_co_generic_bh_cb, iTask);
-+        replay_bh_schedule_oneshot_event(iTask->iscsilun->aio_context,
-+                                         iscsi_co_generic_bh_cb, iTask);
-     } else {
-         iTask->complete = 1;
-     }
-diff --git a/block/nfs.c b/block/nfs.c
-index d93241b3bb..cfd6c956b3 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -37,6 +37,7 @@
- #include "qemu/uri.h"
- #include "qemu/cutils.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/replay.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-@@ -257,8 +258,8 @@ nfs_co_generic_cb(int ret, struct nfs_context *nfs, void *data,
-     if (task->ret < 0) {
-         error_report("NFS Error: %s", nfs_get_error(nfs));
-     }
--    aio_bh_schedule_oneshot(task->client->aio_context,
--                            nfs_co_generic_bh_cb, task);
-+    replay_bh_schedule_oneshot_event(task->client->aio_context,
-+                                     nfs_co_generic_bh_cb, task);
- }
- 
- static int coroutine_fn nfs_co_preadv(BlockDriverState *bs, uint64_t offset,
-diff --git a/block/null.c b/block/null.c
-index 699aa295cb..15e1d56746 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -17,6 +17,7 @@
- #include "qemu/module.h"
- #include "qemu/option.h"
- #include "block/block_int.h"
-+#include "sysemu/replay.h"
- 
- #define NULL_OPT_LATENCY "latency-ns"
- #define NULL_OPT_ZEROES  "read-zeroes"
-@@ -179,7 +180,8 @@ static inline BlockAIOCB *null_aio_common(BlockDriverState *bs,
-         timer_mod_ns(&acb->timer,
-                      qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + s->latency_ns);
-     } else {
--        aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), null_bh_cb, acb);
-+        replay_bh_schedule_oneshot_event(bdrv_get_aio_context(bs),
-+                                         null_bh_cb, acb);
-     }
-     return &acb->common;
- }
-diff --git a/block/nvme.c b/block/nvme.c
-index c28755cc31..ac652e878c 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -22,6 +22,7 @@
- #include "qemu/option.h"
- #include "qemu/vfio-helpers.h"
- #include "block/block_int.h"
-+#include "sysemu/replay.h"
- #include "trace.h"
- 
- #include "block/nvme.h"
-@@ -350,7 +351,8 @@ static bool nvme_process_completion(BDRVNVMeState *s, NVMeQueuePair *q)
-         smp_mb_release();
-         *q->cq.doorbell = cpu_to_le32(q->cq.head);
-         if (!qemu_co_queue_empty(&q->free_req_queue)) {
--            aio_bh_schedule_oneshot(s->aio_context, nvme_free_req_queue_cb, q);
-+            replay_bh_schedule_oneshot_event(s->aio_context,
-+                                             nvme_free_req_queue_cb, q);
-         }
-     }
-     q->busy = false;
-@@ -934,7 +936,7 @@ static void nvme_rw_cb(void *opaque, int ret)
-         /* The rw coroutine hasn't yielded, don't try to enter. */
-         return;
-     }
--    aio_bh_schedule_oneshot(data->ctx, nvme_rw_cb_bh, data);
-+    replay_bh_schedule_oneshot_event(data->ctx, nvme_rw_cb_bh, data);
- }
- 
- static coroutine_fn int nvme_co_prw_aligned(BlockDriverState *bs,
-diff --git a/block/rbd.c b/block/rbd.c
-index 59757b3120..a1ce5b9292 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -22,6 +22,7 @@
- #include "block/qdict.h"
- #include "crypto/secret.h"
- #include "qemu/cutils.h"
-+#include "sysemu/replay.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qjson.h"
-@@ -884,8 +885,8 @@ static void rbd_finish_aiocb(rbd_completion_t c, RADOSCB *rcb)
-     rcb->ret = rbd_aio_get_return_value(c);
-     rbd_aio_release(c);
- 
--    aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
--                            rbd_finish_bh, rcb);
-+    replay_bh_schedule_oneshot_event(bdrv_get_aio_context(acb->common.bs),
-+                                     rbd_finish_bh, rcb);
- }
- 
- static int rbd_aio_discard_wrapper(rbd_image_t image,
-diff --git a/block/vxhs.c b/block/vxhs.c
-index 77fd5eb20d..d79fc97df6 100644
---- a/block/vxhs.c
-+++ b/block/vxhs.c
-@@ -22,6 +22,7 @@
- #include "qapi/error.h"
- #include "qemu/uuid.h"
- #include "crypto/tlscredsx509.h"
-+#include "sysemu/replay.h"
- 
- #define VXHS_OPT_FILENAME           "filename"
- #define VXHS_OPT_VDISK_ID           "vdisk-id"
-@@ -105,8 +106,8 @@ static void vxhs_iio_callback(void *ctx, uint32_t opcode, uint32_t error)
-             trace_vxhs_iio_callback(error);
-         }
- 
--        aio_bh_schedule_oneshot(bdrv_get_aio_context(acb->common.bs),
--                                vxhs_complete_aio_bh, acb);
-+        replay_bh_schedule_oneshot_event(bdrv_get_aio_context(acb->common.bs),
-+                                         vxhs_complete_aio_bh, acb);
-         break;
- 
-     default:
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 28ce19e919..1476ab533e 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -140,6 +140,9 @@ void replay_enable_events(void);
- bool replay_events_enabled(void);
- /*! Adds bottom half event to the queue */
- void replay_bh_schedule_event(QEMUBH *bh);
-+/* Adds oneshot bottom half event to the queue */
-+void replay_bh_schedule_oneshot_event(AioContext *ctx,
-+    QEMUBHFunc *cb, void *opaque);
- /*! Adds input event to the queue */
- void replay_input_event(QemuConsole *src, InputEvent *evt);
- /*! Adds input sync event to the queue */
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 008e80f636..302b84043a 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -36,6 +36,9 @@ static void replay_run_event(Event *event)
-     case REPLAY_ASYNC_EVENT_BH:
-         aio_bh_call(event->opaque);
-         break;
-+    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-+        ((QEMUBHFunc *)event->opaque)(event->opaque2);
-+        break;
-     case REPLAY_ASYNC_EVENT_INPUT:
-         qemu_input_event_send_impl(NULL, (InputEvent *)event->opaque);
-         qapi_free_InputEvent((InputEvent *)event->opaque);
-@@ -131,6 +134,17 @@ void replay_bh_schedule_event(QEMUBH *bh)
-     }
- }
- 
-+void replay_bh_schedule_oneshot_event(AioContext *ctx,
-+    QEMUBHFunc *cb, void *opaque)
++/*
++ * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
++ * Structure: Table 5-142
++ */
++static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
++                          uint32_t num_initiator, uint32_t num_target,
++                          uint32_t *initiator_pxm, int type)
 +{
-+    if (events_enabled) {
-+        uint64_t id = replay_get_current_icount();
-+        replay_add_event(REPLAY_ASYNC_EVENT_BH_ONESHOT, cb, opaque, id);
++    uint32_t s = num_initiator;
++    uint32_t t = num_target;
++    uint8_t m, n;
++    uint8_t mask = 0x0f;
++    int i;
++
++    /* Type */
++    build_append_int_noprefix(table_data, 1, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Length */
++    build_append_int_noprefix(table_data, 32 + 4 * s + 4 * t + 2 * s * t, 4);
++    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
++    build_append_int_noprefix(table_data, hmat_lb->hierarchy & mask, 1);
++    /* Data Type */
++    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Number of Initiator Proximity Domains (s) */
++    build_append_int_noprefix(table_data, s, 4);
++    /* Number of Target Proximity Domains (t) */
++    build_append_int_noprefix(table_data, t, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
++
++    /* Entry Base Unit */
++    if (HMAT_IS_LATENCY(type)) {
++        build_append_int_noprefix(table_data, hmat_lb->base_lat, 8);
 +    } else {
-+        aio_bh_schedule_oneshot(ctx, cb, opaque);
++        build_append_int_noprefix(table_data, hmat_lb->base_bw, 8);
++    }
++
++    /* Initiator Proximity Domain List */
++    for (i = 0; i < s; i++) {
++        build_append_int_noprefix(table_data, initiator_pxm[i], 4);
++    }
++
++    /* Target Proximity Domain List */
++    for (i = 0; i < t; i++) {
++        build_append_int_noprefix(table_data, i, 4);
++    }
++
++    /* Latency or Bandwidth Entries */
++    for (i = 0; i < s; i++) {
++        m = initiator_pxm[i];
++        for (n = 0; n < t; n++) {
++            uint16_t entry;
++
++            if (HMAT_IS_LATENCY(type)) {
++                entry = hmat_lb->latency[m][n];
++            } else {
++                entry = hmat_lb->bandwidth[m][n];
++            }
++
++            build_append_int_noprefix(table_data, entry, 2);
++        }
 +    }
 +}
 +
- void replay_add_input_event(struct InputEvent *event)
+ /* Build HMAT sub table structures */
+ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
  {
-     replay_add_event(REPLAY_ASYNC_EVENT_INPUT, event, NULL, 0);
-@@ -161,6 +175,7 @@ static void replay_save_event(Event *event, int checkpoint)
-         /* save event-specific data */
-         switch (event->event_kind) {
-         case REPLAY_ASYNC_EVENT_BH:
-+        case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-             replay_put_qword(event->id);
-             break;
-         case REPLAY_ASYNC_EVENT_INPUT:
-@@ -216,6 +231,7 @@ static Event *replay_read_event(int checkpoint)
-     /* Events that has not to be in the queue */
-     switch (replay_state.read_event_kind) {
-     case REPLAY_ASYNC_EVENT_BH:
-+    case REPLAY_ASYNC_EVENT_BH_ONESHOT:
-         if (replay_state.read_event_id == -1) {
-             replay_state.read_event_id = replay_get_qword();
-         }
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index afba9a3e0c..55fca1ac6b 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -51,6 +51,7 @@ enum ReplayEvents {
+     uint16_t flags;
+-    int i;
++    uint32_t num_initiator = 0;
++    uint32_t initiator_pxm[MAX_NODES];
++    int i, hrchy, type;
++    HMAT_LB_Info *numa_hmat_lb;
  
- enum ReplayAsyncEventKind {
-     REPLAY_ASYNC_EVENT_BH,
-+    REPLAY_ASYNC_EVENT_BH_ONESHOT,
-     REPLAY_ASYNC_EVENT_INPUT,
-     REPLAY_ASYNC_EVENT_INPUT_SYNC,
-     REPLAY_ASYNC_EVENT_CHAR_READ,
-diff --git a/replay/replay.c b/replay/replay.c
-index 71c4e6b777..242d36a858 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -22,7 +22,7 @@
+     for (i = 0; i < nstat->num_nodes; i++) {
+         flags = 0;
+@@ -82,6 +152,29 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
  
- /* Current version of the replay mechanism.
-    Increase it when file format changes. */
--#define REPLAY_VERSION              0xe02007
-+#define REPLAY_VERSION              0xe02008
- /* Size of replay log header */
- #define HEADER_SIZE                 (sizeof(uint32_t) + sizeof(uint64_t))
- 
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 9c7393b08c..4a50e95ec3 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -20,6 +20,7 @@ stub-obj-y += monitor.o
- stub-obj-y += notify-event.o
- stub-obj-y += qtest.o
- stub-obj-y += replay.o
-+stub-obj-y += replay-user.o
- stub-obj-y += runstate-check.o
- stub-obj-y += set-fd-handler.o
- stub-obj-y += sysbus.o
-diff --git a/stubs/replay-user.c b/stubs/replay-user.c
-new file mode 100644
-index 0000000000..2ad9e27203
---- /dev/null
-+++ b/stubs/replay-user.c
-@@ -0,0 +1,9 @@
-+#include "qemu/osdep.h"
-+#include "sysemu/replay.h"
-+#include "sysemu/sysemu.h"
+         build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
+     }
 +
-+void replay_bh_schedule_oneshot_event(AioContext *ctx,
-+    QEMUBHFunc *cb, void *opaque)
-+{
-+    aio_bh_schedule_oneshot(ctx, cb, opaque);
-+}
++    for (i = 0; i < nstat->num_nodes; i++) {
++        if (nstat->nodes[i].has_cpu) {
++            initiator_pxm[num_initiator++] = i;
++        }
++    }
++
++    /*
++     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
++     * Structure: Table 5-142
++     */
++    for (hrchy = HMAT_LB_MEM_MEMORY;
++         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
++        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
++             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
++            numa_hmat_lb = nstat->hmat_lb[hrchy][type];
++
++            if (numa_hmat_lb) {
++                build_hmat_lb(table_data, numa_hmat_lb, num_initiator,
++                              nstat->num_nodes, initiator_pxm, type);
++            }
++        }
++    }
+ }
+ 
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
+diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+index 574cfba60a..5f050781e6 100644
+--- a/hw/acpi/hmat.h
++++ b/hw/acpi/hmat.h
+@@ -40,6 +40,47 @@
+  */
+ #define HMAT_PROX_INIT_VALID 0x1
+ 
++#define HMAT_IS_LATENCY(type) (type <= HMAT_LB_DATA_WRITE_LATENCY)
++
++struct HMAT_LB_Info {
++    /*
++     * Indicates total number of Proximity Domains
++     * that can initiate memory access requests.
++     */
++    uint32_t    num_initiator;
++    /*
++     * Indicates total number of Proximity Domains
++     * that can act as target.
++     */
++    uint32_t    num_target;
++    /*
++     * Indicates it's memory or
++     * the specified level memory side cache.
++     */
++    uint8_t     hierarchy;
++    /*
++     * Present the type of data,
++     * access/read/write latency or bandwidth.
++     */
++    uint8_t     data_type;
++    /* The base unit for latency in nanoseconds. */
++    uint64_t    base_lat;
++    /* The base unit for bandwidth in megabytes per second(MB/s). */
++    uint64_t    base_bw;
++    /*
++     * latency[i][j]:
++     * Indicates the latency based on base_lat
++     * from Initiator Proximity Domain i to Target Proximity Domain j.
++     */
++    uint16_t    latency[MAX_NODES][MAX_NODES];
++    /*
++     * bandwidth[i][j]:
++     * Indicates the bandwidth based on base_bw
++     * from Initiator Proximity Domain i to Target Proximity Domain j.
++     */
++    uint16_t    bandwidth[MAX_NODES][MAX_NODES];
++};
++
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
+ 
+ #endif
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index fcdaae58c4..c0257e936b 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -33,6 +33,7 @@ typedef struct FWCfgEntry FWCfgEntry;
+ typedef struct FWCfgIoState FWCfgIoState;
+ typedef struct FWCfgMemState FWCfgMemState;
+ typedef struct FWCfgState FWCfgState;
++typedef struct HMAT_LB_Info HMAT_LB_Info;
+ typedef struct HVFX86EmulatorState HVFX86EmulatorState;
+ typedef struct I2CBus I2CBus;
+ typedef struct I2SCodec I2SCodec;
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 46ad06e000..85ddad99b4 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -30,6 +30,9 @@ struct NumaState {
+ 
+     /* NUMA nodes information */
+     NodeInfo nodes[MAX_NODES];
++
++    /* NUMA modes HMAT Locality Latency and Bandwidth Information */
++    HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
+ };
+ typedef struct NumaState NumaState;
+ 
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 984c439ac9..fc638f06cd 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -126,6 +126,27 @@ extern int mem_prealloc;
+ #define NUMA_DISTANCE_MAX         254
+ #define NUMA_DISTANCE_UNREACHABLE 255
+ 
++/* the value of AcpiHmatLBInfo flags */
++enum {
++    HMAT_LB_MEM_MEMORY           = 0,
++    HMAT_LB_MEM_CACHE_1ST_LEVEL  = 1,
++    HMAT_LB_MEM_CACHE_2ND_LEVEL  = 2,
++    HMAT_LB_MEM_CACHE_3RD_LEVEL  = 3,
++};
++
++/* the value of AcpiHmatLBInfo data type */
++enum {
++    HMAT_LB_DATA_ACCESS_LATENCY   = 0,
++    HMAT_LB_DATA_READ_LATENCY     = 1,
++    HMAT_LB_DATA_WRITE_LATENCY    = 2,
++    HMAT_LB_DATA_ACCESS_BANDWIDTH = 3,
++    HMAT_LB_DATA_READ_BANDWIDTH   = 4,
++    HMAT_LB_DATA_WRITE_BANDWIDTH  = 5,
++};
++
++#define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
++#define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
++
+ #define MAX_OPTION_ROMS 16
+ typedef struct QEMUOptionRom {
+     const char *name;
+-- 
+2.20.1
 
 
