@@ -2,88 +2,78 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F807C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566F7C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:40:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67C0D206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:37:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67C0D206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 336022073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:40:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 336022073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs25W-0002Xy-O9
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:37:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59069)
+	id 1hs28z-0003th-IW
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:40:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59439)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hs253-0001n5-Mb
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:36:34 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hs28O-0003En-Uo
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:40:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hs252-0001yt-OT
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:36:33 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40337)
+ (envelope-from <sgarzare@redhat.com>) id 1hs28N-000429-EA
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:40:00 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50729)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hs252-0001yO-GQ
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:36:32 -0400
-Received: by mail-wm1-f65.google.com with SMTP id v19so52836060wmj.5
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 02:36:32 -0700 (PDT)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hs28N-000418-6w
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:39:59 -0400
+Received: by mail-wm1-f68.google.com with SMTP id v15so53211278wml.0
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 02:39:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=k+b+0w7sdl6bhya1EhD8uwlNEB7i8PaOX5OKlwRFLbY=;
- b=iB8qlX6SpocMOcrqu9RADSbaecmU9gXjx3Is/mt2t4f3GPETujTYE34BPyX7v8pmKA
- OlrL5L8gWSfpNnoPIJmR2NUf050/PG1I/YcfGxeprtgGkFfgjaGPZCn9L6XLC+tS+Bfl
- wBH8e+lcTymHB66iABMcKniiyfEEqA7wGPa9aaD/MUZme6csdrt3vU3wdwOh4dl5kBjM
- Tfd54uv04c01w9vBCA8t1uU9rWZ6uz8IL9lpLvy1YwJqR1KrXn2CsP/XsFvSEoo2x+T4
- ddFi5Up0kOk7YpXKSkhBMVKPGibMMCJrCOp8Oa4md32BZ8+REt1Cp7Tx9HfmRf/gQ5qb
- q7Pg==
-X-Gm-Message-State: APjAAAXdt3DAmfFHD50Rd73gJPFXq1GZJm0dpoNUsls6M+HSRqQV29Mw
- sDCyHXbrV0oRcttkbWUbYnaixIu4Deg=
-X-Google-Smtp-Source: APXvYqyngs9i+tjhNmjzzQmJ1PlrH1QKqHJ5JknZOFRzc7DEDLgH7VWht9VcA1UzfgKuM3sETpE+Gw==
-X-Received: by 2002:a1c:4054:: with SMTP id n81mr100397628wma.78.1564392990890; 
- Mon, 29 Jul 2019 02:36:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:29d3:6123:6d5f:2c04?
- ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
- by smtp.gmail.com with ESMTPSA id g8sm58871192wmf.17.2019.07.29.02.36.30
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 29 Jul 2019 02:36:30 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
- <1562775267-1222-5-git-send-email-pbonzini@redhat.com>
- <87d0ie58cj.fsf@dusky.pond.sub.org>
- <78c3bba3-3e85-682b-b4ce-fc4809add90e@redhat.com>
- <87sgqsx7zp.fsf@dusky.pond.sub.org>
- <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
- <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
- <87ftmptiyq.fsf@dusky.pond.sub.org>
- <41165962-2d61-697f-d17a-d5fa7516e8cc@redhat.com>
- <CAFEAcA-Egqpz3MwC2Kk-h_iCP4U74rYh66Nb2oaK5rdjD=7JMQ@mail.gmail.com>
- <aa4801a9-ad0f-a6b8-e167-1fc5f4e6925e@redhat.com>
- <CAFEAcA9X=F2=XP97pf171LJ0PiKHTPNNtKZSqJ8g06CmqWmzUA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <e20ab776-602e-5555-6320-218d0b9b4f50@redhat.com>
-Date: Mon, 29 Jul 2019 11:36:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=676sR5nu05TGZ8pV/P1BcvgvMyq9MWng/l2497TPzoA=;
+ b=kyKMPX5kjD/KehNVYYAH5VX6UkW1xxfC3ijgmcf1jA/I/ZwfpREpPAAvOi41jzV4b0
+ AWKEILtV+HjrziBRU1EewisjGOlZudcTKFyZSDXj+EWOs3MkegsXF0fzxb/eifUj5EYj
+ ugod6EdvEjTe++ETC4qptLjDlXmxbjrtd/b1mE/P4p7KfIBEGgzaYTqyouH4UtiZipDD
+ 858NIwHDEhsHDDHrttp70Hv02zMlz7mqgXMiaksA3wJq0tPgX3AW5dQDwmkVjh8v2A9g
+ scy4J0cyAVV4JKun2JPAC7j5fztkg2sX6crcRN8W4UOHGGGm5aw/mWatFEeYE9jF5xuk
+ BoiQ==
+X-Gm-Message-State: APjAAAXx4PGKwjmWHqnEEnd9LaQBDwvfD9ftOfu0L43tJHrK2O4dp7yx
+ Dzc5lFjobrwmVJledNmhSR+qSQ==
+X-Google-Smtp-Source: APXvYqxZPxmjKDrX6qaIAHUHw+C1N00YG7sQZ3LlJQI82pPSqSle/mwIkSWtTrw45chaqVN4gLgSdg==
+X-Received: by 2002:a1c:7a02:: with SMTP id v2mr98355044wmc.159.1564393196581; 
+ Mon, 29 Jul 2019 02:39:56 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id h16sm64816360wrv.88.2019.07.29.02.39.55
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 29 Jul 2019 02:39:56 -0700 (PDT)
+Date: Mon, 29 Jul 2019 11:39:53 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: dillaman@redhat.com
+Message-ID: <20190729093953.k5brrpievkmndfyc@steredhat>
+References: <20190723071342.383909-1-sgarzare@redhat.com>
+ <CA+aFP1BMUitx40WDT-fcWDjO62j3EsoSdg=3HF2b6c1EdwzUxg@mail.gmail.com>
+ <20190725081334.s2btvq3zdorj7lb5@steredhat>
+ <CA+aFP1CjAMdbFOTy125xWLVm6mE35MX+6pOQ-fRq8NYpPkdRjw@mail.gmail.com>
+ <20190726084816.buweyjycku5qgl3o@steredhat>
+ <CA+aFP1A5khhJj+7Yhwaghhsu7Y-pjiiAAHDN4cB-ZSc6jLtfig@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9X=F2=XP97pf171LJ0PiKHTPNNtKZSqJ8g06CmqWmzUA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+aFP1A5khhJj+7Yhwaghhsu7Y-pjiiAAHDN4cB-ZSc6jLtfig@mail.gmail.com>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.65
-Subject: Re: [Qemu-devel] [PATCH 4/8] convert libqemuutil to meson
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v3] block/rbd: add preallocation support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,36 +85,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/07/19 11:32, Peter Maydell wrote:
->> The NetBSD thing could be worked around with a static library but
->> instead those -D options could be added as global C++ flags:
->>
->>     __STDC_LIMIT_MACROS and __STDC_CONSTANT_MACROS are a workaround to
->>     allow C++ programs to use stdint.h macros specified in the C99
->>     standard that aren't in the C++ standard.
->>
->> Likewise, the -Wno-sign-compare probably should be added to all files
->> for GCC <=4.6, but in fact we don't support anymore GCC 4.6 so it can go
->> away.
->
-> I think it's an indication that the mechanism in general is
-> useful. Switching to a new build system worries me if we
-> already find that it is lacking flexibility we're using with
-> our current build system -- it suggests that there's likely
-> to be missing stuff we're going to run into in future as well...
+On Fri, Jul 26, 2019 at 08:46:56AM -0400, Jason Dillaman wrote:
+> On Fri, Jul 26, 2019 at 4:48 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> >
+> > On Thu, Jul 25, 2019 at 09:30:30AM -0400, Jason Dillaman wrote:
+> > > On Thu, Jul 25, 2019 at 4:13 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > > >
+> > > > On Wed, Jul 24, 2019 at 01:48:42PM -0400, Jason Dillaman wrote:
+> > > > > On Tue, Jul 23, 2019 at 3:13 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+> > > > > >
+> > > > > > This patch adds the support of preallocation (off/full) for the RBD
+> > > > > > block driver.
+> > > > > > If rbd_writesame() is available and supports zeroed buffers, we use
+> > > > > > it to quickly fill the image when full preallocation is required.
+> > > > > >
+> > > > > > Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> > > > > > ---
+> > > > > > v3:
+> > > > > >  - rebased on master
+> > > > > >  - filled with zeroed buffer [Max]
+> > > > > >  - used rbd_writesame() only when we can disable the discard of zeroed
+> > > > > >    buffers
+> > > > > >  - added 'since: 4.2' in qapi/block-core.json [Max]
+> > > > > >  - used buffer as large as the "stripe unit"
+> > > > > > ---
+> > > > > >  block/rbd.c          | 202 ++++++++++++++++++++++++++++++++++++++++---
+> > > > > >  qapi/block-core.json |   5 +-
+> > > > > >  2 files changed, 192 insertions(+), 15 deletions(-)
+> > > > > >
+> > > > > > diff --git a/block/rbd.c b/block/rbd.c
+> > > > > > index 59757b3120..d923a5a26c 100644
+> > > > > > --- a/block/rbd.c
+> > > > > > +++ b/block/rbd.c
+> > > > > > @@ -64,6 +64,7 @@
+> > > > > >  #define OBJ_MAX_SIZE (1UL << OBJ_DEFAULT_OBJ_ORDER)
+> > > > > >
+> > > > > >  #define RBD_MAX_SNAPS 100
+> > > > > > +#define RBD_DEFAULT_CONCURRENT_OPS 10
+> > > > > >
+> > > > > >  /* The LIBRBD_SUPPORTS_IOVEC is defined in librbd.h */
+> > > > > >  #ifdef LIBRBD_SUPPORTS_IOVEC
+> > > > > > @@ -104,6 +105,7 @@ typedef struct BDRVRBDState {
+> > > > > >      char *image_name;
+> > > > > >      char *snap;
+> > > > > >      uint64_t image_size;
+> > > > > > +    bool ws_zero_supported; /* rbd_writesame() supports zeroed buffers */
+> > > > > >  } BDRVRBDState;
+> > > > > >
+> > > > > >  static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+> > > > > > @@ -333,6 +335,155 @@ static void qemu_rbd_memset(RADOSCB *rcb, int64_t offs)
+> > > > > >      }
+> > > > > >  }
+> > > > > >
+> > > > > > +static int qemu_rbd_get_max_concurrent_ops(rados_t cluster)
+> > > > > > +{
+> > > > > > +    char buf[16];
+> > > > > > +    int ret, max_concurrent_ops;
+> > > > > > +
+> > > > > > +    ret = rados_conf_get(cluster, "rbd_concurrent_management_ops", buf,
+> > > > > > +                         sizeof(buf));
+> > > > > > +    if (ret < 0) {
+> > > > > > +        return RBD_DEFAULT_CONCURRENT_OPS;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    ret = qemu_strtoi(buf, NULL, 10, &max_concurrent_ops);
+> > > > > > +    if (ret < 0) {
+> > > > > > +        return RBD_DEFAULT_CONCURRENT_OPS;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    return max_concurrent_ops;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static int qemu_rbd_do_truncate(rados_t cluster, rbd_image_t image,
+> > > > > > +                                int64_t offset, PreallocMode prealloc,
+> > > > > > +                                bool ws_zero_supported, Error **errp)
+> > > > > > +{
+> > > > > > +    uint64_t current_length;
+> > > > > > +    char *buf = NULL;
+> > > > > > +    int ret;
+> > > > > > +
+> > > > > > +    ret = rbd_get_size(image, &current_length);
+> > > > > > +    if (ret < 0) {
+> > > > > > +        error_setg_errno(errp, -ret, "Failed to get file length");
+> > > > > > +        goto out;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    if (current_length > offset && prealloc != PREALLOC_MODE_OFF) {
+> > > > > > +        error_setg(errp, "Cannot use preallocation for shrinking files");
+> > > > > > +        ret = -ENOTSUP;
+> > > > > > +        goto out;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    switch (prealloc) {
+> > > > > > +    case PREALLOC_MODE_FULL: {
+> > > > > > +        uint64_t buf_size, current_offset = current_length;
+> > > > > > +        ssize_t bytes;
+> > > > > > +
+> > > > > > +        ret = rbd_get_stripe_unit(image, &buf_size);
+> > > > > > +        if (ret < 0) {
+> > > > > > +            error_setg_errno(errp, -ret, "Failed to get stripe unit");
+> > > > > > +            goto out;
+> > > > > > +        }
+> > > > > > +
+> > > > > > +        ret = rbd_resize(image, offset);
+> > > > > > +        if (ret < 0) {
+> > > > > > +            error_setg_errno(errp, -ret, "Failed to resize file");
+> > > > > > +            goto out;
+> > > > > > +        }
+> > > > > > +
+> > > > > > +        buf = g_malloc0(buf_size);
+> > > > > > +
+> > > > > > +#ifdef LIBRBD_SUPPORTS_WRITESAME
+> > > > > > +        if (ws_zero_supported) {
+> > > > > > +            uint64_t writesame_max_size;
+> > > > > > +            int max_concurrent_ops;
+> > > > > > +
+> > > > > > +            max_concurrent_ops = qemu_rbd_get_max_concurrent_ops(cluster);
+> > > > > > +            /*
+> > > > > > +             * We limit the rbd_writesame() size to avoid to spawn more then
+> > > > > > +             * 'rbd_concurrent_management_ops' concurrent operations.
+> > > > > > +             */
+> > > > > > +            writesame_max_size = MIN(buf_size * max_concurrent_ops, INT_MAX);
+> > > > >
+> > > > > In the most efficient world, the 'buf_size' would be some small, fixed
+> > > > > power of 2 value (like 512 bytes) since there isn't much need to send
+> > > > > extra zeroes. You would then want to writesame the full stripe period
+> > > > > (if possible), where a stripe period is the data block object size
+> > > > > (defaults to 4MiB and is availble via 'rbd_stat') * the stripe count.
+> > > > > In this case, the stripe count becomes the number of in-flight IOs.
+> > > > > Therefore, you could substitute its value w/ the max_concurrent_ops to
+> > > > > ensure you are issuing exactly max_concurrent_ops IOs per
+> > > > > rbd_writesame call.
+> > > > >
+> > > >
+> > > > Initially, I had a fixed buffer size to 4 KiB, but I noted that, when
+> > > > we didn't use writesame, the rbd_write() was very slow, so I used the
+> > > > stripe unit as a buffer size.
+> > > >
+> > > > Do you think is better to have a small buffer (512 byte) when we use
+> > > > writesame or a 'stripe unit' buffer when we can't use it?
+> > >
+> > > I'd use a small buffer for rbd_writesame and then just reallocate the
+> >
+> > My idea was to allocate a small buffer for rbd_writesame and use the
+> > same to write the remaining bytes that should be a few.
+> > If the buffer was not allocated (so we didn't use the rbd_writesame),
+> > I'll allocate the big one:
+> >
+> >         if (ws_zero_supported) {
+> >             buf_size = 512;
+> >             buf = g_malloc0(buf_size);
+> >             ...
+> >         }
+> >
+> >         if (!buf) {
+> >             buf_size = object_size * max_concurrent_ops;
+> >             buf = g_malloc0(buf_size);
+> >         }
+> >
+> >         while (current_offset < offset) {
+> >             bytes = rbd_write(...)
+> >             ...
+> >         }
+> >
+> > > buffer to a larger size for "rbd_write". It would be most efficient to
+> > > allocate a "object size * max concurrent ops" -sized buffer (up to
+> >
+> > Why "object size * max concurrent ops" and not
+> > "stripe_unit * max concurrent ops"?
+> > IIUC stripe_unit can be smaller than object size.
+> 
+> Correct, stripe unit *must* be smaller than the object size (and both
+> are powers of two). However, it's more efficient to send fewer larger
+> writes to a backing object than sending more small writes --
+> especially in the case of writesame where you don't have the network
+> overhead of transferring a large zeroed buffer. Replacing the full
+> backing object is even more efficient since it will just need to
+> perform a single backing disk allocation that will be continuous
+> instead of fragmented.
+> 
 
-I agree that the mechanism in general is useful and it's worth thinking
-twice about the consequences of not having it (see the CET example).
-However, in both of these cases it seems to me that the per-file CFLAGS
-were used when they should have not.
+Okay, so IIUC I should do the following:
+- if we can use rbd_writesame
+    ~ allocates a buffer of 512 bytes
+    ~ writes "object size * max concurrent ops" bytes per call
+- if we use rbd_write
+    ~ allocates a buffer of "object size * max concurrent ops" bytes
+    ~ writes the entire buffer per call (aligning to the stripe unit)
 
-Paolo
+Is that correct?
+
+Thanks,
+Stefano
 
