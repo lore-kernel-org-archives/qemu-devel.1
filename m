@@ -2,76 +2,90 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8355FC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD271C76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:20:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14B282073F
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:18:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14B282073F
+	by mail.kernel.org (Postfix) with ESMTPS id 7D68D2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:20:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D68D2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsD2o-0000Is-TE
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:18:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56693)
+	id 1hsD40-0001kC-Lf
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:20:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57312)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hsD06-0005cm-IV
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:11 -0400
+ (envelope-from <eblake@redhat.com>) id 1hsD3V-00016m-43
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:19:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hsD05-0003gD-GQ
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:10 -0400
-Received: from mail-qk1-f174.google.com ([209.85.222.174]:46608)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hsD05-0003fx-B9
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:16:09 -0400
-Received: by mail-qk1-f174.google.com with SMTP id r4so44993288qkm.13
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 14:16:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=+ZGWjw1OaIuDmpM6NLOjoTAP/QWzrO1rV9SIMYsAMog=;
- b=X7J7gv6skOzWPyptsgoE9ZxDLkLcrq7g9V/21/28JbAh2CQu6L+TW4dJ15KhziyA53
- W+YBbmdNGUO7j/I8e9bx8Na6ULCicZQVAcBGhq0ofM52APnTPpdWcBPOdjeeKen4Ycrr
- 0St+rnQcaVBKUoBwuJwZ8NvCRSBn+PHnEZUzZL7EUio3qMsWwI78UcXkOYWmxFXhE52k
- Gb3co4L6a02UBhwjPbsvcr+7LZ/Sury/ePmpgCPa+USaRVAjsPr7Pe4p2Swrn4xbboAR
- Y39cPr61a1qrBkx3FxxeD1ErJDLXnG8/h3mO27aa9qM+dVAynEUGmSRpmK0YdeCHzjtf
- Emgg==
-X-Gm-Message-State: APjAAAVdyPK7GQeNXX2NxdG6YCGwDkfU7Cs358KkdIO+dI7A6PVyzwWj
- l4G/V17Z3YEo/av6IT7hzBEjWZ2VLeiTCw==
-X-Google-Smtp-Source: APXvYqwIQRWLRqfFv/di1aDwV3wzaravRnPZtgbUFHmiCYiQsOAGTH224E3dS91XJ1a0yj4jzNSbLg==
-X-Received: by 2002:a05:620a:113b:: with SMTP id
- p27mr44241325qkk.397.1564434968332; 
- Mon, 29 Jul 2019 14:16:08 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- l123sm26687136qkc.9.2019.07.29.14.16.05
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 29 Jul 2019 14:16:07 -0700 (PDT)
-Date: Mon, 29 Jul 2019 17:16:03 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Message-ID: <20190729162903.4489-2-dgilbert@redhat.com>
-References: <20190729211404.1533-1-mst@redhat.com>
+ (envelope-from <eblake@redhat.com>) id 1hsD3U-00047t-7P
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:19:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56612)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hsD3S-00046F-6G; Mon, 29 Jul 2019 17:19:38 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 517163082126;
+ Mon, 29 Jul 2019 21:19:37 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 621DE608A5;
+ Mon, 29 Jul 2019 21:19:29 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
+ <20190725100550.33801-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <3916bd0a-561e-637b-1445-76fe19ce5321@redhat.com>
+Date: Mon, 29 Jul 2019 16:19:28 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-In-Reply-To: <20190729211404.1533-1-mst@redhat.com>
-X-Mailer: git-send-email 2.22.0.678.g13338e74b8
-X-Mutt-Fcc: =sent
+In-Reply-To: <20190725100550.33801-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wygaEbHWdsJZCce7qRTjMyXdYefqdB0TE"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Mon, 29 Jul 2019 21:19:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.174
-Subject: [Qemu-devel] [PULL 1/3] Revert "Revert "globals: Allow global
- properties to be optional""
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] block/stream: use BDRV_REQ_PREFETCH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,69 +97,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, fam@euphon.net, mreitz@redhat.com, stefanha@redhat.com,
+ den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20190729211603.TWAn8DUF8pFfWg9RwqzBnmx9axYgHpaXYomPGlIqhNY@z>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wygaEbHWdsJZCce7qRTjMyXdYefqdB0TE
+Content-Type: multipart/mixed; boundary="FHCcx3W8rbNVdnJXUlTMgH9eHp6MyH0uQ";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, den@openvz.org
+Message-ID: <3916bd0a-561e-637b-1445-76fe19ce5321@redhat.com>
+Subject: Re: [PATCH v3 2/3] block/stream: use BDRV_REQ_PREFETCH
+References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
+ <20190725100550.33801-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190725100550.33801-3-vsementsov@virtuozzo.com>
 
-This reverts commit 8fa70dbd8bb478d9483c1da3e9976a2d86b3f9a0.
+--FHCcx3W8rbNVdnJXUlTMgH9eHp6MyH0uQ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Because we're about to revert it's neighbour and thus uses an optional
-again.
+On 7/25/19 5:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+> This helps to avoid extra io, allocations and memory copying.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/stream.c | 20 +++++++-------------
+>  1 file changed, 7 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/block/stream.c b/block/stream.c
+> index 6ac1e7bec4..170e3b43be 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -22,11 +22,11 @@
+> =20
+>  enum {
+>      /*
+> -     * Size of data buffer for populating the image file.  This should=
+ be large
+> +     * Maximum chunk size to feed it to copy-on-read.  This should be =
+large
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20190729162903.4489-2-dgilbert@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- include/hw/qdev-core.h | 3 +++
- qom/object.c           | 3 +++
- 2 files changed, 6 insertions(+)
+s/feed it/feed/
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index e157fc4acd..136df7774c 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -252,6 +252,8 @@ struct PropertyInfo {
- /**
-  * GlobalProperty:
-  * @used: Set to true if property was used when initializing a device.
-+ * @optional: If set to true, GlobalProperty will be skipped without errors
-+ *            if the property doesn't exist.
-  *
-  * An error is fatal for non-hotplugged devices, when the global is applied.
-  */
-@@ -260,6 +262,7 @@ typedef struct GlobalProperty {
-     const char *property;
-     const char *value;
-     bool used;
-+    bool optional;
- } GlobalProperty;
- 
- static inline void
-diff --git a/qom/object.c b/qom/object.c
-index 3966a3d461..1555547727 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -386,6 +386,9 @@ void object_apply_global_props(Object *obj, const GPtrArray *props, Error **errp
-         if (object_dynamic_cast(obj, p->driver) == NULL) {
-             continue;
-         }
-+        if (p->optional && !object_property_find(obj, p->property, NULL)) {
-+            continue;
-+        }
-         p->used = true;
-         object_property_parse(obj, p->value, p->property, &err);
-         if (err != NULL) {
--- 
-MST
+Will fix during staging
 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--FHCcx3W8rbNVdnJXUlTMgH9eHp6MyH0uQ--
+
+--wygaEbHWdsJZCce7qRTjMyXdYefqdB0TE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0/YuAACgkQp6FrSiUn
+Q2o9iwf+MBN3Hq6ue6osc5ej6z0PxsTRfvAejLvM91IMz652clm7J4dpY9VZOM5P
+TXjU4eO2uFirQ0gqc3hRrCAm8zsETe2p3BzQu3BrXggSa1LN0hgjRJ2MP0nmS+7j
+uVrmT8TIv/KnCNJaq1g2uK57zmaVpaUFDbcbF4nJEmHMIpvX4+ZZ3ymPvpmSr4QJ
+OzxDPVNAs1gH1sSMGNmXvGf6jRMw+JBmqKSBFZmKZv9L3Qlm/MqmDVPaKD1dR/MR
+fFsI5wN0qvI+ZaPpigaUgUbQ2Z5Wr+scuO7tZbKx99eyX7oTx04VWef+z3v/YqkZ
+BMOPY7sjPUWIYMzlE2HiCI3Vf3KBZw==
+=11yv
+-----END PGP SIGNATURE-----
+
+--wygaEbHWdsJZCce7qRTjMyXdYefqdB0TE--
 
