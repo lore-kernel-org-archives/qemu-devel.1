@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDD5C7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F170EC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:17:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABDEB21655
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:17:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C170F21655
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:17:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="HlNjKQcM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABDEB21655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="QNTC4OP8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C170F21655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7P2-0005XT-0T
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:17:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39613)
+	id 1hs7P6-0005gK-1m
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:17:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39814)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs799-0007HI-HC
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:08 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs79E-0007Tp-3X
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs798-0006Xk-6s
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:07 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:49064)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs79C-0006fX-Qq
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 11:01:11 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:49066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hs78x-0005ZH-3s; Mon, 29 Jul 2019 11:00:55 -0400
+ id 1hs78x-0005ZG-3G; Mon, 29 Jul 2019 11:00:55 -0400
 Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id 8950E9702D;
- Mon, 29 Jul 2019 14:59:25 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id F08FB9702E;
+ Mon, 29 Jul 2019 14:59:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564412366;
+ s=mail; t=1564412368;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ktiT63C3qh5TZrbCabCo/OpHpi9eQGkR5JjcE/VjSh4=;
- b=HlNjKQcMc27bLTChaJLKPVXWY7hoAiNPxnOIZviZO4qyPAWpfu6QADe5fwW7nRDPLG9zHs
- fd3jdqwGFaNxH7c0fqo7IQoHzEutW00kV5+XAWFwAtjUmC6q0FaDY+f/pd6cVxylcw1M8Z
- Ql8PO6UxQz3r4KvLhco3pDo3DkUDfgc=
+ bh=X6a9yB+7WOaxY+qK9/kQ2MT/JV31qgwvuX92IoveZZc=;
+ b=QNTC4OP8wnUjZckFl9TQNiZg5F3JNO7F8q8fshP/6FJ+iTiJhoNo+PmsM56el60+nb3I1m
+ 6y2AhnL+2h/k8zBm+RaOMdUvAG1Kfvk8bF7f4bs9nXcxFiHLM0ZqtP/Ukb1fx7Ez873rVf
+ k5MKqB2Lp87XTeONIHv2nlDoFbWZoQ8=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 16:56:47 +0200
-Message-Id: <20190729145654.14644-27-damien.hedde@greensocs.com>
+Date: Mon, 29 Jul 2019 16:56:48 +0200
+Message-Id: <20190729145654.14644-28-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190729145654.14644-1-damien.hedde@greensocs.com>
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564412366;
+ s=mail; t=1564412368;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ktiT63C3qh5TZrbCabCo/OpHpi9eQGkR5JjcE/VjSh4=;
- b=Gt/EhTEZrrDQHDkdpyzEL8/qepLHd1f4VuZho0yLvzVK9x6gINTuwF3YyDcjdy0k+KUjLD
- K7w/U9uOWqqBksxcOZ29HWZ9NX7msRR33WRswJcuhBNFMTZGvNiHNwJYe7ey/h+64DkM4D
- Gz0uSUmqFwkOlBG8+24ZDb64kzlyi0w=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412366; a=rsa-sha256; cv=none;
- b=QmGwgVvFK2E2KgNlIQn/U7wMhdi7n22WLjek7SR52yo/XXP0Vqvp3qmgyCCVhYtGln3GYW
- FbQEyhI6+LOvRwNka/nCuvtiHIVv/c+hGD6kPozXKI4vjbh2qj/IB8m3to5xuLfGwkgpIh
- 1gjyC6ea+c2tIaTDlIM8mwsWotmvJ+o=
+ bh=X6a9yB+7WOaxY+qK9/kQ2MT/JV31qgwvuX92IoveZZc=;
+ b=rIEvNpTiEw4NGTdnopR6kQIGPHKDDvWCetQdwsSBfCIah/t/nXLzJPuHNeKUSxr/2MxxKF
+ GJr+tNsngNVE1RSKmh6grXvm1KqalseSQF/Gj/dyDT1j+Sdsold/qk7x8ce3/HQ+EU1KXq
+ y1Vmhz10YgKhA1vsSdQYFy9bNfZp6/M=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412368; a=rsa-sha256; cv=none;
+ b=UgzksAO3615upQ0mtA93qhU5YRgjXWxjUbiMqR5Iw0olCUPAy+KjKPs+ccTd6gS7xFeJNi
+ 3WlEOFsaiNTT+0xF/gj4yQZOWeRFf55INdfTvV9VeylHy8CwFWhUsXDZDcpiChHpaPeLih
+ CNG3KgoXmTqxZBioSlbmWyyZN3TLDfk=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -77,8 +77,8 @@ X-Spam: Yes
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH v3 26/33] hw/s390x/s390-pci-inst.c: remove
- device_legacy_reset call
+Subject: [Qemu-devel] [PATCH v3 27/33] hw/ide/microdrive.c: remove
+ device_legacy_reset calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,30 +104,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace S390PCIBusDevice legacy reset by device_reset_warm.
+Replace MicroDriveState legacy reset by device_reset_warm.
 
 The new function propagates also the reset to the sub-buses tree.
-I'm not sure whether S390PCIBusDevice has bus children or not.
+The MicroDriveState has a child bus so it is now reset automatically
+as well as all the qdev sub tree. It seems to me that IDE_BUS and
+IDE_DEVICEs reset methods are not implemented so resetting the
+qdev/qbus ide tree will have no effect.
+
+Keep the explicit call to ide_bus_reset (in md_reset function) since
+it is not called when using the standard reset method of the IDE_BUS
+object.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/s390x/s390-pci-inst.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ide/microdrive.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 93cda37c27..d7bca68245 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -242,7 +242,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintpt=
-r_t ra)
-                 stw_p(&ressetpci->hdr.rsp, CLP_RC_SETPCIFN_FHOP);
-                 goto out;
-             }
--            device_legacy_reset(DEVICE(pbdev));
-+            device_reset_warm(DEVICE(pbdev));
-             pbdev->fh &=3D ~FH_MASK_ENABLE;
-             pbdev->state =3D ZPCI_FS_DISABLED;
-             stl_p(&ressetpci->fh, pbdev->fh);
+diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
+index fc346f5ad5..afe2342da8 100644
+--- a/hw/ide/microdrive.c
++++ b/hw/ide/microdrive.c
+@@ -173,7 +173,7 @@ static void md_attr_write(PCMCIACardState *card, uint=
+32_t at, uint8_t value)
+     case 0x00:	/* Configuration Option Register */
+         s->opt =3D value & 0xcf;
+         if (value & OPT_SRESET) {
+-            device_legacy_reset(DEVICE(s));
++            device_reset_warm(DEVICE(s));
+         }
+         md_interrupt_update(s);
+         break;
+@@ -316,7 +316,7 @@ static void md_common_write(PCMCIACardState *card, ui=
+nt32_t at, uint16_t value)
+     case 0xe:	/* Device Control */
+         s->ctrl =3D value;
+         if (value & CTRL_SRST) {
+-            device_legacy_reset(DEVICE(s));
++            device_reset_warm(DEVICE(s));
+         }
+         md_interrupt_update(s);
+         break;
+@@ -541,7 +541,7 @@ static int dscm1xxxx_attach(PCMCIACardState *card)
+     md->attr_base =3D pcc->cis[0x74] | (pcc->cis[0x76] << 8);
+     md->io_base =3D 0x0;
+=20
+-    device_legacy_reset(DEVICE(md));
++    device_reset_warm(DEVICE(md));
+     md_interrupt_update(md);
+=20
+     return 0;
+@@ -551,7 +551,7 @@ static int dscm1xxxx_detach(PCMCIACardState *card)
+ {
+     MicroDriveState *md =3D MICRODRIVE(card);
+=20
+-    device_legacy_reset(DEVICE(md));
++    device_reset_warm(DEVICE(md));
+     return 0;
+ }
+=20
 --=20
 2.22.0
 
