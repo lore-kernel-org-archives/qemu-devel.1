@@ -2,91 +2,81 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D702C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5E3C76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:33:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2CEB206DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:25:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2CEB206DD
+	by mail.kernel.org (Postfix) with ESMTPS id ACF6B2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:33:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACF6B2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsD9L-0004CZ-7P
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:25:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58190)
+	id 1hsDGr-0006kY-O8
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:33:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59298)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsD8U-0003bK-IJ
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:24:51 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hsDFa-0006BW-Rr
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:32:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsD8T-00014Z-Ly
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:24:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39866)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hsD8R-00012y-EH; Mon, 29 Jul 2019 17:24:47 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A356A30842A9;
- Mon, 29 Jul 2019 21:24:46 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E47B5C1A1;
- Mon, 29 Jul 2019 21:24:40 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
- <20190725100550.33801-4-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hsDFZ-0003tS-T1
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:32:10 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36626)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsDFY-0003sk-5O
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:32:08 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n4so63488000wrs.3
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 14:32:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ta6yFkWaTOOr9slw1D7NlZu6j2glEYecvNoJPmsns0A=;
+ b=hesY7msPyczgH93SFgfWN7KUCHXtL8rESwZR8gF0ldck0NeQYxmKkcMU+eac92k05D
+ QvtzDulKTSa2FX+u9La0+O1rQyHj2EHAMLTlxNY8bTggxuaetkQYNUnDKwpJwF9fQoNL
+ tSDZxbaFPAkj6nIqemEF+fxEiF5B+lvyg5ozlhbxQvZy964LediTk9XQZXpUTqqM0gX+
+ jvZLADlwfYRe+oSNeCIAhN1Nxw683XBwdWA2RtaDFvXWe42FlFMgNjtzlPsPU/W0d/Z1
+ CqQ5uwkxaYkUQj9WTe2CS8AKU9A/NmR4jqq9V8dwyudbSTHNLFY64g1Fnm8INuMgEp7t
+ xUaQ==
+X-Gm-Message-State: APjAAAVIdHvDmu93w/zwrB44wEWgCfDvMilR7CrqH9yYHoRDOK26GNQI
+ tZrkxx7Lu4U4frLgdh3gXmTBuQ==
+X-Google-Smtp-Source: APXvYqw/6vsvpgcxOrpbzUSvwcfC3uaO3zsN5VjsMLXdR6oFcqbcWtBhT8d5AZNw7Nmkpuq8RP7WBg==
+X-Received: by 2002:adf:de8e:: with SMTP id w14mr3032317wrl.79.1564435926423; 
+ Mon, 29 Jul 2019 14:32:06 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id w25sm59038357wmk.18.2019.07.29.14.32.05
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 29 Jul 2019 14:32:05 -0700 (PDT)
+To: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+References: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
+ <087e6cb5-b24d-b144-744c-d74defeadb86@redhat.com>
+ <34a8030e-a173-162d-6786-3dafa5a1d4ed@redhat.com>
+ <20190729100946.GC3369@stefanha-x1.localdomain>
+ <9c34e70f-5ead-309c-865c-4a64d8a28724@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <cf6ad0f9-1e4c-9f8a-ab0c-512beaeba53b@redhat.com>
-Date: Mon, 29 Jul 2019 16:24:39 -0500
+Message-ID: <7005cc99-3bb2-fa70-aaf6-86870c37827b@redhat.com>
+Date: Mon, 29 Jul 2019 23:32:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190725100550.33801-4-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JvnGETKiE3y0Bb1A2GKC0lFYaxtOSIYX6"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 29 Jul 2019 21:24:46 +0000 (UTC)
+In-Reply-To: <9c34e70f-5ead-309c-865c-4a64d8a28724@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] nbd: improve CMD_CACHE: use
- BDRV_REQ_PREFETCH
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH] Fix Guest VM crash due to iSCSI Sense Key
+ error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,73 +88,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, mreitz@redhat.com, stefanha@redhat.com,
- den@openvz.org, jsnow@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, shaju.abraham@nutanix.com,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JvnGETKiE3y0Bb1A2GKC0lFYaxtOSIYX6
-Content-Type: multipart/mixed; boundary="7DXtuCtQCPjHrlVVZ3XA9aAHv2BaqsOch";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net,
- stefanha@redhat.com, den@openvz.org
-Message-ID: <cf6ad0f9-1e4c-9f8a-ab0c-512beaeba53b@redhat.com>
-Subject: Re: [PATCH v3 3/3] nbd: improve CMD_CACHE: use BDRV_REQ_PREFETCH
-References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
- <20190725100550.33801-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190725100550.33801-4-vsementsov@virtuozzo.com>
+On 29/07/19 21:45, John Snow wrote:
+> Next, we'll unschedule the BH if there is one. I think the only case
+> where there is one is the reschedule_dma case of dma_blk_cb. (I'm not
+> too familiar with these DMA helpers: in what cases do we expect the iov
+> to be empty?)
 
---7DXtuCtQCPjHrlVVZ3XA9aAHv2BaqsOch
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+When there is another I/O that is using the DMA bounce buffer (the one
+case that comes to mind in which you do DMA from MMIO areas is
+loading/saving VGA RAM).
 
-On 7/25/19 5:05 AM, Vladimir Sementsov-Ogievskiy wrote:
-> This helps to avoid extra io, allocations and memory copying.
-> We assume here that CMD_CACHE is always used with copy-on-read, as
-> otherwise it's a noop.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  nbd/server.c | 43 +++++++++++++++++++++++++++++++++++--------
->  1 file changed, 35 insertions(+), 8 deletions(-)
+> So it looks like this cancellation will produce one of two effects,
+> depending on when it's invoked:
+> 
+> 1) We'll stall the DMA permanently by deleting that BH, because
+> dma_complete will never get invoked and therefore nobody will ever call
+> ide_dma_cb with any return value of any kind. The IDE state machine
+> likely just hangs waiting for the DMA to finish until the guest OS
+> decides to reset the errant controller.
+> 
+> 2) The DMA will continue blissfully unaware it was canceled, because the
+> lower AIOCB has no cancel method, and so will finish, call back to
+> dma_blk_cb, and continue the transfer loop unaware.
+> 
+> 
+> ... Does your reading align with mine?
+> 
+> 
+> If it does -- if there are indeed no places in the code today that
+> artificially inject -ECANCELED -- I need to remove these special stanzas
+> from the IDE code and allow the IDE state machine to handle these errors
+> as true errors.
 
-libnbd is able to test NBD_CMD_CACHE requests, and I've confirmed that
-behavior looks sane under requests issued that way.  I'm wondering if
-qemu-io should also be able to drive this mode of operation, so that we
-can give it iotest coverage without depending on libnbd.
+The bug is that there is no place to inject -ECANCELED in the dbs->bh
+case.  I've sent an obviously^W untested patch.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Paolo
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> I'm just not confident enough in my unwinding of the DMA callback
+> spaghetti, though.
+> 
+> --js
+> 
 
-
---7DXtuCtQCPjHrlVVZ3XA9aAHv2BaqsOch--
-
---JvnGETKiE3y0Bb1A2GKC0lFYaxtOSIYX6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0/ZBcACgkQp6FrSiUn
-Q2piqwf9GkW1J2wWRfanofOBM2Gfd59lxQT0NysiXy1EAXHDqV6d44KsNxUAh0+k
-G7waRCrpiHWaNL1ctPCcUiBv92yWDdLJ0wNplLn0SfljKPu4uhYfmSEVGnuw8SSi
-qBXp+/1f4yEenDkeFIJqFDOOc9G3Ue2RBoXXm4IhLdvDOb+ufqD8U/a5ttffh/ZM
-2GN8n3wDiG5ma9yAwZa2InQLoowIwz+cS/GNxCSXbySfKNySIWffMWOdqx24Zlwf
-MlC4dAxZpdW3f8X+A780/jOJSPQcN45kiyeJlgJEFxgZxGFho0O0WNXgL+4YBXqK
-WS/fYr8BDAS6aNWKhOlcBzF0r5RDjA==
-=yZZX
------END PGP SIGNATURE-----
-
---JvnGETKiE3y0Bb1A2GKC0lFYaxtOSIYX6--
 
