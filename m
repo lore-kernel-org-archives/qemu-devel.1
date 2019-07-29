@@ -2,139 +2,86 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F79BC76186
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FCBC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 453EB2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:47:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453EB2067D
+	by mail.kernel.org (Postfix) with ESMTPS id 2ECFC2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:48:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NI4nBOH1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ECFC2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsDUT-0006Q7-DG
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33504)
+	id 1hsDVU-0007jH-DP
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:48:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33661)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hsDTz-0005wg-Cu
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:47:04 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hsDUn-0006vf-Dq
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hsDTy-0002ou-AH
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:47:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52378)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hsDTv-0002lI-Qk; Mon, 29 Jul 2019 17:47:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C997B44BD1;
- Mon, 29 Jul 2019 21:46:58 +0000 (UTC)
-Received: from [10.18.17.74] (dhcp-17-74.bos.redhat.com [10.18.17.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5AA905D9C5;
- Mon, 29 Jul 2019 21:46:58 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20190729213416.1972-1-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <e8d53076-f5d0-ed13-110b-0cce911a07ec@redhat.com>
-Date: Mon, 29 Jul 2019 17:46:57 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hsDUk-0003Kc-Qk
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:47:52 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32930)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1hsDUk-0003Ju-ER
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:47:50 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n9so63546602wru.0
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 14:47:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=pTcqJxuHRzx/IgdDui6F+TGTCaaxU5b/6/alrJ5LvsA=;
+ b=NI4nBOH1ZEgLkBba/65dOnP1/cB7YQvb0jTF7M1jWFhCKEORkpeDm3RDgEyGIRcJRQ
+ N3OWvju2Z0VUV5ARROVmoxvPBAwnyTB9LZvdgY9vwCELk19y/HoG0u7u5z2e2ZEWty2G
+ apRib53aBc5zVDguuBON2dDARx5iiFhowG23iwBgTD2nVGYnOIA8BnJ7mR3+g5GoGBs2
+ Is+fuWIX5VtEW0Lf+JtwaXop9FUgBijE4PzNM5/XrIefMrVtokhjC4cGIxzfRQXxeBXL
+ 7hmVtHZCiXnTxrJTjayJhY8gFMYhhHlyADiCXrRluYpzcWszdX+58f0XYHq1VS0nsW3L
+ 6uug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=pTcqJxuHRzx/IgdDui6F+TGTCaaxU5b/6/alrJ5LvsA=;
+ b=sfa9kbb9JYodkJ1vjxYb0DnC3qwhb2lmF3QOCLbwbAbPHxvMnkmbAuImwfxneIkHh2
+ PP+6zQDyjh4hGNDxGH/F1w+XnuAQzJ9Zk+TFd5EYoJxvaJRiaUyAkQTlpy+CW/uHiaWs
+ 4eRACK3vyrOcepGrJBt05ArClnwInlMXQ4Y9W87nQ06of0IMorqeqBZ3lSvrSl5IAKBX
+ HCd4C92a5r9xfHFWXumM6sS4PtG3wVEAPDIQjQahD6Ps2+/MBVro61DW6m1ftoEwzDT6
+ cUtJOJhQfa2e2KtSzXrx3LQG22nwGb4i/LRvjXjJenVf1FB7EesS0+5y2JWkYErOcpIi
+ frMQ==
+X-Gm-Message-State: APjAAAWX6nlbvx3k1AOw/Nqb1McjurmXpPgsWsGiPWFyHToVPLCVQ9aZ
+ 9G+EsYE91meJArwB1MXCpvLqvlOVMjc=
+X-Google-Smtp-Source: APXvYqwNKYtYxcZcrppFnJalR/XTwvHD03cFu1jMbQcUk2e6nM3pFVsR+/aaiCcO+tvpS8FUoQ4frQ==
+X-Received: by 2002:adf:e8cb:: with SMTP id k11mr38450719wrn.244.1564436868808; 
+ Mon, 29 Jul 2019 14:47:48 -0700 (PDT)
+Received: from donizetti.lan ([2001:b07:6468:f312:29d3:6123:6d5f:2c04])
+ by smtp.gmail.com with ESMTPSA id s3sm62983238wmh.27.2019.07.29.14.47.48
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 29 Jul 2019 14:47:48 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 29 Jul 2019 23:47:17 +0200
+Message-Id: <20190729214717.6616-2-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190729214717.6616-1-pbonzini@redhat.com>
+References: <20190729214717.6616-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190729213416.1972-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Mon, 29 Jul 2019 21:46:58 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] dma-helpers: ensure AIO callback is
- invoked after cancellation
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH] memory: introduce
+ memory_global_after_dirty_log_sync
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,97 +93,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu-block <qemu-block@nongnu.org>
+Cc: peter.maydell@linaro.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+There is a race between TCG and accesses to the dirty log:
 
+      vCPU thread                  reader thread
+      -----------------------      -----------------------
+      TLB check -> slow path
+        notdirty_mem_write
+          write to RAM
+          set dirty flag
+                                   clear dirty flag
+      TLB check -> fast path
+                                   read memory
+        write to RAM
 
-On 7/29/19 5:34 PM, Paolo Bonzini wrote:
-> dma_aio_cancel unschedules the BH if there is one, which corresponds
-> to the reschedule_dma case of dma_blk_cb.  This can stall the DMA
-> permanently, because dma_complete will never get invoked and therefore
-> nobody will ever invoke the original AIO callback in dbs->common.cb.
-> 
-> Fix this by invoking the callback (which is ensured to happen after
-> a bdrv_aio_cancel_async, or done manually in the dbs->bh case), and
-> add assertions to check that the DMA state machine is indeed waiting
-> for dma_complete or reschedule_dma, but never both.
-> 
-> Reported-by: John Snow <jsnow@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  dma-helpers.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/dma-helpers.c b/dma-helpers.c
-> index 2d7e02d..d3871dc 100644
-> --- a/dma-helpers.c
-> +++ b/dma-helpers.c
-> @@ -90,6 +90,7 @@ static void reschedule_dma(void *opaque)
->  {
->      DMAAIOCB *dbs = (DMAAIOCB *)opaque;
->  
-> +    assert(!dbs->acb && dbs->bh);
->      qemu_bh_delete(dbs->bh);
->      dbs->bh = NULL;
->      dma_blk_cb(dbs, 0);
-> @@ -111,15 +112,12 @@ static void dma_complete(DMAAIOCB *dbs, int ret)
->  {
->      trace_dma_complete(dbs, ret, dbs->common.cb);
->  
-> +    assert(!dbs->acb && !dbs->bh);
->      dma_blk_unmap(dbs);
->      if (dbs->common.cb) {
->          dbs->common.cb(dbs->common.opaque, ret);
->      }
->      qemu_iovec_destroy(&dbs->iov);
-> -    if (dbs->bh) {
-> -        qemu_bh_delete(dbs->bh);
-> -        dbs->bh = NULL;
-> -    }
+Fortunately, in order to fix it, no change is required to the
+vCPU thread.  However, the reader thread must delay the read after
+the vCPU thread has finished the write.  This can be approximated
+conservatively by run_on_cpu, which waits for the end of the current
+translation block.
 
-Now presumably handled by dma_aio_cancel,
+A similar technique is used by KVM, which has to do a synchronous TLB
+flush after doing a test-and-clear of the dirty-page flags.
 
->      qemu_aio_unref(dbs);
->  }
->  
-> @@ -179,14 +177,21 @@ static void dma_aio_cancel(BlockAIOCB *acb)
->  
->      trace_dma_aio_cancel(dbs);
->  
-> +    assert(!(dbs->acb && dbs->bh));
->      if (dbs->acb) {
-> +        /* This will invoke dma_blk_cb.  */
+Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ exec.c                | 31 +++++++++++++++++++++++++++++++
+ include/exec/memory.h | 12 ++++++++++++
+ memory.c              | 10 +++++++++-
+ migration/ram.c       |  1 +
+ 4 files changed, 53 insertions(+), 1 deletion(-)
 
-uhh, does it? this is maybe where I got lost reading this code.
-Isn't dbs->acb going to be what was returned from e.g.
-dma_blk_read_io_func, which ultimately uses blk_aio_em_aiocb_info, that
-has no cancel callback?
-
-I thought this was just going to NOP entirely. No?
-
->          blk_aio_cancel_async(dbs->acb);
-> +        return;
->      }
-> +
->      if (dbs->bh) {
->          cpu_unregister_map_client(dbs->bh);
->          qemu_bh_delete(dbs->bh);
->          dbs->bh = NULL;
->      }
-> +    if (dbs->common.cb) {
-> +        dbs->common.cb(dbs->common.opaque, -ECANCELED);
-> +    }
-
-Well, here at least I am now on terra-firma that we're going to call the
-original callback with ECANCELED, which is a step towards code that
-isn't surprising my sensibilities.
-
->  }
->  
->  static AioContext *dma_get_aio_context(BlockAIOCB *acb)
-> 
+diff --git a/exec.c b/exec.c
+index 3e78de3b8f..ae68f72da4 100644
+--- a/exec.c
++++ b/exec.c
+@@ -198,6 +198,7 @@ typedef struct subpage_t {
+ 
+ static void io_mem_init(void);
+ static void memory_map_init(void);
++static void tcg_log_global_after_sync(MemoryListener *listener);
+ static void tcg_commit(MemoryListener *listener);
+ 
+ static MemoryRegion io_mem_watch;
+@@ -906,6 +907,7 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
+     newas->cpu = cpu;
+     newas->as = as;
+     if (tcg_enabled()) {
++        newas->tcg_as_listener.log_global_after_sync = tcg_log_global_after_sync;
+         newas->tcg_as_listener.commit = tcg_commit;
+         memory_listener_register(&newas->tcg_as_listener, as);
+     }
+@@ -3143,6 +3145,35 @@ void address_space_dispatch_free(AddressSpaceDispatch *d)
+     g_free(d);
+ }
+ 
++static void do_nothing(CPUState *cpu, run_on_cpu_data d)
++{
++}
++
++static void tcg_log_global_after_sync(MemoryListener *listener)
++{
++    CPUAddressSpace *cpuas;
++
++    /* Wait for the CPU to end the current TB.  This avoids the following
++     * incorrect race:
++     *
++     *      vCPU                         migration
++     *      ----------------------       -------------------------
++     *      TLB check -> slow path
++     *        notdirty_mem_write
++     *          write to RAM
++     *          mark dirty
++     *                                   clear dirty flag
++     *      TLB check -> fast path
++     *                                   read memory
++     *        write to RAM
++     *
++     * by pushing the migration thread's memory read after the vCPU thread has
++     * written the memory.
++     */
++    cpuas = container_of(listener, CPUAddressSpace, tcg_as_listener);
++    run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
++}
++
+ static void tcg_commit(MemoryListener *listener)
+ {
+     CPUAddressSpace *cpuas;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index bb0961ddb9..b6bcf31b0a 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -419,6 +419,7 @@ struct MemoryListener {
+     void (*log_clear)(MemoryListener *listener, MemoryRegionSection *section);
+     void (*log_global_start)(MemoryListener *listener);
+     void (*log_global_stop)(MemoryListener *listener);
++    void (*log_global_after_sync)(MemoryListener *listener);
+     void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *section,
+                         bool match_data, uint64_t data, EventNotifier *e);
+     void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection *section,
+@@ -1681,6 +1682,17 @@ MemoryRegionSection memory_region_find(MemoryRegion *mr,
+  */
+ void memory_global_dirty_log_sync(void);
+ 
++/**
++ * memory_global_dirty_log_sync: synchronize the dirty log for all memory
++ *
++ * Synchronizes the vCPUs with a thread that is reading the dirty bitmap.
++ * This function must be called after the dirty log bitmap is cleared, and
++ * before dirty guest memory pages are read.  If you are using
++ * #DirtyBitmapSnapshot, memory_region_snapshot_and_clear_dirty() takes
++ * care of doing this.
++ */
++void memory_global_after_dirty_log_sync(void);
++
+ /**
+  * memory_region_transaction_begin: Start a transaction.
+  *
+diff --git a/memory.c b/memory.c
+index e42d63a3a0..edd0c13c38 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2127,9 +2127,12 @@ DirtyBitmapSnapshot *memory_region_snapshot_and_clear_dirty(MemoryRegion *mr,
+                                                             hwaddr size,
+                                                             unsigned client)
+ {
++    DirtyBitmapSnapshot *snapshot;
+     assert(mr->ram_block);
+     memory_region_sync_dirty_bitmap(mr);
+-    return cpu_physical_memory_snapshot_and_clear_dirty(mr, addr, size, client);
++    snapshot = cpu_physical_memory_snapshot_and_clear_dirty(mr, addr, size, client);
++    memory_global_after_dirty_log_sync();
++    return snapshot;
+ }
+ 
+ bool memory_region_snapshot_get_dirty(MemoryRegion *mr, DirtyBitmapSnapshot *snap,
+@@ -2620,6 +2623,11 @@ void memory_global_dirty_log_sync(void)
+     memory_region_sync_dirty_bitmap(NULL);
+ }
+ 
++void memory_global_after_dirty_log_sync(void)
++{
++    MEMORY_LISTENER_CALL_GLOBAL(log_global_after_sync, Forward);
++}
++
+ static VMChangeStateEntry *vmstate_change;
+ 
+ void memory_global_dirty_log_start(void)
+diff --git a/migration/ram.c b/migration/ram.c
+index 2b0774c2bf..b9d6a3921d 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1801,6 +1801,7 @@ static void migration_bitmap_sync(RAMState *rs)
+     rcu_read_unlock();
+     qemu_mutex_unlock(&rs->bitmap_mutex);
+ 
++    memory_global_after_dirty_log_sync();
+     trace_migration_bitmap_sync_end(rs->num_dirty_pages_period);
+ 
+     end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+-- 
+2.21.0
 
 
