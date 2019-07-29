@@ -2,48 +2,49 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95628C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 20:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D5DC76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:13:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6792120657
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 20:52:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6792120657
+	by mail.kernel.org (Postfix) with ESMTPS id EA3CF2073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 21:13:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3CF2073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsCcw-0006lQ-KH
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 16:52:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51284)
+	id 1hsCxt-0004iY-6b
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 17:13:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56183)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsCcM-0006CT-UN
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 16:51:39 -0400
+ (envelope-from <eblake@redhat.com>) id 1hsCxR-0004C6-E0
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsCcL-000886-Sq
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 16:51:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:11159)
+ (envelope-from <eblake@redhat.com>) id 1hsCxQ-0001OC-Cq
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 17:13:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42592)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hsCcJ-00084q-VV
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 16:51:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hsCxO-0001Mt-5q; Mon, 29 Jul 2019 17:13:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6EE9D3018761;
- Mon, 29 Jul 2019 20:51:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 22D68C04B946;
+ Mon, 29 Jul 2019 21:13:21 +0000 (UTC)
 Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 22E125D9C5;
- Mon, 29 Jul 2019 20:51:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 145525D6A5;
+ Mon, 29 Jul 2019 21:13:15 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-References: <20190725094937.32454-1-vsementsov@virtuozzo.com>
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
+ <20190725100550.33801-2-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +71,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <be68ad00-425d-efbd-0dda-a1cd8d4652fc@redhat.com>
-Date: Mon, 29 Jul 2019 15:51:28 -0500
+Message-ID: <7651c617-f53c-c4b4-4d24-e49cfdcf2f3b@redhat.com>
+Date: Mon, 29 Jul 2019 16:13:14 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190725094937.32454-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190725100550.33801-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="eOrLzyM21JxY8v1w9ZVEptoslcFBAuBgb"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 29 Jul 2019 20:51:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Mon, 29 Jul 2019 21:13:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4] qapi: Add InetSocketAddress member
- keep-alive
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] block: implement BDRV_REQ_PREFETCH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,49 +97,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, berrange@redhat.com, armbru@redhat.com, kraxel@redhat.com
+Cc: kwolf@redhat.com, fam@euphon.net, mreitz@redhat.com, stefanha@redhat.com,
+ den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eOrLzyM21JxY8v1w9ZVEptoslcFBAuBgb
-Content-Type: multipart/mixed; boundary="w3uFoUKI0HIDtWAzC5EeQ4EgWD4CXcpgO";
+--zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6
+Content-Type: multipart/mixed; boundary="YJCPKUxNUmoQN0QPYwr70tJjST60BByF2";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Cc: armbru@redhat.com, kraxel@redhat.com, berrange@redhat.com, den@openvz.org
-Message-ID: <be68ad00-425d-efbd-0dda-a1cd8d4652fc@redhat.com>
-Subject: Re: [PATCH v4] qapi: Add InetSocketAddress member keep-alive
-References: <20190725094937.32454-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190725094937.32454-1-vsementsov@virtuozzo.com>
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, den@openvz.org
+Message-ID: <7651c617-f53c-c4b4-4d24-e49cfdcf2f3b@redhat.com>
+Subject: Re: [PATCH v3 1/3] block: implement BDRV_REQ_PREFETCH
+References: <20190725100550.33801-1-vsementsov@virtuozzo.com>
+ <20190725100550.33801-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190725100550.33801-2-vsementsov@virtuozzo.com>
 
---w3uFoUKI0HIDtWAzC5EeQ4EgWD4CXcpgO
+--YJCPKUxNUmoQN0QPYwr70tJjST60BByF2
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/25/19 4:49 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It's needed to provide keepalive for nbd client to track server
-> availability.
+On 7/25/19 5:05 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Do effective copy-on-read request when we don't need data actually. It
+> will be used for block-stream and NBD_CMD_CACHE.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
-
-> +++ b/util/qemu-sockets.c
-> @@ -219,6 +219,12 @@ static int inet_listen_saddr(InetSocketAddress *sa=
-ddr,
->      bool socket_created =3D false;
->      Error *err =3D NULL;
+>  include/block/block.h |  8 +++++++-
+>  block/io.c            | 18 ++++++++++++------
+>  2 files changed, 19 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 50a07c1c33..73c3fc4daa 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -88,8 +88,14 @@ typedef enum {
+>       * fallback. */
+>      BDRV_REQ_NO_FALLBACK        =3D 0x100,
 > =20
-> +    if (saddr->keep_alive) {
-> +        error_setg(errp, "keep-alive options is not supported for pass=
-ive "
+> +    /*
+> +     * BDRV_REQ_PREFETCH may be used only together with BDRV_REQ_COPY_=
+ON_READ
+> +     * on read request and means that caller don't really need data to=
+ be
 
-option
+doesn't
 
-(will fix as part of staging)
+can fix up while staging.
+
+
+> +++ b/block/io.c
+> @@ -1167,7 +1167,8 @@ bdrv_driver_pwritev_compressed(BlockDriverState *=
+bs, uint64_t offset,
+>  }
+> =20
+>  static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+> -        int64_t offset, unsigned int bytes, QEMUIOVector *qiov)
+> +        int64_t offset, unsigned int bytes, QEMUIOVector *qiov,
+> +        int flags)
+
+We're bad about this, but 'int flags' does not play well with the C
+language and well-defined behavior when it comes to 1<<31 (bit
+operations and unsigned types have guaranteed behavior, bit operations
+and negative signed types can cause the compiler to do differently than
+you expect).  Not a problem for uses where we don't have 32 flags to OR
+together, so I won't change it, so much as point it out for a bigger
+task of auditing the entire code base if we are worried.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -147,24 +176,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---w3uFoUKI0HIDtWAzC5EeQ4EgWD4CXcpgO--
+--YJCPKUxNUmoQN0QPYwr70tJjST60BByF2--
 
---eOrLzyM21JxY8v1w9ZVEptoslcFBAuBgb
+--zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0/XFAACgkQp6FrSiUn
-Q2o6mgf/dFJi8Y721RisHhubEcMeCt5X77irY+3859M3b5huCUN+OMZ3KjzLgXsx
-XpVQDskQ7tVroWALM4DDoFrVdOZSFtwp0t8NDzsKTADwh2MPOXu6zso2xlJNG4hc
-Qd7khXPs8qiPqv8zEMnvyqTJ1siAqKJ6Q4h8Jgz0Ht5i2OKFHzl1+nohKMoKWxWW
-p12oJG+3r03DzhG7FXQSwTUrv8VPlMP+LJ6eNndaNVdDFBpF5ZwfaLn9mY6xgZk7
-kzc1e9dvmghqlcSvTpd8Cv/dXARgtXI4VIq5S5DucEY7KiBRmXyNkBegwrJIMWON
-PpR0D9U80WRad9tOvcZF4TIGDxsaAQ==
-=Nbsd
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl0/YWoACgkQp6FrSiUn
+Q2qY2gf/RfO4aBLECf8MuZrclsILinAfHkoB6eDl5qsK9FSb608tXnDT/o3IO88k
+1nq5fFggxieaU8Ay3AaIGqUxfZ8f5xCowf/5cNCMSiDubC0zWnxDELvKIyzLKXlI
+eFPpn0fc9Aq9KWdRf++Uurdb2u7QOIYEB+X/QAxgUQYSNFnv2z6NAFg/3fbQ9e/X
+d0VnUBcA3VegDUpATqJNXg0r+af192RfR3v4iKrdYPNbFXnJl2PhSCSa7f4I4N+a
+MyjW3+LztRb7ygXoF6WbkfDvjAVKIhfzzNlSwhF+r9uJG5km2rOwOfiU2iP5VyPO
+pjSmXhZ63GDZjzAGOTgzvM6arx6Xeg==
+=Ff/g
 -----END PGP SIGNATURE-----
 
---eOrLzyM21JxY8v1w9ZVEptoslcFBAuBgb--
+--zyh9sXEOMkqXwDZrHo3oIz6vLYd9AzzZ6--
 
