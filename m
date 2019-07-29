@@ -2,70 +2,110 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E91C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A9EC7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:31:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A615206BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:10:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A615206BA
+	by mail.kernel.org (Postfix) with ESMTPS id 46A8D216C8
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 07:31:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46A8D216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrznc-0005BV-SY
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 03:10:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34174)
+	id 1hs088-0001ug-Ge
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 03:31:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37588)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hrznC-0004mq-7W
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:09:59 -0400
+ (envelope-from <david@redhat.com>) id 1hs07c-0001Vk-2F
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hrznA-0006Cb-M4
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:09:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40512)
+ (envelope-from <david@redhat.com>) id 1hs07b-0003tt-7c
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47896)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hrznA-0006BL-Cn
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:09:56 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1hs07a-0003rX-Vw
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 03:31:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74A012F8BDC;
- Mon, 29 Jul 2019 07:09:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-51.ams2.redhat.com
- [10.36.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 92D4960C44;
- Mon, 29 Jul 2019 07:09:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1458E1138619; Mon, 29 Jul 2019 09:09:49 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1562775267-1222-1-git-send-email-pbonzini@redhat.com>
- <1562775267-1222-5-git-send-email-pbonzini@redhat.com>
- <87d0ie58cj.fsf@dusky.pond.sub.org>
- <78c3bba3-3e85-682b-b4ce-fc4809add90e@redhat.com>
- <87sgqsx7zp.fsf@dusky.pond.sub.org>
- <0b209125-4277-2836-e27b-a9c13f43f294@redhat.com>
- <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
-Date: Mon, 29 Jul 2019 09:09:49 +0200
-In-Reply-To: <CAFEAcA8J5AsEC+p3vAQ0H1emN-GS3T5GSj579tS=qC76WjkTVQ@mail.gmail.com>
- (Peter Maydell's message of "Sat, 27 Jul 2019 19:20:15 +0100")
-Message-ID: <87ftmptiyq.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id B96BE3082E51;
+ Mon, 29 Jul 2019 07:31:00 +0000 (UTC)
+Received: from [10.36.117.139] (ovpn-117-139.ams2.redhat.com [10.36.117.139])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2A08B5D6A9;
+ Mon, 29 Jul 2019 07:30:57 +0000 (UTC)
+To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
+References: <20190728131304.1282-1-richardw.yang@linux.intel.com>
+ <20190728131304.1282-2-richardw.yang@linux.intel.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <d05be624-4a49-92bc-6585-4fe4dda71f00@redhat.com>
+Date: Mon, 29 Jul 2019 09:30:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20190728131304.1282-2-richardw.yang@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 29 Jul 2019 07:09:55 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Mon, 29 Jul 2019 07:31:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/8] convert libqemuutil to meson
+Subject: Re: [Qemu-devel] [PATCH 1/3] memory-device: not necessary to use
+ goto for the last check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,152 +117,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: imammedo@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On 28.07.19 15:13, Wei Yang wrote:
+> We are already at the last condition check.
+> 
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  hw/mem/memory-device.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 5f2c408036..df3261b32a 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -186,7 +186,6 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+>      if (!range_contains_range(&as, &new)) {
+>          error_setg(errp, "could not find position in guest address space for "
+>                     "memory device - memory fragmented due to alignments");
+> -        goto out;
+>      }
+>  out:
+>      g_slist_free(list);
+> 
 
-> On Sat, 27 Jul 2019 at 13:24, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 27/07/19 09:16, Markus Armbruster wrote:
->> > We started with a single trace-events.  That wasn't good, so we split it
->> > up into one per directory.  That isn't good, so what about splitting it
->> > up into one per source file?  Pass -DTRACE_HEADER='"trace-DIR-FOO.h"
->> > instead of -DTRACE_HEADER='"trace-DIR.h"' when compiling DIR/FOO.c.
->>
->> For Make this would all work great, however not for Meson because it
->> doesn't allow per-file compile flags.
->
-> Apologies for randomly parachuting into this email thread, but if
-> Meson doesn't support per-file compile flags then what's the plan
-> for handling the cases where we currently need per-file compile flags ?
-> (This is one of the things that I thought was quite a nice move
-> forward in our make infrastructure -- we now have clean syntax
-> for saying "these files need to be built with these warnings disabled
-> or these extra include paths or whatever" and also "these files
-> imply we're going to need to link against library X".)
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-I vaguely remember from my review that Meson lets us express "these
-files imply we're going to need to link against library X" even more
-clearly.  I can't point you to an example, though.
+-- 
 
-Aside: I can't apply this series anymore.  I tried master, failed, tried
-a merge commit shortly before its posting date, failed, gave up.  Can I
-git-pull it from somewhere?
+Thanks,
 
-Losing the ability to add compiler flags per file with minimal fuss
-would be regrettable.  How regrettable?  I append results of a quick
-grep.
-
->> Meson maintainers suggest building a static library for each special set
->> of compile flags; we could do that automatically per-directory(*) but it
->> would be harder to scale that to per-file.
-
-This is clearly not "minimal fuss", not even per directory, let alone
-per file.
-
-It's pretty lame even for the large sets we have (per target,
-target-independent): I guess we'd either throw away the .a unused, or
-link with --wholearchive.
-
-The grep below shows multiple instances of per-file.
-
-We should explore how to handle typical instances before we commit to
-the conversion project.
-
->> (*) Still, I'd rather go on with the forwarding headers and look into
->> that later, to ease review.
-
-For me, forwarding headers are just fine for a PoC, quite tolerable
-while a conversion is in progress, and perhaps even tolerable as a
-permanent work-around.  My *actual* question is how we could do per-file
-rather than per-directory trace.h with Meson.  Quoting myself:
-
-    We have trace-events with hundreds of tracepoints for tens of source
-    files.  The generated trace.h clock in at hundreds of KiB for me.
-    Messing with tracepoints in one source file recompiles most of the
-    directory.  This is so much better than it used to be, but clearly not
-    as good as it could be.
-
-    The worst of the lot is trace-root.h, which gets included for >1300 .o
-    in my "build everything" tree, mostly because it contains tracepoints
-    for static inline functions in widely included headers.  See also
-    "[PATCH 07/28] trace: Do not include qom/cpu.h into generated trace.h",
-    Message-Id: <20190726120542.9894-8-armbru@redhat.com>.
-
-    We started with a single trace-events.  That wasn't good, so we split it
-    up into one per directory.  That isn't good, so what about splitting it
-    up into one per source file?
-
-Any ideas?
-
-
-$ git-grep -F o-cflags
-Makefile.objs:bt-host.o-cflags := $(BLUEZ_CFLAGS)
-Makefile.objs:vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
-Makefile.objs:qemu-seccomp.o-cflags := $(SECCOMP_CFLAGS)
-Makefile.objs:vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
-audio/Makefile.objs:sdl.mo-cflags := $(SDL_CFLAGS)
-block/Makefile.objs:iscsi.o-cflags     := $(LIBISCSI_CFLAGS)
-block/Makefile.objs:curl.o-cflags      := $(CURL_CFLAGS)
-block/Makefile.objs:rbd.o-cflags       := $(RBD_CFLAGS)
-block/Makefile.objs:gluster.o-cflags   := $(GLUSTERFS_CFLAGS)
-block/Makefile.objs:ssh.o-cflags       := $(LIBSSH_CFLAGS)
-block/Makefile.objs:parallels.o-cflags := $(LIBXML2_CFLAGS)
-chardev/Makefile.objs:baum.o-cflags := $(SDL_CFLAGS)
-contrib/vhost-user-gpu/Makefile.objs:main.o-cflags := $(PIXMAN_CFLAGS) $(GBM_CFLAGS)
-contrib/vhost-user-gpu/Makefile.objs:virgl.o-cflags := $(VIRGL_CFLAGS) $(GBM_CFLAGS)
-contrib/vhost-user-gpu/Makefile.objs:vugbm.o-cflags := $(GBM_CFLAGS)
-disas/Makefile.objs:arm-a64.o-cflags := -I$(libvixldir) -Wno-sign-compare
-docs/devel/build-system.txt:  curl.o-cflags      := $(CURL_CFLAGS)
-docs/devel/build-system.txt:  iscsi.o-cflags     := $(LIBISCSI_CFLAGS)
-docs/devel/build-system.txt:  curl.o-cflags      := $(CURL_CFLAGS)
-hw/display/Makefile.objs:milkymist-tmu2.o-cflags := $(X11_CFLAGS) $(OPENGL_CFLAGS)
-hw/display/Makefile.objs:virtio-gpu.o-cflags := $(VIRGL_CFLAGS)
-hw/display/Makefile.objs:virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
-hw/usb/Makefile.objs:smartcard.mo-cflags := $(SMARTCARD_CFLAGS)
-hw/usb/Makefile.objs:redirect.o-cflags = $(USB_REDIR_CFLAGS)
-hw/usb/Makefile.objs:host-libusb.o-cflags := $(LIBUSB_CFLAGS)
-hw/usb/Makefile.objs:xen-usb.o-cflags := $(LIBUSB_CFLAGS)
-net/Makefile.objs:slirp.o-cflags := $(SLIRP_CFLAGS)
-rules.mak:            $(if $($o-cflags), $o-cflags $(eval save-vars-$o-cflags := $($o-cflags))$(eval $o-cflags := )) \
-rules.mak:            $(if $($o-cflags),
-rules.mak:                $(eval $1$o-cflags := $($o-cflags)))
-rules.mak:        # Pass the .mo-cflags and .mo-libs along to its member objects
-rules.mak:                $(if $($o-cflags), $(eval $p-cflags += $($o-cflags)))
-target/unicore32/Makefile.objs:helper.o-cflags := $(CURSES_CFLAGS)
-tests/Makefile.include:tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS)
-tests/Makefile.include:tests/pkix_asn1_tab.o-cflags := $(TASN1_CFLAGS)
-tests/Makefile.include:tests/test-crypto-tlscredsx509.o-cflags := $(TASN1_CFLAGS)
-tests/Makefile.include:tests/test-crypto-tlssession.o-cflags := $(TASN1_CFLAGS)
-ui/Makefile.objs:sdl.mo-cflags := $(SDL_CFLAGS)
-ui/Makefile.objs:gtk.mo-cflags := $(GTK_CFLAGS) $(VTE_CFLAGS)
-ui/Makefile.objs:x_keymap.o-cflags := $(X11_CFLAGS)
-ui/Makefile.objs:curses.mo-cflags := $(CURSES_CFLAGS) $(ICONV_CFLAGS)
-ui/Makefile.objs:spice-app.mo-cflags := $(GIO_CFLAGS)
-$ git-grep ':[^=].*CFLAGS'
-Makefile:qemu-ga$(EXESUF): QEMU_CFLAGS += -I qga/qapi-generated
-Makefile:qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
-configure:# Note: the prototype is needed since QEMU_CFLAGS
-pc-bios/s390-ccw/netboot.mak:$(NETOBJS): QEMU_CFLAGS += $(LIBC_INC) $(LIBNET_INC)
-rules.mak:module-common.o: CFLAGS += $(DSO_OBJ_CFLAGS)
-rules.mak:# Usage: CFLAGS+=$(call cc-option, -falign-functions=0, -malign-functions=0)
-rules.mak:                   $(eval $($o-objs): CFLAGS += $(DSO_OBJ_CFLAGS))
-target/nios2/Makefile.objs:$(obj)/op_helper.o: QEMU_CFLAGS += $(HELPER_CFLAGS)
-tests/tcg/aarch64/Makefile.softmmu-target:memory: CFLAGS+=-DCHECK_UNALIGNED=1
-tests/tcg/alpha/Makefile.softmmu-target:memory: CFLAGS+=-DCHECK_UNALIGNED=0
-tests/tcg/alpha/Makefile.target:test-cmov: EXTRA_CFLAGS=-DTEST_CMOV
-tests/tcg/arm/Makefile.softmmu-target:test-armv6m-undef: EXTRA_CFLAGS+=-mcpu=cortex-m0
-tests/tcg/arm/Makefile.target:hello-arm: CFLAGS+=-marm -ffreestanding
-tests/tcg/arm/Makefile.target:test-arm-iwmmxt: CFLAGS+=-marm -march=iwmmxt -mabi=aapcs -mfpu=fpv4-sp-d16
-tests/tcg/arm/Makefile.target:# fcvt: CFLAGS+=-march=armv8.2-a+fp16 -mfpu=neon-fp-armv8
-tests/tcg/i386/Makefile.softmmu-target:memory: CFLAGS+=-DCHECK_UNALIGNED=1
-tests/tcg/i386/Makefile.target:hello-i386: CFLAGS+=-ffreestanding
-tests/tcg/mips/Makefile.target:hello-mips: CFLAGS+=-mno-abicalls -fno-PIC -mabi=32
+David / dhildenb
 
