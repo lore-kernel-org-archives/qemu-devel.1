@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FEAC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5252C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:05:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8475D2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:05:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7474A2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 15:05:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="1jjxZVGU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8475D2067D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="OktRKzwp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7474A2067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs7DJ-0005k3-GN
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:05:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38068)
+	id 1hs7DX-0006S4-NA
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 11:05:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37813)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs77Q-0004HV-RE
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:59:21 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs77D-00048M-J0
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:59:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hs77L-0004jT-G9
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:59:17 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:48188)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hs77C-0004ZP-AA
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 10:59:07 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:48034)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hs77B-0004Xl-B7; Mon, 29 Jul 2019 10:59:05 -0400
+ id 1hs775-0004S8-Mq; Mon, 29 Jul 2019 10:58:59 -0400
 Received: from kouign-amann.bar.greensocs.com (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPS id 10A3F96F67;
- Mon, 29 Jul 2019 14:59:03 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 7518996F5B;
+ Mon, 29 Jul 2019 14:58:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564412344;
+ s=mail; t=1564412338;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hIw9VOnNOvv6i5KDhQD4nJN5V8svLGb1uTTCxjQz4rM=;
- b=1jjxZVGU+7Ozaw6ODz/G0/Dtymc7847a7SEXlr0up1TjHwz5PMFGuNsY8v+4OdwF6eWrkA
- kf1oAzau6OYvz50HU9jrVw3r/b62NoW9nZkcPw4CGQS8O7jgjg1G3ZhFEVuLRwyYgX50Xg
- xKviJU+60D6gFZztOztafbJSCOTxBnI=
+ bh=aLHBAamQpnZuSEihCn2XlqNPDj9zeHn+BmvmCqsNNyM=;
+ b=OktRKzwpS4DGsPujyFvuHWxHoOiFQMYuec2mEyCqFhQhRqVsx6iRQUmV9yM+GJgjBB1VV2
+ rVU4tTsNKIOKz47aSvmkoNvjINRdD07upaDMw1OASDTHj/1Z3kzShIIzY5VjU5bP8fpe1/
+ SqO10qi/lYTArxhx4bV4ozRANh0QWOg=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 16:56:31 +0200
-Message-Id: <20190729145654.14644-11-damien.hedde@greensocs.com>
+Date: Mon, 29 Jul 2019 16:56:27 +0200
+Message-Id: <20190729145654.14644-7-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190729145654.14644-1-damien.hedde@greensocs.com>
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564412344;
+ s=mail; t=1564412338;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hIw9VOnNOvv6i5KDhQD4nJN5V8svLGb1uTTCxjQz4rM=;
- b=wAZ0WXR22PWrixZWMTlufg5mgCs2YRIK9liXy/YpNo2FyRBHOlhI1M2/oxXOnbuFtbHPEB
- WBTw0KJinWKLcjNeVinkf3RN5GIbPqEgzGKLI+VyieJ0/498tAq40v7TrCAm+RImD/f2Bb
- Y9C3cVeDb3QBgflR59T/oxcqRfcGlBI=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412344; a=rsa-sha256; cv=none;
- b=58H2EsS5g1GX2LiVQ1ar3zUzQameEIsMpV+poV7zJ7ItawiKv7RzPiwP0+uBl9bZrHyRXI
- JOTPnXCaLtNETogtjm53EgW0Ng1Hx27BenMRzwJ1w5/9iV/T07N+L4ngSTIxVrhEvhbLEI
- aeRfvsbvVTBO61ojGKhKAYOjESDQsUU=
+ bh=aLHBAamQpnZuSEihCn2XlqNPDj9zeHn+BmvmCqsNNyM=;
+ b=7FvqhxfHd9nIiRQiKCyoJA5jR+lY+zCsfj/Kt4pNUPP7NB4JZNThXE4fwdVqR7E50vS95J
+ MzyI949VESJBVix+7dyB3nUWQJqmczcRrvEKJ1f8BXPzWvV2uEhsYv1EqZhqwyr6n/04gW
+ hdTHl6Ah5853jF80pMOYu0ims4PzXcs=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564412338; a=rsa-sha256; cv=none;
+ b=3ZEilZd31eZOE/WYaB9XrZNwsUgjcBOsCQbFYa5WECMb+IwBMXujJnoun+SIEXbnoJsbkF
+ IogGDT9L+lKtNZ3VjmNW60NFhBcUJmdAGKBOxSJVn/9vktMXyTu1S7dlHjHG3Zn+B20Xh6
+ axzuVGCpwNJMToS0ZxInyb9JE+TuvYU=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -77,8 +77,8 @@ X-Spam: Yes
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] [PATCH v3 10/33] vl.c: remove qbus_reset_all
- registration
+Subject: [Qemu-devel] [PATCH v3 06/33] add the vmstate description for
+ device reset state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,32 +104,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace deprecated qbus_reset_all by resettable_reset_cold_fn for
-the sysbus reset registration.
-This does not impact the behavior.
+It contains the resetting counter and cold flag status.
+
+At this point, migration of bus reset related state (counter and cold/war=
+m
+flag) is handled by parent device. This done using the post_load
+function in the vmsd subsection.
+
+This is last point allow to add an initial support of migration with part=
+ of
+qdev/qbus tree in reset state under the following condition:
++ time-lasting reset are asserted on Device only
+
+Note that if this condition is not respected, migration will succeed and
+no failure will occurs. The only impact is that the resetting counter
+of a bus may lower afer a migration.
 
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- vl.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/core/Makefile.objs  |  1 +
+ hw/core/qdev-vmstate.c | 45 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 46 insertions(+)
+ create mode 100644 hw/core/qdev-vmstate.c
 
-diff --git a/vl.c b/vl.c
-index b426b32134..5a465c8236 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4421,7 +4421,11 @@ int main(int argc, char **argv, char **envp)
-=20
-     /* TODO: once all bus devices are qdevified, this should be done
-      * when bus is created by qdev.c */
--    qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-+    /*
-+     * TODO: when we have a main reset container/domain object, use
-+     * it to fully benefit from multi-phase reset
-+     */
-+    qemu_register_reset(resettable_reset_cold_fn, sysbus_get_default());
-     qemu_run_machine_init_done_notifiers();
-=20
-     if (rom_check_and_register_reset() !=3D 0) {
+diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+index d9234aa98a..49e9be0228 100644
+--- a/hw/core/Makefile.objs
++++ b/hw/core/Makefile.objs
+@@ -4,6 +4,7 @@ common-obj-y +=3D bus.o reset.o
+ common-obj-y +=3D resettable.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
+ common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
++common-obj-$(CONFIG_SOFTMMU) +=3D qdev-vmstate.o
+ # irq.o needed for qdev GPIO handling:
+ common-obj-y +=3D irq.o
+ common-obj-y +=3D hotplug.o
+diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
+new file mode 100644
+index 0000000000..07b010811f
+--- /dev/null
++++ b/hw/core/qdev-vmstate.c
+@@ -0,0 +1,45 @@
++/*
++ * Device vmstate
++ *
++ * Copyright (c) 2019 GreenSocs
++ *
++ * Authors:
++ *   Damien Hedde
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/qdev.h"
++#include "migration/vmstate.h"
++
++static bool device_vmstate_reset_needed(void *opaque)
++{
++    DeviceState *dev =3D (DeviceState *) opaque;
++    return dev->resetting !=3D 0;
++}
++
++static int device_vmstate_reset_post_load(void *opaque, int version_id)
++{
++    DeviceState *dev =3D (DeviceState *) opaque;
++    BusState *bus;
++    QLIST_FOREACH(bus, &dev->child_bus, sibling) {
++        bus->resetting =3D dev->resetting;
++        bus->reset_is_cold =3D dev->reset_is_cold;
++    }
++    return 0;
++}
++
++const struct VMStateDescription device_vmstate_reset =3D {
++    .name =3D "device_reset",
++    .version_id =3D 0,
++    .minimum_version_id =3D 0,
++    .needed =3D device_vmstate_reset_needed,
++    .post_load =3D device_vmstate_reset_post_load,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_UINT32(resetting, DeviceState),
++        VMSTATE_BOOL(reset_is_cold, DeviceState),
++        VMSTATE_END_OF_LIST()
++    },
++};
 --=20
 2.22.0
 
