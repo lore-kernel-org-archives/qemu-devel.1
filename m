@@ -2,61 +2,63 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11BAC7618B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:41:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2327C7618B
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:41:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 876EB206BA
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:41:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 876EB206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 972E9206BA
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:41:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 972E9206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzLi-0003GZ-QP
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:41:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54246)
+	id 1hrzLu-0003aX-VM
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:41:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56192)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hrzCg-0005OJ-Cc
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:16 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hrzJH-00089j-LW
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:39:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hrzCd-0001t0-Pq
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:14 -0400
-Received: from mga11.intel.com ([192.55.52.93]:47122)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hrzJG-0005YG-Fs
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:39:03 -0400
+Received: from mga17.intel.com ([192.55.52.151]:3485)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hrzCc-0001HA-W4
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:32:11 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hrzJG-0005VH-6J
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:39:02 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Jul 2019 23:31:44 -0700
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 28 Jul 2019 23:38:59 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="370357267"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by fmsmga005.fm.intel.com with ESMTP; 28 Jul 2019 23:31:42 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Date: Mon, 29 Jul 2019 14:31:22 +0800
-Message-Id: <20190729063127.2801-7-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190729063127.2801-1-tao3.xu@intel.com>
-References: <20190729063127.2801-1-tao3.xu@intel.com>
+X-IronPort-AV: E=Sophos;i="5.64,321,1559545200"; d="scan'208";a="173776086"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by orsmga003.jf.intel.com with ESMTP; 28 Jul 2019 23:38:58 -0700
+Date: Mon, 29 Jul 2019 14:38:36 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Ivan Ren <renyime@gmail.com>
+Message-ID: <20190729063836.GA21091@richard>
+References: <1564367573-6327-1-git-send-email-ivanren@tencent.com>
+ <1564367573-6327-2-git-send-email-ivanren@tencent.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1564367573-6327-2-git-send-email-ivanren@tencent.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v8 06/11] hmat acpi: Build Memory Proximity
- Domain Attributes Structure(s)
+X-Received-From: 192.55.52.151
+Subject: Re: [Qemu-devel] [PATCH 1/2] migration: add
+ qemu_file_update_rate_transfer interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,259 +70,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- dan.j.williams@intel.com
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+On Mon, Jul 29, 2019 at 10:32:52AM +0800, Ivan Ren wrote:
+>Add qemu_file_update_rate_transfer for just update bytes_xfer for
+>speed limitation. This will be used for further migration feature
+>such as multifd migration.
+>
+>Signed-off-by: Ivan Ren <ivanren@tencent.com>
+>---
+> migration/qemu-file.c | 5 +++++
+> migration/qemu-file.h | 1 +
+> 2 files changed, 6 insertions(+)
+>
+>diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+>index 0431585502..13e7f03f9b 100644
+>--- a/migration/qemu-file.c
+>+++ b/migration/qemu-file.c
+>@@ -615,6 +615,11 @@ void qemu_file_reset_rate_limit(QEMUFile *f)
+>     f->bytes_xfer = 0;
+> }
+> 
+>+void qemu_file_update_rate_transfer(QEMUFile *f, int64_t len)
 
-HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-(HMAT). The specification references below link:
-http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
+Looks good, except the function name. Not good at naming :-)
 
-It describes the memory attributes, such as memory side cache
-attributes and bandwidth and latency details, related to the
-Memory Proximity Domain. The software is
-expected to use this information as hint for optimization.
+Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
 
-This structure describes Memory Proximity Domain Attributes by memory
-subsystem and its associativity with processor proximity domain as well as
-hint for memory usage.
+>+{
+>+    f->bytes_xfer += len;
+>+}
+>+
+> void qemu_put_be16(QEMUFile *f, unsigned int v)
+> {
+>     qemu_put_byte(f, v >> 8);
+>diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+>index 13baf896bd..6145d10aca 100644
+>--- a/migration/qemu-file.h
+>+++ b/migration/qemu-file.h
+>@@ -147,6 +147,7 @@ int qemu_peek_byte(QEMUFile *f, int offset);
+> void qemu_file_skip(QEMUFile *f, int size);
+> void qemu_update_position(QEMUFile *f, size_t size);
+> void qemu_file_reset_rate_limit(QEMUFile *f);
+>+void qemu_file_update_rate_transfer(QEMUFile *f, int64_t len);
+> void qemu_file_set_rate_limit(QEMUFile *f, int64_t new_rate);
+> int64_t qemu_file_get_rate_limit(QEMUFile *f);
+> void qemu_file_set_error(QEMUFile *f, int ret);
+>-- 
+>2.17.2 (Apple Git-113)
+>
 
-In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-the platform's HMAT tables.
-
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
-
-No changes in v8.
----
- hw/acpi/Kconfig       |   5 +++
- hw/acpi/Makefile.objs |   1 +
- hw/acpi/hmat.c        | 101 ++++++++++++++++++++++++++++++++++++++++++
- hw/acpi/hmat.h        |  45 +++++++++++++++++++
- hw/i386/acpi-build.c  |   3 ++
- 5 files changed, 155 insertions(+)
- create mode 100644 hw/acpi/hmat.c
- create mode 100644 hw/acpi/hmat.h
-
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index 7c59cf900b..039bb99efa 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -7,6 +7,7 @@ config ACPI_X86
-     select ACPI_NVDIMM
-     select ACPI_CPU_HOTPLUG
-     select ACPI_MEMORY_HOTPLUG
-+    select ACPI_HMAT
- 
- config ACPI_X86_ICH
-     bool
-@@ -31,3 +32,7 @@ config ACPI_VMGENID
-     bool
-     default y
-     depends on PC
-+
-+config ACPI_HMAT
-+    bool
-+    depends on ACPI
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 9bb2101e3b..c05019b059 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-+common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- 
- common-obj-y += acpi_interface.o
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-new file mode 100644
-index 0000000000..abf99b1adc
---- /dev/null
-+++ b/hw/acpi/hmat.c
-@@ -0,0 +1,101 @@
-+/*
-+ * HMAT ACPI Implementation
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/numa.h"
-+#include "hw/acpi/hmat.h"
-+
-+/*
-+ * ACPI 6.3:
-+ * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-141
-+ */
-+static void build_hmat_mpda(GArray *table_data, uint16_t flags, int initiator,
-+                           int mem_node)
-+{
-+
-+    /* Memory Proximity Domain Attributes Structure */
-+    /* Type */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 40, 4);
-+    /* Flags */
-+    build_append_int_noprefix(table_data, flags, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Proximity Domain for the Attached Initiator */
-+    build_append_int_noprefix(table_data, initiator, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, mem_node, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Start Address of the System Physical
-+     * Address Range. Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Range Length of the region in bytes.
-+     * Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+}
-+
-+/* Build HMAT sub table structures */
-+static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-+{
-+    uint16_t flags;
-+    int i;
-+
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        flags = 0;
-+
-+        if (nstat->nodes[i].initiator_valid) {
-+            flags |= HMAT_PROX_INIT_VALID;
-+        }
-+
-+        build_hmat_mpda(table_data, flags, nstat->nodes[i].initiator, i);
-+    }
-+}
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-+{
-+    uint64_t hmat_start;
-+
-+    hmat_start = table_data->len;
-+
-+    /* reserve space for HMAT header  */
-+    acpi_data_push(table_data, 40);
-+
-+    hmat_build_table_structs(table_data, nstat);
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + hmat_start),
-+                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
-+}
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-new file mode 100644
-index 0000000000..574cfba60a
---- /dev/null
-+++ b/hw/acpi/hmat.h
-@@ -0,0 +1,45 @@
-+/*
-+ * HMAT ACPI Implementation Header
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#ifndef HMAT_H
-+#define HMAT_H
-+
-+#include "hw/acpi/acpi-defs.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "hw/acpi/aml-build.h"
-+
-+/*
-+ * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
-+ * Table 5-141, Field "flag", Bit [0]: set to 1 to indicate that data in
-+ * the Proximity Domain for the Attached Initiator field is valid.
-+ * Other bits reserved.
-+ */
-+#define HMAT_PROX_INIT_VALID 0x1
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
-+
-+#endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 081a8fc116..90ad0dff99 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -66,6 +66,7 @@
- #include "hw/i386/intel_iommu.h"
- 
- #include "hw/acpi/ipmi.h"
-+#include "hw/acpi/hmat.h"
- 
- /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
-  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-@@ -2696,6 +2697,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, machine);
-         }
-+        acpi_add_table(table_offsets, tables_blob);
-+        build_hmat(tables_blob, tables->linker, machine->numa_state);
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
 -- 
-2.20.1
-
+Wei Yang
+Help you, Help me
 
