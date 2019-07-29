@@ -2,79 +2,74 @@ Return-Path: <SRS0=7VQp=V2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2882C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 863A9C76191
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DE9C206B8
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:35:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yth5dw5m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DE9C206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 594F8206B8
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 09:36:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 594F8206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hs24C-0000UN-F4
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:35:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58939)
+	id 1hs24i-0001MP-N5
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 05:36:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58973)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hs23n-0008SG-Qi
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:35:16 -0400
+ (envelope-from <bounces@canonical.com>) id 1hs24H-0000kY-Ah
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hs23m-0001ZP-Rm
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:35:15 -0400
-Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:37509)
+ (envelope-from <bounces@canonical.com>) id 1hs24G-0001hw-7V
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:35:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46596)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hs23m-0001ZB-Nm
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:35:14 -0400
-Received: by mail-oi1-x234.google.com with SMTP id t76so44812901oih.4
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 02:35:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:from:date:message-id:subject:to;
- bh=rTURHtTjQzJ2KmYKh82f2bhQxI4AT/GY7Ra/tFh9xBo=;
- b=Yth5dw5mG11imd34qoZYaXLt4pFYnhw6VDa4h0xhQsQEEWPUs/Hf55ZG+DKcjef7Ss
- ZS4/rsovWuSTp4cFatDvwwxl2n9rV44VAFSJlVVecXzf5z473+r6iSzUwAB1zuzBUKra
- u35WJf5/pVaWAoIChIKA64fKE0BzgYfLVfkaR+iqoILkxT4C0jJhriSYNIdWKcpkKwUU
- s++Odcsd5gr+LawQhyXiA/m9qRpnhSpi6DKYsbkwc5UgxKdQkHV7tqHweHJBJ90bbXQA
- sn8H4ZPMRTPumf04e29vihRSszm0pFQUK4PFxDu9kOX/nZo/Ny77L8Ebx6wYn3Xcltm0
- FASA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=rTURHtTjQzJ2KmYKh82f2bhQxI4AT/GY7Ra/tFh9xBo=;
- b=pbzsMYuJWzlFJK5hAw8dZqMEZOnuL/tSr6z2Bkm8t5ab50uHcLBTcWoMII2HyGlW7G
- uMXHlE5OygnyC2gNy9l3fwq8YzuwIhXVaO1tSRwPUT5J4vqIBQkt5PB8XTc3SdeY8Th9
- lj+lG8MB4i4PJohDF+9Rm9QlScSwR1re+A4w+EYJjEmmHK3KtIsqdT70tB/QzID9pSD4
- ZwLwBzh3kO4bjSOgaVpAn7i+yjTx+y12H5W7V12SYrdTjE3iGXed127ZUEgjmDc0spkl
- y2Mr+4nh8AWcZzEfbpwVCBi0SzZhlIOwU+/Kbq9EH7UkLwdYxSRkZInlfrqwMuVgeM2B
- AzdQ==
-X-Gm-Message-State: APjAAAVzIqiZIyoPbUJTuKk+RjGjdKzY9DsxpnR8+6o15zCbzo3VMI+/
- hwObFFrs3OlnrlOQaJlDlpyQVfR6cES+8DDdKvvFjN1fb1o=
-X-Google-Smtp-Source: APXvYqz1HVWyaOhXVYMvfgOp+bh3diSrf52FZ8g+NAXFIKyluiC+9SITxyeKmALqZbIelrWCwA6UobWILvWDFabWOtk=
-X-Received: by 2002:aca:ac48:: with SMTP id v69mr51385016oie.48.1564392913746; 
- Mon, 29 Jul 2019 02:35:13 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hs24G-0001hR-1Q
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 05:35:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hs24E-0000ra-1j
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 09:35:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0A0452E80CC
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 09:35:42 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 29 Jul 2019 09:26:32 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 29 Jul 2019 10:35:03 +0100
-Message-ID: <CAFEAcA9-CcpqnPXxpvSdUK=ZxSFgjtab4U3nQOPjKWRu=WmG9w@mail.gmail.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::234
-Subject: [Qemu-devel] Reminder: rc3 tomorrow,
- please list any remaining release-critical issues on wiki
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: edward-vielmetti pawel-moll pmaydell will-newton
+X-Launchpad-Bug-Reporter: Will Newton (will-newton)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <149693268144.10005.16353270944603688746.malonedeb@wampee.canonical.com>
+Message-Id: <156439239287.24243.11754744511111378719.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: a4f976f55a8b8c51299211915a1c285ac25777c3
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1696773] Re: golang calls to exec crash user
+ emulation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,18 +78,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1696773 <1696773@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi; are there any remaining release-critical issues for 4.1?
-If you know of any, please list them on the wiki page:
-https://wiki.qemu.org/Planning/4.1#Known_issues
-(and/or just reply to this email)
+The sigaltstack fix is now in master (commit 5bfce0b74fbd5d530) and at
+least in my test environment this also fixes the "can't build hello.go
+reliably" example. So I'm marking this as 'fix committed'. If there are
+still problems with running Go binaries, these are likely to be
+independent bugs, so please open fresh LP issues for them.
 
-rc3 will be tomorrow, and ideally that will be the final
-rc before our release.
 
-thanks
--- PMM
+** Changed in: qemu
+       Status: In Progress =3D> Fix Committed
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1696773
+
+Title:
+  golang calls to exec crash user emulation
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  An example program can be found here:
+
+  https://github.com/willnewton/qemucrash
+
+  This code starts a goroutine (thread) and calls exec repeatedly. This
+  works ok natively but when run under ARM user emulation it segfaults
+  (usually, there are occasionally other failures).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1696773/+subscriptions
 
