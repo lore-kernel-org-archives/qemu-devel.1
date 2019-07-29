@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 295FAC76186
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 449D1C76186
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:31:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2F142070B
-	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:31:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F142070B
+	by mail.kernel.org (Postfix) with ESMTPS id 1A7DC2064A
+	for <qemu-devel@archiver.kernel.org>; Mon, 29 Jul 2019 06:31:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A7DC2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49817 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hrzBj-0004bt-7y
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:31:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53632)
+	id 1hrzBs-0004mK-DA
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 02:31:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53679)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAG-0001dY-UV
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:45 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAS-00027g-1w
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAF-0007Nv-Pj
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:44 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36688)
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAR-0007as-3k
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:55 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:36736)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAF-0007NE-IL
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:43 -0400
+ (envelope-from <pavel.dovgaluk@gmail.com>) id 1hrzAQ-0007aC-Sr
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 02:29:55 -0400
 Received: from [127.0.1.1] (unknown [85.142.117.226])
- by mail.ispras.ru (Postfix) with ESMTPSA id A3AE854006A;
- Mon, 29 Jul 2019 09:29:42 +0300 (MSK)
+ by mail.ispras.ru (Postfix) with ESMTPSA id E59AE54006A;
+ Mon, 29 Jul 2019 09:29:53 +0300 (MSK)
 From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 29 Jul 2019 09:29:42 +0300
-Message-ID: <156438178246.22071.15709962942179007484.stgit@pasha-Precision-3630-Tower>
+Date: Mon, 29 Jul 2019 09:29:53 +0300
+Message-ID: <156438179371.22071.7134093736590754203.stgit@pasha-Precision-3630-Tower>
 In-Reply-To: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
 References: <156438176555.22071.10523120047318890136.stgit@pasha-Precision-3630-Tower>
 User-Agent: StGit/0.17.1-dirty
@@ -48,8 +48,8 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 83.149.199.45
-Subject: [Qemu-devel] [for-4.2 PATCH 3/6] replay: update docs for
- record/replay with block devices
+Subject: [Qemu-devel] [for-4.2 PATCH 5/6] replay: finish record/replay
+ before closing the disks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,57 +74,40 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch updates the description of the command lines for using
-record/replay with attached block devices.
+After recent updates block devices cannot be closed on qemu exit.
+This happens due to the block request polling when replay is not finished.
+Therefore now we stop execution recording before closing the block devices.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- docs/replay.txt |   12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ replay/replay.c |    2 ++
+ vl.c            |    1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/docs/replay.txt b/docs/replay.txt
-index ee6aee9861..ce97c3f72f 100644
---- a/docs/replay.txt
-+++ b/docs/replay.txt
-@@ -27,7 +27,7 @@ Usage of the record/replay:
-  * First, record the execution with the following command line:
-     qemu-system-i386 \
-      -icount shift=7,rr=record,rrfile=replay.bin \
--     -drive file=disk.qcow2,if=none,id=img-direct \
-+     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-      -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-      -device ide-hd,drive=img-blkreplay \
-      -netdev user,id=net1 -device rtl8139,netdev=net1 \
-@@ -35,7 +35,7 @@ Usage of the record/replay:
-  * After recording, you can replay it by using another command line:
-     qemu-system-i386 \
-      -icount shift=7,rr=replay,rrfile=replay.bin \
--     -drive file=disk.qcow2,if=none,id=img-direct \
-+     -drive file=disk.qcow2,if=none,snapshot,id=img-direct \
-      -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay \
-      -device ide-hd,drive=img-blkreplay \
-      -netdev user,id=net1 -device rtl8139,netdev=net1 \
-@@ -223,7 +223,7 @@ Block devices record/replay module intercepts calls of
- bdrv coroutine functions at the top of block drivers stack.
- To record and replay block operations the drive must be configured
- as following:
-- -drive file=disk.qcow2,if=none,id=img-direct
-+ -drive file=disk.qcow2,if=none,snapshot,id=img-direct
-  -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-  -device ide-hd,drive=img-blkreplay
+diff --git a/replay/replay.c b/replay/replay.c
+index 6a62ec3811..71c4e6b777 100644
+--- a/replay/replay.c
++++ b/replay/replay.c
+@@ -385,6 +385,8 @@ void replay_finish(void)
+     g_free(replay_snapshot);
+     replay_snapshot = NULL;
  
-@@ -252,6 +252,12 @@ This snapshot is created at start of recording and restored at start
- of replaying. It also can be loaded while replaying to roll back
- the execution.
- 
-+'snapshot' flag of the disk image must be removed to save the snapshots
-+in the overlay (or original image) instead of using the temporary overlay.
-+ -drive file=disk.ovl,if=none,id=img-direct
-+ -drive driver=blkreplay,if=none,image=img-direct,id=img-blkreplay
-+ -device ide-hd,drive=img-blkreplay
++    replay_mode = REPLAY_MODE_NONE;
 +
- Use QEMU monitor to create additional snapshots. 'savevm <name>' command
- created the snapshot and 'loadvm <name>' restores it. To prevent corruption
- of the original disk image, use overlay files linked to the original images.
+     replay_finish_events();
+ }
+ 
+diff --git a/vl.c b/vl.c
+index b73fd078a8..2a341f5ad2 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4499,6 +4499,7 @@ int main(int argc, char **argv, char **envp)
+ 
+     /* No more vcpu or device emulation activity beyond this point */
+     vm_shutdown();
++    replay_finish();
+ 
+     job_cancel_sync_all();
+     bdrv_close_all();
 
 
