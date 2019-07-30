@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BB8C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E674EC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEBA0216C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8591216C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="biNk9wJ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEBA0216C8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XJdxCO1W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8591216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsWBB-0005xs-9C
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:44:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36060)
+	id 1hsWBD-00066v-VH
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:44:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35714)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hsW3R-0006TF-Bf
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:36:55 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hsW2n-0005AK-HV
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hsW3P-0000cG-M0
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:36:53 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41211)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1hsW2l-0000Iz-Ph
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:36:13 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33701)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hsW3N-0000bJ-LH; Tue, 30 Jul 2019 13:36:51 -0400
-Received: by mail-pl1-x641.google.com with SMTP id m9so29061782pls.8;
- Tue, 30 Jul 2019 10:36:49 -0700 (PDT)
+ id 1hsW2j-0000IC-3s; Tue, 30 Jul 2019 13:36:11 -0400
+Received: by mail-pg1-x544.google.com with SMTP id f20so21195355pgj.0;
+ Tue, 30 Jul 2019 10:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=KdKcJ85/JvrdjzDPkuDe3haP60+QMnxCxAmkdd7Z4Xg=;
- b=biNk9wJ/m3uEuGOVF7zU1tigL/4YVnK1gXHxc25BvtnipilEYCg/jDnq7/E++jhuK6
- cpnE4TrppXWpF7KcPEhdVgo+0sqSRpBp8+BfBkjThg3C3V4yKIlTNBrcocDdIbMFCj+I
- RyL8xRSXPDl+79BBbmv5hq81pkxPMs0IpCmidWgkwmjYPN9/bXmC+XxpAL+SGyih+V8k
- 6ZJnz4/kFfA7JymvdZjImIh+81H/pBHv92uwJtuaO4brisZ1d81zxUuHfTSM3kD+5z2H
- jo8gStZSH+EfRi2SwaZ4Wy6EYwX9JaQFMVhRJb4p3SY4//fN9v40r9vJ5ePxs8vSfUmN
- KzEQ==
+ bh=VIbCCiqkXwkRR3OlBzyvEa8q9jsIq4iRUCXYKqboH9I=;
+ b=XJdxCO1WiNG7haTrUsFKhB6QVaJv2Eo4LghlqaQPjJUiFl+pVWiqvPaSwsBrMZGBbo
+ FqgHbZbROmy8hGVK9tx2/xv8++wOfi2pnoUWKKNsVz10wVXvccsVYwjWG94hVTjsI6is
+ Gfp7vOB63mOkUAWH9mWM50LDvFgAaz4Pu5iSEi9rvoJgOtldwqFBWQfoWbSj+7+3jBie
+ grCylFl1cMUCeovhqd6h6lAyPC/bXOmSbAA9Blzqf6c+9t5B8bJ1tWln2QgV6IsuK9Bm
+ 3HWXS5Ki6mAx/dX0SoR1e0lfFaWl4PcakydgDFfA176cmuffLWXwfkXKMGBW2TmKF99S
+ JKfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KdKcJ85/JvrdjzDPkuDe3haP60+QMnxCxAmkdd7Z4Xg=;
- b=edskUFMh0jf1N80MFsL+53NDhTEfA3LgFHcv1i6rttYu/egbdqjZEkNRItoInNFss6
- qfsA1a4spcXCwZf8K572NzUI1Qz1iIf1nwoJ+jBXVrAqY7XI1FxfddqBCQnpSh3xp/vU
- zITKTOngzbNE8mUkd1qIUspJuoe7oXy5nMv1M16edYVG2Uz35vhx7TY/KYQh4usc0sy+
- ILIIIN+miOTV7QsLrv+CghDRsyswCy+mCReoUB/Qo0mW1rI0Q/IdWnEoYQbpuPXOFFNb
- o+zx+sUsKp8plBX2oBoQxwmPQ26MQ3Ki1g9YGVU3ID+hybJscRRm3wkJrlRq7s0UMj34
- witQ==
-X-Gm-Message-State: APjAAAVnXxJ61FIA4uydKS42w+mtE375e+QtSpyjbZEvx0n23tXYuPVv
- kS0oEI/5684Cyn25SPvoVdJmHywlncHnmA==
-X-Google-Smtp-Source: APXvYqxgzS6Pr41Xe7Ab8MYfjRpqpyqaGYx+hL0YkPKIajj22RrXo0gM6cwEk+6sn11VHctEBFDICQ==
-X-Received: by 2002:a17:902:424:: with SMTP id
- 33mr36356321ple.151.1564508208039; 
- Tue, 30 Jul 2019 10:36:48 -0700 (PDT)
+ bh=VIbCCiqkXwkRR3OlBzyvEa8q9jsIq4iRUCXYKqboH9I=;
+ b=q5ZwMoY+UnD9Re/169/4xfgGUsr8o/mgd07X1ojxfsKrMVZaYzmGBQhWAcxuOsKDn0
+ yqlZ36/jhH1aC6zW7z9Ybx9XI0KyC58FvNnxwhamPaxQE3Syw1l1trj7VqcMd5mClELr
+ 3oO2uRc21+eD3RrEWZwg7JcVMWi9Ctz0ySKQ7lqozccIoWBrnsdazOtk9eh7sbMgl7Tz
+ bATRXZ6BIo8EMvEZF+HnGCSij0Gzz3POpyVTM+TQicyyk7zKgWSTyjNQGUoF1DTOQJ+E
+ /AxOMsSYwuQqItK7M/UAzT8AtykrvFRgyx2Y2g2eluN7wicFIVg2KPbaneEAyEuZ+g56
+ vQEQ==
+X-Gm-Message-State: APjAAAXdxsqKAktm5jaXkvlBrHVXlppcixSHFFax2o3G/7vx/X+9THI4
+ 3CbB13TWoWE89BqLGo3WK0mQUYnWGsrYjg==
+X-Google-Smtp-Source: APXvYqy+eiQlA+yWiCZKa7wL+ahjjhY+peGsf/z9SL3jbtpI723aTLAhtZSXaRvO1/Il6JzuJ5XIPw==
+X-Received: by 2002:a63:d84e:: with SMTP id
+ k14mr110248982pgj.234.1564508167632; 
+ Tue, 30 Jul 2019 10:36:07 -0700 (PDT)
 Received: from localhost.localdomain ([136.233.9.97])
- by smtp.gmail.com with ESMTPSA id q24sm59122895pjp.14.2019.07.30.10.36.41
+ by smtp.gmail.com with ESMTPSA id q24sm59122895pjp.14.2019.07.30.10.36.02
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 30 Jul 2019 10:36:47 -0700 (PDT)
+ Tue, 30 Jul 2019 10:36:07 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 30 Jul 2019 23:04:40 +0530
-Message-Id: <20190730173441.26486-16-mehta.aaru20@gmail.com>
+Date: Tue, 30 Jul 2019 23:04:33 +0530
+Message-Id: <20190730173441.26486-9-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190730173441.26486-1-mehta.aaru20@gmail.com>
 References: <20190730173441.26486-1-mehta.aaru20@gmail.com>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v8 15/16] tests/qemu-iotests: use AIOMODE with
- various tests
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: [Qemu-devel] [PATCH v8 08/16] block/file-posix.c: extend to use
+ io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,290 +100,219 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
  saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
  Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+ Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Maxim Levitsky <maximlevitsky@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Maxim Levitsky <maximlevitsky@gmail.com>
 ---
- tests/qemu-iotests/028 |  3 ++-
- tests/qemu-iotests/058 |  2 +-
- tests/qemu-iotests/089 |  4 ++--
- tests/qemu-iotests/091 |  7 ++++---
- tests/qemu-iotests/109 |  3 ++-
- tests/qemu-iotests/147 |  5 +++--
- tests/qemu-iotests/181 | 10 +++++-----
- tests/qemu-iotests/183 |  7 ++++---
- tests/qemu-iotests/185 | 17 ++++++++++++-----
- tests/qemu-iotests/200 |  3 ++-
- tests/qemu-iotests/201 | 10 +++++-----
- 11 files changed, 42 insertions(+), 29 deletions(-)
+ block/file-posix.c | 99 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 79 insertions(+), 20 deletions(-)
 
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 01f495912f..59e7b670ed 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -108,7 +108,8 @@ echo block-backup
- echo
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 4479cc7ab4..4aa42f826f 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -156,6 +156,7 @@ typedef struct BDRVRawState {
+     bool has_write_zeroes:1;
+     bool discard_zeroes:1;
+     bool use_linux_aio:1;
++    bool use_linux_io_uring:1;
+     bool page_cache_inconsistent:1;
+     bool has_fallocate;
+     bool needs_alignment;
+@@ -425,7 +426,7 @@ static QemuOptsList raw_runtime_opts = {
+         {
+             .name = "aio",
+             .type = QEMU_OPT_STRING,
+-            .help = "host AIO implementation (threads, native)",
++            .help = "host AIO implementation (threads, native, io_uring)",
+         },
+         {
+             .name = "locking",
+@@ -484,9 +485,15 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+         goto fail;
+     }
  
- qemu_comm_method="monitor"
--_launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk
-+_launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=${AIOMODE},\
-+id=disk
- h=$QEMU_HANDLE
- QEMU_COMM_TIMEOUT=1
+-    aio_default = (bdrv_flags & BDRV_O_NATIVE_AIO)
+-                  ? BLOCKDEV_AIO_OPTIONS_NATIVE
+-                  : BLOCKDEV_AIO_OPTIONS_THREADS;
++    if (bdrv_flags & BDRV_O_NATIVE_AIO) {
++        aio_default = BLOCKDEV_AIO_OPTIONS_NATIVE;
++#ifdef CONFIG_LINUX_IO_URING
++    } else if (bdrv_flags & BDRV_O_IO_URING) {
++        aio_default = BLOCKDEV_AIO_OPTIONS_IO_URING;
++#endif
++    } else {
++        aio_default = BLOCKDEV_AIO_OPTIONS_THREADS;
++    }
+     aio = qapi_enum_parse(&BlockdevAioOptions_lookup,
+                           qemu_opt_get(opts, "aio"),
+                           aio_default, &local_err);
+@@ -495,7 +502,11 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+         ret = -EINVAL;
+         goto fail;
+     }
++
+     s->use_linux_aio = (aio == BLOCKDEV_AIO_OPTIONS_NATIVE);
++#ifdef CONFIG_LINUX_IO_URING
++    s->use_linux_io_uring = (aio == BLOCKDEV_AIO_OPTIONS_IO_URING);
++#endif
  
-diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index 8c3212a72f..38d1ed90c0 100755
---- a/tests/qemu-iotests/058
-+++ b/tests/qemu-iotests/058
-@@ -64,7 +64,7 @@ nbd_snapshot_img="nbd:unix:$nbd_unix_socket"
- converted_image=$TEST_IMG.converted
+     locking = qapi_enum_parse(&OnOffAuto_lookup,
+                               qemu_opt_get(opts, "locking"),
+@@ -559,7 +570,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     s->shared_perm = BLK_PERM_ALL;
  
- # Use -f raw instead of -f $IMGFMT for the NBD connection
--QEMU_IO_NBD="$QEMU_IO -f raw --cache=$CACHEMODE"
-+QEMU_IO_NBD="$QEMU_IO -f raw --cache=$CACHEMODE --aio=$AIOMODE"
+ #ifdef CONFIG_LINUX_AIO
+-     /* Currently Linux does AIO only for files opened with O_DIRECT */
++    /* Currently Linux does AIO only for files opened with O_DIRECT */
+     if (s->use_linux_aio) {
+         if (!(s->open_flags & O_DIRECT)) {
+             error_setg(errp, "aio=native was specified, but it requires "
+@@ -581,6 +592,22 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+     }
+ #endif /* !defined(CONFIG_LINUX_AIO) */
  
- echo
- echo "== preparing image =="
-diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index ad029f1f09..059ad75e28 100755
---- a/tests/qemu-iotests/089
-+++ b/tests/qemu-iotests/089
-@@ -64,7 +64,7 @@ $QEMU_IO -c 'write -P 42 0 512' -c 'write -P 23 512 512' \
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        if (!aio_setup_linux_io_uring(bdrv_get_aio_context(bs), errp)) {
++            error_prepend(errp, "Unable to use io_uring: ");
++            goto fail;
++        }
++    }
++#else
++    if (s->use_linux_io_uring) {
++        error_setg(errp, "aio=io_uring was specified, but is not supported "
++                         "in this build.");
++        ret = -EINVAL;
++        goto fail;
++    }
++#endif /* !defined(CONFIG_LINUX_IO_URING) */
++
+     s->has_discard = true;
+     s->has_write_zeroes = true;
+     if ((bs->open_flags & BDRV_O_NOCACHE) != 0) {
+@@ -1874,21 +1901,25 @@ static int coroutine_fn raw_co_prw(BlockDriverState *bs, uint64_t offset,
+         return -EIO;
  
- $QEMU_IMG convert -f raw -O $IMGFMT "$TEST_IMG.base" "$TEST_IMG"
+     /*
+-     * Check if the underlying device requires requests to be aligned,
+-     * and if the request we are trying to submit is aligned or not.
+-     * If this is the case tell the low-level driver that it needs
+-     * to copy the buffer.
++     * When using O_DIRECT, the request must be aligned to be able to use
++     * either libaio or io_uring interface. If not fail back to regular thread
++     * pool read/write code which emulates this for us if we
++     * set QEMU_AIO_MISALIGNED.
+      */
+-    if (s->needs_alignment) {
+-        if (!bdrv_qiov_is_aligned(bs, qiov)) {
+-            type |= QEMU_AIO_MISALIGNED;
++    if (s->needs_alignment && !bdrv_qiov_is_aligned(bs, qiov)) {
++        type |= QEMU_AIO_MISALIGNED;
++#ifdef CONFIG_LINUX_IO_URING
++    } else if (s->use_linux_io_uring) {
++        LuringState *aio = aio_get_linux_io_uring(bdrv_get_aio_context(bs));
++        assert(qiov->size == bytes);
++        return luring_co_submit(bs, aio, s->fd, offset, qiov, type);
++#endif
+ #ifdef CONFIG_LINUX_AIO
+-        } else if (s->use_linux_aio) {
+-            LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+-            assert(qiov->size == bytes);
+-            return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
++    } else if (s->use_linux_aio) {
++        LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
++        assert(qiov->size == bytes);
++        return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
+ #endif
+-        }
+     }
  
--$QEMU_IO_PROG --cache $CACHEMODE \
-+$QEMU_IO_PROG --cache $CACHEMODE --aio $AIOMODE \
-          -c 'read -P 42 0 512' -c 'read -P 23 512 512' \
-          -c 'read -P 66 1024 512' "json:{
-     \"driver\": \"$IMGFMT\",
-@@ -111,7 +111,7 @@ $QEMU_IO -c 'write -P 42 0x38000 512' "$TEST_IMG" | _filter_qemu_io
+     acb = (RawPosixAIOData) {
+@@ -1924,24 +1955,36 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
  
- # The "image.filename" part tests whether "a": { "b": "c" } and "a.b": "c" do
- # the same (which they should).
--$QEMU_IO_PROG --cache $CACHEMODE \
-+$QEMU_IO_PROG --cache $CACHEMODE --aio $AIOMODE  \
-      -c 'read -P 42 0x38000 512' "json:{
-     \"driver\": \"$IMGFMT\",
-     \"file\": {
-diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-index d62ef18a02..78741d3fe7 100755
---- a/tests/qemu-iotests/091
-+++ b/tests/qemu-iotests/091
-@@ -60,14 +60,15 @@ echo === Starting QEMU VM1 ===
- echo
+ static void raw_aio_plug(BlockDriverState *bs)
+ {
++    BDRVRawState __attribute__((unused)) *s = bs->opaque;
+ #ifdef CONFIG_LINUX_AIO
+-    BDRVRawState *s = bs->opaque;
+     if (s->use_linux_aio) {
+         LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+         laio_io_plug(bs, aio);
+     }
+ #endif
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        LuringState *aio = aio_get_linux_io_uring(bdrv_get_aio_context(bs));
++        luring_io_plug(bs, aio);
++    }
++#endif
+ }
  
- qemu_comm_method="monitor"
--_launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk
-+_launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=${AIOMODE},\
-+             id=disk
- h1=$QEMU_HANDLE
+ static void raw_aio_unplug(BlockDriverState *bs)
+ {
++    BDRVRawState __attribute__((unused)) *s = bs->opaque;
+ #ifdef CONFIG_LINUX_AIO
+-    BDRVRawState *s = bs->opaque;
+     if (s->use_linux_aio) {
+         LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+         laio_io_unplug(bs, aio);
+     }
+ #endif
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        LuringState *aio = aio_get_linux_io_uring(bdrv_get_aio_context(bs));
++        luring_io_unplug(bs, aio);
++    }
++#endif
+ }
  
- echo
- echo === Starting QEMU VM2 ===
- echo
--_launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk \
--             -incoming "exec: cat '${MIG_FIFO}'"
-+_launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=${AIOMODE},\
-+             id=disk -incoming "exec: cat '${MIG_FIFO}'"
- h2=$QEMU_HANDLE
+ static int raw_co_flush_to_disk(BlockDriverState *bs)
+@@ -1961,14 +2004,20 @@ static int raw_co_flush_to_disk(BlockDriverState *bs)
+         .aio_type       = QEMU_AIO_FLUSH,
+     };
  
- echo
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index 9897ceb6cd..451709689a 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -52,7 +52,8 @@ run_qemu()
-     local qmp_format="$3"
-     local qmp_event="$4"
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        LuringState *aio = aio_get_linux_io_uring(bdrv_get_aio_context(bs));
++        return luring_co_submit(bs, aio, s->fd, 0, NULL, QEMU_AIO_FLUSH);
++    }
++#endif
+     return raw_thread_pool_submit(bs, handle_aiocb_flush, &acb);
+ }
  
--    _launch_qemu -drive file="${source_img}",format=raw,cache=${CACHEMODE},id=src
-+    _launch_qemu -drive file="${source_img}",format=raw,cache=${CACHEMODE},\
-+                 aio=${AIOMODE},id=src
-     _send_qemu_cmd $QEMU_HANDLE "{ 'execute': 'qmp_capabilities' }" "return"
+ static void raw_aio_attach_aio_context(BlockDriverState *bs,
+                                        AioContext *new_context)
+ {
++    BDRVRawState __attribute__((unused)) *s = bs->opaque;
+ #ifdef CONFIG_LINUX_AIO
+-    BDRVRawState *s = bs->opaque;
+     if (s->use_linux_aio) {
+         Error *local_err;
+         if (!aio_setup_linux_aio(new_context, &local_err)) {
+@@ -1978,6 +2027,16 @@ static void raw_aio_attach_aio_context(BlockDriverState *bs,
+         }
+     }
+ #endif
++#ifdef CONFIG_LINUX_IO_URING
++    if (s->use_linux_io_uring) {
++        Error *local_err;
++        if (!aio_setup_linux_io_uring(new_context, &local_err)) {
++            error_reportf_err(local_err, "Unable to use linux io_uring, "
++                                         "falling back to thread pool: ");
++            s->use_linux_io_uring = false;
++        }
++    }
++#endif
+ }
  
-     _send_qemu_cmd $QEMU_HANDLE \
-diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-index 2d84fddb01..632973b23c 100755
---- a/tests/qemu-iotests/147
-+++ b/tests/qemu-iotests/147
-@@ -24,7 +24,7 @@ import socket
- import stat
- import time
- import iotests
--from iotests import cachemode, imgfmt, qemu_img, qemu_nbd, qemu_nbd_early_pipe
-+from iotests import cachemode, aiomode, imgfmt, qemu_img, qemu_nbd, qemu_nbd_early_pipe
- 
- NBD_PORT_START      = 32768
- NBD_PORT_END        = NBD_PORT_START + 1024
-@@ -134,7 +134,8 @@ class BuiltinNBD(NBDBlockdevAddBase):
-         self.server.add_drive_raw('if=none,id=nbd-export,' +
-                                   'file=%s,' % test_img +
-                                   'format=%s,' % imgfmt +
--                                  'cache=%s' % cachemode)
-+                                  'cache=%s' % cachemode +
-+                                  'aio=%s' % aiomode)
-         self.server.launch()
- 
-     def tearDown(self):
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index e317e63422..547c1b47b0 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -58,21 +58,21 @@ qemu_comm_method="monitor"
- 
- if [ "$IMGOPTSSYNTAX" = "true" ]; then
-     _launch_qemu \
--        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,id=disk
- else
-     _launch_qemu \
--        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,driver=$IMGFMT,id=disk
- fi
- src=$QEMU_HANDLE
- 
- if [ "$IMGOPTSSYNTAX" = "true" ]; then
-     _launch_qemu \
--        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,id=disk \
-         -incoming "unix:${MIG_SOCKET}"
- else
-     _launch_qemu \
--        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
--        -incoming "unix:${MIG_SOCKET}"
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,driver=$IMGFMT,\
-+        id=disk -incoming "unix:${MIG_SOCKET}"
- fi
- dest=$QEMU_HANDLE
- 
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index fbe5a99beb..b16db9466d 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -56,13 +56,14 @@ echo
- qemu_comm_method="qmp"
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,aio=$AIOMODE,\
-+    driver=$IMGFMT,id=disk
- src=$QEMU_HANDLE
- _send_qemu_cmd $src "{ 'execute': 'qmp_capabilities' }" 'return'
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}.dest",cache=$CACHEMODE,driver=$IMGFMT,id=disk \
--    -incoming "unix:${MIG_SOCKET}"
-+    -drive file="${TEST_IMG}.dest",cache=$CACHEMODE,aio=$AIOMODE,\
-+    driver=$IMGFMT,id=disk -incoming "unix:${MIG_SOCKET}"
- dest=$QEMU_HANDLE
- _send_qemu_cmd $dest "{ 'execute': 'qmp_capabilities' }" 'return'
- 
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index 454ff600cc..1c74a0ef5a 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -54,7 +54,8 @@ echo
- qemu_comm_method="qmp"
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}.base",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+    -drive file="${TEST_IMG}.base",cache=$CACHEMODE,aio=$AIOMODE,\
-+    driver=$IMGFMT,id=disk
- h=$QEMU_HANDLE
- _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
- 
-@@ -125,7 +126,8 @@ echo === Start active commit job and exit qemu ===
- echo
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,aio=$AIOMODE,driver=$IMGFMT,\
-+    id=disk
- h=$QEMU_HANDLE
- _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
- 
-@@ -147,7 +149,8 @@ echo === Start mirror job and exit qemu ===
- echo
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,aio=$AIOMODE,driver=$IMGFMT,\
-+    id=disk
- h=$QEMU_HANDLE
- _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
- 
-@@ -172,7 +175,9 @@ echo === Start backup job and exit qemu ===
- echo
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+    _launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,aio=$AIOMODE,driver=$IMGFMT,\
-+    id=disk
- h=$QEMU_HANDLE
- _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
- 
-@@ -196,7 +201,9 @@ echo === Start streaming job and exit qemu ===
- echo
- 
- _launch_qemu \
--    -drive file="${TEST_IMG}",cache=$CACHEMODE,driver=$IMGFMT,id=disk
-+    _launch_qemu \
-+    -drive file="${TEST_IMG}",cache=$CACHEMODE,aio=$AIOMODE,driver=$IMGFMT,\
-+    id=disk
- h=$QEMU_HANDLE
- _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" 'return'
- 
-diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-index 72d431f251..b554dd947b 100755
---- a/tests/qemu-iotests/200
-+++ b/tests/qemu-iotests/200
-@@ -66,7 +66,8 @@ echo === Starting QEMU VM ===
- echo
- qemu_comm_method="qmp"
- _launch_qemu -object iothread,id=iothread0 $virtio_scsi \
--             -drive file="${TEST_IMG}",media=disk,if=none,cache=$CACHEMODE,id=drive_sysdisk,format=$IMGFMT \
-+             -drive file="${TEST_IMG}",media=disk,if=none,cache=$CACHEMODE,\
-+             aio=$AIOMODE,id=drive_sysdisk,format=$IMGFMT \
-              -device scsi-hd,drive=drive_sysdisk,bus=scsi0.0,id=sysdisk,bootindex=0
- h1=$QEMU_HANDLE
- 
-diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-index 7abf740fe4..48837c4f30 100755
---- a/tests/qemu-iotests/201
-+++ b/tests/qemu-iotests/201
-@@ -58,21 +58,21 @@ qemu_comm_method="monitor"
- 
- if [ "$IMGOPTSSYNTAX" = "true" ]; then
-     _launch_qemu \
--        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,id=disk
- else
-     _launch_qemu \
--        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,driver=$IMGFMT,id=disk
- fi
- src=$QEMU_HANDLE
- 
- if [ "$IMGOPTSSYNTAX" = "true" ]; then
-     _launch_qemu \
--        -drive "${TEST_IMG}",cache=${CACHEMODE},id=disk \
-+        -drive "${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,id=disk \
-         -incoming "unix:${MIG_SOCKET}"
- else
-     _launch_qemu \
--        -drive file="${TEST_IMG}",cache=${CACHEMODE},driver=$IMGFMT,id=disk \
--        -incoming "unix:${MIG_SOCKET}"
-+        -drive file="${TEST_IMG}",cache=${CACHEMODE},aio=$AIOMODE,driver=$IMGFMT,\
-+        id=disk -incoming "unix:${MIG_SOCKET}"
- fi
- dest=$QEMU_HANDLE
- 
+ static void raw_close(BlockDriverState *bs)
 -- 
 2.21.0
 
