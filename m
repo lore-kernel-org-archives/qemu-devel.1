@@ -2,61 +2,94 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A08C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE245C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A7BC20693
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7BC20693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 991C420651
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:09:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eEpV2Kv6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 991C420651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsShh-0002gf-7B
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:02:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55008)
+	id 1hsSom-0007NV-Nf
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:09:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57244)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <piaojun@huawei.com>) id 1hsSgQ-0001Hg-12
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:55 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hsSoE-0006V5-7w
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <piaojun@huawei.com>) id 1hsSgN-0000b3-VV
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:53 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2182 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <piaojun@huawei.com>) id 1hsSgN-0000Y8-1B
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:51 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id A0569FCD0B5F2BC12D2B;
- Tue, 30 Jul 2019 22:00:43 +0800 (CST)
-Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Tue, 30 Jul 2019
- 22:00:39 +0800
-To: Eric Blake <eblake@redhat.com>, <virtio-fs@redhat.com>,
- <qemu-devel@nongnu.org>
-References: <5D3F8F04.3030404@huawei.com>
- <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
-From: piaojun <piaojun@huawei.com>
-Message-ID: <5D404D85.1050109@huawei.com>
-Date: Tue, 30 Jul 2019 22:00:37 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.2.0
+ (envelope-from <alex.bennee@linaro.org>) id 1hsSoD-0005CN-AE
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:08:58 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:38753)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hsSoD-0005Bt-3a
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:08:57 -0400
+Received: by mail-wr1-x441.google.com with SMTP id g17so65947871wrr.5
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 07:08:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=/KcOJWJRRtK90cF9IC37nfXGU/xRIVABo/wGKm0TZJs=;
+ b=eEpV2Kv6FCQ2rjRU9/fadgIukzD/3UOwAAbG8EGrPBaGHfKsTkqSm4TAOyI0MretmK
+ 6c8YTBVcGIMWDkNEqaTrxcpqNvc9mnj/3LPZ2p5DD9OPAx0r8C6BMrSugMwdjClD9gaz
+ YicVS7GVoNP5eS8E8ifr+q3SGo7f11CQynHZgb6G4J/Z2UcC6o/FuKHPbbFPffErgnyW
+ nNAu9QBbJ+SxdLeP8IIhOXYc1DeNMkozQotj6clywBW+MK78sUaOH/4j70L9E35FV/r+
+ JKeNEDqUHqvvYBpdwA91HiesB6jGPburybixlmFUTes90r2pjghEFseyRxoyt2TeTysy
+ G+cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=/KcOJWJRRtK90cF9IC37nfXGU/xRIVABo/wGKm0TZJs=;
+ b=QfTA3af50cFgGvsabkcxItOoBxuX2LNgu9PowlFl7Mgic0lXc3560wC4WjdApMvvH4
+ gFo+rpcexZuH7pRLqCRJB0ICQpC4mFNfM/45eVK8zXNoAiBnfiTYEYNRlU21TRQHs4O+
+ xxzUXrkqoQaaY8Czw3K6Zoa3oFE3atidyNOVgEjy4szkjkLQdfnLreoLgaYuoKClGcNJ
+ ciUIDsCiArzUgnkF2lts0aFf0xXzffj+Y9iUmKep+EckWBtE/sUTHQU7k7tVDPTxEVcV
+ YEzacHr76ksm83G1dS0Ds4BgqrTOykzhgmiDgEKfwEnAXS7mJeUVO1oiQTpGY0KqBn1W
+ x/Iw==
+X-Gm-Message-State: APjAAAVhn596EYxjiBUK6w9veFPa7H7xP2wE+swIPV+1K6p+OfNooxoS
+ jD1dBa9e/eRuM1PHc/8j21l6DQ==
+X-Google-Smtp-Source: APXvYqyp60ytLkfJ62moBg/UwZYOAFoghZGFUe7d+67jhSmIWtmQVpp6rkmyoVEJpvroTbsWG14p7g==
+X-Received: by 2002:a05:6000:14b:: with SMTP id
+ r11mr54134157wrx.196.1564495735801; 
+ Tue, 30 Jul 2019 07:08:55 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id z1sm72740019wrv.90.2019.07.30.07.08.55
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 30 Jul 2019 07:08:55 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BB6CE1FF87;
+ Tue, 30 Jul 2019 15:08:54 +0100 (BST)
+References: <20190614171200.21078-1-alex.bennee@linaro.org>
+ <20190614171200.21078-26-alex.bennee@linaro.org>
+ <bd131b16-2f38-4112-4e09-6a2f63908bf2@linaro.org>
+ <87ftmnitjp.fsf@linaro.org>
+ <67b32364-c3dd-ff0d-fba8-7737327fc1b5@linaro.org>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+In-reply-to: <67b32364-c3dd-ff0d-fba8-7737327fc1b5@linaro.org>
+Date: Tue, 30 Jul 2019 15:08:54 +0100
+Message-ID: <87ef27iphl.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.177.253.249]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: Re: [Qemu-devel] [PATCH] virtiofsd: fix compile error if
- 'F_OFD_GETLK' not defined
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v3 25/50] translator: add translator_ld{ub,
+ sw, uw, l, q}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,97 +101,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eric,
 
-On 2019/7/30 21:28, Eric Blake wrote:
-> On 7/29/19 7:27 PM, piaojun wrote:
->> Use F_GETLK for fcntl when F_OFD_GETLK not defined.
->=20
-> Which system are you hitting this problem on?
->=20
-> The problem with F_GETLK is that it is NOT as safe as F_OFD_GETLK.
->=20
-> We already have fcntl_op_getlk and qemu_probe_lock_ops() in util/osdep.=
-c
-> to not only determine which form to use, but also to emit a warning to
-> the end user if we had to fall back to the unsafe F_GETLK. Why is your
-> code not reusing that logic?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-virtiofsd compile error due to missed 'F_OFD_GETLK'. My kernel version is
-3.10.
+> On 7/30/19 5:41 AM, Alex Benn=C3=A9e wrote:
+>> Do we ever need _code access that isn't part of the
+>> translator loading instructions?
+>
+> We use it; I'm not sure that's the same as need.  ;-)
 
-linux-PUALcm:/home/code/virtiofs/qemu # make -j 8 virtiofsd
+Yeah I've run into others (e.g. alpha alpha_cpu_do_unaligned_access). So
+the question is do I attempt to deprecate code load in this series?
 
-make[1]: Entering directory `/home/code/virtiofs/qemu/slirp'
-make[1]: Nothing to be done for `all'.
-make[1]: Leaving directory `/home/code/virtiofs/qemu/slirp'
-	CHK version_gen.h
-  CC      contrib/virtiofsd/passthrough_ll.o
-  CC      qapi/qapi-clone-visitor.o
-  CC      qapi/qmp-event.o
-  CC      qapi/qapi-util.o
-  CC      qapi/qapi-builtin-types.o
-  CC      qapi/qapi-types-audio.o
-  CC      qapi/qapi-types-authz.o
-  CC      qapi/qapi-types-block-core.o
-contrib/virtiofsd/passthrough_ll.c: In function =E2=80=98lo_getlk=E2=80=99=
-:
-contrib/virtiofsd/passthrough_ll.c:1622:25: error: =E2=80=98F_OFD_GETLK=E2=
-=80=99 undeclared (first use in this function)
-  ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
-                         ^
-contrib/virtiofsd/passthrough_ll.c:1622:25: note: each undeclared identif=
-ier is reported only once for each function it appears in
-contrib/virtiofsd/passthrough_ll.c: In function =E2=80=98lo_setlk=E2=80=99=
-:
-contrib/virtiofsd/passthrough_ll.c:1671:25: error: =E2=80=98F_OFD_SETLK=E2=
-=80=99 undeclared (first use in this function)
+> Lots of the uses that I examined should use a mechanism
+> like arm does for recording syndrome data in the unwind slots.
 
->=20
->>
->> Signed-off-by: Jun Piao <piaojun@huawei.com>
->> ---
->>  contrib/virtiofsd/passthrough_ll.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/pa=
-ssthrough_ll.c
->> index 9ae1381..757785b 100644
->> --- a/contrib/virtiofsd/passthrough_ll.c
->> +++ b/contrib/virtiofsd/passthrough_ll.c
->> @@ -1619,7 +1619,11 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t=
- ino,
->>  		return;
->>  	}
->>
->> +#ifdef F_OFD_GETLK
->>  	ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
->> +#else
->> +	ret =3D fcntl(plock->fd, F_GETLK, lock);
->> +#endif
->=20
-> Hmm. Since this is in contrib, you are trying to compile something that
-> is independent of util/osdep.c (at least, I assume that's the case, as
-> contrib/virtiofsd/ is not even part of qemu.git master yet - in which
-> case, why is this not being squashed in to the patch introducing that
-> file, rather than sent standalone).  On the other hand, that raises the
-> question - who is trying to use virtiofsd on a kernel that is too old t=
-o
-> provid F_OFD_GETLK?  Isn't the whole point of virtiofsd to be speeding
-> up modern usage, at which point an old kernel is just gumming up the
-> works?  It seems like you are better off letting compilation fail on a
-> system that is too old to support decent F_OFD_GETLK, rather than
-> silently falling back to something that is unsafe.
+Yeah - hence the semihosting fixups. ATM we only touch translator_loop
+guests but deprecating means having to do them all. Maybe we could
+poison the build someway and ensure as each legacy translation is
+converted to translator_loop we convert the _code use functions there.
 
-Perhaps reusing qemu_lock_fd() looks a better way to solve this.
+> Quite possibly the only legitimate use is sparc, where it
+> has an alternate address space that reads with execute permission.
+> We could probably find a different way to accomplish that
+> if we removed the *_code helpers.
+>
+>
+> r~
 
-Thanks,
-Jun
 
->=20
-
+--
+Alex Benn=C3=A9e
 
