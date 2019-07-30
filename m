@@ -2,60 +2,82 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08841C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFC7C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:26:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D57E62087F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:26:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D57E62087F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7B632087F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:26:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="seLRh/vG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B632087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59835 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsQGb-0005Gk-4t
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 07:26:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52199)
+	id 1hsQGk-0005f0-Ql
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 07:26:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52380)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hsQFD-0003Xd-Fs
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:24:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hsQFm-0004MR-ES
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hsQFB-0006fw-82
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:24:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34520)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hsQF5-0006ck-GN; Tue, 30 Jul 2019 07:24:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B55063082AEF;
- Tue, 30 Jul 2019 11:24:29 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-75.ams2.redhat.com
- [10.36.117.75])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6F1B6092F;
- Tue, 30 Jul 2019 11:24:28 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Tue, 30 Jul 2019 13:24:21 +0200
-Message-Id: <20190730112425.21497-1-kwolf@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hsQFl-0006zD-I5
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:25:14 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45557)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hsQFl-0006yY-9r
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:25:13 -0400
+Received: by mail-ot1-x341.google.com with SMTP id x21so398766otq.12
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 04:25:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=F3oDi/Zmrw26OuLdHHb6A44/8O2jhczV1bJOF/8qPXI=;
+ b=seLRh/vGzNNneByODUJEF49lMB33bs3N7QjW6DW/+Xf+DFwLPf32wZuy7SHCepCQL8
+ /Tk7n6PRMbTuOGbXWW0px52/xKBW51qzJbrfJg13tlRfKLdIVr+D7r3ZKS/PMMmvyMUL
+ PBH+sjNHSAvbQV/WhmN3HrieBc0cU9gcDYt5BkseB+TUtaFv7gKzjTf0Zs2jmqubP8Ef
+ elHGzOY6kGopcrOad6+ilhMB1E4jKVU+4dWSnmdV58WUPI2vnpVLZBumZJ2PN1XRTHZt
+ u9Qv5u5RFEigMG7KWFAjCcoX13co6ujZsC9o3HN+TUq22Xp52cVyzNnMUDga9wczTDr+
+ e+rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=F3oDi/Zmrw26OuLdHHb6A44/8O2jhczV1bJOF/8qPXI=;
+ b=Xs8PnTu8LKbTh+/RE/w+PK5xJ5dFLOI19/xtX9aOGS2kXW09r13wBe1CfM4feIYC0v
+ zzlAsnOA2NyLnUZzF97QjcWA9QURxQAzxS18/5AG9CNW4Jb5kpt8ks2rhyXCOSXVFF3q
+ y0TnZOpdy32C9hrZcP2/IO+w1TaWda3U9R4mLT4exKB+JVZJwSDLXxxQzxL6dhMlRlOB
+ vOpnMJ1zp6uO9zARgSwx5rOHYbIbnThOGwduqzFrgkkxtOAno9KxZEZAtFLD6zNUKDiD
+ fF6XyE2RMT36TqRFsK+5bUkn0alL4/5N3CTJwsJvmi1/XmfsdwlJnevbMGhsH54s40hN
+ ZDmA==
+X-Gm-Message-State: APjAAAUL7NF50A/T21HzIXCs2MepdCvIZPb9Gw5WeRM9GfJip2TAPCxT
+ BC1HORH8otoWbTTshFxyOOmmfpGvz9GiDuLgohFPTNCn
+X-Google-Smtp-Source: APXvYqyE3+HH6v7c+9F5GeB8tXFS5K5nmMWCnLVdwZIaHUf3R2hxydTDk1wfpH4zApAtM+FdF7/jBckw2IaDJUyUqHw=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr26924575oti.91.1564485912245; 
+ Tue, 30 Jul 2019 04:25:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 30 Jul 2019 11:24:29 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 0/4] Block layer and multiboot test patches
+References: <20190714134028.315-1-laurent@vivier.eu>
+ <20190714134028.315-2-laurent@vivier.eu>
+ <1F76A574-2A97-4070-8EE0-0EE83A4241E9@physik.fu-berlin.de>
+ <13f6aa89-e3f3-61e8-fa05-cde20b55daa0@vivier.eu>
+In-Reply-To: <13f6aa89-e3f3-61e8-fa05-cde20b55daa0@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 30 Jul 2019 12:25:01 +0100
+Message-ID: <CAFEAcA9AM=uJ0evZgthd9kebhGMYNzG_HKz=VYRCMmDj4D_=zw@mail.gmail.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH 2/2] linux-user: manage binfmt-misc
+ preserve-arg[0] flag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,45 +89,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit ee9545ed1543020fba52fa5fb8f2b71c63e538=
-9f:
+On Wed, 17 Jul 2019 at 11:07, Laurent Vivier <laurent@vivier.eu> wrote:
+> QEMU is not able to detect if it has been started by binfmt_misc with
+> the preserve-arg[0] enabled or not, so it can't adapt the args analysis
+> to get the correct list.
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
-ng (2019-07-30 09:43:32 +0100)
+If the kernel provided a more useful interface (for instance
+telling us what it was doing via the ELF auxv so we knew how
+to interpret the command line arguments) this would help.
+Of course you still have to wait until that kernel change actually
+gets into the hands of users...
 
-are available in the Git repository at:
-
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
-
-for you to fetch changes up to 7cef3d1290c9d675deff95029ba78e51fb727125:
-
-  scsi-cd: Fix inserting read-only media in empty drive (2019-07-30 13:21=
-:38 +0200)
-
-----------------------------------------------------------------
-Block layer patches:
-
-- scsi-cd: Fix inserting read-only media in empty drive
-- block/copy-on-read: Fix permissions for inactive node
-- Test case fixes
-
-----------------------------------------------------------------
-Andrey Shinkevich (1):
-      Fixes: add read-zeroes to 051.out
-
-Kevin Wolf (3):
-      tests/multiboot: Fix load address of test kernels
-      block/copy-on-read: Fix permissions for inactive node
-      scsi-cd: Fix inserting read-only media in empty drive
-
- block/copy-on-read.c       | 16 +++++++---------
- hw/scsi/scsi-disk.c        | 10 ++++++++--
- tests/multiboot/link.ld    |  6 +++---
- tests/qemu-iotests/051.out | 10 +++++-----
- 4 files changed, 23 insertions(+), 19 deletions(-)
+thanks
+-- PMM
 
