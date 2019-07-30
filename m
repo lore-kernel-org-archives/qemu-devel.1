@@ -2,66 +2,58 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F28C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 06:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05EDC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 06:48:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 216C02054F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 06:34:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216C02054F
+	by mail.kernel.org (Postfix) with ESMTPS id 970662087F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 06:48:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 970662087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsLhy-0006KR-Cj
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 02:34:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57261)
+	id 1hsLvV-0000ap-UK
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 02:48:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33000)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hsLhY-0005tZ-JY
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 02:33:37 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hsLux-0008Ci-3B
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 02:47:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hsLhX-0004Pp-Et
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 02:33:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45370)
+ (envelope-from <pagupta@redhat.com>) id 1hsLuu-0008Ne-S4
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 02:47:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41276)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hsLhX-0004Pj-A1
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 02:33:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hsLuu-0008M5-JY
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 02:47:24 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8DB453084288
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 06:33:34 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-51.ams2.redhat.com
- [10.36.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C200608A5;
- Tue, 30 Jul 2019 06:33:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F082A1138619; Tue, 30 Jul 2019 08:33:32 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-22-armbru@redhat.com>
- <20190729191605.GF4313@habkost.net>
-Date: Tue, 30 Jul 2019 08:33:32 +0200
-In-Reply-To: <20190729191605.GF4313@habkost.net> (Eduardo Habkost's message of
- "Mon, 29 Jul 2019 16:16:05 -0300")
-Message-ID: <87zhkwf2v7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E6BB81DE3;
+ Tue, 30 Jul 2019 06:47:21 +0000 (UTC)
+Received: from dhcp201-121.englab.pnq.redhat.com (ovpn-116-177.sin2.redhat.com
+ [10.67.116.177])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 73BB0600CD;
+ Tue, 30 Jul 2019 06:47:01 +0000 (UTC)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 30 Jul 2019 12:16:57 +0530
+Message-Id: <20190730064658.27369-1-pagupta@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 30 Jul 2019 06:33:34 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Tue, 30 Jul 2019 06:47:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 21/28] Include hw/qdev-properties.h less
+Subject: [Qemu-devel] [PATCH] virtio pmem: user document
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,70 +65,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org
+Cc: aarcange@redhat.com, pagupta@redhat.com, cohuck@redhat.com,
+ david@redhat.com, mst@redhat.com, lcapitulino@redhat.com, stefanha@redhat.com,
+ riel@surriel.com, nilal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+This patch documents the steps to use virtio pmem.
+It also documents other useful information about
+virtio pmem e.g use-case, comparison with Qemu NVDIMM
+backend and current limitations.
 
-> On Fri, Jul 26, 2019 at 02:05:35PM +0200, Markus Armbruster wrote:
->> In my "build everything" tree, changing hw/qdev-properties.h triggers
->> a recompile of some 2700 out of 6600 objects (not counting tests and
->> objects that don't depend on qemu/osdep.h).
->> 
->> Many places including hw/qdev-properties.h (directly or via hw/qdev.h)
->> actually need only hw/qdev-core.h.  Include hw/qdev-core.h there
->> instead.
->> 
->> hw/qdev.h is actually pointless: all it does is include hw/qdev-core.h
->> and hw/qdev-properties.h, which in turn includes hw/qdev-core.h.
->> Replace the remaining uses of hw/qdev.h by hw/qdev-properties.h.
->> 
->> While there, delete a few superfluous inclusions of hw/qdev-core.h.
->> 
->> Touching hw/qdev-properties.h now recompiles some 1200 objects.
->
-> Impressive, thanks for doing this.
->
-> I only see superfluous whitespace changes at
-> hw/sd/sdhci-internal.h and hw/qdev-dma.h, below.
+Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+---
+ docs/virtio-pmem.txt | 65 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+ create mode 100644 docs/virtio-pmem.txt
 
-Rebasing leftovers, will drop.
+diff --git a/docs/virtio-pmem.txt b/docs/virtio-pmem.txt
+new file mode 100644
+index 0000000000..fc61eebb20
+--- /dev/null
++++ b/docs/virtio-pmem.txt
+@@ -0,0 +1,65 @@
++
++QEMU virtio pmem
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++ This document explains the usage of virtio pmem device=20
++ which is available since QEMU v4.1.0.
++
++ The virtio pmem is paravirtualized persistent memory device
++ on regular(non-NVDIMM) storage.=20
++
++Usecase
++--------
++  Allows to bypass the guest page cache and directly use host page cache=
+.
++  This reduces guest memory footprint as host can make efficient memory
++  reclaim decisions under memory pressure.
++
++o How does virtio-pmem compare to the nvdimm emulation supported by QEMU=
+?
++
++  NVDIMM emulation on regular(non-NVDIMM) host storage does not persists
++  the guest writes as there are no defined semantecs in the device speci=
+fication.
++  With virtio pmem device, guest write persistence on non-NVDIMM storage=
+ is
++  supported.
++
++virtio pmem usage
++-----------------
++  virtio pmem device is created with a memory-backend-file with the belo=
+w
++  options:
++
++  -machine pc -m 8G,slots=3D$N,maxmem=3D$MAX_SIZE
++  -object memory-backend-file,id=3Dmem1,share,mem-path=3D$PATH,size=3D$S=
+IZE
++  -device virtio-pmem-pci,memdev=3Dmem1,id=3Dnv1
++
++   where:
++   - "object memory-backend-file,id=3Dmem1,share,mem-path=3D$PATH,size=3D=
+$VIRTIO_PMEM_SIZE"
++     creates a backend storage of size $SIZE on a file $PATH. All
++     accesses to the virtio pmem device go to the file $PATH.
++
++   - "device virtio-pmem-pci,id=3Dnvdimm1,memdev=3Dmem1" creates a virti=
+o pmem
++     device whose storage is provided by above memory backend device.
++
++  Multiple virtio pmem devices can be created if multiple pairs of "-obj=
+ect"
++  and "-device" are provided.
++
++Hotplug
++-------
++Accomplished by two monitor commands "object_add" and "device_add".
++
++For example, the following commands add another 4GB virtio pmem device t=
+o
++the guest:
++
++ (qemu) object_add memory-backend-file,id=3Dmem2,share=3Don,mem-path=3Dv=
+irtio_pmem2.img,size=3D4G
++ (qemu) device_add virtio-pmem-pci,id=3Dvirtio_pmem2,memdev=3Dmem2
++
++Guest Data Persistence
++----------------------
++Guest data persistence on non-NVDIMM requires guest userspace applicatio=
+n to=20
++perform fsync/msync. This is different than real nvdimm backend where no=
+ additional
++fsync/msync is required for data persistence.
++
++Limitations
++------------
++- Real nvdimm device backend is not supported.
++- virtio pmem hotunplug is not supported.
++- ACPI NVDIMM features like regions/namespaces are not supported.
++- ndctl command is not supported.
+--=20
+2.21.0
 
-> They are harmless, though, so:
->
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Thanks!
-
-> [...]
->> diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
->> index 34141400f8..1d9053c183 100644
->> --- a/hw/sd/sdhci-internal.h
->> +++ b/hw/sd/sdhci-internal.h
->> @@ -21,6 +21,7 @@
->>   * You should have received a copy of the GNU General Public License along
->>   * with this program; if not, see <http://www.gnu.org/licenses/>.
->>   */
->> +
->>  #ifndef SDHCI_INTERNAL_H
->>  #define SDHCI_INTERNAL_H
->>  
-> [...]
->> diff --git a/include/hw/qdev-dma.h b/include/hw/qdev-dma.h
->> index b00391aa0c..002705c57d 100644
->> --- a/include/hw/qdev-dma.h
->> +++ b/include/hw/qdev-dma.h
->> @@ -10,6 +10,7 @@
->>  #ifndef HW_QDEV_DMA_H
->>  #define HW_QDEV_DMA_H
->>  
->> +
->>  #define DEFINE_PROP_DMAADDR(_n, _s, _f, _d)                               \
->>      DEFINE_PROP_UINT64(_n, _s, _f, _d)
->>  
-> [...]
 
