@@ -2,72 +2,84 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCD5C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B1DC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:54:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E06620651
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:51:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E06620651
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1A4BF206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:54:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A4BF206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsOnB-0000kF-HQ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:51:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36647)
+	id 1hsOqF-0002Ck-5w
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:54:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37126)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsOmc-0000KC-9k
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:51:03 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsOpc-0001QK-2W
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsOma-0003F9-SQ
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:51:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47472)
+ (envelope-from <philmd@redhat.com>) id 1hsOpa-0004MH-RS
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:54:07 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36190)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsOma-0003El-MS
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:51:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsOmX-0007ig-UJ
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:50:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0EF6E2E80D2
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:50:57 +0000 (UTC)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hsOpa-0004Ls-LK
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:54:06 -0400
+Received: by mail-wm1-f66.google.com with SMTP id g67so51931998wme.1
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 02:54:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5alA7xgJc5SpP2ELPLHjzW8XMsGTtuPaOAkmlk4H0bo=;
+ b=PTERrgjfSKZoTVLPpBrWOVVBj4aCCEHbjUBEer8D09iGLKf7moSyykn12UJO47uJI3
+ Q+bB8ompjq1XuUCTP63dktjpuByz0ziFJeoyPAGmku1ykwsUPiVsUD0GCBfxIeNiudEt
+ +pgL3+crGhH2+xnZVpmc0beq4yup6H2MfyQGPYWYplV53DwJ818EkapczwbvyRyLmHpr
+ p/H4S3nShr4tFVpE2y6JK3noKO6DDNheW8zLsrbHzhY7mhDWPzUg22zAxNmWrcqh8UcO
+ y9tvmIBiRQxSQMAFQn2GCfn3YisUxsYBgAa4YPB7H0sYr3jC5KH46eeAml+g13nlxY5y
+ nkwg==
+X-Gm-Message-State: APjAAAUkxeWHk0kC2JNoED9wLDFmMiQmHJuRpxnKVG2q0wcPsg3yOSUu
+ 0ThzOgHk2VRdnihmK+79rxiSew==
+X-Google-Smtp-Source: APXvYqwFpWYubvCY36ahw4Llzqh597rUmEHN1SwsYEksQWsxsACqHaoPsdABvswiJkzQegbzx/a/HA==
+X-Received: by 2002:a1c:cc0d:: with SMTP id
+ h13mr101986047wmb.119.1564480445589; 
+ Tue, 30 Jul 2019 02:54:05 -0700 (PDT)
+Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.190])
+ by smtp.gmail.com with ESMTPSA id y7sm47453858wmm.19.2019.07.30.02.54.04
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 02:54:05 -0700 (PDT)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190729223605.7163-1-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7324bc78-1d7b-7b7f-272d-c2932651b007@redhat.com>
+Date: Tue, 30 Jul 2019 11:54:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 09:36:03 -0000
-From: Roman Bolshakov <1818937@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: crash hvf macos
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
-X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
-X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
-References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156447936384.17753.12319986519288026631.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 5723a7a8c50fe1fa14fb20c4972899ee1b5d2179
+In-Reply-To: <20190729223605.7163-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH] Revert "ide/ahci: Check for -ECANCELED in
+ aio callbacks"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,106 +88,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ Shaju Abraham <shaju.abraham@nutanix.com>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's not possible to allocate MSR bitmap in userspace because it
-requires a physical address to be stored in the VMCS field. However, the
-bitmap page is already allocated inside kernel part of
-Hypervisor.framework. The 4k bitmap region is aligned to page boundary.
-It's worth to continue inspection of the checks (26.2 CHECKS ON VMX
-CONTROLS AND HOST-STATE AREA).
+Hi John,
 
-The reason why MSR Bitmap Address has weird value is because it's not
-necessarily the value of the VMCS field (albeit VMCS_CTRL_MSR_BITMAPS is
-defined in hv_arch_vmx.h). HVF uses an internal lookup table that has a
-limited set of VMCS fields exposed by Apple. The list is documented at
-the reference page:
-https://developer.apple.com/documentation/hypervisor/1469436-virtual_machin=
-e_control_structur
+On 7/30/19 12:36 AM, John Snow wrote:
+> This reverts commit 0d910cfeaf2076b116b4517166d5deb0fea76394.
+> 
+> It's not correct to just ignore an error code in a callback; we need to
+> handle that error and possible report failure to the guest so that they
+> don't wait indefinitely for an operation that will now never finish.
 
-It's likely that 0x3f is a field from the VMCS lookup table. Given the
-signature of hv_vmx_vcpu_read_vmcs, I would expect an error (e.g.
-HV_BAD_ARGUMENT) to be returned instead of the silent failure. I have
-submitted FB6858948 to Apple to correct the behaviour.
+Is this 4.1 material? It looks so.
 
-So, Apple doesn't provide an explicit access to MSR Bitmap Address field
-but allows to control the bitmap via hv_vcpu_enable_native_msr.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1818937
-
-Title:
-  Crash with HV_ERROR on macOS host
-
-Status in QEMU:
-  New
-
-Bug description:
-  On macOS host running Windows 10 guest, qemu crashed with error
-  message: Error: HV_ERROR.
-
-  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
- 4278U.
-  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
-  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
-rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
-
-  thread list
-  Process 56054 stopped
-    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
-nar16 + 970, queue =3D 'com.apple.main-thread'
-    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
-__select + 10
-    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
-__sigwait + 10
-  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
-__pthread_kill + 10, stop reason =3D signal SIGABRT
-    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
-__psynch_cvwait + 10
-    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
-`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
-    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
-b`start_wqthread
-    thread #32: tid =3D 0x300c17, 0x0000000000000000
-    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
-`__psynch_cvwait + 10
-
-  =
-
-  Crashed thread:
-
-  * thread #6, stop reason =3D signal SIGABRT
-    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
-10
-      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
-85
-      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
-      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
-unavailable>) at hvf.c:106 [opt]
-      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
-x00007f8e5283de00) at hvf.c:681 [opt]
-      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
-n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
-      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
-s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
-      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
-126
-      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
- 70
-      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
+> This ought to help cases reported by Nutanix where iSCSI returns a
+> legitimate -ECANCELED for certain operations which should be propagated
+> normally.
+> 
+> Reported-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  hw/ide/ahci.c |  3 ---
+>  hw/ide/core.c | 14 --------------
+>  2 files changed, 17 deletions(-)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 00ba422a48..6aaf66534a 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1023,9 +1023,6 @@ static void ncq_cb(void *opaque, int ret)
+>      IDEState *ide_state = &ncq_tfs->drive->port.ifs[0];
+>  
+>      ncq_tfs->aiocb = NULL;
+> -    if (ret == -ECANCELED) {
+> -        return;
+> -    }
+>  
+>      if (ret < 0) {
+>          bool is_read = ncq_tfs->cmd == READ_FPDMA_QUEUED;
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 6afadf894f..8e1624f7ce 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -722,9 +722,6 @@ static void ide_sector_read_cb(void *opaque, int ret)
+>      s->pio_aiocb = NULL;
+>      s->status &= ~BUSY_STAT;
+>  
+> -    if (ret == -ECANCELED) {
+> -        return;
+> -    }
+>      if (ret != 0) {
+>          if (ide_handle_rw_error(s, -ret, IDE_RETRY_PIO |
+>                                  IDE_RETRY_READ)) {
+> @@ -840,10 +837,6 @@ static void ide_dma_cb(void *opaque, int ret)
+>      uint64_t offset;
+>      bool stay_active = false;
+>  
+> -    if (ret == -ECANCELED) {
+> -        return;
+> -    }
+> -
+>      if (ret == -EINVAL) {
+>          ide_dma_error(s);
+>          return;
+> @@ -975,10 +968,6 @@ static void ide_sector_write_cb(void *opaque, int ret)
+>      IDEState *s = opaque;
+>      int n;
+>  
+> -    if (ret == -ECANCELED) {
+> -        return;
+> -    }
+> -
+>      s->pio_aiocb = NULL;
+>      s->status &= ~BUSY_STAT;
+>  
+> @@ -1058,9 +1047,6 @@ static void ide_flush_cb(void *opaque, int ret)
+>  
+>      s->pio_aiocb = NULL;
+>  
+> -    if (ret == -ECANCELED) {
+> -        return;
+> -    }
+>      if (ret < 0) {
+>          /* XXX: What sector number to set here? */
+>          if (ide_handle_rw_error(s, -ret, IDE_RETRY_FLUSH)) {
+> 
 
