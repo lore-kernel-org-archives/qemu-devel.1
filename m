@@ -6,58 +6,65 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61238C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B83C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:06:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 375D320693
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:05:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375D320693
+	by mail.kernel.org (Postfix) with ESMTPS id 3557420693
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:06:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3557420693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsQt3-00058h-H5
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:05:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59347)
+	id 1hsQtM-0005lX-Hl
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:06:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59428)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hsQsa-0004b2-QV
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:05:22 -0400
+ (envelope-from <pagupta@redhat.com>) id 1hsQsm-0004rA-VJ
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:05:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hsQsZ-000108-2Q
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:05:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:12956)
+ (envelope-from <pagupta@redhat.com>) id 1hsQsl-00019F-Jb
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:05:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34198)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hsQsY-0000z4-T6
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:05:19 -0400
+ (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1hsQsl-00018p-Ad
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:05:31 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 588C920260
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 12:05:17 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-204-67.brq.redhat.com [10.40.204.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7DD98600CC;
- Tue, 30 Jul 2019 12:05:13 +0000 (UTC)
-Date: Tue, 30 Jul 2019 14:05:11 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Message-ID: <20190730140511.31decaac@Igors-MacBook-Pro>
-In-Reply-To: <20190730093719.12958-3-dgilbert@redhat.com>
-References: <20190730093719.12958-1-dgilbert@redhat.com>
- <20190730093719.12958-3-dgilbert@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8A0F7B0CCB;
+ Tue, 30 Jul 2019 12:05:30 +0000 (UTC)
+Received: from colo-mx.corp.redhat.com
+ (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C9F0605A8;
+ Tue, 30 Jul 2019 12:05:30 +0000 (UTC)
+Received: from zmail21.collab.prod.int.phx2.redhat.com
+ (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
+ by colo-mx.corp.redhat.com (Postfix) with ESMTP id 5A8A21806B01;
+ Tue, 30 Jul 2019 12:05:30 +0000 (UTC)
+Date: Tue, 30 Jul 2019 08:05:29 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <835647202.5426199.1564488329949.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20190730114548.4ff4188b.cohuck@redhat.com>
+References: <20190730064658.27369-1-pagupta@redhat.com>
+ <20190730114548.4ff4188b.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.116.177, 10.4.195.29]
+Thread-Topic: virtio pmem: user document
+Thread-Index: YB8Kh4j3lyLHqeerYOdlIJxC6YtgrA==
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 30 Jul 2019 12:05:17 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 30 Jul 2019 12:05:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] pcie_root_port: Disable ACS on older
- machines
+Subject: Re: [Qemu-devel] [PATCH] virtio pmem: user document
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,54 +76,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com,
- mst@redhat.com
+Cc: aarcange@redhat.com, riel@surriel.com, mst@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, lcapitulino@redhat.com, stefanha@redhat.com,
+ nilal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 10:37:19 +0100
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> ACS got added in 4.0 unconditionally,  that broke older<->4.0 migration
-> where there was a PCIe root port.
-> Fix this by turning it off for 3.1 and older machines; note this
-> fixes compatibility for older QEMUs but breaks compatibility with 4.0
-> for older machine types.
-> 
->     machine type    source qemu   dest qemu
->        3.1             3.1           4.0        broken
->        3.1             3.1           4.1rc2     broken
->        3.1             3.1           4.1+this   OK ++
->        3.1             4.0           4.1rc2     OK
->        3.1             4.0           4.1+this   broken --
->        4.0             4.0           4.1rc2     OK
->        4.0             4.0           4.1+this   OK
-> 
-> So we gain and lose; the consensus seems to be treat this as a
-> fix for older machine types.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  hw/core/machine.c | 1 +
->  1 file changed, 1 insertion(+)
+> On Tue, 30 Jul 2019 12:16:57 +0530
+> Pankaj Gupta <pagupta@redhat.com> wrote:
 > 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index c58a8e594e..26a5f30e6d 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -52,6 +52,7 @@ GlobalProperty hw_compat_3_1[] = {
->      { "virtio-blk-device", "discard", "false" },
->      { "virtio-blk-device", "write-zeroes", "false" },
->      { "virtio-balloon-device", "qemu-4-0-config-size", "false" },
-> +    { "pcie-root-port-base", "disable-acs", "true" }, /* Added in 4.1 */
->  };
->  const size_t hw_compat_3_1_len = G_N_ELEMENTS(hw_compat_3_1);
->  
+> > This patch documents the steps to use virtio pmem.
+> > It also documents other useful information about
+> > virtio pmem e.g use-case, comparison with Qemu NVDIMM
+> > backend and current limitations.
+> > 
+> > Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
+> > ---
+> >  docs/virtio-pmem.txt | 65 ++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 65 insertions(+)
+> >  create mode 100644 docs/virtio-pmem.txt
+> > 
+> > diff --git a/docs/virtio-pmem.txt b/docs/virtio-pmem.txt
+> 
+> Maybe make this ReST from the start? Should be trivial enough.
 
+o.k
+
+> 
+> > new file mode 100644
+> > index 0000000000..fc61eebb20
+> > --- /dev/null
+> > +++ b/docs/virtio-pmem.txt
+> > @@ -0,0 +1,65 @@
+> > +
+> > +QEMU virtio pmem
+> > +===================
+> > +
+> > + This document explains the usage of virtio pmem device
+> 
+> "setup and usage" ?
+
+o.k
+
+> 
+> > + which is available since QEMU v4.1.0.
+> > +
+> > + The virtio pmem is paravirtualized persistent memory device
+> 
+> "The virtio pmem device is a paravirtualized..."
+
+sure.
+
+> 
+> > + on regular(non-NVDIMM) storage.
+> > +
+> > +Usecase
+> > +--------
+> > +  Allows to bypass the guest page cache and directly use host page cache.
+> > +  This reduces guest memory footprint as host can make efficient memory
+> 
+> s/as host/,as the host/
+
+sure
+
+> 
+> > +  reclaim decisions under memory pressure.
+> > +
+> > +o How does virtio-pmem compare to the nvdimm emulation supported by QEMU?
+> > +
+> > +  NVDIMM emulation on regular(non-NVDIMM) host storage does not persists
+> 
+> s/regular(non-NVDIMM)/regular (i.e. non-NVDIMM)/ ?
+> s/persists/persist/
+
+yes, to both.
+
+> 
+> > +  the guest writes as there are no defined semantecs in the device
+> > specification.
+> 
+> s/semantecs/semantics/
+
+ah...spell checker :(
+
+> 
+> > +  With virtio pmem device, guest write persistence on non-NVDIMM storage
+> > is
+> > +  supported.
+> 
+> "The virtio pmem device provides a way to support guest write
+> persistence on non-NVDIMM storage." ?
+> 
+> > +
+> > +virtio pmem usage
+> > +-----------------
+> > +  virtio pmem device is created with a memory-backend-file with the below
+> > +  options:
+> 
+> "A virtio pmem device backed by a memory-backend-file can be created on
+> the QEMU command line as in the following example:" ?
+
+o.k
+
+> 
+> > +
+> > +  -machine pc -m 8G,slots=$N,maxmem=$MAX_SIZE
+> 
+> I'm not sure you should explicitly specify the machine type in this
+> example. I think it is fine to say that something is only supported on
+> a subset of machine types, but it should not make its way into an
+> example on how to configure a device and its backing.
+
+o.k
+
+> 
+> Also, maybe fill in more concrete values here? Or split it into a part
+> specifying the syntax (where I'd use <max_size> instead of $MAX_SIZE
+> etc.), and a more concrete example?
+
+o.k
+
+> 
+> > +  -object memory-backend-file,id=mem1,share,mem-path=$PATH,size=$SIZE
+> > +  -device virtio-pmem-pci,memdev=mem1,id=nv1
+> > +
+> > +   where:
+> > +   - "object
+> > memory-backend-file,id=mem1,share,mem-path=$PATH,size=$VIRTIO_PMEM_SIZE"
+> > +     creates a backend storage of size $SIZE on a file $PATH. All
+> > +     accesses to the virtio pmem device go to the file $PATH.
+> > +
+> > +   - "device virtio-pmem-pci,id=nvdimm1,memdev=mem1" creates a virtio pmem
+> > +     device whose storage is provided by above memory backend device.
+> 
+> "a virtio pmem PCI device" ?
+
+o.k
+
+> 
+> > +
+> > +  Multiple virtio pmem devices can be created if multiple pairs of
+> > "-object"
+> > +  and "-device" are provided.
+> > +
+> > +Hotplug
+> > +-------
+> > +Accomplished by two monitor commands "object_add" and "device_add".
+> 
+> Hm... what about the following instead:
+> 
+> "Virtio pmem devices can be hotplugged via the QEMU monitor. First, the
+> memory backing has to be added via 'object_add'; afterwards, the virtio
+> pmem device can be added via 'device_add'."
+
+o.k
+
+> 
+> > +
+> > +For example, the following commands add another 4GB virtio pmem device to
+> > +the guest:
+> > +
+> > + (qemu) object_add
+> > memory-backend-file,id=mem2,share=on,mem-path=virtio_pmem2.img,size=4G
+> > + (qemu) device_add virtio-pmem-pci,id=virtio_pmem2,memdev=mem2
+> > +
+> > +Guest Data Persistence
+> > +----------------------
+> > +Guest data persistence on non-NVDIMM requires guest userspace application
+> > to
+> 
+> s/application/applications/ ?
+> 
+> > +perform fsync/msync. This is different than real nvdimm backend where no
+> > additional
+> 
+> s/than/from a/ ?
+
+yes.
+
+> 
+> > +fsync/msync is required for data persistence.
+> 
+> Should we be a bit more verbose on what which guest applications are
+> supposed to do? I.e., how do they know they need to do fsync/msync,
+> when should they do it, and what are the consequences if they don't?
+
+o.k. 
+
+> 
+> > +
+> > +Limitations
+> > +------------
+> > +- Real nvdimm device backend is not supported.
+> > +- virtio pmem hotunplug is not supported.
+> > +- ACPI NVDIMM features like regions/namespaces are not supported.
+> > +- ndctl command is not supported.
+
+Thank you for the review.
+
+Best regards,
+Pankaj
+> 
+> 
+> 
 
