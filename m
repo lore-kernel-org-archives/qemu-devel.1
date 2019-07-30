@@ -2,53 +2,92 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23216C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 01:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6340DC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 02:12:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E38E7206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 01:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E38E7206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 2E23C2064C
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 02:12:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CwJsxsCX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E23C2064C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsHNy-00086R-5E
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 21:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42890)
+	id 1hsHcu-0002vs-DT
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 22:12:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46733)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <balaton@eik.bme.hu>) id 1hsHNN-0007cJ-Qg
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:56:30 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsHcM-0002Oq-UP
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 22:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1hsHNM-0000jB-QW
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:56:29 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:22716)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hsHNM-0000h4-GY
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:56:28 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id EE6F87456E3;
- Tue, 30 Jul 2019 03:56:15 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 59D897456E0; Tue, 30 Jul 2019 03:56:15 +0200 (CEST)
-Message-Id: <5778864958ee7bcaec1c77eed8e40c9e07ed6784.1564451616.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Tue, 30 Jul 2019 03:53:36 +0200
+ (envelope-from <richard.henderson@linaro.org>) id 1hsHcL-0001HG-U7
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 22:11:58 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44571)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hsHcL-0001G3-Ma
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 22:11:57 -0400
+Received: by mail-pg1-x544.google.com with SMTP id i18so29188305pgl.11
+ for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 19:11:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=MXKsa4ZZukKO+/Awb3SeWnZHOK6Chwd+S4t8E6g5bMo=;
+ b=CwJsxsCX4vvqzM9szGcxNw9zvfpYnfCgUV7bn/76s3buVSb19T2zK0PHl8mPJs7QJ9
+ bTNu1cs38v+wDokUi44vzJz2/ZX1hhE0iIMF+L/+iOU+e8cfXbIBSxln3QDGc43a3Fhn
+ sRPWqQHtWfkxyyUVOvpt73xLfQ88onYuMpxHeFagXkPh2fO+9rXmhhhfgR9BFTd9lCo9
+ yiIaRMqmKUUn6HrYffzw6ZAbohq4mnDzYNINE4JS3fctLaeiAyZTmbRboqqWf+SjW9Os
+ KZLko6b0TshT7N+0qcYHikLdJjs2OKT/xHO+njY+XmW8+QToRE9iDmAdUEIEiFZj37Fe
+ 8JMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MXKsa4ZZukKO+/Awb3SeWnZHOK6Chwd+S4t8E6g5bMo=;
+ b=NKqx0KYTU0mV9RDtOWJHJk/U60GNTVFzbIc9C3vPJ8hhgHCXTbF7IBet/wn6/uuiEz
+ LEsfwNFNhCaix7Z3E/oLg+t8i+E+YeERVkUks8tUsufqbFkVEsQ/H7dAktdMxk4giWzo
+ O26efXmpZImYDyrfeZQ3FzIQnpakWqFBSREgRoNmWGCetLvWCMVoBvqcFRoqs0sr4Rw1
+ faHmdTmxr7Ezwhp/kE6cw3cTfxylZQDQ91j2fMLJepAu0nqiFE4BmhSCmBS/rnebfEUQ
+ Hk0y+ltWfnlFi9za3so0jM8fuq0q2l/HJWAIvZxy1hB64Az9Oe30iDlAOSFXHZMxf11W
+ JVcg==
+X-Gm-Message-State: APjAAAUJsqFCR1/9T68KKT12JCDe7TUlcQChZ/uQePSJMen0Ov8w9IWl
+ Y/rMZO3X2vka0e4eNA9lQb1EKA==
+X-Google-Smtp-Source: APXvYqxnoCVjuN0mxPSlbZyhymVmkXHeiIe3EAw9OlrGIPjOtbyJesbeCY4MO2EIrXvRDNChqPR9DQ==
+X-Received: by 2002:a62:2f04:: with SMTP id v4mr38496132pfv.14.1564452716183; 
+ Mon, 29 Jul 2019 19:11:56 -0700 (PDT)
+Received: from [192.168.101.105] ([75.147.178.105])
+ by smtp.gmail.com with ESMTPSA id f197sm62189737pfa.161.2019.07.29.19.11.54
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 29 Jul 2019 19:11:55 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190726175032.6769-1-richard.henderson@linaro.org>
+ <20190726175032.6769-5-richard.henderson@linaro.org>
+ <CAFEAcA-W7idBRdD-DHxrVqfnBsKmAOPZoQAJkaUVOcjnLnGugw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <c7a3ef78-d541-aa0a-21a5-8b4f48db1fd7@linaro.org>
+Date: Mon, 29 Jul 2019 19:11:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: qemu-devel@nongnu.org
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA-W7idBRdD-DHxrVqfnBsKmAOPZoQAJkaUVOcjnLnGugw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2001:738:2001:2001::2001
-Subject: [Qemu-devel] [PATCH] ati-vga: Add limited support for big endian
- frame buffer aperture
+X-Received-From: 2607:f8b0:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH 04/67] target/arm: Remove offset argument
+ to gen_exception_internal_insn
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,85 +99,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Set frame buffer endianness according to requested endianness for
-frame buffer aperture 0. This fixes inverted colors with Xorg frame
-buffer driver. Setting endianness of aperture 1 and reg aperture are
-not implemented.
+On 7/29/19 6:52 AM, Peter Maydell wrote:
+> I'm not so convinced about this one -- gen_exception_insn()
+> and gen_exception_internal_insn() shouldn't have the
+> same pattern of function prototype but different semantics
+> like this, it's confusing. It happens that both the cases
+> of wanting to generate an "internal" exception happen to want
+> it to be taken with the PC being for the following insn,
+> not the current one, but that seems more coincidence to
+> me than anything else.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/display/ati.c      | 9 ++++++++-
- hw/display/ati_int.h  | 1 +
- hw/display/ati_regs.h | 1 +
- 3 files changed, 10 insertions(+), 1 deletion(-)
+I don't like "offsets", because they don't work as expected between different
+modes.  Would you prefer the pc in full be passed in?  Would you prefer that
+the previous patches also pass in a pc, instead of implicitly using
+base.pc_next (you had rationale vs patch 2 for why it was ok as-is).
 
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index d1db07dd2f..84961d193f 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -90,7 +90,8 @@ static void ati_vga_switch_mode(ATIVGAState *s)
-             DPRINTF("Switching to %dx%d %d %d @ %x\n", h, v, stride, bpp=
-, offs);
-             vbe_ioport_write_index(&s->vga, 0, VBE_DISPI_INDEX_ENABLE);
-             vbe_ioport_write_data(&s->vga, 0, VBE_DISPI_DISABLED);
--            s->vga.big_endian_fb =3D false;
-+            s->vga.big_endian_fb =3D (s->regs.config_cntl & APER_0_ENDIA=
-N ?
-+                                    true : false);
-             /* reset VBE regs then set up mode */
-             s->vga.vbe_regs[VBE_DISPI_INDEX_XRES] =3D h;
-             s->vga.vbe_regs[VBE_DISPI_INDEX_YRES] =3D v;
-@@ -311,6 +312,9 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr=
-, unsigned int size)
-     case PALETTE_DATA:
-         val =3D vga_ioport_read(&s->vga, VGA_PEL_D);
-         break;
-+    case CNFG_CNTL:
-+        val =3D s->regs.config_cntl;
-+        break;
-     case CNFG_MEMSIZE:
-         val =3D s->vga.vram_size;
-         break;
-@@ -605,6 +609,9 @@ static void ati_mm_write(void *opaque, hwaddr addr,
-         data >>=3D 8;
-         vga_ioport_write(&s->vga, VGA_PEL_D, data & 0xff);
-         break;
-+    case CNFG_CNTL:
-+        s->regs.config_cntl =3D data;
-+        break;
-     case CRTC_H_TOTAL_DISP:
-         s->regs.crtc_h_total_disp =3D data & 0x07ff07ff;
-         break;
-diff --git a/hw/display/ati_int.h b/hw/display/ati_int.h
-index 31a1927b3e..5b4d3be1e6 100644
---- a/hw/display/ati_int.h
-+++ b/hw/display/ati_int.h
-@@ -39,6 +39,7 @@ typedef struct ATIVGARegs {
-     uint32_t gpio_vga_ddc;
-     uint32_t gpio_dvi_ddc;
-     uint32_t gpio_monid;
-+    uint32_t config_cntl;
-     uint32_t crtc_h_total_disp;
-     uint32_t crtc_h_sync_strt_wid;
-     uint32_t crtc_v_total_disp;
-diff --git a/hw/display/ati_regs.h b/hw/display/ati_regs.h
-index 81fb5302c0..11a54caa83 100644
---- a/hw/display/ati_regs.h
-+++ b/hw/display/ati_regs.h
-@@ -313,6 +313,7 @@
- #define X_MPLL_REF_DIV_MASK                     0x000000FF
-=20
- /* Config control values (CONFIG_CNTL) */
-+#define APER_0_ENDIAN                           0x00000003
- #define CFG_VGA_IO_DIS                          0x00000400
-=20
- /* CRTC control values (CRTC_GEN_CNTL) */
---=20
-2.13.7
+Shall we shuffle these patches later, after the Great Renaming of Things Named
+PC, as discussed wrt patch 6 (pc_read and friends), so that the "offset"
+parameter immediately becomes the Right Sort of PC, rather than some
+intermediary confusion?
 
+
+r~
 
