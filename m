@@ -2,94 +2,149 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2F3C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 344AAC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:06:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 843FF206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:05:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cXJKiorF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 843FF206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0BBE92089E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:06:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBE92089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsVYw-0007sf-PL
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:05:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57710)
+	id 1hsVZf-0000Up-AZ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:06:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57805)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsVYN-0007Rt-Ee
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:04:48 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsVZA-0008G4-FJ
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:05:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsVYM-00089o-5O
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:04:47 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52939)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsVYL-00089H-To
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:04:46 -0400
-Received: by mail-wm1-x341.google.com with SMTP id s3so57845778wms.2
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:04:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=t+P+leOEkZK+KCHD9BHIO0iGLhtorr6w3hDIWFOC+JY=;
- b=cXJKiorFfGQ8OXFRZdyzcB0yxVVKRF5YyhZV6J9Fb5j+vxPIgoDhNE1SnjRuLNgKuJ
- zNOc3ql/fVKKn1KCWd7rzHUHCSN4d/fidFsUKvr0zSx/3p5mh7YcUJw2Efxfhstyj477
- GAihMqSyItzdrdl65tPRhTYULEaKcyCcOunKkeB+lY4qrZ1rC7w+c6jhb2Sw4+2lF7+/
- QN2PpgA6sfPOqQ0K1Gh2/CiaS+InNf3qqddfURK3qDuNEWJU2e2EzqEUHHmjRdqlJFxY
- UNe8zfi77EYs+UFNCs58o0hxNtf7nndKeLrXda2u1IJ7LksHI4IjNjbi2l8fpEi/zzAA
- BzwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=t+P+leOEkZK+KCHD9BHIO0iGLhtorr6w3hDIWFOC+JY=;
- b=bE3XDE5vPzpy62/smPPnB6QnoOkfJakH9nWcadBirZ3qudlUU33B138xruw5AF+r+N
- klygluxcPmUfsFc8DgBE4WeScbByWCbzs6TOKM0OpgXxbekMzydBV9bEmlgcqs6LYvR1
- 0xGiaiUdw1hRcCk/HSqXfNKH8L/ctPPIR+seMWYEvApRVvT0yy90lo8+0Z9hMPvtobkP
- 58TLADxoairqZfAFJI+Mz81PlYiurx9bgoMLes9WydgFwpOWHgUQ9flxl8FL3TQovPGR
- s+AaRE+ShWgI8pwCQIR99FKVXET9Zrm+b184aW0iG1TtJqFwOdwpS1tt5qvBtjsGShTC
- UTxg==
-X-Gm-Message-State: APjAAAVxN3Im9jIU1CvJ8Q60WLQ+7mZjZWGvU7CgU6EsJCrPLYWmdkgn
- xvCYHLCzTSvOd+3Pi0XVHT98/A==
-X-Google-Smtp-Source: APXvYqyXatgpeCjQO061y73djicwBxX/xdaidn+tddR1YhBB9wEqk94Qm1M2kWqbmzXTgNZuwOtoPg==
-X-Received: by 2002:a1c:c145:: with SMTP id
- r66mr106030494wmf.139.1564506284271; 
- Tue, 30 Jul 2019 10:04:44 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id f10sm52825566wrs.22.2019.07.30.10.04.43
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 30 Jul 2019 10:04:43 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4023F1FF87;
- Tue, 30 Jul 2019 18:04:43 +0100 (BST)
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
- <20190614171200.21078-26-alex.bennee@linaro.org>
- <bd131b16-2f38-4112-4e09-6a2f63908bf2@linaro.org>
- <87ftmnitjp.fsf@linaro.org>
- <67b32364-c3dd-ff0d-fba8-7737327fc1b5@linaro.org>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <67b32364-c3dd-ff0d-fba8-7737327fc1b5@linaro.org>
-Date: Tue, 30 Jul 2019 18:04:43 +0100
-Message-ID: <87d0hrihck.fsf@linaro.org>
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsVZ4-0000Hm-PM
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:05:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41532
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1hsVZ4-0000FO-0h
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:05:30 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6UH2scJ140409
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 13:05:28 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u2qrxx4qn-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 13:05:27 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 30 Jul 2019 18:05:25 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 30 Jul 2019 18:05:20 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6UH5KAO42401892
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 30 Jul 2019 17:05:20 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E38774C040;
+ Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 525804C058;
+ Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.144.206])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Tue, 30 Jul 2019 19:05:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19073017-4275-0000-0000-0000035215A3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19073017-4276-0000-0000-0000386302CE
+Message-Id: <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-30_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907300178
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v3 25/50] translator: add translator_ld{ub,
- sw, uw, l, q}
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0b-001b2d01.pphosted.com id x6UH2scJ140409
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
+ before ioctl call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,162 +156,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
+ kvm@vger.kernel.org, mtosatti@redhat.com, mdroth@linux.vnet.ibm.com,
+ armbru@redhat.com, pbonzini@redhat.com, den@openvz.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Richard Henderson <richard.henderson@linaro.org> writes:
 
-> On 7/30/19 5:41 AM, Alex Benn=C3=A9e wrote:
->> Do we ever need _code access that isn't part of the
->> translator loading instructions?
->
-> We use it; I'm not sure that's the same as need.  ;-)
->
-> Lots of the uses that I examined should use a mechanism
-> like arm does for recording syndrome data in the unwind slots.
->
-> Quite possibly the only legitimate use is sparc, where it
-> has an alternate address space that reads with execute permission.
-> We could probably find a different way to accomplish that
-> if we removed the *_code helpers.
+On 30.07.19 18:44, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
+>> Not the whole structure is initialized before passing it to the KVM.
+>> Reduce the number of Valgrind reports.
+>>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>  target/i386/kvm.c | 3 +++
+>>  1 file changed, 3 insertions(+)
+>>
+>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>> index dbbb137..ed57e31 100644
+>> --- a/target/i386/kvm.c
+>> +++ b/target/i386/kvm.c
+>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>>          return 0;
+>>      }
+>> =20
+>> +    memset(&msr_data, 0, sizeof(msr_data));
+>=20
+> I wonder the overhead of this one...
 
-So far I've gone for deprecation, my current fixup patch looks like
-this:
+Cant we use designated initializers like in
 
---8<---------------cut here---------------start------------->8---
-fixup! translator: add translator_ld{ub,sw,uw,l,q}
+commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
+Author:     Christian Borntraeger <borntraeger@de.ibm.com>
+AuthorDate: Thu Oct 30 09:23:41 2014 +0100
+Commit:     Paolo Bonzini <pbonzini@redhat.com>
+CommitDate: Mon Dec 15 12:21:01 2014 +0100
 
-4 files changed, 53 insertions(+), 7 deletions(-)
-include/exec/cpu_ldst.h   | 11 +++++++++++
-include/exec/translator.h | 42 +++++++++++++++++++++++++++++++++++-------
-include/qemu/bswap.h      |  5 +++++
-tcg/tcg.h                 |  2 ++
+    valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
 
-modified   include/exec/cpu_ldst.h
-@@ -129,6 +129,11 @@ static inline void clear_helper_retaddr(void)
- #include "exec/cpu_ldst_useronly_template.h"
- #undef MEMSUFFIX
+and others?
 
-+/*
-+ * Code access is deprecated in favour of translator_ld* functions
-+ * (see translator.h). However there are still users that need to
-+ * converted so for now these stay.
-+ */
- #define MEMSUFFIX _code
- #define CODE_ACCESS
- #define DATA_SIZE 1
-@@ -427,6 +432,12 @@ static inline CPUTLBEntry *tlb_entry(CPUArchState *env=
-, uintptr_t mmu_idx,
- #undef CPU_MMU_INDEX
- #undef MEMSUFFIX
+This should minimize the impact.=20
+>=20
+>>      msr_data.info.nmsrs =3D 1;
+>>      msr_data.entries[0].index =3D MSR_IA32_TSC;
+>>      env->tsc_valid =3D !runstate_is_running();
+>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>> =20
+>>      if (has_xsave) {
+>>          env->xsave_buf =3D qemu_memalign(4096, sizeof(struct kvm_xsav=
+e));
+>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+>=20
+> OK
+>=20
+>>      }
+>> =20
+>>      max_nested_state_len =3D kvm_max_nested_state_length();
+>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
+>>          return 0;
+>>      }
+>> =20
+>> +    memset(&dbgregs, 0, sizeof(dbgregs));
+>=20
+> OK
+>=20
+>>      for (i =3D 0; i < 4; i++) {
+>>          dbgregs.db[i] =3D env->dr[i];
+>>      }
+>=20
+> We could remove 'dbgregs.flags =3D 0;'
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>=20
 
-+/*
-+ * Code access is deprecated in favour of translator_ld* functions
-+ * (see translator.h). However there are still users that need to
-+ * converted so for now these stay.
-+ */
-+
- #define CPU_MMU_INDEX (cpu_mmu_index(env, true))
- #define MEMSUFFIX _code
- #define SOFTMMU_CODE_ACCESS
-modified   include/exec/translator.h
-@@ -145,11 +145,39 @@ void translator_loop(const TranslatorOps *ops, DisasC=
-ontextBase *db,
-
- void translator_loop_temp_check(DisasContextBase *db);
-
--#define GEN_TRANSLATOR_LD(fullname, name, type, swap_fn)                \
-+/*
-+ * Translator Load Functions
-+ *
-+ * These are intended to replace the old cpu_ld*_code functions and
-+ * are mandatory for front-ends that have been migrated to the common
-+ * translator_loop. These functions are only intended to be called
-+ * from the translation stage and should not be called from helper
-+ * functions. Those functions should be converted to encode the
-+ * relevant at translation time.
-+ */
-+
-+#ifdef CONFIG_USER_ONLY
-+
-+#define DO_LOAD(type, name, shift)               \
-+    set_helper_retaddr(1);                       \
-+    ret =3D name ## _p(g2h(pc));                   \
-+    clear_helper_retaddr();
-+
-+#else
-+
-+#define DO_LOAD(type, name, shift)                   \
-+    int mmu_idx =3D cpu_mmu_index(env, true);          \
-+    TCGMemOpIdx oi =3D make_memop_idx(shift, mmu_idx); \
-+    ret =3D helper_ret_ ## name ## _cmmu(env, pc, oi, 0);
-+
-+#endif
-+
-+#define GEN_TRANSLATOR_LD(fullname, name, type, shift, swap_fn)         \
-     static inline type                                                  \
-     fullname ## _swap(CPUArchState *env, abi_ptr pc, bool do_swap)      \
-     {                                                                   \
--        type ret =3D cpu_ ## name ## _code(env, pc);                      \
-+        type ret;                                                       \
-+        DO_LOAD(type, name, shift)                                      \
-                                                                         \
-         if (do_swap) {                                                  \
-             ret =3D swap_fn(ret);                                         \
-@@ -163,11 +191,11 @@ void translator_loop_temp_check(DisasContextBase *db);
-         return fullname ## _swap(env, pc, false);                       \
-     }
-
--GEN_TRANSLATOR_LD(translator_ldub, ldub, uint8_t, /* no swap needed */)
--GEN_TRANSLATOR_LD(translator_ldsw, ldsw, int16_t, bswap16)
--GEN_TRANSLATOR_LD(translator_lduw, lduw, uint16_t, bswap16)
--GEN_TRANSLATOR_LD(translator_ldl, ldl, uint32_t, bswap32)
--GEN_TRANSLATOR_LD(translator_ldq, ldq, uint64_t, bswap64)
-+GEN_TRANSLATOR_LD(translator_ldub, ldb, uint8_t, 1, /* no swap needed */)
-+GEN_TRANSLATOR_LD(translator_ldsw, lduw, int16_t, 2, bswap16)
-+GEN_TRANSLATOR_LD(translator_lduw, lduw, uint16_t, 2, bswap16)
-+GEN_TRANSLATOR_LD(translator_ldl, ldl, uint32_t, 3, bswap32)
-+GEN_TRANSLATOR_LD(translator_ldq, ldq, uint64_t, 4, bswap64)
- #undef GEN_TRANSLATOR_LD
-
- #endif  /* EXEC__TRANSLATOR_H */
-modified   include/qemu/bswap.h
-@@ -306,6 +306,11 @@ static inline int ldub_p(const void *ptr)
-     return *(uint8_t *)ptr;
- }
-
-+static inline int ldb_p(const void *ptr)
-+{
-+    return ldub_p(ptr);
-+}
-+
- static inline int ldsb_p(const void *ptr)
- {
-     return *(int8_t *)ptr;
-modified   tcg/tcg.h
-@@ -1404,6 +1404,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target=
-_ulong addr,
- # define helper_ret_stl_mmu   helper_be_stl_mmu
- # define helper_ret_stq_mmu   helper_be_stq_mmu
- # define helper_ret_ldw_cmmu  helper_be_ldw_cmmu
-+# define helper_ret_lduw_cmmu helper_be_ldw_cmmu
- # define helper_ret_ldl_cmmu  helper_be_ldl_cmmu
- # define helper_ret_ldq_cmmu  helper_be_ldq_cmmu
- #else
-@@ -1417,6 +1418,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target=
-_ulong addr,
- # define helper_ret_stl_mmu   helper_le_stl_mmu
- # define helper_ret_stq_mmu   helper_le_stq_mmu
- # define helper_ret_ldw_cmmu  helper_le_ldw_cmmu
-+# define helper_ret_lduw_cmmu helper_le_ldw_cmmu
- # define helper_ret_ldl_cmmu  helper_le_ldl_cmmu
- # define helper_ret_ldq_cmmu  helper_le_ldq_cmmu
- #endif
---8<---------------cut here---------------end--------------->8---
-
---
-Alex Benn=C3=A9e
 
