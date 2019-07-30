@@ -6,57 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 308D3C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A2BC0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:11:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEB40206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:00:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB40206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 2442C20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:11:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2442C20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsO04-0001DR-6d
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:00:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56586)
+	id 1hsOAk-0003dt-Fs
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:11:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59257)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dinechin@redhat.com>) id 1hsNzT-0000l4-3A
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:00:16 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hsOAL-0003CS-Hd
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:11:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dinechin@redhat.com>) id 1hsNzR-0006M8-W7
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:00:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38212)
+ (envelope-from <imammedo@redhat.com>) id 1hsOAK-0004oT-As
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:11:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36732)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dinechin@redhat.com>)
- id 1hsNzP-0006Kb-Ch; Tue, 30 Jul 2019 05:00:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hsOAK-0004oD-2f; Tue, 30 Jul 2019 05:11:28 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 419AC30ADC81;
- Tue, 30 Jul 2019 09:00:10 +0000 (UTC)
-Received: from ptitpuce (ovpn-116-130.ams2.redhat.com [10.36.116.130])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D8A6F5D6D0;
- Tue, 30 Jul 2019 09:00:02 +0000 (UTC)
-References: <20190729164234.11573-1-kwolf@redhat.com>
-User-agent: mu4e 1.3.2; emacs 26.2
-From: Christophe de Dinechin <dinechin@redhat.com>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190729164234.11573-1-kwolf@redhat.com>
-Date: Tue, 30 Jul 2019 11:00:00 +0200
-Message-ID: <m1y30foq27.fsf@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id BE8062BF7B;
+ Tue, 30 Jul 2019 09:11:25 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-204-67.brq.redhat.com [10.40.204.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0DA115C1A1;
+ Tue, 30 Jul 2019 09:11:22 +0000 (UTC)
+Date: Tue, 30 Jul 2019 11:11:20 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190730111120.63de67ae@Igors-MacBook-Pro>
+In-Reply-To: <04ce7f87-815c-924b-e1df-6a4028750926@intel.com>
+References: <20190729063127.2801-1-tao3.xu@intel.com>
+ <20190729063127.2801-3-tao3.xu@intel.com>
+ <20190729150957.157a7c03@redhat.com>
+ <04ce7f87-815c-924b-e1df-6a4028750926@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 30 Jul 2019 09:00:10 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Tue, 30 Jul 2019 09:11:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] scsi-cd: Fix inserting read-only
- media in empty drive
+Subject: Re: [Qemu-devel] [PATCH v8 02/11] numa: move numa global variable
+ nb_numa_nodes into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,70 +71,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+Cc: ehabkost@redhat.com, aik@ozlabs.ru, jingqi.liu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, qemu-ppc@nongnu.org, jonathan.cameron@huawei.com,
+ David Gibson <dgibson@redhat.com>, dan.j.williams@intel.com, paulus@samba.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 30 Jul 2019 08:53:36 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-Kevin Wolf writes:
+> On 7/29/2019 9:09 PM, Igor Mammedov wrote:
+> > On Mon, 29 Jul 2019 14:31:18 +0800
+> > Tao Xu <tao3.xu@intel.com> wrote:
+> > 
+> >> Add struct NumaState in MachineState and move existing numa global
+> >> nb_numa_nodes(renamed as "num_nodes") into NumaState. And add variable
+> >> numa_support into MachineClass to decide which submachines support NUMA.
+> >>
+> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> >> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> >> ---
+> >>
+> >> Changes in v8:
+> >>      - Add check if numa->numa_state is NULL in pxb_dev_realize_common
+> >>      - Use nb_nodes in spapr_populate_memory() (Igor)
+> >> ---
+> > [...]
+> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >> index 821f0d4a49..1c7c12c415 100644
+> >> --- a/hw/ppc/spapr.c
+> >> +++ b/hw/ppc/spapr.c
+> >> @@ -331,7 +331,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
+> >>               return ret;
+> >>           }
+> >>   
+> >> -        if (nb_numa_nodes > 1) {
+> >> +        if (ms->numa_state->num_nodes > 1) {
+> >>               ret = spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
+> >>               if (ret < 0) {
+> >>                   return ret;
+> >> @@ -351,9 +351,9 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
+> >>   
+> >>   static hwaddr spapr_node0_size(MachineState *machine)
+> >>   {
+> >> -    if (nb_numa_nodes) {
+> >> +    if (machine->numa_state->num_nodes) {
+> >>           int i;
+> >> -        for (i = 0; i < nb_numa_nodes; ++i) {
+> >> +        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
+> >>               if (numa_info[i].node_mem) {
+> >>                   return MIN(pow2floor(numa_info[i].node_mem),
+> >>                              machine->ram_size);
+> >> @@ -398,13 +398,14 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
+> >>   {
+> >>       MachineState *machine = MACHINE(spapr);
+> >>       hwaddr mem_start, node_size;
+> >> -    int i, nb_nodes = nb_numa_nodes;
+> >> +    int i, nb_nodes = machine->numa_state->num_nodes;
+> >>       NodeInfo *nodes = numa_info;
+> >>       NodeInfo ramnode;
+> >>   
+> >>       /* No NUMA nodes, assume there is just one node with whole RAM */
+> >> -    if (!nb_numa_nodes) {
+> >> +    if (!nb_nodes) {
+> >>           nb_nodes = 1;
+> >> +        machine->numa_state->num_nodes = nb_nodes;
+> > You've not addressed a v7 comment
+> > On Tue, 23 Jul 2019 16:56:41 +0200
+> > Igor Mammedov <imammedo@redhat.com> wrote:
+> > 
+> >> I don't like user fixing up generic machine data that came from CLI
+> >> (or luck of such)
+> > [...]
+> >> I'd keep fixup local (i.e. using nb_nodes)
+> > 
+> > i.e. do not modify machine->numa_state->num_nodes and just use value local
+> > like current code does.
+> 
+> But modify machine->numa_state->num_nodes can fix the issue:
+> spapr_populate_memory() creates a implicit node and info
+> temporarily but then spapr_validate_node_memory() will use
+> global nb_numa_nodes which is 0 and skip check.
 
-> scsi-disks decides whether it has a read-only device by looking at
-> whether the BlockBackend specified as drive=... is read-only. In the
-> case of an anonymous BlockBackend (with a node name specified in
-> drive=...), this is the read-only flag of the attached node. In the case
-> of an empty anonymous BlockBackend, it's always read-write because
-> nothing prevented it from being read-write.
->
-> This is a problem because scsi-cd would take write permissions on the
-> anonymous BlockBackend of an empty drive created without a drive=...
-> option. Using blockdev-insert-medium with a read-only node fails then
-> with the error message "Block node is read-only".
->
-> Fix scsi_realize() so that scsi-cd devices always take read-only
-> permissions on their BlockBackend instead.
->
-> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1733920
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  hw/scsi/scsi-disk.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 8e95e3e38d..af3e622dc5 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-> @@ -2318,6 +2318,7 @@ static void scsi_disk_unit_attention_reported(SCSIDevice *dev)
->  static void scsi_realize(SCSIDevice *dev, Error **errp)
->  {
->      SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, dev);
-> +    bool read_only;
->
->      if (!s->qdev.conf.blk) {
->          error_setg(errp, "drive property not set");
-> @@ -2351,8 +2352,13 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
->              return;
->          }
->      }
-> -    if (!blkconf_apply_backend_options(&dev->conf,
-> -                                       blk_is_read_only(s->qdev.conf.blk),
-> +
-> +    read_only = blk_is_read_only(s->qdev.conf.blk);
-> +    if (dev->type == TYPE_ROM) {
-> +        read_only = true;
-> +    }
+it's not related though, there is nothing wrong with fixing a bug
+but it's typically done by separate patch with proper description.
+(try not to mix unrelated things in one patch)
 
-Is there a reason to check blk_is_read_only even for CD-ROM?
-If not, why not make it a "else"?
+But otherwise as you noticed, it might be bug or feature in existing spapr impl,
+and should be fixed by separate patch if necessary, CCing PPC folks.
 
-> +
-> +    if (!blkconf_apply_backend_options(&dev->conf, read_only,
->                                         dev->type == TYPE_DISK, errp)) {
->          return;
->      }
+PS:
+we already have an implicit node creation in generic numa code (when memory hotplug
+is enabled), so we probably could reuse that and a node should be created from there
+instead of fixing up from the code deep within the board.
 
+> Or if I should modify the check part, i.e.
+> static void spapr_validate_node_memory(MachineState *machine, Error **errp)
+> {
+> [...]
+>      for (i = 0; machine->numa_state->nodes[i] == NULL; i++) {
+>          if (machine->numa_state->nodes[i].node_mem % 
+> SPAPR_MEMORY_BLOCK_SIZE) {
+>              error_setg(errp,
+>                         "Node %d memory size 0x%" PRIx64
+>                         " is not aligned to %" PRIu64 " MiB",
+>                         i, machine->numa_state->nodes[i].node_mem,
+>                         SPAPR_MEMORY_BLOCK_SIZE / MiB);)
+> 
+> > 
+> >>           ramnode.node_mem = machine->ram_size;
+> >>           nodes = &ramnode;
+> >>       }
+> > [...]
+> > 
+> 
+> 
 
---
-Cheers,
-Christophe de Dinechin (IRC c3d)
 
