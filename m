@@ -2,73 +2,120 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3604C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C686C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:43:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5726B206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:41:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5726B206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CA24D206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:43:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="CQyQJ74A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA24D206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsTJk-0006Cb-CC
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:41:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35908)
+	id 1hsTLH-0007Dy-2v
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:43:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36099)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsTJK-0005mU-VN
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:41:08 -0400
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1hsTKd-0006hJ-Bj
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsTJJ-0005N0-GG
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:41:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60006)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsTJJ-0005MM-A1
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:41:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsTJI-00061u-4y
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 14:41:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 14E032E89AC
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 14:41:04 +0000 (UTC)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1hsTKb-000622-IX
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:42:27 -0400
+Received: from mail-eopbgr60098.outbound.protection.outlook.com
+ ([40.107.6.98]:29572 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1hsTKb-0005ym-CD
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:42:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SX7zQUtpg0JbLQBWMe4aozyxQgrLSYA4WMHGIUGMHPtzLWEsj5X4Srp7eO+lqajM+ehKInkGNGoSa7TUkIknNew/yRGezk+s39ou+YK7Ec+KQvCLFESG2mMWsF6vhdrIsCuBdwEXJmIXB0CIXUjhjd1raTgk70vaZYGQwWujCjdBCLtSOCPq2jdQoU18hHOTdD+3sEsQWDK6o9en6j5rCIXAoIZyWrZ0h+VWQ0DwgQH1VdBAffBp1NOtsQoZ8aLsqNkMFB+Bv6eRrN+prKe+KyZTz2TWmYl9gI+NNYBbyajWY6IHvB5H95Gb7r5TEtME5aDhwG9eV/pskd4wx5C9Og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PPzNFxS3dYfMP4bbkxa4oIb3EzygwapHA7NPA5mS1vM=;
+ b=nOC6MI1BGUDMeQvnHxfrKxd7YDX2VIph47afW0oVjKFcoVHD+6sEFTIluogWO0PwfOP8a+XMNnknnFHQnSfGcUbVPvt9plKAJsOVlhAn7Ji7uel/QGm4z68CmN6gJVbt8AcOGDogvqomTumFOeAMH6N3SWnWd+Ifu0X4HovzMTtSRW0pSs8/rSM7vbwwkazcr7PlXwYfWe8sHrhMSJqwyZMKy2sn7DMq5yE2wlI3EIrwmketafDugoYT9MH6rG6J7MZ1FwCYTaKePoEj8nWqkAZescalawfy+nHhU6Bos4+nrPM4kidFYQjm/KifPAu4f2N2ONTi+LFy3J9lz834XA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PPzNFxS3dYfMP4bbkxa4oIb3EzygwapHA7NPA5mS1vM=;
+ b=CQyQJ74AtJ9fyRvq8oOwVtqSZOk/CySdlohor9uQ7WrFGbUhAXTH3mZP14J+ms3Ng+cxSXeQruKsTbamLV50teXEf7hksj/ioCtYC4Kk4D5De1niD4ICg4FFaizHYpFOInNTzpWnGkVhHO9twAgTOgiGNX1wrSBG1NI/Oi0Wx4c=
+Received: from VI1PR08MB3760.eurprd08.prod.outlook.com (20.178.14.92) by
+ VI1PR08MB3472.eurprd08.prod.outlook.com (20.177.59.26) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.15; Tue, 30 Jul 2019 14:42:21 +0000
+Received: from VI1PR08MB3760.eurprd08.prod.outlook.com
+ ([fe80::39df:28b7:2704:36cc]) by VI1PR08MB3760.eurprd08.prod.outlook.com
+ ([fe80::39df:28b7:2704:36cc%7]) with mapi id 15.20.2115.005; Tue, 30 Jul 2019
+ 14:42:21 +0000
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>
+Thread-Topic: [Qemu-devel] [PATCH v2 3/3] qcow2: add zstd cluster compression
+Thread-Index: AQHVMmnsD8VlUQRIikmfTNV67r9dDKbB11wogCGNvQA=
+Date: Tue, 30 Jul 2019 14:42:21 +0000
+Message-ID: <D225689A-D897-4AC4-9A01-FB8CFB6E4711@getmailspring.com>
+References: <878st7afz4.fsf@dusky.pond.sub.org>
+In-Reply-To: <878st7afz4.fsf@dusky.pond.sub.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0359.eurprd05.prod.outlook.com
+ (2603:10a6:7:94::18) To VI1PR08MB3760.eurprd08.prod.outlook.com
+ (2603:10a6:803:b9::28)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: Mailspring
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9204285e-826b-43ab-5dc3-08d714fc20ed
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:VI1PR08MB3472; 
+x-ms-traffictypediagnostic: VI1PR08MB3472:
+x-microsoft-antispam-prvs: <VI1PR08MB3472F2EDA532B1D0C7C12D0ACFDC0@VI1PR08MB3472.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0114FF88F6
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(376002)(366004)(396003)(136003)(39850400004)(189003)(199004)(66446008)(476003)(478600001)(11346002)(446003)(6506007)(76176011)(52116002)(102836004)(386003)(6512007)(9686003)(53376002)(733005)(186003)(486006)(14454004)(5660300002)(6486002)(36756003)(6862004)(66946007)(18926415008)(54896002)(64756008)(6436002)(66556008)(33656002)(6306002)(26005)(229853002)(6246003)(8676002)(71200400001)(14444005)(86362001)(256004)(4326008)(54906003)(71190400001)(50226002)(66476007)(305945005)(6116002)(81166006)(8936002)(3736002)(3846002)(68736007)(25786009)(66066001)(2906002)(53936002)(7736002)(99286004)(316002)(81156014)(563064011);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3472;
+ H:VI1PR08MB3760.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: LBxFRNJYt0EO6jZtmBSE7+0GfOrcj/BESWTOkHlsG5X6V2lO6iyyTJMyEth566qK6/ofWDRspUQMRMZB6j5GRELyb5cRSEeC8BtajpZarlrBEWsxvk9xRow5ThMb47Q4hvAlFHvOswgS0lKcX8FF9H/alIWtMewVxEX+yfpkY1sHmlu0b0DZtayUxlY6eM3qNfGg4sQqfnphbvRRYC+EbUKkUQ024mlqF1TDLHn1yDdfUTWIvJuMUDWJmKLqgippjkYhh54x3iKABfcfEHup+H1D5rBKe7WryYZdtoAHX52Zj2DLXof8cvA+q1gjeT8ygfwpPizKe9G+77v5Ma5l2M4/WdBqp3VBgFKQoXZs54CaMLYeBLBL1Cujp3/MpA+lP0oyW6KBklLvex98U/QMNbfh/tVMN8az5EPsZLGV46E=
 MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9204285e-826b-43ab-5dc3-08d714fc20ed
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2019 14:42:21.4424 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dplotnikov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3472
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.98
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 14:26:32 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ppc tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-randrianasulu
-X-Launchpad-Bug-Reporter: Andrew Randrianasulu (andrew-randrianasulu)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <156345756915.8493.13426435768891424211.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156449679288.22702.8163741755681116160.launchpad@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d7b4b53c46cf0f1d391fad060baaaea75fbc471d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1837049] Re: qemu-system-ppc segfaults with
- -display sdl
+Content-Transfer-Encoding: base64
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qcow2: add zstd cluster compression
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,174 +124,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1837049 <1837049@bugs.launchpad.net>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags added: tcg
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1837049
-
-Title:
-  qemu-system-ppc segfaults with -display sdl
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hello.
-
-  I was trying to debug this segfault:
-  https://lists.nongnu.org/archive/html/qemu-ppc/2019-07/msg00186.html
-
-  I recompiled latest qemu from git (commit 0b18cfb8f1828c905139b54c8644b0d=
-8f4aad879 ), using this configure line:
-  ./configure --target-list=3Di386-softmmu,x86_64-softmmu,ppc-softmmu --aud=
-io-drv-list=3Dalsa --disable-werror --extra-cflags=3D"-Og" --enable-debug-t=
-cg
-
-  after this I tried original line under gdb, it was still segfaulting:
-
-  --------------copy-----------------
-  gdb ./ppc-softmmu/qemu-system-ppc
-  GNU gdb (GDB) 7.11.1
-  Copyright (C) 2016 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-  and "show warranty" for details.
-  This GDB was configured as "i586-slackware-linux".
-  Type "show configuration" for configuration details.
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>.
-  Find the GDB manual and other documentation resources online at:
-  <http://www.gnu.org/software/gdb/documentation/>.
-  For help, type "help".
-  Type "apropos word" to search for commands related to "word"...
-  Reading symbols from ./ppc-softmmu/qemu-system-ppc...done.
-  warning: File "/dev/shm/qemu/.gdbinit" auto-loading has been declined by =
-your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
-  To enable execution of this file add
-          add-auto-load-safe-path /dev/shm/qemu/.gdbinit
-  line to your configuration file "/home/guest/.gdbinit".
-  To completely disable this security protection add
-          set auto-load safe-path /
-  line to your configuration file "/home/guest/.gdbinit".
-  For more information about this security protection see the
-  "Auto-loading safe path" section in the GDB manual.  E.g., run from the s=
-hell:
-          info "(gdb)Auto-loading safe path"
-  (gdb) run  -M mac99,via=3Dpmu -L ../queue-vga/pc-bios -cdrom /mnt/sdb1/PP=
-C-img/lubuntu-16.04-desktop-powerpc.iso -m 512 -display sdl,gl=3Don -vga st=
-d -d guest_errors,unimp -boot d -cpu G4 -g 1024x768x24 -device ES1370
-  Starting program: /dev/shm/qemu/ppc-softmmu/qemu-system-ppc -M mac99,via=
-=3Dpmu -L ../queue-vga/pc-bios -cdrom /mnt/sdb1/PPC-img/lubuntu-16.04-deskt=
-op-powerpc.iso -m 512 -display sdl,gl=3Don -vga std -d guest_errors,unimp -=
-boot d -cpu G4 -g 1024x768x24 -device ES1370
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/lib/libthread_db.so.1".
-  [New Thread 0xf560cb40 (LWP 8100)]
-  [New Thread 0xf4c1ab40 (LWP 8101)]
-  [New Thread 0xec1b7b40 (LWP 8102)]
-  [New Thread 0xc5821b40 (LWP 8104)]
-  [Thread 0xf4c1ab40 (LWP 8101) exited]
-  [New Thread 0xf4c1ab40 (LWP 8119)]
-
-  Thread 4 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-  [Switching to Thread 0xec1b7b40 (LWP 8102)]
-  0xf26c2e44 in code_gen_buffer ()
-  (gdb) bt full
-  #0  0xffffffff in code_gen_buffer ()
-  #1  0x56710cf6 in cpu_exec (itb=3D<optimized out>, cpu=3D<optimized out>)=
- at /dev/shm/qemu/accel/tcg/cpu-exec.c:173
-          env =3D <optimized out>
-          ret =3D <optimized out>
-          last_tb =3D <optimized out>
-          tb_exit =3D <optimized out>
-          tb_ptr =3D 0xf26c2cc0 <code_gen_buffer+103976094> "=E2=80=B9]=D1=
-=88=E2=80=A6=D0=AB\017=D0=8A=D0=91\020"
-          ret =3D 0
-          insns_left =3D <optimized out>
-          cflags =3D <optimized out>
-          tb =3D 0x5722fe58
-          last_tb =3D <optimized out>
-          tb_exit =3D <optimized out>
-          cc =3D <optimized out>
-          __func__ =3D "cpu_exec"
-          ret =3D <optimized out>
-          sc =3D <optimized out>
-  #2  0x56710cf6 in cpu_exec (tb_exit=3D<synthetic pointer>, last_tb=3D<syn=
-thetic pointer>, tb=3D<optimized out>, cpu=3D<optimized out>) at /dev/shm/q=
-emu/accel/tcg/cpu-exec.c:621
-          ret =3D 0
-          insns_left =3D <optimized out>
-          cflags =3D <optimized out>
-          tb =3D 0x5722fe58
-          last_tb =3D <optimized out>
-          tb_exit =3D <optimized out>
-          cc =3D <optimized out>
-          __func__ =3D "cpu_exec"
-          ret =3D <optimized out>
-          sc =3D <optimized out>
-  #3  0x56710cf6 in cpu_exec (cpu=3D0x573db8f8) at /dev/shm/qemu/accel/tcg/=
-cpu-exec.c:732
-          cflags =3D <optimized out>
-          tb =3D 0x5722fe58
-          last_tb =3D <optimized out>
-          tb_exit =3D <optimized out>
-          cc =3D <optimized out>
-          __func__ =3D "cpu_exec"
-          ret =3D <optimized out>
-          sc =3D <optimized out>
-  #4  0x566cfade in tcg_cpu_exec (cpu=3D0x573db8f8) at /dev/shm/qemu/cpus.c=
-:1435
-          ret =3D <optimized out>
-  #5  0x566d1e6d in qemu_tcg_rr_cpu_thread_fn (arg=3D0x573db8f8) at /dev/sh=
-m/qemu/cpus.c:1537
-          r =3D <optimized out>
-          cpu =3D 0x573db8f8
-          __PRETTY_FUNCTION__ =3D "qemu_tcg_rr_cpu_thread_fn"
-  #6  0x56b56fe0 in qemu_thread_start (args=3D0x57400668) at util/qemu-thre=
-ad-posix.c:502
-          __cancel_buf =3D {__cancel_jmp_buf =3D {{__cancel_jmp_buf =3D {14=
-61911128, 1463813736, 1461911128, -333745816, 247778263, 1392237730}, __mas=
-k_was_saved =3D 0}}, __pad =3D {0xec1b70d0, 0x0, 0x0, 0x0}}
-          __cancel_routine =3D 0x56b57040 <qemu_thread_atexit_notify>
-          __not_first_call =3D <optimized out>
-          qemu_thread_args =3D 0x57400668
-          start_routine =3D 0x566d1a30 <qemu_tcg_rr_cpu_thread_fn>
-          arg =3D 0x573db8f8
-          r =3D <optimized out>
-  #7  0xffffffff in start_thread () at /lib/libpthread.so.0
-  #8  0xffffffff in clone () at /lib/libc.so.6
-  (gdb) quit
-  A debugging session is active.
-
-          Inferior 1 [process 8096] will be killed.
-
-  Quit anyway? (y or n) y
-  --------------copy end----------
-
-  But when I take away -display sdl, or replace it with -display gtk -
-  same line was booting to desktop!
-
-  Changing cpu to G3 also allowed boot:
-
-  ./ppc-softmmu/qemu-system-ppc -M mac99,via=3Dpmu -L ../queue-vga/pc-bios
-  -cdrom /mnt/sdb1/PPC-img/lubuntu-16.04-desktop-powerpc.iso -m 512
-  -display sdl -vga std -d guest_errors,unimp -boot d -cpu G3 -g
-  1024x768x24 -device ES1370
-
-  This is 32-bit qemu complied with Slackware's gcc 5.5.0. =
-
-  64-bit qemu works fine.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1837049/+subscriptions
-
+T24gSnVsIDkgMjAxOSwgYXQgOToxOCBhbSwgTWFya3VzIEFybWJydXN0ZXIgPGFybWJydUByZWRo
+YXQuY29tPiB3cm90ZToNCkRlbmlzIFBsb3RuaWtvdiA8ZHBsb3RuaWtvdkB2aXJ0dW96em8uY29t
+PiB3cml0ZXM6DQoNCnpzdGQgc2lnbmlmaWNhbnRseSByZWR1Y2VzIGNsdXN0ZXIgY29tcHJlc3Np
+b24gdGltZS4NCkl0IHByb3ZpZGVzIGJldHRlciBjb21wcmVzc2lvbiBwZXJmb3JtYW5jZSBtYWlu
+dGFpbmluZw0KdGhlIHNhbWUgbGV2ZWwgb2YgY29tcHJlc3Npb24gcmF0aW8gaW4gY29tcGFyaXNv
+biB3aXRoDQp6bGliLCB3aGljaCwgYnkgdGhlIG1vbWVudCwgaGFzIGJlZW4gdGhlIG9ubHkgY29t
+cHJlc3Npb24NCm1ldGhvZCBhdmFpbGFibGUuDQoNClRoZSBwZXJmb3JtYW5jZSB0ZXN0IHJlc3Vs
+dHM6DQpUZXN0IGNvbXByZXNzZXMgYW5kIGRlY29tcHJlc3NlcyBxZW11IHFjb3cyIGltYWdlIHdp
+dGgganVzdA0KaW5zdGFsbGVkIHJoZWwtNy42IGd1ZXN0Lg0KSW1hZ2UgY2x1c3RlciBzaXplOiA2
+NEsuIEltYWdlIG9uIGRpc2sgc2l6ZTogMi4yRw0KDQpUaGUgdGVzdCB3YXMgY29uZHVjdGVkIHdp
+dGggYnJkIGRpc2sgdG8gcmVkdWNlIHRoZSBpbmZsdWVuY2UNCm9mIGRpc2sgc3Vic3lzdGVtIHRv
+IHRoZSB0ZXN0IHJlc3VsdHMuDQpUaGUgcmVzdWx0cyBpcyBnaXZlbiBpbiBzZWNvbmRzLg0KDQpj
+b21wcmVzcyBjbWQ6DQp0aW1lIC4vcWVtdS1pbWcgY29udmVydCAtTyBxY293MiAtYyAtbyBjb21w
+cmVzc2lvbl90eXBlPVt6bGlifHpzdGRdDQpzcmMuaW1nIFt6bGlifHpzdGRdX2NvbXByZXNzZWQu
+aW1nDQpkZWNvbXByZXNzIGNtZA0KdGltZSAuL3FlbXUtaW1nIGNvbnZlcnQgLU8gcWNvdzINClt6
+bGlifHpzdGRdX2NvbXByZXNzZWQuaW1nIHVuY29tcHJlc3NlZC5pbWcNCg0KY29tcHJlc3Npb24g
+ZGVjb21wcmVzc2lvbg0KemxpYiB6c3RkIHpsaWIgenN0ZA0KLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpyZWFsIDY1LjUgMTYuMyAo
+LTc1ICUpIDEuOSAxLjYgKC0xNiAlKQ0KdXNlciA2NS4wIDE1LjggNS4zIDIuNQ0Kc3lzIDMuMyAw
+LjIgMi4wIDIuMA0KDQpCb3RoIFpMSUIgYW5kIFpTVEQgZ2F2ZSB0aGUgc2FtZSBjb21wcmVzc2lv
+biByYXRpbzogMS41Nw0KY29tcHJlc3NlZCBpbWFnZSBzaXplIGluIGJvdGggY2FzZXM6IDEuNEcN
+Cg0KU2lnbmVkLW9mZi1ieTogRGVuaXMgUGxvdG5pa292IDxkcGxvdG5pa292QHZpcnR1b3p6by5j
+b20+DQpbLi4uXQ0KZGlmZiAtLWdpdCBhL2RvY3MvaW50ZXJvcC9xY293Mi50eHQgYi9kb2NzL2lu
+dGVyb3AvcWNvdzIudHh0DQppbmRleCA3Y2YwNjhmODE0Li40MzQ0ZTg1OGNiIDEwMDY0NA0KLS0t
+IGEvZG9jcy9pbnRlcm9wL3Fjb3cyLnR4dA0KKysrIGIvZG9jcy9pbnRlcm9wL3Fjb3cyLnR4dA0K
+QEAgLTUzOCw2ICs1MzgsOSBAQCBDb21wcmVzc2VkIENsdXN0ZXJzIERlc2NyaXB0b3IgKHggPSA2
+MiAtIChjbHVzdGVyX2JpdHMgLSA4KSk6DQpBbm90aGVyIGNvbXByZXNzZWQgY2x1c3RlciBtYXkg
+bWFwIHRvIHRoZSB0YWlsIG9mIHRoZSBmaW5hbA0Kc2VjdG9yIHVzZWQgYnkgdGhpcyBjb21wcmVz
+c2VkIGNsdXN0ZXIuDQoNCisgVGhlIGxheW91dCBvZiB0aGUgY29tcHJlc3NlZCBkYXRhIGRlcGVu
+ZHMgb24gdGhlIGNvbXByZXNzaW9uDQorIHR5cGUgdXNlZCBmb3IgdGhlIGltYWdlIChzZWUgY29t
+cHJlc3NlZCBjbHVzdGVyIGxheW91dCkuDQorDQpJZiBhIGNsdXN0ZXIgaXMgdW5hbGxvY2F0ZWQs
+IHJlYWQgcmVxdWVzdHMgc2hhbGwgcmVhZCB0aGUgZGF0YSBmcm9tIHRoZSBiYWNraW5nDQpmaWxl
+IChleGNlcHQgaWYgYml0IDAgaW4gdGhlIFN0YW5kYXJkIENsdXN0ZXIgRGVzY3JpcHRvciBpcyBz
+ZXQpLiBJZiB0aGVyZSBpcw0Kbm8gYmFja2luZyBmaWxlIG9yIHRoZSBiYWNraW5nIGZpbGUgaXMg
+c21hbGxlciB0aGFuIHRoZSBpbWFnZSwgdGhleSBzaGFsbCByZWFkDQpAQCAtNzkwLDMgKzc5Mywx
+OSBAQCBJbiB0aGUgaW1hZ2UgZmlsZSB0aGUgJ2VuYWJsZWQnIHN0YXRlIGlzIHJlZmxlY3RlZCBi
+eSB0aGUgJ2F1dG8nIGZsYWcuIElmIHRoaXMNCmZsYWcgaXMgc2V0LCB0aGUgc29mdHdhcmUgbXVz
+dCBjb25zaWRlciB0aGUgYml0bWFwIGFzICdlbmFibGVkJyBhbmQgc3RhcnQNCnRyYWNraW5nIHZp
+cnR1YWwgZGlzayBjaGFuZ2VzIHRvIHRoaXMgYml0bWFwIGZyb20gdGhlIGZpcnN0IHdyaXRlIHRv
+IHRoZQ0KdmlydHVhbCBkaXNrLiBJZiB0aGlzIGZsYWcgaXMgbm90IHNldCB0aGVuIHRoZSBiaXRt
+YXAgaXMgZGlzYWJsZWQuDQorDQorPT09IENvbXByZXNzZWQgY2x1c3RlciBsYXlvdXQgPT09DQor
+DQorVGhlIGNvbXByZXNzZWQgY2x1c3RlciBkYXRhIG1heSBoYXZlIGEgZGlmZmVyZW50IGxheW91
+dCBkZXBlbmRpbmcgb24gdGhlDQorY29tcHJlc3Npb24gdHlwZSB1c2VkIGZvciB0aGUgaW1hZ2Us
+IGFuZCBzdG9yZSBzcGVjaWZpYyBkYXRhIGZvciB0aGUgcGFydGljdWxhcg0KK2NvbXByZXNzaW9u
+IHR5cGUuDQorDQorQ29tcHJlc3NlZCBkYXRhIGxheW91dCBmb3IgdGhlIGF2YWlsYWJsZSBjb21w
+cmVzc2lvbiB0eXBlczoNCisoeCA9IGRhdGFfc3BhY2VfbGVuZ3RoIC0gMSkNCisNCisgemxpYjoN
+CisgQnl0ZSAwIC0geDogdGhlIGNvbXByZXNzZWQgZGF0YSBjb250ZW50DQorIGFsbCB0aGUgc3Bh
+Y2UgcHJvdmlkZWQgdXNlZCBmb3IgY29tcHJlc3NlZCBkYXRhDQorIHpzdGQ6DQorIEJ5dGUgMCAt
+IDM6IHRoZSBsZW5ndGggb2YgY29tcHJlc3NlZCBkYXRhDQorIDQgLSB4OiB0aGUgY29tcHJlc3Nl
+ZCBkYXRhIGNvbnRlbnQNCg0KQWRkaW5nIDxodHRwOi8vemxpYi5uZXQvPiBhbmQgPGh0dHA6Ly9n
+aXRodWIuY29tL2ZhY2Vib29rL3pzdGQ+IGhlcmUgYXMNCndlbGwgd291bGRuJ3QgaHVydCwgd291
+bGQgaXQ/DQpvaw0KDQpkaWZmIC0tZ2l0IGEvcWFwaS9ibG9jay1jb3JlLmpzb24gYi9xYXBpL2Js
+b2NrLWNvcmUuanNvbg0KaW5kZXggODM1ZGQzYzM3Zi4uMjAyMWUwM2E4NCAxMDA2NDQNCi0tLSBh
+L3FhcGkvYmxvY2stY29yZS5qc29uDQorKysgYi9xYXBpL2Jsb2NrLWNvcmUuanNvbg0KQEAgLTQy
+MTUsMTEgKzQyMTUsMTIgQEANCiMgQ29tcHJlc3Npb24gdHlwZSB1c2VkIGluIHFjb3cyIGltYWdl
+IGZpbGUNCiMNCiMgQHpsaWI6IHpsaWIgY29tcHJlc3Npb24sIHNlZSA8aHR0cDovL3psaWIubmV0
+Lz4NCisjIEB6c3RkOiB6c3RkIGNvbXByZXNzaW9uLCBzZWUgPGh0dHA6Ly9naXRodWIuY29tL2Zh
+Y2Vib29rL3pzdGQ+DQojDQojIFNpbmNlOiA0LjENCiMjDQp7ICdlbnVtJzogJ1Fjb3cyQ29tcHJl
+c3Npb25UeXBlJywNCi0gJ2RhdGEnOiBbICd6bGliJyBdIH0NCisgJ2RhdGEnOiBbICd6bGliJywg
+eyAnbmFtZSc6ICd6c3RkJywgJ2lmJzogJ2RlZmluZWQoQ09ORklHX1pTVEQpJyB9IF0gfQ0KDQoj
+Iw0KIyBAQmxvY2tkZXZDcmVhdGVPcHRpb25zUWNvdzI6DQoNClFBUEkgc2NoZW1hDQpBY2tlZC1i
+eTogTWFya3VzIEFybWJydXN0ZXIgPGFybWJydUByZWRoYXQuY29tPg0KDQo=
