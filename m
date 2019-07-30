@@ -2,86 +2,90 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 122C5C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C94C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3B22216C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:46:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gnIzVVag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3B22216C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD9C9216C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:46:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD9C9216C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsWCh-0000sP-6m
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:46:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36091)
+	id 1hsWCs-0001Et-3j
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36917)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hsW3V-0006es-2u
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:36:58 -0400
+ (envelope-from <eblake@redhat.com>) id 1hsW7m-0007cf-CH
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1hsW3T-0000eB-Qa
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:36:57 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36284)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1hsW3T-0000dv-K1; Tue, 30 Jul 2019 13:36:55 -0400
-Received: by mail-pl1-x644.google.com with SMTP id k8so29191277plt.3;
- Tue, 30 Jul 2019 10:36:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=HtKAermb8jkRwDYfQy50ghQZAMoE/J4HCHa8w9p4Lso=;
- b=gnIzVVagb+U1OgCSEAHTh91dBUTV+FtB00D8rn9inJSJyVA4vADj4Jh3b9BbTLzcjE
- vqxopa6rup94AFxpJvzSFdLkwao57bU+P8edBiejmlf/DATB5w8rNH4VgjtgbW4SF6fv
- s4uF++H2SoRgzwRa5AoPeqZLhBnvDh1A/3gH8OYitOIpoQ9nUOwPOrpDhkmi4EHofHy+
- kv5JBf42GELq4GynQTmhTHKhPYdVR+2/uRZwF8fRrC6/Hocvrk4a6PGFuNl8tyVRLk/9
- rtvYonmH743vHrCHXvOzBg7bjzEOpxMediT32PudI5VDWwjLE+GodIpR4IXC7iGHYK27
- 7KSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=HtKAermb8jkRwDYfQy50ghQZAMoE/J4HCHa8w9p4Lso=;
- b=Go1CJUCfGKKGPcW+Pac3c6XC0CHv2YAVOZ27aiO+LJHD1LRmCB/9fU2kzZhCCcfpV/
- VTYABNKT4M8qh6HcDOJfbMS48spx++bchIthjkmtQdYB3MNIWyc1A60TI+Ky3DXI6Ekq
- mOmi3PIPAXZafebkg5NSOPYeXDvbbjpPRmpZy7F0ALcPk6RS/KzHWCDDQEks2AwrNLQE
- 4Ry2zXBMMr03bEFQMPOsVuCAF7Za7loJRINPxUUnSy1sWoZu2YsqhLMsjcXQ72a9NrAE
- yx6fkopaqJmNHnzBSfTC1GCDM4cVeRp2iORsu/MyaPuIFsFY2btOjc88gbaAJixMfcmw
- 1+BQ==
-X-Gm-Message-State: APjAAAWIweG/aDtZlmmtx6xI51tJw/5uDkAK7UwSvs3IWacWQcGueDkq
- zcil/pQYsvmKgY6QeI6xb7tzWHHRdb7dtA==
-X-Google-Smtp-Source: APXvYqzQDfmcDvr5w3sX0fH6XYiec33MvZN/Bz81R3aRCDBv3hmVBtrSD9OyWfLa+PCUI8+Y85dg9Q==
-X-Received: by 2002:a17:902:e202:: with SMTP id
- ce2mr111846858plb.272.1564508214262; 
- Tue, 30 Jul 2019 10:36:54 -0700 (PDT)
-Received: from localhost.localdomain ([136.233.9.97])
- by smtp.gmail.com with ESMTPSA id q24sm59122895pjp.14.2019.07.30.10.36.48
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 30 Jul 2019 10:36:53 -0700 (PDT)
-From: Aarushi Mehta <mehta.aaru20@gmail.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 30 Jul 2019 23:04:41 +0530
-Message-Id: <20190730173441.26486-17-mehta.aaru20@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190730173441.26486-1-mehta.aaru20@gmail.com>
-References: <20190730173441.26486-1-mehta.aaru20@gmail.com>
+ (envelope-from <eblake@redhat.com>) id 1hsW7k-0002zu-H6
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:41:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58770)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hsW7g-0002yA-Qa; Tue, 30 Jul 2019 13:41:17 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1A934308403B;
+ Tue, 30 Jul 2019 17:41:16 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D2F519C67;
+ Tue, 30 Jul 2019 17:41:15 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190730172508.19911-1-mreitz@redhat.com>
+ <20190730172508.19911-2-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <a7061ab0-afe5-fdf1-0149-3f41f499a236@redhat.com>
+Date: Tue, 30 Jul 2019 12:41:14 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PATCH v8 16/16] block/io_uring: adds fd registration
+In-Reply-To: <20190730172508.19911-2-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="4YK8Csx1yclsyK8GzeMQ7d112YeDq6Jnz"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 30 Jul 2019 17:41:16 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.2 01/13] qcow2: Add Error ** to
+ qcow2_read_snapshots()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,178 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fd registration API in io_uring registers a series of fds
-together that cannot be modified later. Thus, a hashtable
-maintains an index of fds registered and their index in the
-internally registered array. The existing fd array is unregistered
-and a new one submitted.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4YK8Csx1yclsyK8GzeMQ7d112YeDq6Jnz
+Content-Type: multipart/mixed; boundary="NBBWAA48LAEEInO7pIUI4iKR4MRmgay7j";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <a7061ab0-afe5-fdf1-0149-3f41f499a236@redhat.com>
+Subject: Re: [PATCH for-4.2 01/13] qcow2: Add Error ** to
+ qcow2_read_snapshots()
+References: <20190730172508.19911-1-mreitz@redhat.com>
+ <20190730172508.19911-2-mreitz@redhat.com>
+In-Reply-To: <20190730172508.19911-2-mreitz@redhat.com>
 
-Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
----
- block/io_uring.c   | 86 ++++++++++++++++++++++++++++++++++++++++++++--
- block/trace-events |  1 +
- 2 files changed, 85 insertions(+), 2 deletions(-)
+--NBBWAA48LAEEInO7pIUI4iKR4MRmgay7j
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/block/io_uring.c b/block/io_uring.c
-index e2bef380e7..eb8fd23822 100644
---- a/block/io_uring.c
-+++ b/block/io_uring.c
-@@ -45,10 +45,17 @@ typedef struct LuringQueue {
-     QSIMPLEQ_HEAD(, LuringAIOCB) submit_queue;
- } LuringQueue;
- 
-+typedef struct LuringFd {
-+    int *fd_array;
-+    int *fd_index;
-+    GHashTable *fd_lookup;
-+} LuringFd;
-+
- typedef struct LuringState {
-     AioContext *aio_context;
- 
-     struct io_uring ring;
-+    LuringFd fd_reg;
- 
-     /* io queue for submit at batch.  Protected by AioContext lock. */
-     LuringQueue io_q;
-@@ -305,6 +312,70 @@ static int ioq_submit(LuringState *s)
-     }
-     return ret;
- }
-+/**
-+ * luring_fd_register:
-+ *
-+ * Register and unregisters file descriptors, see luring_fd_lookup
-+ */
-+static int luring_fd_register(struct io_uring *ring, LuringFd *fd_reg, int fd)
-+{
-+    int ret, nr;
-+    GHashTable *lookup = fd_reg->fd_lookup;
-+    nr = g_hash_table_size(lookup);
-+
-+    /* Unregister */
-+    if (!fd) {
-+        ret = io_uring_unregister_files(ring);
-+        g_hash_table_remove_all(lookup);
-+        return ret;
-+    }
-+
-+    /* If adding new, API requires older registrations to be removed */
-+    if (nr) {
-+        io_uring_unregister_files(ring);
-+    }
-+
-+    fd_reg->fd_array = g_realloc_n(fd_reg->fd_array, nr + 1, sizeof(int));
-+    fd_reg->fd_array[nr] = fd;
-+    fd_reg->fd_index = g_realloc_n(fd_reg->fd_index, nr + 1, sizeof(int));
-+    fd_reg->fd_index[nr] = nr;
-+
-+    g_hash_table_insert(lookup, &fd_reg->fd_array[nr], &fd_reg->fd_index[nr]);
-+    trace_luring_fd_register(fd, nr);
-+    return io_uring_register_files(ring, fd_reg->fd_array, nr + 1);
-+}
-+
-+/**
-+ * luring_fd_lookup:
-+ *
-+ * Used to lookup fd index in registered array at submission time
-+ * If the lookup table has not been created or the fd is not in the table,
-+ * the fd is registered.
-+ *
-+ * If registration errors, the hash is cleared and the fd used directly
-+ *
-+ * Unregistering is done at luring_detach_aio_context
-+ */
-+static int luring_fd_lookup(LuringState *s, int fd)
-+{
-+    int *index, ret;
-+    if (!s->fd_reg.fd_lookup) {
-+        s->fd_reg.fd_lookup = g_hash_table_new_full(g_int_hash, g_int_equal,
-+                                                    g_free, g_free);
-+        luring_fd_register(&s->ring, &s->fd_reg, fd);
-+    }
-+    index = g_hash_table_lookup(s->fd_reg.fd_lookup, &fd);
-+
-+    if (!index) {
-+        ret = luring_fd_register(&s->ring, &s->fd_reg, fd);
-+        if (ret < 0) {
-+            g_hash_table_remove_all(s->fd_reg.fd_lookup);
-+            return ret;
-+        }
-+        index = g_hash_table_lookup(s->fd_reg.fd_lookup, &fd);
-+    }
-+    return *index;
-+}
- 
- void luring_io_plug(BlockDriverState *bs, LuringState *s)
- {
-@@ -357,7 +428,11 @@ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
-                         __func__, type);
-         abort();
-     }
-+
-     io_uring_sqe_set_data(sqes, luringcb);
-+    if (s->fd_reg.fd_array) {
-+        io_uring_sqe_set_flags(sqes, IOSQE_FIXED_FILE);
-+    }
- 
-     QSIMPLEQ_INSERT_TAIL(&s->io_q.submit_queue, luringcb, next);
-     s->io_q.in_queue++;
-@@ -374,15 +449,21 @@ static int luring_do_submit(int fd, LuringAIOCB *luringcb, LuringState *s,
- }
- 
- int coroutine_fn luring_co_submit(BlockDriverState *bs, LuringState *s, int fd,
-                                   uint64_t offset, QEMUIOVector *qiov, int type)
- {
--    int ret;
-+    int ret, fd_index;
-     LuringAIOCB luringcb = {
-         .co         = qemu_coroutine_self(),
-         .ret        = -EINPROGRESS,
-         .qiov       = qiov,
-         .is_read    = (type == QEMU_AIO_READ),
-     };
-+
-+    fd_index = luring_fd_lookup(s, fd);
-+    if (fd_index >= 0) {
-+        fd = fd_index;
-+    }
-+
-     trace_luring_co_submit(bs, s, &luringcb, fd, offset, qiov ? qiov->size : 0,
-                            type);
-     ret = luring_do_submit(fd, &luringcb, s, offset, type);
-@@ -399,6 +480,7 @@ int coroutine_fn luring_co_submit(BlockDriverState *bs, LuringState *s, int fd,
- 
- void luring_detach_aio_context(LuringState *s, AioContext *old_context)
- {
-+    luring_fd_register(&s->ring, &s->fd_reg, 0);
-     aio_set_fd_handler(old_context, s->ring.ring_fd, false, NULL, NULL, NULL,
-                        s);
-     qemu_bh_delete(s->completion_bh);
-diff --git a/block/trace-events b/block/trace-events
-index 66aaf8352b..13571aa182 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -71,6 +71,7 @@ luring_co_submit(void *bs, void *s, void *luringcb, int fd, uint64_t offset, siz
- luring_process_completion(void *s, void *aiocb, int ret) "LuringState %p luringcb %p ret %d"
- luring_io_uring_submit(void *s, int ret) "LuringState %p ret %d"
- luring_resubmit_short_read(void *s, void *luringcb, int nread) "LuringState %p luringcb %p nread %d"
-+luring_fd_register(int fd, int index) "fd %d index %d"
- 
- # qcow2.c
- qcow2_writev_start_req(void *co, int64_t offset, int bytes) "co %p offset 0x%" PRIx64 " bytes %d"
--- 
-2.21.0
+On 7/30/19 12:24 PM, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  block/qcow2.h          | 2 +-
+>  block/qcow2-snapshot.c | 7 ++++++-
+>  block/qcow2.c          | 3 +--
+>  3 files changed, 8 insertions(+), 4 deletions(-)
 
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--NBBWAA48LAEEInO7pIUI4iKR4MRmgay7j--
+
+--4YK8Csx1yclsyK8GzeMQ7d112YeDq6Jnz
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AgToACgkQp6FrSiUn
+Q2pGCQgAq0kuMWB1xbM1NBW++5Wt3x2rsWuTFZnglSP47dE6WKjEeorCtr3G+KrP
+GU2ExOA5oFbiRPZM76mZvg8jkX6LdQYJoUK1PA7/xuWj/sEkhCFkGC+ERPfWSI8m
+kpeJJ8lseWppM1IlaAc5M8J25OczUy4VDayG86d76jk3X9CQmdsNX4elZ4bEDoH5
+8geQDEexu5+CZdHEd03zzqoy/HA/6vyncfBR/50JMiwO+PK353VlGboetryMxUDW
+aVFIzN1T+HXZkqbwe0pqZ5rvdv1V8/Cet4xYYfQpBhmCq5h9WOTiietxtdritbyN
+bXW4P6rI4hmjk0ZyADdvs6KL4mA4MA==
+=R3C2
+-----END PGP SIGNATURE-----
+
+--4YK8Csx1yclsyK8GzeMQ7d112YeDq6Jnz--
 
