@@ -2,75 +2,87 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B55C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A4FC0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:47:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C07520693
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:46:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C07520693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7CAF620693
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:47:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAF620693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsRWj-00053i-CJ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:46:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38520)
+	id 1hsRXj-0006Bw-OK
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:47:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38752)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsRVb-0004bn-00
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:45:41 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsRXA-0005Ys-NU
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:47:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsRVY-0001yR-Hy
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:45:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39640)
+ (envelope-from <philmd@redhat.com>) id 1hsRX9-0002kH-GH
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:47:16 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38776)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsRVW-0001xL-S6
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:45:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsRVV-0000vT-EL
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 12:45:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 463BE2E80CC
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 12:45:33 +0000 (UTC)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hsRX9-0002jq-Ap
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:47:15 -0400
+Received: by mail-wm1-f67.google.com with SMTP id s15so35167620wmj.3
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 05:47:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jAwznU8TBe9Zfuvv9OoyFCohs23KpFP78UQQWruPTjw=;
+ b=WwmSD2YBprFjDwKOihwDq/HUBk2uH0wDMnB1rPJKKaKsmP45LcEKGRzX/tLsg9Vnhh
+ LUqoE7w4bRBCs/ePuNUFUFVp3Kfe7Ip+lbTZzUPE94fg/LaZ2ScZ1tqlz1z+59Qx87ca
+ 4na5Wi3wbO0MLqlG0R8KamRNtgr3jVG4y044L9y1Ph2qZyKbfZPcdUo4y8vnTMtkxzq1
+ rR8X8ieyBlVGw2XraFL7TivP27A0hrTIwCaeGsDNsroUDLMP47NllFd+IW+FT/VG7nVA
+ +7vGPZfDSxIUXRnbClVwM+ITNkj1tZaL0i341GIa00btKZGEOixqyooqdVvOs1u5hkiZ
+ SEIg==
+X-Gm-Message-State: APjAAAW1jns8073yA49TEbbN3t/RcATV3w1Xj9G/A/tDEdmhZGQSqZa0
+ ZmkXplDgAmE5omF3bOJAN6segiXMn3U=
+X-Google-Smtp-Source: APXvYqxqAxfP7WxrdFWz8KXHOpz1szQ0oOjA+VJ/IUsr/1dRMmMY8VIR+SkruwGoYyg0fGWICfLIYA==
+X-Received: by 2002:a1c:a997:: with SMTP id
+ s145mr102593747wme.106.1564490834380; 
+ Tue, 30 Jul 2019 05:47:14 -0700 (PDT)
+Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.190])
+ by smtp.gmail.com with ESMTPSA id v16sm49401312wrn.28.2019.07.30.05.47.13
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 05:47:13 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190729223605.7163-1-jsnow@redhat.com>
+ <7324bc78-1d7b-7b7f-272d-c2932651b007@redhat.com>
+ <075eaba0-7e50-b240-7679-825c5bd03e0f@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <084951ee-2837-6396-84eb-1b5c5fcf8bd6@redhat.com>
+Date: Tue, 30 Jul 2019 14:47:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 12:38:58 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: elouan-appere pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
- =?utf-8?q?e=29?=
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
-Message-Id: <156449033829.10846.5493606542799960361.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: f8f9eaddb0ccec60878952fca0c91d95a4ef8aa5
+In-Reply-To: <075eaba0-7e50-b240-7679-825c5bd03e0f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression: TCG
- sometimes using wrong values for VBAR_EL2 despite it being correctly
- reported to GDB
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH] Revert "ide/ahci: Check for -ECANCELED in
+ aio callbacks"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,55 +91,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838277 <1838277@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Shaju Abraham <shaju.abraham@nutanix.com>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug is specific to our handling of the 'brk' insn (and other debug
-exceptions within the guest like singlestep or watchpoints or
-breakpoints) at EL2, so you can work around it for the moment by
-avoiding using hardcoded brk insns in your EL2 code.
+On 7/30/19 1:37 PM, Paolo Bonzini wrote:
+> On 30/07/19 11:54, Philippe Mathieu-Daudé wrote:
+>> Hi John,
+>>
+>> On 7/30/19 12:36 AM, John Snow wrote:
+>>> This reverts commit 0d910cfeaf2076b116b4517166d5deb0fea76394.
+>>>
+>>> It's not correct to just ignore an error code in a callback; we need to
+>>> handle that error and possible report failure to the guest so that they
+>>> don't wait indefinitely for an operation that will now never finish.
+>>
+>> Is this 4.1 material? It looks so.
+> 
+> Perhaps could have been last week, but now I suggest Cc qemu-stable and
+> delaying it to 4.2.
 
--- =
+I was wondering because Kevin was preparing a block@ pull request.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838277
+Anyway this seems fair because the reverted commit is dated from 2014.
 
-Title:
-  qemu-system-aarch64: regression: TCG sometimes using wrong values for
-  VBAR_EL2 despite it being correctly reported to GDB
+Thanks,
 
-Status in QEMU:
-  New
-
-Bug description:
-  Affects 3.1.0 (latest stable release) and latest commit
-  (893dc8300c80e3dc32f31e968cf7aa0904da50c3) but did *not* affect 2.11
-  (qemu from bionic ubuntu LTS).
-
-  With the following code and shell commands:
-
-  test.s:
-
-  .text
-  mov x0, #0x60000000
-  msr vbar_el2, x0
-  dsb sy
-  isb sy
-
-  $ aarch64-none-elf-as test.s -o test.o
-  $ aarch64-none-elf-objcopy -S -O binary test.o test.bin
-  $ qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -cpu c=
-ortex-a57 -kernel test.bin -s -S
-
-  vbar_el2 is still 0 after the code, instead of being the expected
-  0x60000000. (see screenshot).
-
-  This regression doesn't seem to happen for vbar_el1 &
-  virtualization=3Doff.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838277/+subscriptions
+Phil.
 
