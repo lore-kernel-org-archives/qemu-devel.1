@@ -2,83 +2,81 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 216F2C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 16:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CD6C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 16:45:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB82620693
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 16:42:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nGF4koiv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB82620693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D9D1E20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 16:45:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9D1E20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsVD9-0000da-6U
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 12:42:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54461)
+	id 1hsVFk-0001qm-Uc
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 12:45:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54937)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hsVCP-00004t-PS
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 12:42:06 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsVFH-0001Fy-Mu
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 12:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hsVCO-0005mY-I1
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 12:42:05 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43125)
+ (envelope-from <philmd@redhat.com>) id 1hsVFF-00073l-M2
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 12:45:03 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33442)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hsVCO-0005lv-Bj
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 12:42:04 -0400
-Received: by mail-oi1-x241.google.com with SMTP id w79so48428701oif.10
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:42:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=OfafEYSPfzAyOBXdbB1n/j4rOF8gCfb1ntDDy8rwbIA=;
- b=nGF4koiv+oDd3rnl/K2HD/M7kQBlUWRoHIPwUayluI93qFFG5QOs/lyqiwkz7mEx/b
- fjBPKvWcmg/15Zi/n3mvsuVC6/L3Qmx4MlM3QRbRSPwGSRiYE7ADnZrbo+NWDmgSs8U1
- AnmK2IkVcCDr7nDVROblItMTtCD2bCb6O64vd0M8oxVz45LmW3nujgy6Z1v4YscSjV0E
- VrKl06/xKuvkroT9kKNYPLnDxY8qm1w59Tx9FlFdB+HcI0MSIevyCKqrYfLSjLk3FS8O
- pdepQLkF/rjWjcFo0xWkUJFq81HV4efG+i65uEIMyInT14vAo7aJ8CtRVGrMWKUBS24b
- r7EA==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hsVFE-00072w-M4
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 12:45:01 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n9so66629209wru.0
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:45:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=OfafEYSPfzAyOBXdbB1n/j4rOF8gCfb1ntDDy8rwbIA=;
- b=HVOJOHPmyBJ5MVa46R1mihsuVs959zdFphqAyNfoIG+sQkSfBtaPy4AAn1EhjMFrnd
- U9HQOkdN3po3OEQhfXdx+pqc/jlUZPoXc/zOwzYzHvSUalDSHoyu3NuClbQFgjvtNY0U
- rqMIwePtiu8reZa92Vxjikpc4rb1uq9eeRUxMHXTMYe+btqKZCkjQ4NgXsVt7kHf2EeR
- 3mG8PTlVcPvcUSR5I895P2lyqqNQMJQ07sirvYYP0YIIuwxiD3f44CVa5T+j5rtXAa02
- YWbIAUBUJ+3I87fAy/u1Uu3w8S14MsiLcsM6jQT7VSfI3IsKWJ3dwZ/VgM6YpN3e6Lvp
- ZtkA==
-X-Gm-Message-State: APjAAAVS/PsU8EwpMruoGa0Oic7neLN01KJEeoIXsInAArTUCI7w7Zm0
- cdCOLaKurpyeYkTuyGv7NiV4ZV2OEIaIxMQ76QF4PQ==
-X-Google-Smtp-Source: APXvYqyeLfRy7iSI8pYbVvXOhB/uWLvBLzQeX/BgOiojfOYMaFtPKKoSrmlvsegEZk3sCxVnijqI07GqrseBLRY5K8M=
-X-Received: by 2002:a05:6808:8c2:: with SMTP id
- k2mr55474571oij.98.1564504923200; 
- Tue, 30 Jul 2019 09:42:03 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=44PWnsZlugzoF8OgUVXZACuqPGycODVBbu6h4inAI8o=;
+ b=RNy0CBOZelP6cSuqp6SEVByQs0ATlfqEiQp6FJWqsETRlOGXTwj6kcQOLIbhc2f2KI
+ +aKVvmiqEd3r20fwv9Ac34xj2mqSU5/jBRfXqYf+D9oBppDRnDyxwh3sT9E8l51fYuXJ
+ YnGa6u7LaeWIvHrEFen+VXQJk1CSNGR4J915mcwa2c5WEN+58tckYiKpiLSfC4X2kNSz
+ m0UezqV9Ol4zyvbynweTDk9TFPbVxzdagwWqK2Nu7KovZwbYvR7bzcw4DA82AcWLTHnV
+ nbdsWqswIEROJxfB8sJb/YKCoJUAgSsJydSt1BFQMwSiWT5pBEsunl3H7zF59lWSS+hl
+ IxNA==
+X-Gm-Message-State: APjAAAXDeQ9WA5ObeqSjdk7W9W6eJVjLHCYo16QcvspTDF+B+ObOk3u/
+ fdVxK2RYtNo5ZmV0dfuvg9M0GQ==
+X-Google-Smtp-Source: APXvYqyxNaQbCpzEb+xWh4DJMWsbihpOAJ8VYcDfTamWG5R6SzfItdFfDyhi3S+O1mCc7qBb9fVfJQ==
+X-Received: by 2002:a5d:628d:: with SMTP id k13mr1679873wru.69.1564505099684; 
+ Tue, 30 Jul 2019 09:44:59 -0700 (PDT)
+Received: from [192.168.43.238] (63.red-95-127-155.staticip.rima-tde.net.
+ [95.127.155.63])
+ by smtp.gmail.com with ESMTPSA id k124sm107600279wmk.47.2019.07.30.09.44.58
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 09:44:59 -0700 (PDT)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+Date: Tue, 30 Jul 2019 18:44:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190730132522.27086-1-peter.maydell@linaro.org>
- <c8d89a39-a711-a416-b069-5710d672b4e7@redhat.com>
-In-Reply-To: <c8d89a39-a711-a416-b069-5710d672b4e7@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jul 2019 17:41:52 +0100
-Message-ID: <CAFEAcA_5+tYKyMO5A2h-YRe4h25VrGS0wm1G=yTY4OLX4Q4XMQ@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH for-4.1?] target/arm: Deliver BKPT/BRK
- exceptions to correct exception level
+In-Reply-To: <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
+ before ioctl call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,50 +88,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
+ kvm@vger.kernel.org, mtosatti@redhat.com, mdroth@linux.vnet.ibm.com,
+ armbru@redhat.com, pbonzini@redhat.com, den@openvz.org, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 at 16:31, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> On 7/30/19 3:25 PM, Peter Maydell wrote:
-> > Most Arm architectural debug exceptions (eg watchpoints) are ignored
-> > if the configured "debug exception level" is below the current
-> > exception level (so for example EL1 can't arrange to get debug exceptio=
-ns
-> > for EL2 execution). Exceptions generated by the BRK or BPKT instruction=
-s
-> > are a special case -- they must always cause an exception, so if
-> > we're executing above the debug exception level then we
-> > must take them to the current exception level.
-> >
-> > This fixes a bug where executing BRK at EL2 could result in an
-> > exception being taken at EL1 (which is strictly forbidden by the
-> > architecture).
-> >
-> > Fixes: https://bugs.launchpad.net/qemu/+bug/1838277
-> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> > ---
-> > At this point in the release cycle I'm not sure we should put this
-> > into 4.1 -- it is definitely a bug but it's not a regression as
-> > we've been wrong like this for multiple releases, pretty much
-> > since we put in the debug handling code I suspect.
->
-> The fix is quite trivial, and the user reported using a release, so
-> having it in the next release would be nice.
-> Or as usual, wait for 'last-minute-bugfix-that-postpone-another-rc' and
-> squeeze this fix in.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
+> Not the whole structure is initialized before passing it to the KVM.
+> Reduce the number of Valgrind reports.
+> 
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  target/i386/kvm.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index dbbb137..ed57e31 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>          return 0;
+>      }
+>  
+> +    memset(&msr_data, 0, sizeof(msr_data));
 
-OK, people seem to think it's worth putting in, so I've applied
-it to master.
+I wonder the overhead of this one...
 
-thanks
--- PMM
+>      msr_data.info.nmsrs = 1;
+>      msr_data.entries[0].index = MSR_IA32_TSC;
+>      env->tsc_valid = !runstate_is_running();
+> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>  
+>      if (has_xsave) {
+>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+
+OK
+
+>      }
+>  
+>      max_nested_state_len = kvm_max_nested_state_length();
+> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
+>          return 0;
+>      }
+>  
+> +    memset(&dbgregs, 0, sizeof(dbgregs));
+
+OK
+
+>      for (i = 0; i < 4; i++) {
+>          dbgregs.db[i] = env->dr[i];
+>      }
+
+We could remove 'dbgregs.flags = 0;'
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
