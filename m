@@ -5,86 +5,85 @@ X-Spam-Level:
 X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED4DBC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 07:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D654C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 07:43:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B465B206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 07:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28156206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 07:43:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XcXfoXQo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B465B206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Chhlb3Yo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28156206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsMm0-0007Fj-0L
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 03:42:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43967)
+	id 1hsMnV-0008KE-GV
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 03:43:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44368)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hsMlY-0006lv-Hm
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 03:41:49 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hsMn7-0007ov-D0
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 03:43:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hsMlX-0008BF-Mh
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 03:41:48 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35241)
+ (envelope-from <stefanha@gmail.com>) id 1hsMn6-0000pL-Jq
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 03:43:25 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43732)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1hsMlX-00087h-E5; Tue, 30 Jul 2019 03:41:47 -0400
-Received: by mail-wm1-x342.google.com with SMTP id l2so55644622wmg.0;
- Tue, 30 Jul 2019 00:41:47 -0700 (PDT)
+ id 1hsMn6-0000ol-Dl; Tue, 30 Jul 2019 03:43:24 -0400
+Received: by mail-wr1-x441.google.com with SMTP id p13so64557248wru.10;
+ Tue, 30 Jul 2019 00:43:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=US0CBPgazd1Ke0PMKoO07sr+MbkK+EZDEhYOuEHgEIA=;
- b=XcXfoXQoiMw1rifJkOGZU2LqIpzAg/2DeoGGjWK2Su9kghbGH48VtijXkkYy3Z/Yly
- e35ujyq4PNJzvq62nSD4l6aLvc7w0J7paQV6q83NgAkVhrlCEN0RNnWZNjWTHjAL02qa
- frNTtiEd9WD2n0n9rBZPbfdrp33dksS9/MpnJEZedE7iE9/6BlhID5hAbsO3a4rAi6+Z
- p/MbOLrRRRWUsEVJUiDkJfv8U02gtTmhPULpaazD6vPmSmr0VjiHg0+1gqyH5LdZHRk5
- n27Cl24nfSFNStYXLJqkI/VQ9h3Mz/rclRFyZncz9Z1TwjhtQCpixsftWiKNdtbDWYqB
- x+vw==
+ bh=4+vY0/fc4hOqHsfxkymmfBwT3mHd9oZtfA/cVdSMdUA=;
+ b=Chhlb3YoEdmkv56xKJEIMoyx6Lbz0U6hP/iKg7LswN5EhOYHqyX6pDo7NUPudWgRa4
+ 4mBzpZofmoHFidt90o+OCaJ/3REW8Cf1/jJS+F+635LenfSZ6hVpY+LPE1MRMOI5E4Nf
+ kEcGmNx6qCadh5Gw3FloSK13z6S+riOJjN3YHjfs6HS/QQLJEbPJrZmPHzrBQs1amLMW
+ m3Y6SGf+A+bxLf7j9dAk550Dh2fo4N5/R8WKjoQsz4xkxdFXhDqDp3UjZCif+br33PW9
+ GZt/+EYGcAUNK0UtWMe8rjzMh58iZFlDR4Akl/CBy9qFPANY8suLCgayu3LsAUi06FMM
+ JK4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=US0CBPgazd1Ke0PMKoO07sr+MbkK+EZDEhYOuEHgEIA=;
- b=o9CX/SDnz+AqlY1QdNZShzMa2tnY1bOUPx0sKLk81AswN3PvJcHEXfzBQ7Vv6aVSBK
- tnhEurJJ/nvxgZ9913UeQb6pJE1hSp+zOL7/vh1RGsZaEnNjiIFiX8LPGMyGUAcgSkHt
- yIE7lBsihykSnH6vctZdPYB+qhzjDLhw6LJkvYEsPP50EfyfYB31k6g0heHHHT0ZO0H/
- ANvHTT7ZHHm0zvR+1C5yskHfQke4kMvI0+saBmTvI6yuRFK+UeQ5mMlVsnR5DDQqxbX+
- dl9+wEHCthvWHMwf4P7fj65s3jWL5E9AlX81gZv4jxagSpptMFV25XibajMd0rew3iwc
- eTTg==
-X-Gm-Message-State: APjAAAXYrQOocId1eWqgzdUA4p+PCx73zipg0LSRxmFo7loYbcGqBsSh
- WloM6HFaSKOtXpR+XIjYYz0=
-X-Google-Smtp-Source: APXvYqysBP/CTjIwmvI+SYliZWH/ARAIMhaelzytQ1TBqTQYfiB8gVHplMzse93woSE3eC0w2+scyw==
-X-Received: by 2002:a1c:7015:: with SMTP id l21mr100081458wmc.82.1564472506325; 
- Tue, 30 Jul 2019 00:41:46 -0700 (PDT)
+ bh=4+vY0/fc4hOqHsfxkymmfBwT3mHd9oZtfA/cVdSMdUA=;
+ b=DxhCl/eQdo6CC63DQm/VJkLGgKfD4oCW2DZECKw9xchoGf83VXyQkaGrY3PrwxvESF
+ 777kstMgSmJC/mKe1Kl3zN9PJx/RN+wYv+WV4HUty2Y7TB32Q/Is2DEsAsExfpwWWeog
+ YTCWrTKdYuTC/Ciw7s7GCvmePQK7lqWf/5VnAhov0LJBUa9G3NNRUrGM7AxfRC9lt+6d
+ 90mXxXLiKzPBhB2Vr0n71RP7ycXcxzlOKcibGtOXKSQU9Dgg+/0Tvkdz4FAYUEzpDcFr
+ YlIB3rfBXE5Amtk6qcgyKZLOrmXt95jNklWxi5J8F6dmIhqWQ+CRDmmsQqRM7+G/eSuK
+ h0Fg==
+X-Gm-Message-State: APjAAAV4pn67BEylUk5VePXL3qGWwPXwgyou8hEDULe5EviRWgKacDvZ
+ 8To2AorDQVFQy4j/4yI5gnQ=
+X-Google-Smtp-Source: APXvYqyppwmw0zVL6CCHh8KrTT8LVImIlR2iOnljmaemfL4YbHJRld9AhdExNYHe+oelvVr8bpaZeg==
+X-Received: by 2002:adf:f3c1:: with SMTP id g1mr36610488wrp.203.1564472603268; 
+ Tue, 30 Jul 2019 00:43:23 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id f7sm62649872wrv.38.2019.07.30.00.41.45
+ by smtp.gmail.com with ESMTPSA id j9sm74441149wrn.81.2019.07.30.00.43.22
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 30 Jul 2019 00:41:45 -0700 (PDT)
-Date: Tue, 30 Jul 2019 08:41:44 +0100
+ Tue, 30 Jul 2019 00:43:22 -0700 (PDT)
+Date: Tue, 30 Jul 2019 08:43:21 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
 To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190730074144.GF30213@stefanha-x1.localdomain>
+Message-ID: <20190730074321.GG30213@stefanha-x1.localdomain>
 References: <20190729151651.21306-1-mehta.aaru20@gmail.com>
- <20190729151651.21306-15-mehta.aaru20@gmail.com>
+ <20190729151651.21306-16-mehta.aaru20@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="p8PhoBjPxaQXD0vg"
+ protocol="application/pgp-signature"; boundary="JkW1gnuWHDypiMFO"
 Content-Disposition: inline
-In-Reply-To: <20190729151651.21306-15-mehta.aaru20@gmail.com>
+In-Reply-To: <20190729151651.21306-16-mehta.aaru20@gmail.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v7 14/15] tests/qemu-iotests:
- enable testing with aio options
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v7 15/15] tests/qemu-iotests:
+ use AIOMODE with various tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,34 +106,42 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---p8PhoBjPxaQXD0vg
+--JkW1gnuWHDypiMFO
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Jul 29, 2019 at 08:46:50PM +0530, Aarushi Mehta wrote:
+On Mon, Jul 29, 2019 at 08:46:51PM +0530, Aarushi Mehta wrote:
 > Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 > ---
->  tests/qemu-iotests/check      | 15 ++++++++++++++-
->  tests/qemu-iotests/common.rc  | 14 ++++++++++++++
->  tests/qemu-iotests/iotests.py |  9 ++++++++-
->  3 files changed, 36 insertions(+), 2 deletions(-)
+>  tests/qemu-iotests/028 |  3 ++-
+>  tests/qemu-iotests/058 |  2 +-
+>  tests/qemu-iotests/089 |  4 ++--
+>  tests/qemu-iotests/091 |  7 ++++---
+>  tests/qemu-iotests/109 |  3 ++-
+>  tests/qemu-iotests/147 |  5 +++--
+>  tests/qemu-iotests/181 | 10 +++++-----
+>  tests/qemu-iotests/183 |  7 ++++---
+>  tests/qemu-iotests/185 | 17 ++++++++++++-----
+>  tests/qemu-iotests/200 |  3 ++-
+>  tests/qemu-iotests/201 | 10 +++++-----
+>  11 files changed, 42 insertions(+), 29 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---p8PhoBjPxaQXD0vg
+--JkW1gnuWHDypiMFO
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0/9LgACgkQnKSrs4Gr
-c8gvKAgAumbA2HclhklYcKxyxlHBxShfCzbbKIjfZRupBwLOFmxK3zDL29QB8KhR
-RGp8AKLvw8iedp3BDS+UkmTHdditG5EeQXjtYdmcv3h569ku2qbLeHXYARNk6smY
-P4gPiHkkitI5V5C+MP9B0UKl27ao2garmuUqriTYy5t7T6zxEOsLNO9bT4e1ybpF
-InAVOSuge5jJzm28i8YxXxqsFDQk5U9zrjTztvxlTHTfBLlct74fo0K5sz9mdxDf
-YfDrX2QTAu+OWv8/lP1G26zqZ+sV4OwvZRV2adzVc8f9p4S13bNc1JIwE3wJg4r/
-PzM3Mx4N1/R7TflltofqA2exNjUC6A==
-=3QWJ
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0/9RkACgkQnKSrs4Gr
+c8jZAAf8CYIze2HIlLSiW5jmIziyjs4Yv926Y1rSvVuoD1Mqm2y0wypkAPcgPWEm
+P+H3/ps5ypogkrGTV5jp9Yl5MhL1NaSAMQQ22+Gw5Xq0cuPSrIgQRliAZqZKUl92
+WJE+PD/JRqRf2FXY3czo5zzyBfTRz9KfKOapTYuJvBHh+Sq1rBfSaAjQCifQ5NwU
+eToKwhnyEYCkt4XgG1QZdAqNZF8aIQXalhGaY8POr4mG77Vg6ZiBKP0phsjFpBSG
+0EWpCpNyk8la002cgki69X5MgrEPlQu/avIQZ0y2uBJ5iUrKUgNrEgHkd17ZzloG
+8yyq59CMonjkJWcmRmr/AsT86iCSaw==
+=3f8O
 -----END PGP SIGNATURE-----
 
---p8PhoBjPxaQXD0vg--
+--JkW1gnuWHDypiMFO--
 
