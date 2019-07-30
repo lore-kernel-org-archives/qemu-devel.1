@@ -2,49 +2,49 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51C7C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEA6C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:36:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BB15206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:36:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BB15206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E9744206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:36:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9744206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsRMY-00029P-QV
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36838)
+	id 1hsRMa-0002Bf-7y
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:36:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36845)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsRLz-0001E5-Iq
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:35:44 -0400
+ (envelope-from <bounces@canonical.com>) id 1hsRLz-0001EE-T0
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsRLy-0005lt-Hm
+ (envelope-from <bounces@canonical.com>) id 1hsRLy-0005m1-R0
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:35:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37056)
+Received: from indium.canonical.com ([91.189.90.7]:37042)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsRLy-0005lM-Cv
+ id 1hsRLy-0005lK-LL
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:35:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsRLx-00081y-Hb
+ id 1hsRLx-00081y-73
  for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 12:35:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8432C2E802D
+ by loganberry.canonical.com (Postfix) with ESMTP id 33ADC2E80C9
  for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 12:35:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 12:26:49 -0000
-From: =?utf-8?b?RWxvdWFuIEFwcMOpcsOp?= <1838277@bugs.launchpad.net>
+Date: Tue, 30 Jul 2019 12:26:28 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
@@ -55,16 +55,15 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: elouan-appere pmaydell
 X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
  =?utf-8?q?e=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
- =?utf-8?q?e=29?=
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
 References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
-Message-Id: <156448960939.11039.2559019559593801206.malone@wampee.canonical.com>
+Message-Id: <156448958899.5869.10346435135705936706.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 4833e1393a05306e00ddcdb976f9884543abfb1a
+X-Launchpad-Hash: c34960c2e3d4cbaa491b4a847357d8102d493ece
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression: TCG
@@ -85,17 +84,17 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As I said, you should have ignored example_x20_mov_sp_x8 totally -- this
-was a bug on my end, which I fixed.
+Thanks for your repro instructions of comment #10. Something weird is
+indeed going on: the -d int logging reports:
 
-What about
-https://bugs.launchpad.net/qemu/+bug/1838277/+attachment/5279996/+files/exa=
-mple.zip,
-the steps for which are in #10? This one does not return from exception,
-and executes a brk instruction in function main. It is supposed to jump
-to 0x60001200 but doesn't (does on version 2.11). The instruction
-following the brk is valid (adrp) & the instruction at 0x60001200 is mrs
-x18, esr_el2.
+Taking exception 7 [Breakpoint]
+...from EL2 to EL1
+...with ESR 0x3c/0xf20003e8
+...with ELR 0x6000010c
+...to EL1 PC 0x200 PSTATE 0x3c5
+
+but an exception should *never* get taken from a higher to a lower
+exception level. I will investigate further.
 
 -- =
 
