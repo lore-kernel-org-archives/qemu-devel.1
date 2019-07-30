@@ -2,140 +2,83 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE6CC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BD0C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:36:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4144F2064A
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4144F2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 023F92064A
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:36:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QU0W8JNf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 023F92064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsWsF-0004lf-DG
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 14:29:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45242)
+	id 1hsWyu-0006TW-8M
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 14:36:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46239)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hsWrp-0004Gw-Rk
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:28:59 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hsWyW-00063T-FF
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:35:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hsWro-0004Dv-Lj
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:28:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41954)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hsWrl-0004Ae-UK; Tue, 30 Jul 2019 14:28:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6DB0B30860A7;
- Tue, 30 Jul 2019 18:28:52 +0000 (UTC)
-Received: from [10.18.17.211] (dhcp-17-211.bos.redhat.com [10.18.17.211])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 24C955D9C8;
- Tue, 30 Jul 2019 18:28:51 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190730163251.755248-1-vsementsov@virtuozzo.com>
- <20190730163251.755248-4-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <2b034619-ab55-a5f1-a1f4-ea14c4c5c18c@redhat.com>
-Date: Tue, 30 Jul 2019 14:28:50 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alistair23@gmail.com>) id 1hsWyV-00080f-3E
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:35:52 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:45781)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hsWyU-0007yQ-8D; Tue, 30 Jul 2019 14:35:51 -0400
+Received: by mail-lf1-x141.google.com with SMTP id u10so6703959lfm.12;
+ Tue, 30 Jul 2019 11:35:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GksNWIKk90TrrPRZNTPGfSJT9d/t1KYvp4rKxyHxnDY=;
+ b=QU0W8JNffRu9ejIA8osKoTRjNBFuuUjDJ1M6TqAUuP9lxJb3AHhFleseozymDMZ+3i
+ CjDA++tsUPmai7i98o42yk4HvcDtuxPcM4WUrih5Heody3DF9Dr9MbBYctig3kE5Mopz
+ 6sOZcd9+6pV04j4T96sY4rt5vZZruXpvJGLW0XgPxpCLZZwmCYJaHLH9UczNbUh2vTrL
+ RwvN4ODUyDXmrtTAG4rvAlUVj4tqKsfnRUYLFVsvUtQQ5VmNYoFj0Sbg1EUAsFFiQ48L
+ A3nf6TBUL8XceUCco7FGVa8sYXFVBmdROQQLJ/uvmvwJokpsV3RYenOg8pA66aUPn5O2
+ Dcag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GksNWIKk90TrrPRZNTPGfSJT9d/t1KYvp4rKxyHxnDY=;
+ b=OJDYtlcpLv+T244tX0CuTxLl2msgpXm+S5areMKx2vfd1fwbiKUsJT8cpw2pfMRtcF
+ CQelM89CuGwjszUD0I+Fk6zAv00UDDsZy9SfLZecW9kQ9/zLEoF2cm/Z/h6i34lW7raM
+ gq8JUOQobaozoYBiXL3JOKyKcCNKDj125CGZA8xDEQ4+uYA0IBYTOf4gnt60dD/tkHCZ
+ PenSLlghxGEvNFL5yTCs7Cq3sIrr3agcAVPH/QwSxkw1yI5XXDAHP4GxArirkGqg0Aff
+ wLD7G3hTMlovxmIBVz/3gXFMXPAufZxSKZcBTX7kH3xBnVRyB/ZObkEV/x793O8lTV4W
+ PlfA==
+X-Gm-Message-State: APjAAAUUHbQlGCGQ4ITeGrxtqGPDsW80egaPRl7ons0qXR0qy5z+e2Lb
+ vi1IiEQZJ+Ve1YnqoW1GVQQBfFa80v7l0XQcToI=
+X-Google-Smtp-Source: APXvYqy5thzXeVMsnMDFhsMO3cw8v1exf0tABstt9uAqsF6xsJWbgOE2qFzcDslg704wkzAXz6IT7kdIFg6E0sbKK1s=
+X-Received: by 2002:a19:c6d4:: with SMTP id
+ w203mr55888282lff.135.1564511746902; 
+ Tue, 30 Jul 2019 11:35:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190730163251.755248-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 30 Jul 2019 18:28:52 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] block/backup: refactor write_flags
+References: <cover.1564080680.git.alistair.francis@wdc.com>
+ <edea77ff4aa6900d01ab7146d5b52c2dae4a856e.1564080680.git.alistair.francis@wdc.com>
+ <CAEiOBXU-4KLv64pZJ__gszG8RyC6cE_GxwTt+przwbDkmS9vgQ@mail.gmail.com>
+In-Reply-To: <CAEiOBXU-4KLv64pZJ__gszG8RyC6cE_GxwTt+przwbDkmS9vgQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 30 Jul 2019 11:32:13 -0700
+Message-ID: <CAKmqyKMZxR_Yeq5i8Xs1Z5GtpbA=B2piGWP2doNvCNUu0JCy0A@mail.gmail.com>
+To: Chih-Min Chao <chihmin.chao@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH-4.2 v1 4/6] target/riscv:
+ Create function to test if FP is enabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,112 +90,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Jul 29, 2019 at 9:56 AM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
+>
+>
+>
+> On Fri, Jul 26, 2019 at 2:55 AM Alistair Francis <alistair.francis@wdc.com> wrote:
+>>
+>> Let's creaate a function that tests if floating point support is
+>> enabled. We can then protect all floating point operations based on if
+>> they are enabled.
+>>
+>> This patch so far doesn't change anything, it's just preparing for the
+>> Hypervisor support for floating point operations.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+>>  target/riscv/cpu.h        |  6 +++++-
+>>  target/riscv/cpu_helper.c | 10 ++++++++++
+>>  target/riscv/csr.c        | 19 ++++++++++---------
+>>  3 files changed, 25 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> index 0adb307f32..2dc9b17678 100644
+>> --- a/target/riscv/cpu.h
+>> +++ b/target/riscv/cpu.h
+>> @@ -255,6 +255,7 @@ void riscv_cpu_do_interrupt(CPUState *cpu);
+>>  int riscv_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
+>>  int riscv_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+>>  bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request);
+>> +bool riscv_cpu_fp_enabled(CPURISCVState *env);
+>>  int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
+>>  hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+>>  void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+>> @@ -298,7 +299,10 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>>  #ifdef CONFIG_USER_ONLY
+>>      *flags = TB_FLAGS_MSTATUS_FS;
+>>  #else
+>> -    *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
+>> +    *flags = cpu_mmu_index(env, 0);
+>> +    if (riscv_cpu_fp_enabled(env)) {
+>> +        *flags |= env->mstatus & MSTATUS_FS;
+>> +    }
+>>  #endif
+>>  }
+>>
+>> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+>> index f027be7f16..225e407cff 100644
+>> --- a/target/riscv/cpu_helper.c
+>> +++ b/target/riscv/cpu_helper.c
+>> @@ -71,6 +71,16 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>>
+>>  #if !defined(CONFIG_USER_ONLY)
+>>
+>> +/* Return true is floating point support is currently enabled */
+>> +bool riscv_cpu_fp_enabled(CPURISCVState *env)
+>> +{
+>> +    if (env->mstatus & MSTATUS_FS) {
+>> +        return true;
+>> +    }
+>> +
+>> +    return false;
+>> +}
+>> +
+>>  int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+>>  {
+>>      CPURISCVState *env = &cpu->env;
+>> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+>> index af3b762c8b..7b73b73cf7 100644
+>> --- a/target/riscv/csr.c
+>> +++ b/target/riscv/csr.c
+>> @@ -46,7 +46,7 @@ void riscv_set_csr_ops(int csrno, riscv_csr_operations *ops)
+>>  static int fs(CPURISCVState *env, int csrno)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>  #endif
+>> @@ -108,7 +108,7 @@ static int pmp(CPURISCVState *env, int csrno)
+>>  static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>  #endif
+>> @@ -119,7 +119,7 @@ static int read_fflags(CPURISCVState *env, int csrno, target_ulong *val)
+>>  static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>      env->mstatus |= MSTATUS_FS;
+>> @@ -131,7 +131,7 @@ static int write_fflags(CPURISCVState *env, int csrno, target_ulong val)
+>>  static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>  #endif
+>> @@ -142,7 +142,7 @@ static int read_frm(CPURISCVState *env, int csrno, target_ulong *val)
+>>  static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>      env->mstatus |= MSTATUS_FS;
+>> @@ -154,7 +154,7 @@ static int write_frm(CPURISCVState *env, int csrno, target_ulong val)
+>>  static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>  #endif
+>> @@ -166,7 +166,7 @@ static int read_fcsr(CPURISCVState *env, int csrno, target_ulong *val)
+>>  static int write_fcsr(CPURISCVState *env, int csrno, target_ulong val)
+>>  {
+>>  #if !defined(CONFIG_USER_ONLY)
+>> -    if (!env->debugger && !(env->mstatus & MSTATUS_FS)) {
+>> +    if (!env->debugger && !riscv_cpu_fp_enabled(env)) {
+>>          return -1;
+>>      }
+>>      env->mstatus |= MSTATUS_FS;
+>> @@ -307,6 +307,7 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+>>  {
+>>      target_ulong mstatus = env->mstatus;
+>>      target_ulong mask = 0;
+>> +    int dirty;
+>>
+>>      /* flush tlb on mstatus fields that affect VM */
+>>      if (env->priv_ver <= PRIV_VERSION_1_09_1) {
+>> @@ -340,8 +341,8 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+>>
+>>      mstatus = (mstatus & ~mask) | (val & mask);
+>>
+>> -    int dirty = ((mstatus & MSTATUS_FS) == MSTATUS_FS) |
+>> -                ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+>> +    dirty = riscv_cpu_fp_enabled(env) |
+>> +            ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+>
+>
+>   FS are 2bits
+>   original:
+>         only 3 is true
+>   new
+>        1, 2, 3 all make dirty true
+>
+>   Since only 3 means dirty, keeps this part unchanged should be reasonable.
 
+Good point, I have updated this.
 
-On 7/30/19 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
-> write flags are constant, let's store it in BackupBlockJob instead of
-> recalculating. It also makes two boolean fields to be unused, so,
-> drop them.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
-> 
-> diff --git a/block/backup.c b/block/backup.c
-> index c5f941101a..4651649e9d 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -47,7 +47,6 @@ typedef struct BackupBlockJob {
->      uint64_t len;
->      uint64_t bytes_read;
->      int64_t cluster_size;
-> -    bool compress;
->      NotifierWithReturn before_write;
->      QLIST_HEAD(, CowRequest) inflight_reqs;
->  
-> @@ -55,7 +54,7 @@ typedef struct BackupBlockJob {
->      bool use_copy_range;
->      int64_t copy_range_size;
->  
-> -    bool serialize_target_writes;
-> +    BdrvRequestFlags write_flags;
->  } BackupBlockJob;
->  
->  static const BlockJobDriver backup_job_driver;
-> @@ -110,10 +109,6 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->      BlockBackend *blk = job->common.blk;
->      int nbytes;
->      int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-> -    int write_flags =
-> -            (job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0) |
-> -            (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-> -
->  
->      assert(QEMU_IS_ALIGNED(start, job->cluster_size));
->      hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
-> @@ -132,7 +127,7 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->      }
->  
->      ret = blk_co_pwrite(job->target, start, nbytes, *bounce_buffer,
-> -                        write_flags);
-> +                        job->write_flags);
->      if (ret < 0) {
->          trace_backup_do_cow_write_fail(job, start, ret);
->          if (error_is_read) {
-> @@ -160,7 +155,6 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
->      BlockBackend *blk = job->common.blk;
->      int nbytes;
->      int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
-> -    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
->  
->      assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
->      assert(QEMU_IS_ALIGNED(start, job->cluster_size));
-> @@ -168,7 +162,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
->      nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
->      hbitmap_reset(job->copy_bitmap, start, job->cluster_size * nr_clusters);
->      ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-> -                            read_flags, write_flags);
-> +                            read_flags, job->write_flags);
->      if (ret < 0) {
->          trace_backup_do_cow_copy_range_fail(job, start, ret);
->          hbitmap_set(job->copy_bitmap, start, job->cluster_size * nr_clusters);
-> @@ -638,10 +632,16 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->      job->sync_mode = sync_mode;
->      job->sync_bitmap = sync_mode == MIRROR_SYNC_MODE_INCREMENTAL ?
->                         sync_bitmap : NULL;
-> -    job->compress = compress;
->  
-> -    /* Detect image-fleecing (and similar) schemes */
-> -    job->serialize_target_writes = bdrv_chain_contains(target, bs);
-> +    /*
-> +     * Set write flags:
-> +     *  1. Detect image-fleecing (and similar) schemes
-> +     *  2. Handle compression
-> +     */
-> +    job->write_flags =
-> +            (bdrv_chain_contains(target, bs) ? BDRV_REQ_SERIALISING : 0) |
-> +            (compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-> +
->      job->cluster_size = cluster_size;
->      job->copy_bitmap = copy_bitmap;
->      copy_bitmap = NULL;
-> 
+Alistair
 
-What happens if you did pass BDRV_REQ_WRITE_COMPRESSED to
-blk_co_copy_range? Is that rejected somewhere in the stack?
-
-I had just assumed it wouldn't work quite right because of the nature of
-copy offloading, but I don't actually know what it does do.
-
-This seems like a pretty minor cleanup, but why not. I like dropping
-extra fields when I can:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+>
+> chihmin
+>
+>>      mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+>>      env->mstatus = mstatus;
+>>
+>> --
+>> 2.22.0
+>>
+>>
 
