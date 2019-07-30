@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFDBC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 192F2C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:01:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C64FC206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:58:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C64FC206A2
+	by mail.kernel.org (Postfix) with ESMTPS id E8DEF206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:01:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DEF206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsWO3-000282-5H
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:58:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40050)
+	id 1hsWRZ-0003ju-46
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 14:01:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40702)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsWNb-0001T5-90
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:57:44 -0400
+ (envelope-from <eblake@redhat.com>) id 1hsWQq-0003Bz-8x
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsWNa-00044k-8l
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:57:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39342)
+ (envelope-from <eblake@redhat.com>) id 1hsWQp-0006Z8-Bx
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:01:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33756)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hsWNY-00041Y-1F; Tue, 30 Jul 2019 13:57:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hsWQn-0006Xv-Cp; Tue, 30 Jul 2019 14:01:01 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 479D13084050;
- Tue, 30 Jul 2019 17:57:38 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B7DC183F4C;
+ Tue, 30 Jul 2019 18:01:00 +0000 (UTC)
 Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C93D66013A;
- Tue, 30 Jul 2019 17:57:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DA2719C77;
+ Tue, 30 Jul 2019 18:01:00 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-4-mreitz@redhat.com>
+ <20190730172508.19911-5-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <c5e9466c-d98e-e0a8-be08-b2d49ffed78d@redhat.com>
-Date: Tue, 30 Jul 2019 12:57:36 -0500
+Message-ID: <711582c5-2886-8c90-c6f8-479f71a0235a@redhat.com>
+Date: Tue, 30 Jul 2019 13:00:59 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190730172508.19911-4-mreitz@redhat.com>
+In-Reply-To: <20190730172508.19911-5-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="In8VifWW0s3eqnnu3WtP4Niq4x9rIpclS"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 30 Jul 2019 17:57:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Tue, 30 Jul 2019 18:01:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 03/13] qcow2: Make
- qcow2_write_snapshots() public
+Subject: Re: [Qemu-devel] [PATCH for-4.2 04/13] qcow2: Put qcow2_upgrade()
+ into an own function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,34 +103,37 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---In8VifWW0s3eqnnu3WtP4Niq4x9rIpclS
-Content-Type: multipart/mixed; boundary="sSC0MYov1OgoZJF2SzfhyqRY7X34gyQfQ";
+--brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse
+Content-Type: multipart/mixed; boundary="83qZUIIoNX3walwgYBHWnWo5QuKmukyTR";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <c5e9466c-d98e-e0a8-be08-b2d49ffed78d@redhat.com>
-Subject: Re: [PATCH for-4.2 03/13] qcow2: Make qcow2_write_snapshots() public
+Message-ID: <711582c5-2886-8c90-c6f8-479f71a0235a@redhat.com>
+Subject: Re: [PATCH for-4.2 04/13] qcow2: Put qcow2_upgrade() into an own
+ function
 References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-4-mreitz@redhat.com>
-In-Reply-To: <20190730172508.19911-4-mreitz@redhat.com>
+ <20190730172508.19911-5-mreitz@redhat.com>
+In-Reply-To: <20190730172508.19911-5-mreitz@redhat.com>
 
---sSC0MYov1OgoZJF2SzfhyqRY7X34gyQfQ
+--83qZUIIoNX3walwgYBHWnWo5QuKmukyTR
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 7/30/19 12:24 PM, Max Reitz wrote:
-> Updating the snapshot list will be useful when upgrading a v2 image to
-> v3, so we will need to call this function in qcow2.c.
+
+Subject line sounds funny; I'd probably s/an/its/
+
+> This does not make sense right now, but it will make sense once we need=
+
+> to do more than to just update s->qcow_version.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/qcow2.h          | 1 +
->  block/qcow2-snapshot.c | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  block/qcow2.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 38 insertions(+), 5 deletions(-)
 >=20
-
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -139,24 +142,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---sSC0MYov1OgoZJF2SzfhyqRY7X34gyQfQ--
+--83qZUIIoNX3walwgYBHWnWo5QuKmukyTR--
 
---In8VifWW0s3eqnnu3WtP4Niq4x9rIpclS
+--brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AhREACgkQp6FrSiUn
-Q2qtDQf/fZcrRcnLjOJQhQL/5lZO1lP0nZ8AMCN1Udpu4LXLvTn+zvewt56M7StO
-hGgCw8gOzFr6z8a+6Yywhm7HCr69Iek97ebNH9xA1t1Flm8XTu5xz1a6cBbv/5BJ
-36IldJtCdQIVE6aXaiV6wg2AyAaSSsVB7DfwsxYHIdvD2KHl5+UGCzNmers7zYxV
-MziNIYUiezOjplPsTq42xqQT13qH9KHk+TXULZY0LduHqk3M9i+fhV60QPvAm/kb
-zVbVWaG8uZ0x+ohxh5glBcf2ALEvi57ahZlwak6wLnAylZu7RnT8btdebDvxTQBZ
-ulQQZgHVnecp6yqL1OdNV/SVXm65Wg==
-=7XMj
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AhdsACgkQp6FrSiUn
+Q2rUPggAh0zTOVbm4f04SMe3aIWB4yFAgLICK4wFW0HSmWX7d+fLlpPGlunxPnMF
+AuDV3/psF5nAE3ng1rMwLyiK0raqB+pRJVD1+dykS5fHArfp9e7tUO94TTjXgJEq
+BBwzU1xSqtg2RxaIw5oiNOqgVeseouNsY1apm352Ughxl/YEyciYA7AMF3FtWicf
+gQ/zPoQIpRFBPk45cM5EOVyvxDdgVONJFJBgAo4j/tiHO68U+Dg53/Yl/6pigwkk
+ZWGxdH4urmde6SF/dgFlhlNxt7xzS5H+MVppVNO/KcGcJT1qJ6JPmz+eIv9mmubX
+Xw+sWqPB8nZuUDoueL05X1cWqjK3WA==
+=GHq8
 -----END PGP SIGNATURE-----
 
---In8VifWW0s3eqnnu3WtP4Niq4x9rIpclS--
+--brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse--
 
