@@ -2,56 +2,57 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A46C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5639CC31E40
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:30:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E667206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 1A9512067D
 	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:30:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E667206A2
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A9512067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsXox-0006SI-Ew
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 15:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56875)
+	id 1hsXoy-0006T4-3w
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 15:30:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56898)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmP-0001s9-54
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:26 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmP-0001sE-Vi
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmN-0004CH-JJ
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmN-0004Co-PK
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:25 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45935 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:45941 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hsXmN-0004Ao-9h
+ id 1hsXmN-0004BD-Bl
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:23 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 98C9C1A222F;
+ by mail.rt-rk.com (Postfix) with ESMTP id AD2DF1A2244;
  Tue, 30 Jul 2019 21:27:19 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7BF261A2229;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 855111A222B;
  Tue, 30 Jul 2019 21:27:19 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 30 Jul 2019 21:27:08 +0200
-Message-Id: <1564514832-29482-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Tue, 30 Jul 2019 21:27:09 +0200
+Message-Id: <1564514832-29482-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564514832-29482-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564514832-29482-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v4 2/6] target/mips: Amend CP0 WatchHi
- register implementation
+Subject: [Qemu-devel] [PATCH for 4.2 v4 3/6] target/mips: Implement Global
+ Invalidate TLB instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,218 +71,476 @@ Sender: "Qemu-devel"
 
 From: Yongbok Kim <yongbok.kim@mips.com>
 
-WatchHi is extended by the field MemoryMapID with the GINVT instruction.
-The field is accessible by MTHC0/MFHC0 in 32-bit architectures and DMTC0/
-DMFC0 in 64-bit architectures.
+Implement Global Invalidate TLB instruction. As QEMU doesn't support
+caches and Virtualization, this implementation only cover the GINVT
+(Global Invalidate TLB) instruction.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  2 +-
- target/mips/helper.h    |  3 +++
- target/mips/machine.c   |  6 +++---
- target/mips/op_helper.c | 23 +++++++++++++++++++++--
- target/mips/translate.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 69 insertions(+), 7 deletions(-)
+ disas/mips.c            |   2 +
+ target/mips/helper.c    |  24 ++++++++--
+ target/mips/helper.h    |   2 +
+ target/mips/internal.h  |   1 +
+ target/mips/op_helper.c | 122 ++++++++++++++++++++++++++++++++++++++++++------
+ target/mips/translate.c |  48 ++++++++++++++++++-
+ 6 files changed, 177 insertions(+), 22 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 90a2ed8..6406ba8 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -898,7 +898,7 @@ struct CPUMIPSState {
- /*
-  * CP0 Register 19
-  */
--    int32_t CP0_WatchHi[8];
-+    uint64_t CP0_WatchHi[8];
- #define CP0WH_ASID 16
- /*
-  * CP0 Register 20
+diff --git a/disas/mips.c b/disas/mips.c
+index dfefe5e..c3a3059 100644
+--- a/disas/mips.c
++++ b/disas/mips.c
+@@ -1409,6 +1409,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
+ {"dvp",        "t",     0x41600024, 0xffe0ffff, TRAP|WR_t,            0, I32R6},
+ {"evp",        "",      0x41600004, 0xffffffff, TRAP,                 0, I32R6},
+ {"evp",        "t",     0x41600004, 0xffe0ffff, TRAP|WR_t,            0, I32R6},
++{"ginvi",      "v",     0x7c00003d, 0xfc1ffcff, TRAP | INSN_TLB,      0, I32R6},
++{"ginvt",      "v",     0x7c0000bd, 0xfc1ffcff, TRAP | INSN_TLB,      0, I32R6},
+ 
+ /* MSA */
+ {"sll.b",   "+d,+e,+f", 0x7800000d, 0xffe0003f, WR_VD|RD_VS|RD_VT,  0, MSA},
+diff --git a/target/mips/helper.c b/target/mips/helper.c
+index a2b6459..6e583d3 100644
+--- a/target/mips/helper.c
++++ b/target/mips/helper.c
+@@ -70,7 +70,12 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+                      target_ulong address, int rw, int access_type)
+ {
+     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    uint32_t MMID = env->CP0_MemoryMapID;
++    bool mi = !!((env->CP0_Config5 >> CP0C5_MI) & 1);
+     int i;
++    uint32_t tlb_mmid;
++
++    MMID = mi ? MMID : (uint32_t) ASID;
+ 
+     for (i = 0; i < env->tlb->tlb_in_use; i++) {
+         r4k_tlb_t *tlb = &env->tlb->mmu.r4k.tlb[i];
+@@ -82,8 +87,9 @@ int r4k_map_address (CPUMIPSState *env, hwaddr *physical, int *prot,
+         tag &= env->SEGMask;
+ #endif
+ 
+-        /* Check ASID, virtual page number & size */
+-        if ((tlb->G == 1 || tlb->ASID == ASID) && VPN == tag && !tlb->EHINV) {
++        /* Check ASID/MMID, virtual page number & size */
++        tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
++        if ((tlb->G == 1 || tlb_mmid == MMID) && VPN == tag && !tlb->EHINV) {
+             /* TLB match */
+             int n = !!(address & mask & ~(mask >> 1));
+             /* Check access rights */
+@@ -1397,12 +1403,20 @@ void r4k_invalidate_tlb (CPUMIPSState *env, int idx, int use_extra)
+     target_ulong addr;
+     target_ulong end;
+     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    uint32_t MMID = env->CP0_MemoryMapID;
+     target_ulong mask;
++    bool mi = !!((env->CP0_Config5 >> CP0C5_MI) & 1);
++    uint32_t tlb_mmid;
++
++    MMID = mi ? MMID : (uint32_t) ASID;
+ 
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+-    /* The qemu TLB is flushed when the ASID changes, so no need to
+-       flush these entries again.  */
+-    if (tlb->G == 0 && tlb->ASID != ASID) {
++    /*
++     * The qemu TLB is flushed when the ASID/MMID changes, so no need to
++     * flush these entries again.
++     */
++    tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
++    if (tlb->G == 0 && tlb_mmid != MMID) {
+         return;
+     }
+ 
 diff --git a/target/mips/helper.h b/target/mips/helper.h
-index 51f0e1c..aad0951 100644
+index aad0951..c7d35bd 100644
 --- a/target/mips/helper.h
 +++ b/target/mips/helper.h
-@@ -78,6 +78,7 @@ DEF_HELPER_1(mfc0_maar, tl, env)
- DEF_HELPER_1(mfhc0_maar, tl, env)
- DEF_HELPER_2(mfc0_watchlo, tl, env, i32)
- DEF_HELPER_2(mfc0_watchhi, tl, env, i32)
-+DEF_HELPER_2(mfhc0_watchhi, tl, env, i32)
- DEF_HELPER_1(mfc0_debug, tl, env)
- DEF_HELPER_1(mftc0_debug, tl, env)
- #ifdef TARGET_MIPS64
-@@ -89,6 +90,7 @@ DEF_HELPER_1(dmfc0_tcschefback, tl, env)
- DEF_HELPER_1(dmfc0_lladdr, tl, env)
- DEF_HELPER_1(dmfc0_maar, tl, env)
- DEF_HELPER_2(dmfc0_watchlo, tl, env, i32)
-+DEF_HELPER_2(dmfc0_watchhi, tl, env, i32)
- DEF_HELPER_1(dmfc0_saar, tl, env)
- #endif /* TARGET_MIPS64 */
- 
-@@ -159,6 +161,7 @@ DEF_HELPER_2(mthc0_maar, void, env, tl)
- DEF_HELPER_2(mtc0_maari, void, env, tl)
- DEF_HELPER_3(mtc0_watchlo, void, env, tl, i32)
- DEF_HELPER_3(mtc0_watchhi, void, env, tl, i32)
-+DEF_HELPER_3(mthc0_watchhi, void, env, tl, i32)
- DEF_HELPER_2(mtc0_xcontext, void, env, tl)
- DEF_HELPER_2(mtc0_framemask, void, env, tl)
- DEF_HELPER_2(mtc0_debug, void, env, tl)
-diff --git a/target/mips/machine.c b/target/mips/machine.c
-index eb2d970..c3e52f8 100644
---- a/target/mips/machine.c
-+++ b/target/mips/machine.c
-@@ -213,8 +213,8 @@ const VMStateDescription vmstate_tlb = {
- 
- const VMStateDescription vmstate_mips_cpu = {
-     .name = "cpu",
--    .version_id = 18,
--    .minimum_version_id = 18,
-+    .version_id = 19,
-+    .minimum_version_id = 19,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         /* Active TC */
-@@ -297,7 +297,7 @@ const VMStateDescription vmstate_mips_cpu = {
-         VMSTATE_INT32(env.CP0_MAARI, MIPSCPU),
-         VMSTATE_UINTTL(env.lladdr, MIPSCPU),
-         VMSTATE_UINTTL_ARRAY(env.CP0_WatchLo, MIPSCPU, 8),
--        VMSTATE_INT32_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-+        VMSTATE_UINT64_ARRAY(env.CP0_WatchHi, MIPSCPU, 8),
-         VMSTATE_UINTTL(env.CP0_XContext, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Framemask, MIPSCPU),
-         VMSTATE_INT32(env.CP0_Debug, MIPSCPU),
+@@ -120,6 +120,7 @@ DEF_HELPER_2(mtc0_tcschefback, void, env, tl)
+ DEF_HELPER_2(mttc0_tcschefback, void, env, tl)
+ DEF_HELPER_2(mtc0_entrylo1, void, env, tl)
+ DEF_HELPER_2(mtc0_context, void, env, tl)
++DEF_HELPER_2(mtc0_memorymapid, void, env, tl)
+ DEF_HELPER_2(mtc0_pagemask, void, env, tl)
+ DEF_HELPER_2(mtc0_pagegrain, void, env, tl)
+ DEF_HELPER_2(mtc0_segctl0, void, env, tl)
+@@ -376,6 +377,7 @@ DEF_HELPER_1(ei, tl, env)
+ DEF_HELPER_1(eret, void, env)
+ DEF_HELPER_1(eretnc, void, env)
+ DEF_HELPER_1(deret, void, env)
++DEF_HELPER_3(ginvt, void, env, tl, i32)
+ #endif /* !CONFIG_USER_ONLY */
+ DEF_HELPER_1(rdhwr_cpunum, tl, env)
+ DEF_HELPER_1(rdhwr_synci_step, tl, env)
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index f6d0d7a..d9216fb 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -92,6 +92,7 @@ struct r4k_tlb_t {
+     target_ulong VPN;
+     uint32_t PageMask;
+     uint16_t ASID;
++    uint32_t MMID;
+     unsigned int G:1;
+     unsigned int C0:3;
+     unsigned int C1:3;
 diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index f7b8c4d..52853e9 100644
+index 52853e9..9b3bf4b 100644
 --- a/target/mips/op_helper.c
 +++ b/target/mips/op_helper.c
-@@ -979,7 +979,12 @@ target_ulong helper_mfc0_watchlo(CPUMIPSState *env, uint32_t sel)
- 
- target_ulong helper_mfc0_watchhi(CPUMIPSState *env, uint32_t sel)
- {
--    return env->CP0_WatchHi[sel];
-+    return (int32_t) env->CP0_WatchHi[sel];
-+}
-+
-+target_ulong helper_mfhc0_watchhi(CPUMIPSState *env, uint32_t sel)
-+{
-+    return env->CP0_WatchHi[sel] >> 32;
+@@ -1409,6 +1409,17 @@ void helper_mtc0_context(CPUMIPSState *env, target_ulong arg1)
+     env->CP0_Context = (env->CP0_Context & 0x007FFFFF) | (arg1 & ~0x007FFFFF);
  }
  
- target_ulong helper_mfc0_debug(CPUMIPSState *env)
-@@ -1055,6 +1060,11 @@ target_ulong helper_dmfc0_saar(CPUMIPSState *env)
-     }
-     return 0;
- }
-+
-+target_ulong helper_dmfc0_watchhi(CPUMIPSState *env, uint32_t sel)
++void helper_mtc0_memorymapid(CPUMIPSState *env, target_ulong arg1)
 +{
-+    return env->CP0_WatchHi[sel];
-+}
- #endif /* TARGET_MIPS64 */
- 
- void helper_mtc0_index(CPUMIPSState *env, target_ulong arg1)
-@@ -1892,11 +1902,20 @@ void helper_mtc0_watchlo(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
- 
- void helper_mtc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
- {
--    int mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
-+    uint64_t mask = 0x40000FF8 | (env->CP0_EntryHi_ASID_mask << CP0WH_ASID);
-+    if ((env->CP0_Config5 >> CP0C5_MI) & 1) {
-+        mask |= 0xFFFFFFFF00000000ULL; /* MMID */
++    int32_t old;
++    old = env->CP0_MemoryMapID;
++    env->CP0_MemoryMapID = (int32_t) arg1;
++    /* If the MemoryMapID changes, flush qemu's TLB.  */
++    if (old != env->CP0_MemoryMapID) {
++        cpu_mips_tlb_flush(env);
 +    }
-     env->CP0_WatchHi[sel] = arg1 & mask;
-     env->CP0_WatchHi[sel] &= ~(env->CP0_WatchHi[sel] & arg1 & 0x7);
- }
- 
-+void helper_mthc0_watchhi(CPUMIPSState *env, target_ulong arg1, uint32_t sel)
-+{
-+    env->CP0_WatchHi[sel] = ((uint64_t) (arg1) << 32) |
-+                            (env->CP0_WatchHi[sel] & 0x00000000ffffffffULL);
 +}
 +
- void helper_mtc0_xcontext(CPUMIPSState *env, target_ulong arg1)
+ void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
  {
-     target_ulong mask = (1ULL << (env->SEGBITS - 7)) - 1;
+     uint64_t mask = arg1 >> (TARGET_PAGE_BITS + 1);
+@@ -1853,6 +1864,8 @@ void helper_mtc0_config5(CPUMIPSState *env, target_ulong arg1)
+ {
+     env->CP0_Config5 = (env->CP0_Config5 & (~env->CP0_Config5_rw_bitmask)) |
+                        (arg1 & env->CP0_Config5_rw_bitmask);
++    env->CP0_EntryHi_ASID_mask = (env->CP0_Config5 & (1 << CP0C5_MI)) ? 0x0 :
++                        (env->CP0_Config4 & (1 << CP0C4_AE)) ? 0x3ff : 0xff;
+     compute_hflags(env);
+ }
+ 
+@@ -2272,6 +2285,7 @@ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
+     tlb->VPN &= env->SEGMask;
+ #endif
+     tlb->ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    tlb->MMID = env->CP0_MemoryMapID;
+     tlb->PageMask = env->CP0_PageMask;
+     tlb->G = env->CP0_EntryLo0 & env->CP0_EntryLo1 & 1;
+     tlb->V0 = (env->CP0_EntryLo0 & 2) != 0;
+@@ -2290,13 +2304,18 @@ static void r4k_fill_tlb(CPUMIPSState *env, int idx)
+ 
+ void r4k_helper_tlbinv(CPUMIPSState *env)
+ {
++    bool mi = !!((env->CP0_Config5 >> CP0C5_MI) & 1);
+     int idx;
+     r4k_tlb_t *tlb;
+     uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    uint32_t MMID = env->CP0_MemoryMapID;
++    uint32_t tlb_mmid;
+ 
++    MMID = mi ? MMID : (uint32_t) ASID;
+     for (idx = 0; idx < env->tlb->nb_tlb; idx++) {
+         tlb = &env->tlb->mmu.r4k.tlb[idx];
+-        if (!tlb->G && tlb->ASID == ASID) {
++        tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
++        if (!tlb->G && tlb_mmid == MMID) {
+             tlb->EHINV = 1;
+         }
+     }
+@@ -2315,11 +2334,16 @@ void r4k_helper_tlbinvf(CPUMIPSState *env)
+ 
+ void r4k_helper_tlbwi(CPUMIPSState *env)
+ {
++    bool mi = !!((env->CP0_Config5 >> CP0C5_MI) & 1);
+     r4k_tlb_t *tlb;
+     int idx;
+     target_ulong VPN;
+-    uint16_t ASID;
+     bool EHINV, G, V0, D0, V1, D1, XI0, XI1, RI0, RI1;
++    uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    uint32_t MMID = env->CP0_MemoryMapID;
++    uint32_t tlb_mmid;
++
++    MMID = mi ? MMID : (uint32_t) ASID;
+ 
+     idx = (env->CP0_Index & ~0x80000000) % env->tlb->nb_tlb;
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+@@ -2327,7 +2351,6 @@ void r4k_helper_tlbwi(CPUMIPSState *env)
+ #if defined(TARGET_MIPS64)
+     VPN &= env->SEGMask;
+ #endif
+-    ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
+     EHINV = (env->CP0_EntryHi & (1 << CP0EnHi_EHINV)) != 0;
+     G = env->CP0_EntryLo0 & env->CP0_EntryLo1 & 1;
+     V0 = (env->CP0_EntryLo0 & 2) != 0;
+@@ -2339,9 +2362,10 @@ void r4k_helper_tlbwi(CPUMIPSState *env)
+     XI1 = (env->CP0_EntryLo1 >> CP0EnLo_XI) &1;
+     RI1 = (env->CP0_EntryLo1 >> CP0EnLo_RI) &1;
+ 
++    tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
+     /* Discard cached TLB entries, unless tlbwi is just upgrading access
+        permissions on the current entry. */
+-    if (tlb->VPN != VPN || tlb->ASID != ASID || tlb->G != G ||
++    if (tlb->VPN != VPN || tlb_mmid != MMID || tlb->G != G ||
+         (!tlb->EHINV && EHINV) ||
+         (tlb->V0 && !V0) || (tlb->D0 && !D0) ||
+         (!tlb->XI0 && XI0) || (!tlb->RI0 && RI0) ||
+@@ -2364,14 +2388,17 @@ void r4k_helper_tlbwr(CPUMIPSState *env)
+ 
+ void r4k_helper_tlbp(CPUMIPSState *env)
+ {
++    bool mi = !!((env->CP0_Config5 >> CP0C5_MI) & 1);
+     r4k_tlb_t *tlb;
+     target_ulong mask;
+     target_ulong tag;
+     target_ulong VPN;
+-    uint16_t ASID;
+     int i;
++    uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    uint32_t MMID = env->CP0_MemoryMapID;
++    uint32_t tlb_mmid;
+ 
+-    ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    MMID = mi ? MMID : (uint32_t) ASID;
+     for (i = 0; i < env->tlb->nb_tlb; i++) {
+         tlb = &env->tlb->mmu.r4k.tlb[i];
+         /* 1k pages are not supported. */
+@@ -2381,8 +2408,9 @@ void r4k_helper_tlbp(CPUMIPSState *env)
+ #if defined(TARGET_MIPS64)
+         tag &= env->SEGMask;
+ #endif
+-        /* Check ASID, virtual page number & size */
+-        if ((tlb->G == 1 || tlb->ASID == ASID) && VPN == tag && !tlb->EHINV) {
++        tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
++        /* Check ASID/MMID, virtual page number & size */
++        if ((tlb->G == 1 || tlb_mmid == MMID) && VPN == tag && !tlb->EHINV) {
+             /* TLB match */
+             env->CP0_Index = i;
+             break;
+@@ -2399,8 +2427,9 @@ void r4k_helper_tlbp(CPUMIPSState *env)
+ #if defined(TARGET_MIPS64)
+             tag &= env->SEGMask;
+ #endif
+-            /* Check ASID, virtual page number & size */
+-            if ((tlb->G == 1 || tlb->ASID == ASID) && VPN == tag) {
++            tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
++            /* Check ASID/MMID, virtual page number & size */
++            if ((tlb->G == 1 || tlb_mmid == MMID) && VPN == tag) {
+                 r4k_mips_tlb_flush_extra (env, i);
+                 break;
+             }
+@@ -2422,17 +2451,22 @@ static inline uint64_t get_entrylo_pfn_from_tlb(uint64_t tlb_pfn)
+ 
+ void r4k_helper_tlbr(CPUMIPSState *env)
+ {
++    bool mi = !!((env->CP0_Config5 >> CP0C5_MI) & 1);
+     r4k_tlb_t *tlb;
+-    uint16_t ASID;
+     int idx;
++    uint16_t ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    uint32_t MMID = env->CP0_MemoryMapID;
++    uint32_t tlb_mmid;
+ 
+-    ASID = env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask;
++    MMID = mi ? MMID : (uint32_t) ASID;
+     idx = (env->CP0_Index & ~0x80000000) % env->tlb->nb_tlb;
+     tlb = &env->tlb->mmu.r4k.tlb[idx];
+ 
+-    /* If this will change the current ASID, flush qemu's TLB.  */
+-    if (ASID != tlb->ASID)
++    tlb_mmid = mi ? tlb->MMID : (uint32_t) tlb->ASID;
++    /* If this will change the current ASID/MMID, flush qemu's TLB.  */
++    if (MMID != tlb_mmid) {
+         cpu_mips_tlb_flush(env);
++    }
+ 
+     r4k_mips_tlb_flush_extra(env, env->tlb->nb_tlb);
+ 
+@@ -2442,7 +2476,8 @@ void r4k_helper_tlbr(CPUMIPSState *env)
+         env->CP0_EntryLo0 = 0;
+         env->CP0_EntryLo1 = 0;
+     } else {
+-        env->CP0_EntryHi = tlb->VPN | tlb->ASID;
++        env->CP0_EntryHi = mi ? tlb->VPN : tlb->VPN | tlb->ASID;
++        env->CP0_MemoryMapID = tlb->MMID;
+         env->CP0_PageMask = tlb->PageMask;
+         env->CP0_EntryLo0 = tlb->G | (tlb->V0 << 1) | (tlb->D0 << 2) |
+                         ((uint64_t)tlb->RI0 << CP0EnLo_RI) |
+@@ -2485,6 +2520,63 @@ void helper_tlbinvf(CPUMIPSState *env)
+     env->tlb->helper_tlbinvf(env);
+ }
+ 
++static void global_invalidate_tlb(CPUMIPSState *env,
++                           uint32_t invMsgVPN2,
++                           uint8_t invMsgR,
++                           uint32_t invMsgMMid,
++                           bool invAll,
++                           bool invVAMMid,
++                           bool invMMid,
++                           bool invVA)
++{
++
++    int idx;
++    r4k_tlb_t *tlb;
++    bool VAMatch;
++    bool MMidMatch;
++
++    for (idx = 0; idx < env->tlb->nb_tlb; idx++) {
++        tlb = &env->tlb->mmu.r4k.tlb[idx];
++        VAMatch =
++            (((tlb->VPN & ~tlb->PageMask) == (invMsgVPN2 & ~tlb->PageMask))
++#ifdef TARGET_MIPS64
++            &&
++            (extract64(env->CP0_EntryHi, 62, 2) == invMsgR)
++#endif
++            );
++        MMidMatch = tlb->MMID == invMsgMMid;
++        if ((invAll && (idx > env->CP0_Wired)) ||
++            (VAMatch && invVAMMid && (tlb->G || MMidMatch)) ||
++            (VAMatch && invVA) ||
++            (MMidMatch && !(tlb->G) && invMMid)) {
++            tlb->EHINV = 1;
++        }
++    }
++    cpu_mips_tlb_flush(env);
++}
++
++void helper_ginvt(CPUMIPSState *env, target_ulong arg, uint32_t type)
++{
++    bool invAll = type == 0;
++    bool invVA = type == 1;
++    bool invMMid = type == 2;
++    bool invVAMMid = type == 3;
++    uint32_t invMsgVPN2 = arg & (TARGET_PAGE_MASK << 1);
++    uint8_t invMsgR = 0;
++    uint32_t invMsgMMid = env->CP0_MemoryMapID;
++    CPUState *other_cs = first_cpu;
++
++#ifdef TARGET_MIPS64
++    invMsgR = extract64(arg, 62, 2);
++#endif
++
++    CPU_FOREACH(other_cs) {
++        MIPSCPU *other_cpu = MIPS_CPU(other_cs);
++        global_invalidate_tlb(&other_cpu->env, invMsgVPN2, invMsgR, invMsgMMid,
++                              invAll, invVAMMid, invMMid, invVA);
++    }
++}
++
+ /* Specials */
+ target_ulong helper_di(CPUMIPSState *env)
+ {
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4ebeabe..8c298f5 100644
+index 8c298f5..d8ac58e 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -2547,6 +2547,7 @@ typedef struct DisasContext {
-     bool nan2008;
+@@ -388,6 +388,7 @@ enum {
+     OPC_BSHFL    = 0x20 | OPC_SPECIAL3,
+     OPC_DBSHFL   = 0x24 | OPC_SPECIAL3,
+     OPC_RDHWR    = 0x3B | OPC_SPECIAL3,
++    OPC_GINV     = 0x3D | OPC_SPECIAL3,
+ 
+     /* Loongson 2E */
+     OPC_MULT_G_2E   = 0x18 | OPC_SPECIAL3,
+@@ -2548,6 +2549,7 @@ typedef struct DisasContext {
      bool abs2008;
      bool saar;
-+    bool mi;
+     bool mi;
++    int gi;
  } DisasContext;
  
  #define DISAS_STOP       DISAS_TARGET_0
-@@ -6680,6 +6681,25 @@ static void gen_mfhc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             goto cp0_unimplemented;
-         }
-         break;
-+    case CP0_REGISTER_19:
-+        switch (sel) {
-+        case 0:
-+        case 1:
-+        case 2:
-+        case 3:
-+        case 4:
-+        case 5:
-+        case 6:
-+        case 7:
-+            /* upper 32 bits are only available when Config5MI != 0 */
-+            CP0_CHECK(ctx->mi);
-+            gen_mfhc0_load64(arg, offsetof(CPUMIPSState, CP0_WatchHi[sel]), 0);
-+            rn = "WatchHi";
-+            break;
-+        default:
-+            goto cp0_unimplemented;
-+        }
-+        break;
-     case CP0_REGISTER_28:
-         switch (sel) {
-         case 0:
-@@ -6766,6 +6786,25 @@ static void gen_mthc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-             goto cp0_unimplemented;
-         }
-         break;
-+    case CP0_REGISTER_19:
-+        switch (sel) {
-+        case 0:
-+        case 1:
-+        case 2:
-+        case 3:
-+        case 4:
-+        case 5:
-+        case 6:
-+        case 7:
-+            /* upper 32 bits are only available when Config5MI != 0 */
-+            CP0_CHECK(ctx->mi);
-+            gen_helper_0e1i(mthc0_watchhi, arg, sel);
-+            rn = "WatchHi";
-+            break;
-+        default:
-+            goto cp0_unimplemented;
-+        }
-+        break;
-     case CP0_REGISTER_28:
-         switch (sel) {
-         case 0:
-@@ -8805,7 +8844,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         case 6:
-         case 7:
-             CP0_CHECK(ctx->CP0_Config1 & (1 << CP0C1_WR));
--            gen_helper_1e0i(mfc0_watchhi, arg, sel);
-+            gen_helper_1e0i(dmfc0_watchhi, arg, sel);
-             register_name = "WatchHi";
+@@ -6261,6 +6263,11 @@ static void gen_compute_branch_nm(DisasContext *ctx, uint32_t opc,
+         not_likely:
+             ctx->hflags |= MIPS_HFLAG_BC;
              break;
++        case 5:
++            CP0_CHECK(ctx->mi);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_MemoryMapID));
++            rn = "MemoryMapID";
++            break;
          default:
-@@ -29965,6 +30004,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
+             MIPS_INVAL("conditional branch/jump");
+             generate_exception_end(ctx, EXCP_RI);
+@@ -7005,6 +7012,11 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_GlobalNumber));
+             register_name = "GlobalNumber";
+             break;
++        case 5:
++            CP0_CHECK(ctx->mi);
++            gen_helper_mtc0_memorymapid(cpu_env, arg);
++            rn = "MemoryMapID";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -7728,6 +7740,11 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_helper_mtc0_tcschefback(cpu_env, arg);
+             register_name = "TCScheFBack";
+             break;
++        case 5:
++            CP0_CHECK(ctx->mi);
++            gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_MemoryMapID));
++            rn = "MemoryMapID";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -8383,6 +8400,11 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_VPControl));
+             register_name = "VPControl";
+             break;
++        case 5:
++            CP0_CHECK(ctx->mi);
++            gen_helper_mtc0_memorymapid(cpu_env, arg);
++            rn = "MemoryMapID";
++            break;
+         default:
+             goto cp0_unimplemented;
+         }
+@@ -27072,6 +27094,27 @@ static void decode_opc_special3_r6(CPUMIPSState *env, DisasContext *ctx)
+             }
+         }
+         break;
++#ifndef CONFIG_USER_ONLY
++    case OPC_GINV:
++        if (unlikely(ctx->gi <= 1)) {
++            generate_exception_end(ctx, EXCP_RI);
++        }
++        check_cp0_enabled(ctx);
++        switch ((ctx->opcode >> 6) & 3) {
++        case 0:
++            /* GINVI */
++            /* Treat as NOP. */
++            break;
++        case 2:
++            /* GINVT */
++            gen_helper_0e1i(ginvt, cpu_gpr[rs], extract32(ctx->opcode, 8, 2));
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++#endif
+ #if defined(TARGET_MIPS64)
+     case R6_OPC_SCD:
+         gen_st_cond(ctx, rt, rs, imm, MO_TEQ, false);
+@@ -30005,6 +30048,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
      ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
      ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-+    ctx->mi = (env->CP0_Config5 >> CP0C5_MI) & 1;
+     ctx->mi = (env->CP0_Config5 >> CP0C5_MI) & 1;
++    ctx->gi = (env->CP0_Config5 >> CP0C5_GI) & 3;
      restore_cpu_state(env, ctx);
  #ifdef CONFIG_USER_ONLY
          ctx->mem_idx = MIPS_HFLAG_UM;
+@@ -30464,8 +30508,8 @@ void cpu_state_reset(CPUMIPSState *env)
+     if (env->CP0_Config3 & (1 << CP0C3_CMGCR)) {
+         env->CP0_CMGCRBase = 0x1fbf8000 >> 4;
+     }
+-    env->CP0_EntryHi_ASID_mask = (env->CP0_Config4 & (1 << CP0C4_AE)) ?
+-                                 0x3ff : 0xff;
++    env->CP0_EntryHi_ASID_mask = (env->CP0_Config5 & (1 << CP0C5_MI)) ? 0x0 :
++                        (env->CP0_Config4 & (1 << CP0C4_AE)) ? 0x3ff : 0xff;
+     env->CP0_Status = (1 << CP0St_BEV) | (1 << CP0St_ERL);
+     /*
+      * Vectored interrupts not implemented, timer on int 7,
 -- 
 2.7.4
 
