@@ -2,91 +2,74 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D654C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 07:43:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BF2C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 08:16:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28156206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 07:43:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Chhlb3Yo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28156206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE3892087F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 08:16:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE3892087F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsMnV-0008KE-GV
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 03:43:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44368)
+	id 1hsNIu-00070J-5H
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 04:16:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50488)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hsMn7-0007ov-D0
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 03:43:26 -0400
+ (envelope-from <bounces@canonical.com>) id 1hsNIT-0006WM-Qj
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 04:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hsMn6-0000pL-Jq
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 03:43:25 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43732)
+ (envelope-from <bounces@canonical.com>) id 1hsNIS-0005Un-OQ
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 04:15:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52078)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>)
- id 1hsMn6-0000ol-Dl; Tue, 30 Jul 2019 03:43:24 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p13so64557248wru.10;
- Tue, 30 Jul 2019 00:43:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=4+vY0/fc4hOqHsfxkymmfBwT3mHd9oZtfA/cVdSMdUA=;
- b=Chhlb3YoEdmkv56xKJEIMoyx6Lbz0U6hP/iKg7LswN5EhOYHqyX6pDo7NUPudWgRa4
- 4mBzpZofmoHFidt90o+OCaJ/3REW8Cf1/jJS+F+635LenfSZ6hVpY+LPE1MRMOI5E4Nf
- kEcGmNx6qCadh5Gw3FloSK13z6S+riOJjN3YHjfs6HS/QQLJEbPJrZmPHzrBQs1amLMW
- m3Y6SGf+A+bxLf7j9dAk550Dh2fo4N5/R8WKjoQsz4xkxdFXhDqDp3UjZCif+br33PW9
- GZt/+EYGcAUNK0UtWMe8rjzMh58iZFlDR4Akl/CBy9qFPANY8suLCgayu3LsAUi06FMM
- JK4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=4+vY0/fc4hOqHsfxkymmfBwT3mHd9oZtfA/cVdSMdUA=;
- b=DxhCl/eQdo6CC63DQm/VJkLGgKfD4oCW2DZECKw9xchoGf83VXyQkaGrY3PrwxvESF
- 777kstMgSmJC/mKe1Kl3zN9PJx/RN+wYv+WV4HUty2Y7TB32Q/Is2DEsAsExfpwWWeog
- YTCWrTKdYuTC/Ciw7s7GCvmePQK7lqWf/5VnAhov0LJBUa9G3NNRUrGM7AxfRC9lt+6d
- 90mXxXLiKzPBhB2Vr0n71RP7ycXcxzlOKcibGtOXKSQU9Dgg+/0Tvkdz4FAYUEzpDcFr
- YlIB3rfBXE5Amtk6qcgyKZLOrmXt95jNklWxi5J8F6dmIhqWQ+CRDmmsQqRM7+G/eSuK
- h0Fg==
-X-Gm-Message-State: APjAAAV4pn67BEylUk5VePXL3qGWwPXwgyou8hEDULe5EviRWgKacDvZ
- 8To2AorDQVFQy4j/4yI5gnQ=
-X-Google-Smtp-Source: APXvYqyppwmw0zVL6CCHh8KrTT8LVImIlR2iOnljmaemfL4YbHJRld9AhdExNYHe+oelvVr8bpaZeg==
-X-Received: by 2002:adf:f3c1:: with SMTP id g1mr36610488wrp.203.1564472603268; 
- Tue, 30 Jul 2019 00:43:23 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id j9sm74441149wrn.81.2019.07.30.00.43.22
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 30 Jul 2019 00:43:22 -0700 (PDT)
-Date: Tue, 30 Jul 2019 08:43:21 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190730074321.GG30213@stefanha-x1.localdomain>
-References: <20190729151651.21306-1-mehta.aaru20@gmail.com>
- <20190729151651.21306-16-mehta.aaru20@gmail.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hsNIS-0005Tl-Il
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 04:15:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hsNIP-0002zz-AF
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 08:15:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 07DDF2E80E6
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 08:15:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="JkW1gnuWHDypiMFO"
-Content-Disposition: inline
-In-Reply-To: <20190729151651.21306-16-mehta.aaru20@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v7 15/15] tests/qemu-iotests:
- use AIOMODE with various tests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 Jul 2019 08:07:55 -0000
+From: Hans Peter <1838312@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=virt-manager;
+ component=universe; status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: green-world78 paelzer
+X-Launchpad-Bug-Reporter: Hans Peter (green-world78)
+X-Launchpad-Bug-Modifier: Hans Peter (green-world78)
+References: <156441781649.17826.2889969380137011138.malonedeb@gac.canonical.com>
+Message-Id: <156447407544.17863.10669643260439058653.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 7bd01e6a24e8ccf058ebe1df6f9beb65e6052623
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1838312] Re: Qemu virt-manager Segmentation fault
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -95,53 +78,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Stefan Hajnoczi <stefan@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- saket.sinha89@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Julia Suvorova <jusual@mail.ru>
+Reply-To: Bug 1838312 <1838312@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+@ Christian Ehrhardt,
 
---JkW1gnuWHDypiMFO
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+I'm on Ubuntu Mate 19.04.
 
-On Mon, Jul 29, 2019 at 08:46:51PM +0530, Aarushi Mehta wrote:
-> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-> ---
->  tests/qemu-iotests/028 |  3 ++-
->  tests/qemu-iotests/058 |  2 +-
->  tests/qemu-iotests/089 |  4 ++--
->  tests/qemu-iotests/091 |  7 ++++---
->  tests/qemu-iotests/109 |  3 ++-
->  tests/qemu-iotests/147 |  5 +++--
->  tests/qemu-iotests/181 | 10 +++++-----
->  tests/qemu-iotests/183 |  7 ++++---
->  tests/qemu-iotests/185 | 17 ++++++++++++-----
->  tests/qemu-iotests/200 |  3 ++-
->  tests/qemu-iotests/201 | 10 +++++-----
->  11 files changed, 42 insertions(+), 29 deletions(-)
+Machine: AMD, 64 bit
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I done no configuration of 'libvirt' yet.
 
---JkW1gnuWHDypiMFO
-Content-Type: application/pgp-signature; name="signature.asc"
+I don't wanna install apport.
 
------BEGIN PGP SIGNATURE-----
+I add installed package-list at attachment.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl0/9RkACgkQnKSrs4Gr
-c8jZAAf8CYIze2HIlLSiW5jmIziyjs4Yv926Y1rSvVuoD1Mqm2y0wypkAPcgPWEm
-P+H3/ps5ypogkrGTV5jp9Yl5MhL1NaSAMQQ22+Gw5Xq0cuPSrIgQRliAZqZKUl92
-WJE+PD/JRqRf2FXY3czo5zzyBfTRz9KfKOapTYuJvBHh+Sq1rBfSaAjQCifQ5NwU
-eToKwhnyEYCkt4XgG1QZdAqNZF8aIQXalhGaY8POr4mG77Vg6ZiBKP0phsjFpBSG
-0EWpCpNyk8la002cgki69X5MgrEPlQu/avIQZ0y2uBJ5iUrKUgNrEgHkd17ZzloG
-8yyq59CMonjkJWcmRmr/AsT86iCSaw==
-=3f8O
------END PGP SIGNATURE-----
+I hope it will helps.
 
---JkW1gnuWHDypiMFO--
+** Attachment added: "Installed package-list"
+   https://bugs.launchpad.net/qemu/+bug/1838312/+attachment/5279991/+files/=
+pkglist.txt
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1838312
+
+Title:
+  Qemu virt-manager Segmentation fault
+
+Status in QEMU:
+  Invalid
+Status in virt-manager package in Ubuntu:
+  Incomplete
+
+Bug description:
+  Hi!
+
+  I installed all these packages:
+
+  sudo apt install qemu
+  sudo apt install ipxe-qemu-256k-compat-efi-roms libspice-server1 libbluet=
+ooth3
+  sudo apt install libbrlapi0.6 libcacard0 libfdt1 libusbredirparser1 libvi=
+rglrenderer0 libxen-4.9 libxenstore3.0
+  sudo apt install cpu-checker ibverbs-providers ipxe-qemu libibverbs1 libi=
+scsi7 libnl-route-3-200 librados2 librbd1 librdmacm1 msr-tools sharutils
+  sudo apt install qemu-block-extra qemu-system-common qemu-system-data qem=
+u-system-gui qemu-utils
+  sudo apt install --no-install-recommends qemu-kvm qemu-system-x86
+  sudo apt install libauparse0 ebtables gir1.2-gtk-vnc-2.0 gir1.2-libosinfo=
+-1.0 gir1.2-libvirt-glib-1.0 gir1.2-spiceclientglib-2.0 gir1.2-spiceclientg=
+tk-3.0 libvde0 libvdeplug2 libgovirt-common libgovirt2 libgtk-vnc-2.0-0 lib=
+gvnc-1.0-0 libosinfo-1.0-0 libphodav-2.0-0 libphodav-2.0-common libspice-cl=
+ient-glib-2.0-8 libspice-client-gtk-3.0-5 libusbredirhost1 libvirt-clients =
+libvirt-daemon libvirt-daemon-driver-storage-rbd libvirt-daemon-system libv=
+irt-glib-1.0-0 libvirt0 osinfo-db python3-libvirt python3-libxml2 spice-cli=
+ent-glib-usb-acl-helper vde2 vde2-cryptcab virt-viewer virtinst virt-manager
+
+  without the i386 packages for Qemu because I want only 64 bit.
+
+  I installed all these packages without error, but when I run
+
+  # virt-manager
+
+  Output: ...shows me:
+
+  Segmentation fault
+
+  =
+
+  My hardware is 100% ok.
+  Maybee a broken lib?
+
+
+  How can I fix that?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1838312/+subscriptions
 
