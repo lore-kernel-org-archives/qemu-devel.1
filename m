@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 192F2C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 491CEC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:11:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8DEF206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:01:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8DEF206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 1FF402089E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 18:11:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FF402089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsWRZ-0003ju-46
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 14:01:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40702)
+	id 1hsWao-0007Cg-4A
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 14:11:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42363)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsWQq-0003Bz-8x
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:01:05 -0400
+ (envelope-from <eblake@redhat.com>) id 1hsWa8-0006ie-AY
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsWQp-0006Z8-Bx
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:01:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33756)
+ (envelope-from <eblake@redhat.com>) id 1hsWa7-0004HU-7j
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 14:10:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47412)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hsWQn-0006Xv-Cp; Tue, 30 Jul 2019 14:01:01 -0400
+ id 1hsWa3-0004ET-1m; Tue, 30 Jul 2019 14:10:36 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B7DC183F4C;
- Tue, 30 Jul 2019 18:01:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A2E9787633;
+ Tue, 30 Jul 2019 18:10:33 +0000 (UTC)
 Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3DA2719C77;
- Tue, 30 Jul 2019 18:01:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C9A5119C65;
+ Tue, 30 Jul 2019 18:10:32 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-5-mreitz@redhat.com>
+ <20190730172508.19911-6-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <711582c5-2886-8c90-c6f8-479f71a0235a@redhat.com>
-Date: Tue, 30 Jul 2019 13:00:59 -0500
+Message-ID: <4027fac6-1faa-6eae-e66e-0f6edaf653b6@redhat.com>
+Date: Tue, 30 Jul 2019 13:10:31 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190730172508.19911-5-mreitz@redhat.com>
+In-Reply-To: <20190730172508.19911-6-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse"
+ boundary="MPkVjhrFnZ3pjZBXneutuqxyIr0J4c9fr"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 30 Jul 2019 18:01:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 30 Jul 2019 18:10:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 04/13] qcow2: Put qcow2_upgrade()
- into an own function
+Subject: Re: [Qemu-devel] [PATCH for-4.2 05/13] qcow2: Write v3-compliant
+ snapshot list on upgrade
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,37 +103,55 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse
-Content-Type: multipart/mixed; boundary="83qZUIIoNX3walwgYBHWnWo5QuKmukyTR";
+--MPkVjhrFnZ3pjZBXneutuqxyIr0J4c9fr
+Content-Type: multipart/mixed; boundary="5J0uztkeDwmeoa4y91jUad83kyFALv44P";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <711582c5-2886-8c90-c6f8-479f71a0235a@redhat.com>
-Subject: Re: [PATCH for-4.2 04/13] qcow2: Put qcow2_upgrade() into an own
- function
+Message-ID: <4027fac6-1faa-6eae-e66e-0f6edaf653b6@redhat.com>
+Subject: Re: [PATCH for-4.2 05/13] qcow2: Write v3-compliant snapshot list on
+ upgrade
 References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-5-mreitz@redhat.com>
-In-Reply-To: <20190730172508.19911-5-mreitz@redhat.com>
+ <20190730172508.19911-6-mreitz@redhat.com>
+In-Reply-To: <20190730172508.19911-6-mreitz@redhat.com>
 
---83qZUIIoNX3walwgYBHWnWo5QuKmukyTR
+--5J0uztkeDwmeoa4y91jUad83kyFALv44P
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/30/19 12:24 PM, Max Reitz wrote:
-
-Subject line sounds funny; I'd probably s/an/its/
-
-> This does not make sense right now, but it will make sense once we need=
-
-> to do more than to just update s->qcow_version.
+On 7/30/19 12:25 PM, Max Reitz wrote:
+> qcow2 v3 requires every snapshot table entry to have two extra data
+> fields: The 64-bit VM state size, and the virtual disk size.  Both are
+> optional for v2 images, so they may not be present.
 >=20
+> qcow2_upgrade() therefore should update the snapshot table to ensure al=
+l
+> entries have these extra data fields.
+>=20
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1727347
+> Reported-by: Eric Blake <eblake@redhat.com>
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  block/qcow2.c | 43 ++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 38 insertions(+), 5 deletions(-)
+>  block/qcow2.c | 29 +++++++++++++++++++++++++++--
+>  1 file changed, 27 insertions(+), 2 deletions(-)
 >=20
+
+> +
+> +    /*
+> +     * In v2, snapshots do not need to have extra data.  v3 requires
+> +     * the 64-bit VM state size and the virtual disk size to be
+> +     * present.
+> +     * qcow2_write_snapshots() will always write the list in the
+> +     * v3-compliant format.
+> +     */
+> +    need_snapshot_update =3D false;
+> +    for (i =3D 0; i < s->nb_snapshots; i++) {
+> +        if (s->snapshots[i].extra_data_size < 16) {
+
+s/16/sizeof(extra)/ looks a bit nicer, but doesn't change semantics.
+
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
@@ -142,24 +160,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---83qZUIIoNX3walwgYBHWnWo5QuKmukyTR--
+--5J0uztkeDwmeoa4y91jUad83kyFALv44P--
 
---brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse
+--MPkVjhrFnZ3pjZBXneutuqxyIr0J4c9fr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AhdsACgkQp6FrSiUn
-Q2rUPggAh0zTOVbm4f04SMe3aIWB4yFAgLICK4wFW0HSmWX7d+fLlpPGlunxPnMF
-AuDV3/psF5nAE3ng1rMwLyiK0raqB+pRJVD1+dykS5fHArfp9e7tUO94TTjXgJEq
-BBwzU1xSqtg2RxaIw5oiNOqgVeseouNsY1apm352Ughxl/YEyciYA7AMF3FtWicf
-gQ/zPoQIpRFBPk45cM5EOVyvxDdgVONJFJBgAo4j/tiHO68U+Dg53/Yl/6pigwkk
-ZWGxdH4urmde6SF/dgFlhlNxt7xzS5H+MVppVNO/KcGcJT1qJ6JPmz+eIv9mmubX
-Xw+sWqPB8nZuUDoueL05X1cWqjK3WA==
-=GHq8
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AiBcACgkQp6FrSiUn
+Q2pEewf/csmVvynBtnWLyZiHuTulJfmgTmvK8aK8lAEQi0pMRFXJ3MxAZJtiFlBV
+/N26pLriclcOl0/ZaqAEEe1QUMI1XUXynPnlhYG3RbAuh32/mObULvIrrDUYrEHT
+h+JhKLXRGSisoA5boOXxwAM0ElBGcbMpfVYP1hstUYNSoLNy42bd5mwY8POUYZXv
+MmRdlqS6Cil9FvERYYWiisrwN+rQCmbumvtav+EIaKRgjK3egdNg+8qUZTpa+EnY
+L11WrTqvPOEVKK1oBaGfWrL9VeAUf04Y/7WudMOS+hLTKLQ7sl5bHk8kQCNu2awu
+1OCev+inqFdzeL/vvCXnmB7+8na4mA==
+=0jGR
 -----END PGP SIGNATURE-----
 
---brG7p17M7cXhGpxdsKKnkNu2cQlPq0pse--
+--MPkVjhrFnZ3pjZBXneutuqxyIr0J4c9fr--
 
