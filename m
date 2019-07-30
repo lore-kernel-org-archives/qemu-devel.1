@@ -2,72 +2,74 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0964C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E60C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:11:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95824206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:11:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95824206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 4C735206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:11:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C735206E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsP6g-0000zQ-TN
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 06:11:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39681)
+	id 1hsP6h-00010y-IK
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 06:11:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39682)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsP5t-0007yY-I4
+ (envelope-from <bounces@canonical.com>) id 1hsP5t-0007yZ-Ih
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsP5o-0004G1-Tq
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:10:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51496)
+ (envelope-from <bounces@canonical.com>) id 1hsP5p-0004GO-EJ
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:10:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51542)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsP5m-0004Dj-3G
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:10:50 -0400
+ id 1hsP5m-0004E4-3M
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:10:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsP5j-0002Ef-PA
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:10:47 +0000
+ id 1hsP5k-0002H0-La
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:10:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BB8E42E80CD
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:10:47 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 9D9FE2E80C7
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:10:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 10:01:20 -0000
-From: Hans Peter <1838312@bugs.launchpad.net>
+Date: Tue, 30 Jul 2019 09:54:38 -0000
+From: =?utf-8?b?RWxvdWFuIEFwcMOpcsOp?= <1838277@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=virt-manager;
- component=universe; status=Incomplete; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm tcg
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: green-world78 paelzer
-X-Launchpad-Bug-Reporter: Hans Peter (green-world78)
-X-Launchpad-Bug-Modifier: Hans Peter (green-world78)
-References: <156441781649.17826.2889969380137011138.malonedeb@gac.canonical.com>
-Message-Id: <156448088050.17753.14383596510841757488.malone@gac.canonical.com>
+X-Launchpad-Bug-Commenters: elouan-appere pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
+ =?utf-8?q?e=29?=
+X-Launchpad-Bug-Modifier: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
+ =?utf-8?q?e=29?=
+References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
+Message-Id: <156448047819.18729.748184267604470482.malone@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 3476d33dee3c6d9af19cdd235db2e9ef40f15209
+X-Launchpad-Hash: a6a4cb20cc0806e71c0bc19418da633a563e07e2
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838312] Re: Qemu virt-manager Segmentation fault
+Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression: msr
+ vbar_el2, xN not working in EL2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,71 +80,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838312 <1838312@bugs.launchpad.net>
+Reply-To: Bug 1838277 <1838277@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "Crash.log of python3.7"
-   https://bugs.launchpad.net/qemu/+bug/1838312/+attachment/5280000/+files/=
-crash.log
+Right, so basically I was working on https://github.com/Atmosphere-
+NX/Atmosphere/tree/hyp/thermosphere (make PLATFORM=3Dqemu qemudbg). This
+uses Arm Trusted Firmware.
+
+While gdb now reports $VBAR_EL2 correctly (as opposed to what the title
+says), I observed the following effects:
+
+- at least before I fixed a bug in my exception handlers, I needed to
+add this JIT workaround I found by accident: https://github.com
+/Atmosphere-NX/Atmosphere/blob/hyp/thermosphere/src/start.s#L62 to get
+to main. Otherwise mov sp, x8 (with x8 aligned) crashed for no reason.
+
+- VBAR_EL2 is/was loaded before msr VBAR_EL2, x8 despite data and
+instruction barriers
+
+- From 3.1 onwards (or after 2.11): VBAR_EL2 is correctly reported (p
+$VBAR_EL2 gives $1 =3D 0x60001000 as exepected, and the read value of
+PSTATE is 0x3c5) but **QEMU acts as if VBAR_EL2 was 0** depending on
+crash site (but still reports it correctly when jumping to 0+0x200)
+(there's a __builtin_trap() call in function main)
+
+Attached elf and binary & built Arm TF build. Run flags: -nographic
+-machine virt,secure=3Don,virtualization=3Don,gic-version=3D2 -cpu cortex-a=
+57
+-smp 4 -m 1024 -bios bl1.bin -d unimp -semihosting-config
+enable,target=3Dnative -serial mon:stdio
+
+** Attachment added: "program triggering jit bug"
+   https://bugs.launchpad.net/qemu/+bug/1838277/+attachment/5279996/+files/=
+example.zip
+
+** Summary changed:
+
+- qemu-system-aarch64: regression: msr vbar_el2, xN not working in EL2
++ qemu-system-aarch64: regression: TCG sometimes using wrong values for VBA=
+R_EL2 despite it being correctly reported to GDB
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838312
+https://bugs.launchpad.net/bugs/1838277
 
 Title:
-  Qemu virt-manager Segmentation fault
+  qemu-system-aarch64: regression: TCG sometimes using wrong values for
+  VBAR_EL2 despite it being correctly reported to GDB
 
 Status in QEMU:
-  Invalid
-Status in virt-manager package in Ubuntu:
-  Incomplete
+  New
 
 Bug description:
-  Hi!
+  Affects 3.1.0 (latest stable release) and latest commit
+  (893dc8300c80e3dc32f31e968cf7aa0904da50c3) but did *not* affect 2.11
+  (qemu from bionic ubuntu LTS).
 
-  I installed all these packages:
+  With the following code and shell commands:
 
-  sudo apt install qemu
-  sudo apt install ipxe-qemu-256k-compat-efi-roms libspice-server1 libbluet=
-ooth3
-  sudo apt install libbrlapi0.6 libcacard0 libfdt1 libusbredirparser1 libvi=
-rglrenderer0 libxen-4.9 libxenstore3.0
-  sudo apt install cpu-checker ibverbs-providers ipxe-qemu libibverbs1 libi=
-scsi7 libnl-route-3-200 librados2 librbd1 librdmacm1 msr-tools sharutils
-  sudo apt install qemu-block-extra qemu-system-common qemu-system-data qem=
-u-system-gui qemu-utils
-  sudo apt install --no-install-recommends qemu-kvm qemu-system-x86
-  sudo apt install libauparse0 ebtables gir1.2-gtk-vnc-2.0 gir1.2-libosinfo=
--1.0 gir1.2-libvirt-glib-1.0 gir1.2-spiceclientglib-2.0 gir1.2-spiceclientg=
-tk-3.0 libvde0 libvdeplug2 libgovirt-common libgovirt2 libgtk-vnc-2.0-0 lib=
-gvnc-1.0-0 libosinfo-1.0-0 libphodav-2.0-0 libphodav-2.0-common libspice-cl=
-ient-glib-2.0-8 libspice-client-gtk-3.0-5 libusbredirhost1 libvirt-clients =
-libvirt-daemon libvirt-daemon-driver-storage-rbd libvirt-daemon-system libv=
-irt-glib-1.0-0 libvirt0 osinfo-db python3-libvirt python3-libxml2 spice-cli=
-ent-glib-usb-acl-helper vde2 vde2-cryptcab virt-viewer virtinst virt-manager
+  test.s:
 
-  without the i386 packages for Qemu because I want only 64 bit.
+  .text
+  mov x0, #0x60000000
+  msr vbar_el2, x0
+  dsb sy
+  isb sy
 
-  I installed all these packages without error, but when I run
+  $ aarch64-none-elf-as test.s -o test.o
+  $ aarch64-none-elf-objcopy -S -O binary test.o test.bin
+  $ qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -cpu c=
+ortex-a57 -kernel test.bin -s -S
 
-  # virt-manager
+  vbar_el2 is still 0 after the code, instead of being the expected
+  0x60000000. (see screenshot).
 
-  Output: ...shows me:
-
-  Segmentation fault
-
-  =
-
-  My hardware is 100% ok.
-  Maybee a broken lib?
-
-
-  How can I fix that?
+  This regression doesn't seem to happen for vbar_el1 &
+  virtualization=3Doff.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838312/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1838277/+subscriptions
 
