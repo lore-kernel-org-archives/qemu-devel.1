@@ -2,49 +2,61 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 730D6C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:13:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D92C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:15:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47E08206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:13:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E08206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id ECAF4208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:15:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECAF4208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsP8o-0003Cq-K0
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 06:13:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40088)
+	id 1hsPAC-0004Ql-8i
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 06:15:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40444)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hsP8K-0002lo-Mu
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:13:29 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hsP9O-0003lX-FN
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hsP8J-0005q5-K9
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:13:28 -0400
-Received: from relay.sw.ru ([185.231.240.75]:41100)
+ (envelope-from <cohuck@redhat.com>) id 1hsP9N-0006Xw-H9
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:14:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55366)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hsP8J-0005pf-Db
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:13:27 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hsP8F-0006ts-EH; Tue, 30 Jul 2019 13:13:23 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 30 Jul 2019 13:13:13 +0300
-Message-Id: <1564481593-776647-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH] Fix: fp-test uninitialized member floatX::exp
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hsP9I-0006UM-M2; Tue, 30 Jul 2019 06:14:29 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D136230BD1B5;
+ Tue, 30 Jul 2019 10:14:26 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A9F3A19C70;
+ Tue, 30 Jul 2019 10:14:10 +0000 (UTC)
+Date: Tue, 30 Jul 2019 12:14:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <20190730121408.2e27f74f.cohuck@redhat.com>
+In-Reply-To: <20190729145654.14644-1-damien.hedde@greensocs.com>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Tue, 30 Jul 2019 10:14:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 00/33] Multi-phase reset mechanism
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,57 +68,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, jhauser@eecs.berkeley.edu, cota@braap.org,
- den@openvz.org, andrey.shinkevich@virtuozzo.com, alex.bennee@linaro.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
+ hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, rth@twiddle.net,
+ thuth@redhat.com, ehabkost@redhat.com, alistair@alistair23.me,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com,
+ david@gibson.dropbear.id.au, berrange@redhat.com, mark.burton@greensocs.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Not all the paths in the functions, such as f16ToFloatX(), initialize
-the member 'exp' of the structure floatX.
+On Mon, 29 Jul 2019 16:56:21 +0200
+Damien Hedde <damien.hedde@greensocs.com> wrote:
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- source/slowfloat.c | 4 ++++
- 1 file changed, 4 insertions(+)
+(...)
 
-diff --git a/tests/fp/berkeley-testfloat-3/source/slowfloat.c b/tests/fp/berkeley-testfloat-3/source/slowfloat.c
-index 4e84656..6e0f0a6 100644
---- a/tests/fp/berkeley-testfloat-3/source/slowfloat.c
-+++ b/tests/fp/berkeley-testfloat-3/source/slowfloat.c
-@@ -623,6 +623,7 @@ static void f16ToFloatX( float16_t a, struct floatX *xPtr )
-     xPtr->isInf = false;
-     xPtr->isZero = false;
-     xPtr->sign = ((uiA & 0x8000) != 0);
-+    xPtr->exp = 0;
-     exp = uiA>>10 & 0x1F;
-     sig64 = uiA & 0x03FF;
-     sig64 <<= 45;
-@@ -759,6 +760,7 @@ static void f32ToFloatX( float32_t a, struct floatX *xPtr )
-     xPtr->isInf = false;
-     xPtr->isZero = false;
-     xPtr->sign = ((uiA & 0x80000000) != 0);
-+    xPtr->exp = 0;
-     exp = uiA>>23 & 0xFF;
-     sig64 = uiA & 0x007FFFFF;
-     sig64 <<= 32;
-@@ -895,6 +897,7 @@ static void f64ToFloatX( float64_t a, struct floatX *xPtr )
-     xPtr->isInf = false;
-     xPtr->isZero = false;
-     xPtr->sign = ((uiA & UINT64_C( 0x8000000000000000 )) != 0);
-+    xPtr->exp = 0;
-     exp = uiA>>52 & 0x7FF;
-     sig64 = uiA & UINT64_C( 0x000FFFFFFFFFFFFF );
-     if ( exp == 0x7FF ) {
-@@ -1220,6 +1223,7 @@ static void f128MToFloatX( const float128_t *aPtr, struct floatX *xPtr )
-     xPtr->isZero = false;
-     uiA64 = uiAPtr->v64;
-     xPtr->sign = ((uiA64 & UINT64_C( 0x8000000000000000 )) != 0);
-+    xPtr->exp = 0;
-     exp = uiA64>>48 & 0x7FFF;
-     sig.v64 = uiA64 & UINT64_C( 0x0000FFFFFFFFFFFF );
-     sig.v0  = uiAPtr->v0;
--- 
-1.8.3.1
+> 2. old's device_reset
+> 
+> There was a few call to this function, I renamed it *device_legacy_reset* to
+> handle the transition. This function allowed to reset only a given device 
+> (and not its eventual qbus subtree). This behavior is not possible with
+> the Resettable interface. I changed existing calls. Most of the time there is
+> no change of behavior because devices have no sub-buses.
+> Here the summary after checking each one (I've reproduced the list made by
+> Peter with some additional commentary of myself):
 
+(...)
+
+>  hw/s390x/s390-pci-inst.c
+>   -- resets the S390PCIBusDevice Needs S390 expertise, but probably
+>      either no child buses or failure to reset them is a bug.
+
+That's the 'zpci' device, which holds additional architecture
+information for each pci device. Looks fine to me, but additional
+confirmation from Collin would be good.
 
