@@ -2,75 +2,61 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D76C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1877AC0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B27412089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:46:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27412089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E2FBA206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:48:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2FBA206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsQa3-0005Va-Sw
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 07:46:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55977)
+	id 1hsQcZ-0006cH-8K
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 07:48:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56414)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsQZc-00055R-Pd
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:45:46 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hsQc6-00065u-JO
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsQZb-0008UR-M9
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:45:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51000)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsQZb-0008U1-H6
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:45:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsQZa-0000W4-A2
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 11:45:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 38FB02E80CC
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 11:45:42 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1hsQc5-00028e-HM
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:48:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53878)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hsQc3-00021u-9Y; Tue, 30 Jul 2019 07:48:15 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9097C12BE;
+ Tue, 30 Jul 2019 11:48:14 +0000 (UTC)
+Received: from localhost (ovpn-116-164.ams2.redhat.com [10.36.116.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 337C460BE5;
+ Tue, 30 Jul 2019 11:48:14 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 30 Jul 2019 13:48:12 +0200
+Message-Id: <20190730114812.10493-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Tue, 30 Jul 2019 11:48:14 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 11:31:14 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: elouan-appere pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
- =?utf-8?q?e=29?=
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
-Message-Id: <156448627468.20347.7464391931508681660.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19010";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: c1d9586d6d22230841f02c16963a0f68dd440d6f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression: TCG
- sometimes using wrong values for VBAR_EL2 despite it being correctly
- reported to GDB
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH for-4.1?] nvme: Limit blkshift to 12 (for 4 kB
+ blocks)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,58 +65,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838277 <1838277@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Can you please provide clear and exact reproduction instructions and
-binaries for whatever the bugs you think you're seeing are? Bear in mind
-that I know nothing at all about your guest binary or how it is supposed
-to behave, and I am not going to build versions of your binary from
-source. If I need to look at things via the gdb interface, give exact
-sequences of gdb commands I need to use to reproduce the behaviour and
-say what you were expecting the behaviour to be.
+Linux does not support blocks greater than 4 kB anyway, so we might as
+well limit blkshift to 12 and thus save us from some potential trouble.
 
--- =
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+I won't be around for too long today, so I thought I'd just write a
+patch myself now.
+---
+ block/nvme.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838277
+diff --git a/block/nvme.c b/block/nvme.c
+index c28755cc31..2c85713519 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -105,7 +105,7 @@ typedef struct {
+=20
+     uint64_t nsze; /* Namespace size reported by identify command */
+     int nsid;      /* The namespace id to read/write data. */
+-    size_t blkshift;
++    int blkshift;
+=20
+     uint64_t max_transfer;
+     bool plugged;
+@@ -420,7 +420,7 @@ static void nvme_identify(BlockDriverState *bs, int n=
+amespace, Error **errp)
+     NvmeIdNs *idns;
+     NvmeLBAF *lbaf;
+     uint8_t *resp;
+-    int r, hwsect_size;
++    int r;
+     uint64_t iova;
+     NvmeCmd cmd =3D {
+         .opcode =3D NVME_ADM_CMD_IDENTIFY,
+@@ -474,11 +474,11 @@ static void nvme_identify(BlockDriverState *bs, int=
+ namespace, Error **errp)
+         goto out;
+     }
+=20
+-    hwsect_size =3D 1 << lbaf->ds;
+-
+-    if (hwsect_size < BDRV_SECTOR_SIZE || hwsect_size > s->page_size) {
+-        error_setg(errp, "Namespace has unsupported block size (%d)",
+-                hwsect_size);
++    if (lbaf->ds < BDRV_SECTOR_BITS || lbaf->ds > 12 ||
++        (1 << lbaf->ds) > s->page_size)
++    {
++        error_setg(errp, "Namespace has unsupported block size (2^%d)",
++                   lbaf->ds);
+         goto out;
+     }
+=20
+@@ -804,16 +804,16 @@ static int64_t nvme_getlength(BlockDriverState *bs)
+     return s->nsze << s->blkshift;
+ }
+=20
+-static int64_t nvme_get_blocksize(BlockDriverState *bs)
++static uint32_t nvme_get_blocksize(BlockDriverState *bs)
+ {
+     BDRVNVMeState *s =3D bs->opaque;
+-    assert(s->blkshift >=3D BDRV_SECTOR_BITS);
+-    return 1 << s->blkshift;
++    assert(s->blkshift >=3D BDRV_SECTOR_BITS && s->blkshift <=3D 12);
++    return UINT32_C(1) << s->blkshift;
+ }
+=20
+ static int nvme_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
+ {
+-    int64_t blocksize =3D nvme_get_blocksize(bs);
++    uint32_t blocksize =3D nvme_get_blocksize(bs);
+     bsz->phys =3D blocksize;
+     bsz->log =3D blocksize;
+     return 0;
+--=20
+2.21.0
 
-Title:
-  qemu-system-aarch64: regression: TCG sometimes using wrong values for
-  VBAR_EL2 despite it being correctly reported to GDB
-
-Status in QEMU:
-  New
-
-Bug description:
-  Affects 3.1.0 (latest stable release) and latest commit
-  (893dc8300c80e3dc32f31e968cf7aa0904da50c3) but did *not* affect 2.11
-  (qemu from bionic ubuntu LTS).
-
-  With the following code and shell commands:
-
-  test.s:
-
-  .text
-  mov x0, #0x60000000
-  msr vbar_el2, x0
-  dsb sy
-  isb sy
-
-  $ aarch64-none-elf-as test.s -o test.o
-  $ aarch64-none-elf-objcopy -S -O binary test.o test.bin
-  $ qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -cpu c=
-ortex-a57 -kernel test.bin -s -S
-
-  vbar_el2 is still 0 after the code, instead of being the expected
-  0x60000000. (see screenshot).
-
-  This regression doesn't seem to happen for vbar_el1 &
-  virtualization=3Doff.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838277/+subscriptions
 
