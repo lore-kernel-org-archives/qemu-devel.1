@@ -3,66 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C78E5C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:49:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E129EC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E9252089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:49:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E9252089E
+	by mail.kernel.org (Postfix) with ESMTPS id B839B2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:50:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B839B2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsUN3-00072r-QY
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 11:49:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47176)
+	id 1hsUOb-0008F0-3T
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 11:50:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47374)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hsUMN-0006SX-8o
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:48:20 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hsUNu-0007ii-Om
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hsUMM-0006K1-66
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:48:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37618)
+ (envelope-from <imammedo@redhat.com>) id 1hsUNt-00089n-LG
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:49:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:2585)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hsUM5-000649-Mb; Tue, 30 Jul 2019 11:48:04 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hsUNs-00089D-Tz; Tue, 30 Jul 2019 11:49:53 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EE83B30BD1CC;
- Tue, 30 Jul 2019 15:47:58 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F83719C5B;
- Tue, 30 Jul 2019 15:47:28 +0000 (UTC)
-Date: Tue, 30 Jul 2019 17:47:25 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <20190730174725.10419dfb.cohuck@redhat.com>
-In-Reply-To: <34a216b0-0067-8627-599c-6a67622c4bd2@greensocs.com>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-2-damien.hedde@greensocs.com>
- <20190730154209.2049f10a.cohuck@redhat.com>
- <CAFEAcA-rwBiXkDEDuT-=KQVJ2A2ob16=P0obbZBPUfZeYXy+dQ@mail.gmail.com>
- <20190730155547.7b201f5e.cohuck@redhat.com>
- <CAFEAcA_BU3DECLVv2QD_RshR0OL3=GqGwsm0YAmEAE6_SpW=HA@mail.gmail.com>
- <34a216b0-0067-8627-599c-6a67622c4bd2@greensocs.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id 3179C3082126;
+ Tue, 30 Jul 2019 15:49:52 +0000 (UTC)
+Received: from Igors-MacBook-Pro (ovpn-204-67.brq.redhat.com [10.40.204.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 283DA1001B14;
+ Tue, 30 Jul 2019 15:49:49 +0000 (UTC)
+Date: Tue, 30 Jul 2019 17:49:46 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <20190730174946.46029336@Igors-MacBook-Pro>
+In-Reply-To: <aac94bbf-eb9b-56bd-0c52-9918968973f2@de.ibm.com>
+References: <20190729145229.4333-1-imammedo@redhat.com>
+ <aac94bbf-eb9b-56bd-0c52-9918968973f2@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Tue, 30 Jul 2019 15:47:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Tue, 30 Jul 2019 15:49:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 01/33] Create Resettable QOM interface
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH RFC 0/2] s390: stop abusing
+ memory_region_allocate_system_memory()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,78 +69,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 16:08:59 +0200
-Damien Hedde <damien.hedde@greensocs.com> wrote:
+On Tue, 30 Jul 2019 17:22:01 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 7/30/19 3:59 PM, Peter Maydell wrote:
-> > On Tue, 30 Jul 2019 at 14:56, Cornelia Huck <cohuck@redhat.com> wrote:  
-> >>
-> >> On Tue, 30 Jul 2019 14:44:21 +0100
-> >> Peter Maydell <peter.maydell@linaro.org> wrote:
-> >>  
-> >>> On Tue, 30 Jul 2019 at 14:42, Cornelia Huck <cohuck@redhat.com> wrote:  
-> >>>> I'm having a hard time figuring out what a 'cold' or a 'warm' reset is
-> >>>> supposed to be... can you add a definition/guideline somewhere?  
-> >>>
-> >>> Generally "cold" reset is "power on" and "warm" is "we were already
-> >>> powered-on, but somebody flipped a reset line somewhere".  
-> >>
-> >> Ok, that makes sense... my main concern is to distinguish that in a
-> >> generic way, as it is a generic interface. What about adding something
-> >> like:
-> >>
-> >> "A 'cold' reset means that the object to be reset is initially reset; a 'warm'
-> >> reset means that the object to be reset has already been initialized."
-> >>
-> >> Or is that again too generic?  
-> > 
-> > I think it doesn't quite capture the idea -- an object can have already
-> > been reset and then get a 'cold' reset: this is like having a powered-on
-> > machine and then power-cycling it.
-> > 
-> > The 'warm' reset is the vaguer one, because the specific behaviour
-> > is somewhat device-dependent (many devices might not have any
-> > difference from 'cold' reset, for those that do the exact detail
-> > of what doesn't get reset on warm-reset will vary). But every
-> > device should have some kind of "as if you power-cycled it" (or
-> > for QEMU, "go back to the same state as if you just started QEMU on the
-> > command line"). Our current "reset" method is really cold-reset.
+> I remember that you send a similar patch a while ago and something broke on s390x.
+> Have you changed something from the old patchs set?
+Thanks for reminder, I totally forgot about it.
 
-Ah ok, that makes sense.
+it was "[PATCH v1 5/5] s390: do not call memory_region_allocate_system_memory() multiple times"
+now looking at history it all comes back, so this series is incomplete as is
+due to memory memory region aliases being merged back to one big memory section
+after flatview is rendered. So KVM get too big chunk of RAM and it breaks.
 
-> >   
+So aliases solve only half of the problem (keeping migration side working)
+and to fix KVM side, I'd add splitting memory section on chunks into
+kvm_set_phys_mem() to keep KVM specifics to kvm code only.
+Board would only have to set max size value and kvm code would use it for splitting,
+I'll try to find that patch.
+
+
 > 
-> Exactly. In the following patches, I've tried to replace existing reset
-> calls by cold or warm reset depending on whether:
-> + it is called through the main system reset -> cold
-> + it is called during normal life-time       -> warm
+> On 29.07.19 16:52, Igor Mammedov wrote:
+> > While looking into unifying guest RAM allocation to use hostmem backends
+> > for initial RAM (especially when -mempath is used) and retiring
+> > memory_region_allocate_system_memory() API, leaving only single hostmem backend,
+> > I was inspecting how currently it is used by boards and it turns out several
+> > boards abuse it by calling the function several times (despite documented contract
+> > forbiding it).
+> > 
+> > s390 is one of such boards where KVM limitation on memslot size got propagated
+> > to board design and memory_region_allocate_system_memory() was abused to satisfy
+> > KVM requirement for max RAM chunk where memory region alias would suffice.
+> > 
+> > Unfortunately, memory_region_allocate_system_memory() usage created migration
+> > dependency where guest RAM is transferred in migration stream as several RAMBlocks
+> > if it's more than KVM_SLOT_MAX_BYTES.
+> > 
+> > In order to replace these several RAM chunks with a single memdev and keep it
+> > working with KVM memslot size limit and migration compatible, following was done:
+> >    * [2/2] use memory region aliases to partition hostmem backend RAM on
+> >            KVM_SLOT_MAX_BYTES chunks, which should keep KVM side working
+> >    * [1/2] hacked memory region aliases (to ram memory regions only) to have
+> >            its own RAMBlocks pointing to RAM chunks owned by aliased memory
+> >            region. While it's admittedly a hack, but it's relatively simple and
+> >            allows board code rashape migration stream as necessary
+> > 
+> >            I haven't tried to use migratable aliases on x86 machines, but with it
+> >            it could be possible to drop legacy RAM allocation and compat knob
+> >            (cd5ff8333a) dropping '-numa node,mem' completely even for old machines.
+> > 
+> > PS:
+> >    Tested with ping pong cross version migration on s390 machine 
+> >    (with reduced KVM_SLOT_MAX_BYTES since I don't have access to large
+> >     enough host)
+> >      
+> > 
+> > Igor Mammedov (2):
+> >   memory: make MemoryRegion alias migratable
+> >   s390: do not call memory_region_allocate_system_memory() multiple
+> >     times
+> > 
+> >  exec.c                     |  7 ++++---
+> >  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
+> >  memory.c                   |  5 +++++
+> >  3 files changed, 24 insertions(+), 8 deletions(-)
+> > 
 > 
-> But I definitely can add some docs/comments to better explain that.
 
-Yes, that would be great; I think I now understand enough for looking
-at the patches.
 
