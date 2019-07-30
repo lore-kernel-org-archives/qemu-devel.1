@@ -2,64 +2,72 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE1FC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCD5C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:51:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D1820651
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:46:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D1820651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E06620651
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E06620651
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsOiJ-0007d6-JZ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35872)
+	id 1hsOnB-0000kF-HQ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:51:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36647)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hsOhs-0007Dp-IB
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:46:09 -0400
+ (envelope-from <bounces@canonical.com>) id 1hsOmc-0000KC-9k
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hsOhr-0001Ul-Cy
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:46:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55214)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hsOhr-0001UU-3R
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:46:07 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0244D796E4;
- Tue, 30 Jul 2019 09:46:06 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BA0535D9C5;
- Tue, 30 Jul 2019 09:45:50 +0000 (UTC)
-Date: Tue, 30 Jul 2019 11:45:48 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Pankaj Gupta <pagupta@redhat.com>
-Message-ID: <20190730114548.4ff4188b.cohuck@redhat.com>
-In-Reply-To: <20190730064658.27369-1-pagupta@redhat.com>
-References: <20190730064658.27369-1-pagupta@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <bounces@canonical.com>) id 1hsOma-0003F9-SQ
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:51:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47472)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hsOma-0003El-MS
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:51:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hsOmX-0007ig-UJ
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:50:58 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0EF6E2E80D2
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:50:57 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 30 Jul 2019 09:46:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 Jul 2019 09:36:03 -0000
+From: Roman Bolshakov <1818937@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: crash hvf macos
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bwibking cuser2 kisg roolebo
+X-Launchpad-Bug-Reporter: Chen Zhang (cuser2)
+X-Launchpad-Bug-Modifier: Roman Bolshakov (roolebo)
+References: <155192472106.28960.15645485731508389788.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156447936384.17753.12319986519288026631.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 5723a7a8c50fe1fa14fb20c4972899ee1b5d2179
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] virtio pmem: user document
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1818937] Re: Crash with HV_ERROR on macOS host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -68,155 +76,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aarcange@redhat.com, david@redhat.com, riel@surriel.com,
- qemu-devel@nongnu.org, lcapitulino@redhat.com, mst@redhat.com,
- stefanha@redhat.com, nilal@redhat.com
+Reply-To: Bug 1818937 <1818937@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 12:16:57 +0530
-Pankaj Gupta <pagupta@redhat.com> wrote:
+It's not possible to allocate MSR bitmap in userspace because it
+requires a physical address to be stored in the VMCS field. However, the
+bitmap page is already allocated inside kernel part of
+Hypervisor.framework. The 4k bitmap region is aligned to page boundary.
+It's worth to continue inspection of the checks (26.2 CHECKS ON VMX
+CONTROLS AND HOST-STATE AREA).
 
-> This patch documents the steps to use virtio pmem.
-> It also documents other useful information about
-> virtio pmem e.g use-case, comparison with Qemu NVDIMM
-> backend and current limitations.
-> 
-> Signed-off-by: Pankaj Gupta <pagupta@redhat.com>
-> ---
->  docs/virtio-pmem.txt | 65 ++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 65 insertions(+)
->  create mode 100644 docs/virtio-pmem.txt
-> 
-> diff --git a/docs/virtio-pmem.txt b/docs/virtio-pmem.txt
+The reason why MSR Bitmap Address has weird value is because it's not
+necessarily the value of the VMCS field (albeit VMCS_CTRL_MSR_BITMAPS is
+defined in hv_arch_vmx.h). HVF uses an internal lookup table that has a
+limited set of VMCS fields exposed by Apple. The list is documented at
+the reference page:
+https://developer.apple.com/documentation/hypervisor/1469436-virtual_machin=
+e_control_structur
 
-Maybe make this ReST from the start? Should be trivial enough.
+It's likely that 0x3f is a field from the VMCS lookup table. Given the
+signature of hv_vmx_vcpu_read_vmcs, I would expect an error (e.g.
+HV_BAD_ARGUMENT) to be returned instead of the silent failure. I have
+submitted FB6858948 to Apple to correct the behaviour.
 
-> new file mode 100644
-> index 0000000000..fc61eebb20
-> --- /dev/null
-> +++ b/docs/virtio-pmem.txt
-> @@ -0,0 +1,65 @@
-> +
-> +QEMU virtio pmem
-> +===================
-> +
-> + This document explains the usage of virtio pmem device 
+So, Apple doesn't provide an explicit access to MSR Bitmap Address field
+but allows to control the bitmap via hv_vcpu_enable_native_msr.
 
-"setup and usage" ?
+-- =
 
-> + which is available since QEMU v4.1.0.
-> +
-> + The virtio pmem is paravirtualized persistent memory device
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1818937
 
-"The virtio pmem device is a paravirtualized..."
+Title:
+  Crash with HV_ERROR on macOS host
 
-> + on regular(non-NVDIMM) storage. 
-> +
-> +Usecase
-> +--------
-> +  Allows to bypass the guest page cache and directly use host page cache.
-> +  This reduces guest memory footprint as host can make efficient memory
+Status in QEMU:
+  New
 
-s/as host/,as the host/
+Bug description:
+  On macOS host running Windows 10 guest, qemu crashed with error
+  message: Error: HV_ERROR.
 
-> +  reclaim decisions under memory pressure.
-> +
-> +o How does virtio-pmem compare to the nvdimm emulation supported by QEMU?
-> +
-> +  NVDIMM emulation on regular(non-NVDIMM) host storage does not persists
+  Host: macOS Mojave 10.14.3 (18D109) Late 2014 Mac mini presumably Core i5=
+ 4278U.
+  QEMU: git commit a3e3b0a7bd5de211a62cdf2d6c12b96d3c403560
+  QEMU parameter: qemu-system-x86_64 -m 3000 -drive file=3Ddisk.img,if=3Dvi=
+rtio,discard=3Dunmap -accel hvf -soundhw hda -smp 3
 
-s/regular(non-NVDIMM)/regular (i.e. non-NVDIMM)/ ?
-s/persists/persist/
+  thread list
+  Process 56054 stopped
+    thread #1: tid =3D 0x2ffec8, 0x00007fff48d0805a vImage`vLookupTable_Pla=
+nar16 + 970, queue =3D 'com.apple.main-thread'
+    thread #2: tid =3D 0x2ffecc, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #3: tid =3D 0x2ffecd, 0x00007fff79d715aa libsystem_kernel.dylib`=
+__select + 10
+    thread #4: tid =3D 0x2ffece, 0x00007fff79d71d9a libsystem_kernel.dylib`=
+__sigwait + 10
+  * thread #6: tid =3D 0x2ffed0, 0x00007fff79d7023e libsystem_kernel.dylib`=
+__pthread_kill + 10, stop reason =3D signal SIGABRT
+    thread #7: tid =3D 0x2ffed1, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #8: tid =3D 0x2ffed2, 0x00007fff79d6d7de libsystem_kernel.dylib`=
+__psynch_cvwait + 10
+    thread #11: tid =3D 0x2fff34, 0x00007fff79d6a17a libsystem_kernel.dylib=
+`mach_msg_trap + 10, name =3D 'com.apple.NSEventThread'
+    thread #30: tid =3D 0x300c04, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #31: tid =3D 0x300c16, 0x00007fff79e233f8 libsystem_pthread.dyli=
+b`start_wqthread
+    thread #32: tid =3D 0x300c17, 0x0000000000000000
+    thread #33: tid =3D 0x300c93, 0x00007fff79d6d7de libsystem_kernel.dylib=
+`__psynch_cvwait + 10
 
-> +  the guest writes as there are no defined semantecs in the device specification.
+  =
 
-s/semantecs/semantics/
+  Crashed thread:
 
-> +  With virtio pmem device, guest write persistence on non-NVDIMM storage is
-> +  supported.
+  * thread #6, stop reason =3D signal SIGABRT
+    * frame #0: 0x00007fff79d7023e libsystem_kernel.dylib`__pthread_kill + =
+10
+      frame #1: 0x00007fff79e26c1c libsystem_pthread.dylib`pthread_kill + 2=
+85
+      frame #2: 0x00007fff79cd91c9 libsystem_c.dylib`abort + 127
+      frame #3: 0x000000010baa476d qemu-system-x86_64`assert_hvf_ok(ret=3D<=
+unavailable>) at hvf.c:106 [opt]
+      frame #4: 0x000000010baa4c8f qemu-system-x86_64`hvf_vcpu_exec(cpu=3D0=
+x00007f8e5283de00) at hvf.c:681 [opt]
+      frame #5: 0x000000010b988423 qemu-system-x86_64`qemu_hvf_cpu_thread_f=
+n(arg=3D0x00007f8e5283de00) at cpus.c:1636 [opt]
+      frame #6: 0x000000010bd9dfce qemu-system-x86_64`qemu_thread_start(arg=
+s=3D<unavailable>) at qemu-thread-posix.c:502 [opt]
+      frame #7: 0x00007fff79e24305 libsystem_pthread.dylib`_pthread_body + =
+126
+      frame #8: 0x00007fff79e2726f libsystem_pthread.dylib`_pthread_start +=
+ 70
+      frame #9: 0x00007fff79e23415 libsystem_pthread.dylib`thread_start + 13
 
-"The virtio pmem device provides a way to support guest write
-persistence on non-NVDIMM storage." ?
-
-> +
-> +virtio pmem usage
-> +-----------------
-> +  virtio pmem device is created with a memory-backend-file with the below
-> +  options:
-
-"A virtio pmem device backed by a memory-backend-file can be created on
-the QEMU command line as in the following example:" ?
-
-> +
-> +  -machine pc -m 8G,slots=$N,maxmem=$MAX_SIZE
-
-I'm not sure you should explicitly specify the machine type in this
-example. I think it is fine to say that something is only supported on
-a subset of machine types, but it should not make its way into an
-example on how to configure a device and its backing.
-
-Also, maybe fill in more concrete values here? Or split it into a part
-specifying the syntax (where I'd use <max_size> instead of $MAX_SIZE
-etc.), and a more concrete example?
-
-> +  -object memory-backend-file,id=mem1,share,mem-path=$PATH,size=$SIZE
-> +  -device virtio-pmem-pci,memdev=mem1,id=nv1
-> +
-> +   where:
-> +   - "object memory-backend-file,id=mem1,share,mem-path=$PATH,size=$VIRTIO_PMEM_SIZE"
-> +     creates a backend storage of size $SIZE on a file $PATH. All
-> +     accesses to the virtio pmem device go to the file $PATH.
-> +
-> +   - "device virtio-pmem-pci,id=nvdimm1,memdev=mem1" creates a virtio pmem
-> +     device whose storage is provided by above memory backend device.
-
-"a virtio pmem PCI device" ?
-
-> +
-> +  Multiple virtio pmem devices can be created if multiple pairs of "-object"
-> +  and "-device" are provided.
-> +
-> +Hotplug
-> +-------
-> +Accomplished by two monitor commands "object_add" and "device_add".
-
-Hm... what about the following instead:
-
-"Virtio pmem devices can be hotplugged via the QEMU monitor. First, the
-memory backing has to be added via 'object_add'; afterwards, the virtio
-pmem device can be added via 'device_add'."
-
-> +
-> +For example, the following commands add another 4GB virtio pmem device to
-> +the guest:
-> +
-> + (qemu) object_add memory-backend-file,id=mem2,share=on,mem-path=virtio_pmem2.img,size=4G
-> + (qemu) device_add virtio-pmem-pci,id=virtio_pmem2,memdev=mem2
-> +
-> +Guest Data Persistence
-> +----------------------
-> +Guest data persistence on non-NVDIMM requires guest userspace application to 
-
-s/application/applications/ ?
-
-> +perform fsync/msync. This is different than real nvdimm backend where no additional
-
-s/than/from a/ ?
-
-> +fsync/msync is required for data persistence.
-
-Should we be a bit more verbose on what which guest applications are
-supposed to do? I.e., how do they know they need to do fsync/msync,
-when should they do it, and what are the consequences if they don't?
-
-> +
-> +Limitations
-> +------------
-> +- Real nvdimm device backend is not supported.
-> +- virtio pmem hotunplug is not supported.
-> +- ACPI NVDIMM features like regions/namespaces are not supported.
-> +- ndctl command is not supported.
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1818937/+subscriptions
 
