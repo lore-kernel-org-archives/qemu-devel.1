@@ -6,66 +6,69 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33436C41514
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 352BAC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF6902089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:36:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF6902089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0EF1620651
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 10:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF1620651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsPUT-0005gw-8M
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 06:36:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43928)
+	id 1hsPUU-0005kH-CW
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 06:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43932)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsPTm-0004VF-Mj
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:35:39 -0400
+ (envelope-from <bounces@canonical.com>) id 1hsPTn-0004VH-00
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsPTl-0007nN-Kl
+ (envelope-from <bounces@canonical.com>) id 1hsPTl-0007nb-TC
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:35:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56288)
+Received: from indium.canonical.com ([91.189.90.7]:56318)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsPTl-0007mq-FJ
+ id 1hsPTl-0007n8-O6
  for qemu-devel@nongnu.org; Tue, 30 Jul 2019 06:35:37 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsPTj-00050C-5w
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:35:35 +0000
+ id 1hsPTk-00053T-Co
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:35:36 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 294012E80D6
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:35:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0682D2E80CC
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 10:35:36 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 30 Jul 2019 10:26:58 -0000
-From: James Smart <1838390@bugs.launchpad.net>
+Date: Tue, 30 Jul 2019 10:26:15 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: hvf macos
+X-Launchpad-Bug-Tags: arm tcg
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: smartrejames
-X-Launchpad-Bug-Reporter: James Smart (smartrejames)
-X-Launchpad-Bug-Modifier: James Smart (smartrejames)
-Message-Id: <156448241864.18390.18158373201974266058.malonedeb@gac.canonical.com>
+X-Launchpad-Bug-Commenters: elouan-appere pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
+ =?utf-8?q?e=29?=
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
+Message-Id: <156448237595.23160.18015532333863680959.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19010";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 6862c9b1c9b3a0c28e09c138c0380d8d2a77a954
+X-Launchpad-Hash: c54f971afd9d65b1cbd12b9a3ed68a080afbf83c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838390] [NEW] vmx_write_mem: mmu_gva_to_gpa
- failed when using hvf
+Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression: TCG
+ sometimes using wrong values for VBAR_EL2 despite it being correctly
+ reported to GDB
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -76,73 +79,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838390 <1838390@bugs.launchpad.net>
+Reply-To: Bug 1838277 <1838277@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-Installed qemu 4.0.0 by homebrew, used below commands:
-
-1. qemu-img create -f raw arch-vm.img 100G
-2. qemu-system-x86_64 -show-cursor -only-migratable -nodefaults -boot order=
-=3Dd -cdrom archlinux-2019.07.01-x86_64.iso -cpu host -device virtio-keyboa=
-rd -device virtio-mouse -device virtio-tablet -drive file=3Darch-vm.img,for=
-mat=3Draw,if=3Dvirtio -m 4096 -machine q35,accel=3Dhvf,vmport=3Doff -nic us=
-er,ipv6=3Doff,model=3Dvirtio -smp 4,sockets=3D1,cores=3D2,threads=3D2 -soun=
-dhw hda -vga virtio
-
-Displayed bootloader menu successfully, select "Boot Arch Linux" then
-crashed with message: vmx_write_mem: mmu_gva_to_gpa ffff91953b540000
-failed.
-
-Use tcg accelerator has no problem but very slow.
-
-See attachment for full crash report.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: hvf macos
-
-** Attachment added: "Untitled-1"
-   https://bugs.launchpad.net/bugs/1838390/+attachment/5280003/+files/Untit=
-led-1
+If you want me to investigate whatever the issue with 'mov sp, x8'
+crashing is you'll need to provide a binary that demonstrates that
+problem, not one with a workaround in it.
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838390
+https://bugs.launchpad.net/bugs/1838277
 
 Title:
-  vmx_write_mem: mmu_gva_to_gpa failed when using hvf
+  qemu-system-aarch64: regression: TCG sometimes using wrong values for
+  VBAR_EL2 despite it being correctly reported to GDB
 
 Status in QEMU:
   New
 
 Bug description:
-  Installed qemu 4.0.0 by homebrew, used below commands:
+  Affects 3.1.0 (latest stable release) and latest commit
+  (893dc8300c80e3dc32f31e968cf7aa0904da50c3) but did *not* affect 2.11
+  (qemu from bionic ubuntu LTS).
 
-  1. qemu-img create -f raw arch-vm.img 100G
-  2. qemu-system-x86_64 -show-cursor -only-migratable -nodefaults -boot ord=
-er=3Dd -cdrom archlinux-2019.07.01-x86_64.iso -cpu host -device virtio-keyb=
-oard -device virtio-mouse -device virtio-tablet -drive file=3Darch-vm.img,f=
-ormat=3Draw,if=3Dvirtio -m 4096 -machine q35,accel=3Dhvf,vmport=3Doff -nic =
-user,ipv6=3Doff,model=3Dvirtio -smp 4,sockets=3D1,cores=3D2,threads=3D2 -so=
-undhw hda -vga virtio
+  With the following code and shell commands:
 
-  Displayed bootloader menu successfully, select "Boot Arch Linux" then
-  crashed with message: vmx_write_mem: mmu_gva_to_gpa ffff91953b540000
-  failed.
+  test.s:
 
-  Use tcg accelerator has no problem but very slow.
+  .text
+  mov x0, #0x60000000
+  msr vbar_el2, x0
+  dsb sy
+  isb sy
 
-  See attachment for full crash report.
+  $ aarch64-none-elf-as test.s -o test.o
+  $ aarch64-none-elf-objcopy -S -O binary test.o test.bin
+  $ qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -cpu c=
+ortex-a57 -kernel test.bin -s -S
+
+  vbar_el2 is still 0 after the code, instead of being the expected
+  0x60000000. (see screenshot).
+
+  This regression doesn't seem to happen for vbar_el1 &
+  virtualization=3Doff.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838390/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1838277/+subscriptions
 
