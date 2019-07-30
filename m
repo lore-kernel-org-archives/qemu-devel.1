@@ -2,91 +2,80 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7821BC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32627C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:45:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4186920693
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:43:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hRQoaM7P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4186920693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0635F20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:45:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0635F20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsRTM-000353-JZ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:43:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37759)
+	id 1hsRVB-000458-Ax
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:45:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38342)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsRRR-0000fq-JO
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:41:22 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsRUj-0003eM-Kj
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsRRP-0007y2-Qt
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:41:21 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44710)
+ (envelope-from <philmd@redhat.com>) id 1hsRUi-00016G-GF
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:44:45 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:33650)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsRRP-0007x1-2O
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:41:19 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p17so65593686wrf.11
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 05:41:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=HSajL510A12WGwHFHorNgqsJmQZJjvkUpk1fsQfA9PA=;
- b=hRQoaM7PJrENTdcuT27ORwxX+80vpb8nLw3oPfpe+5cGa7vf5ybnxnoAmmEV7Xm6Ba
- +dns4dMmTHuWrTzQjczPMLT40FxN9iwegRHn4Z11M19PUnt7iYm/JszyD5qBS7LeM7+K
- HmjgtOMndVbKaU6FF29vQj2fTagXNk9YsGxjv+qMtuoVI4pKikY5IrK9vaiCiWjHLAB5
- Zt6OOry4qcxeU5Y6jenCFixzCEVSr7SADHNpUFWN3J3aAQ5IuNCqX//tXAHX3qXaVKMH
- yAWJB7DnCkWbn9nDUB+MUoEs/ysGx9eZYh/wXbYOaTgusg2uojXXo8MwygvkKRPNITE3
- 51pA==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hsRUi-000160-A5
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:44:44 -0400
+Received: by mail-wm1-f66.google.com with SMTP id h19so45242533wme.0
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 05:44:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=HSajL510A12WGwHFHorNgqsJmQZJjvkUpk1fsQfA9PA=;
- b=Z8rS3jEw5pa2dXwYJ+x8ACPGJEJFO9IR1lG0gn03O8x9u+qdC2p7xzAwW1r7fhGJpv
- dZAwO8dfQSRKiRTgSflmnaEQeVY3SARu8tfn5eIlbXH2/p9RpRbiudHt2CoYzyOOJwCk
- U1cO9qI4/ohZMmTuAMcPfb6sRsooOpemnRIiaeT6FOQZUjC3tO0IyQodGSeNLxJZJDYd
- lxCt2Fo5XzFi6fy9Q3SrJ0UUF7OaXC1+iLwXtCUNcBAwK/vMvvmgOCr5IC7a8Jecflxg
- POmrV3moMrs2gdcUPn6hJ8iOA35/W/iLjwdlLRSm6VFYm1/ZcF5UGZMw4a/uYIu/OQwP
- NvoQ==
-X-Gm-Message-State: APjAAAXNN6AgA5F5fDVOWPkawHHjKdoV1BqoAxx+1azJJYIlmWR/t580
- m+MQRxkP91FJvPdxmdtkI6YqyZtfvMQ=
-X-Google-Smtp-Source: APXvYqx7rZdbRd/jRlQFJy5ROZN/BZ2FHTq3uKJbNUO5BzOuEuhnBOi5s2yR6b1KF0nOLpLmo/T2gg==
-X-Received: by 2002:adf:fa42:: with SMTP id y2mr46430804wrr.170.1564490475910; 
- Tue, 30 Jul 2019 05:41:15 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x24sm60303828wmh.5.2019.07.30.05.41.14
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 30 Jul 2019 05:41:14 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9648B1FF87;
- Tue, 30 Jul 2019 13:41:14 +0100 (BST)
-References: <20190614171200.21078-1-alex.bennee@linaro.org>
- <20190614171200.21078-26-alex.bennee@linaro.org>
- <bd131b16-2f38-4112-4e09-6a2f63908bf2@linaro.org>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-In-reply-to: <bd131b16-2f38-4112-4e09-6a2f63908bf2@linaro.org>
-Date: Tue, 30 Jul 2019 13:41:14 +0100
-Message-ID: <87ftmnitjp.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4Kic34jwrMRJKNGGyXXNdWGTyizjP/+FUol/smm5bpE=;
+ b=H/qLv+3gxBRelDt4Iy6Fq6LmKK1baHAIZ9I/NetgzTcv6svW4UT6eeEw72ss/ZtSHU
+ kusVCoVCvPF8gIEE870IHCNZOhtwio+99jX9Brn4mAZ+9V7XxDVIZEiDUMpdk+iehKA8
+ uot1giKMIhOPvJuRA3QSlgotlyigfc7lD0CyUCRgX9J9IJO4bm9uzI+qFJ7BdZQfsopO
+ Vq9+rrW47oHfiwJq+KaobLumiPV8x0bQIozkdBSQfdqfHrhA7HwcCHxKL2WeX40/hgnK
+ FJ1QHXEggRt4PY7njN2smxSQtT3u+7iMnuVg8sQ52PCfz/vS5ZiBt0/6YL7sRtgGCEXz
+ LBXg==
+X-Gm-Message-State: APjAAAVI3Zmys/ZACtSehWTQloStWBcg08IyrX5u4LSTJiGAmSqUItcp
+ 2m7Mw1t3Eb+YtdbxVnYYP/dLhw==
+X-Google-Smtp-Source: APXvYqwAkljziPW6Sx72sIC2X5NZvAxm8HIUzwOabItB/TBtDoTjCK9zTHm62qEDio2G+bek0Ycdcw==
+X-Received: by 2002:a1c:ac81:: with SMTP id
+ v123mr108066365wme.145.1564490682750; 
+ Tue, 30 Jul 2019 05:44:42 -0700 (PDT)
+Received: from [192.168.1.38] (190.red-81-40-121.staticip.rima-tde.net.
+ [81.40.121.190])
+ by smtp.gmail.com with ESMTPSA id t6sm70391269wmb.29.2019.07.30.05.44.41
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 05:44:42 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20190730123759.21723-1-pbonzini@redhat.com>
+ <20190730123759.21723-3-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ed8416f5-852c-872c-eb05-8850a6aa216d@redhat.com>
+Date: Tue, 30 Jul 2019 14:44:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190730123759.21723-3-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v3 25/50] translator: add translator_ld{ub,
- sw, uw, l, q}
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH 2/3] tests/tcg: cleanup Makefile inclusions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,60 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/30/19 2:37 PM, Paolo Bonzini wrote:
+[...]
+> Drop the usage of TARGET_BASE_ARCH, which is ignored by everything except
+> x86_64 and aarch64.  Fix x86 tests by using -cpu max and, while
+> at it, standardize on QEMU_OPTS for aarch64 tests too.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+[...]
+> --- a/tests/tcg/Makefile.include
+> +++ b/tests/tcg/Makefile.qemu
+> @@ -2,20 +2,23 @@
+>  #
+>  # TCG tests (per-target rules)
+>  #
+> -# This Makefile fragment is included from the per-target
+> -# Makefile.target so will be invoked for each linux-user program we
+> -# build. We have two options for compiling, either using a configured
+> -# guest compiler or calling one of our docker images to do it for us.
+> +# This Makefile fragment is included from the build-tcg target, once
+> +# for each target we build. We have two options for compiling, either
+> +# using a configured guest compiler or calling one of our docker images
+> +# to do it for us.
+>  #
+>  
+>  # The per ARCH makefile, if it exists, holds extra information about
+>  # useful docker images or alternative compiler flags.
+>  
+> --include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
+> --include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
+> +include $(TARGET_DIR)config-target.mak
+> +include $(SRC_PATH)/rules.mak
+> +include $(wildcard \
+> +	$(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include \
+> +	$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include)
+>  
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> On 6/14/19 10:11 AM, Alex Benn=C3=A9e wrote:
->> +#define GEN_TRANSLATOR_LD(fullname, name, type, swap_fn)               =
- \
->> +    static inline type                                                 =
- \
->> +    fullname ## _swap(CPUArchState *env, abi_ptr pc, bool do_swap)     =
- \
->> +    {                                                                  =
- \
->> +        type ret =3D cpu_ ## name ## _code(env, pc);                   =
-   \
->> +                                                                       =
- \
->> +        if (do_swap) {                                                 =
- \
->> +            ret =3D swap_fn(ret);                                      =
-   \
->> +        }                                                              =
- \
->
-> This feels like we should have done this at a different level.  We alread=
-y have
-> lower-level functions that read from memory with the proper
-> endianness.
-
-Yeah - this really only caters to the translator for guests which can
-switch their mode.
-
-> It seems that we don't have them for *_code, but that could be fixed.  Or,
-> indeed, bypassed, since these could be the new official interface, deprec=
-ating
-> the *_code functions.
-
-Hmm how to properly audit that _code isn't being used elsewhere. You get
-lost in a maze of macros pretty quickly :-/
-
-So you are proposing dropping the _code helpers from cpu_ldst_*_template
-and directly binding to the low level load/softmmu function from
-translator.h? Do we ever need _code access that isn't part of the
-translator loading instructions?
-
->
->
-> r~
-
-
---
-Alex Benn=C3=A9e
+It is still used here... Else we could clean ./configure way more.
 
