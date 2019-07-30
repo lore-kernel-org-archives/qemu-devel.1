@@ -2,50 +2,49 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C80DBC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 13:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C3EC0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 13:20:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0598206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 13:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0598206E0
+	by mail.kernel.org (Postfix) with ESMTPS id D7240206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 13:20:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7240206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsRys-000464-0P
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 09:15:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45548)
+	id 1hsS3B-0006eB-Tk
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 09:20:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46289)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsRyI-0003IC-6D
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 09:15:19 -0400
+ (envelope-from <eblake@redhat.com>) id 1hsS2h-0006Ev-7k
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 09:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsRyG-0002oq-SJ
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 09:15:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42060)
+ (envelope-from <eblake@redhat.com>) id 1hsS2f-0004cV-Tx
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 09:19:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46180)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hsRyG-0002oT-K3
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 09:15:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hsS2f-0004bk-LC
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 09:19:49 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F1FE530A7C62;
- Tue, 30 Jul 2019 13:15:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA87681DF1;
+ Tue, 30 Jul 2019 13:19:48 +0000 (UTC)
 Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4082210016E8;
- Tue, 30 Jul 2019 13:15:14 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-24-armbru@redhat.com>
- <20190729194414.GG4313@habkost.net> <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B6E0C605A8;
+ Tue, 30 Jul 2019 13:19:42 +0000 (UTC)
+To: "N. B." <n.b@live.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>
+References: <HK2PR04MB38595779EA521C94675599F981DC0@HK2PR04MB3859.apcprd04.prod.outlook.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -72,22 +71,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <8bea0201-f796-d682-22e6-069985b45523@redhat.com>
-Date: Tue, 30 Jul 2019 08:15:12 -0500
+Message-ID: <32b3e5c7-3bb7-ecd8-0c04-b622c278e5b1@redhat.com>
+Date: Tue, 30 Jul 2019 08:19:41 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
+In-Reply-To: <HK2PR04MB38595779EA521C94675599F981DC0@HK2PR04MB3859.apcprd04.prod.outlook.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="GiGAccUTAzXyCh3SZjJMJLJJuepGav1TL"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="Myq57nJ8IeQzXmQzNtcTbrPdc6ywrIVr4"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 30 Jul 2019 13:15:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Tue, 30 Jul 2019 13:19:48 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] When to use qemu/typedefs.h (was: [PATCH 23/28]
- numa: Don't include hw/boards.h into sysemu/numa.h)
+Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: report QMP event when set
+ running
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,95 +98,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Ning Bo <ning.bo9@zte.com.cn>, "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GiGAccUTAzXyCh3SZjJMJLJJuepGav1TL
-Content-Type: multipart/mixed; boundary="ClrLSUI8Kyp4ADZSVEdAHcQDZL0BpZCSk";
+--Myq57nJ8IeQzXmQzNtcTbrPdc6ywrIVr4
+Content-Type: multipart/mixed; boundary="87VNnOhQEh2Y2Nf2n8oF7QEz3BAGNClEZ";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
-Message-ID: <8bea0201-f796-d682-22e6-069985b45523@redhat.com>
-Subject: Re: When to use qemu/typedefs.h (was: [Qemu-devel] [PATCH 23/28]
- numa: Don't include hw/boards.h into sysemu/numa.h)
-References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-24-armbru@redhat.com>
- <20190729194414.GG4313@habkost.net> <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
-In-Reply-To: <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
+To: "N. B." <n.b@live.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, Ning Bo <ning.bo9@zte.com.cn>
+Message-ID: <32b3e5c7-3bb7-ecd8-0c04-b622c278e5b1@redhat.com>
+Subject: Re: [PATCH] vhost-vsock: report QMP event when set running
+References: <HK2PR04MB38595779EA521C94675599F981DC0@HK2PR04MB3859.apcprd04.prod.outlook.com>
+In-Reply-To: <HK2PR04MB38595779EA521C94675599F981DC0@HK2PR04MB3859.apcprd04.prod.outlook.com>
 
---ClrLSUI8Kyp4ADZSVEdAHcQDZL0BpZCSk
+--87VNnOhQEh2Y2Nf2n8oF7QEz3BAGNClEZ
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 7/30/19 6:01 AM, Markus Armbruster wrote:
-> Cc'ing a few more people who might be interested.
+On 7/30/19 7:24 AM, N. B. wrote:
+> From: Ning Bo <n.b@live.com>
 >=20
-> Eduardo Habkost <ehabkost@redhat.com> writes:
+> Report vsock running event so that the upper application can
+> control boot sequence.
+> see https://github.com/kata-containers/runtime/pull/1918
+>=20
+> Signed-off-by: Ning Bo <ning.bo9@zte.com.cn>
 
->> Why is it bad to require the inclusion of hw/boards.h just
->> because of CPUArchId, but acceptable to require the inclusion of
->> qapi-types-machine.h just to be able to write "NodeInfo *nodes"
->> instead of "struct NodeInfo *nodes" below?
->=20
-> hw/boards.h is worse.  Both headers pull in qapi/qapi-builtin-types.h
-> and qapi/qapi-types-common.h, but hw/boards.h pulls in ~60 more.
->=20
-> That doesn't mean including qapi/qapi-types-common.h is good.
->=20
-> For better or worse[*], our coding style mandates typedefs.
+Your From: and S-o-b: differ from one another, which can make crawling
+through git history in search of contributor statistics a bit harder.
+Can you fix your git settings to use the same address in both places,
+and/or contribute a patch to .mailmap to consolidate your contributions
+under a single preferred address?
 
-I could live with a switch to kernel style of always writing the
-'struct' at every use, instead of using typedefs; but it would have to
-be a flag-day switchover, preferably aided by Coccinelle.  But I'm not
-holding my breath for it happening.
+> ---
+>  hw/virtio/vhost-vsock.c |  3 +++
+>  qapi/char.json          | 22 ++++++++++++++++++++++
+>  2 files changed, 25 insertions(+)
+>=20
 
->=20
-> We generally declare a typedef name in exactly one place.  The obvious
-> place is together with the type it denotes.
->=20
-> Non-local users of the type then need to include the header that
-> declares the typedef name.
->=20
-> This can lead to inclusion cycles, in particular for complete struct an=
-d
-> union types that need more types for their members.
->=20
-> We move typedefs to qemu/typedefs.h to break such cycles.
->=20
-> We also do it to include less, for less frequent recompilation.  As thi=
-s
-> series demonstrates, we're not very good at that.  When to put a typede=
-f
-> in qemu/typedefs.h for this purpose is not obvious.  If we simply put
-> all of them there, we'd recompile the world every time we add a typedef=
-,
-> which is pretty much exactly what we're trying to avoid.
->=20
-> Some of qemu/typedefs.h's typedefs are used in dozens or even hundreds
-> of other headers.  Quite a few only in one.  The latter likely should
-> not be there.
->=20
-> We occasionally give up and use types directly rather than their typede=
-f
-> names, flouting the coding style.  This patch does.  Trades messing wit=
-h
-> qemu/typedefs.h for having to write 'struct' a few times.
->=20
-> Should we give up more?  Or not at all?
->=20
-> Can we have some guidelines on proper use of qemu/typedefs.h?
+> +++ b/qapi/char.json
+> @@ -570,3 +570,25 @@
+>  { 'event': 'VSERPORT_CHANGE',
+>    'data': { 'id': 'str',
+>              'open': 'bool' } }
+> +
+> +##
+> +# @VSOCK_RUNNING:
+> +#
+> +# Emitted when the guest be set running.
 
-How hard would it be to compute which typedefs already in
-qemu/typedefs.h are necessary to avoid cyclic inclusion?
+s/be set running/changes the vsock status/
+
+> +#
+> +# @cid: guest context ID
+> +#
+> +# @running: true if the vsock be set running
+
+s/be set/is/
+
+> +#
+> +# Since: v4.1.0
+
+Not our typical spelling, and as a new feature it is too late for 4.1.
+This should read:
+
+# Since: 4.2
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -195,24 +176,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---ClrLSUI8Kyp4ADZSVEdAHcQDZL0BpZCSk--
+--87VNnOhQEh2Y2Nf2n8oF7QEz3BAGNClEZ--
 
---GiGAccUTAzXyCh3SZjJMJLJJuepGav1TL
+--Myq57nJ8IeQzXmQzNtcTbrPdc6ywrIVr4
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AQuAACgkQp6FrSiUn
-Q2o+ggf/TesoySJfnygApMgPAYSuiOj9t6GL4tkrs8oYp03tE+Sr6FV/VBdkEBUI
-glh0kmLgJpYyVxbtTg2RLKxjmwKyIo2T9lBycRIhnu35ZbdE3xnmycBZYQ5lYw/4
-tcuu2hh/fv8fW8dEbZPQ8z8VatzcTyiLxUV/eJ5v5ZhY9v59yYEspOgKa4uJhT2R
-QX2C7soySdO5D94JH7mE8I28DS4FCk/+DeaueH2pRZJs1NFaG4zqw2szbw7YMxVk
-I/Jgq5FjvHYEHAZkiKXVrAdTYLfdy9TJXO3NsiL9KM0y9aaxxsWxdb9Ggu+PgcSK
-5bR+ixYYfp8kEaVFEXj9SMkriYzNKA==
-=P3pk
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AQ+0ACgkQp6FrSiUn
+Q2pjIgf/bV+HwJKvAzXIztpMVqbdihW28jJO9jsr/j+MYC3Sai5lbaHtBQAdYZ7A
+aaaz9jFtcA+cMkU4wR+9Arn5yc4cRGv6anbSSfOdUeURuZvAavTGDPgeEz6wAb2E
+Ad4C2cOkn9obDS69Yy0gfdA23HCZ8AzfELB0drw/Lj6SE6Y1DpQWJAFC5jH7Uf0v
+25N1gx1WAXp/HJ8VZ6nLbmsWE5Q2kLnWQV9KSv8XR2Njb91Zv0aP8wZvpsxE8BSu
+0Myo+bzbG2+g8zeu0+DnkUv8O8Jkv2ZRaJBLXzE17ognjQKIX3tmcTltoZNlZyv6
+LRnC1bnEHHEKjxzPR8OYi+af/wT8fQ==
+=wLBF
 -----END PGP SIGNATURE-----
 
---GiGAccUTAzXyCh3SZjJMJLJJuepGav1TL--
+--Myq57nJ8IeQzXmQzNtcTbrPdc6ywrIVr4--
 
