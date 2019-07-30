@@ -2,64 +2,101 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D180C41514
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:18:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB331C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 577242089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:18:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 577242089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 953C1206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 12:23:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mdmf6V35"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 953C1206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsR5L-0002OP-EE
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:18:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33739)
+	id 1hsRAT-0004S4-Qv
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 08:23:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34603)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <abologna@redhat.com>) id 1hsR4o-0001zS-0Y
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:17:59 -0400
+ (envelope-from <liam.merwick@oracle.com>) id 1hsR9r-00040v-0A
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:23:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <abologna@redhat.com>) id 1hsR4m-0007Tm-VG
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:17:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55668)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <abologna@redhat.com>) id 1hsR4m-0007TL-Q0
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:17:56 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D646F308338F;
- Tue, 30 Jul 2019 12:17:55 +0000 (UTC)
-Received: from kinshicho (unknown [10.43.2.73])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E655819C65;
- Tue, 30 Jul 2019 12:17:49 +0000 (UTC)
-Message-ID: <09e5ceb5e7c03f74f05307a3b9f9a4df035ff74f.camel@redhat.com>
-From: Andrea Bolognani <abologna@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 30 Jul 2019 14:17:48 +0200
-In-Reply-To: <20190730133546.056f8b19.cohuck@redhat.com>
-References: <20190729125755.45008-1-slp@redhat.com>
- <a43acc8541c7ae811d65eb4d08e1a08333781282.camel@redhat.com>
- <20190730133546.056f8b19.cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
+ (envelope-from <liam.merwick@oracle.com>) id 1hsR9p-00012b-UL
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:23:10 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:46294)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
+ id 1hsR9p-00011X-Kv
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 08:23:09 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6UC9Io4168333;
+ Tue, 30 Jul 2019 12:22:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=TdL8lYAbo8VRfghnHW9UAHDiOlDzL3xO1gRPLcN8n58=;
+ b=mdmf6V358bPDUopEO9NVonUYx6XwfPFfoZ1sZEii9FJz6a4k646Pr2iEOlGYopsZQlgQ
+ siIzHB10d5GSfAd6wRTVpMbZqPxtM0fyGvSYkTy45e7jBMK67NPCC8Hj1wLX6LkRBMaU
+ 0I03vTwsLDsMD69eTX0FErFQ30tfinFJLqP3yakya9v9oOtttnkvcflJ3hBwkqGk8Isl
+ MBNMbuLVuuxNx3Q0worQmIMv3M4Ctlu482x91Vcem8xNDyth8MFj2MjW0VSDl0aR1LPe
+ JkzS/ZIAUqjqJjolYGcDIFmP/6LiQbZyMYb0V5PQzMXHX5dHXibETsik1w1bUAdlc9uS kQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 2u0e1tp8sx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 30 Jul 2019 12:22:59 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6UC8F3E163590;
+ Tue, 30 Jul 2019 12:22:58 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 2u0bqu3e4g-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 30 Jul 2019 12:22:58 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6UCMviH011325;
+ Tue, 30 Jul 2019 12:22:57 GMT
+Received: from dhcp-10-175-172-128.vpn.oracle.com (/10.175.172.128)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 30 Jul 2019 05:22:57 -0700
+To: piaojun <piaojun@huawei.com>, virtio-fs@redhat.com, qemu-devel@nongnu.org
+References: <5D3F8F04.3030404@huawei.com>
+From: Liam Merwick <liam.merwick@oracle.com>
+Message-ID: <8748798a-ac4f-4c0a-96fa-190e24dca52b@oracle.com>
+Date: Tue, 30 Jul 2019 13:22:56 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <5D3F8F04.3030404@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Tue, 30 Jul 2019 12:17:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
- personality (virtio-1)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9333
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1907300129
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9333
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1907300129
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 156.151.31.86
+Subject: Re: [Qemu-devel] [PATCH] virtiofsd: fix compile error if
+ 'F_OFD_GETLK' not defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,56 +108,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- Sergio Lopez <slp@redhat.com>, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2019-07-30 at 13:35 +0200, Cornelia Huck wrote:
-> On Tue, 30 Jul 2019 12:25:30 +0200
-> Andrea Bolognani <abologna@redhat.com> wrote:
-> > Can you please make sure virtio-mmio uses the existing interface
-> > instead of introducing a new one?
+On 30/07/2019 01:27, piaojun wrote:
+> Use F_GETLK for fcntl when F_OFD_GETLK not defined.
+
+
+Use F_GETLK/F_SETLK for fcntl when F_OFD_GETLK/F_OFD_SETLK not defined.
+
 > 
-> FWIW, I really hate virtio-pci's disable-modern/disable-legacy... for a
-> starter, what is 'modern'? Will we have 'ultra-modern' in the future?
-
-AIUI the modern/legacy terminology is part of the VirtIO spec, so
-while I agree that it's not necessarily the least prone to ambiguity
-at least it's well defined.
-
-> It is also quite backwards with the 'disable' terminology.
-
-That's also true. I never claimed the way virtio-pci does it is
-perfect!
-
-> We also have a different mechanism for virtio-ccw ('max_revision',
-> which covers a bit more than virtio-1; it doesn't have a 'min_revision',
-> as negotiating the revision down is fine), so I don't see why
-> virtio-mmio should replicate the virtio-pci mechanism.
+> Signed-off-by: Jun Piao <piaojun@huawei.com>
+> ---
+>   contrib/virtiofsd/passthrough_ll.c | 9 +++++++++
+>   1 file changed, 9 insertions(+)
 > 
-> Also, IIUC, virtio-mmio does not have transitional devices, but either
-> version 1 (legacy) or version 2 (virtio-1). It probably makes more
-> sense to expose the device version instead; either as an exact version
-> (especially if it isn't supposed to go up without incompatible
-> changes), or with some min/max concept (where version 1 would stand a
-> bit alone, so that would probably be a bit awkward.)
+> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
+> index 9ae1381..757785b 100644
+> --- a/contrib/virtiofsd/passthrough_ll.c
+> +++ b/contrib/virtiofsd/passthrough_ll.c
+> @@ -1619,7 +1619,11 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t ino,
+>   		return;
+>   	}
+> 
+> +#ifdef F_OFD_GETLK
+>   	ret = fcntl(plock->fd, F_OFD_GETLK, lock);
+> +#else
+> +	ret = fcntl(plock->fd, F_GETLK, lock);
+> +#endif
+>   	if (ret == -1)
+>   		saverr = errno;
+>   	pthread_mutex_unlock(&inode->plock_mutex);
+> @@ -1668,7 +1672,12 @@ static void lo_setlk(fuse_req_t req, fuse_ino_t ino,
+> 
+>   	/* TODO: Is it alright to modify flock? */
+>   	lock->l_pid = 0;
+> +
+> +#ifdef F_OFD_GETLK
 
-I think that if reinventing the wheel is generally agreed not to be
-a good idea, then it stands to reason that reinventing it twice can
-only be described as absolute madness :)
 
-We should have a single way to control the VirtIO protocol version
-that works for all VirtIO devices, regardless of transport. We might
-even want to have virtio-*-{device,ccw}-non-transitional to mirror
-the existing virtio-*-pci-non-transitional.
+This checks for F_OFD_GETLK but uses F_OFD_SETLK (albeit unlikely one 
+being defined without the other)
 
-FWIW, libvirt already implements support for (non)-transitional
-virtio-pci devices using either the dedicated devices or the base
-virtio-pci plus the disable-{modern,legacy} attributes.
 
--- 
-Andrea Bolognani / Red Hat / Virtualization
+>   	ret = fcntl(plock->fd, F_OFD_SETLK, lock);
+> +#else
+> +	ret = fcntl(plock->fd, F_SETLK, lock);
+> +#endif
+>   	if (ret == -1) {
+>   		saverr = errno;
+>   	}
+>
+Might qemu_lock_fd()/qemu_unlock_fd() in util/osdep.c be useful to hide 
+this instead?
 
+Regards,
+Liam
 
