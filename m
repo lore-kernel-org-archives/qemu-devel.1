@@ -2,59 +2,60 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755FAC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BC4C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:30:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50E762089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:30:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E762089E
+	by mail.kernel.org (Postfix) with ESMTPS id CED182089E
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:30:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED182089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsVx7-0007ml-Iy
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:30:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33377)
+	id 1hsVxI-0008MQ-3Q
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:30:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33523)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hsVsE-0006Vh-9d
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:25:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hsVsM-0006qs-Hg
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hsVsC-0002RT-Hk
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:25:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40184)
+ (envelope-from <mreitz@redhat.com>) id 1hsVsL-0002aS-FF
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:25:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39457)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hsVs7-0002O4-2R; Tue, 30 Jul 2019 13:25:12 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hsVsI-0002X8-LY; Tue, 30 Jul 2019 13:25:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 62F21308FB93;
- Tue, 30 Jul 2019 17:25:10 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EEF07796ED;
+ Tue, 30 Jul 2019 17:25:21 +0000 (UTC)
 Received: from localhost (ovpn-116-164.ams2.redhat.com [10.36.116.164])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E6A7C5D9C5;
- Tue, 30 Jul 2019 17:25:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5568C5C1A1;
+ Tue, 30 Jul 2019 17:25:21 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Tue, 30 Jul 2019 19:24:55 +0200
-Message-Id: <20190730172508.19911-1-mreitz@redhat.com>
+Date: Tue, 30 Jul 2019 19:24:59 +0200
+Message-Id: <20190730172508.19911-5-mreitz@redhat.com>
+In-Reply-To: <20190730172508.19911-1-mreitz@redhat.com>
+References: <20190730172508.19911-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 30 Jul 2019 17:25:10 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Tue, 30 Jul 2019 17:25:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.2 00/13] qcow2: Let check -r all repair
- some snapshot bits
+Subject: [Qemu-devel] [PATCH for-4.2 04/13] qcow2: Put qcow2_upgrade() into
+ an own function
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,92 +73,93 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+This does not make sense right now, but it will make sense once we need
+to do more than to just update s->qcow_version.
 
-As Eric reports in https://bugzilla.redhat.com/show_bug.cgi?id=3D1727347,
-qemu-img amend has a bug when it comes to converting qcow2 v2 images to
-v3: In v3, every snapshot table entry requires at least 16 bytes of
-extra metadata to be present, which isn=E2=80=99t the case for v2 images.
-Currently, qemu-img amend doesn=E2=80=99t take care of updating the snaps=
-hot
-table, so the image is a bit corrupt afterwards (luckily, qemu doesn=E2=80=
-=99t
-take notice, though).
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.c | 43 ++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 5 deletions(-)
 
-This yields the following patches:
-- Patch 3: Helper patch
-- Patch 4: Helper patch, so we can actually do more than just to bump up
-  the version number when upgrading a qcow2 image from v2 to v3
-- Patch 5: The fix
-
-Eric also points out that qemu-img check does not see any problem with
-such images and doesn=E2=80=99t fix them, so:
-- Patch 11: Makes qemu-img check report if a snapshot table entry has
-  too little extra data, and repair it with -r all
-  (Patches 6 and 7 add the necessary infrastructure so we can check and
-  repair the snapshot table at all.)
-
-Then I got the glorious idea of =E2=80=9CHey, if I want to see how much e=
-xtra
-data a snapshot table entry has outside of qcow2_read_snapshots(), I
-should add a field that reports that value to QCowSnapshot.  And if I do
-that, I might as well make the qcow2 driver interpret the specification
-a bit more literally, namely it should ignore all unknown extra data,
-that is (as I interpret it), keep it in memory and write it back when
-updating the snapshot table.=E2=80=9D
-
-That led to patch 2.  Maybe you find that stupid, in which case we can
-totally drop patch 2 (with some changes to other patches).
-
-Anyway.  Because of this, qcow2_read_snapshots() suddenly got more error
-case, so I thought now would be a good time to give it an Error **
-parameter.  Cue patch 1.
-
-At this point:
-(1) I had infrastructure for repairing a snapshot table in
-    qemu-img check -r all, and
-(2) I had added a new error case if a snapshot table entry has a
-    suspiciously large amount of extra data.
-
-I decided that this should be repairable, too.  This is done by patch 8.
-(If we drop patch 2, this will go, too.)
-
-Now I was really into it, so I decided even more things needed fixing!
-Namely the final two reasons why we would reject a snapshot table:
-(1) It has too many snapshots (patch 10),
-(2) It is too long overall (patch 9).
-
-
-Finally, patch 13 adds an overly complicated test (using the new
-peek_file* functions added in patch 12).
-
-
-Max Reitz (13):
-  qcow2: Add Error ** to qcow2_read_snapshots()
-  qcow2: Keep unknown extra snapshot data
-  qcow2: Make qcow2_write_snapshots() public
-  qcow2: Put qcow2_upgrade() into an own function
-  qcow2: Write v3-compliant snapshot list on upgrade
-  qcow2: Separate qcow2_check_read_snapshot_table()
-  qcow2: Add qcow2_check_fix_snapshot_table()
-  qcow2: Fix broken snapshot table entries
-  qcow2: Fix overly long snapshot tables
-  qcow2: Repair snapshot table with too many entries
-  qcow2: Fix v3 snapshot table entry compliancy
-  iotests: Add peek_file* functions
-  iotests: Test qcow2's snapshot table handling
-
- block/qcow2.h                |  15 +-
- block/qcow2-snapshot.c       | 302 +++++++++++++++++++++--
- block/qcow2.c                | 152 ++++++++++--
- tests/qemu-iotests/261       | 449 +++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/261.out   | 321 +++++++++++++++++++++++++
- tests/qemu-iotests/common.rc |  20 ++
- tests/qemu-iotests/group     |   1 +
- 7 files changed, 1219 insertions(+), 41 deletions(-)
- create mode 100755 tests/qemu-iotests/261
- create mode 100644 tests/qemu-iotests/261.out
-
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 0336deaf2c..99e9dad798 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4721,12 +4721,46 @@ static int qcow2_downgrade(BlockDriverState *bs, =
+int target_version,
+     return 0;
+ }
+=20
++/*
++ * Upgrades an image's version.  While newer versions encompass all
++ * features of older versions, some things may have to be presented
++ * differently.
++ */
++static int qcow2_upgrade(BlockDriverState *bs, int target_version,
++                         BlockDriverAmendStatusCB *status_cb, void *cb_o=
+paque,
++                         Error **errp)
++{
++    BDRVQcow2State *s =3D bs->opaque;
++    int current_version =3D s->qcow_version;
++    int ret;
++
++    /* This is qcow2_upgrade(), not qcow2_downgrade() */
++    assert(target_version > current_version);
++
++    /* There are no other versions (yet) that you can upgrade to */
++    assert(target_version =3D=3D 3);
++
++    status_cb(bs, 0, 1, cb_opaque);
++
++    s->qcow_version =3D target_version;
++    ret =3D qcow2_update_header(bs);
++    if (ret < 0) {
++        s->qcow_version =3D current_version;
++        error_setg_errno(errp, -ret, "Failed to update the image header"=
+);
++        return ret;
++    }
++    status_cb(bs, 1, 1, cb_opaque);
++
++    return 0;
++}
++
+ typedef enum Qcow2AmendOperation {
+     /* This is the value Qcow2AmendHelperCBInfo::last_operation will be
+      * statically initialized to so that the helper CB can discern the f=
+irst
+      * invocation from an operation change */
+     QCOW2_NO_OPERATION =3D 0,
+=20
++    QCOW2_UPGRADING,
+     QCOW2_CHANGING_REFCOUNT_ORDER,
+     QCOW2_DOWNGRADING,
+ } Qcow2AmendOperation;
+@@ -4909,17 +4943,16 @@ static int qcow2_amend_options(BlockDriverState *=
+bs, QemuOpts *opts,
+     helper_cb_info =3D (Qcow2AmendHelperCBInfo){
+         .original_status_cb =3D status_cb,
+         .original_cb_opaque =3D cb_opaque,
+-        .total_operations =3D (new_version < old_version)
++        .total_operations =3D (new_version !=3D old_version)
+                           + (s->refcount_bits !=3D refcount_bits)
+     };
+=20
+     /* Upgrade first (some features may require compat=3D1.1) */
+     if (new_version > old_version) {
+-        s->qcow_version =3D new_version;
+-        ret =3D qcow2_update_header(bs);
++        helper_cb_info.current_operation =3D QCOW2_UPGRADING;
++        ret =3D qcow2_upgrade(bs, new_version, &qcow2_amend_helper_cb,
++                            &helper_cb_info, errp);
+         if (ret < 0) {
+-            s->qcow_version =3D old_version;
+-            error_setg_errno(errp, -ret, "Failed to update the image hea=
+der");
+             return ret;
+         }
+     }
 --=20
 2.21.0
 
