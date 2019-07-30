@@ -2,87 +2,51 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC916C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA309C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8817D20651
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:10:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="xikLSMD7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8817D20651
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF13920659
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:19:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF13920659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsSpI-0008Gp-SW
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:10:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57323)
+	id 1hsSyI-0003qP-Vq
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59352)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hsSoQ-0006nl-1E
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:09:11 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hsSxV-0002IH-I1
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:18:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hsSoO-0005IC-Uk
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:09:09 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:56814)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hsSxT-0002ho-NR
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:18:33 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49374)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hsSoK-0005FG-1c; Tue, 30 Jul 2019 10:09:04 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 63AE496F52;
- Tue, 30 Jul 2019 14:09:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564495741;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=72PTcUrEl0VNBb2YbcwlUOaUC4ci2fKOleI/sbnYZek=;
- b=xikLSMD75ffLqRUBKoE5sn+zBED+AAYdUcI6+gh9YpDSf89kEjs3cJQR+aupdHORuvho/2
- /9mHIvHZwcKmEKkxQ3DM2OaD8GRVZ0kmgUUalLnGSzKX9AG5o2nz6NQ14NThjdXtdI5vU3
- geb7piyEmRNySR7I2Jxr56TMtydniwc=
-To: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-2-damien.hedde@greensocs.com>
- <20190730154209.2049f10a.cohuck@redhat.com>
- <CAFEAcA-rwBiXkDEDuT-=KQVJ2A2ob16=P0obbZBPUfZeYXy+dQ@mail.gmail.com>
- <20190730155547.7b201f5e.cohuck@redhat.com>
- <CAFEAcA_BU3DECLVv2QD_RshR0OL3=GqGwsm0YAmEAE6_SpW=HA@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <34a216b0-0067-8627-599c-6a67622c4bd2@greensocs.com>
-Date: Tue, 30 Jul 2019 16:08:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_BU3DECLVv2QD_RshR0OL3=GqGwsm0YAmEAE6_SpW=HA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564495741;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=72PTcUrEl0VNBb2YbcwlUOaUC4ci2fKOleI/sbnYZek=;
- b=wwrpUZDU/W6QlgICbr+k39DoadLRQuOFEuCbtttIuVPQd7LASm8PiCnxy+oJsXpYRfS0bO
- IJJpMhK6CrsR2atAduI/kJyyjaIIB/5Ck0bGAJZAm9yukZsmqPcz760z8Pm8fFNblaASF7
- z08mx2xAQc0ZedBZfYEkS7XuVaJUMT4=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564495741; a=rsa-sha256; cv=none;
- b=rq1QyBpTZvoxvoaVYWal0IFKxkeyUyTTuSLpOl2QqNA7+4XW3NhAi69vDwov+v2wwaYkRx
- z3QgeeC2WREafpEBNle90r4invfcy/fcK9OQVB+7UBYyeEMOpTp8utW+DmzClFLVR4AD46
- u2sNo1puklUPzSCCuB3SHhRs9TZsLks=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH v3 01/33] Create Resettable QOM interface
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hsSxT-0002g9-Fa; Tue, 30 Jul 2019 10:18:31 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hsSxP-0000jQ-J9; Tue, 30 Jul 2019 17:18:27 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Tue, 30 Jul 2019 17:18:23 +0300
+Message-Id: <20190730141826.709849-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190730141826.709849-1-vsementsov@virtuozzo.com>
+References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v2 1/4] block: introduce aio task pool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,72 +58,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Common interface for aio task loops. To be used for improving
+performance of synchronous io loops in qcow2, block-stream,
+copy-on-read, and may be other places.
 
-On 7/30/19 3:59 PM, Peter Maydell wrote:
-> On Tue, 30 Jul 2019 at 14:56, Cornelia Huck <cohuck@redhat.com> wrote:
->>
->> On Tue, 30 Jul 2019 14:44:21 +0100
->> Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->>> On Tue, 30 Jul 2019 at 14:42, Cornelia Huck <cohuck@redhat.com> wrote:
->>>> I'm having a hard time figuring out what a 'cold' or a 'warm' reset is
->>>> supposed to be... can you add a definition/guideline somewhere?
->>>
->>> Generally "cold" reset is "power on" and "warm" is "we were already
->>> powered-on, but somebody flipped a reset line somewhere".
->>
->> Ok, that makes sense... my main concern is to distinguish that in a
->> generic way, as it is a generic interface. What about adding something
->> like:
->>
->> "A 'cold' reset means that the object to be reset is initially reset; a 'warm'
->> reset means that the object to be reset has already been initialized."
->>
->> Or is that again too generic?
-> 
-> I think it doesn't quite capture the idea -- an object can have already
-> been reset and then get a 'cold' reset: this is like having a powered-on
-> machine and then power-cycling it.
-> 
-> The 'warm' reset is the vaguer one, because the specific behaviour
-> is somewhat device-dependent (many devices might not have any
-> difference from 'cold' reset, for those that do the exact detail
-> of what doesn't get reset on warm-reset will vary). But every
-> device should have some kind of "as if you power-cycled it" (or
-> for QEMU, "go back to the same state as if you just started QEMU on the
-> command line"). Our current "reset" method is really cold-reset.
-> 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/aio_task.h    |  52 +++++++++++++++++++
+ block/aio_task.c    | 119 ++++++++++++++++++++++++++++++++++++++++++++
+ block/Makefile.objs |   2 +
+ 3 files changed, 173 insertions(+)
+ create mode 100644 block/aio_task.h
+ create mode 100644 block/aio_task.c
 
-Exactly. In the following patches, I've tried to replace existing reset
-calls by cold or warm reset depending on whether:
-+ it is called through the main system reset -> cold
-+ it is called during normal life-time       -> warm
+diff --git a/block/aio_task.h b/block/aio_task.h
+new file mode 100644
+index 0000000000..933af1d8e7
+--- /dev/null
++++ b/block/aio_task.h
+@@ -0,0 +1,52 @@
++/*
++ * Aio tasks loops
++ *
++ * Copyright (c) 2019 Virtuozzo International GmbH.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef BLOCK_AIO_TASK_H
++#define BLOCK_AIO_TASK_H
++
++#include "qemu/coroutine.h"
++
++typedef struct AioTaskPool AioTaskPool;
++typedef struct AioTask AioTask;
++typedef int (*AioTaskFunc)(AioTask *task);
++struct AioTask {
++    AioTaskPool *pool;
++    AioTaskFunc func;
++    int ret;
++};
++
++/*
++ * aio_task_pool_new
++ *
++ * The caller is responsible to g_free AioTaskPool pointer after use.
++ */
++AioTaskPool *aio_task_pool_new(int max_busy_tasks);
++int aio_task_pool_status(AioTaskPool *pool);
++bool aio_task_pool_empty(AioTaskPool *pool);
++void aio_task_pool_start_task(AioTaskPool *pool, AioTask *task);
++void aio_task_pool_wait_slot(AioTaskPool *pool);
++void aio_task_pool_wait_one(AioTaskPool *pool);
++void aio_task_pool_wait_all(AioTaskPool *pool);
++
++#endif /* BLOCK_AIO_TASK_H */
+diff --git a/block/aio_task.c b/block/aio_task.c
+new file mode 100644
+index 0000000000..807be8deb5
+--- /dev/null
++++ b/block/aio_task.c
+@@ -0,0 +1,119 @@
++/*
++ * Aio tasks loops
++ *
++ * Copyright (c) 2019 Virtuozzo International GmbH.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "block/aio.h"
++#include "aio_task.h"
++
++struct AioTaskPool {
++    Coroutine *main_co;
++    int status;
++    int max_busy_tasks;
++    int busy_tasks;
++    bool wait_done;
++};
++
++static void aio_task_co(void *opaque)
++{
++    AioTask *task = opaque;
++    AioTaskPool *pool = task->pool;
++
++    assert(pool->busy_tasks < pool->max_busy_tasks);
++    pool->busy_tasks++;
++
++    task->ret = task->func(task);
++
++    pool->busy_tasks--;
++
++    if (task->ret < 0 && pool->status == 0) {
++        pool->status = task->ret;
++    }
++
++    g_free(task);
++
++    if (pool->wait_done) {
++        pool->wait_done = false;
++        aio_co_wake(pool->main_co);
++    }
++}
++
++void aio_task_pool_wait_one(AioTaskPool *pool)
++{
++    assert(pool->busy_tasks > 0);
++    assert(qemu_coroutine_self() == pool->main_co);
++
++    pool->wait_done = true;
++    qemu_coroutine_yield();
++
++    assert(!pool->wait_done);
++    assert(pool->busy_tasks < pool->max_busy_tasks);
++}
++
++void aio_task_pool_wait_slot(AioTaskPool *pool)
++{
++    if (pool->busy_tasks < pool->max_busy_tasks) {
++        return;
++    }
++
++    aio_task_pool_wait_one(pool);
++}
++
++void aio_task_pool_wait_all(AioTaskPool *pool)
++{
++    while (pool->busy_tasks > 0) {
++        aio_task_pool_wait_one(pool);
++    }
++}
++
++void aio_task_pool_start_task(AioTaskPool *pool, AioTask *task)
++{
++    aio_task_pool_wait_slot(pool);
++
++    task->pool = pool;
++    qemu_coroutine_enter(qemu_coroutine_create(aio_task_co, task));
++}
++
++AioTaskPool *aio_task_pool_new(int max_busy_tasks)
++{
++    AioTaskPool *pool = g_new0(AioTaskPool, 1);
++
++    pool->main_co = qemu_coroutine_self();
++    pool->max_busy_tasks = max_busy_tasks;
++
++    return pool;
++}
++
++int aio_task_pool_status(AioTaskPool *pool)
++{
++    if (!pool) {
++        return 0; /* Sugar for lazy allocation of aio pool */
++    }
++
++    return pool->status;
++}
++
++bool aio_task_pool_empty(AioTaskPool *pool)
++{
++    return pool->busy_tasks == 0;
++}
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 35f3bca4d9..c2eb8c8769 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -40,6 +40,8 @@ block-obj-y += throttle.o copy-on-read.o
+ 
+ block-obj-y += crypto.o
+ 
++block-obj-y += aio_task.o
++
+ common-obj-y += stream.o
+ 
+ nfs.o-libs         := $(LIBNFS_LIBS)
+-- 
+2.18.0
 
-But I definitely can add some docs/comments to better explain that.
-
---
-Damien
 
