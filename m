@@ -2,77 +2,76 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 344AAC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67AF1C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:10:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BBE92089E
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:06:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBE92089E
+	by mail.kernel.org (Postfix) with ESMTPS id 4265C208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 17:10:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4265C208E3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsVZf-0000Up-AZ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:06:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57805)
+	id 1hsVdx-0002Kj-Gn
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 13:10:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58385)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hsVZA-0008G4-FJ
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:05:38 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsVdW-0001qt-BZ
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:10:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hsVZ4-0000Hm-PM
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:05:34 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41532
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsVdV-0002O6-2U
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:10:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54678
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hsVZ4-0000FO-0h
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:05:30 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ id 1hsVdU-0002No-Tp
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 13:10:05 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6UH2scJ140409
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 13:05:28 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2u2qrxx4qn-1
+ x6UH8Sas097401
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 13:10:03 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u2r68n0h2-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 13:05:27 -0400
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 13:10:03 -0400
 Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 30 Jul 2019 18:05:25 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Tue, 30 Jul 2019 18:10:01 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 30 Jul 2019 18:05:20 +0100
+ Tue, 30 Jul 2019 18:09:58 +0100
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6UH5KAO42401892
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6UH9vsJ52822072
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 30 Jul 2019 17:05:20 GMT
+ Tue, 30 Jul 2019 17:09:57 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E38774C040;
- Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 3CC444C04A;
+ Tue, 30 Jul 2019 17:09:57 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 525804C058;
- Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 8902B4C044;
+ Tue, 30 Jul 2019 17:09:56 +0000 (GMT)
 Received: from oc7455500831.ibm.com (unknown [9.145.144.206])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 30 Jul 2019 17:05:19 +0000 (GMT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+ Tue, 30 Jul 2019 17:09:56 +0000 (GMT)
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
  <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+ <CAFEAcA_M7kTA-tmdNdP4-pVjKkdzHFXuSeR3wKYSohK+W38m+Q@mail.gmail.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
@@ -118,29 +117,27 @@ Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
  RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
  oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
  syiRa+UVlsKmx1hsEg==
-Date: Tue, 30 Jul 2019 19:05:19 +0200
+Date: Tue, 30 Jul 2019 19:09:56 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
+In-Reply-To: <CAFEAcA_M7kTA-tmdNdP4-pVjKkdzHFXuSeR3wKYSohK+W38m+Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19073017-4275-0000-0000-0000035215A3
+x-cbid: 19073017-0028-0000-0000-0000038954DB
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19073017-4276-0000-0000-0000386302CE
-Message-Id: <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com>
+x-cbparentid: 19073017-0029-0000-0000-00002449A30A
+Message-Id: <515f23a7-c520-5474-e03b-4344a06bea2f@de.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-30_07:, , signatures=0
+ definitions=2019-07-30_08:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907300178
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id x6UH2scJ140409
+ mlxlogscore=723 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907300179
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
 X-Received-From: 148.163.158.5
 Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
@@ -156,81 +153,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
- kvm@vger.kernel.org, mtosatti@redhat.com, mdroth@linux.vnet.ibm.com,
- armbru@redhat.com, pbonzini@redhat.com, den@openvz.org, rth@twiddle.net
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, Qemu-block <qemu-block@nongnu.org>,
+ kvm-devel <kvm@vger.kernel.org>, Markus Armbruster <armbru@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Denis V. Lunev" <den@openvz.org>, Richard Henderson <rth@twiddle.net>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 30.07.19 18:44, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
+On 30.07.19 18:46, Peter Maydell wrote:
+> On Tue, 30 Jul 2019 at 17:05, Andrey Shinkevich
+> <andrey.shinkevich@virtuozzo.com> wrote:
+>>
 >> Not the whole structure is initialized before passing it to the KVM.
 >> Reduce the number of Valgrind reports.
 >>
 >> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>  target/i386/kvm.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->> index dbbb137..ed57e31 100644
->> --- a/target/i386/kvm.c
->> +++ b/target/i386/kvm.c
->> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>          return 0;
->>      }
->> =20
->> +    memset(&msr_data, 0, sizeof(msr_data));
->=20
-> I wonder the overhead of this one...
+> 
+> Does it even make sense to try to valgrind a KVM-enabled run
+> of QEMU? As soon as we run the guest it will make modifications
+> to memory which Valgrind can't track; and I don't think
+> Valgrind supports the KVM_RUN ioctl anyway...
 
-Cant we use designated initializers like in
+As long as we do not care about the guest memory, it does make sense 
+and it does find bugs.
 
-commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
-Author:     Christian Borntraeger <borntraeger@de.ibm.com>
-AuthorDate: Thu Oct 30 09:23:41 2014 +0100
-Commit:     Paolo Bonzini <pbonzini@redhat.com>
-CommitDate: Mon Dec 15 12:21:01 2014 +0100
+See also 
+https://www.linux-kvm.org/page/KVM_Forum_2014
+https://www.linux-kvm.org/images/d/d2/03x07-Valgrind.pdf
 
-    valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
-
-and others?
-
-This should minimize the impact.=20
->=20
->>      msr_data.info.nmsrs =3D 1;
->>      msr_data.entries[0].index =3D MSR_IA32_TSC;
->>      env->tsc_valid =3D !runstate_is_running();
->> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->> =20
->>      if (has_xsave) {
->>          env->xsave_buf =3D qemu_memalign(4096, sizeof(struct kvm_xsav=
-e));
->> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
->=20
-> OK
->=20
->>      }
->> =20
->>      max_nested_state_len =3D kvm_max_nested_state_length();
->> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
->>          return 0;
->>      }
->> =20
->> +    memset(&dbgregs, 0, sizeof(dbgregs));
->=20
-> OK
->=20
->>      for (i =3D 0; i < 4; i++) {
->>          dbgregs.db[i] =3D env->dr[i];
->>      }
->=20
-> We could remove 'dbgregs.flags =3D 0;'
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
+Unfortunately I wasnt able to follow up on those.
 
 
