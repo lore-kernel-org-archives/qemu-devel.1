@@ -2,63 +2,80 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9C0C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C051FC0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E299E206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:37:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E299E206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 95F2D206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 11:38:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F2D206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsQRK-0008Q3-7U
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 07:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54367)
+	id 1hsQSe-0002Wp-VI
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 07:38:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54572)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <cohuck@redhat.com>) id 1hsQQ8-000762-Bs
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:35:57 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hsQRZ-00015i-27
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hsQQ7-0004NQ-C9
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:35:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51452)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1hsQQ7-0004NC-6E
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:35:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6C04C3092649;
- Tue, 30 Jul 2019 11:35:54 +0000 (UTC)
-Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7CBC319C67;
- Tue, 30 Jul 2019 11:35:48 +0000 (UTC)
-Date: Tue, 30 Jul 2019 13:35:46 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Andrea Bolognani <abologna@redhat.com>
-Message-ID: <20190730133546.056f8b19.cohuck@redhat.com>
-In-Reply-To: <a43acc8541c7ae811d65eb4d08e1a08333781282.camel@redhat.com>
-References: <20190729125755.45008-1-slp@redhat.com>
- <a43acc8541c7ae811d65eb4d08e1a08333781282.camel@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <pbonzini@redhat.com>) id 1hsQRX-0004tm-TV
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:37:25 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:52217)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsQRX-0004sz-KA
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 07:37:23 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 207so56829209wma.1
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 04:37:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4W7yWniuF20HEUzmuYmR4smJCca7BGfYr/UM9hFHMck=;
+ b=N4PHpTfU6PdSAiCerf2v2QiLHXmD74F1m4NzXCTnsRNJgKjyJ5DzVYjHCzASZpVJC9
+ wKSdp1DplL7PY8zT0hLgwGvl1pjwAxl9sLKSlwFj3507qG0TOBWdOqdG5JYaNahxd7aa
+ 18mUa/KrOmle0pyz49AtIvDQcxrM8l2vC4QRjBHnI5b+c1IwBrYyYe0nci1Af88O8wrG
+ NYNJMTL9LfATuU0qI3JzHK51i16cjMnFaF2FKj7tvLiqbrvxe5g0Tl4XGyXkuPACDeuG
+ 1rxnPJ8JaJAGaDeOpeFJP33+82bZkoNctI1OqAzRH6ebh10H+2sOYmjTLEaWSx9zeMKt
+ aZPg==
+X-Gm-Message-State: APjAAAW1OJo17KQBvIAovjuj62wAm5ueesmRuhPvKavCHmXf1ybnrorS
+ Wt3vrKo0VA/tQIStNMjfVPKc0g==
+X-Google-Smtp-Source: APXvYqz7erF0BTo2bgrIhV7kjeJQhjp1A+qOquXCk1QQtKGQQ7hm7rBu7s3qkfQ3kjzOLQGIqMirdQ==
+X-Received: by 2002:a1c:f409:: with SMTP id z9mr34806727wma.176.1564486641739; 
+ Tue, 30 Jul 2019 04:37:21 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id i12sm76679636wrx.61.2019.07.30.04.37.20
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 04:37:21 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <20190729223605.7163-1-jsnow@redhat.com>
+ <7324bc78-1d7b-7b7f-272d-c2932651b007@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <075eaba0-7e50-b240-7679-825c5bd03e0f@redhat.com>
+Date: Tue, 30 Jul 2019 13:37:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 30 Jul 2019 11:35:54 +0000 (UTC)
+In-Reply-To: <7324bc78-1d7b-7b7f-272d-c2932651b007@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
- personality (virtio-1)
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH] Revert "ide/ahci: Check for -ECANCELED in
+ aio callbacks"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,59 +87,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- Sergio Lopez <slp@redhat.com>, mst@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Shaju Abraham <shaju.abraham@nutanix.com>,
+ qemu-stable <qemu-stable@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 12:25:30 +0200
-Andrea Bolognani <abologna@redhat.com> wrote:
+On 30/07/19 11:54, Philippe Mathieu-Daudé wrote:
+> Hi John,
+> 
+> On 7/30/19 12:36 AM, John Snow wrote:
+>> This reverts commit 0d910cfeaf2076b116b4517166d5deb0fea76394.
+>>
+>> It's not correct to just ignore an error code in a callback; we need to
+>> handle that error and possible report failure to the guest so that they
+>> don't wait indefinitely for an operation that will now never finish.
+> 
+> Is this 4.1 material? It looks so.
 
-> On Mon, 2019-07-29 at 14:57 +0200, Sergio Lopez wrote:
-> [...]
-> >  /* virtio-mmio device */
-> >  
-> >  static Property virtio_mmio_properties[] = {
-> >      DEFINE_PROP_BOOL("format_transport_address", VirtIOMMIOProxy,
-> >                       format_transport_address, true),
-> > +    DEFINE_PROP_BOOL("modern", VirtIOMMIOProxy, modern, false),
-> >      DEFINE_PROP_END_OF_LIST(),
-> >  };  
-> 
-> Not a QEMU developer so forgive me if I say something silly, but IIUC
-> you'd be able to opt into the new feature by using eg.
-> 
->   -device virtio-net-device,modern=on
-> 
-> However, virtio-pci devices already have a mechanism to control the
-> VirtIO protocol version, where you use
-> 
->   -device virtio-net-pci,disable-modern=no,disable-legacy=yes
-> 
-> to get a VirtIO 1.x-only device and
-> 
->   -device virtio-net-pci,disable-modern=no,disable-legacy=no
-> 
-> for a transitional device.
-> 
-> Can you please make sure virtio-mmio uses the existing interface
-> instead of introducing a new one?
-> 
+Perhaps could have been last week, but now I suggest Cc qemu-stable and
+delaying it to 4.2.
 
-FWIW, I really hate virtio-pci's disable-modern/disable-legacy... for a
-starter, what is 'modern'? Will we have 'ultra-modern' in the future?
-It is also quite backwards with the 'disable' terminology.
+Paolo
 
-We also have a different mechanism for virtio-ccw ('max_revision',
-which covers a bit more than virtio-1; it doesn't have a 'min_revision',
-as negotiating the revision down is fine), so I don't see why
-virtio-mmio should replicate the virtio-pci mechanism.
+>> This ought to help cases reported by Nutanix where iSCSI returns a
+>> legitimate -ECANCELED for certain operations which should be propagated
+>> normally.
+>>
+>> Reported-by: Shaju Abraham <shaju.abraham@nutanix.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  hw/ide/ahci.c |  3 ---
+>>  hw/ide/core.c | 14 --------------
+>>  2 files changed, 17 deletions(-)
+>>
+>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>> index 00ba422a48..6aaf66534a 100644
+>> --- a/hw/ide/ahci.c
+>> +++ b/hw/ide/ahci.c
+>> @@ -1023,9 +1023,6 @@ static void ncq_cb(void *opaque, int ret)
+>>      IDEState *ide_state = &ncq_tfs->drive->port.ifs[0];
+>>  
+>>      ncq_tfs->aiocb = NULL;
+>> -    if (ret == -ECANCELED) {
+>> -        return;
+>> -    }
+>>  
+>>      if (ret < 0) {
+>>          bool is_read = ncq_tfs->cmd == READ_FPDMA_QUEUED;
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 6afadf894f..8e1624f7ce 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -722,9 +722,6 @@ static void ide_sector_read_cb(void *opaque, int ret)
+>>      s->pio_aiocb = NULL;
+>>      s->status &= ~BUSY_STAT;
+>>  
+>> -    if (ret == -ECANCELED) {
+>> -        return;
+>> -    }
+>>      if (ret != 0) {
+>>          if (ide_handle_rw_error(s, -ret, IDE_RETRY_PIO |
+>>                                  IDE_RETRY_READ)) {
+>> @@ -840,10 +837,6 @@ static void ide_dma_cb(void *opaque, int ret)
+>>      uint64_t offset;
+>>      bool stay_active = false;
+>>  
+>> -    if (ret == -ECANCELED) {
+>> -        return;
+>> -    }
+>> -
+>>      if (ret == -EINVAL) {
+>>          ide_dma_error(s);
+>>          return;
+>> @@ -975,10 +968,6 @@ static void ide_sector_write_cb(void *opaque, int ret)
+>>      IDEState *s = opaque;
+>>      int n;
+>>  
+>> -    if (ret == -ECANCELED) {
+>> -        return;
+>> -    }
+>> -
+>>      s->pio_aiocb = NULL;
+>>      s->status &= ~BUSY_STAT;
+>>  
+>> @@ -1058,9 +1047,6 @@ static void ide_flush_cb(void *opaque, int ret)
+>>  
+>>      s->pio_aiocb = NULL;
+>>  
+>> -    if (ret == -ECANCELED) {
+>> -        return;
+>> -    }
+>>      if (ret < 0) {
+>>          /* XXX: What sector number to set here? */
+>>          if (ide_handle_rw_error(s, -ret, IDE_RETRY_FLUSH)) {
+>>
 
-Also, IIUC, virtio-mmio does not have transitional devices, but either
-version 1 (legacy) or version 2 (virtio-1). It probably makes more
-sense to expose the device version instead; either as an exact version
-(especially if it isn't supposed to go up without incompatible
-changes), or with some min/max concept (where version 1 would stand a
-bit alone, so that would probably be a bit awkward.)
 
