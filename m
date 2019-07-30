@@ -2,90 +2,54 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26A3C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CEACC0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:28:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82E0120679
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:23:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82E0120679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 054A5206A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:28:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 054A5206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsXiW-0008JE-SN
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 15:23:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55834)
+	id 1hsXn3-0003CL-8I
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 15:28:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56867)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hsXhb-0007IE-QH
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:22:28 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmO-0001s8-RO
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hsXha-0000r8-Ig
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:22:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38644)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmN-0004Cd-NE
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:24 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:45933 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hsXhY-0000ow-00; Tue, 30 Jul 2019 15:22:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 065AD8553F;
- Tue, 30 Jul 2019 19:22:23 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 818255D6A7;
- Tue, 30 Jul 2019 19:22:22 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-13-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <90984be8-3181-03aa-57e4-7e3c46cec6f8@redhat.com>
-Date: Tue, 30 Jul 2019 14:22:21 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190730172508.19911-13-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZABI0nTGYlvu8QsADX28yH8olsHEWfwf7"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 30 Jul 2019 19:22:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 12/13] iotests: Add peek_file*
- functions
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1hsXmN-0004Am-G6
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:23 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 7D1E21A222E;
+ Tue, 30 Jul 2019 21:27:19 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 629561A2226;
+ Tue, 30 Jul 2019 21:27:19 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 30 Jul 2019 21:27:06 +0200
+Message-Id: <1564514832-29482-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH for 4.2 v4 0/6] target/mips: Misc patches for
+ 4.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,107 +61,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, sw@weilnetz.de, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZABI0nTGYlvu8QsADX28yH8olsHEWfwf7
-Content-Type: multipart/mixed; boundary="9g9J96uGF2eX7XyD52ujBCfRhBqJaA7I6";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <90984be8-3181-03aa-57e4-7e3c46cec6f8@redhat.com>
-Subject: Re: [PATCH for-4.2 12/13] iotests: Add peek_file* functions
-References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-13-mreitz@redhat.com>
-In-Reply-To: <20190730172508.19911-13-mreitz@redhat.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
---9g9J96uGF2eX7XyD52ujBCfRhBqJaA7I6
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+This series includes misc MIPS patches intended to be integrated after
+4.1 release.
 
-On 7/30/19 12:25 PM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/common.rc | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->=20
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.r=
-c
-> index 5502c3da2f..78decfd5d5 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -53,6 +53,26 @@ poke_file()
->      printf "$3" | dd "of=3D$1" bs=3D1 "seek=3D$2" conv=3Dnotrunc &>/de=
-v/null
->  }
-> =20
-> +# peek_file_le 'test.img' 512 2 =3D> 65534
-> +peek_file_le()
-> +{
-> +    # Wrap in echo $() to strip spaces
-> +    echo $(od -j"$2" -N"$3" --endian=3Dlittle -An -vtu"$3" "$1")
+v3->v4:
 
-Requires coreutils' od, but we can patch that later if it proves to be a
-problem on other hosts.
+  - fixed build error
 
-I used to do something similar in nbdkit (prior to qemu-nbd --list
-making my life a lot easier; see nbdkit commit b228cb40); but there, I
-read a 16-bit value in 2 8-bit chunks and pieced it together myself
-rather than relying on --endian:
+v2->v3:
 
--    # Protocol is big endian, we want native endian.
--    # xargs trick to trim whitespace from
--    # https://stackoverflow.com/a/12973694
--    eflags_hi=3D$(od -An -N1     -tx1 eflags.out | xargs)
--    eflags_lo=3D$(od -An -N1 -j1 -tx1 eflags.out | xargs)
--    eflags=3D$(( 0x$eflags_hi << 8 | 0x$eflags_lo ))
+  - corrected the patch on WatchHi to include "mi" field
+  - corrected the patch on WatchHi to bump VMStateDescription version
 
-But as long as we are using --endian, your version nicely handles 1, 2,
-4, and 8-byte reads.
+v1->v2:
 
-> +
-> +# peek_file_raw 'test.img' 512 2 =3D> '\xff\xfe'
-> +peek_file_raw()
-> +{
-> +    dd if=3D"$1" bs=3D1 skip=3D"$2" count=3D"$3" status=3Dnone
-> +}
+  - fixed checkpatch warnings
+  - added four new patches on various topics
 
-Of course, calling $(peek_file_raw ...) is a bad idea, because it might
-eat a trailing byte that happened to be a newline; it also doesn't
-handle NUL bytes very well.  Is it worth documenting caveats for using
-this one?
+Aleksandar Markovic (2):
+  tests/tcg: target/mips: Add optional printing of more detailed failure
+    info
+  tests/tcg: target/mips: Fix target configurations for MSA tests
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Yongbok Kim (4):
+  target/mips: Add support for DSPRAM
+  target/mips: Amend CP0 WatchHi register implementation
+  target/mips: Implement Global Invalidate TLB instruction
+  target/mips: Add emulation of CRC32 instructions
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+ default-configs/mips-softmmu-common.mak            |   1 +
+ disas/mips.c                                       |  10 +
+ hw/mips/cps.c                                      |  28 +-
+ hw/misc/Makefile.objs                              |   1 +
+ hw/misc/mips_dspram.c                              | 153 ++++
+ include/hw/mips/cps.h                              |   2 +
+ include/hw/misc/mips_dspram.h                      |  46 ++
+ target/mips/cpu.h                                  |  11 +-
+ target/mips/helper.c                               |  24 +-
+ target/mips/helper.h                               |   7 +
+ target/mips/internal.h                             |   4 +-
+ target/mips/machine.c                              |   6 +-
+ target/mips/op_helper.c                            | 181 +++-
+ target/mips/translate.c                            | 139 +++-
+ target/mips/translate_init.inc.c                   |   2 +
+ tests/tcg/mips/include/test_utils_128.h            |  23 +-
+ .../mips/user/ase/msa/test_msa_compile_32r5eb.sh   | 917 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_32r5el.sh   | 917 +++++++++++++++++++++
+ .../mips/user/ase/msa/test_msa_compile_32r6eb.sh   | 643 ---------------
+ .../mips/user/ase/msa/test_msa_compile_32r6el.sh   | 643 ---------------
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r5eb.sh | 371 +++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r5el.sh | 371 +++++++++
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh | 371 ---------
+ tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh | 371 ---------
+ 24 files changed, 3179 insertions(+), 2063 deletions(-)
+ create mode 100644 hw/misc/mips_dspram.c
+ create mode 100644 include/hw/misc/mips_dspram.h
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r5eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r5el.sh
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6eb.sh
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_compile_32r6el.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r5eb.sh
+ create mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r5el.sh
+ delete mode 100644 tests/tcg/mips/user/ase/msa/test_msa_run_32r6eb.sh
+ delete mode 100755 tests/tcg/mips/user/ase/msa/test_msa_run_32r6el.sh
 
+-- 
+2.7.4
 
---9g9J96uGF2eX7XyD52ujBCfRhBqJaA7I6--
-
---ZABI0nTGYlvu8QsADX28yH8olsHEWfwf7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1AmO0ACgkQp6FrSiUn
-Q2ojGAf/Wx+0jE6Tp7ZCEBS74XQiHbt4WBkzRlZ82AC1XsQffadAQwgeJw+yBVnc
-DU8sO9T+FWBL6n00jndAdCUvIvdZD48ukRAYcssl8pbMQq3gkaNm5nQdjR4mXjoV
-F1/xmHr8UgAqs3AYpq3pI1soWx29OreEBFGXuSTcWGchPfIr4pYrR7u7j1D2DBdm
-hBCdwsUVZdsg3kD9OM8T0/Lx7hQSv2rGaDS10eBgPV1tfXf3qOhcmo/2PkhY8NXJ
-pe37JH4iRMl0FIRu5xuPDfsdzYodtjaXiCo+jH/FXQyPiVWAAZ2HI1lTT/sfbxRL
-27KIU2+KHNMX5maxU1JEyHJ2g3kprQ==
-=shAT
------END PGP SIGNATURE-----
-
---ZABI0nTGYlvu8QsADX28yH8olsHEWfwf7--
 
