@@ -2,56 +2,67 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF25C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DADA5C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 878562067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:30:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 878562067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id A02DE2087F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 19:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A02DE2087F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsXoy-0006Uj-RK
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 15:30:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56895)
+	id 1hsXqq-0000Si-VZ
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 15:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57398)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmP-0001sD-QD
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:28 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hsXqG-0008Od-8q
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:31:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hsXmN-0004CP-Lb
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:25 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:45938 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hsXmN-0004At-Bi
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:27:23 -0400
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 8DBD91A2226;
- Tue, 30 Jul 2019 21:27:19 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
- [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 6C47F1A2228;
- Tue, 30 Jul 2019 21:27:19 +0200 (CEST)
-From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 30 Jul 2019 21:27:07 +0200
-Message-Id: <1564514832-29482-2-git-send-email-aleksandar.markovic@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1564514832-29482-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1564514832-29482-1-git-send-email-aleksandar.markovic@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v4 1/6] target/mips: Add support for
- DSPRAM
+ (envelope-from <no-reply@patchew.org>) id 1hsXqE-0006H5-5e
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:31:24 -0400
+Resent-Date: Tue, 30 Jul 2019 15:31:24 -0400
+Resent-Message-Id: <E1hsXqE-0006H5-5e@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21493)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hsXqD-0006Gb-TY
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 15:31:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1564514154; cv=none; d=zoho.com; s=zohoarc; 
+ b=lsar7XgIyufrW+dCufbAKVZ2a8DcP0NdB+p8+t/m//xpwz9u0uiUZqaLWpXEKyc38QhgG5mVw1o5xqGuKV97SSmupnyC93PqU/fR+jGldkJHzXlKG1/sICQE8nLE+kwd2Sgx0848QL4xPWTBWeyBn8+YosBwdnqSH3pPTKUZ26E=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1564514154;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=2rS8ex3QFKvxxOZBBumcmWAw/4ZRNhyd++lfZrevxTg=; 
+ b=okABba9RM4bNTLuZGFTJcSDJDQ8X0od7JTqHEEMiaR7RWM6i1A8vlNRIwY7sMI7o5SSgu0gBHFV708S20hCsdFIGIcl8dy5cJc7aVkTbse9thBnBr6Q9PxxMK95pDRSnI41yY4wdNEhnP4afYe6UIUSmTRT4fvDsCNkW0ckT1r4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1564514152553980.2853827690728;
+ Tue, 30 Jul 2019 12:15:52 -0700 (PDT)
+Message-ID: <156451415139.17524.6287120260925476152@c4a48874b076>
+In-Reply-To: <1564512798-25527-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: aleksandar.markovic@rt-rk.com
+Date: Tue, 30 Jul 2019 12:15:52 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH for 4.2 v3 0/6] target/mips: Misc patches
+ for 4.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,473 +74,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, sw@weilnetz.de, amarkovic@wavecomp.com
+Reply-To: qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, sw@weilnetz.de, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yongbok Kim <yongbok.kim@mips.com>
-
-The optional Data Scratch Pad RAM (DSPRAM) block provides a general scratch pad RAM
-used for temporary storage of data. The DSPRAM provides a connection to on-chip
-memory or memory-mapped registers, which are accessed in parallel with the L1 data
-cache to minimize access latency
-
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
----
- default-configs/mips-softmmu-common.mak |   1 +
- hw/mips/cps.c                           |  28 +++++-
- hw/misc/Makefile.objs                   |   1 +
- hw/misc/mips_dspram.c                   | 153 ++++++++++++++++++++++++++++++++
- include/hw/mips/cps.h                   |   2 +
- include/hw/misc/mips_dspram.h           |  46 ++++++++++
- target/mips/cpu.h                       |   9 +-
- target/mips/internal.h                  |   3 +-
- target/mips/op_helper.c                 |  14 +++
- target/mips/translate.c                 |   8 ++
- target/mips/translate_init.inc.c        |   2 +
- 11 files changed, 262 insertions(+), 5 deletions(-)
- create mode 100644 hw/misc/mips_dspram.c
- create mode 100644 include/hw/misc/mips_dspram.h
-
-diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
-index da29c6c..99b8df6 100644
---- a/default-configs/mips-softmmu-common.mak
-+++ b/default-configs/mips-softmmu-common.mak
-@@ -33,6 +33,7 @@ CONFIG_MC146818RTC=y
- CONFIG_EMPTY_SLOT=y
- CONFIG_MIPS_CPS=y
- CONFIG_MIPS_ITU=y
-+CONFIG_MIPS_DSPRAM=y
- CONFIG_R4K=y
- CONFIG_MALTA=y
- CONFIG_PCNET_PCI=y
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 0d459c4..76d2a93 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -91,7 +91,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
- 
-     cpu = MIPS_CPU(first_cpu);
-     env = &cpu->env;
--    saar_present = (bool)env->saarp;
-+    saar_present = env->saarp;
-+    bool dspram_present = env->dspramp;
- 
-     /* Inter-Thread Communication Unit */
-     if (itu_present) {
-@@ -102,7 +103,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-         object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
-                                  &err);
-         if (saar_present) {
--            qdev_prop_set_ptr(DEVICE(&s->itu), "saar", (void *)&env->CP0_SAAR);
-+            qdev_prop_set_ptr(DEVICE(&s->itu), "saar",
-+                              (void *) &env->CP0_SAAR[0]);
-         }
-         object_property_set_bool(OBJECT(&s->itu), true, "realized", &err);
-         if (err != NULL) {
-@@ -113,6 +115,28 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-         memory_region_add_subregion(&s->container, 0,
-                            sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->itu), 0));
-     }
-+    env->dspram = g_new0(MIPSDSPRAMState, 1);
-+
-+    /* Data Scratch Pad RAM */
-+    if (dspram_present) {
-+        if (!saar_present) {
-+            error_report("%s: DSPRAM requires SAAR registers", __func__);
-+            return;
-+        }
-+        object_initialize(&s->dspram, sizeof(MIPSDSPRAMState),
-+                          TYPE_MIPS_DSPRAM);
-+        qdev_set_parent_bus(DEVICE(&s->dspram), sysbus_get_default());
-+        qdev_prop_set_ptr(DEVICE(&s->dspram), "saar",
-+                          &env->CP0_SAAR[1]);
-+        object_property_set_bool(OBJECT(&s->dspram), true, "realized", &err);
-+        if (err != NULL) {
-+            error_report("%s: DSPRAM initialisation failed", __func__);
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        memory_region_add_subregion(&s->container, 0,
-+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dspram), 0));
-+    }
- 
-     /* Cluster Power Controller */
-     sysbus_init_child_obj(OBJECT(dev), "cpc", &s->cpc, sizeof(s->cpc),
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index e9aab51..5fcb4db 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -60,6 +60,7 @@ obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-+obj-$(CONFIG_MIPS_DSPRAM) += mips_dspram.o
- obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
- obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
- 
-diff --git a/hw/misc/mips_dspram.c b/hw/misc/mips_dspram.c
-new file mode 100644
-index 0000000..9bc155b
---- /dev/null
-+++ b/hw/misc/mips_dspram.c
-@@ -0,0 +1,153 @@
-+/*
-+ * Data Scratch Pad RAM
-+ *
-+ * Copyright (c) 2017 Imagination Technologies
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
-+#include "qemu/log.h"
-+#include "exec/exec-all.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/misc/mips_dspram.h"
-+
-+static void raise_exception(int excp)
-+{
-+    current_cpu->exception_index = excp;
-+    cpu_loop_exit(current_cpu);
-+}
-+
-+static uint64_t dspram_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MIPSDSPRAMState *s = (MIPSDSPRAMState *)opaque;
-+
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        raise_exception(EXCP_AdEL);
-+        return 0;
-+    case 4:
-+        return *(uint32_t *) &s->ramblock[addr % (1 << s->size)];
-+    case 8:
-+        return *(uint64_t *) &s->ramblock[addr % (1 << s->size)];
-+    }
-+    return 0;
-+}
-+
-+static void dspram_write(void *opaque, hwaddr addr, uint64_t data,
-+                         unsigned size)
-+{
-+    MIPSDSPRAMState *s = (MIPSDSPRAMState *)opaque;
-+
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        raise_exception(EXCP_AdES);
-+        return;
-+    case 4:
-+        *(uint32_t *) &s->ramblock[addr % (1 << s->size)] = (uint32_t) data;
-+        break;
-+    case 8:
-+        *(uint64_t *) &s->ramblock[addr % (1 << s->size)] = data;
-+        break;
-+    }
-+}
-+
-+void dspram_reconfigure(struct MIPSDSPRAMState *dspram)
-+{
-+    MemoryRegion *mr = &dspram->mr;
-+    hwaddr address;
-+    bool is_enabled;
-+
-+    address = ((*(uint64_t *) dspram->saar) & 0xFFFFFFFE000ULL) << 4;
-+    is_enabled = *(uint64_t *) dspram->saar & 1;
-+
-+    memory_region_transaction_begin();
-+    memory_region_set_size(mr, (1 << dspram->size));
-+    memory_region_set_address(mr, address);
-+    memory_region_set_enabled(mr, is_enabled);
-+    memory_region_transaction_commit();
-+}
-+
-+static const MemoryRegionOps dspram_ops = {
-+    .read = dspram_read,
-+    .write = dspram_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .unaligned = false,
-+    }
-+};
-+
-+static void mips_dspram_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MIPSDSPRAMState *s = MIPS_DSPRAM(obj);
-+
-+    memory_region_init_io(&s->mr, OBJECT(s), &dspram_ops, s,
-+                          "mips-dspram", (1 << s->size));
-+    sysbus_init_mmio(sbd, &s->mr);
-+}
-+
-+static void mips_dspram_realize(DeviceState *dev, Error **errp)
-+{
-+    MIPSDSPRAMState *s = MIPS_DSPRAM(dev);
-+
-+    /* some error handling here */
-+
-+    s->ramblock = g_malloc0(1 << s->size);
-+}
-+
-+static void mips_dspram_reset(DeviceState *dev)
-+{
-+    MIPSDSPRAMState *s = MIPS_DSPRAM(dev);
-+
-+    *(uint64_t *) s->saar = s->size << 1;
-+    memset(s->ramblock, 0, (1 << s->size));
-+}
-+
-+static Property mips_dspram_properties[] = {
-+    DEFINE_PROP_PTR("saar", MIPSDSPRAMState, saar),
-+    /* default DSPRAM size is 64 KB */
-+    DEFINE_PROP_SIZE("size", MIPSDSPRAMState, size, 0x10),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mips_dspram_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = mips_dspram_properties;
-+    dc->realize = mips_dspram_realize;
-+    dc->reset = mips_dspram_reset;
-+}
-+
-+static const TypeInfo mips_dspram_info = {
-+    .name          = TYPE_MIPS_DSPRAM,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MIPSDSPRAMState),
-+    .instance_init = mips_dspram_init,
-+    .class_init    = mips_dspram_class_init,
-+};
-+
-+static void mips_dspram_register_types(void)
-+{
-+    type_register_static(&mips_dspram_info);
-+}
-+
-+type_init(mips_dspram_register_types);
-diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
-index aab1af9..a637036 100644
---- a/include/hw/mips/cps.h
-+++ b/include/hw/mips/cps.h
-@@ -25,6 +25,7 @@
- #include "hw/intc/mips_gic.h"
- #include "hw/misc/mips_cpc.h"
- #include "hw/misc/mips_itu.h"
-+#include "hw/misc/mips_dspram.h"
- 
- #define TYPE_MIPS_CPS "mips-cps"
- #define MIPS_CPS(obj) OBJECT_CHECK(MIPSCPSState, (obj), TYPE_MIPS_CPS)
-@@ -41,6 +42,7 @@ typedef struct MIPSCPSState {
-     MIPSGICState gic;
-     MIPSCPCState cpc;
-     MIPSITUState itu;
-+    MIPSDSPRAMState dspram;
- } MIPSCPSState;
- 
- qemu_irq get_cps_irq(MIPSCPSState *cps, int pin_number);
-diff --git a/include/hw/misc/mips_dspram.h b/include/hw/misc/mips_dspram.h
-new file mode 100644
-index 0000000..ee99e17
---- /dev/null
-+++ b/include/hw/misc/mips_dspram.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Data Scratch Pad RAM
-+ *
-+ * Copyright (c) 2017 Imagination Technologies
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef MIPS_DSPRAM_H
-+#define MIPS_DSPRAM_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_MIPS_DSPRAM "mips-dspram"
-+#define MIPS_DSPRAM(obj) OBJECT_CHECK(MIPSDSPRAMState, (obj), TYPE_MIPS_DSPRAM)
-+
-+typedef struct MIPSDSPRAMState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    /* 2 ^ SIZE */
-+    uint64_t size;
-+
-+    MemoryRegion mr;
-+
-+    /* SAAR */
-+    bool saar_present;
-+    void *saar;
-+
-+    /* ramblock */
-+    uint8_t *ramblock;
-+} MIPSDSPRAMState;
-+
-+#endif /* MIPS_DSPRAM_H */
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 21c0615..90a2ed8 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -453,6 +453,7 @@ struct TCState {
- 
- };
- 
-+struct MIPSDSPRAMState;
- struct MIPSITUState;
- typedef struct CPUMIPSState CPUMIPSState;
- struct CPUMIPSState {
-@@ -1035,8 +1036,8 @@ struct CPUMIPSState {
-     uint32_t CP0_Status_rw_bitmask; /* Read/write bits in CP0_Status */
-     uint32_t CP0_TCStatus_rw_bitmask; /* Read/write bits in CP0_TCStatus */
-     uint64_t insn_flags; /* Supported instruction set */
--    int saarp;
--
-+    bool saarp;
-+    bool dspramp;
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
-@@ -1051,6 +1052,7 @@ struct CPUMIPSState {
-     QEMUTimer *timer; /* Internal timer */
-     struct MIPSITUState *itu;
-     MemoryRegion *itc_tag; /* ITC Configuration Tags */
-+    struct MIPSDSPRAMState *dspram;
-     target_ulong exception_base; /* ExceptionBase input to the core */
- };
- 
-@@ -1192,6 +1194,9 @@ void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level);
- /* mips_itu.c */
- void itc_reconfigure(struct MIPSITUState *tag);
- 
-+/* mips_dspram.c */
-+void dspram_reconfigure(struct MIPSDSPRAMState *dspram);
-+
- /* helper.c */
- target_ulong exception_resume_pc(CPUMIPSState *env);
- 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index b2b41a5..f6d0d7a 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -61,7 +61,8 @@ struct mips_def_t {
-     target_ulong CP0_EBaseWG_rw_bitmask;
-     uint64_t insn_flags;
-     enum mips_mmu_types mmu_type;
--    int32_t SAARP;
-+    bool SAARP;
-+    bool DSPRAMP;
- };
- 
- extern const struct mips_def_t mips_defs[];
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 9e2e02f..f7b8c4d 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -1614,7 +1614,14 @@ void helper_mtc0_saar(CPUMIPSState *env, target_ulong arg1)
-                 itc_reconfigure(env->itu);
-             }
-             break;
-+        case 1:
-+            if (env->dspram) {
-+                dspram_reconfigure(env->dspram);
-+            }
-+            break;
-         }
-+    } else {
-+        helper_raise_exception(env, EXCP_RI);
-     }
- }
- 
-@@ -1631,7 +1638,14 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
-                 itc_reconfigure(env->itu);
-             }
-             break;
-+        case 1:
-+            if (env->dspram) {
-+                dspram_reconfigure(env->dspram);
-+            }
-+            break;
-         }
-+    } else {
-+        helper_raise_exception(env, EXCP_RI);
-     }
- }
- 
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ca62800..4ebeabe 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -30368,6 +30368,8 @@ void cpu_state_reset(CPUMIPSState *env)
-     env->active_fpu.fcr31 = env->cpu_model->CP1_fcr31;
-     env->msair = env->cpu_model->MSAIR;
-     env->insn_flags = env->cpu_model->insn_flags;
-+    env->saarp = env->cpu_model->SAARP;
-+    env->dspramp = env->cpu_model->DSPRAMP;
- 
- #if defined(CONFIG_USER_ONLY)
-     env->CP0_Status = (MIPS_HFLAG_UM << CP0St_KSU);
-@@ -30528,6 +30530,12 @@ void cpu_state_reset(CPUMIPSState *env)
-         msa_reset(env);
-     }
- 
-+    /* DSPRAM */
-+    if (env->dspramp) {
-+        /* Fixed DSPRAM size with Default Value */
-+        env->CP0_SAAR[1] = 0x10 << 1;
-+    }
-+
-     compute_hflags(env);
-     restore_fp_status(env);
-     restore_pamask(env);
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index 6d145a9..1df0901 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -760,6 +760,8 @@ const mips_def_t mips_defs[] =
-         .PABITS = 48,
-         .insn_flags = CPU_MIPS64R6 | ASE_MSA,
-         .mmu_type = MMU_TYPE_R4000,
-+        .SAARP = 1,
-+        .DSPRAMP = 1,
-     },
-     {
-         .name = "Loongson-2E",
--- 
-2.7.4
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY0NTEyNzk4LTI1NTI3LTEt
+Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhp
+cyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91
+dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBb
+UWVtdS1kZXZlbF0gW1BBVENIIGZvciA0LjIgdjMgMC82XSB0YXJnZXQvbWlwczogTWlzYyBwYXRj
+aGVzIGZvciA0LjIKTWVzc2FnZS1pZDogMTU2NDUxMjc5OC0yNTUyNy0xLWdpdC1zZW5kLWVtYWls
+LWFsZWtzYW5kYXIubWFya292aWNAcnQtcmsuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3
+IHRhZ10gICAgICAgICBwYXRjaGV3LzE1NjQ1MTI3OTgtMjU1MjctMS1naXQtc2VuZC1lbWFpbC1h
+bGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbSAtPiBwYXRjaGV3LzE1NjQ1MTI3OTgtMjU1Mjct
+MS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbQogLSBbdGFnIHVw
+ZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkwNzMwMTcyNTA4LjE5OTExLTEtbXJlaXR6QHJlZGhhdC5j
+b20gLT4gcGF0Y2hldy8yMDE5MDczMDE3MjUwOC4xOTkxMS0xLW1yZWl0ekByZWRoYXQuY29tClN1
+Ym1vZHVsZSAnY2Fwc3RvbmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdjYXBzdG9uZScKU3VibW9kdWxlICdkdGMnIChodHRwczov
+L2dpdC5xZW11Lm9yZy9naXQvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpTdWJt
+b2R1bGUgJ3JvbXMvUWVtdU1hY0RyaXZlcnMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvUWVt
+dU1hY0RyaXZlcnMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJz
+JwpTdWJtb2R1bGUgJ3JvbXMvU0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9GLmdp
+dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvZWRrMicg
+KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9lZGsyLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
+cm9tcy9lZGsyJwpTdWJtb2R1bGUgJ3JvbXMvaXB4ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dp
+dC9pcHhlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3Jv
+bXMvb3BlbmJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSByZWdp
+c3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5iaW9zJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmhhY2t3
+YXJlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbnNiaScg
+KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuc2JpLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
+aCAncm9tcy9vcGVuc2JpJwpTdWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9n
+aXQucWVtdS5vcmcvZ2l0L3FlbXUtcGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Jv
+bXMvcWVtdS1wYWxjb2RlJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFl
+bXUub3JnL2dpdC9zZWFiaW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlv
+cycKU3VibW9kdWxlICdyb21zL3NlYWJpb3MtaHBwYScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dp
+dC9zZWFiaW9zLWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBw
+YScKU3VibW9kdWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dh
+Ymlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdy
+b21zL3NraWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0
+dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL3UtYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0
+LnFlbXUub3JnL2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL3UtYm9vdC1zYW00NjBleCcKU3VibW9kdWxlICdzbGlycCcgKGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnL2dpdC9saWJzbGlycC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3NsaXJwJwpTdWJtb2R1
+bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
+Z2l0L2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMv
+ZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktdGVz
+dGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvYmVya2VsZXktdGVzdGZsb2F0LTMu
+Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycK
+U3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5
+Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9u
+aW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVja2Vk
+IG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmluZyBp
+bnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5MDlk
+YjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1FlbXVN
+YWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNoZWNr
+ZWQgb3V0ICc5MGM0ODhkNWY0YTQwNzM0MjI0N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9uaW5n
+IGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNrZWQg
+b3V0ICdiYTFhYjM2MGVlYmU2MzM4YmI4ZDdkODNhOTIyMGNjZjdlMjEzYWYzJwpDbG9uaW5nIGlu
+dG8gJ3JvbXMvZWRrMicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMic6IGNoZWNrZWQgb3V0
+ICcyMGQyZTVhMTI1ZTM0ZmM4NTAxMDI2NjEzYTcxNTQ5YjJhMWEzZTU0JwpTdWJtb2R1bGUgJ1Nv
+ZnRGbG9hdCcgKGh0dHBzOi8vZ2l0aHViLmNvbS91Y2ItYmFyL2JlcmtlbGV5LXNvZnRmbG9hdC0z
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGli
+L2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5z
+c2xMaWIvb3BlbnNzbCcgKGh0dHBzOi8vZ2l0aHViLmNvbS9vcGVuc3NsL29wZW5zc2wpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcKQ2xv
+bmluZyBpbnRvICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZs
+b2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQXJtUGtnL0xpYnJhcnkvQXJtU29m
+dEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3
+NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25pbmcgaW50byAnQ3J5cHRvUGtnL0xp
+YnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0Ny
+eXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCc6IGNoZWNrZWQgb3V0ICc1MGVhYWM5
+ZjMzMzc2NjcyNTlkZTcyNTQ1MWYyMDFlNzg0NTk5Njg3JwpTdWJtb2R1bGUgJ2JvcmluZ3NzbCcg
+KGh0dHBzOi8vYm9yaW5nc3NsLmdvb2dsZXNvdXJjZS5jb20vYm9yaW5nc3NsKSByZWdpc3RlcmVk
+IGZvciBwYXRoICdib3Jpbmdzc2wnClN1Ym1vZHVsZSAna3JiNScgKGh0dHBzOi8vZ2l0aHViLmNv
+bS9rcmI1L2tyYjUpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2tyYjUnClN1Ym1vZHVsZSAncHljYS5j
+cnlwdG9ncmFwaHknIChodHRwczovL2dpdGh1Yi5jb20vcHljYS9jcnlwdG9ncmFwaHkuZ2l0KSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdweWNhLWNyeXB0b2dyYXBoeScKQ2xvbmluZyBpbnRvICdib3Jp
+bmdzc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3Bl
+bnNzbExpYi9vcGVuc3NsL2JvcmluZ3NzbCc6IGNoZWNrZWQgb3V0ICcyMDcwZjhhZDkxNTFkYzhm
+M2E3M2JmZmFhMTQ2YjVlNjkzN2E1ODNmJwpDbG9uaW5nIGludG8gJ2tyYjUnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2ty
+YjUnOiBjaGVja2VkIG91dCAnYjlhZDZjNDk1MDVjOTZhMDg4MzI2YjYyYTUyNTY4ZTM0ODRmMjE2
+OCcKQ2xvbmluZyBpbnRvICdweWNhLWNyeXB0b2dyYXBoeScuLi4KU3VibW9kdWxlIHBhdGggJ3Jv
+bXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wvcHljYS1jcnlwdG9n
+cmFwaHknOiBjaGVja2VkIG91dCAnMDk0MDMxMDBkZTJmNmYxY2RkMGQ0ODRkY2I4ZTYyMGYxYzMz
+NWM4ZicKQ2xvbmluZyBpbnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lw
+eGUnOiBjaGVja2VkIG91dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUx
+NycKQ2xvbmluZyBpbnRvICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9v
+cGVuYmlvcyc6IGNoZWNrZWQgb3V0ICdjNzllMGVjYjg0ZjRmMWVlM2Y3M2Y1MjE2MjJlMjY0ZWRk
+MWJmMTc0JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0
+aCAncm9tcy9vcGVuaGFja3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2
+Nzk3ODgyN2FmNmYwYjk1NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL29wZW5zYmknLi4uClN1Ym1v
+ZHVsZSBwYXRoICdyb21zL29wZW5zYmknOiBjaGVja2VkIG91dCAnY2UyMjhlZTA5MTlkZWI5OTU3
+MTkyZDcyM2VlY2M4YWFhZTI2OTdjNicKQ2xvbmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScu
+Li4KU3VibW9kdWxlIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJ2JmMGUx
+MzY5ODg3MjQ1MDE2NGZhNzA0MGRhMzZhOTVkMmQ0YjMyNmYnCkNsb25pbmcgaW50byAncm9tcy9z
+ZWFiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E1
+Y2FiNThlOWEzZmI2ZTE2OGFiYTkxOWM1NjY5YmVhNDA2NTczYjQnCkNsb25pbmcgaW50byAncm9t
+cy9zZWFiaW9zLWhwcGEnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNo
+ZWNrZWQgb3V0ICcwZjRmZTg0NjU4MTY1ZTk2Y2UzNTg3MGZkMTlmYzYzNGUxODJlNzdiJwpDbG9u
+aW5nIGludG8gJ3JvbXMvc2dhYmlvcycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6
+IGNoZWNrZWQgb3V0ICdjYmFlZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpD
+bG9uaW5nIGludG8gJ3JvbXMvc2tpYm9vdCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9v
+dCc6IGNoZWNrZWQgb3V0ICcyNjFjYThlNzc5ZTUxMzg4NjlhNDVmMTc0Y2FhNDliZTZhMjc0NTAx
+JwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJv
+b3QnOiBjaGVja2VkIG91dCAnZDM2ODkyNjdmOTJjNTk1NmUwOWNjN2QxYmFhNDcwMDE0MTY2MmJm
+ZicKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9vdC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvdS1ib290LXNhbTQ2MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3
+M2M1YTZkZjc3MDU1YjJlM2E1ODgnCkNsb25pbmcgaW50byAnc2xpcnAnLi4uClN1Ym1vZHVsZSBw
+YXRoICdzbGlycCc6IGNoZWNrZWQgb3V0ICdmMGRhNjcyNjIwN2I3NDBmNjEwMTAyOGIyOTkyZjkx
+ODQ3N2E0YjA4JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJy4u
+LgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2Vk
+IG91dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBp
+bnRvICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rl
+c3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJzogY2hlY2tlZCBvdXQgJzVhNTlkY2VjMTkzMjcz
+OTZhMDExYTE3ZmQ5MjRhZWQ0ZmVjNDE2YjMnCkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRi
+Jy4uLgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3
+MTZlMmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMyY2UnClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKYzljNDY0OCB0ZXN0cy90Y2c6IHRhcmdldC9taXBzOiBGaXggdGFyZ2V0IGNv
+bmZpZ3VyYXRpb25zIGZvciBNU0EgdGVzdHMKOWVkYzBjNiB0ZXN0cy90Y2c6IHRhcmdldC9taXBz
+OiBBZGQgb3B0aW9uYWwgcHJpbnRpbmcgb2YgbW9yZSBkZXRhaWxlZCBmYWlsdXJlIGluZm8KOWU0
+ZGVlZSB0YXJnZXQvbWlwczogQWRkIGVtdWxhdGlvbiBvZiBDUkMzMiBpbnN0cnVjdGlvbnMKNWRl
+NjQzMyB0YXJnZXQvbWlwczogSW1wbGVtZW50IEdsb2JhbCBJbnZhbGlkYXRlIFRMQiBpbnN0cnVj
+dGlvbgo0MzViODMxIHRhcmdldC9taXBzOiBBbWVuZCBDUDAgV2F0Y2hIaSByZWdpc3RlciBpbXBs
+ZW1lbnRhdGlvbgoyNzhmZGM1IHRhcmdldC9taXBzOiBBZGQgc3VwcG9ydCBmb3IgRFNQUkFNCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzYgQ2hlY2tpbmcgY29tbWl0IDI3OGZkYzU4NGFmOCAodGFy
+Z2V0L21pcHM6IEFkZCBzdXBwb3J0IGZvciBEU1BSQU0pCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBv
+ciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzk0OiAK
+bmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzcxIGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDEvNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoyLzYgQ2hl
+Y2tpbmcgY29tbWl0IDQzNWI4MzEzNWYxMyAodGFyZ2V0L21pcHM6IEFtZW5kIENQMCBXYXRjaEhp
+IHJlZ2lzdGVyIGltcGxlbWVudGF0aW9uKQozLzYgQ2hlY2tpbmcgY29tbWl0IDVkZTY0MzNjOWZh
+MCAodGFyZ2V0L21pcHM6IEltcGxlbWVudCBHbG9iYWwgSW52YWxpZGF0ZSBUTEIgaW5zdHJ1Y3Rp
+b24pCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzw8JyAoY3R4OkV4TykKIzM3
+MTogRklMRTogdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmM6MjU1MToKKzw8PDw8PDwgSEVBRAogXgoK
+RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnPDwnIChjdHg6T3hPKQojMzcxOiBG
+SUxFOiB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYzoyNTUxOgorPDw8PDw8PCBIRUFECiAgIF4KCkVS
+Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzw8JyAoY3R4Ok94TykKIzM3MTogRklM
+RTogdGFyZ2V0L21pcHMvdHJhbnNsYXRlLmM6MjU1MToKKzw8PDw8PDwgSEVBRAogICAgIF4KCkVS
+Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzwnIChjdHg6T3hXKQojMzcxOiBGSUxF
+OiB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYzoyNTUxOgorPDw8PDw8PCBIRUFECiAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9PScgKGN0eDpFeE8pCiMzNzI6IEZJ
+TEU6IHRhcmdldC9taXBzL3RyYW5zbGF0ZS5jOjI1NTI6Cis9PT09PT09CiBeCgpFUlJPUjogc3Bh
+Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc9PScgKGN0eDpPeE8pCiMzNzI6IEZJTEU6IHRhcmdl
+dC9taXBzL3RyYW5zbGF0ZS5jOjI1NTI6Cis9PT09PT09CiAgIF4KCkVSUk9SOiBzcGFjZXMgcmVx
+dWlyZWQgYXJvdW5kIHRoYXQgJz09JyAoY3R4Ok94TykKIzM3MjogRklMRTogdGFyZ2V0L21pcHMv
+dHJhbnNsYXRlLmM6MjU1MjoKKz09PT09PT0KICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICc9JyAoY3R4Ok94RSkKIzM3MjogRklMRTogdGFyZ2V0L21pcHMvdHJhbnNs
+YXRlLmM6MjU1MjoKKz09PT09PT0KICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJv
+dW5kIHRoYXQgJz4+JyAoY3R4OkV4TykKIzM3NDogRklMRTogdGFyZ2V0L21pcHMvdHJhbnNsYXRl
+LmM6MjU1NDoKKz4+Pj4+Pj4gNGM1ZGEyNy4uLiB0YXJnZXQvbWlwczogSW1wbGVtZW50IEdsb2Jh
+bCBJbnZhbGlkYXRlIFRMQiBpbnN0cnVjdGlvbgogXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
+cm91bmQgdGhhdCAnPj4nIChjdHg6T3hPKQojMzc0OiBGSUxFOiB0YXJnZXQvbWlwcy90cmFuc2xh
+dGUuYzoyNTU0OgorPj4+Pj4+PiA0YzVkYTI3Li4uIHRhcmdldC9taXBzOiBJbXBsZW1lbnQgR2xv
+YmFsIEludmFsaWRhdGUgVExCIGluc3RydWN0aW9uCiAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWly
+ZWQgYXJvdW5kIHRoYXQgJz4+JyAoY3R4Ok94TykKIzM3NDogRklMRTogdGFyZ2V0L21pcHMvdHJh
+bnNsYXRlLmM6MjU1NDoKKz4+Pj4+Pj4gNGM1ZGEyNy4uLiB0YXJnZXQvbWlwczogSW1wbGVtZW50
+IEdsb2JhbCBJbnZhbGlkYXRlIFRMQiBpbnN0cnVjdGlvbgogICAgIF4KCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJz4nIChjdHg6T3hXKQojMzc0OiBGSUxFOiB0YXJnZXQvbWlw
+cy90cmFuc2xhdGUuYzoyNTU0OgorPj4+Pj4+PiA0YzVkYTI3Li4uIHRhcmdldC9taXBzOiBJbXBs
+ZW1lbnQgR2xvYmFsIEludmFsaWRhdGUgVExCIGluc3RydWN0aW9uCiAgICAgICBeCgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcvJyAoY3R4OlZ4VikKIzM3NDogRklMRTogdGFy
+Z2V0L21pcHMvdHJhbnNsYXRlLmM6MjU1NDoKKz4+Pj4+Pj4gNGM1ZGEyNy4uLiB0YXJnZXQvbWlw
+czogSW1wbGVtZW50IEdsb2JhbCBJbnZhbGlkYXRlIFRMQiBpbnN0cnVjdGlvbgogICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzon
+IChjdHg6VnhXKQojMzc0OiBGSUxFOiB0YXJnZXQvbWlwcy90cmFuc2xhdGUuYzoyNTU0OgorPj4+
+Pj4+PiA0YzVkYTI3Li4uIHRhcmdldC9taXBzOiBJbXBsZW1lbnQgR2xvYmFsIEludmFsaWRhdGUg
+VExCIGluc3RydWN0aW9uCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
+MTQgZXJyb3JzLCAwIHdhcm5pbmdzLCA0MDUgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy82IGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzYgQ2hlY2tpbmcgY29tbWl0IDllNGRlZWU0MGQ5OCAo
+dGFyZ2V0L21pcHM6IEFkZCBlbXVsYXRpb24gb2YgQ1JDMzIgaW5zdHJ1Y3Rpb25zKQo1LzYgQ2hl
+Y2tpbmcgY29tbWl0IDllZGMwYzY0OTBhNCAodGVzdHMvdGNnOiB0YXJnZXQvbWlwczogQWRkIG9w
+dGlvbmFsIHByaW50aW5nIG9mIG1vcmUgZGV0YWlsZWQgZmFpbHVyZSBpbmZvKQo2LzYgQ2hlY2tp
+bmcgY29tbWl0IGM5YzQ2NDg4MGJmOCAodGVzdHMvdGNnOiB0YXJnZXQvbWlwczogRml4IHRhcmdl
+dCBjb25maWd1cmF0aW9ucyBmb3IgTVNBIHRlc3RzKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3Ig
+ZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxODogCm5l
+dyBmaWxlIG1vZGUgMTAwNzU1Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI1NzYgbGlu
+ZXMgY2hlY2tlZAoKUGF0Y2ggNi82IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NjQ1MTI3OTgtMjU1
+MjctMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS90ZXN0aW5n
+LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
