@@ -2,82 +2,61 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C446FC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A08C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:02:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C99A206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:01:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yeqhFwI2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C99A206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3A7BC20693
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 14:02:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A7BC20693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsSgg-0001Qd-OQ
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:01:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54768)
+	id 1hsShh-0002gf-7B
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 10:02:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55008)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hsSfd-0000VC-Jo
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:06 -0400
+ (envelope-from <piaojun@huawei.com>) id 1hsSgQ-0001Hg-12
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hsSfc-00009f-9c
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:05 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37596)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hsSfc-000099-2T
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:04 -0400
-Received: by mail-ot1-x342.google.com with SMTP id s20so893456otp.4
- for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 07:00:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ozn85kLHHdYbnp7yoE6ellLtbD6HtMj9acchm0i6WTA=;
- b=yeqhFwI29UCqTGtz5SKWJNYgF8q2kwqzYFqe3FE4z/O4rtVK3+tKAqYAkGZfKpJ1yq
- yHCIwqWLpNeOnfOxBANGwy160WDHsDYhnMA5u7EFpfXfDAFS48l8/1jow7A1oo2fdM0u
- Yg1F3Q6pMO6GSp8b/a5q+X6/v7ih+adqKLaWQ0adBuiLtKnRXYfbBoSwqP/Nfx0riesr
- TyXtLj1PZl/okQsFojpBNi+PdQh6AVzLln2guxLSmP2jGSk2/uBOKZQKt9tSVirfqsGy
- k1mdhovZzAEGDzU9XaX+qHpVKNul6SnwUdKK31dxOoNxYwBW3bB0yKXsrBRPA1F9vCP3
- CHTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ozn85kLHHdYbnp7yoE6ellLtbD6HtMj9acchm0i6WTA=;
- b=O3a6rsGNlIblryQTwVk+NPzrW9E2hgxY5+1+5sbBW6dNz3ou1V1rG5F0xTzjXgAs/y
- CliZIIj1V0TOUA7DN4TeQPm9lRPfB9auN6JOlGtH2Glxp5r5eLc9yCUbSePRvPlyewe5
- qu5Dy7pmM45vwpZ+SCAPIoPoKkEMT6oDK2GlAtBT6XRzI4mpUq6NCjtHzPiT9CjWQxOp
- iKSkO5Ru+8WzVB0roFlZAQnP9ZGdEvcmvm+jA/seKBhNk/bquzfUAglj07oO5zoIasH4
- 2o0/Cdn531jlEaRaZ5IoFmH4UU3L+PbOtJYpmDtYoLN4PxGNL3NRftgX3bxN9h2BH1TN
- InkA==
-X-Gm-Message-State: APjAAAVY8Wzac3TZKgBNJ+esiFeqGBjWb8RDh1BPlH59xxsb8r8jEul/
- 43Z92zyR9kubjh9GYdAqCj8pPBSwkFS92fl8gZed6Q==
-X-Google-Smtp-Source: APXvYqzTMAJaqpdIV7b/fTERP8eZj5KhBkD0ItzWYLAOuRQVJ+AsCW+qx4LX6mKzqWlm5O5T+yQdA+WOJX1313u98rc=
-X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr56622087otn.135.1564495203082; 
- Tue, 30 Jul 2019 07:00:03 -0700 (PDT)
+ (envelope-from <piaojun@huawei.com>) id 1hsSgN-0000b3-VV
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:53 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2182 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <piaojun@huawei.com>) id 1hsSgN-0000Y8-1B
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 10:00:51 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id A0569FCD0B5F2BC12D2B;
+ Tue, 30 Jul 2019 22:00:43 +0800 (CST)
+Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Tue, 30 Jul 2019
+ 22:00:39 +0800
+To: Eric Blake <eblake@redhat.com>, <virtio-fs@redhat.com>,
+ <qemu-devel@nongnu.org>
+References: <5D3F8F04.3030404@huawei.com>
+ <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
+From: piaojun <piaojun@huawei.com>
+Message-ID: <5D404D85.1050109@huawei.com>
+Date: Tue, 30 Jul 2019 22:00:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.2.0
 MIME-Version: 1.0
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-2-damien.hedde@greensocs.com>
- <20190730154209.2049f10a.cohuck@redhat.com>
- <CAFEAcA-rwBiXkDEDuT-=KQVJ2A2ob16=P0obbZBPUfZeYXy+dQ@mail.gmail.com>
- <20190730155547.7b201f5e.cohuck@redhat.com>
-In-Reply-To: <20190730155547.7b201f5e.cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 30 Jul 2019 14:59:52 +0100
-Message-ID: <CAFEAcA_BU3DECLVv2QD_RshR0OL3=GqGwsm0YAmEAE6_SpW=HA@mail.gmail.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v3 01/33] Create Resettable QOM interface
+In-Reply-To: <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+X-Originating-IP: [10.177.253.249]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 45.249.212.190
+Subject: Re: [Qemu-devel] [PATCH] virtiofsd: fix compile error if
+ 'F_OFD_GETLK' not defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,63 +68,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Damien Hedde <damien.hedde@greensocs.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 at 14:56, Cornelia Huck <cohuck@redhat.com> wrote:
->
-> On Tue, 30 Jul 2019 14:44:21 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> > On Tue, 30 Jul 2019 at 14:42, Cornelia Huck <cohuck@redhat.com> wrote:
-> > > I'm having a hard time figuring out what a 'cold' or a 'warm' reset is
-> > > supposed to be... can you add a definition/guideline somewhere?
-> >
-> > Generally "cold" reset is "power on" and "warm" is "we were already
-> > powered-on, but somebody flipped a reset line somewhere".
->
-> Ok, that makes sense... my main concern is to distinguish that in a
-> generic way, as it is a generic interface. What about adding something
-> like:
->
-> "A 'cold' reset means that the object to be reset is initially reset; a 'warm'
-> reset means that the object to be reset has already been initialized."
->
-> Or is that again too generic?
+Hi Eric,
 
-I think it doesn't quite capture the idea -- an object can have already
-been reset and then get a 'cold' reset: this is like having a powered-on
-machine and then power-cycling it.
+On 2019/7/30 21:28, Eric Blake wrote:
+> On 7/29/19 7:27 PM, piaojun wrote:
+>> Use F_GETLK for fcntl when F_OFD_GETLK not defined.
+>=20
+> Which system are you hitting this problem on?
+>=20
+> The problem with F_GETLK is that it is NOT as safe as F_OFD_GETLK.
+>=20
+> We already have fcntl_op_getlk and qemu_probe_lock_ops() in util/osdep.=
+c
+> to not only determine which form to use, but also to emit a warning to
+> the end user if we had to fall back to the unsafe F_GETLK. Why is your
+> code not reusing that logic?
 
-The 'warm' reset is the vaguer one, because the specific behaviour
-is somewhat device-dependent (many devices might not have any
-difference from 'cold' reset, for those that do the exact detail
-of what doesn't get reset on warm-reset will vary). But every
-device should have some kind of "as if you power-cycled it" (or
-for QEMU, "go back to the same state as if you just started QEMU on the
-command line"). Our current "reset" method is really cold-reset.
+virtiofsd compile error due to missed 'F_OFD_GETLK'. My kernel version is
+3.10.
 
-thanks
--- PMM
+linux-PUALcm:/home/code/virtiofs/qemu # make -j 8 virtiofsd
+
+make[1]: Entering directory `/home/code/virtiofs/qemu/slirp'
+make[1]: Nothing to be done for `all'.
+make[1]: Leaving directory `/home/code/virtiofs/qemu/slirp'
+	CHK version_gen.h
+  CC      contrib/virtiofsd/passthrough_ll.o
+  CC      qapi/qapi-clone-visitor.o
+  CC      qapi/qmp-event.o
+  CC      qapi/qapi-util.o
+  CC      qapi/qapi-builtin-types.o
+  CC      qapi/qapi-types-audio.o
+  CC      qapi/qapi-types-authz.o
+  CC      qapi/qapi-types-block-core.o
+contrib/virtiofsd/passthrough_ll.c: In function =E2=80=98lo_getlk=E2=80=99=
+:
+contrib/virtiofsd/passthrough_ll.c:1622:25: error: =E2=80=98F_OFD_GETLK=E2=
+=80=99 undeclared (first use in this function)
+  ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
+                         ^
+contrib/virtiofsd/passthrough_ll.c:1622:25: note: each undeclared identif=
+ier is reported only once for each function it appears in
+contrib/virtiofsd/passthrough_ll.c: In function =E2=80=98lo_setlk=E2=80=99=
+:
+contrib/virtiofsd/passthrough_ll.c:1671:25: error: =E2=80=98F_OFD_SETLK=E2=
+=80=99 undeclared (first use in this function)
+
+>=20
+>>
+>> Signed-off-by: Jun Piao <piaojun@huawei.com>
+>> ---
+>>  contrib/virtiofsd/passthrough_ll.c | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/pa=
+ssthrough_ll.c
+>> index 9ae1381..757785b 100644
+>> --- a/contrib/virtiofsd/passthrough_ll.c
+>> +++ b/contrib/virtiofsd/passthrough_ll.c
+>> @@ -1619,7 +1619,11 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t=
+ ino,
+>>  		return;
+>>  	}
+>>
+>> +#ifdef F_OFD_GETLK
+>>  	ret =3D fcntl(plock->fd, F_OFD_GETLK, lock);
+>> +#else
+>> +	ret =3D fcntl(plock->fd, F_GETLK, lock);
+>> +#endif
+>=20
+> Hmm. Since this is in contrib, you are trying to compile something that
+> is independent of util/osdep.c (at least, I assume that's the case, as
+> contrib/virtiofsd/ is not even part of qemu.git master yet - in which
+> case, why is this not being squashed in to the patch introducing that
+> file, rather than sent standalone).  On the other hand, that raises the
+> question - who is trying to use virtiofsd on a kernel that is too old t=
+o
+> provid F_OFD_GETLK?  Isn't the whole point of virtiofsd to be speeding
+> up modern usage, at which point an old kernel is just gumming up the
+> works?  It seems like you are better off letting compilation fail on a
+> system that is too old to support decent F_OFD_GETLK, rather than
+> silently falling back to something that is unsafe.
+
+Perhaps reusing qemu_lock_fd() looks a better way to solve this.
+
+Thanks,
+Jun
+
+>=20
+
 
