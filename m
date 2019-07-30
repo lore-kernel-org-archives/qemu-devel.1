@@ -2,140 +2,80 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851E1C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 565B7C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:32:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BEC1206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:27:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEC1206E0
+	by mail.kernel.org (Postfix) with ESMTPS id 2F7CC206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 15:32:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F7CC206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsU1z-0004mm-Lp
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 11:27:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44074)
+	id 1hsU6q-00071p-Gz
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 11:32:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44795)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hsU0n-0003MQ-3Y
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:26:02 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsU5q-0006Ng-Bt
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:31:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hsU0l-0006ks-NM
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:26:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34114)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hsU0j-0006jB-A3; Tue, 30 Jul 2019 11:25:57 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A199630BA078;
- Tue, 30 Jul 2019 15:25:56 +0000 (UTC)
-Received: from [10.10.120.190] (ovpn-120-190.rdu2.redhat.com [10.10.120.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 672FE5D6B7;
- Tue, 30 Jul 2019 15:25:53 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20190730145727.28965-1-kwolf@redhat.com>
- <20190730145727.28965-3-kwolf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <46e1dc99-8002-aaeb-e4a2-001e9eff4401@redhat.com>
-Date: Tue, 30 Jul 2019 11:25:52 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsU5o-0002mX-Vi
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:31:14 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40461)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hsU5o-0002io-Pr
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 11:31:12 -0400
+Received: by mail-wr1-f66.google.com with SMTP id r1so66248502wrl.7
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 08:31:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=8J3NE8IIlpYqZdQ6IG202nyQ8353ntqIWj2xg30dRhw=;
+ b=F8GQzq3YFwtwTGb9ToKRzgJdSv0QEjIUXRUcWC4exmyh5qjwCBiuf+FSt+R5hbCCn1
+ K+HrvRgDZ6joPlGiDSFf/XMDqyoClqPlK57WFGk0fNPlzf5b6UoSE9LwHTj2us32tOcF
+ D75ParKQWuyLhPBaJacUnVGbiLfTOWFBh4byt5t7foPHHz9FFGoC51smnMwXKCbkkMb5
+ fij2RlAoiNQFiso8pUqdEkuF9WV7zD6E7hV761kf/0+1zni1TNCZuomT3UR6j8pZQLzT
+ W54qMKV58C7MnHzOKMSykArWcGxgNHKcBPoBR4N1H4m30quwbqlemmSeuUp8tPd5KYs5
+ KovA==
+X-Gm-Message-State: APjAAAXg+Sbn1wDNU/1amGJdh/QslugVbcMmoRBwduzVAwTYGYonbuxo
+ l0Bm5jWelU1EapbSdBhcmYQUvQ==
+X-Google-Smtp-Source: APXvYqw3WgMSeg7XBhU7eFym5HuqYb7GgcWUJyL6k4foIGyEBDgkjxa9FLW7drasgo7uQpcFdxmGuw==
+X-Received: by 2002:a5d:6a84:: with SMTP id s4mr50866969wru.125.1564500671769; 
+ Tue, 30 Jul 2019 08:31:11 -0700 (PDT)
+Received: from [192.168.43.238] (63.red-95-127-155.staticip.rima-tde.net.
+ [95.127.155.63])
+ by smtp.gmail.com with ESMTPSA id n8sm53148891wro.89.2019.07.30.08.31.10
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 08:31:11 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20190730132522.27086-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <c8d89a39-a711-a416-b069-5710d672b4e7@redhat.com>
+Date: Tue, 30 Jul 2019 17:31:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190730145727.28965-3-kwolf@redhat.com>
+In-Reply-To: <20190730132522.27086-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 30 Jul 2019 15:25:56 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1 2/2] iotests/118: Test inserting a
- read-only medium
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH for-4.1?] target/arm: Deliver BKPT/BRK
+ exceptions to correct exception level
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,61 +87,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, philmd@redhat.com, armbru@redhat.com,
- mreitz@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 7/30/19 10:57 AM, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 7/30/19 3:25 PM, Peter Maydell wrote:
+> Most Arm architectural debug exceptions (eg watchpoints) are ignored
+> if the configured "debug exception level" is below the current
+> exception level (so for example EL1 can't arrange to get debug exceptions
+> for EL2 execution). Exceptions generated by the BRK or BPKT instructions
+> are a special case -- they must always cause an exception, so if
+> we're executing above the debug exception level then we
+> must take them to the current exception level.
+> 
+> This fixes a bug where executing BRK at EL2 could result in an
+> exception being taken at EL1 (which is strictly forbidden by the
+> architecture).
+> 
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1838277
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  tests/qemu-iotests/118     | 6 +++++-
->  tests/qemu-iotests/118.out | 4 ++--
->  2 files changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-> index 603e10e8a2..499c5f0901 100755
-> --- a/tests/qemu-iotests/118
-> +++ b/tests/qemu-iotests/118
-> @@ -207,10 +207,11 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
->              self.assert_qmp(result, 'return[0]/tray_open', False)
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
-> -    def test_cycle(self):
-> +    def test_cycle(self, read_only_node=False):
->          result = self.vm.qmp('blockdev-add',
->                               node_name='new',
->                               driver=iotests.imgfmt,
-> +                             read_only=read_only_node,
->                               file={'filename': new_img,
->                                      'driver': 'file'})
->          self.assert_qmp(result, 'return', {})
-> @@ -257,6 +258,9 @@ class GeneralChangeTestsBaseClass(ChangeBaseClass):
->              self.assert_qmp(result, 'return[0]/tray_open', False)
->          self.assert_qmp(result, 'return[0]/inserted/image/filename', new_img)
->  
-> +    def test_cycle_read_only_media(self):
-> +        self.test_cycle(True)
-> +
->      def test_close_on_closed(self):
->          result = self.vm.qmp('blockdev-close-tray', id=self.device_name)
->          # Should be a no-op
-> diff --git a/tests/qemu-iotests/118.out b/tests/qemu-iotests/118.out
-> index 6a917130b6..4823c113d5 100644
-> --- a/tests/qemu-iotests/118.out
-> +++ b/tests/qemu-iotests/118.out
-> @@ -1,5 +1,5 @@
-> -...........................................................
-> +...............................................................
->  ----------------------------------------------------------------------
-> -Ran 59 tests
-> +Ran 63 tests
->  
->  OK
-> 
+> At this point in the release cycle I'm not sure we should put this
+> into 4.1 -- it is definitely a bug but it's not a regression as
+> we've been wrong like this for multiple releases, pretty much
+> since we put in the debug handling code I suspect.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+The fix is quite trivial, and the user reported using a release, so
+having it in the next release would be nice.
+Or as usual, wait for 'last-minute-bugfix-that-postpone-another-rc' and
+squeeze this fix in.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> 
+>  target/arm/op_helper.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index 1ab91f915e4..5e1625a1c8a 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -370,6 +370,9 @@ void HELPER(exception_with_syndrome)(CPUARMState *env, uint32_t excp,
+>   */
+>  void HELPER(exception_bkpt_insn)(CPUARMState *env, uint32_t syndrome)
+>  {
+> +    int debug_el = arm_debug_target_el(env);
+> +    int cur_el = arm_current_el(env);
+> +
+>      /* FSR will only be used if the debug target EL is AArch32. */
+>      env->exception.fsr = arm_debug_exception_fsr(env);
+>      /* FAR is UNKNOWN: clear vaddress to avoid potentially exposing
+> @@ -377,7 +380,18 @@ void HELPER(exception_bkpt_insn)(CPUARMState *env, uint32_t syndrome)
+>       * exception/security level.
+>       */
+>      env->exception.vaddress = 0;
+> -    raise_exception(env, EXCP_BKPT, syndrome, arm_debug_target_el(env));
+> +    /*
+> +     * Other kinds of architectural debug exception are ignored if
+> +     * they target an exception level below the current one (in QEMU
+> +     * this is checked by arm_generate_debug_exceptions()). Breakpoint
+> +     * instructions are special because they always generate an exception
+> +     * to somewhere: if they can't go to the configured debug exception
+> +     * level they are taken to the current exception level.
+> +     */
+> +    if (debug_el < cur_el) {
+> +        debug_el = cur_el;
+> +    }
+> +    raise_exception(env, EXCP_BKPT, syndrome, debug_el);
+>  }
+>  
+>  uint32_t HELPER(cpsr_read)(CPUARMState *env)
+> 
 
