@@ -2,67 +2,73 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A2BC0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18137C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:16:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2442C20665
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:11:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2442C20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5E0B20665
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 09:16:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E0B20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsOAk-0003dt-Fs
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:11:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59257)
+	id 1hsOFY-0005Je-8t
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 05:16:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59946)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hsOAL-0003CS-Hd
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:11:30 -0400
+ (envelope-from <bounces@canonical.com>) id 1hsOEX-0004aV-BH
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hsOAK-0004oT-As
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:11:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36732)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1hsOAK-0004oD-2f; Tue, 30 Jul 2019 05:11:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BE8062BF7B;
- Tue, 30 Jul 2019 09:11:25 +0000 (UTC)
-Received: from Igors-MacBook-Pro (ovpn-204-67.brq.redhat.com [10.40.204.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0DA115C1A1;
- Tue, 30 Jul 2019 09:11:22 +0000 (UTC)
-Date: Tue, 30 Jul 2019 11:11:20 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190730111120.63de67ae@Igors-MacBook-Pro>
-In-Reply-To: <04ce7f87-815c-924b-e1df-6a4028750926@intel.com>
-References: <20190729063127.2801-1-tao3.xu@intel.com>
- <20190729063127.2801-3-tao3.xu@intel.com>
- <20190729150957.157a7c03@redhat.com>
- <04ce7f87-815c-924b-e1df-6a4028750926@intel.com>
+ (envelope-from <bounces@canonical.com>) id 1hsOEW-00069X-6a
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:15:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39714)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hsOEV-00069A-Lx
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 05:15:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hsOET-0003fZ-BA
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:15:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1893C2E80E1
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 09:15:45 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 30 Jul 2019 09:11:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 30 Jul 2019 09:01:29 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: arm raspi2
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: aditya-govardhan
+X-Launchpad-Bug-Reporter: Aditya Govardhan (aditya-govardhan)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156377129036.14702.8663571503299830535.malonedeb@wampee.canonical.com>
+Message-Id: <156447729013.7808.16737404267635516804.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19010";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 9002f1023f581b6d54ed1daabca3fb161fd5f8ec
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 02/11] numa: move numa global variable
- nb_numa_nodes into MachineState
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1837347] Re: guest userspace process core dump
+ after raspi2 kernel boot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,122 +77,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, aik@ozlabs.ru, jingqi.liu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org, jonathan.cameron@huawei.com,
- David Gibson <dgibson@redhat.com>, dan.j.williams@intel.com, paulus@samba.org
+Reply-To: Bug 1837347 <1837347@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 08:53:36 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
+** Summary changed:
 
-> On 7/29/2019 9:09 PM, Igor Mammedov wrote:
-> > On Mon, 29 Jul 2019 14:31:18 +0800
-> > Tao Xu <tao3.xu@intel.com> wrote:
-> > 
-> >> Add struct NumaState in MachineState and move existing numa global
-> >> nb_numa_nodes(renamed as "num_nodes") into NumaState. And add variable
-> >> numa_support into MachineClass to decide which submachines support NUMA.
-> >>
-> >> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> >> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> >> ---
-> >>
-> >> Changes in v8:
-> >>      - Add check if numa->numa_state is NULL in pxb_dev_realize_common
-> >>      - Use nb_nodes in spapr_populate_memory() (Igor)
-> >> ---
-> > [...]
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 821f0d4a49..1c7c12c415 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -331,7 +331,7 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
-> >>               return ret;
-> >>           }
-> >>   
-> >> -        if (nb_numa_nodes > 1) {
-> >> +        if (ms->numa_state->num_nodes > 1) {
-> >>               ret = spapr_fixup_cpu_numa_dt(fdt, offset, cpu);
-> >>               if (ret < 0) {
-> >>                   return ret;
-> >> @@ -351,9 +351,9 @@ static int spapr_fixup_cpu_dt(void *fdt, SpaprMachineState *spapr)
-> >>   
-> >>   static hwaddr spapr_node0_size(MachineState *machine)
-> >>   {
-> >> -    if (nb_numa_nodes) {
-> >> +    if (machine->numa_state->num_nodes) {
-> >>           int i;
-> >> -        for (i = 0; i < nb_numa_nodes; ++i) {
-> >> +        for (i = 0; i < machine->numa_state->num_nodes; ++i) {
-> >>               if (numa_info[i].node_mem) {
-> >>                   return MIN(pow2floor(numa_info[i].node_mem),
-> >>                              machine->ram_size);
-> >> @@ -398,13 +398,14 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
-> >>   {
-> >>       MachineState *machine = MACHINE(spapr);
-> >>       hwaddr mem_start, node_size;
-> >> -    int i, nb_nodes = nb_numa_nodes;
-> >> +    int i, nb_nodes = machine->numa_state->num_nodes;
-> >>       NodeInfo *nodes = numa_info;
-> >>       NodeInfo ramnode;
-> >>   
-> >>       /* No NUMA nodes, assume there is just one node with whole RAM */
-> >> -    if (!nb_numa_nodes) {
-> >> +    if (!nb_nodes) {
-> >>           nb_nodes = 1;
-> >> +        machine->numa_state->num_nodes = nb_nodes;
-> > You've not addressed a v7 comment
-> > On Tue, 23 Jul 2019 16:56:41 +0200
-> > Igor Mammedov <imammedo@redhat.com> wrote:
-> > 
-> >> I don't like user fixing up generic machine data that came from CLI
-> >> (or luck of such)
-> > [...]
-> >> I'd keep fixup local (i.e. using nb_nodes)
-> > 
-> > i.e. do not modify machine->numa_state->num_nodes and just use value local
-> > like current code does.
-> 
-> But modify machine->numa_state->num_nodes can fix the issue:
-> spapr_populate_memory() creates a implicit node and info
-> temporarily but then spapr_validate_node_memory() will use
-> global nb_numa_nodes which is 0 and skip check.
+- core dump after raspi2 kernel boot
++ guest userspace process core dump after raspi2 kernel boot
 
-it's not related though, there is nothing wrong with fixing a bug
-but it's typically done by separate patch with proper description.
-(try not to mix unrelated things in one patch)
+** Tags added: arm
 
-But otherwise as you noticed, it might be bug or feature in existing spapr impl,
-and should be fixed by separate patch if necessary, CCing PPC folks.
+-- =
 
-PS:
-we already have an implicit node creation in generic numa code (when memory hotplug
-is enabled), so we probably could reuse that and a node should be created from there
-instead of fixing up from the code deep within the board.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1837347
 
-> Or if I should modify the check part, i.e.
-> static void spapr_validate_node_memory(MachineState *machine, Error **errp)
-> {
-> [...]
->      for (i = 0; machine->numa_state->nodes[i] == NULL; i++) {
->          if (machine->numa_state->nodes[i].node_mem % 
-> SPAPR_MEMORY_BLOCK_SIZE) {
->              error_setg(errp,
->                         "Node %d memory size 0x%" PRIx64
->                         " is not aligned to %" PRIu64 " MiB",
->                         i, machine->numa_state->nodes[i].node_mem,
->                         SPAPR_MEMORY_BLOCK_SIZE / MiB);)
-> 
-> > 
-> >>           ramnode.node_mem = machine->ram_size;
-> >>           nodes = &ramnode;
-> >>       }
-> > [...]
-> > 
-> 
-> 
+Title:
+  guest userspace process core dump after raspi2 kernel boot
 
+Status in QEMU:
+  New
+
+Bug description:
+  Host info:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  x86-64, Ubuntu 18.04, QEMU 4.0.0 (downloaded tarball from main site)
+
+  Guest info:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  ARM7l, Raspbian OS off the main raspberry pi site
+
+  QEMU command:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  qemu-system-arm -M raspi2 -kernel bootpart/kernel7.img -dtb bootpart/bcm2=
+709-rpi-2-b.dtb -drive file=3D2019-07-10-raspbian-buster.img,format=3Draw,i=
+f=3Dsd -append "rw earlyprintk console=3DttyAMA0,115200 fsck.repair=3Dyes r=
+ootwait memtest=3D1 loglevel=3D8 dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0=
+p2" -serial stdio
+
+  kernel7.img and bcm2709-rpi-2-b.dtb were obtained by the following
+  commands:
+
+  guestfish --ro -a 2019-07-10-raspbian-buster.img -m /dev/sda1
+  ><fs> copy-out / bootpart/
+  ><fs> quit
+
+  Output:
+  =3D=3D=3D=3D=3D=3D=3D
+
+  https://pastebin.com/fL1eXhV0
+
+  References:
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  https://translatedcode.wordpress.com/2016/11/03/installing-debian-on-qemu=
+s-32-bit-arm-virt-board/
+  https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspberry=
+-pi-3-model/
+
+  =
+
+  The core dump error can occur at both times, before logging in and after =
+logging in, in this case I have given the output after logging in to show t=
+he initial processes running.
+
+  Also please let me know if I using any kernel flags incorrectly
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1837347/+subscriptions
 
