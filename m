@@ -2,83 +2,91 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A422AC32751
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 23:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A334AC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 23:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BFB4206A2
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 23:21:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BFB4206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D0E42067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 23:39:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="JnJhv33w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D0E42067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36806 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsbR5-0002pm-Qa
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 19:21:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49673)
+	id 1hsbib-0006M9-J1
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 19:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57772)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kevin.tian@intel.com>) id 1hsbQN-0002ES-AG
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 19:20:56 -0400
+ (envelope-from <prvs=10717eeaa=alistair.francis@wdc.com>)
+ id 1hsbhP-0005JE-NH
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 19:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1hsbQM-0007cn-2y
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 19:20:55 -0400
-Received: from mga18.intel.com ([134.134.136.126]:5726)
+ (envelope-from <prvs=10717eeaa=alistair.francis@wdc.com>)
+ id 1hsbhO-0001sl-Mr
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 19:38:31 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:2172)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1hsbQL-0007Xe-P0; Tue, 30 Jul 2019 19:20:53 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 30 Jul 2019 16:20:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,327,1559545200"; d="scan'208";a="323510383"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by orsmga004.jf.intel.com with ESMTP; 30 Jul 2019 16:20:48 -0700
-Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 30 Jul 2019 16:20:48 -0700
-Received: from shsmsx101.ccr.corp.intel.com (10.239.4.153) by
- fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 30 Jul 2019 16:20:47 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.112]) by
- SHSMSX101.ccr.corp.intel.com ([169.254.1.80]) with mapi id 14.03.0439.000;
- Wed, 31 Jul 2019 07:20:45 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Eric Auger <eric.auger@redhat.com>
-Thread-Topic: [PATCH for-4.2 v10 11/15] virtio-iommu: Expose the IOAPIC MSI
- reserved region when relevant
-Thread-Index: AQHVRvuB+lYfnIqunUiYF7Ql9SMCpqbjCI0AgADC99A=
-Date: Tue, 30 Jul 2019 23:20:44 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19CAF8E1B@SHSMSX104.ccr.corp.intel.com>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-12-eric.auger@redhat.com>
- <20190730153628-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20190730153628-mutt-send-email-mst@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMDEyOWQyMWItNGIyNi00YjQxLThkMGUtNDk2MmI0ZDZhZDc0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNTFjOHhsWDRTZVdyUGZVXC8zRnh0bGxBV0tZZFNmME9MWHhrd29HMjBoYWdJN1wvczFmOUk2RWNmTEdNcWh4ZkdJIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <prvs=10717eeaa=alistair.francis@wdc.com>)
+ id 1hsbhO-0001r8-DT; Tue, 30 Jul 2019 19:38:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1564529911; x=1596065911;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=TzSLaqGd1ijZpKYVZGyg4YDJEHLu4T6oDeS8B/digZY=;
+ b=JnJhv33wo2q+MvYxc42I3et9SWKs1UP8Ey5K86LU0xEKHM7CUHYYHN/X
+ gfgfDySa//bEE/tkSRteguuOq3PDa8e9/WUkDxitt23xKD5gTzXaknqt8
+ SB0EI3P78kAHvrxk/8Y7WfzW8Yx5IB/Sohb1xeu0n7ebM7g6+bssUMXYl
+ RFVcCKntGU6h1vIVSvzLrPtp04vXdyAbv5BCtKlYekN42JH7t2WcBNq+V
+ aj373e4qNqlv+NEeRogAxowFwS8snm89pqRBr1tBqgi3EzPCRTKi+Ishe
+ veROGgjAkOZuxJHI18e4EZZ1nNJMoVos3LOaLOuDlyc1Z0q4E6LfKOocR Q==;
+IronPort-SDR: +z5KeEronAc9zV9wGgxQ2fn5sUxKOJ8cPQQjh9l9LyLfKLn51FgEbspg+tQlw+sRUE5t06BQff
+ F2OxtqcFZZR7LrGRQke8JHLx5YJi7OtVNGF1cr9VBSUPXBRQzpX2aXPImJGB64iLr4c2EfjcPX
+ gMog6Gaifv69wSFMnXEq/XVWnKawS7mfypn098Wt4gzlUBQ274g8n+Iff74egrS0wTF9wBYI9d
+ Rz43Z3KEIFd81M5kZm9EYr59tFJz0ixwu+HPuD8wnoW4dP+eNv+VPpUuHjEyQ13M2vAIoCm99p
+ +n4=
+X-IronPort-AV: E=Sophos;i="5.64,327,1559491200"; d="scan'208";a="116132618"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 31 Jul 2019 07:38:27 +0800
+IronPort-SDR: 20B4XNCxalkYbjm2YTXoAa/SILbAcDi7UmYdtD3JbBlM/wmYL24lJFIczfquqgHAhZfDtX8Zb/
+ jjZsbvuxjgZGuESEyzRPfweivH7wIyKf0NV6J0u3pEFaRr82nmo9yDCpry9s+r9gXhQWHLQvu0
+ N9zwCV5iQXh7ROgp1dnzPsOrM8BEg+/tB6G7PSTaKrIthZSL7zbe9wMvriycQg5OwMSgkGDGoi
+ +Ihh4laNS3cWCZsjl+n2HNltYWEKNwtQ2PW1adE1c7xurkyXFvr2VNfZur2g6ogLlQyFpkrf0G
+ iKbQSJ7dBDSENoAfQOyd4vM8
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP; 30 Jul 2019 16:36:28 -0700
+IronPort-SDR: QHc8BU6VDFbEpaT4RGNLfWu7UO4GtqSGxx1ouVrcfMbLaZbnw5CZ7FhRr4MiuaWAt5fe7ikDDc
+ 9o1Kv3A6i+eyk2mr3C9vXv1QFp2+FmFOi+R820HfyVzNWfO5LqwZq5fhjSOk21OLuTgEh3vzhb
+ 90vucpeCHd2fZ9ubrRezOs1H3DW2Rvh4FYZBOvM2Vly8aIuSxaAWxQvPxP9NTU3eX00DSofIgb
+ x6wQLzYq5OA+gbS2Xu37mgLKldSXnRkR2zjkBJ9MX227YxDepAdM3rs7s5c+q7xQIDgPMiNFMC
+ EXE=
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.157.58])
+ by uls-op-cesaip01.wdc.com with ESMTP; 30 Jul 2019 16:38:27 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Date: Tue, 30 Jul 2019 16:35:19 -0700
+Message-Id: <868a01ec5dd656f26ebb06d0b4313452f66206e3.1564529681.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <cover.1564529681.git.alistair.francis@wdc.com>
+References: <cover.1564529681.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 11/15] virtio-iommu: Expose the
- IOAPIC MSI reserved region when relevant
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
+X-Received-From: 216.71.154.45
+Subject: [Qemu-devel] [PATCH-4.2 v2 1/5] target/riscv: Don't set write
+ permissions on dirty PTEs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,154 +98,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "tn@semihalf.com" <tn@semihalf.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Michael S. Tsirkin [mailto:mst@redhat.com]
-> Sent: Wednesday, July 31, 2019 3:38 AM
->=20
-> On Tue, Jul 30, 2019 at 07:21:33PM +0200, Eric Auger wrote:
-> > We introduce a new msi_bypass field which indicates whether
-> > the IOAPIC MSI window [0xFEE00000 - 0xFEEFFFFF] must be exposed
+Setting write permission on dirty PTEs results in userspace inside a
+Hypervisor guest (VU) becoming corrupted. This appears to be because it
+ends up with write permission in the second stage translation in cases
+where we aren't doing a store.
 
-it's not good to call it IOAPIC MSI window. any write to this range, either
-from IOAPIC or PCI device, is interpreted by the platform as interrupt
-request. I'd call it "x86 interrupt address range".
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu_helper.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-> > as a reserved region. By default the field is set to true at
-> > instantiation time. Later on we will introduce a property at
-> > virtio pci proxy level to turn it off.
-> >
-> > Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >
-> > ---
-> >
-> > v8 -> v9:
-> > - pass IOAPIC_RANGE_END to virtio_iommu_register_resv_region
-> > - take into account the change in the struct virtio_iommu_probe_resv_me=
-m
-> >   definition
-> > - We just introduce the field here. A property will be introduced later=
- on
-> >   at pci proxy level.
-> > ---
-> >  hw/virtio/virtio-iommu.c         | 36 ++++++++++++++++++++++++++++++++
-> >  include/hw/virtio/virtio-iommu.h |  1 +
-> >  2 files changed, 37 insertions(+)
-> >
-> > diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> > index 66be9a4627..74038288b0 100644
-> > --- a/hw/virtio/virtio-iommu.c
-> > +++ b/hw/virtio/virtio-iommu.c
-> > @@ -39,6 +39,9 @@
-> >  #define VIOMMU_DEFAULT_QUEUE_SIZE 256
-> >  #define VIOMMU_PROBE_SIZE 512
-> >
-> > +#define IOAPIC_RANGE_START      (0xfee00000)
-> > +#define IOAPIC_RANGE_END        (0xfeefffff)
-> > +
-> >  #define SUPPORTED_PROBE_PROPERTIES (\
-> >      1 << VIRTIO_IOMMU_PROBE_T_RESV_MEM)
-> >
->=20
-> Sorry where are these numbers coming from?
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index e32b6126af..f027be7f16 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -340,10 +340,8 @@ restart:
+             if ((pte & PTE_X)) {
+                 *prot |= PAGE_EXEC;
+             }
+-            /* add write permission on stores or if the page is already dirty,
+-               so that we TLB miss on later writes to update the dirty bit */
+-            if ((pte & PTE_W) &&
+-                    (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
++            /* add write permission on stores */
++            if ((pte & PTE_W) && (access_type == MMU_DATA_STORE)) {
+                 *prot |= PAGE_WRITE;
+             }
+             return TRANSLATE_SUCCESS;
+-- 
+2.22.0
 
-this is architecturally defined in x86 SDM.
-
-> Does this really work on all platforms?
-
-x86 only.=20
-
-> With all guests?
-
-yes.
-
->=20
-> > @@ -100,6 +103,30 @@ static void
-> virtio_iommu_detach_endpoint_from_domain(viommu_endpoint *ep)
-> >      ep->domain =3D NULL;
-> >  }
-> >
-> > +static void virtio_iommu_register_resv_region(viommu_endpoint *ep,
-> > +                                              uint8_t subtype,
-> > +                                              uint64_t start, uint64_t=
- end)
-> > +{
-> > +    viommu_interval *interval;
-> > +    struct virtio_iommu_probe_resv_mem *resv_reg_prop;
-> > +    size_t prop_size =3D sizeof(struct virtio_iommu_probe_resv_mem);
-> > +    size_t value_size =3D prop_size -
-> > +                sizeof(struct virtio_iommu_probe_property);
-> > +
-> > +    interval =3D g_malloc0(sizeof(*interval));
-> > +    interval->low =3D start;
-> > +    interval->high =3D end;
-> > +
-> > +    resv_reg_prop =3D g_malloc0(prop_size);
-> > +    resv_reg_prop->head.type =3D VIRTIO_IOMMU_PROBE_T_RESV_MEM;
-> > +    resv_reg_prop->head.length =3D cpu_to_le64(value_size);
-> > +    resv_reg_prop->subtype =3D cpu_to_le64(subtype);
-> > +    resv_reg_prop->start =3D cpu_to_le64(start);
-> > +    resv_reg_prop->end =3D cpu_to_le64(end);
-> > +
-> > +    g_tree_insert(ep->reserved_regions, interval, resv_reg_prop);
-> > +}
-> > +
-> >  static viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-> >                                                    uint32_t ep_id)
-> >  {
-> > @@ -117,6 +144,12 @@ static viommu_endpoint
-> *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-> >      ep->reserved_regions =3D
-> g_tree_new_full((GCompareDataFunc)interval_cmp,
-> >                                              NULL, (GDestroyNotify)g_fr=
-ee,
-> >                                              (GDestroyNotify)g_free);
-> > +    if (s->msi_bypass) {
-> > +        virtio_iommu_register_resv_region(ep,
-> VIRTIO_IOMMU_RESV_MEM_T_MSI,
-> > +                                          IOAPIC_RANGE_START,
-> > +                                          IOAPIC_RANGE_END);
-> > +    }
-> > +
-> >      return ep;
-> >  }
-> >
-> > @@ -822,6 +855,9 @@ static void virtio_iommu_set_status(VirtIODevice
-> *vdev, uint8_t status)
-> >
-> >  static void virtio_iommu_instance_init(Object *obj)
-> >  {
-> > +    VirtIOIOMMU *s =3D VIRTIO_IOMMU(obj);
-> > +
-> > +    s->msi_bypass =3D true;
-> >  }
-> >
-> >  static const VMStateDescription vmstate_virtio_iommu =3D {
-> > diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virti=
-o-
-> iommu.h
-> > index f55f48d304..56c8b4e57f 100644
-> > --- a/include/hw/virtio/virtio-iommu.h
-> > +++ b/include/hw/virtio/virtio-iommu.h
-> > @@ -59,6 +59,7 @@ typedef struct VirtIOIOMMU {
-> >      GTree *domains;
-> >      QemuMutex mutex;
-> >      GTree *endpoints;
-> > +    bool msi_bypass;
-> >  } VirtIOIOMMU;
-> >
-> >  #endif
-> > --
-> > 2.20.1
 
