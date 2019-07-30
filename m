@@ -2,94 +2,53 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB5CC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 01:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23216C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 01:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B14C20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 01:31:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MjCVgN5W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B14C20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E38E7206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 01:57:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E38E7206E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsGzA-0003ik-Ha
-	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 21:31:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39224)
+	id 1hsHNy-00086R-5E
+	for qemu-devel@archiver.kernel.org; Mon, 29 Jul 2019 21:57:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42890)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hsGyX-0003Jl-Ki
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:30:50 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hsHNN-0007cJ-Qg
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:56:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hsGyW-0004RX-JL
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:30:49 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39925)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hsGyW-0004O0-Bn
- for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:30:48 -0400
-Received: by mail-pl1-x644.google.com with SMTP id b7so28243985pls.6
- for <qemu-devel@nongnu.org>; Mon, 29 Jul 2019 18:30:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ABulo+v5LIO2Y5kgYHTgh6ICRf6L1QUWNDuHmcYVHL8=;
- b=MjCVgN5Wl1FCYMAhzVQ64xPccC6MUVsS/A7vYDyeb7nGOvz1KrKFYCLE2I/Ffs4a2w
- vDJYSNfjawUY/34IDMorgm/XBy9nApfaqFy2a6YuBb+euxh0Op/jDmemkVRX7NH3P6Z3
- QzZ/Pm6voD7p2dDfed1t+BXUDUDQmoNEFYx8KsO0zXtG3mSi6Qm0EBtLu63+sF88v0RT
- MpDZlNqsdfkg153zGvnPNAZ7fH05LiAxaYohzZ88wNZX4x2kWVrb1zdt9A3Yf2mGOx7I
- fe4Qok+wzSBCyDzd1B+83r5iBSKSqrQ8yr5Sl46b54DS++FyOxuNCXUx/jj29rha5LdY
- LWzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ABulo+v5LIO2Y5kgYHTgh6ICRf6L1QUWNDuHmcYVHL8=;
- b=NyvFL6u5bI598k85i/7uOJPXYhb/vwYZVtswR7hwftrZpI2kM7YODSgPOHZGCYayqD
- kYVZsLJpkPg1Fbg8WhpvX4k72IT7qUk0LUENjDzG5vz4/Q01omfswkDNeJ8vLYkA5++e
- r/zSGK0SaVaY8fWbgXhj7asq0hm0Ybxh4SF//SG1q205Rmybu50RkMRek6CAT46cJigb
- JlN9gpJnE5H3oXpN7Y9K8OzT15p/ulECP/V1u441fIU+SU1X81Jq9Ii8wIe8YH3LiBjr
- gXcOUt6DWJiH+lXU3PFKl6r/oclhJBpvNCVIGpogWKtCIn1Ue2GZjqQzA9dyMb8HYxGr
- PU/g==
-X-Gm-Message-State: APjAAAUU4NMckRD8qw+Q4FoNA2DKaJXB5ZkH5kD5om3ikrKEcAds1qlX
- Oo32wElEEiFbgfPJH4t06BQD8A==
-X-Google-Smtp-Source: APXvYqx6wEoY0AFWBGDMZbvaVAeHiliMAg1EucMwjquuIMAdZXt3xiYFJeTb3RyqVczeAD2i2rBrVw==
-X-Received: by 2002:a17:902:1004:: with SMTP id
- b4mr114708536pla.325.1564450245021; 
- Mon, 29 Jul 2019 18:30:45 -0700 (PDT)
-Received: from [192.168.101.105] ([75.147.178.105])
- by smtp.gmail.com with ESMTPSA id j15sm92874681pfn.150.2019.07.29.18.30.43
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 29 Jul 2019 18:30:44 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190726175032.6769-1-richard.henderson@linaro.org>
- <20190726175032.6769-2-richard.henderson@linaro.org>
- <CAFEAcA-+PfEMDE9QJZJ+_yqV0KYY6ih2yxA8c_w1bmrz7GtUkA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <4962c208-04d6-65e8-556d-b1805f4e4ebf@linaro.org>
-Date: Mon, 29 Jul 2019 18:30:42 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <balaton@eik.bme.hu>) id 1hsHNM-0000jB-QW
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:56:29 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:22716)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hsHNM-0000h4-GY
+ for qemu-devel@nongnu.org; Mon, 29 Jul 2019 21:56:28 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id EE6F87456E3;
+ Tue, 30 Jul 2019 03:56:15 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 59D897456E0; Tue, 30 Jul 2019 03:56:15 +0200 (CEST)
+Message-Id: <5778864958ee7bcaec1c77eed8e40c9e07ed6784.1564451616.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Tue, 30 Jul 2019 03:53:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-+PfEMDE9QJZJ+_yqV0KYY6ih2yxA8c_w1bmrz7GtUkA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+To: qemu-devel@nongnu.org
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH 01/67] decodetree: Allow !function with no
- input bits
+X-Received-From: 2001:738:2001:2001::2001
+Subject: [Qemu-devel] [PATCH] ati-vga: Add limited support for big endian
+ frame buffer aperture
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,76 +60,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/29/19 6:43 AM, Peter Maydell wrote:
-> On Fri, 26 Jul 2019 at 18:50, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> With this, we can have the function return a value from the DisasContext.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>  scripts/decodetree.py             | 5 ++++-
->>  tests/decode/succ_function.decode | 2 ++
->>  2 files changed, 6 insertions(+), 1 deletion(-)
->>  create mode 100644 tests/decode/succ_function.decode
->>
->> diff --git a/scripts/decodetree.py b/scripts/decodetree.py
->> index d7a59d63ac..4259d87a95 100755
->> --- a/scripts/decodetree.py
->> +++ b/scripts/decodetree.py
->> @@ -195,7 +195,10 @@ class MultiField:
->>      """Class representing a compound instruction field"""
->>      def __init__(self, subs, mask):
->>          self.subs = subs
->> -        self.sign = subs[0].sign
->> +        if len(subs):
->> +            self.sign = subs[0].sign
->> +        else:
->> +            self.sign = 0
->>          self.mask = mask
->>
->>      def __str__(self):
->> diff --git a/tests/decode/succ_function.decode b/tests/decode/succ_function.decode
->> new file mode 100644
->> index 0000000000..632a9de252
->> --- /dev/null
->> +++ b/tests/decode/succ_function.decode
->> @@ -0,0 +1,2 @@
->> +%foo  !function=foo
->> +foo   00000000000000000000000000000000 %foo
->> --
->> 2.17.1
-> 
-> Could you also update the documentation in docs/devel/decodetree.rst ?
-> 
-> This code change looks like it also now allows definitions
-> of fields that specify nothing at all (ie there's no check
-> that a field definition with no "unnamed_field" parts has
-> a !function specifier) -- what do they do, or should they
-> be made syntax errors ?
+Set frame buffer endianness according to requested endianness for
+frame buffer aperture 0. This fixes inverted colors with Xorg frame
+buffer driver. Setting endianness of aperture 1 and reg aperture are
+not implemented.
 
-Ah good point.  Should be syntax errors.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/display/ati.c      | 9 ++++++++-
+ hw/display/ati_int.h  | 1 +
+ hw/display/ati_regs.h | 1 +
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-> Is one of these functions which just returns a constant
-> from no input bits still a "static int func(DisasContext *s, int x)"
-> taking a pointless input argument, or is it now a
-> "static int func(DisasContext *s)" ? I guess from the fact
-> this code doesn't change the way a call is output that it
-> is the former, but would the latter be cleaner ?
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index d1db07dd2f..84961d193f 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -90,7 +90,8 @@ static void ati_vga_switch_mode(ATIVGAState *s)
+             DPRINTF("Switching to %dx%d %d %d @ %x\n", h, v, stride, bpp=
+, offs);
+             vbe_ioport_write_index(&s->vga, 0, VBE_DISPI_INDEX_ENABLE);
+             vbe_ioport_write_data(&s->vga, 0, VBE_DISPI_DISABLED);
+-            s->vga.big_endian_fb =3D false;
++            s->vga.big_endian_fb =3D (s->regs.config_cntl & APER_0_ENDIA=
+N ?
++                                    true : false);
+             /* reset VBE regs then set up mode */
+             s->vga.vbe_regs[VBE_DISPI_INDEX_XRES] =3D h;
+             s->vga.vbe_regs[VBE_DISPI_INDEX_YRES] =3D v;
+@@ -311,6 +312,9 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr=
+, unsigned int size)
+     case PALETTE_DATA:
+         val =3D vga_ioport_read(&s->vga, VGA_PEL_D);
+         break;
++    case CNFG_CNTL:
++        val =3D s->regs.config_cntl;
++        break;
+     case CNFG_MEMSIZE:
+         val =3D s->vga.vram_size;
+         break;
+@@ -605,6 +609,9 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+         data >>=3D 8;
+         vga_ioport_write(&s->vga, VGA_PEL_D, data & 0xff);
+         break;
++    case CNFG_CNTL:
++        s->regs.config_cntl =3D data;
++        break;
+     case CRTC_H_TOTAL_DISP:
+         s->regs.crtc_h_total_disp =3D data & 0x07ff07ff;
+         break;
+diff --git a/hw/display/ati_int.h b/hw/display/ati_int.h
+index 31a1927b3e..5b4d3be1e6 100644
+--- a/hw/display/ati_int.h
++++ b/hw/display/ati_int.h
+@@ -39,6 +39,7 @@ typedef struct ATIVGARegs {
+     uint32_t gpio_vga_ddc;
+     uint32_t gpio_dvi_ddc;
+     uint32_t gpio_monid;
++    uint32_t config_cntl;
+     uint32_t crtc_h_total_disp;
+     uint32_t crtc_h_sync_strt_wid;
+     uint32_t crtc_v_total_disp;
+diff --git a/hw/display/ati_regs.h b/hw/display/ati_regs.h
+index 81fb5302c0..11a54caa83 100644
+--- a/hw/display/ati_regs.h
++++ b/hw/display/ati_regs.h
+@@ -313,6 +313,7 @@
+ #define X_MPLL_REF_DIV_MASK                     0x000000FF
+=20
+ /* Config control values (CONFIG_CNTL) */
++#define APER_0_ENDIAN                           0x00000003
+ #define CFG_VGA_IO_DIS                          0x00000400
+=20
+ /* CRTC control values (CRTC_GEN_CNTL) */
+--=20
+2.13.7
 
-Right on both counts.  Because of how the loop in MultiField is set up, x will
-always be given 0.  I'll see about cleaning this up.
-
-In the meantime, fyi, this is used for setting the S bit for thumb1 insns,
-where S=0 iff the insn is within an IT block.
-
-
-r~
 
