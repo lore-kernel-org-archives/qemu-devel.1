@@ -2,83 +2,86 @@ Return-Path: <SRS0=D7Ry=V3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3A0C0650F
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 05:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AB3C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 05:46:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C579C206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 05:45:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F821206E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 30 Jul 2019 05:46:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qddvOICz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C579C206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRc3PSOq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F821206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsKxT-00038G-35
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 01:45:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49292)
+	id 1hsKxi-0003Lh-GG
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 01:46:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49372)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rashmica.g@gmail.com>) id 1hsKwm-00023o-6j
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 01:45:17 -0400
+ (envelope-from <rashmica.g@gmail.com>) id 1hsKws-0002DV-Qu
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 01:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rashmica.g@gmail.com>) id 1hsKwl-0002j5-7U
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 01:45:16 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39276)
+ (envelope-from <rashmica.g@gmail.com>) id 1hsKwr-0002mo-ON
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 01:45:22 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36057)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <rashmica.g@gmail.com>)
- id 1hsKwj-0002hp-2f; Tue, 30 Jul 2019 01:45:13 -0400
-Received: by mail-pl1-x643.google.com with SMTP id b7so28475381pls.6;
- Mon, 29 Jul 2019 22:45:12 -0700 (PDT)
+ id 1hsKwp-0002l8-AY; Tue, 30 Jul 2019 01:45:19 -0400
+Received: by mail-pl1-x643.google.com with SMTP id k8so28446294plt.3;
+ Mon, 29 Jul 2019 22:45:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=0c5Fk5uuse8MwbXJXkiQRerY3AzzOY/o674bSmI3StM=;
- b=qddvOICzjQlP2YToI0YL4IEWmZdTvJKs+dxCFSEpyvyAnBbo+e9XRpCuS72br/ubQz
- v+Z9PM/eRvh+xJQZpatsV976LpIDYP60yDo7sH6EBwY1ylHZDvXRIl7MItkss9RXgtr1
- ypLIDrK8pLqNLrq6JIw3mgXw8HbQxguEXto8amAK6iaIMBek6xY9Ifk5E6Qvoq9oeBCm
- qkKSv/DEuRe7oQeHMIZU3yqSlOk8ILgJB+c971XX2O51k/UDESlI428RbblItkzXxN8+
- bgTOaVP7+gi59Ia/jbULUOP1J0XoVOD55mR5kQDzlu1pd5xNXoALaeBdLfjldYPVfGSt
- U31Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=lBGGTqXH/nhd6kXXGRtBAmp2V+9X81H4xeVXysgM8vc=;
+ b=fRc3PSOqfSXfSWV1hindbmUllwI0YjM3yWKapvdpNdfYzbvKtwuIfaOAOtuuMirVfy
+ dgbB5cBJL0kcjyKtk5TtlkPgzlCzr1yUEVxAW3lX3x3U4Ws++sFFKXw4hvyWF5veEroY
+ XJrmgRLdfxnACTQTFzfnHtA5RMTdacBFpWCBPJPwriJsdpeK7OJs+3Z+SLZt6Cyiaa6P
+ 4kPx/1qIsk5IcFgVrOP891PvN8Gf/0me++JaeoMZHRFBvKWm32cIz2MippX2/S9CEKXC
+ aOk9aBUmrFvsS4XkQApd5HvXPnUkrUj/QPo9bGh3Wr/axMW+DTBJaadVVLzH82HEPO0S
+ 962g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=0c5Fk5uuse8MwbXJXkiQRerY3AzzOY/o674bSmI3StM=;
- b=aVC/JnTcKWmDoFI5LqF2hLNAz7l9hkcWwBnITv6Keh8IKkfKjPLC8oyM4CgSXpfIOy
- CN9PLoYONxYXAYsN46SIeFIpB1xW4k8qxdXHi1qZcHNI8zblwqhuj2+AKgXC7bx5kplD
- 5wF22CYzoPPF2zTqVVLn1EsM6WAAfnqV1IESpdTQSVBZI4SrYbRygaRy5YxeGxlARFSL
- N0qWW8ZXc47oHELbsWYaC4eVNjSER5ZcXX8P/WBpVdYjQYEkzLh4Q3JooW995ZEeTdCE
- qU7bXfaIugzxPx8D+mN8bFZ37zbjKDzzQ7gbiAzgqSdAv8pAIHvytkNX0aLI1uHF/+ga
- uEtg==
-X-Gm-Message-State: APjAAAXmu2/1ikBwXOq9AFQd+6+OUQMNaODuzttxa7CpMBHTK6baKgGg
- Sa6v9er8Yw32SU/ci/gsDhU=
-X-Google-Smtp-Source: APXvYqwYLDQutsM4r46TNsT6fVLfw4loor/JqvAN/DfcUOnFg07eQPdFhBWADk56HHGbzt88luzwuw==
-X-Received: by 2002:a17:902:d892:: with SMTP id
- b18mr106373896plz.165.1564465511916; 
- Mon, 29 Jul 2019 22:45:11 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=lBGGTqXH/nhd6kXXGRtBAmp2V+9X81H4xeVXysgM8vc=;
+ b=ntPM/J3QYurHxCeUWHl78MhifBgsEHfx8AXyf/iJ6/N34wV9MO59A45Qlos2OphPuB
+ 89ADcCcxtJ6VKFtZRq4utuoVHcYEsvkp3PZzNVIzBcIKpeM2u0QVQyzN3PbVknHnD6AV
+ CSsePmgSag4IInbaFUBMPA7Ip1GR/y/lG3xUOLk4LpAMEOP2ms01DUakiGrxSWJb5T4G
+ Sxb18fITV5LCXCsoAhtaxbaasf/AjOHX1lSd83GslQUPu0DHoGkd5oq4NScXqUgtXbTF
+ Sgn3X2yoX/jmW4U4cVan28PYGIBwwZI4X8Y7i7vZ6j9CwM3huUPxnGqBNF3HP0k9qwGX
+ Qlpg==
+X-Gm-Message-State: APjAAAXzyUSsP7BnFY8z6SUrzYQrW/bgjuSWJoiNGkQuZYEuKSo0UTA7
+ Ww3nVL0sPREUzcFXmuhp24E=
+X-Google-Smtp-Source: APXvYqxVyu9BMgne+HZ2baytRAann1n2dicxlqfuSWGgOFI1vb3vr5zsfFQGSaQOO1pg0PtVPDPCSw==
+X-Received: by 2002:a17:902:e20c:: with SMTP id
+ ce12mr117403746plb.130.1564465518542; 
+ Mon, 29 Jul 2019 22:45:18 -0700 (PDT)
 Received: from rashmica.ozlabs.ibm.com ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id 81sm99171221pfx.111.2019.07.29.22.45.08
+ by smtp.gmail.com with ESMTPSA id 81sm99171221pfx.111.2019.07.29.22.45.15
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 29 Jul 2019 22:45:11 -0700 (PDT)
+ Mon, 29 Jul 2019 22:45:18 -0700 (PDT)
 From: Rashmica Gupta <rashmica.g@gmail.com>
 To: peter.maydell@linaro.org
-Date: Tue, 30 Jul 2019 15:44:58 +1000
-Message-Id: <20190730054501.32727-1-rashmica.g@gmail.com>
+Date: Tue, 30 Jul 2019 15:45:00 +1000
+Message-Id: <20190730054501.32727-3-rashmica.g@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190730054501.32727-1-rashmica.g@gmail.com>
+References: <20190730054501.32727-1-rashmica.g@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PATCH v3 0/3] Add Aspeed GPIO controller model
+Subject: [Qemu-devel] [PATCH v3 2/3] aspeed: add a GPIO controller to the SoC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,35 +99,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are a couple of things I'm not confident about here:
-- what should be in init vs realize?
-- should the irq state be in vmstate?
-- is there a better way to do composition of classes (patch 3)?
+Signed-off-by: Rashmica Gupta <rashmica.g@gmail.com>
+---
+ hw/arm/aspeed_soc.c         | 17 +++++++++++++++++
+ include/hw/arm/aspeed_soc.h |  3 +++
+ 2 files changed, 20 insertions(+)
 
-v3:
-- didn't have each gpio set up as an irq 
-- now can't access set AC on ast2400 (only exists on ast2500)
-- added ast2600 implementation (patch 3)
-- renamed a couple of variables for clarity
-
-
-v2: Addressed Andrew's feedback, added debounce regs, renamed get/set to
-read/write to minimise confusion with a 'set' of registers.
-
-Rashmica Gupta (3):
-  hw/gpio: Add basic Aspeed GPIO model for AST2400 and AST2500
-  aspeed: add a GPIO controller to the SoC
-  hw/gpio: Add in AST2600 specific implementation
-
- hw/arm/aspeed_soc.c           |   17 +
- hw/gpio/Makefile.objs         |    1 +
- hw/gpio/aspeed_gpio.c         | 1103 +++++++++++++++++++++++++++++++++
- include/hw/arm/aspeed_soc.h   |    3 +
- include/hw/gpio/aspeed_gpio.h |   91 +++
- 5 files changed, 1215 insertions(+)
- create mode 100644 hw/gpio/aspeed_gpio.c
- create mode 100644 include/hw/gpio/aspeed_gpio.h
-
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index c6fb3700f2..ff422c8ad1 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -124,6 +124,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .spis_num     = 1,
+         .fmc_typename = "aspeed.smc.fmc",
+         .spi_typename = aspeed_soc_ast2400_typenames,
++        .gpio_typename = "aspeed.gpio-ast2400",
+         .wdts_num     = 2,
+         .irqmap       = aspeed_soc_ast2400_irqmap,
+         .memmap       = aspeed_soc_ast2400_memmap,
+@@ -136,6 +137,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .spis_num     = 1,
+         .fmc_typename = "aspeed.smc.fmc",
+         .spi_typename = aspeed_soc_ast2400_typenames,
++        .gpio_typename = "aspeed.gpio-ast2400",
+         .wdts_num     = 2,
+         .irqmap       = aspeed_soc_ast2400_irqmap,
+         .memmap       = aspeed_soc_ast2400_memmap,
+@@ -148,6 +150,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .spis_num     = 1,
+         .fmc_typename = "aspeed.smc.fmc",
+         .spi_typename = aspeed_soc_ast2400_typenames,
++        .gpio_typename = "aspeed.gpio-ast2400",
+         .wdts_num     = 2,
+         .irqmap       = aspeed_soc_ast2400_irqmap,
+         .memmap       = aspeed_soc_ast2400_memmap,
+@@ -160,6 +163,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .spis_num     = 2,
+         .fmc_typename = "aspeed.smc.ast2500-fmc",
+         .spi_typename = aspeed_soc_ast2500_typenames,
++        .gpio_typename = "aspeed.gpio-ast2500",
+         .wdts_num     = 3,
+         .irqmap       = aspeed_soc_ast2500_irqmap,
+         .memmap       = aspeed_soc_ast2500_memmap,
+@@ -246,6 +250,9 @@ static void aspeed_soc_init(Object *obj)
+ 
+     sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xdma),
+                           TYPE_ASPEED_XDMA);
++
++    sysbus_init_child_obj(obj, "gpio", OBJECT(&s->gpio), sizeof(s->gpio),
++                          sc->info->gpio_typename);
+ }
+ 
+ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+@@ -425,6 +432,16 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+                     sc->info->memmap[ASPEED_XDMA]);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->xdma), 0,
+                        aspeed_soc_get_irq(s, ASPEED_XDMA));
++
++    /* GPIO */
++    object_property_set_bool(OBJECT(&s->gpio), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->gpio), 0, sc->info->memmap[ASPEED_GPIO]);
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->gpio), 0,
++                       aspeed_soc_get_irq(s, ASPEED_GPIO));
+ }
+ static Property aspeed_soc_properties[] = {
+     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index cef605ad6b..fa04abddd8 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -22,6 +22,7 @@
+ #include "hw/ssi/aspeed_smc.h"
+ #include "hw/watchdog/wdt_aspeed.h"
+ #include "hw/net/ftgmac100.h"
++#include "hw/gpio/aspeed_gpio.h"
+ 
+ #define ASPEED_SPIS_NUM  2
+ #define ASPEED_WDTS_NUM  3
+@@ -47,6 +48,7 @@ typedef struct AspeedSoCState {
+     AspeedSDMCState sdmc;
+     AspeedWDTState wdt[ASPEED_WDTS_NUM];
+     FTGMAC100State ftgmac100[ASPEED_MACS_NUM];
++    AspeedGPIOState gpio;
+ } AspeedSoCState;
+ 
+ #define TYPE_ASPEED_SOC "aspeed-soc"
+@@ -60,6 +62,7 @@ typedef struct AspeedSoCInfo {
+     int spis_num;
+     const char *fmc_typename;
+     const char **spi_typename;
++    const char *gpio_typename;
+     int wdts_num;
+     const int *irqmap;
+     const hwaddr *memmap;
 -- 
 2.20.1
 
