@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0146BC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D523FC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C143C206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3F4E206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ApKufer1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C143C206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IXVI1UXY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3F4E206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsrLK-0000Ih-WF
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:20:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42390)
+	id 1hsrLN-0000Sz-Uc
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42322)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrG7-0005uW-8e
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:24 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrG5-0005pH-Ng
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrG6-0004A0-1m
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:23 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53508)
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrG1-000475-Os
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:19 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33696)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsrG5-00047H-Q6
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:21 -0400
-Received: by mail-wm1-x344.google.com with SMTP id x15so61472968wmj.3
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:18 -0700 (PDT)
+ id 1hsrFz-00045J-R9
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:17 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n9so70435911wru.0
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=TwsNXkTsHTv8y1ITkoQ5QIXyXHIc1coCol9uilfBzDM=;
- b=ApKufer1ZmNFvz+1aMwTxRKO9pQL6ZDR3EM5lxC6cKVhXLgL10LatRlQGd+EOt+pL0
- Vfq6Y3DikqFLXLa4LOuvxZQSI4NEL1U2tG8odekY24u/s7SZ8jZYaitFdKiH7mvGlLYI
- d2tSWlgoY21T0+CXJiEosDttlzv24VDzJElrNv3TaOBOtstJzL0CqW3rnboNH8Q+XB0V
- zQ2zr9LPan0SOg0jRtVzuBkasLOBnoWrL2BKqvaAyo/Aq4qtRGB+ct2ue9Z3UR+ECg9k
- /yZ5THI5hlQvy7zCTPob5jLgsCa/JWIDKAGNtkGd2+EBJuggayHrZ+czjqiu8DpECMf0
- bKyw==
+ bh=ETn84aVwzraVZR/ukzhhM5DHZ0Q2gcDn01igaexosx0=;
+ b=IXVI1UXYGYFOZ9jKBjjo/7x0/5Ula4rEgEDzcFYTcVYscj+i1zbqbhNxiX0fo8JAvu
+ 2RcwY8m5MgfpX/zX/lLdeZL6mvvvQCbfZoHfURxRe44hPBhbtO5Hqodi53cnVEPwV3dK
+ pZWO2rSB7Q+6jI1zFjbaodmMdDf4Wyc7uqoBOVGNyvksNCYJ7TVNLkCxl4HnU3NaQRcf
+ F1ApoJSMzdwD4SrjL6GdkBY92p1+CI/NIJXDB6xY3UaFjlqi5AneOL+gAzm3YPYemv3u
+ gf4AEjbHV5a/u9n6GDzt9bPPdJVro0Y5Jz52g6+Zgol0763C5A3FIfG9h3/98kOWSHsc
+ duJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=TwsNXkTsHTv8y1ITkoQ5QIXyXHIc1coCol9uilfBzDM=;
- b=LK7rgTfoKCKhXAR/CSlxw5Ud0WgPkOCUZhSE/p1jQ2XfNpOh8/UWpcm7Rtm6GqEm3o
- 3TnH7DMenElTDucuHyFozmigZ7leRXgfZHI58bTqP5mZt9SKHeXTNuNWNaVYo/URsWiu
- c608W7scABT5G/WXShA7Wo6FSfv2YUiqKkEEX2D0nEUWWb8wc5MT4arj5D27IaTOOknk
- 7ExXwcNgFC2rs1xl5GaiDkTPZL5pmJY+stSM1XCONCLqP0ToGqu26QB4j9ZVA0UKuOXL
- QAB9Mf+L6umti3nSmlG7iClhQBDv/ECS1rCW5l3UqzSJb2rimrkUDfvobS+d2UZQBofF
- XVSA==
-X-Gm-Message-State: APjAAAUpk3qhTt8qFsxQolH6cklOLULGeWxdzEviX070/1AAGAqkTAEi
- +i2zbZG3YJZhSQYKfpeozbVBXw==
-X-Google-Smtp-Source: APXvYqwlsnN3B64lkx7YjD8MjHOEzJBHHB263RewdHibl9X2zGzGIj8+FhBugarytxweyWBP60SG1w==
-X-Received: by 2002:a1c:7e14:: with SMTP id z20mr108780131wmc.83.1564589717279; 
- Wed, 31 Jul 2019 09:15:17 -0700 (PDT)
+ bh=ETn84aVwzraVZR/ukzhhM5DHZ0Q2gcDn01igaexosx0=;
+ b=pZcgfX6XmX2FSGHKO6HgIWXZ7Gnaht8hihEfWoKH6KdPGfiX0wRjSfbmF2/8fZMGZl
+ Do0hI/vVHim72xiqpHUP1YdrWVrqdXCP2mDPHDva5/Q21Fx8I6VierrAHcaGx0PEjqvL
+ IsAok8MEzfpP2trnKzuDGHyx0RY5t8NOiaCpY96tXwjWsjsHW0gJDi0lNK4bfTtzNo05
+ Az7Ma8aV6P7qyUgpk9vYPmChH7S0tVhFxWnnxT+hi1XGjKeG3/ay0nSBGyxtCBE7MsTu
+ v/wb7aJubRd4+av7Xuc/mnP5F4NhiaVjpO0LSgkmhofnqL7j0iKZ920bP56HkTJF594g
+ hGbw==
+X-Gm-Message-State: APjAAAUfmNC3GjJpWCxXd/E3BT7PdRNgi55rj/z5Lp1FYlbzue4kcHZm
+ aCZr+8ZQlLbsx4IzZ8IjCFfpvQ==
+X-Google-Smtp-Source: APXvYqzT697wIZ21eVsK4mf9nOLgLFWnWSRF96rbadKVA/ceGWCUPmVc5kXiXUK2cx68ZRM3EomM8w==
+X-Received: by 2002:adf:e705:: with SMTP id c5mr87792253wrm.270.1564589713239; 
+ Wed, 31 Jul 2019 09:15:13 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id t63sm62639657wmt.6.2019.07.31.09.15.13
+ by smtp.gmail.com with ESMTPSA id l2sm46111132wmj.4.2019.07.31.09.15.12
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 09:15:14 -0700 (PDT)
+ Wed, 31 Jul 2019 09:15:12 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6FCE71FFB5;
- Wed, 31 Jul 2019 17:07:22 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 9FE611FFC3;
+ Wed, 31 Jul 2019 17:07:23 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 17:06:56 +0100
-Message-Id: <20190731160719.11396-32-alex.bennee@linaro.org>
+Date: Wed, 31 Jul 2019 17:07:10 +0100
+Message-Id: <20190731160719.11396-46-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190731160719.11396-1-alex.bennee@linaro.org>
 References: <20190731160719.11396-1-alex.bennee@linaro.org>
@@ -83,9 +83,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: [Qemu-devel] [PATCH v4 31/54] target/arm: fetch code with
- translator_ld
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH  v4 45/54] linux-user: support -plugin option
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,74 +96,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, aaron@os.amperecomputing.com,
- cota@braap.org, "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- bobby.prani@gmail.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, aaron@os.amperecomputing.com,
+ cota@braap.org, bobby.prani@gmail.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+From: Lluís Vilanova <vilanova@ac.upc.edu>
 
-Now the arm_ld*_code functions are only used at translate time we can
-just pass down to translator_ld functions.
-
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+[ cota: s/instrument/plugin ]
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-[AJB: convert from plugin_insn_append to translator_ld]
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v4
-  - use translator_ld like the rest of them
----
- target/arm/arm_ldst.h | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+ linux-user/main.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/target/arm/arm_ldst.h b/target/arm/arm_ldst.h
-index 5e0ac8bef06..45edb108f6a 100644
---- a/target/arm/arm_ldst.h
-+++ b/target/arm/arm_ldst.h
-@@ -20,25 +20,20 @@
- #ifndef ARM_LDST_H
- #define ARM_LDST_H
- 
--#include "exec/cpu_ldst.h"
-+#include "exec/translator.h"
- #include "qemu/bswap.h"
- 
- /* Load an instruction and return it in the standard little-endian order */
- static inline uint32_t arm_ldl_code(CPUARMState *env, target_ulong addr,
-                                     bool sctlr_b)
- {
--    uint32_t insn = cpu_ldl_code(env, addr);
--    if (bswap_code(sctlr_b)) {
--        return bswap32(insn);
--    }
--    return insn;
-+    return translator_ldl_swap(env, addr, bswap_code(sctlr_b));
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 8ffc5251955..42daa47dd3c 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -33,6 +33,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ #include "qemu/module.h"
++#include "qemu/plugin.h"
+ #include "cpu.h"
+ #include "exec/exec-all.h"
+ #include "tcg.h"
+@@ -392,6 +393,15 @@ static void handle_arg_trace(const char *arg)
+     trace_file = trace_opt_parse(arg);
  }
  
- /* Ditto, for a halfword (Thumb) instruction */
- static inline uint16_t arm_lduw_code(CPUARMState *env, target_ulong addr,
-                                      bool sctlr_b)
- {
--    uint16_t insn;
- #ifndef CONFIG_USER_ONLY
-     /* In big-endian (BE32) mode, adjacent Thumb instructions have been swapped
-        within each word.  Undo that now.  */
-@@ -46,11 +41,7 @@ static inline uint16_t arm_lduw_code(CPUARMState *env, target_ulong addr,
-         addr ^= 2;
++static QemuPluginList plugins = QTAILQ_HEAD_INITIALIZER(plugins);
++
++#ifdef CONFIG_PLUGIN
++static void handle_arg_plugin(const char *arg)
++{
++    qemu_plugin_opt_parse(arg, &plugins);
++}
++#endif
++
+ struct qemu_argument {
+     const char *argv;
+     const char *env;
+@@ -443,6 +453,10 @@ static const struct qemu_argument arg_table[] = {
+      "",           "Seed for pseudo-random number generator"},
+     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
+      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
++#ifdef CONFIG_PLUGIN
++    {"plugin",     "QEMU_PLUGIN",      true,  handle_arg_plugin,
++     "",           "[file=]<file>[,arg=<string>]"},
++#endif
+     {"version",    "QEMU_VERSION",     false, handle_arg_version,
+      "",           "display version information and exit"},
+     {NULL, NULL, false, NULL, NULL, NULL}
+@@ -633,6 +647,7 @@ int main(int argc, char **argv, char **envp)
+     cpu_model = NULL;
+ 
+     qemu_add_opts(&qemu_trace_opts);
++    qemu_plugin_add_opts();
+ 
+     optind = parse_args(argc, argv);
+ 
+@@ -640,6 +655,9 @@ int main(int argc, char **argv, char **envp)
+         exit(1);
      }
- #endif
--    insn = cpu_lduw_code(env, addr);
--    if (bswap_code(sctlr_b)) {
--        return bswap16(insn);
--    }
--    return insn;
-+    return translator_lduw_swap(env, addr, bswap_code(sctlr_b));
- }
+     trace_init_file(trace_file);
++    if (qemu_plugin_load_list(&plugins)) {
++        exit(1);
++    }
  
- #endif
+     /* Zero out regs */
+     memset(regs, 0, sizeof(struct target_pt_regs));
 -- 
 2.20.1
 
