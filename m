@@ -2,62 +2,85 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C22C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBD5C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:39:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5344F206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:31:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5344F206A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0B91720659
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:39:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UGsSntKI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B91720659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsvGG-0001Op-KQ
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:31:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59192)
+	id 1hsvNm-0005pW-7K
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:39:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60573)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1hsvFc-0000tF-V8
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:31:10 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsvMY-0003ve-CX
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1hsvFb-0007KV-BR
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:31:08 -0400
-Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:35899)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hsvFb-0007J3-2t
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:31:07 -0400
-Received: from player695.ha.ovh.net (unknown [10.108.35.185])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 01CDA247766
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 22:31:04 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player695.ha.ovh.net (Postfix) with ESMTPSA id 584A1865036A;
- Wed, 31 Jul 2019 20:30:58 +0000 (UTC)
-Date: Wed, 31 Jul 2019 22:30:57 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <20190731223057.3439026e@bahia.lan>
-In-Reply-To: <742b9d876d86fc263492885a7aacc1e1cda274e1.1562154272.git.qemu_oss@crudebyte.com>
-References: <cover.1562154272.git.qemu_oss@crudebyte.com>
- <742b9d876d86fc263492885a7aacc1e1cda274e1.1562154272.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <richard.henderson@linaro.org>) id 1hsvMX-0003GR-4Y
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:18 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41669)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hsvMW-0003Fp-UV
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:17 -0400
+Received: by mail-pl1-x642.google.com with SMTP id m9so30878031pls.8
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 13:38:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uzXV5HLfF+FU/RryNG65fjgIjJymPTRX0BzRxR8xdnQ=;
+ b=UGsSntKITTmN6I+19W1OAe02o6viPBqZK+IkOyTqZkcpwfnRlG3dgZ26uh+T5mjdhJ
+ 04q/Q8BeHh4ITZbHy/WHKBiZ6SN/TkXGCingEb3wr9m7VgZL/fCV4Y5KvkUKKaOq+6kr
+ Vr3BUx/ZATslD3FOa7DnYYJeOQ/ln3XZ4Ag7tqRa/t+kOdkGjzejBzHksWMuhggaL5cX
+ W3uG1hwV+g/0FNMwImFwU4d8OGF4EhkbZN3Z3vE3O4glxABe+mmyoc0UYwknpNBK13ms
+ WALDz5BtHBFxNM+M9dTmq4pvD9VpmDPzSdssBjYvjfQ1CaI8E9c0erZCdpkK3WwDPUxM
+ UZew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=uzXV5HLfF+FU/RryNG65fjgIjJymPTRX0BzRxR8xdnQ=;
+ b=QALi/XOgSWOyffWYpUZS1ut/8plFGPnNxcP05JWJrx0yaFQ8WjtC/jRoe4+/t6/stW
+ Ln/31jSuOs35kYzEmrsCQ3rrz1U1qJQU4Ua966R13Pdv2EtIB2eaUt6rcCI6ynz1trPS
+ wVUDL+0MUDphUvYbC4JEsI2exqIBA5rPQPJh4zCBVKgW42t4JsBXvjcwR229mMTWRlA2
+ cuYQixDk+dSzHMzAU5XJhG1GGZ3L8k6t2UHXT9RMyxAsYAgB93nTDpaDmHCzKtGNSH+2
+ GV/21YmRhemclYVXeHrFU/7fkRF0ZSIxBgdX6TBMwDQFqMNYepinSqlu/UEpwbhAdfU0
+ fCkg==
+X-Gm-Message-State: APjAAAVYiivlTCVdKtkTPhLWn+f6T1H94IKQj+4S4fF8TTWEtPAs/Jre
+ g9pF517mDcoqcMrg5XMJjl8uP/iRDPI=
+X-Google-Smtp-Source: APXvYqyifwAob4uYGIzCTmix12IafdixE6Uo4eepaTB4923sVmp1ZsnXYkGQj9KI/XPe2kvd02ZJXw==
+X-Received: by 2002:a17:902:2929:: with SMTP id
+ g38mr101488206plb.163.1564605495556; 
+ Wed, 31 Jul 2019 13:38:15 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id g4sm84054164pfo.93.2019.07.31.13.38.14
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 31 Jul 2019 13:38:14 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 31 Jul 2019 13:37:41 -0700
+Message-Id: <20190731203813.30765-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 18052679108127070528
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrleehgddugeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.111.247
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] 9p: Treat multiple devices on one
- export as an error
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PATCH v2 00/32] target/arm: Implement ARMv8.1-VHE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,270 +92,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>, "Dr.
- David Alan Gilbert" <dgilbert@redhat.com>,
- Antonios Motakis <antonios.motakis@huawei.com>,
- Stefan Hajnoczi <stefanha@gmail.com>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 3 Jul 2019 13:01:34 +0200
-Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org> wrote:
+About half of this patch set is cleanup of the qemu tlb handling
+leading up to the actual implementation of VHE, and the biggest
+piece of that: The EL2&0 translation regime.
 
-> The QID path should uniquely identify a file. However, the
-> inode of a file is currently used as the QID path, which
-> on its own only uniquely identifies files within a device.
-> Here we track the device hosting the 9pfs share, in order
-> to prevent security issues with QID path collisions from
-> other devices.
-> 
-> Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
-> [CS: - Assign dev_id to export root's device already in
->        v9fs_device_realize_common(), not postponed in
->        stat_to_qid().
->      - error_report_once() if more than one device was
->        shared by export.
->      - Return -ENODEV instead of -ENOSYS in stat_to_qid().
->      - Fixed typo in log comment. ]
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
+Changes since v1:
+  * Merge feedback from AJB.
+  * Split out 7 renaming patches from "Reorganize ARMMMUIdx".
+  * Alex's MIDR patch keeps the nested KVM from spitting warnings.
 
-The fix is good in the sense that it purely forbids cross-device accesses,
-which provides improved security. But some people may wish to do cross-device
-anyway, for example because they have ultimate knowledge or luck that their
-usual setup doesn't have colliding inodes, or simply that their workload
-doesn't care for inode numbers at all.
+I have tested 
 
-Next patches in this series introduce inode number remapping, which is
-a good way of addressing collisions. This should always be used in a
-cross-device setup. But again, people who don't do cross-device, may
-wish to disable remapping to avoid the potential performance loss or
-extra memory consumption.
+  qemu-system-aarch64 -accel kvm -cpu host -M virt,gic-version-host \
+    -m 512 -bios /usr/share/edk2/aarch64/QEMU_EFI.fd -nographic
 
-I suggest you add a new property to the 9p device so that people can
-choose the behavior that best fits their need. Something like:
+with fedora 30 system qemu, itself booted with
 
--device virtio-9p,cross-device=[ignore|forbid|remap]
+  ../bld/aarch64-softmmu/qemu-system-aarch64 \
+    -cpu max -M virt,gic-version=3,virtualization=on \
+    -drive if=virtio,file=./f30.q,format=qcow2 \
+    -m 4G -nographic
 
-ignore: detect the cross-device condition and spit-once a big fat warning
-        about the potential consequences, and alternatives to avoid
-        them, but don't fail the I/O
-forbid: detect the cross-device condition, spit-once an error and fail the
-        I/O like the current patch does
-remap: well... remap all inode numbers
+It took a while, but eventually the nested bios arrived at the
+pxe boot sequence.  Thankfully (?), the f30 shipped bios has
+debug enabled, so there's some sense of progress in the meantime.
 
-I would make 'ignore' the default since it is the current behavior, but
-I'm ready to change my mind if someone has a convincing argument that
-the default should be more secure.
 
-Cc'ing Stefan and Dave in case they have some more suggestions after the
-discussion we had on irc.
+r~
 
->  hw/9pfs/9p.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++------------
->  hw/9pfs/9p.h |  1 +
->  2 files changed, 56 insertions(+), 14 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 586a6dccba..8cc65c2c67 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -572,10 +572,18 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
->                                  P9_STAT_MODE_SOCKET)
->  
->  /* This is the algorithm from ufs in spfs */
-> -static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
-> +static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID *qidp)
->  {
->      size_t size;
->  
-> +    if (pdu->s->dev_id != stbuf->st_dev) {
-> +        error_report_once(
-> +            "9p: Multiple devices detected in same VirtFS export. "
-> +            "You must use a separate export for each device."
-> +        );
-> +        return -ENODEV;
-> +    }
-> +
->      memset(&qidp->path, 0, sizeof(qidp->path));
->      size = MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
->      memcpy(&qidp->path, &stbuf->st_ino, size);
-> @@ -587,6 +595,8 @@ static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
->      if (S_ISLNK(stbuf->st_mode)) {
->          qidp->type |= P9_QID_TYPE_SYMLINK;
->      }
-> +
-> +    return 0;
->  }
->  
->  static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
-> @@ -599,7 +609,10 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
->      if (err < 0) {
->          return err;
->      }
-> -    stat_to_qid(&stbuf, qidp);
-> +    err = stat_to_qid(pdu, &stbuf, qidp);
-> +    if (err < 0) {
-> +        return err;
-> +    }
->      return 0;
->  }
->  
-> @@ -830,7 +843,10 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
->  
->      memset(v9stat, 0, sizeof(*v9stat));
->  
-> -    stat_to_qid(stbuf, &v9stat->qid);
-> +    err = stat_to_qid(pdu, stbuf, &v9stat->qid);
-> +    if (err < 0) {
-> +        return err;
-> +    }
->      v9stat->mode = stat_to_v9mode(stbuf);
->      v9stat->atime = stbuf->st_atime;
->      v9stat->mtime = stbuf->st_mtime;
-> @@ -891,7 +907,7 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
->  #define P9_STATS_ALL           0x00003fffULL /* Mask for All fields above */
->  
->  
-> -static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
-> +static int stat_to_v9stat_dotl(V9fsPDU *pdu, const struct stat *stbuf,
->                                  V9fsStatDotl *v9lstat)
->  {
->      memset(v9lstat, 0, sizeof(*v9lstat));
-> @@ -913,7 +929,7 @@ static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
->      /* Currently we only support BASIC fields in stat */
->      v9lstat->st_result_mask = P9_STATS_BASIC;
->  
-> -    stat_to_qid(stbuf, &v9lstat->qid);
-> +    return stat_to_qid(pdu, stbuf, &v9lstat->qid);
->  }
->  
->  static void print_sg(struct iovec *sg, int cnt)
-> @@ -1115,7 +1131,6 @@ static void coroutine_fn v9fs_getattr(void *opaque)
->      uint64_t request_mask;
->      V9fsStatDotl v9stat_dotl;
->      V9fsPDU *pdu = opaque;
-> -    V9fsState *s = pdu->s;
->  
->      retval = pdu_unmarshal(pdu, offset, "dq", &fid, &request_mask);
->      if (retval < 0) {
-> @@ -1136,7 +1151,10 @@ static void coroutine_fn v9fs_getattr(void *opaque)
->      if (retval < 0) {
->          goto out;
->      }
-> -    stat_to_v9stat_dotl(s, &stbuf, &v9stat_dotl);
-> +    retval = stat_to_v9stat_dotl(pdu, &stbuf, &v9stat_dotl);
-> +    if (retval < 0) {
-> +        goto out;
-> +    }
->  
->      /*  fill st_gen if requested and supported by underlying fs */
->      if (request_mask & P9_STATS_GEN) {
-> @@ -1381,7 +1399,10 @@ static void coroutine_fn v9fs_walk(void *opaque)
->              if (err < 0) {
->                  goto out;
->              }
-> -            stat_to_qid(&stbuf, &qid);
-> +            err = stat_to_qid(pdu, &stbuf, &qid);
-> +            if (err < 0) {
-> +                goto out;
-> +            }
->              v9fs_path_copy(&dpath, &path);
->          }
->          memcpy(&qids[name_idx], &qid, sizeof(qid));
-> @@ -1483,7 +1504,10 @@ static void coroutine_fn v9fs_open(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      if (S_ISDIR(stbuf.st_mode)) {
->          err = v9fs_co_opendir(pdu, fidp);
->          if (err < 0) {
-> @@ -1593,7 +1617,10 @@ static void coroutine_fn v9fs_lcreate(void *opaque)
->          fidp->flags |= FID_NON_RECLAIMABLE;
->      }
->      iounit =  get_iounit(pdu, &fidp->path);
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
->      if (err < 0) {
->          goto out;
-> @@ -2327,7 +2354,10 @@ static void coroutine_fn v9fs_create(void *opaque)
->          }
->      }
->      iounit = get_iounit(pdu, &fidp->path);
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
->      if (err < 0) {
->          goto out;
-> @@ -2384,7 +2414,10 @@ static void coroutine_fn v9fs_symlink(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err =  pdu_marshal(pdu, offset, "Q", &qid);
->      if (err < 0) {
->          goto out;
-> @@ -3064,7 +3097,10 @@ static void coroutine_fn v9fs_mknod(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Q", &qid);
->      if (err < 0) {
->          goto out;
-> @@ -3222,7 +3258,10 @@ static void coroutine_fn v9fs_mkdir(void *opaque)
->      if (err < 0) {
->          goto out;
->      }
-> -    stat_to_qid(&stbuf, &qid);
-> +    err = stat_to_qid(pdu, &stbuf, &qid);
-> +    if (err < 0) {
-> +        goto out;
-> +    }
->      err = pdu_marshal(pdu, offset, "Q", &qid);
->      if (err < 0) {
->          goto out;
-> @@ -3633,6 +3672,8 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
->          goto out;
->      }
->  
-> +    s->dev_id = stat.st_dev;
-> +
->      s->ctx.fst = &fse->fst;
->      fsdev_throttle_init(s->ctx.fst);
->  
-> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
-> index 8883761b2c..5e316178d5 100644
-> --- a/hw/9pfs/9p.h
-> +++ b/hw/9pfs/9p.h
-> @@ -256,6 +256,7 @@ struct V9fsState
->      Error *migration_blocker;
->      V9fsConf fsconf;
->      V9fsQID root_qid;
-> +    dev_t dev_id;
->  };
->  
->  /* 9p2000.L open flags */
+
+Alex Bennée (2):
+  target/arm: check TGE and E2H flags for EL0 pauth traps
+  target/arm: generate a custom MIDR for -cpu max
+
+Richard Henderson (30):
+  cputlb: Add tlb_set_asid_for_mmuidx
+  cputlb: Add tlb_flush_asid_by_mmuidx and friends
+  target/arm: Install ASIDs for long-form from EL1
+  target/arm: Install ASIDs for short-form from EL1
+  target/arm: Install ASIDs for EL2
+  target/arm: Define isar_feature_aa64_vh
+  target/arm: Enable HCR_E2H for VHE
+  target/arm: Add CONTEXTIDR_EL2
+  target/arm: Add TTBR1_EL2
+  target/arm: Update CNTVCT_EL0 for VHE
+  target/arm: Add the hypervisor virtual counter
+  target/arm: Add VHE system register redirection and aliasing
+  target/arm: Split out vae1_tlbmask, vmalle1_tlbmask
+  target/arm: Simplify tlb_force_broadcast alternatives
+  target/arm: Rename ARMMMUIdx*_S12NSE* to ARMMMUIdx*_E10_*
+  target/arm: Rename ARMMMUIdx_S2NS to ARMMMUIdx_Stage2
+  target/arm: Rename ARMMMUIdx_S1NSE* to ARMMMUIdx_Stage1_E*
+  target/arm: Rename ARMMMUIdx_S1SE* to ARMMMUIdx_SE*
+  target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
+  target/arm: Rename ARMMMUIdx_S1E2 to ARMMMUIdx_E2
+  target/arm: Reorganize ARMMMUIdx
+  target/arm: Add regime_has_2_ranges
+  target/arm: Update arm_mmu_idx for VHE
+  target/arm: Update arm_sctlr for VHE
+  target/arm: Install asids for E2&0 translation regime
+  target/arm: Flush tlbs for E2&0 translation regime
+  target/arm: Update arm_phys_excp_target_el for TGE
+  target/arm: Update regime_is_user for EL2&0
+  target/arm: Update {fp,sve}_exception_el for VHE
+  target/arm: Enable ARMv8.1-VHE in -cpu max
+
+ include/exec/cpu-all.h     |  11 +
+ include/exec/cpu-defs.h    |   2 +
+ include/exec/exec-all.h    |  35 ++
+ include/qom/cpu.h          |   2 +
+ target/arm/cpu-qom.h       |   1 +
+ target/arm/cpu.h           | 260 +++++-----
+ target/arm/internals.h     |  62 ++-
+ target/arm/translate.h     |   2 +-
+ accel/tcg/cputlb.c         |  81 +++
+ target/arm/arch_dump.c     |   2 +-
+ target/arm/cpu.c           |   2 +
+ target/arm/cpu64.c         |  20 +
+ target/arm/debug_helper.c  |  50 +-
+ target/arm/helper-a64.c    |   2 +-
+ target/arm/helper.c        | 983 ++++++++++++++++++++++++++-----------
+ target/arm/m_helper.c      |   6 +-
+ target/arm/pauth_helper.c  |  13 +-
+ target/arm/translate-a64.c |  13 +-
+ target/arm/translate.c     |  17 +-
+ 19 files changed, 1088 insertions(+), 476 deletions(-)
+
+-- 
+2.17.1
 
 
