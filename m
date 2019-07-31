@@ -2,69 +2,119 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6592FC32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 10:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 978EAC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 10:01:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C8C221849
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 10:01:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8C221849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id 61A75216C8
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 10:01:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DLGUGNvg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A75216C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hslQ9-0004F3-J2
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 06:01:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49752)
+	id 1hslQg-00056t-OF
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 06:01:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49933)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hslPh-0003i5-Js
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:00:55 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hslQD-0004Tk-Ui
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:01:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hslPg-0000Fy-3W
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:00:53 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.76]:34826)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hslQC-0000g9-NS
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:01:25 -0400
+Received: from mail-eopbgr140093.outbound.protection.outlook.com
+ ([40.107.14.93]:9349 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>) id 1hslPf-0000Ck-Qk
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:00:52 -0400
-Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- BWP09926081.bt.com (10.36.82.112) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Wed, 31
- Jul 2019 11:00:36 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Wed, 31 Jul 2019 11:00:49 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Wed, 31 Jul
- 2019 11:00:49 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v4 1/1] configure: Define target access
- alignment in configure
-Thread-Index: AQHVR4bU6h4rWIVaE02KW5Sb1rgUeA==
-Date: Wed, 31 Jul 2019 10:00:48 +0000
-Message-ID: <1564567247535.227@bt.com>
-References: <2aaac4eafedb4aec979657993d00b8cd@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <2aaac4eafedb4aec979657993d00b8cd@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hslQC-0000f9-3c; Wed, 31 Jul 2019 06:01:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fDQ1i/PugSV4PjKByOPisOO1/EGB6AFlQxbBra9YGhO0/elt3vd1p3R/3UOwu3yXtcdEgimJss4ox2JuLAC03Y0AoGR7yzsPFYM9VSspx+7/oebrFPwit8m0X91TGkQdSdL3s5WNua77PaLDZ7tpmI1vP72YfHzf38FXSX/eUNmF4DDtLL5HziAuBdDR4exArXXYP6TRPwRkjsj/5xuYtab8rwow932HmVD3eFpUGcFZ5LUdCd0L8BachbeDIMFPtCMRafa5NfdqxNYEMUoWtnOMBHKLwFfg2LKKMW5ud9IAdA1K6+EyMt6ePo+bNF2MB5IDEjxS0q1FcrbDI77hWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jdnqnJrxWN7gjRVR4hC2SHf+uZAxqsIB5dSQxwVwD6Y=;
+ b=GQHSVxCqXRv4Uvse2UqqllT/PbgrhHyveHaoMp9FFaiamZ1DAGmW4Op5yvzqhEYDfnt2C6avXyrzuZqIBTogJYHN1E9F0vML5VaIvsACtsXgiHkxCWw12kPVSfYtSjP2PquT9i+F5wB9p1PkH2Fka8Axee4pQlbDK5cJEKHor/3Ov8p2loPcnFyurdzEI0a3ipFwbRTZLE1GM/jcfSYh+/JIjTAeOQ1B5z2PGoywfehud0kkYulkVW25DAzy0+DyxA+PwFaKt5CGCR2q1606FB1aTT4cBBulBNaliPVJSamx7Vyr301udmSUh+vpxzXHoC5d8QJnpyyKDTaNHgqMhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jdnqnJrxWN7gjRVR4hC2SHf+uZAxqsIB5dSQxwVwD6Y=;
+ b=DLGUGNvgQ5b2X/qnWqzZJb0Zj9rX544Bu/2e7uBIyDfXK2b3HrWvIDO4wqJc5fqnKtvVjUmfbZdRYOtgYKtL4tlGESzKKqruPR5vqoIYaTR8WDhz+8iLcLSqqS7IYkOjZi8XGBlL2lEoGkouoDvpW4/bSILXqWUQmGPyc9kM5CE=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4076.eurprd08.prod.outlook.com (20.179.12.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.14; Wed, 31 Jul 2019 10:01:20 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2136.010; Wed, 31 Jul 2019
+ 10:01:20 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH 1/3] block/backup: deal with zero detection
+Thread-Index: AQHVRvRy+TXY0QGIQkWxUwQMtXaphKbjfpMAgAEBTwA=
+Date: Wed, 31 Jul 2019 10:01:20 +0000
+Message-ID: <6c4d1b26-925b-c7a1-dbe3-9cae2ab0e3d6@virtuozzo.com>
+References: <20190730163251.755248-1-vsementsov@virtuozzo.com>
+ <20190730163251.755248-2-vsementsov@virtuozzo.com>
+ <f13fdafd-34d2-3079-ab17-78cdb7e9f428@redhat.com>
+In-Reply-To: <f13fdafd-34d2-3079-ab17-78cdb7e9f428@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.44]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+x-clientproxiedby: HE1PR0401CA0050.eurprd04.prod.outlook.com
+ (2603:10a6:3:19::18) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190731130118750
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a63b127b-3d61-4938-b05b-08d7159e099e
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4076; 
+x-ms-traffictypediagnostic: DB8PR08MB4076:
+x-microsoft-antispam-prvs: <DB8PR08MB407621B6341156D8E24008F3C1DF0@DB8PR08MB4076.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 011579F31F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(376002)(366004)(396003)(136003)(39850400004)(189003)(199004)(81156014)(4326008)(68736007)(66946007)(110136005)(6436002)(25786009)(107886003)(6246003)(446003)(71200400001)(316002)(6116002)(256004)(476003)(64756008)(31696002)(53936002)(2501003)(66476007)(66446008)(3846002)(229853002)(54906003)(36756003)(86362001)(6512007)(52116002)(66556008)(478600001)(8676002)(99286004)(53546011)(102836004)(2616005)(6486002)(305945005)(8936002)(11346002)(486006)(26005)(76176011)(186003)(2906002)(5660300002)(66066001)(6506007)(31686004)(386003)(81166006)(14444005)(14454004)(71190400001)(7736002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4076;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: K1nX89bSUoXvGUAVtNFSgJgQ/ZbqdKF/F6vUpgUBpHnkK+el5l5orwYfJnSB3Nv2rU39XedQkXqQYj8uLZmtm6PrjjuxBrMd3B+/yCntckBNOiyisomD/Sf6sqSty1m32l98mXWgQklqZp6xF21rjR4H1GaNzcTwXYduFFI8HQOyRmeR9k1pPwl67Bj9GPFo+iUcnFTNvM6o+XTIkmgWxwT6n9rWbp4C8LdQxXuy1zHct3dSckfjB3+wMt41rjoUe9SCau2ITvu0C9BI1J6RALtTDviTlYILq0DAndtaJPwgmdMYSkoTAOQNSE9C7eqPBO3d7qOgi0MmcNDw9heBH42rCEvOZEdyBEnrKykYZ0Z8wYfHJ1HUihNSDW74IbIq04uBh89hNG+I9+Q16v6R3AtSCv+Lg6PwD4mCVKg++IE=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <691A94EB83F7524E957C2BCC6BF55DA0@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a63b127b-3d61-4938-b05b-08d7159e099e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 10:01:20.7776 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4076
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.76
-Subject: [Qemu-devel] [PATCH v4 1/1] configure: Define target access
- alignment in configure
+X-Received-From: 40.107.14.93
+Subject: Re: [Qemu-devel] [PATCH 1/3] block/backup: deal with zero detection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,217 +126,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, arikalo@wavecomp.com, mark.cave-ayland@ilande.co.uk,
- jcmvbkbc@gmail.com, aurelien@aurel32.net, amarkovic@wavecomp.com,
- atar4qemu@gmail.com, rth@twiddle.net
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename ALIGNED_ONLY to TARGET_ALIGNED_ONLY for clarity and move=0A=
-defines out of target/foo/cpu.h into configure, as we do with=0A=
-TARGET_WORDS_BIGENDIAN, so that it is always defined early.=0A=
-=0A=
-Poison TARGET_ALIGNED_ONLY to prevent use in common code.=0A=
-=0A=
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>=0A=
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>=0A=
----=0A=
- configure             | 10 +++++++++-=0A=
- include/exec/poison.h |  1 +=0A=
- include/qom/cpu.h     |  2 +-=0A=
- target/alpha/cpu.h    |  2 --=0A=
- target/hppa/cpu.h     |  1 -=0A=
- target/mips/cpu.h     |  2 --=0A=
- target/sh4/cpu.h      |  2 --=0A=
- target/sparc/cpu.h    |  2 --=0A=
- target/xtensa/cpu.h   |  2 --=0A=
- tcg/tcg.c             |  2 +-=0A=
- tcg/tcg.h             |  8 +++++---=0A=
- 11 files changed, 17 insertions(+), 17 deletions(-)=0A=
-=0A=
-diff --git a/configure b/configure=0A=
-index 714e7fb6a1..482ba0b240 100755=0A=
---- a/configure=0A=
-+++ b/configure=0A=
-@@ -7431,8 +7431,13 @@ for target in $target_list; do=0A=
- target_dir=3D"$target"=0A=
- config_target_mak=3D$target_dir/config-target.mak=0A=
- target_name=3D$(echo $target | cut -d '-' -f 1)=0A=
-+target_aligned_only=3D"no"=0A=
-+case "$target_name" in=0A=
-+  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc=
-|sparc64|sparc32plus|xtensa|xtensaeb)=0A=
-+  target_aligned_only=3D"yes"=0A=
-+  ;;=0A=
-+esac=0A=
- target_bigendian=3D"no"=0A=
--=0A=
- case "$target_name" in=0A=
-   armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1=
-k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)=0A=
-   target_bigendian=3Dyes=0A=
-@@ -7717,6 +7722,9 @@ fi=0A=
- if supported_whpx_target $target; then=0A=
-     echo "CONFIG_WHPX=3Dy" >> $config_target_mak=0A=
- fi=0A=
-+if test "$target_aligned_only" =3D "yes" ; then=0A=
-+  echo "TARGET_ALIGNED_ONLY=3Dy" >> $config_target_mak=0A=
-+fi=0A=
- if test "$target_bigendian" =3D "yes" ; then=0A=
-   echo "TARGET_WORDS_BIGENDIAN=3Dy" >> $config_target_mak=0A=
- fi=0A=
-diff --git a/include/exec/poison.h b/include/exec/poison.h=0A=
-index b862320fa6..955eb863ab 100644=0A=
---- a/include/exec/poison.h=0A=
-+++ b/include/exec/poison.h=0A=
-@@ -35,6 +35,7 @@=0A=
- #pragma GCC poison TARGET_UNICORE32=0A=
- #pragma GCC poison TARGET_XTENSA=0A=
- =0A=
-+#pragma GCC poison TARGET_ALIGNED_ONLY=0A=
- #pragma GCC poison TARGET_HAS_BFLT=0A=
- #pragma GCC poison TARGET_NAME=0A=
- #pragma GCC poison TARGET_SUPPORTS_MTTCG=0A=
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h=0A=
-index 5ee0046b62..9b50b73339 100644=0A=
---- a/include/qom/cpu.h=0A=
-+++ b/include/qom/cpu.h=0A=
-@@ -89,7 +89,7 @@ struct TranslationBlock;=0A=
-  * @do_unassigned_access: Callback for unassigned access handling.=0A=
-  * (this is deprecated: new targets should use do_transaction_failed inste=
-ad)=0A=
-  * @do_unaligned_access: Callback for unaligned access handling, if=0A=
-- * the target defines #ALIGNED_ONLY.=0A=
-+ * the target defines #TARGET_ALIGNED_ONLY.=0A=
-  * @do_transaction_failed: Callback for handling failed memory transaction=
-s=0A=
-  * (ie bus faults or external aborts; not MMU faults)=0A=
-  * @virtio_is_big_endian: Callback to return %true if a CPU which supports=
-=0A=
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h=0A=
-index b3e8a823e1..16eb8047cf 100644=0A=
---- a/target/alpha/cpu.h=0A=
-+++ b/target/alpha/cpu.h=0A=
-@@ -23,8 +23,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* Alpha processors have a weak memory model */=0A=
- #define TCG_GUEST_DEFAULT_MO      (0)=0A=
- =0A=
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h=0A=
-index aab251bc4b..2be67c289a 100644=0A=
---- a/target/hppa/cpu.h=0A=
-+++ b/target/hppa/cpu.h=0A=
-@@ -30,7 +30,6 @@=0A=
-    basis.  It's probably easier to fall back to a strong memory model.  */=
-=0A=
- #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
- #define MMU_KERNEL_IDX   0=0A=
- #define MMU_USER_IDX     3=0A=
- #define MMU_PHYS_IDX     4=0A=
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h=0A=
-index 21c0615e02..c13cd4eb31 100644=0A=
---- a/target/mips/cpu.h=0A=
-+++ b/target/mips/cpu.h=0A=
-@@ -1,8 +1,6 @@=0A=
- #ifndef MIPS_CPU_H=0A=
- #define MIPS_CPU_H=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- #include "fpu/softfloat.h"=0A=
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h=0A=
-index aee733eaaa..ecaa7a18a9 100644=0A=
---- a/target/sh4/cpu.h=0A=
-+++ b/target/sh4/cpu.h=0A=
-@@ -23,8 +23,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* CPU Subtypes */=0A=
- #define SH_CPU_SH7750  (1 << 0)=0A=
- #define SH_CPU_SH7750S (1 << 1)=0A=
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h=0A=
-index 8ed2250cd0..1406f0ba2e 100644=0A=
---- a/target/sparc/cpu.h=0A=
-+++ b/target/sparc/cpu.h=0A=
-@@ -5,8 +5,6 @@=0A=
- #include "cpu-qom.h"=0A=
- #include "exec/cpu-defs.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- #if !defined(TARGET_SPARC64)=0A=
- #define TARGET_DPREGS 16=0A=
- #else=0A=
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h=0A=
-index 2c277134f1..0459243e6b 100644=0A=
---- a/target/xtensa/cpu.h=0A=
-+++ b/target/xtensa/cpu.h=0A=
-@@ -32,8 +32,6 @@=0A=
- #include "exec/cpu-defs.h"=0A=
- #include "xtensa-isa.h"=0A=
- =0A=
--#define ALIGNED_ONLY=0A=
--=0A=
- /* Xtensa processors have a weak memory model */=0A=
- #define TCG_GUEST_DEFAULT_MO      (0)=0A=
- =0A=
-diff --git a/tcg/tcg.c b/tcg/tcg.c=0A=
-index be2c33c400..8d23fb0592 100644=0A=
---- a/tcg/tcg.c=0A=
-+++ b/tcg/tcg.c=0A=
-@@ -1926,7 +1926,7 @@ static const char * const ldst_name[] =3D=0A=
- };=0A=
- =0A=
- static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] =3D =
-{=0A=
--#ifdef ALIGNED_ONLY=0A=
-+#ifdef TARGET_ALIGNED_ONLY=0A=
-     [MO_UNALN >> MO_ASHIFT]    =3D "un+",=0A=
-     [MO_ALIGN >> MO_ASHIFT]    =3D "",=0A=
- #else=0A=
-diff --git a/tcg/tcg.h b/tcg/tcg.h=0A=
-index b411e17a28..529acb2ed8 100644=0A=
---- a/tcg/tcg.h=0A=
-+++ b/tcg/tcg.h=0A=
-@@ -333,10 +333,12 @@ typedef enum TCGMemOp {=0A=
-     MO_TE    =3D MO_LE,=0A=
- #endif=0A=
- =0A=
--    /* MO_UNALN accesses are never checked for alignment.=0A=
-+    /*=0A=
-+     * MO_UNALN accesses are never checked for alignment.=0A=
-      * MO_ALIGN accesses will result in a call to the CPU's=0A=
-      * do_unaligned_access hook if the guest address is not aligned.=0A=
--     * The default depends on whether the target CPU defines ALIGNED_ONLY.=
-=0A=
-+     * The default depends on whether the target CPU defines=0A=
-+     * TARGET_ALIGNED_ONLY.=0A=
-      *=0A=
-      * Some architectures (e.g. ARMv8) need the address which is aligned=
-=0A=
-      * to a size more than the size of the memory access.=0A=
-@@ -353,7 +355,7 @@ typedef enum TCGMemOp {=0A=
-      */=0A=
-     MO_ASHIFT =3D 4,=0A=
-     MO_AMASK =3D 7 << MO_ASHIFT,=0A=
--#ifdef ALIGNED_ONLY=0A=
-+#ifdef TARGET_ALIGNED_ONLY=0A=
-     MO_ALIGN =3D 0,=0A=
-     MO_UNALN =3D MO_AMASK,=0A=
- #else=0A=
--- =0A=
-2.22.0=0A=
+MzAuMDcuMjAxOSAyMTo0MCwgSm9obiBTbm93IHdyb3RlOg0KPiANCj4gDQo+IE9uIDcvMzAvMTkg
+MTI6MzIgUE0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+PiBXZSBoYXZl
+IGRldGVjdF96ZXJvZXMgb3B0aW9uLCBzbyBhdCBsZWFzdCBmb3IgYmxvY2tkZXYtYmFja3VwIHVz
+ZXINCj4+IHNob3VsZCBkZWZpbmUgaXQgaWYgemVyby1kZXRlY3Rpb24gaXMgbmVlZGVkLiBGb3Ig
+ZHJpdmUtYmFja3VwIGxlYXZlDQo+PiBkZXRlY3Rpb24gZW5hYmxlZCBieSBkZWZhdWx0IGJ1dCBk
+byBpdCB0aHJvdWdoIGV4aXN0aW5nIG9wdGlvbiBpbnN0ZWFkDQo+PiBvZiBvcGVuLWNvZGluZy4N
+Cj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2Vt
+ZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgYmxvY2svYmFja3VwLmMgfCAxNSAr
+KysrKystLS0tLS0tLS0NCj4+ICAgYmxvY2tkZXYuYyAgICAgfCAgOCArKysrLS0tLQ0KPj4gICAy
+IGZpbGVzIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDEzIGRlbGV0aW9ucygtKQ0KPj4NCj4+
+IGRpZmYgLS1naXQgYS9ibG9jay9iYWNrdXAuYyBiL2Jsb2NrL2JhY2t1cC5jDQo+PiBpbmRleCA3
+MTVlMWQzYmU4Li5mNGFhZjA4ZGYzIDEwMDY0NA0KPj4gLS0tIGEvYmxvY2svYmFja3VwLmMNCj4+
+ICsrKyBiL2Jsb2NrL2JhY2t1cC5jDQo+PiBAQCAtMTEwLDcgKzExMCwxMCBAQCBzdGF0aWMgaW50
+IGNvcm91dGluZV9mbiBiYWNrdXBfY293X3dpdGhfYm91bmNlX2J1ZmZlcihCYWNrdXBCbG9ja0pv
+YiAqam9iLA0KPj4gICAgICAgQmxvY2tCYWNrZW5kICpibGsgPSBqb2ItPmNvbW1vbi5ibGs7DQo+
+PiAgICAgICBpbnQgbmJ5dGVzOw0KPj4gICAgICAgaW50IHJlYWRfZmxhZ3MgPSBpc193cml0ZV9u
+b3RpZmllciA/IEJEUlZfUkVRX05PX1NFUklBTElTSU5HIDogMDsNCj4+IC0gICAgaW50IHdyaXRl
+X2ZsYWdzID0gam9iLT5zZXJpYWxpemVfdGFyZ2V0X3dyaXRlcyA/IEJEUlZfUkVRX1NFUklBTElT
+SU5HIDogMDsNCj4+ICsgICAgaW50IHdyaXRlX2ZsYWdzID0NCj4+ICsgICAgICAgICAgICAoam9i
+LT5zZXJpYWxpemVfdGFyZ2V0X3dyaXRlcyA/IEJEUlZfUkVRX1NFUklBTElTSU5HIDogMCkgfA0K
+Pj4gKyAgICAgICAgICAgIChqb2ItPmNvbXByZXNzID8gQkRSVl9SRVFfV1JJVEVfQ09NUFJFU1NF
+RCA6IDApOw0KPj4gKw0KPj4gICANCj4+ICAgICAgIGFzc2VydChRRU1VX0lTX0FMSUdORUQoc3Rh
+cnQsIGpvYi0+Y2x1c3Rlcl9zaXplKSk7DQo+PiAgICAgICBoYml0bWFwX3Jlc2V0KGpvYi0+Y29w
+eV9iaXRtYXAsIHN0YXJ0LCBqb2ItPmNsdXN0ZXJfc2l6ZSk7DQo+PiBAQCAtMTI4LDE0ICsxMzEs
+OCBAQCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBiYWNrdXBfY293X3dpdGhfYm91bmNlX2J1ZmZl
+cihCYWNrdXBCbG9ja0pvYiAqam9iLA0KPj4gICAgICAgICAgIGdvdG8gZmFpbDsNCj4+ICAgICAg
+IH0NCj4+ICAgDQo+PiAtICAgIGlmIChidWZmZXJfaXNfemVybygqYm91bmNlX2J1ZmZlciwgbmJ5
+dGVzKSkgew0KPj4gLSAgICAgICAgcmV0ID0gYmxrX2NvX3B3cml0ZV96ZXJvZXMoam9iLT50YXJn
+ZXQsIHN0YXJ0LA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbmJ5dGVz
+LCB3cml0ZV9mbGFncyB8IEJEUlZfUkVRX01BWV9VTk1BUCk7DQo+PiAtICAgIH0gZWxzZSB7DQo+
+PiAtICAgICAgICByZXQgPSBibGtfY29fcHdyaXRlKGpvYi0+dGFyZ2V0LCBzdGFydCwNCj4+IC0g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgbmJ5dGVzLCAqYm91bmNlX2J1ZmZlciwgd3JpdGVf
+ZmxhZ3MgfA0KPj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAoam9iLT5jb21wcmVzcyA/
+IEJEUlZfUkVRX1dSSVRFX0NPTVBSRVNTRUQgOiAwKSk7DQo+PiAtICAgIH0NCj4+ICsgICAgcmV0
+ID0gYmxrX2NvX3B3cml0ZShqb2ItPnRhcmdldCwgc3RhcnQsIG5ieXRlcywgKmJvdW5jZV9idWZm
+ZXIsDQo+PiArICAgICAgICAgICAgICAgICAgICAgICAgd3JpdGVfZmxhZ3MpOw0KPj4gICAgICAg
+aWYgKHJldCA8IDApIHsNCj4+ICAgICAgICAgICB0cmFjZV9iYWNrdXBfZG9fY293X3dyaXRlX2Zh
+aWwoam9iLCBzdGFydCwgcmV0KTsNCj4+ICAgICAgICAgICBpZiAoZXJyb3JfaXNfcmVhZCkgew0K
+Pj4gZGlmZiAtLWdpdCBhL2Jsb2NrZGV2LmMgYi9ibG9ja2Rldi5jDQo+PiBpbmRleCA0ZDE0MWU5
+YTFmLi5hOTRkNzU0NTA0IDEwMDY0NA0KPj4gLS0tIGEvYmxvY2tkZXYuYw0KPj4gKysrIGIvYmxv
+Y2tkZXYuYw0KPj4gQEAgLTM0MzQsNyArMzQzNCw3IEBAIHN0YXRpYyBCbG9ja0pvYiAqZG9fZHJp
+dmVfYmFja3VwKERyaXZlQmFja3VwICpiYWNrdXAsIEpvYlR4biAqdHhuLA0KPj4gICAgICAgQmxv
+Y2tKb2IgKmpvYiA9IE5VTEw7DQo+PiAgICAgICBCZHJ2RGlydHlCaXRtYXAgKmJtYXAgPSBOVUxM
+Ow0KPj4gICAgICAgQWlvQ29udGV4dCAqYWlvX2NvbnRleHQ7DQo+PiAtICAgIFFEaWN0ICpvcHRp
+b25zID0gTlVMTDsNCj4+ICsgICAgUURpY3QgKm9wdGlvbnM7DQo+PiAgICAgICBFcnJvciAqbG9j
+YWxfZXJyID0gTlVMTDsNCj4+ICAgICAgIGludCBmbGFncywgam9iX2ZsYWdzID0gSk9CX0RFRkFV
+TFQ7DQo+PiAgICAgICBpbnQ2NF90IHNpemU7DQo+PiBAQCAtMzUyOSwxMCArMzUyOSwxMCBAQCBz
+dGF0aWMgQmxvY2tKb2IgKmRvX2RyaXZlX2JhY2t1cChEcml2ZUJhY2t1cCAqYmFja3VwLCBKb2JU
+eG4gKnR4biwNCj4+ICAgICAgICAgICBnb3RvIG91dDsNCj4+ICAgICAgIH0NCj4+ICAgDQo+PiAr
+ICAgIG9wdGlvbnMgPSBxZGljdF9uZXcoKTsNCj4+ICsgICAgcWRpY3RfcHV0X3N0cihvcHRpb25z
+LCAiZGlzY2FyZCIsICJ1bm1hcCIpOw0KPj4gKyAgICBxZGljdF9wdXRfc3RyKG9wdGlvbnMsICJk
+ZXRlY3QtemVyb2VzIiwgInVubWFwIik7DQo+PiAgICAgICBpZiAoYmFja3VwLT5mb3JtYXQpIHsN
+Cj4+IC0gICAgICAgIGlmICghb3B0aW9ucykgew0KPj4gLSAgICAgICAgICAgIG9wdGlvbnMgPSBx
+ZGljdF9uZXcoKTsNCj4+IC0gICAgICAgIH0NCj4+ICAgICAgICAgICBxZGljdF9wdXRfc3RyKG9w
+dGlvbnMsICJkcml2ZXIiLCBiYWNrdXAtPmZvcm1hdCk7DQo+PiAgICAgICB9DQo+PiAgIA0KPj4N
+Cj4gDQo+IEknbSBsZXNzIHN1cmUgb2YgdGhpcyBvbmUgcGVyc29uYWxseS4gSXMgaXQgcmlnaHQg
+dG8gYWx3YXlzIHRyeSB0byBzZXQNCj4gdW5tYXAgb24gdGhlIHRhcmdldD8NCj4gDQo+IEkgbGlr
+ZSB0aGUgaWRlYSBvZiByZW1vdmluZyBzcGVjaWFsIGNhc2VzIGFuZCBoYW5kbGluZyB0aGluZ3Mg
+bW9yZQ0KPiBjZW50cmFsbHkgdGhvdWdoLCBidXQgSSdsbCB3YW50IE1heCAob3IgS2V2aW4pIHRv
+IHRha2UgYSBwZWVrLg0KPiANCj4gLS1qcw0KPiANCg0KDQpJZiBub2JvZHkgbWluZHMgSSdkIGFn
+cmVlIHdpdGggeW91IHRvIGRyb3AgemVybyBkZXRlY3RpbmcgZnJvbSBib3RoIGJhY2t1cHMuDQoN
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
