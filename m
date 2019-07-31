@@ -7,58 +7,59 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E1EC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CB2C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:35:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1B22206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEF3A206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bLwqy+vA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1B22206A3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fBmdYlEi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEF3A206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsiCu-0005pB-2g
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 02:35:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46527)
+	id 1hsiCz-0006F4-Tk
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 02:35:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46476)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hsiBc-0003VN-TB
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:11 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hsiBV-0000zq-UY
+ (envelope-from <dgibson@ozlabs.org>) id 1hsiBZ-0003Ui-2y
  for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:06 -0400
-Received: from ozlabs.org ([203.11.71.1]:49971)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgibson@ozlabs.org>) id 1hsiBW-00013B-Sg
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:04 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37505 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hsiBL-00086K-NM; Wed, 31 Jul 2019 02:33:52 -0400
+ id 1hsiBL-00085S-8V; Wed, 31 Jul 2019 02:33:52 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45z3Xk3bR7z9sN4; Wed, 31 Jul 2019 16:33:42 +1000 (AEST)
+ id 45z3Xk1802z9sMQ; Wed, 31 Jul 2019 16:33:42 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1564554822;
- bh=YO3lr6xTHisSEYSyCUnctjxyty/C9WJkfz5EmRT6FYE=;
+ bh=qMhsVxlSWMcTtA/U8kbukBk84nnZwiZSTFwDcLtxMMs=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bLwqy+vAEeA2cjt5W1QkWFKfTEx47DU2DBj/w173Yl3KirlbwcF37t7ysJIemu3fU
- gyBqh426IFzx9c6/QRqtoMCHUZUVJygdnmH8RSzEzhvi+5sTr2tWyvQH2Fxb+2GTyY
- h8THgoCbsqBsMY6OV63dcTKHboio5S6Ou6zZiSIE=
-Date: Wed, 31 Jul 2019 15:56:40 +1000
+ b=fBmdYlEiL8eqwxfeFIiDzOhPtrkR1VXbJYR1Y+ATTjnJaqf8G9N45Y6JRsKL8w/H+
+ MJeY6UqcWtkEBh2ka5dgyosIpTAQqlxD8XRSjZbEAHvi3knzFE+KMtIYtfeXvj2n/E
+ kOXclISiCfwu5BU/qiwFYKJcq6GX1xG7UFEDjtgI=
+Date: Wed, 31 Jul 2019 15:52:29 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <20190731055640.GC2032@umbus.fritz.box>
+Message-ID: <20190731055229.GB2032@umbus.fritz.box>
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-5-damien.hedde@greensocs.com>
+ <20190729145654.14644-4-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="O3RTKUHj+75w1tg5"
+ protocol="application/pgp-signature"; boundary="WYTEVAkct0FjGQmd"
 Content-Disposition: inline
-In-Reply-To: <20190729145654.14644-5-damien.hedde@greensocs.com>
+In-Reply-To: <20190729145654.14644-4-damien.hedde@greensocs.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH v3 04/33] make Device and Bus Resettable
+Subject: Re: [Qemu-devel] [PATCH v3 03/33] Replace all call to device_reset
+ by call to device_legacy_reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,458 +85,222 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---O3RTKUHj+75w1tg5
+--WYTEVAkct0FjGQmd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2019 at 04:56:25PM +0200, Damien Hedde wrote:
-> This add Resettable interface implementation for both Bus and Device.
->=20
-> *resetting* counter and *reset_is_cold* flag are added in DeviceState
-> and BusState.
->=20
-> Compatibility with existing code base is ensured.
-> The legacy bus or device reset method is called in the new exit phase
-> and the other 2 phases are let empty. Using the exit phase guarantee that
-> legacy resets are called in the "post" order (ie: children then parent)
-> in hierarchical reset. That is the same order as legacy qdev_reset_all
-> or qbus_reset_all were using.
->=20
-> New *device_reset* and *bus_reset* function are proposed with an
-> additional boolean argument telling whether the reset is cold or warm.
-> Helper functions *device_reset_[warm|cold]* and *bus_reset_[warm|cold]*
-> are defined also as helpers.
->=20
-> Also add a [device|bus]_is_resetting and [device|bus]_is_reset_cold
-> functions telling respectively whether the object is currently under rese=
-t and
-> if the current reset is cold or not.
->=20
+On Mon, Jul 29, 2019 at 04:56:24PM +0200, Damien Hedde wrote:
 > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+
+I don't see a lot of point keeping this patch separate from the
+previous one.
+
 > ---
->  hw/core/bus.c          | 85 ++++++++++++++++++++++++++++++++++++++++++
->  hw/core/qdev.c         | 82 ++++++++++++++++++++++++++++++++++++++++
->  include/hw/qdev-core.h | 84 ++++++++++++++++++++++++++++++++++++++---
->  tests/Makefile.include |  1 +
->  4 files changed, 247 insertions(+), 5 deletions(-)
+>  hw/audio/intel-hda.c     | 2 +-
+>  hw/hyperv/hyperv.c       | 2 +-
+>  hw/i386/pc.c             | 2 +-
+>  hw/ide/microdrive.c      | 8 ++++----
+>  hw/intc/spapr_xive.c     | 2 +-
+>  hw/ppc/pnv_psi.c         | 2 +-
+>  hw/ppc/spapr_pci.c       | 2 +-
+>  hw/ppc/spapr_vio.c       | 2 +-
+>  hw/s390x/s390-pci-inst.c | 2 +-
+>  hw/scsi/vmw_pvscsi.c     | 2 +-
+>  hw/sd/omap_mmc.c         | 2 +-
+>  hw/sd/pl181.c            | 2 +-
+>  12 files changed, 15 insertions(+), 15 deletions(-)
 >=20
-> diff --git a/hw/core/bus.c b/hw/core/bus.c
-> index 17bc1edcde..08a97addb6 100644
-> --- a/hw/core/bus.c
-> +++ b/hw/core/bus.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/module.h"
->  #include "hw/qdev.h"
->  #include "qapi/error.h"
-> +#include "hw/resettable.h"
+> diff --git a/hw/audio/intel-hda.c b/hw/audio/intel-hda.c
+> index b78baac295..f133684b10 100644
+> --- a/hw/audio/intel-hda.c
+> +++ b/hw/audio/intel-hda.c
+> @@ -1086,7 +1086,7 @@ static void intel_hda_reset(DeviceState *dev)
+>      QTAILQ_FOREACH(kid, &d->codecs.qbus.children, sibling) {
+>          DeviceState *qdev =3D kid->child;
+>          cdev =3D HDA_CODEC_DEVICE(qdev);
+> -        device_reset(DEVICE(cdev));
+> +        device_legacy_reset(DEVICE(cdev));
+>          d->state_sts |=3D (1 << cdev->cad);
+>      }
+>      intel_hda_update_irq(d);
+> diff --git a/hw/hyperv/hyperv.c b/hw/hyperv/hyperv.c
+> index 6ebf31c310..cd9db3cb5c 100644
+> --- a/hw/hyperv/hyperv.c
+> +++ b/hw/hyperv/hyperv.c
+> @@ -140,7 +140,7 @@ void hyperv_synic_reset(CPUState *cs)
+>      SynICState *synic =3D get_synic(cs);
 > =20
->  void qbus_set_hotplug_handler(BusState *bus, Object *handler, Error **er=
-rp)
->  {
-> @@ -68,6 +69,75 @@ int qbus_walk_children(BusState *bus,
->      return 0;
->  }
-> =20
-> +void bus_reset(BusState *bus, bool cold)
-> +{
-> +    resettable_reset(OBJECT(bus), cold);
-> +}
-> +
-> +bool bus_is_resetting(BusState *bus)
-> +{
-> +    return (bus->resetting !=3D 0);
-> +}
-> +
-> +bool bus_is_reset_cold(BusState *bus)
-> +{
-> +    return bus->reset_is_cold;
-> +}
-> +
-> +static uint32_t bus_get_reset_count(Object *obj)
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    return bus->resetting;
-> +}
-> +
-> +static uint32_t bus_increment_reset_count(Object *obj)
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    return ++bus->resetting;
-> +}
-> +
-> +static uint32_t bus_decrement_reset_count(Object *obj)
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    return --bus->resetting;
-> +}
-> +
-> +static bool bus_set_reset_cold(Object *obj, bool cold)
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    bool old =3D bus->reset_is_cold;
-> +    bus->reset_is_cold =3D cold;
-> +    return old;
-> +}
-> +
-> +static bool bus_set_hold_needed(Object *obj, bool hold_needed)
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    bool old =3D bus->reset_hold_needed;
-> +    bus->reset_hold_needed =3D hold_needed;
-> +    return old;
-> +}
-> +
-> +static void bus_foreach_reset_child(Object *obj, void (*func)(Object *))
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    BusChild *kid;
-> +
-> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-> +        func(OBJECT(kid->child));
-> +    }
-> +}
-
-IIUC, every resettable class would need more or less identical
-implementations of the above.  That seems like an awful lot of
-boilerplate.
-
-> +
-> +static void bus_obj_legacy_reset(Object *obj)
-> +{
-> +    BusState *bus =3D BUS(obj);
-> +    BusClass *bc =3D BUS_GET_CLASS(obj);
-> +
-> +    if (bc->reset) {
-> +        bc->reset(bus);
-> +    }
-> +}
-> +
->  static void qbus_realize(BusState *bus, DeviceState *parent, const char =
-*name)
->  {
->      const char *typename =3D object_get_typename(OBJECT(bus));
-> @@ -192,6 +262,8 @@ static void qbus_initfn(Object *obj)
->                               NULL);
->      object_property_add_bool(obj, "realized",
->                               bus_get_realized, bus_set_realized, NULL);
-> +
-> +    bus->resetting =3D 0;
->  }
-> =20
->  static char *default_bus_get_fw_dev_path(DeviceState *dev)
-> @@ -202,9 +274,18 @@ static char *default_bus_get_fw_dev_path(DeviceState=
- *dev)
->  static void bus_class_init(ObjectClass *class, void *data)
->  {
->      BusClass *bc =3D BUS_CLASS(class);
-> +    ResettableClass *rc =3D RESETTABLE_CLASS(class);
-> =20
->      class->unparent =3D bus_unparent;
->      bc->get_fw_dev_path =3D default_bus_get_fw_dev_path;
-> +
-> +    rc->phases.exit =3D bus_obj_legacy_reset;
-> +    rc->get_count =3D bus_get_reset_count;
-> +    rc->increment_count =3D bus_increment_reset_count;
-> +    rc->decrement_count =3D bus_decrement_reset_count;
-> +    rc->foreach_child =3D bus_foreach_reset_child;
-> +    rc->set_cold =3D bus_set_reset_cold;
-> +    rc->set_hold_needed =3D bus_set_hold_needed;
->  }
-> =20
->  static void qbus_finalize(Object *obj)
-> @@ -223,6 +304,10 @@ static const TypeInfo bus_info =3D {
->      .instance_init =3D qbus_initfn,
->      .instance_finalize =3D qbus_finalize,
->      .class_init =3D bus_class_init,
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_RESETTABLE },
-> +        { }
-> +    },
->  };
-> =20
->  static void bus_register_types(void)
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 043e058396..559ced070d 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -254,6 +254,64 @@ HotplugHandler *qdev_get_hotplug_handler(DeviceState=
- *dev)
->      return hotplug_ctrl;
->  }
-> =20
-> +void device_reset(DeviceState *dev, bool cold)
-> +{
-> +    resettable_reset(OBJECT(dev), cold);
-> +}
-> +
-> +bool device_is_resetting(DeviceState *dev)
-> +{
-> +    return (dev->resetting !=3D 0);
-> +}
-> +
-> +bool device_is_reset_cold(DeviceState *dev)
-> +{
-> +    return dev->reset_is_cold;
-> +}
-> +
-> +static uint32_t device_get_reset_count(Object *obj)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    return dev->resetting;
-> +}
-> +
-> +static uint32_t device_increment_reset_count(Object *obj)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    return ++dev->resetting;
-> +}
-> +
-> +static uint32_t device_decrement_reset_count(Object *obj)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    return --dev->resetting;
-> +}
-> +
-> +static bool device_set_reset_cold(Object *obj, bool cold)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    bool old =3D dev->reset_is_cold;
-> +    dev->reset_is_cold =3D cold;
-> +    return old;
-> +}
-> +
-> +static bool device_set_hold_needed(Object *obj, bool hold_needed)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    bool old =3D dev->reset_hold_needed;
-> +    dev->reset_hold_needed =3D hold_needed;
-> +    return old;
-> +}
-> +
-> +static void device_foreach_reset_child(Object *obj, void (*func)(Object =
-*))
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    BusState *bus;
-> +    QLIST_FOREACH(bus, &dev->child_bus, sibling) {
-> +        func(OBJECT(bus));
-> +    }
-> +}
-> +
->  static int qdev_reset_one(DeviceState *dev, void *opaque)
->  {
->      device_legacy_reset(dev);
-> @@ -954,6 +1012,7 @@ static void device_initfn(Object *obj)
-> =20
->      dev->instance_id_alias =3D -1;
->      dev->realized =3D false;
-> +    dev->resetting =3D 0;
-> =20
->      object_property_add_bool(obj, "realized",
->                               device_get_realized, device_set_realized, N=
-ULL);
-> @@ -1046,9 +1105,20 @@ static void device_unparent(Object *obj)
+>      if (synic) {
+> -        device_reset(DEVICE(synic));
+> +        device_legacy_reset(DEVICE(synic));
 >      }
 >  }
 > =20
-> +static void device_obj_legacy_reset(Object *obj)
-> +{
-> +    DeviceState *dev =3D DEVICE(obj);
-> +    DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
-> +
-> +    if (dc->reset) {
-> +        dc->reset(dev);
-> +    }
-> +}
-> +
->  static void device_class_init(ObjectClass *class, void *data)
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 549c437050..c0f20fe8aa 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2823,7 +2823,7 @@ static void pc_machine_reset(MachineState *machine)
+>          cpu =3D X86_CPU(cs);
+> =20
+>          if (cpu->apic_state) {
+> -            device_reset(cpu->apic_state);
+> +            device_legacy_reset(cpu->apic_state);
+>          }
+>      }
+>  }
+> diff --git a/hw/ide/microdrive.c b/hw/ide/microdrive.c
+> index 92ee6e0af8..fc346f5ad5 100644
+> --- a/hw/ide/microdrive.c
+> +++ b/hw/ide/microdrive.c
+> @@ -173,7 +173,7 @@ static void md_attr_write(PCMCIACardState *card, uint=
+32_t at, uint8_t value)
+>      case 0x00:	/* Configuration Option Register */
+>          s->opt =3D value & 0xcf;
+>          if (value & OPT_SRESET) {
+> -            device_reset(DEVICE(s));
+> +            device_legacy_reset(DEVICE(s));
+>          }
+>          md_interrupt_update(s);
+>          break;
+> @@ -316,7 +316,7 @@ static void md_common_write(PCMCIACardState *card, ui=
+nt32_t at, uint16_t value)
+>      case 0xe:	/* Device Control */
+>          s->ctrl =3D value;
+>          if (value & CTRL_SRST) {
+> -            device_reset(DEVICE(s));
+> +            device_legacy_reset(DEVICE(s));
+>          }
+>          md_interrupt_update(s);
+>          break;
+> @@ -541,7 +541,7 @@ static int dscm1xxxx_attach(PCMCIACardState *card)
+>      md->attr_base =3D pcc->cis[0x74] | (pcc->cis[0x76] << 8);
+>      md->io_base =3D 0x0;
+> =20
+> -    device_reset(DEVICE(md));
+> +    device_legacy_reset(DEVICE(md));
+>      md_interrupt_update(md);
+> =20
+>      return 0;
+> @@ -551,7 +551,7 @@ static int dscm1xxxx_detach(PCMCIACardState *card)
 >  {
->      DeviceClass *dc =3D DEVICE_CLASS(class);
-> +    ResettableClass *rc =3D RESETTABLE_CLASS(class);
+>      MicroDriveState *md =3D MICRODRIVE(card);
 > =20
->      class->unparent =3D device_unparent;
-> =20
-> @@ -1060,6 +1130,14 @@ static void device_class_init(ObjectClass *class, =
-void *data)
->       */
->      dc->hotpluggable =3D true;
->      dc->user_creatable =3D true;
-> +
-> +    rc->phases.exit =3D device_obj_legacy_reset;
-> +    rc->get_count =3D device_get_reset_count;
-> +    rc->increment_count =3D device_increment_reset_count;
-> +    rc->decrement_count =3D device_decrement_reset_count;
-> +    rc->foreach_child =3D device_foreach_reset_child;
-> +    rc->set_cold =3D device_set_reset_cold;
-> +    rc->set_hold_needed =3D device_set_hold_needed;
+> -    device_reset(DEVICE(md));
+> +    device_legacy_reset(DEVICE(md));
+>      return 0;
 >  }
 > =20
->  void device_class_set_parent_reset(DeviceClass *dc,
-> @@ -1117,6 +1195,10 @@ static const TypeInfo device_type_info =3D {
->      .class_init =3D device_class_init,
->      .abstract =3D true,
->      .class_size =3D sizeof(DeviceClass),
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_RESETTABLE },
-> +        { }
-> +    },
->  };
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 3ae311d9ff..22e11ad10c 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -1511,7 +1511,7 @@ static target_ulong h_int_reset(PowerPCCPU *cpu,
+>          return H_PARAMETER;
+>      }
 > =20
->  static void qdev_register_types(void)
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 690ce72433..eeb75611c8 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -7,6 +7,7 @@
->  #include "hw/irq.h"
->  #include "hw/hotplug.h"
->  #include "sysemu/sysemu.h"
-> +#include "hw/resettable.h"
+> -    device_reset(DEVICE(xive));
+> +    device_legacy_reset(DEVICE(xive));
 > =20
->  enum {
->      DEV_NVECTORS_UNSPECIFIED =3D -1,
-> @@ -132,6 +133,10 @@ struct NamedGPIOList {
->  /**
->   * DeviceState:
->   * @realized: Indicates whether the device has been fully constructed.
-> + * @resetting: Indicates whether the device is under reset. Also
-> + * used to count how many times reset has been initiated on the device.
-> + * @reset_is_cold: If the device is under reset, indicates whether it is=
- cold
-> + * or warm.
->   *
->   * This structure should not be accessed directly.  We declare it here
->   * so that it can be embedded in individual device state structures.
-> @@ -153,6 +158,9 @@ struct DeviceState {
->      int num_child_bus;
->      int instance_id_alias;
->      int alias_required_for_version;
-> +    uint32_t resetting;
-> +    bool reset_is_cold;
-> +    bool reset_hold_needed;
->  };
+>      if (kvm_irqchip_in_kernel()) {
+>          Error *local_err =3D NULL;
+> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+> index d7b6f5d75b..78eafa353a 100644
+> --- a/hw/ppc/pnv_psi.c
+> +++ b/hw/ppc/pnv_psi.c
+> @@ -703,7 +703,7 @@ static void pnv_psi_p9_mmio_write(void *opaque, hwadd=
+r addr,
+>          break;
+>      case PSIHB9_INTERRUPT_CONTROL:
+>          if (val & PSIHB9_IRQ_RESET) {
+> -            device_reset(DEVICE(&psi9->source));
+> +            device_legacy_reset(DEVICE(&psi9->source));
+>          }
+>          psi->regs[reg] =3D val;
+>          break;
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index 9003fe9010..3c6cf79a5e 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -2029,7 +2029,7 @@ static int spapr_phb_children_reset(Object *child, =
+void *opaque)
+>      DeviceState *dev =3D (DeviceState *) object_dynamic_cast(child, TYPE=
+_DEVICE);
 > =20
->  struct DeviceListener {
-> @@ -199,6 +207,10 @@ typedef struct BusChild {
->  /**
->   * BusState:
->   * @hotplug_handler: link to a hotplug handler associated with bus.
-> + * @resetting: Indicates whether the bus is under reset. Also
-> + * used to count how many times reset has been initiated on the bus.
-> + * @reset_is_cold: If the bus is under reset, indicates whether it is co=
-ld
-> + * or warm.
->   */
->  struct BusState {
->      Object obj;
-> @@ -210,6 +222,9 @@ struct BusState {
->      int num_children;
->      QTAILQ_HEAD(, BusChild) children;
->      QLIST_ENTRY(BusState) sibling;
-> +    uint32_t resetting;
-> +    bool reset_is_cold;
-> +    bool reset_hold_needed;
->  };
+>      if (dev) {
+> -        device_reset(dev);
+> +        device_legacy_reset(dev);
+>      }
 > =20
->  /**
-> @@ -376,6 +391,70 @@ int qdev_walk_children(DeviceState *dev,
->                         qdev_walkerfn *post_devfn, qbus_walkerfn *post_bu=
-sfn,
->                         void *opaque);
+>      return 0;
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index 583c13deda..5a0b5cc35c 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -306,7 +306,7 @@ int spapr_vio_send_crq(SpaprVioDevice *dev, uint8_t *=
+crq)
+>  static void spapr_vio_quiesce_one(SpaprVioDevice *dev)
+>  {
+>      if (dev->tcet) {
+> -        device_reset(DEVICE(dev->tcet));
+> +        device_legacy_reset(DEVICE(dev->tcet));
+>      }
+>      free_crq(dev);
+>  }
+> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+> index 00235148be..93cda37c27 100644
+> --- a/hw/s390x/s390-pci-inst.c
+> +++ b/hw/s390x/s390-pci-inst.c
+> @@ -242,7 +242,7 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintpt=
+r_t ra)
+>                  stw_p(&ressetpci->hdr.rsp, CLP_RC_SETPCIFN_FHOP);
+>                  goto out;
+>              }
+> -            device_reset(DEVICE(pbdev));
+> +            device_legacy_reset(DEVICE(pbdev));
+>              pbdev->fh &=3D ~FH_MASK_ENABLE;
+>              pbdev->state =3D ZPCI_FS_DISABLED;
+>              stl_p(&ressetpci->fh, pbdev->fh);
+> diff --git a/hw/scsi/vmw_pvscsi.c b/hw/scsi/vmw_pvscsi.c
+> index 14641df1c8..cda3fc96a0 100644
+> --- a/hw/scsi/vmw_pvscsi.c
+> +++ b/hw/scsi/vmw_pvscsi.c
+> @@ -835,7 +835,7 @@ pvscsi_on_cmd_reset_device(PVSCSIState *s)
 > =20
-> +/**
-> + * device_reset:
-> + * Resets the device @dev, @cold tell whether to do a cold or warm reset.
-> + * Uses the ressetable interface.
-> + * Base behavior is to reset the device and its qdev/qbus subtree.
-> + */
-> +void device_reset(DeviceState *dev, bool cold);
-> +
-> +static inline void device_reset_warm(DeviceState *dev)
-> +{
-> +    device_reset(dev, false);
-> +}
-> +
-> +static inline void device_reset_cold(DeviceState *dev)
-> +{
-> +    device_reset(dev, true);
-> +}
-> +
-> +/**
-> + * bus_reset:
-> + * Resets the bus @bus, @cold tell whether to do a cold or warm reset.
-> + * Uses the ressetable interface.
-> + * Base behavior is to reset the bus and its qdev/qbus subtree.
-> + */
-> +void bus_reset(BusState *bus, bool cold);
-> +
-> +static inline void bus_reset_warm(BusState *bus)
-> +{
-> +    bus_reset(bus, false);
-> +}
-> +
-> +static inline void bus_reset_cold(BusState *bus)
-> +{
-> +    bus_reset(bus, true);
-> +}
-> +
-> +/**
-> + * device_is_resetting:
-> + * Tell whether the device @dev is currently under reset.
-> + */
-> +bool device_is_resetting(DeviceState *dev);
-> +
-> +/**
-> + * device_is_reset_cold:
-> + * Tell whether the device @dev is currently under reset cold or warm re=
-set.
-> + *
-> + * Note: only valid when device_is_resetting returns true.
-> + */
-> +bool device_is_reset_cold(DeviceState *dev);
-> +
-> +/**
-> + * bus_is_resetting:
-> + * Tell whether the bus @bus is currently under reset.
-> + */
-> +bool bus_is_resetting(BusState *bus);
-> +
-> +/**
-> + * bus_is_reset_cold:
-> + * Tell whether the bus @bus is currently under reset cold or warm reset.
-> + *
-> + * Note: only valid when bus_is_resetting returns true.
-> + */
-> +bool bus_is_reset_cold(BusState *bus);
-> +
->  void qdev_reset_all(DeviceState *dev);
->  void qdev_reset_all_fn(void *opaque);
+>      if (sdev !=3D NULL) {
+>          s->resetting++;
+> -        device_reset(&sdev->qdev);
+> +        device_legacy_reset(&sdev->qdev);
+>          s->resetting--;
+>          return PVSCSI_COMMAND_PROCESSING_SUCCEEDED;
+>      }
+> diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+> index d0c98ca021..24a1edc149 100644
+> --- a/hw/sd/omap_mmc.c
+> +++ b/hw/sd/omap_mmc.c
+> @@ -317,7 +317,7 @@ void omap_mmc_reset(struct omap_mmc_s *host)
+>       * into any bus, and we must reset it manually. When omap_mmc is
+>       * QOMified this must move into the QOM reset function.
+>       */
+> -    device_reset(DEVICE(host->card));
+> +    device_legacy_reset(DEVICE(host->card));
+>  }
 > =20
-> @@ -413,11 +492,6 @@ void qdev_machine_init(void);
->   */
->  void device_legacy_reset(DeviceState *dev);
+>  static uint64_t omap_mmc_read(void *opaque, hwaddr offset,
+> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+> index 81b406dbf0..15b4aaa67f 100644
+> --- a/hw/sd/pl181.c
+> +++ b/hw/sd/pl181.c
+> @@ -480,7 +480,7 @@ static void pl181_reset(DeviceState *d)
+>      /* Since we're still using the legacy SD API the card is not plugged
+>       * into any bus, and we must reset it manually.
+>       */
+> -    device_reset(DEVICE(s->card));
+> +    device_legacy_reset(DEVICE(s->card));
+>  }
 > =20
-> -static inline void device_reset(DeviceState *dev)
-> -{
-> -    device_legacy_reset(dev);
-> -}
-> -
->  void device_class_set_parent_reset(DeviceClass *dc,
->                                     DeviceReset dev_reset,
->                                     DeviceReset *parent_reset);
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fd7fdb8658..1c0a5345b9 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -561,6 +561,7 @@ tests/fp/%:
-> =20
->  tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o \
->  	hw/core/qdev.o hw/core/qdev-properties.o hw/core/hotplug.o\
-> +	hw/core/resettable.o \
->  	hw/core/bus.o \
->  	hw/core/irq.o \
->  	hw/core/fw-path-provider.o \
+>  static void pl181_init(Object *obj)
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -543,25 +308,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---O3RTKUHj+75w1tg5
+--WYTEVAkct0FjGQmd
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1BLZgACgkQbDjKyiDZ
-s5LRJBAAwVkJyW6r+BB4rDnY0nNiF/nIOloT6M90dQ5vLFqC5JAupWUbnfP0uAJI
-ol7smVFYlUD/mpKWEtFJlmsfGYQV9VMv5o2Sn3SoqEdhdSiKms7s42Le3fqejn+I
-Q/HiAoUTF6UJ2Xvx3/2d8JNAJplMHHG1eDo0TpniTXIYa0nGtfe15JXqXtEHBqro
-BVzl9NVXcARWTvIvBBcSItn08GtoAdN9sI2PlP4sTfKKO0ANHIb5WA+4ciP0nNZe
-UcAFRxhiA4tn0xZatnF32eS4JNlcGburvpiUuGCSSCTAkWVDfoqrC5H1FolNsApL
-dS/ME/AjS5INBCFUCeiGz7j4Peu0c1d7PUhYCn5iC90nhRrikbiWh6Le5c2CGy9y
-B6d2LgrmTCQJdCJ8GjK9zPr2wJA0GwGh9wumw/jkzAUzX+y88OOf1LxDuqQGJyC7
-fdV2VJe6iqTDeJMkvpQvJVDbhWaewRjLSs3tqdn79P6dB6WZR5Ds64qfAkNZIKQG
-AgEbAPBupnCQoIGQ5CjRcNd2NKBmhobPb1h7U87jP+kMzXIIilCNeM7LJe/xgp8V
-+La/pa6RFcZXUB8dtGHXit/Y6+mXbUBSnwO7b0SX9N17C4Y68KE+BdZT3SoIqrfY
-dmp3M005R19jIBv8L4Jq5FQluxisLD2B6vM4tP5VvS/WvL/+Foo=
-=9No3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1BLJ0ACgkQbDjKyiDZ
+s5LLSBAAqYrK9ATewznLykGq+OVKUVbs5tnYBXoxjMUTezx49kVnyVOuee7cp1zT
+QGYVY2ah9VZHJL40ieBIvhQJsBrPpRG9F0T4jopSkY+Yuyq/lUlhqy7so2cHpFYw
+oD/CjKalD4fZiDxk6vqcQX/+QxgYKNBpIUPIsS0VXaWkyfJ7SBpd+PYKH/oTxlV+
+I+GqSB/9xi2zdES15L/9yO1LruyXy5uP99Q4n34rFhCkU/I0Lz1rEa5UgHw8xMnm
+KmN92GF7wgnjaJBsTJI+0/d4uteACyL+X0Q58GGHp+TekXjPzApL3Ypd9qcPi4yB
+uF6E7XJGAOIQH2B9Go0snRMSREo7p8mZTeli5sDfSYcCh0powPl4TkMTW/16+5Fw
+RT/ynJjHBQf10N/aMrXsB90GolRLlJa6HT+1zaZ3Kmu+QkYMKuS2Cj3UA2vJENsS
+Ur08bQeR6mTJasGSgfwPSDO4gGzIM3ZjCyRHDPadmSdIpaA85p7uplnGBDo/eK4H
+b46HZ0IfDkFDEEEXEL3oqUCFXDn5m/gz3hPv6vg4Ks0oxVssoncOG/hprsJUNH5k
+fpBvWgHwSQxyf1smU2kEboJkM+kStaxmuRSDm67pklcElTlF10PxXaEWea5tJvKM
+lR4CS78fE8mkKqnwtvJz9mXMwfS0bf3nFCbgk3UaN0QptLoLfcU=
+=2+j4
 -----END PGP SIGNATURE-----
 
---O3RTKUHj+75w1tg5--
+--WYTEVAkct0FjGQmd--
 
