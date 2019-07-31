@@ -2,92 +2,85 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F9DC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F87CC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:30:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09BC320449
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:28:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09BC320449
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6B24620449
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:30:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Myy55KeF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B24620449
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsku1-00084L-11
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:28:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33105)
+	id 1hskw0-00016h-NV
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:30:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33880)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hsktc-0007aD-CV
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:27:45 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hskvZ-0000Ph-H8
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hsktb-0002p2-51
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:27:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34450)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hskvY-00043E-Fc
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:29:45 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:58424)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hsktY-0002nA-Do; Wed, 31 Jul 2019 05:27:40 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1FAD5C00233A;
- Wed, 31 Jul 2019 09:27:39 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-44.ams2.redhat.com
- [10.36.117.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8324E600D1;
- Wed, 31 Jul 2019 09:27:35 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-13-mreitz@redhat.com>
- <90984be8-3181-03aa-57e4-7e3c46cec6f8@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e1b18d6a-3ed2-3b87-56ef-81efe4ce2c51@redhat.com>
-Date: Wed, 31 Jul 2019 11:27:33 +0200
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hskvT-0003zb-Kh; Wed, 31 Jul 2019 05:29:40 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 96A5696F50;
+ Wed, 31 Jul 2019 09:29:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1564565377;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kSQAjbqA5TXg43q0JVmvSZNd+foS5vyVzOrBfp+PDgs=;
+ b=Myy55KeFleX9wJmVFLeMeoIzKsXzJj/DPAYVBQth4Fq+a6c0J0bVNvuttjX4lIRpngEeQ6
+ WFI9zuNMXB8QaVdzTXerix2fcRT6Zyypc59ywVY1Th4VRv/KRueMpR9wcUYmhMQM9Tsp8M
+ Z5zWFCikxLJ5Y9eqfhoeotkEApKtl1Q=
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-6-damien.hedde@greensocs.com>
+ <20190731060533.GD2032@umbus.fritz.box>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <51aa7e6d-3568-8485-4b67-a598a24a1f3d@greensocs.com>
+Date: Wed, 31 Jul 2019 11:29:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <90984be8-3181-03aa-57e4-7e3c46cec6f8@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="YtcANA2eZCfvrK4uurbzXvTFPthovd7l6"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 31 Jul 2019 09:27:39 +0000 (UTC)
+In-Reply-To: <20190731060533.GD2032@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1564565377;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kSQAjbqA5TXg43q0JVmvSZNd+foS5vyVzOrBfp+PDgs=;
+ b=BYat8WSK2wwrLuymKzxmOuaU+48VQnKbhqFhKd3D/0TFwZdrov0AenLwwDsQ3U+NSzxkru
+ 6fb2qQ9yVDrQM1NvojjnMfptnKFcOQDlZoafG9DQZD/HYPqQr7F6TbdCG2ZggBkGuFEnsx
+ 1fFW9BfBcMip0CADm+eg3DhcGyDNigg=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564565377; a=rsa-sha256; cv=none;
+ b=OogKBj3OvtXeELBZNrnS4sXNv/RJpmueV4tXZIjIi1x3UaW9bhCXUNCIdDvhTm2CKrvfd4
+ EnI2+tW0jMQcWF9OoeuyiiFZoO0IZ6TGhdSl7YhOjX4DnCov/6k3FiNWR68RygszaTla2F
+ ztSPsjqT0I6fzfyles/6XQVIeLacrOU=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 12/13] iotests: Add peek_file*
- functions
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH v3 05/33] Switch to new api in qdev/bus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,114 +92,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
+ hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, thuth@redhat.com,
+ ehabkost@redhat.com, alistair@alistair23.me, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com, rth@twiddle.net,
+ berrange@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YtcANA2eZCfvrK4uurbzXvTFPthovd7l6
-Content-Type: multipart/mixed; boundary="KPTaYJG0lxkwie8IfNypdqeh80pNPjtbE";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <e1b18d6a-3ed2-3b87-56ef-81efe4ce2c51@redhat.com>
-Subject: Re: [PATCH for-4.2 12/13] iotests: Add peek_file* functions
-References: <20190730172508.19911-1-mreitz@redhat.com>
- <20190730172508.19911-13-mreitz@redhat.com>
- <90984be8-3181-03aa-57e4-7e3c46cec6f8@redhat.com>
-In-Reply-To: <90984be8-3181-03aa-57e4-7e3c46cec6f8@redhat.com>
 
---KPTaYJG0lxkwie8IfNypdqeh80pNPjtbE
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 30.07.19 21:22, Eric Blake wrote:
-> On 7/30/19 12:25 PM, Max Reitz wrote:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/common.rc | 20 ++++++++++++++++++++
->>  1 file changed, 20 insertions(+)
+On 7/31/19 8:05 AM, David Gibson wrote:
+> On Mon, Jul 29, 2019 at 04:56:26PM +0200, Damien Hedde wrote:
+>> Deprecate old reset apis and make them use the new one while they
+>> are still used somewhere.
 >>
->> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.=
-rc
->> index 5502c3da2f..78decfd5d5 100644
->> --- a/tests/qemu-iotests/common.rc
->> +++ b/tests/qemu-iotests/common.rc
->> @@ -53,6 +53,26 @@ poke_file()
->>      printf "$3" | dd "of=3D$1" bs=3D1 "seek=3D$2" conv=3Dnotrunc &>/d=
-ev/null
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> ---
+>>  hw/core/qdev.c         | 22 +++-------------------
+>>  include/hw/qdev-core.h | 28 ++++++++++++++++++++++------
+>>  2 files changed, 25 insertions(+), 25 deletions(-)
+>>
+>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>> index 559ced070d..e9e5f2d5f9 100644
+>> --- a/hw/core/qdev.c
+>> +++ b/hw/core/qdev.c
+>> @@ -312,25 +312,9 @@ static void device_foreach_reset_child(Object *obj, void (*func)(Object *))
+>>      }
 >>  }
->> =20
->> +# peek_file_le 'test.img' 512 2 =3D> 65534
->> +peek_file_le()
->> +{
->> +    # Wrap in echo $() to strip spaces
->> +    echo $(od -j"$2" -N"$3" --endian=3Dlittle -An -vtu"$3" "$1")
->=20
-> Requires coreutils' od, but we can patch that later if it proves to be =
-a
-> problem on other hosts.
->=20
-> I used to do something similar in nbdkit (prior to qemu-nbd --list
-> making my life a lot easier; see nbdkit commit b228cb40); but there, I
-> read a 16-bit value in 2 8-bit chunks and pieced it together myself
-> rather than relying on --endian:
->=20
-> -    # Protocol is big endian, we want native endian.
-> -    # xargs trick to trim whitespace from
-> -    # https://stackoverflow.com/a/12973694
-> -    eflags_hi=3D$(od -An -N1     -tx1 eflags.out | xargs)
-> -    eflags_lo=3D$(od -An -N1 -j1 -tx1 eflags.out | xargs)
-> -    eflags=3D$(( 0x$eflags_hi << 8 | 0x$eflags_lo ))
->=20
-> But as long as we are using --endian, your version nicely handles 1, 2,=
+>>  
+>> -static int qdev_reset_one(DeviceState *dev, void *opaque)
+>> -{
+>> -    device_legacy_reset(dev);
+>> -
+>> -    return 0;
+>> -}
+>> -
+>> -static int qbus_reset_one(BusState *bus, void *opaque)
+>> -{
+>> -    BusClass *bc = BUS_GET_CLASS(bus);
+>> -    if (bc->reset) {
+>> -        bc->reset(bus);
+>> -    }
+>> -    return 0;
+>> -}
+>> -
+>>  void qdev_reset_all(DeviceState *dev)
+>>  {
+>> -    qdev_walk_children(dev, NULL, NULL, qdev_reset_one, qbus_reset_one, NULL);
+>> +    device_reset(dev, false);
+>>  }
+>>  
+>>  void qdev_reset_all_fn(void *opaque)
+>> @@ -340,7 +324,7 @@ void qdev_reset_all_fn(void *opaque)
+>>  
+>>  void qbus_reset_all(BusState *bus)
+>>  {
+>> -    qbus_walk_children(bus, NULL, NULL, qdev_reset_one, qbus_reset_one, NULL);
+>> +    bus_reset(bus, false);
+>>  }
+>>  
+>>  void qbus_reset_all_fn(void *opaque)
+>> @@ -922,7 +906,7 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+>>              }
+>>          }
+>>          if (dev->hotplugged) {
+>> -            device_legacy_reset(dev);
+>> +            device_reset(dev, true);
+> 
+> So.. is this change in the device_reset() signature really necessary?
+> Even if there are compelling reasons to handle warm reset in the new
+> API, that doesn't been you need to change device_reset() itself from
+> its established meaning of a cold (i.e. as per power cycle) reset.
+> Warm resets are generally called in rather more specific circumstances
+> (often under guest software direction) so it seems likely that users
+> would want to engage with the new reset API directly.  Or we could
+> just create a device_warm_reset() wrapper.  That would also avoid the
+> bare boolean parameter, which is not great for readability (you have
+> to look up the signature to have any idea what it means).
 
-> 4, and 8-byte reads.
->=20
->> +
->> +# peek_file_raw 'test.img' 512 2 =3D> '\xff\xfe'
->> +peek_file_raw()
->> +{
->> +    dd if=3D"$1" bs=3D1 skip=3D"$2" count=3D"$3" status=3Dnone
->> +}
->=20
-> Of course, calling $(peek_file_raw ...) is a bad idea, because it might=
+I've added device_reset_cold/warm wrapper functions to avoid having to
+pass the boolean parameter. it seems I forgot to use them in qdev.c
+I suppose, like you said, we could live with
++ no function with the boolean parameter
++ device_reset doing cold reset
++ device_reset_warm (or device_warm_reset) for the warm version
 
-> eat a trailing byte that happened to be a newline; it also doesn't
-> handle NUL bytes very well.  Is it worth documenting caveats for using
-> this one?
-
-In my experience, it handled NUL bytes so well that I had to tr -d them
-away. :-)
-
-I mean, isn=E2=80=99t the problem in the caller, then?
-
-Max
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-
---KPTaYJG0lxkwie8IfNypdqeh80pNPjtbE--
-
---YtcANA2eZCfvrK4uurbzXvTFPthovd7l6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1BXwYACgkQ9AfbAGHV
-z0DfZQgAxIuAfrI/JabZuQh3RX9j3Km1Lh8L7ic70XzZYyfURPVbU/mK+Rd6L8+c
-qhDcMWZ/SYagZ3QWzetRHVlnKNhed6jM3tiRboKThpo1DmfBdK4qnM7OZusTH96f
-u9rMj7Km0kuENjTCc9lMali3O+9MIKHwtedgrGniOMFhf9UMuD/AyKkzj/yYcrv7
-T3+B1J7J+bpaydwObTFhShK7d1tIF8scAo4YmS2ehtM5nvYUqakjmEZ6VN3RjoVs
-j5bjz0gQo+8Jmdo+D/3847v/oOGFVtVcwRgVrp7pjZbRZyntWOfV0RMkIYeR6/ur
-FPiaDbcVNOrCP3zreX6gt6CPKHx+Gw==
-=l+fT
------END PGP SIGNATURE-----
-
---YtcANA2eZCfvrK4uurbzXvTFPthovd7l6--
+Damien
 
