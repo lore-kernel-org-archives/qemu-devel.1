@@ -2,152 +2,85 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A694C41514
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 426DCC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:45:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FC80208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:44:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC80208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0EC28206B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:45:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oFz76iEe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EC28206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsnxc-00029E-HO
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:44:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36776)
+	id 1hsnzE-0003DN-Bb
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:45:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36990)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1hsnxB-0001f4-BN
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:43:38 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hsnyf-0002eg-OB
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:45:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1hsnxA-0007tM-0Y
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:43:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35790
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1hsnx9-0007t2-Sw
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:43:35 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x6VChKBZ081783
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:43:34 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2u39q9cqq6-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:43:33 -0400
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Wed, 31 Jul 2019 13:43:31 +0100
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 31 Jul 2019 13:43:27 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x6VChQjh48824540
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 31 Jul 2019 12:43:26 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3A3364C044;
- Wed, 31 Jul 2019 12:43:26 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C25BE4C04A;
- Wed, 31 Jul 2019 12:43:25 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 31 Jul 2019 12:43:25 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
- <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
- <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
- <bdbee2e0-62a7-8906-8076-408922511146@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Wed, 31 Jul 2019 14:43:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <bdbee2e0-62a7-8906-8076-408922511146@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19073112-0028-0000-0000-00000389A3C9
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19073112-0029-0000-0000-00002449F4A5
-Message-Id: <f9346216-a4e9-4882-4a36-33580529b75e@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-07-31_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907310130
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
- before ioctl call
+ (envelope-from <bmeng.cn@gmail.com>) id 1hsnye-0008Jr-TS
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:45:09 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37066)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hsnye-0008Jf-NZ; Wed, 31 Jul 2019 08:45:08 -0400
+Received: by mail-pg1-x543.google.com with SMTP id i70so21209601pgd.4;
+ Wed, 31 Jul 2019 05:45:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id;
+ bh=HAeOaFFL9b+Ha+smaOrqj2eR+CVvy1nn1X53scmUeIo=;
+ b=oFz76iEe3ycU62zpRoATFJZgQ6sTKU4nISDkz3NBQhMckLhbI6g0Tu23EXyV09c07a
+ EuZ1/kEw9SoLFGkT8viamF7lJ2C7JK6b28dDISZDUQU0Qxed5NWXdwrbZOHqR1vEEQmW
+ PeZ85JkeQDX8v1uvGbkZgPr2CRbq9XHyDC/lw/rQeDUoC6rLj2LtxRiHJxKPpB75MO+K
+ gWqgz97gllcjz3UjJsLRu3EArbnVx0kjpR7ksQkZpnm2XVtw7JuiStXnCWO6YKIpFO0R
+ aZQLIqNQMqMXogh4k4eLzv7YrFgZESnYCs+ZqwqplmbietkwoFLs8jfAOv2PK8VTBOf9
+ 1bnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id;
+ bh=HAeOaFFL9b+Ha+smaOrqj2eR+CVvy1nn1X53scmUeIo=;
+ b=nYVlReyZZvUM8eG2cHgvQz1NnVr0dU7T8H/9kXLMiFJtlaAgfqz5bHbT+kaA8o/w27
+ mXpPfkxinZnapKxjtrhhzO5XSUTmJNO1DhYlMAf7gwpeX8/Xcmhzy7HclWEzkL+CUN5Q
+ RAbm+T4js0gtPTcqBPC21+11aox4eU4b2Z1yaEnZ0rW+2tTc8SaWLwQeC53j5WRJtw0M
+ piIYgoF9h2FR5FwvjceClZjRyuA13q4t5g/ghi3gG3be1AmbK6uX90Usjf7ZfmmvxJ57
+ qPiBvHJzh3Ztz8eCsMqwc/T2Q51sZWk6rXylooy9jhN4jeVsNs5ZwLDVT2qaVzPLZYnU
+ jOrQ==
+X-Gm-Message-State: APjAAAXcJCGzUs1ETDfSdzLCouIOQS62bIVojqZmSBB8nsxZM2iB8ygt
+ gLDCsluPvOB3Rjz5TFy0nKI=
+X-Google-Smtp-Source: APXvYqxxrknhMfq6PWbtCz5Amh5ezY0IbBRAAv0wvFIdd4Ol9WrnsFIvxSKAqWa0YwGQjT77X5SNPg==
+X-Received: by 2002:aa7:8e18:: with SMTP id c24mr47516887pfr.24.1564577107829; 
+ Wed, 31 Jul 2019 05:45:07 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id cx22sm1785544pjb.25.2019.07.31.05.45.06
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Wed, 31 Jul 2019 05:45:07 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ QEMU devel <qemu-devel@nongnu.org>, QEMU riscv <qemu-riscv@nongnu.org>
+Date: Wed, 31 Jul 2019 05:45:01 -0700
+Message-Id: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: [Qemu-devel] [PATCH] riscv: rv32: Root page table address can be
+ larger than 32-bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -159,112 +92,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "berto@igalia.com" <berto@igalia.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Denis Lunev <den@virtuozzo.com>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "armbru@redhat.com" <armbru@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+For RV32, the root page table's PPN has 22 bits hence its address
+bits could be larger than the maximum bits that target_ulong is
+able to represent. Use hwaddr instead.
 
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+---
 
-On 31.07.19 14:28, Christian Borntraeger wrote:
-> 
-> 
-> On 31.07.19 14:04, Andrey Shinkevich wrote:
->> On 31/07/2019 10:24, Christian Borntraeger wrote:
->>>
->>>
->>> On 30.07.19 21:20, Paolo Bonzini wrote:
->>>> On 30/07/19 18:01, Andrey Shinkevich wrote:
->>>>> Not the whole structure is initialized before passing it to the KVM.
->>>>> Reduce the number of Valgrind reports.
->>>>>
->>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>>>
->>>> Christian, is this the right fix?  It's not expensive so it wouldn't be
->>>> an issue, just checking if there's any better alternative.
->>>
->>> I think all of these variants are valid with pros and cons
->>> 1. teach valgrind about this:
->>> Add to coregrind/m_syswrap/syswrap-linux.c (and the relevant header files)
->>> knowledge about which parts are actually touched.
->>> 2. use designated initializers
->>> 3. use memset
->>> 3. use a valgrind callback VG_USERREQ__MAKE_MEM_DEFINED to tell that this memory is defined
->>>
->>
->> Thank you all very much for taking part in the discussion.
->> Also, one may use the Valgrind technology to suppress the unwanted 
->> reports by adding the Valgrind specific format file valgrind.supp to the 
->> QEMU project. The file content is extendable for future needs.
->> All the cases we like to suppress will be recounted in that file.
->> A case looks like the stack fragments. For instance, from QEMU block:
->>
->> {
->>     hw/block/hd-geometry.c
->>     Memcheck:Cond
->>     fun:guess_disk_lchs
->>     fun:hd_geometry_guess
->>     fun:blkconf_geometry
->>     ...
->>     fun:device_set_realized
->>     fun:property_set_bool
->>     fun:object_property_set
->>     fun:object_property_set_qobject
->>     fun:object_property_set_bool
->> }
->>
->> The number of suppressed cases are reported by the Valgrind with every 
->> run: "ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)"
->>
->> Andrey
-> 
-> Yes, indeed that would be another variant. How performance critical are
-> the fixed locations? That might have an impact on what is the best solution.
-> From a cleanliness approach doing 1 (adding the ioctl definition to valgrind)
-> is certainly the most beautiful way. I did that in the past, look for example at
-> 
-> https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=c2baee9b7bf043702c130de0771a4df439fcf403
-> or 
-> https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=00a31dd3d1e7101b331c2c83fca6c666ba35d910
-> 
-> for examples. 
-> 
-> 
->>
->>>>
->>>> Paolo
->>>>
->>>>> ---
->>>>>   target/i386/kvm.c | 3 +++
->>>>>   1 file changed, 3 insertions(+)
->>>>>
->>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>>>> index dbbb137..ed57e31 100644
->>>>> --- a/target/i386/kvm.c
->>>>> +++ b/target/i386/kvm.c
->>>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>>>>           return 0;
->>>>>       }
->>>>>   
->>>>> +    memset(&msr_data, 0, sizeof(msr_data));
->>>>>       msr_data.info.nmsrs = 1;
->>>>>       msr_data.entries[0].index = MSR_IA32_TSC;
->>>>>       env->tsc_valid = !runstate_is_running();
->>>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>>>   
->>>>>       if (has_xsave) {
->>>>>           env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
->>>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+ target/riscv/cpu_helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This is memsetting 4k? 
-Yet another variant would be to use the RUNNING_ON_VALGRIND macro from
-valgrind/valgrind.h to only memset for valgrind. But just using MAKE_MEM_DEFINED
-from memcheck.h is simpler. 
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index e32b612..3150a6a 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -176,7 +176,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+ 
+     *prot = 0;
+ 
+-    target_ulong base;
++    hwaddr base;
+     int levels, ptidxbits, ptesize, vm, sum;
+     int mxr = get_field(env->mstatus, MSTATUS_MXR);
+ 
+@@ -239,7 +239,7 @@ restart:
+                            ((1 << ptidxbits) - 1);
+ 
+         /* check that physical address of PTE is legal */
+-        target_ulong pte_addr = base + idx * ptesize;
++        hwaddr pte_addr = base + idx * ptesize;
+ 
+         if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+             !pmp_hart_has_privs(env, pte_addr, sizeof(target_ulong),
+-- 
+2.7.4
 
 
