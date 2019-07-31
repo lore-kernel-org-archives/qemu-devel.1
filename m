@@ -6,79 +6,75 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09950C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B91C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:35:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D36F620693
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:33:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D36F620693
+	by mail.kernel.org (Postfix) with ESMTPS id 8968420693
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:35:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8968420693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsnne-0007nl-60
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:33:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34682)
+	id 1hsnow-0000El-T1
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:35:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34998)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hsnnD-0007I3-GE
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:33:20 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hsnoO-0008H3-Ra
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:34:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hsnnC-0008F2-Jv
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:33:19 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52830)
+ (envelope-from <pbonzini@redhat.com>) id 1hsnoN-0001F8-RZ
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:34:32 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53940)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsnnC-0008EW-De
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:33:18 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s3so60601042wms.2
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 05:33:18 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsnoN-0001Et-MG
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:34:31 -0400
+Received: by mail-wm1-f67.google.com with SMTP id x15so60660379wmj.3
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 05:34:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=0T9lTxOLDFBEseRDcg90PQpjuDzOlXyjEFc5keDzUUc=;
- b=Vl8bMOflvknyek2aVgn4R9X2bMgOvCPFEGzHXNHkpT9dqD2Pf/Vsan/nEAm7eOQxxb
- OJFPajxOjA778yrZnsGNAn3YV/8MEQfnfHIEZiPQ3m1UQTaCfaWDNIBMpG8T3VMxhA+3
- KLhIK3OPeW6jSJL4H1mPSraNtW4ZUNgv6omHBBPvNHPMrdovDdcEWM5ZgXLWEhoOeH81
- qIP9DHHMzGq/nG/fmrcThPOFhV9pfI1bocbwWzPv33XAPUGPzSlwx1dklF+K3o5IMBId
- guJwREZ2ApszHxISz0gNsvRE4YT9WcWixpnaBYv1nOWK4hpWZXsNVM9NYJ3iFsR8BfOp
- QSCQ==
-X-Gm-Message-State: APjAAAWWqmOHJS01U0WFf2tYyAu4yXzxexGI/pn6+jlKwIUOj1r1R2Ey
- SEfkTOKrHdl2YZZwz7lmLnrWRQ==
-X-Google-Smtp-Source: APXvYqx0Gfxen1aDoNjtvwtNPLL16ulsQ5fHs4tgo9lQCqT/m+qcBJy38OhVcwypF6w7tCP1kJiuFA==
-X-Received: by 2002:a1c:968c:: with SMTP id
- y134mr104737672wmd.122.1564576397171; 
- Wed, 31 Jul 2019 05:33:17 -0700 (PDT)
+ bh=O4d6PQnNXl49eGgPxln7OX7q0+n+iu+R+qVU2oaJReA=;
+ b=exu8XJnXsvspP4J2/7g5GIHRJpI68cZvDDPDkvz2ria3gn9XWHh3y4mcGvlhw64nsP
+ NKJoGI1Mixo3pxYceUNaij7QHHMyGyIxYAoJ1r/taNoWk7xWYRollwmprFw/oHKxJMj5
+ icH/eZvYxr3KKUlRfqLEwbp6V2c1zxavJdGVmEEv2/Os4/l3sdluuL/b/o6B/Cxm/PtP
+ I9gHNWbaCIEs43U6Fj3fSdd8il0guZqN554bDsEByi7r3dlq0+S0q7LYggrFfToYxMZe
+ Ngv0mFRNaqmv8+oHxnV2WHzqbUr894V+gqWyLpFJcd3Dtlziae2SHLfb9/T9nz+y5vAF
+ JElg==
+X-Gm-Message-State: APjAAAUfghzi2rsoe5fNfWz28H8RsjiJ//k4mi66PtZlV4O3Muh+/ft7
+ CKEgkr7cBuUtEBhfxJ5JL+v/LQ==
+X-Google-Smtp-Source: APXvYqwW3cYj4IK7GZWHSdQCWYPucZHRoB/cXPlvUVpdlb75bUxD3d04obggboR63MAhxcAnosvDsw==
+X-Received: by 2002:a1c:be05:: with SMTP id o5mr112566069wmf.52.1564576470678; 
+ Wed, 31 Jul 2019 05:34:30 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3?
  ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
- by smtp.gmail.com with ESMTPSA id b5sm58014119wru.69.2019.07.31.05.33.16
+ by smtp.gmail.com with ESMTPSA id i18sm90322413wrp.91.2019.07.31.05.34.29
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 31 Jul 2019 05:33:16 -0700 (PDT)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
+ Wed, 31 Jul 2019 05:34:30 -0700 (PDT)
+To: Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190731075652.17053-1-thuth@redhat.com>
- <20190731075652.17053-5-thuth@redhat.com>
- <b3696656-201d-9777-0b73-b6903949d61f@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <533ca6da-a3ae-1c6b-a75d-f20bf97d8115@redhat.com>
-Date: Wed, 31 Jul 2019 14:33:16 +0200
+Message-ID: <7dc8ecea-f7ea-2ff8-e3bd-353e2cacbe9f@redhat.com>
+Date: Wed, 31 Jul 2019 14:34:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <b3696656-201d-9777-0b73-b6903949d61f@redhat.com>
+In-Reply-To: <20190731075652.17053-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw/core: Add a config switch for
- the "register" device
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH for-4.2 v2 0/8] Kconfig switches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,26 +86,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-arm@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/19 13:44, Philippe Mathieu-Daudé wrote:
-> What about naming it REGISTER_ARRAY or REGISTER_BLOCK?
+On 31/07/19 09:56, Thomas Huth wrote:
+> Here are some more Kconfig patches that clean up the switches of
+> existing devices and introduce proper config switches for some
+> other devices that were always enabled before.
 > 
-> The API is:
+> v2:
+>  - Included Philippe's patches to avoid a conflict with XLNX_ZYNQMP
+>  - Don't rely on indirect dependencies, always "select XYZ" if it is
+>    adequate
+>  - Added patch for the generic loader device
 > 
->     RegisterInfoArray *register_init_block32(...);
+> Philippe Mathieu-Daudé (3):
+>   hw/Kconfig: Move the generic XLNX_ZYNQMP to the root hw/Kconfig
+>   hw/intc: Only build the xlnx-iomod-intc device for the MicroBlaze PMU
+>   hw/dma: Do not build the xlnx_dpdma device for the MicroBlaze machines
 > 
-> Cc'ing Alistair for better name ideas :)
+> Thomas Huth (5):
+>   hw/core: Add a config switch for the "register" device
+>   hw/core: Add a config switch for the "or-irq" device
+>   hw/core: Add a config switch for the "split-irq" device
+>   hw/misc: Add a config switch for the "unimplemented" device
+>   hw/core: Add a config switch for the generic loader device
+> 
+>  hw/Kconfig            |  4 ++++
+>  hw/arm/Kconfig        | 15 +++++++++++++++
+>  hw/core/Kconfig       | 13 +++++++++++++
+>  hw/core/Makefile.objs |  8 ++++----
+>  hw/dma/Kconfig        |  1 +
+>  hw/dma/Makefile.objs  |  1 -
+>  hw/intc/Makefile.objs |  2 +-
+>  hw/microblaze/Kconfig |  1 +
+>  hw/misc/Kconfig       |  3 +++
+>  hw/misc/Makefile.objs |  2 +-
+>  hw/pci-host/Kconfig   |  3 ++-
+>  hw/sparc64/Kconfig    |  1 +
+>  hw/timer/Kconfig      |  3 ---
+>  13 files changed, 46 insertions(+), 11 deletions(-)
 > 
 
-I think REGISTER is okay. :)
+Looks good.  Peter, are you picking it?
 
 Paolo
 
