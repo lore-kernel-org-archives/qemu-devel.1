@@ -2,83 +2,83 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9047EC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09950C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:33:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68F4B20693
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:32:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68F4B20693
+	by mail.kernel.org (Postfix) with ESMTPS id D36F620693
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:33:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D36F620693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsnmW-0006jR-OB
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:32:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34190)
+	id 1hsnne-0007nl-60
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:33:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34682)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hsnm7-0006FJ-Ow
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:32:12 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hsnnD-0007I3-GE
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:33:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hsnm6-000642-Kg
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:32:11 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53628)
+ (envelope-from <pbonzini@redhat.com>) id 1hsnnC-0008F2-Jv
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:33:19 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52830)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsnm6-00063D-F2
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:32:10 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x15so60652482wmj.3
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 05:32:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsnnC-0008EW-De
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:33:18 -0400
+Received: by mail-wm1-f68.google.com with SMTP id s3so60601042wms.2
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 05:33:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=piBqViNj5aiB48a8+E54EeLVhMXIbc+xWJcJdyIBVRU=;
- b=bsWw9cQm5jxAXk/5QQfljfK91VAgbWiD6ZL6/0cdXQVvBmDeY6EGd+Lgdn1BYentaf
- 0glKKZ7Vm8N6zo/pWCbNe7mIBZYKMNijJnWe+at4lfyJnFZo6na6Uogcu9Iku2SwRpoN
- t7KCDjuGiSF6/yFHQfgn+VBPBeUUaYR5J+qv/FUee6uF5yWl5sxL5p/huglpyyaKLvsC
- rJZ0McHC7c7xJV6f+FUFaS9QIO1xWJZALKXVEKq7Vn03LJZYiEQIAGoVmxcD0VTWi8P5
- +32Eo69u51MNF/PtnbfT4q+Dyl1gk3DtIT0hfMjgWbQz7D3u0HsWBczdS2LYkSmFoQzp
- /A9w==
-X-Gm-Message-State: APjAAAXKXnnXLqwc1Lgw5sh2rwrm73pTfw6b1A4VT45SisDHteo645p9
- aPwThr6KGTNAcjHvDsCBg0tTtA==
-X-Google-Smtp-Source: APXvYqxDwbqMowdTxUGOO/zJ1b5eZ6/+R1PBgjWPGyp7OZCh+kRuXlsNV/ubjRsD+DSZFNBVLs9Lcw==
-X-Received: by 2002:a1c:988a:: with SMTP id
- a132mr108312390wme.165.1564576328381; 
- Wed, 31 Jul 2019 05:32:08 -0700 (PDT)
+ bh=0T9lTxOLDFBEseRDcg90PQpjuDzOlXyjEFc5keDzUUc=;
+ b=Vl8bMOflvknyek2aVgn4R9X2bMgOvCPFEGzHXNHkpT9dqD2Pf/Vsan/nEAm7eOQxxb
+ OJFPajxOjA778yrZnsGNAn3YV/8MEQfnfHIEZiPQ3m1UQTaCfaWDNIBMpG8T3VMxhA+3
+ KLhIK3OPeW6jSJL4H1mPSraNtW4ZUNgv6omHBBPvNHPMrdovDdcEWM5ZgXLWEhoOeH81
+ qIP9DHHMzGq/nG/fmrcThPOFhV9pfI1bocbwWzPv33XAPUGPzSlwx1dklF+K3o5IMBId
+ guJwREZ2ApszHxISz0gNsvRE4YT9WcWixpnaBYv1nOWK4hpWZXsNVM9NYJ3iFsR8BfOp
+ QSCQ==
+X-Gm-Message-State: APjAAAWWqmOHJS01U0WFf2tYyAu4yXzxexGI/pn6+jlKwIUOj1r1R2Ey
+ SEfkTOKrHdl2YZZwz7lmLnrWRQ==
+X-Google-Smtp-Source: APXvYqx0Gfxen1aDoNjtvwtNPLL16ulsQ5fHs4tgo9lQCqT/m+qcBJy38OhVcwypF6w7tCP1kJiuFA==
+X-Received: by 2002:a1c:968c:: with SMTP id
+ y134mr104737672wmd.122.1564576397171; 
+ Wed, 31 Jul 2019 05:33:17 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3?
  ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
- by smtp.gmail.com with ESMTPSA id b8sm62042864wrr.43.2019.07.31.05.32.07
+ by smtp.gmail.com with ESMTPSA id b5sm58014119wru.69.2019.07.31.05.33.16
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 31 Jul 2019 05:32:07 -0700 (PDT)
-To: Christophe de Dinechin <dinechin@redhat.com>, qemu-devel@nongnu.org
-References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <7a78ef04-4120-20d9-d5f4-6572c5676344@redhat.com>
- <dc9c2e70-c2a6-838e-f191-1c2787e244f5@de.ibm.com> <m136imo9ps.fsf@redhat.com>
+ Wed, 31 Jul 2019 05:33:16 -0700 (PDT)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
+ qemu-devel@nongnu.org
+References: <20190731075652.17053-1-thuth@redhat.com>
+ <20190731075652.17053-5-thuth@redhat.com>
+ <b3696656-201d-9777-0b73-b6903949d61f@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <038487b3-0b39-0695-7ef7-ede1b3143ad1@redhat.com>
-Date: Wed, 31 Jul 2019 14:32:07 +0200
+Message-ID: <533ca6da-a3ae-1c6b-a75d-f20bf97d8115@redhat.com>
+Date: Wed, 31 Jul 2019 14:33:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <m136imo9ps.fsf@redhat.com>
+In-Reply-To: <b3696656-201d-9777-0b73-b6903949d61f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
- before ioctl call
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] hw/core: Add a config switch for
+ the "register" device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,137 +90,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, berto@igalia.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, mtosatti@redhat.com, mdroth@linux.vnet.ibm.com,
- armbru@redhat.com, kvm@vger.kernel.org, den@openvz.org,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-arm@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/19 11:05, Christophe de Dinechin wrote:
+On 31/07/19 13:44, Philippe Mathieu-Daudé wrote:
+> What about naming it REGISTER_ARRAY or REGISTER_BLOCK?
 > 
-> Christian Borntraeger writes:
+> The API is:
 > 
->> On 30.07.19 18:44, Philippe Mathieu-Daudé wrote:
->>> On 7/30/19 6:01 PM, Andrey Shinkevich wrote:
->>>> Not the whole structure is initialized before passing it to the KVM.
->>>> Reduce the number of Valgrind reports.
->>>>
->>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>>> ---
->>>>  target/i386/kvm.c | 3 +++
->>>>  1 file changed, 3 insertions(+)
->>>>
->>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>>> index dbbb137..ed57e31 100644
->>>> --- a/target/i386/kvm.c
->>>> +++ b/target/i386/kvm.c
->>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
->>>>          return 0;
->>>>      }
->>>>
->>>> +    memset(&msr_data, 0, sizeof(msr_data));
->>>
->>> I wonder the overhead of this one...
->>
->> Cant we use designated initializers like in
->>
->> commit bdfc8480c50a53d91aa9a513d23a84de0d5fbc86
->> Author:     Christian Borntraeger <borntraeger@de.ibm.com>
->> AuthorDate: Thu Oct 30 09:23:41 2014 +0100
->> Commit:     Paolo Bonzini <pbonzini@redhat.com>
->> CommitDate: Mon Dec 15 12:21:01 2014 +0100
->>
->>     valgrind/i386: avoid false positives on KVM_SET_XCRS ioctl
->>
->> and others?
->>
->> This should minimize the impact.
+>     RegisterInfoArray *register_init_block32(...);
 > 
-> Oh, when you talked about using designated initializers, I thought you
-> were talking about fully initializing the struct, like so:
+> Cc'ing Alistair for better name ideas :)
+> 
 
-Yeah, that would be good too.  For now I'm applying Andrey's series though.
+I think REGISTER is okay. :)
 
 Paolo
-
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index dbbb13772a..3533870c43 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -180,19 +180,20 @@ static int kvm_get_tsc(CPUState *cs)
->  {
->      X86CPU *cpu = X86_CPU(cs);
->      CPUX86State *env = &cpu->env;
-> -    struct {
-> -        struct kvm_msrs info;
-> -        struct kvm_msr_entry entries[1];
-> -    } msr_data;
->      int ret;
-> 
->      if (env->tsc_valid) {
->          return 0;
->      }
-> 
-> -    msr_data.info.nmsrs = 1;
-> -    msr_data.entries[0].index = MSR_IA32_TSC;
-> -    env->tsc_valid = !runstate_is_running();
-> +    struct {
-> +        struct kvm_msrs info;
-> +        struct kvm_msr_entry entries[1];
-> +    } msr_data = {
-> +        .info = { .nmsrs =  1 },
-> +        .entries = { [0] = { .index = MSR_IA32_TSC } }
-> +    };
-> +     env->tsc_valid = !runstate_is_running();
-> 
->      ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, &msr_data);
->      if (ret < 0) {
-> 
-> 
-> This gives the compiler maximum opportunities to flag mistakes like
-> initializing the same thing twice, and make it easier (read no smart
-> optimizations) to initialize in one go. Moving the declaration past the
-> 'if' also addresses Philippe's concern.
-> 
->>>
->>>>      msr_data.info.nmsrs = 1;
->>>>      msr_data.entries[0].index = MSR_IA32_TSC;
->>>>      env->tsc_valid = !runstate_is_running();
->>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>>
->>>>      if (has_xsave) {
->>>>          env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
->>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
->>>
->>> OK
->>>
->>>>      }
->>>>
->>>>      max_nested_state_len = kvm_max_nested_state_length();
->>>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
->>>>          return 0;
->>>>      }
->>>>
->>>> +    memset(&dbgregs, 0, sizeof(dbgregs));
->>>
->>> OK
->>>
->>>>      for (i = 0; i < 4; i++) {
->>>>          dbgregs.db[i] = env->dr[i];
->>>>      }
->>>
->>> We could remove 'dbgregs.flags = 0;'
->>>
->>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>
-> 
-> 
-> --
-> Cheers,
-> Christophe de Dinechin (IRC c3d)
-> 
-
 
