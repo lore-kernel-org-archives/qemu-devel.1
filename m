@@ -2,86 +2,96 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA4AC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 23:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C1AFC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 23:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3BC720679
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 23:24:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3BC720679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB3BD20449
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 23:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB3BD20449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsxxV-00052O-4k
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 19:24:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51614)
+	id 1hsy7v-0007qV-7a
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 19:35:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55470)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kevin.tian@intel.com>) id 1hsxwZ-000433-VW
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 19:23:41 -0400
+ (envelope-from <daniel@linux.ibm.com>) id 1hsy7U-0007Ip-9R
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 19:34:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1hsxwZ-0001TB-3H
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 19:23:39 -0400
-Received: from mga03.intel.com ([134.134.136.65]:5182)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1hsxwY-0001OU-Rj; Wed, 31 Jul 2019 19:23:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 31 Jul 2019 16:23:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,332,1559545200"; d="scan'208";a="174973704"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by orsmga003.jf.intel.com with ESMTP; 31 Jul 2019 16:23:29 -0700
-Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 31 Jul 2019 16:23:28 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 31 Jul 2019 16:23:28 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.112]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.163]) with mapi id 14.03.0439.000;
- Thu, 1 Aug 2019 07:23:26 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Auger Eric <eric.auger@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Thread-Topic: [PATCH for-4.2 v10 11/15] virtio-iommu: Expose the IOAPIC MSI
- reserved region when relevant
-Thread-Index: AQHVRvuB+lYfnIqunUiYF7Ql9SMCpqbjCI0AgADC99CAAMu+AIAABW2AgADAzMA=
-Date: Wed, 31 Jul 2019 23:23:26 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19CAFD1AF@SHSMSX104.ccr.corp.intel.com>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-12-eric.auger@redhat.com>
- <20190730153628-mutt-send-email-mst@kernel.org>
- <AADFC41AFE54684AB9EE6CBC0274A5D19CAF8E1B@SHSMSX104.ccr.corp.intel.com>
- <20190731151834-mutt-send-email-mst@kernel.org>
- <95de34e9-1b1a-3eff-cebb-ee146e9acc78@redhat.com>
-In-Reply-To: <95de34e9-1b1a-3eff-cebb-ee146e9acc78@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDQ3ZTA0ZTktNDgwNC00ZjcwLWFkZjgtMDNkMTI3YTM5ZmNiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib2lZR0hYWkZqbStORFBUdktsdldMU0wweTVNV3FHMlZMNThETzVnTmRBVjM3elVEbHIrclJvTTVcL1B2RUI0WFIifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <daniel@linux.ibm.com>) id 1hsy7S-0003cZ-T7
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 19:34:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2996
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <daniel@linux.ibm.com>)
+ id 1hsy7S-0003cU-Og
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 19:34:54 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6VNY0lM069166
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 19:34:53 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2u3hy6wwha-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 19:34:53 -0400
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <daniel@linux.ibm.com>;
+ Thu, 1 Aug 2019 00:34:51 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 1 Aug 2019 00:34:48 +0100
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6VNYlwU42139700
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 31 Jul 2019 23:34:47 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 520025205F;
+ Wed, 31 Jul 2019 23:34:47 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B22ED52057;
+ Wed, 31 Jul 2019 23:34:46 +0000 (GMT)
+Received: from volution.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
+ (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 21F0AA01A4;
+ Thu,  1 Aug 2019 09:34:45 +1000 (AEST)
+From: Daniel Black <daniel@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Date: Thu,  1 Aug 2019 09:34:38 +1000
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.65
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 11/15] virtio-iommu: Expose the
- IOAPIC MSI reserved region when relevant
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19073123-0020-0000-0000-000003591F25
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19073123-0021-0000-0000-000021AD2B32
+Message-Id: <20190731233438.483-1-daniel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-31_12:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=997 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907310232
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [PATCH] spapr: quantify error messages regarding
+ capability settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,44 +103,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "tn@semihalf.com" <tn@semihalf.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>,
+ Daniel Black <daniel@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBBdWdlciBFcmljIFttYWlsdG86ZXJpYy5hdWdlckByZWRoYXQuY29tXQ0KPiBTZW50
-OiBUaHVyc2RheSwgQXVndXN0IDEsIDIwMTkgMzo0NSBBTQ0KPiANCj4gSGkgTWljaGFlbCwNCj4g
-DQo+IE9uIDcvMzEvMTkgOToyNSBQTSwgTWljaGFlbCBTLiBUc2lya2luIHdyb3RlOg0KPiA+IE9u
-IFR1ZSwgSnVsIDMwLCAyMDE5IGF0IDExOjIwOjQ0UE0gKzAwMDAsIFRpYW4sIEtldmluIHdyb3Rl
-Og0KPiA+Pj4gRnJvbTogTWljaGFlbCBTLiBUc2lya2luIFttYWlsdG86bXN0QHJlZGhhdC5jb21d
-DQo+ID4+PiBTZW50OiBXZWRuZXNkYXksIEp1bHkgMzEsIDIwMTkgMzozOCBBTQ0KPiA+Pj4NCj4g
-Pj4+IE9uIFR1ZSwgSnVsIDMwLCAyMDE5IGF0IDA3OjIxOjMzUE0gKzAyMDAsIEVyaWMgQXVnZXIg
-d3JvdGU6DQo+ID4+Pj4gV2UgaW50cm9kdWNlIGEgbmV3IG1zaV9ieXBhc3MgZmllbGQgd2hpY2gg
-aW5kaWNhdGVzIHdoZXRoZXINCj4gPj4+PiB0aGUgSU9BUElDIE1TSSB3aW5kb3cgWzB4RkVFMDAw
-MDAgLSAweEZFRUZGRkZGXSBtdXN0IGJlIGV4cG9zZWQNCj4gPj4NCj4gPj4gaXQncyBub3QgZ29v
-ZCB0byBjYWxsIGl0IElPQVBJQyBNU0kgd2luZG93LiBhbnkgd3JpdGUgdG8gdGhpcyByYW5nZSwg
-ZWl0aGVyDQo+ID4+IGZyb20gSU9BUElDIG9yIFBDSSBkZXZpY2UsIGlzIGludGVycHJldGVkIGJ5
-IHRoZSBwbGF0Zm9ybSBhcyBpbnRlcnJ1cHQNCj4gPj4gcmVxdWVzdC4gSSdkIGNhbGwgaXQgIng4
-NiBpbnRlcnJ1cHQgYWRkcmVzcyByYW5nZSIuDQo+ID4NCj4gPiBJc24ndCB0aGlzIEFQSUNfREVG
-QVVMVF9BRERSRVNTPyBJJ20gbm90IHN1cmUgZ3Vlc3RzIGNhbid0IGNoYW5nZSBpdA0KPiA+IGV2
-ZW4gdGhvdWdoIEknbSBub3Qgc3VyZSBxZW11IHN1cHBvcnRzIGNoYW5naW5nIGl0Lg0KPiANCj4g
-VGhhdCdzIGluZGVlZCBtYXRjaGluZzoNCj4gDQo+ICNkZWZpbmUgQVBJQ19ERUZBVUxUX0FERFJF
-U1MgMHhmZWUwMDAwMA0KPiAjZGVmaW5lIEFQSUNfU1BBQ0VfU0laRSAgICAgIDB4MTAwMDAwDQo+
-IA0KDQpUaGV5IGFyZSBkaWZmZXJlbnQgdGhpbmcsIHRob3VnaCB2YWx1ZSBtYXRjaGVzLiBBUElD
-IGRlZmF1bHQgYWRkcmVzcw0KaXMgdGhlIG1lbW9yeS1tYXBwZWQgcmVnaW9uIGZvciBzb2Z0d2Fy
-ZSB0byBhY2Nlc3MgQVBJQyByZWdpc3Rlci4gSXQNCmNhbiBiZSByZWxvY2F0ZWQgYnkgdGhlIHNv
-ZnR3YXJlLCB3aXRoIGRlZmF1bHQgYXMgMHhmZWUwMDAwMC4gT24gdGhlDQpvdGhlciBoYW5kLCB0
-aGUgaW50ZXJydXB0IGFkZHJlc3MgcmFuZ2UgaXMgZm9yIHJvb3QgY29tcGxleCB0byBpbnRlcnBy
-ZXQNCmludGVycnVwdCBtZXNzYWdlIGZyb20gZGV2aWNlcy4gWW91IGNhbiBsb29rIGF0IEludGVs
-IFNETSAzQSwgMTAuMTENCk1lc3NhZ2UgU2lnbmFsbGVkIEludGVycnVwdHMsIHdoZXJlIHRoZSBt
-ZXNzYWdlIGFkZHJlc3MgcmVnaXN0ZXINCmZvcm1hdCBpcyBkZWZpbmVkIHdpdGggMHhmZWUgYXMg
-dGhlIGhhcmQgcHJlZml4Lg0KDQpUaGFua3MNCktldmluDQo=
+Its not immediately obvious how cap-X=y setting need to be applied
+to the command line so this has been clarified to "appending to the
+machine name" in spapr capability error messages.
+
+The wrong value messages have been left as is, as the user has found
+the right location.
+
+Signed-off-by: Daniel Black <daniel@linux.ibm.com>
+---
+ hw/ppc/spapr_caps.c | 47 ++++++++++++++++++++++++++++++---------------
+ 1 file changed, 32 insertions(+), 15 deletions(-)
+
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index bbb001f84a..cf334fe595 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -37,6 +37,8 @@
+ 
+ #include "hw/ppc/spapr.h"
+ 
++#define CAPABILITY_ERROR(X) "appending \"," X "\" to the machine name"
++
+ typedef struct SpaprCapPossible {
+     int num;            /* size of vals array below */
+     const char *help;   /* help text for vals */
+@@ -194,10 +196,12 @@ static void cap_htm_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+     }
+     if (tcg_enabled()) {
+         error_setg(errp,
+-                   "No Transactional Memory support in TCG, try cap-htm=off");
++                   "No Transactional Memory support in TCG, try "
++                   CAPABILITY_ERROR("cap-htm=off"));
+     } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+         error_setg(errp,
+-"KVM implementation does not support Transactional Memory, try cap-htm=off"
++"KVM implementation does not support Transactional Memory, try "
++                   CAPABILITY_ERROR("cap-htm=off")
+             );
+     }
+ }
+@@ -215,7 +219,8 @@ static void cap_vsx_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+      * rid of anything that doesn't do VMX */
+     g_assert(env->insns_flags & PPC_ALTIVEC);
+     if (!(env->insns_flags2 & PPC2_VSX)) {
+-        error_setg(errp, "VSX support not available, try cap-vsx=off");
++        error_setg(errp, "VSX support not available, try "
++                   CAPABILITY_ERROR("cap-vsx=off"));
+     }
+ }
+ 
+@@ -229,7 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+         return;
+     }
+     if (!(env->insns_flags2 & PPC2_DFP)) {
+-        error_setg(errp, "DFP support not available, try cap-dfp=off");
++        error_setg(errp, "DFP support not available, try "
++                   CAPABILITY_ERROR("cap-dfp=off"));
+     }
+ }
+ 
+@@ -249,11 +255,13 @@ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+     if (tcg_enabled() && val) {
+         /* TCG only supports broken, allow other values and print a warning */
+         error_setg(&local_err,
+-                   "TCG doesn't support requested feature, cap-cfpc=%s",
++                   "TCG doesn't support requested feature, use "
++                   CAPABILITY_ERROR("cap-cfpc=%s"),
+                    cap_cfpc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe cache capability level not supported by kvm, try cap-cfpc=%s",
++"Requested safe cache capability level not supported by kvm, try "
++                   CAPABILITY_ERROR("cap-cfpc=%s"),
+                    cap_cfpc_possible.vals[kvm_val]);
+     }
+ 
+@@ -281,7 +289,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
+                    cap_sbbc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe bounds check capability level not supported by kvm, try cap-sbbc=%s",
++"Requested safe bounds check capability level not supported by kvm, try "
++                   CAPABILITY_ERROR("cap-sbbc=%s"),
+                    cap_sbbc_possible.vals[kvm_val]);
+     }
+ 
+@@ -312,7 +321,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+                    cap_ibs_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s",
++"Requested safe indirect branch capability level not supported by kvm, try "
++                   CAPABILITY_ERROR("cap-ibs=%s"),
+                    cap_ibs_possible.vals[kvm_val]);
+     }
+ 
+@@ -401,11 +411,13 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
+ 
+     if (tcg_enabled()) {
+         error_setg(errp,
+-                   "No Nested KVM-HV support in tcg, try cap-nested-hv=off");
++                   "No Nested KVM-HV support in tcg, try "
++                   CAPABILITY_ERROR("cap-nested-hv=off"));
+     } else if (kvm_enabled()) {
+         if (!kvmppc_has_cap_nested_kvm_hv()) {
+             error_setg(errp,
+-"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=off");
++"KVM implementation does not support Nested KVM-HV, try "
++                       CAPABILITY_ERROR("cap-nested-hv=off"));
+         } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
+                 error_setg(errp,
+ "Error enabling cap-nested-hv with KVM, try cap-nested-hv=off");
+@@ -435,10 +447,12 @@ static void cap_large_decr_apply(SpaprMachineState *spapr,
+ 
+         if (!kvm_nr_bits) {
+             error_setg(errp,
+-                       "No large decrementer support, try cap-large-decr=off");
++                       "No large decrementer support, try "
++                        CAPABILITY_ERROR("cap-large-decr=off"));
+         } else if (pcc->lrg_decr_bits != kvm_nr_bits) {
+             error_setg(errp,
+-"KVM large decrementer size (%d) differs to model (%d), try -cap-large-decr=off",
++"KVM large decrementer size (%d) differs to model (%d), try "
++                CAPABILITY_ERROR("cap-large-decr=off"),
+                 kvm_nr_bits, pcc->lrg_decr_bits);
+         }
+     }
+@@ -454,7 +468,8 @@ static void cap_large_decr_cpu_apply(SpaprMachineState *spapr,
+     if (kvm_enabled()) {
+         if (kvmppc_enable_cap_large_decr(cpu, val)) {
+             error_setg(errp,
+-                       "No large decrementer support, try cap-large-decr=off");
++                       "No large decrementer support, try "
++                       CAPABILITY_ERROR("cap-large-decr=off"));
+         }
+     }
+ 
+@@ -474,10 +489,12 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+     if (tcg_enabled() && val) {
+         /* TODO - for now only allow broken for TCG */
+         error_setg(errp,
+-"Requested count cache flush assist capability level not supported by tcg, try cap-ccf-assist=off");
++"Requested count cache flush assist capability level not supported by tcg, try "
++                   CAPABILITY_ERROR("cap-ccf-assist=off"));
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested count cache flush assist capability level not supported by kvm, try cap-ccf-assist=off");
++"Requested count cache flush assist capability level not supported by kvm, try "
++                   CAPABILITY_ERROR("cap-ccf-assist=off"));
+     }
+ }
+ 
+-- 
+2.21.0
+
 
