@@ -2,88 +2,73 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99B3EC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30533C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:16:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66BF62067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:09:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="w396Mv4l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66BF62067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 06F522067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:16:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F522067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hskcC-0005kh-OA
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:09:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56505)
+	id 1hskiL-00082W-6U
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:16:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58350)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hskbk-00054s-7a
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:09:17 -0400
+ (envelope-from <bounces@canonical.com>) id 1hskhw-0007cn-91
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:15:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hskbi-00032S-UG
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:09:16 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:57706)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hskbd-0002xV-D2; Wed, 31 Jul 2019 05:09:09 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id A571D96F50;
- Wed, 31 Jul 2019 09:09:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564564146;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EdWJrB74+JJFJQQlRMKyVQ4d1uYy9h5A4h0dfyTSt04=;
- b=w396Mv4lOCzXExBJjBR1gGLh+X/3idvXVjMo+TA3mqI03gBtfmYL1+uiw+GRynYj/S+Hcs
- kcPLRxnllMWtKhw7cdDtpVw4sZctqit9g8GF+fbxa0/B/OF7p9o58/oUEokT11axbayvBH
- rdUkx9/BPbzW8ZSVRN3qBOnb6S/YLEY=
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-5-damien.hedde@greensocs.com>
- <20190731055640.GC2032@umbus.fritz.box>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <98250dc3-c2db-844d-f9f5-46a27488e94f@greensocs.com>
-Date: Wed, 31 Jul 2019 11:09:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <bounces@canonical.com>) id 1hskhu-000630-K0
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:15:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60520)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hskhu-00062c-EH
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:15:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hskhs-0002IL-Mz
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8B48A2E804E
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190731055640.GC2032@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564564147;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EdWJrB74+JJFJQQlRMKyVQ4d1uYy9h5A4h0dfyTSt04=;
- b=NODQuPewIpRqwUO/OsuxVXJyq+b5OA+MMPuzKpuPRZlNeOPusqlFFGQQTJuDWcyOkurSPe
- KqPoZu55qDrafmS/jAhGrGihAuzD3s6YwEq2AIbGHHzMO+5Jf/Ca8DWFC+zRgb8KmhjRk7
- reV/JQxVBnAnZmz9k9ozX0vuISrrqow=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564564147; a=rsa-sha256; cv=none;
- b=eePtbpv4XK7vrKMQVIvqKeVdWcYFj7Vejk9UiSK4NcFhl3bouUuXafHXALgu/MQXt9kENO
- TiPBr84TIJBincWhmtHXSoD/O8NQTD27cblsBkoQb+LBG51SuUzizSfbPCb2w0GEaPyxIm
- 3Hm8vqy9Chh1NvwDYBr7a2zzPsV29HY=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 31 Jul 2019 09:06:50 -0000
+From: Andrew Randrianasulu <1837049@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: ppc tcg
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andrew-randrianasulu rth
+X-Launchpad-Bug-Reporter: Andrew Randrianasulu (andrew-randrianasulu)
+X-Launchpad-Bug-Modifier: Andrew Randrianasulu (andrew-randrianasulu)
+References: <156345756915.8493.13426435768891424211.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156456401028.18013.3196376757627273234.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19012";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 6fbb124892581df7920c96d9c86e937bbd9def2e
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH v3 04/33] make Device and Bus Resettable
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1837049] Re: qemu-system-ppc segfaults with
+ -display sdl
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,139 +77,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
- dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
- qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
- hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, marcandre.lureau@redhat.com, thuth@redhat.com,
- ehabkost@redhat.com, alistair@alistair23.me, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com, rth@twiddle.net,
- berrange@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com
+Reply-To: Bug 1837049 <1837049@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello, Richard!
+No, same bug was biting me without any specific options, i tried to add -Og=
+ for better debugging, but backtrace was anyway not complete ... I think I =
+can live with -display gtk workaround for now.
 
+-- =
 
-On 7/31/19 7:56 AM, David Gibson wrote:
-> On Mon, Jul 29, 2019 at 04:56:25PM +0200, Damien Hedde wrote:
->> This add Resettable interface implementation for both Bus and Device.
->>
->> *resetting* counter and *reset_is_cold* flag are added in DeviceState
->> and BusState.
->>
->> Compatibility with existing code base is ensured.
->> The legacy bus or device reset method is called in the new exit phase
->> and the other 2 phases are let empty. Using the exit phase guarantee that
->> legacy resets are called in the "post" order (ie: children then parent)
->> in hierarchical reset. That is the same order as legacy qdev_reset_all
->> or qbus_reset_all were using.
->>
->> New *device_reset* and *bus_reset* function are proposed with an
->> additional boolean argument telling whether the reset is cold or warm.
->> Helper functions *device_reset_[warm|cold]* and *bus_reset_[warm|cold]*
->> are defined also as helpers.
->>
->> Also add a [device|bus]_is_resetting and [device|bus]_is_reset_cold
->> functions telling respectively whether the object is currently under reset and
->> if the current reset is cold or not.
->>
->> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->> ---
->>  hw/core/bus.c          | 85 ++++++++++++++++++++++++++++++++++++++++++
->>  hw/core/qdev.c         | 82 ++++++++++++++++++++++++++++++++++++++++
->>  include/hw/qdev-core.h | 84 ++++++++++++++++++++++++++++++++++++++---
->>  tests/Makefile.include |  1 +
->>  4 files changed, 247 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/core/bus.c b/hw/core/bus.c
->> index 17bc1edcde..08a97addb6 100644
->> --- a/hw/core/bus.c
->> +++ b/hw/core/bus.c
->> @@ -22,6 +22,7 @@
->>  #include "qemu/module.h"
->>  #include "hw/qdev.h"
->>  #include "qapi/error.h"
->> +#include "hw/resettable.h"
->>  
->>  void qbus_set_hotplug_handler(BusState *bus, Object *handler, Error **errp)
->>  {
->> @@ -68,6 +69,75 @@ int qbus_walk_children(BusState *bus,
->>      return 0;
->>  }
->>  
->> +void bus_reset(BusState *bus, bool cold)
->> +{
->> +    resettable_reset(OBJECT(bus), cold);
->> +}
->> +
->> +bool bus_is_resetting(BusState *bus)
->> +{
->> +    return (bus->resetting != 0);
->> +}
->> +
->> +bool bus_is_reset_cold(BusState *bus)
->> +{
->> +    return bus->reset_is_cold;
->> +}
->> +
->> +static uint32_t bus_get_reset_count(Object *obj)
->> +{
->> +    BusState *bus = BUS(obj);
->> +    return bus->resetting;
->> +}
->> +
->> +static uint32_t bus_increment_reset_count(Object *obj)
->> +{
->> +    BusState *bus = BUS(obj);
->> +    return ++bus->resetting;
->> +}
->> +
->> +static uint32_t bus_decrement_reset_count(Object *obj)
->> +{
->> +    BusState *bus = BUS(obj);
->> +    return --bus->resetting;
->> +}
->> +
->> +static bool bus_set_reset_cold(Object *obj, bool cold)
->> +{
->> +    BusState *bus = BUS(obj);
->> +    bool old = bus->reset_is_cold;
->> +    bus->reset_is_cold = cold;
->> +    return old;
->> +}
->> +
->> +static bool bus_set_hold_needed(Object *obj, bool hold_needed)
->> +{
->> +    BusState *bus = BUS(obj);
->> +    bool old = bus->reset_hold_needed;
->> +    bus->reset_hold_needed = hold_needed;
->> +    return old;
->> +}
->> +
->> +static void bus_foreach_reset_child(Object *obj, void (*func)(Object *))
->> +{
->> +    BusState *bus = BUS(obj);
->> +    BusChild *kid;
->> +
->> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
->> +        func(OBJECT(kid->child));
->> +    }
->> +}
-> 
-> IIUC, every resettable class would need more or less identical
-> implementations of the above.  That seems like an awful lot of
-> boilerplate.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1837049
 
-Do you mean the get/increment_count/decrement_count, set_cold/hold part ?
-True, but it's limited to the base classes.
-Since Resettable is an interface, we have no state there to store what
-we need. Only alternative is to have some kind of single
-get_resettable_state method returning a pointer to the state (allowing
-us to keep the functions in the interface code).
-Beyond Device and Bus, which are done here, there is probably not so
-many class candidates for the Resettable interface.
+Title:
+  qemu-system-ppc segfaults with -display sdl
 
-Damien
+Status in QEMU:
+  New
+
+Bug description:
+  Hello.
+
+  I was trying to debug this segfault:
+  https://lists.nongnu.org/archive/html/qemu-ppc/2019-07/msg00186.html
+
+  I recompiled latest qemu from git (commit 0b18cfb8f1828c905139b54c8644b0d=
+8f4aad879 ), using this configure line:
+  ./configure --target-list=3Di386-softmmu,x86_64-softmmu,ppc-softmmu --aud=
+io-drv-list=3Dalsa --disable-werror --extra-cflags=3D"-Og" --enable-debug-t=
+cg
+
+  after this I tried original line under gdb, it was still segfaulting:
+
+  --------------copy-----------------
+  gdb ./ppc-softmmu/qemu-system-ppc
+  GNU gdb (GDB) 7.11.1
+  Copyright (C) 2016 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+  and "show warranty" for details.
+  This GDB was configured as "i586-slackware-linux".
+  Type "show configuration" for configuration details.
+  For bug reporting instructions, please see:
+  <http://www.gnu.org/software/gdb/bugs/>.
+  Find the GDB manual and other documentation resources online at:
+  <http://www.gnu.org/software/gdb/documentation/>.
+  For help, type "help".
+  Type "apropos word" to search for commands related to "word"...
+  Reading symbols from ./ppc-softmmu/qemu-system-ppc...done.
+  warning: File "/dev/shm/qemu/.gdbinit" auto-loading has been declined by =
+your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
+  To enable execution of this file add
+          add-auto-load-safe-path /dev/shm/qemu/.gdbinit
+  line to your configuration file "/home/guest/.gdbinit".
+  To completely disable this security protection add
+          set auto-load safe-path /
+  line to your configuration file "/home/guest/.gdbinit".
+  For more information about this security protection see the
+  "Auto-loading safe path" section in the GDB manual.  E.g., run from the s=
+hell:
+          info "(gdb)Auto-loading safe path"
+  (gdb) run  -M mac99,via=3Dpmu -L ../queue-vga/pc-bios -cdrom /mnt/sdb1/PP=
+C-img/lubuntu-16.04-desktop-powerpc.iso -m 512 -display sdl,gl=3Don -vga st=
+d -d guest_errors,unimp -boot d -cpu G4 -g 1024x768x24 -device ES1370
+  Starting program: /dev/shm/qemu/ppc-softmmu/qemu-system-ppc -M mac99,via=
+=3Dpmu -L ../queue-vga/pc-bios -cdrom /mnt/sdb1/PPC-img/lubuntu-16.04-deskt=
+op-powerpc.iso -m 512 -display sdl,gl=3Don -vga std -d guest_errors,unimp -=
+boot d -cpu G4 -g 1024x768x24 -device ES1370
+  [Thread debugging using libthread_db enabled]
+  Using host libthread_db library "/lib/libthread_db.so.1".
+  [New Thread 0xf560cb40 (LWP 8100)]
+  [New Thread 0xf4c1ab40 (LWP 8101)]
+  [New Thread 0xec1b7b40 (LWP 8102)]
+  [New Thread 0xc5821b40 (LWP 8104)]
+  [Thread 0xf4c1ab40 (LWP 8101) exited]
+  [New Thread 0xf4c1ab40 (LWP 8119)]
+
+  Thread 4 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0xec1b7b40 (LWP 8102)]
+  0xf26c2e44 in code_gen_buffer ()
+  (gdb) bt full
+  #0  0xffffffff in code_gen_buffer ()
+  #1  0x56710cf6 in cpu_exec (itb=3D<optimized out>, cpu=3D<optimized out>)=
+ at /dev/shm/qemu/accel/tcg/cpu-exec.c:173
+          env =3D <optimized out>
+          ret =3D <optimized out>
+          last_tb =3D <optimized out>
+          tb_exit =3D <optimized out>
+          tb_ptr =3D 0xf26c2cc0 <code_gen_buffer+103976094> "=E2=80=B9]=D1=
+=88=E2=80=A6=D0=AB\017=D0=8A=D0=91\020"
+          ret =3D 0
+          insns_left =3D <optimized out>
+          cflags =3D <optimized out>
+          tb =3D 0x5722fe58
+          last_tb =3D <optimized out>
+          tb_exit =3D <optimized out>
+          cc =3D <optimized out>
+          __func__ =3D "cpu_exec"
+          ret =3D <optimized out>
+          sc =3D <optimized out>
+  #2  0x56710cf6 in cpu_exec (tb_exit=3D<synthetic pointer>, last_tb=3D<syn=
+thetic pointer>, tb=3D<optimized out>, cpu=3D<optimized out>) at /dev/shm/q=
+emu/accel/tcg/cpu-exec.c:621
+          ret =3D 0
+          insns_left =3D <optimized out>
+          cflags =3D <optimized out>
+          tb =3D 0x5722fe58
+          last_tb =3D <optimized out>
+          tb_exit =3D <optimized out>
+          cc =3D <optimized out>
+          __func__ =3D "cpu_exec"
+          ret =3D <optimized out>
+          sc =3D <optimized out>
+  #3  0x56710cf6 in cpu_exec (cpu=3D0x573db8f8) at /dev/shm/qemu/accel/tcg/=
+cpu-exec.c:732
+          cflags =3D <optimized out>
+          tb =3D 0x5722fe58
+          last_tb =3D <optimized out>
+          tb_exit =3D <optimized out>
+          cc =3D <optimized out>
+          __func__ =3D "cpu_exec"
+          ret =3D <optimized out>
+          sc =3D <optimized out>
+  #4  0x566cfade in tcg_cpu_exec (cpu=3D0x573db8f8) at /dev/shm/qemu/cpus.c=
+:1435
+          ret =3D <optimized out>
+  #5  0x566d1e6d in qemu_tcg_rr_cpu_thread_fn (arg=3D0x573db8f8) at /dev/sh=
+m/qemu/cpus.c:1537
+          r =3D <optimized out>
+          cpu =3D 0x573db8f8
+          __PRETTY_FUNCTION__ =3D "qemu_tcg_rr_cpu_thread_fn"
+  #6  0x56b56fe0 in qemu_thread_start (args=3D0x57400668) at util/qemu-thre=
+ad-posix.c:502
+          __cancel_buf =3D {__cancel_jmp_buf =3D {{__cancel_jmp_buf =3D {14=
+61911128, 1463813736, 1461911128, -333745816, 247778263, 1392237730}, __mas=
+k_was_saved =3D 0}}, __pad =3D {0xec1b70d0, 0x0, 0x0, 0x0}}
+          __cancel_routine =3D 0x56b57040 <qemu_thread_atexit_notify>
+          __not_first_call =3D <optimized out>
+          qemu_thread_args =3D 0x57400668
+          start_routine =3D 0x566d1a30 <qemu_tcg_rr_cpu_thread_fn>
+          arg =3D 0x573db8f8
+          r =3D <optimized out>
+  #7  0xffffffff in start_thread () at /lib/libpthread.so.0
+  #8  0xffffffff in clone () at /lib/libc.so.6
+  (gdb) quit
+  A debugging session is active.
+
+          Inferior 1 [process 8096] will be killed.
+
+  Quit anyway? (y or n) y
+  --------------copy end----------
+
+  But when I take away -display sdl, or replace it with -display gtk -
+  same line was booting to desktop!
+
+  Changing cpu to G3 also allowed boot:
+
+  ./ppc-softmmu/qemu-system-ppc -M mac99,via=3Dpmu -L ../queue-vga/pc-bios
+  -cdrom /mnt/sdb1/PPC-img/lubuntu-16.04-desktop-powerpc.iso -m 512
+  -display sdl -vga std -d guest_errors,unimp -boot d -cpu G3 -g
+  1024x768x24 -device ES1370
+
+  This is 32-bit qemu complied with Slackware's gcc 5.5.0. =
+
+  64-bit qemu works fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1837049/+subscriptions
 
