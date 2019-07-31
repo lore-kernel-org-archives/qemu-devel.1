@@ -2,75 +2,91 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8959AC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 873A2C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:36:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58C39208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:35:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58C39208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 566E3208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:36:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DEpxoE6A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566E3208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsuNs-0000qU-HW
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 15:35:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43029)
+	id 1hsuOl-0001o9-Ma
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 15:36:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43363)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hsuN9-00004v-K7
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:34:53 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsuOC-0001MG-LB
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:35:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hsuN7-0008GS-9W
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:34:51 -0400
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:39340)
+ (envelope-from <richard.henderson@linaro.org>) id 1hsuOB-0000f9-KH
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:35:56 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:39304)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hsuN7-0008FW-28
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:34:49 -0400
-Received: by mail-ua1-f66.google.com with SMTP id j8so27415585uan.6
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 12:34:49 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hsuOB-0000er-Aa
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:35:55 -0400
+Received: by mail-pg1-x541.google.com with SMTP id u17so32560059pgi.6
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 12:35:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=JaGSxodXv4hswMEiRb8HfD/p2DF1lVhhouD5ZaRLGnc=;
+ b=DEpxoE6AfRKRH/KsGMKGdR6019kvjdnGMOdQBgNPFYDaQMISvcxZ7/klTrMEATfujc
+ Qlb4WeRy1FnB5uDiIQTgvwu4kr/t7lzL+Im+t+DVxWN40P+7c6fw+uHaDHK9Kfry4aa2
+ F2QGJXxV52P3HvmPzJ0oqYzXMDtFMN5s9j3/9w5PcrflVRYCQEb1Cun7DYsm2ZlnjB46
+ 3wNhOwGkiiW+cqOFXdk05sl2Ks1imlFaNHB+EXXIPugIJDZZ1ciAECjIB9EO4FsxjJ8v
+ Sal4VR8fgrYtqQR2gVrrQvAaoVuwLouyTGZZz3tcIQYcrGHToZujsWUuRt4WLCP0SeTQ
+ m3Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=UBDJYfXozOLXfnKjdIcsm8Z24VxF4Qv080I7CHf6zmU=;
- b=H5nqxKit4osdxisT046KpRDuh9ut0Lcpi7T3KTi8Hfn9JdqemoH1y9x8Uhc4Bbs0+F
- e+ST37ZcjCXTibe8Xbo59EUsSnoefV+3FSmI6as/8+6y0sp8FjW41WGq9k+fXJ2LDdsk
- lCM5oaauTmlfSvBworf9VqjmWQ4RFlKqmm+sQzw36Csc7xLINhIS/SlrSL0dmloXU94L
- 16RusRGFdtW+K6tepU4/n2+9VBlXOifJmedl41cjAu8y7+wii+c2va4Q0/eSksRdruG0
- i/5s00kbi1yWbbox+Fmf5ILTJbnrlCvghuP3y87tE/Y40evKbafauBHrujYDziPEH4+I
- sP0Q==
-X-Gm-Message-State: APjAAAX3tI7CY1NoVNX4ahyr89b/MOGcDQQXwKhNvEe/ydMeIif1W7+E
- p+UPxm5fy3lNYOdV4m5xQE0N2g==
-X-Google-Smtp-Source: APXvYqywXAVcXQlLGbM0n0A1SO/FkTEMZ0Xw5yHfHoOLhUrsd4DogTDSC3/3ZVN5sYoGEFsjPvXUlQ==
-X-Received: by 2002:ab0:60ad:: with SMTP id f13mr24566054uam.129.1564601688296; 
- Wed, 31 Jul 2019 12:34:48 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- f140sm51995932vka.36.2019.07.31.12.34.45
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 12:34:46 -0700 (PDT)
-Date: Wed, 31 Jul 2019 15:34:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Message-ID: <20190731152635-mutt-send-email-mst@kernel.org>
-References: <20190729125755.45008-1-slp@redhat.com>
- <20190730042004-mutt-send-email-mst@kernel.org>
- <87ftmmwg0e.fsf@redhat.com>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JaGSxodXv4hswMEiRb8HfD/p2DF1lVhhouD5ZaRLGnc=;
+ b=Jv08tVLnLsZIblLQHTnzK+AaLwhGhShO8sMsokH8Blpbj4xLmF7y8kiUL3PirXlX0a
+ /O5p1i53LCXnSA18RNc2t5LpDJmoJ0/9RhBRK3Bv+vDqcd5O8+Z2ka7hPlHGoP7X13/0
+ wbPSUiooAgiDvLGNyUoPTEYePmK9k67Yjm/+5w5w0J7cc69qyHPp5Kxnz0DZO1kxXaMG
+ eEYufvc5I7ab458G7Yd9CTpHerp2fzccDmLDzU1F5qyyAcf7U+1zPjYVZZ7BbLps81Vi
+ R6ufrxCDKe7KlwTHq2O9dnniK55FRMEuJCkt4QdZuW8fPad05JN9cTAfySPTIhRkxnzq
+ xP1g==
+X-Gm-Message-State: APjAAAXLVnxiCHlHIq1aSDe36iaN5pmDnmbnxxAK+ZRF5OCJ0KarLQTX
+ 1avPm54tbo1H9MD8wzSpNIKl2g==
+X-Google-Smtp-Source: APXvYqww/WwJ+IP1n7R/M2wGtjgDi6RA16vMAycxhTcb3AtrI/Rr63eBXHXPWnn5xk4hVFy6fqwVlw==
+X-Received: by 2002:aa7:8641:: with SMTP id a1mr49294016pfo.177.1564601753620; 
+ Wed, 31 Jul 2019 12:35:53 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id 11sm69613994pfw.33.2019.07.31.12.35.52
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 31 Jul 2019 12:35:52 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190731175702.4916-1-jan.bobek@gmail.com>
+ <20190731175702.4916-9-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <6d2c01c9-17a4-163c-349c-537bc54289fb@linaro.org>
+Date: Wed, 31 Jul 2019 12:35:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87ftmmwg0e.fsf@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.66
-Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
- personality (virtio-1)
+In-Reply-To: <20190731175702.4916-9-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: Re: [Qemu-devel] [RFC PATCH v1 08/22] target/i386: reimplement
+ (V)PAND, (V)ANDPS, (V)ANDPD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,534 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 31, 2019 at 02:22:09PM +0200, Sergio Lopez wrote:
-> 
-> Michael S. Tsirkin <mst@redhat.com> writes:
-> 
-> > On Mon, Jul 29, 2019 at 02:57:55PM +0200, Sergio Lopez wrote:
-> >> Implement the modern (v2) personality, according to the VirtIO 1.0
-> >> specification.
-> >> 
-> >> Support for v2 among guests is not as widespread as it'd be
-> >> desirable. While the Linux driver has had it for a while, support is
-> >> missing, at least, from Tianocore EDK II, NetBSD and FreeBSD.
-> >
-> > The fact that there was no open source hypervisor implementation has
-> > probably contributed to this :)
-> >
-> >> For this reason, the v2 personality is disabled, keeping the legacy
-> >> behavior as default.
-> >
-> > I agree it's a good default for existing machine types.
-> >
-> >> Machine types willing to use v2, can enable it
-> >> using MachineClass's compat_props.
-> >
-> > Hmm. Are compat_props really the recommended mechanism to
-> > tweak defaults? I was under the impression it's
-> > only for compatibility with old machine types.
-> > Eduardo, any opinion on this?
-> 
-> Stefan suggested using something like "-global virtio-mmio.modern=true"
-> which does the trick for the command line, but I'd also like a way to
-> set it to true by default on microvm. We can discuss the best way to
-> achieve that (if using compat_props isn't acceptable) on the next
-> microvm patch series.
-
-I'm not saying it's wrong, just asking.
-
-> >> 
-> >> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> >
-> > Endian-ness seems to be wrong:
-> >
-> > static const MemoryRegionOps virtio_mem_ops = {
-> >     .read = virtio_mmio_read,
-> >     .write = virtio_mmio_write,
-> >     .endianness = DEVICE_NATIVE_ENDIAN,
-> > };
-> >
-> > you will see this if you test a big endian guest.
-> 
-> Interesting, a Linux kernel compiled for aarch64_be works just
-> fine. Looking further, seems like, on ARM, Linux assumes all memory I/O
-> operations are little-endian and swaps the data if necessary:
-> 
-> arch/arm64/include/asm/io.h:
-> /*
->  * Relaxed I/O memory access primitives. These follow the Device memory
->  * ordering rules but do not guarantee any ordering relative to Normal memory
->  * accesses.
->  */
-> #define readb_relaxed(c)	({ u8  __r = __raw_readb(c); __r; })
-> #define readw_relaxed(c)	({ u16 __r = le16_to_cpu((__force __le16)__raw_readw(c)); __r; })
-> #define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32)__raw_readl(c)); __r; })
-> #define readq_relaxed(c)	({ u64 __r = le64_to_cpu((__force __le64)__raw_readq(c)); __r; })
-> 
-> #define writeb_relaxed(v,c)	((void)__raw_writeb((v),(c)))
-> #define writew_relaxed(v,c)	((void)__raw_writew((__force u16)cpu_to_le16(v),(c)))
-> #define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
-> #define writeq_relaxed(v,c)	((void)__raw_writeq((__force u64)cpu_to_le64(v),(c)))
-> 
-> The Apendix X from virtio-0.9.5 specs states that "The endianness of the
-> registers follows the native endianness of the Guest". Luckily for us,
-> this isn't the case, as with DEVICE_NATIVE_ENDIAN
-> memory.c:adjust_endianness doesn't attempt any kind of transformation.
-
-Oh sorry, I should have said big endian *host*. DEVICE_NATIVE_ENDIAN
-follows the host endian-ness.
+On 7/31/19 10:56 AM, Jan Bobek wrote:
+> +#define gen_pand_mm(env, s, modrm)   gen_gvec_ld_modrm_mm  ((env), (s), (modrm), MO_64, tcg_gen_gvec_and, 0112)
+> +#define gen_pand_xmm(env, s, modrm)  gen_gvec_ld_modrm_xmm ((env), (s), (modrm), MO_64, tcg_gen_gvec_and, 0112)
+> +#define gen_vpand_xmm(env, s, modrm) gen_gvec_ld_modrm_vxmm((env), (s), (modrm), MO_64, tcg_gen_gvec_and, 0123)
+> +#define gen_vpand_ymm(env, s, modrm) gen_gvec_ld_modrm_vymm((env), (s), (modrm), MO_64, tcg_gen_gvec_and, 0123)
+> +#define gen_andps_xmm  gen_pand_xmm
+> +#define gen_vandps_xmm gen_vpand_xmm
+> +#define gen_vandps_ymm gen_vpand_ymm
+> +#define gen_andpd_xmm  gen_pand_xmm
+> +#define gen_vandpd_xmm gen_vpand_xmm
+> +#define gen_vandpd_ymm gen_vpand_ymm
 
 
-> In any, I guess we should follow the spec, and keep DEVICE_NATIVE_ENDIAN
-> for the legacy mode while using DEVICE_LITTLE_ENDIAN for
-> virtio-mmio-2/virtio-1.
-> 
-> >> ---
-> >>  hw/virtio/virtio-mmio.c | 264 ++++++++++++++++++++++++++++++++++++++--
-> >>  1 file changed, 254 insertions(+), 10 deletions(-)
-> >> 
-> >> diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-> >> index 97b7f35496..1da841336f 100644
-> >> --- a/hw/virtio/virtio-mmio.c
-> >> +++ b/hw/virtio/virtio-mmio.c
-> >> @@ -47,14 +47,24 @@
-> >>          OBJECT_CHECK(VirtIOMMIOProxy, (obj), TYPE_VIRTIO_MMIO)
-> >>  
-> >>  #define VIRT_MAGIC 0x74726976 /* 'virt' */
-> >> -#define VIRT_VERSION 1
-> >> +#define VIRT_VERSION_LEGACY 1
-> >> +#define VIRT_VERSION_MODERN 2
-> >>  #define VIRT_VENDOR 0x554D4551 /* 'QEMU' */
-> >>  
-> >> +typedef struct VirtIOMMIOQueue {
-> >> +    uint16_t num;
-> >> +    bool enabled;
-> >> +    uint32_t desc[2];
-> >> +    uint32_t avail[2];
-> >> +    uint32_t used[2];
-> >> +} VirtIOMMIOQueue;
-> >> +
-> >>  typedef struct {
-> >>      /* Generic */
-> >>      SysBusDevice parent_obj;
-> >>      MemoryRegion iomem;
-> >>      qemu_irq irq;
-> >> +    bool modern;
-> >>      /* Guest accessible state needing migration and reset */
-> >>      uint32_t host_features_sel;
-> >>      uint32_t guest_features_sel;
-> >> @@ -62,6 +72,9 @@ typedef struct {
-> >>      /* virtio-bus */
-> >>      VirtioBusState bus;
-> >>      bool format_transport_address;
-> >> +    /* Fields only used for v2 (modern) devices */
-> >> +    uint32_t guest_features[2];
-> >> +    VirtIOMMIOQueue vqs[VIRTIO_QUEUE_MAX];
-> >>  } VirtIOMMIOProxy;
-> >>  
-> >>  static bool virtio_mmio_ioeventfd_enabled(DeviceState *d)
-> >> @@ -115,7 +128,11 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
-> >>          case VIRTIO_MMIO_MAGIC_VALUE:
-> >>              return VIRT_MAGIC;
-> >>          case VIRTIO_MMIO_VERSION:
-> >> -            return VIRT_VERSION;
-> >> +            if (proxy->modern) {
-> >> +                return VIRT_VERSION_MODERN;
-> >> +            } else {
-> >> +                return VIRT_VERSION_LEGACY;
-> >> +            }
-> >>          case VIRTIO_MMIO_VENDOR_ID:
-> >>              return VIRT_VENDOR;
-> >>          default:
-> >> @@ -146,14 +163,18 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
-> >>      case VIRTIO_MMIO_MAGIC_VALUE:
-> >>          return VIRT_MAGIC;
-> >>      case VIRTIO_MMIO_VERSION:
-> >> -        return VIRT_VERSION;
-> >> +        if (proxy->modern) {
-> >> +            return VIRT_VERSION_MODERN;
-> >> +        } else {
-> >> +            return VIRT_VERSION_LEGACY;
-> >> +        }
-> >>      case VIRTIO_MMIO_DEVICE_ID:
-> >>          return vdev->device_id;
-> >>      case VIRTIO_MMIO_VENDOR_ID:
-> >>          return VIRT_VENDOR;
-> >>      case VIRTIO_MMIO_DEVICE_FEATURES:
-> >>          if (proxy->host_features_sel) {
-> >> -            return 0;
-> >> +            return vdev->host_features >> 32;
-> >
-> > I'd do vdev->host_features >> (32 * proxy->host_features_sel);
-> 
-> OK, looks nicer. I'll sanitize the value host_features_sel on
-> VIRTIO_MMIO_DEVICE_FEATURES too, as I'm already doing with
-> guest_features_sel.
-> 
-> >>          }
-> >>          return vdev->host_features;
-> >>      case VIRTIO_MMIO_QUEUE_NUM_MAX:
-> >> @@ -162,12 +183,34 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
-> >>          }
-> >>          return VIRTQUEUE_MAX_SIZE;
-> >>      case VIRTIO_MMIO_QUEUE_PFN:
-> >> +        if (proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: read from legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return 0;
-> >> +        }
-> >>          return virtio_queue_get_addr(vdev, vdev->queue_sel)
-> >>              >> proxy->guest_page_shift;
-> >> +    case VIRTIO_MMIO_QUEUE_READY:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: read from modern register in legacy mode\n",
-> >> +                          __func__);
-> >> +            return 0;
-> >> +        }
-> >> +        return proxy->vqs[vdev->queue_sel].enabled;
-> >>      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> >>          return atomic_read(&vdev->isr);
-> >>      case VIRTIO_MMIO_STATUS:
-> >>          return vdev->status;
-> >> +    case VIRTIO_MMIO_CONFIG_GENERATION:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: read from modern register in legacy mode\n",
-> >> +                          __func__);
-> >> +            return 0;
-> >> +        }
-> >> +        return vdev->generation;
-> >>      case VIRTIO_MMIO_DEVICE_FEATURES_SEL:
-> >>      case VIRTIO_MMIO_DRIVER_FEATURES:
-> >>      case VIRTIO_MMIO_DRIVER_FEATURES_SEL:
-> >> @@ -177,6 +220,12 @@ static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
-> >>      case VIRTIO_MMIO_QUEUE_ALIGN:
-> >>      case VIRTIO_MMIO_QUEUE_NOTIFY:
-> >>      case VIRTIO_MMIO_INTERRUPT_ACK:
-> >> +    case VIRTIO_MMIO_QUEUE_DESC_LOW:
-> >> +    case VIRTIO_MMIO_QUEUE_DESC_HIGH:
-> >> +    case VIRTIO_MMIO_QUEUE_AVAIL_LOW:
-> >> +    case VIRTIO_MMIO_QUEUE_AVAIL_HIGH:
-> >> +    case VIRTIO_MMIO_QUEUE_USED_LOW:
-> >> +    case VIRTIO_MMIO_QUEUE_USED_HIGH:
-> >>          qemu_log_mask(LOG_GUEST_ERROR,
-> >>                        "%s: read of write-only register\n",
-> >>                        __func__);
-> >> @@ -232,14 +281,26 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
-> >>          proxy->host_features_sel = value;
-> >>          break;
-> >>      case VIRTIO_MMIO_DRIVER_FEATURES:
-> >> -        if (!proxy->guest_features_sel) {
-> >> +        if (proxy->modern) {
-> >> +            proxy->guest_features[proxy->guest_features_sel] = value;
-> >> +        } else if (!proxy->guest_features_sel) {
-> >>              virtio_set_features(vdev, value);
-> >>          }
-> >>          break;
-> >>      case VIRTIO_MMIO_DRIVER_FEATURES_SEL:
-> >> -        proxy->guest_features_sel = value;
-> >> +        if (value) {
-> >> +            proxy->guest_features_sel = 1;
-> >> +        } else {
-> >> +            proxy->guest_features_sel = 0;
-> >> +        }
-> >>          break;
-> >>      case VIRTIO_MMIO_GUEST_PAGE_SIZE:
-> >> +        if (proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >>          proxy->guest_page_shift = ctz32(value);
-> >>          if (proxy->guest_page_shift > 31) {
-> >>              proxy->guest_page_shift = 0;
-> >> @@ -253,15 +314,29 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
-> >>          break;
-> >>      case VIRTIO_MMIO_QUEUE_NUM:
-> >>          trace_virtio_mmio_queue_write(value, VIRTQUEUE_MAX_SIZE);
-> >> -        virtio_queue_set_num(vdev, vdev->queue_sel, value);
-> >> -        /* Note: only call this function for legacy devices */
-> >> -        virtio_queue_update_rings(vdev, vdev->queue_sel);
-> >> +        if (proxy->modern) {
-> >> +            proxy->vqs[vdev->queue_sel].num = value;
-> >> +        } else {
-> >> +            virtio_queue_set_num(vdev, vdev->queue_sel, value);
-> >> +            virtio_queue_update_rings(vdev, vdev->queue_sel);
-> >> +        }
-> >>          break;
-> >>      case VIRTIO_MMIO_QUEUE_ALIGN:
-> >> -        /* Note: this is only valid for legacy devices */
-> >> +        if (proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >>          virtio_queue_set_align(vdev, vdev->queue_sel, value);
-> >>          break;
-> >>      case VIRTIO_MMIO_QUEUE_PFN:
-> >> +        if (proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >>          if (value == 0) {
-> >>              virtio_reset(vdev);
-> >>          } else {
-> >> @@ -269,6 +344,24 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
-> >>                                    value << proxy->guest_page_shift);
-> >>          }
-> >>          break;
-> >> +    case VIRTIO_MMIO_QUEUE_READY:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to modern register in legacy mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        virtio_queue_set_num(vdev, vdev->queue_sel,
-> >> +                             proxy->vqs[vdev->queue_sel].num);
-> >> +        virtio_queue_set_rings(vdev, vdev->queue_sel,
-> >> +                       ((uint64_t)proxy->vqs[vdev->queue_sel].desc[1]) << 32 |
-> >> +                       proxy->vqs[vdev->queue_sel].desc[0],
-> >> +                       ((uint64_t)proxy->vqs[vdev->queue_sel].avail[1]) << 32 |
-> >> +                       proxy->vqs[vdev->queue_sel].avail[0],
-> >> +                       ((uint64_t)proxy->vqs[vdev->queue_sel].used[1]) << 32 |
-> >> +                       proxy->vqs[vdev->queue_sel].used[0]);
-> >> +        proxy->vqs[vdev->queue_sel].enabled = 1;
-> >> +        break;
-> >
-> > This one seems out of spec.
-> > In this respect virtio mmio is more advanced that virtio pci:
-> > it allows setting the ready status to 0.
-> 
-> You're right, I'll fix it.
-> 
-> >>      case VIRTIO_MMIO_QUEUE_NOTIFY:
-> >>          if (value < VIRTIO_QUEUE_MAX) {
-> >>              virtio_queue_notify(vdev, value);
-> >> @@ -283,6 +376,12 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
-> >>              virtio_mmio_stop_ioeventfd(proxy);
-> >>          }
-> >>  
-> >> +        if (proxy->modern && (value & VIRTIO_CONFIG_S_FEATURES_OK)) {
-> >> +            virtio_set_features(vdev,
-> >> +                                ((uint64_t)proxy->guest_features[1]) << 32 |
-> >> +                                proxy->guest_features[0]);
-> >> +        }
-> >> +
-> >>          virtio_set_status(vdev, value & 0xff);
-> >>  
-> >>          if (value & VIRTIO_CONFIG_S_DRIVER_OK) {
-> >> @@ -293,6 +392,60 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
-> >>              virtio_reset(vdev);
-> >>          }
-> >>          break;
-> >> +    case VIRTIO_MMIO_QUEUE_DESC_LOW:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        proxy->vqs[vdev->queue_sel].desc[0] = value;
-> >> +        break;
-> >> +    case VIRTIO_MMIO_QUEUE_DESC_HIGH:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        proxy->vqs[vdev->queue_sel].desc[1] = value;
-> >> +        break;
-> >> +    case VIRTIO_MMIO_QUEUE_AVAIL_LOW:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        proxy->vqs[vdev->queue_sel].avail[0] = value;
-> >> +        break;
-> >> +    case VIRTIO_MMIO_QUEUE_AVAIL_HIGH:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        proxy->vqs[vdev->queue_sel].avail[1] = value;
-> >> +        break;
-> >> +    case VIRTIO_MMIO_QUEUE_USED_LOW:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        proxy->vqs[vdev->queue_sel].used[0] = value;
-> >> +        break;
-> >> +    case VIRTIO_MMIO_QUEUE_USED_HIGH:
-> >> +        if (!proxy->modern) {
-> >> +            qemu_log_mask(LOG_GUEST_ERROR,
-> >> +                          "%s: write to legacy register in modern mode\n",
-> >> +                          __func__);
-> >> +            return;
-> >> +        }
-> >> +        proxy->vqs[vdev->queue_sel].used[1] = value;
-> >> +        break;
-> >>      case VIRTIO_MMIO_MAGIC_VALUE:
-> >>      case VIRTIO_MMIO_VERSION:
-> >>      case VIRTIO_MMIO_DEVICE_ID:
-> >> @@ -300,6 +453,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
-> >>      case VIRTIO_MMIO_DEVICE_FEATURES:
-> >>      case VIRTIO_MMIO_QUEUE_NUM_MAX:
-> >>      case VIRTIO_MMIO_INTERRUPT_STATUS:
-> >> +    case VIRTIO_MMIO_CONFIG_GENERATION:
-> >>          qemu_log_mask(LOG_GUEST_ERROR,
-> >>                        "%s: write to readonly register\n",
-> >>                        __func__);
-> >> @@ -349,15 +503,90 @@ static void virtio_mmio_save_config(DeviceState *opaque, QEMUFile *f)
-> >>      qemu_put_be32(f, proxy->guest_page_shift);
-> >>  }
-> >>  
-> >> +static const VMStateDescription vmstate_virtio_mmio_modern_queue_state = {
-> >> +    .name = "virtio_mmio/modern_queue_state",
-> >> +    .version_id = 1,
-> >> +    .minimum_version_id = 1,
-> >> +    .fields = (VMStateField[]) {
-> >> +        VMSTATE_UINT16(num, VirtIOMMIOQueue),
-> >> +        VMSTATE_BOOL(enabled, VirtIOMMIOQueue),
-> >> +        VMSTATE_UINT32_ARRAY(desc, VirtIOMMIOQueue, 2),
-> >> +        VMSTATE_UINT32_ARRAY(avail, VirtIOMMIOQueue, 2),
-> >> +        VMSTATE_UINT32_ARRAY(used, VirtIOMMIOQueue, 2),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    }
-> >> +};
-> >> +
-> >> +static const VMStateDescription vmstate_virtio_mmio_modern_state_sub = {
-> >> +    .name = "virtio_mmio/modern_state",
-> >> +    .version_id = 1,
-> >> +    .minimum_version_id = 1,
-> >> +    .fields = (VMStateField[]) {
-> >> +        VMSTATE_UINT32_ARRAY(guest_features, VirtIOMMIOProxy, 2),
-> >> +        VMSTATE_STRUCT_ARRAY(vqs, VirtIOMMIOProxy, VIRTIO_QUEUE_MAX, 0,
-> >> +                             vmstate_virtio_mmio_modern_queue_state,
-> >> +                             VirtIOMMIOQueue),
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    }
-> >> +};
-> >> +
-> >> +static const VMStateDescription vmstate_virtio_mmio = {
-> >> +    .name = "virtio_mmio",
-> >> +    .version_id = 1,
-> >> +    .minimum_version_id = 1,
-> >> +    .minimum_version_id_old = 1,
-> >> +    .fields = (VMStateField[]) {
-> >> +        VMSTATE_END_OF_LIST()
-> >> +    },
-> >> +    .subsections = (const VMStateDescription*[]) {
-> >> +        &vmstate_virtio_mmio_modern_state_sub,
-> >> +        NULL
-> >> +    }
-> >> +};
-> >> +
-> >> +static void virtio_mmio_save_extra_state(DeviceState *opaque, QEMUFile *f)
-> >> +{
-> >> +    VirtIOMMIOProxy *proxy = VIRTIO_MMIO(opaque);
-> >> +
-> >> +    vmstate_save_state(f, &vmstate_virtio_mmio, proxy, NULL);
-> >> +}
-> >> +
-> >> +static int virtio_mmio_load_extra_state(DeviceState *opaque, QEMUFile *f)
-> >> +{
-> >> +    VirtIOMMIOProxy *proxy = VIRTIO_MMIO(opaque);
-> >> +
-> >> +    return vmstate_load_state(f, &vmstate_virtio_mmio, proxy, 1);
-> >> +}
-> >> +
-> >> +static bool virtio_mmio_has_extra_state(DeviceState *opaque)
-> >> +{
-> >> +    VirtIOMMIOProxy *proxy = VIRTIO_MMIO(opaque);
-> >> +
-> >> +    return proxy->modern;
-> >> +}
-> >> +
-> >>  static void virtio_mmio_reset(DeviceState *d)
-> >>  {
-> >>      VirtIOMMIOProxy *proxy = VIRTIO_MMIO(d);
-> >> +    int i;
-> >>  
-> >>      virtio_mmio_stop_ioeventfd(proxy);
-> >>      virtio_bus_reset(&proxy->bus);
-> >>      proxy->host_features_sel = 0;
-> >>      proxy->guest_features_sel = 0;
-> >>      proxy->guest_page_shift = 0;
-> >> +
-> >> +    if (proxy->modern) {
-> >> +        proxy->guest_features[0] = proxy->guest_features[1] = 0;
-> >> +
-> >> +        for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-> >> +            proxy->vqs[i].enabled = 0;
-> >> +            proxy->vqs[i].num = 0;
-> >> +            proxy->vqs[i].desc[0] = proxy->vqs[i].desc[1] = 0;
-> >> +            proxy->vqs[i].avail[0] = proxy->vqs[i].avail[1] = 0;
-> >> +            proxy->vqs[i].used[0] = proxy->vqs[i].used[1] = 0;
-> >> +        }
-> >> +    }
-> >>  }
-> >>  
-> >>  static int virtio_mmio_set_guest_notifier(DeviceState *d, int n, bool assign,
-> >> @@ -420,11 +649,22 @@ assign_error:
-> >>      return r;
-> >>  }
-> >>  
-> >> +static void virtio_mmio_pre_plugged(DeviceState *d, Error **errp)
-> >> +{
-> >> +    VirtIOMMIOProxy *proxy = VIRTIO_MMIO(d);
-> >> +    VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-> >> +
-> >> +    if (proxy->modern) {
-> >> +        virtio_add_feature(&vdev->host_features, VIRTIO_F_VERSION_1);
-> >> +    }
-> >> +}
-> >> +
-> >>  /* virtio-mmio device */
-> >>  
-> >>  static Property virtio_mmio_properties[] = {
-> >>      DEFINE_PROP_BOOL("format_transport_address", VirtIOMMIOProxy,
-> >>                       format_transport_address, true),
-> >> +    DEFINE_PROP_BOOL("modern", VirtIOMMIOProxy, modern, false),
-> >>      DEFINE_PROP_END_OF_LIST(),
-> >>  };
-> >>  
-> >> @@ -508,9 +748,13 @@ static void virtio_mmio_bus_class_init(ObjectClass *klass, void *data)
-> >>      k->notify = virtio_mmio_update_irq;
-> >>      k->save_config = virtio_mmio_save_config;
-> >>      k->load_config = virtio_mmio_load_config;
-> >> +    k->save_extra_state = virtio_mmio_save_extra_state;
-> >> +    k->load_extra_state = virtio_mmio_load_extra_state;
-> >> +    k->has_extra_state = virtio_mmio_has_extra_state;
-> >>      k->set_guest_notifiers = virtio_mmio_set_guest_notifiers;
-> >>      k->ioeventfd_enabled = virtio_mmio_ioeventfd_enabled;
-> >>      k->ioeventfd_assign = virtio_mmio_ioeventfd_assign;
-> >> +    k->pre_plugged = virtio_mmio_pre_plugged;
-> >>      k->has_variable_vring_alignment = true;
-> >>      bus_class->max_dev = 1;
-> >>      bus_class->get_dev_path = virtio_mmio_bus_get_dev_path;
-> >> -- 
-> >> 2.21.0
-> 
+Why all of these extra defines?
+
+> +    enum {
+> +        M_0F    = 0x01 << 8,
+> +        M_0F38  = 0x02 << 8,
+> +        M_0F3A  = 0x04 << 8,
+> +        P_66    = 0x08 << 8,
+> +        P_F3    = 0x10 << 8,
+> +        P_F2    = 0x20 << 8,
+> +        VEX_128 = 0x40 << 8,
+> +        VEX_256 = 0x80 << 8,
+> +    };
+> +
+> +    switch(b | M_0F
+> +           | (s->prefix & PREFIX_DATA ? P_66 : 0)
+> +           | (s->prefix & PREFIX_REPZ ? P_F3 : 0)
+> +           | (s->prefix & PREFIX_REPNZ ? P_F2 : 0)
+> +           | (s->prefix & PREFIX_VEX ? (s->vex_l ? VEX_256 : VEX_128) : 0)) {
+
+I think you can move this above almost everything in this function, so that all
+of the legacy bits follow this switch.
+
+> +    case 0xdb | M_0F:                  gen_pand_mm(env, s, modrm); return;
+
+You'll want to put these on the next lines -- checkpatch.pl again.
+
+> +    case 0xdb | M_0F | P_66:           gen_pand_xmm(env, s, modrm); return;
+> +    case 0xdb | M_0F | P_66 | VEX_128: gen_vpand_xmm(env, s, modrm); return;
+> +    case 0xdb | M_0F | P_66 | VEX_256: gen_vpand_ymm(env, s, modrm); return;
+> +    case 0x54 | M_0F:                  gen_andps_xmm(env, s, modrm); return;
+> +    case 0x54 | M_0F | VEX_128:        gen_vandps_xmm(env, s, modrm); return;
+> +    case 0x54 | M_0F | VEX_256:        gen_vandps_ymm(env, s, modrm); return;
+> +    case 0x54 | M_0F | P_66:           gen_andpd_xmm(env, s, modrm); return;
+> +    case 0x54 | M_0F | P_66 | VEX_128: gen_vandpd_xmm(env, s, modrm); return;
+> +    case 0x54 | M_0F | P_66 | VEX_256: gen_vandpd_ymm(env, s, modrm); return;
+> +    default: break;
+> +    }
+
+Perhaps group cases together?
+
+    case 0xdb | M_0F | P_66:  /* PAND */
+    case 0x54 | M_0F:         /* ANDPS */
+    case 0x54 | M_0F | P_66:  /* ANDPD */
+       gen_gvec_ld_modrm_xmm(env, s, modrm, MO_64, tcg_gen_gvec_and, 0112);
+       return;
+
+How are you planning to handle CPUID checks?  I know the currently handling is
+quite spotty, but with a reorg we might as well fix that too.
 
 
+r~
 
