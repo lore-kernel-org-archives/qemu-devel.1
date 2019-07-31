@@ -2,62 +2,67 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7BDDC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208C1C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:30:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE47220578
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:19:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE47220578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E5223206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:30:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5223206A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsdH7-0003ow-1o
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 21:19:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52387)
+	id 1hsdRe-0005zP-1G
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 21:30:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36149)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hsdAN-0001qG-9J
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:32 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hsdQV-0005Sn-Vd
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:29:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hsdAL-0000dE-Lc
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:31 -0400
-Received: from mga18.intel.com ([134.134.136.126]:12485)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hsdAL-0000aT-C9
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:29 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 30 Jul 2019 18:12:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,327,1559545200"; d="scan'208";a="200535567"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by fmsmga002.fm.intel.com with ESMTP; 30 Jul 2019 18:12:26 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Date: Wed, 31 Jul 2019 09:12:06 +0800
-Message-Id: <20190731011209.22538-9-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190731011209.22538-1-tao3.xu@intel.com>
-References: <20190731011209.22538-1-tao3.xu@intel.com>
+ (envelope-from <no-reply@patchew.org>) id 1hsdQI-0008UK-Io
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:29:05 -0400
+Resent-Date: Tue, 30 Jul 2019 21:29:01 -0400
+Resent-Message-Id: <E1hsdQI-0008UK-Io@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hsdQG-0008Qe-Fk
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:28:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1564536516; cv=none; d=zoho.com; s=zohoarc; 
+ b=g7yn1ihECX4r53yWtbKkbWQZniIV97fzsCeIfOVaVx2j61JZ4u4G2udvjA1hug0nlP6icNL9MlbL1rjtxLwRJ+A4K/hrsRkGCmyT+IWHotkVsNlKWQsJnmtyIuMXrDmutIMNsO4CQzZTlwS2hdPbrXgzsMHfrABdk2z/n5yu28c=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1564536516;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=kmxX+U1kE0kYGIy79eAhhhSXSjuDOI7s9xEAbFtLC8A=; 
+ b=nFrEz6OnjV6sYVy4ED3dItlvhpLmBEUfziQKidlB2hqj5gAmAaOAnQTNDUauCvw57OaoTIlaI8pvXP026p78jqQbuxprLVlTM3c8LBLoPYi8ppLbiRqxX6I8smbxJOCNsfAP9aZxbwzfnU9471IrQCkIuRh3dofs9Z3xK14sFLg=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1564536514614982.2431412431772;
+ Tue, 30 Jul 2019 18:28:34 -0700 (PDT)
+Message-ID: <156453651352.18513.7710356879959685063@c4a48874b076>
+In-Reply-To: <1564512798-25527-1-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
-Subject: [Qemu-devel] [PATCH RESEND v8 08/11] hmat acpi: Build Memory Side
- Cache Information Structure(s)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: aleksandar.markovic@rt-rk.com
+Date: Tue, 30 Jul 2019 18:28:34 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH for 4.2 v3 0/6] target/mips: Misc patches
+ for 4.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,193 +74,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- dan.j.williams@intel.com
+Reply-To: qemu-devel@nongnu.org
+Cc: arikalo@wavecomp.com, sw@weilnetz.de, qemu-devel@nongnu.org,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
-
-This structure describes memory side cache information for memory
-proximity domains if the memory side cache is present and the
-physical device forms the memory side cache.
-The software could use this information to effectively place
-the data in memory to maximize the performance of the system
-memory that use the memory side cache.
-
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
-
-No changes in v8.
----
- hw/acpi/hmat.c          | 64 ++++++++++++++++++++++++++++++++++++++++-
- hw/acpi/hmat.h          | 17 +++++++++++
- include/qemu/typedefs.h |  1 +
- include/sysemu/numa.h   |  3 ++
- include/sysemu/sysemu.h |  2 ++
- 5 files changed, 86 insertions(+), 1 deletion(-)
-
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index 431818dc82..01a6552d51 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -134,14 +134,63 @@ static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-     }
- }
- 
-+/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-143 */
-+static void build_hmat_cache(GArray *table_data, HMAT_Cache_Info *hmat_cache)
-+{
-+    /*
-+     * Cache Attributes: Bits [3:0] – Total Cache Levels
-+     * for this Memory Proximity Domain
-+     */
-+    uint32_t cache_attr = hmat_cache->total_levels & 0xF;
-+
-+    /* Bits [7:4] : Cache Level described in this structure */
-+    cache_attr |= (hmat_cache->level & 0xF) << 4;
-+
-+    /* Bits [11:8] - Cache Associativity */
-+    cache_attr |= (hmat_cache->associativity & 0xF) << 8;
-+
-+    /* Bits [15:12] - Write Policy */
-+    cache_attr |= (hmat_cache->write_policy & 0xF) << 12;
-+
-+    /* Bits [31:16] - Cache Line size in bytes */
-+    cache_attr |= (hmat_cache->line_size & 0xFFFF) << 16;
-+
-+    cache_attr = cpu_to_le32(cache_attr);
-+
-+    /* Type */
-+    build_append_int_noprefix(table_data, 2, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 32, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, hmat_cache->mem_proximity, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /* Memory Side Cache Size */
-+    build_append_int_noprefix(table_data, hmat_cache->size, 8);
-+    /* Cache Attributes */
-+    build_append_int_noprefix(table_data, cache_attr, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /*
-+     * Number of SMBIOS handles (n)
-+     * Linux kernel uses Memory Side Cache Information Structure
-+     * without SMBIOS entries for now, so set Number of SMBIOS handles
-+     * as 0.
-+     */
-+    build_append_int_noprefix(table_data, 0, 2);
-+}
-+
- /* Build HMAT sub table structures */
- static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
- {
-     uint16_t flags;
-     uint32_t num_initiator = 0;
-     uint32_t initiator_pxm[MAX_NODES];
--    int i, hrchy, type;
-+    int i, hrchy, type, level;
-     HMAT_LB_Info *numa_hmat_lb;
-+    HMAT_Cache_Info *numa_hmat_cache;
- 
-     for (i = 0; i < nstat->num_nodes; i++) {
-         flags = 0;
-@@ -175,6 +224,19 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *nstat)
-             }
-         }
-     }
-+
-+    /*
-+     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
-+     * Table 5-143
-+     */
-+    for (i = 0; i < nstat->num_nodes; i++) {
-+        for (level = 0; level <= MAX_HMAT_CACHE_LEVEL; level++) {
-+            numa_hmat_cache = nstat->hmat_cache[i][level];
-+            if (numa_hmat_cache) {
-+                build_hmat_cache(table_data, numa_hmat_cache);
-+            }
-+        }
-+    }
- }
- 
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat)
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-index 5f050781e6..6c32f12e78 100644
---- a/hw/acpi/hmat.h
-+++ b/hw/acpi/hmat.h
-@@ -81,6 +81,23 @@ struct HMAT_LB_Info {
-     uint16_t    bandwidth[MAX_NODES][MAX_NODES];
- };
- 
-+struct HMAT_Cache_Info {
-+    /* The memory proximity domain to which the memory belongs. */
-+    uint32_t    mem_proximity;
-+    /* Size of memory side cache in bytes. */
-+    uint64_t    size;
-+    /* Total cache levels for this memory proximity domain. */
-+    uint8_t     total_levels;
-+    /* Cache level described in this structure. */
-+    uint8_t     level;
-+    /* Cache Associativity: None/Direct Mapped/Comple Cache Indexing */
-+    uint8_t     associativity;
-+    /* Write Policy: None/Write Back(WB)/Write Through(WT) */
-+    uint8_t     write_policy;
-+    /* Cache Line size in bytes. */
-+    uint16_t    line_size;
-+};
-+
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *nstat);
- 
- #endif
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index c0257e936b..d971f5109e 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -33,6 +33,7 @@ typedef struct FWCfgEntry FWCfgEntry;
- typedef struct FWCfgIoState FWCfgIoState;
- typedef struct FWCfgMemState FWCfgMemState;
- typedef struct FWCfgState FWCfgState;
-+typedef struct HMAT_Cache_Info HMAT_Cache_Info;
- typedef struct HMAT_LB_Info HMAT_LB_Info;
- typedef struct HVFX86EmulatorState HVFX86EmulatorState;
- typedef struct I2CBus I2CBus;
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 85ddad99b4..1ed3362917 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -33,6 +33,9 @@ struct NumaState {
- 
-     /* NUMA modes HMAT Locality Latency and Bandwidth Information */
-     HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
-+
-+    /* Memory Side Cache Information Structure */
-+    HMAT_Cache_Info *hmat_cache[MAX_NODES][MAX_HMAT_CACHE_LEVEL + 1];
- };
- typedef struct NumaState NumaState;
- 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index fc638f06cd..45525ff8ae 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -144,6 +144,8 @@ enum {
-     HMAT_LB_DATA_WRITE_BANDWIDTH  = 5,
- };
- 
-+#define MAX_HMAT_CACHE_LEVEL        3
-+
- #define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
- #define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
- 
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY0NTEyNzk4LTI1NTI3LTEt
+Z2l0LXNlbmQtZW1haWwtYWxla3NhbmRhci5tYXJrb3ZpY0BydC1yay5jb20vCgoKCkhpLAoKVGhp
+cyBzZXJpZXMgZmFpbGVkIGJ1aWxkIHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhl
+IGRldGFpbHMgYmVsb3cuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMg
+VGVzdGluZyBzY3JpcHQgd2lsbCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0
+aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGll
+ZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJhbmNoCnNldCAtZQoKZWNobwplY2hvICI9PT0gRU5WID09
+PSIKZW52CgplY2hvCmVjaG8gIj09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKCmVjaG8KZWNobyAi
+PT09IFVOQU1FID09PSIKdW5hbWUgLWEKCkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5z
+dGFsbApCVUlMRD0kUFdEL2J1aWxkCm1rZGlyIC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApj
+ZCAkQlVJTEQKJFNSQy9jb25maWd1cmUgLS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAt
+ajQKIyBYWFg6IHdlIG5lZWQgcmVsaWFibGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEK
+bWFrZSBpbnN0YWxsCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgoKCgpUaGUgZnVsbCBsb2cgaXMg
+YXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE1NjQ1MTI3OTgtMjU1MjctMS1n
+aXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbS90ZXN0aW5nLnMzOTB4
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
