@@ -2,68 +2,92 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A276EC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01739C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:51:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F58A214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:45:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F58A214DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C0A74206B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:51:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B55vCmMo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0A74206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsuXT-00056j-RG
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 15:45:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47197)
+	id 1hsud2-0007Ao-Vm
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 15:51:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48859)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1hsuWv-0004Wk-6U
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:44:58 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsucM-0006k0-1X
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:50:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1hsuWt-0002vj-VP
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:44:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34488)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1hsuWn-0002oZ-CZ; Wed, 31 Jul 2019 15:44:50 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E21DA307CDEA;
- Wed, 31 Jul 2019 19:44:46 +0000 (UTC)
-Received: from [10.36.116.49] (ovpn-116-49.ams2.redhat.com [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A0E7F5D6B2;
- Wed, 31 Jul 2019 19:44:37 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>, "Tian, Kevin" <kevin.tian@intel.com>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-12-eric.auger@redhat.com>
- <20190730153628-mutt-send-email-mst@kernel.org>
- <AADFC41AFE54684AB9EE6CBC0274A5D19CAF8E1B@SHSMSX104.ccr.corp.intel.com>
- <20190731151834-mutt-send-email-mst@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <95de34e9-1b1a-3eff-cebb-ee146e9acc78@redhat.com>
-Date: Wed, 31 Jul 2019 21:44:35 +0200
+ (envelope-from <richard.henderson@linaro.org>) id 1hsucK-0006gs-HC
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:50:33 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:40188)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hsucK-0006fg-5J
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:50:32 -0400
+Received: by mail-pf1-x444.google.com with SMTP id p184so32444452pfp.7
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 12:50:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=24a14m2MyWcMaEitorwyCKqCcBd2O7avmsKoYnSSNTE=;
+ b=B55vCmMoWNZsSUPq6qTEDDEPDcXQtEkPBLZDEZoGX1/qKhvqd3gfnq1tvZxYexQLte
+ X5Yk9EJvXNYtBLetqsL9Zw1jWh+tWtDR2vNilIUgh6d8ucJxwTfhqXlWuZXiWit/m+OH
+ /ywSe90yDSmOVICkF+psLsmLnKuia0sAo1J5Yb7UNpQX3LiAi7KnVEGL2D0+zU+QP+ly
+ Mx4U7Recw/VGDT9QfDrycbkcYBcFE8QHFiTa8MbSwRDaWa3RYwtF9797pgP0+u6FVWJQ
+ 1mu7pc9y3WZ9zDwCHD98EQ0TiR7Y3lOPbg7r0XSleDKxuxbW7btvx8A6Fk/nckQaj3Mq
+ XRNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=24a14m2MyWcMaEitorwyCKqCcBd2O7avmsKoYnSSNTE=;
+ b=rB3+IwjZmx3HhVkyX4RGz9SjRUVBIKH6PREzTR1/vE9bAj+WpY3bVh+j9xjdUH3po8
+ SZQvTAXYzTYgHfvK1hwQ+JaPiVbjmtBqOYWvBV/Ba0jP17XzjTMkOGv08inKVq+0dkJV
+ /hzzCZtoJCAw8s7E8uI5juIFVYhQDGx0J4N0W3B98g2WV1eFKM+VwRsy7pA5JdKXZ8wq
+ JoWmgPaE7J6XKD1RQjDGTEfe5VplauIKDyvLiapTBZR3RZDux1weUH7BWNgPBQjnLfPZ
+ Curn1hhW1HL2TrXQ6Co0uADbilHTU8nAUer3mbttNMXIxxxIVRngygh0utDiiFhI/QSh
+ gwoQ==
+X-Gm-Message-State: APjAAAVgMekvBFULgztuYP4++yF+dPc6NYTA/1CyIF7dPXGgKcZhYqnq
+ jI7msR2soKSKgi9qC+tBPfoOHg==
+X-Google-Smtp-Source: APXvYqwxJo2VVQx1YsewxXRbqLEP1UiVEJCvhXpmVDiI1vLNp21TGIG88KDyTjePh23HibLtIIUbeQ==
+X-Received: by 2002:a17:90a:71ca:: with SMTP id
+ m10mr4644816pjs.27.1564602630820; 
+ Wed, 31 Jul 2019 12:50:30 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id q1sm81117788pfg.84.2019.07.31.12.50.29
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 31 Jul 2019 12:50:29 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190731175702.4916-1-jan.bobek@gmail.com>
+ <20190731175702.4916-23-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <1691a32a-e0a2-931b-2d17-4dae8dde7c7e@linaro.org>
+Date: Wed, 31 Jul 2019 12:50:27 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190731151834-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190731175702.4916-23-jan.bobek@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 31 Jul 2019 19:44:47 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 11/15] virtio-iommu: Expose the
- IOAPIC MSI reserved region when relevant
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [RFC PATCH v1 22/22] target/i386: reimplement
+ (V)P(EQ, CMP)(B, W, D)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,194 +99,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "tn@semihalf.com" <tn@semihalf.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "bharat.bhushan@nxp.com" <bharat.bhushan@nxp.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Michael,
+On 7/31/19 10:57 AM, Jan Bobek wrote:
+> +static inline void gen_gvec_cmpeq(unsigned vece, uint32_t dofs,
+> +                                  uint32_t aofs, uint32_t bofs,
+> +                                  uint32_t oprsz, uint32_t maxsz)
+> +{
+> +    tcg_gen_gvec_cmp(TCG_COND_EQ, vece, dofs, aofs, bofs, oprsz, maxsz);
+> +}
+...
+> +static inline void gen_gvec_cmpgt(unsigned vece, uint32_t dofs,
+> +                                  uint32_t aofs, uint32_t bofs,
+> +                                  uint32_t oprsz, uint32_t maxsz)
+> +{
+> +    tcg_gen_gvec_cmp(TCG_COND_GT, vece, dofs, aofs, bofs, oprsz, maxsz);
+> +}
 
-On 7/31/19 9:25 PM, Michael S. Tsirkin wrote:
-> On Tue, Jul 30, 2019 at 11:20:44PM +0000, Tian, Kevin wrote:
->>> From: Michael S. Tsirkin [mailto:mst@redhat.com]
->>> Sent: Wednesday, July 31, 2019 3:38 AM
->>>
->>> On Tue, Jul 30, 2019 at 07:21:33PM +0200, Eric Auger wrote:
->>>> We introduce a new msi_bypass field which indicates whether
->>>> the IOAPIC MSI window [0xFEE00000 - 0xFEEFFFFF] must be exposed
->>
->> it's not good to call it IOAPIC MSI window. any write to this range, either
->> from IOAPIC or PCI device, is interpreted by the platform as interrupt
->> request. I'd call it "x86 interrupt address range".
-> 
-> Isn't this APIC_DEFAULT_ADDRESS? I'm not sure guests can't change it
-> even though I'm not sure qemu supports changing it.
+Drop the inlines.
 
-That's indeed matching:
+> +#define gen_pcmpgt_mm(env, s, modrm, vece)   gen_gvec_ld_modrm_mm  ((env), (s), (modrm), (vece), gen_gvec_cmpgt, 0112)
+> +#define gen_pcmpgt_xmm(env, s, modrm, vece)  gen_gvec_ld_modrm_xmm ((env), (s), (modrm), (vece), gen_gvec_cmpgt, 0112)
+> +#define gen_vpcmpgt_xmm(env, s, modrm, vece) gen_gvec_ld_modrm_vxmm((env), (s), (modrm), (vece), gen_gvec_cmpgt, 0123)
+> +#define gen_vpcmpgt_ymm(env, s, modrm, vece) gen_gvec_ld_modrm_vymm((env), (s), (modrm), (vece), gen_gvec_cmpgt, 0123)
+...
+> +    case 0x64 | M_0F:                  gen_pcmpgt_mm(env, s, modrm, MO_8); return;
+> +    case 0x64 | M_0F | P_66:           gen_pcmpgt_xmm(env, s, modrm, MO_8); return;
+> +    case 0x64 | M_0F | P_66 | VEX_128: gen_vpcmpgt_xmm(env, s, modrm, MO_8); return;
+> +    case 0x64 | M_0F | P_66 | VEX_256: gen_vpcmpgt_ymm(env, s, modrm, MO_8); return;
 
-#define APIC_DEFAULT_ADDRESS 0xfee00000
-#define APIC_SPACE_SIZE      0x100000
-
-> 
-> And if so I'd say integrating IOAPIC defaults into the device itself is
-> inelegant.
-
-I agree.
-
-  How about having guest supply the range through config
-> space? It's a small change that won't be too late for Linux.
-
-Isn't it a property of the platform instead. I mean isn't it the job of
-the machine model to set this. The guest driver is arch agnostic if I am
-not wrong.
+Looks like my comments vs PAND apply to all of the subsequent patches as well.
+ But everything else looks good.
 
 
-> 
->>>> as a reserved region. By default the field is set to true at
->>>> instantiation time. Later on we will introduce a property at
->>>> virtio pci proxy level to turn it off.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>
->>>> ---
->>>>
->>>> v8 -> v9:
->>>> - pass IOAPIC_RANGE_END to virtio_iommu_register_resv_region
->>>> - take into account the change in the struct virtio_iommu_probe_resv_mem
->>>>   definition
->>>> - We just introduce the field here. A property will be introduced later on
->>>>   at pci proxy level.
->>>> ---
->>>>  hw/virtio/virtio-iommu.c         | 36 ++++++++++++++++++++++++++++++++
->>>>  include/hw/virtio/virtio-iommu.h |  1 +
->>>>  2 files changed, 37 insertions(+)
->>>>
->>>> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
->>>> index 66be9a4627..74038288b0 100644
->>>> --- a/hw/virtio/virtio-iommu.c
->>>> +++ b/hw/virtio/virtio-iommu.c
->>>> @@ -39,6 +39,9 @@
->>>>  #define VIOMMU_DEFAULT_QUEUE_SIZE 256
->>>>  #define VIOMMU_PROBE_SIZE 512
->>>>
->>>> +#define IOAPIC_RANGE_START      (0xfee00000)
->>>> +#define IOAPIC_RANGE_END        (0xfeefffff)
->>>> +
->>>>  #define SUPPORTED_PROBE_PROPERTIES (\
->>>>      1 << VIRTIO_IOMMU_PROBE_T_RESV_MEM)
->>>>
->>>
->>> Sorry where are these numbers coming from?
->>
->> this is architecturally defined in x86 SDM.
->>
->>> Does this really work on all platforms?
->>
->> x86 only. 
-> 
-> But you seem to add this code for all platforms:
-> 
-> 	@@ -6,6 +6,11 @@ config VIRTIO_RNG
-> 	     default y
-> 	     depends on VIRTIO
-> 
-> 	+config VIRTIO_IOMMU
-> 	+    bool
-> 	+    default y
-> 	+    depends on VIRTIO
-> 	+
-Actually it was supposed to be integrated with ARM first and then with x86.
-
-Thanks
-
-Eric
-> 
-> 
->>> With all guests?
->>
->> yes.
->>
->>>
->>>> @@ -100,6 +103,30 @@ static void
->>> virtio_iommu_detach_endpoint_from_domain(viommu_endpoint *ep)
->>>>      ep->domain = NULL;
->>>>  }
->>>>
->>>> +static void virtio_iommu_register_resv_region(viommu_endpoint *ep,
->>>> +                                              uint8_t subtype,
->>>> +                                              uint64_t start, uint64_t end)
->>>> +{
->>>> +    viommu_interval *interval;
->>>> +    struct virtio_iommu_probe_resv_mem *resv_reg_prop;
->>>> +    size_t prop_size = sizeof(struct virtio_iommu_probe_resv_mem);
->>>> +    size_t value_size = prop_size -
->>>> +                sizeof(struct virtio_iommu_probe_property);
->>>> +
->>>> +    interval = g_malloc0(sizeof(*interval));
->>>> +    interval->low = start;
->>>> +    interval->high = end;
->>>> +
->>>> +    resv_reg_prop = g_malloc0(prop_size);
->>>> +    resv_reg_prop->head.type = VIRTIO_IOMMU_PROBE_T_RESV_MEM;
->>>> +    resv_reg_prop->head.length = cpu_to_le64(value_size);
->>>> +    resv_reg_prop->subtype = cpu_to_le64(subtype);
->>>> +    resv_reg_prop->start = cpu_to_le64(start);
->>>> +    resv_reg_prop->end = cpu_to_le64(end);
->>>> +
->>>> +    g_tree_insert(ep->reserved_regions, interval, resv_reg_prop);
->>>> +}
->>>> +
->>>>  static viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
->>>>                                                    uint32_t ep_id)
->>>>  {
->>>> @@ -117,6 +144,12 @@ static viommu_endpoint
->>> *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
->>>>      ep->reserved_regions =
->>> g_tree_new_full((GCompareDataFunc)interval_cmp,
->>>>                                              NULL, (GDestroyNotify)g_free,
->>>>                                              (GDestroyNotify)g_free);
->>>> +    if (s->msi_bypass) {
->>>> +        virtio_iommu_register_resv_region(ep,
->>> VIRTIO_IOMMU_RESV_MEM_T_MSI,
->>>> +                                          IOAPIC_RANGE_START,
->>>> +                                          IOAPIC_RANGE_END);
->>>> +    }
->>>> +
->>>>      return ep;
->>>>  }
->>>>
->>>> @@ -822,6 +855,9 @@ static void virtio_iommu_set_status(VirtIODevice
->>> *vdev, uint8_t status)
->>>>
->>>>  static void virtio_iommu_instance_init(Object *obj)
->>>>  {
->>>> +    VirtIOIOMMU *s = VIRTIO_IOMMU(obj);
->>>> +
->>>> +    s->msi_bypass = true;
->>>>  }
->>>>
->>>>  static const VMStateDescription vmstate_virtio_iommu = {
->>>> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-
->>> iommu.h
->>>> index f55f48d304..56c8b4e57f 100644
->>>> --- a/include/hw/virtio/virtio-iommu.h
->>>> +++ b/include/hw/virtio/virtio-iommu.h
->>>> @@ -59,6 +59,7 @@ typedef struct VirtIOIOMMU {
->>>>      GTree *domains;
->>>>      QemuMutex mutex;
->>>>      GTree *endpoints;
->>>> +    bool msi_bypass;
->>>>  } VirtIOIOMMU;
->>>>
->>>>  #endif
->>>> --
->>>> 2.20.1
+r~
 
