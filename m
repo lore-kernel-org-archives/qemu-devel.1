@@ -2,63 +2,79 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCF4C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27051C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:06:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9320208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:46:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9320208E4
+	by mail.kernel.org (Postfix) with ESMTPS id 00A89206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 19:06:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00A89206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hstc5-0005hI-3I
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 14:46:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56104)
+	id 1hstvy-0002v3-1D
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 15:06:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34750)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hstbh-0005HV-DS
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:45:50 -0400
+ (envelope-from <mst@redhat.com>) id 1hstvZ-0002Rh-0B
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hstbg-0004RD-Ip
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:45:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40196)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hstbg-0004Qo-DO
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:45:48 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1BB09308218D;
- Wed, 31 Jul 2019 18:45:47 +0000 (UTC)
-Received: from work-vm (ovpn-116-252.ams2.redhat.com [10.36.116.252])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B1D911001B28;
- Wed, 31 Jul 2019 18:45:41 +0000 (UTC)
-Date: Wed, 31 Jul 2019 19:45:38 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190731184538.GO3203@work-vm>
-References: <20190731161006.9447-1-stefanha@redhat.com>
- <20190731161006.9447-2-stefanha@redhat.com>
+ (envelope-from <mst@redhat.com>) id 1hstvX-0008C3-Fw
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:06:20 -0400
+Received: from mail-vs1-f49.google.com ([209.85.217.49]:42879)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hstvX-00089p-BF
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 15:06:19 -0400
+Received: by mail-vs1-f49.google.com with SMTP id 190so46983432vsf.9
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 12:06:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ISm95VmXnJ4r8KGbd3EH5/GEST2Z7jYB0wYOVqFnTL8=;
+ b=CVpsjOoMpdzhHcDYkF5vOgqQesqQdQLqHxfsn7b2Zj5QR5DbB08FINX53RM8Xk7Ihl
+ NUVYmZ9/GmJaf85J34Pr4KUPmUoKjcGC+LU27/pFnijP+jIVE23OaOXpjLmCbJ21pUYA
+ Vy1KliY51LkoXK3pJkh/hFEWEjkp2zfPmD56960veXe2novMjUsMuxjRlFrmwC2t7xvO
+ k9JIai5cDXtLi42qChNxm729RE/kANWUTcg9ycFZqIyd84OQFVf7Iyh7mFk6jQWetKJf
+ 3xgH2SEdfGXAhKIpKPemaWp+bPOaM/erbOXGSHnwQ4vx5gjqhgooJLAhx5Li6aFHNsMH
+ YUPA==
+X-Gm-Message-State: APjAAAXJmB0sIFmqzdimtjgaX0GNnnEIU95M7VTLoTm8OyjYT084X6kV
+ 1Yf5HZiyswXnsP1STE4I87HhPQ==
+X-Google-Smtp-Source: APXvYqw9wUyQ1JSagfNVg5Bray26+wJK2FKWWFpBA47OdoO0IJQtbwefD2LKox7HZRpRDdNR4wDaVA==
+X-Received: by 2002:a67:d58a:: with SMTP id m10mr81867909vsj.15.1564599977827; 
+ Wed, 31 Jul 2019 12:06:17 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ w9sm31146642vkd.41.2019.07.31.12.06.14
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 31 Jul 2019 12:06:16 -0700 (PDT)
+Date: Wed, 31 Jul 2019 15:06:11 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20190731150448-mutt-send-email-mst@kernel.org>
+References: <20190729125755.45008-1-slp@redhat.com>
+ <a43acc8541c7ae811d65eb4d08e1a08333781282.camel@redhat.com>
+ <20190730133546.056f8b19.cohuck@redhat.com>
+ <09e5ceb5e7c03f74f05307a3b9f9a4df035ff74f.camel@redhat.com>
+ <20190730151400.20686a5b.cohuck@redhat.com>
+ <20190730160605-mutt-send-email-mst@kernel.org>
+ <20190731155551.4bb57ec3.cohuck@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190731161006.9447-2-stefanha@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 31 Jul 2019 18:45:47 +0000 (UTC)
+In-Reply-To: <20190731155551.4bb57ec3.cohuck@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/5] virtiofsd: take lo->mutex around
- lo_add_fd_mapping()
+ [fuzzy]
+X-Received-From: 209.85.217.49
+Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
+ personality (virtio-1)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,58 +86,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Liu Bo <bo.liu@linux.alibaba.com>,
- qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Andrea Bolognani <abologna@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> The lo_add_fd_mapping() function assumes lo->mutex is held, so we should
-> acquire it.
+On Wed, Jul 31, 2019 at 03:55:51PM +0200, Cornelia Huck wrote:
+> On Tue, 30 Jul 2019 16:18:52 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Thanks, applied
-
-Would it make sense for me to squash this into:
-    virtiofsd: passthrough_ll: add fd_map to hide file descriptors 
-
-?
-
-Dave
-
-> ---
->  contrib/virtiofsd/passthrough_ll.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> > On Tue, Jul 30, 2019 at 03:14:00PM +0200, Cornelia Huck wrote:
+> > > On Tue, 30 Jul 2019 14:17:48 +0200
+> > > Andrea Bolognani <abologna@redhat.com> wrote:
+> > >   
+> > > > On Tue, 2019-07-30 at 13:35 +0200, Cornelia Huck wrote:  
+> > > > > On Tue, 30 Jul 2019 12:25:30 +0200
+> > > > > Andrea Bolognani <abologna@redhat.com> wrote:    
+> > > > > > Can you please make sure virtio-mmio uses the existing interface
+> > > > > > instead of introducing a new one?    
+> > > > > 
+> > > > > FWIW, I really hate virtio-pci's disable-modern/disable-legacy... for a
+> > > > > starter, what is 'modern'? Will we have 'ultra-modern' in the future?    
+> > > > 
+> > > > AIUI the modern/legacy terminology is part of the VirtIO spec, so
+> > > > while I agree that it's not necessarily the least prone to ambiguity
+> > > > at least it's well defined.  
+> > > 
+> > > Legacy is, modern isn't :) Devices/drivers are conforming to the
+> > > standard, I don't think there's a special term for that.  
+> > 
+> > Right, if we followed the spec, disable-modern would have been
+> > force-legacy.
+> > 
+> > I'm fine with adding force-legacy for everyone and asking tools to
+> > transition if there. Document it's same as disable-modern for pci.
+> > Cornelia?
 > 
-> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
-> index 65b7352c95..417a104218 100644
-> --- a/contrib/virtiofsd/passthrough_ll.c
-> +++ b/contrib/virtiofsd/passthrough_ll.c
-> @@ -1555,7 +1555,9 @@ static void lo_create(fuse_req_t req, fuse_ino_t parent, const char *name,
->  
->  		update_version(lo, lo_inode(req, parent));
->  
-> +		pthread_mutex_lock(&lo->mutex);
->  		fh = lo_add_fd_mapping(req, fd);
-> +		pthread_mutex_unlock(&lo->mutex);
->  		if (fh == -1) {
->  			close(fd);
->  			fuse_reply_err(req, ENOMEM);
-> @@ -1760,7 +1762,9 @@ static void lo_open(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
->  	if (fd == -1)
->  		return (void) fuse_reply_err(req, errno);
->  
-> +	pthread_mutex_lock(&lo->mutex);
->  	fh = lo_add_fd_mapping(req, fd);
-> +	pthread_mutex_unlock(&lo->mutex);
->  	if (fh == -1) {
->  		close(fd);
->  		fuse_reply_err(req, ENOMEM);
-> -- 
-> 2.21.0
+> 'force-legacy' is certainly better than 'disable-modern'. Not sure if
+> it's much of a gain at this point in time, and it does not really add
+> anything over limiting the revision to 0 for ccw, but I don't really
+> object to it.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > 
+> > > >   
+> > > > > It is also quite backwards with the 'disable' terminology.    
+> > > > 
+> > > > That's also true. I never claimed the way virtio-pci does it is
+> > > > perfect!
+> > > >   
+> > > > > We also have a different mechanism for virtio-ccw ('max_revision',
+> > > > > which covers a bit more than virtio-1; it doesn't have a 'min_revision',
+> > > > > as negotiating the revision down is fine), so I don't see why
+> > > > > virtio-mmio should replicate the virtio-pci mechanism.
+> > > > > 
+> > > > > Also, IIUC, virtio-mmio does not have transitional devices, but either
+> > > > > version 1 (legacy) or version 2 (virtio-1). It probably makes more
+> > > > > sense to expose the device version instead; either as an exact version
+> > > > > (especially if it isn't supposed to go up without incompatible
+> > > > > changes), or with some min/max concept (where version 1 would stand a
+> > > > > bit alone, so that would probably be a bit awkward.)    
+> > > > 
+> > > > I think that if reinventing the wheel is generally agreed not to be
+> > > > a good idea, then it stands to reason that reinventing it twice can
+> > > > only be described as absolute madness :)
+> > > > 
+> > > > We should have a single way to control the VirtIO protocol version
+> > > > that works for all VirtIO devices, regardless of transport. We might
+> > > > even want to have virtio-*-{device,ccw}-non-transitional to mirror
+> > > > the existing virtio-*-pci-non-transitional.
+> > > > 
+> > > > FWIW, libvirt already implements support for (non)-transitional
+> > > > virtio-pci devices using either the dedicated devices or the base
+> > > > virtio-pci plus the disable-{modern,legacy} attributes.  
+> > > 
+> > > One problem (besides my dislike of the existing virtio-pci
+> > > interfaces :) is that pci, ccw, and mmio all have slightly different
+> > > semantics.
+> > > 
+> > > - pci: If we need to keep legacy support around, we cannot enable some
+> > >   features (IIRC, pci-e, maybe others as well.) That means transitional
+> > >   devices are in some ways inferior to virtio-1 only devices, so it
+> > >   makes a lot of sense to be able to configure devices without legacy
+> > >   support. The differences between legacy and virtio-1 are quite large.
+> > > - ccw: Has revisions negotiated between device and driver; virtio-1
+> > >   requires revision 1 or higher. (Legacy drivers that don't know the
+> > >   concept of revisions automatically get revision 0.) Differences
+> > >   between legacy and virtio-1 are mostly virtqueue endianness and some
+> > >   control structures.
+> > > - mmio: Has device versions offered by the device, the driver can take
+> > >   it or leave it. No transitional devices. Differences don't look as
+> > >   large as the ones for pci, either.
+> > > 
+> > > So, if we were to duplicate the same scheme as for pci for ccw and mmio
+> > > as well, we'd get
+> > > 
+> > > - ccw: devices that support revision 0 only (disable-modern), that act
+> > >   as today, or that support at least revision 1 (disable-legacy). We
+> > >   still need to keep max_revision around for backwards compatibility.
+> > >   Legacy only makes sense for compat machines (although this is
+> > >   equivalent to max_revision 0); I don't see a reason why you would
+> > >   want virtio-1 only devices, unless you'd want to rip out legacy
+> > >   support in QEMU completely.  
+> > 
+> > Reduce security attack surface slightly. Save some cycles
+> > (down the road) on branches in the endian-ness handling.
+> 
+> Most of that stuff is actually in the core code, right? Ripping out
+> legacy will have much more impact outside of ccw, I guess.
+> 
+> > Make sure your guests
+> > are all up to date in preparation to the day when legacy will go away.
+> 
+> If legacy goes away, legacy guests will be busted anyway :)
+
+It'll take a while for it to go away. But we can try to
+push guests in the direction of coding up modern
+support e.g. by forcing modern by default.
+
+> (There should not be many, if any, of these -- ccw switched on virtio-1
+> by default quite some time ago, and the s390x legacy virtio transport
+> was s390-virtio anyway :)
+> 
+> > 
+> > Not a huge win, for sure, but hey - it's something.
+> > 
+> > > - mmio: devices that support version 1 (disable-modern), or version 2
+> > >   (disable-legacy). You cannot have both at the same time. Whether this
+> > >   makes sense depends on whether there will be a version 3 in the
+> > >   future.
+> > > 
+> > > So, this might make some sense for mmio; for ccw, I don't see any
+> > > advantages other than confusing people further...  
 
