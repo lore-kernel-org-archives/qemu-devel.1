@@ -2,71 +2,150 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FA7C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 349F1C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:29:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D6D720693
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:23:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6D720693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09C1C20693
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:29:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09C1C20693
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsndi-0002w0-VW
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:23:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60076)
+	id 1hsnjm-0005U4-B8
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:29:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33091)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hsndG-0002Rs-1H
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:23:04 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsniW-00047g-H4
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:28:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hsndD-0006JS-JD
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:23:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35192)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hsnd8-0006GN-Lk; Wed, 31 Jul 2019 08:22:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A2BFE8553A;
- Wed, 31 Jul 2019 12:22:53 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-51.ams2.redhat.com
- [10.36.116.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4151A5D6D0;
- Wed, 31 Jul 2019 12:22:48 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id BD9C61138619; Wed, 31 Jul 2019 14:22:46 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-References: <20190715121338.20600-1-philmd@redhat.com>
- <20190715121338.20600-3-philmd@redhat.com>
- <87o91u2mk7.fsf@dusky.pond.sub.org> <20190716140443.GE2770@work-vm>
- <87h87m109o.fsf@dusky.pond.sub.org>
- <eee0b6db-82d6-3735-f12f-ff139df6cc4a@redhat.com>
-Date: Wed, 31 Jul 2019 14:22:46 +0200
-In-Reply-To: <eee0b6db-82d6-3735-f12f-ff139df6cc4a@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 29 Jul 2019 18:21:33
- +0200")
-Message-ID: <87d0hq5r6x.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsniV-0002qK-4y
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:28:28 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:16830
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1hsniV-0002q1-02
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:28:27 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6VCNAAU073966
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:28:25 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u38f27mvs-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:28:25 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Wed, 31 Jul 2019 13:28:23 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 31 Jul 2019 13:28:19 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x6VCSIZr43450730
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 31 Jul 2019 12:28:18 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 79B724C046;
+ Wed, 31 Jul 2019 12:28:18 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1C9E04C044;
+ Wed, 31 Jul 2019 12:28:18 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 31 Jul 2019 12:28:18 +0000 (GMT)
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
+ <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
+ <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Wed, 31 Jul 2019 14:28:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
+In-Reply-To: <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 31 Jul 2019 12:22:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v5 2/5] hw/block/pflash_cfi01: Use the
- correct READ_ARRAY value
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19073112-0016-0000-0000-00000297F2F5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19073112-0017-0000-0000-000032F60621
+Message-Id: <bdbee2e0-62a7-8906-8076-408922511146@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-31_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907310126
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
+ before ioctl call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,485 +157,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Laszlo Ersek <lersek@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berto@igalia.com" <berto@igalia.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Denis Lunev <den@virtuozzo.com>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "armbru@redhat.com" <armbru@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Hi Markus.
->
-> On 7/16/19 5:12 PM, Markus Armbruster wrote:
->> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
->>=20
->>> * Markus Armbruster (armbru@redhat.com) wrote:
->>>> Philippe asked me to have a look at this one, so here goes.
->
-> Thanks a lot for your careful analysis.
->
-> I got scared the uh-oh you raised would get this series or rework of it
-> still refused for the release, so I went for a quick-and-dirty bugfix.
 
-This close to the release, minimal bug fix now and cleanup later makes
-lots of sense.
-
-> Since this bugfix got merged (as commit 3a283507c0347), I can now think
-> again about how to properly fix this (if it is fixable...).
->
->>>> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+On 31.07.19 14:04, Andrey Shinkevich wrote:
+> On 31/07/2019 10:24, Christian Borntraeger wrote:
+>>
+>>
+>> On 30.07.19 21:20, Paolo Bonzini wrote:
+>>> On 30/07/19 18:01, Andrey Shinkevich wrote:
+>>>> Not the whole structure is initialized before passing it to the KVM.
+>>>> Reduce the number of Valgrind reports.
 >>>>
->>>>> In the document [*] the "Read Array Flowchart", the READ_ARRAY
->>>>> command has a value of 0xff.
->>>>>
->>>>> Use the correct value in the pflash model.
->>>>>
->>>>> There is no change of behavior in the guest, because:
->>>>> - when the guest were sending 0xFF, the reset_flash label
->>>>>   was setting the command value as 0x00
->>>>> - 0x00 was used internally for READ_ARRAY
->>>>
->>>> *Groan*
->>>>
->>>> Is this cleanup, or does it fix an observable bug?
->
-> Well it depends where you stand.
->
-> I have a few patches on top of this adding trace events (4.2 material)
-> and while debugging it was not making sense with the CFI specs.
->
-> 1/ The guest writes 0xFF to go in READ_ARRAY mode, the model report a
-> warning and take the switch default case which calls pflash_reset(),
-> which happens to set the flash in READ_ARRAY.
-
-This one, in pflash_write()?
-
-    switch (pfl->wcycle) {
-    case 0:
-        ...
---->    case 0xff: /* Read array mode */
-            DPRINTF("%s: Read array mode\n", __func__);
-            goto reset_flash;
-        ...
-    }
-    return;
-    ...
- reset_flash:
-    trace_pflash_reset();
-    memory_region_rom_device_set_romd(&pfl->mem, true);
-    pfl->wcycle =3D 0;
-    pfl->cmd =3D 0;
-
-I can't see a warning here.
-
-Let's ignore the tracepoint.
-
-Is the memory_region_rom_device_set_romd() appropriate for READ_ARRAY?
-
-pfl->wcycle =3D 0 is a no-op.
-
-pfl->cmd =3D 0 is part of the "use 0 instead 0f 0xFF to represent
-READ_ARRAY state" madness.
-
-By the way, use of tracing and DPRINTF() in the same .c is an
-anti-pattern.  Care to convert the remaining DPRINTF() into tracepoints?
-Feel free to delete useless ones, if any.
-
-> 2/ Then a later series adds the CFI specs timings (like the CFI02
-> model), because it would useful to test the UEFI Capsule Update feature
-> with real-time behavior. For the 'Virt' pflash, the timing is disabled.
-> Now running a non-Virt pflash, it becomes very slow because each time
-> the guest goes into READ_ARRAY mode, the reset delay (which is the
-> longest) occurs.
-
-Feels like a latent bug.  Adding timing turns it into a real one.
-
-> Talking with Laszlo, I figured for 1/ instead of fixing the model, I can
-> display 0x00 as 0xFF and ignore the pflash_reset() when the caller is
-> not system_reset(). Dirty again.
->
-> For 2/ it is not that easy, it will depends if there is more interest
-> from the UEFI community (Intel parallel NOR flashes are used on x86 and
-> aarch64 UEFI platforms).
->
-> If we justify 1/ and 2/ are not important, then it is simply a cleanup.
-
-If it's a bug fix, have the commit message explain the bug.
-
-If it's just cleanup, heave the commit message say so.
-
->>>>> To keep migration with older versions behaving correctly, we
->>>>> decide to always migrate the READ_ARRAY as 0x00.
->>>>>
->>>>> If the CFI open standard decide to assign a new command of value
->>>>> 0x00, this model is flawed because it uses this value internally.
->>>>> If a guest eventually requires this new CFI feature, a different
->>>>> model will be required (or this same model but breaking backward
->>>>> migration). So it is safe to keep migrating READ_ARRAY as 0x00.
->>>>
->>>> We could perhaps keep migration working for "benign" device states, wi=
-th
->>>> judicious use of subsections.  We'll cross that bridge when we get to
->>>> it.
->>>>
->>>>> [*] "Common Flash Interface (CFI) and Command Sets"
->>>>>     (Intel Application Note 646)
->>>>>     Appendix B "Basic Command Set"
->>>>>
->>>>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->>>>> Regression-tested-by: Laszlo Ersek <lersek@redhat.com>
->>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>> ---
->>>>> v3: Handle migrating the 'cmd' field.
->>>>> v4: Handle migrating to older QEMU (Dave)
->>>>> v5: Add a paragraph about why this model is flawed due to
->>>>>     historically using READ_ARRAY as 0x00 (Dave, Peter).
->>>>>
->>>>> Since Laszlo stated he did not test migration [*], I'm keeping his
->>>>> test tag, because the change with v2 has no impact in the tests
->>>>> he ran.
->>>>>
->>>>> Likewise I'm keeping John and Alistair tags, but I'd like an extra
->>>>> review for the migration change, thanks!
->>>>>
->>>>> [*] https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg00679.ht=
-ml
->>>>> ---
->>>>>  hw/block/pflash_cfi01.c | 57 ++++++++++++++++++++++++++++++++++-----=
---
->>>>>  1 file changed, 48 insertions(+), 9 deletions(-)
->>>>>
->>>>> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->>>>> index 9e34fd4e82..85bb2132c0 100644
->>>>> --- a/hw/block/pflash_cfi01.c
->>>>> +++ b/hw/block/pflash_cfi01.c
->>>>> @@ -96,6 +96,37 @@ struct PFlashCFI01 {
->>>>>      bool old_multiple_chip_handling;
->>>>>  };
->>>>>=20=20
->>>>> +static int pflash_pre_save(void *opaque)
->>>>> +{
->>>>> +    PFlashCFI01 *s =3D opaque;
->>>>> +
->>>>> +    /*
->>>>> +     * Previous to QEMU v4.1 an incorrect value of 0x00 was used for=
- the
->>>>> +     * READ_ARRAY command. To preserve migrating to these older vers=
-ion,
->>>>> +     * always migrate the READ_ARRAY command as 0x00.
->>>>> +     */
->>>>> +    if (s->cmd =3D=3D 0xff) {
->>>>> +        s->cmd =3D 0x00;
->>>>> +    }
->>>>> +
->>>>> +    return 0;
->>>>> +}
->>>>> +
->>>>> +static int pflash_post_save(void *opaque)
->>>>> +{
->>>>> +    PFlashCFI01 *s =3D opaque;
->>>>> +
->>>>> +    /*
->>>>> +     * If migration failed, the guest will continue to run.
->>>>> +     * Restore the correct READ_ARRAY value.
->>>>> +     */
->>>>> +    if (s->cmd =3D=3D 0x00) {
->>>>> +        s->cmd =3D 0xff;
->>>>> +    }
->>>>> +
->>>>> +    return 0;
->>>>> +}
->>>>
->>>> Uh, this gives me a queasy feeling.  Perhaps David can assuage it.
+>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 >>>
->>> See the previous 4 versions of discussion....
->>=20
->> Jumped in at v5; sorry about that.
->>=20
->>>> I figure the intent is to migrate PFlashCFI01 member @cmd value 0xFF as
->>>> 0x00, for migration compatibility to and from older versions.
->>>>
->>>> You do this by monkey-patching it to 0x00 before migration, and to 0xFF
->>>> afterwards.  On the incoming side, you replace 0x00 by 0xFF, in
->>>> pflash_post_load() below.
->>>>
->>>> Questions:
->>>>
->>>> * Can anything but the code that sends @cmd see the temporary 0x00 val=
-ue
->>>>   between pflash_pre_save() and pflash_post_save()
+>>> Christian, is this the right fix?  It's not expensive so it wouldn't be
+>>> an issue, just checking if there's any better alternative.
+>>
+>> I think all of these variants are valid with pros and cons
+>> 1. teach valgrind about this:
+>> Add to coregrind/m_syswrap/syswrap-linux.c (and the relevant header files)
+>> knowledge about which parts are actually touched.
+>> 2. use designated initializers
+>> 3. use memset
+>> 3. use a valgrind callback VG_USERREQ__MAKE_MEM_DEFINED to tell that this memory is defined
+>>
+> 
+> Thank you all very much for taking part in the discussion.
+> Also, one may use the Valgrind technology to suppress the unwanted 
+> reports by adding the Valgrind specific format file valgrind.supp to the 
+> QEMU project. The file content is extendable for future needs.
+> All the cases we like to suppress will be recounted in that file.
+> A case looks like the stack fragments. For instance, from QEMU block:
+> 
+> {
+>     hw/block/hd-geometry.c
+>     Memcheck:Cond
+>     fun:guess_disk_lchs
+>     fun:hd_geometry_guess
+>     fun:blkconf_geometry
+>     ...
+>     fun:device_set_realized
+>     fun:property_set_bool
+>     fun:object_property_set
+>     fun:object_property_set_qobject
+>     fun:object_property_set_bool
+> }
+> 
+> The number of suppressed cases are reported by the Valgrind with every 
+> run: "ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)"
+> 
+> Andrey
+
+Yes, indeed that would be another variant. How performance critical are
+the fixed locations? That might have an impact on what is the best solution.
+From a cleanliness approach doing 1 (adding the ioctl definition to valgrind)
+is certainly the most beautiful way. I did that in the past, look for example at
+
+https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=c2baee9b7bf043702c130de0771a4df439fcf403
+or 
+https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=00a31dd3d1e7101b331c2c83fca6c666ba35d910
+
+for examples. 
+
+
+> 
 >>>
->>> It is the same pflash data structure; but all CPUs are stopped and we're
->>> just walking the list of devices serialising them; so no nothing should
->>> be seeing that value.
->>=20
->> Sounds good.
->>=20
->>> (There is another way to do this, which is to produce a temporary
->>> structure at this point, populate the temporary structure and migrate
->>> that)
->>=20
->> Not necessary.
->>=20
->> The uh-ohs below still need assuaging, not necessarily yours.
->>=20
->>> Dave
+>>> Paolo
 >>>
->>>> * Consider the matrix source \in { old, new } x dest \in { old, new } x
->>>>   @cmd on source in { 0x00, 0xFF }.  What does migration put into @cmd
->>>>   on dest?  Eight cases:
+>>>> ---
+>>>>   target/i386/kvm.c | 3 +++
+>>>>   1 file changed, 3 insertions(+)
 >>>>
->>>>   source @cmd  ->  wire  ->  dest @cmd
->>>>     old  0x00  ->  0x00  ->  old  0x00  (1)
->>>>                              new  0xFF  (2)
->>>>     old  0xFF  ->  0xFF  ->  old  0xFF  (3)
->>>>                              new  0xFF  (4)
->>>>     new  0x00  ->  0x00  ->  old  0x00  (5)
->>>>                              new  0xFF  (6)
->>>>     new  0xFF  ->  0x00  ->  old  0x00  (7)
->>>>                              new  0xFF  (8)
+>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>>> index dbbb137..ed57e31 100644
+>>>> --- a/target/i386/kvm.c
+>>>> +++ b/target/i386/kvm.c
+>>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>>>>           return 0;
+>>>>       }
+>>>>   
+>>>> +    memset(&msr_data, 0, sizeof(msr_data));
+>>>>       msr_data.info.nmsrs = 1;
+>>>>       msr_data.entries[0].index = MSR_IA32_TSC;
+>>>>       env->tsc_valid = !runstate_is_running();
+>>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>>   
+>>>>       if (has_xsave) {
+>>>>           env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+>>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+>>>>       }
+>>>>   
+>>>>       max_nested_state_len = kvm_max_nested_state_length();
+>>>> @@ -3477,6 +3479,7 @@ static int kvm_put_debugregs(X86CPU *cpu)
+>>>>           return 0;
+>>>>       }
+>>>>   
+>>>> +    memset(&dbgregs, 0, sizeof(dbgregs));
+>>>>       for (i = 0; i < 4; i++) {
+>>>>           dbgregs.db[i] = env->dr[i];
+>>>>       }
+>>>> -- 
+>>>> 1.8.3.1
 >>>>
->>>>   Old -> old (cases 1 and 3) is unaffected by this patch.
->>>>
->>>>   New -> new leaves 0xFF unchanged (8).  It changes 0x00 to 0xFF (6).
->>>>   Uh-oh.  Can this happen?  Rephrasing the question: can @cmd ever be
->>>>   0x00 with this patch applied?
->
-> 0x00 is not in the spec (but as suggested Peter Maydell, the spec can
-> eventually assign the value in the future [*]). So no guests use it.
-> This value is only set:
-> - when the (old) model is initialized, without any access to the guest
-> - if the guest wrote an incorrect value, hitting the switch default case.
-> The guest can not read this value (value internal to the state machine).
->
-> So answer: Yes :(
+>>>
+>>>
+>>
+> 
 
-Could zero @cmd be avoided?
-
-> [*] However the spec has a way to announce supported features to the gues=
-t.
->
->>>>
->>>>   Old -> new leaves 0xFF unchanged (4).  It changes 0x00 to 0xFF (2),
->>>>   which I think is intentional.
->>>>
->>>>   New -> old leaves 0x00 unchanged (5).  It changes 0xFF to 0x00 (7),
->>>>   which I think is intentional.
->>>>
->>>>   Old -> new -> old leaves 0x00 unchanged.  Good.  It changes 0xFF to
->>>>   0x00.  Uh-oh.  Can @cmd ever be 0xFF before this patch?
->
-> I understand the full question as "Can @cmd ever be 0xFF [in Old] before
-> this patch?".
->
-> Answer: No, neither the guest nor the state machine can set @cmd to 0xFF
-> in Old.
-
-Good.
-
->>>>
->>>>   New -> old -> new leaves 0xFF unchanged.  Good.  It changes 0x00 to
->>>>   0xFF.  Same uh-oh as for new -> new.
->
-> "Same uh-oh", do you mean "Can @cmd ever be 0x00 [in New] before this
-> patch?"?
-
-Uh, isn't "[in New] before this patch" is a contradiction?
-
-Old =3D QEMU before this patch
-New =3D QEMU with this patch applied
-
-New -> old -> new =3D migrate from QEMU with the patch to QEMU without the
-patch, then migrate again to QEMU with the patch.
-
-If @cmd can be 0x00 initially, then the first migration is (5), and @cmd
-remains 0x00.  The second migration is (2), and @cmd becomes 0xFF.  The
-two migrations together change device state, which could be bad.
-
-> Same answer: No, neither the guest nor the state machine can set @cmd to
-> 0x00 in New.
-
-I'm afraid you gave a different answer to the same question above:
-"Yes :(".
-
->>>>
->>>>> +
->>>>>  static int pflash_post_load(void *opaque, int version_id);
->>>>>=20=20
->>>>>  static const VMStateDescription vmstate_pflash =3D {
->>>>> @@ -103,6 +134,8 @@ static const VMStateDescription vmstate_pflash =
-=3D {
->>>>>      .version_id =3D 1,
->>>>>      .minimum_version_id =3D 1,
->>>>>      .post_load =3D pflash_post_load,
->>>>> +    .pre_save =3D pflash_pre_save,
->>>>> +    .post_save =3D pflash_post_save,
->>>>>      .fields =3D (VMStateField[]) {
->>>>>          VMSTATE_UINT8(wcycle, PFlashCFI01),
->>>>>          VMSTATE_UINT8(cmd, PFlashCFI01),
->>>>> @@ -277,10 +310,9 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hw=
-addr offset,
->>>>>          /* This should never happen : reset state & treat it as a re=
-ad */
->>>>>          DPRINTF("%s: unknown command state: %x\n", __func__, pfl->cm=
-d);
->>>>>          pfl->wcycle =3D 0;
->>>>> -        pfl->cmd =3D 0;
->>>>> +        pfl->cmd =3D 0xff;
->>>>>          /* fall through to read code */
->>>>> -    case 0x00:
->>>>> -        /* Flash area read */
->>>>> +    case 0xff: /* Read Array */
->>>>>          ret =3D pflash_data_read(pfl, offset, width, be);
->>>>>          break;
->>>>
->>>> On 0xFF, we no longer zap pfl->wcycle and pfl->cmd.
->
-> We have 2 ways to set @cmd=3D0xFF.
->
-> - Write 0xFF, write an invalid command,
->   finish a multicycle operation (wcycle returns to 0):
->
->   pflash_write() goto reset_flash, then calls
->   memory_region_rom_device_set_romd(). set wcycle=3D0, cmd=3DREAD_ARRAY.
->
->   Next read() will be in ROMD mode, we won't reach pflash_read().
->
->   - if next access is write, we'll enter the same pflash_write().
->
-> - The /* This should never happen */ comment in pflash_read().
->
->   It might happens migrating? So we migrated crap, the guest wants to
->   read, the crap defaults to READ_ARRAY in I/O mode. Wrong in many ways,
->   not sure what the guest expects there, probably not ARRAY data.
->   Anyway, we stay in this READ_ARRAY I/O mode until the guest eventually
->   does a write access. Wrong.
->
-> The case "The state machine set 0xff, let the device in I/O mode" so we
-> expect to answer to a read() with READ_ARRAY is wrong too, the device
-> should already be in ROMD mode.
->
->>>>
->>>> On 0x00, we do.
->
-> Because we have no idea how we got there... Neither what we should do.
-
-The part I actually understand here is "this device model is wrong in so
-many ways".
-
-Is this device model fixable with reasonable effort?
-
-Would starting over be easier?
-
->>>>
->>>> We zap pfl->cmd to 0xFF instead of 0x00.  Same below after label
->>>> error_flash and reset_flash.  Related: initialization to 0xFF instead =
-of
->>>> 0x00 in pflash_cfi01_realize().  I *guess* these changes together ensu=
-re
->>>> pfl->cmd can't become 0x00.  Correct?
->>>>
->>>>>      case 0x10: /* Single byte program */
->>>>> @@ -448,8 +480,6 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr=
- offset,
->>>>>      case 0:
->>>>>          /* read mode */
->>>>>          switch (cmd) {
->>>>> -        case 0x00: /* ??? */
->>>>> -            goto reset_flash;
->>>>
->>>> On 0x00, we now use default: goto error_flash.  Can this happen?
->
-> This could happen if the the guest is writing crap, so we correctly
-> report this as an error.
-
-A bug fix of sorts.
-
->>>>
->>>>>          case 0x10: /* Single Byte Program */
->>>>>          case 0x40: /* Single Byte Program */
->>>>>              DPRINTF("%s: Single Byte Program\n", __func__);
->>>>> @@ -526,7 +556,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr=
- offset,
->>>>>              if (cmd =3D=3D 0xd0) { /* confirm */
->>>>>                  pfl->wcycle =3D 0;
->>>>>                  pfl->status |=3D 0x80;
->>>>> -            } else if (cmd =3D=3D 0xff) { /* read array mode */
->>>>> +            } else if (cmd =3D=3D 0xff) { /* Read Array */
->>>>>                  goto reset_flash;
->>>>>              } else
->>>>>                  goto error_flash;
->>>>> @@ -553,7 +583,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr=
- offset,
->>>>>              } else if (cmd =3D=3D 0x01) {
->>>>>                  pfl->wcycle =3D 0;
->>>>>                  pfl->status |=3D 0x80;
->>>>> -            } else if (cmd =3D=3D 0xff) {
->>>>> +            } else if (cmd =3D=3D 0xff) { /* read array mode */
->>>>
->>>> Your new comment is phrased the way you corrected in the previous hunk.
->>>> Intentional?
->
-> No :/ Too many rebases.
-
-Easy enough to clean up :)
-
->>>>
->>>>>                  goto reset_flash;
->>>>>              } else {
->>>>>                  DPRINTF("%s: Unknown (un)locking command\n", __func_=
-_);
->>>>> @@ -645,7 +675,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr=
- offset,
->>>>     error_flash:
->>>>        qemu_log_mask(LOG_UNIMP, "%s: Unimplemented flash cmd sequence "
->>>>                      "(offset " TARGET_FMT_plx ", wcycle 0x%x cmd 0x%x=
- value 0x%x)"
->>>>                      "\n", __func__, offset, pfl->wcycle, pfl->cmd, va=
-lue);
->>>>
->>>>     reset_flash:
->>>>>      trace_pflash_reset();
->>>>>      memory_region_rom_device_set_romd(&pfl->mem, true);
->>>>>      pfl->wcycle =3D 0;
->>>>> -    pfl->cmd =3D 0;
->>>>> +    pfl->cmd =3D 0xff;
->>>>>  }
->>>>>=20=20
->>>>>=20=20
->>>>> @@ -761,7 +791,7 @@ static void pflash_cfi01_realize(DeviceState *dev=
-, Error **errp)
->>>>>      }
->>>>>=20=20
->>>>>      pfl->wcycle =3D 0;
->>>>> -    pfl->cmd =3D 0;
->>>>> +    pfl->cmd =3D 0xff;
->>>>>      pfl->status =3D 0;
->>>>>      /* Hardcoded CFI table */
->>>>>      /* Standard "QRY" string */
->>>>> @@ -1001,5 +1031,14 @@ static int pflash_post_load(void *opaque, int =
-version_id)
->>>>>          pfl->vmstate =3D qemu_add_vm_change_state_handler(postload_u=
-pdate_cb,
->>>>>                                                          pfl);
->>>>>      }
->>>>> +
->>>>> +    /*
->>>>> +     * Previous to QEMU v4.1 an incorrect value of 0x00 was used for=
- the
->>>>> +     * READ_ARRAY command.
->>>>> +     */
->>>>> +    if (pfl->cmd =3D=3D 0x00) {
->>>>> +        pfl->cmd =3D 0xff;
->>>>> +    }
->>>>> +
->>>>>      return 0;
->>>>>  }
->>> --
->>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
