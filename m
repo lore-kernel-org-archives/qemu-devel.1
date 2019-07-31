@@ -2,71 +2,95 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D43C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 21:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CEAAC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 22:48:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46E68206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 21:34:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E68206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 06A8A20679
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 22:48:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pQPUGG55"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A8A20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hswEb-0004V4-H8
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 17:34:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41634)
+	id 1hsxO6-00027n-4u
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 18:48:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42410)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hsvmx-0001sw-7y
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 17:05:36 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsxNg-0001as-O4
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 18:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hsvmv-0005sh-Jn
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 17:05:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49228)
+ (envelope-from <richard.henderson@linaro.org>) id 1hsxNf-0008Qt-I7
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 18:47:36 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37068)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hsvmv-0005rw-E7
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 17:05:33 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hsvmu-0002Qs-5s
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 21:05:32 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2368D2E802D
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 21:05:32 +0000 (UTC)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hsxNf-0008QH-AU
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 18:47:35 -0400
+Received: by mail-pl1-x641.google.com with SMTP id b3so31133471plr.4
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 15:47:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Yj8/e1DaY0Y8tUi5r24rXtA1g8VDx/b5LVf6n84eP40=;
+ b=pQPUGG55BreEePR3myLH1Uw98L2y5tYrbioegD2LQIm2FXj7EvW0QtOxastwe3yecq
+ QKB+8YHgT64vwK04IUp/zIYCaMnRxFWod4sBwgr6BWm21K4MRzrInq5V9BwAoGO3/ssG
+ zQG3+JDEyBVa5ZpP5+Fbjban8DWUpoJTUHrXeSXHvEbY74RTY5jCOR2/oK+ObjgUOZPS
+ YIVqqF/Y+UbQYIam2Ig1zeyRGOsAF3plu8LgWjqvknRg2zXiRlOkHmWqCkMfRjpiaGaw
+ acDliJIiMWOOAtFhJT1z9I3mBSxZJW4dn38ewgUwRXvWocSl+oihPhEUnBIA36rCkXW7
+ JGBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Yj8/e1DaY0Y8tUi5r24rXtA1g8VDx/b5LVf6n84eP40=;
+ b=J12PFhVB75VvUONmNIZ4OepajNF3MKTK1smJbs9XJTMFmiP+EP9MF9tBwv9AypV+wO
+ gLeaMqQC3p1CDNeli95Bmjjub2fXFwuC05uNlrYaINdCnpoH55P7eSqxt2htvINQzZ2A
+ x1K6KJfx3LzufeeRtJf6mUr3yg4AA4plMxL79RGKn2m4hbR94SMQgD4/KeLK4xGgf3HV
+ jw14N7XCPdb6jb7WL14Nrbw78PiKzdOK38N0+OicnEEKjqso8b8mSspwfJ07GX+BncAA
+ T+GRTk3WbQIrt8iDh9rwjp5QVdgqXFvEb4rnfEwOAqTvgJC1bja/VLItO7ny/knCPwc4
+ i0dw==
+X-Gm-Message-State: APjAAAWeWdfepKzPTzFMjdQIqGIsLTaLPAzSasNmpQ8Lob+tRtfrPc2S
+ p39wYPxfN3yry3RUfMfr+JSlag==
+X-Google-Smtp-Source: APXvYqyDEvC/pLAvVgPNg0dyb64zK7U4F2JopwdCIKd++q31WoMjKUIM1DKlGKvhQ20aWri3WU/vCQ==
+X-Received: by 2002:a17:902:324:: with SMTP id
+ 33mr119120037pld.340.1564613254135; 
+ Wed, 31 Jul 2019 15:47:34 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id k6sm79037893pfi.12.2019.07.31.15.47.31
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 31 Jul 2019 15:47:33 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190731175702.4916-1-jan.bobek@gmail.com>
+ <20190731175702.4916-7-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0e38a01b-6a1b-cd18-1fd0-29faea840e69@linaro.org>
+Date: Wed, 31 Jul 2019 15:47:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 31 Jul 2019 21:00:13 -0000
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bjoern-teipel
-X-Launchpad-Bug-Reporter: Bjoern Teipel (bjoern-teipel)
-X-Launchpad-Bug-Modifier: Bjoern Teipel (bjoern-teipel)
-Message-Id: <156460681322.6584.3709701644111615718.malonedeb@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19012";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: eccf9f4bb33db1342dc6ec235435c97daab505fe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Wed, 31 Jul 2019 17:33:45 -0400
-Subject: [Qemu-devel] [Bug 1838569] [NEW] virtio-balloon change breaks post
- 4.0 upgrade
+In-Reply-To: <20190731175702.4916-7-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [RFC PATCH v1 06/22] target/i386: introduce
+ gen_gvec_ld_modrm_* helpers
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,153 +99,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Bjoern Teipel via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Bug 1838569 <1838569@bugs.launchpad.net>
-Cc: Bjoern Teipel <bjoern.teipel@rackspace.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 7/31/19 10:56 AM, Jan Bobek wrote:
+> +static inline void gen_gvec_ld_modrm_2(CPUX86State *env, DisasContext *s,
+> +                                       int modrm, unsigned vece,
+> +                                       uint32_t oprsz, uint32_t maxsz,
+> +                                       gen_ld_modrm_2_fp_t gen_ld_modrm_2_fp,
+> +                                       gen_gvec_2_fp_t gen_gvec_2_fp,
+> +                                       int opctl)
+> +{
+> +    uint32_t ofss[2];
+> +
+> +    const int opd = ((opctl >> 6) & 7) - 1;
+> +    const int opa = ((opctl >> 3) & 7) - 1;
+> +    const int opb = ((opctl >> 0) & 7) - 1;
+> +
+> +    assert(0 <= opd && opd < 2);
+> +    assert(0 <= opa && opa < 2);
+> +    assert(0 <= opb && opb < 2);
+> +
+> +    (*gen_ld_modrm_2_fp)(env, s, modrm, &ofss[0], &ofss[1]);
+> +    (*gen_gvec_2_fp)(vece, ofss[opd], ofss[opa], ofss[opb], oprsz, maxsz);
+> +}
+> +
+> +static inline void gen_gvec_ld_modrm_3(CPUX86State *env, DisasContext *s,
+> +                                       int modrm, unsigned vece,
+> +                                       uint32_t oprsz, uint32_t maxsz,
+> +                                       gen_ld_modrm_3_fp_t gen_ld_modrm_3_fp,
+> +                                       gen_gvec_2_fp_t gen_gvec_2_fp,
+> +                                       int opctl)
+> +{
+> +    uint32_t ofss[3];
+> +
+> +    const int opd = ((opctl >> 6) & 7) - 1;
+> +    const int opa = ((opctl >> 3) & 7) - 1;
+> +    const int opb = ((opctl >> 0) & 7) - 1;
+> +
+> +    assert(0 <= opd && opd < 3);
+> +    assert(0 <= opa && opa < 3);
+> +    assert(0 <= opb && opb < 3);
+> +
+> +    (*gen_ld_modrm_3_fp)(env, s, modrm, &ofss[0], &ofss[1], &ofss[2]);
+> +    (*gen_gvec_2_fp)(vece, ofss[opd], ofss[opa], ofss[opb], oprsz, maxsz);
+> +}
+> +> +#define gen_gvec_ld_modrm_mm(env, s, modrm, vece,                       \> +
+                            gen_gvec_2_fp, opctl)                      \> +
+gen_gvec_ld_modrm_2((env), (s), (modrm), (vece),                    \> +
+                 sizeof(MMXReg), sizeof(MMXReg),                 \> +
+              gen_ld_modrm_PqQq,                              \> +
+           gen_gvec_2_fp, (opctl))> +> +#define gen_gvec_ld_modrm_xmm(env, s,
+modrm, vece,                      \> +
+gen_gvec_2_fp, opctl)                     \> +    gen_gvec_ld_modrm_2((env),
+(s), (modrm), (vece),                    \> +
+sizeof(XMMReg), sizeof(XMMReg),                 \> +
+gen_ld_modrm_VxWx,                              \> +
+gen_gvec_2_fp, (opctl))> +> +#define gen_gvec_ld_modrm_vxmm(env, s, modrm,
+vece,                     \> +                               gen_gvec_2_fp,
+opctl)                    \> +    gen_gvec_ld_modrm_3((env), (s), (modrm),
+(vece),                    \> +                        sizeof(XMMReg),
+sizeof(ZMMReg),                 \> +
+gen_ld_modrm_VxHxWx,                            \> +
+gen_gvec_2_fp, (opctl))> +> +#define gen_gvec_ld_modrm_vymm(env, s, modrm,
+vece,                     \> +                               gen_gvec_2_fp,
+opctl)                    \> +    gen_gvec_ld_modrm_3((env), (s), (modrm),
+(vece),                    \> +                        sizeof(YMMReg),
+sizeof(ZMMReg),                 \> +
+gen_ld_modrm_VxHxWx,                            \> +
+gen_gvec_2_fp, (opctl))
 
-We upgraded the libvirt UCA packages from 3.6 to 4.0 as part of a queens up=
-grade and noticed that
-virtio-ballon is broken when instances live migrate (started with a prior 3=
-.6 version)  with:
+I suppose there aren't so many different combinations, but did you consider
+separate callbacks per operand?  If you have
+
+typedef unsigned (*gen_offset)(CPUX86State *, DisasContext *, int);
+
+static unsigned offset_Pq(CPUX86State *env, DisasContext *s, int modrm)
+{
+    int reg = (modrm >> 3) & 7; /* Ignore REX_R */
+    return offsetof(CPUX86State, fpregs[reg].mmx);
+}
+
+static unsigned offset_Qq(CPUX86State *env, DisasContext *s, int modrm)
+{
+    int mod = (modrm >> 6) & 3;
+    unsigned ret;
+
+    if (mod == 3) {
+        int rm = modrm & 7; /* Ignore REX_B */
+        ret = offsetof(CPUX86State, fpregs[rm].mmx);
+    } else {
+        ret = offsetof(CPUX86State, mmx_t0);
+        gen_lea_modrm(env, s, modrm);
+        gen_ldq_env_A0(s, ret);
+    }
+    return ret;
+}
+
+static unsigned offset_Vx(CPUX86State *env, DisasContext *s, int modrm)
+{
+    int reg = ((modrm >> 3) & 7) | REX_R(s);
+    return offsetof(CPUX86State, xmm_regs[reg]);
+}
+
+static unsigned offset_Wx(CPUX86State *env, DisasContext *s, int modrm)
+{
+    int mod = (modrm >> 6) & 3;
+    unsigned ret;
+
+    if (mod == 3) {
+        int rm = (modrm & 7) | REX_B(s);
+        ret = offsetof(CPUX86State, xmm_regs[rm]);
+    } else {
+        ret = offsetof(CPUX86State, xmm_t0);
+        gen_lea_modrm(env, s, modrm);
+        gen_ldo_env_A0(s, ret);
+    }
+    return ret;
+}
+
+static unsigned offset_Hx(CPUX86State *env, DisasContext *s, int modrm)
+{
+    return offsetof(CPUX86State, xmm_regs[s->vex_v]);
+}
+
+Then you can have
+
+#define GEN_GVEC_3(OP0, OP1, OP2, OPRSZ, MAXSZ)
+static void gen_gvec_ld_modrm_##OP0##OP1##OP2(CPUX86State *env,      \
+    DisasContext *s, int modrm, unsigned vece,  gen_gvec_2_fp_t gen) \
+{                                               \
+    int ofd = offset_##OP0(env, s, modrm);      \
+    int of1 = offset_##OP1(env, s, modrm);      \
+    int of2 = offset_##OP2(env, s, modrm);      \
+    gen(vece, opd, opa, opb, OPRSZ, MAXSZ);     \
+}
+
+GEN_GVEC_3(Pq, Pq, Qq, sizeof(MMXReg), sizeof(MMXReg))
+GEN_GVEC_3(Vx, Vx, Wx, sizeof(XMMReg), max_vec_size(s))
+GEN_GVEC_3(Vx, Hx, Wx, sizeof(XMMReg), max_vec_size(s))
+
+The PqPqQq and VxVxWx sub-strings aren't quite canonical, but imo a better fit
+to the actual format of the instruction, with 2 inputs and 1 output.
+
+You can also do
+
+GEN_GVEC_3(Pq, Qq, Pq, sizeof(MMXReg), sizeof(MMXReg))
+
+for those rare "reversed" operations like PANDN.  Now you don't need to carry
+around the OPCTL argument, which I initially found non-obvious.
+
+I initially thought you'd be able to infer maxsz from the set of arguments, but
+since there are vex encoded operations that do not use vex.vvvv that is not
+always the case.  Thus I suggest
+
+static size_t max_vec_size(DisasContext *s)
+{
+    if (s->prefixes & PREFIX_VEX) {
+        /*
+         * TODO: When avx512 is supported and enabled, sizeof(ZMMReg).
+         * In the meantime don't waste time zeroing data that is not
+         * architecturally present.
+         */
+        return sizeof(YMMReg);
+    } else {
+        /* Without vex encoding, only the low 128 bits are modified. */
+        return sizeof(XMMReg);
+    }
+}
 
 
-2019-07-24T06:46:49.487109Z qemu-system-x86_64: warning: Unknown firmware f=
-ile in legacy mode: etc/msr_feature_control
-2019-07-24T06:47:22.187749Z qemu-system-x86_64: VQ 2 size 0x80 < last_avail=
-_idx 0xb57 - used_idx 0xb59
-2019-07-24T06:47:22.187768Z qemu-system-x86_64: Failed to load virtio-ballo=
-on:virtio
-2019-07-24T06:47:22.187771Z qemu-system-x86_64: error while loading state f=
-or instance 0x0 of device '0000:00:05.0/virtio-balloon'
-2019-07-24T06:47:22.188194Z qemu-system-x86_64: load of migration failed: O=
-peration not permitted
-2019-07-24 06:47:22.430+0000: shutting down, reason=3Dfailed
-
-This seem to be the exact problem as reported by
-https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02228.html
-
-Listed the packages which changed:
-
-Start-Date: 2019-07-06  06:40:55
-Commandline: /usr/bin/apt-get -y -o Dpkg::Options::=3D--force-confdef -o Dp=
-kg::Options::=3D--force-confold install libvirt-bin python-libvirt qemu qem=
-u-utils qemu-system qemu-system-arm qemu-system-mips qemu-system-ppc qemu-s=
-ystem-sparc qemu-system-x86 qemu-system-misc qemu-block-extra qemu-utils qe=
-mu-user qemu-kvm
-Install: librdmacm1:amd64 (17.1-1ubuntu0.1~cloud0, automatic), libvirt-daem=
-on-driver-storage-rbd:amd64 (4.0.0-1ubuntu8.10~cloud0, automatic), ipxe-qem=
-u-256k-compat-efi-roms:amd64 (1.0.0+git-20150424.a25a16d-0ubuntu2~cloud0, a=
-utomatic)
-Upgrade: qemu-system-mips:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg=
--1ubuntu7.13~cloud0), qemu-system-misc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1=
-, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-ppc:amd64 (1:2.10+dfsg-0ubun=
-tu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), python-libvirt:amd64 (3.5.0-=
-1build1~cloud0, 4.0.0-1~cloud0), qemu-system-x86:amd64 (1:2.10+dfsg-0ubuntu=
-3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-clients:amd64 (3.6.0-1=
-ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-user:amd64 (1:2.10+dfsg-0=
-ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-bin:amd64 (3.6.0=
--1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu:amd64 (1:2.10+dfsg-0ubu=
-ntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-utils:amd64 (1:2.10+df=
-sg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon-syste=
-m:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-system-sp=
-arc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), =
-qemu-user-binfmt:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7=
-.13~cloud0), qemu-kvm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ub=
-untu7.13~cloud0), libvirt0:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.1=
-0~cloud0), qemu-system-arm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfs=
-g-1ubuntu7.13~cloud0), qemu-block-extra:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud=
-1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-common:amd64 (1:2.10+dfsg-0=
-ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system:amd64 (1:2.1=
-0+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon:a=
-md64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0)
-End-Date: 2019-07-06  06:41:08
-
-At this point the instances would have to be hard rebooted or
-stopped/started to fix the issue for future live migration attemps
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838569
-
-Title:
-  virtio-balloon change breaks post 4.0 upgrade
-
-Status in QEMU:
-  New
-
-Bug description:
-  We upgraded the libvirt UCA packages from 3.6 to 4.0 as part of a queens =
-upgrade and noticed that
-  virtio-ballon is broken when instances live migrate (started with a prior=
- 3.6 version)  with:
-
-  =
-
-  2019-07-24T06:46:49.487109Z qemu-system-x86_64: warning: Unknown firmware=
- file in legacy mode: etc/msr_feature_control
-  2019-07-24T06:47:22.187749Z qemu-system-x86_64: VQ 2 size 0x80 < last_ava=
-il_idx 0xb57 - used_idx 0xb59
-  2019-07-24T06:47:22.187768Z qemu-system-x86_64: Failed to load virtio-bal=
-loon:virtio
-  2019-07-24T06:47:22.187771Z qemu-system-x86_64: error while loading state=
- for instance 0x0 of device '0000:00:05.0/virtio-balloon'
-  2019-07-24T06:47:22.188194Z qemu-system-x86_64: load of migration failed:=
- Operation not permitted
-  2019-07-24 06:47:22.430+0000: shutting down, reason=3Dfailed
-
-  This seem to be the exact problem as reported by
-  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02228.html
-
-  Listed the packages which changed:
-
-  Start-Date: 2019-07-06  06:40:55
-  Commandline: /usr/bin/apt-get -y -o Dpkg::Options::=3D--force-confdef -o =
-Dpkg::Options::=3D--force-confold install libvirt-bin python-libvirt qemu q=
-emu-utils qemu-system qemu-system-arm qemu-system-mips qemu-system-ppc qemu=
--system-sparc qemu-system-x86 qemu-system-misc qemu-block-extra qemu-utils =
-qemu-user qemu-kvm
-  Install: librdmacm1:amd64 (17.1-1ubuntu0.1~cloud0, automatic), libvirt-da=
-emon-driver-storage-rbd:amd64 (4.0.0-1ubuntu8.10~cloud0, automatic), ipxe-q=
-emu-256k-compat-efi-roms:amd64 (1.0.0+git-20150424.a25a16d-0ubuntu2~cloud0,=
- automatic)
-  Upgrade: qemu-system-mips:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+df=
-sg-1ubuntu7.13~cloud0), qemu-system-misc:amd64 (1:2.10+dfsg-0ubuntu3.8~clou=
-d1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-ppc:amd64 (1:2.10+dfsg-0ub=
-untu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), python-libvirt:amd64 (3.5.=
-0-1build1~cloud0, 4.0.0-1~cloud0), qemu-system-x86:amd64 (1:2.10+dfsg-0ubun=
-tu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-clients:amd64 (3.6.0=
--1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-user:amd64 (1:2.10+dfsg=
--0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-bin:amd64 (3.6=
-.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu:amd64 (1:2.10+dfsg-0u=
-buntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-utils:amd64 (1:2.10+=
-dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon-sys=
-tem:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-system-=
-sparc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0)=
-, qemu-user-binfmt:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubunt=
-u7.13~cloud0), qemu-kvm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1=
-ubuntu7.13~cloud0), libvirt0:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8=
-.10~cloud0), qemu-system-arm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+d=
-fsg-1ubuntu7.13~cloud0), qemu-block-extra:amd64 (1:2.10+dfsg-0ubuntu3.8~clo=
-ud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-common:amd64 (1:2.10+dfsg=
--0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system:amd64 (1:2=
-.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon=
-:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0)
-  End-Date: 2019-07-06  06:41:08
-
-  At this point the instances would have to be hard rebooted or
-  stopped/started to fix the issue for future live migration attemps
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838569/+subscriptions
+r~
 
