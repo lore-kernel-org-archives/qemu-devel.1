@@ -2,51 +2,50 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8248AC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 13:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E20DC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 13:46:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5634A206A2
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 13:46:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5634A206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 12D0A206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 13:46:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12D0A206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsovg-0000sq-9i
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 09:46:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54812)
+	id 1hsowR-0001pp-DR
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 09:46:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55300)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hsovG-0000LY-7v
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 09:45:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hsovz-0001Kt-Ux
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 09:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hsovF-0004GB-0d
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 09:45:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46432)
+ (envelope-from <jsnow@redhat.com>) id 1hsovz-0005gO-1K
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 09:46:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51850)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hsovC-0004En-A2; Wed, 31 Jul 2019 09:45:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hsovw-0005dj-Rd; Wed, 31 Jul 2019 09:46:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9422E30860A7;
- Wed, 31 Jul 2019 13:45:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2533030ADC82;
+ Wed, 31 Jul 2019 13:46:24 +0000 (UTC)
 Received: from [10.10.123.215] (ovpn-123-215.rdu2.redhat.com [10.10.123.215])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6BD765D6A7;
- Wed, 31 Jul 2019 13:45:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BDDC15D96E;
+ Wed, 31 Jul 2019 13:46:16 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190730163251.755248-1-vsementsov@virtuozzo.com>
- <20190730163251.755248-2-vsementsov@virtuozzo.com>
- <f13fdafd-34d2-3079-ab17-78cdb7e9f428@redhat.com>
- <6c4d1b26-925b-c7a1-dbe3-9cae2ab0e3d6@virtuozzo.com>
+ <c78b645a-e79b-1335-0e6e-44db4953417d@redhat.com>
+ <877c1717-738e-f3a2-2cb4-3aa11e738fc0@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -123,21 +122,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <daba0fba-4e51-2d73-c741-70e2d9378b26@redhat.com>
-Date: Wed, 31 Jul 2019 09:45:34 -0400
+Message-ID: <34b7193a-8149-6379-ec9e-0b5dfe552e7e@redhat.com>
+Date: Wed, 31 Jul 2019 09:46:15 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6c4d1b26-925b-c7a1-dbe3-9cae2ab0e3d6@virtuozzo.com>
+In-Reply-To: <877c1717-738e-f3a2-2cb4-3aa11e738fc0@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 31 Jul 2019 13:45:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Wed, 31 Jul 2019 13:46:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/3] block/backup: deal with zero detection
+Subject: Re: [Qemu-devel] [PATCH 0/3] backup fixes for 4.1?
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -159,96 +158,36 @@ Sender: "Qemu-devel"
 
 
 
-On 7/31/19 6:01 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 30.07.2019 21:40, John Snow wrote:
+On 7/31/19 6:29 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 30.07.2019 21:41, John Snow wrote:
 >>
 >>
 >> On 7/30/19 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> We have detect_zeroes option, so at least for blockdev-backup user
->>> should define it if zero-detection is needed. For drive-backup leave
->>> detection enabled by default but do it through existing option instead
->>> of open-coding.
+>>> Hi all!
 >>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>   block/backup.c | 15 ++++++---------
->>>   blockdev.c     |  8 ++++----
->>>   2 files changed, 10 insertions(+), 13 deletions(-)
+>>> Here are two small fixes.
 >>>
->>> diff --git a/block/backup.c b/block/backup.c
->>> index 715e1d3be8..f4aaf08df3 100644
->>> --- a/block/backup.c
->>> +++ b/block/backup.c
->>> @@ -110,7 +110,10 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->>>       BlockBackend *blk = job->common.blk;
->>>       int nbytes;
->>>       int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
->>> -    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
->>> +    int write_flags =
->>> +            (job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0) |
->>> +            (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
->>> +
->>>   
->>>       assert(QEMU_IS_ALIGNED(start, job->cluster_size));
->>>       hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
->>> @@ -128,14 +131,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
->>>           goto fail;
->>>       }
->>>   
->>> -    if (buffer_is_zero(*bounce_buffer, nbytes)) {
->>> -        ret = blk_co_pwrite_zeroes(job->target, start,
->>> -                                   nbytes, write_flags | BDRV_REQ_MAY_UNMAP);
->>> -    } else {
->>> -        ret = blk_co_pwrite(job->target, start,
->>> -                            nbytes, *bounce_buffer, write_flags |
->>> -                            (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
->>> -    }
->>> +    ret = blk_co_pwrite(job->target, start, nbytes, *bounce_buffer,
->>> +                        write_flags);
->>>       if (ret < 0) {
->>>           trace_backup_do_cow_write_fail(job, start, ret);
->>>           if (error_is_read) {
->>> diff --git a/blockdev.c b/blockdev.c
->>> index 4d141e9a1f..a94d754504 100644
->>> --- a/blockdev.c
->>> +++ b/blockdev.c
->>> @@ -3434,7 +3434,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
->>>       BlockJob *job = NULL;
->>>       BdrvDirtyBitmap *bmap = NULL;
->>>       AioContext *aio_context;
->>> -    QDict *options = NULL;
->>> +    QDict *options;
->>>       Error *local_err = NULL;
->>>       int flags, job_flags = JOB_DEFAULT;
->>>       int64_t size;
->>> @@ -3529,10 +3529,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
->>>           goto out;
->>>       }
->>>   
->>> +    options = qdict_new();
->>> +    qdict_put_str(options, "discard", "unmap");
->>> +    qdict_put_str(options, "detect-zeroes", "unmap");
->>>       if (backup->format) {
->>> -        if (!options) {
->>> -            options = qdict_new();
->>> -        }
->>>           qdict_put_str(options, "driver", backup->format);
->>>       }
->>>   
+>>> 01 is not a degradation at all, so it's OK for 4.2
+>>> 02 is degradation of 3.0, so it's possibly OK for 4.2 too,
+>>>     but it seems to be real bug and fix is very simple, so,
+>>>     may be 4.1 is better
+>>>
+>>> Or you may take the whole series to 4.1 if you want.
 >>>
 >>
->> I'm less sure of this one personally. Is it right to always try to set
->> unmap on the target?
->>
->> I like the idea of removing special cases and handling things more
->> centrally though, but I'll want Max (or Kevin) to take a peek.
+>> I think (1) and (2) can go in for stable after review, but they're not
+>> crucial for 4.1 especially at this late of a stage. Should be cataclysms
+>> only right now.
 >>
 >> --js
 >>
 > 
-> 
-> If nobody minds I'd agree with you to drop zero detecting from both backups.
+> I can rebase it than on your bitmaps branch. Or, if we want it for stable, maybe,
+> I shouldn't?
 > 
 
-I'm not sure it's WRONG either!
+Good point. Keep it based on main and I'll slip it in at the beginning
+of the staging queue.
+
+--js
 
