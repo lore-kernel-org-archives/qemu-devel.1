@@ -6,66 +6,67 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA0A3C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA94C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:31:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B44ED20449
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:31:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44ED20449
+	by mail.kernel.org (Postfix) with ESMTPS id 8E2B920657
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:31:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E2B920657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hskwu-0002BX-0r
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:31:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34361)
+	id 1hskxU-0003Dr-SM
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:31:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34364)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hskwW-0001jI-Bj
+ (envelope-from <bounces@canonical.com>) id 1hskwW-0001jU-Es
  for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:30:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hskwV-0004lo-63
+ (envelope-from <bounces@canonical.com>) id 1hskwV-0004lk-5v
  for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34152)
+Received: from indium.canonical.com ([91.189.90.7]:34154)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hskwU-0004ku-Vt
+ id 1hskwV-0004kv-01
  for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:30:43 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hskwS-0003cz-Tt
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:30:40 +0000
+ id 1hskwT-0003dV-Cj
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:30:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CC9952E80CB
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:30:40 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 5A3A32E80C9
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:30:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 31 Jul 2019 09:23:11 -0000
+Date: Wed, 31 Jul 2019 09:25:20 -0000
 From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: kvm qemu-kvm x86
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee s4s
-X-Launchpad-Bug-Reporter: _ (s4s)
+X-Launchpad-Bug-Commenters: stefan-proxmox
+X-Launchpad-Bug-Reporter: Stefan (stefan-proxmox)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <156451696673.6584.7291488800307870571.malonedeb@soybean.canonical.com>
-Message-Id: <156456499190.15322.12128839781937792027.malone@wampee.canonical.com>
+References: <156404155054.10633.9207967667458929652.malonedeb@wampee.canonical.com>
+Message-Id: <156456512042.6843.12889194640468618584.launchpad@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19012";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 939bdd17544f0b8fcbf653cd57bafbc05b03b74c
+X-Launchpad-Hash: 90dc6806a4ebff29bbfc12e31865926214c0243c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838465] Re: qemu-system-x86_64 kernel panic 30%
- of the time starting up VM
+Subject: [Qemu-devel] [Bug 1837851] Re: hv-tlbflush malfunctions on Intel
+ host CPUs with neither EPT nor VPID (qemu-kvm)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -76,49 +77,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838465 <1838465@bugs.launchpad.net>
+Reply-To: Bug 1837851 <1837851@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Is this using TCG (i.e. emulation) rather than Hyper V virtualisation?
+** Tags added: kvm x86
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838465
+https://bugs.launchpad.net/bugs/1837851
 
 Title:
-  qemu-system-x86_64 kernel panic 30% of the time starting up VM
+  hv-tlbflush malfunctions on Intel host CPUs with neither EPT nor VPID
+  (qemu-kvm)
 
 Status in QEMU:
   New
 
 Bug description:
-  I have created a Fedora Core 5 x86_64 VM image. When I run the image
-  using QEMU on Windows the VM hangs while loading the kernel about 30%
-  of the time. I am trying to use this VM with a CI software, looking at
-  the history the build failed 27 out of 79 attempts. QEMU 3.0.0 is
-  installed on the CI machine. I have tried using the exact same image
-  using QEMU on Linux (Ubuntu) and found the image boot successful every
-  time (40+ attempts). The VM image is fairly old it was created using
-  QEMU 0.11.1.
+  Enabling hv-tlbflush on older hosts using Intel CPUs supporting VT-x
+  but neither EPT nor VPID will lead to bluescreens on the guest.
 
-  I have tried multiple versions on QEMU on windows; 0.11.1, 2.12.1, and
-  3.0.0 all of them fail randomly. I can reproduce the issue on several
-  different Windows 10 computers.
+  It seems KVM only checks if EPT is available, and if it isn't it
+  forcibly uses VPID. If that's *also* not available, it defaults to
+  basically a no-op hypercall, though windows is expecting the TLB to be
+  flushed.
 
-  The command I am using to start the VM is =E2=80=9Cqemu-system-x86_64.exe=
- -cpu
-  qemu64 -smp cores=3D2 -device e1000,netdev=3Dnet0 -boot menu=3Doff -m 1G
-  -drive `"file=3DC:\qimages\Fedora-Core-5-x64.qcow2,index=3D0,media=3Ddisk=
-`"
-  -snapshot -netdev user,id=3Dnet0,hostfwd=3Dtcp::10022-:22=E2=80=9D
+  hv-tlbflush is pretty useless on machines not supporting these
+  extensions anyway (only reasonably fix I can see would be to flush the
+  *entire* TLB on tlbflush hypercall in KVM (i.e. a kernel fix), but
+  that would remove any performance benefits), so I would suggest some
+  kind of preliminary check and warning/error if hv-tlbflush is
+  specified on such a host.
 
-  I can provide the qcow image but it is somewhat large coming it at
-  4.15GB so I=E2=80=99m not sure what would be the best way to transfer it.
+  All CPUs mentioned in this thread[0] are confirmed to be affected by
+  the bug, and I have successfully reproduced it on an Intel Core2Duo
+  E8500.
+
+  [0] https://forum.proxmox.com/threads/windows-guest-bluescreen-with-
+  proxmox-6.56053/
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838465/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1837851/+subscriptions
 
