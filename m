@@ -2,59 +2,68 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F1CC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8530FC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A8AA20693
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:23:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A8AA20693
+	by mail.kernel.org (Postfix) with ESMTPS id 5A0C020693
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 09:24:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0C020693
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hskpd-0002wf-ES
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:23:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59919)
+	id 1hskqi-0003vV-Mi
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 05:24:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60260)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ppandit@redhat.com>) id 1hskpB-00029E-7G
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:23:10 -0400
+ (envelope-from <ppandit@redhat.com>) id 1hskqA-0003Uu-DD
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:24:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1hskpA-0000Zq-0p
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:23:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48870)
+ (envelope-from <ppandit@redhat.com>) id 1hskq9-00011E-JU
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:24:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56424)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hskp9-0000Yl-Oy
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:23:07 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hskq9-00010W-E6
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 05:24:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1954881DF1;
- Wed, 31 Jul 2019 09:23:07 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-38.phx2.redhat.com
- [10.3.116.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 623F85C1B5;
- Wed, 31 Jul 2019 09:22:56 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A5F3B3082201;
+ Wed, 31 Jul 2019 09:24:08 +0000 (UTC)
+Received: from kaapi (ovpn-116-38.phx2.redhat.com [10.3.116.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6765960852;
+ Wed, 31 Jul 2019 09:23:55 +0000 (UTC)
+Date: Wed, 31 Jul 2019 14:53:49 +0530 (IST)
 From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
 To: Jason Wang <jasowang@redhat.com>
-Date: Wed, 31 Jul 2019 14:49:33 +0530
-Message-Id: <20190731091933.17363-1-ppandit@redhat.com>
+In-Reply-To: <3bd45075-bec1-f597-8f84-4de1f9bd29bf@redhat.com>
+Message-ID: <nycvar.YSQ.7.76.1907311453170.1746@xnncv>
+References: <20190723104754.29324-1-ppandit@redhat.com>
+ <20190723104754.29324-4-ppandit@redhat.com>
+ <20190723130326.GC5445@stefanha-x1.localdomain>
+ <CAKXe6S+pXN0d6K9Vw=kxsy51bVz1PxXBHYEmTesUnYo8u8vcYg@mail.gmail.com>
+ <nycvar.YSQ.7.76.1907241116470.10049@xnncv>
+ <20190729150400.GG6771@stefanha-x1.localdomain>
+ <fb5835f4-2894-72c5-db35-91ccf966cb9f@redhat.com>
+ <nycvar.YSQ.7.76.1907311211020.1746@xnncv>
+ <3bd45075-bec1-f597-8f84-4de1f9bd29bf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 31 Jul 2019 09:23:07 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.47]); Wed, 31 Jul 2019 09:24:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v5] net: tap: replace snprintf with
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] net: tap: replace snprintf with
  g_strdup_printf calls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,98 +77,18 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Stefan Hajnoczi <stefanha@gmail.com>, Li Qiang <liq3ea@gmail.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Prasad J Pandit <pjp@fedoraproject.org>
+ =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
++-- On Wed, 31 Jul 2019, Jason Wang wrote --+
+| The series has been merged. Just need a patch on top and I can queue it for 
+| next release.
 
-When invoking qemu-bridge-helper in 'net_bridge_run_helper',
-instead of using fixed sized buffers, use dynamically allocated
-ones initialised and returned by g_strdup_printf().
-
-If bridge name 'br_buf' is undefined, pass empty string ("") to
-g_strdup_printf() in its place, to avoid printing "(null)" string.
-
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- net/tap.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
-
-Update v5: add commit message about conditional 'br_buf' argument
-  -> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg06397.html
-
-diff --git a/net/tap.c b/net/tap.c
-index e8aadd8d4b..fc38029f41 100644
---- a/net/tap.c
-+++ b/net/tap.c
-@@ -498,9 +498,9 @@ static int net_bridge_run_helper(const char *helper, =
-const char *bridge,
-     }
-     if (pid =3D=3D 0) {
-         int open_max =3D sysconf(_SC_OPEN_MAX), i;
--        char fd_buf[6+10];
--        char br_buf[6+IFNAMSIZ] =3D {0};
--        char helper_cmd[PATH_MAX + sizeof(fd_buf) + sizeof(br_buf) + 15]=
-;
-+        char *fd_buf =3D NULL;
-+        char *br_buf =3D NULL;
-+        char *helper_cmd =3D NULL;
-=20
-         for (i =3D 3; i < open_max; i++) {
-             if (i !=3D sv[1]) {
-@@ -508,17 +508,17 @@ static int net_bridge_run_helper(const char *helper=
-, const char *bridge,
-             }
-         }
-=20
--        snprintf(fd_buf, sizeof(fd_buf), "%s%d", "--fd=3D", sv[1]);
-+        fd_buf =3D g_strdup_printf("%s%d", "--fd=3D", sv[1]);
-=20
-         if (strrchr(helper, ' ') || strrchr(helper, '\t')) {
-             /* assume helper is a command */
-=20
-             if (strstr(helper, "--br=3D") =3D=3D NULL) {
--                snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=3D", brid=
-ge);
-+                br_buf =3D g_strdup_printf("%s%s", "--br=3D", bridge);
-             }
-=20
--            snprintf(helper_cmd, sizeof(helper_cmd), "%s %s %s %s",
--                     helper, "--use-vnet", fd_buf, br_buf);
-+            helper_cmd =3D g_strdup_printf("%s %s %s %s", helper,
-+                            "--use-vnet", fd_buf, br_buf ? br_buf : "");
-=20
-             parg =3D args;
-             *parg++ =3D (char *)"sh";
-@@ -527,10 +527,11 @@ static int net_bridge_run_helper(const char *helper=
-, const char *bridge,
-             *parg++ =3D NULL;
-=20
-             execv("/bin/sh", args);
-+            g_free(helper_cmd);
-         } else {
-             /* assume helper is just the executable path name */
-=20
--            snprintf(br_buf, sizeof(br_buf), "%s%s", "--br=3D", bridge);
-+            br_buf =3D g_strdup_printf("%s%s", "--br=3D", bridge);
-=20
-             parg =3D args;
-             *parg++ =3D (char *)helper;
-@@ -541,6 +542,8 @@ static int net_bridge_run_helper(const char *helper, =
-const char *bridge,
-=20
-             execv(helper, args);
-         }
-+        g_free(fd_buf);
-+        g_free(br_buf);
-         _exit(1);
-=20
-     } else {
---=20
-2.21.0
-
+Sent patch v5. Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
 
