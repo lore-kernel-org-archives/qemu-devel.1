@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFC2C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9955C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:15:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8BDD206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:13:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BDD206B8
+	by mail.kernel.org (Postfix) with ESMTPS id BEF33206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:15:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF33206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hspMV-00004t-V8
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 10:13:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34007)
+	id 1hspO7-0002S1-1P
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 10:15:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34372)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <clg@kaod.org>) id 1hspLg-0006bb-Kr
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:13:01 -0400
+ (envelope-from <clg@kaod.org>) id 1hspMK-000065-QL
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:13:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hspLf-0001ZZ-BQ
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:13:00 -0400
-Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:34516)
+ (envelope-from <clg@kaod.org>) id 1hspMJ-00021H-LJ
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:13:40 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:46709)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hspLf-0001YZ-5Z
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:12:59 -0400
-Received: from player715.ha.ovh.net (unknown [10.109.143.175])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 69E5F1FD476
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 16:12:57 +0200 (CEST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hspMJ-00020a-Bw
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:13:39 -0400
+Received: from player715.ha.ovh.net (unknown [10.108.42.83])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 0A93413E7D0
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 16:13:37 +0200 (CEST)
 Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
  (Authenticated sender: clg@kaod.org)
- by player715.ha.ovh.net (Postfix) with ESMTPSA id 0FB35850B757;
- Wed, 31 Jul 2019 14:12:50 +0000 (UTC)
+ by player715.ha.ovh.net (Postfix) with ESMTPSA id 8BB4E850BA64;
+ Wed, 31 Jul 2019 14:13:32 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 31 Jul 2019 16:12:16 +0200
-Message-Id: <20190731141233.1340-2-clg@kaod.org>
+Date: Wed, 31 Jul 2019 16:12:23 +0200
+Message-Id: <20190731141233.1340-9-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190731141233.1340-1-clg@kaod.org>
 References: <20190731141233.1340-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 11666856313866783718
+X-Ovh-Tracer-Id: 11678115311213186022
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrleehgdejvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.248.196
-Subject: [Qemu-devel] [PATCH v3 01/18] ppc/pnv: Introduce PowerNV machines
- with fixed CPU models
+X-Received-From: 46.105.63.230
+Subject: [Qemu-devel] [PATCH v3 08/18] ppc/pnv: Clarify how the TIMA is
+ accessed on a multichip system
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,150 +74,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the current "powernv" machine an abstract type and derive from it
-new machines with specific CPU models: power8 and power9.
+The TIMA MMIO space is shared among the chips and to identify the chip
+from which the access is being done, the PowerBUS uses a chip field in
+the load/store messages. QEMU does not model these messages, so
+instead, we extract the chip id from the CPU PIR and do a lookup at
+the machine level to fetch the targeted interrupt controller.
 
-The "powernv" machine is now an alias on the "powernv9" machine.
+Introduce pnv_get_chip() and pnv_xive_tm_get_xive() helpers to clarify
+this process in pnv_xive_get_tctx(). The latter will be removed in the
+subsequent patches but the same principle will be kept.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 63 insertions(+), 7 deletions(-)
+ include/hw/ppc/pnv.h | 13 +++++++++++++
+ hw/intc/pnv_xive.c   | 40 +++++++++++++++++++++++-----------------
+ 2 files changed, 36 insertions(+), 17 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 4570ce8afe6a..18602b9e9bcd 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -602,9 +602,20 @@ static void pnv_chip_power9_pic_print_info(PnvChip *=
-chip, Monitor *mon)
-     pnv_psi_pic_print_info(&chip9->psi, mon);
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index fb123edc4e5a..72b5cbb606b5 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -182,6 +182,19 @@ static inline bool pnv_is_power9(PnvMachineState *pn=
+v)
+     return pnv_chip_is_power9(pnv->chips[0]);
  }
 =20
-+static bool pnv_match_cpu(const char *default_type, const char *cpu_type=
-)
++static inline PnvChip *pnv_get_chip(PnvMachineState *pnv, uint32_t chip_=
+id)
 +{
-+    PowerPCCPUClass *ppc_default =3D
-+        POWERPC_CPU_CLASS(object_class_by_name(default_type));
-+    PowerPCCPUClass *ppc =3D
-+        POWERPC_CPU_CLASS(object_class_by_name(cpu_type));
++    int i;
 +
-+    return ppc_default->pvr_match(ppc_default, ppc->pvr);
++    for (i =3D 0; i < pnv->num_chips; i++) {
++        PnvChip *chip =3D pnv->chips[i];
++        if (chip->chip_id =3D=3D chip_id) {
++            return chip;
++        }
++    }
++    return NULL;
 +}
 +
- static void pnv_init(MachineState *machine)
- {
-     PnvMachineState *pnv =3D PNV_MACHINE(machine);
-+    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-     MemoryRegion *ram;
-     char *fw_filename;
-     long fw_size;
-@@ -664,13 +675,23 @@ static void pnv_init(MachineState *machine)
-         }
-     }
+ #define PNV_FDT_ADDR          0x01000000
+ #define PNV_TIMEBASE_FREQ     512000000ULL
 =20
-+    /*
-+     * Check compatibility of the specified CPU with the machine
-+     * default.
-+     */
-+    if (!pnv_match_cpu(mc->default_cpu_type, machine->cpu_type)) {
-+        error_report("invalid CPU model '%s' for %s machine",
-+                     machine->cpu_type, mc->name);
-+        exit(1);
-+    }
-+
-     /* Create the processor chips */
-     i =3D strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
-     chip_typename =3D g_strdup_printf(PNV_CHIP_TYPE_NAME("%.*s"),
-                                     i, machine->cpu_type);
-     if (!object_class_by_name(chip_typename)) {
--        error_report("invalid CPU model '%.*s' for %s machine",
--                     i, machine->cpu_type, MACHINE_GET_CLASS(machine)->n=
-ame);
-+        error_report("invalid chip model '%.*s' for %s machine",
-+                     i, machine->cpu_type, mc->name);
-         exit(1);
-     }
-=20
-@@ -1348,25 +1369,43 @@ static void pnv_machine_class_props_init(ObjectCl=
-ass *oc)
-                               NULL);
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 6f53a2abbb6a..e598857359d8 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -464,31 +464,37 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, =
+uint8_t format,
+     return count;
  }
 =20
--static void pnv_machine_class_init(ObjectClass *oc, void *data)
-+static void pnv_machine_power8_class_init(ObjectClass *oc, void *data)
++/*
++ * The TIMA MMIO space is shared among the chips and to identify the
++ * chip from which the access is being done, we extract the chip id
++ * from the PIR.
++ */
++static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
++{
++    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
++    PnvChip *chip;
++    PnvXive *xive;
++
++    chip =3D pnv_get_chip(pnv, cpu_chip_id(cpu));
++    assert(chip);
++    xive =3D &PNV9_CHIP(chip)->xive;
++
++    if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
++        xive_error(xive, "IC: CPU %x is not enabled", cpu_pir(cpu));
++    }
++    return xive;
++}
++
+ static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
  {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
-     XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-+
-+    mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER8";
-+    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-+
-+    xic->icp_get =3D pnv_icp_get;
-+    xic->ics_get =3D pnv_ics_get;
-+    xic->ics_resend =3D pnv_ics_resend;
-+}
-+
-+static void pnv_machine_power9_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER9";
-+    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
-+
-+    mc->alias =3D "powernv";
-+}
-+
-+static void pnv_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-     InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
-(oc);
+     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+-    PnvXive *xive =3D NULL;
+-    CPUPPCState *env =3D &cpu->env;
+-    int pir =3D env->spr_cb[SPR_PIR].default_value;
++    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
 =20
-     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
-     mc->init =3D pnv_init;
-     mc->reset =3D pnv_reset;
-     mc->max_cpus =3D MAX_CPUS;
--    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
-     mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
-                                       * storage */
-     mc->no_parallel =3D 1;
-     mc->default_boot_order =3D NULL;
-     mc->default_ram_size =3D 2 * GiB;
--    xic->icp_get =3D pnv_icp_get;
--    xic->ics_get =3D pnv_ics_get;
--    xic->ics_resend =3D pnv_ics_resend;
-     ispc->print_info =3D pnv_pic_print_info;
-=20
-     pnv_machine_class_props_init(oc);
-@@ -1386,10 +1425,27 @@ static void pnv_machine_class_init(ObjectClass *o=
-c, void *data)
-         .parent        =3D TYPE_PNV9_CHIP,          \
+-    /*
+-     * Perform an extra check on the HW thread enablement.
+-     *
+-     * The TIMA is shared among the chips and to identify the chip
+-     * from which the access is being done, we extract the chip id
+-     * from the PIR.
+-     */
+-    xive =3D pnv_xive_get_ic((pir >> 8) & 0xf);
+     if (!xive) {
+         return NULL;
      }
 =20
-+#define DEFINE_PNV_MACHINE_TYPE(cpu, class_initfn)      \
-+    {                                                   \
-+        .name          =3D MACHINE_TYPE_NAME(cpu),        \
-+        .parent        =3D TYPE_PNV_MACHINE,              \
-+        .instance_size =3D sizeof(PnvMachineState),       \
-+        .instance_init =3D pnv_machine_instance_init,     \
-+        .class_init    =3D class_initfn,                  \
-+        .interfaces =3D (InterfaceInfo[]) {               \
-+            { TYPE_XICS_FABRIC },                       \
-+            { TYPE_INTERRUPT_STATS_PROVIDER },          \
-+            { },                                        \
-+        },                                              \
-+    }
-+
- static const TypeInfo types[] =3D {
-+    DEFINE_PNV_MACHINE_TYPE("powernv8", pnv_machine_power8_class_init),
-+    DEFINE_PNV_MACHINE_TYPE("powernv9", pnv_machine_power9_class_init),
-     {
-         .name          =3D TYPE_PNV_MACHINE,
-         .parent        =3D TYPE_MACHINE,
-+        .abstract       =3D true,
-         .instance_size =3D sizeof(PnvMachineState),
-         .instance_init =3D pnv_machine_instance_init,
-         .class_init    =3D pnv_machine_class_init,
+-    if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) {
+-        xive_error(PNV_XIVE(xrtr), "IC: CPU %x is not enabled", pir);
+-    }
+-
+-    return tctx;
++    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+ }
+=20
+ /*
 --=20
 2.21.0
 
