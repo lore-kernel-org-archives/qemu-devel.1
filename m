@@ -4,54 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA414C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0114C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:24:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84846206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:23:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84846206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 7B102206B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:24:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B102206B8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hstG2-0002ME-Sc
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 14:23:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50639)
+	id 1hstGu-0004rs-L1
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 14:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50673)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCf-0002PD-FG
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:58 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCh-0002UW-9O
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCe-0001Hp-Ay
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:57 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43545 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCg-0001Io-5a
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:59 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:43991 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hstCe-0001HV-4g
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:56 -0400
+ id 1hstCf-0001IC-VE
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:58 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 11EC91A2252;
- Wed, 31 Jul 2019 20:19:54 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id DFEBB1A22B2;
+ Wed, 31 Jul 2019 20:19:55 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id EA4781A2217;
- Wed, 31 Jul 2019 20:19:53 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id C503B1A2217;
+ Wed, 31 Jul 2019 20:19:55 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 20:19:32 +0200
-Message-Id: <1564597178-24649-7-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 31 Jul 2019 20:19:34 +0200
+Message-Id: <1564597178-24649-9-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564597178-24649-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564597178-24649-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v4 06/12] linux-user: Add support for
- HDIO_GET_NICE and HDIO_SET_NICE ioctls
+Subject: [Qemu-devel] [PATCH for 4.2 v4 08/12] linux-user: Add support for
+ HDIO_GET_ACOUSTIC and HDIO_SET_ACOUSTIC ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,7 +70,7 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add support for HDIO_GET_NICE and HDIO_SET_NICE ioctls.
+Add support for HDIO_GET_ACOUSTIC and HDIO_SET_ACOUSTIC ioctls.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
@@ -79,42 +79,42 @@ Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
  2 files changed, 4 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 6551938..895ba35 100644
+index b54a184..c9b82eb 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -434,6 +434,7 @@
-   IOCTL(HDIO_GET_NOWERR, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(HDIO_GET_DMA, IOC_R, MK_PTR(TYPE_INT))
+@@ -436,6 +436,7 @@
    IOCTL(HDIO_GET_32BIT, IOC_R, MK_PTR(TYPE_INT))
-+  IOCTL(HDIO_GET_NICE, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(HDIO_GET_NICE, IOC_R, MK_PTR(TYPE_INT))
+   IOCTL(HDIO_GET_WCACHE, IOC_R, MK_PTR(TYPE_INT))
++  IOCTL(HDIO_GET_ACOUSTIC, IOC_R, MK_PTR(TYPE_INT))
    IOCTL(HDIO_DRIVE_CMD, IOC_R, MK_PTR(TYPE_INT))
    IOCTL(HDIO_SET_UNMASKINTR, 0, TYPE_INT)
    IOCTL(HDIO_SET_MULTCOUNT, 0, TYPE_INT)
-@@ -442,6 +443,7 @@
-   IOCTL(HDIO_SET_DMA, 0, TYPE_INT)
-   IOCTL(HDIO_SET_32BIT, 0, TYPE_INT)
+@@ -446,6 +447,7 @@
    IOCTL(HDIO_SET_PIO_MODE, 0, TYPE_INT)
-+  IOCTL(HDIO_SET_NICE, 0, TYPE_INT)
+   IOCTL(HDIO_SET_NICE, 0, TYPE_INT)
+   IOCTL(HDIO_SET_WCACHE, 0, TYPE_INT)
++  IOCTL(HDIO_SET_ACOUSTIC, 0, TYPE_INT)
  
    IOCTL(VFAT_IOCTL_READDIR_BOTH, IOC_R, MK_PTR(MK_ARRAY(MK_STRUCT(STRUCT_dirent), 2)))
    IOCTL(VFAT_IOCTL_READDIR_SHORT, IOC_R, MK_PTR(MK_ARRAY(MK_STRUCT(STRUCT_dirent), 2)))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 36256b0..4e219a1 100644
+index fb42d32..b9d1242 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -1064,6 +1064,7 @@ struct target_format_descr {
- #define TARGET_HDIO_GET_32BIT         0x0309  /* get current io_32bit setting */
- #define TARGET_HDIO_GET_NOWERR        0x030a  /* get ignore-write-error flag */
- #define TARGET_HDIO_GET_DMA           0x030b  /* get use-dma flag */
-+#define TARGET_HDIO_GET_NICE          0x030c  /* get nice flags */
+@@ -1067,6 +1067,7 @@ struct target_format_descr {
+ #define TARGET_HDIO_GET_NICE          0x030c  /* get nice flags */
  #define TARGET_HDIO_GET_IDENTITY      0x030d  /* get IDE identification info */
+ #define TARGET_HDIO_GET_WCACHE        0x030e  /* get write cache mode on|off */
++#define TARGET_HDIO_GET_ACOUSTIC      0x030f  /* get acoustic value */
  #define TARGET_HDIO_DRIVE_CMD         0x031f  /* execute a special drive command */
  
-@@ -1075,6 +1076,7 @@ struct target_format_descr {
- #define TARGET_HDIO_SET_NOWERR        0x0325  /* change ignore-write-error flag */
- #define TARGET_HDIO_SET_DMA           0x0326  /* change use-dma flag */
+ /* hd/ide ctl's that pass (arg) non-ptr values are numbered 0x032n/0x033n */
+@@ -1079,6 +1080,7 @@ struct target_format_descr {
  #define TARGET_HDIO_SET_PIO_MODE      0x0327  /* reconfig interface to new speed */
-+#define TARGET_HDIO_SET_NICE          0x0329  /* set nice flags */
+ #define TARGET_HDIO_SET_NICE          0x0329  /* set nice flags */
+ #define TARGET_HDIO_SET_WCACHE        0x032b  /* change write cache mode */
++#define TARGET_HDIO_SET_ACOUSTIC      0x032c  /* change acoustic behavior */
  
  /* loop ioctls */
  #define TARGET_LOOP_SET_FD            0x4C00
