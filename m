@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F1EC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BDFC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31A90206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3588D206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:19:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8WF5ked"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A90206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HLAQf80l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3588D206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsrJ7-0003fW-D7
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:18:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42321)
+	id 1hsrJd-0004Y8-FL
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:19:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40442)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrG5-0005pG-Nm
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:22 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hsr8m-0002AZ-9v
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrG1-00046y-OD
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:19 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42575)
+ (envelope-from <alex.bennee@linaro.org>) id 1hsr8h-0000mO-Fi
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:45 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42500)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsrFz-00045S-RN
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:17 -0400
-Received: by mail-wr1-x442.google.com with SMTP id x1so20432580wrr.9
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:14 -0700 (PDT)
+ id 1hsr8f-0000dv-6T
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:41 -0400
+Received: by mail-wr1-x441.google.com with SMTP id x1so20404052wrr.9
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:07:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=iZ2OY4t64w/OXbcRBQzkejkLpoLwcOyY1K+BIeISZRQ=;
- b=B8WF5kedwnmAyRbmvR5+KcOT2SJ+DR9KN1Rk8JrBbkevCjGkGOP8We/aCgdcDSkznJ
- GUKA5PMbnAscXFKm1Vb7eiApdJLh5uLHbp+JVMhyyrusk/Cv74O57XHXQs+5KBaMunkg
- P71HaeE9m5+2tXegJwC+uz5tdYOv59P9UOCmUsFaPXz7uIOGL+GlFqzZ+OD4sBOF7NuB
- 9c6cKCPchYRIAPd/1yfAbZ7/yj2xChydosq5blidQYKl9rP6yLHpnM+B8hFl6s6FCyp8
- Mt9IqDZGH/QeUDuXTqd4vJ3H5djZkeUbth6QdcLE4PpsoqobCQJx3xwYyFCBuwAWh5W9
- zGcA==
+ bh=uLNFFdsSuak+Uy2t3FRbExjx92r6RyqLYQAFwuvDHzw=;
+ b=HLAQf80lv0Lb/1bSS69wcmuEszlSD+YIxlbf6jVuGFw++d1bTM9wPioHO2Res0xz64
+ CzB7qmOtWf8iZWDzTb0j25GNDreDP3VXg5v+QUyQNpXz91odPYht908236wXvTIJ2q0w
+ Hyma+8H7IQO2IJJW5uFlpe3JuistRDQAnGh15BuMsJi8Ijz54lo3erWearoEJn+xaF9I
+ JPqk4f4ul+sSsL1kmGUXK+IoODkZW1zfX9cNy1GC3GSNhKYfrkMiHEjHPe/xLvIP5ZYy
+ 8+IpEtqmIGJ7AVO4tE3I18SAd3/N/rmasggBzg+MuDzkIhdaahUfUAkXLuTEH2MjhnVh
+ wAsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=iZ2OY4t64w/OXbcRBQzkejkLpoLwcOyY1K+BIeISZRQ=;
- b=Q+3gHBRAY6Clp0HDpJhoTT3qIw9RPu1LJFvvwM8lMjYOE1PzEFBCfRyhsOc9xxuETK
- 9GDFaNy+uVvQvF9weLVjO9tTUW+uaTlg70ldbp60uNlUbc3QH7T61kYx701LXe3lMF01
- kdx4xbj7NImE+SC9Sm44U0/wYFyAO1dIN8yeAjdYDU62pH8ffpnN328XwDPYjhoIYWwq
- zs0fh1QIrIo5YGCp//0Z+C3yVDxGrTlxraB/qqciICFXgpQvAe+bmA8F/0H3ixvxRivK
- kRYcQvhTY4TaUZYC6GXDfTBBMYe1iPrY7saj9lCqU5/72n6IuDcnqnOWI7U96GM5DSnl
- OgEQ==
-X-Gm-Message-State: APjAAAUl2q+epd86VSwvnN+4M2rq6O4R9GqSemw0IBw0IeikyOFzvnkb
- bL3Yw1Refit0w8Qe3S57OP6rSg==
-X-Google-Smtp-Source: APXvYqzh/tJtxvypzwg9UvgvObuGjOdn0JpB/DskkMRxmqumBUmYh2tbqyKu3J7yZT/wor2/Rt2Qig==
-X-Received: by 2002:adf:91c2:: with SMTP id 60mr81069472wri.334.1564589713784; 
- Wed, 31 Jul 2019 09:15:13 -0700 (PDT)
+ bh=uLNFFdsSuak+Uy2t3FRbExjx92r6RyqLYQAFwuvDHzw=;
+ b=cTHVkTPqBU2AzxWNIzH5N/hXHJASos4SJ6huZ0srBCD/gAubYr493gmHii0OA3EVeV
+ mqeh/WLBHR0CzCLhTW3bWkE9HiQE4R9mOa2SkGLdig6EKIg3Q922lxWNqzW1ByGcNu0y
+ B3jPu5HRekg4u8cOf6XTjtW+jTH7scYt5cugklNFUZHBPnFrSickLPIJ1SDgjDfIjvgx
+ kHbw6ccpn9hm8rJN0GGyaHtMpSkhDjKNJ5N3lxwBe+srCZDD+BUqpi6tu7+6P2Bq6szu
+ 4dwKB+Rx3Ac7ZUiTuiBNLrvRHQxZ9M/Fe669gi8t8zzdf/fN9khMFy5nRBcDOKzyYfMt
+ YurA==
+X-Gm-Message-State: APjAAAWZXHGePHIaNK9LhmdosI+Xr7W6f4zAr6mqhjYVmKEa3y1ZIHJA
+ nWnfv0KtNQct/nAKqgPzppLQYA==
+X-Google-Smtp-Source: APXvYqxtiPUqHMCXlkNYlvFTBvypJCnxo2XtuLeNGBhqTIXlO+qcEj+YcqvTNwqZqAHKI+WtAH3qrA==
+X-Received: by 2002:adf:ec8e:: with SMTP id z14mr12171241wrn.269.1564589244646; 
+ Wed, 31 Jul 2019 09:07:24 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id g2sm59980886wmh.0.2019.07.31.09.15.12
+ by smtp.gmail.com with ESMTPSA id t185sm59154541wma.11.2019.07.31.09.07.20
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 09:15:12 -0700 (PDT)
+ Wed, 31 Jul 2019 09:07:23 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9726F1FFB7;
- Wed, 31 Jul 2019 17:07:22 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id DD0A51FF92;
+ Wed, 31 Jul 2019 17:07:19 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 17:06:58 +0100
-Message-Id: <20190731160719.11396-34-alex.bennee@linaro.org>
+Date: Wed, 31 Jul 2019 17:06:30 +0100
+Message-Id: <20190731160719.11396-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190731160719.11396-1-alex.bennee@linaro.org>
 References: <20190731160719.11396-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v4 33/54] target/sh4: fetch code with
- translator_ld
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH v4 05/54] includes: remove stale [smp|max]_cpus
+ externs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,53 +97,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- aaron@os.amperecomputing.com, cota@braap.org, bobby.prani@gmail.com,
+Cc: bobby.prani@gmail.com, cota@braap.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+ aaron@os.amperecomputing.com, Like Xu <like.xu@linux.intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Emilio G. Cota" <cota@braap.org>
+Commit a5e0b3311 removed these in favour of querying machine
+properties. Remove the extern declarations as well.
 
-There is a small wrinkle with the gUSA instruction. The translator
-effectively treats a (known) gUSA sequence as a single instruction.
-For the purposes of the plugin we end up with a long multi-instruction
-qemu_plugin_insn.
-
-If the known sequence isn't detected we shall never run this
-translation anyway.
-
-Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Like Xu <like.xu@linux.intel.com>
+Message-Id: <20190711130546.18578-1-alex.bennee@linaro.org>
 ---
- target/sh4/translate.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/sysemu/sysemu.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 5a7d8c45355..922785e225e 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -1917,7 +1917,7 @@ static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
- 
-     /* Read all of the insns for the region.  */
-     for (i = 0; i < max_insns; ++i) {
--        insns[i] = cpu_lduw_code(env, pc + i * 2);
-+        insns[i] = translator_lduw(env, pc + i * 2);
-     }
- 
-     ld_adr = ld_dst = ld_mop = -1;
-@@ -2332,7 +2332,7 @@ static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     }
- #endif
- 
--    ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
-+    ctx->opcode = translator_lduw(env, ctx->base.pc_next);
-     decode_opc(ctx);
-     ctx->base.pc_next += 2;
- }
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 984c439ac96..e70edf7c1cf 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -103,8 +103,6 @@ extern const char *keyboard_layout;
+ extern int win2k_install_hack;
+ extern int alt_grab;
+ extern int ctrl_grab;
+-extern int smp_cpus;
+-extern unsigned int max_cpus;
+ extern int cursor_hide;
+ extern int graphic_rotate;
+ extern int no_quit;
 -- 
 2.20.1
 
