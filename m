@@ -2,94 +2,63 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF72C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 17:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E65C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 17:45:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3512320679
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 17:36:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A+OiYnMy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3512320679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id CFFFA2067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 17:45:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFFFA2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hssWS-0003or-AI
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 13:36:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36964)
+	id 1hssfO-0006qK-RC
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 13:45:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39006)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hssW3-0003EX-HW
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 13:35:56 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hsset-0006RL-93
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 13:45:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hssW2-000794-Li
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 13:35:55 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36932)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hssW2-00078E-EG
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 13:35:54 -0400
-Received: by mail-pg1-x542.google.com with SMTP id i70so21652284pgd.4
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 10:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=JprkFZG+B7lsQyizGQWAjBZCNRt08yRpbp4jzY2Xmw8=;
- b=A+OiYnMyEJiJgxJajenHptTJyg9iXXiPXxKNnKx1J1qXjv8RBwpV2MSJHNwvdux6Er
- 3swA6XW+h1AJIGEH5KrBeifG3XGCt4gIpzku+dSCKTIjIlo3s6rV1dIg0hF2ZsdceNAn
- VCDZmVm/GmxyA2bUnhsU+nWLSZPLfBY/YAFQWB2m9p6iYgOu/3j96LdYnLLUyTQU89OP
- ME1GFFG2ITks3MqXa6zRlK6rkVEmiH2kvC+KmTAO6cmjQHSWX3c1vpgXPdho3wc2X96b
- gq67UWKXq0fFEx+oMtT+1msReMOAmyAChwHE4ZfXLpXhAlAvCGK99FHtajRXQ1glwzf4
- q64g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JprkFZG+B7lsQyizGQWAjBZCNRt08yRpbp4jzY2Xmw8=;
- b=p4TcrKkoNiOWJMmiBDS+9hirFmYJbjF2eadN7nlYLAFnRQfJ9zONNnSZ0ctuHBaTcR
- 4YlWoGvf9od5YkYP9GdOfKi5loOmtSbLFvoSlDV9CphsVhFo8ae/vQW2bnwfiAQ6Qtb3
- xExHGAzmTeH5BA9B5hcMtEk60GQPsmxFVCUZKVu3mgIVpiGeXQCG1ouYmog8e4RxhUAr
- qdaUf+yCAjvMEHvPXNQlB8pZj9WasBSizIZxR5b/rlJjvguuuZiuPJF+EzZqa5nvNsBq
- kJZuot3RP0+BspR7SZLbBtojCpXzw2auGkE0n7LJhOI3Aii137r1QpDMYxLmqQF/mHz/
- HqFw==
-X-Gm-Message-State: APjAAAWgqLr7QmnCagFb07umgBefT7Sqsxfd14gQUtSF0ezAuStDJVdZ
- Y6FjALcjKSBFxlQs2ufPOiec6Q==
-X-Google-Smtp-Source: APXvYqxYERyQfQCpRFNnk7YcRP24HtAq0RkMTNUCFiGZ/xjUV1rhsm0cKWFyoIf9EasFiz2BtZNjyg==
-X-Received: by 2002:a63:d23:: with SMTP id c35mr114266663pgl.376.1564594552770; 
- Wed, 31 Jul 2019 10:35:52 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id j5sm60150622pgp.59.2019.07.31.10.35.51
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 31 Jul 2019 10:35:51 -0700 (PDT)
-To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
- <Alistair.Francis@wdc.com>, Palmer Dabbelt <palmer@sifive.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- QEMU devel <qemu-devel@nongnu.org>, QEMU riscv <qemu-riscv@nongnu.org>
-References: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <581a0284-c658-265f-1b0f-6f4be5406cee@linaro.org>
-Date: Wed, 31 Jul 2019 10:35:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <dgilbert@redhat.com>) id 1hsses-0003V9-3S
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 13:45:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40306)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hsser-0003Uh-SD
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 13:45:02 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AB79330A7C6D
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 17:45:00 +0000 (UTC)
+Received: from work-vm (ovpn-116-252.ams2.redhat.com [10.36.116.252])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E20119C65;
+ Wed, 31 Jul 2019 17:44:55 +0000 (UTC)
+Date: Wed, 31 Jul 2019 18:44:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190731174452.GL3203@work-vm>
+References: <20190726091103.23503-1-stefanha@redhat.com>
+ <20190726091103.23503-6-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: Re: [Qemu-devel] [PATCH] riscv: rv32: Root page table address can
- be larger than 32-bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190726091103.23503-6-stefanha@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 31 Jul 2019 17:45:00 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/5] virtiofsd: prevent races with
+ lo_dirp_put()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,25 +70,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/31/19 5:45 AM, Bin Meng wrote:
-> -    target_ulong base;
-> +    hwaddr base;
-...
-> -        target_ulong pte_addr = base + idx * ptesize;
-> +        hwaddr pte_addr = base + idx * ptesize;
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> Introduce lo_dirp_put() so that FUSE_RELEASEDIR does not cause
+> use-after-free races with other threads that are accessing lo_dirp.
+> 
+> Also make lo_releasedir() atomic to prevent FUSE_RELEASEDIR racing with
+> itself.  This prevents double-frees.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  contrib/virtiofsd/passthrough_ll.c | 42 +++++++++++++++++++++++++-----
+>  1 file changed, 36 insertions(+), 6 deletions(-)
+> 
+> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
+> index ad3abdd532..f74e7d2d21 100644
+> --- a/contrib/virtiofsd/passthrough_ll.c
+> +++ b/contrib/virtiofsd/passthrough_ll.c
+> @@ -1293,11 +1293,28 @@ static void lo_readlink(fuse_req_t req, fuse_ino_t ino)
+>  }
+>  
+>  struct lo_dirp {
+> +	gint refcount;
+>  	DIR *dp;
+>  	struct dirent *entry;
+>  	off_t offset;
+>  };
+>  
+> +static void lo_dirp_put(struct lo_dirp **dp)
+> +{
+> +	struct lo_dirp *d = *dp;
+> +
+> +	if (!d) {
+> +		return;
+> +	}
+> +	*dp = NULL;
+> +
+> +	if (g_atomic_int_dec_and_test(&d->refcount)) {
+> +		closedir(d->dp);
+> +		free(d);
+> +	}
+> +}
+> +
+> +/* Call lo_dirp_put() on the return value when no longer needed */
+>  static struct lo_dirp *lo_dirp(fuse_req_t req, struct fuse_file_info *fi)
+>  {
+>  	struct lo_data *lo = lo_data(req);
+> @@ -1305,6 +1322,9 @@ static struct lo_dirp *lo_dirp(fuse_req_t req, struct fuse_file_info *fi)
+>  
+>  	pthread_mutex_lock(&lo->mutex);
+>  	elem = lo_map_get(&lo->dirp_map, fi->fh);
+> +	if (elem) {
+> +		g_atomic_int_inc(&elem->dirp->refcount);
 
-I believe that you either need
+I don't understand what protects against reading the elem->dirp
+here at the same time it's free'd by lo_releasedir's call to lo_dirp_put
 
-    base + (hwaddr)idx * ptesize
+> +	}
+>  	pthread_mutex_unlock(&lo->mutex);
+>  	if (!elem)
+>  		return NULL;
+> @@ -1335,6 +1355,8 @@ static void lo_opendir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi
+>  	d->offset = 0;
+>  	d->entry = NULL;
+>  
+> +	g_atomic_int_set(&d->refcount, 1); /* paired with lo_releasedir() */
+> +
+>  	fh = lo_add_dirp_mapping(req, d);
+>  	if (fh == -1)
+>  		goto out_err;
+> @@ -1363,7 +1385,7 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
+>  			  off_t offset, struct fuse_file_info *fi, int plus)
+>  {
+>  	struct lo_data *lo = lo_data(req);
+> -	struct lo_dirp *d;
+> +	struct lo_dirp *d = NULL;
+>  	struct lo_inode *dinode;
+>  	char *buf = NULL;
+>  	char *p;
+> @@ -1451,6 +1473,8 @@ static void lo_do_readdir(fuse_req_t req, fuse_ino_t ino, size_t size,
+>  
+>      err = 0;
+>  error:
+> +    lo_dirp_put(&d);
+> +
+>      // If there's an error, we can only signal it if we haven't stored
+>      // any entries yet - otherwise we'd end up with wrong lookup
+>      // counts for the entries that are already in the buffer. So we
+> @@ -1477,22 +1501,25 @@ static void lo_readdirplus(fuse_req_t req, fuse_ino_t ino, size_t size,
+>  static void lo_releasedir(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi)
+>  {
+>  	struct lo_data *lo = lo_data(req);
+> +	struct lo_map_elem *elem;
+>  	struct lo_dirp *d;
+>  
+>  	(void) ino;
+>  
+> -	d = lo_dirp(req, fi);
+> -	if (!d) {
+> +	pthread_mutex_lock(&lo->mutex);
+> +	elem = lo_map_get(&lo->dirp_map, fi->fh);
+> +	if (!elem) {
+> +		pthread_mutex_unlock(&lo->mutex);
+>  		fuse_reply_err(req, EBADF);
+>  		return;
+>  	}
+>  
+> -	pthread_mutex_lock(&lo->mutex);
+> +	d = elem->dirp;
+>  	lo_map_remove(&lo->dirp_map, fi->fh);
+>  	pthread_mutex_unlock(&lo->mutex);
+>  
+> -	closedir(d->dp);
+> -	free(d);
+> +	lo_dirp_put(&d); /* paired with lo_opendir() */
 
-or change the type of idx to hwaddr above.
+Is the &d really what's intended? That's the local stack variable, so
+lo_dirp_put will set that local to NULL rather than the elem->dirp wont
+it?
 
-Otherwise the multiply overflows before it gets promoted with the add.
+Dave
 
-
-r~
+> +
+>  	fuse_reply_err(req, 0);
+>  }
+>  
+> @@ -1701,6 +1728,9 @@ static void lo_fsyncdir(fuse_req_t req, fuse_ino_t ino, int datasync,
+>  		res = fdatasync(fd);
+>  	else
+>  		res = fsync(fd);
+> +
+> +	lo_dirp_put(&d);
+> +
+>  	fuse_reply_err(req, res == -1 ? errno : 0);
+>  }
+>  
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
