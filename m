@@ -2,63 +2,112 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D3DC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9722FC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F6B0206A2
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:39:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WqRcYF0I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F6B0206A2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 71F8F206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:41:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F8F206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsk98-00020C-Ib
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 04:39:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44672)
+	id 1hskAT-00034F-N9
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 04:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45094)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hsk8i-0001ZL-Sl
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 04:39:18 -0400
+ (envelope-from <thuth@redhat.com>) id 1hsk9u-0002da-NX
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 04:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hsk8h-00017J-Ga
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 04:39:16 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53593 helo=ozlabs.org)
+ (envelope-from <thuth@redhat.com>) id 1hsk9t-0002SL-PC
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 04:40:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hsk8g-00015m-Fb; Wed, 31 Jul 2019 04:39:15 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 45z6KW07mNz9sMr; Wed, 31 Jul 2019 18:39:10 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1564562351;
- bh=yaz6AHd28OiPBZovYbxmRxDST0fRnDH8y1p+nF7nfzA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=WqRcYF0IL3zDyafRanNIzdX3re2d/H27U0UDObdDzRVdOpyOUVQG/XMadj+gKUpSG
- uiOnK7q40wmjbKkOh6tIlKAN7UQgHC9VRUkGyUw37Lxu+qpaUymNq/gUtUxyXFtf2T
- 9UDZ9MwNmORQpAtUHICVLwKHe10Xokxu1S6WIZrM=
-Date: Wed, 31 Jul 2019 16:51:20 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Paul Mackerras <paulus@ozlabs.org>
-Message-ID: <20190731065120.GH2032@umbus.fritz.box>
-References: <20190731043653.shdi5sizjp4t65op@oak.ozlabs.ibm.com>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hsk9t-0002S3-HR
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 04:40:29 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B4245C049E32;
+ Wed, 31 Jul 2019 08:40:28 +0000 (UTC)
+Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7D2E95D9E5;
+ Wed, 31 Jul 2019 08:40:27 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20190726120542.9894-1-armbru@redhat.com>
+ <20190726120542.9894-24-armbru@redhat.com>
+ <20190729194414.GG4313@habkost.net> <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
+ <8bea0201-f796-d682-22e6-069985b45523@redhat.com>
+ <0eb2518f-147c-2b47-f48c-3af26bf5d264@redhat.com>
+ <87zhku90bd.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; keydata=
+ xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
+ aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
+ gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
+ I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
+ ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
+ ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
+ 6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
+ NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
+ l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
+ xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
+ ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
+ gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
+ TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
+ eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
+ 2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
+ x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
+ yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
+ /1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
+ iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
+ 6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
+ VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
+ gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
+ TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
+ p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
+ JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
+ 0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
+ ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
+ lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
+ ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
+ g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
+ rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
+ WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
+Organization: Red Hat
+Message-ID: <54711eb6-4d87-665a-c95a-749ee125b7c9@redhat.com>
+Date: Wed, 31 Jul 2019 10:40:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ik0NlRzMGhMnxrMX"
-Content-Disposition: inline
-In-Reply-To: <20190731043653.shdi5sizjp4t65op@oak.ozlabs.ibm.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+In-Reply-To: <87zhku90bd.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Wed, 31 Jul 2019 08:40:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] spapr: Implement better workaround in
- spapr-vty device
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] When to use qemu/typedefs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,119 +119,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 31/07/2019 08.37, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 30/07/19 15:15, Eric Blake wrote:
+>>>> We occasionally give up and use types directly rather than their typedef
+>>>> names, flouting the coding style.  This patch does.  Trades messing with
+>>>> qemu/typedefs.h for having to write 'struct' a few times.
+>>
+>> I think Markus made the right call here.  Using "struct Foo;" in headers
+>> is a null price to pay if all you need is declaring a pointer-typed
+>> field or parameter.
+> 
+> Eduardo posted a patch to HACKING to clarify this non-usage of typedef
+> is okay.
+> 
+> Should we continue to mandate typedef names elsewhere?  It adds
+> cognitive load: you have to decide where to put the typedef, and when
+> not to use it.
 
---ik0NlRzMGhMnxrMX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+IMHO we should get rid of mandating typedefs. They are causing too much
+trouble - e.g. do you also remember the issues with duplicated typedefs
+in certain compiler versions in the past? (these should be hopefully
+gone now, but still...)
 
-On Wed, Jul 31, 2019 at 02:36:54PM +1000, Paul Mackerras wrote:
-> Linux guest kernels have code which scans the string of characters
-> returned from the H_GET_TERM_CHAR hypercall and removes any \0
-> character which comes immediately after a \r character.  This is to
-> work around a bug which was present in some ancient versions of
-> PowerVM.  In order to avoid the corruption of the console byte stream
-> that this introduced, commit 6c3bc244d3cb ("spapr: Implement bug in
-> spapr-vty device to be compatible with PowerVM") added a workaround
-> which adds a \0 character after every \r character.  Unfortunately,
-> this corrupts the console byte stream for those operating systems,
-> such as AIX, which don't remove the null bytes.
->=20
-> We can avoid triggering the Linux kernel workaround if we avoid
-> returning a buffer which contains a \0 after a \r.  We can do that by
-> breaking out of the loop in vty_getchars() if we are about to insert a
-> \0 and the previous character in the buffer is a \r.  That means we
-> return the characters up to the \r for the current H_GET_TERM_CHAR,
-> and the characters starting with the \0 for the next one.
->=20
-> With this workaround, we don't insert any spurious characters and we
-> avoid triggering the Linux kernel workaround, so the guest will
-> receive an uncorrupted stream whether or not they have the workaround.
->=20
-> Fixes: 6c3bc244d3cb ("spapr: Implement bug in spapr-vty device to be comp=
-atible with PowerVM")
-> Signed-off-by: Paul Mackerras <paulus@ozlabs.org>
+And many QEMU developers are also working on the Linux kernel, which
+rather forbids typedefs. Having to switch your mind back and forth
+whether to use typedefs or not is really annoying.
 
-Applied to ppc-for-4.2, thanks.
+So if you ask me, stop mandating it! It's ok as optional feature in QEMU
+for types that are used all over the place, but we really should not
+enforce it for each and every struct anymore.
 
-> ---
->  hw/char/spapr_vty.c | 30 ++++++++++++------------------
->  1 file changed, 12 insertions(+), 18 deletions(-)
->=20
-> diff --git a/hw/char/spapr_vty.c b/hw/char/spapr_vty.c
-> index 617303dbaf..65a7c2ffbd 100644
-> --- a/hw/char/spapr_vty.c
-> +++ b/hw/char/spapr_vty.c
-> @@ -57,25 +57,19 @@ static int vty_getchars(SpaprVioDevice *sdev, uint8_t=
- *buf, int max)
->      int n =3D 0;
-> =20
->      while ((n < max) && (dev->out !=3D dev->in)) {
-> -        buf[n++] =3D dev->buf[dev->out++ % VTERM_BUFSIZE];
-> -
-> -        /* PowerVM's vty implementation has a bug where it inserts a
-> -         * \0 after every \r going to the guest.  Existing guests have
-> -         * a workaround for this which removes every \0 immediately
-> -         * following a \r, so here we make ourselves bug-for-bug
-> -         * compatible, so that the guest won't drop a real \0-after-\r
-> -         * that happens to occur in a binary stream. */
-> -        if (buf[n - 1] =3D=3D '\r') {
-> -            if (n < max) {
-> -                buf[n++] =3D '\0';
-> -            } else {
-> -                /* No room for the extra \0, roll back and try again
-> -                 * next time */
-> -                dev->out--;
-> -                n--;
-> -                break;
-> -            }
-> +        /*
-> +         * Long ago, PowerVM's vty implementation had a bug where it
-> +         * inserted a \0 after every \r going to the guest.  Existing
-> +         * guests have a workaround for this which removes every \0
-> +         * immediately following a \r.  To avoid triggering this
-> +         * workaround, we stop before inserting a \0 if the preceding
-> +         * character in the output buffer is a \r.
-> +         */
-> +        if (n > 0 && (buf[n - 1] =3D=3D '\r') &&
-> +                (dev->buf[dev->out % VTERM_BUFSIZE] =3D=3D '\0')) {
-> +            break;
->          }
-> +        buf[n++] =3D dev->buf[dev->out++ % VTERM_BUFSIZE];
->      }
-> =20
->      qemu_chr_fe_accept_input(&dev->chardev);
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---ik0NlRzMGhMnxrMX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1BOmUACgkQbDjKyiDZ
-s5Jtlg/+JUBOQciG/JNIvUuFVoNgE/1U4l4PVvdbPG/m8oleds/HHLmvWtDO0KIX
-6C0/7phc4rwbK5Qd5Mln2sdoEHtocT3SfFB9YiGiCH/GsxtRjoxnqeIxpMDhiDLk
-Ovam0mcGXFDotiF0UhOCmoFha6hVczPe0NtSyMign+elSCGvBkyDzWKQYxMHgOsb
-g2zp+uf/pqWRbGK6YZ6/lfUPc3GMHCJ6NLJSpTKHPwRvsP5r6w9SXwkdrnFB3MsV
-99Jbw7PDisq9e1szZdfw/k10JZYBUWL6ZJik/aeSsGcw6HFXKvk++5vWqErfe6Xn
-UNne9H+i0gwred9jwh6R+ej9hshoOTnNFKTR219zG3C6RhKUSOrVSixCvJFsPj5P
-sHg+hDe8RwaH1Mm0gKMwe0Dtab2dBT3FkrSIfrO1u5b4tMcEPQzsuU4Eyx/wDSxh
-vzxOPLEZMa4JQIxdo1aWjD3L2si3T7Ln/Xw7j1EZ72IZfoaLM2RJ6DKZCFeGtC1C
-LTiQUU7rvkT9QY499FBRWMEVzNDrMICN18jcy7GyanxqMmdo2C81tAS2oz/YgST/
-mVisxZLPaOo+q56LrvnDxpWSDjmfXgTYARAFfzbILlSNS+sfz+5Vx4gS7WNZpmLu
-9wnotiXYuIbooB7k2k93xRA6Q5dICvE2xcvspewGs6ylRpjxNns=
-=HQ3O
------END PGP SIGNATURE-----
-
---ik0NlRzMGhMnxrMX--
+ Thomas
 
