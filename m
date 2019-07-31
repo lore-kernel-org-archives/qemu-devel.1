@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 891EDC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD7DC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:36:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 519D2206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:36:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16590206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:36:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mdUmVcay"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 519D2206A3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MXEoMv3p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16590206A3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38309 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsiDs-0000Mn-FO
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 02:36:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46724)
+	id 1hsiEC-00015U-Cy
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 02:36:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47188)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hsiBe-0003bX-2X
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:11 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hsiBm-0003ph-N8
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hsiBa-00019G-TJ
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:09 -0400
-Received: from ozlabs.org ([203.11.71.1]:45971)
+ (envelope-from <dgibson@ozlabs.org>) id 1hsiBj-0001ML-S5
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:34:18 -0400
+Received: from ozlabs.org ([203.11.71.1]:58429)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hsiBL-00086J-0A; Wed, 31 Jul 2019 02:33:52 -0400
+ id 1hsiBQ-0000KO-GW; Wed, 31 Jul 2019 02:33:57 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 45z3Xk4z4Vz9sMr; Wed, 31 Jul 2019 16:33:42 +1000 (AEST)
+ id 45z3Xl0T85z9sN6; Wed, 31 Jul 2019 16:33:42 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1564554822;
- bh=GwcyTEln1jYY3LzdIKE7lFauBXJ4alh9w5AgOOIslmY=;
+ d=gibson.dropbear.id.au; s=201602; t=1564554823;
+ bh=lhKFUlcqXUWUHnuDUXNCadW3btjJUEJeC4/cXTJe+QQ=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=mdUmVcayDTPOQJ0fRDdXpq07sFs/VI6Ah4Uo+/PP8sWRpgyCM97Icb1vPHK2iikzx
- u2ETDgtGXKSwl2hctvz3giC2d7AhEkkmLO2kjGI7oaHHoERT2l4rTiJfFmyJfIzDHy
- y8x07Qzwvq+UuMLfN1TRAZHmnWVKIPkzk4PZFbUA=
-Date: Wed, 31 Jul 2019 16:11:08 +1000
+ b=MXEoMv3pI5bb7Qoy8jD2Zt1dE9bZVikz1JUiatW+QDy2GxSv3LxsTsCyXxrXMzD47
+ bGAGcGj2JQzxKhd7ARSNs3SSOANmr5b9m0kxFNVpVpwzx/t0yxnyd7wFDhcmAYUsLz
+ fnUTMn+791Yst2sBlHD/GQcY5Q2CBcKiIalpAIAM=
+Date: Wed, 31 Jul 2019 16:30:44 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <20190731061108.GF2032@umbus.fritz.box>
+Message-ID: <20190731063044.GG2032@umbus.fritz.box>
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-9-damien.hedde@greensocs.com>
+ <20190729145654.14644-10-damien.hedde@greensocs.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gdTfX7fkYsEEjebm"
+ protocol="application/pgp-signature"; boundary="gm5TwAJMO0F2iVRz"
 Content-Disposition: inline
-In-Reply-To: <20190729145654.14644-9-damien.hedde@greensocs.com>
+In-Reply-To: <20190729145654.14644-10-damien.hedde@greensocs.com>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH v3 08/33] Add function to control reset
- with gpio inputs
+Subject: Re: [Qemu-devel] [PATCH v3 09/33] add doc about Resettable interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,250 +84,226 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---gdTfX7fkYsEEjebm
+--gm5TwAJMO0F2iVRz
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2019 at 04:56:29PM +0200, Damien Hedde wrote:
-> It adds the possibility to add 2 gpios to control the warm and cold reset.
-> With theses ios, the reset can be maintained during some time.
-> Each io is associated with a state to detect level changes.
->=20
-> Vmstate subsections are also added to the existsing device_reset
-> subsection.
-
-This doesn't seem like a thing that should be present on every single
-DeviceState.
-
->=20
+On Mon, Jul 29, 2019 at 04:56:30PM +0200, Damien Hedde wrote:
 > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 > ---
->  hw/core/qdev-vmstate.c | 15 ++++++++++
->  hw/core/qdev.c         | 65 ++++++++++++++++++++++++++++++++++++++++++
->  include/hw/qdev-core.h | 57 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 137 insertions(+)
+>  docs/devel/reset.txt | 165 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 165 insertions(+)
+>  create mode 100644 docs/devel/reset.txt
 >=20
-> diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
-> index 24f8465c61..72f84c6cee 100644
-> --- a/hw/core/qdev-vmstate.c
-> +++ b/hw/core/qdev-vmstate.c
-> @@ -24,10 +24,23 @@ static int device_vmstate_reset_post_load(void *opaqu=
-e, int version_id)
->  {
->      DeviceState *dev =3D (DeviceState *) opaque;
->      BusState *bus;
-> +    uint32_t io_count =3D 0;
+> diff --git a/docs/devel/reset.txt b/docs/devel/reset.txt
+> new file mode 100644
+> index 0000000000..c7a1eb068f
+> --- /dev/null
+> +++ b/docs/devel/reset.txt
+> @@ -0,0 +1,165 @@
 > +
->      QLIST_FOREACH(bus, &dev->child_bus, sibling) {
->          bus->resetting =3D dev->resetting;
->          bus->reset_is_cold =3D dev->reset_is_cold;
->      }
+> +=3D=3D=3D=3D=3D
+> +Reset
+> +=3D=3D=3D=3D=3D
 > +
-> +    if (dev->cold_reset_input.state) {
-> +        io_count +=3D 1;
-> +    }
-> +    if (dev->warm_reset_input.state) {
-> +        io_count +=3D 1;
-> +    }
-> +    /* ensure resetting count is coherent with io states */
-> +    if (dev->resetting < io_count) {
-> +        return -1;
-> +    }
->      return 0;
->  }
-> =20
-> @@ -40,6 +53,8 @@ const struct VMStateDescription device_vmstate_reset =
-=3D {
->      .fields =3D (VMStateField[]) {
->          VMSTATE_UINT32(resetting, DeviceState),
->          VMSTATE_BOOL(reset_is_cold, DeviceState),
-> +        VMSTATE_BOOL(cold_reset_input.state, DeviceState),
-> +        VMSTATE_BOOL(warm_reset_input.state, DeviceState),
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 88387d3743..11a4de55ea 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -450,6 +450,67 @@ void qdev_init_gpio_in(DeviceState *dev, qemu_irq_ha=
-ndler handler, int n)
->      qdev_init_gpio_in_named(dev, handler, NULL, n);
->  }
-> =20
-> +static DeviceResetInputState *device_get_reset_input_state(DeviceState *=
-dev,
-> +                                                            bool cold)
-> +{
-> +    return cold ? &dev->cold_reset_input : &dev->warm_reset_input;
-> +}
+> +The reset of qemu objects is handled using the Resettable interface decl=
+ared
+> +in *include/hw/resettable.h*.
+> +As of now DeviceClass and BusClass implement this interface.
 > +
-> +static void device_reset_handler(DeviceState *dev, bool cold, bool level)
-> +{
-> +    DeviceResetInputState *dris =3D device_get_reset_input_state(dev, co=
-ld);
 > +
-> +    if (dris->type =3D=3D DEVICE_RESET_ACTIVE_LOW) {
-> +        level =3D !level;
-> +    }
+> +Triggering reset
+> +----------------
 > +
-> +    if (dris->state =3D=3D level) {
-> +        /* io state has not changed */
-> +        return;
-> +    }
+> +The function *resettable_reset* is used to trigger a reset on a given
+> +object.
+> +void resettable_reset(Object *obj, bool cold)
 > +
-> +    dris->state =3D level;
+> +The parameter *obj* must implement the Resettable interface.
+
+And what happens if it doesn't?  This function has no way to report an
+error.
+
+> +The parameter *cold* is a boolean specifying whether to do a cold or warm
+> +reset
+
+This doc really needs to explain the distinction between cold and warm
+reset.
+
+> +For Devices and Buses there is also the corresponding helpers:
+> +void device_reset(Device *dev, bool cold)
+> +void bus_reset(Device *dev, bool cold)
+
+What's the semantic difference between resetting a bus and resetting
+the bridge device which owns it?
+
+> +If one wants to put an object into a reset state. There is the
+> +*resettable_assert_reset* function.
+> +void resettable_assert_reset(Object *obj, bool cold)
 > +
-> +    if (level) {
-> +        resettable_assert_reset(OBJECT(dev), cold);
-> +    } else {
-> +        resettable_deassert_reset(OBJECT(dev));
-> +    }
-> +}
+> +One must eventually call the function *resettable_deassert_reset* to end=
+ the
+> +reset state:
+> +void resettable_deassert_reset(Object *obj, bool cold)
 > +
-> +static void device_cold_reset_handler(void *opaque, int n, int level)
-> +{
-> +    device_reset_handler((DeviceState *) opaque, true, level);
-> +}
+> +Calling *resettable_assert_reset* then *resettable_deassert_reset* is the
+> +same as calling *resettable_reset*.
 > +
-> +static void device_warm_reset_handler(void *opaque, int n, int level)
-> +{
-> +    device_reset_handler((DeviceState *) opaque, false, level);
-> +}
+> +It is possible to interleave multiple calls to
+> + - resettable_reset,
+> + - resettable_assert_reset, and
+> + - resettable_deassert_reset.
+> +The only constraint is that *resettable_deassert_reset* must be called o=
+nce
+> +per *resettable_assert_reset* call so that the object leaves the reset s=
+tate.
 > +
-> +void qdev_init_reset_gpio_in_named(DeviceState *dev, const char *name,
-> +                                   bool cold, DeviceResetActiveType type)
-> +{
-> +    DeviceResetInputState *dris =3D device_get_reset_input_state(dev, co=
-ld);
-> +    qemu_irq_handler handler;
+> +Therefore there may be several reset sources/controllers of a given obje=
+ct.
+> +The interface handle everything and the controllers do not need to know
+> +anything about each others. The object will leave reset state only when =
+all
+> +controllers released their reset.
 > +
-> +    switch (type) {
-> +    case DEVICE_RESET_ACTIVE_LOW:
-> +    case DEVICE_RESET_ACTIVE_HIGH:
-> +        break;
-> +    default:
-> +        assert(false);
-> +        break;
-> +    }
+> +All theses functions must called while holding the iothread lock.
 > +
-> +    assert(!dris->exists);
-> +    dris->exists =3D true;
-> +    dris->type =3D type;
 > +
-> +    handler =3D cold ? device_cold_reset_handler : device_warm_reset_han=
-dler;
-> +    qdev_init_gpio_in_named(dev, handler, name, 1);
-> +}
+> +Implementing reset for a Resettable object : Multi-phase reset
+> +--------------------------------------------------------------
 > +
->  void qdev_init_gpio_out_named(DeviceState *dev, qemu_irq *pins,
->                                const char *name, int n)
->  {
-> @@ -1007,6 +1068,10 @@ static void device_initfn(Object *obj)
->      dev->instance_id_alias =3D -1;
->      dev->realized =3D false;
->      dev->resetting =3D 0;
-> +    dev->cold_reset_input.exists =3D false;
-> +    dev->cold_reset_input.state =3D false;
-> +    dev->warm_reset_input.exists =3D false;
-> +    dev->warm_reset_input.state =3D false;
-> =20
->      object_property_add_bool(obj, "realized",
->                               device_get_realized, device_set_realized, N=
-ULL);
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 926d4bbcb1..f724ddc8f4 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -136,6 +136,23 @@ struct NamedGPIOList {
->      QLIST_ENTRY(NamedGPIOList) node;
->  };
-> =20
+> +The Resettable uses a multi-phase mechanism to handle some ordering cons=
+traints
+> +when resetting multiple object at the same time. For a given object the =
+reset
+> +procedure is split into three different phases executed in order:
+> + 1 INIT: This phase should set/reset the state of the Resettable it has =
+when is
+> +         in reset state. Side-effects to others object is forbidden (suc=
+h as
+> +         setting IO level).
+> + 2 HOLD: This phase corresponds to the external side-effects due to stay=
+ing into
+> +         the reset state.
+> + 3 EXIT: This phase corresponds to leaving the reset state. It have both
+> +         local and external effects.
+> +
+> +*resettable_assert_reset* does the INIT and HOLD phases. While
+> +*resettable_deassert_reset* does the EXIT phase.
+> +
+> +When resetting multiple object at the same time. The interface executes =
+the
+> +given phase of the objects before going to the next phase. This guarante=
+e that
+> +all INIT phases are done before any HOLD phase and so on.
+> +
+> +There is three methods in the interface so must be implemented in an obj=
+ect.
+> +The methods corresponds to the three phases:
+> +```
+> +typedef void (*ResettableInitPhase)(Object *obj);
+> +typedef void (*ResettableHoldPhase)(Object *obj);
+> +typedef void (*ResettableExitPhase)(Object *obj);
+> +typedef struct ResettableClass {
+> +    InterfaceClass parent_class;
+> +
+> +    struct ResettablePhases {
+> +        ResettableInitPhase init;
+> +        ResettableHoldPhase hold;
+> +        ResettableExitPhase exit;
+> +    } phases;
+> +    [...]
+> +} ResettableClass;
+> +```
+> +
+> +Theses methods should be updated when specializing an object. For this t=
+he
+> +helper function *resettable_class_set_parent_reset_phases* can be used to
+> +backup parent methods while changing the specialized ones.
+> +void resettable_class_set_parent_reset_phases(ResettableClass *rc,
+> +                                              ResettableInitPhase init,
+> +                                              ResettableHoldPhase hold,
+> +                                              ResettableExitPhase exit,
+> +
+> +For Devices and Buses, some helper exists to know if a device/bus is und=
+er
+> +reset and what type of reset it is:
+> +```
+> +bool device_is_resetting(DeviceState *dev);
+> +bool device_is_reset_cold(DeviceState *dev);
+
+It's not really clear to me when *_is_reset_cold() would be useful.
+
+> +bool bus_is_resetting(BusState *bus);
+> +bool bus_is_reset_cold(BusState *bus);
+> +```
+> +
+> +
+> +Implementing the base Resettable behavior : Re-entrance, Hierarchy and C=
+old/Warm
+> +------------------------------------------------------------------------=
+--------
+> +
+> +There is five others methods in the interface to handle the base mechani=
+cs
+> +of the Resettable interface. The methods should be implemented in object
+> +base class. DeviceClass and BusClass implement them.
+> +
+> +```
+> +typedef bool (*ResettableSetCold)(Object *obj, bool cold);
+> +typedef bool (*ResettableSetHoldNeeded)(Object *obj, bool hold_needed);
+> +typedef uint32_t (*ResettableGetCount)(Object *obj);
+> +typedef uint32_t (*ResettableIncrementCount)(Object *obj);
+> +typedef uint32_t (*ResettableDecrementCount)(Object *obj);
+> +typedef void (*ResettableForeachChild)(Object *obj, void (*visitor)(Obje=
+ct *));
+> +typedef struct ResettableClass {
+> +    InterfaceClass parent_class;
+> +
+> +    [...]
+> +
+> +    ResettableSetCold set_cold;
+> +    ResettableSetHoldNeeded set_hold_needed;
+> +    ResettableGetCount get_count;
+> +    ResettableIncrementCount increment_count;
+> +    ResettableDecrementCount decrement_count;
+> +    ResettableForeachChild foreach_child;
+> +} ResettableClass;
+> +```
+> +
+> +*set_cold* is used when entering reset, before calling the init phase, to
+> +indicate the reset type.
+> +
+> +*set_hold_needed* is used to set/clear and retrieve an "hold_needed" fla=
+g.
+> +This flag allows to omly execute the hold pahse when required.
+> +
+> +As stated above, several reset procedures can be concurrent on an object.
+> +This is handled with the three methods *get_count*, *increment_count* and
+> +*decrement_count*. An object is in reset state if the count is non-zero.
+> +
+> +The reset hierarchy is handled using the *foreach_child* method. This me=
+thod
+> +executes a given function on every reset "child".
+> +
+> +In DeviceClass and BusClass the base behavior is to mimic the legacy qdev
+> +reset. Reset hierarchy follows the qdev/qbus tree.
+> +
+> +Reset control through GPIO
+> +--------------------------
+> +
+> +For devices, two reset inputs can be added: one for the cold, one the wa=
+rm
+> +reset. This is done using the following function.
+> +```
 > +typedef enum DeviceResetActiveType {
 > +    DEVICE_RESET_ACTIVE_LOW,
 > +    DEVICE_RESET_ACTIVE_HIGH,
 > +} DeviceResetActiveType;
-> +
-> +/**
-> + * DeviceResetInputState:
-> + * @exists: tell if io exists
-> + * @type: tell whether the io active low or high
-> + * @state: true if reset is currently active
-> + */
-> +typedef struct DeviceResetInputState {
-> +    bool exists;
-> +    DeviceResetActiveType type;
-> +    bool state;
-> +} DeviceResetInputState;
-> +
->  /**
->   * DeviceState:
->   * @realized: Indicates whether the device has been fully constructed.
-> @@ -143,6 +160,8 @@ struct NamedGPIOList {
->   * used to count how many times reset has been initiated on the device.
->   * @reset_is_cold: If the device is under reset, indicates whether it is=
- cold
->   * or warm.
-> + * @cold_reset_input: state data for cold reset io
-> + * @warm_reset_input: state data for warm reset io
->   *
->   * This structure should not be accessed directly.  We declare it here
->   * so that it can be embedded in individual device state structures.
-> @@ -167,6 +186,8 @@ struct DeviceState {
->      uint32_t resetting;
->      bool reset_is_cold;
->      bool reset_hold_needed;
-> +    DeviceResetInputState cold_reset_input;
-> +    DeviceResetInputState warm_reset_input;
->  };
-> =20
->  struct DeviceListener {
-> @@ -372,6 +393,42 @@ static inline void qdev_init_gpio_in_named(DeviceSta=
-te *dev,
->  void qdev_pass_gpios(DeviceState *dev, DeviceState *container,
->                       const char *name);
-> =20
-> +/**
-> + * qdev_init_reset_gpio_in_named:
-> + * Create a gpio controlling the warm or cold reset of the device.
-> + *
-> + * @cold: specify whether it triggers cold or warm reset
-> + * @type: what kind of reset io it is
-> + *
-> + * Note: the io is considered created in its inactive state. No reset
-> + * is started by this function.
-> + */
 > +void qdev_init_reset_gpio_in_named(DeviceState *dev, const char *name,
 > +                                   bool cold, DeviceResetActiveType type=
 );
-> +
-> +/**
-> + * qdev_init_warm_reset_gpio:
-> + * Create the input to control the device warm reset.
-> + */
-> +static inline void qdev_init_warm_reset_gpio(DeviceState *dev,
-> +                                             const char *name,
-> +                                             DeviceResetActiveType type)
-> +{
-> +    qdev_init_reset_gpio_in_named(dev, name, false, type);
-> +}
-> +
-> +/**
-> + * qdev_init_cold_reset_gpio:
-> + * Create the input to control the device cold reset.
-> + * It can also be used as a power gate control.
-> + */
-> +static inline void qdev_init_cold_reset_gpio(DeviceState *dev,
-> +                                             const char *name,
-> +                                             DeviceResetActiveType type)
-> +{
-> +    qdev_init_reset_gpio_in_named(dev, name, true, type);
-> +}
-> +
->  BusState *qdev_get_parent_bus(DeviceState *dev);
-> =20
->  /*** BUS API. ***/
+> +```
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -336,25 +311,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gdTfX7fkYsEEjebm
+--gm5TwAJMO0F2iVRz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1BMPwACgkQbDjKyiDZ
-s5IINxAA4Vc6I8WjwCTpZSPAI8fdiXVCNWOqdTRWDmIDckrchhPkZ6RorQme66uw
-KpvksM8X0u5HcDkTvDiXhLcI2BxlZd5ibI56wgcZlxmAXUW95bwuopS5Nyn4yuWV
-UolClo3rwERQX6MjDO8N0aYovFngH9ebF2sYGu28PLNUxDuRrRGX1FhyJQ1eHPnY
-UyT8Oh4KbLzJjTTIEFmW4yRVKkg7yCd4R/lXwaQqKFo6xvSsNt/S6PwX8DfTMtf3
-qbdnIKjwTxgGyDI4ZdggmDOir33C80J5obC1IPLznXXtWCAwHmvgPcaF36o0wG8Z
-ETSBtJY2jVOmfme1Z7UGsIWmxkyDsGSjwG5NSKA94pYdU3BjTSK9UvfwLBil34mP
-qjmTS88fW5+6rhG8bTMUyzHfkZnPG1D9quE5EDvFb4iTzVOu5UX1oMrpouVE3nlU
-Gp0qK4w58A1mPomC5AMq1sCidK1AD0qILZKYxsnd0J+cu72OfhxUgehZqPkyo16g
-SRDendKFvkKEBMm8lUtqUFuDlONfWoJT4MZNM+SlxWNAHx+rMtTHSRHahkqEh6BV
-eyP9R45/X7t4ucUtBtm0XNXzxqVPDY5Hg+awVPE8mXH6SVsCIX4rYBJlcXd0AjaY
-lb35GPT+0jDVe/Z6+ZAujCEGxqJ0XOqzYtY5pmpVJJhq9bTRL3g=
-=p8+m
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1BNZEACgkQbDjKyiDZ
+s5LM4w//SL0C4gnI3wMv7jfhk7z2mpqiWd2qrgtrG2CLfc5l0gDrrlTzm7RpRWjj
+Ly/tjC/eWLzMceXGF1787Z7WsXuw7y/0eRcHKuRtB2luKyZ77xF11t02Aj9vUERY
+989b38kmjmOKdPxGuWhcxa/Dk2P6fsDqHuRxofUZfj7f8w8z+ewZfPh/pJEd3q2e
+Atnezbb8JnflvUIGTe+BaXi1Ywhd0Fo5O5aJ1WZdiIohU9vGXK5D5C8GZC9M6OFH
+sSR7JsyAjqIR0L4exq9O9R5V2r+F+1z5BtKNcCQQ+tHgrTGpfKVZMWFBX+BAAG1V
+YDhgdZ8vqBlr3W52Y0nZOuNc1Xwxx2Z9mCkHDqshfB5JJFRl1kI9N45dm6HcX73h
+RqhI22Ox23n4pk5sVNuzkUZ1JLKeoLsLn8GLwnqQkQN4exV+G7fXoSdE+EjEMHi0
+3uc8R/Wjr44KKdt/O3trCH0lJAMKzIWXmV/Emv9Orr/X5svLScE0SRjADaZrKUNf
+2S5YAgk9Xywnmq51CecTRCf594GsYeEGJIKpxlg8ARF/QFjPcigbFIokgjOUVf2R
+D8lhWmsVYg6NDF7eb/4GQnb1f6bD9P4ZkzhWC++9PSg91WcLGpAF95T7FMs/ww7v
+GT/Z8fMFr06/VTzDIYb/lyCkwtxD6LqLC7TEbbBoHSdlunlsTfM=
+=WVZ4
 -----END PGP SIGNATURE-----
 
---gdTfX7fkYsEEjebm--
+--gm5TwAJMO0F2iVRz--
 
