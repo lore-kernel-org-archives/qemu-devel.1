@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D523FC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F57EC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:21:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3F4E206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46CBE206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:21:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IXVI1UXY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3F4E206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dvqjhk3W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CBE206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsrLN-0000Sz-Uc
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:20:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42322)
+	id 1hsrMH-0002Wj-IO
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:21:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42403)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrG5-0005pH-Ng
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:22 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrG7-0005w8-Mh
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrG1-000475-Os
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:19 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33696)
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrG5-00049K-Nd
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:23 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33697)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsrFz-00045J-R9
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:17 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n9so70435911wru.0
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:14 -0700 (PDT)
+ id 1hsrG1-00046g-Qo
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:19 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n9so70436154wru.0
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ETn84aVwzraVZR/ukzhhM5DHZ0Q2gcDn01igaexosx0=;
- b=IXVI1UXYGYFOZ9jKBjjo/7x0/5Ula4rEgEDzcFYTcVYscj+i1zbqbhNxiX0fo8JAvu
- 2RcwY8m5MgfpX/zX/lLdeZL6mvvvQCbfZoHfURxRe44hPBhbtO5Hqodi53cnVEPwV3dK
- pZWO2rSB7Q+6jI1zFjbaodmMdDf4Wyc7uqoBOVGNyvksNCYJ7TVNLkCxl4HnU3NaQRcf
- F1ApoJSMzdwD4SrjL6GdkBY92p1+CI/NIJXDB6xY3UaFjlqi5AneOL+gAzm3YPYemv3u
- gf4AEjbHV5a/u9n6GDzt9bPPdJVro0Y5Jz52g6+Zgol0763C5A3FIfG9h3/98kOWSHsc
- duJA==
+ bh=wNexri908PTiPWm1XMgESUAKCJc8K1I1ZWLPF6fkVnU=;
+ b=Dvqjhk3Whwr8YN8/XkYURjnj4DWkrCi0NowTwwgxYkqW4060jU1KZZsC2IN1B4kkpm
+ TOxOYFy+sFzJaf/rLKBoA0WvXzow82jIuz304gOpvApHbPrUjWJmF+sXsi/dPIyRQR89
+ B8yEYtGDEL2+BUDhSbPXWI/vqIEtpNizPeD/a4P1F9Y/Rz95xhfQPTS/LiNqsb3iRnRu
+ RgN9mNAyhQ91EG15Ytx89ylQZxs6dDg9liPjtVrWMfWhCNQEocu3Mkwl5iXIp/Y/obtB
+ wiaxaJwadnPQDpsBrNq4Ju20tg9xNExnNHdmF68NOPAfIkNIi81AruurYcgcEabw1ID9
+ X/Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ETn84aVwzraVZR/ukzhhM5DHZ0Q2gcDn01igaexosx0=;
- b=pZcgfX6XmX2FSGHKO6HgIWXZ7Gnaht8hihEfWoKH6KdPGfiX0wRjSfbmF2/8fZMGZl
- Do0hI/vVHim72xiqpHUP1YdrWVrqdXCP2mDPHDva5/Q21Fx8I6VierrAHcaGx0PEjqvL
- IsAok8MEzfpP2trnKzuDGHyx0RY5t8NOiaCpY96tXwjWsjsHW0gJDi0lNK4bfTtzNo05
- Az7Ma8aV6P7qyUgpk9vYPmChH7S0tVhFxWnnxT+hi1XGjKeG3/ay0nSBGyxtCBE7MsTu
- v/wb7aJubRd4+av7Xuc/mnP5F4NhiaVjpO0LSgkmhofnqL7j0iKZ920bP56HkTJF594g
- hGbw==
-X-Gm-Message-State: APjAAAUfmNC3GjJpWCxXd/E3BT7PdRNgi55rj/z5Lp1FYlbzue4kcHZm
- aCZr+8ZQlLbsx4IzZ8IjCFfpvQ==
-X-Google-Smtp-Source: APXvYqzT697wIZ21eVsK4mf9nOLgLFWnWSRF96rbadKVA/ceGWCUPmVc5kXiXUK2cx68ZRM3EomM8w==
-X-Received: by 2002:adf:e705:: with SMTP id c5mr87792253wrm.270.1564589713239; 
- Wed, 31 Jul 2019 09:15:13 -0700 (PDT)
+ bh=wNexri908PTiPWm1XMgESUAKCJc8K1I1ZWLPF6fkVnU=;
+ b=leUzcjLsJSS2/2KLNrZGvinw1Aa0xAr6l8mVeYJntEVjkOI3+GrTkIgiAPAikIc2Pw
+ SUuiUBqAnt3L+UTIBw8YLPC9w7dr1XXlcgoXDDiDJ1Yw+wgm+wmgOta9N82ElY2Fpv4r
+ g5HbDzM9ebwJMN0YXjbUA/gWmCC4Jd/DC1kQSN/HC0BqquEkWH3BjbKtwb0bTvqAp8Be
+ Cd8iYN6iuvy6Vji6AplJNaq3CpDRxpZVaA4QY+1S0AKFiCzdYS9Tjx5edC2yqE+/k7J/
+ AHSkvcCaQ3jRFoazPuycpw1FrDhzZLIBQiKLkIENL5NOnC5xKpgXhSW/mbBzNzebIAth
+ KYRA==
+X-Gm-Message-State: APjAAAUUzg5MdUEFdzdXdhN+/mGa/fNLpT8gQ0K/QRFVZg/jQnBc3cbl
+ b2QvJM7jv8Ef0eXa3MeroyXGfA==
+X-Google-Smtp-Source: APXvYqy8k1e8wQ6s4CapOQFYxk5nty4PAj1rYhjZFNGeTNWMzpJFxo4aI+qyuFM54HBFeCZZcIlG+Q==
+X-Received: by 2002:adf:80e1:: with SMTP id 88mr48054009wrl.127.1564589716736; 
+ Wed, 31 Jul 2019 09:15:16 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id l2sm46111132wmj.4.2019.07.31.09.15.12
+ by smtp.gmail.com with ESMTPSA id r11sm107266157wre.14.2019.07.31.09.15.13
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 09:15:12 -0700 (PDT)
+ Wed, 31 Jul 2019 09:15:14 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9FE611FFC3;
- Wed, 31 Jul 2019 17:07:23 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 5A32A1FFB4;
+ Wed, 31 Jul 2019 17:07:22 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 17:07:10 +0100
-Message-Id: <20190731160719.11396-46-alex.bennee@linaro.org>
+Date: Wed, 31 Jul 2019 17:06:55 +0100
+Message-Id: <20190731160719.11396-31-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190731160719.11396-1-alex.bennee@linaro.org>
 References: <20190731160719.11396-1-alex.bennee@linaro.org>
@@ -83,8 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH  v4 45/54] linux-user: support -plugin option
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH  v4 30/54] translator: add translator_ld{ub, sw,
+ uw, l, q}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,84 +97,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, aaron@os.amperecomputing.com,
- cota@braap.org, bobby.prani@gmail.com,
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ aaron@os.amperecomputing.com, cota@braap.org,
+ Paolo Bonzini <pbonzini@redhat.com>, bobby.prani@gmail.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Lluís Vilanova <vilanova@ac.upc.edu>
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-[ cota: s/instrument/plugin ]
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+[AJB: directly plumb into softmmu/user helpers]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- linux-user/main.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 8ffc5251955..42daa47dd3c 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -33,6 +33,7 @@
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- #include "qemu/module.h"
-+#include "qemu/plugin.h"
- #include "cpu.h"
+---
+v4
+  - don't use the cpu_ldst helpers, plumb directly into the lower
+  level
+  - mark the CODE_ACCESS/SOFTMMU_CODE_ACCESS as deprecated
+---
+ include/exec/cpu_ldst.h   | 11 ++++++++
+ include/exec/translator.h | 58 ++++++++++++++++++++++++++++++++++++++-
+ include/qemu/bswap.h      |  5 ++++
+ tcg/tcg.h                 |  2 ++
+ 4 files changed, 75 insertions(+), 1 deletion(-)
+
+diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+index 9151fdb042c..fd499f7e2ff 100644
+--- a/include/exec/cpu_ldst.h
++++ b/include/exec/cpu_ldst.h
+@@ -129,6 +129,11 @@ static inline void clear_helper_retaddr(void)
+ #include "exec/cpu_ldst_useronly_template.h"
+ #undef MEMSUFFIX
+ 
++/*
++ * Code access is deprecated in favour of translator_ld* functions
++ * (see translator.h). However there are still users that need to
++ * converted so for now these stay.
++ */
+ #define MEMSUFFIX _code
+ #define CODE_ACCESS
+ #define DATA_SIZE 1
+@@ -427,6 +432,12 @@ static inline CPUTLBEntry *tlb_entry(CPUArchState *env, uintptr_t mmu_idx,
+ #undef CPU_MMU_INDEX
+ #undef MEMSUFFIX
+ 
++/*
++ * Code access is deprecated in favour of translator_ld* functions
++ * (see translator.h). However there are still users that need to
++ * converted so for now these stay.
++ */
++
+ #define CPU_MMU_INDEX (cpu_mmu_index(env, true))
+ #define MEMSUFFIX _code
+ #define SOFTMMU_CODE_ACCESS
+diff --git a/include/exec/translator.h b/include/exec/translator.h
+index 180c51d5092..30b1a594fc1 100644
+--- a/include/exec/translator.h
++++ b/include/exec/translator.h
+@@ -19,7 +19,10 @@
+  */
+ 
+ 
++#include "qemu/bswap.h"
  #include "exec/exec-all.h"
- #include "tcg.h"
-@@ -392,6 +393,15 @@ static void handle_arg_trace(const char *arg)
-     trace_file = trace_opt_parse(arg);
++#include "exec/cpu_ldst.h"
++#include "exec/plugin-gen.h"
+ #include "tcg/tcg.h"
+ 
+ 
+@@ -142,4 +145,57 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+ void translator_loop_temp_check(DisasContextBase *db);
+ 
+-#endif /* EXEC__TRANSLATOR_H */
++/*
++ * Translator Load Functions
++ *
++ * These are intended to replace the old cpu_ld*_code functions and
++ * are mandatory for front-ends that have been migrated to the common
++ * translator_loop. These functions are only intended to be called
++ * from the translation stage and should not be called from helper
++ * functions. Those functions should be converted to encode the
++ * relevant at translation time.
++ */
++
++#ifdef CONFIG_USER_ONLY
++
++#define DO_LOAD(type, name, shift)               \
++    set_helper_retaddr(1);                       \
++    ret = name ## _p(g2h(pc));                   \
++    clear_helper_retaddr();
++
++#else
++
++#define DO_LOAD(type, name, shift)                   \
++    int mmu_idx = cpu_mmu_index(env, true);          \
++    TCGMemOpIdx oi = make_memop_idx(shift, mmu_idx); \
++    ret = helper_ret_ ## name ## _cmmu(env, pc, oi, 0);
++
++#endif
++
++#define GEN_TRANSLATOR_LD(fullname, name, type, shift, swap_fn)         \
++    static inline type                                                  \
++    fullname ## _swap(CPUArchState *env, abi_ptr pc, bool do_swap)      \
++    {                                                                   \
++        type ret;                                                       \
++        DO_LOAD(type, name, shift)                                      \
++                                                                        \
++        if (do_swap) {                                                  \
++            ret = swap_fn(ret);                                         \
++        }                                                               \
++        plugin_insn_append(&ret, sizeof(ret));                          \
++        return ret;                                                     \
++    }                                                                   \
++                                                                        \
++    static inline type fullname(CPUArchState *env, abi_ptr pc)          \
++    {                                                                   \
++        return fullname ## _swap(env, pc, false);                       \
++    }
++
++GEN_TRANSLATOR_LD(translator_ldub, ldb, uint8_t, 1, /* no swap needed */)
++GEN_TRANSLATOR_LD(translator_ldsw, lduw, int16_t, 2, bswap16)
++GEN_TRANSLATOR_LD(translator_lduw, lduw, uint16_t, 2, bswap16)
++GEN_TRANSLATOR_LD(translator_ldl, ldl, uint32_t, 3, bswap32)
++GEN_TRANSLATOR_LD(translator_ldq, ldq, uint64_t, 4, bswap64)
++#undef GEN_TRANSLATOR_LD
++
++#endif  /* EXEC__TRANSLATOR_H */
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index 2a9f3fe783e..4f707278740 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -306,6 +306,11 @@ static inline int ldub_p(const void *ptr)
+     return *(uint8_t *)ptr;
  }
  
-+static QemuPluginList plugins = QTAILQ_HEAD_INITIALIZER(plugins);
-+
-+#ifdef CONFIG_PLUGIN
-+static void handle_arg_plugin(const char *arg)
++static inline int ldb_p(const void *ptr)
 +{
-+    qemu_plugin_opt_parse(arg, &plugins);
++    return ldub_p(ptr);
 +}
-+#endif
 +
- struct qemu_argument {
-     const char *argv;
-     const char *env;
-@@ -443,6 +453,10 @@ static const struct qemu_argument arg_table[] = {
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=]<pattern>][,events=<file>][,file=<file>]"},
-+#ifdef CONFIG_PLUGIN
-+    {"plugin",     "QEMU_PLUGIN",      true,  handle_arg_plugin,
-+     "",           "[file=]<file>[,arg=<string>]"},
-+#endif
-     {"version",    "QEMU_VERSION",     false, handle_arg_version,
-      "",           "display version information and exit"},
-     {NULL, NULL, false, NULL, NULL, NULL}
-@@ -633,6 +647,7 @@ int main(int argc, char **argv, char **envp)
-     cpu_model = NULL;
- 
-     qemu_add_opts(&qemu_trace_opts);
-+    qemu_plugin_add_opts();
- 
-     optind = parse_args(argc, argv);
- 
-@@ -640,6 +655,9 @@ int main(int argc, char **argv, char **envp)
-         exit(1);
-     }
-     trace_init_file(trace_file);
-+    if (qemu_plugin_load_list(&plugins)) {
-+        exit(1);
-+    }
- 
-     /* Zero out regs */
-     memset(regs, 0, sizeof(struct target_pt_regs));
+ static inline int ldsb_p(const void *ptr)
+ {
+     return *(int8_t *)ptr;
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 93f52f4ca93..c918fdd87c4 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -1404,6 +1404,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+ # define helper_ret_stl_mmu   helper_be_stl_mmu
+ # define helper_ret_stq_mmu   helper_be_stq_mmu
+ # define helper_ret_ldw_cmmu  helper_be_ldw_cmmu
++# define helper_ret_lduw_cmmu helper_be_ldw_cmmu
+ # define helper_ret_ldl_cmmu  helper_be_ldl_cmmu
+ # define helper_ret_ldq_cmmu  helper_be_ldq_cmmu
+ #else
+@@ -1417,6 +1418,7 @@ uint64_t helper_be_ldq_cmmu(CPUArchState *env, target_ulong addr,
+ # define helper_ret_stl_mmu   helper_le_stl_mmu
+ # define helper_ret_stq_mmu   helper_le_stq_mmu
+ # define helper_ret_ldw_cmmu  helper_le_ldw_cmmu
++# define helper_ret_lduw_cmmu helper_le_ldw_cmmu
+ # define helper_ret_ldl_cmmu  helper_le_ldl_cmmu
+ # define helper_ret_ldq_cmmu  helper_le_ldq_cmmu
+ #endif
 -- 
 2.20.1
 
