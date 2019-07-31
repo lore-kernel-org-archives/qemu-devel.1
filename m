@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D06E6C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CD8EC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:26:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BD73206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:26:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC603205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:26:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pe5a9RDd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD73206B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jTtbi57v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC603205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsrQh-0006Y6-Rm
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:26:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45017)
+	id 1hsrR0-0007Ny-7L
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:26:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45176)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrPg-0004jW-DD
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:25:17 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrPm-0004yB-9B
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:25:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsrPf-0000Fh-8f
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:25:16 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43122)
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrPl-0000Ll-4K
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:25:22 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34878)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsrPf-0000Eo-2W
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:25:15 -0400
-Received: by mail-wr1-x442.google.com with SMTP id p13so70341376wru.10
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:25:14 -0700 (PDT)
+ id 1hsrPk-0000L4-Ty
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:25:21 -0400
+Received: by mail-wm1-x342.google.com with SMTP id l2so60370227wmg.0
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:25:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xUIrrQym9hhHiF/ew6BTz6jTay6S+r9Vm5o3Xaev8Hs=;
- b=pe5a9RDdmLDJXrO4vomLHcNnwWulzPfhQIU+Vx6E0POxF7lnvb/Ou387A0TG+PVU4+
- DRj0bfJpQ71cW6V8rK0XPJOB0cKb7oLvEw8MXHQyACjIMVWbh/CMEXST0X7NIOmkTXZG
- ck59fQClGudA6f9TnBoQmZTutGPa7JTBQ4ajP1sTlmOs0tjsSNVUglGoLdzDsXNIxWES
- 7nE2nYjL7CmrUvzyVq3pXIaQovyuxXy5Z3UT8b1AJ5ksZQxm+Cqc1M37yhU+TOaP+WV1
- W3Gnhl6m8cdl0erAvKk2BLTF2uqNyBkGI1GeLaZZAdmiY3EvcXVyRMt5WIw6wFnNFIwb
- D46Q==
+ bh=ebMkUd6CcShKU9UYDJ7SLcVLe6tn+eNZsn2v2BV3RF0=;
+ b=jTtbi57v2A9AIQS1kwDrZxUWLHa+PX9hwXrvh4s268kWwUsfpsNbiMl45yfQMKqrok
+ lPBsP97ihEjpbR/Gxog0y3J9lEAZoLauEmy+XMFlVaOfjtVn4FkOBU1WITQbClPiHl1D
+ mxdN2cPJiOeVO4izcsP7GcOpNaMySkn3U8Vsydl8EWaZGRYe2XtWVdwItsTYMJ32wP8I
+ J2v6MwtmynyNHNFti3JV3Jv4M8vVy9XDXGynwiF2kZm+VZWPwFVanrH9eh1u1XTEKsEe
+ /8y2I99gqfm1tjEyGij+0HgbrQVA7aV282Nc2W3wE16G1xU0hBUZF7jRE2Ap7gt/LXdh
+ 64Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xUIrrQym9hhHiF/ew6BTz6jTay6S+r9Vm5o3Xaev8Hs=;
- b=s35Iwh72qXfFusBXE9lt6ZCIKWxyvC70fBZAZHfpnrPRWiPNgehzqqvBREi1MxPSPK
- JkAyQSeShMnfO0SQ5Ij9XPURAAv14TrhO6FQKtVnfRji4t1XXUNgUus8EnX7TFqgJ89i
- bRvD85M8i36jHoQXNSE29rBQL6zBP2GBhmJd+RDCiX4qH4PkEIK7h/BoGKB4HAv0D11b
- 2b7N9iL9TOCbPEFf+7Wq9q8u0yZ+TGNYojENngnTJx+Rs6he6jQWdGPHe4Wro+G3r+TE
- NzrNEvXOX7aaSt7sIjt4Q3+SLHGlP9nGayYzgjgOx0nEGC6T8iLVbEp4AVvlJB84mdit
- 53Jw==
-X-Gm-Message-State: APjAAAUw048b9gZXNZQpbKKNtNbz+b2uHokW8RqHGXC360tUAuX9oZD4
- JeT5m87it7xvYJqncydlVRWmNg==
-X-Google-Smtp-Source: APXvYqwxlB6/H/TsA842jlg4Tulj9fgHDp0BVeGsZR2fhODR2vGXK4+p08LFLaZsFl3ZIc9GG9Ftrw==
-X-Received: by 2002:a5d:48cf:: with SMTP id p15mr87208181wrs.151.1564590313855; 
- Wed, 31 Jul 2019 09:25:13 -0700 (PDT)
+ bh=ebMkUd6CcShKU9UYDJ7SLcVLe6tn+eNZsn2v2BV3RF0=;
+ b=O8/OI2xBv+UMe/qEMhd3H02/wc/nR85f5Uq478sVVCXBk1CJAFsi6bPlsKjD8QrCpd
+ sl4SU6T91gp1lH0/eXUXkyheC/Ydk3E9GJOD34ZKHmkRTejtYcBEKBEI8FZ75dtIh/R6
+ ZUoiH89rOejz3kugn0DtJtlR7FjCADlNT3+gp6KDEZeXy1iRF5OmyXw/2y/cskdvC6fa
+ QMVPLjKbdPFyF92OXf6ZeseAsxTNpON2+ExSDstf/JTN5dDSeJX1q3m5O4d4ibL/pMwQ
+ uPUQ4pU6TrzeA1U6Ix4roRHjFvyqNHO9poCaI0G1WAgeejDy0BBChrc18qGdCgDZAkht
+ h44g==
+X-Gm-Message-State: APjAAAW4QBMDZsQXnTsCvHqYDq4JHYIPPVI75D5eHOgoFOcR+ss1ji41
+ N93EDeUCaiuwlZTJ4lJpg7DD+g==
+X-Google-Smtp-Source: APXvYqza7P4XH/IdvKaXaY1OkCjWG8fNN1Y9IdGKi5c8CeKLzp9hvYuwFTGfFyHjEExmV8uxTqERLQ==
+X-Received: by 2002:a1c:345:: with SMTP id 66mr113107626wmd.8.1564590319865;
+ Wed, 31 Jul 2019 09:25:19 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id f70sm91237513wme.22.2019.07.31.09.25.12
+ by smtp.gmail.com with ESMTPSA id v15sm65510695wrt.25.2019.07.31.09.25.14
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 09:25:12 -0700 (PDT)
+ Wed, 31 Jul 2019 09:25:16 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0747E1FF9F;
+ by zen.linaroharston (Postfix) with ESMTP id EFE1A1FFAE;
  Wed, 31 Jul 2019 17:07:21 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 17:06:42 +0100
-Message-Id: <20190731160719.11396-18-alex.bennee@linaro.org>
+Date: Wed, 31 Jul 2019 17:06:51 +0100
+Message-Id: <20190731160719.11396-27-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190731160719.11396-1-alex.bennee@linaro.org>
 References: <20190731160719.11396-1-alex.bennee@linaro.org>
@@ -83,8 +83,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH v4 17/54] cputlb: document get_page_addr_code
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH  v4 26/54] *-user: notify plugin of exit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,82 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aaron@os.amperecomputing.com, cota@braap.org,
- Paolo Bonzini <pbonzini@redhat.com>, bobby.prani@gmail.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, aaron@os.amperecomputing.com,
+ cota@braap.org, bobby.prani@gmail.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- accel/tcg/cputlb.c      |  5 -----
- include/exec/exec-all.h | 24 +++++++++++++++++++++---
- 2 files changed, 21 insertions(+), 8 deletions(-)
+ bsd-user/syscall.c | 3 +++
+ linux-user/exit.c  | 1 +
+ 2 files changed, 4 insertions(+)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index bffdb251580..a01e04c5416 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -1015,11 +1015,6 @@ static bool victim_tlb_hit(CPUArchState *env, size_t mmu_idx, size_t index,
-   victim_tlb_hit(env, mmu_idx, index, offsetof(CPUTLBEntry, TY), \
-                  (ADDR) & TARGET_PAGE_MASK)
- 
--/* NOTE: this function can trigger an exception */
--/* NOTE2: the returned address is not exactly the physical address: it
-- * is actually a ram_addr_t (in system mode; the user mode emulation
-- * version of this function returns a guest virtual address).
-- */
- tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
- {
-     uintptr_t mmu_idx = cpu_mmu_index(env, true);
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 16034ee651e..8b1c3d5b9db 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -480,7 +480,15 @@ void mmap_lock(void);
- void mmap_unlock(void);
- bool have_mmap_lock(void);
- 
--static inline tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr)
-+/**
-+ * get_page_addr_code() - user-mode version
-+ * @env: CPUArchState
-+ * @addr: guest virtual address of guest code
-+ *
-+ * Returns @addr.
-+ */
-+static inline tb_page_addr_t get_page_addr_code(CPUArchState *env,
-+                                                target_ulong addr)
- {
-     return addr;
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 1ee6195d9ff..84a983a9a12 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -332,6 +332,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, abi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        qemu_plugin_atexit_cb();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+@@ -430,6 +431,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, abi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        qemu_plugin_atexit_cb();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+@@ -505,6 +507,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, abi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        qemu_plugin_atexit_cb();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret = 0; /* avoid warning */
+diff --git a/linux-user/exit.c b/linux-user/exit.c
+index bdda7205532..a362ef67d2c 100644
+--- a/linux-user/exit.c
++++ b/linux-user/exit.c
+@@ -35,4 +35,5 @@ void preexit_cleanup(CPUArchState *env, int code)
+         __gcov_dump();
+ #endif
+         gdb_exit(env, code);
++        qemu_plugin_atexit_cb();
  }
-@@ -488,8 +496,18 @@ static inline tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong
- static inline void mmap_lock(void) {}
- static inline void mmap_unlock(void) {}
- 
--/* cputlb.c */
--tb_page_addr_t get_page_addr_code(CPUArchState *env1, target_ulong addr);
-+/**
-+ * get_page_addr_code() - full-system version
-+ * @env: CPUArchState
-+ * @addr: guest virtual address of guest code
-+ *
-+ * If we cannot translate and execute from the entire RAM page, or if
-+ * the region is not backed by RAM, returns -1. Otherwise, returns the
-+ * ram_addr_t corresponding to the guest code at @addr.
-+ *
-+ * Note: this function can trigger an exception.
-+ */
-+tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr);
- 
- void tlb_reset_dirty(CPUState *cpu, ram_addr_t start1, ram_addr_t length);
- void tlb_set_dirty(CPUState *cpu, target_ulong vaddr);
 -- 
 2.20.1
 
