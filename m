@@ -2,69 +2,83 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E02F0C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E102C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:44:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2D73206A2
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:42:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D73206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 5154D206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 06:44:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5154D206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsiK2-00042g-QA
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 02:42:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51605)
+	id 1hsiLM-0005aA-GL
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 02:44:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55602)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ppandit@redhat.com>) id 1hsiJd-0003d3-5A
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:42:25 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hsiKx-00059S-01
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ppandit@redhat.com>) id 1hsiJb-0008WO-4w
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:42:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53810)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1hsiJa-0008Os-UK
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:42:23 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B29133082E09;
- Wed, 31 Jul 2019 06:42:20 +0000 (UTC)
-Received: from kaapi (ovpn-116-38.phx2.redhat.com [10.3.116.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C655600CC;
- Wed, 31 Jul 2019 06:42:11 +0000 (UTC)
-Date: Wed, 31 Jul 2019 12:12:02 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Jason Wang <jasowang@redhat.com>
-In-Reply-To: <fb5835f4-2894-72c5-db35-91ccf966cb9f@redhat.com>
-Message-ID: <nycvar.YSQ.7.76.1907311211020.1746@xnncv>
-References: <20190723104754.29324-1-ppandit@redhat.com>
- <20190723104754.29324-4-ppandit@redhat.com>
- <20190723130326.GC5445@stefanha-x1.localdomain>
- <CAKXe6S+pXN0d6K9Vw=kxsy51bVz1PxXBHYEmTesUnYo8u8vcYg@mail.gmail.com>
- <nycvar.YSQ.7.76.1907241116470.10049@xnncv>
- <20190729150400.GG6771@stefanha-x1.localdomain>
- <fb5835f4-2894-72c5-db35-91ccf966cb9f@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hsiKt-0004hy-Vl
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:43:45 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44141)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsiKt-0004bK-Od
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 02:43:43 -0400
+Received: by mail-wr1-f65.google.com with SMTP id p17so68298187wrf.11
+ for <qemu-devel@nongnu.org>; Tue, 30 Jul 2019 23:43:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=l8vTbqW3hyEk0D75+yYdZw9Ngp/Qa3NR9oAlOwKHuGk=;
+ b=L+OtZKcB2WG1yBdmRdygTjPkqqAF9bT/Ea7KnJOCWZfgf3kh9ese34ewfrHP01IHnP
+ Pm6Peadi3NGbR5jl2Kpcj8KTw7zz2snNTCPcAabicmSJWshY7b0ysVtRYDtPNcTkiw7u
+ 4kk7ww7u+os5J1sHw3315C5jy5EnNYP1AKBmrR+HldH6smpHDBeLap8/JlJHvAKUDTds
+ Pmapk0PNEws+mmm1LSAdikiugTldgh5R1QIX09K6FjXRH/DidepwqpgU7OAUN9cjgo5d
+ 59Zo7DMfmBSOFdJjc8O2PstIwoXsx+PNOR8Z9HUrsZKMKiTVdONDG1pOvG333dytt6ts
+ Kp5g==
+X-Gm-Message-State: APjAAAUfslDKpLkB/g9rXo0lTWzJV/C7CgSwfSpB9ovIaCni0fNnrxOY
+ UqzIOwB04C5dyKS/IvUlPOt2fQ==
+X-Google-Smtp-Source: APXvYqxiHZp5K1A1yUX5cE0Q2vmkmpwOiBqzcf4R1Db0pNiRcCb0CEdoQnNGYHnQNZN67wuTsjZKMA==
+X-Received: by 2002:a05:6000:1189:: with SMTP id
+ g9mr97557501wrx.51.1564555421625; 
+ Tue, 30 Jul 2019 23:43:41 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3?
+ ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
+ by smtp.gmail.com with ESMTPSA id b5sm56825303wru.69.2019.07.30.23.43.38
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Tue, 30 Jul 2019 23:43:41 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>
+References: <20190726120542.9894-1-armbru@redhat.com>
+ <20190726120542.9894-24-armbru@redhat.com>
+ <20190729194414.GG4313@habkost.net> <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
+ <8bea0201-f796-d682-22e6-069985b45523@redhat.com>
+ <0eb2518f-147c-2b47-f48c-3af26bf5d264@redhat.com>
+ <87zhku90bd.fsf@dusky.pond.sub.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <ff25a5cb-c62f-a148-8350-2f64b4f7ae4a@redhat.com>
+Date: Wed, 31 Jul 2019 08:43:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 31 Jul 2019 06:42:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+In-Reply-To: <87zhku90bd.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] net: tap: replace snprintf with
- g_strdup_printf calls
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] When to use qemu/typedefs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,28 +90,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Li Qiang <liq3ea@gmail.com>,
- =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Wed, 31 Jul 2019, Jason Wang wrote --+
-| On 2019/7/29 =E4=B8=8B=E5=8D=8811:04, Stefan Hajnoczi wrote:
-| > This change isn't related to the topic of the patch.  It's a separate=
- bug=20
-| > fix.
-| >
-| > Please either document it in the commit description so it's clear the=
-=20
-| > change is intentional, or send it as a separate patch.
-|=20
-| Prasad, please send a patch for this.
+On 31/07/19 08:37, Markus Armbruster wrote:
+> Paolo Bonzini <pbonzini@redhat.com> writes:
+> 
+>> On 30/07/19 15:15, Eric Blake wrote:
+>>>> We occasionally give up and use types directly rather than their typedef
+>>>> names, flouting the coding style.  This patch does.  Trades messing with
+>>>> qemu/typedefs.h for having to write 'struct' a few times.
+>>
+>> I think Markus made the right call here.  Using "struct Foo;" in headers
+>> is a null price to pay if all you need is declaring a pointer-typed
+>> field or parameter.
+> 
+> Eduardo posted a patch to HACKING to clarify this non-usage of typedef
+> is okay.
+> 
+> Should we continue to mandate typedef names elsewhere?  It adds
+> cognitive load: you have to decide where to put the typedef, and when
+> not to use it.
 
-Okay, do I redo the series, or just this one patch is okay? (to confirm)
+A lot of libraries we use (especially GLib) use typedefs, so I'd rather
+keep them.  Also, a mass replacement would be tens of thousands of
+changed lines and not really practical.
 
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
+>>                      Of course this doesn't apply if you have to embed a
+>> struct directly, but then qemu/typedefs.h wouldn't help either.
+> 
+> Yes, and if this leads to an inclusion cycle, I strongly suspect "fat"
+> headers: since you can't embed something in itself, the cycle must
+> involve different things, all bunched together in the same header.
+> 
+>> In general unless you're adding a new subsystem, qemu/typedefs.h should
+>> only decrease in size, never increase.
+> 
+> This series grows it some.  I'll try to avoid that for v2.
+
+Let me review it first. :)  Maybe some of them are good to keep.
+
+Paolo
+
