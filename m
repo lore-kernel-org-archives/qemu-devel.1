@@ -2,112 +2,121 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 968B6C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6E8C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:05:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66BEF20693
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:50:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66BEF20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2797206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:05:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Fo777J2F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2797206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsn80-0003SO-MG
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 07:50:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50136)
+	id 1hsnMO-0006dH-20
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:05:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54133)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hsn7b-0002rG-E2
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:50:20 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hsnLh-00064j-4D
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hsn7a-0000eP-J1
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:50:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56634)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hsn7W-0000ce-Uj; Wed, 31 Jul 2019 07:50:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9914958;
- Wed, 31 Jul 2019 11:50:13 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 726255C21A;
- Wed, 31 Jul 2019 11:50:09 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
- qemu-devel@nongnu.org
-References: <20190731075652.17053-1-thuth@redhat.com>
- <20190731075652.17053-8-thuth@redhat.com>
- <f2399005-cead-a147-37a5-600fda7eaea5@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <b9bbf556-e2fc-8634-2238-9c1c5ead7a35@redhat.com>
-Date: Wed, 31 Jul 2019 13:50:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <f2399005-cead-a147-37a5-600fda7eaea5@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hsnLf-0006bU-TK
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:04:53 -0400
+Received: from mail-eopbgr80101.outbound.protection.outlook.com
+ ([40.107.8.101]:60771 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1hsnLc-0006Y7-W5; Wed, 31 Jul 2019 08:04:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=grpHDtWprOVhDeYy0o00wtmflcvu4mJXbxwCQ2Fn/K4C7cjFytu1++DlYCpTCjJ5rV9TC1L3G21c9i9cWWC3gpt/M9Tz1jMe7qKUFcv1ycma1YsqFOPpWgCAFLQikkf5my0nOppiyqwL7Q5omW3ikK4zssF6eQVdcS+3qN2NY4J+6cgub0HOKYzMwDXsm5//tN1RTrjAJ6X5zzBISqowLY/y3/kG4Hwcsc8H7PnyAgY+ASzY6A3BaCIIqEqi+NniNZ5LHng+S7tW+Wn7cW5rfDww4Lyv38t4JjdGGO0icq/iomWXEMbFUbnm9ebOetgc+n8aZXvxoe0XVnga1Xwh7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yilQWr7gqdzBqbFGRwV7j8g6Cey0XHXd2U0NVWn2ZG0=;
+ b=NvK8Wlmc9X1iSE6zoWRmJOAgMid0yYyRCnlCCm10WpQwlU4qnLoDYrQBsH7mJlV67bUaoPv2spJgR9T3RfAu1gOQExlrqzwm2+YmNpKAjU/dQqI0S/wJicfTCFf1DgxKyRWl7H2U6uop/Ekcr9ps7jim8PflLVGZUfLspTRmqBniSOb0FHlnWayW+4r8NZlqfsr+YfHJAfjZEFjMj66LE9kTj7GBuvJcLENQIxaXoE1Z3bV2LYk5xKSZLgH6/6L4yflLk+Sj7ypDYRK9NIS5l+Gg4if2nSun2nX/Oizomjpr4wyQ0fvLh1bnLi1Ch9s8nGw1385eATDA8yLpImbgLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
+ header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yilQWr7gqdzBqbFGRwV7j8g6Cey0XHXd2U0NVWn2ZG0=;
+ b=Fo777J2FPnHx653/I0nKZsdIrxW5W8D1O0vcjTxwfgFSGfpZeEyBPye04VlL26Plj5EpwA+gJnk58C/IAPjSN8egryaPmwhrQwxwryDxrnS2DHTI/FKHzL9S8+IDQFtjxJckImIjMjdfhuxmitjtOcotcxKQck2SRXZdKx3yvF8=
+Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
+ VI1PR08MB3469.eurprd08.prod.outlook.com (20.177.59.23) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.15; Wed, 31 Jul 2019 12:04:45 +0000
+Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
+ ([fe80::303d:1bb9:76b2:99d7]) by VI1PR08MB4399.eurprd08.prod.outlook.com
+ ([fe80::303d:1bb9:76b2:99d7%6]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
+ 12:04:44 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Thread-Topic: [PATCH 3/3] i386/kvm: initialize struct at full before ioctl call
+Thread-Index: AQHVRvAnLLtzNA+T0EeBbI/1wGIp+qbjic2AgADKawCAAE4tAA==
+Date: Wed, 31 Jul 2019 12:04:44 +0000
+Message-ID: <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
+ <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
+In-Reply-To: <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Wed, 31 Jul 2019 11:50:13 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] hw/misc: Add a config switch for
- the "unimplemented" device
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P189CA0022.EURP189.PROD.OUTLOOK.COM (2603:10a6:7:53::35)
+ To VI1PR08MB4399.eurprd08.prod.outlook.com
+ (2603:10a6:803:102::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6ab02044-8263-48a3-3822-08d715af46be
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:VI1PR08MB3469; 
+x-ms-traffictypediagnostic: VI1PR08MB3469:
+x-microsoft-antispam-prvs: <VI1PR08MB3469E7E52B6E049612BC837CF4DF0@VI1PR08MB3469.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 011579F31F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(366004)(376002)(39850400004)(136003)(346002)(199004)(189003)(66476007)(102836004)(86362001)(6116002)(66556008)(52116002)(71190400001)(186003)(107886003)(36756003)(486006)(99286004)(64756008)(71200400001)(53546011)(3846002)(76176011)(66066001)(386003)(44832011)(305945005)(66446008)(54906003)(6506007)(66946007)(7416002)(6512007)(5660300002)(110136005)(31696002)(4326008)(229853002)(256004)(6486002)(53936002)(476003)(81166006)(31686004)(11346002)(2616005)(316002)(26005)(68736007)(2201001)(6246003)(6436002)(8676002)(2501003)(7736002)(8936002)(446003)(81156014)(478600001)(25786009)(14454004)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3469;
+ H:VI1PR08MB4399.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: Arcn5437whNXUyLF2PB4nMOXWlr4kTb/S01Ee+K2HbvkkvOwy/CGIWYGqtyBbGBvaoRzT6R+u8UmKTcEkCWBCRoPlDJ8dsOsWh26mp/BhT/Uwlj/1G3PCJVCTgyqxwUoY+ZkSQLbXl4/Sq35D3rDRdvru+BhojASYibZWk44iSdas3qaVuprPa8641n1CfgxyMUieG1zrQZOZbB+jKeTL10+Zt2/azuD+x8KN/p7s7i49a2Wp/kQGXORugKl0ivULnVx0JYbZr17M8b5T913ZGvzXKHNkW9en1VOYAxnKnyx1COokPJ8jpb1L4QjX8+hPY+NcYh5KETEInLkx1HoKvYh4wWvG/LkRtJhKT4I2sRA98Gt5Hu2xWFHu1N01JdwWGhVSUKqd/dXl8cCaQSEHwvlzgEyOV0HkYs8ARq8Z68=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EEBD0B39DB78A6469C8D26470591EE39@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ab02044-8263-48a3-3822-08d715af46be
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 12:04:44.8424 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: andrey.shinkevich@virtuozzo.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3469
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.101
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
+ before ioctl call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,28 +128,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm@nongnu.org,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berto@igalia.com" <berto@igalia.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Denis Lunev <den@virtuozzo.com>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "armbru@redhat.com" <armbru@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/2019 13.47, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 7/31/19 9:56 AM, Thomas Huth wrote:
->> The device is only used by some few boards. Let's use a proper Kconfig
->> switch so that we only compile this code if we really need it.
->=20
-> I'd prefer having the UnimpDevice user-creatable and always present as =
-a
-> core device...
-
-Why? This is a sysbus device that needs to be wired up in code, so I
-don't see a reason for making this user-creatable right now.
-
-Anyway, that's a different subject, so this should not be part of this
-patch.
-
- Thomas
+T24gMzEvMDcvMjAxOSAxMDoyNCwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOg0KPiANCj4g
+DQo+IE9uIDMwLjA3LjE5IDIxOjIwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPj4gT24gMzAvMDcv
+MTkgMTg6MDEsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+IE5vdCB0aGUgd2hvbGUgc3Ry
+dWN0dXJlIGlzIGluaXRpYWxpemVkIGJlZm9yZSBwYXNzaW5nIGl0IHRvIHRoZSBLVk0uDQo+Pj4g
+UmVkdWNlIHRoZSBudW1iZXIgb2YgVmFsZ3JpbmQgcmVwb3J0cy4NCj4+Pg0KPj4+IFNpZ25lZC1v
+ZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29t
+Pg0KPj4NCj4+IENocmlzdGlhbiwgaXMgdGhpcyB0aGUgcmlnaHQgZml4PyAgSXQncyBub3QgZXhw
+ZW5zaXZlIHNvIGl0IHdvdWxkbid0IGJlDQo+PiBhbiBpc3N1ZSwganVzdCBjaGVja2luZyBpZiB0
+aGVyZSdzIGFueSBiZXR0ZXIgYWx0ZXJuYXRpdmUuDQo+IA0KPiBJIHRoaW5rIGFsbCBvZiB0aGVz
+ZSB2YXJpYW50cyBhcmUgdmFsaWQgd2l0aCBwcm9zIGFuZCBjb25zDQo+IDEuIHRlYWNoIHZhbGdy
+aW5kIGFib3V0IHRoaXM6DQo+IEFkZCB0byBjb3JlZ3JpbmQvbV9zeXN3cmFwL3N5c3dyYXAtbGlu
+dXguYyAoYW5kIHRoZSByZWxldmFudCBoZWFkZXIgZmlsZXMpDQo+IGtub3dsZWRnZSBhYm91dCB3
+aGljaCBwYXJ0cyBhcmUgYWN0dWFsbHkgdG91Y2hlZC4NCj4gMi4gdXNlIGRlc2lnbmF0ZWQgaW5p
+dGlhbGl6ZXJzDQo+IDMuIHVzZSBtZW1zZXQNCj4gMy4gdXNlIGEgdmFsZ3JpbmQgY2FsbGJhY2sg
+VkdfVVNFUlJFUV9fTUFLRV9NRU1fREVGSU5FRCB0byB0ZWxsIHRoYXQgdGhpcyBtZW1vcnkgaXMg
+ZGVmaW5lZA0KPiANCg0KVGhhbmsgeW91IGFsbCB2ZXJ5IG11Y2ggZm9yIHRha2luZyBwYXJ0IGlu
+IHRoZSBkaXNjdXNzaW9uLg0KQWxzbywgb25lIG1heSB1c2UgdGhlIFZhbGdyaW5kIHRlY2hub2xv
+Z3kgdG8gc3VwcHJlc3MgdGhlIHVud2FudGVkIA0KcmVwb3J0cyBieSBhZGRpbmcgdGhlIFZhbGdy
+aW5kIHNwZWNpZmljIGZvcm1hdCBmaWxlIHZhbGdyaW5kLnN1cHAgdG8gdGhlIA0KUUVNVSBwcm9q
+ZWN0LiBUaGUgZmlsZSBjb250ZW50IGlzIGV4dGVuZGFibGUgZm9yIGZ1dHVyZSBuZWVkcy4NCkFs
+bCB0aGUgY2FzZXMgd2UgbGlrZSB0byBzdXBwcmVzcyB3aWxsIGJlIHJlY291bnRlZCBpbiB0aGF0
+IGZpbGUuDQpBIGNhc2UgbG9va3MgbGlrZSB0aGUgc3RhY2sgZnJhZ21lbnRzLiBGb3IgaW5zdGFu
+Y2UsIGZyb20gUUVNVSBibG9jazoNCg0Kew0KICAgIGh3L2Jsb2NrL2hkLWdlb21ldHJ5LmMNCiAg
+ICBNZW1jaGVjazpDb25kDQogICAgZnVuOmd1ZXNzX2Rpc2tfbGNocw0KICAgIGZ1bjpoZF9nZW9t
+ZXRyeV9ndWVzcw0KICAgIGZ1bjpibGtjb25mX2dlb21ldHJ5DQogICAgLi4uDQogICAgZnVuOmRl
+dmljZV9zZXRfcmVhbGl6ZWQNCiAgICBmdW46cHJvcGVydHlfc2V0X2Jvb2wNCiAgICBmdW46b2Jq
+ZWN0X3Byb3BlcnR5X3NldA0KICAgIGZ1bjpvYmplY3RfcHJvcGVydHlfc2V0X3FvYmplY3QNCiAg
+ICBmdW46b2JqZWN0X3Byb3BlcnR5X3NldF9ib29sDQp9DQoNClRoZSBudW1iZXIgb2Ygc3VwcHJl
+c3NlZCBjYXNlcyBhcmUgcmVwb3J0ZWQgYnkgdGhlIFZhbGdyaW5kIHdpdGggZXZlcnkgDQpydW46
+ICJFUlJPUiBTVU1NQVJZOiA1IGVycm9ycyBmcm9tIDMgY29udGV4dHMgKHN1cHByZXNzZWQ6IDAg
+ZnJvbSAwKSINCg0KQW5kcmV5DQoNCj4+DQo+PiBQYW9sbw0KPj4NCj4+PiAtLS0NCj4+PiAgIHRh
+cmdldC9pMzg2L2t2bS5jIHwgMyArKysNCj4+PiAgIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlv
+bnMoKykNCj4+Pg0KPj4+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9rdm0uYyBiL3RhcmdldC9p
+Mzg2L2t2bS5jDQo+Pj4gaW5kZXggZGJiYjEzNy4uZWQ1N2UzMSAxMDA2NDQNCj4+PiAtLS0gYS90
+YXJnZXQvaTM4Ni9rdm0uYw0KPj4+ICsrKyBiL3RhcmdldC9pMzg2L2t2bS5jDQo+Pj4gQEAgLTE5
+MCw2ICsxOTAsNyBAQCBzdGF0aWMgaW50IGt2bV9nZXRfdHNjKENQVVN0YXRlICpjcykNCj4+PiAg
+ICAgICAgICAgcmV0dXJuIDA7DQo+Pj4gICAgICAgfQ0KPj4+ICAgDQo+Pj4gKyAgICBtZW1zZXQo
+Jm1zcl9kYXRhLCAwLCBzaXplb2YobXNyX2RhdGEpKTsNCj4+PiAgICAgICBtc3JfZGF0YS5pbmZv
+Lm5tc3JzID0gMTsNCj4+PiAgICAgICBtc3JfZGF0YS5lbnRyaWVzWzBdLmluZGV4ID0gTVNSX0lB
+MzJfVFNDOw0KPj4+ICAgICAgIGVudi0+dHNjX3ZhbGlkID0gIXJ1bnN0YXRlX2lzX3J1bm5pbmco
+KTsNCj4+PiBAQCAtMTcwNiw2ICsxNzA3LDcgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVT
+dGF0ZSAqY3MpDQo+Pj4gICANCj4+PiAgICAgICBpZiAoaGFzX3hzYXZlKSB7DQo+Pj4gICAgICAg
+ICAgIGVudi0+eHNhdmVfYnVmID0gcWVtdV9tZW1hbGlnbig0MDk2LCBzaXplb2Yoc3RydWN0IGt2
+bV94c2F2ZSkpOw0KPj4+ICsgICAgICAgIG1lbXNldChlbnYtPnhzYXZlX2J1ZiwgMCwgc2l6ZW9m
+KHN0cnVjdCBrdm1feHNhdmUpKTsNCj4+PiAgICAgICB9DQo+Pj4gICANCj4+PiAgICAgICBtYXhf
+bmVzdGVkX3N0YXRlX2xlbiA9IGt2bV9tYXhfbmVzdGVkX3N0YXRlX2xlbmd0aCgpOw0KPj4+IEBA
+IC0zNDc3LDYgKzM0NzksNyBAQCBzdGF0aWMgaW50IGt2bV9wdXRfZGVidWdyZWdzKFg4NkNQVSAq
+Y3B1KQ0KPj4+ICAgICAgICAgICByZXR1cm4gMDsNCj4+PiAgICAgICB9DQo+Pj4gICANCj4+PiAr
+ICAgIG1lbXNldCgmZGJncmVncywgMCwgc2l6ZW9mKGRiZ3JlZ3MpKTsNCj4+PiAgICAgICBmb3Ig
+KGkgPSAwOyBpIDwgNDsgaSsrKSB7DQo+Pj4gICAgICAgICAgIGRiZ3JlZ3MuZGJbaV0gPSBlbnYt
+PmRyW2ldOw0KPj4+ICAgICAgIH0NCj4+PiAtLSANCj4+PiAxLjguMy4xDQo+Pj4NCj4+DQo+Pg0K
+PiANCg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
 
