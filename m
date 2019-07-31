@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFBCFC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06553C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:00:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93D21208E4
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:00:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93D21208E4
+	by mail.kernel.org (Postfix) with ESMTPS id CDA86206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 08:00:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDA86206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38632 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsjX0-0000c3-Om
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 04:00:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58695)
+	id 1hsjXd-0001cN-1W
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 04:00:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58783)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hsjU5-0002CA-9u
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:18 -0400
+ (envelope-from <thuth@redhat.com>) id 1hsjUD-0002de-SE
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hsjU4-00082e-82
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33434)
+ (envelope-from <thuth@redhat.com>) id 1hsjUC-0008IS-LG
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36722)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hsjU2-000809-5R; Wed, 31 Jul 2019 03:57:14 -0400
+ id 1hsjUA-0008Ck-6N; Wed, 31 Jul 2019 03:57:22 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7007FA7D5;
- Wed, 31 Jul 2019 07:57:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 78CF7C057F2C;
+ Wed, 31 Jul 2019 07:57:21 +0000 (UTC)
 Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C1F915C1B5;
- Wed, 31 Jul 2019 07:57:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C407C5C1B5;
+ Wed, 31 Jul 2019 07:57:19 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 09:56:48 +0200
-Message-Id: <20190731075652.17053-5-thuth@redhat.com>
+Date: Wed, 31 Jul 2019 09:56:51 +0200
+Message-Id: <20190731075652.17053-8-thuth@redhat.com>
 In-Reply-To: <20190731075652.17053-1-thuth@redhat.com>
 References: <20190731075652.17053-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Wed, 31 Jul 2019 07:57:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Wed, 31 Jul 2019 07:57:21 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 4/8] hw/core: Add a config switch for the
- "register" device
+Subject: [Qemu-devel] [PATCH v2 7/8] hw/misc: Add a config switch for the
+ "unimplemented" device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,63 +77,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The "register" device is only used by certain machines. Let's add
-a proper config switch for it so that it only gets compiled when we
-really need it.
+The device is only used by some few boards. Let's use a proper Kconfig
+switch so that we only compile this code if we really need it.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/Kconfig            | 1 +
- hw/core/Kconfig       | 3 +++
- hw/core/Makefile.objs | 2 +-
- hw/dma/Kconfig        | 1 +
- 4 files changed, 6 insertions(+), 1 deletion(-)
+ hw/arm/Kconfig        | 9 +++++++++
+ hw/microblaze/Kconfig | 1 +
+ hw/misc/Kconfig       | 3 +++
+ hw/misc/Makefile.objs | 2 +-
+ hw/sparc64/Kconfig    | 1 +
+ 5 files changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index dbae1c0852..b45db3c813 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -76,3 +76,4 @@ config XILINX_AXI
+diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+index 6e24c73b54..ab9e592d74 100644
+--- a/hw/arm/Kconfig
++++ b/hw/arm/Kconfig
+@@ -217,6 +217,7 @@ config STELLARIS
+     select SSI_SD
+     select STELLARIS_INPUT
+     select STELLARIS_ENET # ethernet
++    select UNIMP
 =20
- config XLNX_ZYNQMP
+ config STRONGARM
      bool
-+    select REGISTER
-diff --git a/hw/core/Kconfig b/hw/core/Kconfig
-index c2a1ae8122..d11920fcb3 100644
---- a/hw/core/Kconfig
-+++ b/hw/core/Kconfig
-@@ -9,3 +9,6 @@ config FITLOADER
+@@ -283,6 +284,7 @@ config ALLWINNER_A10
+     select ALLWINNER_A10_PIC
+     select ALLWINNER_EMAC
+     select SERIAL
++    select UNIMP
 =20
- config PLATFORM_BUS
+ config RASPI
      bool
-+
-+config REGISTER
+@@ -320,6 +322,7 @@ config XLNX_VERSAL
+     select PL011
+     select CADENCE
+     select VIRTIO_MMIO
++    select UNIMP
+=20
+ config FSL_IMX25
+     bool
+@@ -355,6 +358,7 @@ config ASPEED_SOC
+     select SSI_M25P80
+     select TMP105
+     select TMP421
++    select UNIMP
+=20
+ config MPS2
+     bool
+@@ -378,6 +382,7 @@ config FSL_IMX7
+     select IMX_I2C
+     select PCI_EXPRESS_DESIGNWARE
+     select SDHCI
++    select UNIMP
+=20
+ config ARM_SMMUV3
+     bool
+@@ -389,6 +394,7 @@ config FSL_IMX6UL
+     select IMX_FEC
+     select IMX_I2C
+     select SDHCI
++    select UNIMP
+=20
+ config MICROBIT
+     bool
+@@ -398,6 +404,7 @@ config NRF51_SOC
+     bool
+     select I2C
+     select ARM_V7M
++    select UNIMP
+=20
+ config EMCRAFT_SF2
+     bool
+@@ -410,6 +417,7 @@ config MSF2
+     select PTIMER
+     select SERIAL
+     select SSI
++    select UNIMP
+=20
+ config ZAURUS
+     bool
+@@ -448,6 +456,7 @@ config ARMSSE
+     select TZ_MPC
+     select TZ_MSC
+     select TZ_PPC
++    select UNIMP
+=20
+ config ARMSSE_CPUID
+     bool
+diff --git a/hw/microblaze/Kconfig b/hw/microblaze/Kconfig
+index c4dc120973..e2697ced9c 100644
+--- a/hw/microblaze/Kconfig
++++ b/hw/microblaze/Kconfig
+@@ -4,6 +4,7 @@ config PETALOGIX_S3ADSP1800
+     select XILINX
+     select XILINX_AXI
+     select XILINX_ETHLITE
++    select UNIMP
+=20
+ config PETALOGIX_ML605
+     bool
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 385e1b0cec..51754bb47c 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -117,4 +117,7 @@ config AUX
+     bool
+     select I2C
+=20
++config UNIMP
 +    bool
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index f8481d959f..d6cfb2a81b 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -17,7 +17,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D machine.o
- common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
- common-obj-$(CONFIG_FITLOADER) +=3D loader-fit.o
- common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
--common-obj-$(CONFIG_SOFTMMU) +=3D register.o
-+common-obj-$(CONFIG_REGISTER) +=3D register.o
- common-obj-$(CONFIG_SOFTMMU) +=3D or-irq.o
- common-obj-$(CONFIG_SOFTMMU) +=3D split-irq.o
- common-obj-$(CONFIG_PLATFORM_BUS) +=3D platform-bus.o
-diff --git a/hw/dma/Kconfig b/hw/dma/Kconfig
-index 751dec5426..5c61b67bc0 100644
---- a/hw/dma/Kconfig
-+++ b/hw/dma/Kconfig
-@@ -16,6 +16,7 @@ config I8257
++
+ source macio/Kconfig
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index e9aab519a1..e4aad707fb 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -9,7 +9,7 @@ common-obj-$(CONFIG_PCI_TESTDEV) +=3D pci-testdev.o
+ common-obj-$(CONFIG_EDU) +=3D edu.o
+ common-obj-$(CONFIG_PCA9552) +=3D pca9552.o
 =20
- config ZYNQ_DEVCFG
-     bool
-+    select REGISTER
+-common-obj-y +=3D unimp.o
++common-obj-$(CONFIG_UNIMP) +=3D unimp.o
+ common-obj-$(CONFIG_FW_CFG_DMA) +=3D vmcoreinfo.o
 =20
- config STP2000
+ # ARM devices
+diff --git a/hw/sparc64/Kconfig b/hw/sparc64/Kconfig
+index d4d76a89be..f9f8b0f73a 100644
+--- a/hw/sparc64/Kconfig
++++ b/hw/sparc64/Kconfig
+@@ -17,3 +17,4 @@ config NIAGARA
      bool
+     select EMPTY_SLOT
+     select SUN4V_RTC
++    select UNIMP
 --=20
 2.21.0
 
