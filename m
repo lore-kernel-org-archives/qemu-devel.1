@@ -2,80 +2,79 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02233C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DC5C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:15:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2F00206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:15:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0491C206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:15:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RQGsW7X4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2F00206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sM5s12xn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0491C206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42426 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsrGJ-0005om-3Y
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:15:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40373)
+	id 1hsrGT-0006Sq-9Y
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:15:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40375)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hsr8h-00027r-GB
+ (envelope-from <alex.bennee@linaro.org>) id 1hsr8h-00027w-GZ
  for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hsr8e-0000kT-CE
+ (envelope-from <alex.bennee@linaro.org>) id 1hsr8f-0000lE-5T
  for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:43 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:50651)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33613)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hsr8d-0000fE-F8
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:39 -0400
-Received: by mail-wm1-x341.google.com with SMTP id v15so61447898wml.0
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:07:29 -0700 (PDT)
+ id 1hsr8e-0000hn-Cz
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:07:40 -0400
+Received: by mail-wr1-x441.google.com with SMTP id n9so70407051wru.0
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:07:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1nyFaFW/wTOm9VXlvjfZCzFrDnNypgzHnbD0BmcShzY=;
- b=RQGsW7X45cJA5Ute1FzYGoYoH3q6mW6FHCEK620UxSjtuDovwy7Bp0ajbxc3ErOxj/
- H2dovLD3E46rfG+Ptc0SkNnRoM7dTGupkIlFvAder0si4q85nefqfbDrw48cOL7xpICc
- lzx1QTn9z5HSMlW0ksyzbalh8MT6kphywqcl4AiYvpV8lOlwmXYHABv6h+zxM9YFq0yu
- KDzbBThRgFNqbRNj7wfGKvX5KbONoNT+g416Hy/vs5ZzFRvzysJ3CSvC3rz6Lv3ujv44
- kWEyJVmbSJro0ApGAamjIaHXeFuEjCPNjqtx0ReOsOEUQII5If8FVTiEILWFle8hS1EC
- 6CIg==
+ bh=GmxoVYqSi+9b817kRDEMuLT6apMjPTB3tafVvwHS5rQ=;
+ b=sM5s12xnGTDAcJgriEAPd069+NsIoDM75HbkFazGQOGkmgQqIwCwYuOK6xz7Mx0Bc+
+ tnduWy/ebK0pTGdAUfXJI7Af8UmnpPh7XWo31loVDo7GHj2e5psthcg0ImmtlQc0bHBM
+ OgprmpnjWiYaXLzgE1c6qNoyEzbQDZy97uRU32bPK4Iz3My1YgT0UZxqUDGvXNW85sZx
+ frZI5pCnO5cfNWUsfWymNM+HpC4RWS9PUvRPpX3VjBLcNfowFNmwHcxElcprI+g92vqE
+ yY5rwUX9R3Ns0ItyvdCoPAH8uQkwzJ9v/LeIIWTG380fCGP2aqU8D7NhuVHHjwWjCk8X
+ rAIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1nyFaFW/wTOm9VXlvjfZCzFrDnNypgzHnbD0BmcShzY=;
- b=NAbUs2hxGVao+Rp74LfBItn+O6Cu+Wk1noC8GZHoZyGrwrDRjwktxKabZgiawj07mN
- L7U/KIV9mCb6pEUyfkCztCKSaqWpsNaoieWnHUk10+6LLxtIied6N4Sg4AU5B56I3m/o
- EHtU4xS1I7yqlN9MWXt9wadpU4YsNpirunEik9UKDVz53cZkqmZsGFvhfoENz4dYTbce
- E0uww4fnxZrt6twMAbP1ogcl8r3UVQCqDAgSLOMzpn7hDBy4NdL3g5inZbrB8u6GJRlv
- zWA9s7wOJv3lBr8Bwx+QKCSH5gXbI0Ni05dkR/b4dicVHRTiUe+gsd4AdSHE3+d0n/At
- 1VxA==
-X-Gm-Message-State: APjAAAUd51VyrqnbZqSOuHy2uCJfNy98dbPH4nTSJtjP6mqaQndDhlBD
- kTOf++YGSLWyfgk9qN6kVWSMVw==
-X-Google-Smtp-Source: APXvYqzA5vwrBGB1EW1V1+kcijpdq+RQtodwRTg59IEE2FtM+6cdGVvpHCnfLQZLa5JgXCy90oiZCQ==
-X-Received: by 2002:a1c:9c8a:: with SMTP id
- f132mr111826314wme.29.1564589247908; 
- Wed, 31 Jul 2019 09:07:27 -0700 (PDT)
+ bh=GmxoVYqSi+9b817kRDEMuLT6apMjPTB3tafVvwHS5rQ=;
+ b=MtN8gTxikcS7PtDQdtx/z5UdyT3SNxBQZNe/WC+0hA9/J/el48w2CgPWesjRZC3aED
+ R6Zdoq4pch4GvFD7C4RwdCKjWRkxv3X8dkeYlN1NiiFKZn89wIKu5ZMpRBbxonufwVyQ
+ Gj3J4GaKgRgesXKqbY/QxLanOUly6cyGSfwPerwGIGf4+6rNC7MkAfe/KdFixvQHiDKH
+ e+B0akv3ilSvGvyGXwMX1A9CBvu2idUZZdaMeMlqJIgEiBJqsPDW8EfaYEcYowWyV8DS
+ eRjQOClNVSHmwva1SCCJ7hm1WuspnDv74A/tAZ7req+yfagcX1FXYQnua1n+iW8GW/+/
+ pi7A==
+X-Gm-Message-State: APjAAAXyXoTCD73M56OqzUl97Hf2cJpg+btyGOrtFqtpY7AzbvnQyTAw
+ EvAsLDa0v/GohBUpy+qfYwyaPQ==
+X-Google-Smtp-Source: APXvYqzonY00aribchdiGNrDW2Cz73vIuscEhJItbN2oO6pAbM7yKq/zagDIfkyUJfN42RQ4q1WfPg==
+X-Received: by 2002:adf:f646:: with SMTP id x6mr143350740wrp.18.1564589252615; 
+ Wed, 31 Jul 2019 09:07:32 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id t1sm82381007wra.74.2019.07.31.09.07.22
+ by smtp.gmail.com with ESMTPSA id z1sm72144165wrp.51.2019.07.31.09.07.25
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 09:07:23 -0700 (PDT)
+ Wed, 31 Jul 2019 09:07:31 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 71BBD1FF87;
- Wed, 31 Jul 2019 17:07:20 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id 419831FFB3;
+ Wed, 31 Jul 2019 17:07:22 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 17:06:36 +0100
-Message-Id: <20190731160719.11396-12-alex.bennee@linaro.org>
+Date: Wed, 31 Jul 2019 17:06:54 +0100
+Message-Id: <20190731160719.11396-30-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190731160719.11396-1-alex.bennee@linaro.org>
 References: <20190731160719.11396-1-alex.bennee@linaro.org>
@@ -84,9 +83,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v4 11/54] docs/devel: add plugins.rst design
- document
+X-Received-From: 2a00:1450:4864:20::441
+Subject: [Qemu-devel] [PATCH  v4 29/54] plugin-gen: add plugin_insn_append
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,144 +103,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is mostly extracted from Emilio's more verbose commit comments
-with some additional verbiage from me.
+From: "Emilio G. Cota" <cota@braap.org>
 
+By adding it to plugin-gen's header file, we can export is as
+an inline, since tcg.h is included in the header (we need tcg_ctx).
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+[AJB: use g_byte_array]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 ---
-v4
-  - some rewording and tweaks
-  - made non-atomicity of inline ops more explicit
-  - expanded description of plugin unload
+v3
+  - use g_byte_array
 ---
- docs/devel/index.rst   |   1 +
- docs/devel/plugins.rst | 107 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 108 insertions(+)
- create mode 100644 docs/devel/plugins.rst
+ include/exec/plugin-gen.h | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/docs/devel/index.rst b/docs/devel/index.rst
-index 1ec61fcfed9..2ff058bae38 100644
---- a/docs/devel/index.rst
-+++ b/docs/devel/index.rst
-@@ -22,3 +22,4 @@ Contents:
-    decodetree
-    secure-coding-practices
-    tcg
-+   plugins
-diff --git a/docs/devel/plugins.rst b/docs/devel/plugins.rst
-new file mode 100644
-index 00000000000..0a31227b613
---- /dev/null
-+++ b/docs/devel/plugins.rst
-@@ -0,0 +1,107 @@
-+..
-+   Copyright (C) 2017, Emilio G. Cota <cota@braap.org>
-+   Copyright (c) 2019, Linaro Limited
-+   Written by Emilio Cota and Alex Bennée
+diff --git a/include/exec/plugin-gen.h b/include/exec/plugin-gen.h
+index de519883b16..4834a9e2f40 100644
+--- a/include/exec/plugin-gen.h
++++ b/include/exec/plugin-gen.h
+@@ -27,6 +27,17 @@ void plugin_gen_insn_end(void);
+ void plugin_gen_disable_mem_helpers(void);
+ void plugin_gen_empty_mem_callback(TCGv addr, uint32_t info);
+ 
++static inline void plugin_insn_append(const void *from, size_t size)
++{
++    struct qemu_plugin_insn *insn = tcg_ctx->plugin_insn;
 +
-+================
-+QEMU TCG Plugins
-+================
++    if (insn == NULL) {
++        return;
++    }
 +
-+QEMU TCG plugins provide a way for users to run experiments taking
-+advantage of the total system control emulation can have over a guest.
-+It provides a mechanism for plugins to subscribe to events during
-+translation and execution and optionally callback into the plugin
-+during these events.
++    insn->data = g_byte_array_append(insn->data, from, size);
++}
 +
-+API Stability
-+=============
+ #else /* !CONFIG_PLUGIN */
+ 
+ static inline
+@@ -51,6 +62,9 @@ static inline void plugin_gen_disable_mem_helpers(void)
+ static inline void plugin_gen_empty_mem_callback(TCGv addr, uint32_t info)
+ { }
+ 
++static inline void plugin_insn_append(const void *from, size_t size)
++{ }
 +
-+This is a new feature for QEMU and it does allow people to develop
-+out-of-tree plugins that can be dynamically linked into a running QEMU
-+process. However the project reserves the right to change or break the
-+API should it need to do so.
-+
-+Exposure of QEMU internals
-+--------------------------
-+
-+The plugin architecture actively avoids leaking implementation details
-+about how QEMU's translation works to the plugins. While there are
-+conceptions such as translation time and translation blocks the
-+details are opaque to plugins. The plugin is able to query select
-+details of instructions and system configuration only through the
-+exported *qemu_plugin* functions. The types used to describe
-+instructions and events are opaque to the plugins themselves.
-+
-+Usage
-+=====
-+
-+The QEMU binary needs to be compiled for plugin support:
-+
-+::
-+    configure --enable-plugins
-+
-+Once built a program can be run with multiple plugins loaded each with
-+their own arguments:
-+
-+::
-+    $QEMU $OTHER_QEMU_ARGS \
-+      -plugin tests/plugin/libhowvec.so,arg=inline,arg=hint \
-+      -plugin tests/plugin/libhotblocks.so
-+
-+Arguments are plugin specific and can be used to modify their
-+behaviour. In this case the howvec plugin is being asked to use inline
-+ops to count and break down the hint instructions by type.
-+
-+Plugin Life cycle
-+=================
-+
-+First the plugin is loaded and the public qemu_plugin_install function
-+is called. The plugin will then register callbacks for various plugin
-+events. Generally plugins will register a handler for the *atexit*
-+if they want to dump a summary of collected information once the
-+program/system has finished running.
-+
-+When a registered event occurs the plugin callback is invoked. The
-+callbacks may provide additional information. In the case of a
-+translation event the plugin has an option to enumerate the
-+instructions in a block of instructions and optionally register
-+callbacks to some or all instructions when they are executed.
-+
-+There is also a facility to add an inline event where code to
-+increment a counter can be directly inlined with the translation.
-+Currently only a simple increment is supported. This is not atomic so
-+can miss counts. If you want absolute precision you should use a
-+callback which can then ensure atomicity itself.
-+
-+Finally when QEMU exits all the registered *atexit* callbacks are
-+invoked.
-+
-+Internals
-+=========
-+
-+Locking
-+-------
-+
-+We have to ensure we cannot deadlock, particularly under MTTCG. For
-+this we acquire a lock when called from plugin code. We also keep the
-+list of callbacks under RCU so that we do not have to hold the lock
-+when calling the callbacks. This is also for performance, since some
-+callbacks (e.g. memory access callbacks) might be called very
-+frequently.
-+
-+  * A consequence of this is that we keep our own list of CPUs, so that
-+    we do not have to worry about locking order wrt cpu_list_lock.
-+  * Use a recursive lock, since we can get registration calls from
-+    callbacks.
-+
-+As a result registering/unregistering callbacks is "slow", since it
-+takes a lock. But this is very infrequent; we want performance when
-+calling (or not calling) callbacks, not when registering them. Using
-+RCU is great for this.
-+
-+We support the uninstallation of a plugin at any time (e.g. from
-+plugin callbacks). This allows plugins to remove themselves if they no
-+longer want to instrument the code. This operation is asynchronous
-+which means callbacks may still occur after the uninstall operation is
-+requested. The plugin isn't completely uninstalled until the safe work
-+has executed while all vCPUs are quiescent.
+ #endif /* CONFIG_PLUGIN */
+ 
+ #endif /* QEMU_PLUGIN_GEN_H */
 -- 
 2.20.1
 
