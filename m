@@ -2,61 +2,90 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 071D0C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:17:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F1EC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:18:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4512206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:17:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4512206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 31A90206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 16:18:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B8WF5ked"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A90206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42457 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsrIC-0001pI-4t
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:17:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41163)
+	id 1hsrJ7-0003fW-D7
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 12:18:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42321)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1hsrBQ-0006Lg-Pn
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:10:33 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrG5-0005pG-Nm
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1hsrBP-0001uw-Lw
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:10:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46398)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hsrBP-0001un-ES
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:10:31 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C218B30044CC;
- Wed, 31 Jul 2019 16:10:30 +0000 (UTC)
-Received: from localhost (ovpn-117-27.ams2.redhat.com [10.36.117.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 556C219C5B;
- Wed, 31 Jul 2019 16:10:30 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: virtio-fs@redhat.com,
-	qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 17:10:04 +0100
-Message-Id: <20190731161006.9447-4-stefanha@redhat.com>
-In-Reply-To: <20190731161006.9447-1-stefanha@redhat.com>
-References: <20190731161006.9447-1-stefanha@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1hsrG1-00046y-OD
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:19 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42575)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hsrFz-00045S-RN
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 12:15:17 -0400
+Received: by mail-wr1-x442.google.com with SMTP id x1so20432580wrr.9
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 09:15:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=iZ2OY4t64w/OXbcRBQzkejkLpoLwcOyY1K+BIeISZRQ=;
+ b=B8WF5kedwnmAyRbmvR5+KcOT2SJ+DR9KN1Rk8JrBbkevCjGkGOP8We/aCgdcDSkznJ
+ GUKA5PMbnAscXFKm1Vb7eiApdJLh5uLHbp+JVMhyyrusk/Cv74O57XHXQs+5KBaMunkg
+ P71HaeE9m5+2tXegJwC+uz5tdYOv59P9UOCmUsFaPXz7uIOGL+GlFqzZ+OD4sBOF7NuB
+ 9c6cKCPchYRIAPd/1yfAbZ7/yj2xChydosq5blidQYKl9rP6yLHpnM+B8hFl6s6FCyp8
+ Mt9IqDZGH/QeUDuXTqd4vJ3H5djZkeUbth6QdcLE4PpsoqobCQJx3xwYyFCBuwAWh5W9
+ zGcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=iZ2OY4t64w/OXbcRBQzkejkLpoLwcOyY1K+BIeISZRQ=;
+ b=Q+3gHBRAY6Clp0HDpJhoTT3qIw9RPu1LJFvvwM8lMjYOE1PzEFBCfRyhsOc9xxuETK
+ 9GDFaNy+uVvQvF9weLVjO9tTUW+uaTlg70ldbp60uNlUbc3QH7T61kYx701LXe3lMF01
+ kdx4xbj7NImE+SC9Sm44U0/wYFyAO1dIN8yeAjdYDU62pH8ffpnN328XwDPYjhoIYWwq
+ zs0fh1QIrIo5YGCp//0Z+C3yVDxGrTlxraB/qqciICFXgpQvAe+bmA8F/0H3ixvxRivK
+ kRYcQvhTY4TaUZYC6GXDfTBBMYe1iPrY7saj9lCqU5/72n6IuDcnqnOWI7U96GM5DSnl
+ OgEQ==
+X-Gm-Message-State: APjAAAUl2q+epd86VSwvnN+4M2rq6O4R9GqSemw0IBw0IeikyOFzvnkb
+ bL3Yw1Refit0w8Qe3S57OP6rSg==
+X-Google-Smtp-Source: APXvYqzh/tJtxvypzwg9UvgvObuGjOdn0JpB/DskkMRxmqumBUmYh2tbqyKu3J7yZT/wor2/Rt2Qig==
+X-Received: by 2002:adf:91c2:: with SMTP id 60mr81069472wri.334.1564589713784; 
+ Wed, 31 Jul 2019 09:15:13 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id g2sm59980886wmh.0.2019.07.31.09.15.12
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 31 Jul 2019 09:15:12 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9726F1FFB7;
+ Wed, 31 Jul 2019 17:07:22 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Wed, 31 Jul 2019 17:06:58 +0100
+Message-Id: <20190731160719.11396-34-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190731160719.11396-1-alex.bennee@linaro.org>
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Wed, 31 Jul 2019 16:10:30 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/5] virtiofsd: rename inode->refcount to
- inode->nlookup
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH v4 33/54] target/sh4: fetch code with
+ translator_ld
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,134 +97,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Liu Bo <bo.liu@linux.alibaba.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ aaron@os.amperecomputing.com, cota@braap.org, bobby.prani@gmail.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reference counter plays a specific role in the FUSE protocol.  It's
-not a generic object reference counter and the FUSE kernel code calls it
-"nlookup".
+From: "Emilio G. Cota" <cota@braap.org>
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+There is a small wrinkle with the gUSA instruction. The translator
+effectively treats a (known) gUSA sequence as a single instruction.
+For the purposes of the plugin we end up with a long multi-instruction
+qemu_plugin_insn.
+
+If the known sequence isn't detected we shall never run this
+translation anyway.
+
+Signed-off-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- contrib/virtiofsd/passthrough_ll.c | 36 ++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 12 deletions(-)
+ target/sh4/translate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passt=
-hrough_ll.c
-index e1d729d26b..135123366a 100644
---- a/contrib/virtiofsd/passthrough_ll.c
-+++ b/contrib/virtiofsd/passthrough_ll.c
-@@ -97,7 +97,19 @@ struct lo_inode {
- 	int fd;
- 	bool is_symlink;
- 	struct lo_key key;
--	uint64_t refcount; /* protected by lo->mutex */
-+
-+	/* This counter keeps the inode alive during the FUSE session.
-+	 * Incremented when the FUSE inode number is sent in a reply
-+	 * (FUSE_LOOKUP, FUSE_READDIRPLUS, etc).  Decremented when an inode is
-+	 * released by requests like FUSE_FORGET, FUSE_RMDIR, FUSE_RENAME, etc.
-+	 *
-+	 * Note that this value is untrusted because the client can manipulate
-+	 * it arbitrarily using FUSE_FORGET requests.
-+	 *
-+	 * Protected by lo->mutex.
-+	 */
-+	uint64_t nlookup;
-+
- 	uint64_t version_offset;
- 	uint64_t ireg_refid;
- 	fuse_ino_t fuse_ino;
-@@ -485,7 +497,7 @@ retry:
- 	if (last =3D=3D path) {
- 		p =3D &lo->root;
- 		pthread_mutex_lock(&lo->mutex);
--		p->refcount++;
-+		p->nlookup++;
- 		pthread_mutex_unlock(&lo->mutex);
- 	} else {
- 		*last =3D '\0';
-@@ -688,8 +700,8 @@ static struct lo_inode *lo_find(struct lo_data *lo, s=
-truct stat *st)
- 	pthread_mutex_lock(&lo->mutex);
- 	p =3D g_hash_table_lookup(lo->inodes, &key);
- 	if (p) {
--		assert(p->refcount > 0);
--		p->refcount++;
-+		assert(p->nlookup > 0);
-+		p->nlookup++;
- 	}
- 	pthread_mutex_unlock(&lo->mutex);
-=20
-@@ -797,7 +809,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
- 			goto out_err;
-=20
- 		inode->is_symlink =3D S_ISLNK(e->attr.st_mode);
--		inode->refcount =3D 1;
-+		inode->nlookup =3D 1;
- 		inode->fd =3D newfd;
- 		newfd =3D -1;
- 		inode->key.ino =3D e->attr.st_ino;
-@@ -1051,7 +1063,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino,=
- fuse_ino_t parent,
- 		goto out_err;
-=20
- 	pthread_mutex_lock(&lo->mutex);
--	inode->refcount++;
-+	inode->nlookup++;
- 	pthread_mutex_unlock(&lo->mutex);
- 	e.ino =3D inode->fuse_ino;
- 	update_version(lo, inode);
-@@ -1200,9 +1212,9 @@ static void unref_inode(struct lo_data *lo, struct =
-lo_inode *inode, uint64_t n)
- 		return;
-=20
- 	pthread_mutex_lock(&lo->mutex);
--	assert(inode->refcount >=3D n);
--	inode->refcount -=3D n;
--	if (!inode->refcount) {
-+	assert(inode->nlookup >=3D n);
-+	inode->nlookup -=3D n;
-+	if (!inode->nlookup) {
- 		lo_map_remove(&lo->ino_map, inode->fuse_ino);
-                 g_hash_table_remove(lo->inodes, &inode->key);
- 		if (g_hash_table_size(inode->posix_locks)) {
-@@ -1225,7 +1237,7 @@ static int unref_all_inodes_cb(gpointer key, gpoint=
-er value,
- 	struct lo_inode *inode  =3D value;
- 	struct lo_data *lo =3D user_data;
-=20
--	inode->refcount =3D 0;
-+	inode->nlookup =3D 0;
- 	lo_map_remove(&lo->ino_map, inode->fuse_ino);
- 	close(inode->fd);
-=20
-@@ -1252,7 +1264,7 @@ static void lo_forget_one(fuse_req_t req, fuse_ino_=
-t ino, uint64_t nlookup)
- 	if (lo_debug(req)) {
- 		fuse_debug("  forget %lli %lli -%lli\n",
- 			   (unsigned long long) ino,
--			   (unsigned long long) inode->refcount,
-+			   (unsigned long long) inode->nlookup,
- 			   (unsigned long long) nlookup);
- 	}
-=20
-@@ -2581,7 +2593,7 @@ static void setup_root(struct lo_data *lo, struct l=
-o_inode *root)
- 	root->fd =3D fd;
- 	root->key.ino =3D stat.st_ino;
- 	root->key.dev =3D stat.st_dev;
--	root->refcount =3D 2;
-+	root->nlookup =3D 2;
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 5a7d8c45355..922785e225e 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1917,7 +1917,7 @@ static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
+ 
+     /* Read all of the insns for the region.  */
+     for (i = 0; i < max_insns; ++i) {
+-        insns[i] = cpu_lduw_code(env, pc + i * 2);
++        insns[i] = translator_lduw(env, pc + i * 2);
+     }
+ 
+     ld_adr = ld_dst = ld_mop = -1;
+@@ -2332,7 +2332,7 @@ static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     }
+ #endif
+ 
+-    ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
++    ctx->opcode = translator_lduw(env, ctx->base.pc_next);
+     decode_opc(ctx);
+     ctx->base.pc_next += 2;
  }
-=20
- static void setup_proc_self_fd(struct lo_data *lo)
---=20
-2.21.0
+-- 
+2.20.1
 
 
