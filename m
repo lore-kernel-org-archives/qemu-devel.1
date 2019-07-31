@@ -2,109 +2,91 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27025C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 10:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD32AC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:00:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00A3F20651
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 10:54:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00A3F20651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A7B0720651
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:00:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keS9ltW4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B0720651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsmFz-0003z5-4P
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 06:54:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36110)
+	id 1hsmLh-0005Rf-VR
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 07:00:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37979)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hsmFc-0003a5-14
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:54:32 -0400
+ (envelope-from <danielhb413@gmail.com>) id 1hsmLJ-00051Z-Fo
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:00:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hsmFb-00005U-4H
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:54:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51196)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hsmFa-00005N-Sj
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 06:54:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3E48230833A5
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 10:54:30 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 97CB260852;
- Wed, 31 Jul 2019 10:54:29 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190726120542.9894-1-armbru@redhat.com>
- <20190726120542.9894-6-armbru@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-Organization: Red Hat
-Message-ID: <0fe6f815-d73b-6e3a-63f1-64e7ba45c3b5@redhat.com>
-Date: Wed, 31 Jul 2019 12:54:28 +0200
+ (envelope-from <danielhb413@gmail.com>) id 1hsmLI-00043J-8T
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:00:25 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:46259)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+ id 1hsmLI-00042P-16
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:00:24 -0400
+Received: by mail-qt1-x842.google.com with SMTP id h21so66002175qtn.13
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 04:00:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language;
+ bh=9OiGuGVfxgW84qDQvWoxVsuHs7zNTWBbiasMG81oNMM=;
+ b=keS9ltW4dslPX6z3TloZE9Cm7Y8DJYc2sHo1ImTBmyD7Z5Uq/VyALWpNOePvHLNWN9
+ fHHejU2Qr8RIfU2UjLJlJochrjO9eXTXp3D7RZfckksx5YYSIERyd4NKyE8OTVy6sM/z
+ yB7GG2wFhL64GipgNZgEiJEp5Va+0E31sCcDIv8gUynCEUIO+g6EVNoV5bVsW9ZYFfqY
+ GS/xoFipWnEvQapVsgEAt2/chgJHbtDSZ8o+V0eiI63g5062YTrUza8HApbJRAROv/Sh
+ zmPIqr5NpPV/jK6Ex7CPfj4etIaIpD97qyZVXarkDMMuU4Zqg3ZOLgOFMkDvc4rROmRL
+ QzSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language;
+ bh=9OiGuGVfxgW84qDQvWoxVsuHs7zNTWBbiasMG81oNMM=;
+ b=Z5PsGrjouTME0j15grhzhXEXxCjV+NIBQ291/FMSaE0pQ5dWpXjpaeEIawTKH48s9A
+ Rw1qTL2w1EXmq4+sNnJkmADysLGx9J2KMHMGC+tMrlKcw4XaIowJPFpo+OIzJyTaz0tR
+ p3IKWHRNkv9rf4jSJyVxb4AFsXfvwZrF456sAXqpb1Lrx19tjleOagP6nRHOMIYy1f3k
+ SbtXhMdC+zNijIZVLiriMu22FsjP2FcQ/QoRBOSYNkxN0VRNaXRcwl9lcpiJAOvAkvKH
+ qXOmzw8nacIxJJk5Gh9bcCVDKIMWEN8+Z++72dFVn1/H3kHrz9MaRNj1PlTqzHzsfnAs
+ 2GNg==
+X-Gm-Message-State: APjAAAVfXlw5vRBHUrVsD5n75193R7mgBXSJYRt/ORVdrdA76eTRK+J4
+ +jEtU9t2mRhUh7e+QJRLn9w=
+X-Google-Smtp-Source: APXvYqyGBmYYImVyyog4u8K7poCJkZ/e9vior/DiTb47ugcl3e7vzpIS4gTJKVfcY4eBTc1OZR+hog==
+X-Received: by 2002:ac8:3811:: with SMTP id q17mr82696953qtb.315.1564570822617; 
+ Wed, 31 Jul 2019 04:00:22 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7c6:c98b:1f8e:2db4:cad6:fbb6?
+ ([2804:431:c7c6:c98b:1f8e:2db4:cad6:fbb6])
+ by smtp.gmail.com with ESMTPSA id o10sm33630517qti.62.2019.07.31.04.00.20
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 31 Jul 2019 04:00:21 -0700 (PDT)
+To: qemu-devel@nongnu.org
+References: <20190628194512.21311-1-danielhb413@gmail.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <679fbb15-5015-ce4b-1ca3-87fc2eeb7fd8@gmail.com>
+Date: Wed, 31 Jul 2019 08:00:16 -0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190726120542.9894-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190628194512.21311-1-danielhb413@gmail.com>
 Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::842
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 31 Jul 2019 10:54:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 05/28] queue: Drop superfluous #include
- qemu/atomic.h
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v4 0/4] delete created files when
+ block_crypto_co_create_opts_luks fails
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,35 +98,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, jsnow@redhat.com, berrange@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/07/2019 14.05, Markus Armbruster wrote:
-> When commit 5f7d05ecfda added QLIST_INSERT_HEAD_RCU() to qemu/queue.h,
-> it had to include qemu/atomic.h.  Commit 341774fe6cc removed
-> QLIST_INSERT_HEAD_RCU() again, but neglected to remove the #include.
-> Do that now.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/qemu/queue.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-> index 0379bd8fdb..73bf4a984d 100644
-> --- a/include/qemu/queue.h
-> +++ b/include/qemu/queue.h
-> @@ -78,8 +78,6 @@
->   * For details on the use of these macros, see the queue(3) manual page.
->   */
->  
-> -#include "qemu/atomic.h" /* for smp_wmb() */
-> -
->  /*
->   * List definitions.
->   */
-> 
+Ping
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 6/28/19 4:45 PM, Daniel Henrique Barboza wrote:
+> Changes from previous version [1]:
+> - added an extra patch including a new qemu-iotest to exercise the fix
+>
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg07159.html
+>
+> Daniel Henrique Barboza (4):
+>    block: introducing 'bdrv_co_delete_file' interface
+>    block.c: adding bdrv_delete_file
+>    crypto.c: cleanup created file when block_crypto_co_create_opts_luks
+>      fails
+>    qemu-iotests: adding LUKS cleanup for non-UTF8 secret error
+>
+>   block.c                    | 82 ++++++++++++++++++++++++++++++++++++++
+>   block/crypto.c             | 31 ++++++++++++++
+>   block/file-posix.c         | 28 +++++++++++++
+>   include/block/block.h      |  3 ++
+>   include/block/block_int.h  |  6 +++
+>   tests/qemu-iotests/257     | 67 +++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/257.out | 11 +++++
+>   tests/qemu-iotests/group   |  1 +
+>   8 files changed, 229 insertions(+)
+>   create mode 100755 tests/qemu-iotests/257
+>   create mode 100644 tests/qemu-iotests/257.out
+>
 
