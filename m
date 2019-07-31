@@ -3,61 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB29C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 07:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A461FC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 07:58:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4195F206A2
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 07:58:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4195F206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 7B2EF206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 07:58:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B2EF206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsjUz-0003nN-Fv
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 03:58:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58713)
+	id 1hsjVb-0005d9-QM
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 03:58:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58626)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hsjU7-0002Ib-D3
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:20 -0400
+ (envelope-from <thuth@redhat.com>) id 1hsjTx-0001nj-DX
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hsjU6-00084B-7v
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44532)
+ (envelope-from <thuth@redhat.com>) id 1hsjTw-0007xq-EH
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 03:57:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45290)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hsjU4-00081e-1m; Wed, 31 Jul 2019 03:57:16 -0400
+ id 1hsjTu-0007w5-7m; Wed, 31 Jul 2019 03:57:06 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5E0693022468;
- Wed, 31 Jul 2019 07:57:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E2A73B71F;
+ Wed, 31 Jul 2019 07:57:05 +0000 (UTC)
 Received: from thuth.com (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B26795C1B5;
- Wed, 31 Jul 2019 07:57:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CFEB85C1B5;
+ Wed, 31 Jul 2019 07:57:03 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 09:56:49 +0200
-Message-Id: <20190731075652.17053-6-thuth@redhat.com>
+Date: Wed, 31 Jul 2019 09:56:46 +0200
+Message-Id: <20190731075652.17053-3-thuth@redhat.com>
 In-Reply-To: <20190731075652.17053-1-thuth@redhat.com>
 References: <20190731075652.17053-1-thuth@redhat.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 31 Jul 2019 07:57:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Wed, 31 Jul 2019 07:57:05 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 5/8] hw/core: Add a config switch for the
- "or-irq" device
+Subject: [Qemu-devel] [PATCH v2 2/8] hw/intc: Only build the xlnx-iomod-intc
+ device for the MicroBlaze PMU
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,88 +78,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The "or-irq" device is only used by certain machines. Let's add
-a proper config switch for it so that it only gets compiled when we
-really need it.
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+The Xilinx I/O Module Interrupt Controller is only used by the
+MicroBlaze PMU, not by the AArch64 machine.
+Move it from the generic ZynqMP object list to the PMU specific.
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190427141459.19728-3-philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/Kconfig        | 3 +++
- hw/core/Kconfig       | 3 +++
- hw/core/Makefile.objs | 2 +-
- hw/pci-host/Kconfig   | 3 ++-
- 4 files changed, 9 insertions(+), 2 deletions(-)
+ hw/intc/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index ab65ecd216..849195c3f6 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -292,6 +292,7 @@ config RASPI
- config STM32F205_SOC
-     bool
-     select ARM_V7M
-+    select OR_IRQ
-     select STM32F2XX_TIMER
-     select STM32F2XX_USART
-     select STM32F2XX_SYSCFG
-@@ -360,6 +361,7 @@ config MPS2
-     select LAN9118
-     select MPS2_FPGAIO
-     select MPS2_SCC
-+    select OR_IRQ
-     select PL022    # Serial port
-     select PL080    # DMA controller
-=20
-@@ -439,6 +441,7 @@ config ARMSSE
-     select IOTKIT_SECCTL
-     select IOTKIT_SYSCTL
-     select IOTKIT_SYSINFO
-+    select OR_IRQ
-     select TZ_MPC
-     select TZ_MSC
-     select TZ_PPC
-diff --git a/hw/core/Kconfig b/hw/core/Kconfig
-index d11920fcb3..984143456a 100644
---- a/hw/core/Kconfig
-+++ b/hw/core/Kconfig
-@@ -7,6 +7,9 @@ config PTIMER
- config FITLOADER
-     bool
-=20
-+config OR_IRQ
-+    bool
-+
- config PLATFORM_BUS
-     bool
-=20
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-index d6cfb2a81b..ce337bd7c9 100644
---- a/hw/core/Makefile.objs
-+++ b/hw/core/Makefile.objs
-@@ -18,7 +18,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D loader.o
- common-obj-$(CONFIG_FITLOADER) +=3D loader-fit.o
- common-obj-$(CONFIG_SOFTMMU) +=3D qdev-properties-system.o
- common-obj-$(CONFIG_REGISTER) +=3D register.o
--common-obj-$(CONFIG_SOFTMMU) +=3D or-irq.o
-+common-obj-$(CONFIG_OR_IRQ) +=3D or-irq.o
- common-obj-$(CONFIG_SOFTMMU) +=3D split-irq.o
- common-obj-$(CONFIG_PLATFORM_BUS) +=3D platform-bus.o
- common-obj-$(CONFIG_SOFTMMU) +=3D generic-loader.o
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index 8c16d96b3f..1edc1a31d4 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -2,8 +2,9 @@ config PAM
-     bool
-=20
- config PREP_PCI
--    select PCI
-     bool
-+    select PCI
-+    select OR_IRQ
-=20
- config GRACKLE_PCI
-     select PCI
+diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
+index 03019b9a03..f726d87532 100644
+--- a/hw/intc/Makefile.objs
++++ b/hw/intc/Makefile.objs
+@@ -3,7 +3,7 @@ common-obj-$(CONFIG_I8259) +=3D i8259_common.o i8259.o
+ common-obj-$(CONFIG_PL190) +=3D pl190.o
+ common-obj-$(CONFIG_PUV3) +=3D puv3_intc.o
+ common-obj-$(CONFIG_XILINX) +=3D xilinx_intc.o
+-common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-pmu-iomod-intc.o
++common-obj-$(CONFIG_XLNX_ZYNQMP_PMU) +=3D xlnx-pmu-iomod-intc.o
+ common-obj-$(CONFIG_XLNX_ZYNQMP) +=3D xlnx-zynqmp-ipi.o
+ common-obj-$(CONFIG_ETRAXFS) +=3D etraxfs_pic.o
+ common-obj-$(CONFIG_IMX) +=3D imx_avic.o imx_gpcv2.o
 --=20
 2.21.0
 
