@@ -2,121 +2,92 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6E8C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23493C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:09:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2797206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:05:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Fo777J2F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2797206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DDE82206A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:09:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDE82206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsnMO-0006dH-20
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54133)
+	id 1hsnQb-000812-4N
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:09:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55763)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hsnLh-00064j-4D
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:04:58 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hsnQA-0007VP-I6
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:09:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1hsnLf-0006bU-TK
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:04:53 -0400
-Received: from mail-eopbgr80101.outbound.protection.outlook.com
- ([40.107.8.101]:60771 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1hsnLc-0006Y7-W5; Wed, 31 Jul 2019 08:04:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=grpHDtWprOVhDeYy0o00wtmflcvu4mJXbxwCQ2Fn/K4C7cjFytu1++DlYCpTCjJ5rV9TC1L3G21c9i9cWWC3gpt/M9Tz1jMe7qKUFcv1ycma1YsqFOPpWgCAFLQikkf5my0nOppiyqwL7Q5omW3ikK4zssF6eQVdcS+3qN2NY4J+6cgub0HOKYzMwDXsm5//tN1RTrjAJ6X5zzBISqowLY/y3/kG4Hwcsc8H7PnyAgY+ASzY6A3BaCIIqEqi+NniNZ5LHng+S7tW+Wn7cW5rfDww4Lyv38t4JjdGGO0icq/iomWXEMbFUbnm9ebOetgc+n8aZXvxoe0XVnga1Xwh7g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yilQWr7gqdzBqbFGRwV7j8g6Cey0XHXd2U0NVWn2ZG0=;
- b=NvK8Wlmc9X1iSE6zoWRmJOAgMid0yYyRCnlCCm10WpQwlU4qnLoDYrQBsH7mJlV67bUaoPv2spJgR9T3RfAu1gOQExlrqzwm2+YmNpKAjU/dQqI0S/wJicfTCFf1DgxKyRWl7H2U6uop/Ekcr9ps7jim8PflLVGZUfLspTRmqBniSOb0FHlnWayW+4r8NZlqfsr+YfHJAfjZEFjMj66LE9kTj7GBuvJcLENQIxaXoE1Z3bV2LYk5xKSZLgH6/6L4yflLk+Sj7ypDYRK9NIS5l+Gg4if2nSun2nX/Oizomjpr4wyQ0fvLh1bnLi1Ch9s8nGw1385eATDA8yLpImbgLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
- header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yilQWr7gqdzBqbFGRwV7j8g6Cey0XHXd2U0NVWn2ZG0=;
- b=Fo777J2FPnHx653/I0nKZsdIrxW5W8D1O0vcjTxwfgFSGfpZeEyBPye04VlL26Plj5EpwA+gJnk58C/IAPjSN8egryaPmwhrQwxwryDxrnS2DHTI/FKHzL9S8+IDQFtjxJckImIjMjdfhuxmitjtOcotcxKQck2SRXZdKx3yvF8=
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com (20.179.28.141) by
- VI1PR08MB3469.eurprd08.prod.outlook.com (20.177.59.23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.15; Wed, 31 Jul 2019 12:04:45 +0000
-Received: from VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::303d:1bb9:76b2:99d7]) by VI1PR08MB4399.eurprd08.prod.outlook.com
- ([fe80::303d:1bb9:76b2:99d7%6]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
- 12:04:44 +0000
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Paolo Bonzini
- <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH 3/3] i386/kvm: initialize struct at full before ioctl call
-Thread-Index: AQHVRvAnLLtzNA+T0EeBbI/1wGIp+qbjic2AgADKawCAAE4tAA==
-Date: Wed, 31 Jul 2019 12:04:44 +0000
-Message-ID: <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
-References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
- <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
- <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
-In-Reply-To: <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P189CA0022.EURP189.PROD.OUTLOOK.COM (2603:10a6:7:53::35)
- To VI1PR08MB4399.eurprd08.prod.outlook.com
- (2603:10a6:803:102::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6ab02044-8263-48a3-3822-08d715af46be
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:VI1PR08MB3469; 
-x-ms-traffictypediagnostic: VI1PR08MB3469:
-x-microsoft-antispam-prvs: <VI1PR08MB3469E7E52B6E049612BC837CF4DF0@VI1PR08MB3469.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 011579F31F
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(366004)(376002)(39850400004)(136003)(346002)(199004)(189003)(66476007)(102836004)(86362001)(6116002)(66556008)(52116002)(71190400001)(186003)(107886003)(36756003)(486006)(99286004)(64756008)(71200400001)(53546011)(3846002)(76176011)(66066001)(386003)(44832011)(305945005)(66446008)(54906003)(6506007)(66946007)(7416002)(6512007)(5660300002)(110136005)(31696002)(4326008)(229853002)(256004)(6486002)(53936002)(476003)(81166006)(31686004)(11346002)(2616005)(316002)(26005)(68736007)(2201001)(6246003)(6436002)(8676002)(2501003)(7736002)(8936002)(446003)(81156014)(478600001)(25786009)(14454004)(2906002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:VI1PR08MB3469;
- H:VI1PR08MB4399.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Arcn5437whNXUyLF2PB4nMOXWlr4kTb/S01Ee+K2HbvkkvOwy/CGIWYGqtyBbGBvaoRzT6R+u8UmKTcEkCWBCRoPlDJ8dsOsWh26mp/BhT/Uwlj/1G3PCJVCTgyqxwUoY+ZkSQLbXl4/Sq35D3rDRdvru+BhojASYibZWk44iSdas3qaVuprPa8641n1CfgxyMUieG1zrQZOZbB+jKeTL10+Zt2/azuD+x8KN/p7s7i49a2Wp/kQGXORugKl0ivULnVx0JYbZr17M8b5T913ZGvzXKHNkW9en1VOYAxnKnyx1COokPJ8jpb1L4QjX8+hPY+NcYh5KETEInLkx1HoKvYh4wWvG/LkRtJhKT4I2sRA98Gt5Hu2xWFHu1N01JdwWGhVSUKqd/dXl8cCaQSEHwvlzgEyOV0HkYs8ARq8Z68=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <EEBD0B39DB78A6469C8D26470591EE39@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <mreitz@redhat.com>) id 1hsnQ8-0001ZX-RR
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:09:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41294)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hsnQ5-0001Vh-0Z; Wed, 31 Jul 2019 08:09:25 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0061230821AE;
+ Wed, 31 Jul 2019 12:09:24 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-44.ams2.redhat.com
+ [10.36.117.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E48D25D9C5;
+ Wed, 31 Jul 2019 12:09:18 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190725091900.30542-1-vsementsov@virtuozzo.com>
+ <20190725091900.30542-2-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2a105159-ab90-8f7c-bba9-4cec27e6144c@redhat.com>
+Date: Wed, 31 Jul 2019 14:09:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ab02044-8263-48a3-3822-08d715af46be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 12:04:44.8424 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: andrey.shinkevich@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3469
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.101
-Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
- before ioctl call
+In-Reply-To: <20190725091900.30542-2-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="HGNFFV4rPmQTX0MHfEqiR4g5tvalwGZt3"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 31 Jul 2019 12:09:24 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 1/9] block: add
+ .bdrv_need_rw_file_child_during_reopen_rw handler
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,67 +99,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "berto@igalia.com" <berto@igalia.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Denis Lunev <den@virtuozzo.com>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "armbru@redhat.com" <armbru@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gMzEvMDcvMjAxOSAxMDoyNCwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOg0KPiANCj4g
-DQo+IE9uIDMwLjA3LjE5IDIxOjIwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0KPj4gT24gMzAvMDcv
-MTkgMTg6MDEsIEFuZHJleSBTaGlua2V2aWNoIHdyb3RlOg0KPj4+IE5vdCB0aGUgd2hvbGUgc3Ry
-dWN0dXJlIGlzIGluaXRpYWxpemVkIGJlZm9yZSBwYXNzaW5nIGl0IHRvIHRoZSBLVk0uDQo+Pj4g
-UmVkdWNlIHRoZSBudW1iZXIgb2YgVmFsZ3JpbmQgcmVwb3J0cy4NCj4+Pg0KPj4+IFNpZ25lZC1v
-ZmYtYnk6IEFuZHJleSBTaGlua2V2aWNoIDxhbmRyZXkuc2hpbmtldmljaEB2aXJ0dW96em8uY29t
-Pg0KPj4NCj4+IENocmlzdGlhbiwgaXMgdGhpcyB0aGUgcmlnaHQgZml4PyAgSXQncyBub3QgZXhw
-ZW5zaXZlIHNvIGl0IHdvdWxkbid0IGJlDQo+PiBhbiBpc3N1ZSwganVzdCBjaGVja2luZyBpZiB0
-aGVyZSdzIGFueSBiZXR0ZXIgYWx0ZXJuYXRpdmUuDQo+IA0KPiBJIHRoaW5rIGFsbCBvZiB0aGVz
-ZSB2YXJpYW50cyBhcmUgdmFsaWQgd2l0aCBwcm9zIGFuZCBjb25zDQo+IDEuIHRlYWNoIHZhbGdy
-aW5kIGFib3V0IHRoaXM6DQo+IEFkZCB0byBjb3JlZ3JpbmQvbV9zeXN3cmFwL3N5c3dyYXAtbGlu
-dXguYyAoYW5kIHRoZSByZWxldmFudCBoZWFkZXIgZmlsZXMpDQo+IGtub3dsZWRnZSBhYm91dCB3
-aGljaCBwYXJ0cyBhcmUgYWN0dWFsbHkgdG91Y2hlZC4NCj4gMi4gdXNlIGRlc2lnbmF0ZWQgaW5p
-dGlhbGl6ZXJzDQo+IDMuIHVzZSBtZW1zZXQNCj4gMy4gdXNlIGEgdmFsZ3JpbmQgY2FsbGJhY2sg
-VkdfVVNFUlJFUV9fTUFLRV9NRU1fREVGSU5FRCB0byB0ZWxsIHRoYXQgdGhpcyBtZW1vcnkgaXMg
-ZGVmaW5lZA0KPiANCg0KVGhhbmsgeW91IGFsbCB2ZXJ5IG11Y2ggZm9yIHRha2luZyBwYXJ0IGlu
-IHRoZSBkaXNjdXNzaW9uLg0KQWxzbywgb25lIG1heSB1c2UgdGhlIFZhbGdyaW5kIHRlY2hub2xv
-Z3kgdG8gc3VwcHJlc3MgdGhlIHVud2FudGVkIA0KcmVwb3J0cyBieSBhZGRpbmcgdGhlIFZhbGdy
-aW5kIHNwZWNpZmljIGZvcm1hdCBmaWxlIHZhbGdyaW5kLnN1cHAgdG8gdGhlIA0KUUVNVSBwcm9q
-ZWN0LiBUaGUgZmlsZSBjb250ZW50IGlzIGV4dGVuZGFibGUgZm9yIGZ1dHVyZSBuZWVkcy4NCkFs
-bCB0aGUgY2FzZXMgd2UgbGlrZSB0byBzdXBwcmVzcyB3aWxsIGJlIHJlY291bnRlZCBpbiB0aGF0
-IGZpbGUuDQpBIGNhc2UgbG9va3MgbGlrZSB0aGUgc3RhY2sgZnJhZ21lbnRzLiBGb3IgaW5zdGFu
-Y2UsIGZyb20gUUVNVSBibG9jazoNCg0Kew0KICAgIGh3L2Jsb2NrL2hkLWdlb21ldHJ5LmMNCiAg
-ICBNZW1jaGVjazpDb25kDQogICAgZnVuOmd1ZXNzX2Rpc2tfbGNocw0KICAgIGZ1bjpoZF9nZW9t
-ZXRyeV9ndWVzcw0KICAgIGZ1bjpibGtjb25mX2dlb21ldHJ5DQogICAgLi4uDQogICAgZnVuOmRl
-dmljZV9zZXRfcmVhbGl6ZWQNCiAgICBmdW46cHJvcGVydHlfc2V0X2Jvb2wNCiAgICBmdW46b2Jq
-ZWN0X3Byb3BlcnR5X3NldA0KICAgIGZ1bjpvYmplY3RfcHJvcGVydHlfc2V0X3FvYmplY3QNCiAg
-ICBmdW46b2JqZWN0X3Byb3BlcnR5X3NldF9ib29sDQp9DQoNClRoZSBudW1iZXIgb2Ygc3VwcHJl
-c3NlZCBjYXNlcyBhcmUgcmVwb3J0ZWQgYnkgdGhlIFZhbGdyaW5kIHdpdGggZXZlcnkgDQpydW46
-ICJFUlJPUiBTVU1NQVJZOiA1IGVycm9ycyBmcm9tIDMgY29udGV4dHMgKHN1cHByZXNzZWQ6IDAg
-ZnJvbSAwKSINCg0KQW5kcmV5DQoNCj4+DQo+PiBQYW9sbw0KPj4NCj4+PiAtLS0NCj4+PiAgIHRh
-cmdldC9pMzg2L2t2bS5jIHwgMyArKysNCj4+PiAgIDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlv
-bnMoKykNCj4+Pg0KPj4+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9rdm0uYyBiL3RhcmdldC9p
-Mzg2L2t2bS5jDQo+Pj4gaW5kZXggZGJiYjEzNy4uZWQ1N2UzMSAxMDA2NDQNCj4+PiAtLS0gYS90
-YXJnZXQvaTM4Ni9rdm0uYw0KPj4+ICsrKyBiL3RhcmdldC9pMzg2L2t2bS5jDQo+Pj4gQEAgLTE5
-MCw2ICsxOTAsNyBAQCBzdGF0aWMgaW50IGt2bV9nZXRfdHNjKENQVVN0YXRlICpjcykNCj4+PiAg
-ICAgICAgICAgcmV0dXJuIDA7DQo+Pj4gICAgICAgfQ0KPj4+ICAgDQo+Pj4gKyAgICBtZW1zZXQo
-Jm1zcl9kYXRhLCAwLCBzaXplb2YobXNyX2RhdGEpKTsNCj4+PiAgICAgICBtc3JfZGF0YS5pbmZv
-Lm5tc3JzID0gMTsNCj4+PiAgICAgICBtc3JfZGF0YS5lbnRyaWVzWzBdLmluZGV4ID0gTVNSX0lB
-MzJfVFNDOw0KPj4+ICAgICAgIGVudi0+dHNjX3ZhbGlkID0gIXJ1bnN0YXRlX2lzX3J1bm5pbmco
-KTsNCj4+PiBAQCAtMTcwNiw2ICsxNzA3LDcgQEAgaW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVT
-dGF0ZSAqY3MpDQo+Pj4gICANCj4+PiAgICAgICBpZiAoaGFzX3hzYXZlKSB7DQo+Pj4gICAgICAg
-ICAgIGVudi0+eHNhdmVfYnVmID0gcWVtdV9tZW1hbGlnbig0MDk2LCBzaXplb2Yoc3RydWN0IGt2
-bV94c2F2ZSkpOw0KPj4+ICsgICAgICAgIG1lbXNldChlbnYtPnhzYXZlX2J1ZiwgMCwgc2l6ZW9m
-KHN0cnVjdCBrdm1feHNhdmUpKTsNCj4+PiAgICAgICB9DQo+Pj4gICANCj4+PiAgICAgICBtYXhf
-bmVzdGVkX3N0YXRlX2xlbiA9IGt2bV9tYXhfbmVzdGVkX3N0YXRlX2xlbmd0aCgpOw0KPj4+IEBA
-IC0zNDc3LDYgKzM0NzksNyBAQCBzdGF0aWMgaW50IGt2bV9wdXRfZGVidWdyZWdzKFg4NkNQVSAq
-Y3B1KQ0KPj4+ICAgICAgICAgICByZXR1cm4gMDsNCj4+PiAgICAgICB9DQo+Pj4gICANCj4+PiAr
-ICAgIG1lbXNldCgmZGJncmVncywgMCwgc2l6ZW9mKGRiZ3JlZ3MpKTsNCj4+PiAgICAgICBmb3Ig
-KGkgPSAwOyBpIDwgNDsgaSsrKSB7DQo+Pj4gICAgICAgICAgIGRiZ3JlZ3MuZGJbaV0gPSBlbnYt
-PmRyW2ldOw0KPj4+ICAgICAgIH0NCj4+PiAtLSANCj4+PiAxLjguMy4xDQo+Pj4NCj4+DQo+Pg0K
-PiANCg0KLS0gDQpXaXRoIHRoZSBiZXN0IHJlZ2FyZHMsDQpBbmRyZXkgU2hpbmtldmljaA0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HGNFFV4rPmQTX0MHfEqiR4g5tvalwGZt3
+Content-Type: multipart/mixed; boundary="lTNPetTuBKC6yLFpsSKfETEz4ccfqC3yP";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, fam@euphon.net, kwolf@redhat.com, den@openvz.org
+Message-ID: <2a105159-ab90-8f7c-bba9-4cec27e6144c@redhat.com>
+Subject: Re: [PATCH v3 1/9] block: add
+ .bdrv_need_rw_file_child_during_reopen_rw handler
+References: <20190725091900.30542-1-vsementsov@virtuozzo.com>
+ <20190725091900.30542-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190725091900.30542-2-vsementsov@virtuozzo.com>
+
+--lTNPetTuBKC6yLFpsSKfETEz4ccfqC3yP
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 25.07.19 11:18, Vladimir Sementsov-Ogievskiy wrote:
+> On reopen to rw parent may need rw access to child in .prepare, for
+> example qcow2 needs to write IN_USE flags into stored bitmaps
+> (currently it is done in a hacky way after commit and don't work).
+> So, let's introduce such logic.
+>=20
+> The drawback is that in worst case bdrv_reopen_set_read_only may finish=
+
+> with error and in some intermediate state: some nodes reopened RW and
+> some are not. But this is a way to fix bug around reopening qcow2
+> bitmaps in the following commits.
+
+This commit message doesn=E2=80=99t really explain what this patch does.
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  include/block/block_int.h |   2 +
+>  block.c                   | 144 ++++++++++++++++++++++++++++++++++----=
+
+>  2 files changed, 133 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 3aa1e832a8..7bd6fd68dd 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -531,6 +531,8 @@ struct BlockDriver {
+>                               uint64_t parent_perm, uint64_t parent_sha=
+red,
+>                               uint64_t *nperm, uint64_t *nshared);
+> =20
+> +     bool (*bdrv_need_rw_file_child_during_reopen_rw)(BlockDriverState=
+ *bs);
+> +
+>      /**
+>       * Bitmaps should be marked as 'IN_USE' in the image on reopening =
+image
+>       * as rw. This handler should realize it. It also should unset rea=
+donly
+> diff --git a/block.c b/block.c
+> index cbd8da5f3b..3c8e1c59b4 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1715,10 +1715,12 @@ static void bdrv_get_cumulative_perm(BlockDrive=
+rState *bs, uint64_t *perm,
+>                                       uint64_t *shared_perm);
+> =20
+>  typedef struct BlockReopenQueueEntry {
+> -     bool prepared;
+> -     bool perms_checked;
+> -     BDRVReopenState state;
+> -     QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
+> +    bool reopened_file_child_rw;
+> +    bool changed_file_child_perm_rw;
+> +    bool prepared;
+> +    bool perms_checked;
+> +    BDRVReopenState state;
+> +    QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
+>  } BlockReopenQueueEntry;
+> =20
+>  /*
+> @@ -3421,6 +3423,105 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopen=
+Queue *bs_queue,
+>                                     keep_old_opts);
+>  }
+> =20
+> +static int bdrv_reopen_set_read_only_drained(BlockDriverState *bs,
+> +                                             bool read_only,
+> +                                             Error **errp)
+> +{
+> +    BlockReopenQueue *queue;
+> +    QDict *opts =3D qdict_new();
+> +
+> +    qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
+> +
+> +    queue =3D bdrv_reopen_queue(NULL, bs, opts, true);
+> +
+> +    return bdrv_reopen_multiple(queue, errp);
+> +}
+> +
+> +/*
+> + * handle_recursive_reopens
+> + *
+> + * On fail it needs rollback_recursive_reopens to be called.
+
+It would be nice if this description actually said anything about what
+the function is supposed to do.
+
+> + */
+> +static int handle_recursive_reopens(BlockReopenQueueEntry *current,
+> +                                    Error **errp)
+> +{
+> +    int ret;
+> +    BlockDriverState *bs =3D current->state.bs;
+> +
+> +    /*
+> +     * We use the fact that in reopen-queue children are always follow=
+ing
+> +     * parents.
+> +     * TODO: Switch BlockReopenQueue to be QTAILQ and use
+> +     *       QTAILQ_FOREACH_REVERSE.
+
+Why don=E2=80=99t you do that first?  It would make the code more obvious=
+ at
+least to me.
+
+> +     */
+> +    if (QSIMPLEQ_NEXT(current, entry)) {
+> +        ret =3D handle_recursive_reopens(QSIMPLEQ_NEXT(current, entry)=
+, errp);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    if ((current->state.flags & BDRV_O_RDWR) && bs->file && bs->drv &&=
+
+> +        bs->drv->bdrv_need_rw_file_child_during_reopen_rw &&
+> +        bs->drv->bdrv_need_rw_file_child_during_reopen_rw(bs))
+> +    {
+> +        if (!bdrv_is_writable(bs->file->bs)) {
+> +            ret =3D bdrv_reopen_set_read_only_drained(bs->file->bs, fa=
+lse, errp);
+
+Hm.  Sorry, I find this all a bit hard to understand.  (No comments and
+all.)
+
+I understand that this is for an RO -> RW transition?  Everything is
+still RO, but the parent will need an RW child before it transitions to
+RW itself.
+
+
+I=E2=80=99m going to be honest up front, I don=E2=80=99t like this very m=
+uch.  But I
+think it may be a reasonable solution for now.
+
+As I remember, the problem was that when reopening a qcow2 node from RO
+to RW, we need to write something in .prepare() (because it can fail),
+but naturally no .prepare() is called after any .commit(), so no matter
+the order of nodes in the ReopenQueue, the child node will never be RW
+by this point.
+
+Hm.  To me that mostly means that making the whole reopen process a
+transaction was just a dream that turns out not to work.
+
+OK, so what would be the real, proper, all-encompassing fix?  I suppose
+we=E2=80=99d need a way to express reopen dependency relationships.  So i=
+f a
+node depends on one or more of its children to be reopened before/after
+it can be reopened itself, we=E2=80=99d need to pull them out of the Reop=
+enQueue
+(along with their dependencies) and do a separate bdrv_reopen_multiple()
+on them.  So we=E2=80=99d want to split the ReopenQueue into as few subqu=
+eues as
+possible, so that all dependencies are satisfied.
+
+One such dependency is if you change a node from RO to RW, and that
+change requires an RW child.
+
+The reverse dependency occurs is if you change a node from RW to RO, and
+the nodes wants to write something to its child, so it needs to remain
+RW until then.
+
+Currently, the former is just broken (hence this patch).  The latter is
+kind of addressed by virtue of =E2=80=9CWriting happens in .prepare(), an=
+d
+parents come before children in the ReopenQueue=E2=80=9D.
+
+
+OK, so you address one specific case of a dependency, namely of a node
+on its bs->file when it comes to writableness.  Not too bad, supporting
+bs->file as the only dependency makes sense.  Everything else would
+become complicated.
+
+
+Besides being more specific than the general solution I tried to sketch
+above, there is one more difference, though: In that description, I said
+we should remove the node and its dependencies from the ReopenQueue, and
+commit it earlier.  That has three implicatons:
+
+First, this patch reopens the file if it is not writable, but the parent
+needs it to be writable.  I think that=E2=80=99s wrong.  We should take t=
+he
+file=E2=80=99s entry of the ReopenQueue and reopen it accordingly, not bl=
+indly
+reopen it RW.  (If the user didn=E2=80=99t specify the file to be reopene=
+d RW,
+that should be an error.)
+
+Second, you need to take the dependencies into account.  (I don=E2=80=99t=
+ know
+whether this one is a problem in practice.)  If the file node itself has
+a child that needs to be RW, then you need to take that from the
+ReopenQueue, too, and repoen it RW, too.
+
+Third, the reopen may require some other options on the file.
+Temporarily reopening it RW without changing those options may not be
+what the user wants.  (So another reason to take the existing
+ReopenQueue entry.)
+
+
+So -- without having tried, of course -- I think a better design would
+be to look for bs->file->bs in the ReopenQueue, recursively all of its
+children, and move all of those entries into a new queue, and then
+invoke bdrv_reopen_multiple() on that one first.
+
+The question then becomes how to roll back those changes...  I don=E2=80=99=
+t
+know whether just having bdrv_reopen() partially succeed is so bad.
+Otherwise, we=E2=80=99d need a function to translate an existing node's s=
+tate
+into a BdrvReopenQueueEntry so we can thus return to the old state.
+
+> +            if (ret < 0) {
+> +                return ret;
+> +            }
+> +            current->reopened_file_child_rw =3D true;
+> +        }
+> +
+> +        if (!(bs->file->perm & BLK_PERM_WRITE)) {
+> +            ret =3D bdrv_child_try_set_perm(bs->file,
+> +                                          bs->file->perm | BLK_PERM_WR=
+ITE,
+> +                                          bs->file->shared_perm, errp)=
+;
+
+bdrv_child_try_set_perm() is dangerous, because its effect will be
+undone whenever something happens that causes the permissions to be
+refreshed.  (Hence the comment in block_int.h which says to avoid it.)
+Generally, bdrv_child_refresh_perms() should be enough.  If it isn=E2=80=99=
+t,
+I=E2=80=99d say something=E2=80=99s off.
+
+Max
+
+> +            if (ret < 0) {
+> +                return ret;
+> +            }
+> +            current->changed_file_child_perm_rw =3D true;
+> +        }
+> +    }
+> +
+> +    return 0;
+> +}
+
+
+--lTNPetTuBKC6yLFpsSKfETEz4ccfqC3yP--
+
+--HGNFFV4rPmQTX0MHfEqiR4g5tvalwGZt3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1BhOwACgkQ9AfbAGHV
+z0BuXAf/fiqRivsUOvKBgYV3hSLc1Gj1b31bapS3G8k32n1AuhTLQPcaNvnp1R9n
+rqzEa19i7cXeQUIeEpbKlRosD6bM45W7AkhJHerMA9E60hSNhXQcNtASj7jf19H0
+tVUAcb+qyaWio/6ZLpLFfby1rNMV/aK9CQtlNc0pmsmM6WTb7druNGLdLU2RGabn
+uu4ZZto6h4/fUeVLsRJ8Fw4lzuo/Y8+piD2gjwgylsRUjl1yE9o4t0MNWBtnuYpB
+9e1SsW13QXU+w2qynbL0+BCZRHx4o1+Dal7w5M0fYsD2xKlakUhhYA8XL6staBB9
+QuwJmTGfFgXb//Lwf7nk4U/1WPSbMw==
+=DtHX
+-----END PGP SIGNATURE-----
+
+--HGNFFV4rPmQTX0MHfEqiR4g5tvalwGZt3--
 
