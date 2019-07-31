@@ -2,83 +2,62 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D356DC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76C22C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:31:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3B50206A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:28:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OyQ0ckzZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3B50206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5344F206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:31:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5344F206A3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsvCc-00005R-Jj
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:28:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58184)
+	id 1hsvGG-0001Op-KQ
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:31:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59192)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hsvC9-00081b-RE
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:27:35 -0400
+ (envelope-from <groug@kaod.org>) id 1hsvFc-0000tF-V8
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hsvC7-0004bA-Th
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:27:33 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:43167)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hsvC5-0004Yw-VE
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:27:31 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w79so51814620oif.10
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 13:27:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JCP7uvR3g8IBIpYyhI3BS860O1ceIRi23RsvklMOKM4=;
- b=OyQ0ckzZx8UjUcZ0QKvK8Rby0eDAsh0pLcxPYUv2GKNumJ5p2NDCgQQEmVL05pi+w+
- MEA3zDTQSCt6I5EzAqxx4fwDYH6UD2fB/m+NlJw4fXbhIUcu/FJN3sZazG97MQBDpjji
- DYUlXiCwJ3u97Ld7lul0brt7sVAKWczM1n7NIR/CIbq2sgNKeD64dsdd7qmCueDx02un
- CE4fTxa045Os2x7icMkex71ofDsxEA0lQVqbz8JIlToiB/bhy4rP9PLEqL9FTTSg93tU
- mQi3BZGsQumjsb9zlpDQl4t3xMmSccsB0tEMgaU3lwN63rGGtwdErjWiZVYQtXxRnrnq
- JNGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JCP7uvR3g8IBIpYyhI3BS860O1ceIRi23RsvklMOKM4=;
- b=p+hJXCcAziYQGio0B/sz68FHsCD3SuX9qNAmJByJqdqWunJ2nZvg7yEYn/FxsYLPiY
- Cm+/WaBdq/OGvBGfdLHYa7to4Wh2vINC/097zDoQSbAfGh01VcPJth1CYL+n1uggWu5k
- aJs4hqisN7gaOFCIT6IjumZjDS+aZ+T098HSARbsVHHHNE+Yx1kGlJwSnbk6xSvKGbGJ
- 9leaRV9ZeUvDG/0LxVNjiao2Alb6dMvwJ+46Xqx+6KCWrqfImhthCMd5oTK2cCeMX3/o
- Oe8B0bFLHl5qS5sdqEeoHvcdWuKig3uTaB99aNB8DPXTBynNQVuA70hFpDNdR0qQTKnq
- uYpw==
-X-Gm-Message-State: APjAAAVPDEtjmRrva0XMcJdqvuFlYN/ssKXzRo4h8gsP2ZDdsrtKPBu4
- GrebKL83gqWdZiC8SXfz7IPuGjb4kHkxQ/lmuzI=
-X-Google-Smtp-Source: APXvYqz7VPPd0Pi4/CAdAjKwhJp2QDg99rqJ9lQeof0Em1MyB7n8zvIbRdkDffwRPnb35OM/+umvPHXB0py/pqU0xFQ=
-X-Received: by 2002:aca:b254:: with SMTP id b81mr26151537oif.53.1564604847859; 
- Wed, 31 Jul 2019 13:27:27 -0700 (PDT)
+ (envelope-from <groug@kaod.org>) id 1hsvFb-0007KV-BR
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:31:08 -0400
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:35899)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1hsvFb-0007J3-2t
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:31:07 -0400
+Received: from player695.ha.ovh.net (unknown [10.108.35.185])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 01CDA247766
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 22:31:04 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player695.ha.ovh.net (Postfix) with ESMTPSA id 584A1865036A;
+ Wed, 31 Jul 2019 20:30:58 +0000 (UTC)
+Date: Wed, 31 Jul 2019 22:30:57 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <20190731223057.3439026e@bahia.lan>
+In-Reply-To: <742b9d876d86fc263492885a7aacc1e1cda274e1.1562154272.git.qemu_oss@crudebyte.com>
+References: <cover.1562154272.git.qemu_oss@crudebyte.com>
+ <742b9d876d86fc263492885a7aacc1e1cda274e1.1562154272.git.qemu_oss@crudebyte.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20190731175702.4916-1-jan.bobek@gmail.com>
- <20190731175702.4916-9-jan.bobek@gmail.com>
- <6d2c01c9-17a4-163c-349c-537bc54289fb@linaro.org>
-In-Reply-To: <6d2c01c9-17a4-163c-349c-537bc54289fb@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 31 Jul 2019 22:27:17 +0200
-Message-ID: <CAL1e-=io1f_6HR_rWeG7kOSKT4Bsa0S8Hop=j-45QQvT7esjzw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [RFC PATCH v1 08/22] target/i386: reimplement
- (V)PAND, (V)ANDPS, (V)ANDPD
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 18052679108127070528
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrleehgddugeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 178.33.111.247
+Subject: Re: [Qemu-devel] [PATCH v5 2/5] 9p: Treat multiple devices on one
+ export as an error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,116 +69,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Jan Bobek <jan.bobek@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>,
+ Antonios Motakis <antonios.motakis@huawei.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 31, 2019 at 9:36 PM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+On Wed, 3 Jul 2019 13:01:34 +0200
+Christian Schoenebeck via Qemu-devel <qemu-devel@nongnu.org> wrote:
 
-> On 7/31/19 10:56 AM, Jan Bobek wrote:
-> > +#define gen_pand_mm(env, s, modrm)   gen_gvec_ld_modrm_mm  ((env), (s),
-> (modrm), MO_64, tcg_gen_gvec_and, 0112)
-> > +#define gen_pand_xmm(env, s, modrm)  gen_gvec_ld_modrm_xmm ((env), (s),
-> (modrm), MO_64, tcg_gen_gvec_and, 0112)
-> > +#define gen_vpand_xmm(env, s, modrm) gen_gvec_ld_modrm_vxmm((env), (s),
-> (modrm), MO_64, tcg_gen_gvec_and, 0123)
-> > +#define gen_vpand_ymm(env, s, modrm) gen_gvec_ld_modrm_vymm((env), (s),
-> (modrm), MO_64, tcg_gen_gvec_and, 0123)
-> > +#define gen_andps_xmm  gen_pand_xmm
-> > +#define gen_vandps_xmm gen_vpand_xmm
-> > +#define gen_vandps_ymm gen_vpand_ymm
-> > +#define gen_andpd_xmm  gen_pand_xmm
-> > +#define gen_vandpd_xmm gen_vpand_xmm
-> > +#define gen_vandpd_ymm gen_vpand_ymm
->
->
-> Why all of these extra defines?
->
+> The QID path should uniquely identify a file. However, the
+> inode of a file is currently used as the QID path, which
+> on its own only uniquely identifies files within a device.
+> Here we track the device hosting the 9pfs share, in order
+> to prevent security issues with QID path collisions from
+> other devices.
+> 
+> Signed-off-by: Antonios Motakis <antonios.motakis@huawei.com>
+> [CS: - Assign dev_id to export root's device already in
+>        v9fs_device_realize_common(), not postponed in
+>        stat_to_qid().
+>      - error_report_once() if more than one device was
+>        shared by export.
+>      - Return -ENODEV instead of -ENOSYS in stat_to_qid().
+>      - Fixed typo in log comment. ]
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
 
-Because of code clarity and safety, I would say.
+The fix is good in the sense that it purely forbids cross-device accesses,
+which provides improved security. But some people may wish to do cross-device
+anyway, for example because they have ultimate knowledge or luck that their
+usual setup doesn't have colliding inodes, or simply that their workload
+doesn't care for inode numbers at all.
 
-This line:
+Next patches in this series introduce inode number remapping, which is
+a good way of addressing collisions. This should always be used in a
+cross-device setup. But again, people who don't do cross-device, may
+wish to disable remapping to avoid the potential performance loss or
+extra memory consumption.
 
-case 0x54 | M_0F:                  gen_andps_xmm(env, s, modrm); return;
+I suggest you add a new property to the 9p device so that people can
+choose the behavior that best fits their need. Something like:
 
-looks much clearer than this one:
+-device virtio-9p,cross-device=[ignore|forbid|remap]
 
-case 0x54 | M_0F:                  gen_gvec_ld_modrm_mm(env, s, modrm,
-MO_64, tcg_gen_gvec_and, 0112)
+ignore: detect the cross-device condition and spit-once a big fat warning
+        about the potential consequences, and alternatives to avoid
+        them, but don't fail the I/O
+forbid: detect the cross-device condition, spit-once an error and fail the
+        I/O like the current patch does
+remap: well... remap all inode numbers
 
-and such organization is also much less prone to copy/paste bugs etc.
+I would make 'ignore' the default since it is the current behavior, but
+I'm ready to change my mind if someone has a convincing argument that
+the default should be more secure.
 
-Needless to say there is no performance price at all, so it is a no-brainer.
+Cc'ing Stefan and Dave in case they have some more suggestions after the
+discussion we had on irc.
 
-Sincerely,
-Aleksandar
+>  hw/9pfs/9p.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++------------
+>  hw/9pfs/9p.h |  1 +
+>  2 files changed, 56 insertions(+), 14 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 586a6dccba..8cc65c2c67 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -572,10 +572,18 @@ static void coroutine_fn virtfs_reset(V9fsPDU *pdu)
+>                                  P9_STAT_MODE_SOCKET)
+>  
+>  /* This is the algorithm from ufs in spfs */
+> -static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
+> +static int stat_to_qid(V9fsPDU *pdu, const struct stat *stbuf, V9fsQID *qidp)
+>  {
+>      size_t size;
+>  
+> +    if (pdu->s->dev_id != stbuf->st_dev) {
+> +        error_report_once(
+> +            "9p: Multiple devices detected in same VirtFS export. "
+> +            "You must use a separate export for each device."
+> +        );
+> +        return -ENODEV;
+> +    }
+> +
+>      memset(&qidp->path, 0, sizeof(qidp->path));
+>      size = MIN(sizeof(stbuf->st_ino), sizeof(qidp->path));
+>      memcpy(&qidp->path, &stbuf->st_ino, size);
+> @@ -587,6 +595,8 @@ static void stat_to_qid(const struct stat *stbuf, V9fsQID *qidp)
+>      if (S_ISLNK(stbuf->st_mode)) {
+>          qidp->type |= P9_QID_TYPE_SYMLINK;
+>      }
+> +
+> +    return 0;
+>  }
+>  
+>  static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
+> @@ -599,7 +609,10 @@ static int coroutine_fn fid_to_qid(V9fsPDU *pdu, V9fsFidState *fidp,
+>      if (err < 0) {
+>          return err;
+>      }
+> -    stat_to_qid(&stbuf, qidp);
+> +    err = stat_to_qid(pdu, &stbuf, qidp);
+> +    if (err < 0) {
+> +        return err;
+> +    }
+>      return 0;
+>  }
+>  
+> @@ -830,7 +843,10 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
+>  
+>      memset(v9stat, 0, sizeof(*v9stat));
+>  
+> -    stat_to_qid(stbuf, &v9stat->qid);
+> +    err = stat_to_qid(pdu, stbuf, &v9stat->qid);
+> +    if (err < 0) {
+> +        return err;
+> +    }
+>      v9stat->mode = stat_to_v9mode(stbuf);
+>      v9stat->atime = stbuf->st_atime;
+>      v9stat->mtime = stbuf->st_mtime;
+> @@ -891,7 +907,7 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *path,
+>  #define P9_STATS_ALL           0x00003fffULL /* Mask for All fields above */
+>  
+>  
+> -static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
+> +static int stat_to_v9stat_dotl(V9fsPDU *pdu, const struct stat *stbuf,
+>                                  V9fsStatDotl *v9lstat)
+>  {
+>      memset(v9lstat, 0, sizeof(*v9lstat));
+> @@ -913,7 +929,7 @@ static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
+>      /* Currently we only support BASIC fields in stat */
+>      v9lstat->st_result_mask = P9_STATS_BASIC;
+>  
+> -    stat_to_qid(stbuf, &v9lstat->qid);
+> +    return stat_to_qid(pdu, stbuf, &v9lstat->qid);
+>  }
+>  
+>  static void print_sg(struct iovec *sg, int cnt)
+> @@ -1115,7 +1131,6 @@ static void coroutine_fn v9fs_getattr(void *opaque)
+>      uint64_t request_mask;
+>      V9fsStatDotl v9stat_dotl;
+>      V9fsPDU *pdu = opaque;
+> -    V9fsState *s = pdu->s;
+>  
+>      retval = pdu_unmarshal(pdu, offset, "dq", &fid, &request_mask);
+>      if (retval < 0) {
+> @@ -1136,7 +1151,10 @@ static void coroutine_fn v9fs_getattr(void *opaque)
+>      if (retval < 0) {
+>          goto out;
+>      }
+> -    stat_to_v9stat_dotl(s, &stbuf, &v9stat_dotl);
+> +    retval = stat_to_v9stat_dotl(pdu, &stbuf, &v9stat_dotl);
+> +    if (retval < 0) {
+> +        goto out;
+> +    }
+>  
+>      /*  fill st_gen if requested and supported by underlying fs */
+>      if (request_mask & P9_STATS_GEN) {
+> @@ -1381,7 +1399,10 @@ static void coroutine_fn v9fs_walk(void *opaque)
+>              if (err < 0) {
+>                  goto out;
+>              }
+> -            stat_to_qid(&stbuf, &qid);
+> +            err = stat_to_qid(pdu, &stbuf, &qid);
+> +            if (err < 0) {
+> +                goto out;
+> +            }
+>              v9fs_path_copy(&dpath, &path);
+>          }
+>          memcpy(&qids[name_idx], &qid, sizeof(qid));
+> @@ -1483,7 +1504,10 @@ static void coroutine_fn v9fs_open(void *opaque)
+>      if (err < 0) {
+>          goto out;
+>      }
+> -    stat_to_qid(&stbuf, &qid);
+> +    err = stat_to_qid(pdu, &stbuf, &qid);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+>      if (S_ISDIR(stbuf.st_mode)) {
+>          err = v9fs_co_opendir(pdu, fidp);
+>          if (err < 0) {
+> @@ -1593,7 +1617,10 @@ static void coroutine_fn v9fs_lcreate(void *opaque)
+>          fidp->flags |= FID_NON_RECLAIMABLE;
+>      }
+>      iounit =  get_iounit(pdu, &fidp->path);
+> -    stat_to_qid(&stbuf, &qid);
+> +    err = stat_to_qid(pdu, &stbuf, &qid);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+>      err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
+>      if (err < 0) {
+>          goto out;
+> @@ -2327,7 +2354,10 @@ static void coroutine_fn v9fs_create(void *opaque)
+>          }
+>      }
+>      iounit = get_iounit(pdu, &fidp->path);
+> -    stat_to_qid(&stbuf, &qid);
+> +    err = stat_to_qid(pdu, &stbuf, &qid);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+>      err = pdu_marshal(pdu, offset, "Qd", &qid, iounit);
+>      if (err < 0) {
+>          goto out;
+> @@ -2384,7 +2414,10 @@ static void coroutine_fn v9fs_symlink(void *opaque)
+>      if (err < 0) {
+>          goto out;
+>      }
+> -    stat_to_qid(&stbuf, &qid);
+> +    err = stat_to_qid(pdu, &stbuf, &qid);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+>      err =  pdu_marshal(pdu, offset, "Q", &qid);
+>      if (err < 0) {
+>          goto out;
+> @@ -3064,7 +3097,10 @@ static void coroutine_fn v9fs_mknod(void *opaque)
+>      if (err < 0) {
+>          goto out;
+>      }
+> -    stat_to_qid(&stbuf, &qid);
+> +    err = stat_to_qid(pdu, &stbuf, &qid);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+>      err = pdu_marshal(pdu, offset, "Q", &qid);
+>      if (err < 0) {
+>          goto out;
+> @@ -3222,7 +3258,10 @@ static void coroutine_fn v9fs_mkdir(void *opaque)
+>      if (err < 0) {
+>          goto out;
+>      }
+> -    stat_to_qid(&stbuf, &qid);
+> +    err = stat_to_qid(pdu, &stbuf, &qid);
+> +    if (err < 0) {
+> +        goto out;
+> +    }
+>      err = pdu_marshal(pdu, offset, "Q", &qid);
+>      if (err < 0) {
+>          goto out;
+> @@ -3633,6 +3672,8 @@ int v9fs_device_realize_common(V9fsState *s, const V9fsTransport *t,
+>          goto out;
+>      }
+>  
+> +    s->dev_id = stat.st_dev;
+> +
+>      s->ctx.fst = &fse->fst;
+>      fsdev_throttle_init(s->ctx.fst);
+>  
+> diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+> index 8883761b2c..5e316178d5 100644
+> --- a/hw/9pfs/9p.h
+> +++ b/hw/9pfs/9p.h
+> @@ -256,6 +256,7 @@ struct V9fsState
+>      Error *migration_blocker;
+>      V9fsConf fsconf;
+>      V9fsQID root_qid;
+> +    dev_t dev_id;
+>  };
+>  
+>  /* 9p2000.L open flags */
 
 
->
-> > +    enum {
-> > +        M_0F    = 0x01 << 8,
-> > +        M_0F38  = 0x02 << 8,
-> > +        M_0F3A  = 0x04 << 8,
-> > +        P_66    = 0x08 << 8,
-> > +        P_F3    = 0x10 << 8,
-> > +        P_F2    = 0x20 << 8,
-> > +        VEX_128 = 0x40 << 8,
-> > +        VEX_256 = 0x80 << 8,
-> > +    };
-> > +
-> > +    switch(b | M_0F
-> > +           | (s->prefix & PREFIX_DATA ? P_66 : 0)
-> > +           | (s->prefix & PREFIX_REPZ ? P_F3 : 0)
-> > +           | (s->prefix & PREFIX_REPNZ ? P_F2 : 0)
-> > +           | (s->prefix & PREFIX_VEX ? (s->vex_l ? VEX_256 : VEX_128) :
-> 0)) {
->
-> I think you can move this above almost everything in this function, so
-> that all
-> of the legacy bits follow this switch.
->
-> > +    case 0xdb | M_0F:                  gen_pand_mm(env, s, modrm);
-> return;
->
-> You'll want to put these on the next lines -- checkpatch.pl again.
->
-> > +    case 0xdb | M_0F | P_66:           gen_pand_xmm(env, s, modrm);
-> return;
-> > +    case 0xdb | M_0F | P_66 | VEX_128: gen_vpand_xmm(env, s, modrm);
-> return;
-> > +    case 0xdb | M_0F | P_66 | VEX_256: gen_vpand_ymm(env, s, modrm);
-> return;
-> > +    case 0x54 | M_0F:                  gen_andps_xmm(env, s, modrm);
-> return;
-> > +    case 0x54 | M_0F | VEX_128:        gen_vandps_xmm(env, s, modrm);
-> return;
-> > +    case 0x54 | M_0F | VEX_256:        gen_vandps_ymm(env, s, modrm);
-> return;
-> > +    case 0x54 | M_0F | P_66:           gen_andpd_xmm(env, s, modrm);
-> return;
-> > +    case 0x54 | M_0F | P_66 | VEX_128: gen_vandpd_xmm(env, s, modrm);
-> return;
-> > +    case 0x54 | M_0F | P_66 | VEX_256: gen_vandpd_ymm(env, s, modrm);
-> return;
-> > +    default: break;
-> > +    }
->
-> Perhaps group cases together?
->
->     case 0xdb | M_0F | P_66:  /* PAND */
->     case 0x54 | M_0F:         /* ANDPS */
->     case 0x54 | M_0F | P_66:  /* ANDPD */
->        gen_gvec_ld_modrm_xmm(env, s, modrm, MO_64, tcg_gen_gvec_and, 0112);
->        return;
->
-> How are you planning to handle CPUID checks?  I know the currently
-> handling is
-> quite spotty, but with a reorg we might as well fix that too.
->
->
-> r~
->
->
