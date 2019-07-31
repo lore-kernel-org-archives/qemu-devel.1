@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68138C32750
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA42C32750
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:17:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E939205C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E939205C9
+	by mail.kernel.org (Postfix) with ESMTPS id 25C7E20578
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 01:17:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C7E20578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsdEM-0008IH-F3
-	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 21:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52717)
+	id 1hsdEh-0000kV-F7
+	for qemu-devel@archiver.kernel.org; Tue, 30 Jul 2019 21:16:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52576)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hsdAQ-00020m-Lc
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:36 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hsdAP-0001wZ-6s
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hsdAO-0000k2-Q0
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:34 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hsdAN-0000gO-0v
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:33 -0400
 Received: from mga18.intel.com ([134.134.136.126]:12485)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hsdAO-0000aT-FA
- for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:32 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hsdAM-0000aT-KI
+ for qemu-devel@nongnu.org; Tue, 30 Jul 2019 21:12:30 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 30 Jul 2019 18:12:32 -0700
+ 30 Jul 2019 18:12:30 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,327,1559545200"; d="scan'208";a="200535589"
+X-IronPort-AV: E=Sophos;i="5.64,327,1559545200"; d="scan'208";a="200535580"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by fmsmga002.fm.intel.com with ESMTP; 30 Jul 2019 18:12:30 -0700
+ by fmsmga002.fm.intel.com with ESMTP; 30 Jul 2019 18:12:28 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Wed, 31 Jul 2019 09:12:08 +0800
-Message-Id: <20190731011209.22538-11-tao3.xu@intel.com>
+Date: Wed, 31 Jul 2019 09:12:07 +0800
+Message-Id: <20190731011209.22538-10-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190731011209.22538-1-tao3.xu@intel.com>
 References: <20190731011209.22538-1-tao3.xu@intel.com>
@@ -55,8 +55,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 134.134.136.126
-Subject: [Qemu-devel] [PATCH RESEND v8 10/11] numa: Extend the CLI to
- provide memory side cache information
+Subject: [Qemu-devel] [PATCH RESEND v8 09/11] numa: Extend the CLI to
+ provide memory latency and bandwidth information
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,9 +76,10 @@ Sender: "Qemu-devel"
 
 From: Liu Jingqi <jingqi.liu@intel.com>
 
-Add -numa hmat-cache option to provide Memory Side Cache Information.
-These memory attributes help to build Memory Side Cache Information
-Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
+Add -numa hmat-lb option to provide System Locality Latency and
+Bandwidth Information. These memory attributes help to build
+System Locality Latency and Bandwidth Information Structure(s)
+in ACPI Heterogeneous Memory Attribute Table (HMAT).
 
 Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
@@ -86,90 +87,157 @@ Signed-off-by: Tao Xu <tao3.xu@intel.com>
 
 No changes in v8.
 ---
- hw/core/numa.c        | 67 +++++++++++++++++++++++++++++++++++
- include/sysemu/numa.h |  2 ++
- qapi/machine.json     | 81 +++++++++++++++++++++++++++++++++++++++++--
- qemu-options.hx       | 14 +++++++-
- 4 files changed, 161 insertions(+), 3 deletions(-)
+ hw/core/numa.c        | 127 ++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/numa.h |   2 +
+ qapi/machine.json     | 100 ++++++++++++++++++++++++++++++++-
+ qemu-options.hx       |  45 ++++++++++++++-
+ 4 files changed, 271 insertions(+), 3 deletions(-)
 
 diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 83ead77191..75db35ac19 100644
+index cfb6339810..83ead77191 100644
 --- a/hw/core/numa.c
 +++ b/hw/core/numa.c
-@@ -304,6 +304,67 @@ void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-     }
+@@ -37,6 +37,7 @@
+ #include "qemu/option.h"
+ #include "qemu/config-file.h"
+ #include "qemu/cutils.h"
++#include "hw/acpi/hmat.h"
+ 
+ QemuOptsList qemu_numa_opts = {
+     .name = "numa",
+@@ -183,6 +184,126 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
+     ms->numa_state->have_numa_distance = true;
  }
  
-+void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-+                           Error **errp)
++void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
++                        Error **errp)
 +{
 +    int nb_numa_nodes = ms->numa_state->num_nodes;
-+    HMAT_Cache_Info *hmat_cache = NULL;
++    NodeInfo *numa_info = ms->numa_state->nodes;
++    HMAT_LB_Info *hmat_lb = NULL;
 +
-+    if (node->node_id >= nb_numa_nodes) {
-+        error_setg(errp, "Invalid node-id=%" PRIu32
-+                   ", it should be less than %d.",
-+                   node->node_id, nb_numa_nodes);
++    if (node->data_type <= HMATLB_DATA_TYPE_WRITE_LATENCY) {
++        if (!node->has_latency) {
++            error_setg(errp, "Missing 'latency' option.");
++            return;
++        }
++        if (node->has_bandwidth) {
++            error_setg(errp, "Invalid option 'bandwidth' since "
++                       "the data type is latency.");
++            return;
++        }
++        if (node->has_base_bw) {
++            error_setg(errp, "Invalid option 'base_bw' since "
++                       "the data type is latency.");
++            return;
++        }
++    }
++
++    if (node->data_type >= HMATLB_DATA_TYPE_ACCESS_BANDWIDTH) {
++        if (!node->has_bandwidth) {
++            error_setg(errp, "Missing 'bandwidth' option.");
++            return;
++        }
++        if (node->has_latency) {
++            error_setg(errp, "Invalid option 'latency' since "
++                       "the data type is bandwidth.");
++            return;
++        }
++        if (node->has_base_lat) {
++            error_setg(errp, "Invalid option 'base_lat' since "
++                       "the data type is bandwidth.");
++            return;
++        }
++    }
++
++    if (node->initiator >= nb_numa_nodes) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it should be less than %d.",
++                   node->initiator, nb_numa_nodes);
++        return;
++    }
++    if (!numa_info[node->initiator].has_cpu) {
++        error_setg(errp, "Invalid initiator=%"
++                   PRIu16 ", it isn't an initiator proximity domain.",
++                   node->initiator);
 +        return;
 +    }
 +
-+    if (node->total > MAX_HMAT_CACHE_LEVEL) {
-+        error_setg(errp, "Invalid total=%" PRIu8
-+                   ", it should be less than or equal to %d.",
-+                   node->total, MAX_HMAT_CACHE_LEVEL);
++    if (node->target >= nb_numa_nodes) {
++        error_setg(errp, "Invalid target=%"
++                   PRIu16 ", it should be less than %d.",
++                   node->target, nb_numa_nodes);
 +        return;
 +    }
-+    if (node->level > node->total) {
-+        error_setg(errp, "Invalid level=%" PRIu8
-+                   ", it should be less than or equal to"
-+                   " total=%" PRIu8 ".",
-+                   node->level, node->total);
-+        return;
-+    }
-+    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
-+        error_setg(errp, "Duplicate configuration of the side cache for "
-+                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
-+                   node->node_id, node->level);
++    if (!numa_info[node->target].initiator_valid) {
++        error_setg(errp, "Invalid target=%"
++                   PRIu16 ", it hasn't a valid initiator proximity domain.",
++                   node->target);
 +        return;
 +    }
 +
-+    if ((node->level > 1) &&
-+        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
-+        (node->size >=
-+            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
-+        error_setg(errp, "Invalid size=0x%" PRIx64
-+                   ", the size of level=%" PRIu8
-+                   " should be less than the size(0x%" PRIx64
-+                   ") of level=%" PRIu8 ".",
-+                   node->size, node->level,
-+                   ms->numa_state->hmat_cache[node->node_id]
-+                                             [node->level - 1]->size,
-+                   node->level - 1);
-+        return;
++    if (node->has_latency) {
++        hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
++
++        if (!hmat_lb) {
++            hmat_lb = g_malloc0(sizeof(*hmat_lb));
++            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] = hmat_lb;
++        } else if (hmat_lb->latency[node->initiator][node->target]) {
++            error_setg(errp, "Duplicate configuration of the latency for "
++                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
++                       node->initiator, node->target);
++            return;
++        }
++
++        /* Only the first time of setting the base unit is valid. */
++        if ((hmat_lb->base_lat == 0) && (node->has_base_lat)) {
++            hmat_lb->base_lat = node->base_lat;
++        }
++
++        hmat_lb->latency[node->initiator][node->target] = node->latency;
 +    }
 +
-+    hmat_cache = g_malloc0(sizeof(*hmat_cache));
++    if (node->has_bandwidth) {
++        hmat_lb = ms->numa_state->hmat_lb[node->hierarchy][node->data_type];
 +
-+    hmat_cache->mem_proximity = node->node_id;
-+    hmat_cache->size = node->size;
-+    hmat_cache->total_levels = node->total;
-+    hmat_cache->level = node->level;
-+    hmat_cache->associativity = node->assoc;
-+    hmat_cache->write_policy = node->policy;
-+    hmat_cache->line_size = node->line;
++        if (!hmat_lb) {
++            hmat_lb = g_malloc0(sizeof(*hmat_lb));
++            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] = hmat_lb;
++        } else if (hmat_lb->bandwidth[node->initiator][node->target]) {
++            error_setg(errp, "Duplicate configuration of the bandwidth for "
++                       "initiator=%" PRIu16 " and target=%" PRIu16 ".",
++                       node->initiator, node->target);
++            return;
++        }
 +
-+    ms->numa_state->hmat_cache[node->node_id][node->level] = hmat_cache;
++        /* Only the first time of setting the base unit is valid. */
++        if (hmat_lb->base_bw == 0) {
++            if (!node->has_base_bw) {
++                error_setg(errp, "Missing 'base-bw' option");
++                return;
++            } else {
++                hmat_lb->base_bw = node->base_bw;
++            }
++        }
++
++        hmat_lb->bandwidth[node->initiator][node->target] = node->bandwidth;
++    }
++
++    if (hmat_lb) {
++        hmat_lb->hierarchy = node->hierarchy;
++        hmat_lb->data_type = node->data_type;
++    }
 +}
 +
  void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
  {
      Error *err = NULL;
-@@ -348,6 +409,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-             goto end;
-         }
+@@ -221,6 +342,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+         machine_set_cpu_numa_node(ms, qapi_NumaCpuOptions_base(&object->u.cpu),
+                                   &err);
          break;
-+    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
-+        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
++    case NUMA_OPTIONS_TYPE_HMAT_LB:
++        parse_numa_hmat_lb(ms, &object->u.hmat_lb, &err);
 +        if (err) {
 +            goto end;
 +        }
@@ -178,178 +246,218 @@ index 83ead77191..75db35ac19 100644
          abort();
      }
 diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index f0857b7ee6..9009bbdee3 100644
+index 1ed3362917..f0857b7ee6 100644
 --- a/include/sysemu/numa.h
 +++ b/include/sysemu/numa.h
-@@ -43,6 +43,8 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
+@@ -41,6 +41,8 @@ typedef struct NumaState NumaState;
+ 
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
  void parse_numa_opts(MachineState *ms);
- void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-                         Error **errp);
-+void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-+                           Error **errp);
++void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
++                        Error **errp);
  void numa_complete_configuration(MachineState *ms);
  void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
  extern QemuOptsList qemu_numa_opts;
 diff --git a/qapi/machine.json b/qapi/machine.json
-index 25f5b0321d..65a3584b92 100644
+index 05e367d26a..25f5b0321d 100644
 --- a/qapi/machine.json
 +++ b/qapi/machine.json
-@@ -379,10 +379,12 @@
+@@ -377,10 +377,12 @@
  #
- # @hmat-lb: memory latency and bandwidth information (Since: 4.2)
+ # @cpu: property based CPU(s) to node mapping (Since: 2.10)
  #
-+# @hmat-cache: memory side cache information (Since: 4.2)
++# @hmat-lb: memory latency and bandwidth information (Since: 4.2)
 +#
  # Since: 2.1
  ##
  { 'enum': 'NumaOptionsType',
--  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-+  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
+-  'data': [ 'node', 'dist', 'cpu' ] }
++  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
  
  ##
  # @NumaOptions:
-@@ -398,7 +400,8 @@
+@@ -395,7 +397,8 @@
+   'data': {
      'node': 'NumaNodeOptions',
      'dist': 'NumaDistOptions',
-     'cpu': 'NumaCpuOptions',
--    'hmat-lb': 'NumaHmatLBOptions' }}
-+    'hmat-lb': 'NumaHmatLBOptions',
-+    'hmat-cache': 'NumaHmatCacheOptions' }}
+-    'cpu': 'NumaCpuOptions' }}
++    'cpu': 'NumaCpuOptions',
++    'hmat-lb': 'NumaHmatLBOptions' }}
  
  ##
  # @NumaNodeOptions:
-@@ -600,6 +603,80 @@
-     '*latency': 'uint16',
-     '*bandwidth': 'uint16' }}
+@@ -504,6 +507,99 @@
+    'base': 'CpuInstanceProperties',
+    'data' : {} }
  
 +##
-+# @HmatCacheAssociativity:
++# @HmatLBMemoryHierarchy:
 +#
-+# Cache associativity in the Memory Side Cache
-+# Information Structure of HMAT
++# The memory hierarchy in the System Locality Latency
++# and Bandwidth Information Structure of HMAT (Heterogeneous
++# Memory Attribute Table)
 +#
-+# For more information of @HmatCacheAssociativity see
-+# the chapter 5.2.27.5: Table 5-143 of ACPI 6.3 spec.
++# For more information of @HmatLBMemoryHierarchy see
++# the chapter 5.2.27.4: Table 5-142: Field "Flags" of ACPI 6.3 spec.
 +#
-+# @none: None
++# @memory: the structure represents the memory performance
 +#
-+# @direct: Direct Mapped
++# @first-level: first level memory of memory side cached memory
 +#
-+# @complex: Complex Cache Indexing (implementation specific)
++# @second-level: second level memory of memory side cached memory
++#
++# @third-level: third level memory of memory side cached memory
 +#
 +# Since: 4.2
 +##
-+{ 'enum': 'HmatCacheAssociativity',
-+  'data': [ 'none', 'direct', 'complex' ] }
++{ 'enum': 'HmatLBMemoryHierarchy',
++  'data': [ 'memory', 'first-level', 'second-level', 'third-level' ] }
 +
 +##
-+# @HmatCacheWritePolicy:
++# @HmatLBDataType:
 +#
-+# Cache write policy in the Memory Side Cache
-+# Information Structure of HMAT
++# Data type in the System Locality Latency
++# and Bandwidth Information Structure of HMAT (Heterogeneous
++# Memory Attribute Table)
 +#
-+# For more information of @HmatCacheWritePolicy see
-+# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
++# For more information of @HmatLBDataType see
++# the chapter 5.2.27.4: Table 5-142:  Field "Data Type" of ACPI 6.3 spec.
 +#
-+# @none: None
++# @access-latency: access latency (picoseconds)
 +#
-+# @write-back: Write Back (WB)
++# @read-latency: read latency (picoseconds)
 +#
-+# @write-through: Write Through (WT)
++# @write-latency: write latency (picoseconds)
++#
++# @access-bandwidth: access bandwidth (MB/s)
++#
++# @read-bandwidth: read bandwidth (MB/s)
++#
++# @write-bandwidth: write bandwidth (MB/s)
 +#
 +# Since: 4.2
 +##
-+{ 'enum': 'HmatCacheWritePolicy',
-+  'data': [ 'none', 'write-back', 'write-through' ] }
++{ 'enum': 'HmatLBDataType',
++  'data': [ 'access-latency', 'read-latency', 'write-latency',
++            'access-bandwidth', 'read-bandwidth', 'write-bandwidth' ] }
 +
 +##
-+# @NumaHmatCacheOptions:
++# @NumaHmatLBOptions:
 +#
-+# Set the memory side cache information for a given memory domain.
++# Set the system locality latency and bandwidth information
++# between Initiator and Target proximity Domains.
 +#
-+# For more information of @NumaHmatCacheOptions see
-+# the chapter 5.2.27.5: Table 5-143: Field "Cache Attributes" of ACPI 6.3 spec.
++# For more information of @NumaHmatLBOptions see
++# the chapter 5.2.27.4: Table 5-142 of ACPI 6.3 spec.
 +#
-+# @node-id: the memory proximity domain to which the memory belongs.
++# @initiator: the Initiator Proximity Domain.
 +#
-+# @size: the size of memory side cache in bytes.
++# @target: the Target Proximity Domain.
 +#
-+# @total: the total cache levels for this memory proximity domain.
++# @hierarchy: the Memory Hierarchy. Indicates the performance
++#             of memory or side cache.
 +#
-+# @level: the cache level described in this structure.
++# @data-type: presents the type of data, access/read/write
++#             latency or hit latency.
 +#
-+# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
++# @base-lat: the base unit for latency in picoseconds.
 +#
-+# @policy: the write policy, none/write-back/write-through.
++# @base-bw: the base unit for bandwidth in megabytes per second(MB/s).
 +#
-+# @line: the cache Line size in bytes.
++# @latency: the value of latency based on Base Unit from @initiator
++#           to @target proximity domain.
++#
++# @bandwidth: the value of bandwidth based on Base Unit between
++#             @initiator and @target proximity domain.
 +#
 +# Since: 4.2
 +##
-+{ 'struct': 'NumaHmatCacheOptions',
-+  'data': {
-+   'node-id': 'uint32',
-+   'size': 'size',
-+   'total': 'uint8',
-+   'level': 'uint8',
-+   'assoc': 'HmatCacheAssociativity',
-+   'policy': 'HmatCacheWritePolicy',
-+   'line': 'uint16' }}
++{ 'struct': 'NumaHmatLBOptions',
++    'data': {
++    'initiator': 'uint16',
++    'target': 'uint16',
++    'hierarchy': 'HmatLBMemoryHierarchy',
++    'data-type': 'HmatLBDataType',
++    '*base-lat': 'uint64',
++    '*base-bw': 'uint64',
++    '*latency': 'uint16',
++    '*bandwidth': 'uint16' }}
 +
  ##
  # @HostMemPolicy:
  #
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 609ea40086..5f3b2fd234 100644
+index c480781992..609ea40086 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -165,7 +165,8 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+@@ -164,16 +164,19 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+     "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
      "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
      "-numa dist,src=source,dst=destination,val=distance\n"
-     "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
--    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n",
-+    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n"
-+    "-numa hmat-cache,node-id=node,size=size,total=total,level=level[,assoc=none|direct|complex][,policy=none|write-back|write-through][,line=size]\n",
+-    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
++    "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
++    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,base-lat=blat][,base-bw=bbw][,latency=lat][,bandwidth=bw]\n",
      QEMU_ARCH_ALL)
  STEXI
  @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
-@@ -173,6 +174,7 @@ STEXI
+ @itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
  @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
  @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
- @itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
-+@itemx -numa hmat-cache,node-id=@var{node},size=@var{size},total=@var{total},level=@var{level}[,assoc=@var{str}][,policy=@var{str}][,line=@var{size}]
++@itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{str},data-type=@var{str}[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
  @findex -numa
  Define a NUMA node and assign RAM and VCPUs to it.
  Set the NUMA distance from a source node to a destination node.
-@@ -275,11 +277,19 @@ Note: Due to the minimum matrix value entry value being 10, the base unit corres
- to a value of 10. And @var{blat} or @var{bbw} should be an integer. @var{lat} or
- @var{bw} is the latency/bandwidth value.
++Set the ACPI Heterogeneous Memory Attributes for the given nodes.
  
-+In @samp{hmat-cache} option, @var{node-id} is the NUMA-id of the memory belongs.
-+@var{size} is the size of memory side cache in bytes. @var{total} is the total cache levels.
-+@var{level} is the cache level described in this structure. @var{assoc} is the cache associativity.
-+"none/direct-mapped/complex(complex cache indexing). @var{policy} is the write policy.
-+@var{line} is the cache Line size in bytes.
+ Legacy VCPU assignment uses @samp{cpus} option where
+ @var{firstcpu} and @var{lastcpu} are CPU indexes. Each
+@@ -250,6 +253,46 @@ specified resources, it just assigns existing resources to NUMA
+ nodes. This means that one still has to use the @option{-m},
+ @option{-smp} options to allocate RAM and VCPUs respectively.
+ 
++Use @samp{hmat-lb} to set System Locality Latency and Bandwidth Information
++between initiator and target NUMA nodes in ACPI Heterogeneous Attribute Memory Table (HMAT).
++Initiator NUMA node can create memory requests, usually including one or more processors.
++Target NUMA node contains addressable memory.
++[,base-lat=@var{blat}][,base-bw=@var{bbw}][,latency=@var{lat}][,bandwidth=@var{bw}]
 +
- For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
- a ram, node 1 has only a ram. The processors in node 0 access memory in node
- 0 with access-latency 5 picoseconds(base latency is 10), access-bandwidth 5 MB/s(base latency is 20);
- The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
- picoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20).
-+And for memory side cache information, NUMA node 0 and 1 both have 1 level memory
-+cache, size is 0x20000 bytes, policy is write-back, the cache Line size is 8 bytes:
- @example
- -m 2G \
- -object memory-backend-ram,size=1024M,policy=bind,host-nodes=0,id=ram-node0 -numa node,nodeid=0,memdev=ram-node0 \
-@@ -291,6 +301,8 @@ picoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20).
- -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=5 \
- -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,base-lat=10,latency=10 \
- -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=10 \
-+-numa hmat-cache,node-id=0,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8 \
-+-numa hmat-cache,node-id=1,size=0x20000,total=1,level=1,assoc=direct,policy=write-back,line=8 \
- @end example
- 
++In @samp{hmat-lb} option, @var{node} are NUMA node IDs. @var{str} of 'hierarchy'
++is the memory hierarchy of the target NUMA node: if @var{str} is 'memory', the structure
++represents the memory performance; if @var{str} is 'first-level|second-level|third-level',
++this structure represents aggregated performance of memory side caches for each domain.
++@var{str} of 'data-type' is type of data represented by this structure instance:
++if 'hierarchy' is 'memory', 'data-type' is 'access|read|write' latency(picoseconds)
++or 'access|read|write' bandwidth(MB/s) of the target memory; if 'hierarchy' is
++'first-level|second-level|third-level', 'data-type' is 'access|read|write' hit latency(picoseconds)
++or 'access|read|write' hit bandwidth of the target memory side cache. @var{blat}
++or @var{bbw} is Matrix Entry Values(latency or bandwidth) base unit used for normalizing
++the matrix entry values(which store the latency or bandwidth values). Base unit
++for latency in picoseconds. Base unit for bandwidth in megabytes per second(MB/s).
++Note: Due to the minimum matrix value entry value being 10, the base unit corresponds
++to a value of 10. And @var{blat} or @var{bbw} should be an integer. @var{lat} or
++@var{bw} is the latency/bandwidth value.
++
++For example, the following option assigns NUMA node 0 and 1. Node 0 has 2 cpus and
++a ram, node 1 has only a ram. The processors in node 0 access memory in node
++0 with access-latency 5 picoseconds(base latency is 10), access-bandwidth 5 MB/s(base latency is 20);
++The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
++picoseconds(base latency is 10), access-bandwidth 10 MB/s(base latency is 20).
++@example
++-m 2G \
++-object memory-backend-ram,size=1024M,policy=bind,host-nodes=0,id=ram-node0 -numa node,nodeid=0,memdev=ram-node0 \
++-object memory-backend-ram,size=1024M,policy=bind,host-nodes=1,id=ram-node1 -numa node,nodeid=1,memdev=ram-node1 \
++-smp 2 \
++-numa cpu,node-id=0,socket-id=0 \
++-numa cpu,node-id=0,socket-id=1 \
++-numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,base-lat=10,latency=5 \
++-numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=5 \
++-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,base-lat=10,latency=10 \
++-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,base-bw=20,bandwidth=10 \
++@end example
++
  ETEXI
+ 
+ DEF("add-fd", HAS_ARG, QEMU_OPTION_add_fd,
 -- 
 2.20.1
 
