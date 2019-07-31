@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 254EEC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DDD6C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F39CC206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:22:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F39CC206B8
+	by mail.kernel.org (Postfix) with ESMTPS id 7A490206B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 18:22:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A490206B8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hstF0-0007XC-7e
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 14:22:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50627)
+	id 1hstFQ-0000K8-Q8
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 14:22:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50718)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCe-0002Nr-K7
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:57 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCs-0002tG-1j
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:20:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCd-0001Ha-I7
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:56 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:43362 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hstCq-0001Mn-Fb
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:20:09 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44064 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hstCd-0001HG-BJ
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:19:55 -0400
+ id 1hstCq-0001IS-8c
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 14:20:08 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 4A66D1A22A7;
- Wed, 31 Jul 2019 20:19:53 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 0EF971A22BB;
+ Wed, 31 Jul 2019 20:19:56 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 229461A2217;
- Wed, 31 Jul 2019 20:19:53 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id DF0AD1A22B1;
+ Wed, 31 Jul 2019 20:19:55 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 20:19:31 +0200
-Message-Id: <1564597178-24649-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Wed, 31 Jul 2019 20:19:37 +0200
+Message-Id: <1564597178-24649-12-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564597178-24649-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564597178-24649-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v4 05/12] linux-user: Add support for
- FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls
+Subject: [Qemu-devel] [PATCH for 4.2 v4 11/12] linux-user: Add support for
+ RNDRESEEDCRNG ioctl
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,83 +70,42 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
-for controlling error reporting of a floppy drive.
+RNDRESEEDCRNG is a newer ioctl (added in kernel 4.17), and an
+"ifdef" guard is used for that reason in this patch.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h        |  2 ++
- linux-user/syscall_defs.h  | 19 +++++++++++++++++++
- linux-user/syscall_types.h |  7 +++++++
- 3 files changed, 28 insertions(+)
+ linux-user/ioctls.h       | 3 +++
+ linux-user/syscall_defs.h | 1 +
+ 2 files changed, 4 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index e393ad6..6551938 100644
+index 3796ee6..5efa434 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -118,6 +118,8 @@
-      IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
-      IOCTL(FDFMTEND, 0, TYPE_NULL)
-      IOCTL(FDFLUSH, 0, TYPE_NULL)
-+     IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-+     IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
-      IOCTL(FDRESET, 0, TYPE_NULL)
-      IOCTL(FDRAWCMD, 0, TYPE_NULL)
-      IOCTL(FDTWADDLE, 0, TYPE_NULL)
+@@ -259,6 +259,9 @@
+   IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
+   IOCTL(RNDZAPENTCNT, 0, TYPE_NULL)
+   IOCTL(RNDCLEARPOOL, 0, TYPE_NULL)
++#ifdef RNDRESEEDCRNG
++  IOCTL(RNDRESEEDCRNG, 0, TYPE_NULL)
++#endif
+ 
+   IOCTL(CDROMPAUSE, 0, TYPE_NULL)
+   IOCTL(CDROMSTART, 0, TYPE_NULL)
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 1ca115d..36256b0 100644
+index 766d7b9..314a052 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -885,12 +885,31 @@ struct target_pollfd {
+@@ -850,6 +850,7 @@ struct target_pollfd {
+ #define TARGET_RNDADDTOENTCNT  TARGET_IOW('R', 0x01, int)
+ #define TARGET_RNDZAPENTCNT    TARGET_IO('R', 0x04)
+ #define TARGET_RNDCLEARPOOL    TARGET_IO('R', 0x06)
++#define TARGET_RNDRESEEDCRNG   TARGET_IO('R', 0x07)
  
- /* From <linux/fd.h> */
+ /* From <linux/fs.h> */
  
-+struct target_floppy_max_errors {
-+    abi_uint        abort;
-+    abi_uint        read_track;
-+    abi_uint        reset;
-+    abi_uint        recal;
-+    abi_uint        reporting;
-+};
-+
-+struct target_format_descr {
-+    abi_uint        device;
-+    abi_uint        head;
-+    abi_uint        track;
-+};
-+
- #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
- #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
- #define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
- #define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct target_format_descr)
- #define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
-+#define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
- #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
-+#define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c,                               \
-+                                        struct target_floppy_max_errors)
-+#define TARGET_FDGETMAXERRS  TARGET_IOR(2, 0x0e,                               \
-+                                        struct target_floppy_max_errors)
- #define TARGET_FDRESET        TARGET_IO(2, 0x54)
- #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
- #define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index d82d1a5..5ba7c34 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -261,6 +261,13 @@ STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* datalen */
-        TYPE_PTRVOID) /* data */
- 
-+STRUCT(floppy_max_errors,
-+       TYPE_INT,     /* abort */
-+       TYPE_INT,     /* read_track */
-+       TYPE_INT,     /* reset */
-+       TYPE_INT,     /* recal */
-+       TYPE_INT)     /* reporting */
-+
- STRUCT(format_descr,
-        TYPE_INT,     /* device */
-        TYPE_INT,     /* head */
 -- 
 2.7.4
 
