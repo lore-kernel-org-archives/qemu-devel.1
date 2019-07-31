@@ -2,87 +2,89 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001DAC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44327C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:09:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB606206A2
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:04:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KZmQFklR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB606206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1B525206A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:09:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B525206A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hspDu-0000aL-Sc
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 10:04:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60303)
+	id 1hspIM-0002iD-6i
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 10:09:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32950)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hspDV-00009q-Sb
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:04:34 -0400
+ (envelope-from <eblake@redhat.com>) id 1hspHh-00022Q-Fy
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hspDU-00065I-U3
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:04:33 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42328)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hspDU-000631-Bn
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:04:32 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x1so19930106wrr.9
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 07:04:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=KZQDQTJoJmsn4bk38zyEP41eB5Y35J+w6Y7mqvRnCkE=;
- b=KZmQFklRHzyAOjTXV7EoYaXNHNDMkrA0FkGChq/9hbN58RblUm/gjP+6kUWrEM7LTM
- 0WTwSuejWijPV4i8knbFfvsXbzGWckmyucUiimWJqW+9a0+OPMDv9b88oG+nFzSrTowF
- jf1yiLDUgWNhzI7Anwu6uZCWHozZWWVXczDBG27xi10KX04uyuSIo4MTkTed+odj1+MS
- QqqNLofmlffbuHzpLsvFnfSOFTysn1OpkkdltLD5vw3eQHqx+WokMcQYJz0bg8tMI8bq
- NB/Lvwxa+xLPf5oOzPXQFVyCQYjguLEFEseashMjzlLoT9+K0RikouU/qNgDvjRWzy/O
- CiiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=KZQDQTJoJmsn4bk38zyEP41eB5Y35J+w6Y7mqvRnCkE=;
- b=MNKLmRqHi4mUOSSNEsLO/iCND2fwGVwSZDfR3zKkMmN4qgyK/fqor54wx+Sxa9u+Pe
- SSWj3tf4STOdpzi+TAvRsJZ9gpGDta/vMIgV+9pbHLhGbxYIk0gt3IXa+bFYWpIJd6/h
- UkgNMtlsM0TsjT4PxtELQtPbADxeuRAALS7sfuqASGwlirK4fj1/AO4ng4lbYVbD4oIZ
- k2trRzc2Zf7lrYy6fVrkHGgK81CkyDuDLjnE7xEr4sYDQVKIUZL1w3S8vPeOxbu53OW9
- xHtDcTSStQd99kEqnOhDNzjpohgNyPYt7pUTmTkLUMITjHQks96TDgJziErn3zNlQw4S
- /PZg==
-X-Gm-Message-State: APjAAAWXCLKOxyDVs+w789hPlDHx6aVvEC1O3eQIbe7IufmtqTDf5dKT
- vcAtN37P/h7oBW/SDqvY4KmA+9aft4M=
-X-Google-Smtp-Source: APXvYqwY4xkyXmwhuWianznY7D/EGlj4iLUqsFDQrj+qrtBlW8uHE8qmD7vUEDatFuYA+jc9TqpkFw==
-X-Received: by 2002:adf:eb51:: with SMTP id u17mr2490360wrn.257.1564581870038; 
- Wed, 31 Jul 2019 07:04:30 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id l8sm138045623wrg.40.2019.07.31.07.04.29
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 07:04:29 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 0D2321FF87;
- Wed, 31 Jul 2019 15:04:29 +0100 (BST)
+ (envelope-from <eblake@redhat.com>) id 1hspHg-00082V-Hm
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:08:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39469)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hspHg-00081o-9O
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:08:52 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0588F7C83B;
+ Wed, 31 Jul 2019 14:08:51 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AFC75798A;
+ Wed, 31 Jul 2019 14:08:49 +0000 (UTC)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 References: <20190725084341.8287-1-berrange@redhat.com>
-User-agent: mu4e 1.3.3; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190725084341.8287-1-berrange@redhat.com>
-Date: Wed, 31 Jul 2019 15:04:29 +0100
-Message-ID: <87a7cui9le.fsf@linaro.org>
+ <87a7cui9le.fsf@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <196f1373-6105-c3d1-e58c-da83d40c4fc5@redhat.com>
+Date: Wed, 31 Jul 2019 09:08:48 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <87a7cui9le.fsf@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="kIZ8xrJp4N2a2E6EGgkLNlBcg7150iNFs"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Wed, 31 Jul 2019 14:08:51 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 0/3] require newer glib2 to enable
  autofree'ing of stack variables exiting scope
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,33 +98,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kIZ8xrJp4N2a2E6EGgkLNlBcg7150iNFs
+Content-Type: multipart/mixed; boundary="BxVbpbtTwOpfsY0VAd4iuglxoDjSqA28M";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Message-ID: <196f1373-6105-c3d1-e58c-da83d40c4fc5@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] require newer glib2 to enable
+ autofree'ing of stack variables exiting scope
+References: <20190725084341.8287-1-berrange@redhat.com>
+ <87a7cui9le.fsf@linaro.org>
+In-Reply-To: <87a7cui9le.fsf@linaro.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+--BxVbpbtTwOpfsY0VAd4iuglxoDjSqA28M
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> Both GCC and CLang support a C extension attribute((cleanup)) which
-> allows you to define a function that is invoked when a stack variable
-> exits scope. This typically used to free the memory allocated to it,
-> though you're not restricted to this. For example it could be used to
-> unlock a mutex.
-<snip>
->
->     GOOD:
->         g_autofree char *wibble =3D g_strdup("wibble")
-> 	...
-> 	return g_steal_pointer(wibble);
->
->     g_steal_pointer is an inline function which simply copies
->     the pointer to a new variable, and sets the original variable
->     to NULL, thus avoiding cleanup.
+On 7/31/19 9:04 AM, Alex Benn=C3=A9e wrote:
+>=20
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>=20
+>> Both GCC and CLang support a C extension attribute((cleanup)) which
+>> allows you to define a function that is invoked when a stack variable
+>> exits scope. This typically used to free the memory allocated to it,
+>> though you're not restricted to this. For example it could be used to
+>> unlock a mutex.
+> <snip>
+>>
+>>     GOOD:
+>>         g_autofree char *wibble =3D g_strdup("wibble")
+>> 	...
+>> 	return g_steal_pointer(wibble);
+>>
+>>     g_steal_pointer is an inline function which simply copies
+>>     the pointer to a new variable, and sets the original variable
+>>     to NULL, thus avoiding cleanup.
+>=20
+> Surely this is a particular use case where you wouldn't use g_autofree
+> to declare the variable as you intending to return it to the outer scop=
+e?
 
-Surely this is a particular use case where you wouldn't use g_autofree
-to declare the variable as you intending to return it to the outer scope?
+Actually, it's still quite useful if you have intermediate returns:
 
---
-Alex Benn=C3=A9e
+g_autofree char *wibble =3D NULL;
+if (something)
+  return NULL;
+wibble =3D g_strdup("wibble");
+if (something_else)
+  return NULL;
+return g_steal_pointer(wibble);
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--BxVbpbtTwOpfsY0VAd4iuglxoDjSqA28M--
+
+--kIZ8xrJp4N2a2E6EGgkLNlBcg7150iNFs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1BoPAACgkQp6FrSiUn
+Q2o0cQf+JkL6oATiioR1JqJ1BZjf/B0jfJ2q0jNL1HnqoNPIJD/BdLrNvKD10dw6
+ITdIcrwzlozqxNlktSFWwYrow7fdbePLdmLKOdxeDw+X30bebJ7m41Z33IHzFmAk
+yqRpXmFnHX3U+U1pR5ZBFqnflSGYmpZo6u2GDf8A1tk3MNMHr77cpKLajDWYE+a/
+vVSaIuczU8pM7iejpSMlispjXSxa/Ru+RZXITiqTVdNvmfHZ875+7kr15qIqkb1c
+CDQ59GnLotgPocRfSKIcIlxHLDq5xizYsoEWk2ARsTzlY1zxtpKuN1EzwPgJ86Ft
+sym5pQr6vosgHq5AsqXPiL1tPdiqiA==
+=xwqd
+-----END PGP SIGNATURE-----
+
+--kIZ8xrJp4N2a2E6EGgkLNlBcg7150iNFs--
 
