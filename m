@@ -2,79 +2,86 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1395C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC46C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:05:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76ED02089E
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:05:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76ED02089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AAD422089E
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 11:05:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="nrZ1RfgX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAD422089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsmPx-0008EQ-Nn
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 07:05:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38970)
+	id 1hsmQA-0000LV-UZ
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 07:05:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39058)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <slp@redhat.com>) id 1hsmP3-00072F-50
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:04:18 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hsmPI-0007Rh-4y
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:04:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1hsmP1-0007AU-Es
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:04:17 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45208)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1hsmP1-0007A0-7p
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:04:15 -0400
-Received: by mail-wr1-f67.google.com with SMTP id f9so69165721wre.12
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 04:04:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=0d2UQVZRCYZD0Qgx8QF07Wkx9k7Hz+/z4T89nwdVSgk=;
- b=sIuZu7PCaOpDFEMZyyvBsdJLy6HIY/VvMsaHxugfVuEuPhUOHlVDocP5p3luqVd8kg
- sBiwwBHCENrJrrj7I/fM3/K1g9DokPwUlVzrLO3OLm7Jx5odXyKiZchv4HAPU6nLOenj
- FZ3aYzP9SkGRrlxmL80Gj2xPBwmROOqg83xAujB+3YcKLwon1m3ivAO05LsYh47kAdvi
- OyD2K8vk/9I3zkxMjQ+fWm1YplICh/JgySDI88MLqUq6GRX1MnaKSGSkAk7noPNgiqxs
- 8gaphIwCs/dXUyPrUhH9V1Eg97dhhHrgBJ4yza360Jei7w4CB2L7CIYP57AwL4/JDSD1
- PPtQ==
-X-Gm-Message-State: APjAAAWGyQWDYgigtnxnYgZKpQrXbw9CLuQr8qhw/9RSYb9gY3HPXS30
- dZDu1LMOQCexKYqTNEb0UHn3vf8XEdk=
-X-Google-Smtp-Source: APXvYqwLkGt0Exm0QzrDlFEdbIRvSJkxoYiqo1MiijSpnb3Sq5DpPNqKcoenJTgTD2nOiFVpHUthjg==
-X-Received: by 2002:adf:eb0f:: with SMTP id s15mr57377293wrn.324.1564571053767; 
- Wed, 31 Jul 2019 04:04:13 -0700 (PDT)
-Received: from dritchie.redhat.com (18.red-83-35-20.dynamicip.rima-tde.net.
- [83.35.20.18])
- by smtp.gmail.com with ESMTPSA id y7sm50152663wmm.19.2019.07.31.04.04.12
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 04:04:13 -0700 (PDT)
-References: <20190729125755.45008-1-slp@redhat.com>
- <a43acc8541c7ae811d65eb4d08e1a08333781282.camel@redhat.com>
- <20190730133546.056f8b19.cohuck@redhat.com>
- <09e5ceb5e7c03f74f05307a3b9f9a4df035ff74f.camel@redhat.com>
- <20190730151400.20686a5b.cohuck@redhat.com>
- <20190730160605-mutt-send-email-mst@kernel.org>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-In-reply-to: <20190730160605-mutt-send-email-mst@kernel.org>
-Date: Wed, 31 Jul 2019 13:04:11 +0200
-Message-ID: <87h872wjmc.fsf@redhat.com>
+ (envelope-from <damien.hedde@greensocs.com>) id 1hsmPG-0007LJ-V9
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 07:04:32 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:33058)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hsmOz-00078i-Ti; Wed, 31 Jul 2019 07:04:14 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 0B6BD96F50;
+ Wed, 31 Jul 2019 11:04:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1564571051;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ikT6SZrZG3n1LZKc3ZIc97g5lcB2v8DA7BPp9CMbDPs=;
+ b=nrZ1RfgX6qrCoMJ1DSPiZdmNsBTpC1G+A2o7+kn7jv8hSuuTElW4kaL4TFiSD3LJnKA8Qn
+ 2rWjuTRRO4n1GMs9u/qDgKEHBOIHQA2Q90W2qunDOZrcJ0WfaDJn7wuGxUGHOCl46uCXeg
+ 0PsYunN7/gbXniT7IjB7V8KHsEUULh4=
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-7-damien.hedde@greensocs.com>
+ <20190731060850.GE2032@umbus.fritz.box>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <89d90890-e5dc-d343-9c64-064a28b7b24e@greensocs.com>
+Date: Wed, 31 Jul 2019 13:04:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <20190731060850.GE2032@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1564571052;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ikT6SZrZG3n1LZKc3ZIc97g5lcB2v8DA7BPp9CMbDPs=;
+ b=CXKg5NYT5rUcbdNf4V3ITeGToJPW0ZpaRj49ylhEEVEsPLoljoLrwKFL/bwohhwoJKoLvd
+ Sb6CMP5XZEBjDY4szs2A01jjWDaZpql8095WUcwGmk4Ws3tQnFebBCAhCO9F5eM1cFwNkG
+ Q/YT38kDaDbYspWsl7ZV8ssctpF9WUY=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564571052; a=rsa-sha256; cv=none;
+ b=TMuHfoxEcXlK9kdBEl8VBheH/T0DDKgwkir4bZqMl0XutUY2UF3WHNv+2d2OSKRwenv2Ti
+ i3/W4vZf38Cb0fFwqTw+JeLVub6TUu0hoZXu/ZveV3F0wGXRxzdTThc21He4VVVPsaQ+Ob
+ nCqgpRV+yaMti3ZWJxw6JUaxsAEWV7E=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
- personality (virtio-1)
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH v3 06/33] add the vmstate description for
+ device reset state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,148 +93,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Cornelia Huck <cohuck@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
+ hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, thuth@redhat.com,
+ ehabkost@redhat.com, alistair@alistair23.me, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com, rth@twiddle.net,
+ berrange@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
 
 
-Michael S. Tsirkin <mst@redhat.com> writes:
+On 7/31/19 8:08 AM, David Gibson wrote:
+> On Mon, Jul 29, 2019 at 04:56:27PM +0200, Damien Hedde wrote:
+>> It contains the resetting counter and cold flag status.
+>>
+>> At this point, migration of bus reset related state (counter and cold/warm
+>> flag) is handled by parent device. This done using the post_load
+>> function in the vmsd subsection.
+>>
+>> This is last point allow to add an initial support of migration with part of
+>> qdev/qbus tree in reset state under the following condition:
+>> + time-lasting reset are asserted on Device only
+>>
+>> Note that if this condition is not respected, migration will succeed and
+>> no failure will occurs. The only impact is that the resetting counter
+>> of a bus may lower afer a migration.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> ---
+>>  hw/core/Makefile.objs  |  1 +
+>>  hw/core/qdev-vmstate.c | 45 ++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 46 insertions(+)
+>>  create mode 100644 hw/core/qdev-vmstate.c
+>>
+>> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+>> index d9234aa98a..49e9be0228 100644
+>> --- a/hw/core/Makefile.objs
+>> +++ b/hw/core/Makefile.objs
+>> @@ -4,6 +4,7 @@ common-obj-y += bus.o reset.o
+>>  common-obj-y += resettable.o
+>>  common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
+>>  common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
+>> +common-obj-$(CONFIG_SOFTMMU) += qdev-vmstate.o
+>>  # irq.o needed for qdev GPIO handling:
+>>  common-obj-y += irq.o
+>>  common-obj-y += hotplug.o
+>> diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
+>> new file mode 100644
+>> index 0000000000..07b010811f
+>> --- /dev/null
+>> +++ b/hw/core/qdev-vmstate.c
+>> @@ -0,0 +1,45 @@
+>> +/*
+>> + * Device vmstate
+>> + *
+>> + * Copyright (c) 2019 GreenSocs
+>> + *
+>> + * Authors:
+>> + *   Damien Hedde
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "hw/qdev.h"
+>> +#include "migration/vmstate.h"
+>> +
+>> +static bool device_vmstate_reset_needed(void *opaque)
+>> +{
+>> +    DeviceState *dev = (DeviceState *) opaque;
+>> +    return dev->resetting != 0;
+>> +}
+>> +
+>> +static int device_vmstate_reset_post_load(void *opaque, int version_id)
+>> +{
+>> +    DeviceState *dev = (DeviceState *) opaque;
+>> +    BusState *bus;
+>> +    QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+>> +        bus->resetting = dev->resetting;
+> 
+> Having redundant copies of the resetting bit in the bridge and every
+> bus instance seems kind of bogus.
 
-> On Tue, Jul 30, 2019 at 03:14:00PM +0200, Cornelia Huck wrote:
->> On Tue, 30 Jul 2019 14:17:48 +0200
->> Andrea Bolognani <abologna@redhat.com> wrote:
->>=20
->> > On Tue, 2019-07-30 at 13:35 +0200, Cornelia Huck wrote:
->> > > On Tue, 30 Jul 2019 12:25:30 +0200
->> > > Andrea Bolognani <abologna@redhat.com> wrote:=20=20
->> > > > Can you please make sure virtio-mmio uses the existing interface
->> > > > instead of introducing a new one?=20=20
->> > >=20
->> > > FWIW, I really hate virtio-pci's disable-modern/disable-legacy... fo=
-r a
->> > > starter, what is 'modern'? Will we have 'ultra-modern' in the future=
-?=20=20
->> >=20
->> > AIUI the modern/legacy terminology is part of the VirtIO spec, so
->> > while I agree that it's not necessarily the least prone to ambiguity
->> > at least it's well defined.
->>=20
->> Legacy is, modern isn't :) Devices/drivers are conforming to the
->> standard, I don't think there's a special term for that.
->
-> Right, if we followed the spec, disable-modern would have been
-> force-legacy.
->
-> I'm fine with adding force-legacy for everyone and asking tools to
-> transition if there. Document it's same as disable-modern for pci.
-> Cornelia?
+Currently we duplicate the resetting bit of parent into children when we
+do the reset propagation into the tree. It means resetting count of an
+device/bus contains the value of its parent plus any additional bit
+local to the object (due to a reset from an gpio for example).
 
-FWIW, for this patch, I'm perfectly fine with changing the "modern"
-property to "force-legacy", with "true" as the default value.
+I'm not sure if we can avoid that. It would require the
+"get_resetting_count" somehow to be recursive and fetch parent value and
+so on. I need to work on it to know if it's really possible.
 
->> >=20
->> > > It is also quite backwards with the 'disable' terminology.=20=20
->> >=20
->> > That's also true. I never claimed the way virtio-pci does it is
->> > perfect!
->> >=20
->> > > We also have a different mechanism for virtio-ccw ('max_revision',
->> > > which covers a bit more than virtio-1; it doesn't have a 'min_revisi=
-on',
->> > > as negotiating the revision down is fine), so I don't see why
->> > > virtio-mmio should replicate the virtio-pci mechanism.
->> > >=20
->> > > Also, IIUC, virtio-mmio does not have transitional devices, but eith=
-er
->> > > version 1 (legacy) or version 2 (virtio-1). It probably makes more
->> > > sense to expose the device version instead; either as an exact versi=
-on
->> > > (especially if it isn't supposed to go up without incompatible
->> > > changes), or with some min/max concept (where version 1 would stand a
->> > > bit alone, so that would probably be a bit awkward.)=20=20
->> >=20
->> > I think that if reinventing the wheel is generally agreed not to be
->> > a good idea, then it stands to reason that reinventing it twice can
->> > only be described as absolute madness :)
->> >=20
->> > We should have a single way to control the VirtIO protocol version
->> > that works for all VirtIO devices, regardless of transport. We might
->> > even want to have virtio-*-{device,ccw}-non-transitional to mirror
->> > the existing virtio-*-pci-non-transitional.
->> >=20
->> > FWIW, libvirt already implements support for (non)-transitional
->> > virtio-pci devices using either the dedicated devices or the base
->> > virtio-pci plus the disable-{modern,legacy} attributes.
->>=20
->> One problem (besides my dislike of the existing virtio-pci
->> interfaces :) is that pci, ccw, and mmio all have slightly different
->> semantics.
->>=20
->> - pci: If we need to keep legacy support around, we cannot enable some
->>   features (IIRC, pci-e, maybe others as well.) That means transitional
->>   devices are in some ways inferior to virtio-1 only devices, so it
->>   makes a lot of sense to be able to configure devices without legacy
->>   support. The differences between legacy and virtio-1 are quite large.
->> - ccw: Has revisions negotiated between device and driver; virtio-1
->>   requires revision 1 or higher. (Legacy drivers that don't know the
->>   concept of revisions automatically get revision 0.) Differences
->>   between legacy and virtio-1 are mostly virtqueue endianness and some
->>   control structures.
->> - mmio: Has device versions offered by the device, the driver can take
->>   it or leave it. No transitional devices. Differences don't look as
->>   large as the ones for pci, either.
->>=20
->> So, if we were to duplicate the same scheme as for pci for ccw and mmio
->> as well, we'd get
->>=20
->> - ccw: devices that support revision 0 only (disable-modern), that act
->>   as today, or that support at least revision 1 (disable-legacy). We
->>   still need to keep max_revision around for backwards compatibility.
->>   Legacy only makes sense for compat machines (although this is
->>   equivalent to max_revision 0); I don't see a reason why you would
->>   want virtio-1 only devices, unless you'd want to rip out legacy
->>   support in QEMU completely.
->
-> Reduce security attack surface slightly. Save some cycles
-> (down the road) on branches in the endian-ness handling.
-> Make sure your guests
-> are all up to date in preparation to the day when legacy will go away.
->
-> Not a huge win, for sure, but hey - it's something.
->
->> - mmio: devices that support version 1 (disable-modern), or version 2
->>   (disable-legacy). You cannot have both at the same time. Whether this
->>   makes sense depends on whether there will be a version 3 in the
->>   future.
->>=20
->> So, this might make some sense for mmio; for ccw, I don't see any
->> advantages other than confusing people further...
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl1BdasACgkQ9GknjS8M
-AjUqmg/9Gpfm04ur+10Y649SssqfrBFS7X0W64AUjgybEZfBy4tRqnfd/vgns9W1
-X5ySxq5dtswchEuRSINwWRF5/qoGMXsWTL5zh1eR0M+gbbV4g4fnVTxuD+MXmF5v
-h78D9hb+QwAL+jgd1cCBu3doXGN4lIMLBOMWfHW3U/lGNyztTc2exn/3jWbu25s8
-lQCPSU/MbLHviKm+cMqB05OrDtBxo6Mq35itNYHEhWJsQ8inwqZCXcq1kShupeFI
-fup/4cehnabpFWCDFJS6yBtbZEHIz5fhmMys7IClAFv4hVd9oB4NcM1J4lt5JLGk
-wVSbxZ0jnltXFnX5frHqdkSCgJN56bLwGWNVzj2WnsiAFqZ0I64qSaA/Oe2vggr0
-E49osQK0U4afN5nu3NZeBziurYYBvXWnDFss8DdLhbYNCgYSg8vtHTWLyXi+C0y7
-MBp2krAu2PaNDN53vuvAfQOxf+NNMq7AJf9YEjjZn9s6ry4aQ7D5pNzxqljv6VCo
-4in4nrVdNNCqIyCmOLEukiKVVFuq/FfekAduoRR58H0sU7i8g7H+Ms65AN4+X8tL
-UMfk8g6t8FPW+94nbSmJ7Y30JY5gRdGHG3aECPnBiFXdWQH/aBk9/tzCfjgx2Gf1
-i1zwBxVxlc3uO53B3K0Oa7i+JqnYgG5cFIOOpPyHQKF/aMbUyps=
-=/g7q
------END PGP SIGNATURE-----
---=-=-=--
+> 
+>> +        bus->reset_is_cold = dev->reset_is_cold;
+>> +    }
+>> +    return 0;
+>> +}
+>> +
+>> +const struct VMStateDescription device_vmstate_reset = {
+>> +    .name = "device_reset",
+>> +    .version_id = 0,
+>> +    .minimum_version_id = 0,
+>> +    .needed = device_vmstate_reset_needed,
+>> +    .post_load = device_vmstate_reset_post_load,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT32(resetting, DeviceState),
+>> +        VMSTATE_BOOL(reset_is_cold, DeviceState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+> 
 
