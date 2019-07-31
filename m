@@ -2,85 +2,79 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C994C32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 15:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93704C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 15:50:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A1B2206B8
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 15:49:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="s1zAFMen"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1B2206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 69925206B8
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 15:50:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69925206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsqqa-00039E-MU
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 11:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35629)
+	id 1hsqrh-000460-OZ
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 11:50:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35782)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hsqpQ-0002Ct-3A
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 11:47:50 -0400
+ (envelope-from <philmd@redhat.com>) id 1hsqpx-0002ev-Pd
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 11:48:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hsqpO-0007Vj-8W
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 11:47:47 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:40616)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hsqpH-0007PV-83; Wed, 31 Jul 2019 11:47:41 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id BA64596F50;
- Wed, 31 Jul 2019 15:47:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564588057;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Xy1Vqqb/TirIRHsUvqfEQoGyLB8ofKKfiXA/+KzkHFg=;
- b=s1zAFMenPdtrCdLzr7ftOzsvln4tD+gi+zfHpIXTjC+Aac5amDVhMTzfKgkzS+KyMMK0QV
- yKyHQAzffg5i3qn+LxIS++1RSWcVI4VZ+ewIis1jC6+KF4umJSSsxrpQ8hcLXZw+c5gpuF
- NEraKNLUVMR8hSCyuIeef8bkdLMOMh4=
-To: Andrew Baumann <Andrew.Baumann@microsoft.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "clement.deschamps@antfield.fr" <clement.deschamps@antfield.fr>
-References: <6ea54e80-63cd-5759-337b-1eb1686453f5@greensocs.com>
- <CY4PR21MB0278B2C6EDDA39E6F85DD15C9EDF0@CY4PR21MB0278.namprd21.prod.outlook.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <fa22d456-0662-800a-fa24-b4ddc6d3bd0d@greensocs.com>
-Date: Wed, 31 Jul 2019 17:47:36 +0200
+ (envelope-from <philmd@redhat.com>) id 1hsqpw-000804-2N
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 11:48:21 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53431)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hsqpv-0007z7-SE
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 11:48:19 -0400
+Received: by mail-wm1-f65.google.com with SMTP id x15so61376736wmj.3
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:48:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pzcNWa/SJdc37T0/PvsU8BfmBjul9DAml0FWlPMxRHc=;
+ b=sse1dlYyOY4xx3KT9IQlZ6vTj6mTrJgeFTqdT5XW3Nr71uV9QwpTHYt45X0hNpuYDw
+ t9O2694YcxS7okQZXsg+t36Q+SFprbfLonZyBgtNWxchO2pVc/qd4y+Noi1r5qb9GWQ6
+ ZijpniZqDlnC+2gLdKtLmqyB+OIelcp4LrRyoG5lJwiD07n9GT2fzdrL054xQXf8a7bA
+ z+Zzt0Sp3RFjrGcbp2CMa2pC3J3v22GQ8vI3GvcRacaHiyRqCAnQQaEOv8iRdSSbXKif
+ 48zT2JoGh/mo2ZQojY6hKjz2b82NzkloyCvd6e5p2zeteMGGyisPr+KrBLV0HcMsoVCo
+ cUBA==
+X-Gm-Message-State: APjAAAXZSgaZLqBIdoz8wDlTh5oLypJRIkJwJT63CXWCEg+Br1qj2rqX
+ ylLTe848ST1iFxNmCultgtbpvw==
+X-Google-Smtp-Source: APXvYqxKAfVawW6sQbbr6LRDPlTlWMIlRAiC2RTnO6WNVepv3OB6U+ZRmcDOMrc2AmbPXK0OioBzSg==
+X-Received: by 2002:a1c:7503:: with SMTP id o3mr109103266wmc.170.1564588098872; 
+ Wed, 31 Jul 2019 08:48:18 -0700 (PDT)
+Received: from [10.201.33.84] ([195.166.127.210])
+ by smtp.gmail.com with ESMTPSA id v23sm60305500wmj.32.2019.07.31.08.48.16
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 31 Jul 2019 08:48:18 -0700 (PDT)
+To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-20-damien.hedde@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <ea759e77-4514-ec00-3587-8dd3a50712bb@redhat.com>
+Date: Wed, 31 Jul 2019 17:48:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CY4PR21MB0278B2C6EDDA39E6F85DD15C9EDF0@CY4PR21MB0278.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US-large
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564588057;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Xy1Vqqb/TirIRHsUvqfEQoGyLB8ofKKfiXA/+KzkHFg=;
- b=ic9l1QUA18vQLU4gCAHqQ+i14hFX4S+aa5O1VndIHq5QH7l58A4uvQsMa42muRW0YBENFG
- FiBFITbJD2rPJhYopywD1jkmXNZgEH8qxQBToAEbjWQO4h/LZg7NnfEZnxhuYlOrdoN2D+
- wfOGLYeHEKGxw9Es1St0RNFzV0oSzxg=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564588057; a=rsa-sha256; cv=none;
- b=n+4USx+dwiWWjUci1ydT5r/VyY55ElSolZnLq9QlvnhPxOkqpwTZrG0TrHjP2gHbZwIwFv
- 7B/tr6bf1lzvQcnGK6vs55b1Ct6OQwohk9HrEQPGMdaRmIo3qoaC5nDdWl8pahWNDm+xan
- KAWuIWeL68O6yc4nFZaJvObQi7X29fU=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20190729145654.14644-20-damien.hedde@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] RFC raspberry pi sd-card reset
+ [fuzzy]
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [PATCH v3 19/33] hw/sd/pl181.c & omap_mmc.c:
+ remove device_legacy_reset call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,119 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- "f4bug@amsat.org" <f4bug@amsat.org>
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ kraxel@redhat.com, edgar.iglesias@xilinx.com, hare@suse.com,
+ qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com,
+ david@gibson.dropbear.id.au, thuth@redhat.com, ehabkost@redhat.com,
+ alistair@alistair23.me, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ clg@kaod.org, jsnow@redhat.com, rth@twiddle.net, berrange@redhat.com,
+ cohuck@redhat.com, mark.burton@greensocs.com, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 7/29/19 4:56 PM, Damien Hedde wrote:
+> Replace legacy's reset call by device_reset_warm.
+> 
+> The new function propagates also the reset to the sub-buses tree but this has
+> no impact since SDState has no child bus.
+> 
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> ---
+>  hw/sd/omap_mmc.c | 2 +-
+>  hw/sd/pl181.c    | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+> index 24a1edc149..3021e54b8d 100644
+> --- a/hw/sd/omap_mmc.c
+> +++ b/hw/sd/omap_mmc.c
+> @@ -317,7 +317,7 @@ void omap_mmc_reset(struct omap_mmc_s *host)
+>       * into any bus, and we must reset it manually. When omap_mmc is
+>       * QOMified this must move into the QOM reset function.
+>       */
+> -    device_legacy_reset(DEVICE(host->card));
+> +    device_reset_warm(DEVICE(host->card));
+>  }
+>  
+>  static uint64_t omap_mmc_read(void *opaque, hwaddr offset,
+> diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+> index 15b4aaa67f..a59ef7eb2a 100644
+> --- a/hw/sd/pl181.c
+> +++ b/hw/sd/pl181.c
+> @@ -480,7 +480,7 @@ static void pl181_reset(DeviceState *d)
+>      /* Since we're still using the legacy SD API the card is not plugged
+>       * into any bus, and we must reset it manually.
+>       */
+> -    device_legacy_reset(DEVICE(s->card));
+> +    device_reset_warm(DEVICE(s->card));
 
+We need to define what is a sdcard 'warm' reset.
 
-On 7/31/19 5:28 PM, Andrew Baumann wrote:
-> Hi,
->=20
-> =A0
->=20
-> (Sorry for top-posting, just wanted to give you some quick context.)
->=20
-> =A0
->=20
-> The Pi-specific quirk here is that there are two different SD
-> controllers on the board, both accessing the same card, where only one
-> can be used at a time. IIRC Clement Deschamps added this reparenting
-> logic to accomplish that when he implemented the second SD controller. =
-I
-> can=92t give you a concrete suggestion, but =93initialize the platform =
-with
-> the sd-card at the right initial place=94 is not really viable given th=
-at
-> the right place changes depending on GPIO programming by the guest.
-
-I understand that there is different sd controllers the guest can choose.
-My concern is only about the reset, before any guest kicked in. During
-reset the sd-card will always ends up at the same place (the sdhci-bus)
-Right-now machine init put the sd-card at some place, and reset moves it.
-
->=20
-> =A0
->=20
-> Andrew
->=20
-> =A0
->=20
-> -----------------------------------------------------------------------=
--
-> *From:* Damien Hedde <damien.hedde@greensocs.com>
-> *Sent:* Wednesday, July 31, 2019 7:21:02 AM
-> *To:* QEMU Developers <qemu-devel@nongnu.org>
-> *Cc:* Peter Maydell <peter.maydell@linaro.org>; Andrew Baumann
-> <Andrew.Baumann@microsoft.com>; f4bug@amsat.org <f4bug@amsat.org>;
-> qemu-arm <qemu-arm@nongnu.org>
-> *Subject:* RFC raspberry pi sd-card reset
-> =A0
-> Hi,
->=20
-> Concerning the reset on the raspi2/3 machine, I ran into an issue with
-> the sd-card.
->=20
-> Here follows a subset of the qbus/qdev tree of the raspi2&3 machine as
-> it is initialized:
-> =A0+ System
-> =A0=A0 * bcm2835_gpio
-> =A0=A0=A0=A0 + sd-bus
-> =A0=A0=A0=A0=A0=A0 * sd-card
-> =A0=A0 * bcm2835-sdhost
-> =A0=A0=A0=A0 + bcm2835-sdhost-bus
-> =A0=A0 * generic-sdhci
-> =A0=A0=A0=A0 + sdhci-bus
->=20
-> raspi_init does 2 things:
-> =A0+ it creates the soc
-> =A0+ then it explicitly creates the sd-card on the bcm2835_gpio's sd-bu=
-s
->=20
-> As it happens, the reset moves the sd-card on another bus: the
-> sdhci-bus. More precisely the bcm2835_gpio reset method does it (the
-> sd-card can be mapped on bcm2835-sdhost-bus or sdhci-bus depending on
-> bcm2835_gpio registers, reset configuration corresponds to the sdhci-bu=
-s).
->=20
-> Reset call order is the following (it follows children-before-parent or=
-der):
-> =A01 sd-card
-> =A02 sd-bus
-> =A03 bcm2835_gpio -> move the sd-card
-> =A04 bcm2835-sdhost-bus
-> =A05 bcm2835-sdhost
-> =A06 sd-card=A0 (again)
-> =A07 sdhci-bus
-> =A08 generic-sdhci
->=20
-> In the end, the sd-card is reset twice, which is no big-deal in itself.
-> But it only depends on the bcm2835_gpio tree being reset before the
-> generic-sdhci (probably depends on the machine creation code).
->=20
-> I checked and it seems this is the only platform where such things
-> happen during master reset.
->=20
-> IMO this is a bit hazardous because reset is based on the qdev/qbus
-> tree (and with the multi-phase I'm working on, even if it still works,
-> it's worse).
-> I'm not sure what we should do to avoid this (and if there's is
-> something to be done).
->=20
-> The easiest solution would be to initialize the platform with the
-> sd-card at the right initial place (I do not really understand why it i=
-s
-> created in the bcm2835_gpio in the first place since we move it just
-> after). But it won't solve the issue if a reset is done afterwards.
->=20
-> Or maybe we could move the sd-card on the proper bus in a machine
-> reset code so that it's on the right place when we do the sysbus tree
-> reset just after.
->=20
-> What do you think ?
->=20
-> --
-> Damien
+>  }
+>  
+>  static void pl181_init(Object *obj)
+> 
 
