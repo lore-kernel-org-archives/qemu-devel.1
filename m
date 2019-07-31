@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB88FC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3133EC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BC7520659
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:43:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EFC2520659
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pd4FHlXV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BC7520659
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="amuUyuNw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFC2520659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsvRE-0005tW-QN
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:43:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60842)
+	id 1hsvRn-0007DJ-FH
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:43:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60867)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hsvMk-0004PZ-4l
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:31 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsvMl-0004WE-LW
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hsvMj-0003R5-5d
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:30 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42596)
+ (envelope-from <richard.henderson@linaro.org>) id 1hsvMk-0003SQ-DR
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:31 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36177)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hsvMj-0003Qc-0J
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:29 -0400
-Received: by mail-pg1-x542.google.com with SMTP id t132so32632425pgb.9
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 13:38:28 -0700 (PDT)
+ id 1hsvMk-0003Rf-6C
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:30 -0400
+Received: by mail-pf1-x442.google.com with SMTP id r7so32515298pfl.3
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 13:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ebweW1bxG4mlr4zUkxD0Pv+fcpZzn603jNjjqkso5Rc=;
- b=Pd4FHlXVvd1NDlai2uvi/QThJmS6tM9qc8YQZhRRXPHzO/xGKv4PyTfytTx+FuzJGw
- 8vMOLE4mLSYhTlI9N+sVoOdsrBLamtj+EXgP+UI0WYyZ/+5LgzMwUgnziTwp2kGegI8V
- ZenC+sp7oFcVh713Ov6tWgN6zxk8h3UB24DfggXhtQTUP57LWiMsbBVhrnCknyVK1qh5
- 7ZeAIvsKW+e4BqdQQheZohhIRLftBqR0a8i4JKYeaU83Px/TdNaK/yOI4g1rGGjiDm6V
- hEeuvwi1VxTfJ5lcBVI+4bu/Wj0bry6xnF2Um0HQxOJdON+QyWgeMiZolQaUWwZax2Hp
- TUwg==
+ bh=CFTl19ZF5edhUenxmEwmpn5Y/VYa/1WL6bwC0O5YAUU=;
+ b=amuUyuNwDci6gXi5XG1g/VwjnH2iPNi7yLWFwNScGq65RDwAoi1nJAx+bRS0q49EN5
+ oK8W2K/TN2nqy7CVzonuNVUM+JIITKfOG98/TCzvh0qNE/5HUHTEcKWDHY+FQxVCvYf3
+ B12VxhY/wLtFJj7v1fkdvPULody89gFCTh2UOaJ0cpDRbdLVrMb01o6/FeA2a+OgjPPA
+ o+QTwKVmcBEfzSi6tcyetU2ubXGsd7xC7M1Km/POBvW4rvsa9hJYImXfTFTPIJWeSl4M
+ RLDvQ3r5WBeYo1ZY8wZJbqKQ8Gy2XL8dk/5bYFMAXb9kW6zqdiUfSKPIBz5QYYKJ1cBY
+ WHyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ebweW1bxG4mlr4zUkxD0Pv+fcpZzn603jNjjqkso5Rc=;
- b=ESdtlkJ+2zMJpFp6ELuQQ5ArCHZK2uoElb+rgaFb/WJs7U6wTkK97vU7uvp+F3EJO+
- dn/gUB9yxE3w7WowltgVNsn7Pd/15G61vIoC5wtVcqTSNkVsHqYqgQ1thORkYsaphmNp
- gPlqVSwFA0wnlAl9MRQA3yoAQo1/NW8FIlnQNi7YQinyg57jU/NSV2G5dLrgGSzlZ+ok
- tdSo32YU5didPBmuoyzjiCz09liC6eUCybHG1Hfl/PVr2li10/Hys95ly6eI5+ONCJEo
- p6dhGAp/xcaovG/k3lpK34W2gS/DgBfaP6TrGBizm0MsNGVvoQMNYw0eFdpEQw+JCilk
- o+WQ==
-X-Gm-Message-State: APjAAAUJHf9oaL9Nmd4SwHudebTgSrhkbT0lRNROGLH+MqZM+Im8MX4X
- 6hSItZ6xLuqtOBGNueXU9ND0dhzbu/I=
-X-Google-Smtp-Source: APXvYqzIpj1PYk8SZZchf81xB6FYstaT2805Ekm/aKloX7Cr22N30pDGchCcQmW19UGq4I0YnJ+QXQ==
-X-Received: by 2002:a63:f452:: with SMTP id p18mr89844584pgk.373.1564605507738; 
- Wed, 31 Jul 2019 13:38:27 -0700 (PDT)
+ bh=CFTl19ZF5edhUenxmEwmpn5Y/VYa/1WL6bwC0O5YAUU=;
+ b=IH9dm9xvqnY7eVUBNfIOdkVhJI4nbhlI2sg+LCvm9BR+nmyS4d7gVDWfFDzI0IlD/a
+ tuLbdBNbuhqHZ9A3yjitJyjgTl8Y+Gkee3jsx6rqQBGRPz7sSjeUzELPKyz57GXSxolj
+ LKapKrMS7oWj/YqJt42RkM2JGpjuq2Y0uypmJjzYZF5M+6RkQnV2Od8ewqkeQbbrxi5a
+ FojBTndSjxThByguzHhUKv5PO0ECd6tOywoUtnnWEZGf73Zkzuy8kAAyBjHYIFze9MTa
+ U2AQjTlfBqQ+NwLCK/gZ6hSrcunaf7RyfQK+d1t3xKTCFsSvCQXWz/Nr1MbXDC6i4cKy
+ MJVw==
+X-Gm-Message-State: APjAAAWEQqT/gln7hd91yS3U3vmQKSUQ2kYqrJIBo8PtC+8+/atM/YdJ
+ Lxh8lpinfcLlpRjAkws2MYFe0ow5QBA=
+X-Google-Smtp-Source: APXvYqyGLOOxqQiryuyFxgUVwuW7mgaPqKiJOD2c2zGANGfK5om39sexJYEq4WObtiteKWKW8qlNng==
+X-Received: by 2002:a17:90a:2ec1:: with SMTP id
+ h1mr4754846pjs.101.1564605508954; 
+ Wed, 31 Jul 2019 13:38:28 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id g4sm84054164pfo.93.2019.07.31.13.38.26
+ by smtp.gmail.com with ESMTPSA id g4sm84054164pfo.93.2019.07.31.13.38.27
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 13:38:27 -0700 (PDT)
+ Wed, 31 Jul 2019 13:38:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 13:37:51 -0700
-Message-Id: <20190731203813.30765-11-richard.henderson@linaro.org>
+Date: Wed, 31 Jul 2019 13:37:52 -0700
+Message-Id: <20190731203813.30765-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190731203813.30765-1-richard.henderson@linaro.org>
 References: <20190731203813.30765-1-richard.henderson@linaro.org>
@@ -81,8 +82,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
-Subject: [Qemu-devel] [PATCH v2 10/32] target/arm: Update CNTVCT_EL0 for VHE
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: [Qemu-devel] [PATCH v2 11/32] target/arm: Add the hypervisor
+ virtual counter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,81 +101,158 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The virtual offset may be 0 depending on EL, E2H and TGE.
-
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 40 +++++++++++++++++++++++++++++++++++++---
- 1 file changed, 37 insertions(+), 3 deletions(-)
+ target/arm/cpu-qom.h |  1 +
+ target/arm/cpu.h     | 11 +++++----
+ target/arm/cpu.c     |  2 ++
+ target/arm/helper.c  | 57 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 66 insertions(+), 5 deletions(-)
 
+diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
+index 2049fa9612..43fc8296db 100644
+--- a/target/arm/cpu-qom.h
++++ b/target/arm/cpu-qom.h
+@@ -76,6 +76,7 @@ void arm_gt_ptimer_cb(void *opaque);
+ void arm_gt_vtimer_cb(void *opaque);
+ void arm_gt_htimer_cb(void *opaque);
+ void arm_gt_stimer_cb(void *opaque);
++void arm_gt_hvtimer_cb(void *opaque);
+ 
+ #define ARM_AFF0_SHIFT 0
+ #define ARM_AFF0_MASK  (0xFFULL << ARM_AFF0_SHIFT)
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e37008a4f7..bba4e1f984 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -144,11 +144,12 @@ typedef struct ARMGenericTimer {
+     uint64_t ctl; /* Timer Control register */
+ } ARMGenericTimer;
+ 
+-#define GTIMER_PHYS 0
+-#define GTIMER_VIRT 1
+-#define GTIMER_HYP  2
+-#define GTIMER_SEC  3
+-#define NUM_GTIMERS 4
++#define GTIMER_PHYS     0
++#define GTIMER_VIRT     1
++#define GTIMER_HYP      2
++#define GTIMER_SEC      3
++#define GTIMER_HYPVIRT  4
++#define NUM_GTIMERS     5
+ 
+ typedef struct {
+     uint64_t raw_tcr;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9eb40ff755..e10b510c0b 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1218,6 +1218,8 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+                                           arm_gt_htimer_cb, cpu);
+     cpu->gt_timer[GTIMER_SEC] = timer_new(QEMU_CLOCK_VIRTUAL, GTIMER_SCALE,
+                                           arm_gt_stimer_cb, cpu);
++    cpu->gt_timer[GTIMER_HYPVIRT] = timer_new(QEMU_CLOCK_VIRTUAL, GTIMER_SCALE,
++                                              arm_gt_hvtimer_cb, cpu);
+ #endif
+ 
+     cpu_exec_realizefn(cs, &local_err);
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 8d8b3cc40e..e2fcb03da5 100644
+index e2fcb03da5..e0f5627218 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -2484,9 +2484,31 @@ static uint64_t gt_cnt_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     return gt_get_countervalue(env);
+@@ -2527,6 +2527,7 @@ static uint64_t gt_tval_read(CPUARMState *env, const ARMCPRegInfo *ri,
+ 
+     switch (timeridx) {
+     case GTIMER_VIRT:
++    case GTIMER_HYPVIRT:
+         offset = gt_virt_cnt_offset(env);
+         break;
+     }
+@@ -2543,6 +2544,7 @@ static void gt_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ 
+     switch (timeridx) {
+     case GTIMER_VIRT:
++    case GTIMER_HYPVIRT:
+         offset = gt_virt_cnt_offset(env);
+         break;
+     }
+@@ -2698,6 +2700,34 @@ static void gt_sec_ctl_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     gt_ctl_write(env, ri, GTIMER_SEC, value);
  }
  
-+static uint64_t gt_virt_cnt_offset(CPUARMState *env)
++static void gt_hv_timer_reset(CPUARMState *env, const ARMCPRegInfo *ri)
 +{
-+    uint64_t hcr;
-+
-+    switch (arm_current_el(env)) {
-+    case 2:
-+        hcr = arm_hcr_el2_eff(env);
-+        if (hcr & HCR_E2H) {
-+            return 0;
-+        }
-+        break;
-+    case 0:
-+        hcr = arm_hcr_el2_eff(env);
-+        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
-+            return 0;
-+        }
-+        break;
-+    }
-+
-+    return env->cp15.cntvoff_el2;
++    gt_timer_reset(env, ri, GTIMER_HYPVIRT);
 +}
 +
- static uint64_t gt_virt_cnt_read(CPUARMState *env, const ARMCPRegInfo *ri)
++static void gt_hv_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                             uint64_t value)
++{
++    gt_cval_write(env, ri, GTIMER_HYPVIRT, value);
++}
++
++static uint64_t gt_hv_tval_read(CPUARMState *env, const ARMCPRegInfo *ri)
++{
++    return gt_tval_read(env, ri, GTIMER_HYPVIRT);
++}
++
++static void gt_hv_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                             uint64_t value)
++{
++    gt_tval_write(env, ri, GTIMER_HYPVIRT, value);
++}
++
++static void gt_hv_ctl_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                            uint64_t value)
++{
++    gt_ctl_write(env, ri, GTIMER_HYPVIRT, value);
++}
++
+ void arm_gt_ptimer_cb(void *opaque)
  {
--    return gt_get_countervalue(env) - env->cp15.cntvoff_el2;
-+    return gt_get_countervalue(env) - gt_virt_cnt_offset(env);
+     ARMCPU *cpu = opaque;
+@@ -2726,6 +2756,13 @@ void arm_gt_stimer_cb(void *opaque)
+     gt_recalc_timer(cpu, GTIMER_SEC);
  }
  
- static void gt_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
-@@ -2501,7 +2523,13 @@ static void gt_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static uint64_t gt_tval_read(CPUARMState *env, const ARMCPRegInfo *ri,
-                              int timeridx)
- {
--    uint64_t offset = timeridx == GTIMER_VIRT ? env->cp15.cntvoff_el2 : 0;
-+    uint64_t offset = 0;
++void arm_gt_hvtimer_cb(void *opaque)
++{
++    ARMCPU *cpu = opaque;
 +
-+    switch (timeridx) {
-+    case GTIMER_VIRT:
-+        offset = gt_virt_cnt_offset(env);
-+        break;
-+    }
- 
-     return (uint32_t)(env->cp15.c14_timer[timeridx].cval -
-                       (gt_get_countervalue(env) - offset));
-@@ -2511,7 +2539,13 @@ static void gt_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
-                           int timeridx,
-                           uint64_t value)
- {
--    uint64_t offset = timeridx == GTIMER_VIRT ? env->cp15.cntvoff_el2 : 0;
-+    uint64_t offset = 0;
++    gt_recalc_timer(cpu, GTIMER_HYPVIRT);
++}
 +
-+    switch (timeridx) {
-+    case GTIMER_VIRT:
-+        offset = gt_virt_cnt_offset(env);
-+        break;
-+    }
- 
-     trace_arm_gt_tval_write(timeridx, value);
-     env->cp15.c14_timer[timeridx].cval = gt_get_countervalue(env) - offset +
+ static const ARMCPRegInfo generic_timer_cp_reginfo[] = {
+     /* Note that CNTFRQ is purely reads-as-written for the benefit
+      * of software; writing it doesn't actually change the timer frequency.
+@@ -6849,6 +6886,26 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 1,
+               .access = PL2_RW, .writefn = vmsa_tcr_ttbr_el2_write,
+               .fieldoffset = offsetof(CPUARMState, cp15.ttbr1_el[2]) },
++#ifndef CONFIG_USER_ONLY
++            { .name = "CNTHV_CVAL_EL2", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 2,
++              .fieldoffset =
++                offsetof(CPUARMState, cp15.c14_timer[GTIMER_HYPVIRT].cval),
++              .type = ARM_CP_IO, .access = PL2_RW,
++              .writefn = gt_hv_cval_write, .raw_writefn = raw_write },
++            { .name = "CNTHV_TVAL_EL2", .state = ARM_CP_STATE_BOTH,
++              .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 0,
++              .type = ARM_CP_NO_RAW | ARM_CP_IO, .access = PL2_RW,
++              .resetfn = gt_hv_timer_reset,
++              .readfn = gt_hv_tval_read, .writefn = gt_hv_tval_write },
++            { .name = "CNTHV_CTL_EL2", .state = ARM_CP_STATE_BOTH,
++              .type = ARM_CP_IO,
++              .opc0 = 3, .opc1 = 4, .crn = 14, .crm = 3, .opc2 = 1,
++              .access = PL2_RW,
++              .fieldoffset =
++                offsetof(CPUARMState, cp15.c14_timer[GTIMER_HYPVIRT].ctl),
++              .writefn = gt_hv_ctl_write, .raw_writefn = raw_write },
++#endif
+             REGINFO_SENTINEL
+         };
+         define_arm_cp_regs(cpu, vhe_reginfo);
 -- 
 2.17.1
 
