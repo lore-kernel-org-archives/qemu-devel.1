@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9164FC32751
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB88FC32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:43:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6643720659
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BC7520659
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 20:43:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dq6i1Hs9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6643720659
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pd4FHlXV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BC7520659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsvQt-0004lM-N2
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60791)
+	id 1hsvRE-0005tW-QN
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 16:43:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60842)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hsvMh-0004IW-Oq
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hsvMk-0004PZ-4l
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hsvMg-0003OU-J2
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:27 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:46530)
+ (envelope-from <richard.henderson@linaro.org>) id 1hsvMj-0003R5-5d
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:30 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42596)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hsvMg-0003NW-DL
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:26 -0400
-Received: by mail-pf1-x444.google.com with SMTP id c3so9373544pfa.13
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 13:38:26 -0700 (PDT)
+ id 1hsvMj-0003Qc-0J
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 16:38:29 -0400
+Received: by mail-pg1-x542.google.com with SMTP id t132so32632425pgb.9
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 13:38:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BmJBoz3ocCwfjPIQpLnVRF2wr3dk36b5G/HujhxQoNg=;
- b=Dq6i1Hs91zq16uGduehbgnzKRhAalaBIaKorKOpFS3H0qN/HcGntn1JbQwgg+s7Ew1
- GqApdJQUGjWAxY/aMF00+P9eOlfn99eKYnNQ0sCAQ0KpVVUDXlWA5m/3TwR6jsxqt0Xj
- IQM7HjUKo8dWTW3mgc0mkxqQmTYr+yZ4jfBsGljgZ8K5KPvfyXP6ZhUc6k6uWgCKT3l0
- /d6q2IGejlSyIrwYMz3R13QENJgCD3q2nwCdiFPhusW/aFArl8lIjzL/OHZv3PmlXN4N
- 7VRzrHfFj9fKlr/q3Y5cdzxzuJFL1Bnfu1bLTgWtjP6F/GhXJEJ32mGhFYUPXAPidLVz
- O+3Q==
+ bh=ebweW1bxG4mlr4zUkxD0Pv+fcpZzn603jNjjqkso5Rc=;
+ b=Pd4FHlXVvd1NDlai2uvi/QThJmS6tM9qc8YQZhRRXPHzO/xGKv4PyTfytTx+FuzJGw
+ 8vMOLE4mLSYhTlI9N+sVoOdsrBLamtj+EXgP+UI0WYyZ/+5LgzMwUgnziTwp2kGegI8V
+ ZenC+sp7oFcVh713Ov6tWgN6zxk8h3UB24DfggXhtQTUP57LWiMsbBVhrnCknyVK1qh5
+ 7ZeAIvsKW+e4BqdQQheZohhIRLftBqR0a8i4JKYeaU83Px/TdNaK/yOI4g1rGGjiDm6V
+ hEeuvwi1VxTfJ5lcBVI+4bu/Wj0bry6xnF2Um0HQxOJdON+QyWgeMiZolQaUWwZax2Hp
+ TUwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BmJBoz3ocCwfjPIQpLnVRF2wr3dk36b5G/HujhxQoNg=;
- b=H+V5UoRJhd5BX7ZrJPG5PhKL/fewUe+ENqtos0vVltNWUS6NTt6i5gwndr+qPuLQHL
- jJfqDAS35IzhJ74M6iWWnV0ieGANo1/Zls+lxRlpIzXBO3l7V+bzSyxV3GRaejwv1HOE
- jjPV5ggapY383TvnvVWOMJVJKCQ9fnhHJW+uZ+q3Fbgs2MnjpstLPEK9Adbhy9g1S/hY
- k5BPajgh81EIrjxgAlFEMD/oNuefiPHgpgB2Qaq8FzhoVpSoNJvqSfuQK2ygTxC8j2wQ
- /xh3zkwMszyiSK67jQrDUSdH0Yl5tlHzKORQxutL4TlB6dtxSLCoi51vf4JL+dzG4qUp
- 0WjA==
-X-Gm-Message-State: APjAAAUI/GTfbZB4SdBoojiRuvIY25LdskqOMRolVlr/N1LUvhnuoAmR
- XA29GUjLpgafJ9WvFwHmqE/7PPiWV2A=
-X-Google-Smtp-Source: APXvYqyCL2CMqPxgwL8CQNGuInvavMSrrVdR9gHFBtMu2xxN/27T3RG46re5lp2XLkfCb17S0cH4zA==
-X-Received: by 2002:a62:3895:: with SMTP id
- f143mr48675062pfa.116.1564605505099; 
- Wed, 31 Jul 2019 13:38:25 -0700 (PDT)
+ bh=ebweW1bxG4mlr4zUkxD0Pv+fcpZzn603jNjjqkso5Rc=;
+ b=ESdtlkJ+2zMJpFp6ELuQQ5ArCHZK2uoElb+rgaFb/WJs7U6wTkK97vU7uvp+F3EJO+
+ dn/gUB9yxE3w7WowltgVNsn7Pd/15G61vIoC5wtVcqTSNkVsHqYqgQ1thORkYsaphmNp
+ gPlqVSwFA0wnlAl9MRQA3yoAQo1/NW8FIlnQNi7YQinyg57jU/NSV2G5dLrgGSzlZ+ok
+ tdSo32YU5didPBmuoyzjiCz09liC6eUCybHG1Hfl/PVr2li10/Hys95ly6eI5+ONCJEo
+ p6dhGAp/xcaovG/k3lpK34W2gS/DgBfaP6TrGBizm0MsNGVvoQMNYw0eFdpEQw+JCilk
+ o+WQ==
+X-Gm-Message-State: APjAAAUJHf9oaL9Nmd4SwHudebTgSrhkbT0lRNROGLH+MqZM+Im8MX4X
+ 6hSItZ6xLuqtOBGNueXU9ND0dhzbu/I=
+X-Google-Smtp-Source: APXvYqzIpj1PYk8SZZchf81xB6FYstaT2805Ekm/aKloX7Cr22N30pDGchCcQmW19UGq4I0YnJ+QXQ==
+X-Received: by 2002:a63:f452:: with SMTP id p18mr89844584pgk.373.1564605507738; 
+ Wed, 31 Jul 2019 13:38:27 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id g4sm84054164pfo.93.2019.07.31.13.38.24
+ by smtp.gmail.com with ESMTPSA id g4sm84054164pfo.93.2019.07.31.13.38.26
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 31 Jul 2019 13:38:24 -0700 (PDT)
+ Wed, 31 Jul 2019 13:38:27 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Wed, 31 Jul 2019 13:37:49 -0700
-Message-Id: <20190731203813.30765-9-richard.henderson@linaro.org>
+Date: Wed, 31 Jul 2019 13:37:51 -0700
+Message-Id: <20190731203813.30765-11-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190731203813.30765-1-richard.henderson@linaro.org>
 References: <20190731203813.30765-1-richard.henderson@linaro.org>
@@ -82,8 +81,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v2 08/32] target/arm: Add CONTEXTIDR_EL2
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v2 10/32] target/arm: Update CNTVCT_EL0 for VHE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,120 +99,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Not all of the breakpoint types are supported, but those that
-only examine contextidr are extended to support the new register.
+The virtual offset may be 0 depending on EL, E2H and TGE.
 
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/debug_helper.c | 50 +++++++++++++++++++++++++++++----------
- target/arm/helper.c       | 11 +++++++++
- 2 files changed, 49 insertions(+), 12 deletions(-)
+ target/arm/helper.c | 40 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/debug_helper.c b/target/arm/debug_helper.c
-index dde80273ff..2e3e90c6a5 100644
---- a/target/arm/debug_helper.c
-+++ b/target/arm/debug_helper.c
-@@ -20,6 +20,7 @@ static bool linked_bp_matches(ARMCPU *cpu, int lbn)
-     int ctx_cmps = extract32(cpu->dbgdidr, 20, 4);
-     int bt;
-     uint32_t contextidr;
-+    uint64_t hcr_el2;
- 
-     /*
-      * Links to unimplemented or non-context aware breakpoints are
-@@ -40,24 +41,44 @@ static bool linked_bp_matches(ARMCPU *cpu, int lbn)
-     }
- 
-     bt = extract64(bcr, 20, 4);
--
--    /*
--     * We match the whole register even if this is AArch32 using the
--     * short descriptor format (in which case it holds both PROCID and ASID),
--     * since we don't implement the optional v7 context ID masking.
--     */
--    contextidr = extract64(env->cp15.contextidr_el[1], 0, 32);
-+    hcr_el2 = arm_hcr_el2_eff(env);
- 
-     switch (bt) {
-     case 3: /* linked context ID match */
--        if (arm_current_el(env) > 1) {
--            /* Context matches never fire in EL2 or (AArch64) EL3 */
-+        switch (arm_current_el(env)) {
-+        default:
-+            /* Context matches never fire in AArch64 EL3 */
-             return false;
-+        case 2:
-+            if (!(hcr_el2 & HCR_E2H)) {
-+                /* Context matches never fire in EL2 without E2H enabled. */
-+                return false;
-+            }
-+            contextidr = env->cp15.contextidr_el[2];
-+            break;
-+        case 1:
-+            contextidr = env->cp15.contextidr_el[1];
-+            break;
-+        case 0:
-+            if ((hcr_el2 & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
-+                contextidr = env->cp15.contextidr_el[2];
-+            } else {
-+                contextidr = env->cp15.contextidr_el[1];
-+            }
-+            break;
-         }
--        return (contextidr == extract64(env->cp15.dbgbvr[lbn], 0, 32));
--    case 5: /* linked address mismatch (reserved in AArch64) */
-+        break;
-+
-+    case 7:  /* linked contextidr_el1 match */
-+        contextidr = env->cp15.contextidr_el[1];
-+        break;
-+    case 13: /* linked contextidr_el2 match */
-+        contextidr = env->cp15.contextidr_el[2];
-+        break;
-+
-     case 9: /* linked VMID match (reserved if no EL2) */
-     case 11: /* linked context ID and VMID match (reserved if no EL2) */
-+    case 15: /* linked full context ID match */
-     default:
-         /*
-          * Links to Unlinked context breakpoints must generate no
-@@ -66,7 +87,12 @@ static bool linked_bp_matches(ARMCPU *cpu, int lbn)
-         return false;
-     }
- 
--    return false;
-+    /*
-+     * We match the whole register even if this is AArch32 using the
-+     * short descriptor format (in which case it holds both PROCID and ASID),
-+     * since we don't implement the optional v7 context ID masking.
-+     */
-+    return contextidr == (uint32_t)env->cp15.dbgbvr[lbn];
- }
- 
- static bool bp_wp_matches(ARMCPU *cpu, int n, bool is_wp)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9a18ecf8f6..8baeb3f319 100644
+index 8d8b3cc40e..e2fcb03da5 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -6801,6 +6801,17 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         define_arm_cp_regs(cpu, lor_reginfo);
-     }
+@@ -2484,9 +2484,31 @@ static uint64_t gt_cnt_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     return gt_get_countervalue(env);
+ }
  
-+    if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
-+        static const ARMCPRegInfo vhe_reginfo[] = {
-+            { .name = "CONTEXTIDR_EL2", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 4, .crn = 13, .crm = 0, .opc2 = 1,
-+              .access = PL2_RW,
-+              .fieldoffset = offsetof(CPUARMState, cp15.contextidr_el[2]) },
-+            REGINFO_SENTINEL
-+        };
-+        define_arm_cp_regs(cpu, vhe_reginfo);
++static uint64_t gt_virt_cnt_offset(CPUARMState *env)
++{
++    uint64_t hcr;
++
++    switch (arm_current_el(env)) {
++    case 2:
++        hcr = arm_hcr_el2_eff(env);
++        if (hcr & HCR_E2H) {
++            return 0;
++        }
++        break;
++    case 0:
++        hcr = arm_hcr_el2_eff(env);
++        if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++            return 0;
++        }
++        break;
 +    }
 +
-     if (cpu_isar_feature(aa64_sve, cpu)) {
-         define_one_arm_cp_reg(cpu, &zcr_el1_reginfo);
-         if (arm_feature(env, ARM_FEATURE_EL2)) {
++    return env->cp15.cntvoff_el2;
++}
++
+ static uint64_t gt_virt_cnt_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+-    return gt_get_countervalue(env) - env->cp15.cntvoff_el2;
++    return gt_get_countervalue(env) - gt_virt_cnt_offset(env);
+ }
+ 
+ static void gt_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
+@@ -2501,7 +2523,13 @@ static void gt_cval_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static uint64_t gt_tval_read(CPUARMState *env, const ARMCPRegInfo *ri,
+                              int timeridx)
+ {
+-    uint64_t offset = timeridx == GTIMER_VIRT ? env->cp15.cntvoff_el2 : 0;
++    uint64_t offset = 0;
++
++    switch (timeridx) {
++    case GTIMER_VIRT:
++        offset = gt_virt_cnt_offset(env);
++        break;
++    }
+ 
+     return (uint32_t)(env->cp15.c14_timer[timeridx].cval -
+                       (gt_get_countervalue(env) - offset));
+@@ -2511,7 +2539,13 @@ static void gt_tval_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                           int timeridx,
+                           uint64_t value)
+ {
+-    uint64_t offset = timeridx == GTIMER_VIRT ? env->cp15.cntvoff_el2 : 0;
++    uint64_t offset = 0;
++
++    switch (timeridx) {
++    case GTIMER_VIRT:
++        offset = gt_virt_cnt_offset(env);
++        break;
++    }
+ 
+     trace_arm_gt_tval_write(timeridx, value);
+     env->cp15.c14_timer[timeridx].cval = gt_get_countervalue(env) - offset +
 -- 
 2.17.1
 
