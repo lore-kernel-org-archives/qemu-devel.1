@@ -2,78 +2,90 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B84C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00226C32751
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F1E820679
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:23:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB6E82064A
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 14:33:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Y0clnCzh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F1E820679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TdzsaTmh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB6E82064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hspVZ-00045M-Qu
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 10:23:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37761)
+	id 1hspfo-0007XK-UV
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 10:33:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42365)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hspTZ-0000WH-Sb
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:21:11 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hspfT-00077M-0G
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hspTY-0007Uk-RT
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:21:09 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:38428)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hspTW-0007SM-4g; Wed, 31 Jul 2019 10:21:06 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id F109996F50;
- Wed, 31 Jul 2019 14:21:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564582864;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=CIx9wnDk9ftdXlP6H4HNfr9G4iy0BtPVqZppcCvc0MM=;
- b=Y0clnCzheLnDW+uiXaKZNuswYUqvIC908J1hOp8ryf7/5J9v45yt09MKQJwh5loWuhwah6
- CWILtJ5Nzp4sqUk5+PsQU/TX9QzcUCU1vfDYXkxdOZrherX+EfReMFuYf6qu1auj3k8oiV
- EpuAeRyu6rGUdFmACcHI+mmu6lk5Lj4=
-From: Damien Hedde <damien.hedde@greensocs.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <6ea54e80-63cd-5759-337b-1eb1686453f5@greensocs.com>
-Date: Wed, 31 Jul 2019 16:21:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <alex.bennee@linaro.org>) id 1hspfS-0003af-09
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:33:26 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35036)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hspfR-0003aA-Pk
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 10:33:25 -0400
+Received: by mail-wm1-x341.google.com with SMTP id l2so60026303wmg.0
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 07:33:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=oAQ5pqrgiYDeU0LcqcJpINH6c9BvcprJJXZf7rdEvkY=;
+ b=TdzsaTmhdy7YANTNt9dfWOitsgI6tuV305UySzsyo6SBwOr9dWobgLU6mZ+NY16aGF
+ SXeYgTB6jUI4tEOrKUQfHua9GhN6T9ss3kfp7O9tDjPK3qSuOlGpJFWwYRG0LXRmPj/L
+ mGcB15BkxPjZ7fpCoPzItmOraMMJzRSYg9qCIQcqIGPEsw+nyDsyxaE5l6c1sfk/9jr5
+ 36jeTc//uX0c4Qe0TpO6jYpMK4t5a+2UIpOpmKomfWCYDB66kSBCgAG/QDjGbOEP4EOc
+ WWA8XXd4wRoFfCAXPOwqDWJ+U0B93ryKUXMkPqRlKQSmx1tp6Iulc8vlK0+tARW5yXVD
+ 06Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=oAQ5pqrgiYDeU0LcqcJpINH6c9BvcprJJXZf7rdEvkY=;
+ b=HM0xap3lcaRZI1AhzwXlJdqtn7f1chDm4rJQPnY97buR1/nbO0m7VMHzdKgvD35ytS
+ fbAOrdNTtgj9tlwX4M2rZRnv/oTLws9I0sfwku27n/6w8XuZKka5htVFMdrh4gTqhnVm
+ KWco6g6ikYrSXcAc84+PDW126MRUum1WUsuUDpitaYVfNVAoFU8NxhQuSCK8FOTC/gdh
+ IhK8M2dD+wBAs3XI7SBN72l315aW0XzpJ9RzWfeaSxW+djLASqlRczfpzURr8fcf6PMe
+ ddqRyrQlzSrQaXcbi1LLUrZK6uoohWjymhf2/EECOyT1Sn1hUkB5U3V7TMLmaRwSW9Gy
+ Tjkw==
+X-Gm-Message-State: APjAAAX7qXhHXK6S3m5n8L3i9Uik59N7O7QPTUu21DJ2jXVf6qm6DA3T
+ jDxx9uJ4pkxwm20knjUdeo4VFstG8iY=
+X-Google-Smtp-Source: APXvYqwnhwGR9gBuDof0dqJ+tJvPJvNfniJp2FXQIVLfK7JZmKAJ9oHl398uXyKQgEadeaA+z+AdBQ==
+X-Received: by 2002:a1c:f914:: with SMTP id x20mr33887362wmh.142.1564583603992; 
+ Wed, 31 Jul 2019 07:33:23 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id t185sm58813566wma.11.2019.07.31.07.33.23
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 31 Jul 2019 07:33:23 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0C49D1FF87;
+ Wed, 31 Jul 2019 15:33:23 +0100 (BST)
+References: <20190725084341.8287-1-berrange@redhat.com>
+ <87a7cui9le.fsf@linaro.org> <20190731141055.GI12463@redhat.com>
+User-agent: mu4e 1.3.3; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+In-reply-to: <20190731141055.GI12463@redhat.com>
+Date: Wed, 31 Jul 2019 15:33:22 +0100
+Message-ID: <877e7yi899.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564582864;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=CIx9wnDk9ftdXlP6H4HNfr9G4iy0BtPVqZppcCvc0MM=;
- b=wJ0grTRADndZKLn8vEEkpRTuqgEcz9oiHc5v7uTVRAZHli41NYYMAmPN1kucZGyBOSa1g6
- UJZ8mVt7Okpi2Vj2zrZZWqgy2f1lDXqKw1HMdJtnWyXaLe+7qLUhMTronLUu/dudZXrSZa
- 3g6SDsVQHvat8tJRkR+SfINVa7E/BDQ=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564582864; a=rsa-sha256; cv=none;
- b=MSvXQ8Qik1H1dtitCw+iFXeGmi49irVrFbnAqYD85AIJGRR4/bToVbM/07SjGBVcKaYqQM
- ef9LKrjSU1xZ11pLtUfO8vPiqQbYc9tAZI0Yj49e3wd6oJ8+CrQESuDRa7Pz1w2KPKn2SI
- R5Ei0RYvzD/8pBpfArLCFY7fz+YxhWo=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: [Qemu-devel] RFC raspberry pi sd-card reset
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] require newer glib2 to enable
+ autofree'ing of stack variables exiting scope
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,71 +97,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- f4bug@amsat.org, Andrew.Baumann@microsoft.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
 
-Concerning the reset on the raspi2/3 machine, I ran into an issue with
-the sd-card.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Here follows a subset of the qbus/qdev tree of the raspi2&3 machine as
-it is initialized:
- + System
-   * bcm2835_gpio
-     + sd-bus
-       * sd-card
-   * bcm2835-sdhost
-     + bcm2835-sdhost-bus
-   * generic-sdhci
-     + sdhci-bus
+> On Wed, Jul 31, 2019 at 03:04:29PM +0100, Alex Benn=C3=A9e wrote:
+>>
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>
+>> > Both GCC and CLang support a C extension attribute((cleanup)) which
+>> > allows you to define a function that is invoked when a stack variable
+>> > exits scope. This typically used to free the memory allocated to it,
+>> > though you're not restricted to this. For example it could be used to
+>> > unlock a mutex.
+>> <snip>
+>> >
+>> >     GOOD:
+>> >         g_autofree char *wibble =3D g_strdup("wibble")
+>> > 	...
+>> > 	return g_steal_pointer(wibble);
+>> >
+>> >     g_steal_pointer is an inline function which simply copies
+>> >     the pointer to a new variable, and sets the original variable
+>> >     to NULL, thus avoiding cleanup.
+>>
+>> Surely this is a particular use case where you wouldn't use g_autofree
+>> to declare the variable as you intending to return it to the outer scope?
+>
+> I think it depends on the situation. Obviously real code will have
+> something in the "..." part I snipped.
+>
+> You have 20 code paths that can result in returning with an error, where
+> you want to have all variables freed, and only 1 code path for success
+> Then it makes sense to use g_autofree + g_steal_pointer to eliminate
+> many goto jumps.
+>
+> If you have only 1 error path and 1 success path, then a traditional
+> g_free() call is may well be sufficient.
 
-raspi_init does 2 things:
- + it creates the soc
- + then it explicitly creates the sd-card on the bcm2835_gpio's sd-bus
+I suspect this would be worth a write up in HACKING or CODING_STYLE with
+the next iteration? (which reminds me we should really merge and .rst up
+those documents)
 
-As it happens, the reset moves the sd-card on another bus: the
-sdhci-bus. More precisely the bcm2835_gpio reset method does it (the
-sd-card can be mapped on bcm2835-sdhost-bus or sdhci-bus depending on
-bcm2835_gpio registers, reset configuration corresponds to the sdhci-bus).
+>
+> IOW, as with many coding "rules", there's scope to use personal
+> judgement as to when it is right to ignore it vs folow it.
+>
+> Regards,
+> Daniel
 
-Reset call order is the following (it follows children-before-parent order):
- 1 sd-card
- 2 sd-bus
- 3 bcm2835_gpio -> move the sd-card
- 4 bcm2835-sdhost-bus
- 5 bcm2835-sdhost
- 6 sd-card  (again)
- 7 sdhci-bus
- 8 generic-sdhci
-
-In the end, the sd-card is reset twice, which is no big-deal in itself.
-But it only depends on the bcm2835_gpio tree being reset before the
-generic-sdhci (probably depends on the machine creation code).
-
-I checked and it seems this is the only platform where such things
-happen during master reset.
-
-IMO this is a bit hazardous because reset is based on the qdev/qbus
-tree (and with the multi-phase I'm working on, even if it still works,
-it's worse).
-I'm not sure what we should do to avoid this (and if there's is
-something to be done).
-
-The easiest solution would be to initialize the platform with the
-sd-card at the right initial place (I do not really understand why it is
-created in the bcm2835_gpio in the first place since we move it just
-after). But it won't solve the issue if a reset is done afterwards.
-
-Or maybe we could move the sd-card on the proper bus in a machine
-reset code so that it's on the right place when we do the sysbus tree
-reset just after.
-
-What do you think ?
 
 --
-Damien
+Alex Benn=C3=A9e
 
