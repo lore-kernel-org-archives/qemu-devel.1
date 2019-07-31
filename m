@@ -2,79 +2,152 @@ Return-Path: <SRS0=/yOf=V4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B91C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A694C41514
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:44:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8968420693
-	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:35:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8968420693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4FC80208E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 31 Jul 2019 12:44:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC80208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hsnow-0000El-T1
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:35:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34998)
+	id 1hsnxc-00029E-HO
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 08:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36776)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hsnoO-0008H3-Ra
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:34:33 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsnxB-0001f4-BN
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hsnoN-0001F8-RZ
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:34:32 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53940)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hsnoN-0001Et-MG
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:34:31 -0400
-Received: by mail-wm1-f67.google.com with SMTP id x15so60660379wmj.3
- for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 05:34:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=O4d6PQnNXl49eGgPxln7OX7q0+n+iu+R+qVU2oaJReA=;
- b=exu8XJnXsvspP4J2/7g5GIHRJpI68cZvDDPDkvz2ria3gn9XWHh3y4mcGvlhw64nsP
- NKJoGI1Mixo3pxYceUNaij7QHHMyGyIxYAoJ1r/taNoWk7xWYRollwmprFw/oHKxJMj5
- icH/eZvYxr3KKUlRfqLEwbp6V2c1zxavJdGVmEEv2/Os4/l3sdluuL/b/o6B/Cxm/PtP
- I9gHNWbaCIEs43U6Fj3fSdd8il0guZqN554bDsEByi7r3dlq0+S0q7LYggrFfToYxMZe
- Ngv0mFRNaqmv8+oHxnV2WHzqbUr894V+gqWyLpFJcd3Dtlziae2SHLfb9/T9nz+y5vAF
- JElg==
-X-Gm-Message-State: APjAAAUfghzi2rsoe5fNfWz28H8RsjiJ//k4mi66PtZlV4O3Muh+/ft7
- CKEgkr7cBuUtEBhfxJ5JL+v/LQ==
-X-Google-Smtp-Source: APXvYqwW3cYj4IK7GZWHSdQCWYPucZHRoB/cXPlvUVpdlb75bUxD3d04obggboR63MAhxcAnosvDsw==
-X-Received: by 2002:a1c:be05:: with SMTP id o5mr112566069wmf.52.1564576470678; 
- Wed, 31 Jul 2019 05:34:30 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3?
- ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
- by smtp.gmail.com with ESMTPSA id i18sm90322413wrp.91.2019.07.31.05.34.29
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 31 Jul 2019 05:34:30 -0700 (PDT)
-To: Thomas Huth <thuth@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20190731075652.17053-1-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <borntraeger@de.ibm.com>) id 1hsnxA-0007tM-0Y
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:43:37 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35790
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1hsnx9-0007t2-Sw
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 08:43:35 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x6VChKBZ081783
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:43:34 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u39q9cqq6-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 31 Jul 2019 08:43:33 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Wed, 31 Jul 2019 13:43:31 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 31 Jul 2019 13:43:27 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x6VChQjh48824540
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 31 Jul 2019 12:43:26 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3A3364C044;
+ Wed, 31 Jul 2019 12:43:26 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C25BE4C04A;
+ Wed, 31 Jul 2019 12:43:25 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 31 Jul 2019 12:43:25 +0000 (GMT)
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <1564502498-805893-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1564502498-805893-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <14b60c5b-6ed4-0f4d-17a8-6ec861115c1e@redhat.com>
+ <30f40221-d2d2-780b-3375-910e9f755edd@de.ibm.com>
+ <08958a7e-1952-caf7-ab45-2fd503db418c@virtuozzo.com>
+ <bdbee2e0-62a7-8906-8076-408922511146@de.ibm.com>
 Openpgp: preference=signencrypt
-Message-ID: <7dc8ecea-f7ea-2ff8-e3bd-353e2cacbe9f@redhat.com>
-Date: Wed, 31 Jul 2019 14:34:30 +0200
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ syiRa+UVlsKmx1hsEg==
+Date: Wed, 31 Jul 2019 14:43:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <20190731075652.17053-1-thuth@redhat.com>
+In-Reply-To: <bdbee2e0-62a7-8906-8076-408922511146@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v2 0/8] Kconfig switches
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19073112-0028-0000-0000-00000389A3C9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19073112-0029-0000-0000-00002449F4A5
+Message-Id: <f9346216-a4e9-4882-4a36-33580529b75e@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-07-31_06:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1907310130
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [PATCH 3/3] i386/kvm: initialize struct at full
+ before ioctl call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,54 +159,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berto@igalia.com" <berto@igalia.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Denis Lunev <den@virtuozzo.com>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "armbru@redhat.com" <armbru@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/19 09:56, Thomas Huth wrote:
-> Here are some more Kconfig patches that clean up the switches of
-> existing devices and introduce proper config switches for some
-> other devices that were always enabled before.
-> 
-> v2:
->  - Included Philippe's patches to avoid a conflict with XLNX_ZYNQMP
->  - Don't rely on indirect dependencies, always "select XYZ" if it is
->    adequate
->  - Added patch for the generic loader device
-> 
-> Philippe Mathieu-Daudé (3):
->   hw/Kconfig: Move the generic XLNX_ZYNQMP to the root hw/Kconfig
->   hw/intc: Only build the xlnx-iomod-intc device for the MicroBlaze PMU
->   hw/dma: Do not build the xlnx_dpdma device for the MicroBlaze machines
-> 
-> Thomas Huth (5):
->   hw/core: Add a config switch for the "register" device
->   hw/core: Add a config switch for the "or-irq" device
->   hw/core: Add a config switch for the "split-irq" device
->   hw/misc: Add a config switch for the "unimplemented" device
->   hw/core: Add a config switch for the generic loader device
-> 
->  hw/Kconfig            |  4 ++++
->  hw/arm/Kconfig        | 15 +++++++++++++++
->  hw/core/Kconfig       | 13 +++++++++++++
->  hw/core/Makefile.objs |  8 ++++----
->  hw/dma/Kconfig        |  1 +
->  hw/dma/Makefile.objs  |  1 -
->  hw/intc/Makefile.objs |  2 +-
->  hw/microblaze/Kconfig |  1 +
->  hw/misc/Kconfig       |  3 +++
->  hw/misc/Makefile.objs |  2 +-
->  hw/pci-host/Kconfig   |  3 ++-
->  hw/sparc64/Kconfig    |  1 +
->  hw/timer/Kconfig      |  3 ---
->  13 files changed, 46 insertions(+), 11 deletions(-)
-> 
 
-Looks good.  Peter, are you picking it?
 
-Paolo
+On 31.07.19 14:28, Christian Borntraeger wrote:
+> 
+> 
+> On 31.07.19 14:04, Andrey Shinkevich wrote:
+>> On 31/07/2019 10:24, Christian Borntraeger wrote:
+>>>
+>>>
+>>> On 30.07.19 21:20, Paolo Bonzini wrote:
+>>>> On 30/07/19 18:01, Andrey Shinkevich wrote:
+>>>>> Not the whole structure is initialized before passing it to the KVM.
+>>>>> Reduce the number of Valgrind reports.
+>>>>>
+>>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>>
+>>>> Christian, is this the right fix?  It's not expensive so it wouldn't be
+>>>> an issue, just checking if there's any better alternative.
+>>>
+>>> I think all of these variants are valid with pros and cons
+>>> 1. teach valgrind about this:
+>>> Add to coregrind/m_syswrap/syswrap-linux.c (and the relevant header files)
+>>> knowledge about which parts are actually touched.
+>>> 2. use designated initializers
+>>> 3. use memset
+>>> 3. use a valgrind callback VG_USERREQ__MAKE_MEM_DEFINED to tell that this memory is defined
+>>>
+>>
+>> Thank you all very much for taking part in the discussion.
+>> Also, one may use the Valgrind technology to suppress the unwanted 
+>> reports by adding the Valgrind specific format file valgrind.supp to the 
+>> QEMU project. The file content is extendable for future needs.
+>> All the cases we like to suppress will be recounted in that file.
+>> A case looks like the stack fragments. For instance, from QEMU block:
+>>
+>> {
+>>     hw/block/hd-geometry.c
+>>     Memcheck:Cond
+>>     fun:guess_disk_lchs
+>>     fun:hd_geometry_guess
+>>     fun:blkconf_geometry
+>>     ...
+>>     fun:device_set_realized
+>>     fun:property_set_bool
+>>     fun:object_property_set
+>>     fun:object_property_set_qobject
+>>     fun:object_property_set_bool
+>> }
+>>
+>> The number of suppressed cases are reported by the Valgrind with every 
+>> run: "ERROR SUMMARY: 5 errors from 3 contexts (suppressed: 0 from 0)"
+>>
+>> Andrey
+> 
+> Yes, indeed that would be another variant. How performance critical are
+> the fixed locations? That might have an impact on what is the best solution.
+> From a cleanliness approach doing 1 (adding the ioctl definition to valgrind)
+> is certainly the most beautiful way. I did that in the past, look for example at
+> 
+> https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=c2baee9b7bf043702c130de0771a4df439fcf403
+> or 
+> https://sourceware.org/git/?p=valgrind.git;a=commitdiff;h=00a31dd3d1e7101b331c2c83fca6c666ba35d910
+> 
+> for examples. 
+> 
+> 
+>>
+>>>>
+>>>> Paolo
+>>>>
+>>>>> ---
+>>>>>   target/i386/kvm.c | 3 +++
+>>>>>   1 file changed, 3 insertions(+)
+>>>>>
+>>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>>>> index dbbb137..ed57e31 100644
+>>>>> --- a/target/i386/kvm.c
+>>>>> +++ b/target/i386/kvm.c
+>>>>> @@ -190,6 +190,7 @@ static int kvm_get_tsc(CPUState *cs)
+>>>>>           return 0;
+>>>>>       }
+>>>>>   
+>>>>> +    memset(&msr_data, 0, sizeof(msr_data));
+>>>>>       msr_data.info.nmsrs = 1;
+>>>>>       msr_data.entries[0].index = MSR_IA32_TSC;
+>>>>>       env->tsc_valid = !runstate_is_running();
+>>>>> @@ -1706,6 +1707,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>>>   
+>>>>>       if (has_xsave) {
+>>>>>           env->xsave_buf = qemu_memalign(4096, sizeof(struct kvm_xsave));
+>>>>> +        memset(env->xsave_buf, 0, sizeof(struct kvm_xsave));
+
+This is memsetting 4k? 
+Yet another variant would be to use the RUNNING_ON_VALGRIND macro from
+valgrind/valgrind.h to only memset for valgrind. But just using MAKE_MEM_DEFINED
+from memcheck.h is simpler. 
+
 
