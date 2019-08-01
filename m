@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EFDC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:31:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90001C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:32:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B6AB20449
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:31:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6AB20449
+	by mail.kernel.org (Postfix) with ESMTPS id 645FB20665
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:32:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 645FB20665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htAEs-0006Bk-Qw
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:31:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45560)
+	id 1htAFU-0007Vm-Lg
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:32:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45600)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA81-0002Y7-F3
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:24:18 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA8C-00036l-JK
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA80-0004Hs-FU
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:24:17 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:53614 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA8B-0004Q0-LB
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:24:28 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:57751 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1htA80-0004HF-8M
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:24:16 -0400
+ id 1htA8B-0004Ph-Ci
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:24:27 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 17A461A22B3;
- Thu,  1 Aug 2019 14:24:14 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 5A5BE1A215B;
+ Thu,  1 Aug 2019 14:24:25 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id C00221A20B3;
- Thu,  1 Aug 2019 14:24:13 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 377B01A20CF;
+ Thu,  1 Aug 2019 14:24:25 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  1 Aug 2019 14:21:15 +0200
-Message-Id: <1564662076-17964-15-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  1 Aug 2019 14:21:16 +0200
+Message-Id: <1564662076-17964-16-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564662076-17964-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564662076-17964-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v5 14/15] linux-user: Add support for
- RNDRESEEDCRNG ioctl
+Subject: [Qemu-devel] [PATCH for 4.2 v5 15/15] linux-user: Add support for
+ semtimedop() syscall
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,49 +63,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu, amarkovic@wavecomp.com
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>, laurent@vivier.eu,
+ amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
+From: Aleksandar Rikalo <arikalo@wavecomp.com>
 
-RNDRESEEDCRNG is a newer ioctl (added in kernel 4.17), and an
-"ifdef" guard is used for that reason in this patch.
+Add support for semtimedop() emulation. It is based on invocation
+of safe_semtimedop().
 
+Conversion is left out of safe_semtimedop(), since other safe_xxx()
+usually don't contain similar conversions.
+
+Signed-off-by: Aleksandar Rikalo <arikalo@wavecomp.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h       | 3 +++
- linux-user/syscall_defs.h | 1 +
- 2 files changed, 4 insertions(+)
+ linux-user/syscall.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 7a4e85b..240cb50 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -261,6 +261,9 @@
-   IOCTL(RNDADDTOENTCNT, IOC_W, MK_PTR(TYPE_INT))
-   IOCTL(RNDZAPENTCNT, 0, TYPE_NULL)
-   IOCTL(RNDCLEARPOOL, 0, TYPE_NULL)
-+#ifdef RNDRESEEDCRNG
-+  IOCTL(RNDRESEEDCRNG, 0, TYPE_NULL)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index ee80175..6825458 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -6650,7 +6650,43 @@ static inline abi_long host_to_target_statx(struct target_statx *host_stx,
+     return 0;
+ }
+ #endif
++#ifdef TARGET_NR_semtimedop
++static inline abi_long do_semtimedop(int semid, abi_long ptr, unsigned nsops,
++                                     abi_long timeout)
++{
++    struct sembuf *sops;
++    struct timespec ts, *pts;
++    abi_long ret;
++
++    if (timeout) {
++        pts = &ts;
++        if (target_to_host_timespec(pts, timeout)) {
++            return -TARGET_EFAULT;
++        }
++    } else {
++        pts = NULL;
++    }
+ 
++    sops = g_malloc(sizeof(struct sembuf) * nsops);
++    if (sops == NULL) {
++        return -TARGET_EFAULT;
++    }
++
++    if (target_to_host_sembuf(sops, ptr, nsops)) {
++        g_free(sops);
++        return -TARGET_EFAULT;
++    }
++
++#ifdef __NR_semtimedop
++    ret = get_errno(safe_semtimedop(semid, sops, nsops, pts));
++#else
++    ret = -TARGET_ENOSYS;
++#endif
++    g_free(sops);
++
++    return ret;
++}
 +#endif
  
-   IOCTL(CDROMPAUSE, 0, TYPE_NULL)
-   IOCTL(CDROMSTART, 0, TYPE_NULL)
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 50fc44f..1b42578 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -852,6 +852,7 @@ struct target_pollfd {
- #define TARGET_RNDADDTOENTCNT  TARGET_IOW('R', 0x01, int)
- #define TARGET_RNDZAPENTCNT    TARGET_IO('R', 0x04)
- #define TARGET_RNDCLEARPOOL    TARGET_IO('R', 0x06)
-+#define TARGET_RNDRESEEDCRNG   TARGET_IO('R', 0x07)
- 
- /* From <linux/fs.h> */
- 
+ /* ??? Using host futex calls even when target atomic operations
+    are not really atomic probably breaks things.  However implementing
+@@ -9194,6 +9230,10 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+     case TARGET_NR_semop:
+         return do_semop(arg1, arg2, arg3);
+ #endif
++#ifdef TARGET_NR_semtimedop
++    case TARGET_NR_semtimedop:
++        return do_semtimedop(arg1, arg2, arg3, arg4);
++#endif
+ #ifdef TARGET_NR_semctl
+     case TARGET_NR_semctl:
+         return do_semctl(arg1, arg2, arg3, arg4);
 -- 
 2.7.4
 
