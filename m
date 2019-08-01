@@ -2,115 +2,82 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5EAC19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 08:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983AEC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 08:11:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9843F205F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 08:08:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9843F205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 604F5205F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 08:11:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lzVliYtc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 604F5205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46301 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht68p-0002yp-TN
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 04:08:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48351)
+	id 1ht6BD-0004Dv-JC
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 04:11:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48928)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1ht68Q-0002RT-Th
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:08:27 -0400
+ (envelope-from <renyime@gmail.com>) id 1ht6Ah-0003nj-OL
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ht68P-00052P-UO
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:08:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33778)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1ht68N-00050p-PA; Thu, 01 Aug 2019 04:08:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D546A3091761;
- Thu,  1 Aug 2019 08:08:21 +0000 (UTC)
-Received: from thuth.remote.csb (dhcp-200-228.str.redhat.com [10.33.200.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 03FC85D9CD;
- Thu,  1 Aug 2019 08:08:16 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Yang Zhong <yang.zhong@intel.com>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <20190731075652.17053-1-thuth@redhat.com>
- <20190731075652.17053-8-thuth@redhat.com>
- <f2399005-cead-a147-37a5-600fda7eaea5@redhat.com>
- <b9bbf556-e2fc-8634-2238-9c1c5ead7a35@redhat.com>
- <18d71b10-6be2-b76e-54d6-76c0395ca700@redhat.com>
- <CAP+75-Vrr5JcNd1tFhossrNDNEaJV4U4a+iyyDH2rgE5P6tV9g@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; keydata=
- xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
- yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
- 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
- tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
- 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
- O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
- 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
- gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
- 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
- zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzRxUaG9tYXMgSHV0
- aCA8dGguaHV0aEBnbXguZGU+wsF7BBMBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIX
- gAUCUfuWKwIZAQAKCRAu2dd0/nAttbe/EACb9hafyOb2FmhUqeAiBORSsUifFacQ7laVjcgR
- I4um8CSHvxijYftpkM2EdAtmXIKgbNDpQoXcWLXB9lu9mLgTO4DVT00TRR65ikn3FCWcyT74
- ENTOzRKyKLsDCjhXKPblTPIQbYAUCOWElcyAPm0ERd62fA/rKNxgIiNo/l4UODOMoOJm2/Ox
- ZoTckW68Eqv7k9L7m7j+Hn3hoDTjAmcCBJt+j7pOhzWvCbqoNOIH8C8qvPaNlrba+R/K6jkO
- 6jZkTbYQpGIofEQJ/TNn38IsNGpI1ALTHWFtoMxp3j2Imz0REO6dRE2fHRN8sVlHgkoeGhmY
- NbDsDE1jFQOEObFnu0euk//7BXU7tGOHckVAZ8T1smiRPHfQU7UEH2a/grndxJ+PNeM5w7n2
- l+FN3cf2KgPotCK2s9MjSdZA7C5e3rFYO8lqiqTJKvc62vqp3e7B0Kjyy5/QtzSOejBij2QL
- xkKSFNtxIz4MtuxN8e3IDQNxsKry3nF7R4MDvouXlMo6wP9KuyNWb+vFJt9GtbgfDMIFVamp
- ZfhEWzWRJH4VgksENA4K/BzjEHCcbTUb1TFsiB1VRnBPJ0SqlvifnfKk6HcpkDk6Pg8Q5FOJ
- gbNHrdgXsm+m/9GF2zUUr+rOlhVbK23TUqKqPfwnD7uxjpakVcJnsVCFqJpZi1F/ga9IN87B
- TQRR+3lMARAAtp831HniPHb9AuKq3wj83ujZK8lH5RLrfVsB4X1wi47bwo56BqhXpR/zxPTR
- eOFT0gnbw9UkphVc7uk/alnXMDEmgvnuxv89PwIQX6k3qLABeV7ykJQG/WT5HQ6+2DdGtVw3
- 2vjYAPiWQeETsgWRRQMDR0/hwp8s8tL/UodwYCScH6Vxx9pdy353L1fK4Bb9G73a+9FPjp9l
- x+WwKTsltVqSBuSjyZQ3c3EE8qbTidXZxB38JwARH8yN3TX+t65cbBqLl/zRUUUTapHQpUEd
- yoAsHIml32e4q+3xdLtTdlLi7FgPBItSazcqZPjEcYW73UAuLcmQmfJlQ5PkDiuqcitn+KzH
- /1pqsTU7QFZjbmSMJyXY0TDErOFuMOjf20b6arcpEqse1V3IKrb+nqqA2azboRm3pEANLAJw
- iVTwK3qwGRgK5ut6N/Znv20VEHkFUsRAZoOusrIRfR5HFDxlXguAdEz8M/hxXFYYXqOoaCYy
- 6pJxTjy0Y/tIfmS/g9Bnp8qg9wsrsnk0+XRnDVPak++G3Uq9tJPwpJbyO0vcqEI3vAXkAB7X
- VXLzvFwi66RrsPUoDkuzj+aCNumtOePDOCpXQGPpKl+l1aYRMN/+lNSk3+1sVuc2C07WnYyE
- gV/cbEVklPmKrNwu6DeUyD0qI/bVzKMWZAiB1r56hsGeyYcAEQEAAcLBXwQYAQIACQUCUft5
- TAIbDAAKCRAu2dd0/nAttYTwEACLAS/THRqXRKb17PQmKwZHerUvZm2klo+lwQ3wNQBHUJAT
- p2R9ULexyXrJPqjUpy7+voz+FcKiuQBTKyieiIxO46oMxsbXGZ70o3gxjxdYdgimUD6U8PPd
- JH8tfAL4BR5FZNjspcnscN2jgbF4OrpDeOLyBaj6HPmElNPtECHWCaf1xbIFsZxSDGMA6cUh
- 0uX3Q8VI7JN1AR2cfiIRY7NrIlWYucJxyKjO3ivWm69nCtsHiJ0wcF8KlVo7F2eLaufo0K8A
- ynL8SHMF3VEyxsXOP2f1UR9T2Ur30MXcTBpjUxml1TX3RWY5uH89Js/jlIugBwuAmacJ7JYh
- lTg6sF/GNc4nPb4kk2yktNWTade+TzsllYlJPaorD2Qe8qX0iFUhFC6y9+O6mP4ZvWoYapp9
- ezYNuebMgEr93ob1+4sFg3812wNP01WqsGtWCJHnPv/JoonFdMzD/bIkXGEJMk6ks2kxQQZq
- g6Ik/s/vxOfao/xCn8nHt7GwvVy41795hzK6tbSl+BuyCRp0vfPRP34OnK7+jR2nvQpJu/pU
- rCELuGwT9hsYkUPjVd4lfylN3mzEc6iAv/wwjsc0DRTSQCpXT3v2ymTAsRKrVaEZLibTXaf+
- WslxWek3xNYRiqwwWAJuL652eAlxUgQ5ZS+fXBRTiQpJ+F26I/2lccScRd9G5w==
-Organization: Red Hat
-Message-ID: <7c468dcf-51bf-59a9-d281-1f0616b04487@redhat.com>
-Date: Thu, 1 Aug 2019 10:08:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <renyime@gmail.com>) id 1ht6Ag-0006Bq-68
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:10:47 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:40929)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <renyime@gmail.com>) id 1ht6Af-0006B3-WA
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:10:46 -0400
+Received: by mail-io1-xd42.google.com with SMTP id h6so17199053iom.7
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 01:10:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=LEbZ3U87Fz4s3zCQUlQJ1Yb3TVozv0tUTPqcwYsHvHM=;
+ b=lzVliYtcYIV5m60q9rLTVFNmEqv7hBHOeE5dwcGfkoWIVqRHH8ie5AiYt+1r81KxA6
+ rAkf+rY6YoUwWU0SHGRwtZ+B2aRgxFD0/IsGiNWeumZl73QFvovTnPdSe+TPURB8Z+Qz
+ Yeo+WE+Q8P18V2Be6F2SlQy1uLvFhfhuwTphArcmSCWVqSoVgPhntcQpDTq0bbs1R1T3
+ 7ojYqaZyq5WxBYXgZW1ivTXNxbFrzUX6YjHOqbGoovFSb5IuQapki1Lhe1IOVL28Qx31
+ QDE+we7k7aiqm2H0LvyZeHLvZXYfG6bEdIDh2H3NOtC5hKFK3ki+/cyaUC06gQNfOfd9
+ dQig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=LEbZ3U87Fz4s3zCQUlQJ1Yb3TVozv0tUTPqcwYsHvHM=;
+ b=IwdGHdDTtKwKw1ofUcHJWyWmEm7mlK7q6mcVCb93JmzTjrdSKNoiGnBw7NOdkPsxKG
+ wKaTfUA9jAsR3SGopTcR/8VqnH3UQ9A3lv8v5dFzz44evXewvuqUpUnAXLnu3552g+nA
+ hCvuudocn450Pm7+MVD4CHrJvmgZAfFayOjTEhfx+bV2P7K7Xq/dY+DpfL2udKUyH5T5
+ WxgvNeWXsYu3gDLRLZmOs5yzs3W4pbgkfQ+5rpr+IWrW2dJHYgRmLknKYt4SOaSNg9GZ
+ Qa4vy+nj7n3Bk50JABrcGyN59kPgOt6aAZIsQ9/vQZ7ixKEowP37d+owvIkjkXxKomtL
+ FbpA==
+X-Gm-Message-State: APjAAAXrHZ8zPuqsid8lC6/nyuuaJEl1rYS/hxm+P1jM1/JqvQNWA/Ol
+ JBznaz1U6L9LIT1fcdxAtpQ4I/BGlfkqAZzZji5mTJEx
+X-Google-Smtp-Source: APXvYqwAM+2PO+Uj/MJMLWfYstjIIMeortBs/sHURbSosuPOqYVCpX6F9fuVYvaNFkcAg0H//lNpAdR20VmsPSQyrMo=
+X-Received: by 2002:a02:a1c7:: with SMTP id o7mr135123544jah.26.1564647045103; 
+ Thu, 01 Aug 2019 01:10:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAP+75-Vrr5JcNd1tFhossrNDNEaJV4U4a+iyyDH2rgE5P6tV9g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 01 Aug 2019 08:08:22 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] hw/misc: Add a config switch for
- the "unimplemented" device
+References: <1564464992-22305-1-git-send-email-ivanren@tencent.com>
+ <20190801022118.GA21992@richard>
+In-Reply-To: <20190801022118.GA21992@richard>
+From: Ivan Ren <renyime@gmail.com>
+Date: Thu, 1 Aug 2019 16:10:34 +0800
+Message-ID: <CA+6E1==Dc5Zac3Q-tt2V2pbq-DofW=AZX6tP1RoDBp4KSNxiKw@mail.gmail.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d42
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH] migration: always initial ram_counters for
+ a new migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,50 +89,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 31/07/2019 17.59, Philippe Mathieu-Daud=C3=A9 wrote:
-> On Wed, Jul 31, 2019 at 5:55 PM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
->> On 7/31/19 1:50 PM, Thomas Huth wrote:
->>> On 31/07/2019 13.47, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> On 7/31/19 9:56 AM, Thomas Huth wrote:
->>>>> The device is only used by some few boards. Let's use a proper Kcon=
-fig
->>>>> switch so that we only compile this code if we really need it.
->>>>
->>>> I'd prefer having the UnimpDevice user-creatable and always present =
-as a
->>>> core device...
->>>
->>> Why? This is a sysbus device that needs to be wired up in code, so I
->>> don't see a reason for making this user-creatable right now.
->>
->> Right now no.
->>
->>> Anyway, that's a different subject, so this should not be part of thi=
-s
->>> patch.
->>
->> Fair enough.
->>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> Err, you missed MUSCA and MPS2.
+>>     s->iteration_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>>+    /*
+>>+     * Update s->iteration_initial_bytes to match
+s->iteration_start_time.
+>>+     */
+>>+    s->iteration_initial_bytes = migration_total_bytes(s);
+>
+>Is this one necessary? We have sent out nothing yet.
 
-Ah, well, that's another one of those indirections that we discussed in
-v1 and which I apparently forgot to add now in v2 ... both select ARMSSE
-which in turn select UNIMP, so it's not completely missing. I'll send a
-v3 with a fix.
+Yes, currently nothing has been sent yet at this point.
 
-Thanks for noticing!
+Is that better to always match the update of iteration_initial_bytes
+and iteration_start_time in a explicit way to avoid some potential missing?
 
- Thomas
+Thanks.
 
+On Thu, Aug 1, 2019 at 10:21 AM Wei Yang <richardw.yang@linux.intel.com>
+wrote:
+
+> On Tue, Jul 30, 2019 at 01:36:32PM +0800, Ivan Ren wrote:
+> >From: Ivan Ren <ivanren@tencent.com>
+> >
+> >This patch fix a multifd migration bug in migration speed calculation,
+> this
+> >problem can be reproduced as follows:
+> >1. start a vm and give a heavy memory write stress to prevent the vm be
+> >   successfully migrated to destination
+> >2. begin a migration with multifd
+> >3. migrate for a long time [actually, this can be measured by transferred
+> bytes]
+> >4. migrate cancel
+> >5. begin a new migration with multifd, the migration will directly run
+> into
+> >   migration_completion phase
+> >
+> >Reason as follows:
+> >
+> >Migration update bandwidth and s->threshold_size in function
+> >migration_update_counters after BUFFER_DELAY time:
+> >
+> >    current_bytes = migration_total_bytes(s);
+> >    transferred = current_bytes - s->iteration_initial_bytes;
+> >    time_spent = current_time - s->iteration_start_time;
+> >    bandwidth = (double)transferred / time_spent;
+> >    s->threshold_size = bandwidth * s->parameters.downtime_limit;
+> >
+> >In multifd migration, migration_total_bytes function return
+> >qemu_ftell(s->to_dst_file) + ram_counters.multifd_bytes.
+> >s->iteration_initial_bytes will be initialized to 0 at every new
+> migration,
+> >but ram_counters is a global variable, and history migration data will be
+> >accumulated. So if the ram_counters.multifd_bytes is big enough, it may
+> lead
+> >pending_size >= s->threshold_size become false in migration_iteration_run
+> >after the first migration_update_counters.
+> >
+> >Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> >---
+> > migration/migration.c | 15 ++++++++++++++-
+> > migration/savevm.c    |  1 +
+> > 2 files changed, 15 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/migration/migration.c b/migration/migration.c
+> >index 8a607fe1e2..d35a6ae6f9 100644
+> >--- a/migration/migration.c
+> >+++ b/migration/migration.c
+> >@@ -1908,6 +1908,11 @@ static bool migrate_prepare(MigrationState *s,
+> bool blk, bool blk_inc,
+> >     }
+> >
+> >     migrate_init(s);
+> >+    /*
+> >+     * set ram_counters memory to zero for a
+> >+     * new migration
+> >+     */
+> >+    memset(&ram_counters, 0, sizeof(ram_counters));
+> >
+> >     return true;
+> > }
+> >@@ -3187,6 +3192,10 @@ static void *migration_thread(void *opaque)
+> >
+> >     object_ref(OBJECT(s));
+> >     s->iteration_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> >+    /*
+> >+     * Update s->iteration_initial_bytes to match
+> s->iteration_start_time.
+> >+     */
+> >+    s->iteration_initial_bytes = migration_total_bytes(s);
+>
+> Is this one necessary? We have sent out nothing yet.
+>
+> >
+> >     qemu_savevm_state_header(s->to_dst_file);
+> >
+> >@@ -3252,7 +3261,11 @@ static void *migration_thread(void *opaque)
+> >              * breaking transferred_bytes and bandwidth calculation
+> >              */
+> >             s->iteration_start_time =
+> qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> >-            s->iteration_initial_bytes = 0;
+> >+            /*
+> >+             * Update s->iteration_initial_bytes to current size to
+> >+             * avoid historical data lead wrong bandwidth.
+> >+             */
+> >+            s->iteration_initial_bytes = migration_total_bytes(s);
+> >         }
+> >
+> >         current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> >diff --git a/migration/savevm.c b/migration/savevm.c
+> >index 79ed44d475..480c511b19 100644
+> >--- a/migration/savevm.c
+> >+++ b/migration/savevm.c
+> >@@ -1424,6 +1424,7 @@ static int qemu_savevm_state(QEMUFile *f, Error
+> **errp)
+> >     }
+> >
+> >     migrate_init(ms);
+> >+    memset(&ram_counters, 0, sizeof(ram_counters));
+> >     ms->to_dst_file = f;
+> >
+> >     qemu_mutex_unlock_iothread();
+> >--
+> >2.17.2 (Apple Git-113)
+> >
+>
+> --
+> Wei Yang
+> Help you, Help me
+>
