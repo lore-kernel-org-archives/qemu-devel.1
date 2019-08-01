@@ -2,69 +2,85 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23662C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B21C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAA4E20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:50:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAA4E20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3C74720644
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:51:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="MbL+Hhix"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C74720644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htBTa-0004q5-6P
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 09:50:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43110)
+	id 1htBUm-0005sR-H1
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 09:51:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43669)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1htBSx-0003k1-61
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:50:00 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1htBUH-0005MG-T4
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1htBSv-00019x-84
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:49:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49816)
+ (envelope-from <damien.hedde@greensocs.com>) id 1htBUG-00020z-Ld
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:51:21 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:46356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1htBSq-00015u-MV; Thu, 01 Aug 2019 09:49:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 403DF3002F44;
- Thu,  1 Aug 2019 13:49:51 +0000 (UTC)
-Received: from [10.36.117.35] (ovpn-117-35.ams2.redhat.com [10.36.117.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E6D919C70;
- Thu,  1 Aug 2019 13:49:39 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-15-eric.auger@redhat.com>
- <20190730153305-mutt-send-email-mst@kernel.org>
- <a0e88a60-083b-2730-5db8-7bba0299974b@redhat.com>
- <20190801090027-mutt-send-email-mst@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <ff726b89-a1b1-9b9e-a767-ef72da520053@redhat.com>
-Date: Thu, 1 Aug 2019 15:49:37 +0200
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1htBUD-0001w2-KT; Thu, 01 Aug 2019 09:51:18 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id A0E7B96F50;
+ Thu,  1 Aug 2019 13:51:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1564667475;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5DEY8Rq+H+80IURsrwtuyl95l1hjeRxfSQ9fPSXIGQ0=;
+ b=MbL+HhixyGVY66PEDOh9Ui1c8Hd95r10CRTx9Rvks3hJaUlbBBHPYjDvNw5vPS0VYr+Gvi
+ F5AtCt9MHmr7FBU96fwaO6aof62Wha7wUSRWmFv6HXLxtr43n0fS6SZ44EqFTjty9zSOKJ
+ trAtW01BcZ7PpL7up2uqLTodlLQqYbs=
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <6ea54e80-63cd-5759-337b-1eb1686453f5@greensocs.com>
+ <e979936e-3545-87fb-eec6-e3a098785113@redhat.com>
+ <CAP+75-XzR9bQAm6KVdF=QZ4Bs9yWw-OLt6cRXNM=j8d0BjSZmQ@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <dfbfb8a0-2a85-c62c-1ae8-9ed20cbeee1f@greensocs.com>
+Date: Thu, 1 Aug 2019 15:51:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190801090027-mutt-send-email-mst@kernel.org>
+In-Reply-To: <CAP+75-XzR9bQAm6KVdF=QZ4Bs9yWw-OLt6cRXNM=j8d0BjSZmQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 01 Aug 2019 13:49:51 +0000 (UTC)
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1564667476;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5DEY8Rq+H+80IURsrwtuyl95l1hjeRxfSQ9fPSXIGQ0=;
+ b=dmJ3B4bBRJUOh9p+nARRl94e7hmaaeMaIIBcNvbcACmdLg3kDUNZDe7RDb/lAzJwwDjInj
+ OPQLTsx6W+2U/GjWWa4W5l8F7+kPcCla8VDT0BGlKPU8I8VuzcAYmJTqB0aBrHK+XzDrBn
+ 5SwecNzil7S2qWkTIDPKWZ55Wz1mYW4=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564667476; a=rsa-sha256; cv=none;
+ b=CKCGaAJ4OItbjmqf7/VG6ipuaeAbQts/aPsTxiS40aJ13DfwBahnnmDVAH1laHJp9pvAPp
+ hv4/kFT3RdCsjqLGIc/TUA/6UOcAN+szQ0+AvJh4ntFzYEegHO0UNy2S4OA7kMvG8OGeIZ
+ XcQhvjmmh0GkWtSMCQxj1W9i8uS5U3k=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 14/15] virtio-iommu-pci: Add
- virtio iommu pci support
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] RFC raspberry pi sd-card reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,296 +92,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, peter.maydell@linaro.org,
- tn@semihalf.com, qemu-devel@nongnu.org, peterx@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Michael,
 
-On 8/1/19 3:06 PM, Michael S. Tsirkin wrote:
-> On Thu, Aug 01, 2019 at 02:15:03PM +0200, Auger Eric wrote:
->> Hi Michael,
->>
->> On 7/30/19 9:35 PM, Michael S. Tsirkin wrote:
->>> On Tue, Jul 30, 2019 at 07:21:36PM +0200, Eric Auger wrote:
->>>> This patch adds virtio-iommu-pci, which is the pci proxy for
->>>> the virtio-iommu device.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On 7/31/19 5:45 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On Wed, Jul 31, 2019 at 5:43 PM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+>> On 7/31/19 4:21 PM, Damien Hedde wrote:
+>>> Concerning the reset on the raspi2/3 machine, I ran into an issue wit=
+h
+>>> the sd-card.
 >>>
->>> This part I'm not sure we should merge just yet.  The reason being I
->>> think we should limit it to mmio where DT can be used to describe iommu
->>> topology. For PCI I don't see why we shouldn't always expose this
->>> in the config space, and I think it's preferable not to
->>> need to support a mix of DT,ACPI and PCI as options.
+>>> Here follows a subset of the qbus/qdev tree of the raspi2&3 machine a=
+s
+>>> it is initialized:
+>>>  + System
+>>>    * bcm2835_gpio
+>>>      + sd-bus
+>>>        * sd-card
+>>>    * bcm2835-sdhost
+>>>      + bcm2835-sdhost-bus
+>>>    * generic-sdhci
+>>>      + sdhci-bus
+>>>
+>>> raspi_init does 2 things:
+>>>  + it creates the soc
+>>>  + then it explicitly creates the sd-card on the bcm2835_gpio's sd-bu=
+s
+>>>
+>>> As it happens, the reset moves the sd-card on another bus: the
+>>> sdhci-bus. More precisely the bcm2835_gpio reset method does it (the
+>>> sd-card can be mapped on bcm2835-sdhost-bus or sdhci-bus depending on
+>>> bcm2835_gpio registers, reset configuration corresponds to the sdhci-=
+bus).
+>>>
+>>> Reset call order is the following (it follows children-before-parent =
+order):
+>>>  1 sd-card
+>>>  2 sd-bus
+>>>  3 bcm2835_gpio -> move the sd-card
+>>>  4 bcm2835-sdhost-bus
+>>>  5 bcm2835-sdhost
+>>>  6 sd-card  (again)
+>>>  7 sdhci-bus
+>>>  8 generic-sdhci
+>>>
+>>> In the end, the sd-card is reset twice, which is no big-deal in itsel=
+f.
 >>
->> For context, some discussion related to this topic already arose on v7
->> revision of the driver:
+>> The machine cold reset implicitly cold resets the sd-card.
 >>
->> [1] Re: [PATCH v7 0/7] Add virtio-iommu driver
->> https://lore.kernel.org/linux-pci/87a7ioby9u.fsf@morokweng.localdomain/
+>> IIRC the sd-bus shouldn't (cold/warm)-reset the sd-card.
 >>
->> Some additional thoughts.
->>
->> First considering DT boot.
->>
->> THE DT description features an iommu-map property in the
->> pci-host-ecam-generic node that describes which RIDs are handled by the
->> virtio-iommu and a possible offset/mask to be applied inbetween the RID
->> and the streamID at the input of the IOMMU
->> (Documentation/devicetree/bindings/pci/pci-iommu.txt)
->>
->> As far as I understand when a DMA capable device is setup, its DMA
->> configuration is built using that call chain:
->>
->> pci_dma_configure
->> |_ of_dma_configure
->>    |_ of_iommu_configure
->>       |_ of_pci_iommu_init
->>          |_ of_map_rid
->>
->> I understand you would like the iommu-map/iommu-map-mask info to be
->> exposed directly into the config space of the device instead of inside
->> the DT or IORT table. Assuming a module is initialized sufficiently
->> early to retrieve this info, we would need the resulting info to be
->> consolidated to allow pci_dma_configure chain to work seemlessly. This
->> sounds a significant impact on above kernel infrastructure.
-> 
-> I don't really know what consolidated means.
-> It is pretty common for IOMMUs to expose config through
-> PCI registers. This typically happens as a fixup.
-I meant: instead of retrieving the info through the of_* code you need
-to interoperate with the module to retrieve the same info and detect
-when you need to take that path instead of the of one.
-> 
-> I would write a tiny driver to do exactly that,
-> and run it from the fixup.
-> 
-> 
->> This comes in addition to the development of the "small module that
->> loads early and pokes at the IOMMU sufficiently to get the data about
->> which devices use the IOMMU out of it using standard virtio config
->> space" evoked in [1] + the definition of the data formats to be put in
->> the very cfg space.
-> 
-> That last part is true but that's exactly why I propose we
-> wait on this patch a bit.
-> 
->> With ACPI I understand we have the same kind of infrastructure:
->> drivers/acpi/arm64/iort.c currently extracts the mapping between RC RIDs
->> and IOMMU streamids
->>
->> pci_dma_configure(
->> |_ acpi_dma_configure
->>    |_ iort_iommu_configure
->>       |_ iort_pci_iommu_init
->>          |_ iort_node_map_id
->>             |_ iort_id_map
->>
->> Maybe I fail to see the easy and right way to do the integration at
->> kernel level but I am a bit frightened by the efforts that would be
->> requested to follow your suggestion, whereas the DT infra is ready and
->> fully upstreamed to accept the use case.
-> 
-> Did you take a look at drivers/pci/quirks.c and how these run?
-> I think it's just a question of adding DECLARE_PCI_FIXUP_CLASS_EARLY
-> and running your hook from there.
-I will do and trace the code.
-> 
-> 
->> For ACPI I agree AFAIK IORT was primarily defined by ARM, for ARM but we
->> prototyped IORT integration with x86 and it worked for pc machine
->> without major trouble.
->>
->> I sent the kernel and qemu patches prototyping this IORT integration:
->>
->> https://github.com/eauger/linux/tree/virtio-iommu-v0.9-iort-x86
->> https://github.com/eauger/qemu/tree/v3.1.0-rc3-virtio-iommu-v0.9-x86
->>
->> There ACPI IORT was built for PC machine and the integration effort at
->> both kernel and QEMU level was low. This work would need to be rebased
->> and depends on kernel ACPI related patches that are not yet upstreamed
->> though.
->>
->> Thanks
->>
->> Eric
-> 
-> In the end it might turn out you are right.  But it does us no harm to
-> delay this just a bit, and for now limit things to ARM where it's
-> already used and where alternatives exist.
-So if my understanding is correct, at the moment you would accept a DT
-integration using MMIO. Is that correct? Meanwhile we can prototype your
-suggestion.
+>> Only SDBusClass::set_inserted() can cold-reset the card.
 
-Thanks
+I agree but it's something we cannot address until the reset propagation
+is hard-coded to be qdev/qbus based.
 
-Eric
-> 
-> 
+>>
+>>> But it only depends on the bcm2835_gpio tree being reset before the
+>>> generic-sdhci (probably depends on the machine creation code).
 >>>
->>>> ---
->>>>
->>>> v8 -> v9:
->>>> - add the msi-bypass property
->>>> - create virtio-iommu-pci.c
->>>> ---
->>>>  hw/virtio/Makefile.objs          |  1 +
->>>>  hw/virtio/virtio-iommu-pci.c     | 88 ++++++++++++++++++++++++++++++++
->>>>  include/hw/pci/pci.h             |  1 +
->>>>  include/hw/virtio/virtio-iommu.h |  1 +
->>>>  qdev-monitor.c                   |  1 +
->>>>  5 files changed, 92 insertions(+)
->>>>  create mode 100644 hw/virtio/virtio-iommu-pci.c
->>>>
->>>> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
->>>> index f42e4dd94f..80ca719f1c 100644
->>>> --- a/hw/virtio/Makefile.objs
->>>> +++ b/hw/virtio/Makefile.objs
->>>> @@ -27,6 +27,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
->>>>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
->>>>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
->>>>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
->>>> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
->>>>  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
->>>>  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
->>>>  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
->>>> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
->>>> new file mode 100644
->>>> index 0000000000..f9977096bd
->>>> --- /dev/null
->>>> +++ b/hw/virtio/virtio-iommu-pci.c
->>>> @@ -0,0 +1,88 @@
->>>> +/*
->>>> + * Virtio IOMMU PCI Bindings
->>>> + *
->>>> + * Copyright (c) 2019 Red Hat, Inc.
->>>> + * Written by Eric Auger
->>>> + *
->>>> + *  This program is free software; you can redistribute it and/or modify
->>>> + *  it under the terms of the GNU General Public License version 2 or
->>>> + *  (at your option) any later version.
->>>> + */
->>>> +
->>>> +#include "qemu/osdep.h"
->>>> +
->>>> +#include "virtio-pci.h"
->>>> +#include "hw/virtio/virtio-iommu.h"
->>>> +
->>>> +typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
->>>> +
->>>> +/*
->>>> + * virtio-iommu-pci: This extends VirtioPCIProxy.
->>>> + *
->>>> + */
->>>> +#define VIRTIO_IOMMU_PCI(obj) \
->>>> +        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
->>>> +
->>>> +struct VirtIOIOMMUPCI {
->>>> +    VirtIOPCIProxy parent_obj;
->>>> +    VirtIOIOMMU vdev;
->>>> +};
->>>> +
->>>> +static Property virtio_iommu_pci_properties[] = {
->>>> +    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
->>>> +    DEFINE_PROP_BOOL("msi-bypass", VirtIOIOMMUPCI, vdev.msi_bypass, true),
->>>> +    DEFINE_PROP_END_OF_LIST(),
->>>> +};
->>>> +
->>>> +static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->>>> +{
->>>> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
->>>> +    DeviceState *vdev = DEVICE(&dev->vdev);
->>>> +
->>>> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
->>>> +    object_property_set_link(OBJECT(dev),
->>>> +                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
->>>> +                             "primary-bus", errp);
->>>> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
->>>> +}
->>>> +
->>>> +static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
->>>> +{
->>>> +    DeviceClass *dc = DEVICE_CLASS(klass);
->>>> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
->>>> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
->>>> +    k->realize = virtio_iommu_pci_realize;
->>>> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->>>> +    dc->props = virtio_iommu_pci_properties;
->>>> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
->>>> +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_IOMMU;
->>>> +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
->>>> +    pcidev_k->class_id = PCI_CLASS_OTHERS;
->>>> +}
->>>> +
->>>> +static void virtio_iommu_pci_instance_init(Object *obj)
->>>> +{
->>>> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(obj);
->>>> +
->>>> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
->>>> +                                TYPE_VIRTIO_IOMMU);
->>>> +}
->>>> +
->>>> +static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
->>>> +    .base_name             = TYPE_VIRTIO_IOMMU_PCI,
->>>> +    .generic_name          = "virtio-iommu-pci",
->>>> +    .transitional_name     = "virtio-iommu-pci-transitional",
->>>> +    .non_transitional_name = "virtio-iommu-pci-non-transitional",
->>>> +    .instance_size = sizeof(VirtIOIOMMUPCI),
->>>> +    .instance_init = virtio_iommu_pci_instance_init,
->>>> +    .class_init    = virtio_iommu_pci_class_init,
->>>> +};
->>>> +
->>>> +static void virtio_iommu_pci_register(void)
->>>> +{
->>>> +    virtio_pci_types_register(&virtio_iommu_pci_info);
->>>> +}
->>>> +
->>>> +type_init(virtio_iommu_pci_register)
->>>> +
->>>> +
->>>> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
->>>> index aaf1b9f70d..492ea7e68d 100644
->>>> --- a/include/hw/pci/pci.h
->>>> +++ b/include/hw/pci/pci.h
->>>> @@ -86,6 +86,7 @@ extern bool pci_available;
->>>>  #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
->>>>  #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
->>>>  #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
->>>> +#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
->>>>  
->>>>  #define PCI_VENDOR_ID_REDHAT             0x1b36
->>>>  #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
->>>> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
->>>> index 56c8b4e57f..893ac65c0b 100644
->>>> --- a/include/hw/virtio/virtio-iommu.h
->>>> +++ b/include/hw/virtio/virtio-iommu.h
->>>> @@ -25,6 +25,7 @@
->>>>  #include "hw/pci/pci.h"
->>>>  
->>>>  #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
->>>> +#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
->>>>  #define VIRTIO_IOMMU(obj) \
->>>>          OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
->>>>  
->>>> diff --git a/qdev-monitor.c b/qdev-monitor.c
->>>> index 58222c2211..74cf090c61 100644
->>>> --- a/qdev-monitor.c
->>>> +++ b/qdev-monitor.c
->>>> @@ -63,6 +63,7 @@ static const QDevAlias qdev_alias_table[] = {
->>>>      { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
->>>>      { "virtio-input-host-pci", "virtio-input-host",
->>>>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
->>>> +    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
->>>>      { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
->>>>      { "virtio-keyboard-pci", "virtio-keyboard",
->>>>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
->>>> -- 
->>>> 2.20.1
+>>> I checked and it seems this is the only platform where such things
+>>> happen during master reset.
 >>>
-> 
+>>> IMO this is a bit hazardous because reset is based on the qdev/qbus
+>>> tree (and with the multi-phase I'm working on, even if it still works=
+,
+>>> it's worse).
+>>> I'm not sure what we should do to avoid this (and if there's is
+>>> something to be done).
+>>>
+>>> The easiest solution would be to initialize the platform with the
+>>> sd-card at the right initial place (I do not really understand why it=
+ is
+>>> created in the bcm2835_gpio in the first place since we move it just
+>>> after). But it won't solve the issue if a reset is done afterwards.
+>>>
+>>> Or maybe we could move the sd-card on the proper bus in a machine
+>>> reset code so that it's on the right place when we do the sysbus tree
+>>> reset just after.
+>>>
+>>> What do you think ?
+>>
+>> There is only 1 bus, the SDHCI bus lines are muxed with the GPIO ones.
+>>
+>> bcm2835-sdhost-bus should not be child of bcm2835-sdhost, the sdbus
+>> might be child of bcm2835-peripherals and shared by both sdhost and gp=
+io
+>> (as a link property?).
+>=20
+> There is a similar modelling issue with the AUX uart and SPI on this de=
+vice.
+>=20
+>> I tried to do that 2 years ago. I thought I posted the series and Pete=
+r
+>> rejected it but can't find it, maybe we had an IRC chat. I won't have
+>> time until next week to dig for it.
+
+I was thinking of doing a work-around by defining the raspi machine
+reset to something like that.
+
+static void raspi_reset(MachineState *machine)
+{
+    SDBus *sdhci, *sdhost, *sdbus;
+    /*
+     * anticipate following reset and ensure the sd-card at its
+     * end-of-reset place
+     */
+    sdhci =3D object_resolve_path("/path/to/sdhci");
+    sdhost =3D object_resolve_path("/path/to/sdhost");
+    sdbus =3D object_resolve_path("/path/to/sdbus");
+    sdbus_reparent_card(sdbus, sdhci); // no-op if card is not on sdbus
+    sdbus_reparent_card(sdhost, sdhci); //no-op if card is not on sdhost
+
+    /* standard reset */
+    qemu_devices_reset();
+}
+
+Damien
 
