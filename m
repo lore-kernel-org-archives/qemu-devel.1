@@ -2,76 +2,117 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F79C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:07:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EEDC19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:28:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1D1320838
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:06:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1D1320838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2F04C20657
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:28:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="E4qKgWrn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F04C20657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htAnL-0003cw-4r
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 09:06:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53765)
+	id 1htB7f-0005XA-Cq
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 09:27:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36852)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1htAmj-0002rq-JB
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:06:23 -0400
+ (envelope-from <aaron@os.amperecomputing.com>) id 1htB7A-0004ng-6Y
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1htAmh-0002pd-Kn
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:06:21 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:45607)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1htAmh-0002ow-GO
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:06:19 -0400
-Received: by mail-qt1-f193.google.com with SMTP id x22so65160860qtp.12
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 06:06:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=nlQ9MkHwk15BYJd3ELdhLl6PRx2T8iCiDR+8ddX90Jw=;
- b=n78uBVwPzq4OlhHWh/rbUuUmPcctCGvdrSa0uTk4TtdOQq5IGk4AIM+5LuQWOE14Bz
- oTDXEYPjYjn6dYfuTIsaqakLoizG7JnrDzL+pbItrsZphAvuvKNbs6fgKK7besNpZIWG
- 459jwB6YgQlP3Gyxkx/Zp+xeZJOp6SFgW++EESgkfffE81+YcwdxsUy4gON5fA4JrvkB
- I8dnbZGtE/EufwbL6ZVdgLVwEvw5NGDW9XE2m72JzZs6PXC8YpzeqBtq8ZBfAnsDcE/d
- BibgMrWRfGEgaLr8m/PwUln1U/ZYacrN711tKJUD9g2ylMZfl+36GoI3DCmyxY+mFe0q
- Zohw==
-X-Gm-Message-State: APjAAAXXOFXSj8pExMu7Ni0vIPmOSL5++CJf1RUcF2eRwREZlBSw9XZK
- Q6icHWLNwu9wZ+c3PLsLhc9okw==
-X-Google-Smtp-Source: APXvYqwq9aZasiXXOai6U23kbXNhRjdvMwburNQD8lfc7fieBi/DxTx+lsVLBCT5XevTW6EBRsR8Bg==
-X-Received: by 2002:aed:3535:: with SMTP id a50mr92966760qte.237.1564664778574; 
- Thu, 01 Aug 2019 06:06:18 -0700 (PDT)
-Received: from redhat.com ([147.234.38.1])
- by smtp.gmail.com with ESMTPSA id w62sm28447353qkd.30.2019.08.01.06.06.13
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 01 Aug 2019 06:06:17 -0700 (PDT)
-Date: Thu, 1 Aug 2019 09:06:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Auger Eric <eric.auger@redhat.com>
-Message-ID: <20190801090027-mutt-send-email-mst@kernel.org>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-15-eric.auger@redhat.com>
- <20190730153305-mutt-send-email-mst@kernel.org>
- <a0e88a60-083b-2730-5db8-7bba0299974b@redhat.com>
+ (envelope-from <aaron@os.amperecomputing.com>) id 1htB78-0000jc-AM
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:27:28 -0400
+Received: from mail-eopbgr820092.outbound.protection.outlook.com
+ ([40.107.82.92]:19729 helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aaron@os.amperecomputing.com>)
+ id 1htB78-0000i1-0T; Thu, 01 Aug 2019 09:27:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k4S9Vnx0RqBisog9RJU6DY9mZrY9Q/BEhlWDC0aNKHoJM/4IjcbhTqogNKuH5g9qgbMygfqBmDkSnw6L3MYMU5aviOhJgDp7NfJXNIOkoLsggSsxZ4vmFR594xdAaDI1NUgWZQ7KrryVEFXaP4fI9a7XfVwPbAtMZ40ZPy/6bFckAwcQid/773Wv/YZ8/qjr3FX6PH8O2ReTxs3jY8Npr/lwd9fO1ZgAfCW/rUZv99FZzYVYXw/qAAHNN/c5klEgrQlxA+227stEmEP2qrapzoh7715wNKC+Huw6IVjy3CmZ80mjt6aHhQFA9A9W0DCGOep+1SKiAPp9fhcDxQkBQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0cLIhCJHLXxq+SWthXwvTMEcYdhMZSn+6Zpj5ZqUCJY=;
+ b=iuqffrxpLP/V66BuFg/EfKQebBTwmwxNOiMF5skYXZAZj5WlUPPyHmjXrk65x15mk37SXhNoxcx/2iATwXiou7U12EEnalAxsrznz0DaaITPCWHG8fGiGG4PmEjqUbgI/rW2Isbr2Mt2cuxs1VYqbUa5meIWrEFwJH8+9Hqxoq9cfcCfwSWRhyjoampRbRS1pRH+xVKNeTq4UbQezKNLPUEqWC5q6STjPioZ/2Z66UhsarvrF8v4BJ+tOrKP0opNB7PvaN0LjoldYQIleizaUqbo+ob1PCVgJdaibAkGRVeHSZFRTOat/4/EsC3k0ruNqyHCV1Wiolxo1nt79OyD7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=os.amperecomputing.com;dmarc=pass action=none
+ header.from=os.amperecomputing.com;dkim=pass
+ header.d=os.amperecomputing.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0cLIhCJHLXxq+SWthXwvTMEcYdhMZSn+6Zpj5ZqUCJY=;
+ b=E4qKgWrn5rTRbMJFAz7sxb6VcFEjoXAtv0hmztfu/5NAW7SSHe6KaPW4k56laWMRdhz7mq4jicn8QR1PLS7LhzQZ0Q+T2kn4c2GXREU95mueg5c+L6nTAGBAxXwNDFDUnpnVAItDkG9icm/dkwQAqkwQ0RgGEYVRfCCuGZEMFGs=
+Received: from DM6PR01MB4825.prod.exchangelabs.com (20.177.218.222) by
+ DM6PR01MB4587.prod.exchangelabs.com (20.177.222.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.16; Thu, 1 Aug 2019 13:27:16 +0000
+Received: from DM6PR01MB4825.prod.exchangelabs.com
+ ([fe80::4943:2b46:af24:e807]) by DM6PR01MB4825.prod.exchangelabs.com
+ ([fe80::4943:2b46:af24:e807%7]) with mapi id 15.20.2136.010; Thu, 1 Aug 2019
+ 13:27:16 +0000
+To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
+Thread-Topic: [PATCH v4 04/54] target/arm: remove run time semihosting checks
+Thread-Index: AQHVR7oL9+ayys4sVECwZPH13XtFFKbmSjSA
+Date: Thu, 1 Aug 2019 13:27:15 +0000
+Message-ID: <20190801132659.GJ5034@quinoa.localdomain>
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <20190731160719.11396-5-alex.bennee@linaro.org>
+In-Reply-To: <20190731160719.11396-5-alex.bennee@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: CY4PR21CA0046.namprd21.prod.outlook.com
+ (2603:10b6:903:12b::32) To DM6PR01MB4825.prod.exchangelabs.com
+ (2603:10b6:5:6b::30)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=aaron@os.amperecomputing.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [108.169.132.82]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bd635bab-cd88-4e70-9824-08d71683f814
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DM6PR01MB4587; 
+x-ms-traffictypediagnostic: DM6PR01MB4587:
+x-microsoft-antispam-prvs: <DM6PR01MB45877FECC47FB74BF12A05738ADE0@DM6PR01MB4587.prod.exchangelabs.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01165471DB
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(136003)(39830400003)(346002)(396003)(376002)(366004)(199004)(189003)(256004)(3846002)(6486002)(25786009)(478600001)(66946007)(486006)(14444005)(66476007)(66556008)(64756008)(66446008)(53936002)(14454004)(66066001)(11346002)(229853002)(4326008)(476003)(6436002)(6512007)(9686003)(6246003)(81156014)(81166006)(68736007)(71190400001)(71200400001)(66574012)(1076003)(6916009)(33656002)(2906002)(186003)(26005)(8676002)(5660300002)(8936002)(54906003)(99286004)(76176011)(6116002)(316002)(86362001)(446003)(102836004)(52116002)(305945005)(7736002)(6506007)(386003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM6PR01MB4587;
+ H:DM6PR01MB4825.prod.exchangelabs.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:0; MX:1; 
+received-spf: None (protection.outlook.com: os.amperecomputing.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 4Jjd34pR9lA4HJDqk/GD7oAaEttz395vk3q/5tFmd57HEdQ6qCuw8UHhJa0EG9boDqAx0VS7SreuQrt4v9dEjgO1sl0AzUM9FKrw68fPJ0cxQX9t+h4GkF7vMnSG8z9/dxuBALpLD0RxsX2nA1OM6LolfZvnd0zXaXeemzP3jvKQCAIP1YiUwGVvybBkV2Yd7w+ZNc90t37ylmcYVmq4lWTs/zOa+P0R+wYRfJAv7I76nTQ4f/R7XEDbsXtey6axCgRXva0uAou9F1w77CFIVEvgoJd1LHb25D6Nsum9Ruekpme5sYV2zQouobUT4suR+rpHmZ+/oXFI64zcccefhoaizrkUwYmE5UR94qDevljddFznoDZ+s+CqFhabQgPLvgZQ/ttHlIabYY/jxP25w7++5t4MuS4XyYq1k5diHa0=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <23CDEE135EF656488066B3295778FC98@prod.exchangelabs.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a0e88a60-083b-2730-5db8-7bba0299974b@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.160.193
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 14/15] virtio-iommu-pci: Add
- virtio iommu pci support
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd635bab-cd88-4e70-9824-08d71683f814
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2019 13:27:15.9228 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Aaron@os.amperecomputing.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4587
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.82.92
+Subject: Re: [Qemu-devel] [PATCH v4 04/54] target/arm: remove run time
+ semihosting checks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,281 +124,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, peter.maydell@linaro.org,
- tn@semihalf.com, qemu-devel@nongnu.org, peterx@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+From: Aaron Lindsay OS via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "bobby.prani@gmail.com" <bobby.prani@gmail.com>,
+ "cota@braap.org" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 01, 2019 at 02:15:03PM +0200, Auger Eric wrote:
-> Hi Michael,
-> 
-> On 7/30/19 9:35 PM, Michael S. Tsirkin wrote:
-> > On Tue, Jul 30, 2019 at 07:21:36PM +0200, Eric Auger wrote:
-> >> This patch adds virtio-iommu-pci, which is the pci proxy for
-> >> the virtio-iommu device.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> > 
-> > This part I'm not sure we should merge just yet.  The reason being I
-> > think we should limit it to mmio where DT can be used to describe iommu
-> > topology. For PCI I don't see why we shouldn't always expose this
-> > in the config space, and I think it's preferable not to
-> > need to support a mix of DT,ACPI and PCI as options.
-> 
-> For context, some discussion related to this topic already arose on v7
-> revision of the driver:
-> 
-> [1] Re: [PATCH v7 0/7] Add virtio-iommu driver
-> https://lore.kernel.org/linux-pci/87a7ioby9u.fsf@morokweng.localdomain/
-> 
-> Some additional thoughts.
-> 
-> First considering DT boot.
-> 
-> THE DT description features an iommu-map property in the
-> pci-host-ecam-generic node that describes which RIDs are handled by the
-> virtio-iommu and a possible offset/mask to be applied inbetween the RID
-> and the streamID at the input of the IOMMU
-> (Documentation/devicetree/bindings/pci/pci-iommu.txt)
-> 
-> As far as I understand when a DMA capable device is setup, its DMA
-> configuration is built using that call chain:
-> 
-> pci_dma_configure
-> |_ of_dma_configure
->    |_ of_iommu_configure
->       |_ of_pci_iommu_init
->          |_ of_map_rid
-> 
-> I understand you would like the iommu-map/iommu-map-mask info to be
-> exposed directly into the config space of the device instead of inside
-> the DT or IORT table. Assuming a module is initialized sufficiently
-> early to retrieve this info, we would need the resulting info to be
-> consolidated to allow pci_dma_configure chain to work seemlessly. This
-> sounds a significant impact on above kernel infrastructure.
+On Jul 31 17:06, Alex Benn=E9e wrote:
+> Now we do all our checking and use a common EXCP_SEMIHOST for
+> semihosting operations we can make helper code a lot simpler.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> ---
+> v2
+>   - fix re-base conflicts
+>   - hoist EXCP_SEMIHOST check
+>   - comment cleanups
+> ---
+>  target/arm/helper.c | 90 +++++++++------------------------------------
+>  1 file changed, 18 insertions(+), 72 deletions(-)
+>=20
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b74c23a9bc0..c5b90a83d36 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8259,86 +8259,30 @@ static void arm_cpu_do_interrupt_aarch64(CPUState=
+ *cs)
+>                    new_el, env->pc, pstate_read(env));
+>  }
+> =20
+> -static inline bool check_for_semihosting(CPUState *cs)
+> +/*
+> + * Do semihosting call and set the appropriate return value. All the
+> + * permission and validity checks have been done at translate time.
+> + *
+> + * We only see semihosting exceptions in TCG only as they are not
+> + * trapped to the hypervisor in KVM.
+> + */
+> +static void handle_semihosting(CPUState *cs)
+>  {
+>  #ifdef CONFIG_TCG
+> -    /* Check whether this exception is a semihosting call; if so
+> -     * then handle it and return true; otherwise return false.
+> -     */
+>      ARMCPU *cpu =3D ARM_CPU(cs);
+>      CPUARMState *env =3D &cpu->env;
+> =20
+>      if (is_a64(env)) {
+> -        if (cs->exception_index =3D=3D EXCP_SEMIHOST) {
+> -            /* This is always the 64-bit semihosting exception.
+> -             * The "is this usermode" and "is semihosting enabled"
+> -             * checks have been done at translate time.
+> -             */
+> -            qemu_log_mask(CPU_LOG_INT,
+> -                          "...handling as semihosting call 0x%" PRIx64 "=
+\n",
+> -                          env->xregs[0]);
+> -            env->xregs[0] =3D do_arm_semihosting(env);
+> -            return true;
+> -        }
+> -        return false;
+> +        qemu_log_mask(CPU_LOG_INT,
+> +                      "...handling as semihosting call 0x%" PRIx64 "\n",
+> +                      env->xregs[0]);
+> +        env->xregs[0] =3D do_arm_semihosting(env);
+>      } else {
+> -        uint32_t imm;
+> -
+> -        /* Only intercept calls from privileged modes, to provide some
+> -         * semblance of security.
+> -         */
+> -        if (cs->exception_index !=3D EXCP_SEMIHOST &&
+> -            (!semihosting_enabled() ||
+> -             ((env->uncached_cpsr & CPSR_M) =3D=3D ARM_CPU_MODE_USR))) {
+> -            return false;
+> -        }
+> -
+> -        switch (cs->exception_index) {
+> -        case EXCP_SEMIHOST:
+> -            /* This is always a semihosting call; the "is this usermode"
+> -             * and "is semihosting enabled" checks have been done at
+> -             * translate time.
+> -             */
+> -            break;
+> -        case EXCP_SWI:
+> -            /* Check for semihosting interrupt.  */
+> -            if (env->thumb) {
+> -                imm =3D arm_lduw_code(env, env->regs[15] - 2, arm_sctlr_=
+b(env))
+> -                    & 0xff;
+> -                if (imm =3D=3D 0xab) {
+> -                    break;
+> -                }
+> -            } else {
+> -                imm =3D arm_ldl_code(env, env->regs[15] - 4, arm_sctlr_b=
+(env))
+> -                    & 0xffffff;
+> -                if (imm =3D=3D 0x123456) {
+> -                    break;
+> -                }
+> -            }
+> -            return false;
+> -        case EXCP_BKPT:
+> -            /* See if this is a semihosting syscall.  */
+> -            if (env->thumb) {
+> -                imm =3D arm_lduw_code(env, env->regs[15], arm_sctlr_b(en=
+v))
+> -                    & 0xff;
+> -                if (imm =3D=3D 0xab) {
+> -                    env->regs[15] +=3D 2;
+> -                    break;
+> -                }
+> -            }
+> -            return false;
+> -        default:
+> -            return false;
+> -        }
+> -
+>          qemu_log_mask(CPU_LOG_INT,
+>                        "...handling as semihosting call 0x%x\n",
+>                        env->regs[0]);
+>          env->regs[0] =3D do_arm_semihosting(env);
+> -        return true;
+>      }
+> -#else
+> -    return false;
+>  #endif
+>  }
+> =20
+> @@ -8371,11 +8315,13 @@ void arm_cpu_do_interrupt(CPUState *cs)
+>          return;
+>      }
+> =20
+> -    /* Semihosting semantics depend on the register width of the
+> -     * code that caused the exception, not the target exception level,
+> -     * so must be handled here.
+> +    /*
+> +     * Semihosting semantics depend on the register width of the code
+> +     * that caused the exception, not the target exception level, so
+> +     * must be handled here.
+>       */
+> -    if (check_for_semihosting(cs)) {
+> +    if (cs->exception_index =3D=3D EXCP_SEMIHOST) {
+> +        handle_semihosting(cs);
+>          return;
+>      }
 
-I don't really know what consolidated means.
-It is pretty common for IOMMUs to expose config through
-PCI registers. This typically happens as a fixup.
+Previously, this code would never return here if CONFIG_TCG was not
+defined because check_for_semihosting() always returned false in that
+case. Is it now true that `cs->exception_index` will never hold a value
+of EXCP_SEMIHOST if CONFIG_TCG is not defined (or that it is otherwise
+correct to return here in that case where it wasn't previously)?
 
-I would write a tiny driver to do exactly that,
-and run it from the fixup.
-
-
-> This comes in addition to the development of the "small module that
-> loads early and pokes at the IOMMU sufficiently to get the data about
-> which devices use the IOMMU out of it using standard virtio config
-> space" evoked in [1] + the definition of the data formats to be put in
-> the very cfg space.
-
-That last part is true but that's exactly why I propose we
-wait on this patch a bit.
-
-> With ACPI I understand we have the same kind of infrastructure:
-> drivers/acpi/arm64/iort.c currently extracts the mapping between RC RIDs
-> and IOMMU streamids
-> 
-> pci_dma_configure(
-> |_ acpi_dma_configure
->    |_ iort_iommu_configure
->       |_ iort_pci_iommu_init
->          |_ iort_node_map_id
->             |_ iort_id_map
-> 
-> Maybe I fail to see the easy and right way to do the integration at
-> kernel level but I am a bit frightened by the efforts that would be
-> requested to follow your suggestion, whereas the DT infra is ready and
-> fully upstreamed to accept the use case.
-
-Did you take a look at drivers/pci/quirks.c and how these run?
-I think it's just a question of adding DECLARE_PCI_FIXUP_CLASS_EARLY
-and running your hook from there.
-
-
-> For ACPI I agree AFAIK IORT was primarily defined by ARM, for ARM but we
-> prototyped IORT integration with x86 and it worked for pc machine
-> without major trouble.
-> 
-> I sent the kernel and qemu patches prototyping this IORT integration:
-> 
-> https://github.com/eauger/linux/tree/virtio-iommu-v0.9-iort-x86
-> https://github.com/eauger/qemu/tree/v3.1.0-rc3-virtio-iommu-v0.9-x86
-> 
-> There ACPI IORT was built for PC machine and the integration effort at
-> both kernel and QEMU level was low. This work would need to be rebased
-> and depends on kernel ACPI related patches that are not yet upstreamed
-> though.
-> 
-> Thanks
-> 
-> Eric
-
-In the end it might turn out you are right.  But it does us no harm to
-delay this just a bit, and for now limit things to ARM where it's
-already used and where alternatives exist.
-
-
-> > 
-> >> ---
-> >>
-> >> v8 -> v9:
-> >> - add the msi-bypass property
-> >> - create virtio-iommu-pci.c
-> >> ---
-> >>  hw/virtio/Makefile.objs          |  1 +
-> >>  hw/virtio/virtio-iommu-pci.c     | 88 ++++++++++++++++++++++++++++++++
-> >>  include/hw/pci/pci.h             |  1 +
-> >>  include/hw/virtio/virtio-iommu.h |  1 +
-> >>  qdev-monitor.c                   |  1 +
-> >>  5 files changed, 92 insertions(+)
-> >>  create mode 100644 hw/virtio/virtio-iommu-pci.c
-> >>
-> >> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> >> index f42e4dd94f..80ca719f1c 100644
-> >> --- a/hw/virtio/Makefile.objs
-> >> +++ b/hw/virtio/Makefile.objs
-> >> @@ -27,6 +27,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
-> >>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
-> >>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
-> >>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
-> >> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
-> >>  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
-> >>  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
-> >>  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
-> >> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
-> >> new file mode 100644
-> >> index 0000000000..f9977096bd
-> >> --- /dev/null
-> >> +++ b/hw/virtio/virtio-iommu-pci.c
-> >> @@ -0,0 +1,88 @@
-> >> +/*
-> >> + * Virtio IOMMU PCI Bindings
-> >> + *
-> >> + * Copyright (c) 2019 Red Hat, Inc.
-> >> + * Written by Eric Auger
-> >> + *
-> >> + *  This program is free software; you can redistribute it and/or modify
-> >> + *  it under the terms of the GNU General Public License version 2 or
-> >> + *  (at your option) any later version.
-> >> + */
-> >> +
-> >> +#include "qemu/osdep.h"
-> >> +
-> >> +#include "virtio-pci.h"
-> >> +#include "hw/virtio/virtio-iommu.h"
-> >> +
-> >> +typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
-> >> +
-> >> +/*
-> >> + * virtio-iommu-pci: This extends VirtioPCIProxy.
-> >> + *
-> >> + */
-> >> +#define VIRTIO_IOMMU_PCI(obj) \
-> >> +        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
-> >> +
-> >> +struct VirtIOIOMMUPCI {
-> >> +    VirtIOPCIProxy parent_obj;
-> >> +    VirtIOIOMMU vdev;
-> >> +};
-> >> +
-> >> +static Property virtio_iommu_pci_properties[] = {
-> >> +    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
-> >> +    DEFINE_PROP_BOOL("msi-bypass", VirtIOIOMMUPCI, vdev.msi_bypass, true),
-> >> +    DEFINE_PROP_END_OF_LIST(),
-> >> +};
-> >> +
-> >> +static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-> >> +{
-> >> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
-> >> +    DeviceState *vdev = DEVICE(&dev->vdev);
-> >> +
-> >> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> >> +    object_property_set_link(OBJECT(dev),
-> >> +                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
-> >> +                             "primary-bus", errp);
-> >> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
-> >> +}
-> >> +
-> >> +static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
-> >> +{
-> >> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> >> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-> >> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
-> >> +    k->realize = virtio_iommu_pci_realize;
-> >> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> >> +    dc->props = virtio_iommu_pci_properties;
-> >> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
-> >> +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_IOMMU;
-> >> +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
-> >> +    pcidev_k->class_id = PCI_CLASS_OTHERS;
-> >> +}
-> >> +
-> >> +static void virtio_iommu_pci_instance_init(Object *obj)
-> >> +{
-> >> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(obj);
-> >> +
-> >> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-> >> +                                TYPE_VIRTIO_IOMMU);
-> >> +}
-> >> +
-> >> +static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
-> >> +    .base_name             = TYPE_VIRTIO_IOMMU_PCI,
-> >> +    .generic_name          = "virtio-iommu-pci",
-> >> +    .transitional_name     = "virtio-iommu-pci-transitional",
-> >> +    .non_transitional_name = "virtio-iommu-pci-non-transitional",
-> >> +    .instance_size = sizeof(VirtIOIOMMUPCI),
-> >> +    .instance_init = virtio_iommu_pci_instance_init,
-> >> +    .class_init    = virtio_iommu_pci_class_init,
-> >> +};
-> >> +
-> >> +static void virtio_iommu_pci_register(void)
-> >> +{
-> >> +    virtio_pci_types_register(&virtio_iommu_pci_info);
-> >> +}
-> >> +
-> >> +type_init(virtio_iommu_pci_register)
-> >> +
-> >> +
-> >> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> >> index aaf1b9f70d..492ea7e68d 100644
-> >> --- a/include/hw/pci/pci.h
-> >> +++ b/include/hw/pci/pci.h
-> >> @@ -86,6 +86,7 @@ extern bool pci_available;
-> >>  #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
-> >>  #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
-> >>  #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
-> >> +#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
-> >>  
-> >>  #define PCI_VENDOR_ID_REDHAT             0x1b36
-> >>  #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
-> >> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
-> >> index 56c8b4e57f..893ac65c0b 100644
-> >> --- a/include/hw/virtio/virtio-iommu.h
-> >> +++ b/include/hw/virtio/virtio-iommu.h
-> >> @@ -25,6 +25,7 @@
-> >>  #include "hw/pci/pci.h"
-> >>  
-> >>  #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
-> >> +#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
-> >>  #define VIRTIO_IOMMU(obj) \
-> >>          OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
-> >>  
-> >> diff --git a/qdev-monitor.c b/qdev-monitor.c
-> >> index 58222c2211..74cf090c61 100644
-> >> --- a/qdev-monitor.c
-> >> +++ b/qdev-monitor.c
-> >> @@ -63,6 +63,7 @@ static const QDevAlias qdev_alias_table[] = {
-> >>      { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
-> >>      { "virtio-input-host-pci", "virtio-input-host",
-> >>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
-> >> +    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
-> >>      { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
-> >>      { "virtio-keyboard-pci", "virtio-keyboard",
-> >>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
-> >> -- 
-> >> 2.20.1
-> > 
+-Aaron
 
