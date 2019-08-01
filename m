@@ -2,67 +2,75 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD77CC32754
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:16:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3E4C32753
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:18:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A18A820838
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:16:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18A820838
+	by mail.kernel.org (Postfix) with ESMTPS id 556A3214DA
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:18:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 556A3214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htA01-0004dK-RM
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:16:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43103)
+	id 1htA2Q-0007Db-MS
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:18:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43804)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eric.auger@redhat.com>) id 1ht9zS-00044t-Nt
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:15:28 -0400
+ (envelope-from <mst@redhat.com>) id 1htA1t-0006oR-1P
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ht9zQ-0006Q7-T9
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:15:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39742)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ht9zN-0006Kp-2B; Thu, 01 Aug 2019 08:15:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 176C730860CC;
- Thu,  1 Aug 2019 12:15:20 +0000 (UTC)
-Received: from [10.36.117.35] (ovpn-117-35.ams2.redhat.com [10.36.117.35])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2843B60BF7;
- Thu,  1 Aug 2019 12:15:05 +0000 (UTC)
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-15-eric.auger@redhat.com>
- <20190730153305-mutt-send-email-mst@kernel.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a0e88a60-083b-2730-5db8-7bba0299974b@redhat.com>
-Date: Thu, 1 Aug 2019 14:15:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <mst@redhat.com>) id 1htA1s-0007uf-1O
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:17:56 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:38057)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1htA1r-0007uP-Tt
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:17:55 -0400
+Received: by mail-qt1-f196.google.com with SMTP id n11so69919381qtl.5
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 05:17:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=8HvCIqveHQFTQsPbxSY8BPKSR9+7iUK0LCosfuCvszk=;
+ b=oEsIokPR9kr5vBvQ6giUNzNiYpignlKTF4r7D4IvawnonB42KbBX/nu33p8/Ow5TZ4
+ vl7IOVSIsYRpbQHdaSMjEF3moG/SJ5+KLHctO9CjiRoXxlnd3cNGnI9aR8YaSWvY1/ET
+ +yMXXSBawd8V2Y4FwyoEhBLOKmmgvdcQucjS4tby+aZB9mIgtXQZ6/TfpdI14ALsIXw3
+ aWmmecqE4ojMByQAe787rE9Yi+w0esCf5KdaYMhkWwrO5pL/9JQrBjJvNpfxBqWq86zB
+ JkHIZGKPzh0jBY/1BbqhIYVnnhDmp0Jd5A5r6yBfT6n2ARlQErnc5BJsXbOBv+/9Oi/5
+ odyg==
+X-Gm-Message-State: APjAAAVToDA0Yi4Emc+GvUImBjVRtfWFbtI0exQ9aCGTu4PjWHhZJWdx
+ cfnGCPUPFUneGBVitUUAZdyaVA==
+X-Google-Smtp-Source: APXvYqwfPTMpFTqFhgIy4Yn/YpQl1RChv9mHn3UAmRjBf1Ubx8yWbytErX0gFOcnd4QHG20JTTnpQA==
+X-Received: by 2002:aed:2fe6:: with SMTP id m93mr61446518qtd.114.1564661875412; 
+ Thu, 01 Aug 2019 05:17:55 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ o18sm41766116qtb.53.2019.08.01.05.17.52
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 01 Aug 2019 05:17:54 -0700 (PDT)
+Date: Thu, 1 Aug 2019 08:17:49 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Message-ID: <20190801073132-mutt-send-email-mst@kernel.org>
+References: <20190729125755.45008-1-slp@redhat.com>
+ <a43acc8541c7ae811d65eb4d08e1a08333781282.camel@redhat.com>
+ <87imriwjpm.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190730153305-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Thu, 01 Aug 2019 12:15:20 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87imriwjpm.fsf@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 14/15] virtio-iommu-pci: Add
- virtio iommu pci support
+ [fuzzy]
+X-Received-From: 209.85.160.196
+Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
+ personality (virtio-1)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,258 +82,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jean-philippe@linaro.org, kevin.tian@intel.com, peter.maydell@linaro.org,
- tn@semihalf.com, qemu-devel@nongnu.org, peterx@redhat.com,
- alex.williamson@redhat.com, qemu-arm@nongnu.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Cc: peter.maydell@linaro.org, Andrea Bolognani <abologna@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Michael,
-
-On 7/30/19 9:35 PM, Michael S. Tsirkin wrote:
-> On Tue, Jul 30, 2019 at 07:21:36PM +0200, Eric Auger wrote:
->> This patch adds virtio-iommu-pci, which is the pci proxy for
->> the virtio-iommu device.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On Wed, Jul 31, 2019 at 01:02:13PM +0200, Sergio Lopez wrote:
 > 
-> This part I'm not sure we should merge just yet.  The reason being I
-> think we should limit it to mmio where DT can be used to describe iommu
-> topology. For PCI I don't see why we shouldn't always expose this
-> in the config space, and I think it's preferable not to
-> need to support a mix of DT,ACPI and PCI as options.
-
-For context, some discussion related to this topic already arose on v7
-revision of the driver:
-
-[1] Re: [PATCH v7 0/7] Add virtio-iommu driver
-https://lore.kernel.org/linux-pci/87a7ioby9u.fsf@morokweng.localdomain/
-
-Some additional thoughts.
-
-First considering DT boot.
-
-THE DT description features an iommu-map property in the
-pci-host-ecam-generic node that describes which RIDs are handled by the
-virtio-iommu and a possible offset/mask to be applied inbetween the RID
-and the streamID at the input of the IOMMU
-(Documentation/devicetree/bindings/pci/pci-iommu.txt)
-
-As far as I understand when a DMA capable device is setup, its DMA
-configuration is built using that call chain:
-
-pci_dma_configure
-|_ of_dma_configure
-   |_ of_iommu_configure
-      |_ of_pci_iommu_init
-         |_ of_map_rid
-
-I understand you would like the iommu-map/iommu-map-mask info to be
-exposed directly into the config space of the device instead of inside
-the DT or IORT table. Assuming a module is initialized sufficiently
-early to retrieve this info, we would need the resulting info to be
-consolidated to allow pci_dma_configure chain to work seemlessly. This
-sounds a significant impact on above kernel infrastructure.
-
-This comes in addition to the development of the "small module that
-loads early and pokes at the IOMMU sufficiently to get the data about
-which devices use the IOMMU out of it using standard virtio config
-space" evoked in [1] + the definition of the data formats to be put in
-the very cfg space.
-
-With ACPI I understand we have the same kind of infrastructure:
-drivers/acpi/arm64/iort.c currently extracts the mapping between RC RIDs
-and IOMMU streamids
-
-pci_dma_configure(
-|_ acpi_dma_configure
-   |_ iort_iommu_configure
-      |_ iort_pci_iommu_init
-         |_ iort_node_map_id
-            |_ iort_id_map
-
-Maybe I fail to see the easy and right way to do the integration at
-kernel level but I am a bit frightened by the efforts that would be
-requested to follow your suggestion, whereas the DT infra is ready and
-fully upstreamed to accept the use case.
-
-For ACPI I agree AFAIK IORT was primarily defined by ARM, for ARM but we
-prototyped IORT integration with x86 and it worked for pc machine
-without major trouble.
-
-I sent the kernel and qemu patches prototyping this IORT integration:
-
-https://github.com/eauger/linux/tree/virtio-iommu-v0.9-iort-x86
-https://github.com/eauger/qemu/tree/v3.1.0-rc3-virtio-iommu-v0.9-x86
-
-There ACPI IORT was built for PC machine and the integration effort at
-both kernel and QEMU level was low. This work would need to be rebased
-and depends on kernel ACPI related patches that are not yet upstreamed
-though.
-
-Thanks
-
-Eric
+> Andrea Bolognani <abologna@redhat.com> writes:
 > 
->> ---
->>
->> v8 -> v9:
->> - add the msi-bypass property
->> - create virtio-iommu-pci.c
->> ---
->>  hw/virtio/Makefile.objs          |  1 +
->>  hw/virtio/virtio-iommu-pci.c     | 88 ++++++++++++++++++++++++++++++++
->>  include/hw/pci/pci.h             |  1 +
->>  include/hw/virtio/virtio-iommu.h |  1 +
->>  qdev-monitor.c                   |  1 +
->>  5 files changed, 92 insertions(+)
->>  create mode 100644 hw/virtio/virtio-iommu-pci.c
->>
->> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
->> index f42e4dd94f..80ca719f1c 100644
->> --- a/hw/virtio/Makefile.objs
->> +++ b/hw/virtio/Makefile.objs
->> @@ -27,6 +27,7 @@ obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
->>  obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
->>  obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
->>  obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
->> +obj-$(CONFIG_VIRTIO_IOMMU) += virtio-iommu-pci.o
->>  obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
->>  obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
->>  obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
->> diff --git a/hw/virtio/virtio-iommu-pci.c b/hw/virtio/virtio-iommu-pci.c
->> new file mode 100644
->> index 0000000000..f9977096bd
->> --- /dev/null
->> +++ b/hw/virtio/virtio-iommu-pci.c
->> @@ -0,0 +1,88 @@
->> +/*
->> + * Virtio IOMMU PCI Bindings
->> + *
->> + * Copyright (c) 2019 Red Hat, Inc.
->> + * Written by Eric Auger
->> + *
->> + *  This program is free software; you can redistribute it and/or modify
->> + *  it under the terms of the GNU General Public License version 2 or
->> + *  (at your option) any later version.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +
->> +#include "virtio-pci.h"
->> +#include "hw/virtio/virtio-iommu.h"
->> +
->> +typedef struct VirtIOIOMMUPCI VirtIOIOMMUPCI;
->> +
->> +/*
->> + * virtio-iommu-pci: This extends VirtioPCIProxy.
->> + *
->> + */
->> +#define VIRTIO_IOMMU_PCI(obj) \
->> +        OBJECT_CHECK(VirtIOIOMMUPCI, (obj), TYPE_VIRTIO_IOMMU_PCI)
->> +
->> +struct VirtIOIOMMUPCI {
->> +    VirtIOPCIProxy parent_obj;
->> +    VirtIOIOMMU vdev;
->> +};
->> +
->> +static Property virtio_iommu_pci_properties[] = {
->> +    DEFINE_PROP_UINT32("class", VirtIOPCIProxy, class_code, 0),
->> +    DEFINE_PROP_BOOL("msi-bypass", VirtIOIOMMUPCI, vdev.msi_bypass, true),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static void virtio_iommu_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
->> +{
->> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(vpci_dev);
->> +    DeviceState *vdev = DEVICE(&dev->vdev);
->> +
->> +    qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
->> +    object_property_set_link(OBJECT(dev),
->> +                             OBJECT(pci_get_bus(&vpci_dev->pci_dev)),
->> +                             "primary-bus", errp);
->> +    object_property_set_bool(OBJECT(vdev), true, "realized", errp);
->> +}
->> +
->> +static void virtio_iommu_pci_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
->> +    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
->> +    k->realize = virtio_iommu_pci_realize;
->> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->> +    dc->props = virtio_iommu_pci_properties;
->> +    pcidev_k->vendor_id = PCI_VENDOR_ID_REDHAT_QUMRANET;
->> +    pcidev_k->device_id = PCI_DEVICE_ID_VIRTIO_IOMMU;
->> +    pcidev_k->revision = VIRTIO_PCI_ABI_VERSION;
->> +    pcidev_k->class_id = PCI_CLASS_OTHERS;
->> +}
->> +
->> +static void virtio_iommu_pci_instance_init(Object *obj)
->> +{
->> +    VirtIOIOMMUPCI *dev = VIRTIO_IOMMU_PCI(obj);
->> +
->> +    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
->> +                                TYPE_VIRTIO_IOMMU);
->> +}
->> +
->> +static const VirtioPCIDeviceTypeInfo virtio_iommu_pci_info = {
->> +    .base_name             = TYPE_VIRTIO_IOMMU_PCI,
->> +    .generic_name          = "virtio-iommu-pci",
->> +    .transitional_name     = "virtio-iommu-pci-transitional",
->> +    .non_transitional_name = "virtio-iommu-pci-non-transitional",
->> +    .instance_size = sizeof(VirtIOIOMMUPCI),
->> +    .instance_init = virtio_iommu_pci_instance_init,
->> +    .class_init    = virtio_iommu_pci_class_init,
->> +};
->> +
->> +static void virtio_iommu_pci_register(void)
->> +{
->> +    virtio_pci_types_register(&virtio_iommu_pci_info);
->> +}
->> +
->> +type_init(virtio_iommu_pci_register)
->> +
->> +
->> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
->> index aaf1b9f70d..492ea7e68d 100644
->> --- a/include/hw/pci/pci.h
->> +++ b/include/hw/pci/pci.h
->> @@ -86,6 +86,7 @@ extern bool pci_available;
->>  #define PCI_DEVICE_ID_VIRTIO_9P          0x1009
->>  #define PCI_DEVICE_ID_VIRTIO_VSOCK       0x1012
->>  #define PCI_DEVICE_ID_VIRTIO_PMEM        0x1013
->> +#define PCI_DEVICE_ID_VIRTIO_IOMMU       0x1014
->>  
->>  #define PCI_VENDOR_ID_REDHAT             0x1b36
->>  #define PCI_DEVICE_ID_REDHAT_BRIDGE      0x0001
->> diff --git a/include/hw/virtio/virtio-iommu.h b/include/hw/virtio/virtio-iommu.h
->> index 56c8b4e57f..893ac65c0b 100644
->> --- a/include/hw/virtio/virtio-iommu.h
->> +++ b/include/hw/virtio/virtio-iommu.h
->> @@ -25,6 +25,7 @@
->>  #include "hw/pci/pci.h"
->>  
->>  #define TYPE_VIRTIO_IOMMU "virtio-iommu-device"
->> +#define TYPE_VIRTIO_IOMMU_PCI "virtio-iommu-device-base"
->>  #define VIRTIO_IOMMU(obj) \
->>          OBJECT_CHECK(VirtIOIOMMU, (obj), TYPE_VIRTIO_IOMMU)
->>  
->> diff --git a/qdev-monitor.c b/qdev-monitor.c
->> index 58222c2211..74cf090c61 100644
->> --- a/qdev-monitor.c
->> +++ b/qdev-monitor.c
->> @@ -63,6 +63,7 @@ static const QDevAlias qdev_alias_table[] = {
->>      { "virtio-input-host-ccw", "virtio-input-host", QEMU_ARCH_S390X },
->>      { "virtio-input-host-pci", "virtio-input-host",
->>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
->> +    { "virtio-iommu-pci", "virtio-iommu", QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
->>      { "virtio-keyboard-ccw", "virtio-keyboard", QEMU_ARCH_S390X },
->>      { "virtio-keyboard-pci", "virtio-keyboard",
->>              QEMU_ARCH_ALL & ~QEMU_ARCH_S390X },
->> -- 
->> 2.20.1
+> > On Mon, 2019-07-29 at 14:57 +0200, Sergio Lopez wrote:
+> > [...]
+> >>  /* virtio-mmio device */
+> >>  
+> >>  static Property virtio_mmio_properties[] = {
+> >>      DEFINE_PROP_BOOL("format_transport_address", VirtIOMMIOProxy,
+> >>                       format_transport_address, true),
+> >> +    DEFINE_PROP_BOOL("modern", VirtIOMMIOProxy, modern, false),
+> >>      DEFINE_PROP_END_OF_LIST(),
+> >>  };
+> >
+> > Not a QEMU developer so forgive me if I say something silly, but IIUC
+> > you'd be able to opt into the new feature by using eg.
+> >
+> >   -device virtio-net-device,modern=on
+> >
+> > However, virtio-pci devices already have a mechanism to control the
+> > VirtIO protocol version, where you use
+> >
+> >   -device virtio-net-pci,disable-modern=no,disable-legacy=yes
+> >
+> > to get a VirtIO 1.x-only device and
+> >
+> >   -device virtio-net-pci,disable-modern=no,disable-legacy=no
+> >
+> > for a transitional device.
+> >
+> > Can you please make sure virtio-mmio uses the existing interface
+> > instead of introducing a new one?
 > 
+> The problem here is that virtio-pci devices register an specific type
+> for each kind of supported device (virtio-net-pci, virtio-blk-pci...),
+> while virtio-mmio doesn't. This saves a lot of boilerplate, but also
+> implies that bus properties can't be passed through the attached device
+> (virtio-blk-device can't carry properties for it's virtio-mmio parent
+> bus).
+> 
+> Sergio.
+
+That's something we wanted to fix a long time ago though.
+
+-- 
+MST
 
