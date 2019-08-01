@@ -2,72 +2,67 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D33FC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 08:56:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 717B0C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 09:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9C620449
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 08:56:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9C620449
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 45A012087E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 09:08:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45A012087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht6si-0000wZ-D6
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 04:56:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58029)
+	id 1ht74C-00082Q-Ac
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 05:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33412)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1ht6sL-0000SJ-Vh
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:55:55 -0400
+ (envelope-from <stefanha@redhat.com>) id 1ht73o-0007Xo-53
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 05:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ht6sK-0007mf-Su
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:55:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47242)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ht6sK-0007mJ-Np
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 04:55:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ht6sI-0000zP-Hi
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 08:55:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6A6592E80C8
- for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 08:55:50 +0000 (UTC)
+ (envelope-from <stefanha@redhat.com>) id 1ht73n-0006FL-Az
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 05:07:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38398)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ht73n-0006F0-59
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 05:07:43 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0598BC028353
+ for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 09:07:42 +0000 (UTC)
+Received: from localhost (ovpn-116-232.ams2.redhat.com [10.36.116.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26A3A600F8;
+ Thu,  1 Aug 2019 09:07:38 +0000 (UTC)
+Date: Thu, 1 Aug 2019 10:07:38 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190801090738.GA15179@stefanha-x1.localdomain>
+References: <20190726091103.23503-1-stefanha@redhat.com>
+ <20190726091103.23503-5-stefanha@redhat.com>
+ <20190731172716.GK3203@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Aug 2019 08:48:22 -0000
-From: Thomas Huth <1838312@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=virt-manager;
- component=universe; status=Incomplete; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: green-world78 paelzer
-X-Launchpad-Bug-Reporter: Hans Peter (green-world78)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156441781649.17826.2889969380137011138.malonedeb@gac.canonical.com>
-Message-Id: <156464930218.17851.4716450940582855614.launchpad@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19012";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 1eb32938c37d3ffc2432db91cf7b21567428c9ad
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3MwIy2ne0vdjdPXF"
+Content-Disposition: inline
+In-Reply-To: <20190731172716.GK3203@work-vm>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Thu, 01 Aug 2019 09:07:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838312] Re: Qemu virt-manager Segmentation fault
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 4/5] virtiofsd: drop lo_dirp->fd field
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,68 +71,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838312 <1838312@bugs.launchpad.net>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** No longer affects: qemu
 
--- =
+--3MwIy2ne0vdjdPXF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838312
+On Wed, Jul 31, 2019 at 06:27:16PM +0100, Dr. David Alan Gilbert wrote:
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > fdopendir(3) takes ownership of the file descriptor.  The presence of
+> > the lo_dirp->fd field could lead to someone incorrectly adding a
+> > close(d->fd) cleanup call in the future.
+> >=20
+> > Do not store the file descriptor in struct lo_dirp since it is unused.
+> >=20
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>=20
+>=20
+> Thanks, applied; note:
+>   a) This looks like it can go into upstream libfuse
+>   b) I think we're probably leaking DIR *'s if we do an lo_shutdown;
+> I've added that to my todo
 
-Title:
-  Qemu virt-manager Segmentation fault
+FUSE_DESTROY is current broken, it leaks resources and is not
+thread-safe.  It's something I'll tackle in multithreading preparation
+part 3.
 
-Status in virt-manager package in Ubuntu:
-  Incomplete
+Stefan
 
-Bug description:
-  Hi!
+--3MwIy2ne0vdjdPXF
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  I installed all these packages:
+-----BEGIN PGP SIGNATURE-----
 
-  sudo apt install qemu
-  sudo apt install ipxe-qemu-256k-compat-efi-roms libspice-server1 libbluet=
-ooth3
-  sudo apt install libbrlapi0.6 libcacard0 libfdt1 libusbredirparser1 libvi=
-rglrenderer0 libxen-4.9 libxenstore3.0
-  sudo apt install cpu-checker ibverbs-providers ipxe-qemu libibverbs1 libi=
-scsi7 libnl-route-3-200 librados2 librbd1 librdmacm1 msr-tools sharutils
-  sudo apt install qemu-block-extra qemu-system-common qemu-system-data qem=
-u-system-gui qemu-utils
-  sudo apt install --no-install-recommends qemu-kvm qemu-system-x86
-  sudo apt install libauparse0 ebtables gir1.2-gtk-vnc-2.0 gir1.2-libosinfo=
--1.0 gir1.2-libvirt-glib-1.0 gir1.2-spiceclientglib-2.0 gir1.2-spiceclientg=
-tk-3.0 libvde0 libvdeplug2 libgovirt-common libgovirt2 libgtk-vnc-2.0-0 lib=
-gvnc-1.0-0 libosinfo-1.0-0 libphodav-2.0-0 libphodav-2.0-common libspice-cl=
-ient-glib-2.0-8 libspice-client-gtk-3.0-5 libusbredirhost1 libvirt-clients =
-libvirt-daemon libvirt-daemon-driver-storage-rbd libvirt-daemon-system libv=
-irt-glib-1.0-0 libvirt0 osinfo-db python3-libvirt python3-libxml2 spice-cli=
-ent-glib-usb-acl-helper vde2 vde2-cryptcab virt-viewer virtinst virt-manager
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1Cq8AACgkQnKSrs4Gr
+c8grRQf+LLnWRgrw2EwmjFKKptITHvEbhARQ4I7CDX5Zt5GONfH4qg9rG23XHM90
+X/Nv4RLb+jYQfvtVtIz4ZSFm8gN+GosioguRp1rMQD07eQ8xyVAoShUfFTixeiKi
+YN2+fyHBYpbCziWr60RRVkimdDnI6sqjSqT0pdf7mYuv+CRX+0rxdPh3DRBYv3x8
+nU6cokgfSruGC1KAtyGvui5U2uRAHogmStHCCF90UCbJy73tQ4pld4zcoRcAWD6V
+OMOa/NrWW27jz4eqygDt+QRlWHkX8Rxv+viN+0jII4gIc581EXu3IsszRitz2kqr
+yyk8a7HE0ViTfdbc+qb6VwbpwTbO5g==
+=qQqT
+-----END PGP SIGNATURE-----
 
-  without the i386 packages for Qemu because I want only 64 bit.
-
-  I installed all these packages without error, but when I run
-
-  # virt-manager
-
-  Output: ...shows me:
-
-  Segmentation fault
-
-  =
-
-  My hardware is 100% ok.
-  Maybee a broken lib?
-
-
-  How can I fix that?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/virt-manager/+bug/1838312/+subscr=
-iptions
+--3MwIy2ne0vdjdPXF--
 
