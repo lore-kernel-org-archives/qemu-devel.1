@@ -2,65 +2,71 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A35C32751
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 02:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5C0C32751
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 03:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20CD52064A
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 02:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20CD52064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09EB3206B8
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 03:06:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09EB3206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht1GW-0003Rb-A8
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 22:56:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50840)
+	id 1ht1Px-0005n3-95
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 23:06:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52960)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1ht1G7-00032Y-Gg
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:56:04 -0400
+ (envelope-from <bounces@canonical.com>) id 1ht1PL-00055h-58
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 23:05:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1ht1G6-0003Oy-C1
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:56:03 -0400
-Received: from mga11.intel.com ([192.55.52.93]:34257)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1ht1G6-0003Nv-3k
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:56:02 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 31 Jul 2019 19:56:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,332,1559545200"; d="scan'208";a="184024123"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga002.jf.intel.com with ESMTP; 31 Jul 2019 19:55:58 -0700
-Date: Thu, 1 Aug 2019 10:55:35 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Ivan Ren <renyime@gmail.com>
-Message-ID: <20190801025535.GB21992@richard>
-References: <1563115879-2715-1-git-send-email-ivanren@tencent.com>
+ (envelope-from <bounces@canonical.com>) id 1ht1PJ-0006jW-Gp
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 23:05:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54096)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ht1PJ-0006jE-BF
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 23:05:33 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ht1PH-0003Uy-OT
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 03:05:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B36FE2E80BA
+ for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 03:05:31 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1563115879-2715-1-git-send-email-ivanren@tencent.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.93
-Subject: Re: [Qemu-devel] [PATCH] migration: always initial RAMBlock.bmap to
- 1 for new migration
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 01 Aug 2019 02:58:38 -0000
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bjoern-teipel
+X-Launchpad-Bug-Reporter: Bjoern Teipel (bjoern-teipel)
+X-Launchpad-Bug-Modifier: Bjoern Teipel (bjoern-teipel)
+References: <156460681322.6584.3709701644111615718.malonedeb@soybean.canonical.com>
+Message-Id: <156462831881.6437.11686151044993308244.launchpad@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19012";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: ed53e41aa2d4cf7752565c7b43e1dd3b3bd315bc
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1838569] Re: virtio-balloon change breaks post
+ 4.0 upgrade
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,104 +75,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+From: Bjoern Teipel via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Bug 1838569 <1838569@bugs.launchpad.net>
+Cc: Bjoern Teipel <bjoern.teipel@rackspace.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks, I didn't notice this case.
+** Description changed:
 
-On Sun, Jul 14, 2019 at 10:51:19PM +0800, Ivan Ren wrote:
->Reproduce the problem:
->migrate
->migrate_cancel
->migrate
->
->Error happen for memory migration
->
->The reason as follows:
->1. qemu start, ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] all set to
->   1 by a series of cpu_physical_memory_set_dirty_range
->2. migration start:ram_init_bitmaps
->   - memory_global_dirty_log_start: begin log diry
+- We upgraded the libvirt UCA packages from 3.6 to 4.0 as part of a queens =
+upgrade and noticed that
++ We upgraded the libvirt UCA packages from 3.6 to 4.0 and qemu 2.10 to 2.1=
+1  as part of a queens upgrade and noticed that
+  virtio-ballon is broken when instances live migrate (started with a prior=
+ 3.6 version)  with:
+- =
 
-s/diry/dirty/
+  =
 
->   - memory_global_dirty_log_sync: sync dirty bitmap to
->     ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]
->   - migration_bitmap_sync_range: sync ram_list.
->     dirty_memory[DIRTY_MEMORY_MIGRATION] to RAMBlock.bmap
->     and ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] is set to zero
->3. migration data...
->4. migrate_cancel, will stop log dirty
->5. migration start:ram_init_bitmaps
->   - memory_global_dirty_log_start: begin log diry
+  2019-07-24T06:46:49.487109Z qemu-system-x86_64: warning: Unknown firmware=
+ file in legacy mode: etc/msr_feature_control
+  2019-07-24T06:47:22.187749Z qemu-system-x86_64: VQ 2 size 0x80 < last_ava=
+il_idx 0xb57 - used_idx 0xb59
+  2019-07-24T06:47:22.187768Z qemu-system-x86_64: Failed to load virtio-bal=
+loon:virtio
+  2019-07-24T06:47:22.187771Z qemu-system-x86_64: error while loading state=
+ for instance 0x0 of device '0000:00:05.0/virtio-balloon'
+  2019-07-24T06:47:22.188194Z qemu-system-x86_64: load of migration failed:=
+ Operation not permitted
+  2019-07-24 06:47:22.430+0000: shutting down, reason=3Dfailed
+  =
 
-same as above
+  This seem to be the exact problem as reported by
+  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02228.html
+  =
 
->   - memory_global_dirty_log_sync: sync dirty bitmap to
->     ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]
->   - migration_bitmap_sync_range: sync ram_list.
->     dirty_memory[DIRTY_MEMORY_MIGRATION] to RAMBlock.bmap
->     and ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] is set to zero
->
->   Here RAMBlock.bmap only have new logged dirty pages, don't contain
->   the whole guest pages.
->
->Signed-off-by: Ivan Ren <ivanren@tencent.com>
->---
-> migration/ram.c | 15 ++++++++-------
-> 1 file changed, 8 insertions(+), 7 deletions(-)
->
->diff --git a/migration/ram.c b/migration/ram.c
->index 908517fc2b..bbebaee0c1 100644
->--- a/migration/ram.c
->+++ b/migration/ram.c
->@@ -3173,11 +3173,11 @@ static int ram_state_init(RAMState **rsp)
->     QSIMPLEQ_INIT(&(*rsp)->src_page_requests);
-> 
->     /*
->+     * Count the total number of pages used by ram blocks not including any
->+     * gaps due to alignment or unplugs.
->      * This must match with the initial values of dirty bitmap.
->-     * Currently we initialize the dirty bitmap to all zeros so
->-     * here the total dirty page count is zero.
->      */
->-    (*rsp)->migration_dirty_pages = 0;
->+    (*rsp)->migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
->     ram_state_reset(*rsp);
-> 
->     return 0;
->@@ -3196,12 +3196,13 @@ static void ram_list_init_bitmaps(void)
->              * The initial dirty bitmap for migration must be set with all
->              * ones to make sure we'll migrate every guest RAM page to
->              * destination.
->-             * Here we didn't set RAMBlock.bmap simply because it is already
->-             * set in ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION] in
->-             * ram_block_add, and that's where we'll sync the dirty bitmaps.
->-             * Here setting RAMBlock.bmap would be fine too but not necessary.
->+             * Here we set RAMBlock.bmap all to 1 because when rebegin a
->+             * new migration after a failed migration, ram_list.
+  Listed the packages which changed:
+  =
 
-It is after failure or cancel?
+  Start-Date: 2019-07-06  06:40:55
+  Commandline: /usr/bin/apt-get -y -o Dpkg::Options::=3D--force-confdef -o =
+Dpkg::Options::=3D--force-confold install libvirt-bin python-libvirt qemu q=
+emu-utils qemu-system qemu-system-arm qemu-system-mips qemu-system-ppc qemu=
+-system-sparc qemu-system-x86 qemu-system-misc qemu-block-extra qemu-utils =
+qemu-user qemu-kvm
+  Install: librdmacm1:amd64 (17.1-1ubuntu0.1~cloud0, automatic), libvirt-da=
+emon-driver-storage-rbd:amd64 (4.0.0-1ubuntu8.10~cloud0, automatic), ipxe-q=
+emu-256k-compat-efi-roms:amd64 (1.0.0+git-20150424.a25a16d-0ubuntu2~cloud0,=
+ automatic)
+  Upgrade: qemu-system-mips:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+df=
+sg-1ubuntu7.13~cloud0), qemu-system-misc:amd64 (1:2.10+dfsg-0ubuntu3.8~clou=
+d1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-ppc:amd64 (1:2.10+dfsg-0ub=
+untu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), python-libvirt:amd64 (3.5.=
+0-1build1~cloud0, 4.0.0-1~cloud0), qemu-system-x86:amd64 (1:2.10+dfsg-0ubun=
+tu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-clients:amd64 (3.6.0=
+-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-user:amd64 (1:2.10+dfsg=
+-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-bin:amd64 (3.6=
+.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu:amd64 (1:2.10+dfsg-0u=
+buntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-utils:amd64 (1:2.10+=
+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon-sys=
+tem:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-system-=
+sparc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0)=
+, qemu-user-binfmt:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubunt=
+u7.13~cloud0), qemu-kvm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1=
+ubuntu7.13~cloud0), libvirt0:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8=
+.10~cloud0), qemu-system-arm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+d=
+fsg-1ubuntu7.13~cloud0), qemu-block-extra:amd64 (1:2.10+dfsg-0ubuntu3.8~clo=
+ud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-common:amd64 (1:2.10+dfsg=
+-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system:amd64 (1:2=
+.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon=
+:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0)
+  End-Date: 2019-07-06  06:41:08
+  =
 
->+             * dirty_memory[DIRTY_MEMORY_MIGRATION] don't include the whole
->+             * guest memory.
->              */
->             block->bmap = bitmap_new(pages);
->+            bitmap_set(block->bmap, 0, pages);
->             if (migrate_postcopy_ram()) {
->                 block->unsentmap = bitmap_new(pages);
->                 bitmap_set(block->unsentmap, 0, pages);
->-- 
->2.17.2 (Apple Git-113)
->
+  At this point the instances would have to be hard rebooted or
+  stopped/started to fix the issue for future live migration attemps
 
+-- =
 
-Reviewed-by: Wei Yang <richardw.yang@linux.intel.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1838569
 
--- 
-Wei Yang
-Help you, Help me
+Title:
+  virtio-balloon change breaks post 4.0 upgrade
+
+Status in QEMU:
+  New
+
+Bug description:
+  We upgraded the libvirt UCA packages from 3.6 to 4.0 and qemu 2.10 to 2.1=
+1  as part of a queens upgrade and noticed that
+  virtio-ballon is broken when instances live migrate (started with a prior=
+ 3.6 version)  with:
+
+  2019-07-24T06:46:49.487109Z qemu-system-x86_64: warning: Unknown firmware=
+ file in legacy mode: etc/msr_feature_control
+  2019-07-24T06:47:22.187749Z qemu-system-x86_64: VQ 2 size 0x80 < last_ava=
+il_idx 0xb57 - used_idx 0xb59
+  2019-07-24T06:47:22.187768Z qemu-system-x86_64: Failed to load virtio-bal=
+loon:virtio
+  2019-07-24T06:47:22.187771Z qemu-system-x86_64: error while loading state=
+ for instance 0x0 of device '0000:00:05.0/virtio-balloon'
+  2019-07-24T06:47:22.188194Z qemu-system-x86_64: load of migration failed:=
+ Operation not permitted
+  2019-07-24 06:47:22.430+0000: shutting down, reason=3Dfailed
+
+  This seem to be the exact problem as reported by
+  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02228.html
+
+  Listed the packages which changed:
+
+  Start-Date: 2019-07-06  06:40:55
+  Commandline: /usr/bin/apt-get -y -o Dpkg::Options::=3D--force-confdef -o =
+Dpkg::Options::=3D--force-confold install libvirt-bin python-libvirt qemu q=
+emu-utils qemu-system qemu-system-arm qemu-system-mips qemu-system-ppc qemu=
+-system-sparc qemu-system-x86 qemu-system-misc qemu-block-extra qemu-utils =
+qemu-user qemu-kvm
+  Install: librdmacm1:amd64 (17.1-1ubuntu0.1~cloud0, automatic), libvirt-da=
+emon-driver-storage-rbd:amd64 (4.0.0-1ubuntu8.10~cloud0, automatic), ipxe-q=
+emu-256k-compat-efi-roms:amd64 (1.0.0+git-20150424.a25a16d-0ubuntu2~cloud0,=
+ automatic)
+  Upgrade: qemu-system-mips:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+df=
+sg-1ubuntu7.13~cloud0), qemu-system-misc:amd64 (1:2.10+dfsg-0ubuntu3.8~clou=
+d1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-ppc:amd64 (1:2.10+dfsg-0ub=
+untu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), python-libvirt:amd64 (3.5.=
+0-1build1~cloud0, 4.0.0-1~cloud0), qemu-system-x86:amd64 (1:2.10+dfsg-0ubun=
+tu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-clients:amd64 (3.6.0=
+-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-user:amd64 (1:2.10+dfsg=
+-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-bin:amd64 (3.6=
+.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu:amd64 (1:2.10+dfsg-0u=
+buntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-utils:amd64 (1:2.10+=
+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon-sys=
+tem:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-system-=
+sparc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0)=
+, qemu-user-binfmt:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubunt=
+u7.13~cloud0), qemu-kvm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1=
+ubuntu7.13~cloud0), libvirt0:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8=
+.10~cloud0), qemu-system-arm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+d=
+fsg-1ubuntu7.13~cloud0), qemu-block-extra:amd64 (1:2.10+dfsg-0ubuntu3.8~clo=
+ud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-common:amd64 (1:2.10+dfsg=
+-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system:amd64 (1:2=
+.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon=
+:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0)
+  End-Date: 2019-07-06  06:41:08
+
+  At this point the instances would have to be hard rebooted or
+  stopped/started to fix the issue for future live migration attemps
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1838569/+subscriptions
 
