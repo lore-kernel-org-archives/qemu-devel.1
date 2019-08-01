@@ -2,61 +2,85 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BEDC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 10:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD4CC19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 10:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACEE6206B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 10:43:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACEE6206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 247D2206A2
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 10:58:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SIVOUUDm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247D2206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht8Y5-0006yz-M7
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 06:43:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51765)
+	id 1ht8mx-0002F2-BS
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 06:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54598)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <groug@kaod.org>) id 1ht8XB-0006SF-9C
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:42:10 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1ht8mK-0001iJ-NJ
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ht8X9-0000yi-O8
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:42:09 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:42698)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ht8X9-0000y9-J6
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:42:07 -0400
-Received: from player157.ha.ovh.net (unknown [10.109.143.175])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id 3688113D47C
- for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 12:42:05 +0200 (CEST)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player157.ha.ovh.net (Postfix) with ESMTPSA id 0FB16874B1D8;
- Thu,  1 Aug 2019 10:42:00 +0000 (UTC)
-Date: Thu, 1 Aug 2019 12:41:59 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Daniel Black <daniel@linux.ibm.com>
-Message-ID: <20190801124159.75d9fa48@bahia.lan>
-In-Reply-To: <20190801033819.29664-1-daniel@linux.ibm.com>
-References: <20190801033819.29664-1-daniel@linux.ibm.com>
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <peter.maydell@linaro.org>) id 1ht8mJ-0006YB-DB
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:57:48 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35674)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ht8mJ-0006Xj-5M
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:57:47 -0400
+Received: by mail-wr1-x442.google.com with SMTP id y4so73096047wrm.2
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 03:57:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=i5yczFfVrAVlR4940QCcbKeiFq9wP+iOiA2djQVLfF0=;
+ b=SIVOUUDmYzu8CzBNXMzZrqYbvaV+X5Fdm5H8GwoaxpNJb88ybs5sf1HNQwzwXIBwYQ
+ lrbUca/7V2THxZsbYTcGHOQ1MtmrdyhL+Jv/maFlX+0liLv2evo+59aOnBYewHsA2b1N
+ g46rbGEpyTKRPoSsRjbDagjGmsMOzemlKNkKZ9k2fZaSwCMa0ej/1lAgrMLaedn8Ldz/
+ dqOjoHnFFkRsCgs/JW8YVYXsZjn+cBWuAfiz/kDHMVPPrdcFxsK+IOWrDxrHS385MFNR
+ wgpKpijAWEaHFNJOea7GR7z5JuOfeeQ1Ki9lf+DHnODqCujgU7g5zJeoG6Y/Wnwh3iiZ
+ 2+UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=i5yczFfVrAVlR4940QCcbKeiFq9wP+iOiA2djQVLfF0=;
+ b=C1ScFGLGeB2PER29acZbtVYRB5yXSeeAYr1M4dkypkeiFJjV8HbI+Lpyh0GSUkXgUz
+ FUJDvPn9q5Pz8A8beIEN3x6GVhlOKl79Itg7dRZXHJ/OTe6ivgK676NhakpQGrG8qCM3
+ upZCNgGxo7EVrnz/rfJ7n/w5C/m07utavGkKsS7MHYZK7BI1mE4GHX6hK1bLItU4W+7S
+ UQ8Lp1qmLcwqtg8wRBXDJSlOuidbFYr20v9D4ZPWvRYkxMC6vmhwVoxC32WS38IOwGW4
+ 6WU84IoxP5mD2lW7nJUxI+u6eRRrwPzVOwZNYq3kLDWRNKemitgBV0KTl3jXghL/N6RJ
+ Dn9g==
+X-Gm-Message-State: APjAAAU/5XPww2/NZoYyjXJvAbi1Ca8SWlABa4LoiqBjdPaymLDfMj0/
+ kSEcbrM23xxtx4isSMJbpRDeEg==
+X-Google-Smtp-Source: APXvYqwwM9Hawd0U9pUV1WLp+RkK3J/4CO/HAt22unUylWxWOrCpFKlaoXnVeFb9vZaDLingMcjMdQ==
+X-Received: by 2002:adf:de8e:: with SMTP id w14mr20438551wrl.79.1564657065815; 
+ Thu, 01 Aug 2019 03:57:45 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id j16sm17320424wrp.62.2019.08.01.03.57.44
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 01 Aug 2019 03:57:45 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Date: Thu,  1 Aug 2019 11:57:42 +0100
+Message-Id: <20190801105742.20036-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13978047347330292144
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrleejgdeftdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 46.105.76.148
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr: quantify error
- messages regarding capability settings
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH for-4.1] target/arm: Avoid bogus NSACR traps on
+ M-profile without Security Extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,196 +92,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  1 Aug 2019 13:38:19 +1000
-Daniel Black <daniel@linux.ibm.com> wrote:
+In Arm v8.0 M-profile CPUs without the Security Extension and also in
+v7M CPUs, there is no NSACR register. However, the code we have to handle
+the FPU does not always check whether the ARM_FEATURE_M_SECURITY bit
+is set before testing whether env->v7m.nsacr permits access to the
+FPU. This means that for a CPU with an FPU but without the Security
+Extension we would always take a bogus fault when trying to stack
+the FPU registers on an exception entry.
 
-> Its not immediately obvious how cap-X=Y setting need to be applied
-> to the command line so, for spapr capability error messages, this
-> has been clarified to:
-> 
->   ..[try] appending -machine cap-X=Y
-> 
-> The wrong value messages have been left as is, as the user has found
-> the right location.
-> 
-> Signed-off-by: Daniel Black <daniel@linux.ibm.com>
-> ---
-> v2 Improved error message thanks David Gibson
-> 
-> Left the "appending" as its not obvious more that one -machine
-> arguement is allowed.
-> ---
->  hw/ppc/spapr_caps.c | 47 ++++++++++++++++++++++++++++++---------------
->  1 file changed, 32 insertions(+), 15 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index bbb001f84a..1c0222a081 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -37,6 +37,8 @@
->  
->  #include "hw/ppc/spapr.h"
->  
-> +#define CAPABILITY_ERROR(X) "appending -machine " X
+We could fix this by adding extra feature bit checks for all uses,
+but it is simpler to just make the internal value of nsacr 0x3ff
+("all non-secure accesses allowed"), since this is not guest
+visible when the Security Extension is not present. This allows
+us to continue to follow the Arm ARM pseudocode which takes a
+similar approach. (In particular, in the v8.1 Arm ARM the register
+is documented as reading as 0xcff in this configuration.)
 
-I would make that:
+Fixes: https://bugs.launchpad.net/qemu/+bug/1838475
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I've marked this as for-4.1 because support for M-profile FPU
+is new in this release and this is a pretty bad bug for it.
+It probably doesn't qualify as so bad we need an rc4 but I
+think we need an rc4 anyway and it probably does merit putting
+in at that point.
 
-#define CAPABILITY_HINT() "try appending -machine " X
+ target/arm/cpu.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-because it is really an hint for the user, not an
-error, and all original strings have "try", except...
-
-> +
->  typedef struct SpaprCapPossible {
->      int num;            /* size of vals array below */
->      const char *help;   /* help text for vals */
-> @@ -194,10 +196,12 @@ static void cap_htm_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
->      }
->      if (tcg_enabled()) {
->          error_setg(errp,
-> -                   "No Transactional Memory support in TCG, try cap-htm=off");
-> +                   "No Transactional Memory support in TCG, try "
-> +                   CAPABILITY_ERROR("cap-htm=off"));
->      } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
->          error_setg(errp,
-> -"KVM implementation does not support Transactional Memory, try cap-htm=off"
-> +"KVM implementation does not support Transactional Memory, try "
-> +                   CAPABILITY_ERROR("cap-htm=off")
->              );
->      }
->  }
-> @@ -215,7 +219,8 @@ static void cap_vsx_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
->       * rid of anything that doesn't do VMX */
->      g_assert(env->insns_flags & PPC_ALTIVEC);
->      if (!(env->insns_flags2 & PPC2_VSX)) {
-> -        error_setg(errp, "VSX support not available, try cap-vsx=off");
-> +        error_setg(errp, "VSX support not available, try "
-> +                   CAPABILITY_ERROR("cap-vsx=off"));
->      }
->  }
->  
-> @@ -229,7 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
->          return;
->      }
->      if (!(env->insns_flags2 & PPC2_DFP)) {
-> -        error_setg(errp, "DFP support not available, try cap-dfp=off");
-> +        error_setg(errp, "DFP support not available, try "
-> +                   CAPABILITY_ERROR("cap-dfp=off"));
->      }
->  }
->  
-> @@ -249,11 +255,13 @@ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
->      if (tcg_enabled() && val) {
->          /* TCG only supports broken, allow other values and print a warning */
->          error_setg(&local_err,
-> -                   "TCG doesn't support requested feature, cap-cfpc=%s",
-> +                   "TCG doesn't support requested feature, "
-> +                   CAPABILITY_ERROR("cap-cfpc=%s"),
-
-... this one, but it doesn't look like a hint to me. It just tells which
-is the unsupported cap.
-
->                     cap_cfpc_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested safe cache capability level not supported by kvm, try cap-cfpc=%s",
-> +"Requested safe cache capability level not supported by kvm, try "
-> +                   CAPABILITY_ERROR("cap-cfpc=%s"),
->                     cap_cfpc_possible.vals[kvm_val]);
-
-Also, we have a dedicated API for hints, which are only printed under
-the monitor but ignored under QMP.
-
-Not sure why it isn't used here but it should be something like:
-
-        error_setg(errp, 
-                   "Requested safe cache capability level not supported by kvm");
-        error_append_hint(errp, CAPABILITY_HINT("cap-cfpc=%s") "\n",
-                          cap_cfpc_possible.vals[kvm_val]);
-
->      }
->  
-> @@ -281,7 +289,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
->                     cap_sbbc_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested safe bounds check capability level not supported by kvm, try cap-sbbc=%s",
-> +"Requested safe bounds check capability level not supported by kvm, try "
-> +                   CAPABILITY_ERROR("cap-sbbc=%s"),
->                     cap_sbbc_possible.vals[kvm_val]);
->      }
->  
-> @@ -312,7 +321,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
->                     cap_ibs_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s",
-> +"Requested safe indirect branch capability level not supported by kvm, try "
-> +                   CAPABILITY_ERROR("cap-ibs=%s"),
->                     cap_ibs_possible.vals[kvm_val]);
->      }
->  
-> @@ -401,11 +411,13 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
->  
->      if (tcg_enabled()) {
->          error_setg(errp,
-> -                   "No Nested KVM-HV support in tcg, try cap-nested-hv=off");
-> +                   "No Nested KVM-HV support in tcg, try "
-> +                   CAPABILITY_ERROR("cap-nested-hv=off"));
->      } else if (kvm_enabled()) {
->          if (!kvmppc_has_cap_nested_kvm_hv()) {
->              error_setg(errp,
-> -"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=off");
-> +"KVM implementation does not support Nested KVM-HV, try "
-> +                       CAPABILITY_ERROR("cap-nested-hv=off"));
->          } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
->                  error_setg(errp,
->  "Error enabling cap-nested-hv with KVM, try cap-nested-hv=off");
-> @@ -435,10 +447,12 @@ static void cap_large_decr_apply(SpaprMachineState *spapr,
->  
->          if (!kvm_nr_bits) {
->              error_setg(errp,
-> -                       "No large decrementer support, try cap-large-decr=off");
-> +                       "No large decrementer support, try "
-> +                        CAPABILITY_ERROR("cap-large-decr=off"));
->          } else if (pcc->lrg_decr_bits != kvm_nr_bits) {
->              error_setg(errp,
-> -"KVM large decrementer size (%d) differs to model (%d), try -cap-large-decr=off",
-> +"KVM large decrementer size (%d) differs to model (%d), try "
-> +                CAPABILITY_ERROR("cap-large-decr=off"),
->                  kvm_nr_bits, pcc->lrg_decr_bits);
->          }
->      }
-> @@ -454,7 +468,8 @@ static void cap_large_decr_cpu_apply(SpaprMachineState *spapr,
->      if (kvm_enabled()) {
->          if (kvmppc_enable_cap_large_decr(cpu, val)) {
->              error_setg(errp,
-> -                       "No large decrementer support, try cap-large-decr=off");
-> +                       "No large decrementer support, try "
-> +                       CAPABILITY_ERROR("cap-large-decr=off"));
->          }
->      }
->  
-> @@ -474,10 +489,12 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
->      if (tcg_enabled() && val) {
->          /* TODO - for now only allow broken for TCG */
->          error_setg(errp,
-> -"Requested count cache flush assist capability level not supported by tcg, try cap-ccf-assist=off");
-> +"Requested count cache flush assist capability level not supported by tcg, try "
-> +                   CAPABILITY_ERROR("cap-ccf-assist=off"));
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested count cache flush assist capability level not supported by kvm, try cap-ccf-assist=off");
-> +"Requested count cache flush assist capability level not supported by kvm, try "
-> +                   CAPABILITY_ERROR("cap-ccf-assist=off"));
->      }
->  }
->  
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9eb40ff755f..ec2ab95dbeb 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -266,6 +266,14 @@ static void arm_cpu_reset(CPUState *s)
+              * on ARM_FEATURE_V8 (we don't let the guest see the bit).
+              */
+             env->v7m.aircr = R_V7M_AIRCR_BFHFNMINS_MASK;
++            /*
++             * Set NSACR to indicate "NS access permitted to everything";
++             * this avoids having to have all the tests of it being
++             * conditional on ARM_FEATURE_M_SECURITY. Note also that from
++             * v8.1M the guest-visible value of NSACR in a CPU without the
++             * Security Extension is 0xcff.
++             */
++            env->v7m.nsacr = 0xcff;
+         }
+ 
+         /* In v7M the reset value of this bit is IMPDEF, but ARM recommends
+-- 
+2.20.1
 
 
