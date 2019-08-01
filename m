@@ -2,64 +2,64 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C71FC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 02:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E94C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 02:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC0BB20693
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 02:29:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0BB20693
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE22D20693
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 02:35:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZTS7PwH0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE22D20693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht0qD-0004sr-Vq
-	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 22:29:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46985)
+	id 1ht0vo-0006Kl-4B
+	for qemu-devel@archiver.kernel.org; Wed, 31 Jul 2019 22:35:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47755)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jing2.liu@linux.intel.com>) id 1ht0pq-0004UH-01
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:28:55 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1ht0vN-0005nl-Fy
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jing2.liu@linux.intel.com>) id 1ht0po-00084n-8I
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:28:53 -0400
-Received: from mga06.intel.com ([134.134.136.31]:27115)
+ (envelope-from <dgibson@ozlabs.org>) id 1ht0vM-0005l5-22
+ for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:34:37 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:44033 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jing2.liu@linux.intel.com>)
- id 1ht0po-0007xV-0C
- for qemu-devel@nongnu.org; Wed, 31 Jul 2019 22:28:52 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 31 Jul 2019 19:28:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,332,1559545200"; d="scan'208";a="371810394"
-Received: from liujing-mobl.ccr.corp.intel.com (HELO [10.238.129.50])
- ([10.238.129.50])
- by fmsmga005.fm.intel.com with ESMTP; 31 Jul 2019 19:28:44 -0700
-To: qemu-devel@nongnu.org, pbonzini@redhat.com
-References: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
-From: Jing Liu <jing2.liu@linux.intel.com>
-Message-ID: <f2db9953-c878-2272-0f3e-43d60b142c2d@linux.intel.com>
-Date: Thu, 1 Aug 2019 10:28:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ht0vK-0005iE-JW; Wed, 31 Jul 2019 22:34:36 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 45zZBD4NPsz9sNF; Thu,  1 Aug 2019 12:34:28 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1564626868;
+ bh=2SCxjVtvUaxpNjIdAoz9KDAGhC0o9od6uTuug3ewizY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZTS7PwH0HV1WS8coV65FcPu1iI3PsvLm7JsahOSWt92ebja2G6+/vpJ/28ziF3OLR
+ 3nAUDqvnlVr1VUpbdeWRh5Pk9BYBI4iP3aH+1ZY9YyxlNyqkO6kpw0URrKqobCzAio
+ D4Ipj4os3bNMgPF9/8fVxQcgXUNjyZnorzaNtrgg=
+Date: Thu, 1 Aug 2019 12:14:06 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Black <daniel@linux.ibm.com>
+Message-ID: <20190801021406.GA21024@umbus.fritz.box>
+References: <20190731233438.483-1-daniel@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1564035256-11828-1-git-send-email-jing2.liu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="tKW2IUtsqtDRztdT"
+Content-Disposition: inline
+In-Reply-To: <20190731233438.483-1-daniel@linux.ibm.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.31
-Subject: Re: [Qemu-devel] [PATCH v2] x86: Intel AVX512_BF16 feature enabling
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH] spapr: quantify error messages regarding
+ capability settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,185 +71,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
 
-Looking forward to your comments. :)
+--tKW2IUtsqtDRztdT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks!
-Jing
+On Thu, Aug 01, 2019 at 09:34:38AM +1000, Daniel Black wrote:
+> Its not immediately obvious how cap-X=3Dy setting need to be applied
+> to the command line so this has been clarified to "appending to the
+> machine name" in spapr capability error messages.
+>=20
+> The wrong value messages have been left as is, as the user has found
+> the right location.
 
-On 7/25/2019 2:14 PM, Jing Liu wrote:
-> Intel CooperLake cpu adds AVX512_BF16 instruction, defining as
-> CPUID.(EAX=7,ECX=1):EAX[bit 05].
-> 
-> The patch adds a property for setting the subleaf of CPUID leaf 7 in
-> case that people would like to specify it.
-> 
-> The release spec link as follows,
-> https://software.intel.com/sites/default/files/managed/c5/15/\
-> architecture-instruction-set-extensions-programming-reference.pdf
-> 
-> Signed-off-by: Jing Liu <jing2.liu@linux.intel.com>
+Good idea, but I think it would be easier to follow if you just said
+	"try -machine cap-whatever=3Don"
+It's permitted to have multiple -machine options, so that works even
+if you are currently using the default machine type.
+
+>=20
+> Signed-off-by: Daniel Black <daniel@linux.ibm.com>
 > ---
->   target/i386/cpu.c | 39 ++++++++++++++++++++++++++++++++++++++-
->   target/i386/cpu.h |  7 +++++++
->   target/i386/kvm.c |  3 ++-
->   3 files changed, 47 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 805ce95..517dedb 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -770,6 +770,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
->             /* CPUID_7_0_ECX_OSPKE is dynamic */ \
->             CPUID_7_0_ECX_LA57)
->   #define TCG_7_0_EDX_FEATURES 0
-> +#define TCG_7_1_EAX_FEATURES 0
->   #define TCG_APM_FEATURES 0
->   #define TCG_6_EAX_FEATURES CPUID_6_EAX_ARAT
->   #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
-> @@ -1095,6 +1096,25 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->           },
->           .tcg_features = TCG_7_0_EDX_FEATURES,
->       },
-> +    [FEAT_7_1_EAX] = {
-> +        .type = CPUID_FEATURE_WORD,
-> +        .feat_names = {
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, "avx512-bf16", NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +            NULL, NULL, NULL, NULL,
-> +        },
-> +        .cpuid = {
-> +            .eax = 7,
-> +            .needs_ecx = true, .ecx = 1,
-> +            .reg = R_EAX,
-> +        },
-> +        .tcg_features = TCG_7_1_EAX_FEATURES,
-> +    },
->       [FEAT_8000_0007_EDX] = {
->           .type = CPUID_FEATURE_WORD,
->           .feat_names = {
-> @@ -4293,13 +4313,19 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->       case 7:
->           /* Structured Extended Feature Flags Enumeration Leaf */
->           if (count == 0) {
-> -            *eax = 0; /* Maximum ECX value for sub-leaves */
-> +            /* Maximum ECX value for sub-leaves */
-> +            *eax = env->cpuid_level_func7;
->               *ebx = env->features[FEAT_7_0_EBX]; /* Feature flags */
->               *ecx = env->features[FEAT_7_0_ECX]; /* Feature flags */
->               if ((*ecx & CPUID_7_0_ECX_PKU) && env->cr[4] & CR4_PKE_MASK) {
->                   *ecx |= CPUID_7_0_ECX_OSPKE;
->               }
->               *edx = env->features[FEAT_7_0_EDX]; /* Feature flags */
-> +        } else if (count == 1) {
-> +            *eax = env->features[FEAT_7_1_EAX];
-> +            *ebx = 0;
-> +            *ecx = 0;
-> +            *edx = 0;
->           } else {
->               *eax = 0;
->               *ebx = 0;
-> @@ -4949,6 +4975,11 @@ static void x86_cpu_adjust_feat_level(X86CPU *cpu, FeatureWord w)
->           x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel2, eax);
->       break;
->       }
+>  hw/ppc/spapr_caps.c | 47 ++++++++++++++++++++++++++++++---------------
+>  1 file changed, 32 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index bbb001f84a..cf334fe595 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -37,6 +37,8 @@
+> =20
+>  #include "hw/ppc/spapr.h"
+> =20
+> +#define CAPABILITY_ERROR(X) "appending \"," X "\" to the machine name"
 > +
-> +    if (eax == 7) {
-> +        x86_cpu_adjust_level(cpu, &env->cpuid_min_level_func7,
-> +                             fi->cpuid.ecx);
-> +    }
->   }
->   
->   /* Calculate XSAVE components based on the configured CPU feature flags */
-> @@ -5067,6 +5098,7 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->           x86_cpu_adjust_feat_level(cpu, FEAT_1_ECX);
->           x86_cpu_adjust_feat_level(cpu, FEAT_6_EAX);
->           x86_cpu_adjust_feat_level(cpu, FEAT_7_0_ECX);
-> +        x86_cpu_adjust_feat_level(cpu, FEAT_7_1_EAX);
->           x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_EDX);
->           x86_cpu_adjust_feat_level(cpu, FEAT_8000_0001_ECX);
->           x86_cpu_adjust_feat_level(cpu, FEAT_8000_0007_EDX);
-> @@ -5098,6 +5130,9 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
->       }
->   
->       /* Set cpuid_*level* based on cpuid_min_*level, if not explicitly set */
-> +    if (env->cpuid_level_func7 == UINT32_MAX) {
-> +        env->cpuid_level_func7 = env->cpuid_min_level_func7;
-> +    }
->       if (env->cpuid_level == UINT32_MAX) {
->           env->cpuid_level = env->cpuid_min_level;
->       }
-> @@ -5869,6 +5904,8 @@ static Property x86_cpu_properties[] = {
->       DEFINE_PROP_BOOL("host-phys-bits", X86CPU, host_phys_bits, false),
->       DEFINE_PROP_UINT8("host-phys-bits-limit", X86CPU, host_phys_bits_limit, 0),
->       DEFINE_PROP_BOOL("fill-mtrr-mask", X86CPU, fill_mtrr_mask, true),
-> +    DEFINE_PROP_UINT32("level-func7", X86CPU, env.cpuid_level_func7,
-> +                       UINT32_MAX),
->       DEFINE_PROP_UINT32("level", X86CPU, env.cpuid_level, UINT32_MAX),
->       DEFINE_PROP_UINT32("xlevel", X86CPU, env.cpuid_xlevel, UINT32_MAX),
->       DEFINE_PROP_UINT32("xlevel2", X86CPU, env.cpuid_xlevel2, UINT32_MAX),
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 05393cf..df9106f 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -479,6 +479,7 @@ typedef enum FeatureWord {
->       FEAT_7_0_EBX,       /* CPUID[EAX=7,ECX=0].EBX */
->       FEAT_7_0_ECX,       /* CPUID[EAX=7,ECX=0].ECX */
->       FEAT_7_0_EDX,       /* CPUID[EAX=7,ECX=0].EDX */
-> +    FEAT_7_1_EAX,       /* CPUID[EAX=7,ECX=1].EAX */
->       FEAT_8000_0001_EDX, /* CPUID[8000_0001].EDX */
->       FEAT_8000_0001_ECX, /* CPUID[8000_0001].ECX */
->       FEAT_8000_0007_EDX, /* CPUID[8000_0007].EDX */
-> @@ -692,6 +693,8 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->   #define CPUID_7_0_EDX_CORE_CAPABILITY   (1U << 30)  /*Core Capability*/
->   #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
->   
-> +#define CPUID_7_1_EAX_AVX512_BF16 (1U << 5) /* AVX512 BFloat16 Instruction */
-> +
->   #define CPUID_8000_0008_EBX_WBNOINVD  (1U << 9)  /* Write back and
->                                                                                do not invalidate cache */
->   #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
-> @@ -1322,6 +1325,10 @@ typedef struct CPUX86State {
->       /* Fields after this point are preserved across CPU reset. */
->   
->       /* processor features (e.g. for CPUID insn) */
-> +    /* Minimum cpuid leaf 7 value */
-> +    uint32_t cpuid_level_func7;
-> +    /* Actual cpuid leaf 7 value */
-> +    uint32_t cpuid_min_level_func7;
->       /* Minimum level/xlevel/xlevel2, based on CPU model + features */
->       uint32_t cpuid_min_level, cpuid_min_xlevel, cpuid_min_xlevel2;
->       /* Maximum level/xlevel/xlevel2 value for auto-assignment: */
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index ec7870c..fd0a447 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -1493,6 +1493,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->                   c = &cpuid_data.entries[cpuid_i++];
->               }
->               break;
-> +        case 0x7:
->           case 0x14: {
->               uint32_t times;
->   
-> @@ -1505,7 +1506,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->               for (j = 1; j <= times; ++j) {
->                   if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
->                       fprintf(stderr, "cpuid_data is full, no space for "
-> -                                "cpuid(eax:0x14,ecx:0x%x)\n", j);
-> +                                "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
->                       abort();
->                   }
->                   c = &cpuid_data.entries[cpuid_i++];
-> 
+>  typedef struct SpaprCapPossible {
+>      int num;            /* size of vals array below */
+>      const char *help;   /* help text for vals */
+> @@ -194,10 +196,12 @@ static void cap_htm_apply(SpaprMachineState *spapr,=
+ uint8_t val, Error **errp)
+>      }
+>      if (tcg_enabled()) {
+>          error_setg(errp,
+> -                   "No Transactional Memory support in TCG, try cap-htm=
+=3Doff");
+> +                   "No Transactional Memory support in TCG, try "
+> +                   CAPABILITY_ERROR("cap-htm=3Doff"));
+>      } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+>          error_setg(errp,
+> -"KVM implementation does not support Transactional Memory, try cap-htm=
+=3Doff"
+> +"KVM implementation does not support Transactional Memory, try "
+> +                   CAPABILITY_ERROR("cap-htm=3Doff")
+>              );
+>      }
+>  }
+> @@ -215,7 +219,8 @@ static void cap_vsx_apply(SpaprMachineState *spapr, u=
+int8_t val, Error **errp)
+>       * rid of anything that doesn't do VMX */
+>      g_assert(env->insns_flags & PPC_ALTIVEC);
+>      if (!(env->insns_flags2 & PPC2_VSX)) {
+> -        error_setg(errp, "VSX support not available, try cap-vsx=3Doff");
+> +        error_setg(errp, "VSX support not available, try "
+> +                   CAPABILITY_ERROR("cap-vsx=3Doff"));
+>      }
+>  }
+> =20
+> @@ -229,7 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, u=
+int8_t val, Error **errp)
+>          return;
+>      }
+>      if (!(env->insns_flags2 & PPC2_DFP)) {
+> -        error_setg(errp, "DFP support not available, try cap-dfp=3Doff");
+> +        error_setg(errp, "DFP support not available, try "
+> +                   CAPABILITY_ERROR("cap-dfp=3Doff"));
+>      }
+>  }
+> =20
+> @@ -249,11 +255,13 @@ static void cap_safe_cache_apply(SpaprMachineState =
+*spapr, uint8_t val,
+>      if (tcg_enabled() && val) {
+>          /* TCG only supports broken, allow other values and print a warn=
+ing */
+>          error_setg(&local_err,
+> -                   "TCG doesn't support requested feature, cap-cfpc=3D%s=
+",
+> +                   "TCG doesn't support requested feature, use "
+> +                   CAPABILITY_ERROR("cap-cfpc=3D%s"),
+>                     cap_cfpc_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested safe cache capability level not supported by kvm, try cap-cfp=
+c=3D%s",
+> +"Requested safe cache capability level not supported by kvm, try "
+> +                   CAPABILITY_ERROR("cap-cfpc=3D%s"),
+>                     cap_cfpc_possible.vals[kvm_val]);
+>      }
+> =20
+> @@ -281,7 +289,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineS=
+tate *spapr, uint8_t val,
+>                     cap_sbbc_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested safe bounds check capability level not supported by kvm, try =
+cap-sbbc=3D%s",
+> +"Requested safe bounds check capability level not supported by kvm, try "
+> +                   CAPABILITY_ERROR("cap-sbbc=3D%s"),
+>                     cap_sbbc_possible.vals[kvm_val]);
+>      }
+> =20
+> @@ -312,7 +321,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachi=
+neState *spapr,
+>                     cap_ibs_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested safe indirect branch capability level not supported by kvm, t=
+ry cap-ibs=3D%s",
+> +"Requested safe indirect branch capability level not supported by kvm, t=
+ry "
+> +                   CAPABILITY_ERROR("cap-ibs=3D%s"),
+>                     cap_ibs_possible.vals[kvm_val]);
+>      }
+> =20
+> @@ -401,11 +411,13 @@ static void cap_nested_kvm_hv_apply(SpaprMachineSta=
+te *spapr,
+> =20
+>      if (tcg_enabled()) {
+>          error_setg(errp,
+> -                   "No Nested KVM-HV support in tcg, try cap-nested-hv=
+=3Doff");
+> +                   "No Nested KVM-HV support in tcg, try "
+> +                   CAPABILITY_ERROR("cap-nested-hv=3Doff"));
+>      } else if (kvm_enabled()) {
+>          if (!kvmppc_has_cap_nested_kvm_hv()) {
+>              error_setg(errp,
+> -"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=3D=
+off");
+> +"KVM implementation does not support Nested KVM-HV, try "
+> +                       CAPABILITY_ERROR("cap-nested-hv=3Doff"));
+>          } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
+>                  error_setg(errp,
+>  "Error enabling cap-nested-hv with KVM, try cap-nested-hv=3Doff");
+> @@ -435,10 +447,12 @@ static void cap_large_decr_apply(SpaprMachineState =
+*spapr,
+> =20
+>          if (!kvm_nr_bits) {
+>              error_setg(errp,
+> -                       "No large decrementer support, try cap-large-decr=
+=3Doff");
+> +                       "No large decrementer support, try "
+> +                        CAPABILITY_ERROR("cap-large-decr=3Doff"));
+>          } else if (pcc->lrg_decr_bits !=3D kvm_nr_bits) {
+>              error_setg(errp,
+> -"KVM large decrementer size (%d) differs to model (%d), try -cap-large-d=
+ecr=3Doff",
+> +"KVM large decrementer size (%d) differs to model (%d), try "
+> +                CAPABILITY_ERROR("cap-large-decr=3Doff"),
+>                  kvm_nr_bits, pcc->lrg_decr_bits);
+>          }
+>      }
+> @@ -454,7 +468,8 @@ static void cap_large_decr_cpu_apply(SpaprMachineStat=
+e *spapr,
+>      if (kvm_enabled()) {
+>          if (kvmppc_enable_cap_large_decr(cpu, val)) {
+>              error_setg(errp,
+> -                       "No large decrementer support, try cap-large-decr=
+=3Doff");
+> +                       "No large decrementer support, try "
+> +                       CAPABILITY_ERROR("cap-large-decr=3Doff"));
+>          }
+>      }
+> =20
+> @@ -474,10 +489,12 @@ static void cap_ccf_assist_apply(SpaprMachineState =
+*spapr, uint8_t val,
+>      if (tcg_enabled() && val) {
+>          /* TODO - for now only allow broken for TCG */
+>          error_setg(errp,
+> -"Requested count cache flush assist capability level not supported by tc=
+g, try cap-ccf-assist=3Doff");
+> +"Requested count cache flush assist capability level not supported by tc=
+g, try "
+> +                   CAPABILITY_ERROR("cap-ccf-assist=3Doff"));
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested count cache flush assist capability level not supported by kv=
+m, try cap-ccf-assist=3Doff");
+> +"Requested count cache flush assist capability level not supported by kv=
+m, try "
+> +                   CAPABILITY_ERROR("cap-ccf-assist=3Doff"));
+>      }
+>  }
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--tKW2IUtsqtDRztdT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1CSusACgkQbDjKyiDZ
+s5LG4Q/8C7gMlc3gWzna7g/7GpYVsE5Vq5xcrPuFJltsF7A8yoSDo33uthMukYiH
+lAFDpkS6aklCWyvOSlXcTlqJ7A2mKekMHy/PpCxi3X3bYTaO4w35Hk87aen9RoMG
+XLSXqLzHTVgULDHMePTe+0iyrVpjjYtKxGC75K2TZ963LPJRW8SOT6tDu/VPKvl+
+TQu+tVpdsPQ0K8LCeUG2Qhv4lVdorJeafgsq9jW9VMTI9Fjbb2NXPxLZIrSHFK77
++nrPaqbkdEqKmwwgm9E5jmYa/hgaNeMPABlVkebGFuzUAqCO8lqUtx3rGTrFFGDL
+o58F7Arbgmdr0e4ywvulwOaXxIfu/T4dpPoM7MCd2nkLhkFwFG9E1/jaUfYUhZ9s
+UmyeM2VKsxEQHAwtgHrKAjoD2dQkpaQHCwblXCP87MJrc4Um8WOiLleyCqX7uE/G
+Cvji4u4E49XQeRM4XJjOy8uWv9GBBIRm6m/fkmV0/MY99cwvf7UvZ3VysyESIbtV
+4zQ1PIaFdVev5pSfsKJGdWiiHs160nd0tYUI9gXvEsBG3eHZxZhBu3c/6xYvo09o
+blYNKL7sA8CmxaUDKObL9d2Xg2krazC75TwYJdC2yPhUZXJxpc8Km9wBZ5TeGFK8
+yLOwz3HxISL2zI2x7W6a781hgbkCxSG0fLiyUz0gESdqszrzfVA=
+=IOq3
+-----END PGP SIGNATURE-----
+
+--tKW2IUtsqtDRztdT--
 
