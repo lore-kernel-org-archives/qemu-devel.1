@@ -2,95 +2,75 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C086C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF89C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:17:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D77FB206A2
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:07:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77FB206A2
+	by mail.kernel.org (Postfix) with ESMTPS id D6125206B8
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:17:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6125206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htGQ9-0002ez-1J
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 15:07:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37608)
+	id 1htGZS-0005dt-2m
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 15:17:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42444)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1htGPh-0002AC-Ny
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:06:58 -0400
+ (envelope-from <mst@redhat.com>) id 1htGY5-0005As-W4
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:15:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1htGPg-0001Q5-Mp
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:06:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34398)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1htGPc-0001Lw-Ha; Thu, 01 Aug 2019 15:06:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ED1DBADAE8;
- Thu,  1 Aug 2019 19:06:49 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-187.brq.redhat.com
- [10.40.204.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BCA815D9D3;
- Thu,  1 Aug 2019 19:06:44 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190725091900.30542-1-vsementsov@virtuozzo.com>
- <20190725091900.30542-2-vsementsov@virtuozzo.com>
- <2a105159-ab90-8f7c-bba9-4cec27e6144c@redhat.com>
- <db90d600-3336-5791-659b-518e88919014@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e4011bd5-7b6b-2bc7-4739-699980abdad6@redhat.com>
-Date: Thu, 1 Aug 2019 21:06:42 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <mst@redhat.com>) id 1htGY4-0005hU-JW
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:15:37 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:46042)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1htGY4-0005hB-Ep
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:15:36 -0400
+Received: by mail-qt1-f194.google.com with SMTP id x22so66494420qtp.12
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 12:15:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=CbHsRifZcP4KVzzUpZ4Tb5jMR01LF3DSH9W0kIoflvE=;
+ b=JoRHnNp9slbPAMvNewarYGv7dICk3oGc7GqyFKu1P8cVykiFluz1zUrcRZkinTGlEw
+ VXiH6FIT8pZ/Zxt2hi38aONgRiIo8AbXn9GbcTHdD+RklM/NiIZQhbSFa01zAtSP2Pfo
+ Q7tSDZ0kD7UW5EronO9Ffd7IW94ZphVQ09C75SMB1NdyjFsWYNn/QVPUDcXqinsI7Rpd
+ MNzJpinLXbIKzpMFeeBOTJzrcRVP2ZR20/khjwEyW2LiRV+frgw1kqEdJnEwxn7iSZ5P
+ MNiRM5/RBOCvxDDNkIs8VbchgvkoyM8TfmRtYc7ipBxDpWqKjQ1A7Ern2UJqEABvYBvU
+ SNTw==
+X-Gm-Message-State: APjAAAX8buMtG3T0OZJa7QexM5uZP62S5eLp4/aMaeehFNrylDlxrKlO
+ WLgPiXrgeABTEuvxqng8Ne+rQA==
+X-Google-Smtp-Source: APXvYqzkSqxuM4WATxS9kS4yPG9LbfV3xiBgVmrnoIunfgFOA5RhGdGZ64LOiBEIljcsD+AsyyYifg==
+X-Received: by 2002:ac8:3233:: with SMTP id x48mr94258980qta.159.1564686935163; 
+ Thu, 01 Aug 2019 12:15:35 -0700 (PDT)
+Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
+ by smtp.gmail.com with ESMTPSA id
+ z21sm28717857qto.48.2019.08.01.12.15.32
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 01 Aug 2019 12:15:34 -0700 (PDT)
+Date: Thu, 1 Aug 2019 15:15:29 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190801151258-mutt-send-email-mst@kernel.org>
+References: <1564644533-28850-1-git-send-email-ning.bo9@zte.com.cn>
+ <87v9vgoqlr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <db90d600-3336-5791-659b-518e88919014@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JuRKQC7MvTWMuu1hJ2IpBMrWdlgdtFK2v"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 01 Aug 2019 19:06:50 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87v9vgoqlr.fsf@dusky.pond.sub.org>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/9] block: add
- .bdrv_need_rw_file_child_during_reopen_rw handler
+ [fuzzy]
+X-Received-From: 209.85.160.194
+Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: report QMP event when set
+ running
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,121 +82,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Cc: Ning Bo <ning.bo9@zte.com.cn>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JuRKQC7MvTWMuu1hJ2IpBMrWdlgdtFK2v
-Content-Type: multipart/mixed; boundary="j8bFQKcnsDXTVYWLZ2JmcvlZ7hDrLSdgf";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "jsnow@redhat.com" <jsnow@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <e4011bd5-7b6b-2bc7-4739-699980abdad6@redhat.com>
-Subject: Re: [PATCH v3 1/9] block: add
- .bdrv_need_rw_file_child_during_reopen_rw handler
-References: <20190725091900.30542-1-vsementsov@virtuozzo.com>
- <20190725091900.30542-2-vsementsov@virtuozzo.com>
- <2a105159-ab90-8f7c-bba9-4cec27e6144c@redhat.com>
- <db90d600-3336-5791-659b-518e88919014@virtuozzo.com>
-In-Reply-To: <db90d600-3336-5791-659b-518e88919014@virtuozzo.com>
-
---j8bFQKcnsDXTVYWLZ2JmcvlZ7hDrLSdgf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 01.08.19 16:02, Vladimir Sementsov-Ogievskiy wrote:
-> 31.07.2019 15:09, Max Reitz wrote:
-
-[...]
-
->> So -- without having tried, of course -- I think a better design would=
-
->> be to look for bs->file->bs in the ReopenQueue, recursively all of its=
-
->> children, and move all of those entries into a new queue, and then
->> invoke bdrv_reopen_multiple() on that one first.
->=20
-> Why all children recursively? Shouldn't we instead only follow defined
-> dependencies?
-> Or it just seems bad to put not full subtree into bdrv_reopen multiple(=
-) ?
-
-For example, making a node RW without opening its children RW seems
-wrong.  Whenever we reopen a node, we should reopen all of its children,
-if they are in the queue.
-
->> The question then becomes how to roll back those changes...  I don=E2=80=
-=99t
->> know whether just having bdrv_reopen() partially succeed is so bad.
->> Otherwise, we=E2=80=99d need a function to translate an existing node'=
-s state
->> into a BdrvReopenQueueEntry so we can thus return to the old state.
->=20
-> And this rollback may fail too and we are still in partial success stat=
-e.
->=20
-> But if we roll-back simple ro->rw reopen it's safe enough: in worst cas=
-e
-> file will be rw, but marked ro, so Qemu may have more access rights tha=
-n
-> needed but will not use them, this is why I was concentrating around
-> only ro->rw case..
-
-In practice, this is always so.  The =E2=80=9Cchildren need to be reopene=
-d
-before parent=E2=80=9D case is always a sign of more permissions being ta=
-ken;
-whereas =E2=80=9Cchildren need to be reopened after parent=E2=80=9D is a =
-sign of
-permissions being released.
-
-What we want to fix now is the former =E2=80=9Creopen children before par=
-ent=E2=80=9D
-case.  Because this is always a sign of taking more permissions, a
-partial success/failure state means we always have taken more
-permissions than we need to.
-
-> So, what about go similar way to this patch, i.e. only reopen ro->rw ch=
-ildren
-> which we need to be rw, not touching other flags, but check, that in re=
-open
-> queue we have this child, and it is going to be reopened RW, and if not=
-,
-> return error immediately?
-
-If the RO -> RW change for the child is accompanied by other options
-being changed, the user may find it vital to change these flags along
-with the RO/RW access.  We shouldn=E2=80=99t ignore them.
-
-Max
+On Thu, Aug 01, 2019 at 05:25:04PM +0200, Markus Armbruster wrote:
+> Ning Bo <ning.bo9@zte.com.cn> writes:
+> 
+> > Report vsock running event so that the upper application can
+> > control boot sequence.
+> > see https://github.com/kata-containers/runtime/pull/1918
+> 
+> Please provide a more complete summary of the use case in the commit
+> message.  What exactly is the problem?  What is the proposed solution,
+> and how does it make use of the new event?
+> 
+> > Signed-off-by: Ning Bo <ning.bo9@zte.com.cn>
 
 
---j8bFQKcnsDXTVYWLZ2JmcvlZ7hDrLSdgf--
+Also it would seem that it should be possible to detect
+port listen state change just by trying to connect to it.
+Why isn't that an option?
 
---JuRKQC7MvTWMuu1hJ2IpBMrWdlgdtFK2v
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1DOEMACgkQ9AfbAGHV
-z0DOVQf7BMRXeZUlHcHlOt2mwNmzTWjqsu6mIA1a+gmibZncECxsz3XR0JEyF5iR
-4zZScArk4AAjNvF4npLKCR4bWwq6ubMjspJmt0MAg06+Gn05iNh7RgsWUheTT49L
-TcYn+xcS4nSbBcPOm82WCuO2EtXJy48cysynTPq8jhcUJ2stG0F1MM2hSB0dEav+
-Vdu50MONRvZiEdxgGlCQCVz/nzo1/6oYyK4U+BtLE9yOgN0EGCUsfQ5gycdl3U8A
-SeJUf7bHd6ju8/eBjy/MosJku/sC3UOLCUiMPQn6TuZPBGnxEmMfq0n+O1LJcdY8
-gQXeQ1ZaPZjAfGA994jGZ4n+ZeIjaQ==
-=dw3h
------END PGP SIGNATURE-----
+> > ---
+> >  hw/virtio/vhost-vsock.c |  3 +++
+> >  qapi/char.json          | 22 ++++++++++++++++++++++
+> >  2 files changed, 25 insertions(+)
+> >
+> > diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
+> > index 0371493..a5920fd 100644
+> > --- a/hw/virtio/vhost-vsock.c
+> > +++ b/hw/virtio/vhost-vsock.c
+> > @@ -22,6 +22,7 @@
+> >  #include "qemu/iov.h"
+> >  #include "qemu/module.h"
+> >  #include "monitor/monitor.h"
+> > +#include "qapi/qapi-events-char.h"
+> >  
+> >  enum {
+> >      VHOST_VSOCK_SAVEVM_VERSION = 0,
+> > @@ -68,6 +69,8 @@ static int vhost_vsock_set_running(VHostVSock *vsock, int start)
+> >      if (ret < 0) {
+> >          return -errno;
+> >      }
+> > +    qapi_event_send_vsock_running(vsock->conf.guest_cid, start != 0);
+> > +
+> >      return 0;
+> >  }
+> >  
+> > diff --git a/qapi/char.json b/qapi/char.json
+> > index a6e81ac..7b746e3 100644
+> > --- a/qapi/char.json
+> > +++ b/qapi/char.json
+> > @@ -570,3 +570,25 @@
+> >  { 'event': 'VSERPORT_CHANGE',
+> >    'data': { 'id': 'str',
+> >              'open': 'bool' } }
+> > +
+> > +##
+> > +# @VSOCK_RUNNING:
+> > +#
+> > +# Emitted when the guest changes the vsock status.
+> > +#
+> > +# @cid: guest context ID
+> > +#
+> > +# @running: true if the vsock is running
+> > +#
+> > +# Since: v4.2
+> > +#
+> > +# Example:
+> > +#
+> > +# <- { "event": "VSOCK_RUNNING",
+> > +#      "data": { "cid": "123456", "running": true },
+> > +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
+> > +#
+> > +##
+> > +{ 'event': 'VSOCK_RUNNING',
+> > +  'data': { 'cid': 'uint64',
+> > +            'running': 'bool' } }
+> 
+> Can you explain why you put this into char.json?
+> 
+> The event traces successful calls of vhost_vsock_set_running().  I have
+> no idea what vhost_vsock_set_running() does (pardon my ignorance).  Can
+> you point me to a specification?
+> 
+> Its @start parameter is int.  The event's @running is bool.  Zero gets
+> mapped to false, non-zero to true.  Are you sure all non-zero values are
+> equivalent, and will remain equivalent?
 
---JuRKQC7MvTWMuu1hJ2IpBMrWdlgdtFK2v--
+
+Allowing guest to emit events at a high speed 
+
 
