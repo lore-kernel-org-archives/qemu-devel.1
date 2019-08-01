@@ -2,86 +2,94 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2045FC19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 18:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC69C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 18:39:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF12E20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 18:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF33520838
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 18:39:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dsyu8dRb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF12E20838
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SQe76BW3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF33520838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htFyI-0005rl-7x
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 14:38:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59336)
+	id 1htFyq-0006dR-5o
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 14:39:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60670)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1htFqT-0005vr-3N
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 14:30:34 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htFxS-0005WS-V4
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 14:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1htFqR-0002Sj-AW
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 14:30:32 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44371)
+ (envelope-from <richard.henderson@linaro.org>) id 1htFxR-0007DB-Pj
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 14:37:46 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35613)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1htFqP-0002PG-5F
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 14:30:31 -0400
-Received: by mail-wr1-x442.google.com with SMTP id p17so74604542wrf.11
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 11:30:23 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1htFxR-0007CI-Jb
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 14:37:45 -0400
+Received: by mail-pg1-x543.google.com with SMTP id s1so28378157pgr.2
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 11:37:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3ACUCJ4J4ZTgyEv5rJDA4/ZTS/t+qCZGcs+88DOJKtM=;
- b=Dsyu8dRbkRv6Z6/o2I3QGG2JObWj+0cw1TybpS+MLUg6RIOpcIDTsmlQSBJO/CJN7y
- 9ftWu5Dzuj10ZSg3UdSQsbKaW4bk3mBL1Z7z5JM1+b5d216T3U4S08XBL3Z6eZzP7OxT
- Y4V9jcUAipheMj4zzF1pGr59G9yTVKuBiX+K6WqOTMN8A5G7elgLSvLotw3eXXECjWQk
- KZHOLAqRUmFJAN4KaX3/nMeOJghArqBWRx3ZArm3qqp5ioi9Vd9+/s7x06cQKtbk/+O6
- hpDW+/8hbD6V2HQeffJV6dor+M0/Go0epXYTcZx5i0MhORIG9c/iqvlWEXk7eW/+MzgX
- F+mA==
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6uS6z9ltovd2M87dnrmRh+Tl+Py8c4eKqotEugbW7ig=;
+ b=SQe76BW32PqffPtMMHxlDPAwVHQcoFXwRX9ym+A2TvPR7IGMQP488Rar3PaQ1eFYA5
+ RXTfn/B7Z4m+coVgX42ILeyZDfatW5tVJxkZYVq2nkb5A4d1H5pMBSYxrQ+2H/i6vXg+
+ 4by6VkOYPeYzr7WFPiB//x/haPBlBNmZm8xMuDqo5JqbJdPa+KasA10t/+p3GStT+rSw
+ RbvYmm4j0A9MsjpDFypGfAUBzJeiW1wCqEI0K4Kjdv3pK9+/qUR7auSRgfig7Y4w5MFi
+ gZiZL4gxtIcvkZXC398GZGP8NUpw97F/JPSjSTM2EGcrKLqEJCg0pzcE7ggrb8lj9Qb3
+ iQww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3ACUCJ4J4ZTgyEv5rJDA4/ZTS/t+qCZGcs+88DOJKtM=;
- b=BnOBjgnPWXtdgiO4G2HtwECSN6QI/KGNxHTyNHehz9k9ybey7E4Os61v5Cyx1XiCks
- log5Hd7o7jERN7Z5pjkT5cZ/h1fmochbYIz2TvR/Ty5hSy1Jy8BMFQUsk7eFVVwKFVdr
- fYPAS1q7ocMI3Ymts6dEaH775ZXj+B1OekmoTHpL77ErFADP1/rPuR0K3hE5LlSTR4nl
- cTX1TI1HB5Y27JQzUKLGnGuQWKdVbhCyMONna6eWCKFJYCcK5XHOba4/szMGFUkKDSxP
- uv18WXRohjjjNemEiP8DCJmb05RIx9aGGN5nG6UzLaM839+QlyKx1pZ2mMwa8ph34yjQ
- EQ8Q==
-X-Gm-Message-State: APjAAAWKAoukyFiUy1oowOX/AEypd9ekvnBSjujN4exn0j74ha1W3Ngi
- N66RAdigi6NrKzBzJe4SbuJ8uy/B1PXOYQ==
-X-Google-Smtp-Source: APXvYqydhDFvlAuN8tjcCAXDcft5Rq4xi8kNNkesauPrWp0qqnj2PX+0f2aZ9YkeJCo/GYBZQxxaiQ==
-X-Received: by 2002:adf:f046:: with SMTP id t6mr26164668wro.307.1564684222387; 
- Thu, 01 Aug 2019 11:30:22 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id e6sm71702104wrw.23.2019.08.01.11.30.21
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 01 Aug 2019 11:30:21 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Thu,  1 Aug 2019 19:30:12 +0100
-Message-Id: <20190801183012.17564-8-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190801183012.17564-1-peter.maydell@linaro.org>
-References: <20190801183012.17564-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6uS6z9ltovd2M87dnrmRh+Tl+Py8c4eKqotEugbW7ig=;
+ b=C3MYQRd6fL+sZw1iT0PirS4eLQlzLdjN1CXycvmzgazBIZV4DGpoZ/+OIxHUQmP+vj
+ Gcnya4g+6onztEowLn0jgyhkIFLLuzMUhEmhOq0uZan+QIXDQ76FzR2hyCROwdmeFtLM
+ k4TvWMWXKNN3IRH/m4v9Qjg0txOlitswcfNxuvhAperMJlgTfOzZEPA2ZjkudpMG+dqi
+ eL7EdLdTLoXYCdmsESaSodGeGmG4QdpuiYWrcHBmMQpoX3gzfdV2ykOPD7W4lnOQX0b9
+ ML2LAGxGVhq3aRUKBSDNeJvRlZndVCEIfgHUwKlFVCWu/0G6nSG+EIOhTRGrN2Wo7EAW
+ ym1A==
+X-Gm-Message-State: APjAAAX20n31c2BMHlWIEbUEpRJVxj3O2fFKM849iQhhrLIFdZYwYnLY
+ Y7GgcHqlwXVsrSz+pDSLG7EQSg==
+X-Google-Smtp-Source: APXvYqz9gLXr8JOHolfR9+Z+v5+m9fGXuBfRgt2lxBMxnT0zweHxTikFXTvtCbTp1bQ/HJyLMuuFVw==
+X-Received: by 2002:a17:90a:bc42:: with SMTP id
+ t2mr156235pjv.121.1564684664244; 
+ Thu, 01 Aug 2019 11:37:44 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id x26sm92220455pfq.69.2019.08.01.11.37.42
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 01 Aug 2019 11:37:43 -0700 (PDT)
+To: Aaron Lindsay OS <aaron@os.amperecomputing.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <20190731160719.11396-25-alex.bennee@linaro.org>
+ <20190801141431.GK5034@quinoa.localdomain>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <7d4d47c9-c1ac-5778-35a6-8aa3174a302a@linaro.org>
+Date: Thu, 1 Aug 2019 11:37:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190801141431.GK5034@quinoa.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: [Qemu-devel] [PATCH 7/7] target/sparc: Switch to
- do_transaction_failed() hook
+X-Received-From: 2607:f8b0:4864:20::543
+Subject: Re: [Qemu-devel] [PATCH v4 24/54] plugins: implement helpers for
+ resolving hwaddr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,90 +101,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "bobby.prani@gmail.com" <bobby.prani@gmail.com>,
+ "cota@braap.org" <cota@braap.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Switch the SPARC target from the old unassigned_access hook to the
-new do_transaction_failed hook.
+On 8/1/19 7:14 AM, Aaron Lindsay OS via Qemu-devel wrote:
+> On Jul 31 17:06, Alex Bennée wrote:
+>> We need to keep a local per-cpu copy of the data as other threads may
+>> be running. We use a automatically growing array and re-use the space
+>> for subsequent queries.
+> 
+> [...]
+> 
+>> +bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
+>> +                       bool is_store, struct qemu_plugin_hwaddr *data)
+>> +{
+>> +    CPUArchState *env = cpu->env_ptr;
+>> +    CPUTLBEntry *tlbe = tlb_entry(env, mmu_idx, addr);
+>> +    target_ulong tlb_addr = is_store ? tlb_addr_write(tlbe) : tlbe->addr_read;
+>> +
+>> +    if (tlb_hit(tlb_addr, addr)) {
+>> +        if (tlb_addr & TLB_MMIO) {
+>> +            data->hostaddr = 0;
+>> +            data->is_io = true;
+>> +            /* XXX: lookup device */
+>> +        } else {
+>> +            data->hostaddr = addr + tlbe->addend;
+>> +            data->is_io = false;
+>> +        }
+>> +        return true;
+>> +    }
+>> +    return false;
+>> +}
+> 
+> In what cases do you expect tlb_hit() should not evaluate to true here?
+> Will returns of false only be in error cases, or do you expect it can
+> occur during normal operation? In particular, I'm interested in ensuring
+> this is as reliable as possible, since some plugins may require physical
+> addresses.
 
-This will cause the "if transaction failed" code paths added in
-the previous commits to become active if the access is to an
-unassigned address. In particular we'll now handle bus errors
-during page table walks correctly (generating a translation
-error with the right kind of fault status).
+I have the same question.  Given the access has just succeeded, it would seem
+to be that the tlb entry *must* hit.  No victim tlb check or anything.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/sparc/cpu.h         |  8 +++++---
- target/sparc/cpu.c         |  2 +-
- target/sparc/ldst_helper.c | 16 ++++++++++++----
- 3 files changed, 18 insertions(+), 8 deletions(-)
 
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 8ed2250cd03..0bf365bed22 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -614,9 +614,11 @@ static inline int tlb_compare_context(const SparcTLBEntry *tlb,
- 
- /* cpu-exec.c */
- #if !defined(CONFIG_USER_ONLY)
--void sparc_cpu_unassigned_access(CPUState *cpu, hwaddr addr,
--                                 bool is_write, bool is_exec, int is_asi,
--                                 unsigned size);
-+void sparc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-+                                     vaddr addr, unsigned size,
-+                                     MMUAccessType access_type,
-+                                     int mmu_idx, MemTxAttrs attrs,
-+                                     MemTxResult response, uintptr_t retaddr);
- #if defined(TARGET_SPARC64)
- hwaddr cpu_get_phys_page_nofault(CPUSPARCState *env, target_ulong addr,
-                                            int mmu_idx);
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index ee60a5536a0..bc659295520 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -877,7 +877,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
-     cc->gdb_write_register = sparc_cpu_gdb_write_register;
-     cc->tlb_fill = sparc_cpu_tlb_fill;
- #ifndef CONFIG_USER_ONLY
--    cc->do_unassigned_access = sparc_cpu_unassigned_access;
-+    cc->do_transaction_failed = sparc_cpu_do_transaction_failed;
-     cc->do_unaligned_access = sparc_cpu_do_unaligned_access;
-     cc->get_phys_page_debug = sparc_cpu_get_phys_page_debug;
-     cc->vmsd = &vmstate_sparc_cpu;
-diff --git a/target/sparc/ldst_helper.c b/target/sparc/ldst_helper.c
-index 91cd0b593ef..7345827a966 100644
---- a/target/sparc/ldst_helper.c
-+++ b/target/sparc/ldst_helper.c
-@@ -1943,11 +1943,19 @@ void helper_st_asi(CPUSPARCState *env, target_ulong addr, target_ulong val,
- #endif /* TARGET_SPARC64 */
- 
- #if !defined(CONFIG_USER_ONLY)
--void sparc_cpu_unassigned_access(CPUState *cs, hwaddr addr,
--                                 bool is_write, bool is_exec, int is_asi,
--                                 unsigned size)
-+
-+void sparc_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
-+                                     vaddr addr, unsigned size,
-+                                     MMUAccessType access_type,
-+                                     int mmu_idx, MemTxAttrs attrs,
-+                                     MemTxResult response, uintptr_t retaddr)
- {
--    sparc_raise_mmu_fault(cs, addr, is_write, is_exec, is_asi, size, GETPC());
-+    bool is_write = access_type == MMU_DATA_STORE;
-+    bool is_exec = access_type == MMU_INST_FETCH;
-+    bool is_asi = false;
-+
-+    sparc_raise_mmu_fault(cs, physaddr, is_write, is_exec,
-+                          is_asi, size, retaddr);
- }
- #endif
- 
--- 
-2.20.1
-
+r~
 
