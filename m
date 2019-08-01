@@ -2,71 +2,59 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F74DC19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 16:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 749F1C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 16:52:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 328AF206B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 16:52:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 328AF206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cam.ac.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 496D7206B8
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 16:52:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496D7206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htEJr-0002Be-DM
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 12:52:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41066)
+	id 1htEJy-0002Ok-KA
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 12:52:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57698)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1htDCA-0004PI-Eu
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:40:48 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htEFa-0004vW-8y
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 12:48:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1htDC9-0006Kj-9L
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:40:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37904)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1htDC9-0006KO-20
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:40:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1htDC7-0005is-Is
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 15:40:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5129E2E80D3
- for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 15:40:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 01 Aug 2019 15:34:44 -0000
-From: Patrick Welche <prlw1@cam.ac.uk>
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htEFY-0006Bb-4w
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 12:48:22 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:35910 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1htEFX-00067h-1B
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 12:48:20 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 238591A2233;
+ Thu,  1 Aug 2019 18:48:15 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.13.43])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 092551A2264;
+ Thu,  1 Aug 2019 18:48:15 +0200 (CEST)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: prlw1
-X-Launchpad-Bug-Reporter: Patrick Welche (prlw1)
-X-Launchpad-Bug-Modifier: Patrick Welche (prlw1)
-Message-Id: <156467368424.6955.5535032657029646608.malonedeb@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19012";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: fa4b589dd496978aa4d0face770a5c23758e744c
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-X-Mailman-Approved-At: Thu, 01 Aug 2019 12:47:57 -0400
-Subject: [Qemu-devel] [Bug 1838658] [NEW] qemu 4.0.0 broken by glib update
+Date: Thu,  1 Aug 2019 18:45:18 +0200
+Message-Id: <1564677923-23173-8-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1564677923-23173-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1564677923-23173-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 89.216.37.149
+Subject: [Qemu-devel] [PATCH for 4.2 v5 07/12] target/mips: Style
+ improvements in cpu.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,64 +63,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838658 <1838658@bugs.launchpad.net>
+Cc: arikalo@wavecomp.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-In brief, an install CD will successfully boot with qemu 4.0.0 built with g=
-lib 2.58.3, but freeze during boot with qemu 4.0.0 built with glib 2.60.0. =
-I tracked it down to glib's GHashTable improvements. qemu is happy with a g=
-lib built from
-```
- git checkout -f 2.60.4
- git revert --no-edit 86c6f7e2b..3bed8a13b
- git revert --no-edit 75f8ec1df9b48b0c3a13a9125f2c7d7c5adf5159
- git revert --no-edit 603fb5958..d3074a748
- git revert --no-edit 0b45ddc55..0600dd322
-```
-When the GHashTable improvements were committed, there was already a preemp=
-tive note about any breakage being due to using private implementation deta=
-ils, hence mentioning it here rather than with glib.
+Fixes mostly errors and warings reported by 'checkpatch.pl -f'.
 
-For the full saga, see: http://gnats.netbsd.org/54310
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ target/mips/cpu.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 39eafaf..3ffa342 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -57,9 +57,11 @@ static bool mips_cpu_has_work(CPUState *cs)
+     CPUMIPSState *env = &cpu->env;
+     bool has_work = false;
+ 
+-    /* Prior to MIPS Release 6 it is implementation dependent if non-enabled
+-       interrupts wake-up the CPU, however most of the implementations only
+-       check for interrupts that can be taken. */
++    /*
++     * Prior to MIPS Release 6 it is implementation dependent if non-enabled
++     * interrupts wake-up the CPU, however most of the implementations only
++     * check for interrupts that can be taken.
++     */
+     if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+         cpu_mips_hw_interrupts_pending(env)) {
+         if (cpu_mips_hw_interrupts_enabled(env) ||
+@@ -70,8 +72,10 @@ static bool mips_cpu_has_work(CPUState *cs)
+ 
+     /* MIPS-MT has the ability to halt the CPU.  */
+     if (env->CP0_Config3 & (1 << CP0C3_MT)) {
+-        /* The QEMU model will issue an _WAKE request whenever the CPUs
+-           should be woken up.  */
++        /*
++         * The QEMU model will issue an _WAKE request whenever the CPUs
++         * should be woken up.
++         */
+         if (cs->interrupt_request & CPU_INTERRUPT_WAKE) {
+             has_work = true;
+         }
+@@ -112,7 +116,8 @@ static void mips_cpu_reset(CPUState *s)
+ #endif
+ }
+ 
+-static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info) {
++static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info)
++{
+     MIPSCPU *cpu = MIPS_CPU(s);
+     CPUMIPSState *env = &cpu->env;
+ 
+-- 
+2.7.4
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838658
-
-Title:
-  qemu 4.0.0 broken by glib update
-
-Status in QEMU:
-  New
-
-Bug description:
-  In brief, an install CD will successfully boot with qemu 4.0.0 built with=
- glib 2.58.3, but freeze during boot with qemu 4.0.0 built with glib 2.60.0=
-. I tracked it down to glib's GHashTable improvements. qemu is happy with a=
- glib built from
-  ```
-   git checkout -f 2.60.4
-   git revert --no-edit 86c6f7e2b..3bed8a13b
-   git revert --no-edit 75f8ec1df9b48b0c3a13a9125f2c7d7c5adf5159
-   git revert --no-edit 603fb5958..d3074a748
-   git revert --no-edit 0b45ddc55..0600dd322
-  ```
-  When the GHashTable improvements were committed, there was already a pree=
-mptive note about any breakage being due to using private implementation de=
-tails, hence mentioning it here rather than with glib.
-
-  For the full saga, see: http://gnats.netbsd.org/54310
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838658/+subscriptions
 
