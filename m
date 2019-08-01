@@ -2,117 +2,92 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C787C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:15:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4E1C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:17:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB46C20838
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:15:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7720920838
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:17:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=os.amperecomputing.com header.i=@os.amperecomputing.com header.b="VebUyt8H"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB46C20838
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hcDtWsy+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7720920838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htBrP-0005RY-7z
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 10:15:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52151)
+	id 1htBtD-0006lu-RC
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 10:17:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52473)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aaron@os.amperecomputing.com>) id 1htBqz-00050B-NS
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:14:50 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htBsp-0006Jw-JJ
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aaron@os.amperecomputing.com>) id 1htBqx-00043x-TD
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:14:49 -0400
-Received: from mail-eopbgr770099.outbound.protection.outlook.com
- ([40.107.77.99]:17739 helo=NAM02-SN1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aaron@os.amperecomputing.com>)
- id 1htBqx-00043N-Ja
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:14:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Wv/HxqHXEHtApBXi3BcXwGyKoDy3cUIISFWti5B4FG4TxjQuHiyXU7vCEt9/nIDeK7bxl832GBQGLtW1dmcplh/KoHRJZHec1Mc8yDZ/5o0AodTpcR7VWNMHyTfnXkTEHe/mCvLVfYd+mTZDY9kr35gKYCQoAIRRetIAMscK5z1e8cXjX3YXlT7JdOrA7/7orpv2zH45gPZcPTKq0w2v2VEqYsMutriU0cDUqTzpQFpbQK3Hx6l0RAYJFLCBatXGcCI6zD/GnIGdFYO8AXedja9uJ86rGP8xu6aYvr0Qv88+zOumDF2aHx41dH3X7JtamNNcLK87JJn3HGqBBVB5Jg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FTdqe4v4PRm9CUiYg/P30MYOUWMe5LX0z7lwMjYOWF8=;
- b=W4vfsWvhFn3gxoZboTw4jczv06MsxTnsspa6vCwsmmXNyKMG9TCjKoeH7MZnz/tmmsmNmHp648TRijQDqKcllnbPKLjTPxv3aDNyqBghutV3a+mhrVU2Kj/TSHJr3dUs6ZGGVsHU/tFd/W2eDtVlGRGTJ7u3Jiq/FbmPfmIllJJHD/VpV9+0G2XPuMVHV2MKd+4mPbAk8Z2VYL6Qx6lTsEKoLdciKcDp9YhYnB2M66l20GJB5AEQJI8DQ4s8AcIxMsQJMs7x3whPTNmwjrps8uFlBKHBraZ5ht57asL/5258BHCT6c68HfNx/9it9GOfnVrQYOKLPNe5Z0GPZlHM1A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=os.amperecomputing.com;dmarc=pass action=none
- header.from=os.amperecomputing.com;dkim=pass
- header.d=os.amperecomputing.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FTdqe4v4PRm9CUiYg/P30MYOUWMe5LX0z7lwMjYOWF8=;
- b=VebUyt8H1JMzIS3h0QI2rpA1wdFNwNt01+NTNDR/Ubi23htHDO5VbVjckRJCNDGv3Fz9GT514/YWSpMtboti43YTiMoprMyWh3hveg5qj4kAAWGanufVZLKvP/lHb/iHLSzebNYNCiszMDcalbt/SDd+UF0weJzdZ2Oe8dtOjds=
-Received: from DM6PR01MB4825.prod.exchangelabs.com (20.177.218.222) by
- DM6PR01MB4684.prod.exchangelabs.com (20.177.217.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.15; Thu, 1 Aug 2019 14:14:43 +0000
-Received: from DM6PR01MB4825.prod.exchangelabs.com
- ([fe80::4943:2b46:af24:e807]) by DM6PR01MB4825.prod.exchangelabs.com
- ([fe80::4943:2b46:af24:e807%7]) with mapi id 15.20.2136.010; Thu, 1 Aug 2019
- 14:14:43 +0000
-To: =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
-Thread-Topic: [PATCH  v4 24/54] plugins: implement helpers for resolving hwaddr
-Thread-Index: AQHVR7yN48iU1aXBCUeeGvORnrwZJabmV3UA
-Date: Thu, 1 Aug 2019 14:14:43 +0000
-Message-ID: <20190801141431.GK5034@quinoa.localdomain>
-References: <20190731160719.11396-1-alex.bennee@linaro.org>
- <20190731160719.11396-25-alex.bennee@linaro.org>
-In-Reply-To: <20190731160719.11396-25-alex.bennee@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: CY4PR06CA0037.namprd06.prod.outlook.com
- (2603:10b6:903:77::23) To DM6PR01MB4825.prod.exchangelabs.com
- (2603:10b6:5:6b::30)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=aaron@os.amperecomputing.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [108.169.132.82]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0a7cddbd-ed1f-4c8d-df5e-08d7168a99a7
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DM6PR01MB4684; 
-x-ms-traffictypediagnostic: DM6PR01MB4684:
-x-microsoft-antispam-prvs: <DM6PR01MB4684734D5416787189E011F38ADE0@DM6PR01MB4684.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01165471DB
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(366004)(136003)(39830400003)(396003)(346002)(376002)(189003)(199004)(66574012)(99286004)(6512007)(8676002)(68736007)(305945005)(71190400001)(76176011)(9686003)(52116002)(6436002)(1076003)(71200400001)(14454004)(53936002)(66476007)(316002)(8936002)(66446008)(66946007)(256004)(81156014)(66556008)(478600001)(6246003)(6916009)(64756008)(6116002)(3846002)(486006)(81166006)(54906003)(25786009)(33656002)(7736002)(6486002)(229853002)(186003)(66066001)(386003)(86362001)(446003)(26005)(476003)(102836004)(5660300002)(4326008)(11346002)(6506007)(2906002)(21314003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DM6PR01MB4684;
- H:DM6PR01MB4825.prod.exchangelabs.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:0; 
-received-spf: None (protection.outlook.com: os.amperecomputing.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: tUJlz6l/cjxpvAxUjtzcjBx0a1RUbVsuYY4tT+Cdkr1Oe82AivBkss5ezva2QEaMoUb4PlUAxyWDOfXoT8xGwSzB5w3Qs12n3gBUUr702Bru6dqKJXJjfzVG2MAc/dyxnEWfgo2UVItGECiVIsvJteTxqNDdZ5JmaWkNLLJG60OywEaCYM0Zi4wf0Xj0o0q4HDfvpFITA1Cb+xRbgyoG7KXbHFk9QxeudNj2GvRR/NENBwgOyNVuwdHNYmtUsgoDWjfbSkIzLR7yLc+3Xh+tUgtkgsLpNFfe29Su2XDTYYHmP/AFzFDpsj3yWyd1Vhxphi68ESwCXy2f6dNXQunwkl3dP/Th42K/TiodRxy1X25K3tfuh6O+GJsfFVae/ZMP7yJ6Xz/5oGbl3xGGngsiw9EshDqcmtFPwt4/hbx3YVQ=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <62A0768D712AE04F9E753EA8EAF0308D@prod.exchangelabs.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <richard.henderson@linaro.org>) id 1htBso-0005by-Mi
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:16:43 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35973)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1htBso-0005bS-Eh
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:16:42 -0400
+Received: by mail-pg1-x541.google.com with SMTP id l21so34290557pgm.3
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 07:16:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=nvgx3691qemUajFHkiros1xQZE99DVaku3/9F7Mq1Eg=;
+ b=hcDtWsy+JB25ZfK6dakt2CQy2GNILkBDz4fmKP4LltxsEyW9pQ5a9hNrQ5PtBcGDIO
+ 2wUROVHkmcmtbhYedipZmcm/gbWeBLUKNQ28L5sfvT85IG6Sv65gdsQedVYYmQrbSGO3
+ YyN8QSExx8a92X1XjYklzmOPaMLobwh53l+BzD+nRDZFQ9zB3UaYMic2xAe8szkBy0r+
+ ROsYu2ubXm/7ASwVVCg4qAjsVTMiE7DZL91QQpLfamkjMMSV/dJUP2a0jAbpvkbE/qMV
+ 99Qr2iVOM48ajS9Cg+omlXcRAlBNp9F55SyIHEsdj8S2xx++sVDOQxqmLtPkfxuwXIPj
+ EXUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nvgx3691qemUajFHkiros1xQZE99DVaku3/9F7Mq1Eg=;
+ b=fjHDMiq6CzIezlhW2MkBhEoG774wN+asME3nYIjaDo1jhs3o0vdECv4ceBBVsm8M71
+ azyEiehi/qE3QZgIm5zFsdRI9eoYBOoyGeFWEbhPs13z5XWqgyHo/mezMv4EUZS6NTnp
+ bE2xrxHkklg3Xg9xMl8N+oo/uUdvVygCpXiXBOECAkunWuH9QsbmjRbyGJL37+93PaEV
+ S8Eq/PJIDVdNN6I0j5LkIbTeL5gd5/m2JFqtR2qZVi23BHI+NBasbrSPccOPGxoK3NW2
+ i+up6dHb9mrOe51G61uvSecI5FzBo05DPIeNlY/gjVF5uVeSFA5yXDqSvrLs1qEr67MD
+ TUBw==
+X-Gm-Message-State: APjAAAXjky5vbzd3UexALOGZAHleQRY+tIII4ayGUXVBiolTyruR5aA1
+ nSPh9YD+1OCiTohx2tfF3ztKEw==
+X-Google-Smtp-Source: APXvYqxhZ2RDS8KaLywMCOz70goBxxWXc7usIn9leMztRuMga/Pw/j96VKF3/lXK/FqVM4plJ3YyRw==
+X-Received: by 2002:a63:4c46:: with SMTP id m6mr122823401pgl.59.1564669000973; 
+ Thu, 01 Aug 2019 07:16:40 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id u128sm81246813pfu.48.2019.08.01.07.16.39
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 01 Aug 2019 07:16:40 -0700 (PDT)
+To: Bin Meng <bmeng.cn@gmail.com>
+References: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
+ <581a0284-c658-265f-1b0f-6f4be5406cee@linaro.org>
+ <CAEUhbmVXC6GeHYFST514cLRJHQOo5ki=ZPG=OsLzV2YA0ChQgA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ac4453de-81cd-c32a-17f8-283fa3569ed0@linaro.org>
+Date: Thu, 1 Aug 2019 07:16:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a7cddbd-ed1f-4c8d-df5e-08d7168a99a7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2019 14:14:43.7366 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Aaron@os.amperecomputing.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4684
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.77.99
-Subject: Re: [Qemu-devel] [PATCH v4 24/54] plugins: implement helpers for
- resolving hwaddr
+In-Reply-To: <CAEUhbmVXC6GeHYFST514cLRJHQOo5ki=ZPG=OsLzV2YA0ChQgA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH] riscv: rv32: Root page table address can
+ be larger than 32-bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,82 +99,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-From: Aaron Lindsay OS via Qemu-devel <qemu-devel@nongnu.org>
-Reply-To: Aaron Lindsay OS <aaron@os.amperecomputing.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "bobby.prani@gmail.com" <bobby.prani@gmail.com>,
- "cota@braap.org" <cota@braap.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: QEMU riscv <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>, QEMU devel <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Jul 31 17:06, Alex Benn=E9e wrote:
-> We need to keep a local per-cpu copy of the data as other threads may
-> be running. We use a automatically growing array and re-use the space
-> for subsequent queries.
+On 7/31/19 6:53 PM, Bin Meng wrote:
+> I am not sure how (idx * ptesize) could overflow. It represents the
+> offset by a page table which is [0, 4096).
 
-[...]
+You're right, I mis-read what was going on there.
 
-> +bool tlb_plugin_lookup(CPUState *cpu, target_ulong addr, int mmu_idx,
-> +                       bool is_store, struct qemu_plugin_hwaddr *data)
-> +{
-> +    CPUArchState *env =3D cpu->env_ptr;
-> +    CPUTLBEntry *tlbe =3D tlb_entry(env, mmu_idx, addr);
-> +    target_ulong tlb_addr =3D is_store ? tlb_addr_write(tlbe) : tlbe->ad=
-dr_read;
-> +
-> +    if (tlb_hit(tlb_addr, addr)) {
-> +        if (tlb_addr & TLB_MMIO) {
-> +            data->hostaddr =3D 0;
-> +            data->is_io =3D true;
-> +            /* XXX: lookup device */
-> +        } else {
-> +            data->hostaddr =3D addr + tlbe->addend;
-> +            data->is_io =3D false;
-> +        }
-> +        return true;
-> +    }
-> +    return false;
-> +}
+However, lower down, "target_ulong ppn" needs to be promoted to hwaddr, so that
 
-In what cases do you expect tlb_hit() should not evaluate to true here?
-Will returns of false only be in error cases, or do you expect it can
-occur during normal operation? In particular, I'm interested in ensuring
-this is as reliable as possible, since some plugins may require physical
-addresses.
+    ppn = pte >> PTE_PPN_SHIFT;
+    ...
+    base = ppn << PGSHIFT;
 
-> +struct qemu_plugin_hwaddr *qemu_plugin_get_hwaddr(qemu_plugin_meminfo_t =
-info,
-> +                                                  uint64_t vaddr)
-> +{
-> +    CPUState *cpu =3D current_cpu;
-> +    unsigned int mmu_idx =3D info >> TRACE_MEM_MMU_SHIFT;
-> +    struct qemu_plugin_hwaddr *hwaddr;
-> +
-> +    /* Ensure we have memory allocated for this work */
-> +    if (!hwaddr_refs) {
-> +        hwaddr_refs =3D g_array_sized_new(false, true,
-> +                                        sizeof(struct qemu_plugin_hwaddr=
-),
-> +                                        cpu->cpu_index + 1);
-> +    } else if (cpu->cpu_index >=3D hwaddr_refs->len) {
-> +        hwaddr_refs =3D g_array_set_size(hwaddr_refs, cpu->cpu_index + 1=
-);
-> +    }
+does not overflow.  (Which is the part of the page table walk that I thought I
+had gleaned from the patch without actually reading the entire function.)
 
-Are there one or more race conditions with the allocations here? If so,
-could they be solved by doing the allocations at plugin initialization
-and when the number of online cpu's changes, instead of lazily?
 
->  uint64_t qemu_plugin_hwaddr_to_raddr(const struct qemu_plugin_hwaddr *ha=
-ddr)
-
-I was at first confused about the utility of this function until I
-(re-?)discovered you had to convert first to hwaddr and then raddr to
-get a "true" physical address. Perhaps that could be added to a comment
-here or in the API definition in the main plugin header file.
-
--Aaron
+r~
 
