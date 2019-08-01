@@ -2,75 +2,84 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF89C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:17:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23ACAC19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:24:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6125206B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:17:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6125206B8
+	by mail.kernel.org (Postfix) with ESMTPS id E63A720838
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 19:24:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E63A720838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htGZS-0005dt-2m
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 15:17:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42444)
+	id 1htGgO-000884-44
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 15:24:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43435)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1htGY5-0005As-W4
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:15:39 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1htGfP-0007i2-CT
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1htGY4-0005hU-JW
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:15:37 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:46042)
+ (envelope-from <pbonzini@redhat.com>) id 1htGfO-0007st-3l
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:23:11 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44316)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1htGY4-0005hB-Ep
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:15:36 -0400
-Received: by mail-qt1-f194.google.com with SMTP id x22so66494420qtp.12
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 12:15:35 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1htGfN-0007sS-U9
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 15:23:10 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p17so74740461wrf.11
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 12:23:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=CbHsRifZcP4KVzzUpZ4Tb5jMR01LF3DSH9W0kIoflvE=;
- b=JoRHnNp9slbPAMvNewarYGv7dICk3oGc7GqyFKu1P8cVykiFluz1zUrcRZkinTGlEw
- VXiH6FIT8pZ/Zxt2hi38aONgRiIo8AbXn9GbcTHdD+RklM/NiIZQhbSFa01zAtSP2Pfo
- Q7tSDZ0kD7UW5EronO9Ffd7IW94ZphVQ09C75SMB1NdyjFsWYNn/QVPUDcXqinsI7Rpd
- MNzJpinLXbIKzpMFeeBOTJzrcRVP2ZR20/khjwEyW2LiRV+frgw1kqEdJnEwxn7iSZ5P
- MNiRM5/RBOCvxDDNkIs8VbchgvkoyM8TfmRtYc7ipBxDpWqKjQ1A7Ern2UJqEABvYBvU
- SNTw==
-X-Gm-Message-State: APjAAAX8buMtG3T0OZJa7QexM5uZP62S5eLp4/aMaeehFNrylDlxrKlO
- WLgPiXrgeABTEuvxqng8Ne+rQA==
-X-Google-Smtp-Source: APXvYqzkSqxuM4WATxS9kS4yPG9LbfV3xiBgVmrnoIunfgFOA5RhGdGZ64LOiBEIljcsD+AsyyYifg==
-X-Received: by 2002:ac8:3233:: with SMTP id x48mr94258980qta.159.1564686935163; 
- Thu, 01 Aug 2019 12:15:35 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- z21sm28717857qto.48.2019.08.01.12.15.32
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 01 Aug 2019 12:15:34 -0700 (PDT)
-Date: Thu, 1 Aug 2019 15:15:29 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190801151258-mutt-send-email-mst@kernel.org>
-References: <1564644533-28850-1-git-send-email-ning.bo9@zte.com.cn>
- <87v9vgoqlr.fsf@dusky.pond.sub.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tKAihF9ty/d1LsfQLMNyWdhrrO/GJkEPkrfyO6OG5I4=;
+ b=mmKUvHwvw1lRQd0Mvi7mTTL1+ZkCpHaI8wcOjQyHqr06cVagBiazueia4QelAgOawx
+ Bo2jCAyvMdov+fQowdy7QCTqYbss/j9uNordzc7N70fA5qGSC9DkhI4gLTo/tX23wDvw
+ Qp21ahYrGorXt5E6axEDy9tAtKi9niw8V/VVrl3ir1MFQNe+olzfP+12tWruB44XBVQU
+ W9XYCRjB0pooeQtwmwAaKg7rMgtqBf6Fc7+CqbClOJYcYfY3A0nrGvqZV7dXS7k8fOEs
+ oWRo4bdY//BR3o1ms6j4e7NhT8Vj9gq/3PWBvYmQZyc47egkIqG1nt0JR7L+PqB0Xfff
+ 7LVw==
+X-Gm-Message-State: APjAAAUOVMfvTbMfrz+3iC8j+RZAjzU+9E1jc18B5Tvj6rjkHYOtTXzu
+ 3Uds98buM8X+fe6V8gmo6kDY0w==
+X-Google-Smtp-Source: APXvYqxxMNpyifXzRBXIO+keH9IewwBtCrwVIcVpLMM/NC5DjqSv819D/z+HICHO7VZ4jFRyphuUGQ==
+X-Received: by 2002:adf:aac8:: with SMTP id i8mr20623717wrc.56.1564687387523; 
+ Thu, 01 Aug 2019 12:23:07 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:91e7:65e:d8cd:fdb3?
+ ([2001:b07:6468:f312:91e7:65e:d8cd:fdb3])
+ by smtp.gmail.com with ESMTPSA id n9sm117824892wrp.54.2019.08.01.12.23.06
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 01 Aug 2019 12:23:06 -0700 (PDT)
+To: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>
+References: <20190726120542.9894-1-armbru@redhat.com>
+ <20190726120542.9894-24-armbru@redhat.com>
+ <20190729194414.GG4313@habkost.net> <87d0hreqh3.fsf_-_@dusky.pond.sub.org>
+ <8bea0201-f796-d682-22e6-069985b45523@redhat.com>
+ <0eb2518f-147c-2b47-f48c-3af26bf5d264@redhat.com>
+ <20190730210718.GU4313@habkost.net>
+ <e995c6d9-f63a-be72-7d15-ac59a343b487@redhat.com>
+ <20190801185043.GC20035@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <a8736545-74f6-4b2b-3f10-1ccc780a11fa@redhat.com>
+Date: Thu, 1 Aug 2019 21:23:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87v9vgoqlr.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190801185043.GC20035@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.160.194
-Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: report QMP event when set
- running
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [RFC] HACKING: Document 'struct' keyword usage
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,99 +91,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ning Bo <ning.bo9@zte.com.cn>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 01, 2019 at 05:25:04PM +0200, Markus Armbruster wrote:
-> Ning Bo <ning.bo9@zte.com.cn> writes:
+On 01/08/19 20:50, Eduardo Habkost wrote:
+> On Wed, Jul 31, 2019 at 10:35:31AM +0200, Thomas Huth wrote:
+>> On 30/07/2019 23.07, Eduardo Habkost wrote:
+>>> Sometimes we use the 'struct' keyword to help us reduce
+>>> dependencies between header files.  Document that practice.
+>>>
+>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>> ---
+>>> I wonder if this is too terse?  Should we give examples?
+>>> ---
+>>>  HACKING | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/HACKING b/HACKING
+>>> index 0fc3e0fc04..112685bdaf 100644
+>>> --- a/HACKING
+>>> +++ b/HACKING
+>>> @@ -101,6 +101,8 @@ it points to, or it is aliased to another pointer that is.
+>>>  
+>>>  2.3. Typedefs
+>>>  Typedefs are used to eliminate the redundant 'struct' keyword.
+>>> +However, the 'struct' keyword may be sometimes used in header
+>>> +files to avoid unnecessary dependencies between headers.
+>>
+>> See also the discussion earlier this year:
+>>
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg586180.html
 > 
-> > Report vsock running event so that the upper application can
-> > control boot sequence.
-> > see https://github.com/kata-containers/runtime/pull/1918
+> Nice, it adds even more information than this patch.
 > 
-> Please provide a more complete summary of the use case in the commit
-> message.  What exactly is the problem?  What is the proposed solution,
-> and how does it make use of the new event?
+> For reference, this is the patch at the URL above:
 > 
-> > Signed-off-by: Ning Bo <ning.bo9@zte.com.cn>
-
-
-Also it would seem that it should be possible to detect
-port listen state change just by trying to connect to it.
-Why isn't that an option?
-
-
-
-> > ---
-> >  hw/virtio/vhost-vsock.c |  3 +++
-> >  qapi/char.json          | 22 ++++++++++++++++++++++
-> >  2 files changed, 25 insertions(+)
-> >
-> > diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-> > index 0371493..a5920fd 100644
-> > --- a/hw/virtio/vhost-vsock.c
-> > +++ b/hw/virtio/vhost-vsock.c
-> > @@ -22,6 +22,7 @@
-> >  #include "qemu/iov.h"
-> >  #include "qemu/module.h"
-> >  #include "monitor/monitor.h"
-> > +#include "qapi/qapi-events-char.h"
-> >  
-> >  enum {
-> >      VHOST_VSOCK_SAVEVM_VERSION = 0,
-> > @@ -68,6 +69,8 @@ static int vhost_vsock_set_running(VHostVSock *vsock, int start)
-> >      if (ret < 0) {
-> >          return -errno;
-> >      }
-> > +    qapi_event_send_vsock_running(vsock->conf.guest_cid, start != 0);
-> > +
-> >      return 0;
-> >  }
-> >  
-> > diff --git a/qapi/char.json b/qapi/char.json
-> > index a6e81ac..7b746e3 100644
-> > --- a/qapi/char.json
-> > +++ b/qapi/char.json
-> > @@ -570,3 +570,25 @@
-> >  { 'event': 'VSERPORT_CHANGE',
-> >    'data': { 'id': 'str',
-> >              'open': 'bool' } }
-> > +
-> > +##
-> > +# @VSOCK_RUNNING:
-> > +#
-> > +# Emitted when the guest changes the vsock status.
-> > +#
-> > +# @cid: guest context ID
-> > +#
-> > +# @running: true if the vsock is running
-> > +#
-> > +# Since: v4.2
-> > +#
-> > +# Example:
-> > +#
-> > +# <- { "event": "VSOCK_RUNNING",
-> > +#      "data": { "cid": "123456", "running": true },
-> > +#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
-> > +#
-> > +##
-> > +{ 'event': 'VSOCK_RUNNING',
-> > +  'data': { 'cid': 'uint64',
-> > +            'running': 'bool' } }
+> -Typedefs are used to eliminate the redundant 'struct' keyword.
+> +Typedefs can be used to eliminate the redundant 'struct' keyword. This is
+> +especially helpful for common types that are used all over the place. Since
+> +certain C compilers choke on duplicated typedefs, you should avoid them and
+> +declare a typedef only in one header file. For common types, you can use
+> +"include/qemu/typedefs.h" for example. Note that it is also perfectly fine to
+> +use forward struct definitions without typedefs for references in headers
+> +to avoid the problem with duplicated typedefs.
 > 
-> Can you explain why you put this into char.json?
+> I don't agree with the first two sentences, and I agree with what Paolo said
+> here:
+>   https://www.mail-archive.com/qemu-devel@nongnu.org/msg586214.html
 > 
-> The event traces successful calls of vhost_vsock_set_running().  I have
-> no idea what vhost_vsock_set_running() does (pardon my ignorance).  Can
-> you point me to a specification?
+> ("I agree 100% with the wording after 'Since'.  However, I think the first
+> part should be made stronger, not weaker.")
 > 
-> Its @start parameter is int.  The event's @running is bool.  Zero gets
-> mapped to false, non-zero to true.  Are you sure all non-zero values are
-> equivalent, and will remain equivalent?
+> Paolo sent the following proposal:
+> 
+> | Typedefs are use to eliminate the redundant 'struct' keyword, since type
+> | names have a different style than other identifiers ("CamelCase" versus
+> | "snake_case").  Each struct should have a CamelCase name and a
+> | corresponding typedef.
+> | 
+> | Since certain C compilers choke on duplicated typedefs, you should avoid
+> | them and declare a typedef only in one header file.  For common types,
+> | you can use "include/qemu/typedefs.h" for example.  However, as a metter
+> | of convenience it is also perfectly fine to use forward struct
+> | definitions instead of typedefs in headers and function prototypes; this
+> | avoids problems with duplicated typedefs and reduces the need to include
+> | headers from other headers.
+> 
+> It seems perfect to me.
+> 
+> Paolo, do I have your signed-off-by to send that in a patch?
 
+Sure.
 
-Allowing guest to emit events at a high speed 
+Paolo
 
 
