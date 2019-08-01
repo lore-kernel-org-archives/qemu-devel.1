@@ -7,87 +7,88 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1C4C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 20:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC732C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 20:27:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43DF22080C
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 20:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94B4E206A2
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 20:27:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u7M39GvF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43DF22080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bUn6KRgU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94B4E206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htHcR-00069f-Gm
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 16:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56259)
+	id 1htHfJ-0007hZ-KY
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 16:27:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57458)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htHbd-0005S6-Dx
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 16:23:22 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htHe6-0007F4-Tv
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 16:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htHbZ-0003eB-GR
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 16:23:21 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43535)
+ (envelope-from <richard.henderson@linaro.org>) id 1htHds-000693-T3
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 16:25:44 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:34099)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htHbX-0003cj-Dj
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 16:23:17 -0400
-Received: by mail-pg1-x541.google.com with SMTP id r22so7210692pgk.10
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 13:23:12 -0700 (PDT)
+ id 1htHdo-00065e-U8
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 16:25:38 -0400
+Received: by mail-pf1-x442.google.com with SMTP id b13so34706556pfo.1
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 13:25:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6pI+YhFdbEDx7Sc31KYBH3UY1F3MlVfiLKxy7EZZ2dQ=;
- b=u7M39GvFeoOL74TAVkelw0Vm7WwzzzMiEeYzXZfcYAQ5FdBfIHbL+xj//2gIDENllM
- EhFk7P2MlmUlxVdxsJnBkmk2EcaLhrN3YxmYroRP87zzkEuRXLP1fboJu8rdHijjfGRr
- Ht+11saVdXOXxbBd1Ud6c/Rwr3mmSdC4j4aowf8hRjOxKFUjV+ueEaibr52WMkn1joDy
- Ned6J/lVIwQLI0MioFwn6B3Hyut+T/h2MDRTb48vUdFs1ZN+o+9Bmtl/e9wcdNt//lwg
- NkeJgr6v6qFyekZ5e/LUL9GVpkrRdNNV0yKIzbX1ZyK71uEqr/xgSoV1LHPlHSRlDuhB
- ORng==
+ bh=tdH3f1+wXtBougQVDrm8mP/yzoAdeXgP/sV8haVVlJM=;
+ b=bUn6KRgUfhPo7YHK0EQITboy5nO6qV6WMIrpdUCP3297cQd/uL96TfU+SGMhkwzcM8
+ 9Yw6qYimb1KEHadTMy/k6f006iH7BPRjYByCJ4bpKoPV1jIEd+n4xw2xiqUu7/kGNCmF
+ 1+rUaaV80z9i3kPeBsT0RbKcIo1dTMbE9xsYtuSvSK8XDUsg6HhD1D3GRc1ZFplBVjhY
+ 1sboVQ1s/N++o4gfNsnAPE63MPM24udcixNB91ZLXoOSzr6c7SbaGU0zSGpkSj8QF0pf
+ aliXf40AhlsIvI3relv7BqDoqm9PiPStQKK5zxIgxU4G4ez2ail7mxkvSUhu348nJzUG
+ 65zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=6pI+YhFdbEDx7Sc31KYBH3UY1F3MlVfiLKxy7EZZ2dQ=;
- b=kwJy7V1eZ6ZAwV4kkwoEtgLPZiwgNUnvXHrlGp8OG6hnwY4ZEF6esUgq7wdqAFXSSt
- J4X3g6IQiO6KVOgk9iTl52Bt7Gs8FV99S/2VwtwuzhQSmz6+NNLUUUOmoHe0ZTkpmgpk
- 8MytFKNLPA1TWJ9p37GNi7pUhYPeJVS4gJ4tn3T5PDQ1ty3wqMIN140bakuTmHe39JlB
- K/5qajD751hXUGb09vomVzSlor8Lv8quyqyKahmr2SemMvX2uWCMkh6sxPUz81DNUM7p
- bJBlGtOkeJ7ifsSipHww2TBd1CvkSshrGQxbWAW+Mu6WF3tLlpHH69rmHcIk5UODDdl6
- QQEQ==
-X-Gm-Message-State: APjAAAUL+ViV4Tqe3nh9pQXLSacTgqb8iwji8AIqtkA4BzBAl9YOg5Gz
- hCi0yxkjKo9gJvwDcbdHhT5avQ==
-X-Google-Smtp-Source: APXvYqwuM5K6xmQvXoN7xvWobMHOYpiiaHaMWLKkA6qZNrs2ycunBdWWxeUAHuDJV8IIRMo+SiB+Hw==
-X-Received: by 2002:a62:e515:: with SMTP id n21mr56210968pff.186.1564690991239; 
- Thu, 01 Aug 2019 13:23:11 -0700 (PDT)
+ bh=tdH3f1+wXtBougQVDrm8mP/yzoAdeXgP/sV8haVVlJM=;
+ b=C9VvM5feH+KqfKFMY2Zk6y1teLoQ5c9Q/UVQJjukxn+vw6PmexuMmJNMoDSXAy+NFv
+ lJhSvGHpAUCssEqmKdvNFZnwGDPB8nXoxMkpbwgmuWeW82SgNoxxtJsfg0gMI+1ECz/U
+ unwihoE0Tt9GZAkxBYtAILVtFt7tkbqmTf78u7HkCDNLCgU8rfZRJCOguvEU+u6/YVnP
+ 6pLZ5WOSt3WSq6dUtYNG+NhVn3pDKPNxx6gO3u2Ek7/fWhVTkMFlI0AQwtG1kEuCHGof
+ CSAOTbN5ImrebwK1+hg6f1oTeikAIeArmqOeGDa4tbsRB9D2x8cOHE4vf2Eft8BS8sOc
+ splg==
+X-Gm-Message-State: APjAAAXVe/kChG6m1ua3PWQWqNcRq8LkSKpVcbfI2crutDu8lAYocX4A
+ 8XY/VjDmW72sDzsTnPAjyygp7g==
+X-Google-Smtp-Source: APXvYqxSvtMl56z3IyItdE3SqtcMn8aX5DizdpANF2xCjKLraBpFKXMP1cTxgaPVzIQPk5vVlGq7vQ==
+X-Received: by 2002:a63:6686:: with SMTP id
+ a128mr112675722pgc.361.1564691133811; 
+ Thu, 01 Aug 2019 13:25:33 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z63sm46166822pfb.98.2019.08.01.13.23.10
+ by smtp.gmail.com with ESMTPSA id a6sm72128170pfa.162.2019.08.01.13.25.32
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 01 Aug 2019 13:23:10 -0700 (PDT)
+ Thu, 01 Aug 2019 13:25:33 -0700 (PDT)
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 References: <20190801183012.17564-1-peter.maydell@linaro.org>
- <20190801183012.17564-4-peter.maydell@linaro.org>
+ <20190801183012.17564-5-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <8751735a-3827-c613-9a96-46058044d86d@linaro.org>
-Date: Thu, 1 Aug 2019 13:23:08 -0700
+Message-ID: <e13f1849-39e3-283d-1d7b-01959b9d0ff6@linaro.org>
+Date: Thu, 1 Aug 2019 13:25:31 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190801183012.17564-4-peter.maydell@linaro.org>
+In-Reply-To: <20190801183012.17564-5-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH 3/7] target/sparc: Check for transaction
- failures in MXCC stream ASI accesses
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH 4/7] target/sparc: Correctly handle bus
+ errors in page table walks
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,29 +107,23 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/1/19 11:30 AM, Peter Maydell wrote:
-> Currently the ld/st_asi helper functions make calls to the
-> ld*_phys() and st*_phys() functions for those ASIs which
-> imply direct accesses to physical addresses. These implicitly
-> rely on the unassigned_access hook to cause them to generate
-> an MMU fault if the access fails.
+> Currently we use the ldl_phys() function to read page table entries.
+> With the unassigned_access hook in place, if these hit an unassigned
+> area of memory then the hook will cause us to wrongly generate
+> an exception with a fault address matching the address of the
+> page table entry.
 > 
-> Switch to using the address_space_* functions instead, which
-> return a MemTxResult that we can check. This means that when
-> we switch SPARC over to using the do_transaction_failed hook
-> we'll still get the same MMU faults we did before.
+> Change to using address_space_ldl() so we can detect and correctly
+> handle bus errors and give them their correct behaviour of
+> causing a translation error with a suitable fault status register.
 > 
-> This commit converts the ASIs which do MXCC stream source
-> and destination accesses.
-> 
-> It's not clear to me whether raising an MMU fault like this
-> is the correct behaviour if we encounter a bus error, but
-> we retain the same behaviour that the old unassigned_access
-> hook would implement.
+> Note that this won't actually take effect until we switch the
+> over to using the do_translation_failed hook.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/sparc/ldst_helper.c | 57 +++++++++++++++++++++++++-------------
->  1 file changed, 37 insertions(+), 20 deletions(-)
+>  target/sparc/mmu_helper.c | 24 ++++++++++++++++++++----
+>  1 file changed, 20 insertions(+), 4 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
