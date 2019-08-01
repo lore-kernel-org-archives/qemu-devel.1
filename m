@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF5AC41514
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDB9C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:29:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C480420665
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:27:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C480420665
+	by mail.kernel.org (Postfix) with ESMTPS id 8F7BD20665
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:29:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7BD20665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htABa-0001Ni-2l
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:27:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45213)
+	id 1htACj-0002b1-Rw
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:29:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44923)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA7D-0001K4-KI
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:28 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA6a-0000ru-Ry
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA7B-0002lb-VT
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:27 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50315 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA6Y-0002JJ-R4
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:22:48 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:48399 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1htA7B-0002iw-Lt
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:25 -0400
+ id 1htA6Y-0002HW-JJ
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:22:46 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id E91B81A215B;
- Thu,  1 Aug 2019 14:23:20 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 9B4381A2258;
+ Thu,  1 Aug 2019 14:22:32 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id CFE6B1A20CF;
- Thu,  1 Aug 2019 14:23:20 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 745FE1A21E1;
+ Thu,  1 Aug 2019 14:22:32 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  1 Aug 2019 14:21:11 +0200
-Message-Id: <1564662076-17964-11-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  1 Aug 2019 14:21:06 +0200
+Message-Id: <1564662076-17964-6-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564662076-17964-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564662076-17964-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v5 10/15] linux-user: Add support for
- HDIO_GET_BUSSTATE and HDIO_SET_BUSSTATE ioctls
+Subject: [Qemu-devel] [PATCH for 4.2 v5 05/15] linux-user: Add support for
+ FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,54 +70,83 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add support for HDIO_GET_BUSSTATE and HDIO_SET_BUSSTATE ioctls.
+FDSETEMSGTRESH, FDSETMAXERRS, and FDGETMAXERRS ioctls are commands
+for controlling error reporting of a floppy drive.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/ioctls.h        |  2 ++
+ linux-user/syscall_defs.h  | 19 +++++++++++++++++++
+ linux-user/syscall_types.h |  7 +++++++
+ 3 files changed, 28 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index b9c6a5a..3796ee6 100644
+index e393ad6..6551938 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -438,6 +438,7 @@
-   IOCTL(HDIO_GET_WCACHE, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(HDIO_GET_ACOUSTIC, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(HDIO_GET_ADDRESS, IOC_R, MK_PTR(TYPE_INT))
-+  IOCTL(HDIO_GET_BUSSTATE, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(HDIO_DRIVE_CMD, IOC_R, MK_PTR(TYPE_INT))
-   IOCTL(HDIO_SET_UNMASKINTR, 0, TYPE_INT)
-   IOCTL(HDIO_SET_MULTCOUNT, 0, TYPE_INT)
-@@ -449,6 +450,7 @@
-   IOCTL(HDIO_SET_NICE, 0, TYPE_INT)
-   IOCTL(HDIO_SET_WCACHE, 0, TYPE_INT)
-   IOCTL(HDIO_SET_ACOUSTIC, 0, TYPE_INT)
-+  IOCTL(HDIO_SET_BUSSTATE, 0, TYPE_INT)
-   IOCTL(HDIO_SET_ADDRESS, 0, TYPE_INT)
- 
-   IOCTL(VFAT_IOCTL_READDIR_BOTH, IOC_R, MK_PTR(MK_ARRAY(MK_STRUCT(STRUCT_dirent), 2)))
+@@ -118,6 +118,8 @@
+      IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
+      IOCTL(FDFMTEND, 0, TYPE_NULL)
+      IOCTL(FDFLUSH, 0, TYPE_NULL)
++     IOCTL(FDSETMAXERRS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
++     IOCTL(FDGETMAXERRS, IOC_R, MK_PTR(MK_STRUCT(STRUCT_floppy_max_errors)))
+      IOCTL(FDRESET, 0, TYPE_NULL)
+      IOCTL(FDRAWCMD, 0, TYPE_NULL)
+      IOCTL(FDTWADDLE, 0, TYPE_NULL)
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index aa9c6af..766d7b9 100644
+index 1ca115d..36256b0 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -1069,6 +1069,7 @@ struct target_format_descr {
- #define TARGET_HDIO_GET_WCACHE        0x030e  /* get write cache mode on|off */
- #define TARGET_HDIO_GET_ACOUSTIC      0x030f  /* get acoustic value */
- #define TARGET_HDIO_GET_ADDRESS       0x0310  /* get lba addressing modes */
-+#define TARGET_HDIO_GET_BUSSTATE      0x031a  /* get hwif bus state */
- #define TARGET_HDIO_DRIVE_CMD         0x031f  /* execute a special drive command */
+@@ -885,12 +885,31 @@ struct target_pollfd {
  
- /* hd/ide ctl's that pass (arg) non-ptr values are numbered 0x032n/0x033n */
-@@ -1082,6 +1083,7 @@ struct target_format_descr {
- #define TARGET_HDIO_SET_NICE          0x0329  /* set nice flags */
- #define TARGET_HDIO_SET_WCACHE        0x032b  /* change write cache mode */
- #define TARGET_HDIO_SET_ACOUSTIC      0x032c  /* change acoustic behavior */
-+#define TARGET_HDIO_SET_BUSSTATE      0x032d  /* set hwif bus state */
- #define TARGET_HDIO_SET_ADDRESS       0x032f  /* change lba addressing modes */
+ /* From <linux/fd.h> */
  
- /* loop ioctls */
++struct target_floppy_max_errors {
++    abi_uint        abort;
++    abi_uint        read_track;
++    abi_uint        reset;
++    abi_uint        recal;
++    abi_uint        reporting;
++};
++
++struct target_format_descr {
++    abi_uint        device;
++    abi_uint        head;
++    abi_uint        track;
++};
++
+ #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
+ #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
+ #define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
+ #define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct target_format_descr)
+ #define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
++#define TARGET_FDSETEMSGTRESH TARGET_IO(2, 0x4a)
+ #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
++#define TARGET_FDSETMAXERRS  TARGET_IOW(2, 0x4c,                               \
++                                        struct target_floppy_max_errors)
++#define TARGET_FDGETMAXERRS  TARGET_IOR(2, 0x0e,                               \
++                                        struct target_floppy_max_errors)
+ #define TARGET_FDRESET        TARGET_IO(2, 0x54)
+ #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
+ #define TARGET_FDTWADDLE      TARGET_IO(2, 0x59)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index d82d1a5..5ba7c34 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -261,6 +261,13 @@ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* datalen */
+        TYPE_PTRVOID) /* data */
+ 
++STRUCT(floppy_max_errors,
++       TYPE_INT,     /* abort */
++       TYPE_INT,     /* read_track */
++       TYPE_INT,     /* reset */
++       TYPE_INT,     /* recal */
++       TYPE_INT)     /* reporting */
++
+ STRUCT(format_descr,
+        TYPE_INT,     /* device */
+        TYPE_INT,     /* head */
 -- 
 2.7.4
 
