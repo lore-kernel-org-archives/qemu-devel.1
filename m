@@ -2,59 +2,58 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DBAC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 17:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60ED4C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 17:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3809F206A2
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 17:42:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3809F206A2
+	by mail.kernel.org (Postfix) with ESMTPS id 354DB206A2
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 17:43:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 354DB206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htF6P-0004HQ-KR
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 13:42:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49426)
+	id 1htF6S-0004Kv-Dk
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 13:43:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49409)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1htF3F-0002J4-1C
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 13:39:44 -0400
+ (envelope-from <mreitz@redhat.com>) id 1htF35-0002Ib-Hi
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 13:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1htF35-0005Mi-NW
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 13:39:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60722)
+ (envelope-from <mreitz@redhat.com>) id 1htF2s-0005Gt-Fb
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 13:39:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40852)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1htF2l-0005A4-7t; Thu, 01 Aug 2019 13:39:11 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1htF2i-00054F-Kg; Thu, 01 Aug 2019 13:39:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B61468D3B2;
- Thu,  1 Aug 2019 17:39:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 15B7268D57;
+ Thu,  1 Aug 2019 17:39:05 +0000 (UTC)
 Received: from localhost (ovpn-204-187.brq.redhat.com [10.40.204.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E721F600C6;
- Thu,  1 Aug 2019 17:39:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58A741001281;
+ Thu,  1 Aug 2019 17:39:02 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Thu,  1 Aug 2019 19:38:59 +0200
-Message-Id: <20190801173900.23851-2-mreitz@redhat.com>
-In-Reply-To: <20190801173900.23851-1-mreitz@redhat.com>
-References: <20190801173900.23851-1-mreitz@redhat.com>
+Date: Thu,  1 Aug 2019 19:38:58 +0200
+Message-Id: <20190801173900.23851-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 01 Aug 2019 17:39:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 01 Aug 2019 17:39:05 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 for-4.1 1/2] backup: Copy only dirty areas
+Subject: [Qemu-devel] [PATCH v2 for-4.1 0/2] backup: Copy only dirty areas
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,67 +73,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The backup job must only copy areas that the copy_bitmap reports as
-dirty.  This is always the case when using traditional non-offloading
-backup, because it copies each cluster separately.  When offloading the
-copy operation, we sometimes copy more than one cluster at a time, but
-we only check whether the first one is dirty.
+Hi,
 
-Therefore, whenever copy offloading is possible, the backup job
-currently produces wrong output when the guest writes to an area of
-which an inner part has already been backed up, because that inner part
-will be re-copied.
+In a discussion with Vladimir today, we noticed that the backup job
+currently is pretty broken when using copy offloading.  I don=E2=80=99t k=
+now
+about you, but my local filesystem (XFS) supports copy offloading, so
+the job uses it automatically.  That means, that backup is broken and
+has been broken for a year on my local FS.
 
-Fixes: 9ded4a0114968e98b41494fc035ba14f84cdf700
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/backup.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+The last working version was 2.12, so this isn=E2=80=99t a regression in =
+4.1.
+We could thus justify moving it to 4.2.  But I think this should really
+go into 4.1, because this is not really an edge case and as far as I
+know users cannot do anything to prevent the backup job from performing
+copy offloading if the system and all involved block drivers support it.
+I just wonder why nobody has noticed...
 
-diff --git a/block/backup.c b/block/backup.c
-index 715e1d3be8..1ee271f9f1 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -202,22 +202,31 @@ static int coroutine_fn backup_do_cow(BackupBlockJo=
-b *job,
-     cow_request_begin(&cow_request, job, start, end);
-=20
-     while (start < end) {
-+        int64_t dirty_end;
-+
-         if (!hbitmap_get(job->copy_bitmap, start)) {
-             trace_backup_do_cow_skip(job, start);
-             start +=3D job->cluster_size;
-             continue; /* already copied */
-         }
-=20
-+        dirty_end =3D hbitmap_next_zero(job->copy_bitmap, start, (end - =
-start));
-+        if (dirty_end < 0) {
-+            dirty_end =3D end;
-+        }
-+
-         trace_backup_do_cow_process(job, start);
-=20
-         if (job->use_copy_range) {
--            ret =3D backup_cow_with_offload(job, start, end, is_write_no=
-tifier);
-+            ret =3D backup_cow_with_offload(job, start, dirty_end,
-+                                          is_write_notifier);
-             if (ret < 0) {
-                 job->use_copy_range =3D false;
-             }
-         }
-         if (!job->use_copy_range) {
--            ret =3D backup_cow_with_bounce_buffer(job, start, end, is_wr=
-ite_notifier,
-+            ret =3D backup_cow_with_bounce_buffer(job, start, dirty_end,
-+                                                is_write_notifier,
-                                                 error_is_read, &bounce_b=
-uffer);
-         }
-         if (ret < 0) {
+
+v2:
+- Test case: Use auto-dismiss=3DFalse for the backup jobs and explicitly
+  dismiss them, so we know for sure that the reference and destination
+  images are no longer in use by qemu by the time we want to compare
+  them (reported by Vladimir)
+
+
+git-backport-diff against v1:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/2:[----] [--] 'backup: Copy only dirty areas'
+002/2:[0009] [FC] 'iotests: Test backup job with two guest writes'
+
+
+Max Reitz (2):
+  backup: Copy only dirty areas
+  iotests: Test backup job with two guest writes
+
+ block/backup.c             | 13 +++++++++++--
+ tests/qemu-iotests/056     | 39 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/056.out |  4 ++--
+ 3 files changed, 52 insertions(+), 4 deletions(-)
+
 --=20
 2.21.0
 
