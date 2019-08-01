@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A6AC19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F9F0C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:30:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB00620665
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:30:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB00620665
+	by mail.kernel.org (Postfix) with ESMTPS id E85DA20665
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:30:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85DA20665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htADY-00045o-7m
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:30:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45316)
+	id 1htAE8-0004q7-6k
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:30:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45253)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA7P-0001T7-WB
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:40 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA7I-0001Rl-2O
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA7M-0002tV-Pw
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:38 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:50846 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htA7E-0002nn-Es
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:30 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:47344 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1htA7J-0002qG-Gh
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:34 -0400
+ id 1htA7D-0001ye-KH
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 08:23:27 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 58D4A1A215B;
- Thu,  1 Aug 2019 14:23:31 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id F34A91A216D;
+ Thu,  1 Aug 2019 14:22:24 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 3F7BE1A20CF;
- Thu,  1 Aug 2019 14:23:31 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id D410F1A216C;
+ Thu,  1 Aug 2019 14:22:24 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  1 Aug 2019 14:21:12 +0200
-Message-Id: <1564662076-17964-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Thu,  1 Aug 2019 14:21:05 +0200
+Message-Id: <1564662076-17964-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564662076-17964-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564662076-17964-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v5 11/15] linux-user: Add support for
- KDGKBMETA and KDSKBMETA ioctls
+Subject: [Qemu-devel] [PATCH for 4.2 v5 04/15] linux-user: Add support for
+ FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,40 +70,60 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Add support for KDGKBMETA and KDSKBMETA ioctls.
+FDFMTBEG, FDFMTTRK, and FDFMTEND ioctls provide means for controlling
+formatting of a floppy drive.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- linux-user/ioctls.h       | 2 ++
- linux-user/syscall_defs.h | 2 ++
- 2 files changed, 4 insertions(+)
+ linux-user/ioctls.h        | 3 +++
+ linux-user/syscall_defs.h  | 3 +++
+ linux-user/syscall_types.h | 5 +++++
+ 3 files changed, 11 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 3796ee6..2100cf4 100644
+index ab4ef2e..e393ad6 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -63,6 +63,8 @@
-      IOCTL(KDSKBMODE, 0, TYPE_INT)
-      IOCTL(KDGKBENT, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_kbentry)))
-      IOCTL(KDGKBSENT, IOC_RW, MK_PTR(MK_STRUCT(STRUCT_kbsentry)))
-+     IOCTL(KDGKBMETA, IOC_R, MK_PTR(TYPE_INT))
-+     IOCTL(KDSKBMETA, IOC_W, TYPE_INT)
-      IOCTL(KDGKBLED, 0, TYPE_INT)
-      IOCTL(KDSKBLED, 0, TYPE_INT)
-      IOCTL(KDGETLED, 0, TYPE_INT)
+@@ -114,6 +114,9 @@
+ 
+      IOCTL(FDMSGON, 0, TYPE_NULL)
+      IOCTL(FDMSGOFF, 0, TYPE_NULL)
++     IOCTL(FDFMTBEG, 0, TYPE_NULL)
++     IOCTL(FDFMTTRK, IOC_W, MK_PTR(MK_STRUCT(STRUCT_format_descr)))
++     IOCTL(FDFMTEND, 0, TYPE_NULL)
+      IOCTL(FDFLUSH, 0, TYPE_NULL)
+      IOCTL(FDRESET, 0, TYPE_NULL)
+      IOCTL(FDRAWCMD, 0, TYPE_NULL)
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 766d7b9..50fc44f 100644
+index 4185391..1ca115d 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -750,6 +750,8 @@ struct target_pollfd {
- #define TARGET_KDSKBMODE       0x4b45
- #define TARGET_KDGKBENT	       0x4B46	/* gets one entry in translation table */
- #define TARGET_KDGKBSENT       0x4B48	/* gets one function key string entry */
-+#define TARGET_KDGKBMETA       0x4B62   /* gets meta key handling mode */
-+#define TARGET_KDSKBMETA       0x4B63   /* sets meta key handling mode */
- #define TARGET_KDGKBLED        0x4B64	/* get led flags (not lights) */
- #define TARGET_KDSKBLED        0x4B65	/* set led flags (not lights) */
- #define TARGET_KDGETLED        0x4B31	/* return current led state */
+@@ -887,6 +887,9 @@ struct target_pollfd {
+ 
+ #define TARGET_FDMSGON        TARGET_IO(2, 0x45)
+ #define TARGET_FDMSGOFF       TARGET_IO(2, 0x46)
++#define TARGET_FDFMTBEG       TARGET_IO(2, 0x47)
++#define TARGET_FDFMTTRK      TARGET_IOW(2, 0x48, struct target_format_descr)
++#define TARGET_FDFMTEND       TARGET_IO(2, 0x49)
+ #define TARGET_FDFLUSH        TARGET_IO(2, 0x4b)
+ #define TARGET_FDRESET        TARGET_IO(2, 0x54)
+ #define TARGET_FDRAWCMD       TARGET_IO(2, 0x58)
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 4e36983..d82d1a5 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -261,6 +261,11 @@ STRUCT(blkpg_ioctl_arg,
+        TYPE_INT, /* datalen */
+        TYPE_PTRVOID) /* data */
+ 
++STRUCT(format_descr,
++       TYPE_INT,     /* device */
++       TYPE_INT,     /* head */
++       TYPE_INT)     /* track */
++
+ #if defined(CONFIG_USBFS)
+ /* usb device ioctls */
+ STRUCT(usbdevfs_ctrltransfer,
 -- 
 2.7.4
 
