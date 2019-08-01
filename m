@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5575C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9EBC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9067B206A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:48:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A70FB206A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uXTtlLmy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9067B206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gv1XNJJG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A70FB206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htKoA-0000eZ-T6
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 19:48:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60875)
+	id 1htKoF-0000nF-W1
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 19:48:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60941)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1htKiI-0007Fc-2S
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:42:27 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1htKiJ-0007Ip-FU
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1htKiF-0003Qe-TE
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:42:25 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:34290)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1htKiI-0003TE-86
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:42:27 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40475)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1htKiF-0003Nb-80; Thu, 01 Aug 2019 19:42:23 -0400
-Received: by mail-pg1-x541.google.com with SMTP id n9so28827867pgc.1;
- Thu, 01 Aug 2019 16:42:18 -0700 (PDT)
+ id 1htKiH-0003RS-7a; Thu, 01 Aug 2019 19:42:25 -0400
+Received: by mail-pg1-x541.google.com with SMTP id w10so35054851pgj.7;
+ Thu, 01 Aug 2019 16:42:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ipr3iNyxvPc1pw+FEpkLWVBnB0CK9mROZwdZiLP7cbc=;
- b=uXTtlLmyGtz4fEhRzAS/eMc/qy91v4szRv/kL3zIGmtRzUbQP5zRAn2IDQdZC6j+2R
- wlb+/cE6XICk3UgTU5HSWCzaKtHtUIgs9gIISKqxyC5gQ+RgXUcHk0Ddz+ATKuRL27tT
- ofEs+F62yqBccHr1qn40g6Yd6Fm8xZkLOqoqiUkL0++jquiwhwCjlHaYT1pwS34A3A3Z
- nGRRWx+fvyElReTzBCIGoCvDwbgn05nrRy7sJf6165Juaa31W09DIbR5XlqvlsErb9p/
- mAHj/zNSpWgZdvnGzyeev/fj/kyxctZ7Ip037bxucSEFw5uM00sXTh9wmIw2KKy0CH4v
- Pj0A==
+ bh=WeED2N/xrRXHqk+R3uuiNy7p3rAfCPFvDRDie7m+ELM=;
+ b=Gv1XNJJG/aZKueZZZhyqU5J46YtC6MD5SEFlMYE4DFd0rlb8pXf7Md7DTNYi9NOXar
+ OcpY6Km/MfzWUSLdKtiZSjyQ+66sZqQIk2+EqK2zJTU54RIHtWTW/1Vy0UJ+WTvzfnyb
+ Q0TRKkA2SaULN+EkwLPf49Q00eru4YfeAUpLYXtkY76cy9HcpvVOtp+isTmOWiqcSfIl
+ eNhtwjwdL7swXPiJh0SQQevSN+Abzn7hMlvMq8cBDimiCeicl+VI/UEERcgrtKvag64Q
+ IRVp5aRvSyeaTFvP2OEZGRantmC/BZ0VMUe2YZSef9dukNYNt4lFEHflnrUnr/RN89uG
+ s/vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=ipr3iNyxvPc1pw+FEpkLWVBnB0CK9mROZwdZiLP7cbc=;
- b=LhAzsvgxeEPIKjUz+y1bsvigEhLbBflLMUrvZZcSitsE9ANsX5iWftRbbqYfuQQSVC
- Ln45ZKL4XkLrcZHn/zjB2LxH9s73lSClxdjFGQfIUalg0WuvWT2YNnqVJsOI51by2z64
- W4c181NZwAtzcxMNbcFXwncTe06DZHmOYwtXvPcZxiZN25KYfmROt7zBlu/FUWIg8aHd
- Gi8aUFT75Mynlpgn05lnNqJUiM59Uyp4ZInTeMpCw6GbrZXE+nsysy1GlT4Z0jqVuygc
- edoW2kjZrXxPnIrSsfD7LJkI1xDkenOk0DowRcL5wjbxxfJVNI5HWyfCKi7plPCJfNU8
- nN0w==
-X-Gm-Message-State: APjAAAVDLpXOWHj1stCDB90dfmCgKudAuEjXOvgxSARCYxnw7S/tR3tW
- gI7WynrET+AgFWnA9e/DU/TdRodGOnQAUQ==
-X-Google-Smtp-Source: APXvYqwyGgFMmkRY/U1ruYLuWPo7DAdILhS2Odyq/LqYjxPf5K7wJ9niiU4ZxWBFLSK20+WSy+xnBg==
-X-Received: by 2002:a65:64c4:: with SMTP id t4mr82477311pgv.298.1564702937553; 
- Thu, 01 Aug 2019 16:42:17 -0700 (PDT)
+ bh=WeED2N/xrRXHqk+R3uuiNy7p3rAfCPFvDRDie7m+ELM=;
+ b=k8ZMENjua+LwtxEswkmrdGirUMTV0dt2TXtS0zfxmR7+tKvrfs22DazhSz2C36R6Qb
+ uNTq/FXixzfbgc/nSnloYii8y0RKmGQOHWH1HjmRMm1e8nVNQKqgHrBFuMDytv4lXJoU
+ l3qmvqLWDm0KVfyTDfIa1uVdhYEp8RwCcWW9cIIdSAXnWnRk40ZnOSgVftC0sWCDdC40
+ v7nz7qsxeMftsoNPLv0E8x6pupMv/rGJc3GuxUF2FgVP2R/wuPJ9rofRNd+LYiQ+e79c
+ EqPI2Lc3fYeMhhpJoJGgHNJ0aEV/hPem7qjo9zCYRT1Rbgjne8P2H16GV643FWfCcb5b
+ S8Uw==
+X-Gm-Message-State: APjAAAVFKGxRBJo2PnuJ9lEXKSnQEydRNk+XvwUHV6MUSP3ith08M8TJ
+ kW30pc108QTuxJFDI4YtGvkFN4bOKjM4CQ==
+X-Google-Smtp-Source: APXvYqy/xCxc7gW0i283Si7AItH+WSbgemt/rObzTBv2TxbHMjtyvu+fLlJzYjJi2F1o9/KS5r6LVw==
+X-Received: by 2002:a63:e48:: with SMTP id 8mr34066731pgo.389.1564702943751;
+ Thu, 01 Aug 2019 16:42:23 -0700 (PDT)
 Received: from localhost.localdomain ([2402:3a80:572:3de5:765:cb16:92cd:ee3e])
  by smtp.gmail.com with ESMTPSA id
- g18sm117975426pgm.9.2019.08.01.16.42.11
+ g18sm117975426pgm.9.2019.08.01.16.42.17
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 01 Aug 2019 16:42:16 -0700 (PDT)
+ Thu, 01 Aug 2019 16:42:23 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 05:10:25 +0530
-Message-Id: <20190801234031.29561-12-mehta.aaru20@gmail.com>
+Date: Fri,  2 Aug 2019 05:10:26 +0530
+Message-Id: <20190801234031.29561-13-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190801234031.29561-1-mehta.aaru20@gmail.com>
 References: <20190801234031.29561-1-mehta.aaru20@gmail.com>
@@ -81,7 +81,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PATCH v9 11/17] qemu-io: adds option to use aio engine
+Subject: [Qemu-devel] [PATCH v9 12/17] qemu-img: adds option to use aio
+ engine for benchmarking
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,87 +107,79 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 ---
- qemu-io.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ qemu-img-cmds.hx |  4 ++--
+ qemu-img.c       | 11 ++++++++++-
+ qemu-img.texi    |  5 ++++-
+ 3 files changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index f64eca6940..0abb4af134 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -130,7 +130,8 @@ static void open_help(void)
- " -C, -- use copy-on-read\n"
- " -n, -- disable host cache, short for -t none\n"
- " -U, -- force shared permissions\n"
--" -k, -- use kernel AIO implementation (on Linux only)\n"
-+" -k, -- use kernel AIO implementation (Linux only, prefer use of -i)\n"
-+" -i, -- use AIO mode (threads, native or io_uring)\n"
- " -t, -- use the given cache mode for the image\n"
- " -d, -- use the given discard mode for the image\n"
- " -o, -- options to be given to the block driver"
-@@ -172,7 +173,7 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-     QDict *opts;
-     bool force_share = false;
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 1c93e6d185..77b5a8dda8 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -20,9 +20,9 @@ STEXI
+ ETEXI
  
--    while ((c = getopt(argc, argv, "snCro:kt:d:U")) != -1) {
-+    while ((c = getopt(argc, argv, "snCro:ki:t:d:U")) != -1) {
-         switch (c) {
-         case 's':
-             flags |= BDRV_O_SNAPSHOT;
-@@ -204,6 +205,13 @@ static int open_f(BlockBackend *blk, int argc, char **argv)
-                 return -EINVAL;
-             }
+ DEF("bench", img_bench,
+-    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-w] [-U] filename")
++    "bench [-c count] [-d depth] [-f fmt] [--flush-interval=flush_interval] [-n] [--no-drain] [-o offset] [--pattern=pattern] [-q] [-s buffer_size] [-S step_size] [-t cache] [-i aio] [-w] [-U] filename")
+ STEXI
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-i @var{aio}] [-w] [-U] @var{filename}
+ ETEXI
+ 
+ DEF("check", img_check,
+diff --git a/qemu-img.c b/qemu-img.c
+index 79983772de..27ac33f7d7 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -4192,7 +4192,8 @@ static int img_bench(int argc, char **argv)
+             {"force-share", no_argument, 0, 'U'},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hc:d:f:no:qs:S:t:wU", long_options, NULL);
++        c = getopt_long(argc, argv, ":hc:d:f:ni:o:qs:S:t:wU", long_options,
++                        NULL);
+         if (c == -1) {
              break;
-+        case 'i':
-+            if (bdrv_parse_aio(optarg, &flags) < 0) {
-+                error_report("Invalid aio option: %s", optarg);
-+                qemu_opts_reset(&empty_opts);
-+                return -EINVAL;
-+            }
-+            break;
-         case 'o':
-             if (imageOpts) {
-                 printf("--image-opts and 'open -o' are mutually exclusive\n");
-@@ -291,7 +299,9 @@ static void usage(const char *name)
- "  -n, --nocache        disable host cache, short for -t none\n"
- "  -C, --copy-on-read   enable copy-on-read\n"
- "  -m, --misalign       misalign allocations for O_DIRECT\n"
--"  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"
-+"  -k, --native-aio     use kernel AIO implementation\n"
-+"                       (Linux only, prefer use of -i)\n"
-+"  -i, --aio=MODE       use AIO mode (threads, native or io_uring)\n"
- "  -t, --cache=MODE     use the given cache mode for the image\n"
- "  -d, --discard=MODE   use the given discard mode for the image\n"
- "  -T, --trace [[enable=]<pattern>][,events=<file>][,file=<file>]\n"
-@@ -489,7 +499,7 @@ static QemuOptsList file_opts = {
- int main(int argc, char **argv)
- {
-     int readonly = 0;
--    const char *sopt = "hVc:d:f:rsnCmkt:T:U";
-+    const char *sopt = "hVc:d:f:rsnCmki:t:T:U";
-     const struct option lopt[] = {
-         { "help", no_argument, NULL, 'h' },
-         { "version", no_argument, NULL, 'V' },
-@@ -501,6 +511,7 @@ int main(int argc, char **argv)
-         { "copy-on-read", no_argument, NULL, 'C' },
-         { "misalign", no_argument, NULL, 'm' },
-         { "native-aio", no_argument, NULL, 'k' },
-+        { "aio", required_argument, NULL, 'i' },
-         { "discard", required_argument, NULL, 'd' },
-         { "cache", required_argument, NULL, 't' },
-         { "trace", required_argument, NULL, 'T' },
-@@ -568,6 +579,12 @@ int main(int argc, char **argv)
-         case 'k':
+         }
+@@ -4235,6 +4236,14 @@ static int img_bench(int argc, char **argv)
+         case 'n':
              flags |= BDRV_O_NATIVE_AIO;
              break;
 +        case 'i':
-+            if (bdrv_parse_aio(optarg, &flags) < 0) {
++            ret = bdrv_parse_aio(optarg, &flags);
++            if (ret < 0) {
 +                error_report("Invalid aio option: %s", optarg);
-+                exit(1);
++                ret = -1;
++                goto out;
 +            }
 +            break;
-         case 't':
-             if (bdrv_parse_cache_mode(optarg, &flags, &writethrough) < 0) {
-                 error_report("Invalid cache option: %s", optarg);
+         case 'o':
+         {
+             offset = cvtnum(optarg);
+diff --git a/qemu-img.texi b/qemu-img.texi
+index c8e9bba515..0a2eccea85 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -206,7 +206,7 @@ Command description:
+ Amends the image format specific @var{options} for the image file
+ @var{filename}. Not all file formats support this operation.
+ 
+-@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
++@item bench [-c @var{count}] [-d @var{depth}] [-f @var{fmt}] [--flush-interval=@var{flush_interval}] [-n] [-i @var{aio}][--no-drain] [-o @var{offset}] [--pattern=@var{pattern}] [-q] [-s @var{buffer_size}] [-S @var{step_size}] [-t @var{cache}] [-w] [-U] @var{filename}
+ 
+ Run a simple sequential I/O benchmark on the specified image. If @code{-w} is
+ specified, a write test is performed, otherwise a read test is performed.
+@@ -227,6 +227,9 @@ If @code{-n} is specified, the native AIO backend is used if possible. On
+ Linux, this option only works if @code{-t none} or @code{-t directsync} is
+ specified as well.
+ 
++If @code{-i} is specified, aio option can be used to specify different AIO
++backends: @var{threads}, @var{native} or @var{io_uring}.
++
+ For write tests, by default a buffer filled with zeros is written. This can be
+ overridden with a pattern byte specified by @var{pattern}.
+ 
 -- 
 2.21.0
 
