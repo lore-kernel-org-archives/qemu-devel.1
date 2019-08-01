@@ -8,71 +8,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CCCC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B518C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:43:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 755DE206A3
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 150ED206A3
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 23:43:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iRq/GR6E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755DE206A3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sRblJsCz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150ED206A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htKid-00072W-OV
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 19:42:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60080)
+	id 1htKiz-0007PI-D1
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 19:43:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60161)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mehta.aaru20@gmail.com>) id 1htKhB-0005JN-LV
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:41:18 -0400
+ (envelope-from <mehta.aaru20@gmail.com>) id 1htKhH-0005Xa-EK
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mehta.aaru20@gmail.com>) id 1htKhA-0002X9-QG
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:41:17 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41292)
+ (envelope-from <mehta.aaru20@gmail.com>) id 1htKhG-0002d3-Fi
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 19:41:23 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38762)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <mehta.aaru20@gmail.com>)
- id 1htKhA-0002WX-Jq; Thu, 01 Aug 2019 19:41:16 -0400
-Received: by mail-pf1-x442.google.com with SMTP id m30so34964590pff.8;
- Thu, 01 Aug 2019 16:41:16 -0700 (PDT)
+ id 1htKhG-0002cP-AW; Thu, 01 Aug 2019 19:41:22 -0400
+Received: by mail-pg1-x541.google.com with SMTP id f5so26229662pgu.5;
+ Thu, 01 Aug 2019 16:41:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=kq+GocMZNBzs7h+JrH4HUXS6sT3wW7TSwegih8ayQCc=;
- b=iRq/GR6EwHoD+MuyWgZ5RKCxUU45yxdpe8G6Dh8WARNBMYllQ3iYRLFYBtEtGf45Fl
- M2EEwS2gM/RrEIIPa6DK6A2lpyGeaDhOMJ5o7N3uFIy9kaNVcFogKMbnlPuxkdzBXAZ1
- bn+S9DXu/0uUmlp2nfK6pHqW95BXnkx29jZ9iFLVhulRb1wXcAP+psGNVwoDzPjRveM6
- j7zTZuTSby0LRzeVu3QkLlcHrfqCL7aBjdO3QCei1AsepLw0C4nfZhybiH8JsSfoeh1P
- qBH2n0/b7Yk7f0venYs+NMWzoZDDtjmrLt2idsht/oPSCobT6lRGNK3mGaULRnc7Jpe1
- ENUA==
+ bh=2qHkahVEkN1zu8CSs6/qp7V0fV616Ybkp0QDQj4tHxQ=;
+ b=sRblJsCzFkP5cxUc0otHsHJIx9cnvVRdxSxVbV5r4nlaQUA25oPZ3zjR1D4AVM4IEL
+ bD5S9ztG1h7BBoiiKzmrFyJqiPsoq1zM04wZCLADPo6xAx0p6GzkO8L5wrqjtR0FHqr5
+ Sl+JtdCAISYTtjWMD1qxJWuNxH8Zde3Z8utcG1yrro/brXKLs9wQMtlABfCQ437WHJBy
+ z3TELbbX+8E0iQwM+LlyT2LwiVeqwX27ChXzDxupbUWTx0Fmg6DZGJpFAZeG5LyroeHC
+ JSDrbdOZPLsxTjpInOpraPZEYwODwB7YeLuBPPcGX4mUXu7OPwKLCYmp1BrTYuCvYbp0
+ 6gmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=kq+GocMZNBzs7h+JrH4HUXS6sT3wW7TSwegih8ayQCc=;
- b=U6+Ej7yhX8Jd8GDxEj1TMeGxm0K0dxJMnwpSlVzExtyQBlKNXHg292WooAJwe1sIni
- lZzio8DilSyT1eRbSNymsZBHIoudDsJHQfV7yglROKNNAZmBtuxGJo6I426FbmCtxwJw
- j8nyZqGy7krNISDxG4Q00yQq0yjghDnZFHnuFf45RDtDaJrryd8HKHX59Lyl6TbD4LuI
- PC046+PqLT0+P00StJLgg0BEw2s2M/NSYQkdWY4cd6KcusBmGHC/Nq4UMIiQiCDI8Vd0
- sA1PljRtOSt5LE3Mt7izg04tcggQn0s2Ux1vb4ZcqpsXXgA6w1bsOtiGu9TzBPa5Axie
- jb2w==
-X-Gm-Message-State: APjAAAUuCY3cLSYz2Wkuszx+yRBGm8XsY8Ox3ojmLB32E76oDzpuZgAH
- bVE2g6JE0P7LCYDWEKPgjBmgaG7tWPZ7Hw==
-X-Google-Smtp-Source: APXvYqyQ6ojcmIVH3UvGUs5/DI7u/lEkVqLkgbXfItztus3TbN1qCnE476el9yjaQoS0eUPTZ9yR3w==
-X-Received: by 2002:a62:1616:: with SMTP id 22mr57310422pfw.120.1564702875261; 
- Thu, 01 Aug 2019 16:41:15 -0700 (PDT)
+ bh=2qHkahVEkN1zu8CSs6/qp7V0fV616Ybkp0QDQj4tHxQ=;
+ b=nVtkj5xN0gHt7ILwc1pjX690X31P2c4mO2oyaImwEq80qYCgsJRkyQnxazQ186LRt2
+ mlGctTYTWe3Eb2iNO3CCVDwxYmxphbTJEQR4+GDuaHTsmeK9H7t9HDKHAz1wgLTCCmwY
+ kiWp35l385NHbrYcWfNo8D8HcSqohSTsQDXgcVFXSbPpwT2jAvmlRQ+jgvdrTk5+/c+l
+ r3vVe+dhqPpCG8oTE61QUjpLY2khOQeJcsoAX77SOx9tl2PLxEYsuwjxYFwQCkl14eWi
+ xl/HNwqROlrmfBJlLQGlkaJKIQKihOewCHjqIOXPKtDTc6BG1dzMH116pJoNr9EeBtxy
+ UjYA==
+X-Gm-Message-State: APjAAAUdLnp3EGb33m6HTl0D1olE89whO6Ve07JC/FI548K4YuKAejcz
+ oVMSptB2gJuT+g1wKI/u2xAGfKJz4S6qaw==
+X-Google-Smtp-Source: APXvYqy76Pmq4P8MzDrDXm3AcVoRzrsr0vLd9ULztHgi/12FeyDStq0M3pdWkpb37AG3RINBv/cC9w==
+X-Received: by 2002:a63:c70d:: with SMTP id
+ n13mr120222407pgg.171.1564702880898; 
+ Thu, 01 Aug 2019 16:41:20 -0700 (PDT)
 Received: from localhost.localdomain ([2402:3a80:572:3de5:765:cb16:92cd:ee3e])
  by smtp.gmail.com with ESMTPSA id
- g18sm117975426pgm.9.2019.08.01.16.41.10
+ g18sm117975426pgm.9.2019.08.01.16.41.15
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 01 Aug 2019 16:41:14 -0700 (PDT)
+ Thu, 01 Aug 2019 16:41:20 -0700 (PDT)
 From: Aarushi Mehta <mehta.aaru20@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 05:10:16 +0530
-Message-Id: <20190801234031.29561-3-mehta.aaru20@gmail.com>
+Date: Fri,  2 Aug 2019 05:10:17 +0530
+Message-Id: <20190801234031.29561-4-mehta.aaru20@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190801234031.29561-1-mehta.aaru20@gmail.com>
 References: <20190801234031.29561-1-mehta.aaru20@gmail.com>
@@ -80,8 +81,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH v9 02/17] qapi/block-core: add option for
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH v9 03/17] block/block: add BDRV flag for
  io_uring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,40 +101,31 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
  saket.sinha89@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
  Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+ Aarushi Mehta <mehta.aaru20@gmail.com>,
+ Maxim Levitsky <maximlevitsky@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only enumerates option for devices that support it. Since QAPI schema
-supports io_uring, which is the actual name of the Linux API, it is
-preferred over io-uring.
-
 Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Maxim Levitsky <maximlevitsky@gmail.com>
 ---
- qapi/block-core.json | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/block/block.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0d43d4f37c..3dc93b483f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2792,11 +2792,13 @@
- #
- # @threads:     Use qemu's thread pool
- # @native:      Use native AIO backend (only Linux and Windows)
-+# @io_uring:    Use linux io_uring (since 4.2)
- #
- # Since: 2.9
- ##
- { 'enum': 'BlockdevAioOptions',
--  'data': [ 'threads', 'native' ] }
-+  'data': [ 'threads', 'native',
-+            { 'name': 'io_uring', 'if': 'defined(CONFIG_LINUX_IO_URING)' } ] }
+diff --git a/include/block/block.h b/include/block/block.h
+index 50a07c1c33..e29baa172c 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -121,6 +121,7 @@ typedef struct HDGeometry {
+                                       ignoring the format layer */
+ #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
+ #define BDRV_O_AUTO_RDONLY 0x20000 /* degrade to read-only if opening read-write fails */
++#define BDRV_O_IO_URING    0x40000 /* use io_uring instead of the thread pool */
  
- ##
- # @BlockdevCacheOptions:
+ #define BDRV_O_CACHE_MASK  (BDRV_O_NOCACHE | BDRV_O_NO_FLUSH)
+ 
 -- 
 2.21.0
 
