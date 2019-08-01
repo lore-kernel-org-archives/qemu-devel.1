@@ -2,65 +2,74 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7D4C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BEAC19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:06:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C984520665
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 12:47:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C984520665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zte.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id 48ACC214DA
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 13:06:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48ACC214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htAUg-0006AP-P4
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 08:47:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40376)
+	id 1htAmg-0002eT-Ei
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 09:06:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53697)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ning.bo9@zte.com.cn>) id 1ht5Sj-0001cF-Ns
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 03:25:22 -0400
+ (envelope-from <bounces@canonical.com>) id 1htAmF-0002EO-8P
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:05:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ning.bo9@zte.com.cn>) id 1ht5Si-0007il-Ft
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 03:25:21 -0400
-Received: from mxhk.zte.com.cn ([63.217.80.70]:26146)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ning.bo9@zte.com.cn>) id 1ht5Si-0007fv-6O
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 03:25:20 -0400
-Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
- by Forcepoint Email with ESMTPS id 82BED8AFCE4C014F1806;
- Thu,  1 Aug 2019 15:25:10 +0800 (CST)
-Received: from notes_smtp.zte.com.cn ([10.30.1.239])
- by mse-fl2.zte.com.cn with ESMTP id x717P9K8077670;
- Thu, 1 Aug 2019 15:25:09 +0800 (GMT-8)
- (envelope-from ning.bo9@zte.com.cn)
-Received: from kvm-146.localdomain ([10.74.120.146])
- by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
- with ESMTP id 2019080115252831-2696892 ;
- Thu, 1 Aug 2019 15:25:28 +0800 
-From: Ning Bo <ning.bo9@zte.com.cn>
-To: qemu-devel@nongnu.org, eblake@redhat.com, armbru@redhat.com
-Date: Thu, 1 Aug 2019 15:28:53 +0800
-Message-Id: <1564644533-28850-1-git-send-email-ning.bo9@zte.com.cn>
-X-Mailer: git-send-email 1.8.3.1
-X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release
- 8.5.3FP6|November 21, 2013) at 2019-08-01 15:25:28,
- Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2019-08-01 15:25:04, Serialize complete at 2019-08-01 15:25:04
-X-MAIL: mse-fl2.zte.com.cn x717P9K8077670
+ (envelope-from <bounces@canonical.com>) id 1htAmD-0002Vh-Hp
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:05:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58138)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1htAmD-0002Us-C2
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 09:05:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1htAmB-0002PP-O0
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 13:05:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id AFFB82E80C7
+ for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 13:05:47 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 01 Aug 2019 13:00:13 -0000
+From: diddly <dflogeras2@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user syscall-abi
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dflogeras2 liuke schneiderit
+X-Launchpad-Bug-Reporter: Kan Li (liuke)
+X-Launchpad-Bug-Modifier: diddly (dflogeras2)
+References: <154353638253.10384.17899256838547579767.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156466441320.6723.7655002868127465571.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19012";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 001c0339b46382f1f1507df48337303b97f9617c
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 63.217.80.70
-X-Mailman-Approved-At: Thu, 01 Aug 2019 08:47:18 -0400
-Subject: [Qemu-devel] [PATCH] vhost-vsock: report QMP event when set running
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1805913] Re: readdir() returns NULL
+ (errno=EOVERFLOW) for 32-bit user-static qemu on 64-bit host
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -69,73 +78,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ning Bo <ning.bo9@zte.com.cn>, mst@redhat.com
+Reply-To: Bug 1805913 <1805913@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Report vsock running event so that the upper application can
-control boot sequence.
-see https://github.com/kata-containers/runtime/pull/1918
+After studying linux-user/syscall.c a bit, would it be possible to work
+around this issue by doing something like the following:
 
-Signed-off-by: Ning Bo <ning.bo9@zte.com.cn>
----
- hw/virtio/vhost-vsock.c |  3 +++
- qapi/char.json          | 22 ++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+Add a new #define EMULATE_GETDENTS64_WITH_GETDENTS, and enable this iff
+we have getdents, and the target is 32, while the host is 64 bits.
+Something similar, but complementary is done with
+EMULATE_GETDENTS_WITH_GETDENTS64.
 
-diff --git a/hw/virtio/vhost-vsock.c b/hw/virtio/vhost-vsock.c
-index 0371493..a5920fd 100644
---- a/hw/virtio/vhost-vsock.c
-+++ b/hw/virtio/vhost-vsock.c
-@@ -22,6 +22,7 @@
- #include "qemu/iov.h"
- #include "qemu/module.h"
- #include "monitor/monitor.h"
-+#include "qapi/qapi-events-char.h"
- 
- enum {
-     VHOST_VSOCK_SAVEVM_VERSION = 0,
-@@ -68,6 +69,8 @@ static int vhost_vsock_set_running(VHostVSock *vsock, int start)
-     if (ret < 0) {
-         return -errno;
-     }
-+    qapi_event_send_vsock_running(vsock->conf.guest_cid, start != 0);
-+
-     return 0;
- }
- 
-diff --git a/qapi/char.json b/qapi/char.json
-index a6e81ac..7b746e3 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -570,3 +570,25 @@
- { 'event': 'VSERPORT_CHANGE',
-   'data': { 'id': 'str',
-             'open': 'bool' } }
-+
-+##
-+# @VSOCK_RUNNING:
-+#
-+# Emitted when the guest changes the vsock status.
-+#
-+# @cid: guest context ID
-+#
-+# @running: true if the vsock is running
-+#
-+# Since: v4.2
-+#
-+# Example:
-+#
-+# <- { "event": "VSOCK_RUNNING",
-+#      "data": { "cid": "123456", "running": true },
-+#      "timestamp": { "seconds": 1401385907, "microseconds": 422329 } }
-+#
-+##
-+{ 'event': 'VSOCK_RUNNING',
-+  'data': { 'cid': 'uint64',
-+            'running': 'bool' } }
--- 
-2.9.5
+In that case, when userspace calls getdents64, we implement a
+"conversion" (similar to getdents #if logic), which calls the host's
+getdents and converts the data structures back to their 64-bit variants
+before handing back to user-space.
 
+I'm likely over-simplifying a problem that I don't fully understand, but
+would happily work on a patch if someone higher up the food chain could
+fill in the gaps.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1805913
+
+Title:
+  readdir() returns NULL (errno=3DEOVERFLOW) for 32-bit user-static qemu
+  on 64-bit host
+
+Status in QEMU:
+  New
+
+Bug description:
+  This can be simply reproduced by compiling and running the attached C
+  code (readdir-bug.c) under 32-bit user-static qemu, such as qemu-arm-
+  static:
+
+  # Setup docker for user-static binfmt
+  docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  # Compile the code and run (readdir for / is fine, so create a new direct=
+ory /test).
+  docker run -v /path/to/qemu-arm-static:/usr/bin/qemu-arm-static -v /path/=
+to/readdir-bug.c:/tmp/readdir-bug.c -it --rm arm32v7/ubuntu:18.10 bash -c '=
+{ apt update && apt install -y gcc; } >&/dev/null && mkdir -p /test && cd /=
+test && gcc /tmp/readdir-bug.c && ./a.out'
+  dir=3D0xff5b4150
+  readdir(dir)=3D(nil)
+  errno=3D75: Value too large for defined data type
+
+  Do remember to replace the /path/to/qemu-arm-static and /path/to
+  /readdir-bug.c to the actual paths of the files.
+
+  The root cause is in glibc:
+  https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/=
+linux/getdents.c;h=3D6d09a5be7057e2792be9150d3a2c7b293cf6fc34;hb=3Da5275ba5=
+378c9256d18e582572b4315e8edfcbfb#l87
+
+  By C standard, the return type of readdir() is DIR*, in which the
+  inode number and offset are 32-bit integers, therefore, glibc calls
+  getdents64() and check if the inode number and offset fits the 32-bit
+  range, and reports EOVERFLOW if not.
+
+  The problem here is for 32-bit user-static qemu running on 64-bit
+  host, getdents64 simply passing through the inode number and offset
+  from underlying getdents64 syscall (from 64-bit kernel), which is very
+  likely to not fit into 32-bit range. On real hardware, the 32-bit
+  kernel creates 32-bit inode numbers, therefore works properly.
+
+  The glibc code makes sense to do the check to be conformant with C
+  standard, therefore ideally it should be a fix on qemu side. I admit
+  this is difficult because qemu has to maintain a mapping between
+  underlying 64-bit inode numbers and 32-bit inode numbers, which would
+  severely hurt the performance. I don't expect this could be fix
+  anytime soon (or even there would be a fix), but it would be
+  worthwhile to surface this issue.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1805913/+subscriptions
 
