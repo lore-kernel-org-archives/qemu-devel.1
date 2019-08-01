@@ -2,120 +2,94 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD31C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 11:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA1AC19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 11:38:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3698D206B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 11:32:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="cwPGTitS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3698D206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7337A20B7C
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 11:38:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7337A20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht9KK-0002CW-Gm
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 07:32:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33714)
+	id 1ht9Pp-0005VY-KI
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 07:38:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35075)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ht9Jo-0001hl-Og
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 07:32:25 -0400
+ (envelope-from <mreitz@redhat.com>) id 1ht9PL-00052m-Eo
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 07:38:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ht9Jn-0002eC-Dv
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 07:32:24 -0400
-Received: from mail-eopbgr10110.outbound.protection.outlook.com
- ([40.107.1.110]:52359 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ht9Jm-0002cV-K3; Thu, 01 Aug 2019 07:32:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XWd++gnclj55/XZnx50ODw32dJ6bhnPord7xVovU3nwqd18Ho+NNuerRafy02LMa7rU84eG68uXqX9NBWAzl1dRNiubxxzHdhHSnTGRM4Mgwjf8irsk1xzxFpWYJ96k649yiPeTrtp2YqJzr3eNxJD34PogAFa+5XwXd1uOWOEGetBk00TLSqF03VUSxk4ZcMS1vWQRoWVFEbmL3GwrU2CVlK9eg+BH1l06ajlYtw1CRD6jUHU2kl5l1oBWRZt0agOGdZOKSjYP6zAciecnJCCf5V9aMViRvegbP7JjrVaKNbF1Z+pOiECuaJ1Qxuyidl10sCI2AxJYmKiHDbzDfnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iYQdAyWXlnv+vJYXxuF49u3mAVTxJt+3GRqtl/9ageg=;
- b=gb322/TMPOi9AXUgoL2LWHnZ7yCE6WoxqPG1lR+DBwBCVKUwGt2GSlRoZBF80033dhPwsOEPkQJ8Sx7DOu9fQ6M/9SXZa71i2LoGF5aSpqHQtfJGBruKxlkK2ISFbnCk2M17C3mWjFFBMoCDJN08abL1YnF6AOSDBdrbWjaZ3ww1ADZWc6PJXXDHsX00HWLEzI6O0M36kqDys3y+kN7anzTNX6tDERoDVTJEdor+cWzZ7aJbeHRnzjSb1mKD7U2GhKySz/n1SciZCFeRt5UETxDiLMUt8E6Qr+b+UiRMyBQzELxlCquC+FaYv8xjxdz+xq+T5XL2VfzslZgeN/NFRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=virtuozzo.com;dmarc=pass action=none
- header.from=virtuozzo.com;dkim=pass header.d=virtuozzo.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iYQdAyWXlnv+vJYXxuF49u3mAVTxJt+3GRqtl/9ageg=;
- b=cwPGTitSEGwq5om9IdvvfwG01uQ9NAlrRunAU0GYH53lCdlOQXb5Lvjd3cJcdN01SlJIc8WAybFcjKxyFBj/lo3cPIEX1MSRAkICJhW64MraMOmXrS6vd7UnpXoLo3XznSocWY1ayBpetzoD5A/h6l8uG7KdoIQoWsJtN4xjLZU=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB4027.eurprd08.prod.outlook.com (20.179.9.225) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.10; Thu, 1 Aug 2019 11:32:18 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2136.010; Thu, 1 Aug 2019
- 11:32:17 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH 3/3] block/backup: refactor write_flags
-Thread-Index: AQHVRvRyYDfKfvF2I0uqR/7Rutw88Kbje1sAgAFpCoCAAUYpgIAAARKA
-Date: Thu, 1 Aug 2019 11:32:17 +0000
-Message-ID: <29be5652-33d3-216c-a377-ed7d76c23c1b@virtuozzo.com>
+ (envelope-from <mreitz@redhat.com>) id 1ht9PK-0006yG-6A
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 07:38:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50916)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1ht9PH-0006wv-9g; Thu, 01 Aug 2019 07:38:03 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 067D030A7C5D;
+ Thu,  1 Aug 2019 11:38:02 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-187.brq.redhat.com
+ [10.40.204.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A5B8560A9F;
+ Thu,  1 Aug 2019 11:37:57 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190730163251.755248-1-vsementsov@virtuozzo.com>
  <20190730163251.755248-4-vsementsov@virtuozzo.com>
  <2b034619-ab55-a5f1-a1f4-ea14c4c5c18c@redhat.com>
  <f6927c00-5708-e471-e768-ef9d1e0c2dc6@virtuozzo.com>
  <12efde81-7a17-56c0-e50d-080574faa9f9@redhat.com>
-In-Reply-To: <12efde81-7a17-56c0-e50d-080574faa9f9@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR1001CA0018.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:3:f7::28) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190801143215777
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cffb3c83-8f0b-4966-a39b-08d71673e8b0
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB4027; 
-x-ms-traffictypediagnostic: DB8PR08MB4027:
-x-microsoft-antispam-prvs: <DB8PR08MB4027674D687A719605D7F741C1DE0@DB8PR08MB4027.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 01165471DB
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39850400004)(376002)(346002)(366004)(136003)(396003)(199004)(189003)(52314003)(3846002)(6116002)(52116002)(76176011)(486006)(2616005)(229853002)(102836004)(68736007)(14454004)(99286004)(8676002)(71190400001)(71200400001)(81156014)(81166006)(8936002)(446003)(31686004)(478600001)(476003)(11346002)(6436002)(316002)(5660300002)(54906003)(6506007)(186003)(53546011)(66946007)(6246003)(386003)(66446008)(66476007)(36756003)(110136005)(14444005)(256004)(66556008)(64756008)(31696002)(6512007)(26005)(6486002)(305945005)(7736002)(66066001)(2906002)(25786009)(86362001)(107886003)(53936002)(2501003)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4027;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 6WrE0O3suYQDBP9I3zL35sC4KJJk0FB4JA+jNWGcEXSWt160r+vd3HPKXPI8t4fPf/7dOC1gWJ0XearUpSkTix+QJOckXeWGICrty5ytogyUsB4Fqj6bhRMd+NBHatSkCBVIgi4phE7K+UM4vKIdMm2H8FV3Zgt6rY2M6v/tIyz3nMRANHnCCPeCSWBbTw/+dL9wEhfrkidFevXlo9uFAIuYZpYjvXTuK2IYa1XgiW05zhxuHY1zbD1oSodpgoJfQXEVoddxpzffDc5fKz3Kl0/9j0AwlCADFHO3l/wy9keCbRBXT+hvMNmpc54v41IReuqu6B6Zhw50GwGri5RE5NBEvBN8T4mQWS3kPtqKVItnuFY93kZ9dDJVWY7K0n0cQSosxSP2Uto7mCwdZPPjtvoYbSXUsFcU/eRTLqluB24=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8F0E937C5F4B134A87FBF1BAAD14DD32@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <29be5652-33d3-216c-a377-ed7d76c23c1b@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f83ed7fb-b9cd-4d28-d58e-92357f3acc73@redhat.com>
+Date: Thu, 1 Aug 2019 13:37:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cffb3c83-8f0b-4966-a39b-08d71673e8b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Aug 2019 11:32:17.8075 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsementsov@virtuozzo.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4027
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.1.110
+In-Reply-To: <29be5652-33d3-216c-a377-ed7d76c23c1b@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="q6RyEYM2ChhaUH8HFtFGTK6Fw0HG9nWoW"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Thu, 01 Aug 2019 11:38:02 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH 3/3] block/backup: refactor write_flags
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,101 +109,205 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDEuMDguMjAxOSAxNDoyOCwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAzMS4wNy4xOSAxODowMSwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDMwLjA3LjIwMTkgMjE6Mjgs
-IEpvaG4gU25vdyB3cm90ZToNCj4+Pg0KPj4+DQo+Pj4gT24gNy8zMC8xOSAxMjozMiBQTSwgVmxh
-ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gd3JpdGUgZmxhZ3MgYXJlIGNv
-bnN0YW50LCBsZXQncyBzdG9yZSBpdCBpbiBCYWNrdXBCbG9ja0pvYiBpbnN0ZWFkIG9mDQo+Pj4+
-IHJlY2FsY3VsYXRpbmcuIEl0IGFsc28gbWFrZXMgdHdvIGJvb2xlYW4gZmllbGRzIHRvIGJlIHVu
-dXNlZCwgc28sDQo+Pj4+IGRyb3AgdGhlbS4NCj4+Pj4NCj4+Pj4gU2lnbmVkLW9mZi1ieTogVmxh
-ZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPj4+
-PiAtLS0NCj4+Pj4gICAgYmxvY2svYmFja3VwLmMgfCAyNCArKysrKysrKysrKystLS0tLS0tLS0t
-LS0NCj4+Pj4gICAgMSBmaWxlIGNoYW5nZWQsIDEyIGluc2VydGlvbnMoKyksIDEyIGRlbGV0aW9u
-cygtKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svYmFja3VwLmMgYi9ibG9jay9iYWNr
-dXAuYw0KPj4+PiBpbmRleCBjNWY5NDExMDFhLi40NjUxNjQ5ZTlkIDEwMDY0NA0KPj4+PiAtLS0g
-YS9ibG9jay9iYWNrdXAuYw0KPj4+PiArKysgYi9ibG9jay9iYWNrdXAuYw0KPj4+PiBAQCAtNDcs
-NyArNDcsNiBAQCB0eXBlZGVmIHN0cnVjdCBCYWNrdXBCbG9ja0pvYiB7DQo+Pj4+ICAgICAgICB1
-aW50NjRfdCBsZW47DQo+Pj4+ICAgICAgICB1aW50NjRfdCBieXRlc19yZWFkOw0KPj4+PiAgICAg
-ICAgaW50NjRfdCBjbHVzdGVyX3NpemU7DQo+Pj4+IC0gICAgYm9vbCBjb21wcmVzczsNCj4+Pj4g
-ICAgICAgIE5vdGlmaWVyV2l0aFJldHVybiBiZWZvcmVfd3JpdGU7DQo+Pj4+ICAgICAgICBRTElT
-VF9IRUFEKCwgQ293UmVxdWVzdCkgaW5mbGlnaHRfcmVxczsNCj4+Pj4gICAgDQo+Pj4+IEBAIC01
-NSw3ICs1NCw3IEBAIHR5cGVkZWYgc3RydWN0IEJhY2t1cEJsb2NrSm9iIHsNCj4+Pj4gICAgICAg
-IGJvb2wgdXNlX2NvcHlfcmFuZ2U7DQo+Pj4+ICAgICAgICBpbnQ2NF90IGNvcHlfcmFuZ2Vfc2l6
-ZTsNCj4+Pj4gICAgDQo+Pj4+IC0gICAgYm9vbCBzZXJpYWxpemVfdGFyZ2V0X3dyaXRlczsNCj4+
-Pj4gKyAgICBCZHJ2UmVxdWVzdEZsYWdzIHdyaXRlX2ZsYWdzOw0KPj4+PiAgICB9IEJhY2t1cEJs
-b2NrSm9iOw0KPj4+PiAgICANCj4+Pj4gICAgc3RhdGljIGNvbnN0IEJsb2NrSm9iRHJpdmVyIGJh
-Y2t1cF9qb2JfZHJpdmVyOw0KPj4+PiBAQCAtMTEwLDEwICsxMDksNiBAQCBzdGF0aWMgaW50IGNv
-cm91dGluZV9mbiBiYWNrdXBfY293X3dpdGhfYm91bmNlX2J1ZmZlcihCYWNrdXBCbG9ja0pvYiAq
-am9iLA0KPj4+PiAgICAgICAgQmxvY2tCYWNrZW5kICpibGsgPSBqb2ItPmNvbW1vbi5ibGs7DQo+
-Pj4+ICAgICAgICBpbnQgbmJ5dGVzOw0KPj4+PiAgICAgICAgaW50IHJlYWRfZmxhZ3MgPSBpc193
-cml0ZV9ub3RpZmllciA/IEJEUlZfUkVRX05PX1NFUklBTElTSU5HIDogMDsNCj4+Pj4gLSAgICBp
-bnQgd3JpdGVfZmxhZ3MgPQ0KPj4+PiAtICAgICAgICAgICAgKGpvYi0+c2VyaWFsaXplX3Rhcmdl
-dF93cml0ZXMgPyBCRFJWX1JFUV9TRVJJQUxJU0lORyA6IDApIHwNCj4+Pj4gLSAgICAgICAgICAg
-IChqb2ItPmNvbXByZXNzID8gQkRSVl9SRVFfV1JJVEVfQ09NUFJFU1NFRCA6IDApOw0KPj4+PiAt
-DQo+Pj4+ICAgIA0KPj4+PiAgICAgICAgYXNzZXJ0KFFFTVVfSVNfQUxJR05FRChzdGFydCwgam9i
-LT5jbHVzdGVyX3NpemUpKTsNCj4+Pj4gICAgICAgIGhiaXRtYXBfcmVzZXQoam9iLT5jb3B5X2Jp
-dG1hcCwgc3RhcnQsIGpvYi0+Y2x1c3Rlcl9zaXplKTsNCj4+Pj4gQEAgLTEzMiw3ICsxMjcsNyBA
-QCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBiYWNrdXBfY293X3dpdGhfYm91bmNlX2J1ZmZlcihC
-YWNrdXBCbG9ja0pvYiAqam9iLA0KPj4+PiAgICAgICAgfQ0KPj4+PiAgICANCj4+Pj4gICAgICAg
-IHJldCA9IGJsa19jb19wd3JpdGUoam9iLT50YXJnZXQsIHN0YXJ0LCBuYnl0ZXMsICpib3VuY2Vf
-YnVmZmVyLA0KPj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAgd3JpdGVfZmxhZ3MpOw0KPj4+
-PiArICAgICAgICAgICAgICAgICAgICAgICAgam9iLT53cml0ZV9mbGFncyk7DQo+Pj4+ICAgICAg
-ICBpZiAocmV0IDwgMCkgew0KPj4+PiAgICAgICAgICAgIHRyYWNlX2JhY2t1cF9kb19jb3dfd3Jp
-dGVfZmFpbChqb2IsIHN0YXJ0LCByZXQpOw0KPj4+PiAgICAgICAgICAgIGlmIChlcnJvcl9pc19y
-ZWFkKSB7DQo+Pj4+IEBAIC0xNjAsNyArMTU1LDYgQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4g
-YmFja3VwX2Nvd193aXRoX29mZmxvYWQoQmFja3VwQmxvY2tKb2IgKmpvYiwNCj4+Pj4gICAgICAg
-IEJsb2NrQmFja2VuZCAqYmxrID0gam9iLT5jb21tb24uYmxrOw0KPj4+PiAgICAgICAgaW50IG5i
-eXRlczsNCj4+Pj4gICAgICAgIGludCByZWFkX2ZsYWdzID0gaXNfd3JpdGVfbm90aWZpZXIgPyBC
-RFJWX1JFUV9OT19TRVJJQUxJU0lORyA6IDA7DQo+Pj4+IC0gICAgaW50IHdyaXRlX2ZsYWdzID0g
-am9iLT5zZXJpYWxpemVfdGFyZ2V0X3dyaXRlcyA/IEJEUlZfUkVRX1NFUklBTElTSU5HIDogMDsN
-Cj4+Pj4gICAgDQo+Pj4+ICAgICAgICBhc3NlcnQoUUVNVV9JU19BTElHTkVEKGpvYi0+Y29weV9y
-YW5nZV9zaXplLCBqb2ItPmNsdXN0ZXJfc2l6ZSkpOw0KPj4+PiAgICAgICAgYXNzZXJ0KFFFTVVf
-SVNfQUxJR05FRChzdGFydCwgam9iLT5jbHVzdGVyX3NpemUpKTsNCj4+Pj4gQEAgLTE2OCw3ICsx
-NjIsNyBAQCBzdGF0aWMgaW50IGNvcm91dGluZV9mbiBiYWNrdXBfY293X3dpdGhfb2ZmbG9hZChC
-YWNrdXBCbG9ja0pvYiAqam9iLA0KPj4+PiAgICAgICAgbnJfY2x1c3RlcnMgPSBESVZfUk9VTkRf
-VVAobmJ5dGVzLCBqb2ItPmNsdXN0ZXJfc2l6ZSk7DQo+Pj4+ICAgICAgICBoYml0bWFwX3Jlc2V0
-KGpvYi0+Y29weV9iaXRtYXAsIHN0YXJ0LCBqb2ItPmNsdXN0ZXJfc2l6ZSAqIG5yX2NsdXN0ZXJz
-KTsNCj4+Pj4gICAgICAgIHJldCA9IGJsa19jb19jb3B5X3JhbmdlKGJsaywgc3RhcnQsIGpvYi0+
-dGFyZ2V0LCBzdGFydCwgbmJ5dGVzLA0KPj4+PiAtICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHJlYWRfZmxhZ3MsIHdyaXRlX2ZsYWdzKTsNCj4+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICByZWFkX2ZsYWdzLCBqb2ItPndyaXRlX2ZsYWdzKTsNCj4+Pj4gICAgICAgIGlmIChyZXQg
-PCAwKSB7DQo+Pj4+ICAgICAgICAgICAgdHJhY2VfYmFja3VwX2RvX2Nvd19jb3B5X3JhbmdlX2Zh
-aWwoam9iLCBzdGFydCwgcmV0KTsNCj4+Pj4gICAgICAgICAgICBoYml0bWFwX3NldChqb2ItPmNv
-cHlfYml0bWFwLCBzdGFydCwgam9iLT5jbHVzdGVyX3NpemUgKiBucl9jbHVzdGVycyk7DQo+Pj4+
-IEBAIC02MzgsMTAgKzYzMiwxNiBAQCBCbG9ja0pvYiAqYmFja3VwX2pvYl9jcmVhdGUoY29uc3Qg
-Y2hhciAqam9iX2lkLCBCbG9ja0RyaXZlclN0YXRlICpicywNCj4+Pj4gICAgICAgIGpvYi0+c3lu
-Y19tb2RlID0gc3luY19tb2RlOw0KPj4+PiAgICAgICAgam9iLT5zeW5jX2JpdG1hcCA9IHN5bmNf
-bW9kZSA9PSBNSVJST1JfU1lOQ19NT0RFX0lOQ1JFTUVOVEFMID8NCj4+Pj4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICBzeW5jX2JpdG1hcCA6IE5VTEw7DQo+Pj4+IC0gICAgam9iLT5jb21wcmVz
-cyA9IGNvbXByZXNzOw0KPj4+PiAgICANCj4+Pj4gLSAgICAvKiBEZXRlY3QgaW1hZ2UtZmxlZWNp
-bmcgKGFuZCBzaW1pbGFyKSBzY2hlbWVzICovDQo+Pj4+IC0gICAgam9iLT5zZXJpYWxpemVfdGFy
-Z2V0X3dyaXRlcyA9IGJkcnZfY2hhaW5fY29udGFpbnModGFyZ2V0LCBicyk7DQo+Pj4+ICsgICAg
-LyoNCj4+Pj4gKyAgICAgKiBTZXQgd3JpdGUgZmxhZ3M6DQo+Pj4+ICsgICAgICogIDEuIERldGVj
-dCBpbWFnZS1mbGVlY2luZyAoYW5kIHNpbWlsYXIpIHNjaGVtZXMNCj4+Pj4gKyAgICAgKiAgMi4g
-SGFuZGxlIGNvbXByZXNzaW9uDQo+Pj4+ICsgICAgICovDQo+Pj4+ICsgICAgam9iLT53cml0ZV9m
-bGFncyA9DQo+Pj4+ICsgICAgICAgICAgICAoYmRydl9jaGFpbl9jb250YWlucyh0YXJnZXQsIGJz
-KSA/IEJEUlZfUkVRX1NFUklBTElTSU5HIDogMCkgfA0KPj4+PiArICAgICAgICAgICAgKGNvbXBy
-ZXNzID8gQkRSVl9SRVFfV1JJVEVfQ09NUFJFU1NFRCA6IDApOw0KPj4+PiArDQo+Pj4+ICAgICAg
-ICBqb2ItPmNsdXN0ZXJfc2l6ZSA9IGNsdXN0ZXJfc2l6ZTsNCj4+Pj4gICAgICAgIGpvYi0+Y29w
-eV9iaXRtYXAgPSBjb3B5X2JpdG1hcDsNCj4+Pj4gICAgICAgIGNvcHlfYml0bWFwID0gTlVMTDsN
-Cj4+Pj4NCj4+Pg0KPj4+IFdoYXQgaGFwcGVucyBpZiB5b3UgZGlkIHBhc3MgQkRSVl9SRVFfV1JJ
-VEVfQ09NUFJFU1NFRCB0bw0KPj4+IGJsa19jb19jb3B5X3JhbmdlPyBJcyB0aGF0IHJlamVjdGVk
-IHNvbWV3aGVyZSBpbiB0aGUgc3RhY2s/DQo+Pg0KPj4NCj4+IEhtbSwgSSdtIGFmcmFpZCB0aGF0
-IGl0IHdpbGwgYmUgc2lsZW50bHkgaWdub3JlZC4NCj4+DQo+PiBBbmQgSSBoYXZlIG9uZSBxdWVz
-dGlvbiByZWxhdGVkIHRvIGNvcHkgb2ZmbG9hZCB0b28uDQo+Pg0KPj4gRG8gd2UgcmVhbGx5IG5l
-ZWQgdG8gaGFuZGxlIG1heF90cmFuc2ZlciBpbiBiYWNrdXAgY29kZSBmb3IgY29weSBvZmZsb2Fk
-Pw0KPj4gSXMgbWF4X3RyYW5zZmVyIHJlbGF0ZWQgdG8gaXQgcmVhbGx5Pw0KPj4NCj4+IEFueXdh
-eSwgYmwubWF4X3RyYW5zZmVyIHNob3VsZCBiZSBoYW5kbGVkIGluIGdlbmVyaWMgY29weV9yYW5n
-ZSBjb2RlIGluIGJsb2NrL2lvLmMNCj4+IChpZiBpdCBzaG91bGQgYXQgYWxsKSwgSSdtIGdvaW5n
-IHRvIGZpeCBpdCwgYnV0IG1heSBiZSwgSSBjYW4ganVzdCBkcm9wIHRoaXMgbGltaXRhdGlvbg0K
-Pj4gZnJvbSBiYWNrdXA/DQo+IA0KPiBPbiBhIHF1aWNrIGdsYW5jZSwgaXQgZG9lc27igJl0IGxv
-b2sgbGlrZSBhIGxpbWl0YXRpb24gdG8gbWUgYnV0IGFjdHVhbGx5DQo+IGxpa2UgdGhlIG9wcG9z
-aXRlLiAgYmFja3VwX2Nvd193aXRoX2JvdW5jZV9idWZmZXIoKSBvbmx5IGNvcGllcyB1cCB0bw0K
-PiBjbHVzdGVyX3NpemUsIHdoZXJlYXMgYmFja3VwX2Nvd193aXRoX29mZmxvYWQoKSB3aWxsIGNv
-cHkgdXAgdG8gdGhlDQo+IG1heGltdW0gdHJhbnNmZXIgc2l6ZSBwZXJtaXR0ZWQgYnkgYm90aCBz
-b3VyY2UgYW5kIHRhcmdldCBmb3IgY29weQ0KPiBvZmZsb2FkaW5nLg0KPiANCg0KSSBtZWFuLCB3
-aHkgbm90IHRvIGp1c3QgY29weSB0aGUgd2hvbGUgY2h1bmsgY29tZXMgaW4gbm90aWZpZXIgYW5k
-IGRvbid0IGNhcmUgYWJvdXQNCm1heF90cmFuc2Zlcj8gQmFja3VwIGxvb3AgY29waWVzIGNsdXN0
-ZXIgYnkgY2x1c3RlciBhbnl3YXksIHNvIG9ubHkgbm90aWZpZXIgbWF5IGNvcHkNCmxhcmdlciBj
-aHVuay4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q6RyEYM2ChhaUH8HFtFGTK6Fw0HG9nWoW
+Content-Type: multipart/mixed; boundary="R9N77uutsdIoxkoNdtrhrNwj4x8pZhNb5";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
+Message-ID: <f83ed7fb-b9cd-4d28-d58e-92357f3acc73@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] block/backup: refactor write_flags
+References: <20190730163251.755248-1-vsementsov@virtuozzo.com>
+ <20190730163251.755248-4-vsementsov@virtuozzo.com>
+ <2b034619-ab55-a5f1-a1f4-ea14c4c5c18c@redhat.com>
+ <f6927c00-5708-e471-e768-ef9d1e0c2dc6@virtuozzo.com>
+ <12efde81-7a17-56c0-e50d-080574faa9f9@redhat.com>
+ <29be5652-33d3-216c-a377-ed7d76c23c1b@virtuozzo.com>
+In-Reply-To: <29be5652-33d3-216c-a377-ed7d76c23c1b@virtuozzo.com>
+
+--R9N77uutsdIoxkoNdtrhrNwj4x8pZhNb5
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 01.08.19 13:32, Vladimir Sementsov-Ogievskiy wrote:
+> 01.08.2019 14:28, Max Reitz wrote:
+>> On 31.07.19 18:01, Vladimir Sementsov-Ogievskiy wrote:
+>>> 30.07.2019 21:28, John Snow wrote:
+>>>>
+>>>>
+>>>> On 7/30/19 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> write flags are constant, let's store it in BackupBlockJob instead =
+of
+>>>>> recalculating. It also makes two boolean fields to be unused, so,
+>>>>> drop them.
+>>>>>
+>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
+om>
+>>>>> ---
+>>>>>    block/backup.c | 24 ++++++++++++------------
+>>>>>    1 file changed, 12 insertions(+), 12 deletions(-)
+>>>>>
+>>>>> diff --git a/block/backup.c b/block/backup.c
+>>>>> index c5f941101a..4651649e9d 100644
+>>>>> --- a/block/backup.c
+>>>>> +++ b/block/backup.c
+>>>>> @@ -47,7 +47,6 @@ typedef struct BackupBlockJob {
+>>>>>        uint64_t len;
+>>>>>        uint64_t bytes_read;
+>>>>>        int64_t cluster_size;
+>>>>> -    bool compress;
+>>>>>        NotifierWithReturn before_write;
+>>>>>        QLIST_HEAD(, CowRequest) inflight_reqs;
+>>>>>   =20
+>>>>> @@ -55,7 +54,7 @@ typedef struct BackupBlockJob {
+>>>>>        bool use_copy_range;
+>>>>>        int64_t copy_range_size;
+>>>>>   =20
+>>>>> -    bool serialize_target_writes;
+>>>>> +    BdrvRequestFlags write_flags;
+>>>>>    } BackupBlockJob;
+>>>>>   =20
+>>>>>    static const BlockJobDriver backup_job_driver;
+>>>>> @@ -110,10 +109,6 @@ static int coroutine_fn backup_cow_with_bounce=
+_buffer(BackupBlockJob *job,
+>>>>>        BlockBackend *blk =3D job->common.blk;
+>>>>>        int nbytes;
+>>>>>        int read_flags =3D is_write_notifier ? BDRV_REQ_NO_SERIALISI=
+NG : 0;
+>>>>> -    int write_flags =3D
+>>>>> -            (job->serialize_target_writes ? BDRV_REQ_SERIALISING :=
+ 0) |
+>>>>> -            (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
+>>>>> -
+>>>>>   =20
+>>>>>        assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+>>>>>        hbitmap_reset(job->copy_bitmap, start, job->cluster_size);
+>>>>> @@ -132,7 +127,7 @@ static int coroutine_fn backup_cow_with_bounce_=
+buffer(BackupBlockJob *job,
+>>>>>        }
+>>>>>   =20
+>>>>>        ret =3D blk_co_pwrite(job->target, start, nbytes, *bounce_bu=
+ffer,
+>>>>> -                        write_flags);
+>>>>> +                        job->write_flags);
+>>>>>        if (ret < 0) {
+>>>>>            trace_backup_do_cow_write_fail(job, start, ret);
+>>>>>            if (error_is_read) {
+>>>>> @@ -160,7 +155,6 @@ static int coroutine_fn backup_cow_with_offload=
+(BackupBlockJob *job,
+>>>>>        BlockBackend *blk =3D job->common.blk;
+>>>>>        int nbytes;
+>>>>>        int read_flags =3D is_write_notifier ? BDRV_REQ_NO_SERIALISI=
+NG : 0;
+>>>>> -    int write_flags =3D job->serialize_target_writes ? BDRV_REQ_SE=
+RIALISING : 0;
+>>>>>   =20
+>>>>>        assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_si=
+ze));
+>>>>>        assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+>>>>> @@ -168,7 +162,7 @@ static int coroutine_fn backup_cow_with_offload=
+(BackupBlockJob *job,
+>>>>>        nr_clusters =3D DIV_ROUND_UP(nbytes, job->cluster_size);
+>>>>>        hbitmap_reset(job->copy_bitmap, start, job->cluster_size * n=
+r_clusters);
+>>>>>        ret =3D blk_co_copy_range(blk, start, job->target, start, nb=
+ytes,
+>>>>> -                            read_flags, write_flags);
+>>>>> +                            read_flags, job->write_flags);
+>>>>>        if (ret < 0) {
+>>>>>            trace_backup_do_cow_copy_range_fail(job, start, ret);
+>>>>>            hbitmap_set(job->copy_bitmap, start, job->cluster_size *=
+ nr_clusters);
+>>>>> @@ -638,10 +632,16 @@ BlockJob *backup_job_create(const char *job_i=
+d, BlockDriverState *bs,
+>>>>>        job->sync_mode =3D sync_mode;
+>>>>>        job->sync_bitmap =3D sync_mode =3D=3D MIRROR_SYNC_MODE_INCRE=
+MENTAL ?
+>>>>>                           sync_bitmap : NULL;
+>>>>> -    job->compress =3D compress;
+>>>>>   =20
+>>>>> -    /* Detect image-fleecing (and similar) schemes */
+>>>>> -    job->serialize_target_writes =3D bdrv_chain_contains(target, b=
+s);
+>>>>> +    /*
+>>>>> +     * Set write flags:
+>>>>> +     *  1. Detect image-fleecing (and similar) schemes
+>>>>> +     *  2. Handle compression
+>>>>> +     */
+>>>>> +    job->write_flags =3D
+>>>>> +            (bdrv_chain_contains(target, bs) ? BDRV_REQ_SERIALISIN=
+G : 0) |
+>>>>> +            (compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
+>>>>> +
+>>>>>        job->cluster_size =3D cluster_size;
+>>>>>        job->copy_bitmap =3D copy_bitmap;
+>>>>>        copy_bitmap =3D NULL;
+>>>>>
+>>>>
+>>>> What happens if you did pass BDRV_REQ_WRITE_COMPRESSED to
+>>>> blk_co_copy_range? Is that rejected somewhere in the stack?
+>>>
+>>>
+>>> Hmm, I'm afraid that it will be silently ignored.
+>>>
+>>> And I have one question related to copy offload too.
+>>>
+>>> Do we really need to handle max_transfer in backup code for copy offl=
+oad?
+>>> Is max_transfer related to it really?
+>>>
+>>> Anyway, bl.max_transfer should be handled in generic copy_range code =
+in block/io.c
+>>> (if it should at all), I'm going to fix it, but may be, I can just dr=
+op this limitation
+>>> from backup?
+>>
+>> On a quick glance, it doesn=E2=80=99t look like a limitation to me but=
+ actually
+>> like the opposite.  backup_cow_with_bounce_buffer() only copies up to
+>> cluster_size, whereas backup_cow_with_offload() will copy up to the
+>> maximum transfer size permitted by both source and target for copy
+>> offloading.
+>>
+>=20
+> I mean, why not to just copy the whole chunk comes in notifier and don'=
+t care about
+> max_transfer? Backup loop copies cluster by cluster anyway, so only not=
+ifier may copy
+> larger chunk.
+
+One thing that comes to mind is the hbitmap_get() check in
+backup_do_cow().  You don=E2=80=99t want to copy everything just because =
+the
+first cluster needs to be copied.
+
+Max
+
+
+--R9N77uutsdIoxkoNdtrhrNwj4x8pZhNb5--
+
+--q6RyEYM2ChhaUH8HFtFGTK6Fw0HG9nWoW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1CzxQACgkQ9AfbAGHV
+z0DOdQgAiXT5+42goawYJh8YlwFH9fJuIjDw6qJPYp06dOomaBUdfdKWYq5v+9ZB
+S2pJUFBS4ahX2o+HyyYlgkqzIrOgsw4hWj0/ELiQ2UnZp1luLCTurpmGT5QBBFMT
+9M9Z857BwJmZAtenkUon43x3sH6r1w6TON4tFjxedPnYwQJ73JI+NyDhd+rkqtoa
+Qi8Qzo+m2Ty8kCKKFRrHvPtWgP1Yejblhhac8bco0Yg0ozFIgK9my9VetfpbkH3M
+jw1KG5ufQWQUEShpKtAKCP/JQGaBv3iGNTpnLGl4fJvxzlX7yuGUryvkrfJ2Xxjz
+S9leGDSveKFU1j1k/IJ6nXk9Dy63Xw==
+=/NAr
+-----END PGP SIGNATURE-----
+
+--q6RyEYM2ChhaUH8HFtFGTK6Fw0HG9nWoW--
 
