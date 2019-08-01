@@ -2,90 +2,61 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14E6BC19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 09:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BEDC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 10:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94D2F214DA
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 09:35:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Owa0DGGa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94D2F214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id ACEE6206B8
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 10:43:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACEE6206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ht7V8-0001Lt-Jv
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 05:35:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38785)
+	id 1ht8Y5-0006yz-M7
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 06:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51765)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1ht7Ug-0000oE-QT
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 05:35:32 -0400
+ (envelope-from <groug@kaod.org>) id 1ht8XB-0006SF-9C
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:42:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1ht7Uf-0006fH-LJ
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 05:35:30 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:39786)
+ (envelope-from <groug@kaod.org>) id 1ht8X9-0000yi-O8
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:42:09 -0400
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:42698)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1ht7Ua-0006b4-7g; Thu, 01 Aug 2019 05:35:24 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 3E7D896F50;
- Thu,  1 Aug 2019 09:35:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1564652122;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nriKtxb87UsfPA9J85BeVqjBwR431vjNFezY0aAKjYo=;
- b=Owa0DGGasQKiaj3LA9qgupXgm8u4ANQMWc2duWwDMzbqGl0odgBfJbjkDPryjNfH76mU4X
- aiWS3mgXue1hQJlKzk9pSkTY31e+zHy+6aiw72ljJaojxLQgjpZG1G2e1sWHetFfbUx+Sh
- hLnEVlQ+QNDPHfrRy3CYkFvEeyNcm1E=
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-2-damien.hedde@greensocs.com>
- <20190730154209.2049f10a.cohuck@redhat.com>
- <CAFEAcA-rwBiXkDEDuT-=KQVJ2A2ob16=P0obbZBPUfZeYXy+dQ@mail.gmail.com>
- <20190730155547.7b201f5e.cohuck@redhat.com>
- <CAFEAcA_BU3DECLVv2QD_RshR0OL3=GqGwsm0YAmEAE6_SpW=HA@mail.gmail.com>
- <34a216b0-0067-8627-599c-6a67622c4bd2@greensocs.com>
- <20190731054612.GA2032@umbus.fritz.box>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <1ed75cda-805e-af0b-77f5-62b9bc489e95@greensocs.com>
-Date: Thu, 1 Aug 2019 11:35:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ht8X9-0000y9-J6
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 06:42:07 -0400
+Received: from player157.ha.ovh.net (unknown [10.109.143.175])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 3688113D47C
+ for <qemu-devel@nongnu.org>; Thu,  1 Aug 2019 12:42:05 +0200 (CEST)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player157.ha.ovh.net (Postfix) with ESMTPSA id 0FB16874B1D8;
+ Thu,  1 Aug 2019 10:42:00 +0000 (UTC)
+Date: Thu, 1 Aug 2019 12:41:59 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Daniel Black <daniel@linux.ibm.com>
+Message-ID: <20190801124159.75d9fa48@bahia.lan>
+In-Reply-To: <20190801033819.29664-1-daniel@linux.ibm.com>
+References: <20190801033819.29664-1-daniel@linux.ibm.com>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20190731054612.GA2032@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US-large
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1564652122;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=nriKtxb87UsfPA9J85BeVqjBwR431vjNFezY0aAKjYo=;
- b=c2vyHtO0x/QVRLB10kkp5S8b/VpmIy8a5bJhSfKESbkxfq1TQ2SiAY6uQYd9Ks6pYpybOQ
- XoxV3OuYaJEoWV1Y3Q09f64e8dDOWcHJg4ikSw66WOgMVYpfgD1qZAenrzBCj4gBhUf9GE
- pJqjdCWhonVZQeW5O4pOGIc/AzaIj2U=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1564652122; a=rsa-sha256; cv=none;
- b=HdhuFftnYD2d/OLaIJjWyQmpLnBY1j4dNWpRcozeBSplEOhdNa4KWRI7Gu+qHY4jjw90n+
- UWx8n7gORzGRXznEFdR7u4+yF8PrrPMUQy2z6ha7xiY/10LLzPah8OqNb6khL5HDJ3XcWV
- eXQgDdMiQLzwW/wsyyrEPZw2v3FZEOw=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-Ovh-Tracer-Id: 13978047347330292144
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddrleejgdeftdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH v3 01/33] Create Resettable QOM interface
+X-Received-From: 46.105.76.148
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2] spapr: quantify error
+ messages regarding capability settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,101 +68,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu,  1 Aug 2019 13:38:19 +1000
+Daniel Black <daniel@linux.ibm.com> wrote:
 
-
-On 7/31/19 7:46 AM, David Gibson wrote:
-> On Tue, Jul 30, 2019 at 04:08:59PM +0200, Damien Hedde wrote:
->>
->> On 7/30/19 3:59 PM, Peter Maydell wrote:
->>> On Tue, 30 Jul 2019 at 14:56, Cornelia Huck <cohuck@redhat.com> wrote:
->>>>
->>>> On Tue, 30 Jul 2019 14:44:21 +0100
->>>> Peter Maydell <peter.maydell@linaro.org> wrote:
->>>>
->>>>> On Tue, 30 Jul 2019 at 14:42, Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>> I'm having a hard time figuring out what a 'cold' or a 'warm' reset is
->>>>>> supposed to be... can you add a definition/guideline somewhere?
->>>>>
->>>>> Generally "cold" reset is "power on" and "warm" is "we were already
->>>>> powered-on, but somebody flipped a reset line somewhere".
->>>>
->>>> Ok, that makes sense... my main concern is to distinguish that in a
->>>> generic way, as it is a generic interface. What about adding something
->>>> like:
->>>>
->>>> "A 'cold' reset means that the object to be reset is initially reset; a 'warm'
->>>> reset means that the object to be reset has already been initialized."
->>>>
->>>> Or is that again too generic?
->>>
->>> I think it doesn't quite capture the idea -- an object can have already
->>> been reset and then get a 'cold' reset: this is like having a powered-on
->>> machine and then power-cycling it.
->>>
->>> The 'warm' reset is the vaguer one, because the specific behaviour
->>> is somewhat device-dependent (many devices might not have any
->>> difference from 'cold' reset, for those that do the exact detail
->>> of what doesn't get reset on warm-reset will vary). But every
->>> device should have some kind of "as if you power-cycled it" (or
->>> for QEMU, "go back to the same state as if you just started QEMU on the
->>> command line"). Our current "reset" method is really cold-reset.
->>>
->>
->> Exactly. In the following patches, I've tried to replace existing reset
->> calls by cold or warm reset depending on whether:
->> + it is called through the main system reset -> cold
->> + it is called during normal life-time       -> warm
->>
->> But I definitely can add some docs/comments to better explain that.
+> Its not immediately obvious how cap-X=Y setting need to be applied
+> to the command line so, for spapr capability error messages, this
+> has been clarified to:
 > 
-> Hrm, that helps, but it still seems pretty vague to me.
+>   ..[try] appending -machine cap-X=Y
 > 
-> It's not really my call, but building the concept of warm versus cold
-> resets into such a generic interface seems pretty dubios to me.  While
-> it's moderately common for things to have a notion of warm versus cold
-> reset it's certainly not universal.  There are many devices where
-> there's no meaningful difference between the two.  There are some
-> devices where there are > 2 different types of reset suitable for
-> various different situations.
+> The wrong value messages have been left as is, as the user has found
+> the right location.
 > 
-> Is there any way this could work with it usually just presenting the
-> cold reset (which is the closest to a universal concept), and any warm
-> or additional resets are handled buy a different instance of the
-> Resettable interface?
+> Signed-off-by: Daniel Black <daniel@linux.ibm.com>
+> ---
+> v2 Improved error message thanks David Gibson
 > 
+> Left the "appending" as its not obvious more that one -machine
+> arguement is allowed.
+> ---
+>  hw/ppc/spapr_caps.c | 47 ++++++++++++++++++++++++++++++---------------
+>  1 file changed, 32 insertions(+), 15 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index bbb001f84a..1c0222a081 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -37,6 +37,8 @@
+>  
+>  #include "hw/ppc/spapr.h"
+>  
+> +#define CAPABILITY_ERROR(X) "appending -machine " X
 
-In my current implementation, cold/warm is only a question of setting a
-flag before calling the reset methods. I rely and the reset methods to
-check that flag if necessary. The feature can be added/removed without
-pain (if we stick with device_reset to do a cold one). So if it's
-better, I can put it aside for now.
+I would make that:
 
-IMO handling warm reset with another interface is probably not a good
-idea because it will need another load of methods.
+#define CAPABILITY_HINT() "try appending -machine " X
 
---
-Damien
+because it is really an hint for the user, not an
+error, and all original strings have "try", except...
+
+> +
+>  typedef struct SpaprCapPossible {
+>      int num;            /* size of vals array below */
+>      const char *help;   /* help text for vals */
+> @@ -194,10 +196,12 @@ static void cap_htm_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+>      }
+>      if (tcg_enabled()) {
+>          error_setg(errp,
+> -                   "No Transactional Memory support in TCG, try cap-htm=off");
+> +                   "No Transactional Memory support in TCG, try "
+> +                   CAPABILITY_ERROR("cap-htm=off"));
+>      } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+>          error_setg(errp,
+> -"KVM implementation does not support Transactional Memory, try cap-htm=off"
+> +"KVM implementation does not support Transactional Memory, try "
+> +                   CAPABILITY_ERROR("cap-htm=off")
+>              );
+>      }
+>  }
+> @@ -215,7 +219,8 @@ static void cap_vsx_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+>       * rid of anything that doesn't do VMX */
+>      g_assert(env->insns_flags & PPC_ALTIVEC);
+>      if (!(env->insns_flags2 & PPC2_VSX)) {
+> -        error_setg(errp, "VSX support not available, try cap-vsx=off");
+> +        error_setg(errp, "VSX support not available, try "
+> +                   CAPABILITY_ERROR("cap-vsx=off"));
+>      }
+>  }
+>  
+> @@ -229,7 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+>          return;
+>      }
+>      if (!(env->insns_flags2 & PPC2_DFP)) {
+> -        error_setg(errp, "DFP support not available, try cap-dfp=off");
+> +        error_setg(errp, "DFP support not available, try "
+> +                   CAPABILITY_ERROR("cap-dfp=off"));
+>      }
+>  }
+>  
+> @@ -249,11 +255,13 @@ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+>      if (tcg_enabled() && val) {
+>          /* TCG only supports broken, allow other values and print a warning */
+>          error_setg(&local_err,
+> -                   "TCG doesn't support requested feature, cap-cfpc=%s",
+> +                   "TCG doesn't support requested feature, "
+> +                   CAPABILITY_ERROR("cap-cfpc=%s"),
+
+... this one, but it doesn't look like a hint to me. It just tells which
+is the unsupported cap.
+
+>                     cap_cfpc_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested safe cache capability level not supported by kvm, try cap-cfpc=%s",
+> +"Requested safe cache capability level not supported by kvm, try "
+> +                   CAPABILITY_ERROR("cap-cfpc=%s"),
+>                     cap_cfpc_possible.vals[kvm_val]);
+
+Also, we have a dedicated API for hints, which are only printed under
+the monitor but ignored under QMP.
+
+Not sure why it isn't used here but it should be something like:
+
+        error_setg(errp, 
+                   "Requested safe cache capability level not supported by kvm");
+        error_append_hint(errp, CAPABILITY_HINT("cap-cfpc=%s") "\n",
+                          cap_cfpc_possible.vals[kvm_val]);
+
+>      }
+>  
+> @@ -281,7 +289,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
+>                     cap_sbbc_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested safe bounds check capability level not supported by kvm, try cap-sbbc=%s",
+> +"Requested safe bounds check capability level not supported by kvm, try "
+> +                   CAPABILITY_ERROR("cap-sbbc=%s"),
+>                     cap_sbbc_possible.vals[kvm_val]);
+>      }
+>  
+> @@ -312,7 +321,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+>                     cap_ibs_possible.vals[val]);
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s",
+> +"Requested safe indirect branch capability level not supported by kvm, try "
+> +                   CAPABILITY_ERROR("cap-ibs=%s"),
+>                     cap_ibs_possible.vals[kvm_val]);
+>      }
+>  
+> @@ -401,11 +411,13 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
+>  
+>      if (tcg_enabled()) {
+>          error_setg(errp,
+> -                   "No Nested KVM-HV support in tcg, try cap-nested-hv=off");
+> +                   "No Nested KVM-HV support in tcg, try "
+> +                   CAPABILITY_ERROR("cap-nested-hv=off"));
+>      } else if (kvm_enabled()) {
+>          if (!kvmppc_has_cap_nested_kvm_hv()) {
+>              error_setg(errp,
+> -"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=off");
+> +"KVM implementation does not support Nested KVM-HV, try "
+> +                       CAPABILITY_ERROR("cap-nested-hv=off"));
+>          } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
+>                  error_setg(errp,
+>  "Error enabling cap-nested-hv with KVM, try cap-nested-hv=off");
+> @@ -435,10 +447,12 @@ static void cap_large_decr_apply(SpaprMachineState *spapr,
+>  
+>          if (!kvm_nr_bits) {
+>              error_setg(errp,
+> -                       "No large decrementer support, try cap-large-decr=off");
+> +                       "No large decrementer support, try "
+> +                        CAPABILITY_ERROR("cap-large-decr=off"));
+>          } else if (pcc->lrg_decr_bits != kvm_nr_bits) {
+>              error_setg(errp,
+> -"KVM large decrementer size (%d) differs to model (%d), try -cap-large-decr=off",
+> +"KVM large decrementer size (%d) differs to model (%d), try "
+> +                CAPABILITY_ERROR("cap-large-decr=off"),
+>                  kvm_nr_bits, pcc->lrg_decr_bits);
+>          }
+>      }
+> @@ -454,7 +468,8 @@ static void cap_large_decr_cpu_apply(SpaprMachineState *spapr,
+>      if (kvm_enabled()) {
+>          if (kvmppc_enable_cap_large_decr(cpu, val)) {
+>              error_setg(errp,
+> -                       "No large decrementer support, try cap-large-decr=off");
+> +                       "No large decrementer support, try "
+> +                       CAPABILITY_ERROR("cap-large-decr=off"));
+>          }
+>      }
+>  
+> @@ -474,10 +489,12 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+>      if (tcg_enabled() && val) {
+>          /* TODO - for now only allow broken for TCG */
+>          error_setg(errp,
+> -"Requested count cache flush assist capability level not supported by tcg, try cap-ccf-assist=off");
+> +"Requested count cache flush assist capability level not supported by tcg, try "
+> +                   CAPABILITY_ERROR("cap-ccf-assist=off"));
+>      } else if (kvm_enabled() && (val > kvm_val)) {
+>          error_setg(errp,
+> -"Requested count cache flush assist capability level not supported by kvm, try cap-ccf-assist=off");
+> +"Requested count cache flush assist capability level not supported by kvm, try "
+> +                   CAPABILITY_ERROR("cap-ccf-assist=off"));
+>      }
+>  }
+>  
+
 
