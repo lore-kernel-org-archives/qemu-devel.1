@@ -2,61 +2,94 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F79C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 15:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E19D5C19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 15:29:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3C9A206B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 15:20:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3C9A206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A8F4220665
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 15:29:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AQ9Ubn+Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8F4220665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htCsz-0000QZ-8H
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 11:20:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36127)
+	id 1htD1M-0004vm-Oe
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 11:29:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37582)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1htCqJ-0005TQ-OW
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:18:13 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htCxb-0003CQ-NO
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1htCqI-0000w4-CN
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:18:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53306)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1htCqF-0000v0-7L; Thu, 01 Aug 2019 11:18:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9099CC08EC18;
- Thu,  1 Aug 2019 15:18:06 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-98.ams2.redhat.com
- [10.36.117.98])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A903E5D712;
- Thu,  1 Aug 2019 15:17:58 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Date: Thu,  1 Aug 2019 17:17:44 +0200
-Message-Id: <20190801151744.798-4-kwolf@redhat.com>
-In-Reply-To: <20190801151744.798-1-kwolf@redhat.com>
-References: <20190801151744.798-1-kwolf@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1htCxW-0006aU-4B
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:25:41 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:35581)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1htCxO-0006NB-A0
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 11:25:32 -0400
+Received: by mail-pl1-x642.google.com with SMTP id w24so32368791plp.2
+ for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 08:25:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=gCM1I/MqAWRzSpFbCXcbrgopoWvXgui2878Yjg73wPs=;
+ b=AQ9Ubn+ZiCp6wV9SDhwU290EEQ3gqqnWY6q3QiHOXHOFSws/6KPH/Py0AvloJ2oOiw
+ gBVcW7gOw/wKlU2F1+OJxfOCqZuCR/KB61xz1up0eGPQ6J9n97mBR+pzXuhzw7yTAUcv
+ kRoXCLzQ/S9e70TQQ7wwLdzmqK6icPk65l9kuPOxRPU4FMOGksiTPBuyq5pKWCef8/g1
+ mxsqzl5g8fJvg+aLgrcdy4o3zVJ6A8YOk8SXy6/NrF71wud4vLw7oDb4oZYJcPaKB6i9
+ acxCLyutlJQuHFW4LrG1YB5l2WqiGAlA4BmuPNmE8B6YB8ScgQZIB3g9ZJvSaFB0fv2p
+ 3fnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=gCM1I/MqAWRzSpFbCXcbrgopoWvXgui2878Yjg73wPs=;
+ b=ATB+9Rlc0CNtRrD9f00cP0QPtFhXL4oll4XoSjvXP5FjjLakhsRI0F1WUF5lDsnfVQ
+ LP5BToKwBuVvV8fHAoNpjukISskv3qY5FbB8RGxDJ5+t1jL+4MBeajtLRPBzOxjmBgHX
+ 3gF/GBaUGsh+7xYzuAmknL0Gf+yfvqa9fsOm0SAH3+9ZkZ/wBE6SnwMKT/pakT5L5adB
+ fyU4Afk4lFcRqCSe9SZv66mDzUJhCR8cCL9pfz0NU0T9g+7CQb1rzRgpXDMLN0lJPX9p
+ DrCzauCDhewBrPzt48sIb6Jl6PFpnQE0UzVKkFI/M+06byV1eUAdRnTBIhCVz8t8zZhU
+ ob2g==
+X-Gm-Message-State: APjAAAUuf9CymRNXT9V/dpVLJ/S8V78tjj5T/6pJbN64Eurt2uhNZlIC
+ BTdWNWObBS65XrYordjXjdHMsw==
+X-Google-Smtp-Source: APXvYqxTvsdDACu037ZKig2bruA12RouiA7I0QlOCjd8dOTsD41MWD9ErnApQZQKsuNK9RELPb7Qig==
+X-Received: by 2002:a17:902:bd06:: with SMTP id
+ p6mr129888332pls.189.1564673106890; 
+ Thu, 01 Aug 2019 08:25:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d8sm66664711pgh.45.2019.08.01.08.25.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 01 Aug 2019 08:25:05 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20190731160719.11396-1-alex.bennee@linaro.org>
+ <20190731160719.11396-11-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <865def91-1140-f62b-c3c7-db08eba1cb66@linaro.org>
+Date: Thu, 1 Aug 2019 08:25:04 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 01 Aug 2019 15:18:06 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/3] iotests: Test migration with all kinds of
- filter nodes
+In-Reply-To: <20190731160719.11396-11-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH v4 10/54] translate-all: use
+ cpu_in_exclusive_work_context() in tb_flush
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,165 +101,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, aaron@os.amperecomputing.com,
+ cota@braap.org, bobby.prani@gmail.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test case is motivated by commit 2b23f28639 ('block/copy-on-read:
-Fix permissions for inactive node'). Instead of just testing
-copy-on-read on migration, let's stack all sorts of filter nodes on top
-of each other and try if the resulting VM can still migrate
-successfully. For good measure, put everything into an iothread, because
-why not?
+On 7/31/19 9:06 AM, Alex Bennée wrote:
+> From: "Emilio G. Cota" <cota@braap.org>
+> 
+> tb_flush will be called by the plugin module from a safe
+> work environment. Prepare for that.
+> 
+> Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  accel/tcg/translate-all.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/262     | 84 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/262.out | 17 ++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 102 insertions(+)
- create mode 100755 tests/qemu-iotests/262
- create mode 100644 tests/qemu-iotests/262.out
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
-new file mode 100755
-index 0000000000..dcd81a6059
---- /dev/null
-+++ b/tests/qemu-iotests/262
-@@ -0,0 +1,84 @@
-+#!/usr/bin/env python
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
-+#
-+# Test migration with filter drivers present. Keep everything in an
-+# iothread just for fun.
-+
-+import iotests
-+import os
-+
-+iotests.verify_image_format(supported_fmts=3D['qcow2'])
-+iotests.verify_platform(['linux'])
-+
-+iotests.init()
-+
-+with iotests.FilePath('img') as img_path, \
-+     iotests.FilePath('mig_fifo') as fifo, \
-+     iotests.VM(path_suffix=3D'a') as vm_a, \
-+     iotests.VM(path_suffix=3D'b') as vm_b:
-+
-+    def add_opts(vm):
-+        vm.add_object('iothread,id=3Diothread0')
-+        vm.add_object('throttle-group,id=3Dtg0,x-bps-total=3D65536')
-+        vm.add_blockdev('file,filename=3D%s,node-name=3Ddrive0-file' % (=
-img_path))
-+        vm.add_blockdev('%s,file=3Ddrive0-file,node-name=3Ddrive0-fmt' %=
- (iotests.imgfmt))
-+        vm.add_blockdev('copy-on-read,file=3Ddrive0-fmt,node-name=3Ddriv=
-e0-cor')
-+        vm.add_blockdev('throttle,file=3Ddrive0-cor,node-name=3Ddrive0-t=
-hrottle,throttle-group=3Dtg0')
-+        vm.add_blockdev('blkdebug,image=3Ddrive0-throttle,node-name=3Ddr=
-ive0-dbg')
-+        vm.add_blockdev('null-co,node-name=3Dnull,read-zeroes=3Don')
-+        vm.add_blockdev('blkverify,test=3Ddrive0-dbg,raw=3Dnull,node-nam=
-e=3Ddrive0-verify')
-+
-+        if iotests.supports_quorum():
-+            vm.add_blockdev('quorum,children.0=3Ddrive0-verify,vote-thre=
-shold=3D1,node-name=3Ddrive0-quorum')
-+            root =3D "drive0-quorum"
-+        else:
-+            root =3D "drive0-verify"
-+
-+        vm.add_device('virtio-blk,drive=3D%s,iothread=3Diothread0' % roo=
-t)
-+
-+    iotests.qemu_img_pipe('create', '-f', iotests.imgfmt, img_path, '64M=
-')
-+
-+    os.mkfifo(fifo)
-+
-+    iotests.log('Launching source VM...')
-+    add_opts(vm_a)
-+    vm_a.launch()
-+
-+    vm_a.enable_migration_events('A')
-+
-+    iotests.log('Launching destination VM...')
-+    add_opts(vm_b)
-+    vm_b.add_incoming("exec: cat '%s'" % (fifo))
-+    vm_b.launch()
-+
-+    vm_b.enable_migration_events('B')
-+
-+    iotests.log('Starting migration to B...')
-+    iotests.log(vm_a.qmp('migrate', uri=3D'exec:cat >%s' % (fifo)))
-+    with iotests.Timeout(3, 'Migration does not complete'):
-+        # Wait for the source first (which includes setup=3Dsetup)
-+        vm_a.wait_migration()
-+        # Wait for the destination second (which does not)
-+        vm_b.wait_migration()
-+
-+    iotests.log(vm_a.qmp('query-migrate')['return']['status'])
-+    iotests.log(vm_b.qmp('query-migrate')['return']['status'])
-+
-+    iotests.log(vm_a.qmp('query-status'))
-+    iotests.log(vm_b.qmp('query-status'))
-diff --git a/tests/qemu-iotests/262.out b/tests/qemu-iotests/262.out
-new file mode 100644
-index 0000000000..5a58e5e9f8
---- /dev/null
-+++ b/tests/qemu-iotests/262.out
-@@ -0,0 +1,17 @@
-+Launching source VM...
-+Enabling migration QMP events on A...
-+{"return": {}}
-+Launching destination VM...
-+Enabling migration QMP events on B...
-+{"return": {}}
-+Starting migration to B...
-+{"return": {}}
-+{"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"micro=
-seconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
-oseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micr=
-oseconds": "USECS", "seconds": "SECS"}}
-+{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"m=
-icroseconds": "USECS", "seconds": "SECS"}}
-+completed
-+completed
-+{"return": {"running": false, "singlestep": false, "status": "postmigrat=
-e"}}
-+{"return": {"running": true, "singlestep": false, "status": "running"}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index f13e5f2e23..71ba3c05dc 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -271,3 +271,4 @@
- 254 rw backing quick
- 255 rw quick
- 256 rw quick
-+262 rw quick migration
---=20
-2.20.1
+
+r~
 
 
