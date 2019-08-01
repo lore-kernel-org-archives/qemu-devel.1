@@ -2,92 +2,63 @@ Return-Path: <SRS0=TBk9=V5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC4E1C19759
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A6EC19759
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:22:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7720920838
-	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:17:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hcDtWsy+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7720920838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id A29582087E
+	for <qemu-devel@archiver.kernel.org>; Thu,  1 Aug 2019 14:22:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A29582087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htBtD-0006lu-RC
-	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 10:17:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52473)
+	id 1htBxy-000107-U8
+	for qemu-devel@archiver.kernel.org; Thu, 01 Aug 2019 10:22:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53256)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htBsp-0006Jw-JJ
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:16:44 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1htBwW-0000Aq-UX
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:20:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htBso-0005by-Mi
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:16:43 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:35973)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htBso-0005bS-Eh
- for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:16:42 -0400
-Received: by mail-pg1-x541.google.com with SMTP id l21so34290557pgm.3
- for <qemu-devel@nongnu.org>; Thu, 01 Aug 2019 07:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=nvgx3691qemUajFHkiros1xQZE99DVaku3/9F7Mq1Eg=;
- b=hcDtWsy+JB25ZfK6dakt2CQy2GNILkBDz4fmKP4LltxsEyW9pQ5a9hNrQ5PtBcGDIO
- 2wUROVHkmcmtbhYedipZmcm/gbWeBLUKNQ28L5sfvT85IG6Sv65gdsQedVYYmQrbSGO3
- YyN8QSExx8a92X1XjYklzmOPaMLobwh53l+BzD+nRDZFQ9zB3UaYMic2xAe8szkBy0r+
- ROsYu2ubXm/7ASwVVCg4qAjsVTMiE7DZL91QQpLfamkjMMSV/dJUP2a0jAbpvkbE/qMV
- 99Qr2iVOM48ajS9Cg+omlXcRAlBNp9F55SyIHEsdj8S2xx++sVDOQxqmLtPkfxuwXIPj
- EXUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nvgx3691qemUajFHkiros1xQZE99DVaku3/9F7Mq1Eg=;
- b=fjHDMiq6CzIezlhW2MkBhEoG774wN+asME3nYIjaDo1jhs3o0vdECv4ceBBVsm8M71
- azyEiehi/qE3QZgIm5zFsdRI9eoYBOoyGeFWEbhPs13z5XWqgyHo/mezMv4EUZS6NTnp
- bE2xrxHkklg3Xg9xMl8N+oo/uUdvVygCpXiXBOECAkunWuH9QsbmjRbyGJL37+93PaEV
- S8Eq/PJIDVdNN6I0j5LkIbTeL5gd5/m2JFqtR2qZVi23BHI+NBasbrSPccOPGxoK3NW2
- i+up6dHb9mrOe51G61uvSecI5FzBo05DPIeNlY/gjVF5uVeSFA5yXDqSvrLs1qEr67MD
- TUBw==
-X-Gm-Message-State: APjAAAXjky5vbzd3UexALOGZAHleQRY+tIII4ayGUXVBiolTyruR5aA1
- nSPh9YD+1OCiTohx2tfF3ztKEw==
-X-Google-Smtp-Source: APXvYqxhZ2RDS8KaLywMCOz70goBxxWXc7usIn9leMztRuMga/Pw/j96VKF3/lXK/FqVM4plJ3YyRw==
-X-Received: by 2002:a63:4c46:: with SMTP id m6mr122823401pgl.59.1564669000973; 
- Thu, 01 Aug 2019 07:16:40 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id u128sm81246813pfu.48.2019.08.01.07.16.39
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 01 Aug 2019 07:16:40 -0700 (PDT)
-To: Bin Meng <bmeng.cn@gmail.com>
-References: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
- <581a0284-c658-265f-1b0f-6f4be5406cee@linaro.org>
- <CAEUhbmVXC6GeHYFST514cLRJHQOo5ki=ZPG=OsLzV2YA0ChQgA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <ac4453de-81cd-c32a-17f8-283fa3569ed0@linaro.org>
-Date: Thu, 1 Aug 2019 07:16:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <dgilbert@redhat.com>) id 1htBwS-0007N4-IT
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:20:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58248)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1htBwP-0007I5-2u
+ for qemu-devel@nongnu.org; Thu, 01 Aug 2019 10:20:26 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id A0BE6E8CAA;
+ Thu,  1 Aug 2019 14:20:22 +0000 (UTC)
+Received: from work-vm (ovpn-117-184.ams2.redhat.com [10.36.117.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 274CC5D9E1;
+ Thu,  1 Aug 2019 14:20:18 +0000 (UTC)
+Date: Thu, 1 Aug 2019 15:20:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190801142016.GI2773@work-vm>
+References: <5D3F8F04.3030404@huawei.com>
+ <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEUhbmVXC6GeHYFST514cLRJHQOo5ki=ZPG=OsLzV2YA0ChQgA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH] riscv: rv32: Root page table address can
- be larger than 32-bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Thu, 01 Aug 2019 14:20:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH] virtiofsd: fix compile error
+ if 'F_OFD_GETLK' not defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,30 +70,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU riscv <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>, QEMU devel <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: piaojun <piaojun@huawei.com>, virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/31/19 6:53 PM, Bin Meng wrote:
-> I am not sure how (idx * ptesize) could overflow. It represents the
-> offset by a page table which is [0, 4096).
+* Eric Blake (eblake@redhat.com) wrote:
+> On 7/29/19 7:27 PM, piaojun wrote:
+> > Use F_GETLK for fcntl when F_OFD_GETLK not defined.
+> 
+> Which system are you hitting this problem on?
+> 
+> The problem with F_GETLK is that it is NOT as safe as F_OFD_GETLK.
+> 
+> We already have fcntl_op_getlk and qemu_probe_lock_ops() in util/osdep.c
+> to not only determine which form to use, but also to emit a warning to
+> the end user if we had to fall back to the unsafe F_GETLK. Why is your
+> code not reusing that logic?
+> 
+> > 
+> > Signed-off-by: Jun Piao <piaojun@huawei.com>
+> > ---
+> >  contrib/virtiofsd/passthrough_ll.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> > 
+> > diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
+> > index 9ae1381..757785b 100644
+> > --- a/contrib/virtiofsd/passthrough_ll.c
+> > +++ b/contrib/virtiofsd/passthrough_ll.c
+> > @@ -1619,7 +1619,11 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t ino,
+> >  		return;
+> >  	}
+> > 
+> > +#ifdef F_OFD_GETLK
+> >  	ret = fcntl(plock->fd, F_OFD_GETLK, lock);
+> > +#else
+> > +	ret = fcntl(plock->fd, F_GETLK, lock);
+> > +#endif
+> 
+> Hmm. Since this is in contrib, you are trying to compile something that
+> is independent of util/osdep.c (at least, I assume that's the case, as
+> contrib/virtiofsd/ is not even part of qemu.git master yet - in which
+> case, why is this not being squashed in to the patch introducing that
+> file, rather than sent standalone).  On the other hand, that raises the
+> question - who is trying to use virtiofsd on a kernel that is too old to
+> provid F_OFD_GETLK?  Isn't the whole point of virtiofsd to be speeding
+> up modern usage, at which point an old kernel is just gumming up the
+> works?  It seems like you are better off letting compilation fail on a
+> system that is too old to support decent F_OFD_GETLK, rather than
+> silently falling back to something that is unsafe.
 
-You're right, I mis-read what was going on there.
+It is, but I guess the answer here is someone wanted to build on RHEL7.
 
-However, lower down, "target_ulong ppn" needs to be promoted to hwaddr, so that
+Dave
 
-    ppn = pte >> PTE_PPN_SHIFT;
-    ...
-    base = ppn << PGSHIFT;
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3226
+> Virtualization:  qemu.org | libvirt.org
+> 
 
-does not overflow.  (Which is the part of the page table walk that I thought I
-had gleaned from the patch without actually reading the entire function.)
 
 
-r~
+
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
