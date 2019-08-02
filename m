@@ -6,136 +6,107 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08971C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF88C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:46:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D38D921726
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:41:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D38D921726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED97E20679
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:46:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED97E20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htXob-0005VP-0k
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 09:41:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54925)
+	id 1htXsx-0007md-7l
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 09:46:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55818)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1htXo0-0004b1-HT
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:41:13 -0400
+ (envelope-from <david@redhat.com>) id 1htXs9-0006lM-JP
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1htXnz-0002kK-Az
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:41:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58058)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1htXnz-0002ie-3O
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:41:11 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x72Db9ET017266
- for <qemu-devel@nongnu.org>; Fri, 2 Aug 2019 09:41:09 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2u4kdhq5t2-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 09:41:08 -0400
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 2 Aug 2019 14:41:06 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 2 Aug 2019 14:41:03 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x72Df2Me52428860
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 2 Aug 2019 13:41:03 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id BE10D5205A;
- Fri,  2 Aug 2019 13:41:02 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 8C10C5204F;
- Fri,  2 Aug 2019 13:41:02 +0000 (GMT)
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- qemu-devel@nongnu.org
+ (envelope-from <david@redhat.com>) id 1htXs8-0007Lw-AY
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:45:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45760)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1htXs8-0007Ja-2D; Fri, 02 Aug 2019 09:45:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7F83530821DF;
+ Fri,  2 Aug 2019 13:45:26 +0000 (UTC)
+Received: from [10.36.116.87] (ovpn-116-87.ams2.redhat.com [10.36.116.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B482A5D704;
+ Fri,  2 Aug 2019 13:45:24 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <20190802133241.29298-1-imammedo@redhat.com>
  <20190802133241.29298-3-imammedo@redhat.com>
  <482f260f-5d66-3e67-9d3e-4dffaca18a96@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
+ <d908916f-d6ea-4e75-e7eb-a16c2f559184@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Fri, 2 Aug 2019 15:41:02 +0200
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <85f5d813-40ac-e69a-bb4b-bb38b019d739@redhat.com>
+Date: Fri, 2 Aug 2019 15:45:23 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <482f260f-5d66-3e67-9d3e-4dffaca18a96@redhat.com>
+In-Reply-To: <d908916f-d6ea-4e75-e7eb-a16c2f559184@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19080213-0016-0000-0000-0000029902D2
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19080213-0017-0000-0000-000032F802F0
-Message-Id: <d908916f-d6ea-4e75-e7eb-a16c2f559184@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-08-02_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908020140
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Fri, 02 Aug 2019 13:45:26 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH for-4.2 v3 2/2] s390: do not call
  memory_region_allocate_system_memory() multiple times
 X-BeenThere: qemu-devel@nongnu.org
@@ -155,87 +126,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 02.08.19 15:36, David Hildenbrand wrote:
-> On 02.08.19 15:32, Igor Mammedov wrote:
->> s390 was trying to solve limited KVM memslot size issue by abusing
->> memory_region_allocate_system_memory(), which breaks API contract
->> where the function might be called only once.
->>
->> Beside an invalid use of API, the approach also introduced migration
->> issue, since RAM chunks for each KVM_SLOT_MAX_BYTES are transferred in
->> migration stream as separate RAMBlocks.
->>
->> After discussion [1], it was agreed to break migration from older
->> QEMU for guest with RAM >8Tb (as it was relatively new (since 2.12)
->> and considered to be not actually used downstream).
->> Migration should keep working for guests with less than 8TB and for
->> more than 8TB with QEMU 4.2 and newer binary.
->> In case user tries to migrate more than 8TB guest, between incompatible
->> QEMU versions, migration should fail gracefully due to non-exiting
->> RAMBlock ID or RAMBlock size mismatch.
->>
->> Taking in account above and that now KVM code is able to split too
->> big MemorySection into several memslots, stop abusing
->>   memory_region_allocate_system_memory()
->> and use only one memory region for RAM.
->>
->> 1) [PATCH RFC v2 4/4] s390: do not call  memory_region_allocate_system_memory() multiple times
->>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> ---
->> v3:
->>   - drop migration compat code
->>
->> PS:
->> I don't have access to a suitable system to test it.
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 21 +++------------------
->>  1 file changed, 3 insertions(+), 18 deletions(-)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 0c03ffb7c7..e30058df38 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -154,27 +154,12 @@ static void virtio_ccw_register_hcalls(void)
->>  static void s390_memory_init(ram_addr_t mem_size)
->>  {
->>      MemoryRegion *sysmem = get_system_memory();
->> -    ram_addr_t chunk, offset = 0;
->> -    unsigned int number = 0;
->> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
->>      Error *local_err = NULL;
->> -    gchar *name;
->>  
->>      /* allocate RAM for core */
->> -    name = g_strdup_printf("s390.ram");
->> -    while (mem_size) {
->> -        MemoryRegion *ram = g_new(MemoryRegion, 1);
->> -        uint64_t size = mem_size;
->> -
->> -        /* KVM does not allow memslots >= 8 TB */
->> -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
->> -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
->> -        memory_region_add_subregion(sysmem, offset, ram);
->> -        mem_size -= chunk;
->> -        offset += chunk;
->> -        g_free(name);
->> -        name = g_strdup_printf("s390.ram.%u", ++number);
->> -    }
->> -    g_free(name);
->> +    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
->> +    memory_region_add_subregion(sysmem, 0, ram);
->>  
->>      /*
->>       * Configure the maximum page size. As no memory devices were created
->>
+On 02.08.19 15:41, Christian Borntraeger wrote:
 > 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
 > 
-> We have to remember putting it into the next release notes. (or do we
-> even want to get this into v4.1 ?)
+> On 02.08.19 15:36, David Hildenbrand wrote:
+>> On 02.08.19 15:32, Igor Mammedov wrote:
+>>> s390 was trying to solve limited KVM memslot size issue by abusing
+>>> memory_region_allocate_system_memory(), which breaks API contract
+>>> where the function might be called only once.
+>>>
+>>> Beside an invalid use of API, the approach also introduced migration
+>>> issue, since RAM chunks for each KVM_SLOT_MAX_BYTES are transferred in
+>>> migration stream as separate RAMBlocks.
+>>>
+>>> After discussion [1], it was agreed to break migration from older
+>>> QEMU for guest with RAM >8Tb (as it was relatively new (since 2.12)
+>>> and considered to be not actually used downstream).
+>>> Migration should keep working for guests with less than 8TB and for
+>>> more than 8TB with QEMU 4.2 and newer binary.
+>>> In case user tries to migrate more than 8TB guest, between incompatible
+>>> QEMU versions, migration should fail gracefully due to non-exiting
+>>> RAMBlock ID or RAMBlock size mismatch.
+>>>
+>>> Taking in account above and that now KVM code is able to split too
+>>> big MemorySection into several memslots, stop abusing
+>>>   memory_region_allocate_system_memory()
+>>> and use only one memory region for RAM.
+>>>
+>>> 1) [PATCH RFC v2 4/4] s390: do not call  memory_region_allocate_system_memory() multiple times
+>>>
+>>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>>> ---
+>>> v3:
+>>>   - drop migration compat code
+>>>
+>>> PS:
+>>> I don't have access to a suitable system to test it.
+>>> ---
+>>>  hw/s390x/s390-virtio-ccw.c | 21 +++------------------
+>>>  1 file changed, 3 insertions(+), 18 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>>> index 0c03ffb7c7..e30058df38 100644
+>>> --- a/hw/s390x/s390-virtio-ccw.c
+>>> +++ b/hw/s390x/s390-virtio-ccw.c
+>>> @@ -154,27 +154,12 @@ static void virtio_ccw_register_hcalls(void)
+>>>  static void s390_memory_init(ram_addr_t mem_size)
+>>>  {
+>>>      MemoryRegion *sysmem = get_system_memory();
+>>> -    ram_addr_t chunk, offset = 0;
+>>> -    unsigned int number = 0;
+>>> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>>      Error *local_err = NULL;
+>>> -    gchar *name;
+>>>  
+>>>      /* allocate RAM for core */
+>>> -    name = g_strdup_printf("s390.ram");
+>>> -    while (mem_size) {
+>>> -        MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>> -        uint64_t size = mem_size;
+>>> -
+>>> -        /* KVM does not allow memslots >= 8 TB */
+>>> -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+>>> -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+>>> -        memory_region_add_subregion(sysmem, offset, ram);
+>>> -        mem_size -= chunk;
+>>> -        offset += chunk;
+>>> -        g_free(name);
+>>> -        name = g_strdup_printf("s390.ram.%u", ++number);
+>>> -    }
+>>> -    g_free(name);
+>>> +    memory_region_allocate_system_memory(ram, NULL, "s390.ram", mem_size);
+>>> +    memory_region_add_subregion(sysmem, 0, ram);
+>>>  
+>>>      /*
+>>>       * Configure the maximum page size. As no memory devices were created
+>>>
+>>
+>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>>
+>> We have to remember putting it into the next release notes. (or do we
+>> even want to get this into v4.1 ?)
+> 
+> This is too invasive for 4.1
+> 
 
-This is too invasive for 4.1
+Makes sense
 
+-- 
+
+Thanks,
+
+David / dhildenb
 
