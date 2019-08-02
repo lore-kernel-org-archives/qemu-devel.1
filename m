@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA234C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E2FC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:10:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA797204EC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:09:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA797204EC
+	by mail.kernel.org (Postfix) with ESMTPS id C27C1204EC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:10:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C27C1204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZBq-0004WW-0a
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:09:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47191)
+	id 1htZCB-0005NU-2c
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:10:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47246)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jfreimann@redhat.com>) id 1htZ8h-0005gh-Js
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:40 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8s-0006AN-FQ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1htZ8g-0005Pn-Gi
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53136)
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8r-0005Tq-43
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39280)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1htZ8g-0005PX-BU
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1htZ8q-0005TL-Rf
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A6CEA882EA
- for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 18BABC057EC0
+ for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:48 +0000 (UTC)
 Received: from localhost (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F41DB60605;
- Fri,  2 Aug 2019 15:06:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A889A5D9D3;
+ Fri,  2 Aug 2019 15:06:47 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 17:06:00 +0200
-Message-Id: <20190802150605.5880-5-jfreimann@redhat.com>
+Date: Fri,  2 Aug 2019 17:06:03 +0200
+Message-Id: <20190802150605.5880-8-jfreimann@redhat.com>
 In-Reply-To: <20190802150605.5880-1-jfreimann@redhat.com>
 References: <20190802150605.5880-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Fri, 02 Aug 2019 15:06:37 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Fri, 02 Aug 2019 15:06:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 4/9] migration: allow unplug during migration
- for failover devices
+Subject: [Qemu-devel] [PATCH 7/9] migration: Add new migration state
+ wait-unplug
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,61 +74,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In "b06424de62 migration: Disable hotplug/unplug during migration" we
-added a check to disable unplug for all devices until we have figured
-out what works. For failover primary devices qdev_unplug() is called
-from the migration handler, i.e. during migration.
+This patch is not ready for inclusion yet, I'm looking for
+feedback/ideas on a particular problem. See below.
 
-This patch adds a flag to DeviceState which is set to false for all
-devices and makes an exception for vfio-pci devices that are also
-primary devices in a failover pair.
+This patch adds a new migration state called wait-unplug.  It is
+entered after the SETUP state and will transition into ACTIVE once all
+devices were succesfully unplugged from the guest.
+
+So if a guest doesn't respond or takes long to honor the unplug
+request the user will see the migration state 'wait-unplug'.
+
+It adds a new function callback to VMStateDescription which is
+called for every device that implements it and reports its
+device_pending status.
+
+Now this loop in the migration thread:
+
+while (qemu_savevm_state_guest_unplug_pending()) { continue; }
+
+clearly needs a condition to terminate after a while/or a certain
+number of iterations. But I'm not sure what is a good solution. How much
+waiting time is acceptable for a migration?
 
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- hw/core/qdev.c         | 1 +
- include/hw/qdev-core.h | 1 +
- qdev-monitor.c         | 2 +-
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ include/migration/vmstate.h |  2 ++
+ migration/migration.c       | 14 ++++++++++++++
+ migration/savevm.c          | 18 ++++++++++++++++++
+ migration/savevm.h          |  1 +
+ qapi/migration.json         |  5 ++++-
+ 5 files changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 31e90ebaa2..f43f744133 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -973,6 +973,7 @@ static void device_initfn(Object *obj)
-=20
-     dev->instance_id_alias =3D -1;
-     dev->realized =3D false;
-+    dev->allow_unplug_during_migration =3D false;
-=20
-     object_property_add_bool(obj, "realized",
-                              device_get_realized, device_set_realized, N=
-ULL);
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 6174538b01..af4857d391 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -147,6 +147,7 @@ struct DeviceState {
-     bool pending_deleted_event;
-     QemuOpts *opts;
-     int hotplugged;
-+    bool allow_unplug_during_migration;
-     BusState *parent_bus;
-     QLIST_HEAD(, NamedGPIOList) gpios;
-     QLIST_HEAD(, BusState) child_bus;
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index c69e283419..e7ab5cacb3 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -845,7 +845,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
-         return;
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index c2bfa7a7f0..8b2a125c4c 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -187,6 +187,8 @@ struct VMStateDescription {
+     int (*pre_save)(void *opaque);
+     int (*post_save)(void *opaque);
+     bool (*needed)(void *opaque);
++    bool (*dev_unplug_pending)(void *opaque);
++
+     const VMStateField *fields;
+     const VMStateDescription **subsections;
+ };
+diff --git a/migration/migration.c b/migration/migration.c
+index 8a607fe1e2..a7d21b73fe 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -946,6 +946,9 @@ static void fill_source_migration_info(MigrationInfo =
+*info)
+     case MIGRATION_STATUS_CANCELLED:
+         info->has_status =3D true;
+         break;
++    case MIGRATION_STATUS_WAIT_UNPLUG:
++        info->has_status =3D true;
++        break;
      }
+     info->status =3D s->state;
+ }
+@@ -1680,6 +1683,7 @@ bool migration_is_idle(void)
+     case MIGRATION_STATUS_COLO:
+     case MIGRATION_STATUS_PRE_SWITCHOVER:
+     case MIGRATION_STATUS_DEVICE:
++    case MIGRATION_STATUS_WAIT_UNPLUG:
+         return false;
+     case MIGRATION_STATUS__MAX:
+         g_assert_not_reached();
+@@ -1712,6 +1716,7 @@ void migrate_init(MigrationState *s)
+     error_free(s->error);
+     s->error =3D NULL;
 =20
--    if (!migration_is_idle() && !migration_in_setup(migrate_get_current(=
-))) {
-+    if (!migration_is_idle() && !dev->allow_unplug_during_migration) {
-         error_setg(errp, "device_del not allowed while migrating");
-         return;
++    /* go to WAIT_UNPLUG first? */
+     migrate_set_state(&s->state, MIGRATION_STATUS_NONE, MIGRATION_STATUS=
+_SETUP);
+=20
+     s->start_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+@@ -3218,6 +3223,15 @@ static void *migration_thread(void *opaque)
+=20
+     qemu_savevm_state_setup(s->to_dst_file);
+=20
++    migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
++                      MIGRATION_STATUS_WAIT_UNPLUG);
++    while (qemu_savevm_state_guest_unplug_pending()) {
++        continue;
++    }
++    migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
++                      MIGRATION_STATUS_ACTIVE);=20
++
++
+     s->setup_time =3D qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
+     migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+                       MIGRATION_STATUS_ACTIVE);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 79ed44d475..2bb54b3a8a 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1085,6 +1085,24 @@ void qemu_savevm_state_header(QEMUFile *f)
      }
+ }
+=20
++bool qemu_savevm_state_guest_unplug_pending(void)
++{
++    SaveStateEntry *se;
++    bool ret =3D false;
++
++    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
++        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
++            continue;
++        }
++        ret =3D se->vmsd->dev_unplug_pending(se->opaque);
++        if (ret) {
++            break;
++        }
++    }
++
++    return ret;
++}
++
+ void qemu_savevm_state_setup(QEMUFile *f)
+ {
+     SaveStateEntry *se;
+diff --git a/migration/savevm.h b/migration/savevm.h
+index 51a4b9caa8..ba64a7e271 100644
+--- a/migration/savevm.h
++++ b/migration/savevm.h
+@@ -31,6 +31,7 @@
+=20
+ bool qemu_savevm_state_blocked(Error **errp);
+ void qemu_savevm_state_setup(QEMUFile *f);
++bool qemu_savevm_state_guest_unplug_pending(void);
+ int qemu_savevm_state_resume_prepare(MigrationState *s);
+ void qemu_savevm_state_header(QEMUFile *f);
+ int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index d567ac9fc3..c42381a85f 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -133,6 +133,9 @@
+ # @device: During device serialisation when pause-before-switchover is e=
+nabled
+ #        (since 2.11)
+ #
++# @wait-unplug: wait for device unplug request by guest OS to be complet=
+ed.
++#               (since 4.2)=20
++#
+ # Since: 2.3
+ #
+ ##
+@@ -140,7 +143,7 @@
+   'data': [ 'none', 'setup', 'cancelling', 'cancelled',
+             'active', 'postcopy-active', 'postcopy-paused',
+             'postcopy-recover', 'completed', 'failed', 'colo',
+-            'pre-switchover', 'device' ] }
++            'pre-switchover', 'device', 'wait-unplug' ] }
+=20
+ ##
+ # @MigrationInfo:
 --=20
 2.21.0
 
