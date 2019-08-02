@@ -6,75 +6,76 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BFDC32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:09:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E2BC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:09:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06F722087C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:09:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F722087C
+	by mail.kernel.org (Postfix) with ESMTPS id DC14D2087C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:09:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC14D2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36225 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hta7h-00073j-AQ
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 12:09:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33094)
+	id 1hta7n-0007GZ-6G
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 12:09:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33176)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hta6c-0004v0-29
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:08:35 -0400
+ (envelope-from <philmd@redhat.com>) id 1hta79-0005zP-IA
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:09:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hta6Y-0002uf-GO
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:08:34 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:35341)
+ (envelope-from <philmd@redhat.com>) id 1hta78-0003Ik-GQ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:09:07 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:46057)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hta6Y-0002tV-9X
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:08:30 -0400
-Received: by mail-ed1-f67.google.com with SMTP id w20so72806982edd.2
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 09:08:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hta78-0003IC-Ah
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:09:06 -0400
+Received: by mail-ed1-f65.google.com with SMTP id x19so66911080eda.12
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 09:09:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=PmcxLtiieGLRzL5rIEcHI0v84Y1wQ83aJZqoLV6Ssms=;
- b=fHrIumXemVhoSh5UOYwYbJ+KcNZ0nFWEXA/33NHGTOtSmO45wiMjdi1hF/WtdhQu9s
- UbqQrDPZKBzwI/D5os4byrQ5HEAq7AV6chf9sGfnXPQPNHLM+EdHpwixiWUgYTunlKRy
- JX3aEJ2eta4p4UVRjZU8fhhZRuDucNdblCICitQaparIG/WHU28HrvW1aDgmvmmbfklN
- TmEdR8uUFDUnxLT9/2UX6CnZpL0T1pswlHjz6D5KeCd8TiO1+ZHVX5o6+F7jiK7lql0A
- /sXbjI4IJb7CxRFBsCyVt9gRuc09S1OZkDpMHyEsUPLiL4OBOauvkxWHAdWl3gQSejX7
- axFA==
-X-Gm-Message-State: APjAAAXIng1VIHqGfyCl1brgzBNbTgyNwQD1dm9yQICkysYzEPtf96ve
- HWiSvJUXjWZamQs32HtPXWkm7ndts+ShpA==
-X-Google-Smtp-Source: APXvYqyTnkeBRc8njG/gHu+Miep0dfDNr61pbD34e61vEv1OgFzMfsneSKJV4nA1KkAHokrgL0irvw==
-X-Received: by 2002:aa7:d404:: with SMTP id z4mr119931319edq.131.1564762109341; 
- Fri, 02 Aug 2019 09:08:29 -0700 (PDT)
+ bh=TU0O2D2g8vyGPUyjEM/MYVfipxX/tAxh/1WrwX5hpsM=;
+ b=bkKpTEhes3zaO4Sa1FiS9huvbM2BYlMp62b50utfZXt3KXUiMlNszsuyguQ93NQBmM
+ jiHyrtj9HKUK1Qv8LRy0Tid7vLG3gr2NVceS65ofovhwm5J4SCdLNbmXhUv0mfZVXhrq
+ Hb68rA1uGfAWqjigxQhm6r3QJj1bxLotWl590Cq62AT0NuXvtgEhPCG/5hq9EgbLHOnD
+ dLuXCpQ0n4MEff4LpxgLMnI3CZwcOGqtncFdWcab1Ej+6c+btNt9wiUTu6a9TfnuztOG
+ tOFjENKt+a+YW6rcKCZe0mzjjs3Xb5LaFtpPtODYTK5AZeJitDwqnbMty79PwXNoq8WI
+ gU4w==
+X-Gm-Message-State: APjAAAVPe8LMty7Guhq+96Np7Pl/ejalh55hgx9swyYEzi1bTAl2vAbz
+ MB8faTfcbzTohEFWHmsmMB7KlA==
+X-Google-Smtp-Source: APXvYqzq91svCa5lRHKjICLn3BO9pWeJKaUxQfzBmR4Dyi6D9cXja64PxBnQCDUg7zdgMmrdbSp3MQ==
+X-Received: by 2002:a17:906:114d:: with SMTP id
+ i13mr106225033eja.252.1564762145256; 
+ Fri, 02 Aug 2019 09:09:05 -0700 (PDT)
 Received: from [10.0.0.124] ([185.102.219.36])
- by smtp.gmail.com with ESMTPSA id h2sm17538689edq.33.2019.08.02.09.08.28
+ by smtp.gmail.com with ESMTPSA id k10sm18398756eda.9.2019.08.02.09.09.03
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 02 Aug 2019 09:08:28 -0700 (PDT)
+ Fri, 02 Aug 2019 09:09:04 -0700 (PDT)
 To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
 References: <1564677923-23173-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1564677923-23173-7-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1564677923-23173-8-git-send-email-aleksandar.markovic@rt-rk.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <0e631e4b-9a8c-c83e-6d7f-f0a1612603a6@redhat.com>
-Date: Fri, 2 Aug 2019 18:08:26 +0200
+Message-ID: <c9e0849e-05d4-75c0-b904-b934d4b95c9b@redhat.com>
+Date: Fri, 2 Aug 2019 18:09:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <1564677923-23173-7-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1564677923-23173-8-git-send-email-aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.208.67
-Subject: Re: [Qemu-devel] [PATCH for 4.2 v5 06/12] target/mips: Style
- improvements in cp0_timer.c
+X-Received-From: 209.85.208.65
+Subject: Re: [Qemu-devel] [PATCH for 4.2 v5 07/12] target/mips: Style
+ improvements in cpu.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,118 +105,49 @@ On 8/1/19 6:45 PM, Aleksandar Markovic wrote:
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 > ---
->  target/mips/cp0_timer.c | 42 +++++++++++++++++++++++-------------------
->  1 file changed, 23 insertions(+), 19 deletions(-)
+>  target/mips/cpu.c | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
 > 
-> diff --git a/target/mips/cp0_timer.c b/target/mips/cp0_timer.c
-> index f471639..b5f3560 100644
-> --- a/target/mips/cp0_timer.c
-> +++ b/target/mips/cp0_timer.c
-> @@ -29,7 +29,7 @@
->  #define TIMER_PERIOD 10 /* 10 ns period for 100 Mhz frequency */
+> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+> index 39eafaf..3ffa342 100644
+> --- a/target/mips/cpu.c
+> +++ b/target/mips/cpu.c
+> @@ -57,9 +57,11 @@ static bool mips_cpu_has_work(CPUState *cs)
+>      CPUMIPSState *env = &cpu->env;
+>      bool has_work = false;
 >  
->  /* XXX: do not use a global */
-> -uint32_t cpu_mips_get_random (CPUMIPSState *env)
-> +uint32_t cpu_mips_get_random(CPUMIPSState *env)
->  {
->      static uint32_t seed = 1;
->      static uint32_t prev_idx = 0;
-> @@ -42,8 +42,10 @@ uint32_t cpu_mips_get_random (CPUMIPSState *env)
->  
->      /* Don't return same value twice, so get another value */
->      do {
-> -        /* Use a simple algorithm of Linear Congruential Generator
-> -         * from ISO/IEC 9899 standard. */
-> +        /*
-> +         * Use a simple algorithm of Linear Congruential Generator
-> +         * from ISO/IEC 9899 standard.
-> +         */
->          seed = 1103515245 * seed + 12345;
->          idx = (seed >> 16) % nb_rand_tlb + env->CP0_Wired;
->      } while (idx == prev_idx);
-> @@ -73,7 +75,7 @@ static void cpu_mips_timer_expire(CPUMIPSState *env)
->      qemu_irq_raise(env->irq[(env->CP0_IntCtl >> CP0IntCtl_IPTI) & 0x7]);
->  }
->  
-> -uint32_t cpu_mips_get_count (CPUMIPSState *env)
-> +uint32_t cpu_mips_get_count(CPUMIPSState *env)
->  {
->      if (env->CP0_Cause & (1 << CP0Ca_DC)) {
->          return env->CP0_Count;
-> @@ -91,16 +93,16 @@ uint32_t cpu_mips_get_count (CPUMIPSState *env)
->      }
->  }
->  
-> -void cpu_mips_store_count (CPUMIPSState *env, uint32_t count)
-> +void cpu_mips_store_count(CPUMIPSState *env, uint32_t count)
->  {
->      /*
->       * This gets called from cpu_state_reset(), potentially before timer init.
->       * So env->timer may be NULL, which is also the case with KVM enabled so
->       * treat timer as disabled in that case.
->       */
-> -    if (env->CP0_Cause & (1 << CP0Ca_DC) || !env->timer)
-> +    if (env->CP0_Cause & (1 << CP0Ca_DC) || !env->timer) {
->          env->CP0_Count = count;
-> -    else {
-> +    } else {
->          /* Store new count register */
->          env->CP0_Count = count -
->                 (uint32_t)(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) / TIMER_PERIOD);
-> @@ -109,13 +111,15 @@ void cpu_mips_store_count (CPUMIPSState *env, uint32_t count)
->      }
->  }
->  
-> -void cpu_mips_store_compare (CPUMIPSState *env, uint32_t value)
-> +void cpu_mips_store_compare(CPUMIPSState *env, uint32_t value)
->  {
->      env->CP0_Compare = value;
-> -    if (!(env->CP0_Cause & (1 << CP0Ca_DC)))
-> +    if (!(env->CP0_Cause & (1 << CP0Ca_DC))) {
->          cpu_mips_timer_update(env);
-> -    if (env->insn_flags & ISA_MIPS32R2)
-> +    }
-> +    if (env->insn_flags & ISA_MIPS32R2) {
->          env->CP0_Cause &= ~(1 << CP0Ca_TI);
-> +    }
->      qemu_irq_lower(env->irq[(env->CP0_IntCtl >> CP0IntCtl_IPTI) & 0x7]);
->  }
->  
-> @@ -131,27 +135,27 @@ void cpu_mips_stop_count(CPUMIPSState *env)
->                                   TIMER_PERIOD);
->  }
->  
-> -static void mips_timer_cb (void *opaque)
-> +static void mips_timer_cb(void *opaque)
->  {
->      CPUMIPSState *env;
->  
->      env = opaque;
-> -#if 0
-> -    qemu_log("%s\n", __func__);
-> -#endif
->  
-> -    if (env->CP0_Cause & (1 << CP0Ca_DC))
-> +    if (env->CP0_Cause & (1 << CP0Ca_DC)) {
->          return;
-> +    }
->  
-> -    /* ??? This callback should occur when the counter is exactly equal to
-> -       the comparator value.  Offset the count by one to avoid immediately
-> -       retriggering the callback before any virtual time has passed.  */
+> -    /* Prior to MIPS Release 6 it is implementation dependent if non-enabled
+> -       interrupts wake-up the CPU, however most of the implementations only
+> -       check for interrupts that can be taken. */
 > +    /*
-> +     * ??? This callback should occur when the counter is exactly equal to
-> +     * the comparator value.  Offset the count by one to avoid immediately
-> +     * retriggering the callback before any virtual time has passed.
+> +     * Prior to MIPS Release 6 it is implementation dependent if non-enabled
+> +     * interrupts wake-up the CPU, however most of the implementations only
+> +     * check for interrupts that can be taken.
 > +     */
->      env->CP0_Count++;
->      cpu_mips_timer_expire(env);
->      env->CP0_Count--;
+>      if ((cs->interrupt_request & CPU_INTERRUPT_HARD) &&
+>          cpu_mips_hw_interrupts_pending(env)) {
+>          if (cpu_mips_hw_interrupts_enabled(env) ||
+> @@ -70,8 +72,10 @@ static bool mips_cpu_has_work(CPUState *cs)
+>  
+>      /* MIPS-MT has the ability to halt the CPU.  */
+>      if (env->CP0_Config3 & (1 << CP0C3_MT)) {
+> -        /* The QEMU model will issue an _WAKE request whenever the CPUs
+> -           should be woken up.  */
+> +        /*
+> +         * The QEMU model will issue an _WAKE request whenever the CPUs
+> +         * should be woken up.
+> +         */
+>          if (cs->interrupt_request & CPU_INTERRUPT_WAKE) {
+>              has_work = true;
+>          }
+> @@ -112,7 +116,8 @@ static void mips_cpu_reset(CPUState *s)
+>  #endif
 >  }
 >  
-> -void cpu_mips_clock_init (MIPSCPU *cpu)
-> +void cpu_mips_clock_init(MIPSCPU *cpu)
->  {
+> -static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info) {
+> +static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info)
+> +{
+>      MIPSCPU *cpu = MIPS_CPU(s);
 >      CPUMIPSState *env = &cpu->env;
 >  
 > 
