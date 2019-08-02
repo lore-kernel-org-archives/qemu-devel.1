@@ -6,104 +6,140 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C901C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 10:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1E2C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 10:28:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D829C205C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 10:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D829C205C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09E2A20665
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 10:28:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E2A20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htUll-0004vj-7W
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 06:26:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37095)
+	id 1htUnY-0006Ei-9m
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 06:28:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37602)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1htUl4-0004LX-8s
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 06:25:59 -0400
+ (envelope-from <borntraeger@de.ibm.com>) id 1htUn4-0005Xh-Tc
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 06:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1htUl2-0006BY-RK
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 06:25:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57276)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1htUl2-0006AD-Io; Fri, 02 Aug 2019 06:25:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D5307C09AD11;
- Fri,  2 Aug 2019 10:25:55 +0000 (UTC)
-Received: from [10.36.116.87] (ovpn-116-87.ams2.redhat.com [10.36.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 92DD25C207;
- Fri,  2 Aug 2019 10:25:53 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+ (envelope-from <borntraeger@de.ibm.com>) id 1htUn3-00072j-BQ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 06:28:02 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14034
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1htUn3-000720-6j
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 06:28:01 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x72ARgtO154725
+ for <qemu-devel@nongnu.org>; Fri, 2 Aug 2019 06:27:59 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u4k4u8sft-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 06:27:59 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Fri, 2 Aug 2019 11:27:54 +0100
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 2 Aug 2019 11:27:52 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x72ARpNT44761338
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 2 Aug 2019 10:27:51 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 55E5DAE04D;
+ Fri,  2 Aug 2019 10:27:51 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0E398AE059;
+ Fri,  2 Aug 2019 10:27:51 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri,  2 Aug 2019 10:27:50 +0000 (GMT)
+To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org
 References: <20190802093854.5343-1-imammedo@redhat.com>
  <20190802093854.5343-5-imammedo@redhat.com>
-From: David Hildenbrand <david@redhat.com>
+ <d96d27c6-0bef-f319-bb92-98f654d7ba99@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <d96d27c6-0bef-f319-bb92-98f654d7ba99@redhat.com>
-Date: Fri, 2 Aug 2019 12:25:52 +0200
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ mQINBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
+ J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
+ CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
+ 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
+ 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
+ +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
+ T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
+ OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
+ /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
+ IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABtDRDaHJpc3RpYW4g
+ Qm9ybnRyYWVnZXIgKElCTSkgPGJvcm50cmFlZ2VyQGRlLmlibS5jb20+iQI4BBMBAgAiBQJO
+ nDz4AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRARe7yAtaYcfOYVD/9sqc6ZdYKD
+ bmDIvc2/1LL0g7OgiA8pHJlYN2WHvIhUoZUIqy8Sw2EFny/nlpPVWfG290JizNS2LZ0mCeGZ
+ 80yt0EpQNR8tLVzLSSr0GgoY0lwsKhAnx3p3AOrA8WXsPL6prLAu3yJI5D0ym4MJ6KlYVIjU
+ ppi4NLWz7ncA2nDwiIqk8PBGxsjdc/W767zOOv7117rwhaGHgrJ2tLxoGWj0uoH3ZVhITP1z
+ gqHXYaehPEELDV36WrSKidTarfThCWW0T3y4bH/mjvqi4ji9emp1/pOWs5/fmd4HpKW+44tD
+ Yt4rSJRSa8lsXnZaEPaeY3nkbWPcy3vX6qafIey5d8dc8Uyaan39WslnJFNEx8cCqJrC77kI
+ vcnl65HaW3y48DezrMDH34t3FsNrSVv5fRQ0mbEed8hbn4jguFAjPt4az1xawSp0YvhzwATJ
+ YmZWRMa3LPx/fAxoolq9cNa0UB3D3jmikWktm+Jnp6aPeQ2Db3C0cDyxcOQY/GASYHY3KNra
+ z8iwS7vULyq1lVhOXg1EeSm+lXQ1Ciz3ub3AhzE4c0ASqRrIHloVHBmh4favY4DEFN19Xw1p
+ 76vBu6QjlsJGjvROW3GRKpLGogQTLslbjCdIYyp3AJq2KkoKxqdeQYm0LZXjtAwtRDbDo71C
+ FxS7i/qfvWJv8ie7bE9A6Wsjn7kCDQROnDz4ARAAmPI1e8xB0k23TsEg8O1sBCTXkV8HSEq7
+ JlWz7SWyM8oFkJqYAB7E1GTXV5UZcr9iurCMKGSTrSu3ermLja4+k0w71pLxws859V+3z1jr
+ nhB3dGzVZEUhCr3EuN0t8eHSLSMyrlPL5qJ11JelnuhToT6535cLOzeTlECc51bp5Xf6/XSx
+ SMQaIU1nDM31R13o98oRPQnvSqOeljc25aflKnVkSfqWSrZmb4b0bcWUFFUKVPfQ5Z6JEcJg
+ Hp7qPXHW7+tJTgmI1iM/BIkDwQ8qe3Wz8R6rfupde+T70NiId1M9w5rdo0JJsjKAPePKOSDo
+ RX1kseJsTZH88wyJ30WuqEqH9zBxif0WtPQUTjz/YgFbmZ8OkB1i+lrBCVHPdcmvathknAxS
+ bXL7j37VmYNyVoXez11zPYm+7LA2rvzP9WxR8bPhJvHLhKGk2kZESiNFzP/E4r4Wo24GT4eh
+ YrDo7GBHN82V4O9JxWZtjpxBBl8bH9PvGWBmOXky7/bP6h96jFu9ZYzVgIkBP3UYW+Pb1a+b
+ w4A83/5ImPwtBrN324bNUxPPqUWNW0ftiR5b81ms/rOcDC/k/VoN1B+IHkXrcBf742VOLID4
+ YP+CB9GXrwuF5KyQ5zEPCAjlOqZoq1fX/xGSsumfM7d6/OR8lvUPmqHfAzW3s9n4lZOW5Jfx
+ bbkAEQEAAYkCHwQYAQIACQUCTpw8+AIbDAAKCRARe7yAtaYcfPzbD/9WNGVf60oXezNzSVCL
+ hfS36l/zy4iy9H9rUZFmmmlBufWOATjiGAXnn0rr/Jh6Zy9NHuvpe3tyNYZLjB9pHT6mRZX7
+ Z1vDxeLgMjTv983TQ2hUSlhRSc6e6kGDJyG1WnGQaqymUllCmeC/p9q5m3IRxQrd0skfdN1V
+ AMttRwvipmnMduy5SdNayY2YbhWLQ2wS3XHJ39a7D7SQz+gUQfXgE3pf3FlwbwZhRtVR3z5u
+ aKjxqjybS3Ojimx4NkWjidwOaUVZTqEecBV+QCzi2oDr9+XtEs0m5YGI4v+Y/kHocNBP0myd
+ pF3OoXvcWdTb5atk+OKcc8t4TviKy1WCNujC+yBSq3OM8gbmk6NwCwqhHQzXCibMlVF9hq5a
+ FiJb8p4QKSVyLhM8EM3HtiFqFJSV7F+h+2W0kDyzBGyE0D8z3T+L3MOj3JJJkfCwbEbTpk4f
+ n8zMboekuNruDw1OADRMPlhoWb+g6exBWx/YN4AY9LbE2KuaScONqph5/HvJDsUldcRN3a5V
+ RGIN40QWFVlZvkKIEkzlzqpAyGaRLhXJPv/6tpoQaCQQoSAc5Z9kM/wEd9e2zMeojcWjUXgg
+ oWj8A/wY4UXExGBu+UCzzP/6sQRpBiPFgmqPTytrDo/gsUGqjOudLiHQcMU+uunULYQxVghC
+ syiRa+UVlsKmx1hsEg==
+Date: Fri, 2 Aug 2019 12:27:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190802093854.5343-5-imammedo@redhat.com>
+In-Reply-To: <d96d27c6-0bef-f319-bb92-98f654d7ba99@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 02 Aug 2019 10:25:55 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+X-TM-AS-GCONF: 00
+x-cbid: 19080210-0028-0000-0000-0000038A5C5C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080210-0029-0000-0000-0000244AB40F
+Message-Id: <f48d6578-7477-40ed-750d-055e13b4db41@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-02_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=2 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908020107
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
 Subject: Re: [Qemu-devel] [PATCH RFC v2 4/4] s390: do not call
  memory_region_allocate_system_memory() multiple times
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,161 +154,163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- thuth@redhat.com, borntraeger@de.ibm.com
+ thuth@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02.08.19 11:38, Igor Mammedov wrote:
-> s390 was trying to solve limited KVM memslot size issue by abusing
-> memory_region_allocate_system_memory(), which breaks API contract
-> where the function might be called only once.
-> 
-> s390 should have used memory aliases to fragment inital memory into
-> smaller chunks to satisfy KVM's memslot limitation. But its a bit
-> late now, since allocated pieces are transfered in migration stream
-> separately, so it's not possible to just replace broken layout with
-> correct one. To workaround issue, MemoryRegion alases are made
-> migratable and this patch switches to use them to split big initial
-> RAM chunk into smaller pieces (KVM_SLOT_MAX_BYTES max) and registers
-> aliases for migration. That should keep migration compatible with
-> previous QEMU versions.
-> 
-> New machine types (since 4.2) will use single memory region, which
-> will get transimitted in migration stream as a whole RAMBlock.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> I don't have access to a suitable system to test it, so I've simulated
-> it with smaller chunks on x84 host. Ping-pong migration between old
-> and new QEMU worked fine. KVM part should be fine as memslots
-> using mapped MemoryRegions (in this case it would be aliases) as
-> far as I know but is someone could test it on big enough host it
-> would be nice.
-> ---
->  include/hw/s390x/s390-virtio-ccw.h |  4 +++
->  hw/s390x/s390-virtio-ccw.c         | 56 +++++++++++++++++++++---------
->  2 files changed, 43 insertions(+), 17 deletions(-)
-> 
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index 00632f94b4..f9ed3737f8 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -21,6 +21,9 @@
->  #define S390_MACHINE_CLASS(klass) \
->      OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
->  
-> +#define S390_MACHINE_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(S390CcwMachineClass, (obj), TYPE_S390_CCW_MACHINE)
-> +
->  /*
->   * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
->   * as the dirty bitmap must be managed by bitops that take an int as
-> @@ -50,6 +53,7 @@ typedef struct S390CcwMachineClass {
->      bool cpu_model_allowed;
->      bool css_migration_enabled;
->      bool hpage_1m_allowed;
-> +    bool split_ram_layout;
->  } S390CcwMachineClass;
->  
->  /* runtime-instrumentation allowed by the machine */
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 073672f9cb..9160c1ed0a 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -151,28 +151,47 @@ static void virtio_ccw_register_hcalls(void)
->                                     virtio_ccw_hcall_early_printk);
->  }
->  
-> -static void s390_memory_init(ram_addr_t mem_size)
-> +static void s390_memory_init(MachineState *ms)
->  {
-> +    S390CcwMachineClass *s390mc = S390_MACHINE_GET_CLASS(ms);
->      MemoryRegion *sysmem = get_system_memory();
-> -    ram_addr_t chunk, offset = 0;
-> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
->      unsigned int number = 0;
->      Error *local_err = NULL;
-> -    gchar *name;
-> +    ram_addr_t mem_size = ms->ram_size;
-> +    gchar *name = g_strdup_printf(s390mc->split_ram_layout ?
-> +                                  "s390.whole.ram" : "s390.ram");
->  
->      /* allocate RAM for core */
-> -    name = g_strdup_printf("s390.ram");
-> -    while (mem_size) {
-> -        MemoryRegion *ram = g_new(MemoryRegion, 1);
-> -        uint64_t size = mem_size;
-> -
-> -        /* KVM does not allow memslots >= 8 TB */
-> -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
-> -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
-> -        memory_region_add_subregion(sysmem, offset, ram);
-> -        mem_size -= chunk;
-> -        offset += chunk;
-> -        g_free(name);
-> -        name = g_strdup_printf("s390.ram.%u", ++number);
-> +    memory_region_allocate_system_memory(ram, NULL, name, mem_size);
-> +
-> +    /* migration compatible RAM handling for 4.1 and older machines */
-> +    if (s390mc->split_ram_layout) {
-> +       ram_addr_t chunk, offset = 0;
-> +       /*
-> +        * memory_region_allocate_system_memory() registers allocated RAM for
-> +        * migration, however for compat reasons the RAM should be passed over
-> +        * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
-> +        * allocated RAM so it won't be migrated directly. Aliases will take care
-> +        * of segmenting RAM into legacy chunks that migration compatible.
-> +        */
-> +       vmstate_unregister_ram(ram, NULL);
-> +       name = g_strdup_printf("s390.ram");
-> +       while (mem_size) {
-> +           MemoryRegion *alias = g_new(MemoryRegion, 1);
-> +
-> +           /* KVM does not allow memslots >= 8 TB */
-> +           chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
-> +           memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
-> +           vmstate_register_ram_global(alias);
-> +           memory_region_add_subregion(sysmem, offset, alias);
-> +           mem_size -= chunk;
-> +           offset += chunk;
-> +           g_free(name);
-> +           name = g_strdup_printf("s390.ram.%u", ++number);
-> +       }
-> +    } else {
-> +       memory_region_add_subregion(sysmem, 0, ram);
->      }
->      g_free(name);
->  
-> @@ -257,7 +276,7 @@ static void ccw_init(MachineState *machine)
->  
->      s390_sclp_init();
->      /* init memory + setup max page size. Required for the CPU model */
-> -    s390_memory_init(machine->ram_size);
-> +    s390_memory_init(machine);
->  
->      /* init CPUs (incl. CPU model) early so s390_has_feature() works */
->      s390_init_cpus(machine);
-> @@ -667,8 +686,11 @@ static void ccw_machine_4_1_instance_options(MachineState *machine)
->  
->  static void ccw_machine_4_1_class_options(MachineClass *mc)
->  {
-> +    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
-> +
->      ccw_machine_4_2_class_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-> +    s390mc->split_ram_layout = true;
->  }
->  DEFINE_CCW_MACHINE(4_1, "4.1", false);
->  
-> 
 
-As discussed, I am not sure if adding that compat code really is worth
-it. :)
 
--- 
+On 02.08.19 12:25, David Hildenbrand wrote:
+> On 02.08.19 11:38, Igor Mammedov wrote:
+>> s390 was trying to solve limited KVM memslot size issue by abusing
+>> memory_region_allocate_system_memory(), which breaks API contract
+>> where the function might be called only once.
+>>
+>> s390 should have used memory aliases to fragment inital memory into
+>> smaller chunks to satisfy KVM's memslot limitation. But its a bit
+>> late now, since allocated pieces are transfered in migration stream
+>> separately, so it's not possible to just replace broken layout with
+>> correct one. To workaround issue, MemoryRegion alases are made
+>> migratable and this patch switches to use them to split big initial
+>> RAM chunk into smaller pieces (KVM_SLOT_MAX_BYTES max) and registers
+>> aliases for migration. That should keep migration compatible with
+>> previous QEMU versions.
+>>
+>> New machine types (since 4.2) will use single memory region, which
+>> will get transimitted in migration stream as a whole RAMBlock.
+>>
+>> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>> I don't have access to a suitable system to test it, so I've simulated
+>> it with smaller chunks on x84 host. Ping-pong migration between old
+>> and new QEMU worked fine. KVM part should be fine as memslots
+>> using mapped MemoryRegions (in this case it would be aliases) as
+>> far as I know but is someone could test it on big enough host it
+>> would be nice.
+>> ---
+>>  include/hw/s390x/s390-virtio-ccw.h |  4 +++
+>>  hw/s390x/s390-virtio-ccw.c         | 56 +++++++++++++++++++++---------
+>>  2 files changed, 43 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+>> index 00632f94b4..f9ed3737f8 100644
+>> --- a/include/hw/s390x/s390-virtio-ccw.h
+>> +++ b/include/hw/s390x/s390-virtio-ccw.h
+>> @@ -21,6 +21,9 @@
+>>  #define S390_MACHINE_CLASS(klass) \
+>>      OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
+>>  
+>> +#define S390_MACHINE_GET_CLASS(obj) \
+>> +    OBJECT_GET_CLASS(S390CcwMachineClass, (obj), TYPE_S390_CCW_MACHINE)
+>> +
+>>  /*
+>>   * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
+>>   * as the dirty bitmap must be managed by bitops that take an int as
+>> @@ -50,6 +53,7 @@ typedef struct S390CcwMachineClass {
+>>      bool cpu_model_allowed;
+>>      bool css_migration_enabled;
+>>      bool hpage_1m_allowed;
+>> +    bool split_ram_layout;
+>>  } S390CcwMachineClass;
+>>  
+>>  /* runtime-instrumentation allowed by the machine */
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index 073672f9cb..9160c1ed0a 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -151,28 +151,47 @@ static void virtio_ccw_register_hcalls(void)
+>>                                     virtio_ccw_hcall_early_printk);
+>>  }
+>>  
+>> -static void s390_memory_init(ram_addr_t mem_size)
+>> +static void s390_memory_init(MachineState *ms)
+>>  {
+>> +    S390CcwMachineClass *s390mc = S390_MACHINE_GET_CLASS(ms);
+>>      MemoryRegion *sysmem = get_system_memory();
+>> -    ram_addr_t chunk, offset = 0;
+>> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>>      unsigned int number = 0;
+>>      Error *local_err = NULL;
+>> -    gchar *name;
+>> +    ram_addr_t mem_size = ms->ram_size;
+>> +    gchar *name = g_strdup_printf(s390mc->split_ram_layout ?
+>> +                                  "s390.whole.ram" : "s390.ram");
+>>  
+>>      /* allocate RAM for core */
+>> -    name = g_strdup_printf("s390.ram");
+>> -    while (mem_size) {
+>> -        MemoryRegion *ram = g_new(MemoryRegion, 1);
+>> -        uint64_t size = mem_size;
+>> -
+>> -        /* KVM does not allow memslots >= 8 TB */
+>> -        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+>> -        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+>> -        memory_region_add_subregion(sysmem, offset, ram);
+>> -        mem_size -= chunk;
+>> -        offset += chunk;
+>> -        g_free(name);
+>> -        name = g_strdup_printf("s390.ram.%u", ++number);
+>> +    memory_region_allocate_system_memory(ram, NULL, name, mem_size);
+>> +
+>> +    /* migration compatible RAM handling for 4.1 and older machines */
+>> +    if (s390mc->split_ram_layout) {
+>> +       ram_addr_t chunk, offset = 0;
+>> +       /*
+>> +        * memory_region_allocate_system_memory() registers allocated RAM for
+>> +        * migration, however for compat reasons the RAM should be passed over
+>> +        * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
+>> +        * allocated RAM so it won't be migrated directly. Aliases will take care
+>> +        * of segmenting RAM into legacy chunks that migration compatible.
+>> +        */
+>> +       vmstate_unregister_ram(ram, NULL);
+>> +       name = g_strdup_printf("s390.ram");
+>> +       while (mem_size) {
+>> +           MemoryRegion *alias = g_new(MemoryRegion, 1);
+>> +
+>> +           /* KVM does not allow memslots >= 8 TB */
+>> +           chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
+>> +           memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
+>> +           vmstate_register_ram_global(alias);
+>> +           memory_region_add_subregion(sysmem, offset, alias);
+>> +           mem_size -= chunk;
+>> +           offset += chunk;
+>> +           g_free(name);
+>> +           name = g_strdup_printf("s390.ram.%u", ++number);
+>> +       }
+>> +    } else {
+>> +       memory_region_add_subregion(sysmem, 0, ram);
+>>      }
+>>      g_free(name);
+>>  
+>> @@ -257,7 +276,7 @@ static void ccw_init(MachineState *machine)
+>>  
+>>      s390_sclp_init();
+>>      /* init memory + setup max page size. Required for the CPU model */
+>> -    s390_memory_init(machine->ram_size);
+>> +    s390_memory_init(machine);
+>>  
+>>      /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+>>      s390_init_cpus(machine);
+>> @@ -667,8 +686,11 @@ static void ccw_machine_4_1_instance_options(MachineState *machine)
+>>  
+>>  static void ccw_machine_4_1_class_options(MachineClass *mc)
+>>  {
+>> +    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+>> +
+>>      ccw_machine_4_2_class_options(mc);
+>>      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
+>> +    s390mc->split_ram_layout = true;
+>>  }
+>>  DEFINE_CCW_MACHINE(4_1, "4.1", false);
+>>  
+>>
+> 
+> As discussed, I am not sure if adding that compat code really is worth
+> it. :)
 
-Thanks,
+Agreed. As long as forward migration (e.g. 4.2->4.3 will work) and we document
+that migration will fails for 2.12->.....4.1 for guests >=8TB we  can simplify
+things.
 
-David / dhildenb
 
