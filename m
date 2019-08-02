@@ -2,70 +2,65 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51805C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189E8C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26BE42087C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:22:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26BE42087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2D272087C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:24:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D272087C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZON-0003F3-Vt
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:22:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50635)
+	id 1htZPZ-0004Mo-0U
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:24:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50788)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1htZNu-0002nV-1J
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:22:23 -0400
+ (envelope-from <no-reply@patchew.org>) id 1htZOV-0003ZF-5j
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:23:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1htZNs-00084U-63
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:22:21 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:41584)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1htZNr-00083y-Q9
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:22:19 -0400
-Received: by mail-qt1-f194.google.com with SMTP id d17so74132945qtj.8
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 08:22:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=eloXJTEf1J/DdBKKZ0x13ostIqMFLpYGj6V3KArZ9kU=;
- b=a5C+l7Pf415Y21BdsVCpMb8NDnluSaTu/0TFtGPJtMKCTC1YDRuozi5t3F3wFkP7eT
- K+HyUzr6LgYVSTXt008jRY9G4geLjEOalArqCmgZVtFDIpxQqxJKu3a2tBY6DBNos78x
- /7A1qTy7i+KuKc1TOllQTaPmt6cn0ko2svsETJjXn3yEg3jnpuFv1ZWoLQuXuXZsRwwO
- f1kwH+hydAT/VOBfUZP3+Y/dhmENepOS2AaYQjHWm1UNCSU/f8T/qafX9mnwqx/9ZdUP
- ckxm7udN2BocapRiOQfXqu1EUzbSmYkou/DuzQTlkmPiVLbvaEkSfQjn9BibkFzJNzeS
- Udow==
-X-Gm-Message-State: APjAAAXXNx+2wq5wcE9YTAmhh7rgO5ygNLeS8fycVVKQGINUFG2zzhPv
- A0mgFF+TFNC1JrTAOeiP8U39HQ==
-X-Google-Smtp-Source: APXvYqw1+c4uuWDZsf2RmcP2rzBiFVhO/Xzth8Oqm21icUvDKVIWTKAXvHZMS958P0X33qAm/v6GXA==
-X-Received: by 2002:aed:3e96:: with SMTP id n22mr89368710qtf.247.1564759338854; 
- Fri, 02 Aug 2019 08:22:18 -0700 (PDT)
-Received: from redhat.com ([147.234.38.1])
- by smtp.gmail.com with ESMTPSA id p3sm49183968qta.12.2019.08.02.08.22.13
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 02 Aug 2019 08:22:17 -0700 (PDT)
-Date: Fri, 2 Aug 2019 11:22:10 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20190802112047-mutt-send-email-mst@kernel.org>
-References: <20190802150605.5880-1-jfreimann@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+ (envelope-from <no-reply@patchew.org>) id 1htZOT-0008TS-Dp
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:22:59 -0400
+Resent-Date: Fri, 02 Aug 2019 11:22:59 -0400
+Resent-Message-Id: <E1htZOT-0008TS-Dp@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21837)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1htZOT-0008Qb-5f
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:22:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1564759365; cv=none; d=zoho.com; s=zohoarc; 
+ b=JVE2Wb7oVcSRRLdMuNv9qZ1bhsX5fd/M5owBqT5lpVpMRy5YKqkawzWdxcYkTgMN6hCPjDXSKdYjw6xew5C2HKIs+faT96OALxGUkl/mtA5JOtvH3lriidIQ3GBXEQHcN3kmSWSgvGfC65Vk66AnPv6dvLP+CEI24Cxe4dOydIk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1564759365;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=N9m4VbxuhtNJ1tSBVFjtneN7vP9RLw22DerC4URYGDk=; 
+ b=N2XyiFKqsmBRv1tO6AU+QGs54ahiiLrfcgLwOG+B4nfRJ84W4q7Diw0dk47fOlURxUXKM7rvI8HfqXh3luZO++hN/UpT6z7T2Vzxp2gbqWoidcuyLFqIpTu24Tat6/W92wMJkK7uOj1SbUjcchKinSi2Wsv0lQLZRsfw1Kqi1jI=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1564759364687423.9089212638901;
+ Fri, 2 Aug 2019 08:22:44 -0700 (PDT)
+Message-ID: <156475936319.31781.10651568248889262361@c4a48874b076>
 In-Reply-To: <20190802150605.5880-1-jfreimann@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: jfreimann@redhat.com
+Date: Fri, 2 Aug 2019 08:22:44 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.160.194
+X-Received-From: 135.84.80.218
 Subject: Re: [Qemu-devel] [PATCH v2 0/9] add failover feature for assigned
  network devices
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,190 +74,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
 Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- aadam@redhat.com, qemu-devel@nongnu.org, laine@redhat.com, ailan@redhat.com
+ mst@redhat.com, aadam@redhat.com, qemu-devel@nongnu.org, laine@redhat.com,
+ ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 02, 2019 at 05:05:56PM +0200, Jens Freimann wrote:
-> This is implementing the host side of the net_failover concept
-> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
-> 
-> Changes since v1:
-> - add new QMP events,
->    - one is send when the primary device is unplugged
->    - one is send when VIRTIO_NET_F_STANDBY is not negotiated.
->      This is needed because we hide the primary device until
->      the feature bit is negotiated and then add it with
->      qdev_add_device(). The event is for libvirt to be aware of that.
-> - patch 7/9: a new migration state, called wait-unplug.
->   It is entered after SETUP and before ACTIVE. In this phase we check
->   devices for pending guest unplug complete event.
->   This patch still has a problem. It checks in a loop if there are still
->   devices that are not unplugged by the guest. If the guest never
->   returns it will run forever. How to terminate this loop? I thought
->   about a timed wait semaphore or just spinning for a certain amount of time,
->   but nothing seems good. Any ideas here?
-> - patch 2/9: When unplugging the primary devices, only do the guest part i.e.
->   call hotplug_handler_unplug_request() which calls the pcie attention
->   button code. The unrealize part is not done so the ressources of the
->   device are not freed.  In case of migration failure we can re-plug the device to
->   the guest with hotplug_handler_hotplug(). I tested migration failure and
->   a following second attempt to migrate that doesn't fail.
-> - add the primary device on the target VM, done in runstate change
->   handler.
-> - fix error reporting (dgilbert)
-> - get rid of timer to add device after feature negotiation
-> 
-> The general idea is that we have a pair of devices, a vfio-pci and a
-> virtio-net device. Before migration the vfio device is unplugged and data
-> flows to the virtio-net device, on the target side another vfio-pci device
-> is plugged in to take over the data-path. In the guest the net_failover
-> module will pair net devices with the same MAC address.
-> 
-> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
-> 
-> * Patch 2 In the second patch the virtio-net uses the API to defer adding the vfio
->   device until the VIRTIO_NET_F_STANDBY feature is acked. It also
->   implements the migration handler to unplug the device from the guest and
->   re-plug in case of migration failure
-> 
-> * Patch 3 and 4 make sure that we can unplug the vfio-device before
->   migration starts
-> 
-> * Patch 5 and 6 add new qmp events, one sends the device id of a device
->   that was just requested to be unplugged from the guest and another one
->   to let libvirt know if VIRTIO_NET_F_STANDBY was negotiated
-> 
-> * Patch 7 adds a new migration state that is entered while we wait for
->   devices to be unplugged by guest OS
-> 
-> * Patch 8 sets a new flag for PCIDevice 'partially_hotplugged' which we
->   use to skip the unrealize code path when doing a unplug of the primary
->   device
-> 
-> * Patch 9 sets the pending_deleted_event before triggering the guest
->   unplug request
-> 
-> Previous discussion:
->   RFC v1 https://patchwork.ozlabs.org/cover/989098/
->   RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.html
->   v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03968.html
-> 
-> To summarize concerns/feedback from previous discussion:
-> 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
->   Migration might get stuck for unpredictable time with unclear reason.
->   This approach combines two tricky things, hot/unplug and migration.
->   -> We need to let libvirt know what's happening. Add new qmp events
->      and a new migration state. When a primary device is (partially)
->      unplugged (only from guest) we send a qmp event with the device id. When
->      it is unplugged from the guest the DEVICE_DELETED event is sent.
->      Migration will enter the wait-unplug state while waiting for the guest
->      os to unplug all primary devices and then move on with migration.
-> 2. PCI devices are a precious ressource. The primary device should never
->   be added to QEMU if it won't be used by guest instead of hiding it in
->   QEMU.
->   -> We only hotplug the device when the standby feature bit was
->      negotiated. We save the device cmdline options until we need it for
->      qdev_device_add()
->      Hiding a device can be a useful concept to model. For example a
->      pci device in a powered-off slot could be marked as hidden until the slot is
->      powered on (mst).
-> 3. Management layer software should handle this. Open Stack already has
->   components/code to handle unplug/replug VFIO devices and metadata to
->   provide to the guest for detecting which devices should be paired.
->   -> An approach that includes all software from firmware to
->      higher-level management software wasn't tried in the last years. This is
->      an attempt to keep it simple and contained in QEMU as much as possible.
->      One of the problems that stopped management software and libvirt from
->      implementing this idea is that it can't be sure that it's possible to
->      re-plug the primary device. By not freeing the devices resources in QEMU
->      and only asking the guest OS to unplug it is possible to re-plug the
->      device in case of a migration failure.
-> 4. Hotplugging a device and then making it part of a failover setup is
->    not possible
->   -> addressed by extending qdev hotplug functions to check for hidden
->      attribute, so e.g. device_add can be used to plug a device.
-> 
-> 
-> I have tested this with a mlx5 NIC and was able to migrate the VM with
-> above mentioned workarounds for open problems.
-> 
-> Command line example:
-> 
-> qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
->         -machine q35,kernel-irqchip=split -cpu host   \
->         -k fr   \
->         -serial stdio   \
->         -net none \
->         -qmp unix:/tmp/qmp.socket,server,nowait \
->         -monitor telnet:127.0.0.1:5555,server,nowait \
->         -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
->         -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
->         -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
->         -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
->         -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,failover=on \
-> 	-device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,standby=net1 \
->         /root/rhel-guest-image-8.0-1781.x86_64.qcow2
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwMjE1MDYwNS41ODgw
+LTEtamZyZWltYW5uQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2
+ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBp
+bmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYy
+IDAvOV0gYWRkIGZhaWxvdmVyIGZlYXR1cmUgZm9yIGFzc2lnbmVkIG5ldHdvcmsgZGV2aWNlcwpN
+ZXNzYWdlLWlkOiAyMDE5MDgwMjE1MDYwNS41ODgwLTEtamZyZWltYW5uQHJlZGhhdC5jb20KCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4g
+L2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
+Y2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMjAxOTA4MDIxNTA2
+MDUuNTg4MC0xLWpmcmVpbWFubkByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA4MDIxNTA2MDUu
+NTg4MC0xLWpmcmVpbWFubkByZWRoYXQuY29tClN1Ym1vZHVsZSAnY2Fwc3RvbmUnIChodHRwczov
+L2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdjYXBz
+dG9uZScKU3VibW9kdWxlICdkdGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZHRjLmdpdCkg
+cmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpTdWJtb2R1bGUgJ3JvbXMvUWVtdU1hY0RyaXZlcnMn
+IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvUWVtdU1hY0RyaXZlcnMuZ2l0KSByZWdpc3RlcmVk
+IGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJzJwpTdWJtb2R1bGUgJ3JvbXMvU0xPRicgKGh0
+dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9GLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9t
+cy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvZWRrMicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9l
+ZGsyLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9lZGsyJwpTdWJtb2R1bGUgJ3JvbXMv
+aXB4ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5i
+aW9zJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcv
+Z2l0L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3
+YXJlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbnNiaScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9v
+cGVuc2JpLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuc2JpJwpTdWJtb2R1bGUg
+J3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3FlbXUtcGFsY29k
+ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJwpTdWJtb2R1bGUg
+J3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLmdpdC8pIHJl
+Z2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdyb21zL3NlYWJpb3Mt
+aHBwYScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLWhwcGEuZ2l0KSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3MtaHBwYScKU3VibW9kdWxlICdyb21zL3NnYWJpb3Mn
+IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2dhYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBh
+dGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxlICdyb21zL3NraWJvb3QnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2tpYm9v
+dCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJv
+b3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdCcKU3VibW9kdWxlICdyb21z
+L3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3Qtc2FtNDYw
+ZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCcKU3VibW9k
+dWxlICdzbGlycCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9saWJzbGlycC5naXQpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ3NsaXJwJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRm
+bG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdp
+dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1
+Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11
+Lm9yZy9naXQvYmVya2VsZXktdGVzdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0
+ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGIn
+IChodHRwczovL2dpdC5xZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBm
+b3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJt
+b2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0
+NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRo
+ICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0
+OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0
+aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNoZWNrZWQgb3V0ICc5MGM0ODhkNWY0YTQwNzM0MjI0
+N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9k
+dWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNrZWQgb3V0ICdiYTFhYjM2MGVlYmU2MzM4YmI4ZDdk
+ODNhOTIyMGNjZjdlMjEzYWYzJwpDbG9uaW5nIGludG8gJ3JvbXMvZWRrMicuLi4KU3VibW9kdWxl
+IHBhdGggJ3JvbXMvZWRrMic6IGNoZWNrZWQgb3V0ICcyMGQyZTVhMTI1ZTM0ZmM4NTAxMDI2NjEz
+YTcxNTQ5YjJhMWEzZTU0JwpTdWJtb2R1bGUgJ1NvZnRGbG9hdCcgKGh0dHBzOi8vZ2l0aHViLmNv
+bS91Y2ItYmFyL2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAn
+QXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJt
+b2R1bGUgJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcgKGh0dHBzOi8vZ2l0
+aHViLmNvbS9vcGVuc3NsL29wZW5zc2wpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ0NyeXB0b1BrZy9M
+aWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcKQ2xvbmluZyBpbnRvICdBcm1Qa2cvTGlicmFyeS9B
+cm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICdy
+b21zL2VkazIvQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9h
+dC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgw
+MzcnCkNsb25pbmcgaW50byAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJy4u
+LgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIv
+b3BlbnNzbCc6IGNoZWNrZWQgb3V0ICc1MGVhYWM5ZjMzMzc2NjcyNTlkZTcyNTQ1MWYyMDFlNzg0
+NTk5Njg3JwpTdWJtb2R1bGUgJ2JvcmluZ3NzbCcgKGh0dHBzOi8vYm9yaW5nc3NsLmdvb2dsZXNv
+dXJjZS5jb20vYm9yaW5nc3NsKSByZWdpc3RlcmVkIGZvciBwYXRoICdib3Jpbmdzc2wnClN1Ym1v
+ZHVsZSAna3JiNScgKGh0dHBzOi8vZ2l0aHViLmNvbS9rcmI1L2tyYjUpIHJlZ2lzdGVyZWQgZm9y
+IHBhdGggJ2tyYjUnClN1Ym1vZHVsZSAncHljYS5jcnlwdG9ncmFwaHknIChodHRwczovL2dpdGh1
+Yi5jb20vcHljYS9jcnlwdG9ncmFwaHkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdweWNhLWNy
+eXB0b2dyYXBoeScKQ2xvbmluZyBpbnRvICdib3Jpbmdzc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdy
+b21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2JvcmluZ3NzbCc6
+IGNoZWNrZWQgb3V0ICcyMDcwZjhhZDkxNTFkYzhmM2E3M2JmZmFhMTQ2YjVlNjkzN2E1ODNmJwpD
+bG9uaW5nIGludG8gJ2tyYjUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtn
+L0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2tyYjUnOiBjaGVja2VkIG91dCAnYjlhZDZjNDk1
+MDVjOTZhMDg4MzI2YjYyYTUyNTY4ZTM0ODRmMjE2OCcKQ2xvbmluZyBpbnRvICdweWNhLWNyeXB0
+b2dyYXBoeScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9P
+cGVuc3NsTGliL29wZW5zc2wvcHljYS1jcnlwdG9ncmFwaHknOiBjaGVja2VkIG91dCAnMDk0MDMx
+MDBkZTJmNmYxY2RkMGQ0ODRkY2I4ZTYyMGYxYzMzNWM4ZicKQ2xvbmluZyBpbnRvICdyb21zL2lw
+eGUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91dCAnZGU0NTY1Y2Jl
+NzZlYTlmNzkxM2EwMWYzMzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRvICdyb21zL29wZW5i
+aW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNrZWQgb3V0ICdjNzll
+MGVjYjg0ZjRmMWVlM2Y3M2Y1MjE2MjJlMjY0ZWRkMWJmMTc0JwpDbG9uaW5nIGludG8gJ3JvbXMv
+b3BlbmhhY2t3YXJlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnOiBjaGVj
+a2VkIG91dCAnYzU1OWRhN2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1NDZmNScKQ2xvbmlu
+ZyBpbnRvICdyb21zL29wZW5zYmknLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5zYmknOiBj
+aGVja2VkIG91dCAnY2UyMjhlZTA5MTlkZWI5OTU3MTkyZDcyM2VlY2M4YWFhZTI2OTdjNicKQ2xv
+bmluZyBpbnRvICdyb21zL3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvcWVt
+dS1wYWxjb2RlJzogY2hlY2tlZCBvdXQgJ2JmMGUxMzY5ODg3MjQ1MDE2NGZhNzA0MGRhMzZhOTVk
+MmQ0YjMyNmYnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAn
+cm9tcy9zZWFiaW9zJzogY2hlY2tlZCBvdXQgJ2E1Y2FiNThlOWEzZmI2ZTE2OGFiYTkxOWM1NjY5
+YmVhNDA2NTczYjQnCkNsb25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL3NlYWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcwZjRmZTg0NjU4MTY1ZTk2
+Y2UzNTg3MGZkMTlmYzYzNGUxODJlNzdiJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dhYmlvcycuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFlZTUyMjg3ZTVm
+MzIzNzMxODFjZmY1MGEwMGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMvc2tpYm9vdCcu
+Li4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICcyNjFjYThlNzc5
+ZTUxMzg4NjlhNDVmMTc0Y2FhNDliZTZhMjc0NTAxJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290
+Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAnZDM2ODkyNjdm
+OTJjNTk1NmUwOWNjN2QxYmFhNDcwMDE0MTY2MmJmZicKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9v
+dC1zYW00NjBleCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JzogY2hl
+Y2tlZCBvdXQgJzYwYjM5MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1ODgnCkNsb25p
+bmcgaW50byAnc2xpcnAnLi4uClN1Ym1vZHVsZSBwYXRoICdzbGlycCc6IGNoZWNrZWQgb3V0ICcx
+MjZjMDRhY2JhYmQ3YWQzMmMyYjAxOGZlMTBkZmFjMmEzYmMxMjEwJwpDbG9uaW5nIGludG8gJ3Rl
+c3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAv
+YmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgx
+OTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0
+ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0z
+JzogY2hlY2tlZCBvdXQgJzVhNTlkY2VjMTkzMjczOTZhMDExYTE3ZmQ5MjRhZWQ0ZmVjNDE2YjMn
+CkNsb25pbmcgaW50byAndWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0aCAndWkva2V5
+Y29kZW1hcGRiJzogY2hlY2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBl
+ZjNkODMyY2UnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNTQxM2IxMSBwY2k6IG1h
+cmsgZGV2aWNlIGhhdmluZyBndWVzdCB1bnBsdWcgcmVxdWVzdCBwZW5kaW5nCjExMjJhOTggcGNp
+OiBtYXJrIGRldmljZXMgcGFydGlhbGx5IHVucGx1Z2dlZAowMzdlY2U2IG1pZ3JhdGlvbjogQWRk
+IG5ldyBtaWdyYXRpb24gc3RhdGUgd2FpdC11bnBsdWcKOTc3Y2RkZCBxYXBpOiBBZGQgZmFpbG92
+ZXIgbmVnb3RpYXRlZCBldmVudApjNjY3YWFjIHFhcGk6IGFkZCB1bnBsdWcgcHJpbWFyeSBldmVu
+dAplZDdjOTAxIG1pZ3JhdGlvbjogYWxsb3cgdW5wbHVnIGR1cmluZyBtaWdyYXRpb24gZm9yIGZh
+aWxvdmVyIGRldmljZXMKYTViNDRlZiB2ZmlvOiB1bnBsdWcgZmFpbG92ZXIgcHJpbWFyeSBkZXZp
+Y2UgYmVmb3JlIG1pZ3JhdGlvbgpmYjY1ZjM4IG5ldC92aXJ0aW86IGFkZCBmYWlsb3ZlciBzdXBw
+b3J0CjEzY2ZmMTkgcWRldi9xYnVzOiBBZGQgaGlkZGVuIGRldmljZSBzdXBwb3J0Cgo9PT0gT1VU
+UFVUIEJFR0lOID09PQoxLzkgQ2hlY2tpbmcgY29tbWl0IDEzY2ZmMTk3Y2MwYyAocWRldi9xYnVz
+OiBBZGQgaGlkZGVuIGRldmljZSBzdXBwb3J0KQoyLzkgQ2hlY2tpbmcgY29tbWl0IGZiNjVmMzhh
+ZGJjZiAobmV0L3ZpcnRpbzogYWRkIGZhaWxvdmVyIHN1cHBvcnQpCjMvOSBDaGVja2luZyBjb21t
+aXQgYTViNDRlZjZiYTFmICh2ZmlvOiB1bnBsdWcgZmFpbG92ZXIgcHJpbWFyeSBkZXZpY2UgYmVm
+b3JlIG1pZ3JhdGlvbikKNC85IENoZWNraW5nIGNvbW1pdCBlZDdjOTAxOWEzOTIgKG1pZ3JhdGlv
+bjogYWxsb3cgdW5wbHVnIGR1cmluZyBtaWdyYXRpb24gZm9yIGZhaWxvdmVyIGRldmljZXMpCjUv
+OSBDaGVja2luZyBjb21taXQgYzY2N2FhYzljYjY5IChxYXBpOiBhZGQgdW5wbHVnIHByaW1hcnkg
+ZXZlbnQpCjYvOSBDaGVja2luZyBjb21taXQgOTc3Y2RkZDQ4MzNjIChxYXBpOiBBZGQgZmFpbG92
+ZXIgbmVnb3RpYXRlZCBldmVudCkKNy85IENoZWNraW5nIGNvbW1pdCAwMzdlY2U2NzlkNTkgKG1p
+Z3JhdGlvbjogQWRkIG5ldyBtaWdyYXRpb24gc3RhdGUgd2FpdC11bnBsdWcpCkVSUk9SOiB0cmFp
+bGluZyB3aGl0ZXNwYWNlCiM4NTogRklMRTogbWlncmF0aW9uL21pZ3JhdGlvbi5jOjMyMzI6Cisg
+ICAgICAgICAgICAgICAgICAgICAgTUlHUkFUSU9OX1NUQVRVU19BQ1RJVkUpOyAkCgpFUlJPUjog
+dHJhaWxpbmcgd2hpdGVzcGFjZQojMTQxOiBGSUxFOiBxYXBpL21pZ3JhdGlvbi5qc29uOjEzNzoK
+KyMgICAgICAgICAgICAgICAoc2luY2UgNC4yKSAkCgp0b3RhbDogMiBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDk0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDcvOSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKOC85IENoZWNraW5nIGNvbW1pdCAxMTIyYTk4MGIwZmYgKHBjaTogbWFyayBkZXZpY2VzIHBh
+cnRpYWxseSB1bnBsdWdnZWQpCjkvOSBDaGVja2luZyBjb21taXQgNTQxM2IxMTQyNmMwIChwY2k6
+IG1hcmsgZGV2aWNlIGhhdmluZyBndWVzdCB1bnBsdWcgcmVxdWVzdCBwZW5kaW5nKQo9PT0gT1VU
+UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwg
+bG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDgwMjE1MDYw
+NS41ODgwLTEtamZyZWltYW5uQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1l
+c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
 
-Didn't read this yet, one question: how do migration commands look
-like?
-
-
-
-
-> I'm grateful for any remarks or ideas!
-> 
-> Thanks!
-> 
-> Changes from RFCv2 to v1:
-> - work around circular dependency of commandline options. Just add
->   failover=on to the virtio-net standby options and reference it from
->   primary (vfio-pci) device with standby=<id>
-> - add patch 3/4 to allow migration of vfio-pci device when it is part of a
->   failover pair, still disallow for all other devices
-> - add patch 4/4 to allow unplug of device during migrationm, make an
->   exception for failover primary devices. I'd like feedback on how to
->   solve this more elegant. I added a boolean to DeviceState, have it
->   default to false for all devices except for primary devices.
-> - not tested yet with surprise removal
-> - I don't expect this to go in as it is, still needs more testing but
->   I'd like to get feedback on above mentioned changes.
-> 
-> 
-> 
-> Jens Freimann (9):
->   qdev/qbus: Add hidden device support
->   net/virtio: add failover support
->   vfio: unplug failover primary device before migration
->   migration: allow unplug during migration for failover devices
->   qapi: add unplug primary event
->   qapi: Add failover negotiated event
->   migration: Add new migration state wait-unplug
->   pci: mark devices partially unplugged
->   pci: mark device having guest unplug request pending
-> 
->  hw/core/qdev.c                 |  20 ++++
->  hw/net/virtio-net.c            | 180 +++++++++++++++++++++++++++++++++
->  hw/pci/pci.c                   |   2 +
->  hw/pci/pcie.c                  |   6 ++
->  hw/vfio/pci.c                  |  25 ++++-
->  hw/vfio/pci.h                  |   2 +
->  include/hw/pci/pci.h           |   1 +
->  include/hw/qdev-core.h         |   9 ++
->  include/hw/virtio/virtio-net.h |  13 +++
->  include/hw/virtio/virtio.h     |   1 +
->  include/migration/vmstate.h    |   2 +
->  migration/migration.c          |  14 +++
->  migration/savevm.c             |  18 ++++
->  migration/savevm.h             |   1 +
->  qapi/migration.json            |  24 ++++-
->  qapi/net.json                  |  16 +++
->  qdev-monitor.c                 |  43 +++++++-
->  vl.c                           |   6 +-
->  18 files changed, 375 insertions(+), 8 deletions(-)
-> 
-> -- 
-> 2.21.0
 
