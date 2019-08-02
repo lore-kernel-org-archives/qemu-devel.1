@@ -4,62 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C75C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87286C32753
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:16:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABD8A20665
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:09:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD8A20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 640DF20880
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:16:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640DF20880
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htScX-0007au-ND
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:09:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37713)
+	id 1htSkE-0000jg-ET
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:16:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39199)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1htSc5-00077D-Qs
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:08:34 -0400
+ (envelope-from <piaojun@huawei.com>) id 1htSjp-0000Kj-Qc
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:16:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1htSc4-0005fx-U2
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:08:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51866)
+ (envelope-from <piaojun@huawei.com>) id 1htSjo-000112-Ak
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:16:33 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2183 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>)
- id 1htSc2-0005eg-S3; Fri, 02 Aug 2019 04:08:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 218613082137;
- Fri,  2 Aug 2019 08:08:30 +0000 (UTC)
-Received: from localhost (ovpn-116-202.ams2.redhat.com [10.36.116.202])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B18395D712;
- Fri,  2 Aug 2019 08:08:23 +0000 (UTC)
-Date: Fri, 2 Aug 2019 09:08:22 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Aarushi Mehta <mehta.aaru20@gmail.com>
-Message-ID: <20190802080822.GE4227@stefanha-x1.localdomain>
-References: <20190801234031.29561-1-mehta.aaru20@gmail.com>
- <20190801234031.29561-18-mehta.aaru20@gmail.com>
+ (Exim 4.71) (envelope-from <piaojun@huawei.com>) id 1htSjo-0000vT-04
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:16:32 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id A029CE61FE73E52B6563;
+ Fri,  2 Aug 2019 16:16:21 +0800 (CST)
+Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Fri, 2 Aug 2019
+ 16:16:20 +0800
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake
+ <eblake@redhat.com>
+References: <5D3F8F04.3030404@huawei.com>
+ <4ec43f2f-1d72-5fe1-3b93-2c75ee6f87b4@redhat.com>
+ <20190801142016.GI2773@work-vm> <20190801142637.GJ2773@work-vm>
+From: piaojun <piaojun@huawei.com>
+Message-ID: <5D43F143.6060901@huawei.com>
+Date: Fri, 2 Aug 2019 16:16:03 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.2.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="jTMWTj4UTAEmbWeb"
-Content-Disposition: inline
-In-Reply-To: <20190801234031.29561-18-mehta.aaru20@gmail.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 02 Aug 2019 08:08:30 +0000 (UTC)
+In-Reply-To: <20190801142637.GJ2773@work-vm>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.177.253.249]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 17/17] block/io_uring: enable kernel
- submission polling
+X-Received-From: 45.249.212.190
+Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH] virtiofsd: fix compile error
+ if 'F_OFD_GETLK' not defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,77 +69,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
- Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Dave and Eric,
 
---jTMWTj4UTAEmbWeb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 2019/8/1 22:26, Dr. David Alan Gilbert wrote:
+> * Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+>> * Eric Blake (eblake@redhat.com) wrote:
+>>> On 7/29/19 7:27 PM, piaojun wrote:
+>>>> Use F_GETLK for fcntl when F_OFD_GETLK not defined.
+>>>
+>>> Which system are you hitting this problem on?
+>>>
+>>> The problem with F_GETLK is that it is NOT as safe as F_OFD_GETLK.
+>>>
+>>> We already have fcntl_op_getlk and qemu_probe_lock_ops() in util/osdep.c
+>>> to not only determine which form to use, but also to emit a warning to
+>>> the end user if we had to fall back to the unsafe F_GETLK. Why is your
+>>> code not reusing that logic?
+>>>
+>>>>
+>>>> Signed-off-by: Jun Piao <piaojun@huawei.com>
+>>>> ---
+>>>>  contrib/virtiofsd/passthrough_ll.c | 9 +++++++++
+>>>>  1 file changed, 9 insertions(+)
+>>>>
+>>>> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passthrough_ll.c
+>>>> index 9ae1381..757785b 100644
+>>>> --- a/contrib/virtiofsd/passthrough_ll.c
+>>>> +++ b/contrib/virtiofsd/passthrough_ll.c
+>>>> @@ -1619,7 +1619,11 @@ static void lo_getlk(fuse_req_t req, fuse_ino_t ino,
+>>>>  		return;
+>>>>  	}
+>>>>
+>>>> +#ifdef F_OFD_GETLK
+>>>>  	ret = fcntl(plock->fd, F_OFD_GETLK, lock);
+>>>> +#else
+>>>> +	ret = fcntl(plock->fd, F_GETLK, lock);
+>>>> +#endif
+>>>
+>>> Hmm. Since this is in contrib, you are trying to compile something that
+>>> is independent of util/osdep.c (at least, I assume that's the case, as
+>>> contrib/virtiofsd/ is not even part of qemu.git master yet - in which
+>>> case, why is this not being squashed in to the patch introducing that
+>>> file, rather than sent standalone).  On the other hand, that raises the
+>>> question - who is trying to use virtiofsd on a kernel that is too old to
+>>> provid F_OFD_GETLK?  Isn't the whole point of virtiofsd to be speeding
+>>> up modern usage, at which point an old kernel is just gumming up the
+>>> works?  It seems like you are better off letting compilation fail on a
+>>> system that is too old to support decent F_OFD_GETLK, rather than
+>>> silently falling back to something that is unsafe.
+>>
+>> It is, but I guess the answer here is someone wanted to build on RHEL7.
+> 
+> although looking at the tools it went in 7.6
+> 
+> Dave
+> 
 
-On Fri, Aug 02, 2019 at 05:10:31AM +0530, Aarushi Mehta wrote:
-> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
-> ---
->  block/io_uring.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
+Yes, the compile error comes from kernel 3.10, and it seems necessary
+to solve this. I try to reuse qemu_lock_fd() to compat F_GETLK/F_SETLK,
+but its semantics differs from fcntl, so I think using #ifdef will be
+easier.
 
-How does SQPOLL performance compare?
+We could delete F_GETLK/F_SETLK compat when virtiofsd is limited to be
+built in newer kernel. And I'm glad to hear from other developers.
 
-> diff --git a/block/io_uring.c b/block/io_uring.c
-> index 1553cd2e58..2a1d79704a 100644
-> --- a/block/io_uring.c
-> +++ b/block/io_uring.c
-> @@ -288,6 +288,17 @@ static int ioq_submit(LuringState *s)
->              *sqes = luringcb->sqeq;
->              QSIMPLEQ_REMOVE_HEAD(&s->io_q.submit_queue, next);
->          }
-> +        /*
-> +         * io_uring_submit() returns sqes in ring for kernel side
-> +         * submission polling and sets wakeup flag if needed.
-> +         *
-> +         * It is not possible for any sqes to have already been
-> +         * submitted by the sq_poll as the writes are only made visible
-> +         * to the kernel in this function.
-> +         *
-> +         * For normal I/O, it returns the actual submitted requests
-> +         * from io_uring_enter()
-> +         */
->          ret = io_uring_submit(&s->ring);
->          trace_luring_io_uring_submit(s, ret);
->          /* Prevent infinite loop if submission is refused */
-> @@ -525,7 +536,11 @@ LuringState *luring_init(Error **errp)
->      s = g_new0(LuringState, 1);
->      trace_luring_init_state(s, sizeof(*s));
->      struct io_uring *ring = &s->ring;
-> -    rc = io_uring_queue_init(MAX_EVENTS, ring, 0);
-> +
-> +    rc = io_uring_queue_init(MAX_EVENTS, ring, IORING_SETUP_SQPOLL);
-> +    if (rc == -EOPNOTSUPP) {
-> +            rc = io_uring_queue_init(MAX_EVENTS, ring, 0);
+Thanks,
+Jun
 
-Please use 4-space indentation.
-
---jTMWTj4UTAEmbWeb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1D73YACgkQnKSrs4Gr
-c8i9Owf+Kc/jFGuKqyfmkOYVvLg0ZRpfvoAr6e0q+hErdsOHQOWoSg34rPCea7ND
-voA1Pt1QCSBcH/1WlM63x2d5HOJNOdEXc/u5Q2jl41XyrF7l9qyUoBTWj0BBT9N8
-YLUqG44LvuxFhLYM4+qidsY1dUu5hFPCEeWqNvr5E5ri7M4PceQOECgYD69YlFOi
-Iwh7mJzJ1n+ASNC7PulsnsXUW5MW/OcAvBIuIq/eO+Ux+LlKe4oGMDE+A1ujf75y
-G4HT7u17gqitOhjlGdyVQVW37Zf8nv4Htuixd/YuuZElSDiu4MqfXrJUFMoa2C1E
-Lh9BcJeSq+SLTVJ7zHGHq6T0ZkUGhg==
-=L2rb
------END PGP SIGNATURE-----
-
---jTMWTj4UTAEmbWeb--
+>> Dave
+>>
+>>>
+>>> -- 
+>>> Eric Blake, Principal Software Engineer
+>>> Red Hat, Inc.           +1-919-301-3226
+>>> Virtualization:  qemu.org | libvirt.org
+>>>
+>>
+>>
+>>
+>>
+>>> _______________________________________________
+>>> Virtio-fs mailing list
+>>> Virtio-fs@redhat.com
+>>> https://www.redhat.com/mailman/listinfo/virtio-fs
+>>
+>> --
+>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>>
+>> _______________________________________________
+>> Virtio-fs mailing list
+>> Virtio-fs@redhat.com
+>> https://www.redhat.com/mailman/listinfo/virtio-fs
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
+> .
+> 
 
