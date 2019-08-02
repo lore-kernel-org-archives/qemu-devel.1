@@ -2,63 +2,85 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D17C6C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 21:35:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95309C0650F
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 22:19:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9850220B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 21:35:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9850220B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5C34E2087C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 22:19:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPYvlx8g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C34E2087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htfCl-00064A-SS
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 17:35:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48028)
+	id 1htftl-0006jS-Kc
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 18:19:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56189)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1htfBh-0005bz-Q2
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:34:11 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1htftH-0006JT-2T
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:19:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1htfBf-0005dS-SM
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:34:09 -0400
-Received: from mga09.intel.com ([134.134.136.24]:28642)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1htfBf-0005bg-FL
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:34:07 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 02 Aug 2019 14:34:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,339,1559545200"; d="scan'208";a="373076313"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga006.fm.intel.com with ESMTP; 02 Aug 2019 14:34:04 -0700
-Date: Sat, 3 Aug 2019 05:33:40 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20190802213340.GA25611@richard>
-References: <20190802020716.11985-1-richardw.yang@linux.intel.com>
- <87a7csm965.fsf@dusky.pond.sub.org>
- <20190802054338.GA15295@richard> <20190802100220.GE2899@work-vm>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1htftF-0006Nt-5m
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:19:11 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45619)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1htftD-0006MT-4u
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:19:09 -0400
+Received: by mail-wr1-x444.google.com with SMTP id f9so78599602wre.12
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 15:19:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=MRp2pXCsWr7h412oTHqX0Wy4CduJAcJgM7131Lh4D5U=;
+ b=nPYvlx8gAx/kjdzoYFp3o60h3PwgibOX6SFgZPB0Txi5B05LrRPVDF50eyE9S9SOBX
+ wQItEmCIZBKtMHWZEHrzbxlLoqNzjmBSCKcQNdBgDKJL0Sa+8t1vPoCVwyeh+WE/wibH
+ 1TvzwocDF5hvI92hqzDtQSNqQsxmvixCn6wo8pcGPJW3tnx4PiIqZEENATkp79CRXQtE
+ wEZgRmc5EZ7CEFB43aSSX21u7yfLijKPuyotWb05mGZtYh5R5NJsKNd5EgLMiSijmdxh
+ PTC3DavgOGMcUC3gADcbxtT3GHtqF8RHQ7BO+yAkOeGjGQcDLZa+4hkDCdA40FWKuxAR
+ jJ3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=MRp2pXCsWr7h412oTHqX0Wy4CduJAcJgM7131Lh4D5U=;
+ b=e/HRhVYTt5/oumQ27JWVLf7cFPXNGQgNRc/PLVgzanUdhQO/Cxs33lyTCW7h56KTcs
+ XjbIkEfWPGriEHc7V4jo+ObeTazWq0KKv9+SlB4IOS3/WzpzMgNf/7brmIB3qahqZoUZ
+ 7SkLXGUj6P6rCQACMH/keAOhQUsw+9OVCJgxXwbqTfZsAhPQ7bMcyv5RV11dY2R6kSB2
+ fdWcI21dshheTEP8/QZSXiUe8s0hEmilIxCUN+ljBtN3t5napk5AALaMt0IpcN8vyVnU
+ Pi3oIQWExuUCTzGWXG/6Nc2TrMydSjmHMhjF5FooUe4MYGvCXNcjFozbn96wRMDFWL0g
+ gLdA==
+X-Gm-Message-State: APjAAAUJZDhIHD2YIQTniDTtiw1iMWeUiiu7X6kZhQataaGklO/zcS0q
+ 4aq5q4pLByyYerTyMxdSZBEa0WM3HuAJzGELPYA=
+X-Google-Smtp-Source: APXvYqw/eqU3dqJWIjMAi++HyMSo2aB66AV3UBKZyhQ6zw+kRRw2qXY5dIVtNcC2Y1c1s8d+5M0U06W6b2c/Ynp6baU=
+X-Received: by 2002:adf:ea8b:: with SMTP id
+ s11mr145845713wrm.100.1564784344950; 
+ Fri, 02 Aug 2019 15:19:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802100220.GE2899@work-vm>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20190802180449.10288-1-philmd@redhat.com>
+ <20190802180449.10288-2-philmd@redhat.com>
+In-Reply-To: <20190802180449.10288-2-philmd@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Sat, 3 Aug 2019 02:18:53 +0400
+Message-ID: <CAJ+F1C+r-7Eaw_MeaJWHyxxPEL3Ag6p13mhdE1+mrCLasXZ-7w@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.24
-Subject: Re: [Qemu-devel] [PATCH] hmp/info_migration: formatting migration
- capability output
+X-Received-From: 2a00:1450:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH-for-3.1.1 1/1] Fix heap overflow in
+ ip_reass on big packet input
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,112 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Jan Kiszka <jan.kiszka@siemens.com>, QEMU <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 02, 2019 at 11:02:20AM +0100, Dr. David Alan Gilbert wrote:
->* Wei Yang (richardw.yang@linux.intel.com) wrote:
->> On Fri, Aug 02, 2019 at 07:24:34AM +0200, Markus Armbruster wrote:
->> >Subject doesn't quite conform to conventions.  Suggest
->> >
->> >    hmp: Improve how "info migrate" formats capabilities
->> 
->> Thanks
->> 
->> >
->> >Wei Yang <richardw.yang@linux.intel.com> writes:
->> >
->> >> Current we put all migration capability in one line, which make it hard
->> >> to read them and someone them are missed due to terminal width.
->> >>
->> >> This patch formats it to print 4 in one line, which looks like this now:
->> >>
->> >> capabilities:
->> >>               xbzrle: off         rdma-pin-all: off        auto-converge: off          zero-blocks: off
->> >>             compress:  on               events: off         postcopy-ram: off               x-colo: off
->> >>          release-ram: off                block: off          return-path: off pause-before-switchover: off
->> >>              multifd: off        dirty-bitmaps: off   postcopy-blocktime: off  late-block-activate: off
->> >>      x-ignore-shared: off
->> >>
->> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
->> >> ---
->> >>  monitor/hmp-cmds.c | 8 ++++++--
->> >>  1 file changed, 6 insertions(+), 2 deletions(-)
->> >>
->> >> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
->> >> index 5ca3ebe942..29ce5b73e4 100644
->> >> --- a/monitor/hmp-cmds.c
->> >> +++ b/monitor/hmp-cmds.c
->> >> @@ -229,9 +229,13 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->> >>  
->> >>      /* do not display parameters during setup */
->> >>      if (info->has_status && caps) {
->> >> +        int index = 0;
->> >>          monitor_printf(mon, "capabilities: ");
->> >> -        for (cap = caps; cap; cap = cap->next) {
->> >> -            monitor_printf(mon, "%s: %s ",
->> >> +        for (cap = caps; cap; cap = cap->next, index++) {
->> >> +            if (!(index % 4)) {
->> >> +                monitor_printf(mon, "\n");
->> >> +            }
->> >> +            monitor_printf(mon, "%20s: %3s ",
->> >>                             MigrationCapability_str(cap->value->capability),
->> >>                             cap->value->state ? "on" : "off");
->> >>          }
->> >
->> >This assumes migration capability names are at most 20 characters long.
->> >late-block-activate is pushing it already: 19 characters.
->> >
->> >It adds up to 104 characters per line, which is rather wide.
->> >
->> >What about putting each capability on its own line, just like globals,
->> >and just like "info migrate_capabilities"?
->> >
->> >(qemu) info migrate
->> >globals:
->> >store-global-state: on
->> >only-migratable: off
->> >send-configuration: on
->> >send-section-footer: on
->> >decompress-error-check: on
->> >clear-bitmap-shift: 18
->> >capabilities:
->> >xbzrle: off
->> >rdma-pin-all: off
->> >auto-converge: off
->> >[...]
->> 
->> This looks good, while would reader may feel difficult to clarify from which
->> one the capabilities stops. 
->> 
->> How about add 4 space at the beginning of each capability?
->> 
->> Would the output be too long? How about wrap two capability into one line?
+On Fri, Aug 2, 2019 at 10:09 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
->IMHO the simpler way is just not to display the capabilities on
->'info migrate' at all.  If people want the list of capabilities there's
->already 'info migrate_capabiltiies' they can use.
+> From: Samuel Thibault <samuel.thibault@ens-lyon.org>
 >
->It was nice displaying them at the start of 'info migrate'
->when we only had a few, but nowe we've got so many it's perhaps
->easier just to omit them.
+> When the first fragment does not fit in the preallocated buffer, q will
+> already be pointing to the ext buffer, so we mustn't try to update it.
+>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> (cherry picked from libslirp commit 126c04acbabd7ad32c2b018fe10dfac2a3bc1=
+210)
+> Fixes: CVE-2019-14378
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
+thanks
+
+> ---
+>  slirp/ip_input.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/slirp/ip_input.c b/slirp/ip_input.c
+> index 348e1dca5a..07d8808671 100644
+> --- a/slirp/ip_input.c
+> +++ b/slirp/ip_input.c
+> @@ -334,6 +334,8 @@ insert:
+>      q =3D fp->frag_link.next;
+>         m =3D dtom(slirp, q);
+>
+> +       int was_ext =3D m->m_flags & M_EXT;
+> +
+>         q =3D (struct ipasfrag *) q->ipf_next;
+>         while (q !=3D (struct ipasfrag*)&fp->frag_link) {
+>           struct mbuf *t =3D dtom(slirp, q);
+> @@ -356,7 +358,7 @@ insert:
+>          * the old buffer (in the mbuf), so we must point ip
+>          * into the new buffer.
+>          */
+> -       if (m->m_flags & M_EXT) {
+> +       if (!was_ext && m->m_flags & M_EXT) {
+>           int delta =3D (char *)q - m->m_dat;
+>           q =3D (struct ipasfrag *)(m->m_ext + delta);
+>         }
+> --
+> 2.20.1
+>
 >
 
-Got it.
 
->Dave
->
->> -- 
->> Wei Yang
->> Help you, Help me
->--
->Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
--- 
-Wei Yang
-Help you, Help me
+--=20
+Marc-Andr=C3=A9 Lureau
 
