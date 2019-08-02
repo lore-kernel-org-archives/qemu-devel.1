@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A1AC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2478DC32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:38:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D02B020665
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:38:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D02B020665
+	by mail.kernel.org (Postfix) with ESMTPS id E9EE320665
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:38:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9EE320665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZd5-0000dM-43
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:38:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53567)
+	id 1htZdm-00024V-AK
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:38:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53563)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htZcH-0008Cv-1n
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:37:14 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htZcG-0008Cu-Vy
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htZcF-0000R4-Te
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1htZcG-0000RB-0E
  for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:37:12 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:58571 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:58623 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1htZcF-0008QC-NK
+ id 1htZcF-0008QM-QF
  for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:37:11 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D81A41A2205;
- Fri,  2 Aug 2019 17:36:08 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id 249EF1A220C;
+ Fri,  2 Aug 2019 17:36:09 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id BAD9C1A21F4;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 0656A1A21F4;
  Fri,  2 Aug 2019 17:36:08 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 17:35:57 +0200
-Message-Id: <1564760158-27536-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  2 Aug 2019 17:35:58 +0200
+Message-Id: <1564760158-27536-3-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH 1/2] tests/acceptance: Refactor and improve
- reporting in linux_ssh_mips_malta.py
+Subject: [Qemu-devel] [PATCH 2/2] tests/acceptance: Add new test cases in
+ linux_ssh_mips_malta.py
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,74 +71,70 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-This patch restructures code organization around the test case
-executions. At the same time, rather than outputing a cryptic message:
-
-FAIL: True not found in [False],
-
-the following will be reported too, if the command output does not meet
-specified expectations:
-
-'lspci -d 11ab:4620' output doesn't contain the word 'GT-64120'
+Add 15 new tests cases. They all rely on simple commands used for
+detecting hardware configuration information.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/acceptance/linux_ssh_mips_malta.py | 36 +++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 15 deletions(-)
+ tests/acceptance/linux_ssh_mips_malta.py | 45 ++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
 diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
-index aafb0c3..8368e1f 100644
+index 8368e1f..c153c41 100644
 --- a/tests/acceptance/linux_ssh_mips_malta.py
 +++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -145,27 +145,33 @@ class LinuxSSH(Test):
-         self.ssh_disconnect_vm()
-         self.wait_for_console_pattern('Power down')
+@@ -155,6 +155,51 @@ class LinuxSSH(Test):
  
--    def run_common_commands(self):
--        stdout, stderr = self.ssh_command('lspci -d 11ab:4620')
--        self.assertIn(True, ["GT-64120" in line for line in stdout])
--
--        stdout, stderr = self.ssh_command('cat /sys/bus/i2c/devices/i2c-0/name')
--        self.assertIn(True, ["SMBus PIIX4 adapter" in line
--                             for line in stdout])
--
--        stdout, stderr = self.ssh_command('cat /proc/mtd')
--        self.assertIn(True, ["YAMON" in line
--                             for line in stdout])
-+    def ssh_command_output_contains(self, cmd, exp):
-+        stdout, _ = self.ssh_command(cmd)
-+        for line in stdout:
-+            if exp in line:
-+                break
-+        else:
-+            self.fail('"%s" output does not contain "%s"' % (cmd, exp))
- 
-+    def run_common_commands(self):
+     def run_common_commands(self):
+         self.ssh_command_output_contains(
++            'cat /proc/cpuinfo',
++            '24Kc')
 +        self.ssh_command_output_contains(
-+            'lspci -d 11ab:4620',
-+            'GT-64120')
++            'uname -m',
++            'mips')
 +        self.ssh_command_output_contains(
-+            'cat /sys/bus/i2c/devices/i2c-0/name',
-+            'SMBus PIIX4 adapter')
++            'uname -r',
++            '3.2.0-4-4kc-malta')
 +        self.ssh_command_output_contains(
-+            'cat /proc/mtd',
-+            'YAMON')
-         # Empty 'Board Config'
--        stdout, stderr = self.ssh_command('md5sum /dev/mtd2ro')
--        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in line
--                             for line in stdout])
++            'cat /proc/interrupts',
++            'timer')
 +        self.ssh_command_output_contains(
-+            'md5sum /dev/mtd2ro',
-+            '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
- 
-     def do_test_mips_malta(self, endianess, kernel_path, uname_m):
-         self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_path)
- 
--        stdout, stderr = self.ssh_command('uname -a')
-+        stdout, _ = self.ssh_command('uname -a')
-         self.assertIn(True, [uname_m + " GNU/Linux" in line for line in stdout])
- 
-         self.run_common_commands()
++            'cat /proc/interrupts',
++            'i8042')
++        self.ssh_command_output_contains(
++            'cat /proc/interrupts',
++            'serial')
++        self.ssh_command_output_contains(
++            'cat /proc/interrupts',
++            'ata_piix')
++        self.ssh_command_output_contains(
++            'cat /proc/interrupts',
++            'eth0')
++        self.ssh_command_output_contains(
++            'cat /proc/interrupts',
++            'eth0')
++        self.ssh_command_output_contains(
++            'cat /proc/devices',
++            'input')
++        self.ssh_command_output_contains(
++            'cat /proc/devices',
++            'usb')
++        self.ssh_command_output_contains(
++            'cat /proc/devices',
++            'fb')
++        self.ssh_command_output_contains(
++            'cat /proc/ioports',
++            'serial')
++        self.ssh_command_output_contains(
++            'cat /proc/ioports',
++            'ata_piix')
++        self.ssh_command_output_contains(
++            'cat /proc/ioports',
++            'piix4_smbus')
++        self.ssh_command_output_contains(
+             'lspci -d 11ab:4620',
+             'GT-64120')
+         self.ssh_command_output_contains(
 -- 
 2.7.4
 
