@@ -2,66 +2,81 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A555C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC23C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E5E820B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:08:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E5E820B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7396A2064A
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:11:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xstoGZSi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7396A2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htYEV-00021u-AJ
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 10:08:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60187)
+	id 1htYHN-0003Ws-QE
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 10:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32870)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1htYDY-0000eb-JB
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:07:37 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1htYGw-0002wf-Bk
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1htYDX-00014a-Fo
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:07:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40780)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1htYDV-00013W-8y; Fri, 02 Aug 2019 10:07:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8379630832E9;
- Fri,  2 Aug 2019 14:07:32 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-107.ams2.redhat.com
- [10.36.117.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E37FE600C8;
- Fri,  2 Aug 2019 14:07:28 +0000 (UTC)
-Date: Fri, 2 Aug 2019 16:07:27 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190802140727.GD6379@localhost.localdomain>
-References: <20190801151744.798-1-kwolf@redhat.com>
- <20190801151744.798-3-kwolf@redhat.com>
- <976a878d-0344-8cb6-aa4b-d8e540bb1eaf@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1htYGv-0002nj-9u
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:11:06 -0400
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:39609)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1htYGv-0002nN-3g
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:11:05 -0400
+Received: by mail-ot1-x32e.google.com with SMTP id r21so72248238otq.6
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 07:11:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VMwKg6cKsBo+BU00rfS0YKkciqoBntqCNaO5DSIAG0E=;
+ b=xstoGZSieXWmjg5Q+NhWSJYcOjhGZtDgtUqabNUgDBNF+DizYrBCy+ce5nGJgFwNUA
+ yc2xDVZD+0LwKSrIcccMtaQppE4KQYvuIff/eNnUeCoLrt6yogxzr+6TJ8P78pgDw816
+ Wq6deVa0nB7zw/siyKLT7X0Zt1d1H4XldjyErZtACn3YQHSmAyU2FQ0SZfs6OK8O57v1
+ CDC5C9bmh+3czc08zvFRpnK4myi69/UwWgFpzEGzh1/Y7W56JDT4iUQP69lVf/9Cd+Or
+ QLyNsai9Hw88UifH/VVE192ylTeCiRK6Pm6zoa0DnvT/Lj466UPhNFijS+hX417jf1hb
+ 7x1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VMwKg6cKsBo+BU00rfS0YKkciqoBntqCNaO5DSIAG0E=;
+ b=ZjQSABzaebHDNnZYmsYP0q0kROx5p0pi4l4BI3rqXRj+ojq9oarDMLK3sMrgY1HaNz
+ UW3PX7UdsFIkGSWS5CM7saGSJ+++16vVm7dxH3pTHzxEzs/Qo+ucpttK7nHB4sUWWZ2E
+ JWZqrypCZzf1gP2YpnR0ITw+obRkeVqBy1xqKRvzm06JN2XguGN7M3Z7nMo2Wm6RfnIO
+ JwUSdItsRmC8qSfjlzRtN/sULbdaGdJOgI2pmSCTDN6+xdgS7vZit9/inUlKbEfJ8m7d
+ 4adfO7aBUbqghUjabcDH69QKG0u1EHkZS+ChCtdtVGWfzkfsbtv2nrM4TrthB9/YNbL9
+ 2x7A==
+X-Gm-Message-State: APjAAAWCrkFMVJZnhZpaRVgkMyvUwmgqydID9HhXOy4qrGwm8xSRR+Ec
+ MDZ6Lmu+q3Y5QOaU+DaEPti/VSLI9h6h8HF2rv0D63a6
+X-Google-Smtp-Source: APXvYqyf8RZcaGw0ksUlnIh1KnQ5o4oFwMl8RC2jwTcQjyq6K6kXGVMovvT8ko87E6VniFFTM36Pw8CTS5CWK7xmtjg=
+X-Received: by 2002:a9d:6a0f:: with SMTP id g15mr72062333otn.135.1564755064251; 
+ Fri, 02 Aug 2019 07:11:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="3uo+9/B/ebqu+fSQ"
-Content-Disposition: inline
-In-Reply-To: <976a878d-0344-8cb6-aa4b-d8e540bb1eaf@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Fri, 02 Aug 2019 14:07:32 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: Enable -d for Python
- non-unittest tests
+References: <20190802111833.32187-1-marcandre.lureau@redhat.com>
+In-Reply-To: <20190802111833.32187-1-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Aug 2019 15:10:53 +0100
+Message-ID: <CAFEAcA8RxD=+BJhiRg9c6QnjC7+UU2ie2c574yg_y8qbnT9qyw@mail.gmail.com>
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
+Subject: Re: [Qemu-devel] [PULL 0/1] Slirp cve 2019 14378 patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,59 +88,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, 2 Aug 2019 at 12:18, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> The following changes since commit 3bd6cbbb181b6ae60a1d1f33ccd325b45f71aa=
+2a:
+>
+>   Update version for v4.1.0-rc3 release (2019-07-30 22:02:05 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/elmarco/qemu.git tags/slirp-CVE-2019-14378-pull-requ=
+est
+>
+> for you to fetch changes up to e1a4a24d262ba5ac74ea1795adb3ab1cd574c7fb:
+>
+>   slirp: update with CVE-2019-14378 fix (2019-08-02 15:14:56 +0400)
+>
+> ----------------------------------------------------------------
+> Slirp CVE-2019-14378 pull request
+>
+> ----------------------------------------------------------------
+>
+> Marc-Andr=C3=A9 Lureau (1):
+>   slirp: update with CVE-2019-14378 fix
+>
+>  slirp | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
---3uo+9/B/ebqu+fSQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-Am 01.08.2019 um 19:57 hat Max Reitz geschrieben:
-> On 01.08.19 17:17, Kevin Wolf wrote:
-> > The part of iotests.main() that is related to the implementation of the
-> > debug option -d and enables QEMU and QMP logging is not only useful in
-> > tests that use the Python unittest framework, but also in tests that
-> > work by comparing with a reference output.
-> >=20
-> > Factor these parts out into iotests.init() and call it from the test
-> > cases that currently lack support for debug output.
->=20
-> How does this relate to
-> https://lists.nongnu.org/archive/html/qemu-block/2019-07/msg01212.html ?
 
-Hm, no idea? :-)
+Applied, thanks.
 
-Looks like John's patch depends on some other patches which would then
-conflict with mine, too, so maybe I'll just drop my patch and wait what
-happens?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.1
+for any user-visible changes.
 
-John, any opinion?
-
-Kevin
-
---3uo+9/B/ebqu+fSQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdREOfAAoJEH8JsnLIjy/WZ+IQAKDPIr3bWJ/OJPYdpAeKd0bc
-xke1lKVqvz5QtHa8h4wJ5bg0N3pD5JCRG0muD2kTslmUrLvEnEwBOWv/Bta7PFWC
-WFiSqeQArYpVeDiLkGP5qlMIwAOJct+d75oGq7S4AyeE8yI6XXUE2sNijP8cCLfv
-Pi/SIoJhx6AIeSqFFiXmCjyc48170XdH+mAdOfaDIs8aMTMsnUC7fBfzWGkOwv8/
-VDSELNuO5uffpmsaoOhyigT6GyxbLzGVVxPOj2HwPatammGeoV65u2Tnza4qTAEO
-8EaNWH6Ujy4KDhykJdxRVVdKuAJasTfDEalfHQljX6SfcsMZX93RVxqwYdWGFet4
-lbvgoKqEsYoPLu0W1bb0dKHRdf2vPw9r5rukrhr6x1Y8nLBk1Jqafa+lKaUoTqEV
-uiOTEkHHzm8OHYxX/KV7DUayfF4dCbVzMi2tD6t6NE7b3adcPgjWAVBnoHbyeiDI
-lFZP251PPzDzja0qfxNCcDsfXV7AKFp0qf84K/8w/rrk4IalfwqB8cXViAkncieq
-WQ1sqlaJQStN2Gv1Z4fhC4yLUPv5Qz8HphoIrqKxtX+GbTR908rHjIxHs3MCphQH
-RW9uRM9XntE/XSe928jZY6SJFvvR9iHyXf49FOZkAo5I3/quKZKr95pPptOI99eJ
-3t75hOvChbi95VDiJoE5
-=VDSs
------END PGP SIGNATURE-----
-
---3uo+9/B/ebqu+fSQ--
+-- PMM
 
