@@ -2,66 +2,56 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CCD5C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 06:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4265EC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 06:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BF32206A2
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 06:00:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF32206A2
+	by mail.kernel.org (Postfix) with ESMTPS id C97DF206A2
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 06:04:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97DF206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htQc0-0004YR-6I
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 02:00:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43503)
+	id 1htQgT-0005kQ-QM
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 02:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44499)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1htQbG-0003zR-P9
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 01:59:35 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1htQg3-0005KM-7U
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 02:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1htQbF-0001LY-LU
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 01:59:34 -0400
-Received: from mga04.intel.com ([192.55.52.120]:37722)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1htQfy-0008CV-Tk
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 02:04:29 -0400
+Received: from mga09.intel.com ([134.134.136.24]:54871)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1htQbF-0001Jd-DW
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 01:59:33 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+ id 1htQfy-0008Br-99
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 02:04:26 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 01 Aug 2019 22:59:30 -0700
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 01 Aug 2019 23:04:24 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,337,1559545200"; d="scan'208";a="167139350"
+X-IronPort-AV: E=Sophos;i="5.64,337,1559545200"; d="scan'208";a="201551575"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga008.jf.intel.com with ESMTP; 01 Aug 2019 22:59:28 -0700
-Date: Fri, 2 Aug 2019 13:59:04 +0800
+ by fmsmga002.fm.intel.com with ESMTP; 01 Aug 2019 23:04:23 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
-To: Ivan Ren <renyime@gmail.com>
-Message-ID: <20190802055904.GA15613@richard>
-References: <1564464992-22305-1-git-send-email-ivanren@tencent.com>
- <20190801022118.GA21992@richard>
- <CA+6E1==Dc5Zac3Q-tt2V2pbq-DofW=AZX6tP1RoDBp4KSNxiKw@mail.gmail.com>
- <20190802004904.GA20638@richard>
- <CA+6E1=n-B7u1H_eSn-0FKeg_PuvbkJyxN6u2U37ageZVM7xUkQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+6E1=n-B7u1H_eSn-0FKeg_PuvbkJyxN6u2U37ageZVM7xUkQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+To: qemu-devel@nongnu.org
+Date: Fri,  2 Aug 2019 14:03:59 +0800
+Message-Id: <20190802060359.16556-1-richardw.yang@linux.intel.com>
+X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.120
-Subject: Re: [Qemu-devel] [PATCH] migration: always initial ram_counters for
- a new migration
+X-Received-From: 134.134.136.24
+Subject: [Qemu-devel] [RFC PATCH] migration/postcopy: enable compress with
+ postcopy
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,68 +63,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
- dgilbert@redhat.com, qemu-devel@nongnu.org
+Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 02, 2019 at 01:46:41PM +0800, Ivan Ren wrote:
->>>>>     s->iteration_start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
->>>>>+    /*
->>>>>+     * Update s->iteration_initial_bytes to match
->>>s->iteration_start_time.
->>>>>+     */
->>>>>+    s->iteration_initial_bytes = migration_total_bytes(s);
->>>>
->>>>Is this one necessary? We have sent out nothing yet.
->>>
->>>Yes, currently nothing has been sent yet at this point.
->>>
->>>Is that better to always match the update of iteration_initial_bytes
->>>and iteration_start_time in a explicit way to avoid some potential
->missing?
->>>
->>
->>You may get some point. Well after a close look, we may find other
->potential
->>problem.
->>
+This patch enable compress with postcopy.
 
-Well, I guess you need to use another tool to send mail. The format is
-corrupted.
+This is a RFC and based on some unmerged patch
 
->>1. To be consistency, we need to update iteration_initial_pages too.
->>   So my opinion is to wrap the update of these three counters into a
->helper
->>   function. So each time all of them.
+  "migration: extract ram_load_precopy"
+  "migration/postcopy: skip compression when postcopy is active"
 
-I don't see you reply this one or the mail is corrupted.
+Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+---
+ migration/postcopy-ram.c |  3 +--
+ migration/ram.c          | 35 +++++++++++++++++++++--------------
+ 2 files changed, 22 insertions(+), 16 deletions(-)
 
-If we don't update iteration_initial_pages, the initial_pages will mismatch
-the initial_bytes. Am I right?
-
->>2. In function ram_get_total_transferred_pages, do we missed multifd_bytes?
->
->In function ram_save_multifd_page, ram pages transferred by multifd threads
->is
->counted by ram_counters.normal.
->You mean other multifd bytes like multifd packet or multifd sync info?
->
-
-Ok, it is counted in normal.
-
-While if my understanding is correct, normal is used to count pages sent by
-save_normal_page(). Sounds this is misused?
-
->Thanks.
->
->On Fri, Aug 2, 2019 at 8:49 AM Wei Yang <richardw.yang@linux.intel.com>
->wrote:
->
-
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index a7e7ec9c22..70b6beb5a9 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -1252,8 +1252,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+             }
+             memset(mis->postcopy_tmp_zero_page, '\0', mis->largest_page_size);
+         }
+-        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page,
+-                                   rb);
++        return postcopy_place_page(mis, host, mis->postcopy_tmp_zero_page, rb);
+     }
+ }
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index a0d3bc60b2..c1d6eadf38 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2384,16 +2384,6 @@ static bool save_page_use_compression(RAMState *rs)
+         return false;
+     }
+ 
+-    /*
+-     * The decompression threads asynchronously write into RAM
+-     * rather than use the atomic copies needed to avoid
+-     * userfaulting.  It should be possible to fix the decompression
+-     * threads for compatibility in future.
+-     */
+-    if (migration_in_postcopy()) {
+-        return false;
+-    }
+-
+     /*
+      * If xbzrle is on, stop using the data compression after first
+      * round of migration even if compression is enabled. In theory,
+@@ -3433,6 +3423,11 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+         }
+         i++;
+     }
++
++    if (migrate_postcopy_ram()) {
++        flush_compressed_data(rs);
++    }
++
+     rcu_read_unlock();
+ 
+     /*
+@@ -4019,6 +4014,7 @@ static int ram_load_postcopy(QEMUFile *f)
+         void *place_source = NULL;
+         RAMBlock *block = NULL;
+         uint8_t ch;
++        int len;
+ 
+         addr = qemu_get_be64(f);
+ 
+@@ -4036,7 +4032,8 @@ static int ram_load_postcopy(QEMUFile *f)
+ 
+         trace_ram_load_postcopy_loop((uint64_t)addr, flags);
+         place_needed = false;
+-        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE)) {
++        if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
++                     RAM_SAVE_FLAG_COMPRESS_PAGE)) {
+             block = ram_block_from_stream(f, flags);
+ 
+             host = host_from_ram_block_offset(block, addr);
+@@ -4109,6 +4106,17 @@ static int ram_load_postcopy(QEMUFile *f)
+                                          TARGET_PAGE_SIZE);
+             }
+             break;
++        case RAM_SAVE_FLAG_COMPRESS_PAGE:
++            all_zero = false;
++            len = qemu_get_be32(f);
++            if (len < 0 || len > compressBound(TARGET_PAGE_SIZE)) {
++                error_report("Invalid compressed data length: %d", len);
++                ret = -EINVAL;
++                break;
++            }
++            decompress_data_with_multi_threads(f, page_buffer, len);
++            ret |= wait_for_decompress_done();
++            break;
+         case RAM_SAVE_FLAG_EOS:
+             /* normal exit */
+             multifd_recv_sync_main();
+@@ -4130,8 +4138,7 @@ static int ram_load_postcopy(QEMUFile *f)
+             void *place_dest = host + TARGET_PAGE_SIZE - block->page_size;
+ 
+             if (all_zero) {
+-                ret = postcopy_place_page_zero(mis, place_dest,
+-                                               block);
++                ret = postcopy_place_page_zero(mis, place_dest, block);
+             } else {
+                 ret = postcopy_place_page(mis, place_dest,
+                                           place_source, block);
+@@ -4372,6 +4379,7 @@ static int ram_load_precopy(QEMUFile *f)
+         }
+     }
+ 
++    ret |= wait_for_decompress_done();
+     return ret;
+ }
+ 
+@@ -4405,7 +4413,6 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+         ret = ram_load_precopy(f);
+     }
+ 
+-    ret |= wait_for_decompress_done();
+     rcu_read_unlock();
+     trace_ram_load_complete(ret, seq_iter);
+ 
 -- 
-Wei Yang
-Help you, Help me
+2.17.1
+
 
