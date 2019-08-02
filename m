@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25266C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CC8C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:26:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F012320644
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:23:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F012320644
+	by mail.kernel.org (Postfix) with ESMTPS id 6F47E21874
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:26:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F47E21874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htSqx-0002bR-6M
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:23:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41105)
+	id 1htStq-0003mA-M4
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:26:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42066)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1htSqY-0002BH-QJ
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:23:31 -0400
+ (envelope-from <david@redhat.com>) id 1htStL-0003Kd-AW
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1htSqX-00059G-MT
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:23:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52224)
+ (envelope-from <david@redhat.com>) id 1htStK-0000dz-BL
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:26:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59090)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1htSqX-00058t-Eu; Fri, 02 Aug 2019 04:23:29 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1htStK-0000dc-2I; Fri, 02 Aug 2019 04:26:22 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 76CFE83F3C;
- Fri,  2 Aug 2019 08:23:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5295A308FBA9;
+ Fri,  2 Aug 2019 08:26:21 +0000 (UTC)
 Received: from [10.36.116.87] (ovpn-116-87.ams2.redhat.com [10.36.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EFE3F19C79;
- Fri,  2 Aug 2019 08:23:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 212A95D9D3;
+ Fri,  2 Aug 2019 08:26:19 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <20190729145229.4333-1-imammedo@redhat.com>
@@ -90,18 +90,18 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <85cbce89-7b1d-34e4-c0c0-e9234587bb4b@redhat.com>
-Date: Fri, 2 Aug 2019 10:23:26 +0200
+Message-ID: <cb35c294-1c2e-c40a-875f-77e018c4b344@redhat.com>
+Date: Fri, 2 Aug 2019 10:26:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.2
 MIME-Version: 1.0
 In-Reply-To: <0e9cd550-c69b-3e97-4619-6746da4d4bd1@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 02 Aug 2019 08:23:28 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.43]); Fri, 02 Aug 2019 08:26:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH RFC 0/2] s390: stop abusing
@@ -124,60 +124,29 @@ Sender: "Qemu-devel"
 
 On 02.08.19 10:04, David Hildenbrand wrote:
 > On 29.07.19 16:52, Igor Mammedov wrote:
->> While looking into unifying guest RAM allocation to use hostmem backen=
-ds
+>> While looking into unifying guest RAM allocation to use hostmem backends
 >> for initial RAM (especially when -mempath is used) and retiring
->> memory_region_allocate_system_memory() API, leaving only single hostme=
-m backend,
->> I was inspecting how currently it is used by boards and it turns out s=
-everal
->> boards abuse it by calling the function several times (despite documen=
-ted contract
+>> memory_region_allocate_system_memory() API, leaving only single hostmem backend,
+>> I was inspecting how currently it is used by boards and it turns out several
+>> boards abuse it by calling the function several times (despite documented contract
 >> forbiding it).
 >>
->> s390 is one of such boards where KVM limitation on memslot size got pr=
-opagated
->> to board design and memory_region_allocate_system_memory() was abused =
-to satisfy
->> KVM requirement for max RAM chunk where memory region alias would suff=
-ice.
+>> s390 is one of such boards where KVM limitation on memslot size got propagated
+>> to board design and memory_region_allocate_system_memory() was abused to satisfy
+>> KVM requirement for max RAM chunk where memory region alias would suffice.
 >>
->> Unfortunately, memory_region_allocate_system_memory() usage created mi=
-gration
->> dependency where guest RAM is transferred in migration stream as sever=
-al RAMBlocks
+>> Unfortunately, memory_region_allocate_system_memory() usage created migration
+>> dependency where guest RAM is transferred in migration stream as several RAMBlocks
 >> if it's more than KVM_SLOT_MAX_BYTES.
->=20
+> 
 > So if I understand it correctly, we only call
 > memory_region_allocate_system_memory() in case the guest initial memory
 > size exceeds KVM_SLOT_MAX_BYTES - ~8TB.
->=20
-> Do we *really* care about keeping migration of systems running that mos=
-t
-> probably nobody (except Christian ;) ) really uses? (especially not in
-> production).
->=20
-> I am fine keeping migration running if it's easy, but introducing hacks
-> (reading below) for such obscure use cases - I don't know.
->=20
-> @Christian: Please prove me wrong. :)
 
-For reference:
-
-https://access.redhat.com/articles/rhel-kvm-limits
-
-RHEL 7/8 supports up to 2TB maximum memory in KVM guests.
+(to clarify, I meant: call it more than once)
 
 
-https://www.suse.com/releasenotes/s390x/SUSE-SLES/15-SP1/
-
-SLES 15 seems to support up to 4TB in a VM
-
-
-If migration failing would mean "abort migration, continue on migration
-source", I could sleep good at night. (as long as nothing crashes)
-
---=20
+-- 
 
 Thanks,
 
