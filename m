@@ -2,89 +2,63 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D6AC32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 21:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17C6C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 21:35:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D70E20665
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 21:20:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D70E20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9850220B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 21:35:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9850220B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hteyR-0002RH-IW
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 17:20:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45210)
+	id 1htfCl-00064A-SS
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 17:35:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48028)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1htexw-0001ty-9A
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:19:57 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1htfBh-0005bz-Q2
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1htexv-0001Qw-2i
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:19:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57596)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1htfBf-0005dS-SM
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:34:09 -0400
+Received: from mga09.intel.com ([134.134.136.24]:28642)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1htexs-00010J-CH; Fri, 02 Aug 2019 17:19:52 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B49F34E927;
- Fri,  2 Aug 2019 21:19:49 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E440C1972A;
- Fri,  2 Aug 2019 21:19:42 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190802185830.74648-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <815da22c-e88e-e813-d342-9ad14191d052@redhat.com>
-Date: Fri, 2 Aug 2019 23:19:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1htfBf-0005bg-FL
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 17:34:07 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Aug 2019 14:34:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,339,1559545200"; d="scan'208";a="373076313"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga006.fm.intel.com with ESMTP; 02 Aug 2019 14:34:04 -0700
+Date: Sat, 3 Aug 2019 05:33:40 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190802213340.GA25611@richard>
+References: <20190802020716.11985-1-richardw.yang@linux.intel.com>
+ <87a7csm965.fsf@dusky.pond.sub.org>
+ <20190802054338.GA15295@richard> <20190802100220.GE2899@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190802185830.74648-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="yLpMtNDKlsuVgOWytRNPgj12poRMXJlMg"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 02 Aug 2019 21:19:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] util/hbitmap: fix unaligned reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190802100220.GE2899@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
+Subject: Re: [Qemu-devel] [PATCH] hmp/info_migration: formatting migration
+ capability output
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,147 +70,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- den@openvz.org
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yLpMtNDKlsuVgOWytRNPgj12poRMXJlMg
-Content-Type: multipart/mixed; boundary="5XdVgH3rydlA5lppYhz9iRvUQzrfdQ5yz";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, fam@euphon.net,
- kwolf@redhat.com, den@openvz.org
-Message-ID: <815da22c-e88e-e813-d342-9ad14191d052@redhat.com>
-Subject: Re: [PATCH] util/hbitmap: fix unaligned reset
-References: <20190802185830.74648-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190802185830.74648-1-vsementsov@virtuozzo.com>
+On Fri, Aug 02, 2019 at 11:02:20AM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> On Fri, Aug 02, 2019 at 07:24:34AM +0200, Markus Armbruster wrote:
+>> >Subject doesn't quite conform to conventions.  Suggest
+>> >
+>> >    hmp: Improve how "info migrate" formats capabilities
+>> 
+>> Thanks
+>> 
+>> >
+>> >Wei Yang <richardw.yang@linux.intel.com> writes:
+>> >
+>> >> Current we put all migration capability in one line, which make it hard
+>> >> to read them and someone them are missed due to terminal width.
+>> >>
+>> >> This patch formats it to print 4 in one line, which looks like this now:
+>> >>
+>> >> capabilities:
+>> >>               xbzrle: off         rdma-pin-all: off        auto-converge: off          zero-blocks: off
+>> >>             compress:  on               events: off         postcopy-ram: off               x-colo: off
+>> >>          release-ram: off                block: off          return-path: off pause-before-switchover: off
+>> >>              multifd: off        dirty-bitmaps: off   postcopy-blocktime: off  late-block-activate: off
+>> >>      x-ignore-shared: off
+>> >>
+>> >> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> >> ---
+>> >>  monitor/hmp-cmds.c | 8 ++++++--
+>> >>  1 file changed, 6 insertions(+), 2 deletions(-)
+>> >>
+>> >> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+>> >> index 5ca3ebe942..29ce5b73e4 100644
+>> >> --- a/monitor/hmp-cmds.c
+>> >> +++ b/monitor/hmp-cmds.c
+>> >> @@ -229,9 +229,13 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>> >>  
+>> >>      /* do not display parameters during setup */
+>> >>      if (info->has_status && caps) {
+>> >> +        int index = 0;
+>> >>          monitor_printf(mon, "capabilities: ");
+>> >> -        for (cap = caps; cap; cap = cap->next) {
+>> >> -            monitor_printf(mon, "%s: %s ",
+>> >> +        for (cap = caps; cap; cap = cap->next, index++) {
+>> >> +            if (!(index % 4)) {
+>> >> +                monitor_printf(mon, "\n");
+>> >> +            }
+>> >> +            monitor_printf(mon, "%20s: %3s ",
+>> >>                             MigrationCapability_str(cap->value->capability),
+>> >>                             cap->value->state ? "on" : "off");
+>> >>          }
+>> >
+>> >This assumes migration capability names are at most 20 characters long.
+>> >late-block-activate is pushing it already: 19 characters.
+>> >
+>> >It adds up to 104 characters per line, which is rather wide.
+>> >
+>> >What about putting each capability on its own line, just like globals,
+>> >and just like "info migrate_capabilities"?
+>> >
+>> >(qemu) info migrate
+>> >globals:
+>> >store-global-state: on
+>> >only-migratable: off
+>> >send-configuration: on
+>> >send-section-footer: on
+>> >decompress-error-check: on
+>> >clear-bitmap-shift: 18
+>> >capabilities:
+>> >xbzrle: off
+>> >rdma-pin-all: off
+>> >auto-converge: off
+>> >[...]
+>> 
+>> This looks good, while would reader may feel difficult to clarify from which
+>> one the capabilities stops. 
+>> 
+>> How about add 4 space at the beginning of each capability?
+>> 
+>> Would the output be too long? How about wrap two capability into one line?
+>
+>IMHO the simpler way is just not to display the capabilities on
+>'info migrate' at all.  If people want the list of capabilities there's
+>already 'info migrate_capabiltiies' they can use.
+>
+>It was nice displaying them at the start of 'info migrate'
+>when we only had a few, but nowe we've got so many it's perhaps
+>easier just to omit them.
+>
 
---5XdVgH3rydlA5lppYhz9iRvUQzrfdQ5yz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Got it.
 
-On 02.08.19 20:58, Vladimir Sementsov-Ogievskiy wrote:
-> hbitmap_reset is broken: it rounds up the requested region. It leads to=
+>Dave
+>
+>> -- 
+>> Wei Yang
+>> Help you, Help me
+>--
+>Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-> the following bug, which is shown by fixed test:
->=20
-> assume granularity =3D 2
-> set(0, 3) # count becomes 4
-> reset(0, 1) # count becomes 2
->=20
-> But user of the interface assume that virtual bit 1 should be still
-> dirty, so hbitmap should report count to be 4!
->=20
-> In other words, because of granularity, when we set one "virtual" bit,
-> yes, we make all "virtual" bits in same chunk to be dirty. But this
-> should not be so for reset.
->=20
-> Fix this, aligning bound correctly.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->=20
-> Hi all!
->=20
-> Hmm, is it a bug or feature? :)
-> I don't have a test for mirror yet, but I think that sync mirror may be=
- broken
-> because of this, as do_sync_target_write() seems to be using unaligned =
-reset.
-
-Crap.
-
-
-Yes, you=E2=80=99re right.  This would fix it, and it wouldn=E2=80=99t fi=
-x it in the
-worst way.
-
-But I don=E2=80=99t know whether this patch is the best way forward still=
-=2E  I
-think call hbitmap_reset() with unaligned boundaries generally calls for
-trouble, as John has laid out.  If mirror=E2=80=99s do_sync_target_write(=
-) is
-the only offender right now, I=E2=80=99d prefer for hbitmap_reset() to as=
-sert
-that the boundaries are aligned (for 4.2), and for
-do_sync_target_write() to be fixed (for 4.1? :-/).
-
-(A practical problem with this patch is that do_sync_target_write() will
-still do the write, but it won=E2=80=99t change anything in the bitmap, s=
-o the
-copy operation was effectively useless.)
-
-I don=E2=80=99t know how to fix mirror exactly, though.  I have four idea=
-s:
-
-(A) Quick fix 1: do_sync_target_write() should shrink [offset, offset +
-bytes) such that it is aligned.  This would make it skip writes that
-don=E2=80=99t fill one whole chunk.
-
-+: Simple fix.  Could go into 4.1.
--: Makes copy-mode=3Dwrite-blocking equal to copy-mode=3Dbackground unles=
-s
-   you set the granularity to like 512. (Still beats just being
-   completely broken.)
-
-(B) Quick fix 2: Setting the request_alignment block limit to the job=E2=80=
-=99s
-granularity when in write-blocking mode.
-
-+: Very simple fix.  Could go into 4.1.
-+: Every write will trigger a RMW cycle, which copies the whole chunk to
-   the target, so write-blocking will do what it=E2=80=99s supposed to do=
-=2E
--: request_alignment forces everything to have the same granularity, so
-   this slows down reads needlessly.  (But only for write-blocking.)
-
-(C) Maybe the right fix 1: Let do_sync_target_write() expand [offset,
-offset + bytes) such that it is aligned and read head and tail from the
-source node.  (So it would do the RMW itself.)
-
-+ Doesn=E2=80=99t slow reads down.
-+ Writes to dirty areas will make them clean =E2=80=93 which is what
-  write-blocking is for.
-- Probably more complicated.  Nothing for 4.1.
-
-(D) Maybe the right fix 2: Split BlockLimits.request_alignment into
-read_alignment and write_alignment.  Then do (B).
-
-In effect, this is more or less the same as (C), but probably in a
-simpler way.  Still not simple enough for 4.1, though.
-
-
-So...  I tend to do either (A) or (B) now, and then probably (D) for
-4.2?  (And because (D) is an extension to (B), it would make sense to do
-(B) now, unless you=E2=80=99d prefer (A).)
-
-Max
-
-
---5XdVgH3rydlA5lppYhz9iRvUQzrfdQ5yz--
-
---yLpMtNDKlsuVgOWytRNPgj12poRMXJlMg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1EqOwACgkQ9AfbAGHV
-z0D2SQf/WNND81YIa8HZksyoemxsuEdgFGG1JU6vVKC7B9SLCKSBLV/c9eyG8d02
-6GqFrz5U5a8duOe9r0At9ebePMs8Xy5RaqSgZSjXazZl+emqUivxpeMxPWwe4VRO
-z0kUTH7hDvzI0nrI4a6+lL0t3ErcEimADPA77zCxwKGFQWA6Eu0j34UiGban/NHo
-QZstI3JO/Hk01ANHr+sTIGXg4kJEKEZVZeOEgLM6iUV33DeFR4UNuAy9W2FXqcPO
-4lEIhwvo5mMhXXvjSkJJuqu5XaIH3Ca6QQ4ciG4ucR9LKRRfKnDCyCv/YN4U8fLb
-G5DnQRbOF3cueMbt6Caxe3lUzlukfQ==
-=Lxig
------END PGP SIGNATURE-----
-
---yLpMtNDKlsuVgOWytRNPgj12poRMXJlMg--
+-- 
+Wei Yang
+Help you, Help me
 
