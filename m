@@ -2,74 +2,71 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA659C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 18:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8008DC32753
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 18:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B52320578
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 18:07:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B52320578
+	by mail.kernel.org (Postfix) with ESMTPS id 5F9CA20880
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 18:07:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F9CA20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htbxI-0007Ta-IL
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 14:07:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57738)
+	id 1htbxK-0007Vf-Mf
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 14:07:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1htbry-0005RL-1z
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 14:01:35 -0400
+ (envelope-from <bounces@canonical.com>) id 1htbry-0005SC-IN
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 14:01:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1htbrw-000517-NG
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 14:01:33 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55584)
+ (envelope-from <bounces@canonical.com>) id 1htbrw-00051X-OI
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 14:01:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55790)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1htbrw-0004Ej-Dq
+ id 1htbrw-0004IW-ED
  for qemu-devel@nongnu.org; Fri, 02 Aug 2019 14:01:32 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1htbrR-0001Xt-Py
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 18:01:01 +0000
+ id 1htbrX-0001iB-J3
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 18:01:07 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C0CD12E80CB
- for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 18:01:01 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 8E8E02E80CB
+ for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 18:01:07 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Aug 2019 17:54:17 -0000
+Date: Fri, 02 Aug 2019 17:46:23 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug-Tags: arm tcg
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: elouan-appere pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
- =?utf-8?q?e=29?=
+X-Launchpad-Bug-Commenters: deepi mjt+launchpad-tls ospite pmaydell
+X-Launchpad-Bug-Reporter: Antonio Ospite (ospite)
 X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156441235921.17753.6613889826588806043.malonedeb@gac.canonical.com>
-Message-Id: <156476845753.25084.14186354941287113194.malone@soybean.canonical.com>
+References: <155085278488.30597.14551761138419562879.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156476798391.27618.703557350455095524.malone@chaenomeles.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19014";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: eecc38fa618b0dec41cf43f76dc24947f9c282cb
+X-Launchpad-Hash: 74e4b7b42be3977ee109886400d91d1de41ad851
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838277] Re: qemu-system-aarch64: regression in
- 3.1: breakpoint instructions always routed to EL_D even when current EL is
- higher
+Subject: [Qemu-devel] [Bug 1817345] Re: configure script breaks when
+ $source_path contains white spaces
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -80,12 +77,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838277 <1838277@bugs.launchpad.net>
+Reply-To: Bug 1817345 <1817345@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fix for this is now in git and will be in the 4.1.0 release.
+Antonio's patches are in git and will be in the upcoming 4.1.0 release.
 
 
 ** Changed in: qemu
@@ -95,41 +92,70 @@ The fix for this is now in git and will be in the 4.1.0 release.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838277
+https://bugs.launchpad.net/bugs/1817345
 
 Title:
-  qemu-system-aarch64: regression in 3.1: breakpoint instructions always
-  routed to EL_D even when current EL is higher
+  configure script breaks when $source_path contains white spaces
 
 Status in QEMU:
   Fix Committed
 
 Bug description:
-  Affects 3.1.0 (latest stable release) and latest commit
-  (893dc8300c80e3dc32f31e968cf7aa0904da50c3) but did *not* affect 2.11
-  (qemu from bionic ubuntu LTS).
+  Hi,
 
-  With the following code and shell commands:
+  I noticed that the configure script breaks when the qemu source
+  directory is in a path containing white spaces, in particular the list
+  of targets is not correctly generated when calling "./configure
+  --help".
 
-  test.s:
+  Steps to reproduce the problem:
 
-  .text
-  mov x0, #0x60000000
-  msr vbar_el2, x0
-  dsb sy
-  isb sy
+  $ mkdir "dir with spaces"
+  $ cd dir\ with\ spaces/
+  $ git clone https://git.qemu.org/git/qemu.git
+  $ cd qemu/
+  $ ./configure --help | grep -A3 target-list
 
-  $ aarch64-none-elf-as test.s -o test.o
-  $ aarch64-none-elf-objcopy -S -O binary test.o test.bin
-  $ qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -cpu c=
-ortex-a57 -kernel test.bin -s -S
+  =
 
-  vbar_el2 is still 0 after the code, instead of being the expected
-  0x60000000. (see screenshot).
+  Actual result:
 
-  This regression doesn't seem to happen for vbar_el1 &
-  virtualization=3Doff.
+    --target-list=3DLIST       set target list (default: build everything)
+                             Available targets: dir with *-softmmu dir with =
+
+                             *-linux-user
+
+  =
+
+  Expected result:
+
+    --target-list=3DLIST       set target list (default: build everything)
+                             Available targets: aarch64-softmmu alpha-softm=
+mu =
+
+                             arm-softmmu cris-softmmu hppa-softmmu i386-sof=
+tmmu =
+
+                             lm32-softmmu m68k-softmmu microblaze-softmmu =
+
+
+  =
+
+  This happens because the $mak_wilds variable uses spaces to separate diff=
+erent paths, maybe newlines may be used, which are less likely to be in dir=
+ectory names.
+
+  BTW "shellcheck" may help finding some other problems.
+
+  Qemu version:
+
+  $ git describe =
+
+  v3.1.0-1960-ga05838cb2a
+
+  Thanks,
+     Antonio
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838277/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1817345/+subscriptions
 
