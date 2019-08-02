@@ -2,109 +2,64 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 597B8C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C75C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:09:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30DC0204EC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:04:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30DC0204EC
+	by mail.kernel.org (Postfix) with ESMTPS id ABD8A20665
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:09:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD8A20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htSYQ-0006CR-ET
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:04:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36826)
+	id 1htScX-0007au-ND
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:09:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37713)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <david@redhat.com>) id 1htSXx-0005Lu-3f
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:04:18 -0400
+ (envelope-from <stefanha@redhat.com>) id 1htSc5-00077D-Qs
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1htSXv-0003oi-SP
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:04:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47880)
+ (envelope-from <stefanha@redhat.com>) id 1htSc4-0005fx-U2
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:08:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51866)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1htSXv-0003ny-Kk; Fri, 02 Aug 2019 04:04:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>)
+ id 1htSc2-0005eg-S3; Fri, 02 Aug 2019 04:08:31 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4F455B2DF5;
- Fri,  2 Aug 2019 08:04:14 +0000 (UTC)
-Received: from [10.36.116.87] (ovpn-116-87.ams2.redhat.com [10.36.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0C75F19C68;
- Fri,  2 Aug 2019 08:04:12 +0000 (UTC)
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20190729145229.4333-1-imammedo@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <0e9cd550-c69b-3e97-4619-6746da4d4bd1@redhat.com>
-Date: Fri, 2 Aug 2019 10:04:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ by mx1.redhat.com (Postfix) with ESMTPS id 218613082137;
+ Fri,  2 Aug 2019 08:08:30 +0000 (UTC)
+Received: from localhost (ovpn-116-202.ams2.redhat.com [10.36.116.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B18395D712;
+ Fri,  2 Aug 2019 08:08:23 +0000 (UTC)
+Date: Fri, 2 Aug 2019 09:08:22 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Aarushi Mehta <mehta.aaru20@gmail.com>
+Message-ID: <20190802080822.GE4227@stefanha-x1.localdomain>
+References: <20190801234031.29561-1-mehta.aaru20@gmail.com>
+ <20190801234031.29561-18-mehta.aaru20@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190729145229.4333-1-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="jTMWTj4UTAEmbWeb"
+Content-Disposition: inline
+In-Reply-To: <20190801234031.29561-18-mehta.aaru20@gmail.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 02 Aug 2019 08:04:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.42]); Fri, 02 Aug 2019 08:08:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH RFC 0/2] s390: stop abusing
- memory_region_allocate_system_memory()
+Subject: Re: [Qemu-devel] [PATCH v9 17/17] block/io_uring: enable kernel
+ submission polling
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,94 +71,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org, dgilbert@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ saket.sinha89@gmail.com, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Stefan Hajnoczi <stefan@redhat.com>, Julia Suvorova <jusual@mail.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.07.19 16:52, Igor Mammedov wrote:
-> While looking into unifying guest RAM allocation to use hostmem backend=
-s
-> for initial RAM (especially when -mempath is used) and retiring
-> memory_region_allocate_system_memory() API, leaving only single hostmem=
- backend,
-> I was inspecting how currently it is used by boards and it turns out se=
-veral
-> boards abuse it by calling the function several times (despite document=
-ed contract
-> forbiding it).
->=20
-> s390 is one of such boards where KVM limitation on memslot size got pro=
-pagated
-> to board design and memory_region_allocate_system_memory() was abused t=
-o satisfy
-> KVM requirement for max RAM chunk where memory region alias would suffi=
-ce.
->=20
-> Unfortunately, memory_region_allocate_system_memory() usage created mig=
-ration
-> dependency where guest RAM is transferred in migration stream as severa=
-l RAMBlocks
-> if it's more than KVM_SLOT_MAX_BYTES.
 
-So if I understand it correctly, we only call
-memory_region_allocate_system_memory() in case the guest initial memory
-size exceeds KVM_SLOT_MAX_BYTES - ~8TB.
+--jTMWTj4UTAEmbWeb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Do we *really* care about keeping migration of systems running that most
-probably nobody (except Christian ;) ) really uses? (especially not in
-production).
+On Fri, Aug 02, 2019 at 05:10:31AM +0530, Aarushi Mehta wrote:
+> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+> ---
+>  block/io_uring.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
 
-I am fine keeping migration running if it's easy, but introducing hacks
-(reading below) for such obscure use cases - I don't know.
+How does SQPOLL performance compare?
 
-@Christian: Please prove me wrong. :)
+> diff --git a/block/io_uring.c b/block/io_uring.c
+> index 1553cd2e58..2a1d79704a 100644
+> --- a/block/io_uring.c
+> +++ b/block/io_uring.c
+> @@ -288,6 +288,17 @@ static int ioq_submit(LuringState *s)
+>              *sqes = luringcb->sqeq;
+>              QSIMPLEQ_REMOVE_HEAD(&s->io_q.submit_queue, next);
+>          }
+> +        /*
+> +         * io_uring_submit() returns sqes in ring for kernel side
+> +         * submission polling and sets wakeup flag if needed.
+> +         *
+> +         * It is not possible for any sqes to have already been
+> +         * submitted by the sq_poll as the writes are only made visible
+> +         * to the kernel in this function.
+> +         *
+> +         * For normal I/O, it returns the actual submitted requests
+> +         * from io_uring_enter()
+> +         */
+>          ret = io_uring_submit(&s->ring);
+>          trace_luring_io_uring_submit(s, ret);
+>          /* Prevent infinite loop if submission is refused */
+> @@ -525,7 +536,11 @@ LuringState *luring_init(Error **errp)
+>      s = g_new0(LuringState, 1);
+>      trace_luring_init_state(s, sizeof(*s));
+>      struct io_uring *ring = &s->ring;
+> -    rc = io_uring_queue_init(MAX_EVENTS, ring, 0);
+> +
+> +    rc = io_uring_queue_init(MAX_EVENTS, ring, IORING_SETUP_SQPOLL);
+> +    if (rc == -EOPNOTSUPP) {
+> +            rc = io_uring_queue_init(MAX_EVENTS, ring, 0);
 
->=20
-> In order to replace these several RAM chunks with a single memdev and k=
-eep it
-> working with KVM memslot size limit and migration compatible, following=
- was done:
->    * [2/2] use memory region aliases to partition hostmem backend RAM o=
-n
->            KVM_SLOT_MAX_BYTES chunks, which should keep KVM side workin=
-g
->    * [1/2] hacked memory region aliases (to ram memory regions only) to=
- have
->            its own RAMBlocks pointing to RAM chunks owned by aliased me=
-mory
->            region. While it's admittedly a hack, but it's relatively si=
-mple and
->            allows board code rashape migration stream as necessary
->=20
->            I haven't tried to use migratable aliases on x86 machines, b=
-ut with it
->            it could be possible to drop legacy RAM allocation and compa=
-t knob
->            (cd5ff8333a) dropping '-numa node,mem' completely even for o=
-ld machines.
->=20
-> PS:
->    Tested with ping pong cross version migration on s390 machine=20
->    (with reduced KVM_SLOT_MAX_BYTES since I don't have access to large
->     enough host)
->     =20
->=20
-> Igor Mammedov (2):
->   memory: make MemoryRegion alias migratable
->   s390: do not call memory_region_allocate_system_memory() multiple
->     times
->=20
->  exec.c                     |  7 ++++---
->  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
->  memory.c                   |  5 +++++
->  3 files changed, 24 insertions(+), 8 deletions(-)
->=20
+Please use 4-space indentation.
 
+--jTMWTj4UTAEmbWeb
+Content-Type: application/pgp-signature; name="signature.asc"
 
---=20
+-----BEGIN PGP SIGNATURE-----
 
-Thanks,
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1D73YACgkQnKSrs4Gr
+c8i9Owf+Kc/jFGuKqyfmkOYVvLg0ZRpfvoAr6e0q+hErdsOHQOWoSg34rPCea7ND
+voA1Pt1QCSBcH/1WlM63x2d5HOJNOdEXc/u5Q2jl41XyrF7l9qyUoBTWj0BBT9N8
+YLUqG44LvuxFhLYM4+qidsY1dUu5hFPCEeWqNvr5E5ri7M4PceQOECgYD69YlFOi
+Iwh7mJzJ1n+ASNC7PulsnsXUW5MW/OcAvBIuIq/eO+Ux+LlKe4oGMDE+A1ujf75y
+G4HT7u17gqitOhjlGdyVQVW37Zf8nv4Htuixd/YuuZElSDiu4MqfXrJUFMoa2C1E
+Lh9BcJeSq+SLTVJ7zHGHq6T0ZkUGhg==
+=L2rb
+-----END PGP SIGNATURE-----
 
-David / dhildenb
+--jTMWTj4UTAEmbWeb--
 
