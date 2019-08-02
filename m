@@ -2,67 +2,85 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0496C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B624DC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:19:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B703020B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:13:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B703020B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8785E20B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:19:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gmBPANj5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8785E20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htYIt-000544-20
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 10:13:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33133)
+	id 1htYOj-0007Sm-Jw
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 10:19:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34851)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1htYHq-0004BQ-Pl
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:12:03 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1htYO9-00072U-Sn
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:18:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1htYHp-0003D4-NJ
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:12:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34810)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1htYHp-0003CM-Hn
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:12:01 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2023A30A5413;
- Fri,  2 Aug 2019 14:12:00 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-81.ams2.redhat.com
- [10.36.116.81])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AAF3260BF4;
- Fri,  2 Aug 2019 14:11:50 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E41CE11AB8; Fri,  2 Aug 2019 16:11:49 +0200 (CEST)
-Date: Fri, 2 Aug 2019 16:11:49 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190802141149.dj7zv5p5wscftvnr@sirius.home.kraxel.org>
-References: <1564508710-22909-1-git-send-email-linux@roeck-us.net>
- <160cda6c-63b3-4d52-018e-d282514be2a3@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1htYO8-00079H-VS
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:18:33 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43039)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1htYO8-000795-JQ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:18:32 -0400
+Received: by mail-ot1-x343.google.com with SMTP id j11so20979344otp.10
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 07:18:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oZE1A/d0B/Z4FaGo46WCCYaZPAH6Cb7O4NrVTCVzfO8=;
+ b=gmBPANj5my+Ny8fXPHgU4adaI3IroCT4RQBpXD7K9OW8wz+gOXyrZNPpffKRWYTcSY
+ hsgiojM5RECiGbBI0nlL3gU/GQO/E4Hawace2OBP31vGx2VGD0qwyDIyAsrs+zPfJt2H
+ pzB7Z8Bhb3HPHlquURDmRlcFzAejtDAOOt/r75YZQvCAxnGBsTAT+ZHc4i8sP51U0jc+
+ NPEh+JNv5qf9ecvNTZUcIO8C833rT8y2KrVoOaF4m4QOVqrywYdnEJbmm9Z2TH8BQv/u
+ xcMvg4YCQmnoHuqlR8zUCm22Xxe66X8URVBO+soKh+W+rGpHdRCncZKQCsL98O/y85kk
+ Ld+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oZE1A/d0B/Z4FaGo46WCCYaZPAH6Cb7O4NrVTCVzfO8=;
+ b=TJP8YpH/tkyrZ1APOKA5Y7HlShPd0WFlmkJHBtgcQDu+ymqFbjT2pgPR7Opr315oHP
+ ruveJPH+e1S2+tJsqfVhMg8qPunL/OKWoV86hSDN7VH/Ypd/aG4w4GMcO4lh9+LUyMJF
+ CktMb/V/eiJUykNYQoEam4CfqeezIPWdUZpqBClAHpnCqPNJy0ji2vDvOT8qIXXhvT5n
+ cvXzXOQyZpQ8vCyKzrOqMGCyzfSu825UVvz5ky2zwFj5fTIV8T+pAO/U8nVsjvYkfjnG
+ +ICIKcNeA13iZhICcsZwwQlKNf9bn6DwbuOgvEgZAp+0f3c8i1lq3vTDqOLKqt8yuHXb
+ d11A==
+X-Gm-Message-State: APjAAAVz5+p7oDgWqzBb9HgdIaBf2pP3o+o0p2Cj67RN1qNgDzLFaZqV
+ 0cmZToqMIDs2au1/cBdQzWY9Hjxm9z+Tr8JIB0k=
+X-Google-Smtp-Source: APXvYqwfk0cqb0L5ovyzWSa4BjNkjqWHqkbL6G4PuffRB1DqjWRZ9NISSIFTUoAgE41YnkfahgwKOM0vG646awLKUkY=
+X-Received: by 2002:a9d:5cc1:: with SMTP id r1mr15063168oti.341.1564755511490; 
+ Fri, 02 Aug 2019 07:18:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <160cda6c-63b3-4d52-018e-d282514be2a3@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 02 Aug 2019 14:12:00 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] ehci: Ensure that device is not NULL
- before calling usb_ep_get
+References: <20190731175702.4916-1-jan.bobek@gmail.com>
+ <20190731175702.4916-23-jan.bobek@gmail.com>
+ <1691a32a-e0a2-931b-2d17-4dae8dde7c7e@linaro.org>
+ <CAL1e-=h2eHpH2KAtT+orB9gbqnaqTVYf+W_eVfmNrj+jxVsnnA@mail.gmail.com>
+ <bf8155f6-4f03-dcb6-5159-5f10dd0211a0@linaro.org>
+In-Reply-To: <bf8155f6-4f03-dcb6-5159-5f10dd0211a0@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 2 Aug 2019 16:18:20 +0200
+Message-ID: <CAL1e-=i0xU3W69gCzie5RNBvdVeHm8TTrcsY64ym=gkSPbn4RA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [RFC PATCH v1 22/22] target/i386: reimplement
+ (V)P(EQ, CMP)(B, W, D)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,61 +92,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Guenter Roeck <linux@roeck-us.net>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Jan Bobek <jan.bobek@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Jul 31, 2019 at 01:08:50PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 7/30/19 7:45 PM, Guenter Roeck wrote:
-> > The following assert is seen once in a while while resetting the
-> > Linux kernel.
-> >=20
-> > qemu-system-x86_64: hw/usb/core.c:734: usb_ep_get:
-> > 	Assertion `dev !=3D NULL' failed.
-> >=20
-> > The call to usb_ep_get() originates from ehci_execute().
-> > Analysis and debugging shows that p->queue->dev can indeed be NULL
-> > in this function. Add check for this condition and return an error
-> > if it is seen.
->=20
-> Your patch is not wrong as it corrects your case, but I wonder why we
-> get there. This assert seems to have catched a bug.
+>
+>
+>   Functions whose address are passed as a callback, as these are, are
+> always forced out of line.
+>
+>
+OK, Richard. However, on a much higher level than this single patch, I am
+really
+curious about this: what would be the rationale beyond the use of callbacks
+in TCG
+vector support interface? What is, in fact, achieved with such interface
+design that
+could not be achieved with callback-less approach?
 
-https://bugzilla.redhat.com//show_bug.cgi?id=3D1715801 maybe.
-
-> Gerd, shouldn't we call usb_packet_cleanup() in ehci_reset() rather tha=
-n
-> ehci_finalize()? Then we shouldn't need this patch.
-
-The two ehci_queues_rip_all() calls in ehci_reset() should clean up every=
-thing
-properly.
-
-Can you try the patch below to see whenever a ehci_find_device failure is=
- the
-root cause?
-
-thanks,
-  Gerd
-
-diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-index 62dab0592fa2..2b0a57772ed5 100644
---- a/hw/usb/hcd-ehci.c
-+++ b/hw/usb/hcd-ehci.c
-@@ -1644,6 +1644,10 @@ static EHCIQueue *ehci_state_fetchqh(EHCIState *eh=
-ci, int async)
-         q->dev =3D ehci_find_device(q->ehci,
-                                   get_field(q->qh.epchar, QH_EPCHAR_DEVA=
-DDR));
-     }
-+    if (q->dev =3D=3D NULL) {
-+        fprintf(stderr, "%s: device %d not found\n", __func__,
-+                get_field(q->qh.epchar, QH_EPCHAR_DEVADDR));
-+    }
-=20
-     if (async && (q->qh.epchar & QH_EPCHAR_H)) {
-=20
-
+Thanks,
+Aleksandar
