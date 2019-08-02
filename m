@@ -2,85 +2,69 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_EXCESS_BASE64,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95309C0650F
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 22:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 003F0C0650F
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 22:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C34E2087C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 22:19:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPYvlx8g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C34E2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C44A22087E
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 22:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C44A22087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htftl-0006jS-Kc
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 18:19:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56189)
+	id 1htg86-0002ll-55
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 18:34:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59104)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marcandre.lureau@gmail.com>) id 1htftH-0006JT-2T
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:19:12 -0400
+ (envelope-from <lersek@redhat.com>) id 1htg7T-0002Ld-9J
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1htftF-0006Nt-5m
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:19:11 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45619)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1htftD-0006MT-4u
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:19:09 -0400
-Received: by mail-wr1-x444.google.com with SMTP id f9so78599602wre.12
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 15:19:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=MRp2pXCsWr7h412oTHqX0Wy4CduJAcJgM7131Lh4D5U=;
- b=nPYvlx8gAx/kjdzoYFp3o60h3PwgibOX6SFgZPB0Txi5B05LrRPVDF50eyE9S9SOBX
- wQItEmCIZBKtMHWZEHrzbxlLoqNzjmBSCKcQNdBgDKJL0Sa+8t1vPoCVwyeh+WE/wibH
- 1TvzwocDF5hvI92hqzDtQSNqQsxmvixCn6wo8pcGPJW3tnx4PiIqZEENATkp79CRXQtE
- wEZgRmc5EZ7CEFB43aSSX21u7yfLijKPuyotWb05mGZtYh5R5NJsKNd5EgLMiSijmdxh
- PTC3DavgOGMcUC3gADcbxtT3GHtqF8RHQ7BO+yAkOeGjGQcDLZa+4hkDCdA40FWKuxAR
- jJ3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=MRp2pXCsWr7h412oTHqX0Wy4CduJAcJgM7131Lh4D5U=;
- b=e/HRhVYTt5/oumQ27JWVLf7cFPXNGQgNRc/PLVgzanUdhQO/Cxs33lyTCW7h56KTcs
- XjbIkEfWPGriEHc7V4jo+ObeTazWq0KKv9+SlB4IOS3/WzpzMgNf/7brmIB3qahqZoUZ
- 7SkLXGUj6P6rCQACMH/keAOhQUsw+9OVCJgxXwbqTfZsAhPQ7bMcyv5RV11dY2R6kSB2
- fdWcI21dshheTEP8/QZSXiUe8s0hEmilIxCUN+ljBtN3t5napk5AALaMt0IpcN8vyVnU
- Pi3oIQWExuUCTzGWXG/6Nc2TrMydSjmHMhjF5FooUe4MYGvCXNcjFozbn96wRMDFWL0g
- gLdA==
-X-Gm-Message-State: APjAAAUJZDhIHD2YIQTniDTtiw1iMWeUiiu7X6kZhQataaGklO/zcS0q
- 4aq5q4pLByyYerTyMxdSZBEa0WM3HuAJzGELPYA=
-X-Google-Smtp-Source: APXvYqw/eqU3dqJWIjMAi++HyMSo2aB66AV3UBKZyhQ6zw+kRRw2qXY5dIVtNcC2Y1c1s8d+5M0U06W6b2c/Ynp6baU=
-X-Received: by 2002:adf:ea8b:: with SMTP id
- s11mr145845713wrm.100.1564784344950; 
- Fri, 02 Aug 2019 15:19:04 -0700 (PDT)
+ (envelope-from <lersek@redhat.com>) id 1htg7R-0006Me-GI
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:33:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47574)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1htg7R-0006MG-Ae
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 18:33:49 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 636932DD3B;
+ Fri,  2 Aug 2019 22:33:47 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-36.ams2.redhat.com
+ [10.36.116.36])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0593600C1;
+ Fri,  2 Aug 2019 22:33:41 +0000 (UTC)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190729125755.45008-1-slp@redhat.com>
+ <932a0c3c-b6cb-540f-ca07-1559c8fe9049@redhat.com>
+ <9953cc99-80b3-814c-f75e-a16c987c23e5@redhat.com>
+ <9b2acff6-8c6d-3aa0-8020-d6d831222496@redhat.com>
+ <CAFEAcA9fHPpsvwXeKMnUbbHYu_=F+v+SF9ttAm+vOcXOmPVhMA@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <665148f7-8b64-e6df-cd43-ee1306c7878a@redhat.com>
+Date: Sat, 3 Aug 2019 00:33:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20190802180449.10288-1-philmd@redhat.com>
- <20190802180449.10288-2-philmd@redhat.com>
-In-Reply-To: <20190802180449.10288-2-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 3 Aug 2019 02:18:53 +0400
-Message-ID: <CAJ+F1C+r-7Eaw_MeaJWHyxxPEL3Ag6p13mhdE1+mrCLasXZ-7w@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH-for-3.1.1 1/1] Fix heap overflow in
- ip_reass on big packet input
+In-Reply-To: <CAFEAcA9fHPpsvwXeKMnUbbHYu_=F+v+SF9ttAm+vOcXOmPVhMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Fri, 02 Aug 2019 22:33:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC] virtio-mmio: implement modern (v2)
+ personality (virtio-1)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,64 +76,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Jan Kiszka <jan.kiszka@siemens.com>, QEMU <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Sergio Lopez Pascual <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 2, 2019 at 10:09 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> From: Samuel Thibault <samuel.thibault@ens-lyon.org>
->
-> When the first fragment does not fit in the preallocated buffer, q will
-> already be pointing to the ext buffer, so we mustn't try to update it.
->
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> (cherry picked from libslirp commit 126c04acbabd7ad32c2b018fe10dfac2a3bc1=
-210)
-> Fixes: CVE-2019-14378
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 08/02/19 11:20, Peter Maydell wrote:
+> On Fri, 2 Aug 2019 at 01:26, Laszlo Ersek <lersek@redhat.com> wrote:
+>> But it's extra work, not entirely risk-free (regressions), and I can't
+>> tell if someone out there still uses virtio-mmio (despite me thinking
+>> that would be unreasonable). I wouldn't like to see more work sunk into
+>> it either way :)
+> 
+> The main reasons I still see people using virtio-mmio for
+> the 'virt' board are:
+>  * still using old but working command lines
+>  * newer setups that were put together working from older tutorials
+>    that recommended virtio-mmio because they predated virtio-pci
+>    support being widespread
+>  * using older (eg distro) kernels -- for 32-bit kernels in
+>    particular it was a while before the virtio-pci support
+>    got built in the default configs I think, and then longer
+>    again until those got into stable distro releases
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+There was one time when edk2 core modules gained a feature for marking
+the DXE phase stack non-executable. We happily enabled it in OVMF. Then
+people reported that UEFI grub in their old Debian guests had broken --
+on their hosts carrying OVMF binaries built from upstream. :) We had to
+flip the default off in OVMF, and we've stuck with that ever since...
 
+  https://github.com/tianocore/edk2/commit/d20b06a3afdf
 
-thanks
+> I wouldn't be surprised if some of those applied also to
+> via-OVMF boot setups as well as direct kernel boot. So it
+> depends a bit what your tolerance for breaking existing
+> user setups is.
 
-> ---
->  slirp/ip_input.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/slirp/ip_input.c b/slirp/ip_input.c
-> index 348e1dca5a..07d8808671 100644
-> --- a/slirp/ip_input.c
-> +++ b/slirp/ip_input.c
-> @@ -334,6 +334,8 @@ insert:
->      q =3D fp->frag_link.next;
->         m =3D dtom(slirp, q);
->
-> +       int was_ext =3D m->m_flags & M_EXT;
-> +
->         q =3D (struct ipasfrag *) q->ipf_next;
->         while (q !=3D (struct ipasfrag*)&fp->frag_link) {
->           struct mbuf *t =3D dtom(slirp, q);
-> @@ -356,7 +358,7 @@ insert:
->          * the old buffer (in the mbuf), so we must point ip
->          * into the new buffer.
->          */
-> -       if (m->m_flags & M_EXT) {
-> +       if (!was_ext && m->m_flags & M_EXT) {
->           int delta =3D (char *)q - m->m_dat;
->           q =3D (struct ipasfrag *)(m->m_ext + delta);
->         }
-> --
-> 2.20.1
->
->
+Near zero. :)
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+Thanks
+Laszlo
 
