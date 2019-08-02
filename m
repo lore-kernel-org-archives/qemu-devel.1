@@ -2,61 +2,89 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C50C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 12:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 562F1C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:07:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBDCC21841
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 12:34:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBDCC21841
+	by mail.kernel.org (Postfix) with ESMTPS id 2D3B120578
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:07:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D3B120578
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htWlZ-0003eR-3i
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 08:34:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37914)
+	id 1htXHA-0001oQ-D6
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 09:07:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45503)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <drjones@redhat.com>) id 1htWdt-0005mg-JQ
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 08:26:42 -0400
+ (envelope-from <eblake@redhat.com>) id 1htXGd-0001K2-W3
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1htWds-00022t-5I
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 08:26:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34950)
+ (envelope-from <eblake@redhat.com>) id 1htXGc-000182-S1
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:06:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46522)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1htWdp-00020C-2I; Fri, 02 Aug 2019 08:26:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1htXGc-00015p-Ju
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:06:42 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 557B73082129;
- Fri,  2 Aug 2019 12:26:36 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9558C5C205;
- Fri,  2 Aug 2019 12:26:32 +0000 (UTC)
-From: Andrew Jones <drjones@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-arm@nongnu.org
-Date: Fri,  2 Aug 2019 14:25:37 +0200
-Message-Id: <20190802122540.26385-13-drjones@redhat.com>
-In-Reply-To: <20190802122540.26385-1-drjones@redhat.com>
-References: <20190802122540.26385-1-drjones@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 00C8A308A958
+ for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 13:06:41 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9899110016EA;
+ Fri,  2 Aug 2019 13:06:40 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190802122325.16520-1-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <5478e720-7d1e-a1c2-44cb-75b33f1abe15@redhat.com>
+Date: Fri, 2 Aug 2019 08:06:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20190802122325.16520-1-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="HP2kmzpw2SueSXyiHLOOgy75PTCdMHOwS"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Fri, 02 Aug 2019 12:26:36 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.41]); Fri, 02 Aug 2019 13:06:41 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 12/15] target/arm/kvm64: max cpu: Enable SVE
- when available
+Subject: Re: [Qemu-devel] [PATCH] qapi: Make visit_next_list()'s comment
+ less confusing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,220 +96,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, armbru@redhat.com,
- eric.auger@redhat.com, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Enable SVE in the KVM guest when the 'max' cpu type is configured
-and KVM supports it. KVM SVE requires use of the new finalize
-vcpu ioctl, so we add that now too. For starters SVE can only be
-turned on or off, getting all vector lengths the host CPU supports
-when on. We'll add the other SVE CPU properties in later patches.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HP2kmzpw2SueSXyiHLOOgy75PTCdMHOwS
+Content-Type: multipart/mixed; boundary="jb5e55zk1llZNky5T8NcTSfYib5J5ybd6";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <5478e720-7d1e-a1c2-44cb-75b33f1abe15@redhat.com>
+Subject: Re: [PATCH] qapi: Make visit_next_list()'s comment less confusing
+References: <20190802122325.16520-1-armbru@redhat.com>
+In-Reply-To: <20190802122325.16520-1-armbru@redhat.com>
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- target/arm/cpu64.c       | 17 ++++++++++++++---
- target/arm/kvm.c         |  5 +++++
- target/arm/kvm64.c       | 20 +++++++++++++++++++-
- target/arm/kvm_arm.h     | 27 +++++++++++++++++++++++++++
- tests/arm-cpu-features.c |  1 +
- 5 files changed, 66 insertions(+), 4 deletions(-)
+--jb5e55zk1llZNky5T8NcTSfYib5J5ybd6
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index c9412a0b71af..f8ed393ed16c 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -610,6 +610,11 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v,=
- const char *name,
-         return;
-     }
-=20
-+    if (value && kvm_enabled() && !kvm_arm_sve_supported(CPU(cpu))) {
-+        error_setg(errp, "'sve' feature not supported by KVM on this hos=
-t");
-+        return;
-+    }
-+
-     t =3D cpu->isar.id_aa64pfr0;
-     t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, value);
-     cpu->isar.id_aa64pfr0 =3D t;
-@@ -634,11 +639,16 @@ static void aarch64_max_initfn(Object *obj)
- {
-     ARMCPU *cpu =3D ARM_CPU(obj);
-     uint32_t vq;
-+    uint64_t t;
-=20
-     if (kvm_enabled()) {
-         kvm_arm_set_cpu_features_from_host(cpu);
-+        if (kvm_arm_sve_supported(CPU(cpu))) {
-+            t =3D cpu->isar.id_aa64pfr0;
-+            t =3D FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
-+            cpu->isar.id_aa64pfr0 =3D t;
-+        }
-     } else {
--        uint64_t t;
-         uint32_t u;
-         aarch64_a57_initfn(obj);
-=20
-@@ -720,8 +730,6 @@ static void aarch64_max_initfn(Object *obj)
-=20
-         object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve=
-_max_vq,
-                             cpu_max_set_sve_max_vq, NULL, NULL, &error_f=
-atal);
--        object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
--                            cpu_arm_set_sve, NULL, NULL, &error_fatal);
-=20
-         /*
-          * sve_vq_map uses a special state while setting properties, so
-@@ -736,6 +744,9 @@ static void aarch64_max_initfn(Object *obj)
-                                 cpu_arm_set_sve_vq, NULL, NULL, &error_f=
-atal);
-         }
-     }
-+
-+    object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
-+                        cpu_arm_set_sve, NULL, NULL, &error_fatal);
- }
-=20
- struct ARMCPUInfo {
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index bfe3d445e196..ce4e362b3476 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -49,6 +49,11 @@ int kvm_arm_vcpu_init(CPUState *cs)
-     return kvm_vcpu_ioctl(cs, KVM_ARM_VCPU_INIT, &init);
- }
-=20
-+int kvm_arm_vcpu_finalize(CPUState *cs, int feature)
-+{
-+    return kvm_vcpu_ioctl(cs, KVM_ARM_VCPU_FINALIZE, &feature);
-+}
-+
- void kvm_arm_init_serror_injection(CPUState *cs)
- {
-     cap_has_inject_serror_esr =3D kvm_check_extension(cs->kvm_state,
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index f5c99984f25f..a6871017d375 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -602,6 +602,13 @@ bool kvm_arm_aarch32_supported(CPUState *cpu)
-     return kvm_check_extension(s, KVM_CAP_ARM_EL1_32BIT);
- }
-=20
-+bool kvm_arm_sve_supported(CPUState *cpu)
-+{
-+    KVMState *s =3D KVM_STATE(current_machine->accelerator);
-+
-+    return kvm_check_extension(s, KVM_CAP_ARM_SVE);
-+}
-+
- #define ARM_CPU_ID_MPIDR       3, 0, 0, 0, 5
-=20
- int kvm_arch_init_vcpu(CPUState *cs)
-@@ -630,13 +637,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_EL1_32BIT;
-     }
-     if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
--            cpu->has_pmu =3D false;
-+        cpu->has_pmu =3D false;
-     }
-     if (cpu->has_pmu) {
-         cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_PMU_V3;
-     } else {
-         unset_feature(&env->features, ARM_FEATURE_PMU);
-     }
-+    if (cpu_isar_feature(aa64_sve, cpu)) {
-+        assert(kvm_arm_sve_supported(cs));
-+        cpu->kvm_init_features[0] |=3D 1 << KVM_ARM_VCPU_SVE;
-+    }
-=20
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret =3D kvm_arm_vcpu_init(cs);
-@@ -644,6 +655,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         return ret;
-     }
-=20
-+    if (cpu_isar_feature(aa64_sve, cpu)) {
-+        ret =3D kvm_arm_vcpu_finalize(cs, KVM_ARM_VCPU_SVE);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
-+
-     /*
-      * When KVM is in use, PSCI is emulated in-kernel and not by qemu.
-      * Currently KVM has its own idea about MPIDR assignment, so we
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index b3106c8600af..1151877f97ea 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -27,6 +27,20 @@
-  */
- int kvm_arm_vcpu_init(CPUState *cs);
-=20
-+/**
-+ * kvm_arm_vcpu_finalize
-+ * @cs: CPUState
-+ * @feature: int
-+ *
-+ * Finalizes the configuration of the specified VCPU feature by
-+ * invoking the KVM_ARM_VCPU_FINALIZE ioctl. Features requiring
-+ * this are documented in the "KVM_ARM_VCPU_FINALIZE" section of
-+ * KVM's API documentation.
-+ *
-+ * Returns: 0 if success else < 0 error code
-+ */
-+int kvm_arm_vcpu_finalize(CPUState *cs, int feature);
-+
- /**
-  * kvm_arm_register_device:
-  * @mr: memory region for this device
-@@ -225,6 +239,14 @@ bool kvm_arm_aarch32_supported(CPUState *cs);
-  */
- bool kvm_arm_pmu_supported(CPUState *cs);
-=20
-+/**
-+ * bool kvm_arm_sve_supported:
-+ * @cs: CPUState
-+ *
-+ * Returns true if the KVM VCPU can enable SVE and false otherwise.
-+ */
-+bool kvm_arm_sve_supported(CPUState *cs);
-+
- /**
-  * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
-  * IPA address space supported by KVM
-@@ -275,6 +297,11 @@ static inline bool kvm_arm_pmu_supported(CPUState *c=
-s)
-     return false;
- }
-=20
-+static inline bool kvm_arm_sve_supported(CPUState *cs)
-+{
-+    return false;
-+}
-+
- static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
- {
-     return -ENOENT;
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index a0752d000c08..51fbb1739d8e 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -394,6 +394,7 @@ static void test_query_cpu_model_expansion_kvm(const =
-void *data)
-=20
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         assert_has_feature(qts, "host", "aarch64");
-+        assert_has_feature(qts, "max", "sve");
-=20
-         assert_error(qts, "cortex-a15",
-             "We cannot guarantee the CPU type 'cortex-a15' works "
+On 8/2/19 7:23 AM, Markus Armbruster wrote:
+> visit_next_list() returns non-null on success, null on failure.  The
+> comment's phrasing "until NULL return or error occurs" is needlessly
+> confusing.  Scratch the "or error occurs" part.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  include/qapi/visitor.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+>=20
+> diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+> index 5b2ed3f202..c5b23851a1 100644
+> --- a/include/qapi/visitor.h
+> +++ b/include/qapi/visitor.h
+> @@ -364,10 +364,10 @@ void visit_start_list(Visitor *v, const char *nam=
+e, GenericList **list,
+>   * @tail must not be NULL; on the first call, @tail is the value of
+>   * *list after visit_start_list(), and on subsequent calls @tail must
+>   * be the previously returned value.  Should be called in a loop until=
+
+> - * a NULL return or error occurs; for each non-NULL return, the caller=
+
+> - * then calls the appropriate visit_type_*() for the element type of
+> - * the list, with that function's name parameter set to NULL and obj
+> - * set to the address of @tail->value.
+> + * a NULL return; for each non-NULL return, the caller then calls the
+> + * appropriate visit_type_*() for the element type of the list, with
+> + * that function's name parameter set to NULL and obj set to the
+> + * address of @tail->value.
+>   */
+>  GenericList *visit_next_list(Visitor *v, GenericList *tail, size_t siz=
+e);
+> =20
+>=20
+
 --=20
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
+
+--jb5e55zk1llZNky5T8NcTSfYib5J5ybd6--
+
+--HP2kmzpw2SueSXyiHLOOgy75PTCdMHOwS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1ENV8ACgkQp6FrSiUn
+Q2rJTAgApjYuCLlaweVZ2HERoal4wsZ8ZS52ZahEp21kxntyOimva2XFNEQecpmC
+OCMQ+VFpCfqYSzAYo9J0RF0qfbT+6fi3wGZZoxx6wcUk/x5l01i2vAh3yfArCv0P
+ZoICWommj5/54kud98Zf4NLWQEqZYHYADXf0imSxfRmS15eCwvn8rLJwGb/1BOCw
+Xc21y5XGaTLXj54lkGJWsVvVqvQPB2t5FGnJeXLdMoUz1y/Wuv+mALHImwP1SPRQ
+FyumKLIlQXzCICpcyOC4wLF/TCkVM8CNr2h2YxK4CWtAlJ1hj1ma9ng2qi6aNlOL
+Q3b1MT5CAW4sZXJmo5khwVq/KByAnw==
+=2//G
+-----END PGP SIGNATURE-----
+
+--HP2kmzpw2SueSXyiHLOOgy75PTCdMHOwS--
 
