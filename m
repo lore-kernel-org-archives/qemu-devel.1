@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A3B8C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD33C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4C78204EC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4C78204EC
+	by mail.kernel.org (Postfix) with ESMTPS id 7EE75204EC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:08:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE75204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35575 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZ9V-0007UY-4B
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:07:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47206)
+	id 1htZAE-0001JY-Ps
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:08:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47160)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jfreimann@redhat.com>) id 1htZ8j-0005ka-AH
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:42 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8a-0005Jf-Hq
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1htZ8i-0005QW-CY
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41086)
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8Z-0005NK-CZ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47696)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1htZ8i-0005QE-78
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:40 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1htZ8Z-0005N4-54
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:31 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 87F2F3082E20
- for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7D233C027339
+ for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:30 +0000 (UTC)
 Received: from localhost (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2DFF660623;
- Fri,  2 Aug 2019 15:06:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C7301600C8;
+ Fri,  2 Aug 2019 15:06:23 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 17:06:01 +0200
-Message-Id: <20190802150605.5880-6-jfreimann@redhat.com>
+Date: Fri,  2 Aug 2019 17:05:59 +0200
+Message-Id: <20190802150605.5880-4-jfreimann@redhat.com>
 In-Reply-To: <20190802150605.5880-1-jfreimann@redhat.com>
 References: <20190802150605.5880-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 02 Aug 2019 15:06:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Fri, 02 Aug 2019 15:06:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 5/9] qapi: add unplug primary event
+Subject: [Qemu-devel] [PATCH 3/9] vfio: unplug failover primary device
+ before migration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,42 +74,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add new qmp event to send the device id of a device that was
-requested to be unplugged by the guest OS.
-=20
+As usual block all vfio-pci devices from being migrated, but make an
+exception for failover primary devices. This is achieved by setting
+unmigratable to 0 but also add a migration blocker for all vfio-pci
+devices except failover primary devices. These will be unplugged before
+migration happens by the migration handler of the corresponding
+virtio-net standby device.
+
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- qapi/migration.json | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ hw/vfio/pci.c | 24 +++++++++++++++++++++++-
+ hw/vfio/pci.h |  1 +
+ 2 files changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 9cfbaf8c6c..d567ac9fc3 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1445,3 +1445,22 @@
- # Since: 3.0
- ##
- { 'command': 'migrate-pause', 'allow-oob': true }
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index d6ae9bd4ac..398d26669b 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -35,6 +35,9 @@
+ #include "pci.h"
+ #include "trace.h"
+ #include "qapi/error.h"
++#include "migration/blocker.h"
++#include "qemu/option.h"
++#include "qemu/option_int.h"
+=20
+ #define TYPE_VFIO_PCI "vfio-pci"
+ #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+@@ -2693,6 +2696,12 @@ static void vfio_unregister_req_notifier(VFIOPCIDe=
+vice *vdev)
+     vdev->req_enabled =3D false;
+ }
+=20
++static int has_standby_arg(void *opaque, const char *name,
++                           const char *value, Error **errp)
++{
++    return strcmp(name, "standby") =3D=3D 0;
++}
 +
-+##
-+# @UNPLUG_PRIMARY:
-+#
-+# Emitted from source side of a migration when migration state is
-+# WAIT_UNPLUG. Device was unplugged by guest operating system.
-+# Device resources in QEMU are kept on standby to be able to re-plug it =
-in case
-+# of migration failure.
-+#
-+# @device_id: QEMU device id of the unplugged device
-+#
-+# Since: 4.2
-+#
-+# Example:
-+#   {"event": "UNPLUG_PRIMARY", "data": {"device_id": "hostdev0"} }
-+#
-+##
-+{ 'event': 'UNPLUG_PRIMARY',
-+  'data': { 'device_id': 'str' } }
+ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ {
+     VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+@@ -2706,6 +2715,19 @@ static void vfio_realize(PCIDevice *pdev, Error **=
+errp)
+     int i, ret;
+     bool is_mdev;
+=20
++    if (qemu_opt_foreach(pdev->qdev.opts, has_standby_arg,
++                         (void *) pdev->qdev.opts, &err) =3D=3D 0) {
++        error_setg(&vdev->migration_blocker,
++                "VFIO device doesn't support migration");
++        ret =3D migrate_add_blocker(vdev->migration_blocker, &err);
++        if (err) {
++            error_propagate(errp, err);
++            error_free(vdev->migration_blocker);
++        }
++    } else {
++        pdev->qdev.allow_unplug_during_migration =3D true;
++    }
++
+     if (!vdev->vbasedev.sysfsdev) {
+         if (!(~vdev->host.domain || ~vdev->host.bus ||
+               ~vdev->host.slot || ~vdev->host.function)) {
+@@ -3148,7 +3170,7 @@ static Property vfio_pci_dev_properties[] =3D {
+=20
+ static const VMStateDescription vfio_pci_vmstate =3D {
+     .name =3D "vfio-pci",
+-    .unmigratable =3D 1,
++    .unmigratable =3D 0,
+ };
+=20
+ static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 27d58fc55b..0f6f8cb395 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -169,6 +169,7 @@ typedef struct VFIOPCIDevice {
+     bool no_vfio_ioeventfd;
+     bool enable_ramfb;
+     VFIODisplay *dpy;
++    Error *migration_blocker;
+ } VFIOPCIDevice;
+=20
+ uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
 --=20
 2.21.0
 
