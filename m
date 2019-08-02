@@ -2,144 +2,59 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A51C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55294C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52D9B2087C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:05:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D9B2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28799204EC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28799204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZ7q-0003VS-Ca
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:05:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46719)
+	id 1htZ95-0006EE-BU
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:07:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47062)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <borntraeger@de.ibm.com>) id 1htZ6k-0002zc-Fc
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:04:39 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8K-0004eO-JF
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1htZ6h-0004bN-Ds
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:04:37 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39268)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1htZ6g-0004Zi-6F
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:04:34 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x72F2Sr3112477
- for <qemu-devel@nongnu.org>; Fri, 2 Aug 2019 11:04:28 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2u4pjqjqg3-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 11:04:27 -0400
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Fri, 2 Aug 2019 16:04:25 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 2 Aug 2019 16:04:22 +0100
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x72F4LNs43974790
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 2 Aug 2019 15:04:21 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A41294C04A;
- Fri,  2 Aug 2019 15:04:21 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6788D4C059;
- Fri,  2 Aug 2019 15:04:21 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.71])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri,  2 Aug 2019 15:04:21 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <20190802133241.29298-1-imammedo@redhat.com>
- <8318d96d-3130-f7ba-0b3c-5c0da8535d80@de.ibm.com>
- <2bff9895-f60f-1aba-2d22-943af53003c2@de.ibm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- syiRa+UVlsKmx1hsEg==
-Date: Fri, 2 Aug 2019 17:04:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8I-0005DZ-OC
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13122)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1htZ8I-0005D1-Fs
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 87BA53090FCE
+ for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:13 +0000 (UTC)
+Received: from localhost (dhcp-192-195.str.redhat.com [10.33.192.195])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7351B5D713;
+ Fri,  2 Aug 2019 15:06:06 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  2 Aug 2019 17:05:56 +0200
+Message-Id: <20190802150605.5880-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2bff9895-f60f-1aba-2d22-943af53003c2@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19080215-4275-0000-0000-00000353445A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19080215-4276-0000-0000-000038643A62
-Message-Id: <eb897214-2625-1a44-2709-e33560256480@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-08-02_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908020155
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v3 0/2] s390: stop abusing
- memory_region_allocate_system_memory()
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 02 Aug 2019 15:06:13 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v2 0/9] add failover feature for assigned
+ network devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,73 +66,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- thuth@redhat.com, david@redhat.com
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ mst@redhat.com, aadam@redhat.com, laine@redhat.com, ailan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is implementing the host side of the net_failover concept
+(https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+
+Changes since v1:
+- add new QMP events,
+   - one is send when the primary device is unplugged
+   - one is send when VIRTIO_NET_F_STANDBY is not negotiated.
+     This is needed because we hide the primary device until
+     the feature bit is negotiated and then add it with
+     qdev_add_device(). The event is for libvirt to be aware of that.
+- patch 7/9: a new migration state, called wait-unplug.
+  It is entered after SETUP and before ACTIVE. In this phase we check
+  devices for pending guest unplug complete event.
+  This patch still has a problem. It checks in a loop if there are still
+  devices that are not unplugged by the guest. If the guest never
+  returns it will run forever. How to terminate this loop? I thought
+  about a timed wait semaphore or just spinning for a certain amount of t=
+ime,
+  but nothing seems good. Any ideas here?
+- patch 2/9: When unplugging the primary devices, only do the guest part =
+i.e.
+  call hotplug_handler_unplug_request() which calls the pcie attention
+  button code. The unrealize part is not done so the ressources of the
+  device are not freed.  In case of migration failure we can re-plug the =
+device to
+  the guest with hotplug_handler_hotplug(). I tested migration failure an=
+d
+  a following second attempt to migrate that doesn't fail.
+- add the primary device on the target VM, done in runstate change
+  handler.
+- fix error reporting (dgilbert)
+- get rid of timer to add device after feature negotiation
+
+The general idea is that we have a pair of devices, a vfio-pci and a
+virtio-net device. Before migration the vfio device is unplugged and data
+flows to the virtio-net device, on the target side another vfio-pci devic=
+e
+is plugged in to take over the data-path. In the guest the net_failover
+module will pair net devices with the same MAC address.
+
+* Patch 1 adds the infrastructure to hide the device for the qbus and qde=
+v APIs
+
+* Patch 2 In the second patch the virtio-net uses the API to defer adding=
+ the vfio
+  device until the VIRTIO_NET_F_STANDBY feature is acked. It also
+  implements the migration handler to unplug the device from the guest an=
+d
+  re-plug in case of migration failure
+
+* Patch 3 and 4 make sure that we can unplug the vfio-device before
+  migration starts
+
+* Patch 5 and 6 add new qmp events, one sends the device id of a device
+  that was just requested to be unplugged from the guest and another one
+  to let libvirt know if VIRTIO_NET_F_STANDBY was negotiated
+
+* Patch 7 adds a new migration state that is entered while we wait for
+  devices to be unplugged by guest OS
+
+* Patch 8 sets a new flag for PCIDevice 'partially_hotplugged' which we
+  use to skip the unrealize code path when doing a unplug of the primary
+  device
+
+* Patch 9 sets the pending_deleted_event before triggering the guest
+  unplug request
+
+Previous discussion:
+  RFC v1 https://patchwork.ozlabs.org/cover/989098/
+  RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.htm=
+l
+  v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03968.html
+
+To summarize concerns/feedback from previous discussion:
+1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+  Migration might get stuck for unpredictable time with unclear reason.
+  This approach combines two tricky things, hot/unplug and migration.
+  -> We need to let libvirt know what's happening. Add new qmp events
+     and a new migration state. When a primary device is (partially)
+     unplugged (only from guest) we send a qmp event with the device id. =
+When
+     it is unplugged from the guest the DEVICE_DELETED event is sent.
+     Migration will enter the wait-unplug state while waiting for the gue=
+st
+     os to unplug all primary devices and then move on with migration.
+2. PCI devices are a precious ressource. The primary device should never
+  be added to QEMU if it won't be used by guest instead of hiding it in
+  QEMU.
+  -> We only hotplug the device when the standby feature bit was
+     negotiated. We save the device cmdline options until we need it for
+     qdev_device_add()
+     Hiding a device can be a useful concept to model. For example a
+     pci device in a powered-off slot could be marked as hidden until the=
+ slot is
+     powered on (mst).
+3. Management layer software should handle this. Open Stack already has
+  components/code to handle unplug/replug VFIO devices and metadata to
+  provide to the guest for detecting which devices should be paired.
+  -> An approach that includes all software from firmware to
+     higher-level management software wasn't tried in the last years. Thi=
+s is
+     an attempt to keep it simple and contained in QEMU as much as possib=
+le.
+     One of the problems that stopped management software and libvirt fro=
+m
+     implementing this idea is that it can't be sure that it's possible t=
+o
+     re-plug the primary device. By not freeing the devices resources in =
+QEMU
+     and only asking the guest OS to unplug it is possible to re-plug the
+     device in case of a migration failure.
+4. Hotplugging a device and then making it part of a failover setup is
+   not possible
+  -> addressed by extending qdev hotplug functions to check for hidden
+     attribute, so e.g. device_add can be used to plug a device.
 
 
-On 02.08.19 16:59, Christian Borntraeger wrote:
-> 
-> 
-> On 02.08.19 16:42, Christian Borntraeger wrote:
->> On 02.08.19 15:32, Igor Mammedov wrote:
->>> Changelog:
->>>   since v2:
->>>     - break migration from old QEMU (since 2.12-4.1) for guest with >8TB RAM
->>>       and drop migratable aliases patch as was agreed during v2 review
->>>     - drop 4.2 machines patch as it's not prerequisite anymore
->>>   since v1:
->>>     - include 4.2 machines patch for adding compat RAM layout on top
->>>     - 2/4 add missing in v1 patch for splitting too big MemorySection on
->>>           several memslots
->>>     - 3/4 amend code path on alias destruction to ensure that RAMBlock is
->>>           cleaned properly
->>>     - 4/4 add compat machine code to keep old layout (migration-wise) for
->>>           4.1 and older machines 
->>>
->>>
->>> While looking into unifying guest RAM allocation to use hostmem backends
->>> for initial RAM (especially when -mempath is used) and retiring
->>> memory_region_allocate_system_memory() API, leaving only single hostmem backend,
->>> I was inspecting how currently it is used by boards and it turns out several
->>> boards abuse it by calling the function several times (despite documented contract
->>> forbiding it).
->>>
->>> s390 is one of such boards where KVM limitation on memslot size got propagated
->>> to board design and memory_region_allocate_system_memory() was abused to satisfy
->>> KVM requirement for max RAM chunk where memory region alias would suffice.
->>>
->>> Unfortunately, memory_region_allocate_system_memory() usage created migration
->>> dependency where guest RAM is transferred in migration stream as several RAMBlocks
->>> if it's more than KVM_SLOT_MAX_BYTES. During v2 review it was agreed to ignore
->>> migration breakage (documenting it in release notes) and leaving only KVM fix.
->>>
->>> In order to replace these several RAM chunks with a single memdev and keep it
->>> working with KVM memslot size limit, following was done:
->>>    * [1/2] split too big RAM chunk inside of KVM code on several memory slots
->>>            if necessary
->>>    * [2/2] drop manual ram splitting in s390 code
->>>
->>>
->>> CC: pbonzini@redhat.com
->>> CC: qemu-s390x@nongnu.org
->>> CC: borntraeger@de.ibm.com
->>> CC: thuth@redhat.com
->>> CC: david@redhat.com
->>> CC: cohuck@redhat.com
->>
->> With the fixup this patch set seems to work on s390. I can start 9TB guests and
->> I can migrate smaller guests between 4.1+patch and 4.0 and 3.1. I currently can
->> not test migration for the 9TB guest due to lack of a 2nd system. 
-> 
-> I have to correct myself. The 9TB guest started up but it does not seem to do
-> anything useful (it hangs).
+I have tested this with a mlx5 NIC and was able to migrate the VM with
+above mentioned workarounds for open problems.
 
-Seems that the userspace addr is wrong (its the same). 
-[pid 258234] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=0, flags=0, guest_phys_addr=0, memory_size=8796091973632, userspace_addr=0x3fff7d00000}) = 0
-[pid 258234] ioctl(10, KVM_SET_USER_MEMORY_REGION, {slot=1, flags=0, guest_phys_addr=0x7fffff00000, memory_size=1099512676352, userspace_addr=0x3fff7d00000}) = 0
+Command line example:
+
+qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
+        -machine q35,kernel-irqchip=3Dsplit -cpu host   \
+        -k fr   \
+        -serial stdio   \
+        -net none \
+        -qmp unix:/tmp/qmp.socket,server,nowait \
+        -monitor telnet:127.0.0.1:5555,server,nowait \
+        -device pcie-root-port,id=3Droot0,multifunction=3Don,chassis=3D0,=
+addr=3D0xa \
+        -device pcie-root-port,id=3Droot1,bus=3Dpcie.0,chassis=3D1 \
+        -device pcie-root-port,id=3Droot2,bus=3Dpcie.0,chassis=3D2 \
+        -netdev tap,script=3D/root/bin/bridge.sh,downscript=3Dno,id=3Dhos=
+tnet1,vhost=3Don \
+        -device virtio-net-pci,netdev=3Dhostnet1,id=3Dnet1,mac=3D52:54:00=
+:6f:55:cc,bus=3Droot2,failover=3Don \
+	-device vfio-pci,host=3D5e:00.2,id=3Dhostdev0,bus=3Droot1,standby=3Dnet1=
+ \
+        /root/rhel-guest-image-8.0-1781.x86_64.qcow2
+
+I'm grateful for any remarks or ideas!
+
+Thanks!
+
+Changes from RFCv2 to v1:
+- work around circular dependency of commandline options. Just add
+  failover=3Don to the virtio-net standby options and reference it from
+  primary (vfio-pci) device with standby=3D<id>
+- add patch 3/4 to allow migration of vfio-pci device when it is part of =
+a
+  failover pair, still disallow for all other devices
+- add patch 4/4 to allow unplug of device during migrationm, make an
+  exception for failover primary devices. I'd like feedback on how to
+  solve this more elegant. I added a boolean to DeviceState, have it
+  default to false for all devices except for primary devices.
+- not tested yet with surprise removal
+- I don't expect this to go in as it is, still needs more testing but
+  I'd like to get feedback on above mentioned changes.
+
+
+
+Jens Freimann (9):
+  qdev/qbus: Add hidden device support
+  net/virtio: add failover support
+  vfio: unplug failover primary device before migration
+  migration: allow unplug during migration for failover devices
+  qapi: add unplug primary event
+  qapi: Add failover negotiated event
+  migration: Add new migration state wait-unplug
+  pci: mark devices partially unplugged
+  pci: mark device having guest unplug request pending
+
+ hw/core/qdev.c                 |  20 ++++
+ hw/net/virtio-net.c            | 180 +++++++++++++++++++++++++++++++++
+ hw/pci/pci.c                   |   2 +
+ hw/pci/pcie.c                  |   6 ++
+ hw/vfio/pci.c                  |  25 ++++-
+ hw/vfio/pci.h                  |   2 +
+ include/hw/pci/pci.h           |   1 +
+ include/hw/qdev-core.h         |   9 ++
+ include/hw/virtio/virtio-net.h |  13 +++
+ include/hw/virtio/virtio.h     |   1 +
+ include/migration/vmstate.h    |   2 +
+ migration/migration.c          |  14 +++
+ migration/savevm.c             |  18 ++++
+ migration/savevm.h             |   1 +
+ qapi/migration.json            |  24 ++++-
+ qapi/net.json                  |  16 +++
+ qdev-monitor.c                 |  43 +++++++-
+ vl.c                           |   6 +-
+ 18 files changed, 375 insertions(+), 8 deletions(-)
+
+--=20
+2.21.0
 
 
