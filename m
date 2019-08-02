@@ -3,66 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2677FC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FACC32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F22C1205F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:18:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22C1205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F33ED205F4
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:19:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33ED205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htTiC-0000Hy-53
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 05:18:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51068)
+	id 1htTiW-00016t-4j
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 05:19:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51146)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1htThb-0008FR-Mg
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:18:20 -0400
+ (envelope-from <imammedo@redhat.com>) id 1htThv-0000Fz-0c
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1htTha-0002e4-Mn
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:18:19 -0400
-Resent-Date: Fri, 02 Aug 2019 05:18:19 -0400
-Resent-Message-Id: <E1htTha-0002e4-Mn@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21859)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1htTha-0002dI-Ey
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:18:18 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1564737486; cv=none; d=zoho.com; s=zohoarc; 
- b=CAgAODmzMF8SdDCnLnbidyFj6LszfKjB70ShK/J3uoBAv0lvyshzcr0reIRGkyFZVoXWeqJMioBoRHZQCr9Gahb2RLiFQak72srMarWrE3DLQuGJLEultLiuDz33GMgfIDx1OCvz+CrAkGMi55GL9sFihgB3/9YCpjSUNw8tHXQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1564737486;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=J7svWgw4ut89qwrH9/hYgoQdWE4XEC0xIyZTZRLuBtw=; 
- b=ADeC2kMXK/3fIJcIKT0I9NIg7ODESTiZyVJURmi35tWFgbnf3zKOfKfeagmJ7kYt1jEtU1N5tLTtYUi83/zh2oxPH+qFcrlXMqpZEx2xTPSDgndJkDL6gvHtEjnCHn1SPGu/3k6tJz3D5XRGAMOBtuGOz/R6hvgdo9JlBuYbMw8=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1564737484816341.4516498485194;
- Fri, 2 Aug 2019 02:18:04 -0700 (PDT)
-Message-ID: <156473748376.29356.13491393800448965202@c4a48874b076>
-In-Reply-To: <1564736786-26495-1-git-send-email-ivanren@tencent.com>
+ (envelope-from <imammedo@redhat.com>) id 1htTht-0002mb-RD
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:18:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60018)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1htTht-0002lE-Hu; Fri, 02 Aug 2019 05:18:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id AA8E6C0A4F4B;
+ Fri,  2 Aug 2019 09:18:34 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 547916013A;
+ Fri,  2 Aug 2019 09:18:32 +0000 (UTC)
+Date: Fri, 2 Aug 2019 11:18:30 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <20190802111830.29636f24@redhat.com>
+In-Reply-To: <63d203d2-25b5-44e6-ccee-1857396556f0@de.ibm.com>
+References: <20190729145229.4333-1-imammedo@redhat.com>
+ <0e9cd550-c69b-3e97-4619-6746da4d4bd1@redhat.com>
+ <63d203d2-25b5-44e6-ccee-1857396556f0@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: renyime@gmail.com
-Date: Fri, 2 Aug 2019 02:18:04 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Fri, 02 Aug 2019 09:18:34 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH v2] migration: always initial ram_counters
- for a new migration
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH RFC 0/2] s390: stop abusing
+ memory_region_allocate_system_memory()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,33 +70,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, richardw.yang@linux.intel.com, dgilbert@redhat.com,
- quintela@redhat.com
+Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY0NzM2Nzg2LTI2NDk1LTEt
-Z2l0LXNlbmQtZW1haWwtaXZhbnJlbkB0ZW5jZW50LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBm
-YWlsZWQgdGhlIGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFu
-ZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwg
-eW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JL
-PTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14ODZfNjQt
-c29mdG1tdSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBBUyAgICAg
-IHBjLWJpb3Mvb3B0aW9ucm9tL211bHRpYm9vdC5vCiAgQ0MgICAgICBxZ2EvY29tbWFuZHMtcG9z
-aXgubwogIEFTICAgICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290Lm8KL3RtcC9xZW11LXRl
-c3Qvc3JjL21pZ3JhdGlvbi9taWdyYXRpb24uYzozMDMzOjg6IGVycm9yOiB0eXBlIHNwZWNpZmll
-ciBtaXNzaW5nLCBkZWZhdWx0cyB0byAnaW50JyBbLVdlcnJvciwtV2ltcGxpY2l0LWludF0Kc3Rh
-dGljIHVwZGF0ZV9pdGVyYXRpb25faW5pdGlhbF9zdGF0dXMoTWlncmF0aW9uU3RhdGUgKnMpCn5+
-fn5+fiBeCi90bXAvcWVtdS10ZXN0L3NyYy9taWdyYXRpb24vbWlncmF0aW9uLmM6MzA0MjoxOiBl
-cnJvcjogY29udHJvbCByZWFjaGVzIGVuZCBvZiBub24tdm9pZCBmdW5jdGlvbiBbLVdlcnJvciwt
-V3JldHVybi10eXBlXQp9Cl4KMiBlcnJvcnMgZ2VuZXJhdGVkLgoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU2NDczNjc4Ni0yNjQ5NS0xLWdp
-dC1zZW5kLWVtYWlsLWl2YW5yZW5AdGVuY2VudC5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+On Fri, 2 Aug 2019 10:29:43 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> On 02.08.19 10:04, David Hildenbrand wrote:
+> > On 29.07.19 16:52, Igor Mammedov wrote:  
+> >> While looking into unifying guest RAM allocation to use hostmem backends
+> >> for initial RAM (especially when -mempath is used) and retiring
+> >> memory_region_allocate_system_memory() API, leaving only single hostmem backend,
+> >> I was inspecting how currently it is used by boards and it turns out several
+> >> boards abuse it by calling the function several times (despite documented contract
+> >> forbiding it).
+> >>
+> >> s390 is one of such boards where KVM limitation on memslot size got propagated
+> >> to board design and memory_region_allocate_system_memory() was abused to satisfy
+> >> KVM requirement for max RAM chunk where memory region alias would suffice.
+> >>
+> >> Unfortunately, memory_region_allocate_system_memory() usage created migration
+> >> dependency where guest RAM is transferred in migration stream as several RAMBlocks
+> >> if it's more than KVM_SLOT_MAX_BYTES.  
+> > 
+> > So if I understand it correctly, we only call
+> > memory_region_allocate_system_memory() in case the guest initial memory
+> > size exceeds KVM_SLOT_MAX_BYTES - ~8TB.  
+> 
+> We always call it. We just call it twice for > 8TB
+> > 
+> > Do we *really* care about keeping migration of systems running that most
+> > probably nobody (except Christian ;) ) really uses? (especially not in
+> > production).
+> > 
+> > I am fine keeping migration running if it's easy, but introducing hacks
+> > (reading below) for such obscure use cases - I don't know.
+> > 
+> > @Christian: Please prove me wrong. :)  
+> 
+> For the time being we can block migration for guests > 8TB if that helps (it should not
+> fail in a guest killing fashion), but we should
+> 1. continue to be able to migrate guests < 8TB
+> 2. continue to be 
+> 
+> On the other hand I find "and suddenly it fails if you go beyond this" really
+> unpleasant. So it would be interesting to see the next round of patches to 
+> check how "hacky" those really are.
+
+I've looked into cleaning up "migratable aliases",
+so far it works fine (well in configurations I was able to test,
+there were no regressions in x86 machines which use aliases quite a bit).
+As I've written before, aliases could be used for x86 later but
+that yet to be proved, so I'd prefer to delay this patch if possible.
+
+However, I'd prefer to intentionally break migration with >8TB
+guests to simpler code without keepeing around compat mode
+that won't/isn't used in practice.
+
+As for new round of patches (including missing KVM fixup),
+I'm going to post them now-ish for you to check it out.
+
+> 
+> >   
+> >>
+> >> In order to replace these several RAM chunks with a single memdev and keep it
+> >> working with KVM memslot size limit and migration compatible, following was done:
+> >>    * [2/2] use memory region aliases to partition hostmem backend RAM on
+> >>            KVM_SLOT_MAX_BYTES chunks, which should keep KVM side working
+> >>    * [1/2] hacked memory region aliases (to ram memory regions only) to have
+> >>            its own RAMBlocks pointing to RAM chunks owned by aliased memory
+> >>            region. While it's admittedly a hack, but it's relatively simple and
+> >>            allows board code rashape migration stream as necessary
+> >>
+> >>            I haven't tried to use migratable aliases on x86 machines, but with it
+> >>            it could be possible to drop legacy RAM allocation and compat knob
+> >>            (cd5ff8333a) dropping '-numa node,mem' completely even for old machines.
+> >>
+> >> PS:
+> >>    Tested with ping pong cross version migration on s390 machine 
+> >>    (with reduced KVM_SLOT_MAX_BYTES since I don't have access to large
+> >>     enough host)
+> >>      
+> >>
+> >> Igor Mammedov (2):
+> >>   memory: make MemoryRegion alias migratable
+> >>   s390: do not call memory_region_allocate_system_memory() multiple
+> >>     times
+> >>
+> >>  exec.c                     |  7 ++++---
+> >>  hw/s390x/s390-virtio-ccw.c | 20 +++++++++++++++-----
+> >>  memory.c                   |  5 +++++
+> >>  3 files changed, 24 insertions(+), 8 deletions(-)
+> >>  
+> > 
+> >   
+> 
 
 
