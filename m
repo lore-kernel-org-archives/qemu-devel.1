@@ -2,66 +2,67 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F580C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0496C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:13:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7940620B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:13:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7940620B7C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B703020B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 14:13:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B703020B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htYIm-0004qI-Mu
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 10:13:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33069)
+	id 1htYIt-000544-20
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 10:13:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33133)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1htYHk-00042h-Ss
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:11:57 -0400
+ (envelope-from <kraxel@redhat.com>) id 1htYHq-0004BQ-Pl
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1htYHj-00038b-Nf
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:11:56 -0400
-Resent-Date: Fri, 02 Aug 2019 10:11:56 -0400
-Resent-Message-Id: <E1htYHj-00038b-Nf@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21827)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1htYHj-00037W-GB; Fri, 02 Aug 2019 10:11:55 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1564755103; cv=none; d=zoho.com; s=zohoarc; 
- b=WVxRMvmIIYHBytcXF6TNEyc94sejFfEfMIKcNEOtvz8wbxugRK97USCNwFjr24i6/0rCors+1aafr2Ih88i3+07QfQ/TC58SbiNT4chpD/+EvL7sbBnV/viX5hH5CvfM0yVCQooBs45IilRks+FuzaraqN6vOGHfwlt1JvgJmzE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1564755103;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=SwBoc33d1lFh1XPJnReIFytkv2E/s4dECBD6d2oolGQ=; 
- b=GOAXYu0SsvNefVdS/oHH8cGDqJQ0ngjrHI55l/UVJqRQUYJwis6J9c2OAlB4bVU8MvJfMC9R9wrPQ8Hz+rn/tj+f9Nz9kleQekp/zgGtAtoGRHdXbuY9N33oKTEcjkR4LRjXQan9cgkgLxcHJIKvBGVz7/JD4qe7WbUx5W3GerA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 156475510112582.96841681330557;
- Fri, 2 Aug 2019 07:11:41 -0700 (PDT)
-Message-ID: <156475509960.31476.347774062561552000@c4a48874b076>
-In-Reply-To: <20190802133241.29298-1-imammedo@redhat.com>
+ (envelope-from <kraxel@redhat.com>) id 1htYHp-0003D4-NJ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:12:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34810)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1htYHp-0003CM-Hn
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 10:12:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2023A30A5413;
+ Fri,  2 Aug 2019 14:12:00 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-81.ams2.redhat.com
+ [10.36.116.81])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AAF3260BF4;
+ Fri,  2 Aug 2019 14:11:50 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id E41CE11AB8; Fri,  2 Aug 2019 16:11:49 +0200 (CEST)
+Date: Fri, 2 Aug 2019 16:11:49 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20190802141149.dj7zv5p5wscftvnr@sirius.home.kraxel.org>
+References: <1564508710-22909-1-git-send-email-linux@roeck-us.net>
+ <160cda6c-63b3-4d52-018e-d282514be2a3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: imammedo@redhat.com
-Date: Fri, 2 Aug 2019 07:11:41 -0700 (PDT)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <160cda6c-63b3-4d52-018e-d282514be2a3@redhat.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Fri, 02 Aug 2019 14:12:00 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v3 0/2] s390: stop abusing
- memory_region_allocate_system_memory()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] ehci: Ensure that device is not NULL
+ before calling usb_ep_get
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,46 +74,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- pbonzini@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Guenter Roeck <linux@roeck-us.net>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwMjEzMzI0MS4yOTI5
-OC0xLWltYW1tZWRvQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxk
-IHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBi
-ZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8g
-YSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMg
-YnJhbmNoCnNldCAtZQoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8gIj09
-PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKCmVjaG8KZWNobyAiPT09IFVOQU1FID09PSIKdW5hbWUg
-LWEKCkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxk
-Cm1rZGlyIC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1
-cmUgLS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAtajQKIyBYWFg6IHdlIG5lZWQgcmVs
-aWFibGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEKbWFrZSBpbnN0YWxsCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgogIENDICAgICAgczM5MHgtc29mdG1tdS90YXJnZXQvczM5MHgvc2ln
-cC5vCiAgQ0MgICAgICBzMzkweC1zb2Z0bW11L3RhcmdldC9zMzkweC9rdm0ubwovdmFyL3RtcC9w
-YXRjaGV3LXRlc3Rlci10bXAtYmNmeGJrZWcvc3JjL3RhcmdldC9zMzkweC9rdm0uYzogSW4gZnVu
-Y3Rpb24g4oCYa3ZtX2FyY2hfaW5pdOKAmToKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWJj
-Znhia2VnL3NyYy90YXJnZXQvczM5MHgva3ZtLmM6MzUwOjU6IGVycm9yOiBpbXBsaWNpdCBkZWNs
-YXJhdGlvbiBvZiBmdW5jdGlvbiDigJhrdm1fc2V0X21heF9tZW1zbG90X3NpemXigJk7IGRpZCB5
-b3UgbWVhbiDigJhrdm1fZ2V0X21heF9tZW1zbG90c+KAmT8gWy1XZXJyb3I9aW1wbGljaXQtZnVu
-Y3Rpb24tZGVjbGFyYXRpb25dCiAgMzUwIHwgICAgIGt2bV9zZXRfbWF4X21lbXNsb3Rfc2l6ZShL
-Vk1fU0xPVF9NQVhfQllURVMpOwogICAgICB8ICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4K
-ICAgICAgfCAgICAga3ZtX2dldF9tYXhfbWVtc2xvdHMKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
-dG1wLWJjZnhia2VnL3NyYy90YXJnZXQvczM5MHgva3ZtLmM6MzUwOjU6IGVycm9yOiBuZXN0ZWQg
-ZXh0ZXJuIGRlY2xhcmF0aW9uIG9mIOKAmGt2bV9zZXRfbWF4X21lbXNsb3Rfc2l6ZeKAmSBbLVdl
-cnJvcj1uZXN0ZWQtZXh0ZXJuc10KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBl
-cnJvcnMKbWFrZVsxXTogKioqIFsvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtYmNmeGJrZWcv
-c3JjL3J1bGVzLm1hazo2OTogdGFyZ2V0L3MzOTB4L2t2bS5vXSBFcnJvciAxCm1ha2U6ICoqKiBb
-TWFrZWZpbGU6NDcyOiBzMzkweC1zb2Z0bW11L2FsbF0gRXJyb3IgMgoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA4MDIxMzMyNDEuMjky
-OTgtMS1pbWFtbWVkb0ByZWRoYXQuY29tL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4KLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hl
-dy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhh
-dC5jb20=
+On Wed, Jul 31, 2019 at 01:08:50PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 7/30/19 7:45 PM, Guenter Roeck wrote:
+> > The following assert is seen once in a while while resetting the
+> > Linux kernel.
+> >=20
+> > qemu-system-x86_64: hw/usb/core.c:734: usb_ep_get:
+> > 	Assertion `dev !=3D NULL' failed.
+> >=20
+> > The call to usb_ep_get() originates from ehci_execute().
+> > Analysis and debugging shows that p->queue->dev can indeed be NULL
+> > in this function. Add check for this condition and return an error
+> > if it is seen.
+>=20
+> Your patch is not wrong as it corrects your case, but I wonder why we
+> get there. This assert seems to have catched a bug.
 
+https://bugzilla.redhat.com//show_bug.cgi?id=3D1715801 maybe.
+
+> Gerd, shouldn't we call usb_packet_cleanup() in ehci_reset() rather tha=
+n
+> ehci_finalize()? Then we shouldn't need this patch.
+
+The two ehci_queues_rip_all() calls in ehci_reset() should clean up every=
+thing
+properly.
+
+Can you try the patch below to see whenever a ehci_find_device failure is=
+ the
+root cause?
+
+thanks,
+  Gerd
+
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index 62dab0592fa2..2b0a57772ed5 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -1644,6 +1644,10 @@ static EHCIQueue *ehci_state_fetchqh(EHCIState *eh=
+ci, int async)
+         q->dev =3D ehci_find_device(q->ehci,
+                                   get_field(q->qh.epchar, QH_EPCHAR_DEVA=
+DDR));
+     }
++    if (q->dev =3D=3D NULL) {
++        fprintf(stderr, "%s: device %d not found\n", __func__,
++                get_field(q->qh.epchar, QH_EPCHAR_DEVADDR));
++    }
+=20
+     if (async && (q->qh.epchar & QH_EPCHAR_H)) {
+=20
 
