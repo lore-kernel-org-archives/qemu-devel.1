@@ -6,54 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27880C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5670DC32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 016A22086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:39:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 016A22086A
+	by mail.kernel.org (Postfix) with ESMTPS id 2E7982086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:39:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E7982086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htU2M-0008FB-BF
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 05:39:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55588)
+	id 1htU2R-0008UW-Eh
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 05:39:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55668)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1htU1j-0006zI-BL
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:08 -0400
+ (envelope-from <imammedo@redhat.com>) id 1htU1o-00077s-9u
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1htU1h-0000x3-Kk
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37668)
+ (envelope-from <imammedo@redhat.com>) id 1htU1m-00011S-UH
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46116)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1htU1h-0000wc-DW; Fri, 02 Aug 2019 05:39:05 -0400
+ id 1htU1m-00010s-NT; Fri, 02 Aug 2019 05:39:10 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AED8CC0586AE;
- Fri,  2 Aug 2019 09:39:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 13EBE3082B4B;
+ Fri,  2 Aug 2019 09:39:10 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4181519C6A;
- Fri,  2 Aug 2019 09:39:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9A1BE19C6A;
+ Fri,  2 Aug 2019 09:39:08 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 05:38:51 -0400
-Message-Id: <20190802093854.5343-2-imammedo@redhat.com>
+Date: Fri,  2 Aug 2019 05:38:54 -0400
+Message-Id: <20190802093854.5343-5-imammedo@redhat.com>
 In-Reply-To: <20190802093854.5343-1-imammedo@redhat.com>
 References: <20190802093854.5343-1-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 02 Aug 2019 09:39:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Fri, 02 Aug 2019 09:39:10 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH RFC v2 1/4] hw: add compat machines for 4.2
+Subject: [Qemu-devel] [PATCH RFC v2 4/4] s390: do not call
+ memory_region_allocate_system_memory() multiple times
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,235 +72,147 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cornelia Huck <cohuck@redhat.com>
+s390 was trying to solve limited KVM memslot size issue by abusing
+memory_region_allocate_system_memory(), which breaks API contract
+where the function might be called only once.
 
-Add 4.2 machine types for arm/i440fx/q35/s390x/spapr.
+s390 should have used memory aliases to fragment inital memory into
+smaller chunks to satisfy KVM's memslot limitation. But its a bit
+late now, since allocated pieces are transfered in migration stream
+separately, so it's not possible to just replace broken layout with
+correct one. To workaround issue, MemoryRegion alases are made
+migratable and this patch switches to use them to split big initial
+RAM chunk into smaller pieces (KVM_SLOT_MAX_BYTES max) and registers
+aliases for migration. That should keep migration compatible with
+previous QEMU versions.
 
-For i440fx and q35, unversioned cpu models are still translated
-to -v1, as 0788a56bd1ae ("i386: Make unversioned CPU models be
-aliases") states this should only transition to the latest cpu
-model version in 4.3 (or later).
+New machine types (since 4.2) will use single memory region, which
+will get transimitted in migration stream as a whole RAMBlock.
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- include/hw/boards.h        |  3 +++
- include/hw/i386/pc.h       |  3 +++
- hw/arm/virt.c              |  9 ++++++++-
- hw/core/machine.c          |  3 +++
- hw/i386/pc.c               |  3 +++
- hw/i386/pc_piix.c          | 14 +++++++++++++-
- hw/i386/pc_q35.c           | 13 ++++++++++++-
- hw/ppc/spapr.c             | 15 +++++++++++++--
- hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
- 9 files changed, 71 insertions(+), 6 deletions(-)
+I don't have access to a suitable system to test it, so I've simulated
+it with smaller chunks on x84 host. Ping-pong migration between old
+and new QEMU worked fine. KVM part should be fine as memslots
+using mapped MemoryRegions (in this case it would be aliases) as
+far as I know but is someone could test it on big enough host it
+would be nice.
+---
+ include/hw/s390x/s390-virtio-ccw.h |  4 +++
+ hw/s390x/s390-virtio-ccw.c         | 56 +++++++++++++++++++++---------
+ 2 files changed, 43 insertions(+), 17 deletions(-)
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index a71d1a53a5..d9ec37d807 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -317,6 +317,9 @@ struct MachineState {
-     } \
-     type_init(machine_initfn##_register_types)
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index 00632f94b4..f9ed3737f8 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -21,6 +21,9 @@
+ #define S390_MACHINE_CLASS(klass) \
+     OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
  
-+extern GlobalProperty hw_compat_4_1[];
-+extern const size_t hw_compat_4_1_len;
-+
- extern GlobalProperty hw_compat_4_0[];
- extern const size_t hw_compat_4_0_len;
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 859b64c51d..c840e39251 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -302,6 +302,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
-+extern GlobalProperty pc_compat_4_1[];
-+extern const size_t pc_compat_4_1_len;
-+
- extern GlobalProperty pc_compat_4_0[];
- extern const size_t pc_compat_4_0_len;
- 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index d9496c9363..64e3fc3440 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2046,10 +2046,17 @@ static void machvirt_machine_init(void)
- }
- type_init(machvirt_machine_init);
- 
-+static void virt_machine_4_2_options(MachineClass *mc)
-+{
-+}
-+DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
-+
- static void virt_machine_4_1_options(MachineClass *mc)
- {
-+    virt_machine_4_2_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(4, 1)
-+DEFINE_VIRT_MACHINE(4, 1)
- 
- static void virt_machine_4_0_options(MachineClass *mc)
- {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 28a475ad97..fd76dad859 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -27,6 +27,9 @@
- #include "hw/pci/pci.h"
- #include "hw/mem/nvdimm.h"
- 
-+GlobalProperty hw_compat_4_1[] = {};
-+const size_t hw_compat_4_1_len = G_N_ELEMENTS(hw_compat_4_1);
-+
- GlobalProperty hw_compat_4_0[] = {
-     { "VGA",            "edid", "false" },
-     { "secondary-vga",  "edid", "false" },
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 549c437050..2aa1c49701 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -116,6 +116,9 @@ struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
- /* Physical Address of PVH entry point read from kernel ELF NOTE */
- static size_t pvh_start_addr;
- 
-+GlobalProperty pc_compat_4_1[] = {};
-+const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
-+
- GlobalProperty pc_compat_4_0[] = {};
- const size_t pc_compat_4_0_len = G_N_ELEMENTS(pc_compat_4_0);
- 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index c2280c72ef..24e71be1d2 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -433,7 +433,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
- 
--static void pc_i440fx_4_1_machine_options(MachineClass *m)
-+static void pc_i440fx_4_2_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-     pc_i440fx_machine_options(m);
-@@ -442,6 +442,18 @@ static void pc_i440fx_4_1_machine_options(MachineClass *m)
-     pcmc->default_cpu_version = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v4_2, "pc-i440fx-4.2", NULL,
-+                      pc_i440fx_4_2_machine_options);
-+
-+static void pc_i440fx_4_1_machine_options(MachineClass *m)
-+{
-+    pc_i440fx_4_2_machine_options(m);
-+    m->alias = NULL;
-+    m->is_default = 0;
-+    compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-+    compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
-+}
-+
- DEFINE_I440FX_MACHINE(v4_1, "pc-i440fx-4.1", NULL,
-                       pc_i440fx_4_1_machine_options);
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 397e1fdd2f..e61260762c 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -365,7 +365,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_4_1_machine_options(MachineClass *m)
-+static void pc_q35_4_2_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-     pc_q35_machine_options(m);
-@@ -373,6 +373,17 @@ static void pc_q35_4_1_machine_options(MachineClass *m)
-     pcmc->default_cpu_version = 1;
- }
- 
-+DEFINE_Q35_MACHINE(v4_2, "pc-q35-4.2", NULL,
-+                   pc_q35_4_2_machine_options);
-+
-+static void pc_q35_4_1_machine_options(MachineClass *m)
-+{
-+    pc_q35_4_2_machine_options(m);
-+    m->alias = NULL;
-+    compat_props_add(m->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-+    compat_props_add(m->compat_props, pc_compat_4_1, pc_compat_4_1_len);
-+}
-+
- DEFINE_Q35_MACHINE(v4_1, "pc-q35-4.1", NULL,
-                    pc_q35_4_1_machine_options);
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 821f0d4a49..6c8aa60545 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4426,15 +4426,26 @@ static const TypeInfo spapr_machine_info = {
-     }                                                                \
-     type_init(spapr_machine_register_##suffix)
- 
-+/*
-+ * pseries-4.2
-+ */
-+static void spapr_machine_4_2_class_options(MachineClass *mc)
-+{
-+    /* Defaults for the latest behaviour inherited from the base class */
-+}
-+
-+DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
++#define S390_MACHINE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(S390CcwMachineClass, (obj), TYPE_S390_CCW_MACHINE)
 +
  /*
-  * pseries-4.1
-  */
- static void spapr_machine_4_1_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    spapr_machine_4_2_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
- }
+  * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
+  * as the dirty bitmap must be managed by bitops that take an int as
+@@ -50,6 +53,7 @@ typedef struct S390CcwMachineClass {
+     bool cpu_model_allowed;
+     bool css_migration_enabled;
+     bool hpage_1m_allowed;
++    bool split_ram_layout;
+ } S390CcwMachineClass;
  
--DEFINE_SPAPR_MACHINE(4_1, "4.1", true);
-+DEFINE_SPAPR_MACHINE(4_1, "4.1", false);
- 
- /*
-  * pseries-4.0
+ /* runtime-instrumentation allowed by the machine */
 diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 5b6a9a4e55..593b34e0e2 100644
+index 073672f9cb..9160c1ed0a 100644
 --- a/hw/s390x/s390-virtio-ccw.c
 +++ b/hw/s390x/s390-virtio-ccw.c
-@@ -660,14 +660,26 @@ bool css_migration_enabled(void)
-     }                                                                         \
-     type_init(ccw_machine_register_##suffix)
- 
-+static void ccw_machine_4_2_instance_options(MachineState *machine)
-+{
-+}
-+
-+static void ccw_machine_4_2_class_options(MachineClass *mc)
-+{
-+}
-+DEFINE_CCW_MACHINE(4_2, "4.2", true);
-+
- static void ccw_machine_4_1_instance_options(MachineState *machine)
- {
-+    ccw_machine_4_2_instance_options(machine);
+@@ -151,28 +151,47 @@ static void virtio_ccw_register_hcalls(void)
+                                    virtio_ccw_hcall_early_printk);
  }
+ 
+-static void s390_memory_init(ram_addr_t mem_size)
++static void s390_memory_init(MachineState *ms)
+ {
++    S390CcwMachineClass *s390mc = S390_MACHINE_GET_CLASS(ms);
+     MemoryRegion *sysmem = get_system_memory();
+-    ram_addr_t chunk, offset = 0;
++    MemoryRegion *ram = g_new(MemoryRegion, 1);
+     unsigned int number = 0;
+     Error *local_err = NULL;
+-    gchar *name;
++    ram_addr_t mem_size = ms->ram_size;
++    gchar *name = g_strdup_printf(s390mc->split_ram_layout ?
++                                  "s390.whole.ram" : "s390.ram");
+ 
+     /* allocate RAM for core */
+-    name = g_strdup_printf("s390.ram");
+-    while (mem_size) {
+-        MemoryRegion *ram = g_new(MemoryRegion, 1);
+-        uint64_t size = mem_size;
+-
+-        /* KVM does not allow memslots >= 8 TB */
+-        chunk = MIN(size, KVM_SLOT_MAX_BYTES);
+-        memory_region_allocate_system_memory(ram, NULL, name, chunk);
+-        memory_region_add_subregion(sysmem, offset, ram);
+-        mem_size -= chunk;
+-        offset += chunk;
+-        g_free(name);
+-        name = g_strdup_printf("s390.ram.%u", ++number);
++    memory_region_allocate_system_memory(ram, NULL, name, mem_size);
++
++    /* migration compatible RAM handling for 4.1 and older machines */
++    if (s390mc->split_ram_layout) {
++       ram_addr_t chunk, offset = 0;
++       /*
++        * memory_region_allocate_system_memory() registers allocated RAM for
++        * migration, however for compat reasons the RAM should be passed over
++        * as RAMBlocks of the size upto KVM_SLOT_MAX_BYTES. So unregister just
++        * allocated RAM so it won't be migrated directly. Aliases will take care
++        * of segmenting RAM into legacy chunks that migration compatible.
++        */
++       vmstate_unregister_ram(ram, NULL);
++       name = g_strdup_printf("s390.ram");
++       while (mem_size) {
++           MemoryRegion *alias = g_new(MemoryRegion, 1);
++
++           /* KVM does not allow memslots >= 8 TB */
++           chunk = MIN(mem_size, KVM_SLOT_MAX_BYTES);
++           memory_region_init_alias(alias, NULL, name, ram, offset, chunk);
++           vmstate_register_ram_global(alias);
++           memory_region_add_subregion(sysmem, offset, alias);
++           mem_size -= chunk;
++           offset += chunk;
++           g_free(name);
++           name = g_strdup_printf("s390.ram.%u", ++number);
++       }
++    } else {
++       memory_region_add_subregion(sysmem, 0, ram);
+     }
+     g_free(name);
+ 
+@@ -257,7 +276,7 @@ static void ccw_init(MachineState *machine)
+ 
+     s390_sclp_init();
+     /* init memory + setup max page size. Required for the CPU model */
+-    s390_memory_init(machine->ram_size);
++    s390_memory_init(machine);
+ 
+     /* init CPUs (incl. CPU model) early so s390_has_feature() works */
+     s390_init_cpus(machine);
+@@ -667,8 +686,11 @@ static void ccw_machine_4_1_instance_options(MachineState *machine)
  
  static void ccw_machine_4_1_class_options(MachineClass *mc)
  {
-+    ccw_machine_4_2_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
++    S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
++
+     ccw_machine_4_2_class_options(mc);
+     compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
++    s390mc->split_ram_layout = true;
  }
--DEFINE_CCW_MACHINE(4_1, "4.1", true);
-+DEFINE_CCW_MACHINE(4_1, "4.1", false);
+ DEFINE_CCW_MACHINE(4_1, "4.1", false);
  
- static void ccw_machine_4_0_instance_options(MachineState *machine)
- {
 -- 
 2.18.1
 
