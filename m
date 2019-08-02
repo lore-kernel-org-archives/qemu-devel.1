@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EA3C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 297DCC32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE46D204EC
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE46D204EC
+	by mail.kernel.org (Postfix) with ESMTPS id E373C204EC
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:07:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E373C204EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZ9B-0006X9-4r
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:07:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47106)
+	id 1htZ9G-0006m7-6o
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:07:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47125)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jfreimann@redhat.com>) id 1htZ8Q-0004qh-Fw
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:23 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8T-0004w0-2j
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1htZ8P-0005JH-55
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33718)
+ (envelope-from <jfreimann@redhat.com>) id 1htZ8R-0005K7-9y
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39164)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1htZ8O-0005Iv-TR
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1htZ8R-0005Jl-2R
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:06:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2BE33305B1C1
- for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5316930821DF
+ for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 15:06:22 +0000 (UTC)
 Received: from localhost (dhcp-192-195.str.redhat.com [10.33.192.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D26C60BEC;
- Fri,  2 Aug 2019 15:06:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A29955D712;
+ Fri,  2 Aug 2019 15:06:21 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 17:05:57 +0200
-Message-Id: <20190802150605.5880-2-jfreimann@redhat.com>
+Date: Fri,  2 Aug 2019 17:05:58 +0200
+Message-Id: <20190802150605.5880-3-jfreimann@redhat.com>
 In-Reply-To: <20190802150605.5880-1-jfreimann@redhat.com>
 References: <20190802150605.5880-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 02 Aug 2019 15:06:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Fri, 02 Aug 2019 15:06:22 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 1/9] qdev/qbus: Add hidden device support
+Subject: [Qemu-devel] [PATCH 2/9] net/virtio: add failover support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,215 +73,381 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds support for hiding a device to the qbus and qdev APIs.
-qdev_device_add() is modified to check for a standby argument in the
-option string. A DeviceListener callback should_be_hidden() is added. It
-can be used by a standby device to inform qdev that this device should
-not be added now. The standby device handler can store the device
-options to plug the device in at a later point in time.
+This patch adds support to handle failover device pairs of a virtio-net
+device and a vfio-pci device, where the virtio-net acts as the standby
+device and the vfio-pci device as the primary.
+
+The general idea is that we have a pair of devices, a vfio-pci and a
+emulated (virtio-net) device. Before migration the vfio device is
+unplugged and data flows to the emulated device, on the target side
+another vfio-pci device is plugged in to take over the data-path. In the
+guest the net_failover module will pair net devices with the same MAC
+address.
+
+To achieve this we need:
+
+1. Provide a callback function for the should_be_hidden DeviceListener.
+   It is called when the primary device is plugged in. Evaluate the QOpt
+   passed in to check if it is the matching primary device. It returns
+   two values:
+     - one to signal if the device to be added is the matching
+       primary device
+     - another one to signal to qdev if it should actually
+       continue with adding the device or skip it.
+
+   In the latter case it stores the device options in the VirtioNet
+   struct and the device is added once the VIRTIO_NET_F_STANDBY feature i=
+s
+   negotiated during virtio feature negotiation.
+
+2. Register a callback for migration status notifier. When called it
+   will unplug its primary device before the migration happens.
 
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- hw/core/qdev.c         | 19 +++++++++++++++++++
- hw/vfio/pci.c          |  1 +
- hw/vfio/pci.h          |  1 +
- include/hw/qdev-core.h |  8 ++++++++
- qdev-monitor.c         | 43 ++++++++++++++++++++++++++++++++++++++----
- vl.c                   |  6 ++++--
- 6 files changed, 72 insertions(+), 6 deletions(-)
+ hw/net/virtio-net.c            | 180 +++++++++++++++++++++++++++++++++
+ include/hw/virtio/virtio-net.h |  13 +++
+ include/hw/virtio/virtio.h     |   1 +
+ 3 files changed, 194 insertions(+)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 94ebc0a4a1..31e90ebaa2 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -211,6 +211,25 @@ void device_listener_unregister(DeviceListener *list=
-ener)
-     QTAILQ_REMOVE(&device_listeners, listener, link);
- }
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index b9e1cd71cf..2f29155d9f 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -12,6 +12,7 @@
+  */
 =20
-+bool qdev_should_hide_device(QemuOpts *opts, Error **errp)
-+{
-+    bool res =3D false;
-+    bool match_found =3D false;
-+
-+    DeviceListener *listener;
-+
-+    QTAILQ_FOREACH(listener, &device_listeners, link) {
-+       if (listener->should_be_hidden) {
-+            listener->should_be_hidden(listener, opts, &match_found, &re=
-s);
-+        }
-+
-+        if (match_found) {
-+            break;
-+        }
-+    }
-+    return res;
-+}
-+
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version)
- {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index d7a4e1875c..d6ae9bd4ac 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3105,6 +3105,7 @@ static Property vfio_pci_dev_properties[] =3D {
-                             display, ON_OFF_AUTO_OFF),
-     DEFINE_PROP_UINT32("xres", VFIOPCIDevice, display_xres, 0),
-     DEFINE_PROP_UINT32("yres", VFIOPCIDevice, display_yres, 0),
-+    DEFINE_PROP_STRING("standby", VFIOPCIDevice, standby),
-     DEFINE_PROP_UINT32("x-intx-mmap-timeout-ms", VFIOPCIDevice,
-                        intx.mmap_timeout, 1100),
-     DEFINE_PROP_BIT("x-vga", VFIOPCIDevice, features,
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 834a90d646..27d58fc55b 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -134,6 +134,7 @@ typedef struct VFIOPCIDevice {
-     PCIHostDeviceAddress host;
-     EventNotifier err_notifier;
-     EventNotifier req_notifier;
-+    char *standby;
-     int (*resetfn)(struct VFIOPCIDevice *);
-     uint32_t vendor_id;
-     uint32_t device_id;
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 136df7774c..6174538b01 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -158,6 +158,13 @@ struct DeviceState {
- struct DeviceListener {
-     void (*realize)(DeviceListener *listener, DeviceState *dev);
-     void (*unrealize)(DeviceListener *listener, DeviceState *dev);
-+    /*
-+     * This callback is called just upon init of the DeviceState
-+     * and can be used by a standby device for informing qdev if this
-+     * device should be hidden by checking the device opts
-+     */
-+    void (*should_be_hidden)(DeviceListener *listener, QemuOpts *device_=
-opts,
-+            bool *match_found, bool *res);
-     QTAILQ_ENTRY(DeviceListener) link;
- };
-=20
-@@ -457,5 +464,6 @@ void device_listener_unregister(DeviceListener *liste=
-ner);
- VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
-                                                      VMChangeStateHandle=
-r *cb,
-                                                      void *opaque);
-+bool qdev_should_hide_device(QemuOpts *opts, Error **errp);
-=20
- #endif
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 58222c2211..c69e283419 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -32,8 +32,10 @@
- #include "qemu/help_option.h"
- #include "qemu/option.h"
- #include "qemu/qemu-print.h"
+ #include "qemu/osdep.h"
++#include "qemu/atomic.h"
+ #include "qemu/iov.h"
+ #include "qemu/module.h"
+ #include "hw/virtio/virtio.h"
+@@ -20,16 +21,24 @@
+ #include "net/tap.h"
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
++#include "qemu/option.h"
 +#include "qemu/option_int.h"
- #include "sysemu/block-backend.h"
++#include "qemu/config-file.h"
++#include "qapi/qmp/qdict.h"
+ #include "hw/virtio/virtio-net.h"
+ #include "net/vhost_net.h"
+ #include "net/announce.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-net.h"
++#include "qapi/qapi-types-migration.h"
++#include "qapi/qapi-events-migration.h"
+ #include "hw/virtio/virtio-access.h"
  #include "migration/misc.h"
-+#include "migration/migration.h"
+ #include "standard-headers/linux/ethtool.h"
+ #include "trace.h"
++#include "monitor/qdev.h"
++#include "hw/pci/pci.h"
 =20
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -561,14 +563,45 @@ void qdev_set_id(DeviceState *dev, const char *id)
-     }
+ #define VIRTIO_NET_VM_VERSION    11
+=20
+@@ -743,6 +752,24 @@ static inline uint64_t virtio_net_supported_guest_of=
+floads(VirtIONet *n)
+     return virtio_net_guest_offloads_by_features(vdev->guest_features);
  }
 =20
-+static int is_failover_device(void *opaque, const char *name, const char=
- *value,
-+                        Error **errp)
++static void failover_add_primary(VirtIONet *n)
 +{
-+    if (strcmp(name, "standby") =3D=3D 0) {
-+        QemuOpts *opts =3D (QemuOpts *)opaque;
++    Error *err =3D NULL;
 +
-+        if (qdev_should_hide_device(opts, errp) && errp && !*errp) {
-+            return 1;
-+        } else if (errp && *errp) {
-+            return -1;
++    n->primary_device_opts =3D qemu_opts_find(qemu_find_opts("device"),
++            n->primary_device_id);
++    if (n->primary_device_opts) {
++        n->primary_dev =3D qdev_device_add(n->primary_device_opts, &err)=
+;
++        if (n->primary_dev) {
++            n->primary_bus =3D n->primary_dev->parent_bus;
 +        }
 +    }
-+
-+    return 0;
++    if (err) {
++        error_report_err(err);
++    }
 +}
 +
-+static bool should_hide_device(QemuOpts *opts, Error **err)
++
+ static void virtio_net_set_features(VirtIODevice *vdev, uint64_t feature=
+s)
+ {
+     VirtIONet *n =3D VIRTIO_NET(vdev);
+@@ -787,6 +814,11 @@ static void virtio_net_set_features(VirtIODevice *vd=
+ev, uint64_t features)
+     } else {
+         memset(n->vlans, 0xff, MAX_VLAN >> 3);
+     }
++
++    if (virtio_has_feature(features, VIRTIO_NET_F_STANDBY)) {
++        atomic_set(&n->primary_should_be_hidden, false);
++        failover_add_primary(n);
++    }
+ }
+=20
+ static int virtio_net_handle_rx_mode(VirtIONet *n, uint8_t cmd,
+@@ -2627,6 +2659,119 @@ void virtio_net_set_netclient_name(VirtIONet *n, =
+const char *name,
+     n->netclient_type =3D g_strdup(type);
+ }
+=20
++static bool failover_unplug_primary(VirtIONet *n)
 +{
-+    if (qemu_opt_foreach(opts, is_failover_device, opts, err) =3D=3D 0) =
-{
++    HotplugHandler *hotplug_ctrl;
++    PCIDevice *pci_dev;
++    Error *err =3D NULL;
++
++    hotplug_ctrl =3D qdev_get_hotplug_handler(n->primary_dev);
++    if (hotplug_ctrl) {
++        pci_dev =3D PCI_DEVICE(n->primary_dev);
++        pci_dev->partially_hotplugged =3D true;
++        hotplug_handler_unplug_request(hotplug_ctrl, n->primary_dev, &er=
+r);
++        if (err) {
++            error_report_err(err);
++            return false;
++        }
++    } else {
 +        return false;
 +    }
 +    return true;
 +}
 +
- DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
- {
-     DeviceClass *dc;
-     const char *driver, *path;
--    DeviceState *dev;
-+    DeviceState *dev =3D NULL;
-     BusState *bus =3D NULL;
-     Error *err =3D NULL;
-=20
-+    if (opts && should_hide_device(opts, &err)) {
-+        if (err) {
-+            goto err_del_dev;
++static bool failover_replug_primary(VirtIONet *n, Error *err)
++{
++    HotplugHandler *hotplug_ctrl;
++
++    if (!n->primary_device_opts) {
++        n->primary_device_opts =3D qemu_opts_from_qdict(
++                qemu_find_opts("device"),
++                n->primary_device_dict, &err);
++    }
++    if (n->primary_device_opts) {
++        qdev_set_parent_bus(n->primary_dev, n->primary_bus);
++        n->primary_should_be_hidden =3D false;
++        qemu_opt_set_bool(n->primary_device_opts,
++                "partially_hotplugged", true, &err);
++        hotplug_ctrl =3D qdev_get_hotplug_handler(n->primary_dev);
++        if (hotplug_ctrl) {
++            hotplug_handler_pre_plug(hotplug_ctrl, n->primary_dev, &err)=
+;
++            hotplug_handler_plug(hotplug_ctrl, n->primary_dev, &err);
 +        }
-+        return NULL;
++        if (!n->primary_dev) {
++            error_setg(&err, "virtio_net: couldn't find primary device")=
+;
++        }
++    }
++    return err !=3D NULL;
++}
++
++static void virtio_net_handle_migration_primary(VirtIONet *n,
++                                                MigrationState *s)
++{
++    bool should_be_hidden;
++    Error *err =3D NULL;
++
++    should_be_hidden =3D atomic_read(&n->primary_should_be_hidden);
++
++    if (!n->primary_dev) {
++        error_report("virtio_net: couldn't find primary device");
++        return;
 +    }
 +
-     driver =3D qemu_opt_get(opts, "driver");
-     if (!driver) {
-         error_setg(errp, QERR_MISSING_PARAMETER, "driver");
-@@ -640,8 +673,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error *=
-*errp)
-=20
- err_del_dev:
-     error_propagate(errp, err);
--    object_unparent(OBJECT(dev));
--    object_unref(OBJECT(dev));
-+    if (dev) {
-+        object_unparent(OBJECT(dev));
-+        object_unref(OBJECT(dev));
++    if (migration_in_setup(s) && !should_be_hidden &&
++        n->primary_dev) {
++        if (failover_unplug_primary(n)) {
++            vmstate_unregister(n->primary_dev, qdev_get_vmsd(n->primary_=
+dev),
++                    n->primary_dev);
++            qapi_event_send_unplug_primary(n->primary_device_id);
++            atomic_set(&n->primary_should_be_hidden, true);
++        } else {
++            error_report("virtio_net: Couldn't unplug primary device");
++        }
++    } else if (migration_has_failed(s)) {
++        /* We already unplugged the device let's plugged it back */
++        if (!failover_replug_primary(n, err)) {
++            error_report_err(err);
++        }
 +    }
-     return NULL;
- }
-=20
-@@ -810,7 +845,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
-         return;
++}
++
++static void migration_state_notifier(Notifier *notifier, void *data)
++{
++    MigrationState *s =3D data;
++    VirtIONet *n =3D container_of(notifier, VirtIONet, migration_state);
++    virtio_net_handle_migration_primary(n, s);
++}
++
++static void virtio_net_primary_should_be_hidden(DeviceListener *listener=
+,
++            QemuOpts *device_opts, bool *match_found, bool *res)
++{
++    VirtIONet *n =3D container_of(listener, VirtIONet, primary_listener)=
+;
++
++    if (device_opts) {
++        n->primary_device_dict =3D qemu_opts_to_qdict(device_opts,
++                n->primary_device_dict);
++        n->primary_device_opts =3D device_opts;
++    }
++    g_free(n->standby_id);
++    n->standby_id =3D g_strdup(qdict_get_try_str(n->primary_device_dict,
++                             "standby"));
++    if (n->standby_id) {
++        *match_found =3D true;
++    }
++    /* primary_should_be_hidden is set during feature negotiation */
++    if (atomic_read(&n->primary_should_be_hidden) && *match_found) {
++        *res =3D true;
++    } else if (*match_found)  {
++        n->primary_device_dict =3D qemu_opts_to_qdict(device_opts,
++                n->primary_device_dict);
++        *res =3D false;
++    }
++    g_free(n->primary_device_id);
++    n->primary_device_id =3D g_strdup(device_opts->id);
++}
++
+ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
+@@ -2657,6 +2802,16 @@ static void virtio_net_device_realize(DeviceState =
+*dev, Error **errp)
+         n->host_features |=3D (1ULL << VIRTIO_NET_F_SPEED_DUPLEX);
      }
 =20
--    if (!migration_is_idle()) {
-+    if (!migration_is_idle() && !migration_in_setup(migrate_get_current(=
-))) {
-         error_setg(errp, "device_del not allowed while migrating");
-         return;
-     }
-diff --git a/vl.c b/vl.c
-index b426b32134..1848195da7 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2189,10 +2189,12 @@ static int device_init_func(void *opaque, QemuOpt=
-s *opts, Error **errp)
-     DeviceState *dev;
++    if (n->failover) {
++        n->primary_listener.should_be_hidden =3D
++            virtio_net_primary_should_be_hidden;
++        atomic_set(&n->primary_should_be_hidden, true);
++        device_listener_register(&n->primary_listener);
++        n->migration_state.notify =3D migration_state_notifier;
++        add_migration_state_change_notifier(&n->migration_state);
++        n->host_features |=3D (1ULL << VIRTIO_NET_F_STANDBY);
++    }
++
+     virtio_net_set_config_size(n, n->host_features);
+     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
 =20
-     dev =3D qdev_device_add(opts, errp);
--    if (!dev) {
-+    if (!dev && *errp) {
-+        error_report_err(*errp);
-         return -1;
-+    } else if (dev) {
-+        object_unref(OBJECT(dev));
-     }
--    object_unref(OBJECT(dev));
+@@ -2779,6 +2934,13 @@ static void virtio_net_device_unrealize(DeviceStat=
+e *dev, Error **errp)
+     g_free(n->mac_table.macs);
+     g_free(n->vlans);
+=20
++    if (n->failover) {
++        g_free(n->primary_device_id);
++        g_free(n->standby_id);
++        qobject_unref(n->primary_device_dict);
++        n->primary_device_dict =3D NULL;
++    }
++
+     max_queues =3D n->multiqueue ? n->max_queues : 1;
+     for (i =3D 0; i < max_queues; i++) {
+         virtio_net_del_queue(n, i);
+@@ -2816,6 +2978,21 @@ static int virtio_net_pre_save(void *opaque)
      return 0;
  }
 =20
++static bool primary_unplug_pending(void *opaque)
++{
++    VirtIONet *n =3D opaque;
++
++    return n ? n->primary_dev->pending_deleted_event : false;
++}
++
++static bool dev_unplug_pending(void *opaque)
++{
++    DeviceState *dev =3D opaque;
++    VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(dev);
++
++    return vdc->primary_unplug_pending(dev);
++}
++
+ static const VMStateDescription vmstate_virtio_net =3D {
+     .name =3D "virtio-net",
+     .minimum_version_id =3D VIRTIO_NET_VM_VERSION,
+@@ -2825,6 +3002,7 @@ static const VMStateDescription vmstate_virtio_net =
+=3D {
+         VMSTATE_END_OF_LIST()
+     },
+     .pre_save =3D virtio_net_pre_save,
++    .dev_unplug_pending =3D dev_unplug_pending,
+ };
+=20
+ static Property virtio_net_properties[] =3D {
+@@ -2886,6 +3064,7 @@ static Property virtio_net_properties[] =3D {
+                      true),
+     DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN)=
+,
+     DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
++    DEFINE_PROP_BOOL("failover", VirtIONet, failover, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+@@ -2910,6 +3089,7 @@ static void virtio_net_class_init(ObjectClass *klas=
+s, void *data)
+     vdc->guest_notifier_pending =3D virtio_net_guest_notifier_pending;
+     vdc->legacy_features |=3D (0x1 << VIRTIO_NET_F_GSO);
+     vdc->vmsd =3D &vmstate_virtio_net_device;
++    vdc->primary_unplug_pending =3D primary_unplug_pending;
+ }
+=20
+ static const TypeInfo virtio_net_info =3D {
+diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-ne=
+t.h
+index b96f0c643f..08392df2cd 100644
+--- a/include/hw/virtio/virtio-net.h
++++ b/include/hw/virtio/virtio-net.h
+@@ -18,6 +18,7 @@
+ #include "standard-headers/linux/virtio_net.h"
+ #include "hw/virtio/virtio.h"
+ #include "net/announce.h"
++#include "qemu/option_int.h"
+=20
+ #define TYPE_VIRTIO_NET "virtio-net-device"
+ #define VIRTIO_NET(obj) \
+@@ -43,6 +44,7 @@ typedef struct virtio_net_conf
+     int32_t speed;
+     char *duplex_str;
+     uint8_t duplex;
++    char *primary_id_str;
+ } virtio_net_conf;
+=20
+ /* Coalesced packets type & status */
+@@ -185,6 +187,17 @@ struct VirtIONet {
+     AnnounceTimer announce_timer;
+     bool needs_vnet_hdr_swap;
+     bool mtu_bypass_backend;
++    QemuOpts *primary_device_opts;
++    QDict *primary_device_dict;
++    DeviceState *primary_dev;
++    BusState *primary_bus;
++    char *primary_device_id;
++    char *standby_id;
++    bool primary_should_be_hidden;
++    bool failover;
++    DeviceListener primary_listener;
++    QEMUTimer *primary_device_timer;
++    Notifier migration_state;
+ };
+=20
+ void virtio_net_set_netclient_name(VirtIONet *n, const char *name,
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index b189788cb2..dcb3ee6916 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -159,6 +159,7 @@ typedef struct VirtioDeviceClass {
+     void (*save)(VirtIODevice *vdev, QEMUFile *f);
+     int (*load)(VirtIODevice *vdev, QEMUFile *f, int version_id);
+     const VMStateDescription *vmsd;
++    bool (*primary_unplug_pending)(void *opaque);
+ } VirtioDeviceClass;
+=20
+ void virtio_instance_init_common(Object *proxy_obj, void *data,
 --=20
 2.21.0
 
