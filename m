@@ -2,58 +2,61 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B10C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 12:27:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FE1C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 12:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A4B5216C8
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 12:27:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4B5216C8
+	by mail.kernel.org (Postfix) with ESMTPS id 2140B216C8
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 12:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2140B216C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htWeD-0006Fs-L1
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 08:27:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37546)
+	id 1htWeE-0006Io-Ea
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 08:27:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37588)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <drjones@redhat.com>) id 1htWdA-0004Gt-8n
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 08:25:57 -0400
+ (envelope-from <drjones@redhat.com>) id 1htWdE-0004Qk-1b
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 08:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1htWd9-0001et-1g
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 08:25:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58410)
+ (envelope-from <drjones@redhat.com>) id 1htWdC-0001iJ-UH
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 08:25:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44260)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <drjones@redhat.com>)
- id 1htWd6-0001co-EK; Fri, 02 Aug 2019 08:25:52 -0400
+ id 1htWdA-0001fF-BY; Fri, 02 Aug 2019 08:25:56 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E2309307D88D;
- Fri,  2 Aug 2019 12:25:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D5D330832EA;
+ Fri,  2 Aug 2019 12:25:55 +0000 (UTC)
 Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B3D455C205;
- Fri,  2 Aug 2019 12:25:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8CAFC5C205;
+ Fri,  2 Aug 2019 12:25:53 +0000 (UTC)
 From: Andrew Jones <drjones@redhat.com>
 To: qemu-devel@nongnu.org,
 	qemu-arm@nongnu.org
-Date: Fri,  2 Aug 2019 14:25:25 +0200
-Message-Id: <20190802122540.26385-1-drjones@redhat.com>
+Date: Fri,  2 Aug 2019 14:25:27 +0200
+Message-Id: <20190802122540.26385-3-drjones@redhat.com>
+In-Reply-To: <20190802122540.26385-1-drjones@redhat.com>
+References: <20190802122540.26385-1-drjones@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 02 Aug 2019 12:25:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Fri, 02 Aug 2019 12:25:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 00/15] target/arm/kvm: enable SVE in guests
+Subject: [Qemu-devel] [PATCH v3 02/15] target/arm/cpu: Ensure we can use the
+ pmu with kvm
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,87 +75,129 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since Linux kernel v5.2-rc1 KVM has support for enabling SVE in guests.
-This series provides the QEMU bits for that enablement. First, we
-select existing CPU properties representing features we want to
-advertise in addition to the SVE vector lengths and prepare
-them for a qmp query. Then we introduce the qmp query, applying
-it immediately to those selected features. We also document ARM CPU
-features at this time. We next add a qtest for the selected CPU
-features that uses the qmp query for its tests - and we continue to
-add tests as we add CPU features with the following patches. So then,
-once we have the support we need for CPU feature querying and testing,
-we add our first SVE CPU feature property, 'sve', which just allows
-SVE to be completely enabled/disabled. Following that feature property,
-we add all 16 vector length properties along with the input validation
-they need and tests to prove the validation works. At this point the
-SVE features are still only for TCG, so we provide some patches to
-prepare for KVM and then a patch that allows the 'max' CPU type to
-enable SVE with KVM, but at first without vector length properties.
-After a bit more preparation we add the SVE vector length properties
-to the KVM-enabled 'max' CPU type along with the additional input
-validation and tests that that needs.  Finally we allow the 'host'
-CPU type to also enjoy these properties by simply sharing them with it.
+We first convert the pmu property from a static property to one with
+its own accessors. Then we use the set accessor to check if the PMU is
+supported when using KVM. Indeed a 32-bit KVM host does not support
+the PMU, so this check will catch an attempt to use it at property-set
+time.
 
-v3:
-  - Added documentation (docs/arm-cpu-features.rst)
-  - Fixed TCG emulation of ZCR
-  - Fixed KVM put/get_sve registers to not forget to bswap FFR
-  - Now ensure we never end up with no vector lengths selected and sve=3D=
-on
-  - Now also auto-disable uninitialized larger vector lengths that are
-    no longer possible due to disabling a dependent smaller length
-  - Now only use cpu_isar_feature(aa64_sve, cpu) to track SVE enablement
-  - Now sve-max-vq can come wherever it wants in an sve* property sequenc=
-e
-  - No longer abuse sve_max_vq for additional states; instead use a coupl=
-e
-    new helper functions to determine the same states
-  - Changed some error messages
-  - Dropped some asserts
-  - Added more code comments
-  - Churned a good amount of code for refactoring and cleanups
-  - Picked up some tags from Eric and Richard
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ target/arm/cpu.c     | 30 +++++++++++++++++++++++++-----
+ target/arm/kvm.c     |  7 +++++++
+ target/arm/kvm_arm.h | 14 ++++++++++++++
+ 3 files changed, 46 insertions(+), 5 deletions(-)
 
-
-Thanks!
-drew
-
-Andrew Jones (15):
-  target/arm/cpu64: Ensure kvm really supports aarch64=3Doff
-  target/arm/cpu: Ensure we can use the pmu with kvm
-  target/arm/monitor: Introduce qmp_query_cpu_model_expansion
-  tests: arm: Introduce cpu feature tests
-  target/arm/helper: zcr: Add build bug next to value range assumption
-  target/arm/cpu: Use div-round-up to determine predicate register array
-    size
-  target/arm: Allow SVE to be disabled via a CPU property
-  target/arm/cpu64: max cpu: Introduce sve<vl-bits> properties
-  target/arm/kvm64: Fix error returns
-  target/arm/kvm64: Move the get/put of fpsimd registers out
-  target/arm/kvm64: Add kvm_arch_get/put_sve
-  target/arm/kvm64: max cpu: Enable SVE when available
-  target/arm/kvm: scratch vcpu: Preserve input kvm_vcpu_init features
-  target/arm/cpu64: max cpu: Support sve properties with KVM
-  target/arm/kvm: host cpu: Add support for sve<vl-bits> properties
-
- docs/arm-cpu-features.rst | 301 ++++++++++++++++++++++
- qapi/machine-target.json  |   6 +-
- target/arm/cpu.c          |  38 ++-
- target/arm/cpu.h          |  19 +-
- target/arm/cpu64.c        | 499 +++++++++++++++++++++++++++++++++--
- target/arm/helper.c       |  14 +-
- target/arm/kvm.c          |  32 ++-
- target/arm/kvm32.c        |   6 +-
- target/arm/kvm64.c        | 439 ++++++++++++++++++++++++++-----
- target/arm/kvm_arm.h      |  67 +++++
- target/arm/monitor.c      | 154 +++++++++++
- tests/Makefile.include    |   5 +-
- tests/arm-cpu-features.c  | 529 ++++++++++++++++++++++++++++++++++++++
- 13 files changed, 2005 insertions(+), 104 deletions(-)
- create mode 100644 docs/arm-cpu-features.rst
- create mode 100644 tests/arm-cpu-features.c
-
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9eb40ff755f9..8b86ce478fc0 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -986,10 +986,6 @@ static Property arm_cpu_has_el3_property =3D
+ static Property arm_cpu_cfgend_property =3D
+             DEFINE_PROP_BOOL("cfgend", ARMCPU, cfgend, false);
+=20
+-/* use property name "pmu" to match other archs and virt tools */
+-static Property arm_cpu_has_pmu_property =3D
+-            DEFINE_PROP_BOOL("pmu", ARMCPU, has_pmu, true);
+-
+ static Property arm_cpu_has_vfp_property =3D
+             DEFINE_PROP_BOOL("vfp", ARMCPU, has_vfp, true);
+=20
+@@ -1012,6 +1008,29 @@ static Property arm_cpu_pmsav7_dregion_property =3D
+                                            pmsav7_dregion,
+                                            qdev_prop_uint32, uint32_t);
+=20
++static bool arm_get_pmu(Object *obj, Error **errp)
++{
++    ARMCPU *cpu =3D ARM_CPU(obj);
++
++    return cpu->has_pmu;
++}
++
++static void arm_set_pmu(Object *obj, bool value, Error **errp)
++{
++    ARMCPU *cpu =3D ARM_CPU(obj);
++
++    if (value) {
++        if (kvm_enabled() && !kvm_arm_pmu_supported(CPU(cpu))) {
++            error_setg(errp, "'pmu' feature not supported by KVM on this=
+ host");
++            return;
++        }
++        set_feature(&cpu->env, ARM_FEATURE_PMU);
++    } else {
++        unset_feature(&cpu->env, ARM_FEATURE_PMU);
++    }
++    cpu->has_pmu =3D value;
++}
++
+ static void arm_get_init_svtor(Object *obj, Visitor *v, const char *name=
+,
+                                void *opaque, Error **errp)
+ {
+@@ -1086,7 +1105,8 @@ void arm_cpu_post_init(Object *obj)
+     }
+=20
+     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
+-        qdev_property_add_static(DEVICE(obj), &arm_cpu_has_pmu_property,
++        cpu->has_pmu =3D true;
++        object_property_add_bool(obj, "pmu", arm_get_pmu, arm_set_pmu,
+                                  &error_abort);
+     }
+=20
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index fe4f461d4ef6..bfe3d445e196 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -162,6 +162,13 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+     env->features =3D arm_host_cpu_features.features;
+ }
+=20
++bool kvm_arm_pmu_supported(CPUState *cpu)
++{
++    KVMState *s =3D KVM_STATE(current_machine->accelerator);
++
++    return kvm_check_extension(s, KVM_CAP_ARM_PMU_V3);
++}
++
+ int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+ {
+     KVMState *s =3D KVM_STATE(ms->accelerator);
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 98af1050a753..b3106c8600af 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -216,6 +216,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)=
+;
+  */
+ bool kvm_arm_aarch32_supported(CPUState *cs);
+=20
++/**
++ * bool kvm_arm_pmu_supported:
++ * @cs: CPUState
++ *
++ * Returns: true if the KVM VCPU can enable its PMU
++ * and false otherwise.
++ */
++bool kvm_arm_pmu_supported(CPUState *cs);
++
+ /**
+  * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
+  * IPA address space supported by KVM
+@@ -261,6 +270,11 @@ static inline bool kvm_arm_aarch32_supported(CPUStat=
+e *cs)
+     return false;
+ }
+=20
++static inline bool kvm_arm_pmu_supported(CPUState *cs)
++{
++    return false;
++}
++
+ static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+ {
+     return -ENOENT;
 --=20
 2.20.1
 
