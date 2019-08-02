@@ -2,66 +2,63 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DATE_IN_PAST_06_12,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E28EC32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA02C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:14:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED57C2087C
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:13:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED57C2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ABB812087C
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 13:14:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z5RDqFsh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABB812087C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htXN9-0004jT-7L
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 09:13:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47088)
+	id 1htXOE-0005is-2W
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 09:14:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47418)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1htXMi-00044n-Gc
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:13:01 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1htXNn-0005Dr-Vu
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:14:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1htXMh-0004Qv-Ab
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:13:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44530)
+ (envelope-from <dgibson@ozlabs.org>) id 1htXNm-0005ID-R8
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 09:14:07 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52567 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1htXMe-0004Lj-Mj; Fri, 02 Aug 2019 09:12:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 378A7300BC74;
- Fri,  2 Aug 2019 13:12:55 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-107.ams2.redhat.com
- [10.36.117.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B4985C220;
- Fri,  2 Aug 2019 13:12:48 +0000 (UTC)
-Date: Fri, 2 Aug 2019 15:12:47 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190802131247.GB6379@localhost.localdomain>
-References: <20190724094025.12442-1-vsementsov@virtuozzo.com>
- <1977e825-0a1f-e575-2ffa-0ea8c65531bb@redhat.com>
- <7a7c668b-eac0-eadd-7065-689c5eae6ce0@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1htXNl-0005BB-LV; Fri, 02 Aug 2019 09:14:06 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 460SKZ0GJJz9sML; Fri,  2 Aug 2019 23:13:53 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1564751634;
+ bh=frtsMBVGFEousdhK5AxCi0PK1N5daALpasNxCizDqmg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Z5RDqFshOITjYhIq9Pd5l05xLC8AlipkQBa4a0RD5XDCqhfLiqTjSyie54cAP/kNS
+ AriVr5YTrDZQgsZFPp2lz9AVFjj0Ghiyn84Wn4+iBS/+ocsWHncsIPaH/gNNKN+FhK
+ im08Mo1HFqn8N+cFaZ59GSV9SPFXZkDUdZo9dpn4=
+Date: Fri, 2 Aug 2019 16:55:38 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190802065538.GA2031@umbus.fritz.box>
+References: <20190801075258.19070-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="3V7upXqbjpZ4EhLz"
 Content-Disposition: inline
-In-Reply-To: <7a7c668b-eac0-eadd-7065-689c5eae6ce0@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 02 Aug 2019 13:12:55 +0000 (UTC)
+In-Reply-To: <20190801075258.19070-1-tao3.xu@intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] blockjob: drain all job nodes in
- block_job_drain
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [RFC PATCH] numa: add auto_enable_numa to fix
+ broken check in spapr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,142 +70,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: imammedo@redhat.com, qemu-ppc@nongnu.org, ehabkost@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---BOKacYhQ+x31HxR3
-Content-Type: text/plain; charset=utf-8
+--3V7upXqbjpZ4EhLz
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Am 01.08.2019 um 21:44 hat Max Reitz geschrieben:
-> On 30.07.19 21:11, John Snow wrote:
-> >=20
-> >=20
-> > On 7/24/19 5:40 AM, Vladimir Sementsov-Ogievskiy wrote:
-> >> Instead of draining additional nodes in each job code, let's do it in
-> >> common block_job_drain, draining just all job's children.
-> >> BlockJobDriver.drain becomes unused, so, drop it at all.
-> >>
-> >> It's also a first step to finally get rid of blockjob->blk.
-> >>
-> >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >> ---
-> >>
-> >> v3: just resend, as I've some auto returned mails and not sure that
-> >>     v2 reached recipients.
-> >>
-> >> v2: apply Max's suggestions:
-> >>  - drop BlockJobDriver.drain
-> >>  - do firtly loop of bdrv_drained_begin and then separate loop
-> >>    of bdrv_drained_end.
-> >>
-> >>    Hmm, a question here: should I call bdrv_drained_end in reverse
-> >>    order? Or it's OK as is?
-> >>
-> >=20
-> > I think it should be OK. These nodes don't necessarily have a well
-> > defined relationship between each other, do they?
+On Thu, Aug 01, 2019 at 03:52:58PM +0800, Tao Xu wrote:
+> Introduce MachineClass::auto_enable_numa for one implicit NUMA node,
+> and enable it to fix broken check in spapr_validate_node_memory(), when
+> spapr_populate_memory() creates a implicit node and info then use
+> nb_numa_nodes which is 0.
 >=20
-> It=E2=80=99s OK.  If they do have a relationship, the drain code sorts it=
- out by
-> itself anyway.
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+
+The change here looks fine so,
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+However, I'm not following what check in spapr is broken and why.
+
+> ---
 >=20
-> [...]
+> This patch has a dependency on
+> https://patchwork.kernel.org/cover/11063235/
+> ---
+>  hw/core/numa.c      | 9 +++++++--
+>  hw/ppc/spapr.c      | 9 +--------
+>  include/hw/boards.h | 1 +
+>  3 files changed, 9 insertions(+), 10 deletions(-)
 >=20
-> > Seems much nicer to me. What becomes of the ref/unref pairs?
-> >=20
-> > I guess not needed anymore?, since job cleanup necessarily happens in
-> > the main loop context now and we don't have a backup_complete function
-> > anymore ...?
-> >=20
-> > In the cases where auto_finalize=3Dtrue, do we have any guarantee that =
-the
-> > completion callbacks cannot be scheduled while we are here?
->=20
-> Let me try to figure this out...
->=20
-> The only caller of block_job_drain() is job_drain(), whose only caller
-> is job_finish_sync() in an AIO_WAIT_WHILE() loop.  That loop can only
-> work in the main loop, so I suppose it does run in the main loop (and
-> consequentially, block_job_drain() runs in the main loop, too).
->=20
-> That AIO_WAIT_WHILE() loop drains the job (so all nodes) and waits until
-> the job has completed.  To me that looks like it is designed to have the
-> completion callback run at some point...?
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index 75db35ac19..756d243d3f 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -580,9 +580,14 @@ void numa_complete_configuration(MachineState *ms)
+>       *   guest tries to use it with that drivers.
+>       *
+>       * Enable NUMA implicitly by adding a new NUMA node automatically.
+> +     *
+> +     * Or if MachineClass::auto_enable_numa is true and no NUMA nodes,
+> +     * assume there is just one node with whole RAM.
+>       */
+> -    if (ms->ram_slots > 0 && ms->numa_state->num_nodes =3D=3D 0 &&
+> -        mc->auto_enable_numa_with_memhp) {
+> +    if (ms->numa_state->num_nodes =3D=3D 0 &&
+> +        ((ms->ram_slots > 0 &&
+> +        mc->auto_enable_numa_with_memhp) ||
+> +        mc->auto_enable_numa)) {
+>              NumaNodeOptions node =3D { };
+>              parse_numa_node(ms, &node, &error_abort);
+>      }
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f607ca567b..e50343f326 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -400,14 +400,6 @@ static int spapr_populate_memory(SpaprMachineState *=
+spapr, void *fdt)
+>      hwaddr mem_start, node_size;
+>      int i, nb_nodes =3D machine->numa_state->num_nodes;
+>      NodeInfo *nodes =3D machine->numa_state->nodes;
+> -    NodeInfo ramnode;
+> -
+> -    /* No NUMA nodes, assume there is just one node with whole RAM */
+> -    if (!nb_nodes) {
+> -        nb_nodes =3D 1;
+> -        ramnode.node_mem =3D machine->ram_size;
+> -        nodes =3D &ramnode;
+> -    }
+> =20
+>      for (i =3D 0, mem_start =3D 0; i < nb_nodes; ++i) {
+>          if (!nodes[i].node_mem) {
+> @@ -4369,6 +4361,7 @@ static void spapr_machine_class_init(ObjectClass *o=
+c, void *data)
+>       */
+>      mc->numa_mem_align_shift =3D 28;
+>      mc->numa_mem_supported =3D true;
+> +    mc->auto_enable_numa =3D true;
+> =20
+>      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 2eb9a0b4e0..4a350b87d2 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -220,6 +220,7 @@ struct MachineClass {
+>      bool smbus_no_migration_support;
+>      bool nvdimm_supported;
+>      bool numa_mem_supported;
+> +    bool auto_enable_numa;
+> =20
+>      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                             DeviceState *dev);
 
-Yes, definitely.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-However, I wonder why we do this blk_drain(). We are not really
-interested in stopping all requests to the nodes involves in the job, we
-just want to get the job to make progress so that it will eventually
-complete. Draining looks like the entirely wrong tool to me.
-
-This was introduced in commit bae8196d9f9, and it looks to me as if it
-was a hack because drain could work cross-AioContext and everything else
-couldn't.
-
-Today we use AIO_WAIT_WHILE() in job_finish_sync(), so I wonder if maybe
-the whole drain part is unnecessary now and just doing the job_enter()
-part would be enough.
-
-> I suppose anything like that is scheduled by job_enter() in job_drain(),
-> namely the aio_co_enter() in there.
->=20
-> (A) If the job runs in the main AioContext, aio_co_enter() will enter
-> the coroutine if we do not run in a coroutine right now (safe), or it
-> will schedule it for a later point if we do run in a coroutine.  That
-> latter part may be unsafe, because I guess some coroutine work in
-> bdrv_drained_begin() or bdrv_drained_end() may wake it up, which can
-> then mess everything up.
-
-It should be fine, actually. The drain functions drop out of coroutine
-context to avoid such problems. So if it gets woken up, it's before the
-actual drain has started.
-
-> (B) If the job runs in another context, aio_co_enter() will schedule the
-> job immediately, which I guess means that it can run at any point?  So
-> it could complete at any point, including block_job_drain().  Ah, no,
-> actually.  AIO_WAIT_WHILE() will have the job=E2=80=99s context acquired =
-while
-> evaluating the condition (that is, when calling block_job_drain()).  So
-> this is safe.
->=20
->=20
-> So, well.  Unless Vladimir can give you a guarantee why e.g.
-> block_job_remove_all_bdrv() won=E2=80=99t run during e.g. bdrv_drained_be=
-gin(),
-> I suppose you=E2=80=99re right and the node list needs to be copied at the
-> beginning of this function and all nodes should be ref=E2=80=99d.
-
-At some point, it will probably run, in the polling phase of
-bdrv_drained_begin().
-
-Kevin
-
---BOKacYhQ+x31HxR3
+--3V7upXqbjpZ4EhLz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJdRDbPAAoJEH8JsnLIjy/WBm0P/RDsxVZjnIjQ9fVI2rdb6Xna
-sJs2CM8049nqkdD3y6E9ddAOU8hJx6dkuSo08geYWME4dr3CTYWzZ+h2WYntI5+p
-Bt765yiJyfEUK+G+7k04FwBaGp5mkbFw7ZaG7IvPkxubPfKgAtNQtqwLo0yXgSen
-a+O8rfDU3TC2UzvtLF6V/fqlvelpxkBFgb/HDP6D+EJvTnB9a/0L9SWCqX/oj7nS
-scpxna6MzhLk2Z5lEgeZfsGBcGos4hIj+JohbjR5l82TXMAkjEyy95MF8KmwZzzL
-M1a70c9h9MdObLdtM/Sm8b9ZFxGaok1/DP/HcC0QEorYxtbykjlrGy5SAfsq0Woa
-dlbxNDKcEMSYeCKvzJY694kttyKlJbGVEBZUXDcRrcgS61jigqVrqvxR4wZIYPiQ
-umdOEl2LlMs53xzULTHDiV7fRsh9AfaYfNPD+YyRhannF2kDk+oDsPNQVLdGsuqx
-6mXRmNsPKhjjbixdGLKwj0w6g8vC5fi8THhFsPIisbTvhunsB9Vb3jETloFvx+a2
-VoZ+jaoCJY604l8PnEKsCrNDRvdaozX26Zi1huffb7odUDghVAWiZjb3DdLDhN92
-a2GGrD/AtDSV5Z5Gbd20zZJXiwNTZnmhrV4XJM5OMa9KTKuKv50fwhtyz1slFdA3
-ckVZHeNHJQ2HBGwHLLeE
-=lBGl
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1D3mgACgkQbDjKyiDZ
+s5IIwQ//cEMnHyxmeEJ1+B1+SaOQYM/M9XfFX3Nn72u9/jLKvr8sgjhQU62nr/6N
+peaG4gbQGUZHw+Hhwa18vwP1bBzK0Q3CGnuhCj+J5kDk8fS66UzoelZdo3QU9zxG
+sTKj7tEodUVSMgwxVX9Dnw+pfAPz1BjDmPO4YHSLWhGIpneK5pYBPObZNgeH9XuG
+/JA4ZIXPPiwTDgXWetZ0ItAEKD098Mcc/pn+RhrYVfpyaOez33SKdUkL1LoBiH2M
+NPgRFSpKvdcOiHub5OYzF7u1cJDpxihhqWnAX/Z22Piz4Kvt7pychcjLtoPzL3+r
+qxV9pnxAQKHFsyuyivvEVf7YU8MSNBshn1C5WPvMOBtbeT8G7TgcqVGcBMuXBj/C
+ic/0lgFB2FrjbVvD9A7bxHCTZOjb/wvRqU4ZxzglblDATaGvA8nhyl9C+loiSR1D
+s5qY+DxZMfxJ37XOAsABfXppqNCcIcaxLi9mZxAftUXLDYJFPlwQmin4RwJOJ3i5
+hwwq0Qoq1LaAPR1+vk1LXbRqXm5tkgKdY1iwRzAWA5jTqTOstnPT6WJZ3XqPuc4C
+7MFsdbXHt4vnocNojzpOdWV6kfc5fk4DdvjMGcj4AkdwD0OCwcZM8441j7GSdriT
+YFcR3sRtG1+C5jKu3Dym9TfqddPBj1GNkwqWHUwpd1QHSZYx7Qw=
+=Y1Wl
 -----END PGP SIGNATURE-----
 
---BOKacYhQ+x31HxR3--
+--3V7upXqbjpZ4EhLz--
 
