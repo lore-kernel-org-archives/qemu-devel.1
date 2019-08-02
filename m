@@ -6,62 +6,76 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC20C32750
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B54C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 596AB20679
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:43:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 596AB20679
+	by mail.kernel.org (Postfix) with ESMTPS id 6E12C2173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 15:59:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E12C2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htZig-0004LB-1c
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:43:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55154)
+	id 1htZxZ-0008Uk-MI
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 11:59:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58609)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1htZi0-0003Yj-5c
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:43:09 -0400
+ (envelope-from <philmd@redhat.com>) id 1htZx3-00084V-19
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1htZhy-0003ij-NH
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:43:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58794)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1htZhv-0003gN-O6; Fri, 02 Aug 2019 11:43:03 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 37048307D934;
- Fri,  2 Aug 2019 15:43:02 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-107.ams2.redhat.com
- [10.36.117.107])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C895C600D1;
- Fri,  2 Aug 2019 15:42:57 +0000 (UTC)
-Date: Fri, 2 Aug 2019 17:42:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190802154256.GE6379@localhost.localdomain>
-References: <20190725091900.30542-1-vsementsov@virtuozzo.com>
- <20190725091900.30542-2-vsementsov@virtuozzo.com>
- <2a105159-ab90-8f7c-bba9-4cec27e6144c@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1htZx1-0005FA-PD
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:58:40 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:42825)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1htZx1-0005Dl-Hf
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 11:58:39 -0400
+Received: by mail-ed1-f65.google.com with SMTP id v15so72827852eds.9
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 08:58:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mdVaBBfegqRBWuGVv3fcrgrnieb0rN41um/u33kyB1g=;
+ b=UGSKvrWMoxbCPkRNWlab2C/ar5Uo21ynWv3eVj6k1+TT5TPpmVmFqIkuUNGdILl47k
+ HQVOcMtd4vz5GK2zydppmlQfMoAbaFgrReePgaYu8wofxjOsloun55JllHbGCJh/+Y7W
+ X3XGThyVYC7RlF3UCFfb13LDEgZPrK8z/L+RVdCguYAwljv6uOLfoSwCRWLc7GeFFa8b
+ c2uOieQflb6mEeiL8IbonM4Aw5APkUjFk3b/qKEDwi4/+BAgWYjiddLF7ZZc2silxjWx
+ WmwCsZIxaz07aAK3BD993qF/WMSWEZ0maAOqoGbb8/+lndHZ8rbD8amF9woJ3DWMBr0A
+ DVpw==
+X-Gm-Message-State: APjAAAXBF9RNlYxSbV/aovQFQW1kFPUwxoup47m5fvr9GRjSMWZkj3bL
+ oU77QbFdn5dFg8cqbCN/k+5HCQ==
+X-Google-Smtp-Source: APXvYqzwG4xOTKpL93bW/jg4rsrw2IMNoHvA6PZ/wuNanQGTR8M3KF1E/wEwH/omCG7GbgYRnozrcg==
+X-Received: by 2002:a17:906:470a:: with SMTP id
+ y10mr90476915ejq.115.1564761518487; 
+ Fri, 02 Aug 2019 08:58:38 -0700 (PDT)
+Received: from [10.0.0.124] ([185.102.219.36])
+ by smtp.gmail.com with ESMTPSA id x11sm13404955eju.26.2019.08.02.08.58.36
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 02 Aug 2019 08:58:37 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
+References: <1564760158-27536-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1564760158-27536-2-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <f71dae2e-52ce-5ad8-fe1d-1433788b5d11@redhat.com>
+Date: Fri, 2 Aug 2019 17:58:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="PuGuTyElPB9bOcsM"
-Content-Disposition: inline
-In-Reply-To: <2a105159-ab90-8f7c-bba9-4cec27e6144c@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 02 Aug 2019 15:43:02 +0000 (UTC)
+In-Reply-To: <1564760158-27536-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/9] block: add
- .bdrv_need_rw_file_child_during_reopen_rw handler
+ [fuzzy]
+X-Received-From: 209.85.208.65
+Subject: Re: [Qemu-devel] [PATCH 1/2] tests/acceptance: Refactor and improve
+ reporting in linux_ssh_mips_malta.py
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,205 +87,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, den@openvz.org, jsnow@redhat.com
+Cc: cohuck@redhat.com, ehabkost@redhat.com, crosa@redhat.com, f4bug@amsat.org,
+ amarkovic@wavecomp.com, ccarrara@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 8/2/19 5:35 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+> 
+> This patch restructures code organization around the test case
+> executions. At the same time, rather than outputing a cryptic message:
+> 
+> FAIL: True not found in [False],
+> 
+> the following will be reported too, if the command output does not meet
+> specified expectations:
+> 
+> 'lspci -d 11ab:4620' output doesn't contain the word 'GT-64120'
+> 
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  tests/acceptance/linux_ssh_mips_malta.py | 36 +++++++++++++++++++-------------
+>  1 file changed, 21 insertions(+), 15 deletions(-)
+> 
+> diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
+> index aafb0c3..8368e1f 100644
+> --- a/tests/acceptance/linux_ssh_mips_malta.py
+> +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> @@ -145,27 +145,33 @@ class LinuxSSH(Test):
+>          self.ssh_disconnect_vm()
+>          self.wait_for_console_pattern('Power down')
+>  
+> -    def run_common_commands(self):
+> -        stdout, stderr = self.ssh_command('lspci -d 11ab:4620')
+> -        self.assertIn(True, ["GT-64120" in line for line in stdout])
+> -
+> -        stdout, stderr = self.ssh_command('cat /sys/bus/i2c/devices/i2c-0/name')
+> -        self.assertIn(True, ["SMBus PIIX4 adapter" in line
+> -                             for line in stdout])
+> -
+> -        stdout, stderr = self.ssh_command('cat /proc/mtd')
+> -        self.assertIn(True, ["YAMON" in line
+> -                             for line in stdout])
+> +    def ssh_command_output_contains(self, cmd, exp):
+> +        stdout, _ = self.ssh_command(cmd)
+> +        for line in stdout:
+> +            if exp in line:
+> +                break
+> +        else:
+> +            self.fail('"%s" output does not contain "%s"' % (cmd, exp))
 
---PuGuTyElPB9bOcsM
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Or easier using 'return':
 
-Am 31.07.2019 um 14:09 hat Max Reitz geschrieben:
-> On 25.07.19 11:18, Vladimir Sementsov-Ogievskiy wrote:
-> > On reopen to rw parent may need rw access to child in .prepare, for
-> > example qcow2 needs to write IN_USE flags into stored bitmaps
-> > (currently it is done in a hacky way after commit and don't work).
-> > So, let's introduce such logic.
-> >=20
-> > The drawback is that in worst case bdrv_reopen_set_read_only may finish
-> > with error and in some intermediate state: some nodes reopened RW and
-> > some are not. But this is a way to fix bug around reopening qcow2
-> > bitmaps in the following commits.
->=20
-> This commit message doesn=E2=80=99t really explain what this patch does.
->=20
-> > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> > ---
-> >  include/block/block_int.h |   2 +
-> >  block.c                   | 144 ++++++++++++++++++++++++++++++++++----
-> >  2 files changed, 133 insertions(+), 13 deletions(-)
-> >=20
-> > diff --git a/include/block/block_int.h b/include/block/block_int.h
-> > index 3aa1e832a8..7bd6fd68dd 100644
-> > --- a/include/block/block_int.h
-> > +++ b/include/block/block_int.h
-> > @@ -531,6 +531,8 @@ struct BlockDriver {
-> >                               uint64_t parent_perm, uint64_t parent_sha=
-red,
-> >                               uint64_t *nperm, uint64_t *nshared);
-> > =20
-> > +     bool (*bdrv_need_rw_file_child_during_reopen_rw)(BlockDriverState=
- *bs);
-> > +
-> >      /**
-> >       * Bitmaps should be marked as 'IN_USE' in the image on reopening =
-image
-> >       * as rw. This handler should realize it. It also should unset rea=
-donly
-> > diff --git a/block.c b/block.c
-> > index cbd8da5f3b..3c8e1c59b4 100644
-> > --- a/block.c
-> > +++ b/block.c
-> > @@ -1715,10 +1715,12 @@ static void bdrv_get_cumulative_perm(BlockDrive=
-rState *bs, uint64_t *perm,
-> >                                       uint64_t *shared_perm);
-> > =20
-> >  typedef struct BlockReopenQueueEntry {
-> > -     bool prepared;
-> > -     bool perms_checked;
-> > -     BDRVReopenState state;
-> > -     QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
-> > +    bool reopened_file_child_rw;
-> > +    bool changed_file_child_perm_rw;
-> > +    bool prepared;
-> > +    bool perms_checked;
-> > +    BDRVReopenState state;
-> > +    QSIMPLEQ_ENTRY(BlockReopenQueueEntry) entry;
-> >  } BlockReopenQueueEntry;
-> > =20
-> >  /*
-> > @@ -3421,6 +3423,105 @@ BlockReopenQueue *bdrv_reopen_queue(BlockReopen=
-Queue *bs_queue,
-> >                                     keep_old_opts);
-> >  }
-> > =20
-> > +static int bdrv_reopen_set_read_only_drained(BlockDriverState *bs,
-> > +                                             bool read_only,
-> > +                                             Error **errp)
-> > +{
-> > +    BlockReopenQueue *queue;
-> > +    QDict *opts =3D qdict_new();
-> > +
-> > +    qdict_put_bool(opts, BDRV_OPT_READ_ONLY, read_only);
-> > +
-> > +    queue =3D bdrv_reopen_queue(NULL, bs, opts, true);
-> > +
-> > +    return bdrv_reopen_multiple(queue, errp);
-> > +}
-> > +
-> > +/*
-> > + * handle_recursive_reopens
-> > + *
-> > + * On fail it needs rollback_recursive_reopens to be called.
->=20
-> It would be nice if this description actually said anything about what
-> the function is supposed to do.
->=20
-> > + */
-> > +static int handle_recursive_reopens(BlockReopenQueueEntry *current,
-> > +                                    Error **errp)
-> > +{
-> > +    int ret;
-> > +    BlockDriverState *bs =3D current->state.bs;
-> > +
-> > +    /*
-> > +     * We use the fact that in reopen-queue children are always follow=
-ing
-> > +     * parents.
-> > +     * TODO: Switch BlockReopenQueue to be QTAILQ and use
-> > +     *       QTAILQ_FOREACH_REVERSE.
->=20
-> Why don=E2=80=99t you do that first?  It would make the code more obvious=
- at
-> least to me.
->=20
-> > +     */
-> > +    if (QSIMPLEQ_NEXT(current, entry)) {
-> > +        ret =3D handle_recursive_reopens(QSIMPLEQ_NEXT(current, entry)=
-, errp);
-> > +        if (ret < 0) {
-> > +            return ret;
-> > +        }
-> > +    }
-> > +
-> > +    if ((current->state.flags & BDRV_O_RDWR) && bs->file && bs->drv &&
-> > +        bs->drv->bdrv_need_rw_file_child_during_reopen_rw &&
-> > +        bs->drv->bdrv_need_rw_file_child_during_reopen_rw(bs))
-> > +    {
-> > +        if (!bdrv_is_writable(bs->file->bs)) {
-> > +            ret =3D bdrv_reopen_set_read_only_drained(bs->file->bs, fa=
-lse, errp);
->=20
-> Hm.  Sorry, I find this all a bit hard to understand.  (No comments and
-> all.)
->=20
-> I understand that this is for an RO -> RW transition?  Everything is
-> still RO, but the parent will need an RW child before it transitions to
-> RW itself.
->=20
->=20
-> I=E2=80=99m going to be honest up front, I don=E2=80=99t like this very m=
-uch.  But I
-> think it may be a reasonable solution for now.
->=20
-> As I remember, the problem was that when reopening a qcow2 node from RO
-> to RW, we need to write something in .prepare() (because it can fail),
-> but naturally no .prepare() is called after any .commit(), so no matter
-> the order of nodes in the ReopenQueue, the child node will never be RW
-> by this point.
->=20
-> Hm.  To me that mostly means that making the whole reopen process a
-> transaction was just a dream that turns out not to work.
+     def ssh_command_output_contains(self, cmd, exp):
+        stdout, _ = self.ssh_command(cmd)
+        for line in stdout:
+            if exp in line:
+                return
+        self.fail('"%s" output does not contain "%s"' % (cmd, exp))
 
-This patch already looks somewhat complicated to me, and what you're
-proposing below sounds another order of magnitude more complex.
+Regardless, thanks for the cleanup!
 
-But I think the important point is your last sentence above. Once we
-acknowledge that we can't possibly maintain full transaction semantics,
-I'll ask this naive question: What prevents us from just keeping the
-additional write in .commit?
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-It is expected to work in the common case, so we're only talking about
-the behaviour in error cases anyway. If something fails and we can't do
-things in a transactionable way, we need to decide what the surprise
-result will look like, because we can neither guarantee a rollback nor
-successful completion.
-
-If the write fails unexpectedly, and we end up with a qcow2 image that
-is opened r/w, but has read-only bitmaps - wouldn't that be a reasonable
-result? It seems much easier to explain than some dependency subchain
-already being committed and the rest rolled back.
-
-So, I guess my question is, what is the specifc scenario you're trying
-to fix with this series (why isn't the final patch a test case that
-would answer this question?), and are we sure that the cure isn't worse
-than the disease?
-
-Kevin
-
---PuGuTyElPB9bOcsM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdRFoAAAoJEH8JsnLIjy/WI8oQAK9+eLe5fcme0skj0WqjQuTf
-RhnIFF77ypC1Ik7qk09SCNDmcgR6PYoijsvGswJLjQcQPNgZgfUngUgXaJ4N5TFr
-waDzaDGDHaqX6bmG36t7nzPeEiwIg1wh2w+SOb6XuhVbTmIrynnjSsgXj3SiyJBb
-MUxw7FIe6U8tD0epY9M69T1FVkTN+PvO9D077w0p6amP/74874JPpC2ig/atLwzr
-1LC8HwVIYuCurygETvy4HKb2x9aYHB6bJ/0Y6dxaB96DBKM2Wtj9nWhlkXazVXr3
-uZXa4GUSDHjhBXCqoIcLE5I7R8BJSkfFIsG8qltpmEkHnb5E3VDhtXneT+nQ2GRE
-ab6FHIlPPXlpKCyiOUzDM2Ac3U13hKsu2qkpuNtcE7AKWOFLoA7mSWAXj7eezaNe
-q1AXiFtSF025FkzEPp84ELiXvweBEIA6U0eK6NqgrqO4NMtBjRTXmdlZnWiO1ETW
-xnTqFL6oxgNwVRhOfKOdfBOCgqCZJqmW9DGWZiQFtrkGdZjjY5Cx6ASe0ddj5uT0
-NpI6vGKllsFKhlEQr7pF6Ju7uSOa5CZ98NFML3uWJYhQiJEpKudiciptPQlZwXj+
-Ygsqt0NT2uc/XnQOfJUGGMJfBj5gbZcGe0Nxu3+YEzfxisXuUz7MfeaXjCqghAyM
-3p3yQIwB8csqapBrF921
-=knYR
------END PGP SIGNATURE-----
-
---PuGuTyElPB9bOcsM--
+>  
+> +    def run_common_commands(self):
+> +        self.ssh_command_output_contains(
+> +            'lspci -d 11ab:4620',
+> +            'GT-64120')
+> +        self.ssh_command_output_contains(
+> +            'cat /sys/bus/i2c/devices/i2c-0/name',
+> +            'SMBus PIIX4 adapter')
+> +        self.ssh_command_output_contains(
+> +            'cat /proc/mtd',
+> +            'YAMON')
+>          # Empty 'Board Config'
+> -        stdout, stderr = self.ssh_command('md5sum /dev/mtd2ro')
+> -        self.assertIn(True, ["0dfbe8aa4c20b52e1b8bf3cb6cbdf193" in line
+> -                             for line in stdout])
+> +        self.ssh_command_output_contains(
+> +            'md5sum /dev/mtd2ro',
+> +            '0dfbe8aa4c20b52e1b8bf3cb6cbdf193')
+>  
+>      def do_test_mips_malta(self, endianess, kernel_path, uname_m):
+>          self.boot_debian_wheezy_image_and_ssh_login(endianess, kernel_path)
+>  
+> -        stdout, stderr = self.ssh_command('uname -a')
+> +        stdout, _ = self.ssh_command('uname -a')
+>          self.assertIn(True, [uname_m + " GNU/Linux" in line for line in stdout])
+>  
+>          self.run_common_commands()
+> 
 
