@@ -2,93 +2,82 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15FA2C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE59C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:39:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D14E52087E
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:36:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 240DD2087E
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 16:39:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a2DtwsCJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D14E52087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k1e5doCM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 240DD2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htaXS-0008G1-6j
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 12:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39182)
+	id 1htaaP-000183-FH
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 12:39:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39800)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htaX3-0007hg-VI
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:35:54 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1htaZm-0000YR-Os
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:38:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htaX3-0008Oi-00
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:35:53 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45115)
+ (envelope-from <peter.maydell@linaro.org>) id 1htaZl-00011s-Qi
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:38:42 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46802)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htaX2-0008OQ-Oc
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:35:52 -0400
-Received: by mail-pf1-x441.google.com with SMTP id r1so36294022pfq.12
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 09:35:52 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1htaZl-00011g-Kq
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 12:38:41 -0400
+Received: by mail-ot1-x344.google.com with SMTP id z23so50404638ote.13
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 09:38:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ofHR5x+bnfIPl+rlR7IwCOhCOElxnwlX0H9IAE/w9mc=;
- b=a2DtwsCJJwkt7EWoz+CCYzpQ9lutYz3w1dyDa04Td3mu/m9GHzswyj/a9jLuXlwJ99
- XTLkx/BOpiRSO2nr7wp5iTI4PHkRHZQFM4+cYWkvw1NXdprMhti7nNKI/KdBEj15Vu5b
- LoIOwnbc1lySiOjIXHObrtZL7drd5wX1WSGhP7h8O4MHziWdnyv5WABIyoz3t1Qorufj
- azFrK1dp34JMhvoGOpzrejcv8aUomGOIEPIza1CY+I6woRm80ES7EUd3ynulZCyYQYmq
- fvDiyf4l3grVvi0HBif2hN/ZW8wtmzl57XUH51CA5Ef+KcMxjgxm+9YbK+TVUghIQ+Mq
- a+gQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xFI2+7XPTOv3b7japO9eQFMtUcdolV/Yk2OxnwsKfZk=;
+ b=k1e5doCMkVCCaFON4eNc9BukwQMWmq00YRXBVHoQl7u3Eo0CeK7lv9ZKCXV1lbyWKN
+ JtrB044h1FD3AdBxGmyyWlY1O5UQLv44oHPv1qR2pGZ7IzcBoShSgKnXnKLvuQcPJKXX
+ uJVzqfr5SDRkFB7FjAeWo+QNXF+G23LRJk+OHeGuKHVJ30LC6vEv+7kOd4tGDjnA9IV7
+ NtxC6rBQkDr2nA+b9BVrxlW9PBb66q4oANKz17Cud6nW3MpM2p/pW6FQxiClWP24QK/N
+ Q+YOZq+ee4d8fTebwhMfGbkUpBhLvBTPFrd8i8qfw+tUYCUAAD2W496Wl9zlgBNBLTyQ
+ xXkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ofHR5x+bnfIPl+rlR7IwCOhCOElxnwlX0H9IAE/w9mc=;
- b=ch+bCW2guX+M77t53uh651AGnYJ8e2Volfc2advGCdkSPGDSdlO+5uJkjKvLCnPZtp
- 6iXBHDkBptJG6xIEfLXhzMMZY8sD/w/CWt+yJearXGA2ToRCWnqQXm21mkm0PozrtoqJ
- PtEb8+wm2bQP/+JQKzdsDrndAIAJnWUAT/T1fn5d97Ro4hIPAFhbpbNqe+dAWoeMU5m5
- 9S62+/ejx/jolns+zarIimJNJL20xRny/KHD2gIR323CGqOzH/0RfzcC3rdAJDRHhRD8
- QQYqKVmHEfRkkNXTTdPRR7A6uXdaML1EpFxA3G7R+KzNfuvuJakWpNFv2Ky6D0U4xyM+
- ieBA==
-X-Gm-Message-State: APjAAAUeYQF9V+alIENCUR6/Fz1pKJOOJqCYgt5+PirUhCzz8rVzHlps
- CZxi72HqSK54VHsbDUHHxhnqlQ==
-X-Google-Smtp-Source: APXvYqzuP9aZLLdkCqSTmUzvqjZUlPQNljTGZqcRITtOxAkTUXAFEZvyteTuVwhPNNSd9k0v1rEM0w==
-X-Received: by 2002:a62:1c93:: with SMTP id c141mr62500792pfc.9.1564763751885; 
- Fri, 02 Aug 2019 09:35:51 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t7sm7023610pjq.15.2019.08.02.09.35.50
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 02 Aug 2019 09:35:51 -0700 (PDT)
-To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-References: <20190802122540.26385-1-drjones@redhat.com>
- <20190802122540.26385-8-drjones@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <045c61e9-ab5d-a068-dd54-441a6f864ea7@linaro.org>
-Date: Fri, 2 Aug 2019 09:35:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xFI2+7XPTOv3b7japO9eQFMtUcdolV/Yk2OxnwsKfZk=;
+ b=tdWW61ttZrxx1/HR/0Glc8fIcm2q7kZ3beHm2+HyPCO1d4L5H8AdIcUvKiXDkm+B4y
+ PGoHCHJ3VLdr4O8JpgiG9c1UE5p3n8w/MsaGGzd8N+8wph+XjTSnoHslbgemlceVPzSm
+ XWIf2QGbmQZUC7BboCsEZ0An3unq5avk662uYigaAd97OxmvJjtekofXkggnve7Rww+0
+ DTWiJkPqQLzXIociDv3Uoqf6BiOo26SkPbSFFFRnP2PL1W+Hp738nlkiTDGVejjq3n+W
+ GBY5LIWzmEK48431hbByTDngASpDOk4rqkpzYeZSQ7H2psW/98d5QbhDioCFy+flEgrM
+ 0a5Q==
+X-Gm-Message-State: APjAAAX9yNoSnjCwCMo2jz3paMzH2klUVmMuadFIt/n2ouN99bI4GmW0
+ CzuYKnt8LYQwKwL+PbzcSqQGE5kZhppe9q+cTuMAvQ==
+X-Google-Smtp-Source: APXvYqwGrBgdTE4EDZg8pEKWRd0mwZy5xLCn9LpS+go97X1sgzBsJB9faApnTbQTYDpmeXOmlNurDiDkREaojyLcDCc=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr43437299oti.91.1564763920712; 
+ Fri, 02 Aug 2019 09:38:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190802122540.26385-8-drjones@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190801105742.20036-1-peter.maydell@linaro.org>
+ <af347b17-b524-1075-d462-2b0e6eef41a5@greensocs.com>
+ <CAFEAcA87XdDJH5TO-AiDfSqudmwzuY0yoa0H60objxXp3Bh9LA@mail.gmail.com>
+ <569b96b1-e11a-59c5-4f67-1da2d592b8fc@greensocs.com>
+In-Reply-To: <569b96b1-e11a-59c5-4f67-1da2d592b8fc@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 2 Aug 2019 17:38:30 +0100
+Message-ID: <CAFEAcA_K3v_XXHh-eTpdrb39cVGu9Co95TaLQG+zAU1qa8MXKw@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: Re: [Qemu-devel] [PATCH v3 07/15] target/arm: Allow SVE to be
- disabled via a CPU property
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH for-4.1] target/arm: Avoid bogus NSACR
+ traps on M-profile without Security Extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,30 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, armbru@redhat.com, eric.auger@redhat.com,
- imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/2/19 5:25 AM, Andrew Jones wrote:
-> Since 97a28b0eeac14 ("target/arm: Allow VFP and Neon to be disabled via
-> a CPU property") we can disable the 'max' cpu model's VFP and neon
-> features, but there's no way to disable SVE. Add the 'sve=on|off'
-> property to give it that flexibility. We also rename
-> cpu_max_get/set_sve_vq to cpu_max_get/set_sve_max_vq in order for them
-> to follow the typical *_get/set_<property-name> pattern.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  target/arm/cpu.c         |  3 ++-
->  target/arm/cpu64.c       | 42 ++++++++++++++++++++++++++++++++++------
->  target/arm/monitor.c     |  2 +-
->  tests/arm-cpu-features.c |  1 +
->  4 files changed, 40 insertions(+), 8 deletions(-)
+On Fri, 2 Aug 2019 at 08:51, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+>
+> On 8/1/19 4:38 PM, Peter Maydell wrote:
+> > On Thu, 1 Aug 2019 at 15:20, Damien Hedde <damien.hedde@greensocs.com> wrote:
+> >>
+> >>
+> >> On 8/1/19 12:57 PM, Peter Maydell wrote:
+> >>> In Arm v8.0 M-profile CPUs without the Security Extension and also in
+> >>> v7M CPUs, there is no NSACR register. However, the code we have to handle
+> >>> the FPU does not always check whether the ARM_FEATURE_M_SECURITY bit
+> >>> is set before testing whether env->v7m.nsacr permits access to the
+> >>> FPU. This means that for a CPU with an FPU but without the Security
+> >>> Extension we would always take a bogus fault when trying to stack
+> >>> the FPU registers on an exception entry.
+> >>>
+> >>> We could fix this by adding extra feature bit checks for all uses,
+> >>> but it is simpler to just make the internal value of nsacr 0x3ff
+> >>
+> >> s/0x3ff/0xcff/ I think, given you put 0xcff after and in the code
+> >
+> > Yes, 0xcff is correct and the commit message is wrong. (Bits 8 and 9
+> > of the NSACR are RES0 in all situations.)
+> >
+>
+> Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks; since we need an rc4 anyway I have pushed this to master,
+with the commit message typo fixed.
 
-
-r~
+-- PMM
 
