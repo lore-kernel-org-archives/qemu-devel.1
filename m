@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 477AEC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF479C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 214EA20679
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:40:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214EA20679
+	by mail.kernel.org (Postfix) with ESMTPS id 8CE8C2087E
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 09:41:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE8C2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htU3D-00022X-EX
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 05:40:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55612)
+	id 1htU3p-0002y3-QW
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 05:41:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55631)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1htU1k-0006zt-WC
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:10 -0400
+ (envelope-from <imammedo@redhat.com>) id 1htU1m-00072N-9L
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1htU1j-0000yB-Bx
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54906)
+ (envelope-from <imammedo@redhat.com>) id 1htU1l-00010D-6W
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 05:39:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54896)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1htU1j-0000xd-47; Fri, 02 Aug 2019 05:39:07 -0400
+ id 1htU1l-0000zn-1B; Fri, 02 Aug 2019 05:39:09 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 709C63082E09;
- Fri,  2 Aug 2019 09:39:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 56CAF83F45;
+ Fri,  2 Aug 2019 09:39:08 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F397519C6A;
- Fri,  2 Aug 2019 09:39:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B56AB19C6A;
+ Fri,  2 Aug 2019 09:39:06 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  2 Aug 2019 05:38:52 -0400
-Message-Id: <20190802093854.5343-3-imammedo@redhat.com>
+Date: Fri,  2 Aug 2019 05:38:53 -0400
+Message-Id: <20190802093854.5343-4-imammedo@redhat.com>
 In-Reply-To: <20190802093854.5343-1-imammedo@redhat.com>
 References: <20190802093854.5343-1-imammedo@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 02 Aug 2019 09:39:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Fri, 02 Aug 2019 09:39:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH RFC v2 2/4] kvm: s390: split too big memory
- section on several memslots
+Subject: [Qemu-devel] [PATCH RFC v2 3/4] memory: make MemoryRegion alias
+ migratable
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,210 +66,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, dgilbert@redhat.com,
  borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Max memslot size supported by kvm on s390 is 8Tb,
-move logic of splitting RAM on chunks upto 8T to KVM code.
+use qemu_ram_alloc_from_ptr() to create aliased RAMBlock
+to the part of original memory region.
 
-This way it will hide KVM specific restrictions in KVM code
-and won't affect baord level design decisions. Which would allow
-us to avoid misusing memory_region_allocate_system_memory() API
-and eventually use a single hostmem backend for guest RAM.
+Change is migration safe as we do not migrate every existing RAMBlock
+anymore, to make it migratable code has to explicitly call
+vmstate_register_ram() on MemoryRegion that owns RAMBlock.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-patch prepares only KVM side for switching to single RAM memory region
-other patche will take care of migration issues that improper use
-of memory_region_allocate_system_memory() introduced
----
- include/hw/s390x/s390-virtio-ccw.h | 10 ++++
- include/sysemu/kvm_int.h           |  1 +
- accel/kvm/kvm-all.c                | 77 ++++++++++++++++++------------
- hw/s390x/s390-virtio-ccw.c         |  9 ----
- target/s390x/kvm.c                 |  1 +
- 5 files changed, 58 insertions(+), 40 deletions(-)
+PS:
+tested ping-pong migration between new and old QEMU for x86 pc/q35
+and s390 machines.
 
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index 8aa27199c9..00632f94b4 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -21,6 +21,16 @@
- #define S390_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(S390CcwMachineClass, (klass), TYPE_S390_CCW_MACHINE)
+CC: dgilbert@redhat.com
+
+ exec.c   | 9 +++++----
+ memory.c | 6 ++++++
+ 2 files changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index 3e78de3b8f..f5e9699632 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2313,7 +2313,7 @@ static void ram_block_add(RAMBlock *new_block, Error **errp, bool shared)
+                                         new_block->used_length,
+                                         DIRTY_CLIENTS_ALL);
  
-+/*
-+ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-+ * as the dirty bitmap must be managed by bitops that take an int as
-+ * position indicator. If we have a guest beyond that we will split off
-+ * new subregions. The split must happen on a segment boundary (1MB).
-+ */
-+#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
-+#define SEG_MSK (~0xfffffULL)
-+#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
-+
- typedef struct S390CcwMachineState {
-     /*< private >*/
-     MachineState parent_obj;
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 31df465fdc..7f7520bce2 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -41,4 +41,5 @@ typedef struct KVMMemoryListener {
- void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-                                   AddressSpace *as, int as_id);
- 
-+void kvm_set_max_memslot_size(hwaddr max_slot_size);
- #endif
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f450f25295..9a5ee0dc4f 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -138,6 +138,7 @@ bool kvm_direct_msi_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
- static bool kvm_immediate_exit;
-+static hwaddr kvm_max_slot_size = ~0;
- 
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-     KVM_CAP_INFO(USER_MEMORY),
-@@ -951,6 +952,12 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
-     return NULL;
- }
- 
-+void kvm_set_max_memslot_size(hwaddr max_slot_size)
-+{
-+    g_assert(ROUND_UP(max_slot_size, qemu_real_host_page_size) == max_slot_size);
-+    kvm_max_slot_size = max_slot_size;
-+}
-+
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
- {
-@@ -958,7 +965,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     int err;
-     MemoryRegion *mr = section->mr;
-     bool writeable = !mr->readonly && !mr->rom_device;
--    hwaddr start_addr, size;
-+    hwaddr start_addr, size, slot_size;
-     void *ram;
- 
-     if (!memory_region_is_ram(mr)) {
-@@ -983,41 +990,49 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     kvm_slots_lock(kml);
- 
-     if (!add) {
--        mem = kvm_lookup_matching_slot(kml, start_addr, size);
--        if (!mem) {
--            goto out;
--        }
--        if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
--            kvm_physical_sync_dirty_bitmap(kml, section);
--        }
-+        do {
-+            slot_size = kvm_max_slot_size < size ? kvm_max_slot_size : size;
-+            mem = kvm_lookup_matching_slot(kml, start_addr, slot_size);
-+            if (!mem) {
-+                goto out;
-+            }
-+            if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+                kvm_physical_sync_dirty_bitmap(kml, section);
-+            }
- 
--        /* unregister the slot */
--        g_free(mem->dirty_bmap);
--        mem->dirty_bmap = NULL;
--        mem->memory_size = 0;
--        mem->flags = 0;
--        err = kvm_set_user_memory_region(kml, mem, false);
--        if (err) {
--            fprintf(stderr, "%s: error unregistering slot: %s\n",
--                    __func__, strerror(-err));
--            abort();
--        }
-+            /* unregister the slot */
-+            g_free(mem->dirty_bmap);
-+            mem->dirty_bmap = NULL;
-+            mem->memory_size = 0;
-+            mem->flags = 0;
-+            err = kvm_set_user_memory_region(kml, mem, false);
-+            if (err) {
-+                fprintf(stderr, "%s: error unregistering slot: %s\n",
-+                        __func__, strerror(-err));
-+                abort();
-+            }
-+            start_addr += slot_size;
-+        } while ((size -= slot_size));
-         goto out;
+-    if (new_block->host) {
++    if (new_block->host && !new_block->mr->alias) {
+         qemu_ram_setup_dump(new_block->host, new_block->max_length);
+         qemu_madvise(new_block->host, new_block->max_length, QEMU_MADV_HUGEPAGE);
+         /* MADV_DONTFORK is also needed by KVM in absence of synchronous MMU */
+@@ -2497,7 +2497,7 @@ void qemu_ram_free(RAMBlock *block)
+         return;
      }
  
-     /* register the new slot */
--    mem = kvm_alloc_slot(kml);
--    mem->memory_size = size;
--    mem->start_addr = start_addr;
--    mem->ram = ram;
--    mem->flags = kvm_mem_flags(mr);
--
--    err = kvm_set_user_memory_region(kml, mem, true);
--    if (err) {
--        fprintf(stderr, "%s: error registering slot: %s\n", __func__,
--                strerror(-err));
--        abort();
--    }
-+    do {
-+        slot_size = kvm_max_slot_size < size ? kvm_max_slot_size : size;
-+        mem = kvm_alloc_slot(kml);
-+        mem->memory_size = slot_size;
-+        mem->start_addr = start_addr;
-+        mem->ram = ram;
-+        mem->flags = kvm_mem_flags(mr);
-+
-+        err = kvm_set_user_memory_region(kml, mem, true);
-+        if (err) {
-+            fprintf(stderr, "%s: error registering slot: %s\n", __func__,
-+                    strerror(-err));
-+            abort();
-+        }
-+        start_addr += slot_size;
-+    } while ((size -= slot_size));
+-    if (block->host) {
++    if (block->host && !block->mr->alias) {
+         ram_block_notify_remove(block->host, block->max_length);
+     }
  
- out:
-     kvm_slots_unlock(kml);
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 593b34e0e2..073672f9cb 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -151,15 +151,6 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
+@@ -2671,7 +2671,8 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+ 
+     rcu_read_lock();
+     block = atomic_rcu_read(&ram_list.mru_block);
+-    if (block && block->host && host - block->host < block->max_length) {
++    if (block && !block->mr->alias && block->host &&
++        host - block->host < block->max_length) {
+         goto found;
+     }
+ 
+@@ -2680,7 +2681,7 @@ RAMBlock *qemu_ram_block_from_host(void *ptr, bool round_offset,
+         if (block->host == NULL) {
+             continue;
+         }
+-        if (host - block->host < block->max_length) {
++        if (!block->mr->alias && host - block->host < block->max_length) {
+             goto found;
+         }
+     }
+diff --git a/memory.c b/memory.c
+index 5d8c9a9234..d7c3609ce3 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1678,6 +1678,12 @@ void memory_region_init_alias(MemoryRegion *mr,
+     memory_region_init(mr, owner, name, size);
+     mr->alias = orig;
+     mr->alias_offset = offset;
++    if (orig->ram_block && size) {
++        mr->destructor = memory_region_destructor_ram;
++        mr->ram_block = qemu_ram_alloc_from_ptr(size,
++                                                orig->ram_block->host + offset,
++                                                mr, &error_fatal);
++    }
  }
  
--/*
-- * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-- * as the dirty bitmap must be managed by bitops that take an int as
-- * position indicator. If we have a guest beyond that we will split off
-- * new subregions. The split must happen on a segment boundary (1MB).
-- */
--#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
--#define SEG_MSK (~0xfffffULL)
--#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
- static void s390_memory_init(ram_addr_t mem_size)
- {
-     MemoryRegion *sysmem = get_system_memory();
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 6e814c230b..d0267da8e1 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -347,6 +347,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
- 
-+    kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
-     return 0;
- }
- 
+ void memory_region_init_rom_nomigrate(MemoryRegion *mr,
 -- 
 2.18.1
 
