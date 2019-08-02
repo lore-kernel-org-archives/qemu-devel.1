@@ -2,71 +2,115 @@ Return-Path: <SRS0=8V6M=V6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A54FC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8411C32750
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:37:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA42E218BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:36:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA42E218BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id B5C4E2064A
+	for <qemu-devel@archiver.kernel.org>; Fri,  2 Aug 2019 08:37:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C4E2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60975 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htT2p-0007GV-0P
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:36:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43503)
+	id 1htT4E-00006m-24
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 04:37:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43734)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1htT2D-0006p1-2g
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:35:34 -0400
+ (envelope-from <david@redhat.com>) id 1htT3o-00088K-DW
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:37:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1htT2B-0006FU-Tt
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:35:32 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51358)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1htT2B-0006FK-OJ
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:35:31 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1htT2A-0000NR-MU
- for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 08:35:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A91A82E8041
- for <qemu-devel@nongnu.org>; Fri,  2 Aug 2019 08:35:30 +0000 (UTC)
+ (envelope-from <david@redhat.com>) id 1htT3n-0007Mx-BQ
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 04:37:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36834)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1htT3n-0007MU-3u; Fri, 02 Aug 2019 04:37:11 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6AE35308FBA9;
+ Fri,  2 Aug 2019 08:37:10 +0000 (UTC)
+Received: from [10.36.116.87] (ovpn-116-87.ams2.redhat.com [10.36.116.87])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE390600C8;
+ Fri,  2 Aug 2019 08:37:08 +0000 (UTC)
+To: Christian Borntraeger <borntraeger@de.ibm.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <20190729145229.4333-1-imammedo@redhat.com>
+ <0e9cd550-c69b-3e97-4619-6746da4d4bd1@redhat.com>
+ <63d203d2-25b5-44e6-ccee-1857396556f0@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <cda9803f-f6ba-6e3b-13a4-146e6d4e53a7@redhat.com>
+Date: Fri, 2 Aug 2019 10:37:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <63d203d2-25b5-44e6-ccee-1857396556f0@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Fri, 02 Aug 2019 08:37:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 02 Aug 2019 08:25:59 -0000
-From: Daniel Berrange <1838658@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange prlw1
-X-Launchpad-Bug-Reporter: Patrick Welche (prlw1)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
-References: <156467368424.6955.5535032657029646608.malonedeb@soybean.canonical.com>
-Message-Id: <156473435986.27658.4248874150514857935.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19014";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: d4486ac97244521d8b2c1dda6b81c689042a93ec
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838658] Re: qemu 4.0.0 broken by glib update
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH RFC 0/2] s390: stop abusing
+ memory_region_allocate_system_memory()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,47 +119,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838658 <1838658@bugs.launchpad.net>
+Cc: pbonzini@redhat.com, qemu-s390x@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fedora 30 has been shipping glib2 2.60.0 through to 2.60.5 and QEMU in
-general has been working normally AFAICT.
+On 02.08.19 10:29, Christian Borntraeger wrote:
+>=20
+>=20
+> On 02.08.19 10:04, David Hildenbrand wrote:
+>> On 29.07.19 16:52, Igor Mammedov wrote:
+>>> While looking into unifying guest RAM allocation to use hostmem backe=
+nds
+>>> for initial RAM (especially when -mempath is used) and retiring
+>>> memory_region_allocate_system_memory() API, leaving only single hostm=
+em backend,
+>>> I was inspecting how currently it is used by boards and it turns out =
+several
+>>> boards abuse it by calling the function several times (despite docume=
+nted contract
+>>> forbiding it).
+>>>
+>>> s390 is one of such boards where KVM limitation on memslot size got p=
+ropagated
+>>> to board design and memory_region_allocate_system_memory() was abused=
+ to satisfy
+>>> KVM requirement for max RAM chunk where memory region alias would suf=
+fice.
+>>>
+>>> Unfortunately, memory_region_allocate_system_memory() usage created m=
+igration
+>>> dependency where guest RAM is transferred in migration stream as seve=
+ral RAMBlocks
+>>> if it's more than KVM_SLOT_MAX_BYTES.
+>>
+>> So if I understand it correctly, we only call
+>> memory_region_allocate_system_memory() in case the guest initial memor=
+y
+>> size exceeds KVM_SLOT_MAX_BYTES - ~8TB.
+>=20
+> We always call it. We just call it twice for > 8TB
 
->From the netbsd bug report it looks like the reproducer was demoed using
-the sparc emulator - is that the only QEMU arch that is affected ?
+Yeah, that's what I meant.
 
--- =
+>>
+>> Do we *really* care about keeping migration of systems running that mo=
+st
+>> probably nobody (except Christian ;) ) really uses? (especially not in
+>> production).
+>>
+>> I am fine keeping migration running if it's easy, but introducing hack=
+s
+>> (reading below) for such obscure use cases - I don't know.
+>>
+>> @Christian: Please prove me wrong. :)
+>=20
+> For the time being we can block migration for guests > 8TB if that help=
+s (it should not
+> fail in a guest killing fashion), but we should
+> 1. continue to be able to migrate guests < 8TB
+> 2. continue to be=20
+>=20
+> On the other hand I find "and suddenly it fails if you go beyond this" =
+really
+> unpleasant. So it would be interesting to see the next round of patches=
+ to=20
+> check how "hacky" those really are.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838658
+I mean migration will work perfectly fine once we fixed it for new QEMU
+versions. It's only the older QEMU versions to/from the > fixed one.
 
-Title:
-  qemu 4.0.0 broken by glib update
+Looking at the log I can see that this was introduced with v2.12.0.
 
-Status in QEMU:
-  New
+I would document this in the next release notes: "Migration of unusual
+big VMs (>=3D 8TB) will not work from/to previous QEMU versions (up to
+v2.12, before that starting such guests didn't even work)."
 
-Bug description:
-  In brief, an install CD will successfully boot with qemu 4.0.0 built with=
- glib 2.58.3, but freeze during boot with qemu 4.0.0 built with glib 2.60.0=
-. I tracked it down to glib's GHashTable improvements. qemu is happy with a=
- glib built from
-  ```
-   git checkout -f 2.60.4
-   git revert --no-edit 86c6f7e2b..3bed8a13b
-   git revert --no-edit 75f8ec1df9b48b0c3a13a9125f2c7d7c5adf5159
-   git revert --no-edit 603fb5958..d3074a748
-   git revert --no-edit 0b45ddc55..0600dd322
-  ```
-  When the GHashTable improvements were committed, there was already a pree=
-mptive note about any breakage being due to using private implementation de=
-tails, hence mentioning it here rather than with glib.
+--=20
 
-  For the full saga, see: http://gnats.netbsd.org/54310
+Thanks,
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838658/+subscriptions
+David / dhildenb
 
