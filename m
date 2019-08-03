@@ -2,67 +2,85 @@ Return-Path: <SRS0=Oxyb=V7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAFCC31E40
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 13:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC33C433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 13:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 424672085B
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 13:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424672085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 445FE2075C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 13:22:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Q5fgSnzT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 445FE2075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1httla-0000j5-JW
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 09:08:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33544)
+	id 1httzu-0004DG-Gx
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 09:22:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35630)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mlureau@redhat.com>) id 1httkq-0008W0-3K
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:07:25 -0400
+ (envelope-from <jan.kiszka@web.de>) id 1httzE-0003n2-45
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1httkp-0000e3-3Y
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:07:24 -0400
-Received: from mail-oi1-f174.google.com ([209.85.167.174]:43522)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1httko-0000dV-VV
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:07:23 -0400
-Received: by mail-oi1-f174.google.com with SMTP id w79so58955047oif.10
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 06:07:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=fwUQ6tNKOqRSy7kX+oFp4wbartpWeUFMkbznppeqod4=;
- b=dwXd6I5VEdiUdU6qZSyOfGHLJOWJI8vAfdjdCSDVxEs6vLgFGbubxi+H2Cyx5s0YJz
- ID0BoqG/i9EB51NQzQoGYhEzZ4ayw5s4mBsF2xfekT5cJvTr+F/VSroGW6G0IemoSgcd
- OdB4iFLa9CyhXKB4AkTOn6OG/xHhrYNg/xbD+UPEUKK8ORmPZbNQspuyvDSobXwHec+i
- GB+DYAzraZ37pQHdx1v94pJiYBwgY25Z1ltzXcd5JkdFQvUgn6rM9OTKYQlmZpISOWIR
- r55FBEjkR4zfyTJO5SNyJzc8X1ZvQGv+nzeWOgoSyj5s/73EbpozzoLeagYAVnczR0bA
- 6zzw==
-X-Gm-Message-State: APjAAAURTiMiJrgDGVY1I/6jZgCQOehXazIrdAEdsG8PdndOmYGxFXcV
- 91nYG5Ux7QLUHAto/hszI/TFvyCfBO2M3XnB8iNbvA==
-X-Google-Smtp-Source: APXvYqxQhe4bdXmxZRYg0LdKs/hf/EzYHBVHhV5rFe2gvaxG8zbcbuklzxJg0KxCSIG2LD/x3Yr/BAX5P1bRBLxC99o=
-X-Received: by 2002:aca:f513:: with SMTP id t19mr6078011oih.76.1564837640960; 
- Sat, 03 Aug 2019 06:07:20 -0700 (PDT)
+ (envelope-from <jan.kiszka@web.de>) id 1httzD-0007Kg-6S
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:22:16 -0400
+Received: from mout.web.de ([212.227.15.14]:52391)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1httzC-0007Jj-Ps
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:22:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1564838528;
+ bh=R3ejnI676/pdtRKXM44ZtN7+PS4/3VROnv/nljAhjQs=;
+ h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
+ b=Q5fgSnzTWXUJMOiNUs4Zne8NAVfV/882AdjMo9shh+3iWj2GrwhiveXW1w+CZMl4g
+ HM3qKTzgCmVXXqFcSuJqf0U1vCFTwHHDjyxDoZ/9Zd26seeM825i1lvDSpUC+5Qhq9
+ rhBfKMdA8g5b8RYGjonqM9UFAJ2i+vW0qqEPcYsA=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb004
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0M9ui8-1i4vY836k4-00B4LK; Sat, 03
+ Aug 2019 15:22:08 +0200
+To: qemu-devel <qemu-devel@nongnu.org>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
+Date: Sat, 3 Aug 2019 15:22:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190802131509.lplyvrbdwiwo2tve@auriga.localdomain>
-In-Reply-To: <20190802131509.lplyvrbdwiwo2tve@auriga.localdomain>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Sat, 3 Aug 2019 17:07:09 +0400
-Message-ID: <CAMxuvawykqui1GA4ojF5gdPwzOF5ETWnaGMhxyC97FR=HmB7DQ@mail.gmail.com>
-To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1pLsXyUl+grBg85UzrdcfyqtF6M4vBHPNUfeYhk7dU1x7YtX2bV
+ o4nfF9rhqnF+kMzR9qFuWVl0IlUWaxY7a6l0VauAEfxE296ODYX6ExK0D6d6qpwxn4Sue4M
+ EKkWQyH3Dqskh2zxJBxrT6PG7tzKzmQWaS/v3+R1DqjUbU7SdIgejyPqTCbUSC35dJtXkbI
+ dRA+GFcqJxC9XC/xTMveQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:khYx7Og24Og=:bIdC5m/FMLrzk9oQ2CPl7U
+ 45SHqN3baRFdAY3QhceIEWTrElv/fr5pBmbiA8UYJGi6p1Yt4jo5Miuy+a2rD22H4kZSIfbUt
+ 2RaqU0ymIU0O/q2hTRa/HXa6Jw1b479s51oNxIziV4bgAGGKw1rrzgT6GOAHnP+8JaspPm4A8
+ zQZ11+wwkdty7DWFFlSZRfaUW4EDE6b43Diki7i7+h4TWe+H2P1Xny9m4+0/qDbom7D0A3uao
+ om6r3fwd0ppsXsbbGB5aY45mpivw7tqvllup77x3w9grF7RkBegMoqobTifuh0h1A+Oh3+PrF
+ mU81GbktJ36JL67IT5VrIAYQeAHE5yHEeYMBSq0an6yuKEeYTG8MWUAMBA46uq0AJbRQ/lQoq
+ lKYHSxt4tID4ICpclkAqaOtLbPExUen2Ic8QhAOdIIrvhlnpiYWE6C+RNPmFSeJRmEc7HG07N
+ 7EXTGmxV5+IhLg/nwEjcCOtxOuoBU6QDX9JnO9B7GFz9WZ29Rik20dtlbvdDxVmBmaZHbIII6
+ npAeyS7+XuaDFq/LmB6LCZ7VBmsyPLO5TidMNrzD5ur7y1u1VrKHK2r0EkqTTzPyfGu6wYFrw
+ Wg185VbHTYPUdJp805VNJht53JlxuqMMJjR5gt/Vc8talDev1EjH1Ula/csJ5IUNy5JC66FZS
+ TKsqNajKWJoa1ihRt3rm+bMYDcqjL7Uh34Ge5YsiS1GZPaed5eyyCWJnAEiIWf5Hqqsmc/+Sb
+ M3/qHu2jwuYQPJm0uG46IsTEY4sR6isvFgzmKrTROA9OcSjWw/tL5wXC6Q8SEFHiJHRX/Vi4Z
+ yTMUj2GiaKLnVS0gaaxVX71CmLuCDNF6JkPlhzmEds+MXGQGG8iItAKk0Fy+zahc6ONxBOAPJ
+ 5tE+ta658vGJohOjpffh2oehQhrpHSjBd6lvJ1vJutFg4TTDdXX71C6HNG+Y0o+dO97E2+LK9
+ aUdAFBMDFY9Rb1Uo74Mun1oGnIthxDcwG9s/ZInGsK/o7w+5Ua74E6T7ZoU3vOKKzvCvP4wHg
+ jC5fy85MIAfXDCSR9XdhCu31ySCbkAfK0hKszTMVUAVQG4vA/GZsJgLpG0jJSEGHlb9Kr2RCe
+ r2OWD6hSV4sbfyQD1zbmcDS7IQCHBNEfUp8fCiqtUJAUsytuMuKUVtBjxsq+Vf0PH/Cb68RgC
+ jm0Rk=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.167.174
-Subject: Re: [Qemu-devel] qemu-ga -- virtio driver version reporting
+X-Received-From: 212.227.15.14
+Subject: [Qemu-devel] [PATCH v2] ivshmem-server: Terminate also on SIGINT
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,96 +92,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gal Hammer <ghammer@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-On Fri, Aug 2, 2019 at 5:12 PM Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@=
-redhat.com> wrote:
->
-> Hi,
->
-> I would like to add version reporting of Windows virtio drivers to qemu-g=
-a.
-> Obviously this is specific to Windows as for POSIX systems it corelates w=
-ith
-> the version of kernel. I would appreciate your ideas on a few topics.
->
-> Does it make sense to add this information as new (optonal) field to resu=
-lt of
-> 'guest-get-osinfo'. Or would it be better to add whole new command? I exp=
-ect
+Allows to shutdown a foreground session via ctrl-c.
 
-If the information is cheap to retrieve, I think it is fine as part of
-get-osinfo.
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+=2D--
 
-> the result to look something like this:
->
->     "component-versions": [
->         {
->             "name": "VirtIO Balloon Driver",
->             "version": "03/10/2019,62.77.104.16900"
->         },
->         {
->             "name": "QEMU PVPanic Device",
->             "version": "06/11/2018,62.76.104.15400"
->         },
->         ...
->     ]
+Changes in v2:
+ - adjust error message
 
-I am not a Windows expert, but I can imagine drivers have a more
-uniquely identifiable ID than a human string.
+ contrib/ivshmem-server/main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
->
-> Alternatively we could report all available versions of the specific
-> driver instead of just the latest. Note that this does not say much
-> about which version is in use or if a device is available in the
-> system.
+diff --git a/contrib/ivshmem-server/main.c b/contrib/ivshmem-server/main.c
+index 197c79c57e..e4cd35f74c 100644
+=2D-- a/contrib/ivshmem-server/main.c
++++ b/contrib/ivshmem-server/main.c
+@@ -223,8 +223,9 @@ main(int argc, char *argv[])
+     sa_quit.sa_handler =3D ivshmem_server_quit_cb;
+     sa_quit.sa_flags =3D 0;
+     if (sigemptyset(&sa_quit.sa_mask) =3D=3D -1 ||
+-        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1) {
+-        perror("failed to add SIGTERM handler; sigaction");
++        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1 ||
++        sigaction(SIGINT, &sa_quit, 0) =3D=3D -1) {
++        perror("failed to add signal handler; sigaction");
+         goto err;
+     }
 
-What's the goal of this version reporting btw? to audit the VM? Isn't
-there other mechanism to keep Windows systems up to date and alert
-management layers? Perhaps that's Windows business/enterprise
-solutions that are too expensive though, and we want something more
-specific to qemu VMs.
-
->
->
-> I have checked the available drivers and the names quite vary. I guess we=
-'ll
-> need to list and match the complete name and not just some substring (lik=
-e
-> "VirtIO"). See the following list:
->
->     QEMU FWCfg Device
->     QEMU PVPanic Device
->     QEMU Serial PCI Card
->     Red Hat Q35 SM Bus driver
->     Red Hat QXL controller
->     Red Hat VirtIO Ethernet Adapter
->     Red Hat VirtIO SCSI controller
->     Red Hat VirtIO SCSI controller
->     Red Hat VirtIO SCSI pass-through controller
->     VirtIO Balloon Driver
->     VirtIO Input Driver
->     VirtIO RNG Device
->     VirtIO Serial Driver
->     VirtIO-Serial Driver
->
-> Is it OK to hardcode the list in qemu-ga source? Is there already any sup=
-port
-> for dealing with regexes or tries in qemu source tree?
-
-glib has GRegexp.
-
->
-> Any other ideas, concerns?
->
->     Tomas
->
-> --
-> Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+=2D-
+2.16.4
 
