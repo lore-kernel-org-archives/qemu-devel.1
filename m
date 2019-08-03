@@ -2,85 +2,81 @@ Return-Path: <SRS0=Oxyb=V7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE82C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 21:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308FDC31E40
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 21:09:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BA5121726
+	by mail.kernel.org (Postfix) with ESMTPS id E9DF921726
 	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 21:09:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cwcnxi5L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA5121726
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oCnDlNNf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9DF921726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hu1Gw-0002cG-Ja
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 17:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51917)
+	id 1hu1Gx-0002cn-4s
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 17:09:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51923)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hu1GC-0000xW-9Y
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:17 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hu1GD-0000xa-KE
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hu1G6-0005Mk-5H
+ (envelope-from <richard.henderson@linaro.org>) id 1hu1G5-0005MO-Hm
  for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:12 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45611)
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:38614)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hu1G5-0005Ly-J7
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:10 -0400
-Received: by mail-pf1-x443.google.com with SMTP id r1so37694468pfq.12
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 14:08:09 -0700 (PDT)
+ id 1hu1G4-0005LX-NM
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:08 -0400
+Received: by mail-pl1-x643.google.com with SMTP id az7so34925757plb.5
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 14:08:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=+x0WGSWw36fXqg8sJBr/e/px4PQ5p89CEe43iMHBL7I=;
- b=Cwcnxi5Ll9OoC5PykIu9TfQLHldwMsAvoEc5GYdHrv0oEpkGdUvSWDZOHssZzXVhSA
- ZwhC9Gh7AdPJde9++OK0GnIhE3yzaWgrAI7Z/Re9IIvsMm8PwOIpoO9qBU8sSy4S0nMS
- 4jPbOD05A/lQ116UAkRA1qAe042pCBEOa9ey7y8RWftADpaZ+XcVZqCVXeKbsIEcfUib
- lsZv8Itprsc/qgMfYyBtYJmWuS9G9zMCLYm+f5GdXhfnNlRFsYX50Ok+lxHfjdZaL2Yg
- GvvXTJ+6V3nBSG29NGko2nj08Yn7bI6B7mGob9evEDVkRrrHMkUCEsNRR7JaB9ESvqNL
- CSwA==
+ h=from:to:cc:subject:date:message-id;
+ bh=NSPLjACG69kNYWPaNBk+06B1y1rFaDkEzgMb35jlC8g=;
+ b=oCnDlNNf5zNP3/Oi+lvw0lUsjJpABryCJ+9Jb9i/DaJgNIytsrFiiyfeWkedYUEXtL
+ dJjzmeBuc8pYvNjXU2A6PD4Ygjg6nyzFS9RZMXYr01n1oCaqwy1qIiVXQcQzWlSq5DBM
+ l/chYORv/qjUFsuVWPP3pxQY/24q3gwokexTc5/HG0msH7LtDKJOBgQfjhkXg/vXtjP3
+ WQoDMb7hGxzNi62o2BzHXk865GiC0wMA46DRCpAo9rn5SML4GFNEBtvkQbdBL0i+6ar8
+ jKsuxD3QuJuCv4ZFQ/8LTw0w9rJ6ID8hk1AWj/vafPx0rNv4k7iXxy/8DWCpHDS08Dx3
+ rNHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=+x0WGSWw36fXqg8sJBr/e/px4PQ5p89CEe43iMHBL7I=;
- b=b5k+UQBZt3ZlFMkyN5ROThO7Hqia2fzRDDkpx64yBHhIT35S9Medb85Zfc/rfQE12J
- qmSBX9vhvB4F2NV3VGeCWvKhyR8E0l4fe4s+f7Vc94DxLaN4QiBkkIVRT5/S/DEhBu2k
- S9LtZe4HxLWc5+uMbKstYD11/WoY29rji7u/3vdLR2TplNC4Ez8GUxspbEUqP/HL+q23
- kI6zZIbgkDacBrlgWu73vFpY83YNn8SIOWidq00irTVQDd7JbXMVTPA8UWX7WYjFtB4c
- chGH7ahme/yXKd/G7HTneSDZvx+h9l5pCaku6x/mMuH3fAZAddbi+wQAhIj0t3/RkBbq
- 2ZNQ==
-X-Gm-Message-State: APjAAAVm1ARYbmRStOUaWIAq2FeBgrWNuwVB4gD8jkOmcNajN81tXHfd
- bmwpNM74kk5G79EGS2rqYTSWF/MDdqA=
-X-Google-Smtp-Source: APXvYqxWqqWPuBOLdRQc/hJXfPoBdGtaq4fiuoS0mDfuRQj9NKrBc2K0oy/9Xr5Ai6Lkek3SZ7VJxw==
-X-Received: by 2002:a17:90a:5884:: with SMTP id
- j4mr11266253pji.142.1564866488176; 
- Sat, 03 Aug 2019 14:08:08 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=NSPLjACG69kNYWPaNBk+06B1y1rFaDkEzgMb35jlC8g=;
+ b=tjX6mxAo5Ws3AV2Q63LpeT2h9tGTUYpMi6gH5WA7h7L1wlo1dsCxU9gz5ueEZVvLn2
+ dd+ljKAbicLHokP0T3Gz7TgUxWK3kozdIXELgfTyTPThJmgrXweA0EFTsIPyQkxxNw22
+ 5UUcdGMjZ+SfP1w5gH8vq810UjeCBH/OLm/J+zWgB+lw7cB8LpfGKoHQhsEs+9/i7sTE
+ qoYEEffQUZi3IRPVbFzKdFxAYncEpAc5Z1vvb2BVKhvmwBmtVT5fyurbQi0NbjWUcmi2
+ Qjec6BYYLtXIU5l0doZhOWM7oNHWqvQAU5/1VKyoAsD09gxCXj1ZMWpk3614irBmDixn
+ TOCg==
+X-Gm-Message-State: APjAAAWRKB2rQLqKi/JhwNk07w2IWZcwjW4S+OcOO1XI9UPCrw6nFsDV
+ BwE7Y4dMnn/fzd2ZtYHcdpAq5rAKntg=
+X-Google-Smtp-Source: APXvYqyHAY3ScBRbXoWwdAJoy2rS58cmuHWiYevubWRtgAUvVaxrBxznA5Wt5Qm9RqKr9i/OP2W+gg==
+X-Received: by 2002:a17:902:1e2:: with SMTP id
+ b89mr30397176plb.7.1564866487066; 
+ Sat, 03 Aug 2019 14:08:07 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id x25sm110129644pfa.90.2019.08.03.14.08.07
+ by smtp.gmail.com with ESMTPSA id x25sm110129644pfa.90.2019.08.03.14.08.03
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 14:08:07 -0700 (PDT)
+ Sat, 03 Aug 2019 14:08:04 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 14:07:58 -0700
-Message-Id: <20190803210803.5701-2-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 14:07:57 -0700
+Message-Id: <20190803210803.5701-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190803210803.5701-1-richard.henderson@linaro.org>
-References: <20190803210803.5701-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH v7 1/6] linux-user/aarch64: Reset btype for
- signals
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: [Qemu-devel] [PATCH v7 0/6] target/arm: Implement ARMv8.5-BTI for
+ linux-user
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,36 +94,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The kernel sets btype for the signal handler as if for a call.
+Changes since v6:
+  * Rebased on the ARMv8.1-VHE patch set.
+  * Review from Dave Martin:
+    + Remove PSTATE.BTYPE adjustment on syscall entry.
+    + Rely on PT_GNU_PROPERTY to find the NT_GNU_PROPERTY_TYPE_0 note.
+    + For the test case, add a linker script to create the PHDR.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/aarch64/signal.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Changes since v5:
+  * New function to validate the target PROT parameter for mmap/mprotect.
+  * Require BTI in the cpu for PROT_BTI set.
+  * Set PSTATE.BTYPE=2 for the signal handler.
+    Adjust the smoke test to match.
+  * Tidy up the note parsing.
 
-diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-index cd521ee42d..2c596a7088 100644
---- a/linux-user/aarch64/signal.c
-+++ b/linux-user/aarch64/signal.c
-@@ -506,10 +506,16 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
-             + offsetof(struct target_rt_frame_record, tramp);
-     }
-     env->xregs[0] = usig;
--    env->xregs[31] = frame_addr;
-     env->xregs[29] = frame_addr + fr_ofs;
--    env->pc = ka->_sa_handler;
-     env->xregs[30] = return_addr;
-+    env->xregs[31] = frame_addr;
-+    env->pc = ka->_sa_handler;
-+
-+    /* Invoke the signal handler as if by indirect call.  */
-+    if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
-+        env->btype = 2;
-+    }
-+
-     if (info) {
-         tswap_siginfo(&frame->info, info);
-         env->xregs[1] = frame_addr + offsetof(struct target_rt_sigframe, info);
+Based-on: 20190803184800.8221-1-richard.henderson@linaro.org
+"[PATCH v3 00/34] target/arm: Implement ARMv8.1-VHE"
+
+
+r~
+
+
+Richard Henderson (6):
+  linux-user/aarch64: Reset btype for signals
+  linux-user: Validate mmap/mprotect prot value
+  linux-user: Set PAGE_TARGET_1 for TARGET_PROT_BTI
+  include/elf: Add defines related to GNU property notes for AArch64
+  linux-user: Parse NT_GNU_PROPERTY_TYPE_0 notes
+  tests/tcg/aarch64: Add bti smoke test
+
+ include/elf.h                     |  22 ++++++
+ include/exec/cpu-all.h            |   2 +
+ linux-user/syscall_defs.h         |   4 +
+ linux-user/aarch64/signal.c       |  10 ++-
+ linux-user/elfload.c              |  94 +++++++++++++++++++++--
+ linux-user/mmap.c                 | 121 ++++++++++++++++++++++--------
+ target/arm/translate-a64.c        |   6 +-
+ tests/tcg/aarch64/bti-1.c         |  77 +++++++++++++++++++
+ tests/tcg/aarch64/bti-crt.inc.c   |  69 +++++++++++++++++
+ tests/tcg/aarch64/Makefile.target |   3 +
+ tests/tcg/aarch64/bti.ld          |  15 ++++
+ 11 files changed, 379 insertions(+), 44 deletions(-)
+ create mode 100644 tests/tcg/aarch64/bti-1.c
+ create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
+ create mode 100644 tests/tcg/aarch64/bti.ld
+
 -- 
 2.17.1
 
