@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6957FC433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF93DC433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:03:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 324B52087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:02:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7655F2087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:03:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dMqUYYmR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 324B52087C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QWKl0+P7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7655F2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htzID-00048b-DA
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 15:02:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32862)
+	id 1htzIx-0005SU-QT
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 15:02:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33011)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htz51-0006ka-Bu
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:36 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htz5D-0006vt-Hs
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htz50-0007Mm-3x
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:35 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43813)
+ (envelope-from <richard.henderson@linaro.org>) id 1htz5B-0007SL-Ju
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:47 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34530)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htz4z-0007MK-V4
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:34 -0400
-Received: by mail-pl1-x641.google.com with SMTP id 4so27885291pld.10
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:33 -0700 (PDT)
+ id 1htz59-0007Pz-KF
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:44 -0400
+Received: by mail-pg1-x542.google.com with SMTP id n9so31447493pgc.1
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=XOwe1x9jkMeobEp2gGQ1QVWfLomppnXBcfQfzlWOS/E=;
- b=dMqUYYmRfdayPFfbUWwMEx9J2DbZBKw2F4NAJoNPOwLBmqrOuFzJaZYBpEpuXKphx1
- k73GH4LZNLW8ZcfyO87kGFQQTTfXTFLE/f6gvk1z2RiesiH1K0PjhQnXIzaW3SHb/cID
- /w/DfIbV/75N84T2THH4vOYiInYakfJu9A7ElnolFK36pD1HyeS43c3PgOew1zddvEWX
- HzAcn4s9+sTMspPIHAkYjlByi0Y0pfsgypM/POeJxGLNs40YlCnb1AVJsc+MKMs4UAxx
- Aveu6pq6lBGaSaBO+2y82E3xXr7kW26UT0Un0Qe3PPlUksqIRPxlEERvvNnIzzlHH8ww
- ERrA==
+ bh=JBDZxP60+vIjwwzQbC3L2o1kpMj6601b/tqCyxFOHVI=;
+ b=QWKl0+P7ZCOzrJrGAAa335JojcAeKlcVoNs1cAydwjDyaxukqGtQnw6FMo6klTTsSr
+ V8JrdKdrddDhr1/jqvOmEUZOrm/NCNmkWtc8YEsvczoU0dOKyATP6Pzc1B01JyNL34dN
+ J3mwHRjHZGob/MtP/AJsmyZpX9MFb2OXxjLYg7rPRwIJkEK2p9CpM/ojJYbxjJNjJvej
+ YEwlX7vtKw5QXwXU+l7G6J7yC5ppYyeCTRz+COZRCf9UjW6lf2K0c3AeYlyNvlA6a16X
+ /lHkMqyLXBtduo9etkcuJU4JK7ICQiik7TISJxmCSAZlFZDX6l65LIBrGBUCRbwafi81
+ 337g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=XOwe1x9jkMeobEp2gGQ1QVWfLomppnXBcfQfzlWOS/E=;
- b=saSaKNMlZ9AdMs67TabjHunn5zoJUfGTuSKsXgnPU7Z88YNR3Lqo5vsKOl8D9cVyaG
- c/zwbnG8KJ3ert7fTIicxolPgW0HhJFgCU+CiZ4/2DfprpqqWDs23qjamwpDhPVajTLc
- sOxFF/TTLsHyUjP32dYw0YYJng4Ahr5TdS2BMwtp4v4dJQ+oanG9IGKU8V6oB3v95veB
- T6elbTDRrZ8cJheLzRpgzRLITGf3CRXgKRKcjLrCZHdDHU+ACqh5I8i6jdntQrFb951L
- ELjTnRP3JTZAEHCF5ZnqxnqRF1zs+DUsKu9Y8HVCbVXws6ubcbDnkQFA6925a0MExkDs
- uuDg==
-X-Gm-Message-State: APjAAAWLAvLUJT3DbXvxVVqWLFoKrsoQRrZCowmDLXqUqBUlCcqS7HZv
- gdYW0k1U36YTUFp8xUpk3IWpP/+r82U=
-X-Google-Smtp-Source: APXvYqyb1AF8sTnicyX+NAezc54dTu4e+BfaRxO4fEL/ZNln+ZX+TAvvOyDRIIAMgqa+cbIuuztDxA==
-X-Received: by 2002:a17:902:b48f:: with SMTP id
- y15mr139996271plr.268.1564858112630; 
- Sat, 03 Aug 2019 11:48:32 -0700 (PDT)
+ bh=JBDZxP60+vIjwwzQbC3L2o1kpMj6601b/tqCyxFOHVI=;
+ b=EzJd4sweE6Zktx8FacOAjlZ1Gcz8/V8RLkVpXlulbnr9iCgD8mdRL7zg9swsPmhGr7
+ DT7J8TeqzwobmTBZ3YcrXJLNquWmXHn1UO7Mt3LDgl4wnjxQbOi1Hyut+GF0UH+13FrS
+ 1ZhIjPNnHiVytDZzS2prs8vxwWZQwj0UecuKq3ow1JmU+W663idPJIKe4qQGdT7Ywxd0
+ SBlSdhsBv/Sr493MRHzRlubceHKJn2IU5hChf/HYRXh5+uhtTcr3FSFU4l4m318L8Y0x
+ 3iihL9QjPvQG0lBT+mQ6R9zbZ0u/rAuYaI8WZpAh8pDsBEtpk9cDE4da2yZFoqxsSbnL
+ 18WQ==
+X-Gm-Message-State: APjAAAWdZAx6qW26EtoMen4K5y1YnNFGR50OeZSn/HtDwJPwbQbxCjMY
+ be79vQMVVOwqTNHAp5G5BWWAPPPNeik=
+X-Google-Smtp-Source: APXvYqyw43hH5g5+9yj8il4fBZ/JqVWEEe+LCjQgr0W4w2DChR3Y+K97beq7ZV93AlZ4kzUNQG17aw==
+X-Received: by 2002:a17:90a:2525:: with SMTP id
+ j34mr10667580pje.11.1564858120445; 
+ Sat, 03 Aug 2019 11:48:40 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.31
+ by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.39
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 11:48:31 -0700 (PDT)
+ Sat, 03 Aug 2019 11:48:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 11:47:51 -0700
-Message-Id: <20190803184800.8221-26-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 11:47:58 -0700
+Message-Id: <20190803184800.8221-33-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190803184800.8221-1-richard.henderson@linaro.org>
 References: <20190803184800.8221-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
-Subject: [Qemu-devel] [PATCH v3 25/34] target/arm: Update aa64_zva_access
- for EL2
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v3 32/34] target/arm: Enable ARMv8.1-VHE in
+ -cpu max
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,51 +97,23 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The comment that we don't support EL2 is somewhat out of date.
-Update to include checks against HCR_EL2.TDZ.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 26 +++++++++++++++++++++-----
- 1 file changed, 21 insertions(+), 5 deletions(-)
+ target/arm/cpu64.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 9e9d2ce99b..37c881baab 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4113,11 +4113,27 @@ static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
- static CPAccessResult aa64_zva_access(CPUARMState *env, const ARMCPRegInfo *ri,
-                                       bool isread)
- {
--    /* We don't implement EL2, so the only control on DC ZVA is the
--     * bit in the SCTLR which can prohibit access for EL0.
--     */
--    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_DZE)) {
--        return CP_ACCESS_TRAP;
-+    int cur_el = arm_current_el(env);
-+
-+    if (cur_el < 2) {
-+        uint64_t hcr = arm_hcr_el2_eff(env);
-+
-+        if (cur_el == 0) {
-+            if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
-+                if (!(env->cp15.sctlr_el[2] & SCTLR_DZE)) {
-+                    return CP_ACCESS_TRAP_EL2;
-+                }
-+            } else {
-+                if (!(env->cp15.sctlr_el[1] & SCTLR_DZE)) {
-+                    return CP_ACCESS_TRAP;
-+                }
-+                if (hcr & HCR_TDZ) {
-+                    return CP_ACCESS_TRAP_EL2;
-+                }
-+            }
-+        } else if (hcr & HCR_TDZ) {
-+            return CP_ACCESS_TRAP_EL2;
-+        }
-     }
-     return CP_ACCESS_OK;
- }
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 1901997a06..b1bb394c6d 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -337,6 +337,7 @@ static void aarch64_max_initfn(Object *obj)
+         t = cpu->isar.id_aa64mmfr1;
+         t = FIELD_DP64(t, ID_AA64MMFR1, HPDS, 1); /* HPD */
+         t = FIELD_DP64(t, ID_AA64MMFR1, LO, 1);
++        t = FIELD_DP64(t, ID_AA64MMFR1, VH, 1);
+         cpu->isar.id_aa64mmfr1 = t;
+ 
+         /* Replicate the same data to the 32-bit id registers.  */
 -- 
 2.17.1
 
