@@ -2,84 +2,87 @@ Return-Path: <SRS0=Oxyb=V7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90283C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C8A1C433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5673C2073D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:49:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 553BC2073D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M/WffFcz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5673C2073D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zeuwLZaL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 553BC2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htz5q-0007re-IB
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 14:49:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60442)
+	id 1htz5y-0008Gi-Lk
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 14:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60581)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htz4X-0005s9-VC
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htz4c-00063Q-T8
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htz4W-00073F-NQ
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:05 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42851)
+ (envelope-from <richard.henderson@linaro.org>) id 1htz4b-00077s-TD
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:10 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42853)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htz4W-00071n-FQ
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:04 -0400
-Received: by mail-pf1-x441.google.com with SMTP id q10so37607147pff.9
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:04 -0700 (PDT)
+ id 1htz4b-00077L-OA
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:09 -0400
+Received: by mail-pf1-x443.google.com with SMTP id q10so37607192pff.9
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Mdp2g3jSgzrGtd9KtHgOE+2yumLnmy9dW9qf3A8Vh/A=;
- b=M/WffFczN/fF0BKujryYFO7wtRBF0xlsTxmkm/n2qqwNGBn6fj5IZIGUl+y0zN4O+J
- MqJ2/KI0Opah1zmQsgGJOj7gNoXROcEpWp+jO+W+LeZr6nobami600pIy/qAOL+RxVfL
- FWXxV8hJmxoqxVK7ebqkI1wdU056Y4fwXjaEU/0AP7Zbm+mZ7jDiFzlQmfDsMysXQOv1
- FnK2GHwLpHzSr4TF5pYvHEnlkwnQh2bIHyVQcUgd2vpu2Nv0XPLfkKiUgfPE8UVYtC/w
- N4HUJHTF35aN3vSEQpudO3w8Dk2ZW/ZsdjJ6h8ouC9GbcTcDXj23fuVr8pwtkdAtuyCO
- CsOQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=hV2eslCkM9+11E22XGBDo1tPxuDz+vxwGvc3iXR5Q+U=;
+ b=zeuwLZaLsuKqWvo0H7Lao3Xmq/IJ/PIq5u1FH0Yo7+Ni0P3R68YJHjwxjMrTtuaWjv
+ 6UIrxJop+hOjmQMKQmGyUtp6T3hEuNYSt7wzQQZMeD4Whyg71621DfHr+ZDL3FNabgcM
+ Ei6YZ1Qjm2qvwsPMXDbAodapGHrzDuKJ3WFjUAlA8hwRKF4hZoqaVeY8Cy4Zf5EQD70Q
+ toso8YjoLAGaQ0ePImuSya6uKEGRuNX4Z83FoB9B2hX682K7shVPM9hj7y+Jn0ZN4wQE
+ 8sVIe+ORce9HBYoAAavsZ0O0+Lb03HwTAA2v7x85Sf2HmI6PUWezWG7TUkVOBoRkMEhK
+ GWZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Mdp2g3jSgzrGtd9KtHgOE+2yumLnmy9dW9qf3A8Vh/A=;
- b=UWuXTfTgnzxOyJi/ukkPsXg2/29zWrGet0GBjgGY/oXySJJImUs3APAhCD+SUBogPy
- 5I3sq42LuG4ne+DU8fhxbWq/zTQbgygWSJW95jHxHpDZlIjW5yLZV8zYJTVtXnirm51B
- QohIt8g7rduUVfK149lH5bgaE63/2F3QjKlWfsavOMl8sO2urD58KT5fH7OASlsQwI4r
- goPwaupWxdVxEsZk4ST+XN1blsTovH3So0vtDg1rXylrqMJ0n0h/+3SldDD6DWztunGg
- 6HF1qjhz8FeFa5gYvhhn5dTnUZETAWrMgCI7tPWT0ElzOvvH1AJ4P5RnQnqoDJDOOAoi
- lqvQ==
-X-Gm-Message-State: APjAAAULtjWo1q7l/R7nPEKZhlHMBSspaNrR64nJZnJc5aZU1p2bBXJz
- Bik3z1njGvfVBwQ+Dl9wWyTg2KnumNc=
-X-Google-Smtp-Source: APXvYqym32Jjcqm6Y5uD9VOGwQumhKcN0/1ZruKLacdjKeyh1L+2lBKh7SShcpX6bfXFE13wffbkKw==
-X-Received: by 2002:aa7:8705:: with SMTP id b5mr13375773pfo.27.1564858083031; 
- Sat, 03 Aug 2019 11:48:03 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=hV2eslCkM9+11E22XGBDo1tPxuDz+vxwGvc3iXR5Q+U=;
+ b=gm5CXamxZzmKFIFap4ZPFWc2mAuJjcqKYvxBE35igQ7PR1wHlBAQ4icG7YwMO65iUo
+ guviJeT0CgEFFyEpAySZ2nXQjbwblf1tiRwtowtqACC9MaCWIDWrRpamIO02tp5wyw6r
+ SUyNwv0Of8o+/eDTFWi30T4En4ZiYJrDhOr8k3OHl0VQHhg8IEIrCUZq1fm7uKqHEeVI
+ 7qD8zF1l2GuXEecSyHfD0sNdxwrRpIkzjIvUjRYdnacvmpISX+EKoe+qKMlftEauGgP5
+ mVpfzYY81wQ2wHg7do5eSmc80gUq4G+GVvBbGzkmEf/JCpspwf8RofDRPSURZ6RPj/SL
+ Oxsg==
+X-Gm-Message-State: APjAAAV/nyIJ4/7OsdaTYCwg+53KuMvCKMsFxz+Hr/+RkPHkrFTXruxv
+ 18UVAwwLb49aYTnNBIXkdojX0T3YAYw=
+X-Google-Smtp-Source: APXvYqw50D1tcuFilG+lYYxJAjSIostRpVb5BrDCxdOpOTlicOOpTPm5TWnKVhKHX8m23N4E7EEppA==
+X-Received: by 2002:a62:8246:: with SMTP id w67mr67312952pfd.226.1564858088554; 
+ Sat, 03 Aug 2019 11:48:08 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.00
+ by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.07
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 11:48:02 -0700 (PDT)
+ Sat, 03 Aug 2019 11:48:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 11:47:26 -0700
-Message-Id: <20190803184800.8221-1-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 11:47:31 -0700
+Message-Id: <20190803184800.8221-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190803184800.8221-1-richard.henderson@linaro.org>
+References: <20190803184800.8221-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v3 00/34] target/arm: Implement ARMv8.1-VHE
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v3 05/34] target/arm: Install ASIDs for EL2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,99 +99,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-About half of this patch set is cleanup of the qemu tlb handling
-leading up to the actual implementation of VHE, and the biggest
-piece of that: The EL2&0 translation regime.
+The VMID is the ASID for the 2nd stage page lookup.
 
-Changes since v2:
-  * arm_mmu_idx was incomplete; test TGE+E2H not just E2H.
-  * arm_sctlr was incomplete; now uses arm_mmu_idx to avoid
-    duplication of tests.
-  * Update aa64_zva_access and ctr_el0_access for EL2.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-Changes since v1:
-  * Merge feedback from AJB.
-  * Split out 7 renaming patches from "Reorganize ARMMMUIdx".
-  * Alex's MIDR patch keeps the nested KVM from spitting warnings.
-
-I have tested 
-
-  qemu-system-aarch64 -accel kvm -cpu host -M virt,gic-version-host \
-    -m 512 -bios /usr/share/edk2/aarch64/QEMU_EFI.fd -nographic
-
-with fedora 30 system qemu, itself booted with
-
-  ../bld/aarch64-softmmu/qemu-system-aarch64 \
-    -cpu max -M virt,gic-version=3,virtualization=on \
-    -drive if=virtio,file=./f30.q,format=qcow2 \
-    -m 4G -nographic
-
-It took a while, but eventually the nested bios arrived at the
-pxe boot sequence.  Thankfully (?), the f30 shipped bios has
-debug enabled, so there's some sense of progress in the meantime.
-
-
-r~
-
-
-Alex Bennée (2):
-  target/arm: check TGE and E2H flags for EL0 pauth traps
-  target/arm: generate a custom MIDR for -cpu max
-
-Richard Henderson (32):
-  cputlb: Add tlb_set_asid_for_mmuidx
-  cputlb: Add tlb_flush_asid_by_mmuidx and friends
-  target/arm: Install ASIDs for long-form from EL1
-  target/arm: Install ASIDs for short-form from EL1
-  target/arm: Install ASIDs for EL2
-  target/arm: Define isar_feature_aa64_vh
-  target/arm: Enable HCR_E2H for VHE
-  target/arm: Add CONTEXTIDR_EL2
-  target/arm: Add TTBR1_EL2
-  target/arm: Update CNTVCT_EL0 for VHE
-  target/arm: Add the hypervisor virtual counter
-  target/arm: Add VHE system register redirection and aliasing
-  target/arm: Split out vae1_tlbmask, vmalle1_tlbmask
-  target/arm: Simplify tlb_force_broadcast alternatives
-  target/arm: Rename ARMMMUIdx*_S12NSE* to ARMMMUIdx*_E10_*
-  target/arm: Rename ARMMMUIdx_S2NS to ARMMMUIdx_Stage2
-  target/arm: Rename ARMMMUIdx_S1NSE* to ARMMMUIdx_Stage1_E*
-  target/arm: Rename ARMMMUIdx_S1SE* to ARMMMUIdx_SE*
-  target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
-  target/arm: Rename ARMMMUIdx_S1E2 to ARMMMUIdx_E2
-  target/arm: Reorganize ARMMMUIdx
-  target/arm: Add regime_has_2_ranges
-  target/arm: Update arm_mmu_idx for VHE
-  target/arm: Update arm_sctlr for VHE
-  target/arm: Update aa64_zva_access for EL2
-  target/arm: Update ctr_el0_access for EL2
-  target/arm: Install asids for E2&0 translation regime
-  target/arm: Flush tlbs for E2&0 translation regime
-  target/arm: Update arm_phys_excp_target_el for TGE
-  target/arm: Update regime_is_user for EL2&0
-  target/arm: Update {fp,sve}_exception_el for VHE
-  target/arm: Enable ARMv8.1-VHE in -cpu max
-
- include/exec/cpu-all.h     |   11 +
- include/exec/cpu-defs.h    |    2 +
- include/exec/exec-all.h    |   35 ++
- include/qom/cpu.h          |    2 +
- target/arm/cpu-qom.h       |    1 +
- target/arm/cpu.h           |  261 ++++-----
- target/arm/internals.h     |   62 ++-
- target/arm/translate.h     |    2 +-
- accel/tcg/cputlb.c         |   81 +++
- target/arm/cpu.c           |    2 +
- target/arm/cpu64.c         |   20 +
- target/arm/debug_helper.c  |   50 +-
- target/arm/helper-a64.c    |    2 +-
- target/arm/helper.c        | 1042 +++++++++++++++++++++++++-----------
- target/arm/m_helper.c      |    6 +-
- target/arm/pauth_helper.c  |   13 +-
- target/arm/translate-a64.c |   13 +-
- target/arm/translate.c     |   17 +-
- 18 files changed, 1134 insertions(+), 488 deletions(-)
-
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c0dc76ed41..65e3ffbb43 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3452,17 +3452,23 @@ static void vmsa_ttbr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                         uint64_t value)
+ {
+-    ARMCPU *cpu = env_archcpu(env);
+-    CPUState *cs = CPU(cpu);
++    CPUState *cs = env_cpu(env);
++    int vmid;
+ 
+-    /* Accesses to VTTBR may change the VMID so we must flush the TLB.  */
+-    if (raw_read(env, ri) != value) {
+-        tlb_flush_by_mmuidx(cs,
+-                            ARMMMUIdxBit_S12NSE1 |
+-                            ARMMMUIdxBit_S12NSE0 |
+-                            ARMMMUIdxBit_S2NS);
+-        raw_write(env, ri, value);
+-    }
++    raw_write(env, ri, value);
++
++    /*
++     * TODO: with ARMv8.1-VMID16, aarch64 must examine VTCR.VS
++     * (re-evaluating with changes to VTCR) then use bits [63:48].
++     */
++    vmid = extract64(value, 48, 8);
++
++    /*
++     * A change in VMID to the stage2 page table (S2NS) invalidates
++     * the combined stage 1&2 tlbs (S12NSE1 and S12NSE0).
++     */
++    tlb_set_asid_for_mmuidx(cs, vmid, ARMMMUIdxBit_S2NS,
++                            ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0);
+ }
+ 
+ static const ARMCPRegInfo vmsa_pmsa_cp_reginfo[] = {
 -- 
 2.17.1
 
