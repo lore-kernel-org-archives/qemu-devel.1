@@ -2,86 +2,94 @@ Return-Path: <SRS0=Oxyb=V7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1A8C0650F
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 00:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41DCC433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 01:30:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64A8D2087E
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 00:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF17A2166E
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 01:30:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ueI0R8GH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A8D2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="peAEqdQ/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF17A2166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hthu2-00059O-KN
-	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 20:28:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51753)
+	id 1htisU-0007Ej-UG
+	for qemu-devel@archiver.kernel.org; Fri, 02 Aug 2019 21:30:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33461)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hthte-0004Um-Oq
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 20:27:43 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htiqz-00063W-Og
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 21:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hthtd-00076W-1G
- for qemu-devel@nongnu.org; Fri, 02 Aug 2019 20:27:42 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39946)
+ (envelope-from <richard.henderson@linaro.org>) id 1htiqy-0001YX-BL
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 21:29:01 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38538)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hthtc-00072q-SM; Fri, 02 Aug 2019 20:27:40 -0400
-Received: by mail-pl1-x644.google.com with SMTP id a93so34168746pla.7;
- Fri, 02 Aug 2019 17:27:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id;
- bh=yAxZ8RM+7BN40lgaBTxH7y4VBapD3Af85d2Gzv1To1A=;
- b=ueI0R8GHXKe7lf/OYpF3cGWWQuElYJ/uA/eZ7Hjj0pAOFq1RSj4c/IKlmT7+PW5F7e
- SpsCKdzVHrS3ogwG9zVKOByv0Jfl5Q1AtVWeTSsVuSbRE1MiRME7IkdXRBhP4Zo+IPGZ
- xI9WOFL3U20PJdKcwrx/4wn3jEBQZH58OV+aIS2L4lS+o4wTjGjgIENnrfuBoJ8S7eFe
- dmwFCtIRAnuOq8EXuHtUdU+2zyZgGR/1bEfqLUg5i+puNTkBUeImC/P3Z5e31S80aRLc
- 5HWcJnq8h0gPC26XPGuSfUPyC/USOGkRQ6U9b9uWx0qt+GLPfZI+hG6mzBR/Yr7Bp6wA
- np6Q==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1htiqy-0001Vd-2l
+ for qemu-devel@nongnu.org; Fri, 02 Aug 2019 21:29:00 -0400
+Received: by mail-pf1-x444.google.com with SMTP id y15so36856853pfn.5
+ for <qemu-devel@nongnu.org>; Fri, 02 Aug 2019 18:28:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=O2YN/QvQPLAClyEHRsWfCjD/z1AkYNw3I+YAPw1gM+M=;
+ b=peAEqdQ/+jsPCbvSoNEMbZBGBEB7ki3rifLdsBrYOJ5QKxZWLx1r+73A+qAOYmq5mD
+ UFghBw8pYHSMfttL1UUuMSG05BfX39qf5PZz+gdA0dHRPJp1XfiGz/H5P4Sv8v9VWu8e
+ sC142ceEEwx9Qnyg/aOteuebeBAw7hzsmkWuruWg1To0qG+FtFjEIJYf7EZPOmero6wa
+ M6oNh9j/hNaLxjBCirpPkbVsIemJlO5tXPEAVpWRAGIeUkvYzpiTZ4JmQr7/rBHMgqK8
+ /sVlTbxaTIHb+Yj+HHw/eiE7uGIxUUhj+hk3mCJizkgW9XXv/prcPgaB1DQQ7GG60g0q
+ oKyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id;
- bh=yAxZ8RM+7BN40lgaBTxH7y4VBapD3Af85d2Gzv1To1A=;
- b=rkuFXjQJcbkI3tg6kL8eYLPCgkR24yjDC0snNEIjvcMd7ikS4usvAjfiA7l2GuRKix
- w2Pl5kpytf8Jr5DJfeXTSUBtSr6CI4HZXIWkUC2vDSkr3C8O0YD3yOV7kupZ4fb/cXOj
- 0pX/f8psO4snd/z9s1u0ZXIvr/2WM3XKDoZv4k++YOWsYAwjBVe3NabtMhQAcyHMoITQ
- 8u3YnVM2aCUBfeNVFzUGeNJoUsFDQjdxdWiKqzMThm4av/qemmPvzvLWnRrVkAn8x9gv
- fSgdSHEIsnZbOSl/NsByZ53LvqleVReUXL56ka7k2rRrYgnrnrNjue3X9Yri1V/4GKEN
- 7ngg==
-X-Gm-Message-State: APjAAAWRb9LJT8Ldt6tLkyPArqiiJZLgpi0cW8qU8Ra5IWNTExz5yV3D
- OKNFMb6Dpiz3hnpI0i8UiHA=
-X-Google-Smtp-Source: APXvYqw/y/RkEoMZqYxFyDiHraPalbf1S/Mb65HmPFEHyF2japhprA/WfbHFcIEP/ANgslQf5+pVTw==
-X-Received: by 2002:a17:902:7283:: with SMTP id
- d3mr43675532pll.93.1564792058189; 
- Fri, 02 Aug 2019 17:27:38 -0700 (PDT)
-Received: from localhost.localdomain (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id 23sm80222524pfn.176.2019.08.02.17.27.37
- (version=TLS1 cipher=AES128-SHA bits=128/128);
- Fri, 02 Aug 2019 17:27:37 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Date: Fri,  2 Aug 2019 17:27:32 -0700
-Message-Id: <1564792052-6469-1-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 1.7.1
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=O2YN/QvQPLAClyEHRsWfCjD/z1AkYNw3I+YAPw1gM+M=;
+ b=j09LiwVqDUukKTjd6bRfiXLHMp0rJq4um7lF8V4j4u0zyewhdSeIqIDDb09iRUK5Ll
+ FKVlQYdPhZDa6O+YTHMtXdDr2D7JBCLiVCQ+4lqqA/gzhtB/yi50K0tJlg0IqfWAJ3NE
+ Qd1bj1VC1Owgab6eO1xCAwln0rIPzRkASJCLKS0gOjzzMfzsEk1JcsoBoKIDkqgK10hh
+ E14Zdy0B8oSamA+Z5Zkzz4WLQCSnHepP51gsU1zN1x9juhI9/oq482eJRZINfCaFywq9
+ cmNbUHhLhZP4JiaH//H5yLGaT856gRSmRDaYD4xjU5TtvcjVN3tJ0mmmLpC4hxG8vp0p
+ 7RsQ==
+X-Gm-Message-State: APjAAAVc+n7jfRrO8NukL2oAO37uDGv4Y0XJYoqBVVQKXRqj8rk2zl+H
+ TDImXUU1vu1TLN28i287gk4aJw==
+X-Google-Smtp-Source: APXvYqwnVSUZlfREhsnBw9LuHXiDiZQOlt95M3/uViEX+7mxMOn6jU98+8N42JxsR+pBkaRjBsNXqw==
+X-Received: by 2002:a17:90a:8c90:: with SMTP id
+ b16mr6967034pjo.133.1564795735351; 
+ Fri, 02 Aug 2019 18:28:55 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id v13sm89644104pfe.105.2019.08.02.18.28.53
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 02 Aug 2019 18:28:54 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: Andrew Jones <drjones@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <20190802122540.26385-1-drjones@redhat.com>
+ <20190802122540.26385-4-drjones@redhat.com>
+ <d0983bd5-c1a5-adf6-324d-2b199ca0e23c@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ec44ddad-c33c-918b-e94b-a534a2519a9e@linaro.org>
+Date: Fri, 2 Aug 2019 18:28:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <d0983bd5-c1a5-adf6-324d-2b199ca0e23c@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: [Qemu-devel] [PATCH] riscv: sifive_e: Correct various SoC IP block
- sizes
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: Re: [Qemu-devel] [PATCH v3 03/15] target/arm/monitor: Introduce
+ qmp_query_cpu_model_expansion
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,41 +101,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, armbru@redhat.com, eric.auger@redhat.com,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of the SoC IP block sizes are wrong. Correct them according
-to the FE310 manual.
+On 8/2/19 9:27 AM, Richard Henderson wrote:
+> On 8/2/19 5:25 AM, Andrew Jones wrote:
+>> Note, certainly more features may be added to the list of
+>> advertised features, e.g. 'vfp' and 'neon'. The only requirement
+>> is that their property set accessors fail when invalid
+>> configurations are detected. For vfp we would need something like
+>>
+>>  set_vfp()
+>>  {
+>>    if (arm_feature(env, ARM_FEATURE_AARCH64) &&
+>>        cpu->has_vfp != cpu->has_neon)
+>>        error("AArch64 CPUs must have both VFP and Neon or neither")
+>>
+>> in its set accessor, and the same for neon, rather than doing that
+>> check at realize time, which isn't executed at qmp query time.
+> 
+> How could this succeed?  Either set_vfp or set_neon would be called first, at
+> which point the two features are temporarily out of sync, but the error would
+> trigger anyway.
+> 
+> This would seem to require some separate "qmp validate" step that is processed
+> after a collection of properties are set.
+> 
+> I was about to say something about this being moot until someone actually wants
+> to be able to disable vfp+neon on aarch64, but then...
+> 
+>> +A note about CPU feature dependencies
+>> +-------------------------------------
+>> +
+>> +It's possible for features to have dependencies on other features. I.e.
+>> +it may be possible to change one feature at a time without error, but
+>> +when attempting to change all features at once an error could occur
+>> +depending on the order they are processed.  It's also possible changing
+>> +all at once doesn't generate an error, because a feature's dependencies
+>> +are satisfied with other features, but the same feature cannot be changed
+>> +independently without error.  For these reasons callers should always
+>> +attempt to make their desired changes all at once in order to ensure the
+>> +collection is valid.
+> 
+> ... this language makes me think that you've already encountered an ordering
+> problem that might be better solved with a separate validate step?
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
----
+It appears to me that we can handle both use cases with a single function to
+handle validation of the cross-dependent properties.
 
- hw/riscv/sifive_e.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+It would need to be called at the beginning of arm_cpu_realizefn, for the case
+in which we are building a cpu that we wish to instantiate, and
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 2a499d8..9655847 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -53,13 +53,13 @@ static const struct MemmapEntry {
-     hwaddr base;
-     hwaddr size;
- } sifive_e_memmap[] = {
--    [SIFIVE_E_DEBUG] =    {        0x0,      0x100 },
-+    [SIFIVE_E_DEBUG] =    {        0x0,     0x1000 },
-     [SIFIVE_E_MROM] =     {     0x1000,     0x2000 },
-     [SIFIVE_E_OTP] =      {    0x20000,     0x2000 },
-     [SIFIVE_E_CLINT] =    {  0x2000000,    0x10000 },
-     [SIFIVE_E_PLIC] =     {  0xc000000,  0x4000000 },
--    [SIFIVE_E_AON] =      { 0x10000000,     0x8000 },
--    [SIFIVE_E_PRCI] =     { 0x10008000,     0x8000 },
-+    [SIFIVE_E_AON] =      { 0x10000000,     0x1000 },
-+    [SIFIVE_E_PRCI] =     { 0x10008000,     0x1000 },
-     [SIFIVE_E_OTP_CTRL] = { 0x10010000,     0x1000 },
-     [SIFIVE_E_GPIO0] =    { 0x10012000,     0x1000 },
-     [SIFIVE_E_UART0] =    { 0x10013000,     0x1000 },
--- 
-2.7.4
+> +        if (!err) {
+> +            visit_check_struct(visitor, &err);
+> +        }
 
+here, inside qmp_query_cpu_model_expansion for the query case.
+
+Looking at the validation code scattered across multiple functions, across 4
+patches, convinces me that the code will be smaller and more readable if we
+consolidate them into a single validation function.
+
+
+r~
 
