@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B144C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:51:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00323C433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:52:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 628CF2073D
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B55C02087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:52:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xYQqIug3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 628CF2073D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AJ98DjJu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55C02087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htz8F-0005H6-LF
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 14:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60644)
+	id 1htz8e-0006gN-UE
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 14:52:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60692)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htz4h-0006CX-5p
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:16 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htz4k-0006EH-6a
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htz4e-00079o-R3
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:15 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:45989)
+ (envelope-from <richard.henderson@linaro.org>) id 1htz4i-0007B7-0G
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:18 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:36583)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htz4e-00079M-MD
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:12 -0400
-Received: by mail-pf1-x444.google.com with SMTP id r1so37612157pfq.12
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:12 -0700 (PDT)
+ id 1htz4h-0007AJ-5O
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:15 -0400
+Received: by mail-pf1-x441.google.com with SMTP id r7so37626311pfl.3
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=VC440BcwSuqOKz+Fo7ui0w+dupEF68UzkVylEVc+WDs=;
- b=xYQqIug3gmfLrgPuAZoKA+vetM7unvOZ/ZGAnj/U508vBjOOKgPiRgD1Kqn26Kleay
- mnfIK+wozNSd+s4VKGGZldx3aH3FaWGxLPvZSzApdwKxKPn/w3P1WTLmiXsteqysDCl9
- 5qMHusOO+bNqRwvYOx5bHMiJTfGTve3JxSHWI5s4Fc/AU/EgdvoZDV1W5lK1Hvt6AJyn
- QjDuCJJieLrHL2oW5lE9Rye5CAhZ1gL07/LDHjywbVZQNj36hHP4+cLTKme9MziVU2eT
- nury2BWc68bWSp+ZCFqKt7H4fT0FRLejKjejROKZDnI2jgExCs0AaBwKMV86gRws5EIh
- ialA==
+ bh=eXztB5+CPZYWvtJqCXCkkbobp/U8zAPLQueishTnE64=;
+ b=AJ98DjJuyQa8Lr5B1/KRUNoK+ILQGZEY9Jv3+Ww03P6WGufe/CvR8wyHMj88ptaIR4
+ r0bz8uvJn0E8vEGQoHbmsxXpve9cfB66rxvlVOkP9ljpopFmHG1HcxbH8MWz7/H6q3M6
+ u95D3jILdArc0uyivXitYvp/ISBhXCsXQvaDnNABaopop/5PgGllnE99riLxlLbRUUc8
+ 2uo3HYe/J1G0KDBaQFEyXM7aXMX/W/5LTHVOxlT+NvzzmkBDKDJxrQZBOVYCfq3ezmxW
+ fV87C/o1zBtN9yOn+zD50rUqX+VBxjFC3dQUVAaej+TKRJgx1ZB5eCkudDlyeWXz1YUf
+ Jtsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=VC440BcwSuqOKz+Fo7ui0w+dupEF68UzkVylEVc+WDs=;
- b=V9/DNaJ+/rXuQq0xAXqOjqdt5ztjvEcCjLcnjNwWT6+WkUK1v4lxTz1bqUgEWkn8wI
- GvBsXSUeQfqT/maGwUE2dA1ZPI4Wd1OtNQed59aMNOt/3iygLq6WtFILOn9F2oPNQH5H
- aeBUOYpTS2xwAjf4/SqwnI1uSoIgzm4h/y3bIM3dhdmPX2RRrD5T8uDd66m1NPI6pgg2
- Pa5/igTRa6EZtgqChDxINjkn6yvoKf1Ja65SVjytcmSnYe7wkpwPufDXFOV3A5XpDy5z
- x8lf19Cb9KQP18hmagu13c+6ZQQzkDmdvDjIvmXt9dK+Nb/C3YTQhTsANa3/Ct9UBVf/
- 1zGQ==
-X-Gm-Message-State: APjAAAWVZX+plKFWIvWQJ6uBhDaX2zsUIN1uzlqsJOkXhF7Nwwmfg5vy
- +A0nRetZyaRFfT1zAW3ezIagl4pnxCM=
-X-Google-Smtp-Source: APXvYqz6lBWZaB/Djz8xzjkNxK72Fp1Nk7R2FXSOlEzz7gtgzwgysoidHM+p/ov4HizfXtY7fvjwfA==
-X-Received: by 2002:a62:5c47:: with SMTP id q68mr66933851pfb.205.1564858091413; 
- Sat, 03 Aug 2019 11:48:11 -0700 (PDT)
+ bh=eXztB5+CPZYWvtJqCXCkkbobp/U8zAPLQueishTnE64=;
+ b=LJubyNOzmPZGytdygDInN26K8MV3kp6LWEKzNHdvT9t04GdwXiB5bLMJQtjYCS+Vlt
+ KKZ4GTrIpDf2/4WI9hwR0pDGpbkumqrA7kXKe581B6czCyE1hEfwrkZtseVB+Me+47vO
+ C3UvPcpdqkR4mqGa1RJhmw3R6rubMsbouQVn9r9CD1V8/CXhZDmJZHbJDEG6K6NWMoaf
+ deoRb4zXrC4MQ7lprV5HgVOlpbiJthFRFzCvEWPZTs8pnp4LvQLz26BFjSfkL1x2q+A7
+ 5hbYGudtBOjnLAcI0mYMXKQWFi4OfZNY1FBC6BUOvyijDQCrOpaP9caa4T0wHImNZn5t
+ Kkpg==
+X-Gm-Message-State: APjAAAVG0ukj01I3v6Oyygki7KRQkg/NvpgiT940F1Fj5h+UeQPAmkZA
+ eA6ObP9X77QGzZmgpDI2ByYYpUWpz6s=
+X-Google-Smtp-Source: APXvYqxLtTrDQd2ygpe7u9I3MpwqN034hu3moDA93qP3hIuKQzIwJYfCmTIvAo5R/ZLJ4/IHyRsOnQ==
+X-Received: by 2002:a62:750c:: with SMTP id q12mr67644200pfc.59.1564858093677; 
+ Sat, 03 Aug 2019 11:48:13 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.10
+ by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.12
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 11:48:10 -0700 (PDT)
+ Sat, 03 Aug 2019 11:48:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 11:47:33 -0700
-Message-Id: <20190803184800.8221-8-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 11:47:35 -0700
+Message-Id: <20190803184800.8221-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190803184800.8221-1-richard.henderson@linaro.org>
 References: <20190803184800.8221-1-richard.henderson@linaro.org>
@@ -81,8 +81,8 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: [Qemu-devel] [PATCH v3 07/34] target/arm: Enable HCR_E2H for VHE
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH v3 09/34] target/arm: Add TTBR1_EL2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,55 +99,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+At the same time, add writefn to TTBR0_EL2 and TCR_EL2.
+A later patch will update any ASID therein.
+
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/cpu.h    | 7 -------
- target/arm/helper.c | 6 +++++-
- 2 files changed, 5 insertions(+), 8 deletions(-)
+ target/arm/helper.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e6a76d14c6..e37008a4f7 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1366,13 +1366,6 @@ static inline void xpsr_write(CPUARMState *env, uint32_t val, uint32_t mask)
- #define HCR_ATA       (1ULL << 56)
- #define HCR_DCT       (1ULL << 57)
- 
--/*
-- * When we actually implement ARMv8.1-VHE we should add HCR_E2H to
-- * HCR_MASK and then clear it again if the feature bit is not set in
-- * hcr_write().
-- */
--#define HCR_MASK      ((1ULL << 34) - 1)
--
- #define SCR_NS                (1U << 0)
- #define SCR_IRQ               (1U << 1)
- #define SCR_FIQ               (1U << 2)
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 65e3ffbb43..9a18ecf8f6 100644
+index 8baeb3f319..8d8b3cc40e 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -4623,7 +4623,8 @@ static const ARMCPRegInfo el3_no_el2_v8_cp_reginfo[] = {
- static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
- {
-     ARMCPU *cpu = env_archcpu(env);
--    uint64_t valid_mask = HCR_MASK;
-+    /* Begin with bits defined in base ARMv8.0.  */
-+    uint64_t valid_mask = MAKE_64BIT_MASK(0, 34);
+@@ -3449,6 +3449,12 @@ static void vmsa_ttbr_el1_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     }
+ }
  
-     if (arm_feature(env, ARM_FEATURE_EL3)) {
-         valid_mask &= ~HCR_HCD;
-@@ -4637,6 +4638,9 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
-          */
-         valid_mask &= ~HCR_TSC;
-     }
-+    if (cpu_isar_feature(aa64_vh, cpu)) {
-+        valid_mask |= HCR_E2H;
-+    }
-     if (cpu_isar_feature(aa64_lor, cpu)) {
-         valid_mask |= HCR_TLOR;
-     }
++static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
++                                    uint64_t value)
++{
++    raw_write(env, ri, value);
++}
++
+ static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+                         uint64_t value)
+ {
+@@ -4844,10 +4850,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+       .resetvalue = 0 },
+     { .name = "TCR_EL2", .state = ARM_CP_STATE_BOTH,
+       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 2,
+-      .access = PL2_RW,
+-      /* no .writefn needed as this can't cause an ASID change;
+-       * no .raw_writefn or .resetfn needed as we never use mask/base_mask
+-       */
++      .access = PL2_RW, .writefn = vmsa_tcr_ttbr_el2_write,
++      /* no .raw_writefn or .resetfn needed as we never use mask/base_mask */
+       .fieldoffset = offsetof(CPUARMState, cp15.tcr_el[2]) },
+     { .name = "VTCR", .state = ARM_CP_STATE_AA32,
+       .cp = 15, .opc1 = 4, .crn = 2, .crm = 1, .opc2 = 2,
+@@ -4881,7 +4885,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] = {
+       .fieldoffset = offsetof(CPUARMState, cp15.tpidr_el[2]) },
+     { .name = "TTBR0_EL2", .state = ARM_CP_STATE_AA64,
+       .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 0,
+-      .access = PL2_RW, .resetvalue = 0,
++      .access = PL2_RW, .resetvalue = 0, .writefn = vmsa_tcr_ttbr_el2_write,
+       .fieldoffset = offsetof(CPUARMState, cp15.ttbr0_el[2]) },
+     { .name = "HTTBR", .cp = 15, .opc1 = 4, .crm = 2,
+       .access = PL2_RW, .type = ARM_CP_64BIT | ARM_CP_ALIAS,
+@@ -6807,6 +6811,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+               .opc0 = 3, .opc1 = 4, .crn = 13, .crm = 0, .opc2 = 1,
+               .access = PL2_RW,
+               .fieldoffset = offsetof(CPUARMState, cp15.contextidr_el[2]) },
++            { .name = "TTBR1_EL2", .state = ARM_CP_STATE_AA64,
++              .opc0 = 3, .opc1 = 4, .crn = 2, .crm = 0, .opc2 = 1,
++              .access = PL2_RW, .writefn = vmsa_tcr_ttbr_el2_write,
++              .fieldoffset = offsetof(CPUARMState, cp15.ttbr1_el[2]) },
+             REGINFO_SENTINEL
+         };
+         define_arm_cp_regs(cpu, vhe_reginfo);
 -- 
 2.17.1
 
