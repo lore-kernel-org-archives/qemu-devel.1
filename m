@@ -7,83 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 770B2C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE82C433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 21:09:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BCCE2087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:05:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BA5121726
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 21:09:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q2KjR7sz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BCCE2087C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cwcnxi5L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA5121726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htzKz-0000FY-Hf
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 15:05:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33108)
+	id 1hu1Gw-0002cG-Ja
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 17:09:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51917)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htz5K-0007GI-LZ
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:55 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hu1GC-0000xW-9Y
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htz5J-0007WE-OA
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:54 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42856)
+ (envelope-from <richard.henderson@linaro.org>) id 1hu1G6-0005Mk-5H
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:12 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45611)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htz5J-0007QN-JI
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:53 -0400
-Received: by mail-pf1-x441.google.com with SMTP id q10so37607491pff.9
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:42 -0700 (PDT)
+ id 1hu1G5-0005Ly-J7
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 17:08:10 -0400
+Received: by mail-pf1-x443.google.com with SMTP id r1so37694468pfq.12
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 14:08:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=1OFhZYB7REGpAAmdzyA7otQ/hGEth32oUJ6nOIibRSY=;
- b=Q2KjR7szqQzFJBEH2NX0Shzd0whUpZj611QA5mIAYhzgpKlRBh5ODsGM5FpzlG4XYN
- E60p6k7knFLoG/3l6e6jb7NjxMSe0Uv8+wqgGre6LtOAO8f9GbaDAC+QVVD/ZN5iyITN
- lGdwQcy388XZhoO0jJnjvMrs8PgL8MKY8f2zAiABXU4jRRFArYBaW2DC9HbECCXS3boA
- MVFaJlKA0Jjiem7h2Fc2fVhhL4udB+lpnGcgR8fnzJZy8uhg7VgTozjHaTNGGsA68nb+
- pNMQWGe5juX6arF/6MAQUZs+Ue9hikLMS6b4/+dUo5QLrj218JfX5gH9w7La9BbmqPbo
- yNEg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=+x0WGSWw36fXqg8sJBr/e/px4PQ5p89CEe43iMHBL7I=;
+ b=Cwcnxi5Ll9OoC5PykIu9TfQLHldwMsAvoEc5GYdHrv0oEpkGdUvSWDZOHssZzXVhSA
+ ZwhC9Gh7AdPJde9++OK0GnIhE3yzaWgrAI7Z/Re9IIvsMm8PwOIpoO9qBU8sSy4S0nMS
+ 4jPbOD05A/lQ116UAkRA1qAe042pCBEOa9ey7y8RWftADpaZ+XcVZqCVXeKbsIEcfUib
+ lsZv8Itprsc/qgMfYyBtYJmWuS9G9zMCLYm+f5GdXhfnNlRFsYX50Ok+lxHfjdZaL2Yg
+ GvvXTJ+6V3nBSG29NGko2nj08Yn7bI6B7mGob9evEDVkRrrHMkUCEsNRR7JaB9ESvqNL
+ CSwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1OFhZYB7REGpAAmdzyA7otQ/hGEth32oUJ6nOIibRSY=;
- b=PiA56Qe461Ikjgo524YDH1tBp04+AV3VRRgNXiGQvkN7Yi5N6SeyQ2fUje4QgvDXRt
- uOMj9niWmdtcyy9v0T489aBsjEo5HQPX2dR449GR97yt0MF05PbqyrUik0KVGxVGzKfw
- EYUAWR2YkTCMOCehSHN6Xu3+4G8pYyXIcuF9lY44tC7occMjSfKZiMLEgIHWvxlwVvCp
- d3WC4AYge3u5p99XoIGTsY0+BnOWnYlXALLD4aekRpkDBgKsIBNBXa5uJ4DjiAV57CKP
- 7vEOu+rl5I7gc/vEJqvr6XzjdsHmruap9M8bzXSkLLd4o1gVAGB8QjUwf4R9uAu/Yh6T
- eQBQ==
-X-Gm-Message-State: APjAAAVEJHwRwsdPHVwFIIpIEUcLirj1kS1kpm2LIXQQ+R0hIeeL88aM
- a8i7F+w43qWGAi77C507n73S396lM+4=
-X-Google-Smtp-Source: APXvYqwcpUfQm+lN0lAiyTvKZ+LKiZdqq8LkPAnYLxLczAXe8PepUtoBWVyUkepumSba4RRwsKQ6zg==
-X-Received: by 2002:a62:ac11:: with SMTP id v17mr65823645pfe.236.1564858121535; 
- Sat, 03 Aug 2019 11:48:41 -0700 (PDT)
+ :references;
+ bh=+x0WGSWw36fXqg8sJBr/e/px4PQ5p89CEe43iMHBL7I=;
+ b=b5k+UQBZt3ZlFMkyN5ROThO7Hqia2fzRDDkpx64yBHhIT35S9Medb85Zfc/rfQE12J
+ qmSBX9vhvB4F2NV3VGeCWvKhyR8E0l4fe4s+f7Vc94DxLaN4QiBkkIVRT5/S/DEhBu2k
+ S9LtZe4HxLWc5+uMbKstYD11/WoY29rji7u/3vdLR2TplNC4Ez8GUxspbEUqP/HL+q23
+ kI6zZIbgkDacBrlgWu73vFpY83YNn8SIOWidq00irTVQDd7JbXMVTPA8UWX7WYjFtB4c
+ chGH7ahme/yXKd/G7HTneSDZvx+h9l5pCaku6x/mMuH3fAZAddbi+wQAhIj0t3/RkBbq
+ 2ZNQ==
+X-Gm-Message-State: APjAAAVm1ARYbmRStOUaWIAq2FeBgrWNuwVB4gD8jkOmcNajN81tXHfd
+ bmwpNM74kk5G79EGS2rqYTSWF/MDdqA=
+X-Google-Smtp-Source: APXvYqxWqqWPuBOLdRQc/hJXfPoBdGtaq4fiuoS0mDfuRQj9NKrBc2K0oy/9Xr5Ai6Lkek3SZ7VJxw==
+X-Received: by 2002:a17:90a:5884:: with SMTP id
+ j4mr11266253pji.142.1564866488176; 
+ Sat, 03 Aug 2019 14:08:08 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.40
+ by smtp.gmail.com with ESMTPSA id x25sm110129644pfa.90.2019.08.03.14.08.07
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 11:48:40 -0700 (PDT)
+ Sat, 03 Aug 2019 14:08:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 11:47:59 -0700
-Message-Id: <20190803184800.8221-34-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 14:07:58 -0700
+Message-Id: <20190803210803.5701-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190803184800.8221-1-richard.henderson@linaro.org>
-References: <20190803184800.8221-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190803210803.5701-1-richard.henderson@linaro.org>
+References: <20190803210803.5701-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::441
-Subject: [Qemu-devel] [PATCH v3 33/34] target/arm: check TGE and E2H flags
- for EL0 pauth traps
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH v7 1/6] linux-user/aarch64: Reset btype for
+ signals
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,37 +92,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org,
+ Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alex Bennée <alex.bennee@linaro.org>
+The kernel sets btype for the signal handler as if for a call.
 
-According to ARM ARM we should only trap from EL0
-when TCG or E2H are 0.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/pauth_helper.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ linux-user/aarch64/signal.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/pauth_helper.c b/target/arm/pauth_helper.c
-index 42c9141bb7..9fa002068e 100644
---- a/target/arm/pauth_helper.c
-+++ b/target/arm/pauth_helper.c
-@@ -371,7 +371,9 @@ static void pauth_check_trap(CPUARMState *env, int el, uintptr_t ra)
-     if (el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-         uint64_t hcr = arm_hcr_el2_eff(env);
-         bool trap = !(hcr & HCR_API);
--        /* FIXME: ARMv8.1-VHE: trap only applies to EL1&0 regime.  */
-+        if (el < 1) {
-+            trap &= !(hcr & HCR_TGE) | !(hcr & HCR_E2H);
-+        }
-         /* FIXME: ARMv8.3-NV: HCR_NV trap takes precedence for ERETA[AB].  */
-         if (trap) {
-             pauth_trap(env, 2, ra);
+diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+index cd521ee42d..2c596a7088 100644
+--- a/linux-user/aarch64/signal.c
++++ b/linux-user/aarch64/signal.c
+@@ -506,10 +506,16 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
+             + offsetof(struct target_rt_frame_record, tramp);
+     }
+     env->xregs[0] = usig;
+-    env->xregs[31] = frame_addr;
+     env->xregs[29] = frame_addr + fr_ofs;
+-    env->pc = ka->_sa_handler;
+     env->xregs[30] = return_addr;
++    env->xregs[31] = frame_addr;
++    env->pc = ka->_sa_handler;
++
++    /* Invoke the signal handler as if by indirect call.  */
++    if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
++        env->btype = 2;
++    }
++
+     if (info) {
+         tswap_siginfo(&frame->info, info);
+         env->xregs[1] = frame_addr + offsetof(struct target_rt_sigframe, info);
 -- 
 2.17.1
 
