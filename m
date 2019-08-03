@@ -2,61 +2,59 @@ Return-Path: <SRS0=Oxyb=V7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FAFC31E40
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 08:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0551C433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 08:26:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 660772087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 08:26:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 660772087C
+	by mail.kernel.org (Postfix) with ESMTPS id 958AD2087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 08:26:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 958AD2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htpMc-0000Ak-Sq
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 04:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41087)
+	id 1htpMj-0000Dr-Ug
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 04:26:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41083)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1htpM0-0007pG-0s
+ (envelope-from <philmd@redhat.com>) id 1htpLz-0007pF-VY
  for qemu-devel@nongnu.org; Sat, 03 Aug 2019 04:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1htpLy-0006rI-Pr
+ (envelope-from <philmd@redhat.com>) id 1htpLy-0006qr-2j
  for qemu-devel@nongnu.org; Sat, 03 Aug 2019 04:25:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49752)
+Received: from mx1.redhat.com ([209.132.183.28]:47592)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1htpLy-0006qZ-5d
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1htpLw-0006pb-5S
  for qemu-devel@nongnu.org; Sat, 03 Aug 2019 04:25:26 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7DA583DE22;
- Sat,  3 Aug 2019 08:25:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1810E315C003
+ for <qemu-devel@nongnu.org>; Sat,  3 Aug 2019 08:25:23 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-58.brq.redhat.com [10.40.204.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B359960BF4;
- Sat,  3 Aug 2019 08:25:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FF1A60BF4;
+ Sat,  3 Aug 2019 08:25:19 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 10:25:17 +0200
-Message-Id: <20190803082517.15035-2-philmd@redhat.com>
-In-Reply-To: <20190803082517.15035-1-philmd@redhat.com>
-References: <20190803082517.15035-1-philmd@redhat.com>
+Date: Sat,  3 Aug 2019 10:25:16 +0200
+Message-Id: <20190803082517.15035-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Sat, 03 Aug 2019 08:25:25 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Sat, 03 Aug 2019 08:25:23 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/1] Makefile: remove DESTDIR from firmware file
- content
+Subject: [Qemu-devel] [PULL 0/1] EDK2 firmware patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,44 +66,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Olaf Hering <olaf@aepfle.de>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Olaf Hering <olaf@aepfle.de>
+The following changes since commit 9bcf2dfa163f67b0fec6ee0fe88ad5dc5d69dc=
+59:
 
-The resulting firmware files should only contain the runtime path.
-Fixes commit 26ce90fde5c ("Makefile: install the edk2 firmware images
-and their descriptors")
+  Merge remote-tracking branch 'remotes/elmarco/tags/slirp-CVE-2019-14378=
+-pull-request' into staging (2019-08-02 13:06:03 +0100)
 
-Signed-off-by: Olaf Hering <olaf@aepfle.de>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Message-Id: <20190530192812.17637-1-olaf@aepfle.de>
-Fixes: https://bugs.launchpad.net/qemu/+bug/1838703
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
+are available in the Git repository at:
+
+  https://gitlab.com/philmd/qemu.git tags/edk2-next-20190803
+
+for you to fetch changes up to 177cd674d6203d3c1a98e170ea56c5a904ac4ce8:
+
+  Makefile: remove DESTDIR from firmware file content (2019-08-03 09:52:3=
+2 +0200)
+
+----------------------------------------------------------------
+A harmless build-sys patch that fixes a regression affecting Linux
+distributions packaging QEMU.
+
+----------------------------------------------------------------
+
+Olaf Hering (1):
+  Makefile: remove DESTDIR from firmware file content
+
  Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index cfab1561b9..85862fb81a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -881,7 +881,7 @@ ifneq ($(DESCS),)
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)/firmware"
- 	set -e; tmpf=3D$$(mktemp); trap 'rm -f -- "$$tmpf"' EXIT; \
- 	for x in $(DESCS); do \
--		sed -e 's,@DATADIR@,$(DESTDIR)$(qemu_datadir),' \
-+		sed -e 's,@DATADIR@,$(qemu_datadir),' \
- 			"$(SRC_PATH)/pc-bios/descriptors/$$x" > "$$tmpf"; \
- 		$(INSTALL_DATA) "$$tmpf" \
- 			"$(DESTDIR)$(qemu_datadir)/firmware/$$x"; \
 --=20
 2.20.1
 
