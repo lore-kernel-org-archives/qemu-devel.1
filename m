@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C89AAC31E40
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6957FC433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:02:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 912FE2087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:01:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 324B52087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:02:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B/K5WUnn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 912FE2087C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dMqUYYmR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 324B52087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htzHT-0002Vg-TL
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 15:01:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33003)
+	id 1htzID-00048b-DA
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 15:02:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32862)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htz5D-0006vn-Hg
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:49 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htz51-0006ka-Bu
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htz5B-0007SF-KW
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:47 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39906)
+ (envelope-from <richard.henderson@linaro.org>) id 1htz50-0007Mm-3x
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:35 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43813)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htz59-0007Oy-L3
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:44 -0400
-Received: by mail-pl1-x643.google.com with SMTP id b7so34933483pls.6
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:38 -0700 (PDT)
+ id 1htz4z-0007MK-V4
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:34 -0400
+Received: by mail-pl1-x641.google.com with SMTP id 4so27885291pld.10
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=4Ze85vH/aQjxlcuWsjYuHifd5A5xyc14ioC1rkP0Yto=;
- b=B/K5WUnnGiy111NPTwOaiQW0NtyN9hpfo4MH+vcSVcsOM/2oss8u0hV3oRVIh0AYHT
- Q9X/yodCD/1/kDno63G/LcVovJJW9iHlyBX9ihwk5aeRS+mLvzxOt6LWUnYKffOMdALc
- 8kQ9ZcY0bj3js5usQnd1daxvaGay8B7k6IRXr0W24a8TIsrx9bnj3IwL5yBIa2aCyuKT
- J1HSY9fImd3SmYU/7JQN3uWubz7I6BH++g0KihvBQT7bQEx2AAeNwOLZzSRTVLUjF3w0
- L+JnCj9eer4GkI2V/tXWBV8W+bIl6bil4kr89MYOhpuVVxpEKi+uHWL4KIYumKvxoUev
- 468Q==
+ bh=XOwe1x9jkMeobEp2gGQ1QVWfLomppnXBcfQfzlWOS/E=;
+ b=dMqUYYmRfdayPFfbUWwMEx9J2DbZBKw2F4NAJoNPOwLBmqrOuFzJaZYBpEpuXKphx1
+ k73GH4LZNLW8ZcfyO87kGFQQTTfXTFLE/f6gvk1z2RiesiH1K0PjhQnXIzaW3SHb/cID
+ /w/DfIbV/75N84T2THH4vOYiInYakfJu9A7ElnolFK36pD1HyeS43c3PgOew1zddvEWX
+ HzAcn4s9+sTMspPIHAkYjlByi0Y0pfsgypM/POeJxGLNs40YlCnb1AVJsc+MKMs4UAxx
+ Aveu6pq6lBGaSaBO+2y82E3xXr7kW26UT0Un0Qe3PPlUksqIRPxlEERvvNnIzzlHH8ww
+ ERrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=4Ze85vH/aQjxlcuWsjYuHifd5A5xyc14ioC1rkP0Yto=;
- b=g6Zf4BnZZTBWgxvrFkT1L7+5p2agrZpz+PBFnzYsN7fx/nlSbhmLjxrvv5zod47NsD
- GeWABKE/IAGPXgGi6KaATv3VJnnwzxFsq6fegrUc5LPqc+tC6banbWtAhXSQWZNYVXmk
- kwd8/f3G0FuvIRRx4S7q2WHJZqDNqT8h6zWfQm9/OxbDU0vKCMw6tk4Bs9rrOtwpqtD3
- rEcsgRdd9lZX5o1gPs8HJsXyEf1GpkN58NR5+ZWxX4uoFJDBUFD44lLEb2O0h/MHCn+1
- hVDVHffC4chKvxDpNn2f4QXCdajaK/NiucYl/exPk2dRe6t/Z/PLAp3evVURBiKf4PbM
- FwvA==
-X-Gm-Message-State: APjAAAUziHgcxg8h0nmbDwy+bS5pXoHeZBauvWiFksE0dipChpa0iUoE
- 18SuS8LpiJgtVVP5E8ZKtD3ioUJZIS8=
-X-Google-Smtp-Source: APXvYqzJFO+1FmGoDSJ9r7CICKD1CR4xMc85MG0BDcvENkf1v3+QwuGOrezYuv0NcVNbI0lt6Kk2OA==
-X-Received: by 2002:a17:902:9041:: with SMTP id
- w1mr23791104plz.132.1564858117384; 
- Sat, 03 Aug 2019 11:48:37 -0700 (PDT)
+ bh=XOwe1x9jkMeobEp2gGQ1QVWfLomppnXBcfQfzlWOS/E=;
+ b=saSaKNMlZ9AdMs67TabjHunn5zoJUfGTuSKsXgnPU7Z88YNR3Lqo5vsKOl8D9cVyaG
+ c/zwbnG8KJ3ert7fTIicxolPgW0HhJFgCU+CiZ4/2DfprpqqWDs23qjamwpDhPVajTLc
+ sOxFF/TTLsHyUjP32dYw0YYJng4Ahr5TdS2BMwtp4v4dJQ+oanG9IGKU8V6oB3v95veB
+ T6elbTDRrZ8cJheLzRpgzRLITGf3CRXgKRKcjLrCZHdDHU+ACqh5I8i6jdntQrFb951L
+ ELjTnRP3JTZAEHCF5ZnqxnqRF1zs+DUsKu9Y8HVCbVXws6ubcbDnkQFA6925a0MExkDs
+ uuDg==
+X-Gm-Message-State: APjAAAWLAvLUJT3DbXvxVVqWLFoKrsoQRrZCowmDLXqUqBUlCcqS7HZv
+ gdYW0k1U36YTUFp8xUpk3IWpP/+r82U=
+X-Google-Smtp-Source: APXvYqyb1AF8sTnicyX+NAezc54dTu4e+BfaRxO4fEL/ZNln+ZX+TAvvOyDRIIAMgqa+cbIuuztDxA==
+X-Received: by 2002:a17:902:b48f:: with SMTP id
+ y15mr139996271plr.268.1564858112630; 
+ Sat, 03 Aug 2019 11:48:32 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.36
+ by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.31
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 11:48:36 -0700 (PDT)
+ Sat, 03 Aug 2019 11:48:31 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 11:47:55 -0700
-Message-Id: <20190803184800.8221-30-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 11:47:51 -0700
+Message-Id: <20190803184800.8221-26-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190803184800.8221-1-richard.henderson@linaro.org>
 References: <20190803184800.8221-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PATCH v3 29/34] target/arm: Update
- arm_phys_excp_target_el for TGE
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PATCH v3 25/34] target/arm: Update aa64_zva_access
+ for EL2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,30 +97,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TGE bit routes all asynchronous exceptions to EL2.
+The comment that we don't support EL2 is somewhat out of date.
+Update to include checks against HCR_EL2.TDZ.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/arm/helper.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 984a441cc4..a0969b78bf 100644
+index 9e9d2ce99b..37c881baab 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -7968,6 +7968,12 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
-         break;
-     };
- 
-+    /*
-+     * For these purposes, TGE and AMO/IMO/FMO both force the
-+     * interrupt to EL2.  Fold TGE into the bit extracted above.
-+     */
-+    hcr |= (hcr_el2 & HCR_TGE) != 0;
+@@ -4113,11 +4113,27 @@ static void tlbi_aa64_ipas2e1is_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ static CPAccessResult aa64_zva_access(CPUARMState *env, const ARMCPRegInfo *ri,
+                                       bool isread)
+ {
+-    /* We don't implement EL2, so the only control on DC ZVA is the
+-     * bit in the SCTLR which can prohibit access for EL0.
+-     */
+-    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_DZE)) {
+-        return CP_ACCESS_TRAP;
++    int cur_el = arm_current_el(env);
 +
-     /* Perform a table-lookup for the target EL given the current state */
-     target_el = target_el_table[is64][scr][rw][hcr][secure][cur_el];
- 
++    if (cur_el < 2) {
++        uint64_t hcr = arm_hcr_el2_eff(env);
++
++        if (cur_el == 0) {
++            if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++                if (!(env->cp15.sctlr_el[2] & SCTLR_DZE)) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
++            } else {
++                if (!(env->cp15.sctlr_el[1] & SCTLR_DZE)) {
++                    return CP_ACCESS_TRAP;
++                }
++                if (hcr & HCR_TDZ) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
++            }
++        } else if (hcr & HCR_TDZ) {
++            return CP_ACCESS_TRAP_EL2;
++        }
+     }
+     return CP_ACCESS_OK;
+ }
 -- 
 2.17.1
 
