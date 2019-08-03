@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC05C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F0BC31E40
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:00:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD0952087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:59:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8859E2087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 19:00:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZHFbLtM2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD0952087C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xyjg5s19"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8859E2087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1htzFh-0006qW-24
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 14:59:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33000)
+	id 1htzG7-0008Cw-T1
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 15:00:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32884)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1htz5D-0006vh-H6
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:49 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htz52-0006ng-De
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1htz5B-0007Ri-F9
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:47 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:43344)
+ (envelope-from <richard.henderson@linaro.org>) id 1htz51-0007NR-BK
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:36 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33665)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1htz59-0007Pd-IZ
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:43 -0400
-Received: by mail-pf1-x443.google.com with SMTP id i189so37625822pfg.10
- for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:40 -0700 (PDT)
+ id 1htz51-0007My-2X
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:35 -0400
+Received: by mail-pg1-x542.google.com with SMTP id n190so2542703pgn.0
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=fQb2baX8+br9XDTjkUGb5FILfpDmjfnieLRvexjfCRg=;
- b=ZHFbLtM2E06kgJw7hT0Egbeg9owC+1p6dPnG4drYYDaV1gn4UGEFq6dm4GnDGTxgJ6
- yPYbHxLvHHTQ3bYaIFZwUNkS/1xDppWkvjVkOmRUqHXoI+Tf4z1UGdu1DjksEdf8uGXl
- +SuFpIsNLFprQtP1if5EjQGhtH8IcVn+wwwCn7GLUllKJRV88oqO8J/DCg0D5HJfDnT6
- +o5weLX8BQujymbxv3/CzWAb7CFIMmM4VCf+WhyDSWqlwF8rYhiXKUZaPemUAn9/qU3C
- TBMaSgrAct7EUoGw408h+YJRJYNrc2S3hF6DF8YeT/KQP1YpAbN8O6n1vfsTauCdmhs1
- Q2vA==
+ bh=+czGE1389+p9Ry0JcTeQCKYKOo7/YkTFZC4yltahS2c=;
+ b=Xyjg5s19r/WRWUfR6xaWgAyr8CsYpH1Dr1oYlq23QP+aj6s+bmdUNjI9ShzPR/5bnD
+ 8MtEvO474wOlswxFWfcG976klTMfYNrp2yo7J5Mj5ul/UI5FsIpB1iNE2+6AVR9CjG/q
+ AayUcEl14Gm7TZL84nQm+/2sVXDCVtdUoLRPJoLyuxCe78jcvMfCya7ikbRPUnpg29y+
+ MGss9X0u+c9rabYdQZX7JAGTwIb3FNrEn2HiYEqMRIDE798KSq2aJMY/ykeQlm5vxoib
+ Tm7V6QmSqeXMlMBhQFeo04Qrdfr9jYnyjyR1JSGmWLeD/g9KQGISk4DjevZtQOx1+gGz
+ KUxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=fQb2baX8+br9XDTjkUGb5FILfpDmjfnieLRvexjfCRg=;
- b=Ji/0e/9NCqsV79Pua8kJGIHSkQ3sEpueoao3DPf+DFIqbr8jwCs2MEiFgQPLP7mWbw
- qzgAVLWsul8rY/VZnw9MZftoPRYo8SNp08cKFuyZVCTWCqMuB6DZHhDhmWXkLpgT2UY6
- EmkmTHY0RoYGA+4HirYhLfNHqsVY1Iw69MUDGX50pJv8gFnT9v5KkdwDYHh6alP4NAFR
- feaF31fYpYgpgwcfet0zkh4K+/hBPP0xp0tZRv7zn6lDVotlos1L3/GhpeukZ2EFR80j
- yMCw9/lzAdV9+WWhjz94rSv4fmFil9QmVXOm51O+p/PcuKt4raFr775tnHUvG1r5j+n+
- b0hw==
-X-Gm-Message-State: APjAAAWvN7Qc1ZlDV6mQnvhELEaLs+1lGofN07789rODXcKc58u6upze
- eMHfl3E7sPqnYT2iDiqkKB5dRsKaKhA=
-X-Google-Smtp-Source: APXvYqxINb8Pz4XuN9P/UruqFE4PZJ/nLF369CIR3xnPOPBp6QD6RZuXQ+W29y3PmKGblH6A890Abw==
-X-Received: by 2002:aa7:8b10:: with SMTP id f16mr66690094pfd.44.1564858119468; 
- Sat, 03 Aug 2019 11:48:39 -0700 (PDT)
+ bh=+czGE1389+p9Ry0JcTeQCKYKOo7/YkTFZC4yltahS2c=;
+ b=pHu5ks8KiF+G/ZU080eNpWvGQS1DvPgaVNHJ9Bpmqz4kp4oTUBhsxM+7KWRm0ZgqlV
+ XISJbK3JrMQvkQ/4zTAHl38aSFZLi3dXLM0I/gq/1rkAgniHshZX5uTjlc6WEzg1g8w2
+ 6PMvmm632dvu9va4+0NQQKprITkg/sri9+4skFF9VgE5EDUWLfM0khFVNJRkFPWZ0GR6
+ tecrNNzMcgvWOcSeNo4IrhTGsXtAbjtTVod/6Sr4rU0Er2jiTMIJFcRhF4EqyI2TaDOt
+ xj0YggKKveTQ0p3ZPkdOhfnPIKfkmp9pNW7c9kNYalJWQb8Y/xeVY2OWDS/HAf2G+B1z
+ mJtQ==
+X-Gm-Message-State: APjAAAVu8Rcn0nLwvM6FB5WyJF/aiwjHoQOp2YK1TRYaD1fems3fgds4
+ uexalbECHmqM6/atLK98WuJbh3puwrc=
+X-Google-Smtp-Source: APXvYqxd5/9+viNsBVQVD55FqfdoyCeNMDAhjpNUvd3wgZV9Jk4QnMFb+7iGOnZQIhlJa1MG8uCZzQ==
+X-Received: by 2002:a63:784c:: with SMTP id
+ t73mr133510686pgc.268.1564858113670; 
+ Sat, 03 Aug 2019 11:48:33 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.38
+ by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.32
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Sat, 03 Aug 2019 11:48:38 -0700 (PDT)
+ Sat, 03 Aug 2019 11:48:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Sat,  3 Aug 2019 11:47:57 -0700
-Message-Id: <20190803184800.8221-32-richard.henderson@linaro.org>
+Date: Sat,  3 Aug 2019 11:47:52 -0700
+Message-Id: <20190803184800.8221-27-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190803184800.8221-1-richard.henderson@linaro.org>
 References: <20190803184800.8221-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH v3 31/34] target/arm: Update {fp,
- sve}_exception_el for VHE
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v3 26/34] target/arm: Update ctr_el0_access for
+ EL2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,102 +97,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When TGE+E2H are both set, CPACR_EL1 is ignored.
+Update to include checks against HCR_EL2.TID2.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.c | 53 ++++++++++++++++++++++++---------------------
- 1 file changed, 28 insertions(+), 25 deletions(-)
+ target/arm/helper.c | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index d481716b97..2939454c8a 100644
+index 37c881baab..b8c45eb484 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -5539,7 +5539,9 @@ static const ARMCPRegInfo debug_lpae_cp_reginfo[] = {
- int sve_exception_el(CPUARMState *env, int el)
+@@ -5361,11 +5361,27 @@ static void define_arm_vh_e2h_redirects_aliases(ARMCPU *cpu)
+ static CPAccessResult ctr_el0_access(CPUARMState *env, const ARMCPRegInfo *ri,
+                                      bool isread)
  {
- #ifndef CONFIG_USER_ONLY
--    if (el <= 1) {
-+    uint64_t hcr_el2 = arm_hcr_el2_eff(env);
+-    /* Only accessible in EL0 if SCTLR.UCT is set (and only in AArch64,
+-     * but the AArch32 CTR has its own reginfo struct)
+-     */
+-    if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
+-        return CP_ACCESS_TRAP;
++    int cur_el = arm_current_el(env);
 +
-+    if (el <= 1 && (hcr_el2 & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
-         bool disabled = false;
- 
-         /* The CPACR.ZEN controls traps to EL1:
-@@ -5554,8 +5556,7 @@ int sve_exception_el(CPUARMState *env, int el)
-         }
-         if (disabled) {
-             /* route_to_el2 */
--            return (arm_feature(env, ARM_FEATURE_EL2)
--                    && (arm_hcr_el2_eff(env) & HCR_TGE) ? 2 : 1);
-+            return hcr_el2 & HCR_TGE ? 2 : 1;
-         }
- 
-         /* Check CPACR.FPEN.  */
-@@ -11263,8 +11264,6 @@ uint32_t HELPER(crc32c)(uint32_t acc, uint32_t val, uint32_t bytes)
- int fp_exception_el(CPUARMState *env, int cur_el)
- {
- #ifndef CONFIG_USER_ONLY
--    int fpen;
--
-     /* CPACR and the CPTR registers don't exist before v6, so FP is
-      * always accessible
-      */
-@@ -11292,30 +11291,34 @@ int fp_exception_el(CPUARMState *env, int cur_el)
-      * 0, 2 : trap EL0 and EL1/PL1 accesses
-      * 1    : trap only EL0 accesses
-      * 3    : trap no accesses
-+     * This register is ignored if E2H+TGE are both set.
-      */
--    fpen = extract32(env->cp15.cpacr_el1, 20, 2);
--    switch (fpen) {
--    case 0:
--    case 2:
--        if (cur_el == 0 || cur_el == 1) {
--            /* Trap to PL1, which might be EL1 or EL3 */
--            if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
-+    if ((arm_hcr_el2_eff(env) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
-+        int fpen = extract32(env->cp15.cpacr_el1, 20, 2);
++    if (cur_el < 2) {
++        uint64_t hcr = arm_hcr_el2_eff(env);
 +
-+        switch (fpen) {
-+        case 0:
-+        case 2:
-+            if (cur_el == 0 || cur_el == 1) {
-+                /* Trap to PL1, which might be EL1 or EL3 */
-+                if (arm_is_secure(env) && !arm_el_is_aa64(env, 3)) {
-+                    return 3;
++        if (cur_el == 0) {
++            if ((hcr & (HCR_E2H | HCR_TGE)) == (HCR_E2H | HCR_TGE)) {
++                if (!(env->cp15.sctlr_el[2] & SCTLR_UCT)) {
++                    return CP_ACCESS_TRAP_EL2;
 +                }
-+                return 1;
++            } else {
++                if (!(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
++                    return CP_ACCESS_TRAP;
++                }
++                if (hcr & HCR_TID2) {
++                    return CP_ACCESS_TRAP_EL2;
++                }
 +            }
-+            if (cur_el == 3 && !is_a64(env)) {
-+                /* Secure PL1 running at EL3 */
-                 return 3;
-             }
--            return 1;
-+            break;
-+        case 1:
-+            if (cur_el == 0) {
-+                return 1;
-+            }
-+            break;
-+        case 3:
-+            break;
-         }
--        if (cur_el == 3 && !is_a64(env)) {
--            /* Secure PL1 running at EL3 */
--            return 3;
--        }
--        break;
--    case 1:
--        if (cur_el == 0) {
--            return 1;
--        }
--        break;
--    case 3:
--        break;
++        } else if (hcr & HCR_TID2) {
++            return CP_ACCESS_TRAP_EL2;
++        }
      }
- 
-     /*
+     return CP_ACCESS_OK;
+ }
 -- 
 2.17.1
 
