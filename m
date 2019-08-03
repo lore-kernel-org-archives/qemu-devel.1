@@ -2,85 +2,84 @@ Return-Path: <SRS0=Oxyb=V7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC33C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 13:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90283C433FF
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:49:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 445FE2075C
-	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 13:22:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5673C2073D
+	for <qemu-devel@archiver.kernel.org>; Sat,  3 Aug 2019 18:49:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="Q5fgSnzT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 445FE2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M/WffFcz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5673C2073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1httzu-0004DG-Gx
-	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 09:22:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35630)
+	id 1htz5q-0007re-IB
+	for qemu-devel@archiver.kernel.org; Sat, 03 Aug 2019 14:49:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60442)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.kiszka@web.de>) id 1httzE-0003n2-45
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:22:16 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1htz4X-0005s9-VC
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@web.de>) id 1httzD-0007Kg-6S
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:22:16 -0400
-Received: from mout.web.de ([212.227.15.14]:52391)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1httzC-0007Jj-Ps
- for qemu-devel@nongnu.org; Sat, 03 Aug 2019 09:22:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1564838528;
- bh=R3ejnI676/pdtRKXM44ZtN7+PS4/3VROnv/nljAhjQs=;
- h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
- b=Q5fgSnzTWXUJMOiNUs4Zne8NAVfV/882AdjMo9shh+3iWj2GrwhiveXW1w+CZMl4g
- HM3qKTzgCmVXXqFcSuJqf0U1vCFTwHHDjyxDoZ/9Zd26seeM825i1lvDSpUC+5Qhq9
- rhBfKMdA8g5b8RYGjonqM9UFAJ2i+vW0qqEPcYsA=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0M9ui8-1i4vY836k4-00B4LK; Sat, 03
- Aug 2019 15:22:08 +0200
-To: qemu-devel <qemu-devel@nongnu.org>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
-Date: Sat, 3 Aug 2019 15:22:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <richard.henderson@linaro.org>) id 1htz4W-00073F-NQ
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:05 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:42851)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1htz4W-00071n-FQ
+ for qemu-devel@nongnu.org; Sat, 03 Aug 2019 14:48:04 -0400
+Received: by mail-pf1-x441.google.com with SMTP id q10so37607147pff.9
+ for <qemu-devel@nongnu.org>; Sat, 03 Aug 2019 11:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Mdp2g3jSgzrGtd9KtHgOE+2yumLnmy9dW9qf3A8Vh/A=;
+ b=M/WffFczN/fF0BKujryYFO7wtRBF0xlsTxmkm/n2qqwNGBn6fj5IZIGUl+y0zN4O+J
+ MqJ2/KI0Opah1zmQsgGJOj7gNoXROcEpWp+jO+W+LeZr6nobami600pIy/qAOL+RxVfL
+ FWXxV8hJmxoqxVK7ebqkI1wdU056Y4fwXjaEU/0AP7Zbm+mZ7jDiFzlQmfDsMysXQOv1
+ FnK2GHwLpHzSr4TF5pYvHEnlkwnQh2bIHyVQcUgd2vpu2Nv0XPLfkKiUgfPE8UVYtC/w
+ N4HUJHTF35aN3vSEQpudO3w8Dk2ZW/ZsdjJ6h8ouC9GbcTcDXj23fuVr8pwtkdAtuyCO
+ CsOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Mdp2g3jSgzrGtd9KtHgOE+2yumLnmy9dW9qf3A8Vh/A=;
+ b=UWuXTfTgnzxOyJi/ukkPsXg2/29zWrGet0GBjgGY/oXySJJImUs3APAhCD+SUBogPy
+ 5I3sq42LuG4ne+DU8fhxbWq/zTQbgygWSJW95jHxHpDZlIjW5yLZV8zYJTVtXnirm51B
+ QohIt8g7rduUVfK149lH5bgaE63/2F3QjKlWfsavOMl8sO2urD58KT5fH7OASlsQwI4r
+ goPwaupWxdVxEsZk4ST+XN1blsTovH3So0vtDg1rXylrqMJ0n0h/+3SldDD6DWztunGg
+ 6HF1qjhz8FeFa5gYvhhn5dTnUZETAWrMgCI7tPWT0ElzOvvH1AJ4P5RnQnqoDJDOOAoi
+ lqvQ==
+X-Gm-Message-State: APjAAAULtjWo1q7l/R7nPEKZhlHMBSspaNrR64nJZnJc5aZU1p2bBXJz
+ Bik3z1njGvfVBwQ+Dl9wWyTg2KnumNc=
+X-Google-Smtp-Source: APXvYqym32Jjcqm6Y5uD9VOGwQumhKcN0/1ZruKLacdjKeyh1L+2lBKh7SShcpX6bfXFE13wffbkKw==
+X-Received: by 2002:aa7:8705:: with SMTP id b5mr13375773pfo.27.1564858083031; 
+ Sat, 03 Aug 2019 11:48:03 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id q69sm15405454pjb.0.2019.08.03.11.48.00
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Sat, 03 Aug 2019 11:48:02 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Sat,  3 Aug 2019 11:47:26 -0700
+Message-Id: <20190803184800.8221-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:1pLsXyUl+grBg85UzrdcfyqtF6M4vBHPNUfeYhk7dU1x7YtX2bV
- o4nfF9rhqnF+kMzR9qFuWVl0IlUWaxY7a6l0VauAEfxE296ODYX6ExK0D6d6qpwxn4Sue4M
- EKkWQyH3Dqskh2zxJBxrT6PG7tzKzmQWaS/v3+R1DqjUbU7SdIgejyPqTCbUSC35dJtXkbI
- dRA+GFcqJxC9XC/xTMveQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:khYx7Og24Og=:bIdC5m/FMLrzk9oQ2CPl7U
- 45SHqN3baRFdAY3QhceIEWTrElv/fr5pBmbiA8UYJGi6p1Yt4jo5Miuy+a2rD22H4kZSIfbUt
- 2RaqU0ymIU0O/q2hTRa/HXa6Jw1b479s51oNxIziV4bgAGGKw1rrzgT6GOAHnP+8JaspPm4A8
- zQZ11+wwkdty7DWFFlSZRfaUW4EDE6b43Diki7i7+h4TWe+H2P1Xny9m4+0/qDbom7D0A3uao
- om6r3fwd0ppsXsbbGB5aY45mpivw7tqvllup77x3w9grF7RkBegMoqobTifuh0h1A+Oh3+PrF
- mU81GbktJ36JL67IT5VrIAYQeAHE5yHEeYMBSq0an6yuKEeYTG8MWUAMBA46uq0AJbRQ/lQoq
- lKYHSxt4tID4ICpclkAqaOtLbPExUen2Ic8QhAOdIIrvhlnpiYWE6C+RNPmFSeJRmEc7HG07N
- 7EXTGmxV5+IhLg/nwEjcCOtxOuoBU6QDX9JnO9B7GFz9WZ29Rik20dtlbvdDxVmBmaZHbIII6
- npAeyS7+XuaDFq/LmB6LCZ7VBmsyPLO5TidMNrzD5ur7y1u1VrKHK2r0EkqTTzPyfGu6wYFrw
- Wg185VbHTYPUdJp805VNJht53JlxuqMMJjR5gt/Vc8talDev1EjH1Ula/csJ5IUNy5JC66FZS
- TKsqNajKWJoa1ihRt3rm+bMYDcqjL7Uh34Ge5YsiS1GZPaed5eyyCWJnAEiIWf5Hqqsmc/+Sb
- M3/qHu2jwuYQPJm0uG46IsTEY4sR6isvFgzmKrTROA9OcSjWw/tL5wXC6Q8SEFHiJHRX/Vi4Z
- yTMUj2GiaKLnVS0gaaxVX71CmLuCDNF6JkPlhzmEds+MXGQGG8iItAKk0Fy+zahc6ONxBOAPJ
- 5tE+ta658vGJohOjpffh2oehQhrpHSjBd6lvJ1vJutFg4TTDdXX71C6HNG+Y0o+dO97E2+LK9
- aUdAFBMDFY9Rb1Uo74Mun1oGnIthxDcwG9s/ZInGsK/o7w+5Ua74E6T7ZoU3vOKKzvCvP4wHg
- jC5fy85MIAfXDCSR9XdhCu31ySCbkAfK0hKszTMVUAVQG4vA/GZsJgLpG0jJSEGHlb9Kr2RCe
- r2OWD6hSV4sbfyQD1zbmcDS7IQCHBNEfUp8fCiqtUJAUsytuMuKUVtBjxsq+Vf0PH/Cb68RgC
- jm0Rk=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 212.227.15.14
-Subject: [Qemu-devel] [PATCH v2] ivshmem-server: Terminate also on SIGINT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: [Qemu-devel] [PATCH v3 00/34] target/arm: Implement ARMv8.1-VHE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,40 +91,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Claudio Fontana <cfontana@suse.de>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
+About half of this patch set is cleanup of the qemu tlb handling
+leading up to the actual implementation of VHE, and the biggest
+piece of that: The EL2&0 translation regime.
 
-Allows to shutdown a foreground session via ctrl-c.
+Changes since v2:
+  * arm_mmu_idx was incomplete; test TGE+E2H not just E2H.
+  * arm_sctlr was incomplete; now uses arm_mmu_idx to avoid
+    duplication of tests.
+  * Update aa64_zva_access and ctr_el0_access for EL2.
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-=2D--
+Changes since v1:
+  * Merge feedback from AJB.
+  * Split out 7 renaming patches from "Reorganize ARMMMUIdx".
+  * Alex's MIDR patch keeps the nested KVM from spitting warnings.
 
-Changes in v2:
- - adjust error message
+I have tested 
 
- contrib/ivshmem-server/main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+  qemu-system-aarch64 -accel kvm -cpu host -M virt,gic-version-host \
+    -m 512 -bios /usr/share/edk2/aarch64/QEMU_EFI.fd -nographic
 
-diff --git a/contrib/ivshmem-server/main.c b/contrib/ivshmem-server/main.c
-index 197c79c57e..e4cd35f74c 100644
-=2D-- a/contrib/ivshmem-server/main.c
-+++ b/contrib/ivshmem-server/main.c
-@@ -223,8 +223,9 @@ main(int argc, char *argv[])
-     sa_quit.sa_handler =3D ivshmem_server_quit_cb;
-     sa_quit.sa_flags =3D 0;
-     if (sigemptyset(&sa_quit.sa_mask) =3D=3D -1 ||
--        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1) {
--        perror("failed to add SIGTERM handler; sigaction");
-+        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1 ||
-+        sigaction(SIGINT, &sa_quit, 0) =3D=3D -1) {
-+        perror("failed to add signal handler; sigaction");
-         goto err;
-     }
+with fedora 30 system qemu, itself booted with
 
-=2D-
-2.16.4
+  ../bld/aarch64-softmmu/qemu-system-aarch64 \
+    -cpu max -M virt,gic-version=3,virtualization=on \
+    -drive if=virtio,file=./f30.q,format=qcow2 \
+    -m 4G -nographic
+
+It took a while, but eventually the nested bios arrived at the
+pxe boot sequence.  Thankfully (?), the f30 shipped bios has
+debug enabled, so there's some sense of progress in the meantime.
+
+
+r~
+
+
+Alex Bennée (2):
+  target/arm: check TGE and E2H flags for EL0 pauth traps
+  target/arm: generate a custom MIDR for -cpu max
+
+Richard Henderson (32):
+  cputlb: Add tlb_set_asid_for_mmuidx
+  cputlb: Add tlb_flush_asid_by_mmuidx and friends
+  target/arm: Install ASIDs for long-form from EL1
+  target/arm: Install ASIDs for short-form from EL1
+  target/arm: Install ASIDs for EL2
+  target/arm: Define isar_feature_aa64_vh
+  target/arm: Enable HCR_E2H for VHE
+  target/arm: Add CONTEXTIDR_EL2
+  target/arm: Add TTBR1_EL2
+  target/arm: Update CNTVCT_EL0 for VHE
+  target/arm: Add the hypervisor virtual counter
+  target/arm: Add VHE system register redirection and aliasing
+  target/arm: Split out vae1_tlbmask, vmalle1_tlbmask
+  target/arm: Simplify tlb_force_broadcast alternatives
+  target/arm: Rename ARMMMUIdx*_S12NSE* to ARMMMUIdx*_E10_*
+  target/arm: Rename ARMMMUIdx_S2NS to ARMMMUIdx_Stage2
+  target/arm: Rename ARMMMUIdx_S1NSE* to ARMMMUIdx_Stage1_E*
+  target/arm: Rename ARMMMUIdx_S1SE* to ARMMMUIdx_SE*
+  target/arm: Rename ARMMMUIdx*_S1E3 to ARMMMUIdx*_SE3
+  target/arm: Rename ARMMMUIdx_S1E2 to ARMMMUIdx_E2
+  target/arm: Reorganize ARMMMUIdx
+  target/arm: Add regime_has_2_ranges
+  target/arm: Update arm_mmu_idx for VHE
+  target/arm: Update arm_sctlr for VHE
+  target/arm: Update aa64_zva_access for EL2
+  target/arm: Update ctr_el0_access for EL2
+  target/arm: Install asids for E2&0 translation regime
+  target/arm: Flush tlbs for E2&0 translation regime
+  target/arm: Update arm_phys_excp_target_el for TGE
+  target/arm: Update regime_is_user for EL2&0
+  target/arm: Update {fp,sve}_exception_el for VHE
+  target/arm: Enable ARMv8.1-VHE in -cpu max
+
+ include/exec/cpu-all.h     |   11 +
+ include/exec/cpu-defs.h    |    2 +
+ include/exec/exec-all.h    |   35 ++
+ include/qom/cpu.h          |    2 +
+ target/arm/cpu-qom.h       |    1 +
+ target/arm/cpu.h           |  261 ++++-----
+ target/arm/internals.h     |   62 ++-
+ target/arm/translate.h     |    2 +-
+ accel/tcg/cputlb.c         |   81 +++
+ target/arm/cpu.c           |    2 +
+ target/arm/cpu64.c         |   20 +
+ target/arm/debug_helper.c  |   50 +-
+ target/arm/helper-a64.c    |    2 +-
+ target/arm/helper.c        | 1042 +++++++++++++++++++++++++-----------
+ target/arm/m_helper.c      |    6 +-
+ target/arm/pauth_helper.c  |   13 +-
+ target/arm/translate-a64.c |   13 +-
+ target/arm/translate.c     |   17 +-
+ 18 files changed, 1134 insertions(+), 488 deletions(-)
+
+-- 
+2.17.1
+
 
