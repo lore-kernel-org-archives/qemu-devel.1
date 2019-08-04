@@ -5,79 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6D3C433FF
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Aug 2019 17:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBA5C433FF
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Aug 2019 17:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3933A206C1
-	for <qemu-devel@archiver.kernel.org>; Sun,  4 Aug 2019 17:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DCBA206C1
+	for <qemu-devel@archiver.kernel.org>; Sun,  4 Aug 2019 17:07:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EMbEHk6h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3933A206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sFjtWgdn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DCBA206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huJz0-0001BB-Hc
-	for qemu-devel@archiver.kernel.org; Sun, 04 Aug 2019 13:07:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56686)
+	id 1huJz1-0001FW-UF
+	for qemu-devel@archiver.kernel.org; Sun, 04 Aug 2019 13:07:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56751)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1huJw4-0002O8-PL
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 13:04:47 -0400
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1huJw7-0002Pv-RL
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 13:04:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1huJw2-00048N-KD
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 13:04:44 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37667)
+ (envelope-from <dirty.ice.hu@gmail.com>) id 1huJw3-00049X-Az
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 13:04:45 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44340)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1huJw1-00040h-GX
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 13:04:42 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f17so70837785wme.2
- for <qemu-devel@nongnu.org>; Sun, 04 Aug 2019 10:04:36 -0700 (PDT)
+ id 1huJw3-00040Q-1r
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 13:04:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id p17so82047421wrf.11
+ for <qemu-devel@nongnu.org>; Sun, 04 Aug 2019 10:04:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rslzC2c2WDwNlJOxHo//ed6lLff8LJfI6lnQMj5SLIg=;
- b=EMbEHk6h6pQNZwGzxGYAtxbS5OwGqmB7zIC6lQTqkNqIGbXv1jlnYU1cNpkuNDN/18
- m29tip//zh0qgVM0V/cajWI1knBCAnZ0a8zmd+3VOf49ihcGvr5f83DyJkgVFrs170Gq
- m1b1Ulj+E2/CT/0xqd0Bim+F/oazvCPG4PjljnvQupIELKxaRhFI2LMzrV1QhDyy09Pj
- p6KYeVcSe19tLfTGnFCpWLZ6sh8tLpCmSfoXBT0D/VKua46HoFoMNMitFx/gXsxrx9Oy
- bmqKWkBudatCp7Dur3KvvYqafJNIjv4+7boKg9Du+QO9Tgr5B6VEWBeHkQzUFt+yL74d
- 5OfQ==
+ bh=PksipMVzAiiMTAlABLCmlNruZKZ2bg95M8Q+Ha0hlqQ=;
+ b=sFjtWgdnNg98Urrin4BYTtOENReVLX3VsN5naYziLh/Y6A2sUcga5FB5Qne4gUEibg
+ AqF3hiXfblFUjCnNgypJ813/jk6hovuu6TDYYKw4MflCBbY2GQeoM2ttRhXhuqwaZBUi
+ KQoay9RoB+VSx7y0yhIv8rdd95gQhCxTO0Esx90wM06+S9yFn4IKi/MWhxHBij9nQa6i
+ bdN6P6bRl5rDUqKC8p2sirfuf2JpwMFgm2bA1H9MAESuzhhui5tglIJ8b44gsO6VEjeJ
+ CD4lbnAHX1K/60T5OT4tSsj03VVSBQJGdWos6Wb13Nmh+zwuF0LExL2Yb9Xervcl2dTO
+ uXaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rslzC2c2WDwNlJOxHo//ed6lLff8LJfI6lnQMj5SLIg=;
- b=eUgu95HlzxML0kWYRdhgfFihT0gpFAFdDeH2sjp0VtYlCur5Bl7FZF1fWmWgxYvvWi
- cB6VS8QFukprPhzRxPzW5S0OfFYvOghJi2iJJDNLaC1QQ/8kq5JrMWYo9xuaVX0K+zK2
- c+/wg+jOHMFcJQw9BcVkVFNcYiBcToVlzd3eVqfSAsrxqrmsVxXrDmkbUdbi3F2Zvpxu
- cJklZrr5M8eTqWeYkBOagJ2MINlfm2RTBUbzqmbD10mXinliyeDSaNJMRCMy299ZS6E3
- JjwFa+u/xRcf0fQ05Fx8B+cD7m4I7SMV1yeiPKB04L56eQC+A0UacMQUUbKFW6PXMnBc
- QFeA==
-X-Gm-Message-State: APjAAAVIHliXNSY3AevnOye2/26NN7SY9ai7iUwArJ7v96ga5Tm//6La
- dRQlHmawOb3LT4BtDrxCoic/uug7IFc=
-X-Google-Smtp-Source: APXvYqyudTjPiWYkD0+gxZ7Smp2oZ/xvd8PoPP4b8/5c4Tsahce7Sbg+XBtlKhMktnyL3MBI5Ob2yA==
-X-Received: by 2002:a7b:c195:: with SMTP id y21mr14002063wmi.16.1564938275570; 
- Sun, 04 Aug 2019 10:04:35 -0700 (PDT)
+ bh=PksipMVzAiiMTAlABLCmlNruZKZ2bg95M8Q+Ha0hlqQ=;
+ b=npDINRtlnBLhQTdLP2l80BFgQFjz67IQmurDWni05Z3+h614wKQQoTZmIxnEWZbIfq
+ sBsGMGNaLk4/XZvqnROnsIRoQpxpbgQY5Ialzk6+9l2o0F3s/zZ7kqeYey+SKIey/OvP
+ o5C0LLuWHDAkyhJzx8gUpl6QxEQFsEA3SP6K66R6iCKYVOa3ooVF/g7mWZ8ZemvTZhDY
+ HdFTliYSBUI9/tipF146Y5co4oI445Uaup/tm/HzK5Gxp4ykKMo2bYrJpUwkUOFSIFDG
+ uHMl6PlWoBnhdm+UYs0R5rhxiM/xygHNelyXbx+Xdr6qoJA42F4BUyaH9uVLhEUh1sww
+ lPKg==
+X-Gm-Message-State: APjAAAX7oTjyo8WSqzJf4u88U5dZyX8P1szYr51eAT53G5AMCJotR1g9
+ 2EDgO08Zqaev/3Pl9pA/T4HIJrPRuYc=
+X-Google-Smtp-Source: APXvYqxT8hCtITiFtyszZ5HCoHc4+cRVmDKjO6caNxyRzQudCUVcaob9/82Qly2A/fry744F9s10vQ==
+X-Received: by 2002:a5d:5302:: with SMTP id e2mr5201889wrv.347.1564938273955; 
+ Sun, 04 Aug 2019 10:04:33 -0700 (PDT)
 Received: from nullptr.home.dirty-ice.org
  (2a01-036c-0113-632c-0000-0000-0000-0005.pool6.digikabel.hu.
  [2a01:36c:113:632c::5])
- by smtp.gmail.com with ESMTPSA id s10sm104876106wmf.8.2019.08.04.10.04.34
+ by smtp.gmail.com with ESMTPSA id s10sm104876106wmf.8.2019.08.04.10.04.33
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 04 Aug 2019 10:04:35 -0700 (PDT)
+ Sun, 04 Aug 2019 10:04:33 -0700 (PDT)
 From: "=?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?="
  <dirty.ice.hu@gmail.com>
 X-Google-Original-From: =?UTF-8?q?K=C5=91v=C3=A1g=C3=B3=2C=20Zolt=C3=A1n?=
  <DirtY.iCE.hu@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sun,  4 Aug 2019 19:04:20 +0200
-Message-Id: <d1085ec6129416705b2cb65737e510ec9ffec508.1564925486.git.DirtY.iCE.hu@gmail.com>
+Date: Sun,  4 Aug 2019 19:04:18 +0200
+Message-Id: <faa22ae99df3a4de8c83effe90ed986460df7b34.1564925486.git.DirtY.iCE.hu@gmail.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1564925486.git.DirtY.iCE.hu@gmail.com>
 References: <cover.1564925486.git.DirtY.iCE.hu@gmail.com>
@@ -86,9 +86,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v3 08/14] paaudio: properly disconnect streams
- in fini_*
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH v3 06/14] audio: audiodev= parameters no longer
+ optional when -audiodev present
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,69 +100,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently this needs a workaround due to bug #247 in pulseaudio.
+This means you should probably stop using -soundhw (as it doesn't allow
+you to specify any options) and add the device manually with -device.
+The exception is pcspk, it's currently not possible to manually add it.
+To use it with audiodev, use something like this:
+
+    -audiodev id=foo,... -global isa-pcspk.audiodev=foo -soundhw pcspk
 
 Signed-off-by: Kővágó, Zoltán <DirtY.iCE.hu@gmail.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- audio/paaudio.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
 
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 24d98b344a..1d68173636 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -685,6 +685,27 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsettings *as, void *drv_opaque)
-     return -1;
- }
+Notes:
+    Changes from v1:
+    
+    * Split off paaudio changes to a different commit.
+
+ audio/audio.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/audio/audio.c b/audio/audio.c
+index 4baa37caac..d131958194 100644
+--- a/audio/audio.c
++++ b/audio/audio.c
+@@ -101,6 +101,8 @@ const struct mixeng_volume nominal_volume = {
+ #endif
+ };
  
-+static void qpa_simple_disconnect(PAConnection *c, pa_stream *stream)
-+{
-+    int err;
++static bool legacy_config = true;
 +
-+    pa_threaded_mainloop_lock(c->mainloop);
-+    /*
-+     * wait until actually connects. workaround pa bug #247
-+     * https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/247
-+     */
-+    while (pa_stream_get_state(stream) == PA_STREAM_CREATING) {
-+        pa_threaded_mainloop_wait(c->mainloop);
-+    }
-+
-+    err = pa_stream_disconnect(stream);
-+    if (err != 0) {
-+        dolog("Failed to disconnect! err=%d\n", err);
-+    }
-+    pa_stream_unref(stream);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+}
-+
- static void qpa_fini_out (HWVoiceOut *hw)
+ #ifdef AUDIO_IS_FLAWLESS_AND_NO_CHECKS_ARE_REQURIED
+ #error No its not
+ #else
+@@ -1392,7 +1394,7 @@ static AudiodevListEntry *audiodev_find(
+  * if dev == NULL => legacy implicit initialization, return the already created
+  *   state or create a new one
+  */
+-static AudioState *audio_init(Audiodev *dev)
++static AudioState *audio_init(Audiodev *dev, const char *name)
  {
-     void *ret;
-@@ -696,7 +717,7 @@ static void qpa_fini_out (HWVoiceOut *hw)
-     audio_pt_join(&pa->pt, &ret, __func__);
+     static bool atexit_registered;
+     size_t i;
+@@ -1406,12 +1408,13 @@ static AudioState *audio_init(Audiodev *dev)
  
-     if (pa->stream) {
--        pa_stream_unref (pa->stream);
-+        qpa_simple_disconnect(pa->g->conn, pa->stream);
-         pa->stream = NULL;
+     if (dev) {
+         /* -audiodev option */
++        legacy_config = false;
+         drvname = AudiodevDriver_str(dev->driver);
+     } else if (!QTAILQ_EMPTY(&audio_states)) {
+-        /*
+-         * todo: check for -audiodev once we have normal audiodev selection
+-         * support
+-         */
++        if (!legacy_config) {
++            dolog("You must specify an audiodev= for the device %s\n", name);
++            exit(1);
++        }
+         return QTAILQ_FIRST(&audio_states);
+     } else {
+         /* legacy implicit initialization */
+@@ -1518,7 +1521,7 @@ void audio_free_audiodev_list(AudiodevListHead *head)
+ void AUD_register_card (const char *name, QEMUSoundCard *card)
+ {
+     if (!card->state) {
+-        card->state = audio_init(NULL);
++        card->state = audio_init(NULL, name);
      }
  
-@@ -716,7 +737,7 @@ static void qpa_fini_in (HWVoiceIn *hw)
-     audio_pt_join(&pa->pt, &ret, __func__);
+     card->name = g_strdup (name);
+@@ -1544,8 +1547,11 @@ CaptureVoiceOut *AUD_add_capture(
+     struct capture_callback *cb;
  
-     if (pa->stream) {
--        pa_stream_unref (pa->stream);
-+        qpa_simple_disconnect(pa->g->conn, pa->stream);
-         pa->stream = NULL;
+     if (!s) {
+-        /* todo: remove when we have normal audiodev selection support */
+-        s = audio_init(NULL);
++        if (!legacy_config) {
++            dolog("You must specify audiodev when trying to capture\n");
++            return NULL;
++        }
++        s = audio_init(NULL, NULL);
      }
+ 
+     if (audio_validate_settings (as)) {
+@@ -1776,7 +1782,7 @@ void audio_init_audiodevs(void)
+     AudiodevListEntry *e;
+ 
+     QSIMPLEQ_FOREACH(e, &audiodevs, next) {
+-        audio_init(e->dev);
++        audio_init(e->dev, NULL);
+     }
+ }
  
 -- 
 2.22.0
