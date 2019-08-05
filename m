@@ -2,90 +2,63 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC24BC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 199A5C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:27:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD5172086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:20:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD5172086D
+	by mail.kernel.org (Postfix) with ESMTPS id E10BA2086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:27:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E10BA2086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hubyT-0000oW-ER
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 08:20:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43911)
+	id 1huc5Q-0002OU-1v
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 08:27:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45481)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hubxg-0000G2-Nk
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:19:38 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1huc4t-0001xI-O6
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:27:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hubxe-0001me-4H
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:19:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48860)
+ (envelope-from <dgilbert@redhat.com>) id 1huc4s-0002Qx-M4
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:27:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51654)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hubxX-0001fk-VX; Mon, 05 Aug 2019 08:19:31 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1huc4s-0002QG-Ee
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:27:02 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B326EC065131;
- Mon,  5 Aug 2019 12:19:26 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 54CD560E1C;
- Mon,  5 Aug 2019 12:19:22 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <95578562-dd2a-08f2-2a00-d5f5ec723ebe@redhat.com>
-Date: Mon, 5 Aug 2019 14:19:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 65322C04B946;
+ Mon,  5 Aug 2019 12:27:01 +0000 (UTC)
+Received: from work-vm (ovpn-117-168.ams2.redhat.com [10.36.117.168])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BF56B5D6C8;
+ Mon,  5 Aug 2019 12:26:55 +0000 (UTC)
+Date: Mon, 5 Aug 2019 13:26:52 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190805122652.GM13734@work-vm>
+References: <20190801165409.20121-1-stefanha@redhat.com>
+ <20190801165409.20121-3-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190801165409.20121-3-stefanha@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Mon, 05 Aug 2019 12:19:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Mon, 05 Aug 2019 12:27:01 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] util/hbitmap: update orig_size on
- truncate
+Subject: Re: [Qemu-devel] [PATCH 2/4] virtiofsd: prevent
+ FUSE_INIT/FUSE_DESTROY races
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,87 +70,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
- jsnow@redhat.com
+Cc: virtio-fs@redhat.com, Liu Bo <bo.liu@linux.alibaba.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd
-Content-Type: multipart/mixed; boundary="qa6kotLvrqgulwuUcr7AcrR1BjtxyaVgo";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, fam@euphon.net,
- kwolf@redhat.com, den@openvz.org, eblake@redhat.com
-Message-ID: <95578562-dd2a-08f2-2a00-d5f5ec723ebe@redhat.com>
-Subject: Re: [PATCH for-4.1] util/hbitmap: update orig_size on truncate
-References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> When running with multiple threads it can be tricky to handle
+> FUSE_INIT/FUSE_DESTROY in parallel with other request types or in
+> parallel with themselves.  Serialize FUSE_INIT and FUSE_DESTROY so that
+> malicious clients cannot trigger race conditions.
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---qa6kotLvrqgulwuUcr7AcrR1BjtxyaVgo
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+(It took me a few minutes getting my head around the different _destroy
+functions)
 
-On 05.08.19 14:01, Vladimir Sementsov-Ogievskiy wrote:
-> Without this, hbitmap_next_zero and hbitmap_next_dirty_area are broken
-> after truncate. So, orig_size is broken since it's introduction in
-> 76d570dc495c56bb.
->=20
-> Fixes: 76d570dc495c56bb
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->=20
-> Hi!
->=20
-> Here is one more hbitmap bug I noticed. It's my fault, I'm sorry :(
-> Broken in 4.0, but if we are already going to fix in 4.1 some things
-> around it, it's a small meaningful addition.
-
-Hm. :-/
-
-> Users of broken API are incremental backup, sync mirror (but it may not=
-
-> be broken, if truncates not allowed during mirror, are they?),
-
-It doesn=E2=80=99t appear that way (we don=E2=80=99t share BLK_PERM_RESIZ=
-E).
-
-> bitmap export through NBD.
-
-I suppose that counts as block-y enough for me to take it.  Well, I=E2=80=
-=99d
-still like a test case to see the impact...  I=E2=80=99ll see whether I c=
-an come
-up with something.
-
->  util/hbitmap.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---qa6kotLvrqgulwuUcr7AcrR1BjtxyaVgo--
-
---ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1IHsgACgkQ9AfbAGHV
-z0A4oQf+MmRZu8esatI/e0e2tfv3EURDg7NBK2NE6QylDVXRR81aiDXuaN4GXaVQ
-MHFry+mocJl9mCtirTWmgGz85/DUh8fqeDyaf2ulZskuWF8HAsvyJ405b9FzSL8k
-yF82VnoxvnjuQAISXu+Vd81DH3s+jeS/WNcG8PGcM8bzkcbV7MG0ry0WVLRknJai
-sLH0a/r9HZoY3HrOoTMrN3smrE0uBuKcq8heJr/DEhgHKz/+ayV58kl2Nz3Wh7mF
-w0B/990fwUQ+ojFlaBNX//mDAnjr/n7msijzrE9RguyWMmShLKF025e9SJLxG1ZS
-gjNYM4vsf+JikCiJ8gwGmoC36zA9Ow==
-=TEHm
------END PGP SIGNATURE-----
-
---ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd--
+>  contrib/virtiofsd/fuse_i.h        |  1 +
+>  contrib/virtiofsd/fuse_lowlevel.c | 17 +++++++++++++++++
+>  2 files changed, 18 insertions(+)
+> 
+> diff --git a/contrib/virtiofsd/fuse_i.h b/contrib/virtiofsd/fuse_i.h
+> index ff6e1b75ba..dcde9feb97 100644
+> --- a/contrib/virtiofsd/fuse_i.h
+> +++ b/contrib/virtiofsd/fuse_i.h
+> @@ -63,6 +63,7 @@ struct fuse_session {
+>  	struct fuse_req list;
+>  	struct fuse_req interrupts;
+>  	pthread_mutex_t lock;
+> +	pthread_rwlock_t init_rwlock;
+>  	int got_destroy;
+>  	int broken_splice_nonblock;
+>  	uint64_t notify_ctr;
+> diff --git a/contrib/virtiofsd/fuse_lowlevel.c b/contrib/virtiofsd/fuse_lowlevel.c
+> index 6ebf237baa..483a1bc9be 100644
+> --- a/contrib/virtiofsd/fuse_lowlevel.c
+> +++ b/contrib/virtiofsd/fuse_lowlevel.c
+> @@ -2473,6 +2473,18 @@ void fuse_session_process_buf_int(struct fuse_session *se,
+>  	req->ctx.pid = in->pid;
+>  	req->ch = ch ? fuse_chan_get(ch) : NULL;
+>  
+> +	/* INIT and DESTROY requests are serialized, all other request types
+> +	 * run in parallel.  This prevents races between FUSE_INIT and ordinary
+> +	 * requests, FUSE_INIT and FUSE_INIT, FUSE_INIT and FUSE_DESTROY, and
+> +	 * FUSE_DESTROY and FUSE_DESTROY.
+> +	 */
+> +	if (in->opcode == FUSE_INIT || in->opcode == CUSE_INIT ||
+> +	    in->opcode == FUSE_DESTROY) {
+> +		pthread_rwlock_wrlock(&se->init_rwlock);
+> +	} else {
+> +		pthread_rwlock_rdlock(&se->init_rwlock);
+> +	}
+> +
+>  	err = EIO;
+>  	if (!se->got_init) {
+>  		enum fuse_opcode expected;
+> @@ -2524,10 +2536,13 @@ void fuse_session_process_buf_int(struct fuse_session *se,
+>  		do_write_buf(req, in->nodeid, &iter, bufv);
+>  	else
+>  		fuse_ll_ops[in->opcode].func(req, in->nodeid, &iter);
+> +
+> +	pthread_rwlock_unlock(&se->init_rwlock);
+>  	return;
+>  
+>  reply_err:
+>  	fuse_reply_err(req, err);
+> +	pthread_rwlock_unlock(&se->init_rwlock);
+>  }
+>  
+>  #define LL_OPTION(n,o,v) \
+> @@ -2569,6 +2584,7 @@ void fuse_session_destroy(struct fuse_session *se)
+>  		if (se->op.destroy)
+>  			se->op.destroy(se->userdata, se);
+>  	}
+> +	pthread_rwlock_destroy(&se->init_rwlock);
+>  	pthread_mutex_destroy(&se->lock);
+>  	free(se->cuse_data);
+>  	if (se->fd != -1)
+> @@ -2656,6 +2672,7 @@ struct fuse_session *fuse_session_new(struct fuse_args *args,
+>  	list_init_req(&se->list);
+>  	list_init_req(&se->interrupts);
+>  	fuse_mutex_init(&se->lock);
+> +	pthread_rwlock_init(&se->init_rwlock, NULL);
+>  
+>  	memcpy(&se->op, op, op_size);
+>  	se->owner = getuid();
+> -- 
+> 2.21.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
