@@ -2,60 +2,65 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30051C19759
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 02:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D45C19759
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 02:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04B6E2086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 02:53:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04B6E2086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A11DB2086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 02:59:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Rlmk0bty"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A11DB2086D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huT7q-0000xt-9C
-	for qemu-devel@archiver.kernel.org; Sun, 04 Aug 2019 22:53:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55717)
+	id 1huTDY-0002PU-Hq
+	for qemu-devel@archiver.kernel.org; Sun, 04 Aug 2019 22:59:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56376)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <piaojun@huawei.com>) id 1huT6z-0000Wi-KO
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:52:38 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1huTD7-0001ul-Vv
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:58:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <piaojun@huawei.com>) id 1huT6y-0002TA-98
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:52:37 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:60312 helo=huawei.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1huTD6-0007ul-MM
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:58:57 -0400
+Received: from ozlabs.org ([203.11.71.1]:45195)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <piaojun@huawei.com>) id 1huT6x-0002Q7-8Y
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:52:36 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id B7B252624C06C64101E9;
- Mon,  5 Aug 2019 10:52:29 +0800 (CST)
-Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Mon, 5 Aug 2019
- 10:52:24 +0800
-To: Stefan Hajnoczi <stefanha@redhat.com>, <virtio-fs@redhat.com>,
- <qemu-devel@nongnu.org>
-References: <20190801165409.20121-1-stefanha@redhat.com>
-From: piaojun <piaojun@huawei.com>
-Message-ID: <5D4799E5.6020006@huawei.com>
-Date: Mon, 5 Aug 2019 10:52:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.2.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1huTD5-0007sK-9a; Sun, 04 Aug 2019 22:58:56 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4622XV2LkSz9sDB; Mon,  5 Aug 2019 12:58:50 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1564973930;
+ bh=hGNpndo8qO96RsjGxUkggparRDVgxf/f6kOGyKhlZ/Q=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Rlmk0btyIStThMNNqhCsjsG5kfZxv4PtWVh+dv48IALslCSvnYfRg0Ffo0dc0/EIr
+ L3+8PjCof9r5/poWcy3qX7PHEcxkeiVkguNFUoKefRzwHdPgzjxNDU4y9rpGCOztdi
+ LXCy8SXTuZsOTxvplZYtbJ9SjSuaZ7jMuG++WJJQ=
+Date: Mon, 5 Aug 2019 12:58:44 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190805025844.GA29381@umbus.fritz.box>
+References: <20190801075258.19070-1-tao3.xu@intel.com>
+ <20190802065538.GA2031@umbus.fritz.box>
+ <27846884-9bf4-7729-7a9e-0392280ee67f@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190801165409.20121-1-stefanha@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.253.249]
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Dxnq1zWXvFF0Q93v"
+Content-Disposition: inline
+In-Reply-To: <27846884-9bf4-7729-7a9e-0392280ee67f@intel.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.35
-Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH 0/4] virtiofsd: multithreading
- preparation part 3
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [RFC PATCH] numa: add auto_enable_numa to fix
+ broken check in spapr
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,143 +72,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: imammedo@redhat.com, qemu-ppc@nongnu.org, ehabkost@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
 
-From my test, 9p has better bandwidth than virtio as below:
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
-9p Test:
-# mount -t 9p -o trans=virtio,version=9p2000.L,rw,nodev,msize=1000000000,access=client 9pshare /mnt/9pshare
+On Mon, Aug 05, 2019 at 08:56:40AM +0800, Tao Xu wrote:
+> On 8/2/2019 2:55 PM, David Gibson wrote:
+> > On Thu, Aug 01, 2019 at 03:52:58PM +0800, Tao Xu wrote:
+> > > Introduce MachineClass::auto_enable_numa for one implicit NUMA node,
+> > > and enable it to fix broken check in spapr_validate_node_memory(), wh=
+en
+> > > spapr_populate_memory() creates a implicit node and info then use
+> > > nb_numa_nodes which is 0.
+> > >=20
+> > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> > > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> >=20
+> > The change here looks fine so,
+> >=20
+> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> > However, I'm not following what check in spapr is broken and why.
+> >=20
+> Sorry, may be I should update the commit message.
+>=20
+> Because in spapr_populate_memory(), if numa node is 0
+>=20
+>     if (!nb_nodes) {
+>         nb_nodes =3D 1;
+>         ramnode.node_mem =3D machine->ram_size;
+>         nodes =3D &ramnode;
+>     }
+>=20
+> it use a local 'nb_nodes' as 1 and update global nodes info, but
+> inpapr_validate_node_memory(), use the global nb_numa_nodes
+>=20
+>     for (i =3D 0; i < nb_numa_nodes; i++) {
+>     	if (numa_info[i].node_mem % SPAPR_MEMORY_BLOCK_SIZE) {
+>=20
+> so the global is 0 and skip the node_mem check.
 
-# fio -direct=1 -time_based -iodepth=1 -rw=randwrite -ioengine=libaio -bs=1M -size=1G -numjob=1 -runtime=30 -group_reporting -name=file -filename=/mnt/9pshare/file
-file: (g=0): rw=randwrite, bs=1M-1M/1M-1M/1M-1M, ioengine=libaio, iodepth=1
-fio-2.13
-Starting 1 process
-file: Laying out IO file(s) (1 file(s) / 1024MB)
-Jobs: 1 (f=1): [w(1)] [100.0% done] [0KB/1091MB/0KB /s] [0/1091/0 iops] [eta 00m:00s]
-file: (groupid=0, jobs=1): err= 0: pid=6187: Mon Aug  5 17:55:44 2019
-  write: io=35279MB, bw=1175.1MB/s, iops=1175, runt= 30001msec
-    slat (usec): min=589, max=4211, avg=844.04, stdev=124.04
-    clat (usec): min=1, max=24, avg= 2.53, stdev= 1.16
-     lat (usec): min=591, max=4214, avg=846.57, stdev=124.14
-    clat percentiles (usec):
-     |  1.00th=[    2],  5.00th=[    2], 10.00th=[    2], 20.00th=[    2],
-     | 30.00th=[    2], 40.00th=[    2], 50.00th=[    2], 60.00th=[    3],
-     | 70.00th=[    3], 80.00th=[    3], 90.00th=[    3], 95.00th=[    3],
-     | 99.00th=[    4], 99.50th=[   13], 99.90th=[   18], 99.95th=[   20],
-     | 99.99th=[   22]
-    lat (usec) : 2=0.04%, 4=98.27%, 10=1.15%, 20=0.48%, 50=0.06%
-  cpu          : usr=23.83%, sys=5.24%, ctx=105843, majf=0, minf=9
-  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued    : total=r=0/w=35279/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
-     latency   : target=0, window=0, percentile=100.00%, depth=1
----
+Well, not really.  That loop is that each node has memory size a
+multiple of 256MiB.  But we've already checked that the whole memory
+size is a multiple of 256MiB, so in the case of one NUMA node, the
+per-node check doesn't actually do anything extra.
 
----
-virtiofs Test:
-# ./virtiofsd -o vhost_user_socket=/tmp/vhostqemu -o source=/mnt/virtiofs/ -o cache=none
+And in the "non-NUMA" case, nb_numa_nodes =3D=3D 0, then I don't believe
+numa_info[] is populated anyway, so we couldn't do the check like
+this.
 
-# mount -t virtio_fs myfs /mnt/virtiofs -o rootmode=040000,user_id=0,group_id=0
 
-# fio -direct=1 -time_based -iodepth=1 -rw=randwrite -ioengine=libaio -bs=1M -size=1G -numjob=1 -runtime=30 -group_reporting -name=file -filename=/mnt/virtiofs/file
-file: (g=0): rw=randwrite, bs=1M-1M/1M-1M/1M-1M, ioengine=libaio, iodepth=1
-fio-2.13
-Starting 1 process
-file: Laying out IO file(s) (1 file(s) / 1024MB)
-Jobs: 1 (f=1): [w(1)] [100.0% done] [0KB/895.1MB/0KB /s] [0/895/0 iops] [eta 00m:00s]
-file: (groupid=0, jobs=1): err= 0: pid=6046: Mon Aug  5 17:54:58 2019
-  write: io=23491MB, bw=801799KB/s, iops=783, runt= 30001msec
-    slat (usec): min=93, max=390, avg=233.40, stdev=64.22
-    clat (usec): min=849, max=4083, avg=1039.32, stdev=178.98
-     lat (usec): min=971, max=4346, avg=1272.72, stdev=200.34
-    clat percentiles (usec):
-     |  1.00th=[  972],  5.00th=[  980], 10.00th=[  988], 20.00th=[  988],
-     | 30.00th=[  996], 40.00th=[ 1004], 50.00th=[ 1012], 60.00th=[ 1012],
-     | 70.00th=[ 1020], 80.00th=[ 1032], 90.00th=[ 1032], 95.00th=[ 1384],
-     | 99.00th=[ 1560], 99.50th=[ 1768], 99.90th=[ 3664], 99.95th=[ 4016],
-     | 99.99th=[ 4048]
-    lat (usec) : 1000=37.21%
-    lat (msec) : 2=62.39%, 4=0.34%, 10=0.06%
-  cpu          : usr=15.39%, sys=4.03%, ctx=23496, majf=0, minf=10
-  IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
-     submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued    : total=r=0/w=23491/d=0, short=r=0/w=0/d=0, drop=r=0/w=0/d=0
-     latency   : target=0, window=0, percentile=100.00%, depth=1
----
+> > > ---
+> > >=20
+> > > This patch has a dependency on
+> > > https://patchwork.kernel.org/cover/11063235/
+> > > ---
+> > >   hw/core/numa.c      | 9 +++++++--
+> > >   hw/ppc/spapr.c      | 9 +--------
+> > >   include/hw/boards.h | 1 +
+> > >   3 files changed, 9 insertions(+), 10 deletions(-)
+> > >=20
+> > > diff --git a/hw/core/numa.c b/hw/core/numa.c
+> > > index 75db35ac19..756d243d3f 100644
+> > > --- a/hw/core/numa.c
+> > > +++ b/hw/core/numa.c
+> > > @@ -580,9 +580,14 @@ void numa_complete_configuration(MachineState *m=
+s)
+> > >        *   guest tries to use it with that drivers.
+> > >        *
+> > >        * Enable NUMA implicitly by adding a new NUMA node automatical=
+ly.
+> > > +     *
+> > > +     * Or if MachineClass::auto_enable_numa is true and no NUMA node=
+s,
+> > > +     * assume there is just one node with whole RAM.
+> > >        */
+> > > -    if (ms->ram_slots > 0 && ms->numa_state->num_nodes =3D=3D 0 &&
+> > > -        mc->auto_enable_numa_with_memhp) {
+> > > +    if (ms->numa_state->num_nodes =3D=3D 0 &&
+> > > +        ((ms->ram_slots > 0 &&
+> > > +        mc->auto_enable_numa_with_memhp) ||
+> > > +        mc->auto_enable_numa)) {
+> > >               NumaNodeOptions node =3D { };
+> > >               parse_numa_node(ms, &node, &error_abort);
+> > >       }
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index f607ca567b..e50343f326 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -400,14 +400,6 @@ static int spapr_populate_memory(SpaprMachineSta=
+te *spapr, void *fdt)
+> > >       hwaddr mem_start, node_size;
+> > >       int i, nb_nodes =3D machine->numa_state->num_nodes;
+> > >       NodeInfo *nodes =3D machine->numa_state->nodes;
+> > > -    NodeInfo ramnode;
+> > > -
+> > > -    /* No NUMA nodes, assume there is just one node with whole RAM */
+> > > -    if (!nb_nodes) {
+> > > -        nb_nodes =3D 1;
+> > > -        ramnode.node_mem =3D machine->ram_size;
+> > > -        nodes =3D &ramnode;
+> > > -    }
+> > >       for (i =3D 0, mem_start =3D 0; i < nb_nodes; ++i) {
+> > >           if (!nodes[i].node_mem) {
+> > > @@ -4369,6 +4361,7 @@ static void spapr_machine_class_init(ObjectClas=
+s *oc, void *data)
+> > >        */
+> > >       mc->numa_mem_align_shift =3D 28;
+> > >       mc->numa_mem_supported =3D true;
+> > > +    mc->auto_enable_numa =3D true;
+> > >       smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> > >       smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
+> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > index 2eb9a0b4e0..4a350b87d2 100644
+> > > --- a/include/hw/boards.h
+> > > +++ b/include/hw/boards.h
+> > > @@ -220,6 +220,7 @@ struct MachineClass {
+> > >       bool smbus_no_migration_support;
+> > >       bool nvdimm_supported;
+> > >       bool numa_mem_supported;
+> > > +    bool auto_enable_numa;
+> > >       HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+> > >                                              DeviceState *dev);
+> >=20
+>=20
 
-And the backend filesystem is ext4 + ramdisk, and 9p has deeper queue
-depth than virtiofs catched by iostat. Then I check the code, and found
-9p uses pwritev, but virtiofs uses pwrite. I wonder if virtiofs could
-also use iovec to improve its performance.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-I'd like to help contributing the patch in the future.
+--Dxnq1zWXvFF0Q93v
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
-Jun
+-----BEGIN PGP SIGNATURE-----
 
-On 2019/8/2 0:54, Stefan Hajnoczi wrote:
-> This patch series introduces the virtiofsd --thread-pool-size=NUM and sets the
-> default value to 64.  Each virtqueue has its own thread pool for processing
-> requests.  Blocking requests no longer pause virtqueue processing and I/O
-> performance should be greatly improved when the queue depth is greater than 1.
-> 
-> Linux boot and pjdfstest have been tested with these patches and the default
-> thread pool size of 64.
-> 
-> I have now concluded the thread-safety code audit.  Please let me know if you
-> have concerns about things I missed.
-> 
-> Performance
-> -----------
-> Please try these patches out and share your results.
-> 
-> Scalability
-> -----------
-> There are several synchronization primitives that are taken by the virtqueue
-> processing thread or the thread pool worker.  Unfortunately this is necessary
-> to protect shared state.  It means that thread pool workers contend on or at
-> least access thread synchronization primitives.  If anyone has suggestions for
-> improving this situation, please discuss.
-> 
-> 1. vu_dispatch_rwlock - libvhost-user from races between the vhost-user
->    protocol thread and the virtqueue processing and thread pool worker threads.
-> 
-> 2. vq_lock - protects the virtqueue from races between the virtqueue processing
->    thread and thread pool workers.
-> 
-> 3. init_rwlock - protects FUSE_INIT/FUSE_DESTROY from races with other
->    requests.
-> 
-> 4. se->lock - protects se->list and the FUSE_INTERRUPT shared state.
-> 
-> Ideally we could avoid hitting all of these locks on each request.  That would
-> make the code scale better.
-> 
-> Future work
-> -----------
-> This series does not complete the multithreading effort yet.  Two items are
-> still missing:
-> 1. Multiqueue support
-> 2. CPU affinity for virtqueue processing threads and thread pools
-> 
-> Stefan Hajnoczi (4):
->   virtiofsd: process requests in a thread pool
->   virtiofsd: prevent FUSE_INIT/FUSE_DESTROY races
->   virtiofsd: fix lo_destroy() resource leaks
->   virtiofsd: add --thread-pool-size=NUM option
-> 
->  contrib/virtiofsd/fuse_i.h         |   2 +
->  contrib/virtiofsd/fuse_lowlevel.c  |  25 +-
->  contrib/virtiofsd/fuse_virtio.c    | 491 ++++++++++++++++-------------
->  contrib/virtiofsd/passthrough_ll.c |  43 ++-
->  contrib/virtiofsd/seccomp.c        |   1 +
->  5 files changed, 318 insertions(+), 244 deletions(-)
-> 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1Hm2EACgkQbDjKyiDZ
+s5LDFhAArqnm2QZDYC6+flTxt+wmkkFkiK8fkoav1lV0VQuAnh+fXg39885A7/e+
+HgIAWaHBDs8RJBXTTiT/bCeU8WOPqXOnvAYgTPub9DIZXrBEoRugiWF3HRMJqd0X
+dRuJL/qMtz02j20ZFwLsREB+IJzlhGL0UN3fzcBRLo11bPITkkGyOnmNWKpdh4S8
+YbTY5o/VzWzlALXlIOP5M4H/GFx5088QCKU6R3bcv+vcJHBxCGmLFoJo/k6KuoY0
+CBJlWpaT26Vkgt9wCMm/qstbRuSpOxds154eAmd/t+Ld2sXF3STPGsJuXueTX9My
+NIuVN6+QYsQ/6r3jWgmhXTF+28/SHQdJ4JXTX9KSZHdPhCcSTokQT93mMPoWtWx3
+AI6N0SlHvnPxxotwBy9gccwQXD/a94qfukxUX4o01gDVVYY+6zo+0knyAKpqgQS9
+WqDnZi8Cfl3oH5qGptf//NxKOTHB5ByGFaIt7lzRZhVJygE5HOcHLfkI2YHS4ENL
+albzMEEUD6ch81AgD82gZ7Kf7zKc9ttICrQU+LGQgY+3jFLEmSnP4kkeSVpT1rUw
+9gWiszP2NIS0RUt7pY/0rFiDwCz+hyFQhWvrrbl2ITd+0CloLw58hs9qlEiEIIjG
+KjAOf6Kzv1pxzdf4qUPkVxrLtLx77QcyVUhgfxoHz8LwT+aWj/s=
+=qB95
+-----END PGP SIGNATURE-----
+
+--Dxnq1zWXvFF0Q93v--
 
