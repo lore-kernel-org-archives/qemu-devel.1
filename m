@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF15C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C725FC0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B614B216F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:39:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B614B216F4
+	by mail.kernel.org (Postfix) with ESMTPS id 982FE216F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:40:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 982FE216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huf5P-0000XH-1w
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:39:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53999)
+	id 1huf6C-0002pJ-Tz
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:40:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54309)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1huf4b-0007wC-Ff
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:59 -0400
+ (envelope-from <mreitz@redhat.com>) id 1huf5W-0001JK-Db
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:39:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1huf4a-0006gT-Fx
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33532)
+ (envelope-from <mreitz@redhat.com>) id 1huf5V-0007gf-C1
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:39:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46935)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1huf4X-0006e7-VB; Mon, 05 Aug 2019 11:38:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1huf5T-0007cy-02; Mon, 05 Aug 2019 11:39:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0682530FB8E2;
- Mon,  5 Aug 2019 15:38:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5441230675B0;
+ Mon,  5 Aug 2019 15:39:50 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 617465D6C8;
- Mon,  5 Aug 2019 15:38:44 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AC4160A97;
+ Mon,  5 Aug 2019 15:39:44 +0000 (UTC)
+To: qemu-block@nongnu.org
+References: <20190805152840.32190-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -70,22 +69,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cb3c73a4-e851-0329-91ad-d9e6fb342ca3@redhat.com>
-Date: Mon, 5 Aug 2019 17:38:42 +0200
+Message-ID: <1973bdc5-571d-908c-c46a-a1683babcbe0@redhat.com>
+Date: Mon, 5 Aug 2019 17:39:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190805152840.32190-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="NmXKP5DpJruvXLitQvtQBKMBZ5rh3p4EI"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 05 Aug 2019 15:38:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 05 Aug 2019 15:39:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH for-4.1] util/hbitmap: update orig_size on
- truncate
+Subject: Re: [Qemu-devel] [PATCH] iotests: Test incremental backup after
+ truncation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,68 +96,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
- jsnow@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp
-Content-Type: multipart/mixed; boundary="aZP35LA11XGpjQfm6bBOPU4nmGTlqunoU";
+--NmXKP5DpJruvXLitQvtQBKMBZ5rh3p4EI
+Content-Type: multipart/mixed; boundary="MByY9av2idzrMMC8oGYdHV39NcyYsOAkS";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, fam@euphon.net,
- kwolf@redhat.com, den@openvz.org, eblake@redhat.com
-Message-ID: <cb3c73a4-e851-0329-91ad-d9e6fb342ca3@redhat.com>
-Subject: Re: [PATCH for-4.1] util/hbitmap: update orig_size on truncate
-References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <1973bdc5-571d-908c-c46a-a1683babcbe0@redhat.com>
+Subject: Re: [PATCH] iotests: Test incremental backup after truncation
+References: <20190805152840.32190-1-mreitz@redhat.com>
+In-Reply-To: <20190805152840.32190-1-mreitz@redhat.com>
 
---aZP35LA11XGpjQfm6bBOPU4nmGTlqunoU
+--MByY9av2idzrMMC8oGYdHV39NcyYsOAkS
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 05.08.19 14:01, Vladimir Sementsov-Ogievskiy wrote:
-> Without this, hbitmap_next_zero and hbitmap_next_dirty_area are broken
-> after truncate. So, orig_size is broken since it's introduction in
-> 76d570dc495c56bb.
->=20
-> Fixes: 76d570dc495c56bb
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 05.08.19 17:28, Max Reitz wrote:
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+> Based-on: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/124     | 38 ++++++++++++++++++++++++++++++++++----=
 
-Thanks, applied to my block branch:
+>  tests/qemu-iotests/124.out |  4 ++--
+>  2 files changed, 36 insertions(+), 6 deletions(-)
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
-
-A unit test as a follow-up would indeed be nice, but I=E2=80=99ll just ta=
-ke it
-now anyway.
+I=E2=80=99ll take this now, protests welcome.  I=E2=80=99ll still need to=
+ run all the
+tests anyway.  (And see what we do about the mirror bug.)
 
 Max
 
 
---aZP35LA11XGpjQfm6bBOPU4nmGTlqunoU--
+--MByY9av2idzrMMC8oGYdHV39NcyYsOAkS--
 
---I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp
+--NmXKP5DpJruvXLitQvtQBKMBZ5rh3p4EI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1ITYIACgkQ9AfbAGHV
-z0A3xggAnbpiXbdeHkmdwABkC4VzzAKZ3iN3vIg4HVlvePfGNRRB6NPKsCoggC99
-Kiany1CnwiFI47ihsuJgT+Im3fTY5GHYMSUmjYrR00GOo2DaRim6XqRYvpEwwqcw
-hy+GKRiFkptcoafw6kjCN11qPOV/gGGcg9P84oxN9QD7d6dlczmTRTNFze1d7P87
-pDzhAaW4zptmtfyU1mvGi2Cb+XQoFY8KJ068w5tYpP2PKKbGfBzExaWu26lUM7qt
-YekwSZ8dKJvKEwHTI+95MxSjiqDRpmRGaHgmpgDcXDyd7UJwfZwp7hD5TN7Q/cWP
-7P8wJMKemxosWSBIGIQmpy8R/dqVTw==
-=0JSB
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1ITb4ACgkQ9AfbAGHV
+z0BAvAgAo0HQih1wlI9foEFkh3cDazD4iM1nZzR72Ec8q5QlvHmr+Nz259BRYGs4
+85iMgozu8HKPsQzWc2H4CsvVceH+X6muAncgQhREyU0lfmTqtHcXT4t6gtwdK+7g
+tqCRaNbduAGIaihOZ9GOCacLHbsymuTXNuzUl8vjyNCR9CZv1LBt147vx+U0ZPBu
+V7OKDLj9oTAnTZNBF5elx5Yg8RZldHAGg3TaagbtrHKTBmGR1nVfyx1zXVFe8cFu
+1t9RAbveozCJNHQj7jXUTsSZDi+N4OjT+0PfAUDfCQHRWWitgrzzepnI6P7jW2/D
+XBNeDYwrVbUK9ubk8PGuHreCHl4HMg==
+=OkZC
 -----END PGP SIGNATURE-----
 
---I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp--
+--NmXKP5DpJruvXLitQvtQBKMBZ5rh3p4EI--
 
