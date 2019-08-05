@@ -2,84 +2,79 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454F0C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 18:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD1DC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 18:06:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11E46206A2
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 18:04:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 071C1206A2
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 18:06:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iq55lWjG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E46206A2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dpcn8Fpl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 071C1206A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huhLh-0001qh-DT
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 14:04:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51337)
+	id 1huhNS-00036V-8w
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 14:06:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51656)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1huhKe-0001KU-6j
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:03:41 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1huhMW-0002bb-To
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:05:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1huhKc-0008HC-9e
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:03:40 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33063)
+ (envelope-from <peter.maydell@linaro.org>) id 1huhMV-0000jI-R0
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:05:36 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34751)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1huhKa-0008Ge-Cl
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:03:37 -0400
-Received: by mail-wm1-x342.google.com with SMTP id h19so7193285wme.0
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 11:03:36 -0700 (PDT)
+ id 1huhMV-0000iT-Mw
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:05:35 -0400
+Received: by mail-ot1-x344.google.com with SMTP id n5so86243554otk.1
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 11:05:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1slUGVTRC6RA0vil6xneVXHT+hWs0FhLhmq2qSsOEZ0=;
- b=iq55lWjGMXgL1IEQDcoVyCHwHi3F70vzTn+goFuc777p7j8a8wdWpfiAQ889jZQMhE
- uyCUTaylcXxHEh2Whp5mmxzkN6ixEyVRPWOoppXoNfUsVJ/X9lqXoeFHMBPFgjuO8giR
- +T+PUX/nvBZX+V+yFHiNgVQf002M5jbGNiaPWpFtOcPS2rm73pPWzLpMfuyMzHjzgesM
- hcdTgJM7vONnFOEg9EY3pBV5CGwzFkBVbfznKtF+jKJs6l4n09ZW3GQqjFNOJLmUv6sY
- rlIPK41BebxRHeh1khOTgdyZO2Egesb75bGisszHgSvJcZHvHVBZZPcuJIVxnZ7RoLUQ
- YBRA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=x3S9lnMWPO6rmwqwt0o+pilqUoT9vEjbQASB4qNatFM=;
+ b=dpcn8FplpMXKVO/2g/zLeH2wcRv88lmV4vx8CKKYowVeamoywNrOQbgx575LKKOSxB
+ hx7JnaFlUhPLUtnzBuWdlB1lLl5Y5iEz+jYOUS5lWkUX8m4rpfb9gxxSJcv9lBTmnv9f
+ 6l4v582A185ouUTEaWEuJFgNbCfLUOh750eSnbuPRoSuk7r+nLyyuPuHvQ4DpXxkmSeB
+ Z83Rxt5SSvrrej9YbgcXc2ZCuH46bK+t4zgjL4MXRafv7u2SWfNdh56n+72TwEq5GYMD
+ s595r5Szy2NEZ0xO2nJyMUhnqouis3qL+xtxdrSixCy1eF0Yrn8gfp1pHTv82USEsmdb
+ 18Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=1slUGVTRC6RA0vil6xneVXHT+hWs0FhLhmq2qSsOEZ0=;
- b=HBdICwIo48y2IG+OXdCB/3vhD+6p2LrOszla9Gq72PfjWfjtl3m8KLf0JHB1QKGjZl
- MtOwkhyEfNsqNwjkkc+D2UTIQ28D260qY3KqEdSlneFRFvGsCVuW7hbwDkEUEyOE5nIP
- Zi1PxbRt3GZFtLGgMQ+OQ5jnR4O6fMMc6Mf5rt/6m7stO1aTAcJj7o4LpITH6b2af/Ze
- xidt5pjcdc/Eu6UKRFCnYDx5d8ePnqMM+my9bXpU8qnHEg9mXecQd7aGF50GqG/klNTX
- qyuE5p8kJ2uWT4HdwCDQykbNZ5h4zb5KtH/ZHpxMUz98FKBh5w/jq2qBfXl+jHdV58sX
- 5E4A==
-X-Gm-Message-State: APjAAAXP/0NzXSZp91DpicsuF5x3Ifwu2IEwvfuZQx1Kn/IhBeMKZ8N9
- I6/HWVYHfYWc+gVqc7g1IcHEM+xrWsfXEw==
-X-Google-Smtp-Source: APXvYqzbDBkW4rnaiIV+0YnBJZc3D5hcx/LKvP48QkNF7g7iJjhr8iTEhlyDfIFLs+LmB2rvruq2Mw==
-X-Received: by 2002:a1c:7e14:: with SMTP id z20mr19155909wmc.83.1565028214887; 
- Mon, 05 Aug 2019 11:03:34 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p7sm58897670wrs.6.2019.08.05.11.03.33
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 05 Aug 2019 11:03:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Mon,  5 Aug 2019 19:03:32 +0100
-Message-Id: <20190805180332.10185-1-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=x3S9lnMWPO6rmwqwt0o+pilqUoT9vEjbQASB4qNatFM=;
+ b=Sr3yUeI/8KpCTQYgP54otEN5zzH0mMBvKHSURaTiWs+OIkAlhMOAbuFar5LNdD4Mr3
+ WBdM6xhS2jpgEjid7RT1aDCU86fsRMwVnIhzbJrElMgcHe0Xm5HJGpKf6YtoWrpU1S2Y
+ X7flrMwUlYnnIuoc+MIckb5Ar0KW7F6hbzd+QKUzS5G3xo8zOov4Q86JdknV5PT/6sn0
+ tPCbAlwMziBxy2FGX5RwTNIhz3MfU4ue9Q6ko9ocJAWDtW+cS/B6SddXDFdHiH5HNKKe
+ SlVVMPtKtytd7c+EOxMsbqMf44rigQ6JhBqS/3rwu50NiIAWWEpitEnVRig7uecrTGaI
+ 0Dvg==
+X-Gm-Message-State: APjAAAWnkUA2km7o72lyM8dUl0EV3dbiVh0VYN11nOO23HVw7D65j9AW
+ PWqj9XlFp7YSFnSvro7kGBUX9cJSxuQZ3AuOiF/Uz1w1
+X-Google-Smtp-Source: APXvYqy5hfzJZU5bBPI6l0OShr0ZsiTMCKzr9l2eI6VNfsCI2VbKeuqGj9xD77X26kLYTSAjqNYxAoiTVyIeocPC/50=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr56501036oti.91.1565028333828; 
+ Mon, 05 Aug 2019 11:05:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190805163740.23616-1-mreitz@redhat.com>
+In-Reply-To: <20190805163740.23616-1-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 5 Aug 2019 19:05:22 +0100
+Message-ID: <CAFEAcA9UH0g2A5g=akRbcLS4RXKQcDfFySFum3-fgO=R=mE=Ng@mail.gmail.com>
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH] target/i386: Return 'indefinite integer value'
- for invalid SSE fp->int conversions
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PULL 0/7] Block patches for 4.1.0-rc4
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,215 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The x86 architecture requires that all conversions from floating
-point to integer which raise the 'invalid' exception (infinities of
-both signs, NaN, and all values which don't fit in the destination
-integer) return what the x86 spec calls the "indefinite integer
-value", which is 0x8000_0000 for 32-bits or 0x8000_0000_0000_0000 for
-64-bits.  The softfloat functions return the more usual behaviour of
-positive overflows returning the maximum value that fits in the
-destination integer format and negative overflows returning the
-minimum value that fits.
+On Mon, 5 Aug 2019 at 17:37, Max Reitz <mreitz@redhat.com> wrote:
+>
+> The following changes since commit 9bb68d34dda9be60335e73e65c8fb61bca035362:
+>
+>   Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-20190803' into staging (2019-08-05 11:05:36 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/XanClic/qemu.git tags/pull-block-2019-08-05
+>
+> for you to fetch changes up to 07b0851c592efe188a87259adbda26a63c61dc92:
+>
+>   block/backup: disable copy_range for compressed backup (2019-08-05 18:05:05 +0200)
+>
+> ----------------------------------------------------------------
+> Block patches for 4.1.0-rc4:
+> - Fix the backup block job when using copy offloading
+> - Fix the mirror block job when using the write-blocking copy mode
+> - Fix incremental backups after the image has been grown with the
+>   respective bitmap attached to it
+>
+> ----------------------------------------------------------------
+> Max Reitz (5):
+>   backup: Copy only dirty areas
+>   iotests: Test backup job with two guest writes
+>   iotests: Test incremental backup after truncation
+>   mirror: Only mirror granularity-aligned chunks
+>   iotests: Test unaligned blocking mirror write
+>
+> Vladimir Sementsov-Ogievskiy (2):
+>   util/hbitmap: update orig_size on truncate
+>   block/backup: disable copy_range for compressed backup
+>
+>  block/backup.c             | 15 ++++++++++++---
+>  block/mirror.c             | 29 ++++++++++++++++++++++++++++
+>  util/hbitmap.c             |  6 +++++-
+>  tests/qemu-iotests/056     | 39 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/056.out |  4 ++--
+>  tests/qemu-iotests/124     | 38 +++++++++++++++++++++++++++++++++----
+>  tests/qemu-iotests/124.out |  4 ++--
+>  tests/qemu-iotests/151     | 25 ++++++++++++++++++++++++
+>  tests/qemu-iotests/151.out |  4 ++--
+>  9 files changed, 150 insertions(+), 14 deletions(-)
 
-Wrap the softfloat functions in x86-specific versions which
-detect the 'invalid' condition and return the indefinite integer.
+This is quite a lot of changes for rc4 -- how confident are
+you about them ? I suppose 3 out of 4 commits are updating
+the test suite...
 
-Note that we don't use these wrappers for the 3DNow! pf2id and pf2iw
-instructions, which do return the minimum value that fits in
-an int32 if the input float is a large negative number.
-
-Fixes: https://bugs.launchpad.net/qemu/+bug/1815423
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I've tested that this fixes the LP:1815423 test case. If anybody
-has an x86 VM image to hand that has node.js installed it would
-also be useful to test the operations in
-https://bugs.launchpad.net/qemu/+bug/1832281
-(I don't have such a VM.)
-
-The other approach here would be to make the softfloat functions be
-flexible enough to allow this behaviour -- from my reading of IEEE754
-I think the exact returned result for 'invalid' inputs for float to
-int conversions is not specified.
-
- target/i386/ops_sse.h | 88 +++++++++++++++++++++++++++++--------------
- 1 file changed, 60 insertions(+), 28 deletions(-)
-
-diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-index ed05989768f..ec1ec745d09 100644
---- a/target/i386/ops_sse.h
-+++ b/target/i386/ops_sse.h
-@@ -710,102 +710,134 @@ void helper_cvtsq2sd(CPUX86State *env, ZMMReg *d, uint64_t val)
- #endif
- 
- /* float to integer */
-+
-+/*
-+ * x86 mandates that we return the indefinite integer value for the result
-+ * of any float-to-integer conversion that raises the 'invalid' exception.
-+ * Wrap the softfloat functions to get this behaviour.
-+ */
-+#define WRAP_FLOATCONV(RETTYPE, FN, FLOATTYPE, INDEFVALUE)              \
-+    static inline RETTYPE x86_##FN(FLOATTYPE a, float_status *s)        \
-+    {                                                                   \
-+        int oldflags, newflags;                                         \
-+        RETTYPE r;                                                      \
-+                                                                        \
-+        oldflags = get_float_exception_flags(s);                        \
-+        set_float_exception_flags(0, s);                                \
-+        r = FN(a, s);                                                   \
-+        newflags = get_float_exception_flags(s);                        \
-+        if (newflags & float_flag_invalid) {                            \
-+            r = INDEFVALUE;                                             \
-+        }                                                               \
-+        set_float_exception_flags(newflags | oldflags, s);              \
-+        return r;                                                       \
-+    }
-+
-+WRAP_FLOATCONV(int32_t, float32_to_int32, float32, INT32_MIN)
-+WRAP_FLOATCONV(int32_t, float32_to_int32_round_to_zero, float32, INT32_MIN)
-+WRAP_FLOATCONV(int32_t, float64_to_int32, float64, INT32_MIN)
-+WRAP_FLOATCONV(int32_t, float64_to_int32_round_to_zero, float64, INT32_MIN)
-+WRAP_FLOATCONV(int64_t, float32_to_int64, float32, INT64_MIN)
-+WRAP_FLOATCONV(int64_t, float32_to_int64_round_to_zero, float32, INT64_MIN)
-+WRAP_FLOATCONV(int64_t, float64_to_int64, float64, INT64_MIN)
-+WRAP_FLOATCONV(int64_t, float64_to_int64_round_to_zero, float64, INT64_MIN)
-+
- void helper_cvtps2dq(CPUX86State *env, ZMMReg *d, ZMMReg *s)
- {
--    d->ZMM_L(0) = float32_to_int32(s->ZMM_S(0), &env->sse_status);
--    d->ZMM_L(1) = float32_to_int32(s->ZMM_S(1), &env->sse_status);
--    d->ZMM_L(2) = float32_to_int32(s->ZMM_S(2), &env->sse_status);
--    d->ZMM_L(3) = float32_to_int32(s->ZMM_S(3), &env->sse_status);
-+    d->ZMM_L(0) = x86_float32_to_int32(s->ZMM_S(0), &env->sse_status);
-+    d->ZMM_L(1) = x86_float32_to_int32(s->ZMM_S(1), &env->sse_status);
-+    d->ZMM_L(2) = x86_float32_to_int32(s->ZMM_S(2), &env->sse_status);
-+    d->ZMM_L(3) = x86_float32_to_int32(s->ZMM_S(3), &env->sse_status);
- }
- 
- void helper_cvtpd2dq(CPUX86State *env, ZMMReg *d, ZMMReg *s)
- {
--    d->ZMM_L(0) = float64_to_int32(s->ZMM_D(0), &env->sse_status);
--    d->ZMM_L(1) = float64_to_int32(s->ZMM_D(1), &env->sse_status);
-+    d->ZMM_L(0) = x86_float64_to_int32(s->ZMM_D(0), &env->sse_status);
-+    d->ZMM_L(1) = x86_float64_to_int32(s->ZMM_D(1), &env->sse_status);
-     d->ZMM_Q(1) = 0;
- }
- 
- void helper_cvtps2pi(CPUX86State *env, MMXReg *d, ZMMReg *s)
- {
--    d->MMX_L(0) = float32_to_int32(s->ZMM_S(0), &env->sse_status);
--    d->MMX_L(1) = float32_to_int32(s->ZMM_S(1), &env->sse_status);
-+    d->MMX_L(0) = x86_float32_to_int32(s->ZMM_S(0), &env->sse_status);
-+    d->MMX_L(1) = x86_float32_to_int32(s->ZMM_S(1), &env->sse_status);
- }
- 
- void helper_cvtpd2pi(CPUX86State *env, MMXReg *d, ZMMReg *s)
- {
--    d->MMX_L(0) = float64_to_int32(s->ZMM_D(0), &env->sse_status);
--    d->MMX_L(1) = float64_to_int32(s->ZMM_D(1), &env->sse_status);
-+    d->MMX_L(0) = x86_float64_to_int32(s->ZMM_D(0), &env->sse_status);
-+    d->MMX_L(1) = x86_float64_to_int32(s->ZMM_D(1), &env->sse_status);
- }
- 
- int32_t helper_cvtss2si(CPUX86State *env, ZMMReg *s)
- {
--    return float32_to_int32(s->ZMM_S(0), &env->sse_status);
-+    return x86_float32_to_int32(s->ZMM_S(0), &env->sse_status);
- }
- 
- int32_t helper_cvtsd2si(CPUX86State *env, ZMMReg *s)
- {
--    return float64_to_int32(s->ZMM_D(0), &env->sse_status);
-+    return x86_float64_to_int32(s->ZMM_D(0), &env->sse_status);
- }
- 
- #ifdef TARGET_X86_64
- int64_t helper_cvtss2sq(CPUX86State *env, ZMMReg *s)
- {
--    return float32_to_int64(s->ZMM_S(0), &env->sse_status);
-+    return x86_float32_to_int64(s->ZMM_S(0), &env->sse_status);
- }
- 
- int64_t helper_cvtsd2sq(CPUX86State *env, ZMMReg *s)
- {
--    return float64_to_int64(s->ZMM_D(0), &env->sse_status);
-+    return x86_float64_to_int64(s->ZMM_D(0), &env->sse_status);
- }
- #endif
- 
- /* float to integer truncated */
- void helper_cvttps2dq(CPUX86State *env, ZMMReg *d, ZMMReg *s)
- {
--    d->ZMM_L(0) = float32_to_int32_round_to_zero(s->ZMM_S(0), &env->sse_status);
--    d->ZMM_L(1) = float32_to_int32_round_to_zero(s->ZMM_S(1), &env->sse_status);
--    d->ZMM_L(2) = float32_to_int32_round_to_zero(s->ZMM_S(2), &env->sse_status);
--    d->ZMM_L(3) = float32_to_int32_round_to_zero(s->ZMM_S(3), &env->sse_status);
-+    d->ZMM_L(0) = x86_float32_to_int32_round_to_zero(s->ZMM_S(0), &env->sse_status);
-+    d->ZMM_L(1) = x86_float32_to_int32_round_to_zero(s->ZMM_S(1), &env->sse_status);
-+    d->ZMM_L(2) = x86_float32_to_int32_round_to_zero(s->ZMM_S(2), &env->sse_status);
-+    d->ZMM_L(3) = x86_float32_to_int32_round_to_zero(s->ZMM_S(3), &env->sse_status);
- }
- 
- void helper_cvttpd2dq(CPUX86State *env, ZMMReg *d, ZMMReg *s)
- {
--    d->ZMM_L(0) = float64_to_int32_round_to_zero(s->ZMM_D(0), &env->sse_status);
--    d->ZMM_L(1) = float64_to_int32_round_to_zero(s->ZMM_D(1), &env->sse_status);
-+    d->ZMM_L(0) = x86_float64_to_int32_round_to_zero(s->ZMM_D(0), &env->sse_status);
-+    d->ZMM_L(1) = x86_float64_to_int32_round_to_zero(s->ZMM_D(1), &env->sse_status);
-     d->ZMM_Q(1) = 0;
- }
- 
- void helper_cvttps2pi(CPUX86State *env, MMXReg *d, ZMMReg *s)
- {
--    d->MMX_L(0) = float32_to_int32_round_to_zero(s->ZMM_S(0), &env->sse_status);
--    d->MMX_L(1) = float32_to_int32_round_to_zero(s->ZMM_S(1), &env->sse_status);
-+    d->MMX_L(0) = x86_float32_to_int32_round_to_zero(s->ZMM_S(0), &env->sse_status);
-+    d->MMX_L(1) = x86_float32_to_int32_round_to_zero(s->ZMM_S(1), &env->sse_status);
- }
- 
- void helper_cvttpd2pi(CPUX86State *env, MMXReg *d, ZMMReg *s)
- {
--    d->MMX_L(0) = float64_to_int32_round_to_zero(s->ZMM_D(0), &env->sse_status);
--    d->MMX_L(1) = float64_to_int32_round_to_zero(s->ZMM_D(1), &env->sse_status);
-+    d->MMX_L(0) = x86_float64_to_int32_round_to_zero(s->ZMM_D(0), &env->sse_status);
-+    d->MMX_L(1) = x86_float64_to_int32_round_to_zero(s->ZMM_D(1), &env->sse_status);
- }
- 
- int32_t helper_cvttss2si(CPUX86State *env, ZMMReg *s)
- {
--    return float32_to_int32_round_to_zero(s->ZMM_S(0), &env->sse_status);
-+    return x86_float32_to_int32_round_to_zero(s->ZMM_S(0), &env->sse_status);
- }
- 
- int32_t helper_cvttsd2si(CPUX86State *env, ZMMReg *s)
- {
--    return float64_to_int32_round_to_zero(s->ZMM_D(0), &env->sse_status);
-+    return x86_float64_to_int32_round_to_zero(s->ZMM_D(0), &env->sse_status);
- }
- 
- #ifdef TARGET_X86_64
- int64_t helper_cvttss2sq(CPUX86State *env, ZMMReg *s)
- {
--    return float32_to_int64_round_to_zero(s->ZMM_S(0), &env->sse_status);
-+    return x86_float32_to_int64_round_to_zero(s->ZMM_S(0), &env->sse_status);
- }
- 
- int64_t helper_cvttsd2sq(CPUX86State *env, ZMMReg *s)
- {
--    return float64_to_int64_round_to_zero(s->ZMM_D(0), &env->sse_status);
-+    return x86_float64_to_int64_round_to_zero(s->ZMM_D(0), &env->sse_status);
- }
- #endif
- 
--- 
-2.20.1
-
+thanks
+-- PMM
 
