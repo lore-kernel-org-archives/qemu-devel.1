@@ -2,84 +2,88 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47E80C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 071DDC0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F2A620651
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C160420651
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:11:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I7kx4Gue"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2A620651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaJtLwlm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C160420651
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hufaS-0008Gh-92
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:11:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60853)
+	id 1hufaY-00006Q-0B
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:11:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58595)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hufYO-0003MF-F2
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:09:45 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hufPu-0000ms-3n
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:01:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hufYN-0007BH-5D
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:09:44 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:44347)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hufPr-00033K-Mg
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:00:57 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44720)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hufYJ-00077Q-Cp; Mon, 05 Aug 2019 12:09:39 -0400
-Received: by mail-ed1-x542.google.com with SMTP id k8so79193750edr.11;
- Mon, 05 Aug 2019 09:09:39 -0700 (PDT)
+ id 1hufPr-000328-91; Mon, 05 Aug 2019 12:00:55 -0400
+Received: by mail-pf1-x444.google.com with SMTP id t16so39843687pfe.11;
+ Mon, 05 Aug 2019 09:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xfqPt+uOeXJnvtJQ1eeLGHOCKPxOAyHacceChXWj/yc=;
- b=I7kx4Guelsa7Wit9/p0ThVIjMCkOkuaT1AoWPu2bv4BqPq+v53buKJ9yDp8JYlCuMz
- hK46mi7ILqJNmI0VF6IYoClV573NnfBObTXYQrTvgNwLZtZBj4HDs90maE1CBr3PTN2W
- xccTdrLQYbPZZcGERp61YQqZY1XoKFSaFHj6RBvHYZ4VoxKro5u6mO5RcOfThqkJ2QzW
- ldVoafbMQzrit5C1zIuajAb+2pHF3Os5e+TTFCd04Lt3bCnC97vt8/d8VCpJlCyyythB
- mEWUFE97W/cQmKc+S1cu56nPPKm8e3Ft5Cf4xMd9f7mz9sYErb6g0pi3BfuMx8CuZmgr
- /eBg==
+ h=from:to:subject:date:message-id:in-reply-to:references;
+ bh=s/GGftnAQofWbHcLlvYGC8C8gu8FXqIu5dq4uDy4E24=;
+ b=XaJtLwlmHWNElbOvgx6+rVIllv0QHp3yTNeGEN+sDckvrSZmyeloi2oij0b42vH7tB
+ Zm4WmP3VOxJ1w0Czxdw1CY1bClfMT6IjL4zN35ynDa+vw/nMDp9XX9M6yltgEFhdzyPI
+ RtHO51Mmfs27SDf6tmpvCPNwKfNCqfQQVKguBCogxVEx7PYzr5oj4krm7AkXrEvhhJr5
+ vEe4pCEsqEEIpB9qPjDyiunqXsUHlFu6/41ZmTety8N2WVSEE1cCmoP7aU2wDLU5G23Y
+ L82MAnyo5sPdEnMciQFQb7TLt3XgyvtvqGh30ZfcLVfGLCUL3MKKzRyGU36vMkFw1hzf
+ c6cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xfqPt+uOeXJnvtJQ1eeLGHOCKPxOAyHacceChXWj/yc=;
- b=TIGjeATqD/TJJZKaCXJ+gHx0ulxDyyHIW7hHvNUi55FBiAueJvHLDkuvEB1J4VgIAl
- f5Nh+GWIq5Dz6R/qeRMsOLdwfS1RA8eKqXYm+HcdcuEdbGrGJxpXURc/Py3zlkdoF1vv
- g0c/G+Qf2Lyk6UysdI0GzFOyRH/zuumgDqb7EfsvOLLZanng4GvtGkqXPSirjZZSXGg3
- m2R3mfaUTtP9em6NamnmMtI+kUtddblrbdWt84zUloIW8UeAqNSatTwuyswxzHJtAIqy
- MyiH4NdVu+gnDPRlSf37GXtjCDFc/KKU1hF2Zy1dCo58r/MWcPybTHlIVU5dZDjJHXlU
- MgAg==
-X-Gm-Message-State: APjAAAXSCeZsYQApx3qKDjlmxFKjICVkUboeZ9am271gnn3tJ8oScf8g
- DWIIb/v70ZAy2Pl/+ICacYz4FpHRL+/CBPOVXsg=
-X-Google-Smtp-Source: APXvYqyPn/B48yLfsfsWOkWUmiyWdHupakx8ZNCW0HxZoxIDHOeyIbYVmp8J4cx0NOr0OTfn0+3CYGoAgdLEJ9Ij0/M=
-X-Received: by 2002:a17:906:fcb8:: with SMTP id
- qw24mr119308778ejb.239.1565021377947; 
- Mon, 05 Aug 2019 09:09:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <1558108285-19571-1-git-send-email-bmeng.cn@gmail.com>
- <1558108285-19571-2-git-send-email-bmeng.cn@gmail.com>
- <9338c7b4-6a05-2189-b93d-25cb2bd4dd54@adacore.com>
- <CAEUhbmUtdvkYPm4DZL4MSeV5imaj82x2xtPkQ0yLKF599N=vXw@mail.gmail.com>
- <CAKmqyKP1BcTOQJDJoFiEL4NhMwTHQHmSDn=ZPiq8eDMB_hVSkw@mail.gmail.com>
-In-Reply-To: <CAKmqyKP1BcTOQJDJoFiEL4NhMwTHQHmSDn=ZPiq8eDMB_hVSkw@mail.gmail.com>
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references;
+ bh=s/GGftnAQofWbHcLlvYGC8C8gu8FXqIu5dq4uDy4E24=;
+ b=Sb5uV1PV58zyBAPHAJrPD4+UtMldeJFc/JFA/e98QbDxKvvFUJsHokTWPAuBuQuhNK
+ XIYxYIWrwpPjr8kjrW8tlcb8Wgo92HhB5z9U6xjsn+sdVu2tHTBPEkVOyv8OaZCUo2M+
+ iOfJ+E+dAgjWrJAuDbI7TG3jSe1L8efTrHuqufn55c1zmM5psqa0E+lK+ydBi85SAMcf
+ SpZvpQvCd88/62FG7PVHpyMD699LXKMNxzW8hfH6DC6cU8Etpf0SKk1uyKBTQx91ogf9
+ JjK4gf6Ql+GzU01FUyxdXR4PBBFbC3CY+0uKuh6RY59hZrrLIrfm6HytKBPFG/BW/TB1
+ LIdg==
+X-Gm-Message-State: APjAAAXfazaqpgiCLWYGf1yrc4NqPwL6jww/qNE6M5oIRrUero0uxl7t
+ mExezrpT2Y5Q0IHJpmazTxw=
+X-Google-Smtp-Source: APXvYqw1Tbc8kWcrhl2cYkvDscRq0ur177F9vPlqWjLDjuy9wk9+WxnSHR0Yyz8FNTrzSSrKRzquJA==
+X-Received: by 2002:a62:82c2:: with SMTP id
+ w185mr76487908pfd.202.1565020854292; 
+ Mon, 05 Aug 2019 09:00:54 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id d18sm47728793pgi.40.2019.08.05.09.00.53
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Mon, 05 Aug 2019 09:00:53 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Tue, 6 Aug 2019 00:09:27 +0800
-Message-ID: <CAEUhbmXcOMuQiSfSYD2-_vR+5HqTfou1XhoC_Vi7m9EGb1K1kw@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Date: Mon,  5 Aug 2019 09:00:19 -0700
+Message-Id: <1565020823-24223-25-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
+References: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::542
-Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH 2/2] riscv: sifive_u: Update
- the plic hart config to support multicore
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH 24/28] riscv: sifive_u: Fix broken GEM support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,74 +95,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+At present the GEM support in sifive_u machine is seriously broken.
 
-On Tue, Jul 16, 2019 at 5:33 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Sat, Jul 13, 2019 at 8:23 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > Hi Fabien,
-> >
-> > On Tue, Jul 9, 2019 at 12:31 AM Fabien Chouteau <chouteau@adacore.com> wrote:
-> > >
-> > > Hi Bin,
-> > >
-> > > Thanks for this patch.
-> > >
-> > > I know I am very late to the game but I have a comment here.
-> > >
-> > > On 17/05/2019 17:51, Bin Meng wrote:
-> > > > +    /* create PLIC hart topology configuration string */
-> > > > +    plic_hart_config_len = (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1) * smp_cpus;
-> > > > +    plic_hart_config = g_malloc0(plic_hart_config_len);
-> > > > +    for (i = 0; i < smp_cpus; i++) {
-> > > > +        if (i != 0) {
-> > > > +            strncat(plic_hart_config, ",", plic_hart_config_len);
-> > > > +        }
-> > > > +        strncat(plic_hart_config, SIFIVE_U_PLIC_HART_CONFIG,
-> > > > +                plic_hart_config_len);
-> > > > +        plic_hart_config_len -= (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1);
-> > > > +    }
-> > > > +
-> > >
-> > > This will create up to 4 MS PLIC devices. However on the Unleashed FU540 the PLICs are M,MS,MS,MS,MS because of the monitor hart #0.
-> > >
-> > > This means a different memory layout than the real hardware.
-> > >
-> > > For instance address 0x0C00_2080 will be hart #0 S-Mode interrupt enables in QEMU, instead of #1 M-Mode interrupt enables for the real hardware.
-> >
-> > Thanks for the notes! I agree to better match the real hardware, it
-> > should be modeled like that. However I am not sure what the original
-> > intention was when creating the "sifive_u" machine. Both OpenSBI and
-> > U-Boot list sifive_u as a special target, instead of the real
-> > Unleashed board hence I assume this is a hypothetical target too, like
-> > the "virt", but was created to best match the real Unleashed board
-> > though.
->
-> I thought (Palmer correct me if I'm wrong) that the sifive_u machine
-> *should* match the hardware. The problem is that QEMU doesn't support
-> everything that the HW supports which is why U-Boot and OpenSBI have
-> their own targets. The goal is to not require special QEMU targets, so
-> this is a step in the right direction.
->
+- The GEM block register base was set to a weird number (0x100900FC),
+  which for no way could work with the cadence_gem model in QEMU.
+- The generated DT node for GEM has a "clocks-names" which is an
+  invalid property name.
 
-I've sent a series that improves the emulation fidelity of sifive_u
-machine, so that the upstream OpenSBI, U-Boot and kernel images built
-for the SiFive HiFive Unleashed board can be used out of the box
-without any special hack.
+Not like other GEM variants, the FU540-specific GEM has a management
+block to control 10/100/1000Mbps link speed changes, that is mapped
+to 0x100a0000. We can simply map it into MMIO space without special
+handling using sifive_mmio_emulate().
 
-Please have a look.
-http://patchwork.ozlabs.org/project/qemu-devel/list/?series=123386
+Update the GEM node compatible string to use the official name used
+by the upstream Linux kernel, and add the management block reg base
+& size to the <reg> property encoding.
 
-Regards,
-Bin
+Tested with upstream U-Boot and Linux kernel MACB drivers.
+
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+---
+
+ hw/riscv/sifive_u.c         | 17 +++++++++++++----
+ include/hw/riscv/sifive_u.h |  3 ++-
+ 2 files changed, 15 insertions(+), 5 deletions(-)
+
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 9945b82..85cd4b5 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -3,6 +3,7 @@
+  *
+  * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
+  * Copyright (c) 2017 SiFive, Inc.
++ * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
+  *
+  * Provides a board compatible with the SiFive Freedom U SDK:
+  *
+@@ -11,6 +12,7 @@
+  * 2) PLIC (Platform Level Interrupt Controller)
+  * 3) PRCI (Power, Reset, Clock, Interrupt)
+  * 4) OTP (One-Time Programmable) memory with stored serial number
++ * 5) GEM (Gigabit Ethernet Controller) and management block
+  *
+  * This board currently uses a hardcoded devicetree that indicates five harts.
+  *
+@@ -68,7 +70,8 @@ static const struct MemmapEntry {
+     [SIFIVE_U_UART1] =    { 0x10011000,     0x1000 },
+     [SIFIVE_U_OTP] =      { 0x10070000,     0x1000 },
+     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
+-    [SIFIVE_U_GEM] =      { 0x100900FC,     0x2000 },
++    [SIFIVE_U_GEM] =      { 0x10090000,     0x2000 },
++    [SIFIVE_U_GEM_MGMT] = { 0x100a0000,     0x1000 },
+ };
+ 
+ #define SIFIVE_OTP_SERIAL   1
+@@ -244,17 +247,20 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+     nodename = g_strdup_printf("/soc/ethernet@%lx",
+         (long)memmap[SIFIVE_U_GEM].base);
+     qemu_fdt_add_subnode(fdt, nodename);
+-    qemu_fdt_setprop_string(fdt, nodename, "compatible", "cdns,macb");
++    qemu_fdt_setprop_string(fdt, nodename, "compatible",
++        "sifive,fu540-c000-gem");
+     qemu_fdt_setprop_cells(fdt, nodename, "reg",
+         0x0, memmap[SIFIVE_U_GEM].base,
+-        0x0, memmap[SIFIVE_U_GEM].size);
++        0x0, memmap[SIFIVE_U_GEM].size,
++        0x0, memmap[SIFIVE_U_GEM_MGMT].base,
++        0x0, memmap[SIFIVE_U_GEM_MGMT].size);
+     qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
+     qemu_fdt_setprop_string(fdt, nodename, "phy-mode", "gmii");
+     qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
+     qemu_fdt_setprop_cell(fdt, nodename, "interrupts", SIFIVE_U_GEM_IRQ);
+     qemu_fdt_setprop_cells(fdt, nodename, "clocks",
+         prci_phandle, PRCI_CLK_GEMGXLPLL, prci_phandle, PRCI_CLK_GEMGXLPLL);
+-    qemu_fdt_setprop(fdt, nodename, "clocks-names", ethclk_names,
++    qemu_fdt_setprop(fdt, nodename, "clock-names", ethclk_names,
+         sizeof(ethclk_names));
+     qemu_fdt_setprop_cell(fdt, nodename, "#address-cells", 1);
+     qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0);
+@@ -455,6 +461,9 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->gem), 0, memmap[SIFIVE_U_GEM].base);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->gem), 0,
+                        plic_gpios[SIFIVE_U_GEM_IRQ]);
++
++    sifive_mmio_emulate(system_memory, "riscv.sifive.u.gem-mgmt",
++        memmap[SIFIVE_U_GEM_MGMT].base, memmap[SIFIVE_U_GEM_MGMT].size);
+ }
+ 
+ static void riscv_sifive_u_machine_init(MachineClass *mc)
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index 0461331..e92f1aa 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -56,7 +56,8 @@ enum {
+     SIFIVE_U_UART1,
+     SIFIVE_U_OTP,
+     SIFIVE_U_DRAM,
+-    SIFIVE_U_GEM
++    SIFIVE_U_GEM,
++    SIFIVE_U_GEM_MGMT
+ };
+ 
+ enum {
+-- 
+2.7.4
+
 
