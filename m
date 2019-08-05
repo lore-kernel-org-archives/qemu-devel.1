@@ -2,72 +2,68 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EBFC32750
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 07:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D922C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 07:11:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B22AA20657
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 07:11:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FEA220657
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 07:11:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="EbZOk+bF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B22AA20657
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="eSlLeOcm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FEA220657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huX9q-0004ia-SG
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 03:11:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37203)
+	id 1huX9r-0004lK-FU
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 03:11:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37199)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alxndr@bu.edu>) id 1huX98-00039y-Du
+ (envelope-from <alxndr@bu.edu>) id 1huX98-00039x-7W
  for qemu-devel@nongnu.org; Mon, 05 Aug 2019 03:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alxndr@bu.edu>) id 1huX97-0001rT-CX
+ (envelope-from <alxndr@bu.edu>) id 1huX97-0001rJ-0C
  for qemu-devel@nongnu.org; Mon, 05 Aug 2019 03:11:06 -0400
 Received: from mail-eopbgr790111.outbound.protection.outlook.com
  ([40.107.79.111]:12064 helo=NAM03-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1huX97-0001qn-6z
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 03:11:05 -0400
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1huX96-0001qn-LV
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 03:11:04 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CmeVWoRyrTS5zHlFwdWoQELBFaSnnzVMQlwBrsaptIGe7KfFX5HZyht3PRcwAWfbaiCN8AyJq7kUVPC6CqHWsHx5URPh7ghw0j7keEwV/7RflAvoBGxpQHwc7WaRZH28jumi4DkbM03CN0DXHOOa1wRSTFU6mkgfuQCnwS/cwXEVznSvG5jlry6bZhVyw08Atos0jcjSqYvwKZZULzCmMT/zYlUGFwizFU3RUqsXcXC88AyCmxpwYQk9mNzTYcmzRt0ONs5Gijpa3h+clCZ3TvjtyyKm3lYZA/+br/nseHkcs9s2wPXuXNNE+jhL3PEZaLrW+oaYvutrgIvDavHreA==
+ b=ckT6r+FtrdTUw3ty8KDCL10uMv7hN8gyQ4YX7rZzUj8FfWKBFSwZlcuNF2lzxI6M7g0prDbq9IklZYAty9T04ZboP8hanyr/6vHrPvq0NATJEWxxRM/qbxJiSx8cqejOWBUbY+S2BrhzIFYnE5KbC/Boe22KWa7ZPHxaBnWwz5gQDg57qjZxo2qwBcWu96Kpd4GgL2TOjnaN14AWTZDWP0oxn/mu8PJmHwXTq/xVUEjKCdnjq/4HeNtujX+djcovbebxxxuaXIgrz2fULJyX3g4RRdOqo2Am/kCClEsjVdys1V5USNnXJV3SsuIig/HYCkTjvSFG5q8oZwuxnN5F7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8xc2Nz4P+llAvkrm00k9L/WRKVfsUvVyJ5b/Y143C/8=;
- b=B67/nqGX7WyPSwtHrhxmru4jLI1Qm1UOiEMoMfhEGvCqyem+t5Avk7QC6tETmG/svzJckDmPCIscfl4rwejNv8jqzGeqwmcBJKetMIKgseNHINAzO8L7HGzJQuqihhzgBoFlnzwsEMDEBUKhH5bhBarcX2a557ZbaXAY+l1vf+7bBRKTcJNAwAt5qLc8jb0E+TkVGfcPtqGA9DUFSG9R3PrlC3Ydq1Qx244O8zfIrgTIXKhYxa5H4RIb6cJsSf+Owx8N14lZTYyjXNPVxOP+7mTrLSZU+NUwVb/PSYLjwY+59UBb+UXVeY3K2TLVWn7IrtLS7MGJ30KOst8bTz4zGg==
+ bh=k4aZ21J6+lcfbBhm8yUhBM7AE5+PXYAZh1RSdAEp7qc=;
+ b=RiCBqCijeM0tTaAj4kV3srBaIAQ2GmGkxSAPxGtvXUjgkxzJDbmCNxAKMyd3L8Es88pEkUz2SVEiHd8XnOuINREYBW07dRviauiOmABRltr0ypjivgM3TdXEbQrWpjFSWWvbCpq3WB6nUI1bcmHWaRmIRCZgCTy05swrIt0/05x+OgFIXepVTzPytU9O1DC6DzMDhJqyb5jFjAGfXO6xdWfNap1irWCJptBIa7FyVY/I9pyfkP2hUF/6EXXnaWq5AUhgyswnZ6rduYCqAYW+mRO0g+QStieTzMbuw4AsfqvpPpJGVcIkb21/6stck/ZMv+Up8FvRahU2ohVjN/hhpw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=bu.edu;dmarc=pass action=none header.from=bu.edu;dkim=pass
  header.d=bu.edu;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8xc2Nz4P+llAvkrm00k9L/WRKVfsUvVyJ5b/Y143C/8=;
- b=EbZOk+bFBYowLEtE7xBWy3ue34T+eNWCYJAHGYiUByNE8vsZj301c/hfUZ3QAm662PSmqpz2Ch2ntVGDIcUn3KLU4TKX60Ym6tIy5ZVCKofldABMpbDFhwWP9VIJcuPT82A4MhrEr+KE0sfHWAjKPe3TEgHcVi0f+sf0p7SiTFQ=
+ bh=k4aZ21J6+lcfbBhm8yUhBM7AE5+PXYAZh1RSdAEp7qc=;
+ b=eSlLeOcmzeh/vKbJqLl5Mk8exUxa7Rei5fYjjCLNv1IKByHhrubkeLx/WvMSh0zT3vZm1BFYlMU9kOWrrn3VueAFAQbaifyg/Mt7vVcq89mO+0kuVmHr63qb9RCmHw7YlkLnMiX5UdLE3yQbsEr5aWKr4BtJ+lef1TfN350rlSg=
 Received: from CY4PR03MB2872.namprd03.prod.outlook.com (10.175.118.17) by
  CY4PR03MB2646.namprd03.prod.outlook.com (10.173.43.142) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2136.16; Mon, 5 Aug 2019 07:11:03 +0000
+ 15.20.2136.16; Mon, 5 Aug 2019 07:11:02 +0000
 Received: from CY4PR03MB2872.namprd03.prod.outlook.com
  ([fe80::6cce:cc85:9e3:d33a]) by CY4PR03MB2872.namprd03.prod.outlook.com
  ([fe80::6cce:cc85:9e3:d33a%4]) with mapi id 15.20.2136.018; Mon, 5 Aug 2019
- 07:11:03 +0000
+ 07:11:02 +0000
 From: "Oleinik, Alexander" <alxndr@bu.edu>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [RFC PATCH v2 01/17] fuzz: Move initialization from main to
- qemu_init
-Thread-Index: AQHVS1zwoeA2FT8J9UWtfdO35keS4Q==
+Thread-Topic: [RFC PATCH v2 00/17] Add virtual device fuzzing support
+Thread-Index: AQHVS1zwRoWB3hU23U20ghvShPoNVA==
 Date: Mon, 5 Aug 2019 07:11:02 +0000
-Message-ID: <20190805071038.32146-2-alxndr@bu.edu>
-References: <20190805071038.32146-1-alxndr@bu.edu>
-In-Reply-To: <20190805071038.32146-1-alxndr@bu.edu>
+Message-ID: <20190805071038.32146-1-alxndr@bu.edu>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -80,29 +76,29 @@ x-clientproxiedby: BL0PR02CA0068.namprd02.prod.outlook.com
 authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
 x-ms-exchange-messagesentrepresentingtype: 1
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 27c5d9f2-1018-46ef-74c0-08d71974134f
+x-ms-office365-filtering-correlation-id: 1bc57f4b-4a3a-4584-5b67-08d7197412c4
 x-microsoft-antispam: BCL:0; PCL:0;
  RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
  SRVR:CY4PR03MB2646; 
 x-ms-traffictypediagnostic: CY4PR03MB2646:
-x-microsoft-antispam-prvs: <CY4PR03MB2646E23395FF45FAB69C6CD9BADA0@CY4PR03MB2646.namprd03.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-microsoft-antispam-prvs: <CY4PR03MB2646BF3499A33129589928BABADA0@CY4PR03MB2646.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-forefront-prvs: 01208B1E18
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(4636009)(366004)(39860400002)(396003)(136003)(346002)(376002)(189003)(199004)(71200400001)(71190400001)(6916009)(186003)(2351001)(1076003)(76176011)(6436002)(53936002)(86362001)(5640700003)(52116002)(6512007)(26005)(5660300002)(102836004)(386003)(6506007)(2501003)(66066001)(75432002)(6486002)(66476007)(2906002)(88552002)(4326008)(8676002)(316002)(786003)(50226002)(54906003)(81166006)(14454004)(81156014)(68736007)(476003)(2616005)(11346002)(446003)(486006)(36756003)(66446008)(66946007)(256004)(64756008)(25786009)(99286004)(478600001)(6116002)(3846002)(7736002)(305945005)(66556008)(8936002)(42522002);
+ SFS:(10019020)(4636009)(366004)(39860400002)(396003)(136003)(346002)(376002)(189003)(199004)(71200400001)(71190400001)(6916009)(186003)(2351001)(1076003)(6436002)(53936002)(86362001)(5640700003)(52116002)(6512007)(26005)(5660300002)(102836004)(386003)(6506007)(2501003)(66066001)(75432002)(6486002)(66476007)(2906002)(88552002)(4326008)(8676002)(316002)(786003)(50226002)(54906003)(81166006)(14454004)(81156014)(68736007)(476003)(2616005)(486006)(36756003)(66446008)(66946007)(256004)(64756008)(25786009)(99286004)(478600001)(6116002)(3846002)(7736002)(305945005)(66556008)(8936002)(14444005)(42522002);
  DIR:OUT; SFP:1102; SCL:1; SRVR:CY4PR03MB2646;
  H:CY4PR03MB2872.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
 received-spf: None (protection.outlook.com: bu.edu does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: d4j2ZdRKUJbygTAKcMNh9bgPgVQgFKoWY4zPnCJZ7nx1SOHxejQE8AF0KcbHGQlCYv9/1omeXh5Cw2eRdNjKyFwF73hcYrsoxopjRIZX9MMa1NCM9XI5zmNFPVi3hr4HYkOP8elTzkbaQ9pz5eMXUEP7bK8DSTSf/r0nmi7PVKOqnLMi1Oc6xu3s5TabslGO12NCjkOtJvH7+QViXu5/cBDkGgoOowTFgbVlqAI8HiDNniwxvv2wINoN5ZCIKl3obY3Ia51JG+tBnlhMWGMbpAGnxro7hzCiFukB4JkvycvPRElZ0XEBi+3dTwKtv5Ifgk8UMuxkTQNSkvGGC4qYdcY3LB3VH2wUy1e9W76MGG2IBxdXzQkIOAdT/Z8vLhBgimKs0sYlIloXKqUOqqfCzjW6jVZWPKmaWoOq28/pR1w=
+x-microsoft-antispam-message-info: 96wa2xfU70tobBV9SmsZzVB+tUhNAshvm1xdc0YthS9D+2R24omwmOw47qN2wyg1u7rqGAlkkHVtZJVk2yyC+HuxJfigwB/uRGQ2ScaxkyRiuyI08M6gxypPV0EiPfEvEckW4YKcv6A8PXCpSs/bN89BwMhXq2wvlHZAHL6fJV0n0vS5dla8D/mraq7T0TmlKYrfsf9GJOjEouOCCMiVEuriAeTs7puwadekyzT6t7R6UGKhNoRQ6JeVd1R4eZeSqFsDrlMdRqPrWNVtL9kgvYTtVwGj94CcvaHX9U13tgty7FsFBE4fsLRvJL+JoHKy9QqYOtpUJX9JNXWttNGsvwuyUnTLAholI72dkVOj1ZYZqB6LYrhM++JdlqPbqGGJ21qOHDFRsb3FgkfH2IFbvVIFQgTp0zr24/sVYZ0A5us=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 27c5d9f2-1018-46ef-74c0-08d71974134f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2019 07:11:03.0208 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1bc57f4b-4a3a-4584-5b67-08d7197412c4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2019 07:11:02.0692 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
@@ -110,8 +106,7 @@ X-MS-Exchange-CrossTenant-userprincipalname: alxndr@bu.edu
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR03MB2646
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
 X-Received-From: 40.107.79.111
-Subject: [Qemu-devel] [RFC PATCH v2 01/17] fuzz: Move initialization from
- main to qemu_init
+Subject: [Qemu-devel] [RFC PATCH v2 00/17] Add virtual device fuzzing support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,95 +125,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Using this, we avoid needing a special case to break out of main(),
-early, when initializing the fuzzer, as we can just call qemu_init.
-There is still a #define around main(), since it otherwise conflicts
-with the libfuzzer main().
+Changes since v1
+ * Split off changes to qos virtio-net and qtest server to other patches
+ * Move vl:main initialization into new func: qemu_init
+ * Moved useful functions from qos-test.c to a separate object
+ * Use struct of function pointers for add_fuzz_target(), instead of
+   arguments
+ * Move ramfile to migration/qemu-file
+ * Rewrite fork-based fuzzer pending patch to libfuzzer
+ * Pass check-patch
 
-Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+Based-on: 20190805032400.8054-1-alxndr@bu.edu
+Based-on: 20190805031240.6024-1-alxndr@bu.edu
+
 ---
- include/sysemu/sysemu.h |  5 +++++
- vl.c                    | 25 +++++++++++++++++++++++--
- 2 files changed, 28 insertions(+), 2 deletions(-)
+As part of Google Summer of Code 2019, I'm working on integrating
+fuzzing of virtual devices into QEMU [1]. This is a highly WIP patchset
+adding this functionality.
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 984c439ac9..a63d5ccce3 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -184,6 +184,8 @@ QemuOpts *qemu_get_machine_opts(void);
-=20
- bool defaults_enabled(void);
-=20
-+int qemu_init(int argc, char **argv, char **envp);
-+
- extern QemuOptsList qemu_legacy_drive_opts;
- extern QemuOptsList qemu_common_drive_opts;
- extern QemuOptsList qemu_drive_opts;
-@@ -197,4 +199,7 @@ extern QemuOptsList qemu_global_opts;
- extern QemuOptsList qemu_mon_opts;
- extern QemuOptsList qemu_semihosting_config_opts;
-=20
-+#ifdef CONFIG_FUZZ
-+int real_main(int argc, char **argv, char **envp);
-+#endif
- #endif
-diff --git a/vl.c b/vl.c
-index 130a389712..914bb9b2de 100644
---- a/vl.c
-+++ b/vl.c
-@@ -130,6 +130,10 @@ int main(int argc, char **argv)
- #include "sysemu/iothread.h"
- #include "qemu/guest-random.h"
-=20
-+#ifdef CONFIG_FUZZ
-+#include "tests/libqtest.h"
-+#endif
-+
- #define MAX_VIRTIO_CONSOLES 1
-=20
- static const char *data_dir[16];
-@@ -2854,7 +2858,7 @@ static void user_register_global_props(void)
-                       global_init_func, NULL, NULL);
- }
-=20
--int main(int argc, char **argv, char **envp)
-+int qemu_init(int argc, char **argv, char **envp)
- {
-     int i;
-     int snapshot, linux_boot;
-@@ -4453,7 +4457,7 @@ int main(int argc, char **argv, char **envp)
-     if (vmstate_dump_file) {
-         /* dump and exit */
-         dump_vmstate_json_to_file(vmstate_dump_file);
--        return 0;
-+        exit(0);
-     }
-=20
-     if (incoming) {
-@@ -4470,6 +4474,23 @@ int main(int argc, char **argv, char **envp)
-     accel_setup_post(current_machine);
-     os_setup_post();
-=20
-+    return 0;
-+}
-+#ifdef CONFIG_FUZZ
-+/*
-+ * Without this, the compiler complains about all of the unused
-+ * cleanup and shutdown() functions
-+ */
-+int real_main(int argc, char **argv, char **envp)
-+#else
-+int main(int argc, char **argv, char **envp)
-+#endif
-+{
-+    int ret =3D qemu_init(argc, argv, envp);
-+    if (ret !=3D 0) {
-+        return ret;
-+    }
-+
-     main_loop();
-=20
-     gdbserver_cleanup();
+Fuzzers provide random data to a program and monitor its execution for
+errors. Coverage-guided fuzzers also observe the parts of the program
+that are exercised by each input, and use this information to
+mutate/guide the inputs to reach additional parts of the program. They
+are quite effective for finding bugs in a wide range of software.=20
+
+Summary:
+ - The virtual-device fuzzers use libfuzzer [2] for coverage-guided
+   in-process fuzzing.
+ - To fuzz a device, create a new fuzz "target" - i.e. a function that
+   exercises QEMU based on inputs provided by the fuzzer.
+ - Fuzz targets rely on qtest and libqos to turn inputs into actions.
+ - Since libfuzzer does in-process fuzzing, the QEMU state needs to be
+   reset after each fuzz run. These patches provide three methods for
+   resetting state.
+ - There are currently few targets, but they have already helped
+   discover bugs in the console, and virtio-net, and have reproduced
+   previously-reported vulnerabilities.
+
+Alexander Oleinik (17):
+  fuzz: Move initialization from main to qemu_init
+  fuzz: Add fuzzer configure options
+  fuzz: Keep memory mapped for fork-based fuzzer
+  fuzz: Skip modules that were already initialized
+  fuzz: Add direct receive function for qtest server
+  fuzz: Add FUZZ_TARGET module type
+  fuzz: Add ramfile qemu-file type
+  fuzz: Export the qemu_savevm_live_state function
+  fuzz: hardcode needed objects into i386 target
+  fuzz: qtest client directly interacts with server
+  fuzz: Move useful qos functions to separate object
+  fuzz: Add fuzzer skeleton
+  fuzz: Add libqos support to the fuzzer
+  fuzz: Add forking support to the fuzzer
+  fuzz: Add general qtest fuzz-target
+  fuzz: Add virtio-net fuzz targets
+  fuzz: Add fuzz accelerator type
+
+ accel/fuzz.c                 |  48 +++++++
+ configure                    |  15 ++
+ exec.c                       |   2 +
+ include/qemu/module.h        |   4 +-
+ include/sysemu/fuzz.h        |  15 ++
+ include/sysemu/qtest.h       |   4 +
+ include/sysemu/sysemu.h      |   5 +
+ migration/qemu-file.c        |  84 +++++++++++
+ migration/qemu-file.h        |  11 ++
+ migration/savevm.c           |   9 +-
+ migration/savevm.h           |   2 +
+ qtest.c                      |  14 ++
+ target/i386/Makefile.objs    |  20 +++
+ tests/fuzz/fuzz.c            | 245 +++++++++++++++++++++++++++++++++
+ tests/fuzz/fuzz.h            |  70 ++++++++++
+ tests/fuzz/fuzzer_hooks.c    |  62 +++++++++
+ tests/fuzz/fuzzer_hooks.h    |  21 +++
+ tests/fuzz/qos_fuzz.c        |  58 ++++++++
+ tests/fuzz/qos_fuzz.h        |  23 ++++
+ tests/fuzz/qos_helpers.c     | 190 +++++++++++++++++++++++++
+ tests/fuzz/qos_helpers.h     |  17 +++
+ tests/fuzz/qtest_fuzz.c      | 260 +++++++++++++++++++++++++++++++++++
+ tests/fuzz/qtest_fuzz.h      |  37 +++++
+ tests/fuzz/virtio-net-fuzz.c | 254 ++++++++++++++++++++++++++++++++++
+ tests/libqos/qos_external.c  | 149 ++++++++++++++++++++
+ tests/libqos/qos_external.h  |   8 ++
+ tests/libqtest.c             |  61 +++++++-
+ tests/libqtest.h             |   6 +
+ tests/qos-test.c             | 132 +-----------------
+ util/module.c                |   7 +
+ vl.c                         |  25 +++-
+ 31 files changed, 1720 insertions(+), 138 deletions(-)
+ create mode 100644 accel/fuzz.c
+ create mode 100644 include/sysemu/fuzz.h
+ create mode 100644 tests/fuzz/fuzz.c
+ create mode 100644 tests/fuzz/fuzz.h
+ create mode 100644 tests/fuzz/fuzzer_hooks.c
+ create mode 100644 tests/fuzz/fuzzer_hooks.h
+ create mode 100644 tests/fuzz/qos_fuzz.c
+ create mode 100644 tests/fuzz/qos_fuzz.h
+ create mode 100644 tests/fuzz/qos_helpers.c
+ create mode 100644 tests/fuzz/qos_helpers.h
+ create mode 100644 tests/fuzz/qtest_fuzz.c
+ create mode 100644 tests/fuzz/qtest_fuzz.h
+ create mode 100644 tests/fuzz/virtio-net-fuzz.c
+ create mode 100644 tests/libqos/qos_external.c
+ create mode 100644 tests/libqos/qos_external.h
+
 --=20
 2.20.1
 
