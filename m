@@ -2,52 +2,90 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83483C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC24BC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:20:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 539922086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:15:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 539922086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=espressif.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD5172086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:20:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD5172086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hubtE-0007bW-9p
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 08:15:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43263)
+	id 1hubyT-0000oW-ER
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 08:20:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43911)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ivan@espressif.com>) id 1hubsT-0006iB-Lw
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:14:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hubxg-0000G2-Nk
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ivan@espressif.com>) id 1hubsS-0004Ex-Ig
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:14:13 -0400
-Received: from cnmail.espressif.com ([140.206.114.118]:15308)
+ (envelope-from <mreitz@redhat.com>) id 1hubxe-0001me-4H
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:19:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ivan@espressif.com>) id 1hubsR-00045v-VA
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:14:12 -0400
-Received: from [192.168.0.145] ([195.122.199.236])
- by cnmail.espressif.com ((Espressif cloud mail system)) with ASMTP (SSL) id
- 201908052015300999; Mon, 05 Aug 2019 20:15:30 +0800
-From: Ivan Grokhotkov <ivan@espressif.com>
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Message-Id: <B6797C6C-483E-4D08-92C8-BC109B149E50@espressif.com>
-Date: Mon, 5 Aug 2019 14:14:00 +0200
-To: qemu-devel@nongnu.org
-X-Mailer: Apple Mail (2.3445.104.11)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 140.206.114.118
-Subject: [Qemu-devel] [PATCH v2] target/riscv: don't overwrite priv_version
- and resetvec when realizing
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hubxX-0001fk-VX; Mon, 05 Aug 2019 08:19:31 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B326EC065131;
+ Mon,  5 Aug 2019 12:19:26 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 54CD560E1C;
+ Mon,  5 Aug 2019 12:19:22 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <95578562-dd2a-08f2-2a00-d5f5ec723ebe@redhat.com>
+Date: Mon, 5 Aug 2019 14:19:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Mon, 05 Aug 2019 12:19:26 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1] util/hbitmap: update orig_size on
+ truncate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,107 +97,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CPU-specific init functions (riscv_*_cpu_init) configure members of
-CPURISCVState, such as priv_version and resetvec. However
-riscv_cpu_realize unconditionally overwrites these members. The
-result is that some CPUs (such as CPU_SIFIVE_U34) are getting created
-with incorrect priv_version.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd
+Content-Type: multipart/mixed; boundary="qa6kotLvrqgulwuUcr7AcrR1BjtxyaVgo";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, fam@euphon.net,
+ kwolf@redhat.com, den@openvz.org, eblake@redhat.com
+Message-ID: <95578562-dd2a-08f2-2a00-d5f5ec723ebe@redhat.com>
+Subject: Re: [PATCH for-4.1] util/hbitmap: update orig_size on truncate
+References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
 
-Only set priv_version in riscv_cpu_realize if priv_spec property was
-set. Don't set resetvec in riscv_cpu_realize, rely on the init
-function to set it. Set default priv_version and resetvec in init
-functions where this was missing.
+--qa6kotLvrqgulwuUcr7AcrR1BjtxyaVgo
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ivan Grokhotkov <ivan@espressif.com>
----
-target/riscv/cpu.c | 12 +++++++-----
-target/riscv/cpu.h |  1 +
-2 files changed, 8 insertions(+), 5 deletions(-)
+On 05.08.19 14:01, Vladimir Sementsov-Ogievskiy wrote:
+> Without this, hbitmap_next_zero and hbitmap_next_dirty_area are broken
+> after truncate. So, orig_size is broken since it's introduction in
+> 76d570dc495c56bb.
+>=20
+> Fixes: 76d570dc495c56bb
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>=20
+> Hi!
+>=20
+> Here is one more hbitmap bug I noticed. It's my fault, I'm sorry :(
+> Broken in 4.0, but if we are already going to fix in 4.1 some things
+> around it, it's a small meaningful addition.
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index f8d07bd20a..8f3cb0c6bf 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -110,7 +110,7 @@ static void riscv_any_cpu_init(Object *obj)
-{
-     CPURISCVState *env =3D &RISCV_CPU(obj)->env;
-     set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
--    set_priv_version(env, PRIV_VERSION_1_11_0);
-+    set_priv_version(env, PRIV_VERSION_DEFAULT);
-     set_resetvec(env, DEFAULT_RSTVEC);
-}
+Hm. :-/
 
-@@ -119,6 +119,8 @@ static void riscv_any_cpu_init(Object *obj)
-static void riscv_base32_cpu_init(Object *obj)
-{
-     CPURISCVState *env =3D &RISCV_CPU(obj)->env;
-+    set_priv_version(env, PRIV_VERSION_DEFAULT);
-+    set_resetvec(env, DEFAULT_RSTVEC);
-     /* We set this in the realise function */
-     set_misa(env, 0);
-}
-@@ -157,6 +159,8 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
-static void riscv_base64_cpu_init(Object *obj)
-{
-     CPURISCVState *env =3D &RISCV_CPU(obj)->env;
-+    set_priv_version(env, PRIV_VERSION_DEFAULT);
-+    set_resetvec(env, DEFAULT_RSTVEC);
-     /* We set this in the realise function */
-     set_misa(env, 0);
-}
-@@ -316,7 +320,7 @@ static void riscv_cpu_realize(DeviceState *dev, =
-Error **errp)
-     RISCVCPU *cpu =3D RISCV_CPU(dev);
-     CPURISCVState *env =3D &cpu->env;
-     RISCVCPUClass *mcc =3D RISCV_CPU_GET_CLASS(dev);
--    int priv_version =3D PRIV_VERSION_1_11_0;
-+    int priv_version =3D PRIV_VERSION_DEFAULT;
-     target_ulong target_misa =3D 0;
-     Error *local_err =3D NULL;
+> Users of broken API are incremental backup, sync mirror (but it may not=
 
-@@ -339,11 +343,9 @@ static void riscv_cpu_realize(DeviceState *dev, =
-Error **errp)
-                        cpu->cfg.priv_spec);
-             return;
-         }
-+        set_priv_version(env, priv_version);
-     }
+> be broken, if truncates not allowed during mirror, are they?),
 
--    set_priv_version(env, priv_version);
--    set_resetvec(env, DEFAULT_RSTVEC);
--
-     if (cpu->cfg.mmu) {
-         set_feature(env, RISCV_FEATURE_MMU);
-     }
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 0adb307f32..88a52a1c8c 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -81,6 +81,7 @@ enum {
-#define PRIV_VERSION_1_09_1 0x00010901
-#define PRIV_VERSION_1_10_0 0x00011000
-#define PRIV_VERSION_1_11_0 0x00011100
-+#define PRIV_VERSION_DEFAULT PRIV_VERSION_1_11_0
+It doesn=E2=80=99t appear that way (we don=E2=80=99t share BLK_PERM_RESIZ=
+E).
 
-#define TRANSLATE_PMP_FAIL 2
-#define TRANSLATE_FAIL 1
---=20
-2.20.1 (Apple Git-117)
+> bitmap export through NBD.
+
+I suppose that counts as block-y enough for me to take it.  Well, I=E2=80=
+=99d
+still like a test case to see the impact...  I=E2=80=99ll see whether I c=
+an come
+up with something.
+
+>  util/hbitmap.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
+--qa6kotLvrqgulwuUcr7AcrR1BjtxyaVgo--
 
-Re-sending with corrected indentation.
+--ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
----
-Best regards,
-Ivan Grokhotkov
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1IHsgACgkQ9AfbAGHV
+z0A4oQf+MmRZu8esatI/e0e2tfv3EURDg7NBK2NE6QylDVXRR81aiDXuaN4GXaVQ
+MHFry+mocJl9mCtirTWmgGz85/DUh8fqeDyaf2ulZskuWF8HAsvyJ405b9FzSL8k
+yF82VnoxvnjuQAISXu+Vd81DH3s+jeS/WNcG8PGcM8bzkcbV7MG0ry0WVLRknJai
+sLH0a/r9HZoY3HrOoTMrN3smrE0uBuKcq8heJr/DEhgHKz/+ayV58kl2Nz3Wh7mF
+w0B/990fwUQ+ojFlaBNX//mDAnjr/n7msijzrE9RguyWMmShLKF025e9SJLxG1ZS
+gjNYM4vsf+JikCiJ8gwGmoC36zA9Ow==
+=TEHm
+-----END PGP SIGNATURE-----
 
-
+--ejmTyGAK1Z0sBZrVCEELwwH15YVQfhlGd--
 
