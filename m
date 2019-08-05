@@ -2,67 +2,82 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA99DC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 04:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8168C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 04:44:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2EC92086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 04:15:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2EC92086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 85C822086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 04:44:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMV2q1Bl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85C822086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huUOx-0006Lb-15
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 00:15:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38209)
+	id 1huUr3-00029C-O4
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 00:44:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41982)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1huUOW-0005uf-SK
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:14:50 -0400
+ (envelope-from <liq3ea@gmail.com>) id 1huUqL-0001ds-S8
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:43:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1huUOV-00079n-Cc
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:14:48 -0400
-Resent-Date: Mon, 05 Aug 2019 00:14:48 -0400
-Resent-Message-Id: <E1huUOV-00079n-Cc@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21505)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1huUOV-000774-7F
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:14:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1564978471; cv=none; d=zoho.com; s=zohoarc; 
- b=fB1ujEwklWAbO4QdGzOaX+vzBCSXGzYddiwDLEffF8nYZY9P+tyTyVBbn5MFFwFNptljahA5u4Q4xuy0oV0TI3Zmh43TtusNearS4IcMB+G6wKtkotMnZlo1g1pHNr3ztMIi47Wv4A/S8x8K7u57Aps3nSKOtetsSgP3UdWuXDk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1564978471;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=pJadji3I1wke0MApp3msQjXbNoVE8LgA4CwVj56ODrs=; 
- b=IWxwgD5SKHMfi4vVuuiFyiWxyyc81VL1m1VJYZH0Uajgxhtl7qmzWpjc+EZnCZE8sGqUDI9rGS8CmW50Ge7lMfOsPLfbDjugqx3qkek7E6P5LWPpSNHJmB+p9shLc55JmM6Q8+Oz+VzkGjXL5Tza0mYtkURT/NYD0vO6c76ptLQ=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1564978469778938.5975160635495;
- Sun, 4 Aug 2019 21:14:29 -0700 (PDT)
-Message-ID: <156497846838.907.8296078590401998721@c4a48874b076>
-In-Reply-To: <20190805032400.8054-1-alxndr@bu.edu>
+ (envelope-from <liq3ea@gmail.com>) id 1huUqK-0007uT-Ok
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:43:33 -0400
+Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36463)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>)
+ id 1huUqK-0007u5-Hp; Mon, 05 Aug 2019 00:43:32 -0400
+Received: by mail-ot1-x32b.google.com with SMTP id r6so83964067oti.3;
+ Sun, 04 Aug 2019 21:43:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=aK93g3QL2dG+tUnUCxSDwKdK7PX56Wj5Ql2kuCgjTrk=;
+ b=jMV2q1Blsr4UTQXxW1YRj4f+Zx/EIWZCku8acGTtlCoXl3O8rPmCK3UUg2qz/Td+64
+ sh/O6TZFB311Ry0lDnxjsaw+GE3C5v1xgjVU+k4FZXluHYyDYC/r88v4JcOZRXlE7Ibs
+ u6nWqEj4zyi69Ri0W/rnK2BIwTg1xtUFBffgsKa6ah1B9b4EW5qk4DK2wSn/WhOKVg+p
+ Q+f1IYZIu9DDFIH8h/RSDIZZinrizhOHh0DicIMNabgJg8VOp8KosXW0VI9CJcTMRqhQ
+ Dsngp1Fzioxxsq3UO4zPzrCSgHYMhFDKyHY8ljlP0QcM5XksLOwj/L/SREG8Y/edaV40
+ eFVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=aK93g3QL2dG+tUnUCxSDwKdK7PX56Wj5Ql2kuCgjTrk=;
+ b=O8WMfN85jfcZAEKM8w9Btu6UcJlHjdp6XlXiF2EOiK+KTS+dMiNNXmHwALcl9vW1qc
+ +Gso6tnSva3OvlRSCGAwxWnAkhqijlTS4m0HLEeckZNJeVeyWNFs+Ok/UwVIZf0ONyav
+ KIykCDzgrItrUKzhRZVfkrMX8609a2vDBKgcD4h83qh/jCxqL2xhqMiQw/6gIhGJDnI7
+ XJIPPwkvj74q0A7IWw5K1+YbFUTLwxsZ4uInfB3G8MraW1YP4KSuzaMe48mOjRZLXBaG
+ QEdkZQVFJXXCmfjSP5o/TTmV7k0wvX1cmR3oN6At7YEtE7hZjaWRMvstZf4trnSR6loB
+ 30lg==
+X-Gm-Message-State: APjAAAVRhIYhCDkqQSMewAKyTiqv1wkUhrR89X9haBt2XGbPCAFv0WC4
+ /YvDoIwB00YDUnDqv2HbryDXKIS5uOhtacx8OMc=
+X-Google-Smtp-Source: APXvYqzUGR8aDXlzPn+LyFfu12DSc+UPCc2fvUteUxO5x8MA56t41rMrh54svV9yfkSaTCNTE8sW9J9xhsFHStqdZW8=
+X-Received: by 2002:a05:6830:1291:: with SMTP id
+ z17mr48407542otp.194.1564980211666; 
+ Sun, 04 Aug 2019 21:43:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alxndr@bu.edu
-Date: Sun, 4 Aug 2019 21:14:29 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH] libqos: Account for the ctrl queue in
- virtio-net
+References: <7f455f0d.730d.16c5fdc21af.Coremail.hope2hope@163.com>
+In-Reply-To: <7f455f0d.730d.16c5fdc21af.Coremail.hope2hope@163.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 5 Aug 2019 12:42:55 +0800
+Message-ID: <CAKXe6SKMS__GaxTL4rkTBFpCpRkRS_bHoJx8=6w6WktFr5K9XQ@mail.gmail.com>
+To: ddm <hope2hope@163.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32b
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] How to configure QEMU to support APIC
+ virtualization
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,109 +89,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, alxndr@bu.edu,
- bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+Cc: Qemu Developers <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwNTAzMjQwMC44MDU0
-LTEtYWx4bmRyQGJ1LmVkdS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGFzYW4gYnVp
-bGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1
-dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSBy
-ZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
-c2gKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tl
-ci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14ODZfNjQtc29mdG1tdSBKPTE0IE5FVFdP
-Uks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKY2xhbmcgLWlxdW90ZSAvdG1wL3FlbXUtdGVz
-dC9idWlsZC8uIC1pcXVvdGUgLiAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy90Y2cgLWlxdW90
-ZSAvdG1wL3FlbXUtdGVzdC9zcmMvdGNnL2kzODYgLUkvdG1wL3FlbXUtdGVzdC9zcmMvbGludXgt
-aGVhZGVycyAtSS90bXAvcWVtdS10ZXN0L2J1aWxkL2xpbnV4LWhlYWRlcnMgLWlxdW90ZSAuIC1p
-cXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjIC1pcXVvdGUgL3RtcC9xZW11LXRlc3Qvc3JjL2FjY2Vs
-L3RjZyAtaXF1b3RlIC90bXAvcWVtdS10ZXN0L3NyYy9pbmNsdWRlIC1JL3RtcC9xZW11LXRlc3Qv
-c3JjL3Rlc3RzL2ZwIC1JL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRm
-bG9hdC0zL3NvdXJjZS9pbmNsdWRlIC1JL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL2ZwL2Jlcmtl
-bGV5LXNvZnRmbG9hdC0zL3NvdXJjZS84MDg2LVNTRSAtSS90bXAvcWVtdS10ZXN0L3NyYy90ZXN0
-cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMy9zb3VyY2UgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEg
-LUkvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xpYmZkdCAtV2Vycm9yIC1wdGhyZWFkIC1JL3Vzci9p
-bmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlIC1mUElFIC1EUElF
-IC1tNjQgLW1jeDE2IC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJH
-RUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwg
-LVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3Qt
-YWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtc3RkPWdudTk5IC1Xbm8tc3RyaW5nLXBsdXMt
-aW50IC1Xbm8tdHlwZWRlZi1yZWRlZmluaXRpb24gLVduby1pbml0aWFsaXplci1vdmVycmlkZXMg
-LVdleHBhbnNpb24tdG8tZGVmaW5lZCAtV2VuZGlmLWxhYmVscyAtV25vLXNoaWZ0LW5lZ2F0aXZl
-LXZhbHVlIC1Xbm8tbWlzc2luZy1pbmNsdWRlLWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4
-dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkgLVdmb3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3Jl
-ZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxlLWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNr
-LXByb3RlY3Rvci1zdHJvbmcgLUkvdXNyL2luY2x1ZGUvcDExLWtpdC0xIC1JL3Vzci9pbmNsdWRl
-L2xpYnBuZzE2IC1JL3Vzci9pbmNsdWRlL3NwaWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Utc2Vy
-dmVyIC1JL3Vzci9pbmNsdWRlL2NhY2FyZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3Iv
-bGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAtSS91c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNsdWRl
-L25zcHI0IC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRlL2Js
-a2lkIC1JL3Vzci9pbmNsdWRlL3V1aWQgLUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgLURIV19QT0lT
-T05fSCAtRFRBUkdFVF9BUk0gIC1EU09GVEZMT0FUX1JPVU5EX09ERCAtRElOTElORV9MRVZFTD01
-IC1EU09GVEZMT0FUX0ZBU1RfRElWMzJUTzE2IC1EU09GVEZMT0FUX0ZBU1RfRElWNjRUTzMyIC1E
-U09GVEZMT0FUX0ZBU1RfSU5UNjQgIC1ERkxPQVQxNiAtREZMT0FUNjQgLURFWFRGTE9BVDgwIC1E
-RkxPQVQxMjggLURGTE9BVF9ST1VORF9PREQgLURMT05HX0RPVUJMRV9JU19FWFRGTE9BVDgwIC1X
-bm8tbWlzc2luZy1wcm90b3R5cGVzIC1Xbm8tcmVkdW5kYW50LWRlY2xzIC1Xbm8tcmV0dXJuLXR5
-cGUgLVduby1lcnJvciAtTU1EIC1NUCAtTVQgc19lcTEyOC5vIC1NRiAuL3NfZXExMjguZCAtZnNh
-bml0aXplPXVuZGVmaW5lZCAtZnNhbml0aXplPWFkZHJlc3MgLWcgICAtYyAtbyBzX2VxMTI4Lm8g
-L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zL3NvdXJjZS9z
-X2VxMTI4LmMKY2xhbmcrKyAtTC90bXAvcWVtdS10ZXN0L2J1aWxkL2R0Yy9saWJmZHQgIC1JL3Vz
-ci9pbmNsdWRlL3BpeG1hbi0xICAtSS90bXAvcWVtdS10ZXN0L3NyYy9kdGMvbGliZmR0IC1XZXJy
-b3IgIC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIu
-MC9pbmNsdWRlICAtZlBJRSAtRFBJRSAtbTY0IC1tY3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVf
-T0ZGU0VUX0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1X
-cmVkdW5kYW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1w
-cm90b3R5cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1n
-bnU5OSAgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25v
-LWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10by1kZWZpbmVkIC1XZW5kaWYtbGFi
-ZWxzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1taXNzaW5nLWluY2x1ZGUtZGlycyAt
-V2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15
-MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdvbGQtc3R5bGUtZGVmaW5pdGlv
-biAtV3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAgLUkvdXNyL2luY2x1ZGUv
-cDExLWtpdC0xICAgICAtSS91c3IvaW5jbHVkZS9saWJwbmcxNiAgLUkvdXNyL2luY2x1ZGUvc3Bp
-Y2UtMSAtSS91c3IvaW5jbHVkZS9zcGljZS1zZXJ2ZXIgLUkvdXNyL2luY2x1ZGUvY2FjYXJkIC1J
-L3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2NC9nbGliLTIuMC9pbmNsdWRlIC1JL3Vz
-ci9pbmNsdWRlL25zczMgLUkvdXNyL2luY2x1ZGUvbnNwcjQgLXB0aHJlYWQgLUkvdXNyL2luY2x1
-ZGUvbGlibW91bnQgLUkvdXNyL2luY2x1ZGUvYmxraWQgLUkvdXNyL2luY2x1ZGUvdXVpZCAtSS91
-c3IvaW5jbHVkZS9waXhtYW4tMSAgIC1JL3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzIC1mc2FuaXRp
-emU9dW5kZWZpbmVkIC1mc2FuaXRpemU9YWRkcmVzcyAtZyAgLVdsLC0td2Fybi1jb21tb24gLVds
-LC16LHJlbHJvIC1XbCwteixub3cgLXBpZSAtbTY0IC1nICAtbyB0ZXN0cy9jaGVjay1xZGljdCB0
-ZXN0cy9jaGVjay1xZGljdC5vICBsaWJxZW11dXRpbC5hICAgLWxtIC1seiAgLXB0aHJlYWQgLWxn
-dGhyZWFkLTIuMCAtbGdsaWItMi4wICAtbG5ldHRsZSAgLWxnbnV0bHMgICAtbHJ0IC1seiAtbHV0
-aWwgLWxjYXAtbmcgCmNsYW5nKysgLUwvdG1wL3FlbXUtdGVzdC9idWlsZC9kdGMvbGliZmR0ICAt
-SS91c3IvaW5jbHVkZS9waXhtYW4tMSAgLUkvdG1wL3FlbXUtdGVzdC9zcmMvZHRjL2xpYmZkdCAt
-V2Vycm9yICAtcHRocmVhZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xp
-Yi0yLjAvaW5jbHVkZSAgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJDRSAtRF9G
-SUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBl
-cyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3Np
-bmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1z
-dGQ9Z251OTkgIC1Xbm8tc3RyaW5nLXBsdXMtaW50IC1Xbm8tdHlwZWRlZi1yZWRlZmluaXRpb24g
-LVduby1pbml0aWFsaXplci1vdmVycmlkZXMgLVdleHBhbnNpb24tdG8tZGVmaW5lZCAtV2VuZGlm
-LWxhYmVscyAtV25vLXNoaWZ0LW5lZ2F0aXZlLXZhbHVlIC1Xbm8tbWlzc2luZy1pbmNsdWRlLWRp
-cnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkgLVdmb3Jt
-YXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxlLWRlZmlu
-aXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgIC1JL3Vzci9pbmNs
-dWRlL3AxMS1raXQtMSAgICAgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgIC1JL3Vzci9pbmNsdWRl
-L3NwaWNlLTEgLUkvdXNyL2luY2x1ZGUvc3BpY2Utc2VydmVyIC1JL3Vzci9pbmNsdWRlL2NhY2Fy
-ZCAtSS91c3IvaW5jbHVkZS9nbGliLTIuMCAtSS91c3IvbGliNjQvZ2xpYi0yLjAvaW5jbHVkZSAt
-SS91c3IvaW5jbHVkZS9uc3MzIC1JL3Vzci9pbmNsdWRlL25zcHI0IC1wdGhyZWFkIC1JL3Vzci9p
-bmNsdWRlL2xpYm1vdW50IC1JL3Vzci9pbmNsdWRlL2Jsa2lkIC1JL3Vzci9pbmNsdWRlL3V1aWQg
-LUkvdXNyL2luY2x1ZGUvcGl4bWFuLTEgICAtSS90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cyAtZnNh
-bml0aXplPXVuZGVmaW5lZCAtZnNhbml0aXplPWFkZHJlc3MgLWcgIC1XbCwtLXdhcm4tY29tbW9u
-IC1XbCwteixyZWxybyAtV2wsLXosbm93IC1waWUgLW02NCAtZyAgLW8gdGVzdHMvY2hlY2stYmxv
-Y2stcWRpY3QgdGVzdHMvY2hlY2stYmxvY2stcWRpY3QubyAgbGlicWVtdXV0aWwuYSAgIC1sbSAt
-bHogIC1wdGhyZWFkIC1sZ3RocmVhZC0yLjAgLWxnbGliLTIuMCAgLWxuZXR0bGUgIC1sZ251dGxz
-ICAgLWxydCAtbHogLWx1dGlsIC1sY2FwLW5nIAovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvbGli
-cW9zL3ZpcnRpby1uZXQuYzo1Njo1OiBlcnJvcjogdXNlIG9mIHVuZGVjbGFyZWQgaWRlbnRpZmll
-ciAnaW50ZWZhY2UnOyBkaWQgeW91IG1lYW4gJ2ludGVyZmFjZSc/CiAgICBpbnRlZmFjZS0+bl9x
-dWV1ZXMrKzsgLyogQWNjb3VudCBmb3IgdGhlIGN0cmwgcXVldWUgKi8KICAgIF5+fn5+fn5+CiAg
-ICBpbnRlcmZhY2UKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMTkwODA1MDMyNDAwLjgwNTQtMS1hbHhuZHJAYnUuZWR1L3Rlc3RpbmcuYXNh
-bi8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+ddm <hope2hope@163.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=885=E6=97=A5=E5=91=A8=
+=E4=B8=80 =E4=B8=8A=E5=8D=8811:55=E5=86=99=E9=81=93=EF=BC=9A
+
+> Hi guys,
+>
+>
+> I have tried via modprobe kvmintel enable_apicv=3DY  to adjust KVM
+> parameter, but it doesn't effect,  and
+> cat /sys/module/kvm_intel/parameters/enable_apicv always return "N".
+> I don't know how to configure KVM or QEMU to support APIC virtualizaion
+> feature?
+>
+>
+AFAICT APICv is hardware feature, but I still don't know accurately after
+which CPU support it.
+You may refer the code about 'enable_apicv' related code in kvm to see how
+to detect this capability.
+
+Thanks,
+Li Qiang
 
 
+>
+> My host infos are as follows:
+> Architecture:          x86_64
+> CPU op-mode(s):        32-bit, 64-bit
+> Byte Order:            Little Endian
+> CPU(s):                1
+> On-line CPU(s) list:   0
+> Thread(s) per core:    1
+> Core(s) per socket:    1
+> Socket(s):             1
+> NUMA node(s):          1
+> Vendor ID:             GenuineIntel
+> CPU family:            6
+> Model:                 142
+> Model name:            Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
+> Stepping:              10
+> CPU MHz:               2112.001
+> BogoMIPS:              4224.00
+> Virtualization:        VT-x
+> Hypervisor vendor:     VMware
+> Virtualization type:   full
+> L1d cache:             32K
+> L1i cache:             32K
+> L2 cache:              256K
+> L3 cache:              8192K
+> NUMA node0 CPU(s):     0
+> Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
+> pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb
+> rdtscp lm constant_tsc arch_perfmon nopl xtopology tsc_reliable nonstop_t=
+sc
+> cpuid pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe
+> popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm ab=
+m
+> 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp
+> tpr_shadow vnmi ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2
+> invpcid rtm rdseed adx smap xsaveopt arat flush_l1d arch_capabilities
+>
+>
+> Could you tell me how to configure it?
+>
+>
+> Thanks!
+>
+>
