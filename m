@@ -2,63 +2,64 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9D8C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:04:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9F3C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:09:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81CDE206A2
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:04:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81CDE206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9BC532086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 12:09:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ihwPu9Gl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC532086D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hubil-0003rd-SN
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 08:04:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40765)
+	id 1hubnf-0005XJ-Tr
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 08:09:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42203)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hubhr-0003Eq-6F
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:03:16 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hubnH-00057N-CK
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:08:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hubhp-0001gW-VW
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:03:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41676)
+ (envelope-from <dgibson@ozlabs.org>) id 1hubnF-00078W-SD
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:08:51 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34195 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hubhp-0001eT-G8
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 08:03:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B68493C93;
- Mon,  5 Aug 2019 12:03:12 +0000 (UTC)
-Received: from work-vm (ovpn-117-168.ams2.redhat.com [10.36.117.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA40C60610;
- Mon,  5 Aug 2019 12:02:33 +0000 (UTC)
-Date: Mon, 5 Aug 2019 13:02:31 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20190805120231.GL13734@work-vm>
-References: <20190801165409.20121-1-stefanha@redhat.com>
- <20190801165409.20121-2-stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hubnE-00075N-JM; Mon, 05 Aug 2019 08:08:49 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 462Gl02LGzz9sN4; Mon,  5 Aug 2019 22:08:44 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1565006924;
+ bh=tyWOw+yVBFssrg8dQ0nZi2tg/LcAaoJe/+eV1JkgqoE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ihwPu9Gl8U8NiPlCWsWRydYttfsRKKaN7Kld++jJtD0t+pKfcLg/GAE9y2RrZ5flv
+ a2tb1jHARBAtRgEPuFdYNwoPxPoNnRUW/vGFPcPC5Bikq7+OddQngsfCBIXnf33ya+
+ W1nTKi/frPpTLpmIQdUMtEsyngTHlDXZqdxAlDKg=
+Date: Mon, 5 Aug 2019 20:46:28 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Message-ID: <20190805104628.GA14494@umbus.fritz.box>
+References: <20190731141233.1340-1-clg@kaod.org>
+ <20190731141233.1340-2-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
 Content-Disposition: inline
-In-Reply-To: <20190801165409.20121-2-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 05 Aug 2019 12:03:12 +0000 (UTC)
+In-Reply-To: <20190731141233.1340-2-clg@kaod.org>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/4] virtiofsd: process requests in a
- thread pool
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [PATCH v3 01/18] ppc/pnv: Introduce PowerNV
+ machines with fixed CPU models
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,109 +71,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, Liu Bo <bo.liu@linux.alibaba.com>,
- qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> Introduce a thread pool so that fv_queue_thread() just pops
-> VuVirtqElements and hands them to the thread pool.  For the time being
-> only one worker thread is allowed since passthrough_ll.c is not
-> thread-safe yet.  Future patches will lift this restriction so that
-> multiple FUSE requests can be processed in parallel.
-> 
-> The main new concept is struct FVRequest, which contains both
-> VuVirtqElement and struct fuse_chan.  We now have fv_VuDev for a device,
-> fv_QueueInfo for a virtqueue, and FVRequest for a request.  Some of
-> fv_QueueInfo's fields are moved into FVRequest because they are
-> per-request.  The name FVRequest conforms to QEMU coding style and I
-> expect the struct fv_* types will be renamed in a future refactoring.
-> 
-> This patch series is not optimal.  fbuf reuse is dropped so each request
-> does malloc(se->bufsize), but there is no clean and cheap way to keep
-> this with a thread pool.  The vq_lock mutex is held for longer than
-> necessary, especially during the eventfd_write() syscall.  Performance
-> can be improved in the future.
-> 
-> prctl(2) had to be added to the seccomp whitelist because glib invokes
-> it.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Thanks, applied; some comments below.
+--liOOAslEiF7prFVr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jul 31, 2019 at 04:12:16PM +0200, C=E9dric Le Goater wrote:
+> Make the current "powernv" machine an abstract type and derive from it
+> new machines with specific CPU models: power8 and power9.
+>=20
+> The "powernv" machine is now an alias on the "powernv9" machine.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+Applied to ppc-for-4.2.
+
+> ---
+>  hw/ppc/pnv.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++------
+>  1 file changed, 63 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 4570ce8afe6a..18602b9e9bcd 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -602,9 +602,20 @@ static void pnv_chip_power9_pic_print_info(PnvChip *=
+chip, Monitor *mon)
+>      pnv_psi_pic_print_info(&chip9->psi, mon);
+>  }
+> =20
+> +static bool pnv_match_cpu(const char *default_type, const char *cpu_type)
+> +{
+> +    PowerPCCPUClass *ppc_default =3D
+> +        POWERPC_CPU_CLASS(object_class_by_name(default_type));
+> +    PowerPCCPUClass *ppc =3D
+> +        POWERPC_CPU_CLASS(object_class_by_name(cpu_type));
 > +
-> +        pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock);
-> +        pthread_mutex_lock(&qi->vq_lock);
-> +        vu_queue_push(dev, q, elem, tosend_len);
-> +        vu_queue_notify(dev, q);
-> +        pthread_mutex_unlock(&qi->vq_lock);
-> +        pthread_rwlock_unlock(&qi->virtio_dev->vu_dispatch_rwlock);
-
-It surprises me that these paired locks are so common.
->  
->  err:
->  
-> @@ -249,9 +268,12 @@ int virtio_send_data_iov(struct fuse_session *se, struct fuse_chan *ch,
->                           struct iovec *iov, int count,
->                           struct fuse_bufvec *buf, size_t len)
+> +    return ppc_default->pvr_match(ppc_default, ppc->pvr);
+> +}
+> +
+>  static void pnv_init(MachineState *machine)
 >  {
-> +        FVRequest *req = container_of(ch, FVRequest, ch);
-
-I can't think of a better answer than the container_of but it does make
-me a bit nervous; I guess we need it because 'ch' comes from the generic
-fs code so can't be FVRequest*
-> +        struct VuDev *dev = &qi->virtio_dev->dev;
-> +        FVRequest *req = data;
-> +        VuVirtqElement *elem = &req->elem;
-> +        struct fuse_buf fbuf = {};
-> +        bool allocated_bufv = false;
-> +        struct fuse_bufvec bufv;
-> +        struct fuse_bufvec *pbufv;
+>      PnvMachineState *pnv =3D PNV_MACHINE(machine);
+> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>      MemoryRegion *ram;
+>      char *fw_filename;
+>      long fw_size;
+> @@ -664,13 +675,23 @@ static void pnv_init(MachineState *machine)
+>          }
+>      }
+> =20
+> +    /*
+> +     * Check compatibility of the specified CPU with the machine
+> +     * default.
+> +     */
+> +    if (!pnv_match_cpu(mc->default_cpu_type, machine->cpu_type)) {
+> +        error_report("invalid CPU model '%s' for %s machine",
+> +                     machine->cpu_type, mc->name);
+> +        exit(1);
+> +    }
 > +
-> +        assert(se->bufsize > sizeof(struct fuse_in_header));
+>      /* Create the processor chips */
+>      i =3D strlen(machine->cpu_type) - strlen(POWERPC_CPU_TYPE_SUFFIX);
+>      chip_typename =3D g_strdup_printf(PNV_CHIP_TYPE_NAME("%.*s"),
+>                                      i, machine->cpu_type);
+>      if (!object_class_by_name(chip_typename)) {
+> -        error_report("invalid CPU model '%.*s' for %s machine",
+> -                     i, machine->cpu_type, MACHINE_GET_CLASS(machine)->n=
+ame);
+> +        error_report("invalid chip model '%.*s' for %s machine",
+> +                     i, machine->cpu_type, mc->name);
+>          exit(1);
+>      }
+> =20
+> @@ -1348,25 +1369,43 @@ static void pnv_machine_class_props_init(ObjectCl=
+ass *oc)
+>                                NULL);
+>  }
+> =20
+> -static void pnv_machine_class_init(ObjectClass *oc, void *data)
+> +static void pnv_machine_power8_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+>      XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
 > +
-> +        /* An element contains one request and the space to send our response
-> +         * They're spread over multiple descriptors in a scatter/gather set
-> +         * and we can't trust the guest to keep them still; so copy in/out.
-> +         */
-> +        fbuf.mem = malloc(se->bufsize);
-> +        assert(fbuf.mem);
+> +    mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER8";
+> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+> +
+> +    xic->icp_get =3D pnv_icp_get;
+> +    xic->ics_get =3D pnv_ics_get;
+> +    xic->ics_resend =3D pnv_ics_resend;
+> +}
+> +
+> +static void pnv_machine_power9_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +
+> +    mc->desc =3D "IBM PowerNV (Non-Virtualized) POWER9";
+> +    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
+> +
+> +    mc->alias =3D "powernv";
+> +}
+> +
+> +static void pnv_machine_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+>      InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
+> =20
+>      mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+>      mc->init =3D pnv_init;
+>      mc->reset =3D pnv_reset;
+>      mc->max_cpus =3D MAX_CPUS;
+> -    mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+>      mc->block_default_type =3D IF_IDE; /* Pnv provides a AHCI device for
+>                                        * storage */
+>      mc->no_parallel =3D 1;
+>      mc->default_boot_order =3D NULL;
+>      mc->default_ram_size =3D 2 * GiB;
+> -    xic->icp_get =3D pnv_icp_get;
+> -    xic->ics_get =3D pnv_ics_get;
+> -    xic->ics_resend =3D pnv_ics_resend;
+>      ispc->print_info =3D pnv_pic_print_info;
+> =20
+>      pnv_machine_class_props_init(oc);
+> @@ -1386,10 +1425,27 @@ static void pnv_machine_class_init(ObjectClass *o=
+c, void *data)
+>          .parent        =3D TYPE_PNV9_CHIP,          \
+>      }
+> =20
+> +#define DEFINE_PNV_MACHINE_TYPE(cpu, class_initfn)      \
+> +    {                                                   \
+> +        .name          =3D MACHINE_TYPE_NAME(cpu),        \
+> +        .parent        =3D TYPE_PNV_MACHINE,              \
+> +        .instance_size =3D sizeof(PnvMachineState),       \
+> +        .instance_init =3D pnv_machine_instance_init,     \
+> +        .class_init    =3D class_initfn,                  \
+> +        .interfaces =3D (InterfaceInfo[]) {               \
+> +            { TYPE_XICS_FABRIC },                       \
+> +            { TYPE_INTERRUPT_STATS_PROVIDER },          \
+> +            { },                                        \
+> +        },                                              \
+> +    }
+> +
+>  static const TypeInfo types[] =3D {
+> +    DEFINE_PNV_MACHINE_TYPE("powernv8", pnv_machine_power8_class_init),
+> +    DEFINE_PNV_MACHINE_TYPE("powernv9", pnv_machine_power9_class_init),
+>      {
+>          .name          =3D TYPE_PNV_MACHINE,
+>          .parent        =3D TYPE_MACHINE,
+> +        .abstract       =3D true,
+>          .instance_size =3D sizeof(PnvMachineState),
+>          .instance_init =3D pnv_machine_instance_init,
+>          .class_init    =3D pnv_machine_class_init,
 
-Now we're using thread pools etc, maybe it's time to switch to glib's
-g_new/g_malloc etc that never return NULL?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-> +        if (se->debug)
-> +                fuse_debug("%s: elem %d: with %d out desc of length %zd"
-> +                           " bad_in_num=%u bad_out_num=%u\n",
-> +                           __func__, elem->index, out_num,
-> +                           out_len, req->bad_in_num, req->bad_out_num);
+--liOOAslEiF7prFVr
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Are the debug/logging calls thread safe?
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1ICQIACgkQbDjKyiDZ
+s5I91w/+Mqc9jfV8FmL8B19EupYrZf0v1MrmryjADsEQubDNtZA+9q8A7+a4tHNL
+o0L+9r1tNnqqaguagzkBMUXWV+UlrgS1eWKt/njSZ90H78wCr7Pss5L0vm1DDZ3z
+BQyXoZN26drnoa0tEUMO2Yjy3xfeumMY4D3BUYjzmoE0FoJypBr9PzcREVGQC7vl
+uLcwZXz9xT9p/YurzzCpZ+cHCCZFYB8/dhJrj9QGwFzhcMSao79sc1+0abAq5BFT
+hBmCNi2YxYVtqA8ynhiUWOi4WGLVaH72nibaFgJa/pARWgeh5WLQLNA9Rj0oSlt5
+z4NrIFFbXkXGltL6e5dcWU3gMhJulKpQd6zW90uU6mkiIgaTr2FrJ6IJoJkVHzTs
+WxT0AJnJG18mwMbvmNhBPlm3AYa/r4WDWWjCer7r8B1/Pqa8pSfuYWVnpOXewUQ+
+IhK8cKG0nlteJux+N5VGYSL35p01RNjlf0dmb05Bd8WiSUTDSvlYThET3zGYr1zZ
+/0drRYCwwHIt0Z5OQ6nfQlAWyZxvmQqt6uUeCZ3/mdTj2VwhqAME57xcFaLPC62J
+LVCIucwLy1JheILosbm3/+4hSB9q3Ki9tXhcUPq17hiKhmvul+JomBzaKyI55UeY
+Std1rqPiE01wFfeW3luUpBYuc/GVgrcgublpfrp96kS8kXFMCbw=
+=nUF6
+-----END PGP SIGNATURE-----
 
-> diff --git a/contrib/virtiofsd/seccomp.c b/contrib/virtiofsd/seccomp.c
-> index cea4cc5f60..5f1c873b82 100644
-> --- a/contrib/virtiofsd/seccomp.c
-> +++ b/contrib/virtiofsd/seccomp.c
-> @@ -58,6 +58,7 @@ static const int syscall_whitelist[] = {
->  	SCMP_SYS(open),
->  	SCMP_SYS(openat),
->  	SCMP_SYS(ppoll),
-> +	SCMP_SYS(prctl), /* TODO restrict to just PR_SET_NAME? */
-
-Would seem a good idea because prctl can do lots of crazy things.
-
-Dave
-
->  	SCMP_SYS(preadv),
->  	SCMP_SYS(pwrite64),
->  	SCMP_SYS(read),
-> -- 
-> 2.21.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--liOOAslEiF7prFVr--
 
