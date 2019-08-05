@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55449C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 132AEC0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EE1C214C6
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:16:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EE1C214C6
+	by mail.kernel.org (Postfix) with ESMTPS id E0FF82087B
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:18:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0FF82087B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hua2M-0008JC-Ep
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 06:16:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39171)
+	id 1hua4C-0002M8-6J
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 06:18:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39312)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZwy-0005Px-5z
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:45 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZx8-0005vh-HL
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZww-0002hl-4c
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:44 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44464 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZx7-0002st-DY
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:54 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44839 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1huZwv-0002gK-Ta
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:42 -0400
+ id 1huZx7-0002i8-61
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:53 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 5B41E1A2170;
+ by mail.rt-rk.com (Postfix) with ESMTP id 8FB7A1A217D;
  Mon,  5 Aug 2019 12:09:36 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id F29401A209F;
- Mon,  5 Aug 2019 12:09:35 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4024D1A211A;
+ Mon,  5 Aug 2019 12:09:36 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  5 Aug 2019 12:09:09 +0200
-Message-Id: <1564999760-27438-12-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  5 Aug 2019 12:09:16 +0200
+Message-Id: <1564999760-27438-19-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564999760-27438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564999760-27438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v6 11/22] target/mips: Style
- improvements in cps.c
+Subject: [Qemu-devel] [PATCH for 4.2 v6 18/22] target/mips: Clean up
+ handling of CP0 register 26
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,30 +70,53 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
+Clean up handling of CP0 register 26.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- hw/mips/cps.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ target/mips/translate.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index c84bc64..8fe2f47 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -37,8 +37,10 @@ static void mips_cps_init(Object *obj)
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     MIPSCPSState *s = MIPS_CPS(obj);
- 
--    /* Cover entire address space as there do not seem to be any
--     * constraints for the base address of CPC and GIC. */
-+    /*
-+     * Cover entire address space as there do not seem to be any
-+     * constraints for the base address of CPC and GIC.
-+     */
-     memory_region_init(&s->container, obj, "mips-cps-container", UINT64_MAX);
-     sysbus_init_mmio(sbd, &s->container);
- }
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 28ce30d..4db9712 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -7494,7 +7494,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_26:
+         switch (sel) {
+-        case 0:
++        case CP0_REG00__ERRCTL:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_ErrCtl));
+             register_name = "ErrCtl";
+             break;
+@@ -8244,7 +8244,7 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+        break;
+     case CP0_REGISTER_26:
+         switch (sel) {
+-        case 0:
++        case CP0_REG00__ERRCTL:
+             gen_helper_mtc0_errctl(cpu_env, arg);
+             ctx->base.is_jmp = DISAS_STOP;
+             register_name = "ErrCtl";
+@@ -8974,7 +8974,7 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_26:
+         switch (sel) {
+-        case 0:
++        case CP0_REG00__ERRCTL:
+             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_ErrCtl));
+             register_name = "ErrCtl";
+             break;
+@@ -9706,7 +9706,7 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_26:
+         switch (sel) {
+-        case 0:
++        case CP0_REG00__ERRCTL:
+             gen_helper_mtc0_errctl(cpu_env, arg);
+             ctx->base.is_jmp = DISAS_STOP;
+             register_name = "ErrCtl";
 -- 
 2.7.4
 
