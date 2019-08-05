@@ -2,80 +2,90 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3163C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF15C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:39:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D99321734
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:39:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPVpU5Kb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D99321734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B614B216F4
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:39:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B614B216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huf5K-0000Nq-TA
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:39:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53984)
+	id 1huf5P-0000XH-1w
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:39:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53999)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <hikarupsp@gmail.com>) id 1huf4a-0007v4-JR
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1huf4b-0007wC-Ff
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hikarupsp@gmail.com>) id 1huf4Z-0006fp-Js
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:56 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:45874)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hikarupsp@gmail.com>) id 1huf4Z-0006eF-8e
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:55 -0400
-Received: by mail-lj1-x243.google.com with SMTP id m23so79590937lje.12
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 08:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dO0bRjvyeRf4VDf72MQHmFk38oTfQL3ChnAy795ezuU=;
- b=PPVpU5KbI6yB5Ss6qdixIdBCmJJ286nb0j4zxdTU/SB7PwaXETJUbDNinNr+AuoxUF
- SZ0mvlQPq5QTs7AbRyFRjOdsXVe8aJpGpKf4rOBA1zymAwPa3pXRxOgb3dhly5+71eNw
- EHNMoPYsIDmtzuYsbhrRCavDHaxvU9vSY4mCNbkXJqdv8/XODHIHObC0eQ+XabnO4CIw
- 4iguZ708WMZqFdkKAekZJ2H0VLoKSgYmDQT/FmZ06O7pgm98qQshPagn8uiiaI+EV5TM
- vsIXBZ8T7IqPX5e4T1HA49vWQzt65uLiVx28Fc6hxt3ayKvKYB6NM3OkOKgbShX/UmYL
- zDiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dO0bRjvyeRf4VDf72MQHmFk38oTfQL3ChnAy795ezuU=;
- b=JO6DlVAH1/oSbVruzk+F4z94l+jtXHPiCDXpnIp2p7w2iu7XhPlPSQ+rbIC0cPljLI
- dUqhreYoJeFgpdwZbdhX8Tq60A0OcuIglXv1+UZhg7x/2IH0omnm4c1iAPKNDUw8ynQK
- gKecHrf5juFDkr4pHDDnagAPRK/u5s/MjGZZdvdBLHlL8ZYSSurio8Cj0uMMeNAG8FnQ
- sC16myiCi/CIMg4hcbieehgI/1okloVDoecJrMnBuVAYDb1n5lhQJnYkuwj0okocJjht
- PzDe+nmr04LSq9RW9EXe72rkovu30yJZER48y4V9dgLEYedb42+uYEBCTuySxBzhzJKf
- z9QQ==
-X-Gm-Message-State: APjAAAVhURGuTEkEZyfAa/7O4pdP2H6yIUOX5LX0QM1LqdfQN13Zgajq
- 57CxKF5OlokfvgYTPD/+pWyMkVwZI1EYjr7yH5Z9CdSK
-X-Google-Smtp-Source: APXvYqwkfrYAMViJ6T+Grbse+PEDDU1jAOQ7Qa4DZni/nIkz6/Da2raXZxy61vz6aWUWu7GGv9ZfyXmaaCyrXOzg/9I=
-X-Received: by 2002:a2e:9701:: with SMTP id r1mr11968837lji.12.1565019532292; 
- Mon, 05 Aug 2019 08:38:52 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1huf4a-0006gT-Fx
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:38:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33532)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1huf4X-0006e7-VB; Mon, 05 Aug 2019 11:38:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0682530FB8E2;
+ Mon,  5 Aug 2019 15:38:53 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 617465D6C8;
+ Mon,  5 Aug 2019 15:38:44 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <cb3c73a4-e851-0329-91ad-d9e6fb342ca3@redhat.com>
+Date: Mon, 5 Aug 2019 17:38:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190720060427.50457-1-hikarupsp@gmail.com>
-In-Reply-To: <20190720060427.50457-1-hikarupsp@gmail.com>
-From: Hikaru Nishida <hikarupsp@gmail.com>
-Date: Tue, 6 Aug 2019 00:38:41 +0900
-Message-ID: <CAD-w0GD_YGE-3iRbm=Qf+_zqWNyt36sHD3uKB9q2P0ff=0M55Q@mail.gmail.com>
-To: qemu-devel@nongnu.org
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH] xhci: Add No Op Command
+In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Mon, 05 Aug 2019 15:38:53 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH for-4.1] util/hbitmap: update orig_size on
+ truncate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,47 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, den@openvz.org,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ping...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp
+Content-Type: multipart/mixed; boundary="aZP35LA11XGpjQfm6bBOPU4nmGTlqunoU";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, fam@euphon.net,
+ kwolf@redhat.com, den@openvz.org, eblake@redhat.com
+Message-ID: <cb3c73a4-e851-0329-91ad-d9e6fb342ca3@redhat.com>
+Subject: Re: [PATCH for-4.1] util/hbitmap: update orig_size on truncate
+References: <20190805120120.23585-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190805120120.23585-1-vsementsov@virtuozzo.com>
 
-2019=E5=B9=B47=E6=9C=8820=E6=97=A5(=E5=9C=9F) 15:04 <hikarupsp@gmail.com>:
+--aZP35LA11XGpjQfm6bBOPU4nmGTlqunoU
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> From: Hikaru Nishida <hikarupsp@gmail.com>
->
-> This commit adds No Op Command (23) to xHC for verifying the operation
-> of the Command Ring mechanisms.
-> No Op Command is defined in XHCI spec (4.6.2) and just reports Command
-> Completion Event with Completion Code =3D=3D Success.
-> Before this commit, No Op Command is not implemented so xHC reports
-> Command Completion Event with Completion Code =3D=3D TRB Error. This comm=
-it
-> fixes this behaviour to report Completion Code correctly.
->
-> Signed-off-by: Hikaru Nishida <hikarupsp@gmail.com>
-> ---
->  hw/usb/hcd-xhci.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-> index 5894a18663..5ceff78280 100644
-> --- a/hw/usb/hcd-xhci.c
-> +++ b/hw/usb/hcd-xhci.c
-> @@ -2542,6 +2542,9 @@ static void xhci_process_commands(XHCIState *xhci)
->          case CR_GET_PORT_BANDWIDTH:
->              event.ccode =3D xhci_get_port_bandwidth(xhci, trb.parameter)=
-;
->              break;
-> +        case CR_NOOP:
-> +            event.ccode =3D CC_SUCCESS;
-> +            break;
->          case CR_VENDOR_NEC_FIRMWARE_REVISION:
->              if (xhci->nec_quirks) {
->                  event.type =3D 48; /* NEC reply */
-> --
-> 2.20.1 (Apple Git-117)
->
->
+On 05.08.19 14:01, Vladimir Sementsov-Ogievskiy wrote:
+> Without this, hbitmap_next_zero and hbitmap_next_dirty_area are broken
+> after truncate. So, orig_size is broken since it's introduction in
+> 76d570dc495c56bb.
+>=20
+> Fixes: 76d570dc495c56bb
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Thanks, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+A unit test as a follow-up would indeed be nice, but I=E2=80=99ll just ta=
+ke it
+now anyway.
+
+Max
+
+
+--aZP35LA11XGpjQfm6bBOPU4nmGTlqunoU--
+
+--I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1ITYIACgkQ9AfbAGHV
+z0A3xggAnbpiXbdeHkmdwABkC4VzzAKZ3iN3vIg4HVlvePfGNRRB6NPKsCoggC99
+Kiany1CnwiFI47ihsuJgT+Im3fTY5GHYMSUmjYrR00GOo2DaRim6XqRYvpEwwqcw
+hy+GKRiFkptcoafw6kjCN11qPOV/gGGcg9P84oxN9QD7d6dlczmTRTNFze1d7P87
+pDzhAaW4zptmtfyU1mvGi2Cb+XQoFY8KJ068w5tYpP2PKKbGfBzExaWu26lUM7qt
+YekwSZ8dKJvKEwHTI+95MxSjiqDRpmRGaHgmpgDcXDyd7UJwfZwp7hD5TN7Q/cWP
+7P8wJMKemxosWSBIGIQmpy8R/dqVTw==
+=0JSB
+-----END PGP SIGNATURE-----
+
+--I7LF2e7xFHmX9FhFAsDr8HJ08Kb2A8mOp--
+
