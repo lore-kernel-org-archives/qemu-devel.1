@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1AFC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE32C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:39:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3C292064A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:38:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3C292064A
+	by mail.kernel.org (Postfix) with ESMTPS id E1C652064A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:39:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1C652064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hug0g-0007cO-WB
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:38:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37476)
+	id 1hug0p-0007xC-5s
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:39:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37584)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hufzc-0005mU-Cz
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:37:53 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hufzk-0006Be-Uf
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hufzb-0005v2-5w
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:37:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60155)
+ (envelope-from <mreitz@redhat.com>) id 1hufzj-0005zx-Qx
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:38:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48154)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hufzY-0005pG-Fq; Mon, 05 Aug 2019 12:37:48 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hufzh-0005xT-J0; Mon, 05 Aug 2019 12:37:57 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B6418307CDFC;
- Mon,  5 Aug 2019 16:37:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DEDD53083391;
+ Mon,  5 Aug 2019 16:37:56 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D0101001B17;
- Mon,  5 Aug 2019 16:37:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 79B1960C05;
+ Mon,  5 Aug 2019 16:37:56 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  5 Aug 2019 18:37:35 +0200
-Message-Id: <20190805163740.23616-3-mreitz@redhat.com>
+Date: Mon,  5 Aug 2019 18:37:39 +0200
+Message-Id: <20190805163740.23616-7-mreitz@redhat.com>
 In-Reply-To: <20190805163740.23616-1-mreitz@redhat.com>
 References: <20190805163740.23616-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 05 Aug 2019 16:37:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Mon, 05 Aug 2019 16:37:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 2/7] iotests: Test backup job with two guest
- writes
+Subject: [Qemu-devel] [PULL 6/7] iotests: Test unaligned blocking mirror
+ write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,107 +73,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Perform two guest writes to not yet backed up areas of an image, where
-the former touches an inner area of the latter.
-
-Before HEAD^, copy offloading broke this in two ways:
-(1) The target image differs from the reference image (what the source
-    was when the backup started).
-(2) But you will not see that in the failing output, because the job
-    offset is reported as being greater than the job length.  This is
-    because one cluster is copied twice, and thus accounted for twice,
-    but of course the job length does not increase.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190801173900.23851-3-mreitz@redhat.com
+Message-id: 20190805113526.20319-1-mreitz@redhat.com
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Tested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/056     | 39 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/056.out |  4 ++--
- 2 files changed, 41 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/151     | 25 +++++++++++++++++++++++++
+ tests/qemu-iotests/151.out |  4 ++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
-index f40fc11a09..e761e465ae 100755
---- a/tests/qemu-iotests/056
-+++ b/tests/qemu-iotests/056
-@@ -133,6 +133,7 @@ class BackupTest(iotests.QMPTestCase):
-         self.vm =3D iotests.VM()
-         self.test_img =3D img_create('test')
-         self.dest_img =3D img_create('dest')
-+        self.ref_img =3D img_create('ref')
-         self.vm.add_drive(self.test_img)
-         self.vm.launch()
+diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
+index 1bb74d67c4..ad7359fc8d 100755
+--- a/tests/qemu-iotests/151
++++ b/tests/qemu-iotests/151
+@@ -114,6 +114,31 @@ class TestActiveMirror(iotests.QMPTestCase):
+     def testActiveIOFlushed(self):
+         self.doActiveIO(True)
 =20
-@@ -140,6 +141,7 @@ class BackupTest(iotests.QMPTestCase):
-         self.vm.shutdown()
-         try_remove(self.test_img)
-         try_remove(self.dest_img)
-+        try_remove(self.ref_img)
++    def testUnalignedActiveIO(self):
++        # Fill the source image
++        result =3D self.vm.hmp_qemu_io('source', 'write -P 1 0 2M')
++
++        # Start the block job (very slowly)
++        result =3D self.vm.qmp('blockdev-mirror',
++                             job_id=3D'mirror',
++                             filter_node_name=3D'mirror-node',
++                             device=3D'source-node',
++                             target=3D'target-node',
++                             sync=3D'full',
++                             copy_mode=3D'write-blocking',
++                             buf_size=3D(1048576 // 4),
++                             speed=3D1)
++        self.assert_qmp(result, 'return', {})
++
++        # Start an unaligned request to a dirty area
++        result =3D self.vm.hmp_qemu_io('source', 'write -P 2 %i 1' % (10=
+48576 + 42))
++
++        # Let the job finish
++        result =3D self.vm.qmp('block-job-set-speed', device=3D'mirror',=
+ speed=3D0)
++        self.assert_qmp(result, 'return', {})
++        self.complete_and_wait(drive=3D'mirror')
++
++        self.potential_writes_in_flight =3D False
 =20
-     def hmp_io_writes(self, drive, patterns):
-         for pattern in patterns:
-@@ -177,6 +179,43 @@ class BackupTest(iotests.QMPTestCase):
-             self.assert_qmp(event, 'data/error', qerror)
-             return False
 =20
-+    def test_overlapping_writes(self):
-+        # Write something to back up
-+        self.hmp_io_writes('drive0', [('42', '0M', '2M')])
-+
-+        # Create a reference backup
-+        self.qmp_backup_and_wait(device=3D'drive0', format=3Diotests.img=
-fmt,
-+                                 sync=3D'full', target=3Dself.ref_img,
-+                                 auto_dismiss=3DFalse)
-+        res =3D self.vm.qmp('block-job-dismiss', id=3D'drive0')
-+        self.assert_qmp(res, 'return', {})
-+
-+        # Now to the test backup: We simulate the following guest
-+        # writes:
-+        # (1) [1M + 64k, 1M + 128k): Afterwards, everything in that
-+        #     area should be in the target image, and we must not copy
-+        #     it again (because the source image has changed now)
-+        #     (64k is the job's cluster size)
-+        # (2) [1M, 2M): The backup job must not get overeager.  It
-+        #     must copy [1M, 1M + 64k) and [1M + 128k, 2M) separately,
-+        #     but not the area in between.
-+
-+        self.qmp_backup(device=3D'drive0', format=3Diotests.imgfmt, sync=
-=3D'full',
-+                        target=3Dself.dest_img, speed=3D1, auto_dismiss=3D=
-False)
-+
-+        self.hmp_io_writes('drive0', [('23', '%ik' % (1024 + 64), '64k')=
-,
-+                                      ('66', '1M', '1M')])
-+
-+        # Let the job complete
-+        res =3D self.vm.qmp('block-job-set-speed', device=3D'drive0', sp=
-eed=3D0)
-+        self.assert_qmp(res, 'return', {})
-+        self.qmp_backup_wait('drive0')
-+        res =3D self.vm.qmp('block-job-dismiss', id=3D'drive0')
-+        self.assert_qmp(res, 'return', {})
-+
-+        self.assertTrue(iotests.compare_images(self.ref_img, self.dest_i=
-mg),
-+                        'target image does not match reference image')
-+
-     def test_dismiss_false(self):
-         res =3D self.vm.qmp('query-block-jobs')
-         self.assert_qmp(res, 'return', [])
-diff --git a/tests/qemu-iotests/056.out b/tests/qemu-iotests/056.out
-index dae404e278..36376bed87 100644
---- a/tests/qemu-iotests/056.out
-+++ b/tests/qemu-iotests/056.out
+ if __name__ =3D=3D '__main__':
+diff --git a/tests/qemu-iotests/151.out b/tests/qemu-iotests/151.out
+index fbc63e62f8..8d7e996700 100644
+--- a/tests/qemu-iotests/151.out
++++ b/tests/qemu-iotests/151.out
 @@ -1,5 +1,5 @@
--.........
-+..........
+-..
++...
  ----------------------------------------------------------------------
--Ran 9 tests
-+Ran 10 tests
+-Ran 2 tests
++Ran 3 tests
 =20
  OK
 --=20
