@@ -2,88 +2,85 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3745C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A764FC0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:06:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9CF32064A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:05:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 714B32064A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:06:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlX9MSLq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9CF32064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4V2ZquL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 714B32064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hufU1-0007pH-PF
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:05:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58214)
+	id 1hufVD-0001Ae-O4
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:06:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58187)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hufPV-0008UZ-CW
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:00:35 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hufPT-0008Pc-B5
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:00:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hufPT-0002lx-Kn
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:00:33 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:36059)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hufPR-0002jI-MS
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:00:31 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:32805)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hufPT-0002lI-EA; Mon, 05 Aug 2019 12:00:31 -0400
-Received: by mail-pf1-x442.google.com with SMTP id r7so39875161pfl.3;
- Mon, 05 Aug 2019 09:00:31 -0700 (PDT)
+ id 1hufPR-0002hB-E8; Mon, 05 Aug 2019 12:00:29 -0400
+Received: by mail-pl1-x641.google.com with SMTP id c14so36567129plo.0;
+ Mon, 05 Aug 2019 09:00:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:message-id:in-reply-to:references;
- bh=mdOZHYB72+h5rorUmv2iv5y/NbklkxYCe2/8rZ8DW6s=;
- b=TlX9MSLqY7b8MJuhFNC/UL2k0pGbaC193V66r4z9QjhDLYzrDBLFCU37sfaRhhgSx3
- sUV4XGLIAgQd8aeX58nVo814sc32ruVgfBsLzrBOVO87Hr4cb7I7yqNZODQF8qjfEslg
- s9y2Q7sOUZCx53rg70ls5/b6iygvNaIwsm3IQ3NwIN2KnfPcW8FplT3dI+tEZK7han+o
- 2kDyI58bAXLuiCawwpts7pnHgaedfg+lk8zaSP3cH8q8IVyOWVkuAiT8UmMrocT3jYer
- 0qp/y4OsJFZG7aZkQP7ygITWB6qMe9rk7Jy6gj9WjUXA0WJ9K1EKHh2vGLIEHtpKxHFJ
- +d8Q==
+ h=from:to:subject:date:message-id;
+ bh=TtE2TN8qJaX/qotNkH+V8ocOIPSa55Bf89V7FHWWfhI=;
+ b=k4V2ZquL2qc0YwVsFTEv6YpQDfnSDeIwRGh7Pj4+hh84JAM3sjSVv3ePFi28QHZu5O
+ fYUZaVC016UGcXEYW6EMEU7iAKOoSWB682NHALsZcINzHklMm2v2ZKxhKviMI4fKJqMs
+ 81taMcD2aZ1ca8IF9rtmViIivXcB4kATQs46xOC21kzC/YArFZRwcqSjkFTKvAqRp5nE
+ UAo6Tslma+HGEfu/d35293G/YLh9DKkwilgYSTRCBeObzBm3tDFDTkJ8dZZ47kUxVvLl
+ 4rl64wwj36DMMkPHNJWRwy05t0bEeK8CTSTpn6leIzbSiK4SGYayP6Dkijs/bAHCvkLE
+ OF7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references;
- bh=mdOZHYB72+h5rorUmv2iv5y/NbklkxYCe2/8rZ8DW6s=;
- b=jjm2/70HQHR0hLtxWikFjg7O/lrCJb2nOqpJaXlfCrQExcOYtyCID7GW0df/QmqAKS
- KaS6O16l7nciwUhZKuZx8Ua2sPyRXnoZqgrGaDweqPrxlD2hpdMj53GCHUFbGcn1WXzw
- WvvQYdXP2EBsWoeNxG2RHWBaWL3kRnbASsNUU/4VyW0YC0ZKPohBYNBar2VvRFpK8eE5
- o9hQgLJfEvqOtpecSGyOoLC65AuHnZNHedJz19eBG8mtAiBMNlJic3d2lFaCujLYdPew
- ggVShaLbUAK95g+lwI3cnySUuFhy8VEEpMS2dn/SdvHhsmtSAAMwfX+/9TotufnI+FdH
- +Rbg==
-X-Gm-Message-State: APjAAAU0ZOtINgmk9UyjPquv2pVWZVcqyUWFOe5Ve2qcHU6TIEUfc+yX
- 4bt4Ob1jFP++dLxe8B83KK4=
-X-Google-Smtp-Source: APXvYqysZZSCJLQhQuWnHUDCMhV2/P3+TqhoGluYY6FOrAC22xtdvR3zTcTWT/6qirwdCH+Tp+aXJg==
-X-Received: by 2002:a63:d23:: with SMTP id c35mr136428667pgl.376.1565020830449; 
- Mon, 05 Aug 2019 09:00:30 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id;
+ bh=TtE2TN8qJaX/qotNkH+V8ocOIPSa55Bf89V7FHWWfhI=;
+ b=ZqJL4jNGfGpPRT+Q9ealTR5koePwESfonS9nE43uspbdwJMi0i5XGMnEvGK6Co5XuJ
+ fJJBlUzepmbNk5qgmKKsAAi66jhj/QWlm5gnmjmpKvjTDvDEUz/z+egttc1y4xyEEqCJ
+ gZo6zAXP2yz1iwwoKjWo+jalOSoT8yGMBNWiPuGVYQVywviWNAC5ME1V/7A2naZocxtC
+ KHWoe5nUf0apTdWl7p8qNpDjvuWoLYNtD/GeG8EOmlgQEWlg5690LfVNliyGxKCsQufO
+ bSMST2oFBM/39in9C+Xw/kK9hPt9nJrUjJyPbPTwj7WTFVQkvU0sPV83nrCz36kY/PzJ
+ 084A==
+X-Gm-Message-State: APjAAAULS5zL9k6W9W1YNS7hbHH2F9T/EHhAxMWBnkvB9hQvuU8ik0e5
+ JkFChZYEEtZgSvN210RgOvs=
+X-Google-Smtp-Source: APXvYqwwO9HgWPwF32EwEltptxLV+cmPifY0jRovZ38asf/kjB6rIj6GJUbyihqylDtsVgUJBruiZg==
+X-Received: by 2002:a17:902:41:: with SMTP id
+ 59mr51438959pla.195.1565020828262; 
+ Mon, 05 Aug 2019 09:00:28 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id d18sm47728793pgi.40.2019.08.05.09.00.29
+ by smtp.gmail.com with ESMTPSA id d18sm47728793pgi.40.2019.08.05.09.00.27
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Mon, 05 Aug 2019 09:00:29 -0700 (PDT)
+ Mon, 05 Aug 2019 09:00:27 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmer@sifive.com>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Date: Mon,  5 Aug 2019 08:59:57 -0700
-Message-Id: <1565020823-24223-3-git-send-email-bmeng.cn@gmail.com>
+Date: Mon,  5 Aug 2019 08:59:55 -0700
+Message-Id: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
-References: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH 02/28] riscv: hw: Use qemu_fdt_setprop_cell()
- for property with only 1 cell
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PATCH 00/28] riscv: sifive_u: Improve the emulation
+ fidelity of sifive_u machine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,128 +96,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some of the properties only have 1 cell so we should use
-qemu_fdt_setprop_cell() instead of qemu_fdt_setprop_cells().
+As of today, the QEMU 'sifive_u' machine is a special target that does
+not boot the upstream OpenSBI/U-Boot firmware images built for the real
+SiFive HiFive Unleashed board. Hence OpenSBI supports a special platform
+"qemu/sifive_u". For U-Boot, the sifive_fu540_defconfig is referenced
+in the OpenSBI doc as its payload, but that does not boot at all due
+to various issues in current QEMU 'sifive_u' machine codes.
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
----
+This series aims to improve the emulation fidelity of sifive_u machine,
+so that the upstream OpenSBI, U-Boot and kernel images built for the
+SiFive HiFive Unleashed board can be used out of the box without any
+special hack.
 
- hw/riscv/sifive_u.c | 16 ++++++++--------
- hw/riscv/virt.c     | 24 ++++++++++++------------
- 2 files changed, 20 insertions(+), 20 deletions(-)
+The major changes are:
+- Heterogeneous harts creation supported, so that we can create a CPU
+  that exactly mirrors the real hardware: 1 E51 + 4 U54.
+- Implemented a PRCI model for FU540
+- Implemented an OTP model for FU540, primarily used for storing serial
+  number of the board
+- Fixed GEM support that was seriously broken on sifive_u
+- Synced device tree with upstream Linux kernel on sifive_u
+- Adding initramfs loading support on sifive_u
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index ef36948..623ee64 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -182,7 +182,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 0x35);
--    qemu_fdt_setprop_cells(fdt, nodename, "phandle", plic_phandle);
-+    qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
-     plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-     g_free(cells);
-     g_free(nodename);
-@@ -207,20 +207,20 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         0x0, memmap[SIFIVE_U_GEM].size);
-     qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-     qemu_fdt_setprop_string(fdt, nodename, "phy-mode", "gmii");
--    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
--    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_GEM_IRQ);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", SIFIVE_U_GEM_IRQ);
-     qemu_fdt_setprop_cells(fdt, nodename, "clocks",
-         ethclk_phandle, ethclk_phandle, ethclk_phandle);
-     qemu_fdt_setprop(fdt, nodename, "clocks-names", ethclk_names,
-         sizeof(ethclk_names));
--    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells", 1);
--    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells", 1);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0);
-     g_free(nodename);
- 
-     nodename = g_strdup_printf("/soc/ethernet@%lx/ethernet-phy@0",
-         (long)memmap[SIFIVE_U_GEM].base);
-     qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_cells(fdt, nodename, "reg", 0x0);
-+    qemu_fdt_setprop_cell(fdt, nodename, "reg", 0x0);
-     g_free(nodename);
- 
-     nodename = g_strdup_printf("/soc/uart@%lx",
-@@ -232,8 +232,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         0x0, memmap[SIFIVE_U_UART0].size);
-     qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
-                           SIFIVE_U_CLOCK_FREQ / 2);
--    qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
--    qemu_fdt_setprop_cells(fdt, nodename, "interrupts", SIFIVE_U_UART0_IRQ);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", SIFIVE_U_UART0_IRQ);
- 
-     qemu_fdt_add_subnode(fdt, "/chosen");
-     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 00be05a..127f005 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -233,8 +233,8 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     nodename = g_strdup_printf("/soc/interrupt-controller@%lx",
-         (long)memmap[VIRT_PLIC].base);
-     qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells",
--                           FDT_PLIC_ADDR_CELLS);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
-+                          FDT_PLIC_ADDR_CELLS);
-     qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
-                           FDT_PLIC_INT_CELLS);
-     qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
-@@ -247,7 +247,7 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
--    qemu_fdt_setprop_cells(fdt, nodename, "phandle", plic_phandle);
-+    qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
-     plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-     g_free(cells);
-     g_free(nodename);
-@@ -260,19 +260,19 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-         qemu_fdt_setprop_cells(fdt, nodename, "reg",
-             0x0, memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
-             0x0, memmap[VIRT_VIRTIO].size);
--        qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
--        qemu_fdt_setprop_cells(fdt, nodename, "interrupts", VIRTIO_IRQ + i);
-+        qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-+        qemu_fdt_setprop_cell(fdt, nodename, "interrupts", VIRTIO_IRQ + i);
-         g_free(nodename);
-     }
- 
-     nodename = g_strdup_printf("/soc/pci@%lx",
-         (long) memmap[VIRT_PCIE_ECAM].base);
-     qemu_fdt_add_subnode(fdt, nodename);
--    qemu_fdt_setprop_cells(fdt, nodename, "#address-cells",
--                           FDT_PCI_ADDR_CELLS);
--    qemu_fdt_setprop_cells(fdt, nodename, "#interrupt-cells",
--                           FDT_PCI_INT_CELLS);
--    qemu_fdt_setprop_cells(fdt, nodename, "#size-cells", 0x2);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#address-cells",
-+                          FDT_PCI_ADDR_CELLS);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
-+                          FDT_PCI_INT_CELLS);
-+    qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0x2);
-     qemu_fdt_setprop_string(fdt, nodename, "compatible",
-                             "pci-host-ecam-generic");
-     qemu_fdt_setprop_string(fdt, nodename, "device_type", "pci");
-@@ -309,8 +309,8 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-         0x0, memmap[VIRT_UART0].base,
-         0x0, memmap[VIRT_UART0].size);
-     qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency", 3686400);
--        qemu_fdt_setprop_cells(fdt, nodename, "interrupt-parent", plic_phandle);
--        qemu_fdt_setprop_cells(fdt, nodename, "interrupts", UART0_IRQ);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupt-parent", plic_phandle);
-+    qemu_fdt_setprop_cell(fdt, nodename, "interrupts", UART0_IRQ);
- 
-     qemu_fdt_add_subnode(fdt, "/chosen");
-     qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+OpenSBI v0.4 image built for sifive/fu540 is included as the default
+bios image for 'sifive_u' machine.
+
+The series is tested against OpenSBI v0.4 image for sifive/fu540
+paltform, U-Boot v2019.10-rc1 image for sifive_fu540_defconfig,
+and Linux kernel v5.3-rc3 image with the following patch:
+
+macb: Update compatibility string for SiFive FU540-C000
+https://patchwork.kernel.org/patch/11050003/
+
+OpenSBI + U-Boot, ping/tftpboot with U-Boot MACB driver works well.
+For Linux, only checked boot log of MACB probe success without error.
+
+
+Bin Meng (28):
+  riscv: hw: Remove superfluous "linux,phandle" property
+  riscv: hw: Use qemu_fdt_setprop_cell() for property with only 1 cell
+  riscv: Add a sifive_cpu.h to include both E and U cpu type defines
+  riscv: hart: Extract hart realize to a separate routine
+  riscv: hart: Support heterogeneous harts population
+  riscv: sifive_u: Update hart configuration to reflect the real FU540
+    SoC
+  riscv: sifive_u: Set the minimum number of cpus to 2
+  riscv: sifive_u: Update PLIC hart topology configuration string
+  riscv: sifive_u: Update UART base addresses
+  riscv: sifive_u: Remove the unnecessary include of prci header
+  riscv: sifive: Rename sifive_prci.{c,h} to sifive_e_prci.{c,h}
+  riscv: sifive_e: prci: Fix a typo of hfxosccfg register programming
+  riscv: sifive_e: prci: Update the PRCI register block size
+  riscv: sifive: Implement PRCI model for FU540
+  riscv: sifive_u: Generate hfclk and rtcclk nodes
+  riscv: sifive_u: Add PRCI block to the SoC
+  riscv: sifive_u: Change UART node name in device tree
+  riscv: hw: Implement a model for SiFive FU540 OTP
+  riscv: sifive_u: Instantiate OTP memory with a serial number
+  riscv: roms: Update default bios for sifive_u machine
+  riscv: sifive_u: Update UART and ethernet node clock properties
+  riscv: sifive_u: Generate an aliases node in the device tree
+  riscv: sifive: Move sifive_mmio_emulate() to a common place
+  riscv: sifive_u: Fix broken GEM support
+  riscv: sifive_u: Support loading initramfs
+  riscv: hw: Update PLIC device tree
+  riscv: virt: Change create_fdt() to return void
+  riscv: sifive_u: Update model and compatible strings in device tree
+
+ hw/riscv/Makefile.objs                             |   4 +-
+ hw/riscv/riscv_hart.c                              |  75 ++++++--
+ hw/riscv/sifive_e.c                                |  12 +-
+ hw/riscv/{sifive_prci.c => sifive_e_prci.c}        |  16 +-
+ hw/riscv/sifive_u.c                                | 181 +++++++++++++------
+ hw/riscv/sifive_u_otp.c                            | 194 +++++++++++++++++++++
+ hw/riscv/sifive_u_prci.c                           | 163 +++++++++++++++++
+ hw/riscv/virt.c                                    |  42 ++---
+ include/hw/riscv/sifive_cpu.h                      |  39 +++++
+ include/hw/riscv/sifive_e.h                        |   7 +-
+ .../hw/riscv/{sifive_prci.h => sifive_e_prci.h}    |  16 +-
+ include/hw/riscv/sifive_u.h                        |  15 +-
+ include/hw/riscv/sifive_u_otp.h                    |  90 ++++++++++
+ include/hw/riscv/sifive_u_prci.h                   | 100 +++++++++++
+ pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin       | Bin 40968 -> 45064 bytes
+ roms/Makefile                                      |   4 +-
+ 16 files changed, 824 insertions(+), 134 deletions(-)
+ rename hw/riscv/{sifive_prci.c => sifive_e_prci.c} (88%)
+ create mode 100644 hw/riscv/sifive_u_otp.c
+ create mode 100644 hw/riscv/sifive_u_prci.c
+ create mode 100644 include/hw/riscv/sifive_cpu.h
+ rename include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} (80%)
+ create mode 100644 include/hw/riscv/sifive_u_otp.h
+ create mode 100644 include/hw/riscv/sifive_u_prci.h
+
 -- 
 2.7.4
 
