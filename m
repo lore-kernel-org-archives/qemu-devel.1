@@ -2,92 +2,90 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 342AEC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12475C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02AAB216B7
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF17C20665
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:11:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OqrcPzxP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02AAB216B7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X88q2QcY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF17C20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hudYF-0006rq-85
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 10:01:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60939)
+	id 1hudi9-0002JZ-Uc
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 10:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34594)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hudXL-0006NP-9U
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:00:32 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hudhn-0001sN-Bp
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:11:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hudXK-00056M-7U
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:00:31 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45630)
+ (envelope-from <alex.bennee@linaro.org>) id 1hudhm-0004jN-9Z
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:11:19 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32850)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hudXK-00053p-1u
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:00:30 -0400
-Received: by mail-pf1-x443.google.com with SMTP id r1so39689371pfq.12
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 07:00:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hudhm-0004iU-2r
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:11:18 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n9so84701154wru.0
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 07:11:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=/wy4ViPRWDvx0bz3Qem2DWS/A61LNcdI96nSPoQZO7Q=;
- b=OqrcPzxPBU4o/ROYAzmcRiDWfCh0y6Jo8frZ3nHTDvjwxMLuC3AYHjMHkDeeh7w48h
- 0uaLwkLECFspyC6JpWkOPYScr6o7LvM0d7+gPmJ5XUByRoDCHI495emwq412iLJD3XTv
- KhESveGD0roWLaQt7DS6HHLTmPnRXYbTV6LF6+a6CLlrx1gJy5D9W+mPPuUa3FrQn9Ct
- YpGrEFoJTmdXc3o+J45fUKe+jHKde7AAQDNpIXdjaNLQTwwgQEvx2x6YYqmFf0TlHIEc
- fLnmGpl7LnNsReBiMi9tSpIHyEzrFxav/GmykQAOEU2YkieqpVOmSBqKzht1pZ4Xpn6w
- KRqQ==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Xt6UXRCxFBJRvWwckGEqLVkKph1Wzb3PwxOQD2KXTdc=;
+ b=X88q2QcYnpmVzIc5yBwoEbG2mJGeHeR7/nuoWe0rsaWbSL+AEMlaHn4qJPj3csV3fZ
+ NgTIBqLML0hDqUrhA+lzu9+usCZHo5ikIPZaz3sthxik+i7oAsxcAA5pR6zfFcEYUO9V
+ PUjhwC0bKWG2JV8xKhRHlosyKtrqROXxiDcvjpNFje9dFHYXbTfSpKvGE3qJuOJbQ76w
+ poBXCfTCa6xvjuadqlFzMwzHirGBqA/4tzgg/Nz0x0hik8XiMTwmvAonbWPdHXjH9nYQ
+ ZWTiFrm7ekK8G+eiv2GIuHMepoFhGTR/Ci12iQ5defD+4VydW7YcZ5fztPZ9UThHRcdA
+ I6KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/wy4ViPRWDvx0bz3Qem2DWS/A61LNcdI96nSPoQZO7Q=;
- b=FO+pg7P7s1vSdmX4qAmaFXrzRZda3NBD48ta63kKjE4VKSrqc5wWALIgHUMqySCfwf
- 8XkGkNjz6r/z4TArjKv6E05fUDKGBfkGaKr8vphxVbPH6GXkSI3Zh+4MR8gIeSJQaNg8
- RWRi3K/vYtHQSRlwXFwZtxNL8R0YCv+gCPY1MT7i9rdjClydnX554agve46buqTGMD+p
- TNrq/CVnuUrZshWDJd6o/YkMSa8mTX8dx/kjc9omb07wLxxrcJaHoFEhUuA352AKj511
- y0RjPaH1G/ESG/EAx80oCMWtih06TLs60kIG4jiyq/7kvoJN4jriJw3aCqJDm3kgRg36
- 1hmQ==
-X-Gm-Message-State: APjAAAUsDoLVAYj1vgDzAIjZzKpYgAsGGlBG1NaoM6BEpd9RaW7lcYVp
- e9HtFtKQxDwhH6ZevVt/oUoSfw==
-X-Google-Smtp-Source: APXvYqzS2SXsW/nAT0UTDFb8y5gV5wxcDbQ5Tk2+SjQ3slGFXKZIVnZ7cn2KuXG217ZJshX3eNMx7w==
-X-Received: by 2002:a17:90a:7f85:: with SMTP id
- m5mr18234603pjl.78.1565013628309; 
- Mon, 05 Aug 2019 07:00:28 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id p20sm108180589pgi.81.2019.08.05.07.00.26
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 05 Aug 2019 07:00:27 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20190803184800.8221-1-richard.henderson@linaro.org>
- <8736ifkbod.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <db7e63d9-fcf6-fda2-c164-af8f90815617@linaro.org>
-Date: Mon, 5 Aug 2019 07:00:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Xt6UXRCxFBJRvWwckGEqLVkKph1Wzb3PwxOQD2KXTdc=;
+ b=P30t5PuemS2wM/q2ySNJfGDLdC9BTB5dSvU4jnnRpmkGhywT66vRD1UogO2JRuHoNa
+ RWuWs6uO770Bjkw7kdoVt5USlCo92rn1wyvNxUsGbWSSrAdjKttn4UC8uS7Bv8Szy5Et
+ iNduX4ClZo1jdhTcGpBTKLcW6TNwLkGcsWn+VYE0IpyrVIeuJ+dlj6tRLusXWAskcUDm
+ /a3fRyxphhT3ZjtAUNhXgUXtivKAGpLoX1WfXFoKmCmAn73/ohqqvxt5zb/5G8BNnTBE
+ +g7RkDFuINrGINMEgdcjxS+kO56t9CtO2SD9JKL35r7TYd+fyfLIY4CxZu3Hya5hmr/X
+ g5vA==
+X-Gm-Message-State: APjAAAVQmWHLOTafzCLeWAN6Zg0HEelmcauwHFD8PJC/5RvmW61kkSQY
+ hkUwI6R7xMTzBW+9p6JORuoVQg==
+X-Google-Smtp-Source: APXvYqyTIkMtowxzb3Ya8I8vtR+SYAFJFKlmP3sj15JGbFM4wyFs2/AoKuCzlPoZidfU+2uMB+Tssw==
+X-Received: by 2002:a05:6000:1148:: with SMTP id
+ d8mr5171916wrx.354.1565014276738; 
+ Mon, 05 Aug 2019 07:11:16 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id v204sm101751531wma.20.2019.08.05.07.11.16
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 05 Aug 2019 07:11:16 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C10EA1FF87;
+ Mon,  5 Aug 2019 15:11:15 +0100 (BST)
+References: <BN6PR2201MB1251F757F3129C433E540F9AC6DA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+ <CAFEAcA8NE=hy4a-WuDuKeysi3KOjy8=ybHbLKkvzPM=ELvXBnQ@mail.gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+In-reply-to: <CAFEAcA8NE=hy4a-WuDuKeysi3KOjy8=ybHbLKkvzPM=ELvXBnQ@mail.gmail.com>
+Date: Mon, 05 Aug 2019 15:11:15 +0100
+Message-ID: <871rxzk8ho.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8736ifkbod.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v3 00/34] target/arm: Implement ARMv8.1-VHE
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [BUG] gcov support appears to be broken
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,66 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/5/19 6:02 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> About half of this patch set is cleanup of the qemu tlb handling
->> leading up to the actual implementation of VHE, and the biggest
->> piece of that: The EL2&0 translation regime.
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Mon, 5 Aug 2019 at 11:39, Aleksandar Markovic <amarkovic@wavecomp.com>=
+ wrote:
 >>
->> Changes since v2:
->>   * arm_mmu_idx was incomplete; test TGE+E2H not just E2H.
->>   * arm_sctlr was incomplete; now uses arm_mmu_idx to avoid
->>     duplication of tests.
->>   * Update aa64_zva_access and ctr_el0_access for EL2.
+>> Hello, according to out docs, here is the procedure that should produce =
+coverage report for execution of the complete "make check":
 >>
->> Changes since v1:
->>   * Merge feedback from AJB.
->>   * Split out 7 renaming patches from "Reorganize ARMMMUIdx".
->>   * Alex's MIDR patch keeps the nested KVM from spitting warnings.
+>> #./configure --enable-gcov
+>> #make
+>> #make check
+>> #make coverage-report
 >>
->> I have tested
+>> It seems that first three commands execute as expected. (For example,
+>> there are plenty of files generated by "make check" that would've not
+>> been generated if "enable-gcov" hadn't been chosen.) However, the
+>> last command complains about some missing files related to FP
+>> support. If those files are added (for example, artificially, using
+>> "touch <missing-file"), that it starts complaining about missing some
+>> decodetree-generated files. Other kinds of files are involved too.
+
+The gcov tool is fairly noisy about missing files but that just
+indicates the tests haven't exercised those code paths. "make check"
+especially doesn't touch much of the TCG code and a chunk of floating
+point.
+
 >>
->>   qemu-system-aarch64 -accel kvm -cpu host -M virt,gic-version-host \
->>     -m 512 -bios /usr/share/edk2/aarch64/QEMU_EFI.fd -nographic
-> 
-> So testing with a host doing:
-> 
->   ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt,virtualization=on -cpu cortex-a57 -serial mon:stdio -nic user,model=virtio-net-pci,hostfwd=tcp::2222-:22 -device virtio-scsi-pci -drive file=/dev/zvol/hackpool-0/debian-buster-arm64,id=hd0,index=0,if=none,format=raw,discard=on -device scsi-hd,drive=hd0 -kernel ../linux.git/builds/arm64/arch/arm64/boot/Image -append "console=ttyAMA0 root=/dev/sda2" -display none -m 4096 -smp 8
-> 
-> And a guest doing:
-> 
->   ./aarch64-softmmu/qemu-system-aarch64 -machine type=virt -cpu host
->   -serial mon:stdio -nic user,model=virtio-net-pci -device
->   virtio-scsi-pci -kernel /boot/vmlinuz-4.19.0-5-arm64 -append "console=ttyAMA0 panic=-1" -display none -m 256 -smp 4 --no-reboot
->   --enable-kvm
-> 
-> I triggered:
-> 
->   ERROR:/home/alex.bennee/lsrc/qemu.git/target/arm/helper.c:3436:update_lpae_el1_asid: code should not be reached
-> fish: “./aarch64-softmmu/qemu-system-a…” terminated by signal SIGABRT (Abort)
+>> It would be nice to have coverage support working. Please somebody
+>> take a look, or explain if I make a mistake or misunderstood our gcov
+>> support.
 
-Whoops.  Rebase error while changing the signature of this function.
-Thanks for re-testing the case where VHE isn't present.  :-P
+So your failure mode is no report is generated at all? It's working for
+me here.
 
-> With -cpu max on the host it hangs the whole thing. I'm going to
-> continue to experiment with explicit GIC versions.
+>
+> Cc'ing Alex who's probably the closest we have to a gcov expert.
+>
+> (make/make check of a --enable-gcov build is in the set of things our
+> Travis CI setup runs, so we do defend that part against regressions.)
 
-Hangs the host?  Are you sure that the guest isn't just slow?
-That's why I changed my testing to boot a debug edk2, which
-outputs stuff much sooner than the kernel does.
+We defend the build but I have just checked and it seems our
+check_coverage script is currently failing:
 
-Although I have no idea why the guest should be extra slow.
-It does seem like it ought to be booting at the same speed as
-the host.  I see tlb flushes as quite high in the profile,
-and wonder if I'm doing too many of them.
+  https://travis-ci.org/stsquad/qemu/jobs/567809808#L10328
+
+But as it's an after_success script it doesn't fail the build.
+
+>
+> thanks
+> -- PMM
 
 
-r~
+--
+Alex Benn=C3=A9e
 
