@@ -2,80 +2,66 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3FFC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D9EAC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:47:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FCD82086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:45:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WiMCEUiX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FCD82086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2EBB92086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:47:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EBB92086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hufAq-0006WG-Ng
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:45:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55148)
+	id 1hufCz-0008Se-Gj
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55690)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hufAL-00066U-4m
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:44:55 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hufCW-0007wv-G8
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hufAJ-0002gj-8E
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:44:53 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36597)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hufAH-0002ZA-Fg
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:44:50 -0400
-Received: by mail-oi1-x242.google.com with SMTP id c15so6963629oic.3
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 08:44:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Cmpr037zZdqrGbQDYy6TyQP+T3AEBIQBH0/WDKEh4SA=;
- b=WiMCEUiXn1mDQxUW5y2ECW2h7RIVHFyMesQ53egZ77/f80ZwlHHBN2hLE0XqziD7Z9
- OOgislZIm+OLUDSdDr2LwWzaazDKzbax77C843xCu4Av4+kQXH+lYBhR2vpIb4mfYD8Q
- LaMgNnekuS21xy5hRv9Ok6/KJvJaD1cdvPx7Kf7lDS7ITz5Ua8EB+iusehgGWdGVZSV+
- 6R8maZ+E8ZqSU4sxn/OFCK69LlR5ERm+ch/6XBWG+6rRNOAkXwIPvIxYx0KJYtjnBZva
- pY9C1MfgBc+oltIJp2rc0wI+5Mrb8rC4Fs9BMzvVwGxGCKayiGEDQuS2xADoW4i6tdj7
- gbOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Cmpr037zZdqrGbQDYy6TyQP+T3AEBIQBH0/WDKEh4SA=;
- b=n8BoswgN32fmjQ/RUTYqKoc2oYmdoYmkiZ/GCQU43+1KMmp1aCR07XaaruU9lLFLrt
- DNetVfKU0AiyXsm+z4L/vbpyRgTMVk6LORY/dAhRmKyOr+Io4p99Y0MdlhAlw51FqCSv
- +Wv9nxJ3ys0okA933sFZNNPi9IArvYbm6IPnMASUI4A6l7Tegjrh+1SThRFgQ6ax/Lnt
- 6sLGbuUbGlp0ac5xcpC4EuB5lK+aHcQLavE6vw3dFzOnotGGwIsK5Sw4Q5wkKC3X8u1Z
- rM+fOLS95X/t6GHRE6gyQjSSgCgarWruF6n83NMvFT8a5CwppXPhQT35DihlnVx/zOyW
- F81Q==
-X-Gm-Message-State: APjAAAXUfK7X3ioKy15x45TqHCqzd8xtkapS6ISnUfdpplUrqOHyHl1f
- mQYzkl2gYxf4Vi0NVwp3Aj+l1c4pJqTO+dtl90Uaag==
-X-Google-Smtp-Source: APXvYqzaPguh6H/Zb1GXEA2z7Sn69wZJXA5IJpfXVIEtvYRmhHNlM6mLuZkZTONbUq3Y1zJtf0wsmDbYVpG5ph0lb/Q=
-X-Received: by 2002:aca:4bcc:: with SMTP id
- y195mr10633477oia.146.1565019887841; 
- Mon, 05 Aug 2019 08:44:47 -0700 (PDT)
+ (envelope-from <imammedo@redhat.com>) id 1hufCV-0004A4-CF
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:47:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37640)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hufCS-00046f-NI; Mon, 05 Aug 2019 11:47:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 39D853090FF4;
+ Mon,  5 Aug 2019 15:47:03 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8115B60A97;
+ Mon,  5 Aug 2019 15:46:54 +0000 (UTC)
+Date: Mon, 5 Aug 2019 17:46:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <20190805174652.61e9852a@redhat.com>
+In-Reply-To: <CAFEAcA-+z4t75VwfWG1ezJm=4zfdWH6nz1Oe75Zs953+vKMvdQ@mail.gmail.com>
+References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
+ <20190726104519.23812-4-shameerali.kolothum.thodi@huawei.com>
+ <20190730172524.6cf566ed@Igors-MacBook-Pro>
+ <5FC3163CFD30C246ABAA99954A238FA83F33D896@lhreml524-mbs.china.huawei.com>
+ <20190805153045.60db7bf5@redhat.com>
+ <CAFEAcA-+z4t75VwfWG1ezJm=4zfdWH6nz1Oe75Zs953+vKMvdQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20190726175032.6769-1-richard.henderson@linaro.org>
-In-Reply-To: <20190726175032.6769-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 5 Aug 2019 16:44:37 +0100
-Message-ID: <CAFEAcA_JDfN+Njo8J0EhbtECWEW5_LcCVehbxmpY6AX3BLbOsA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
-Subject: Re: [Qemu-devel] [PATCH 00/67] target/arm: Convert aa32 base isa to
- decodetree
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Mon, 05 Aug 2019 15:47:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v8 3/9] hw/acpi: Add ACPI Generic
+ Event Device Support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,25 +73,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "sameo@linux.intel.com" <sameo@linux.intel.com>,
+ "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
+ "lersek@redhat.com" <lersek@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jul 2019 at 18:50, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This unifies the implementation of the actual instructions
-> for a32, t32, and t16.  In order to make this happen, we
-> need several preliminary cleanups.  Most importantly to how
-> we handle the architectural representation of PC.
+On Mon, 5 Aug 2019 14:42:38 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-I'd be happy to take the preliminary-cleanups part (subject
-to the various review comments) without waiting for the
-rest of the series to get respun.
+> On Mon, 5 Aug 2019 at 14:30, Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > On Thu, 1 Aug 2019 08:36:33 +0000
+> > Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+> >  
+> > > Hi Igor,
+> > >  
+> > > > -----Original Message-----  
+> > > > > +static void acpi_ged_device_realize(DeviceState *dev, Error **errp)
+> > > > > +{
+> > > > > +    AcpiGedState *s = ACPI_GED(dev);
+> > > > > +
+> > > > > +    assert(s->ged_base);
+> > > > > +    acpi_ged_init(get_system_memory(), dev, &s->ged_state);  
+> > > >
+> > > > calling get_system_memory() from device code used to be a reason for
+> > > > rejecting patch,
+> > > > I'm not sure what suggest though.
+> > > >
+> > > > Maybe Paolo could suggest something.  
+> > >
+> > > How about using object_property_set_link()? Something like below.  
+> > I'm afraid it doesn't help much. Issue here is that we are letting
+> > device to manage whole address space (which should be managed by machine)
+> > So I'd just keep get_system_memory() as is for now if there aren't any
+> > objections.  
+> 
+> What are we trying to do with this device, and what does it need
+> the system memory region for?
+> 
+> In this case, we seem to do:
+> 
+> +static void acpi_ged_init(MemoryRegion *as, DeviceState *dev, GEDState *ged_st)
+> +{
+> +    AcpiGedState *s = ACPI_GED(dev);
+> +
+> +    memory_region_init_io(&ged_st->io, OBJECT(dev), &ged_ops, ged_st,
+> +                          TYPE_ACPI_GED, ACPI_GED_EVT_SEL_LEN);
+> +    memory_region_add_subregion(as, s->ged_base, &ged_st->io);
+> +    qdev_init_gpio_out_named(DEVICE(s), &s->irq, "ged-irq", 1);
+> +}
+> 
+> 
+> This is definitely a bad idea -- devices should not add their
+> own memory regions to the system memory MR. They should
+> expose their MRs (by being a sysbus-device) and let the board
+> code do the wiring up of the MRs into the right memory space
+> at the right address.
 
-thanks
--- PMM
+it's not the only place in GED that is trying to add to system address
+space, optionally if called acpi_memory_hotplug_init() will do the same,
+then later we could add cpu hotplug memory region over there.
+
+Perhaps we could use bus-less device plug code path,
+in that case memory_region_init_io()/qdev_init_gpio_out_named()
+should be moved to ged_initfn() and mapping part into specialized helper
+(similar to pc_dimm_plug() ) that's called by board (from virt_machine_device_plug_cb)
+callback during completing device realize stage, it would be something like:
+
+virt.c:
+   virt_machine_device_plug_cb()
+      if dev == GED_TYPE
+        machine_ged_plug_helper(system_memory)
+
+generic_event_device.c:
+   machine_ged_plug_helper(as, irq) // similar to sysbus_mmio_map() but ged specialized
+      connect_irq()
+      memory_region_add_subregion(as, ged->ged_base, &ged->io)
+      if ged->memory-hotplug-support
+          memory_region_add_subregion(as, ged->memhp_base , &ged->memhp_state.memhp_io)
+
+
+in this case addresses could be normally hard-codded in board code if device is not optional
+(as in patch 6/9: create_acpi_ged() )
+or potentially they could come from CLI as -device parameters
+(/me thinking about building blocks that allow to create machine from config)
+
+sysbus device might be fine as shortcut if we are thinking about
+only creating device during machine_init (although I have a reservations towards
+sysbus interface (ex: caller of sysbus_mmio_map() has no clue when mapping N-th
+region at some address)).
+
+
+> thanks
+> -- PMM
+
 
