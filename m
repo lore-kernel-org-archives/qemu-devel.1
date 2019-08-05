@@ -2,57 +2,59 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B84CC0650F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DDDAC433FF
 	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:14:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6503E20880
+	by mail.kernel.org (Postfix) with ESMTPS id 283192087B
 	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:14:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6503E20880
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 283192087B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hua0a-0005TP-LX
+	id 1hua0a-0005TT-Fb
 	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 06:14:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39232)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39213)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZwz-0005QN-4Q
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZwy-0005Q8-OJ
  for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZww-0002jH-Jx
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:45 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:44468 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1huZww-0002j4-J3
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:44 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:44492 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1huZww-0002gR-4V
+ id 1huZww-0002gX-2H
  for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:10:42 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 88B411A209F;
+ by mail.rt-rk.com (Postfix) with ESMTP id 30C261A2111;
  Mon,  5 Aug 2019 12:09:36 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 06AE31A2124;
- Mon,  5 Aug 2019 12:09:36 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id E356A1A206E;
+ Mon,  5 Aug 2019 12:09:35 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Mon,  5 Aug 2019 12:09:10 +0200
-Message-Id: <1564999760-27438-13-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon,  5 Aug 2019 12:09:07 +0200
+Message-Id: <1564999760-27438-10-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1564999760-27438-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1564999760-27438-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v6 12/22] target/mips: Style
- improvements in mips_fulong2e.c
+Subject: [Qemu-devel] [PATCH for 4.2 v6 09/22] target/mips: Style
+ improvements in internal.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,200 +76,131 @@ From: Aleksandar Markovic <amarkovic@wavecomp.com>
 Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/mips/mips_fulong2e.c | 96 +++++++++++++++++++++++++++++--------------------
- 1 file changed, 58 insertions(+), 38 deletions(-)
+ target/mips/internal.h | 57 +++++++++++++++++++++++++++++++-------------=
+------
+ 1 file changed, 35 insertions(+), 22 deletions(-)
 
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 5dbaa3b..0c3d947 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -48,13 +48,13 @@
- 
- #define DEBUG_FULONG2E_INIT
- 
--#define ENVP_ADDR       0x80002000l
--#define ENVP_NB_ENTRIES	 	16
--#define ENVP_ENTRY_SIZE	 	256
-+#define ENVP_ADDR               0x80002000l
-+#define ENVP_NB_ENTRIES         16
-+#define ENVP_ENTRY_SIZE         256
- 
- /* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
--#define BIOS_SIZE (512 * KiB)
--#define MAX_IDE_BUS 2
-+#define BIOS_SIZE               (512 * KiB)
-+#define MAX_IDE_BUS             2
- 
- /*
-  * PMON is not part of qemu and released with BSD license, anyone
-@@ -83,14 +83,15 @@ static struct _loaderparams {
-     const char *initrd_filename;
- } loaderparams;
- 
--static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
-+static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t *prom_buf, int index,
-                                         const char *string, ...)
- {
-     va_list ap;
-     int32_t table_addr;
- 
--    if (index >= ENVP_NB_ENTRIES)
-+    if (index >= ENVP_NB_ENTRIES) {
-         return;
-+    }
- 
-     if (string == NULL) {
-         prom_buf[index] = 0;
-@@ -105,7 +106,7 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
-     va_end(ap);
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index d9216fb..836de7a 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -1,4 +1,5 @@
+-/* mips internal definitions and helpers
++/*
++ * MIPS internal definitions and helpers
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+@@ -8,8 +9,10 @@
+ #define MIPS_INTERNAL_H
+=20
+=20
+-/* MMU types, the first four entries have the same layout as the
+-   CP0C0_MT field.  */
++/*
++ * MMU types, the first four entries have the same layout as the
++ * CP0C0_MT field.
++ */
+ enum mips_mmu_types {
+     MMU_TYPE_NONE,
+     MMU_TYPE_R4000,
+@@ -159,9 +162,11 @@ static inline bool cpu_mips_hw_interrupts_enabled(CP=
+UMIPSState *env)
+         !(env->CP0_Status & (1 << CP0St_EXL)) &&
+         !(env->CP0_Status & (1 << CP0St_ERL)) &&
+         !(env->hflags & MIPS_HFLAG_DM) &&
+-        /* Note that the TCStatus IXMT field is initialized to zero,
+-           and only MT capable cores can set it to one. So we don't
+-           need to check for MT capabilities here.  */
++        /*
++         * Note that the TCStatus IXMT field is initialized to zero,
++         * and only MT capable cores can set it to one. So we don't
++         * need to check for MT capabilities here.
++         */
+         !(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_IXMT));
  }
- 
--static int64_t load_kernel (CPUMIPSState *env)
-+static int64_t load_kernel(CPUMIPSState *env)
- {
-     int64_t kernel_entry, kernel_low, kernel_high, initrd_size;
-     int index = 0;
-@@ -130,16 +131,18 @@ static int64_t load_kernel (CPUMIPSState *env)
-     initrd_size = 0;
-     initrd_offset = 0;
-     if (loaderparams.initrd_filename) {
--        initrd_size = get_image_size (loaderparams.initrd_filename);
-+        initrd_size = get_image_size(loaderparams.initrd_filename);
-         if (initrd_size > 0) {
--            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
-+            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) &
-+                            INITRD_PAGE_MASK;
-             if (initrd_offset + initrd_size > ram_size) {
-                 error_report("memory too small for initial ram disk '%s'",
-                              loaderparams.initrd_filename);
-                 exit(1);
-             }
-             initrd_size = load_image_targphys(loaderparams.initrd_filename,
--                                     initrd_offset, ram_size - initrd_offset);
-+                                              initrd_offset,
-+                                              ram_size - initrd_offset);
-         }
-         if (initrd_size == (target_ulong) -1) {
-             error_report("could not load initial ram disk '%s'",
-@@ -154,9 +157,10 @@ static int64_t load_kernel (CPUMIPSState *env)
- 
-     prom_set(prom_buf, index++, "%s", loaderparams.kernel_filename);
-     if (initrd_size > 0) {
--        prom_set(prom_buf, index++, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
--                 cpu_mips_phys_to_kseg0(NULL, initrd_offset), initrd_size,
--                 loaderparams.kernel_cmdline);
-+        prom_set(prom_buf, index++,
-+                 "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
-+                 cpu_mips_phys_to_kseg0(NULL, initrd_offset),
-+                 initrd_size, loaderparams.kernel_cmdline);
+=20
+@@ -176,14 +181,18 @@ static inline bool cpu_mips_hw_interrupts_pending(C=
+PUMIPSState *env)
+     status =3D env->CP0_Status & CP0Ca_IP_mask;
+=20
+     if (env->CP0_Config3 & (1 << CP0C3_VEIC)) {
+-        /* A MIPS configured with a vectorizing external interrupt contr=
+oller
+-           will feed a vector into the Cause pending lines. The core tre=
+ats
+-           the status lines as a vector level, not as indiviual masks.  =
+*/
++        /*
++         * A MIPS configured with a vectorizing external interrupt contr=
+oller
++         * will feed a vector into the Cause pending lines. The core tre=
+ats
++         * the status lines as a vector level, not as indiviual masks.
++         */
+         r =3D pending > status;
      } else {
-         prom_set(prom_buf, index++, "%s", loaderparams.kernel_cmdline);
+-        /* A MIPS configured with compatibility or VInt (Vectored Interr=
+upts)
+-           treats the pending lines as individual interrupt lines, the s=
+tatus
+-           lines are individual masks.  */
++        /*
++         * A MIPS configured with compatibility or VInt (Vectored Interr=
+upts)
++         * treats the pending lines as individual interrupt lines, the s=
+tatus
++         * lines are individual masks.
++         */
+         r =3D (pending & status) !=3D 0;
      }
-@@ -175,34 +179,48 @@ static int64_t load_kernel (CPUMIPSState *env)
-     return kernel_entry;
- }
- 
--static void write_bootloader (CPUMIPSState *env, uint8_t *base, int64_t kernel_addr)
-+static void write_bootloader(CPUMIPSState *env, uint8_t *base,
-+                             int64_t kernel_addr)
- {
-     uint32_t *p;
- 
-     /* Small bootloader */
--    p = (uint32_t *) base;
-+    p = (uint32_t *)base;
- 
--    stl_p(p++, 0x0bf00010);                                      /* j 0x1fc00040 */
--    stl_p(p++, 0x00000000);                                      /* nop */
-+    /* j 0x1fc00040 */
-+    stl_p(p++, 0x0bf00010);
-+    /* nop */
-+    stl_p(p++, 0x00000000);
- 
-     /* Second part of the bootloader */
--    p = (uint32_t *) (base + 0x040);
+     return r;
+@@ -268,12 +277,14 @@ static inline int mips_vpe_active(CPUMIPSState *env=
+)
+         active =3D 0;
+     }
+=20
+-    /* Now verify that there are active thread contexts in the VPE.
 -
--    stl_p(p++, 0x3c040000);                                      /* lui a0, 0 */
--    stl_p(p++, 0x34840002);                                      /* ori a0, a0, 2 */
--    stl_p(p++, 0x3c050000 | ((ENVP_ADDR >> 16) & 0xffff));       /* lui a1, high(ENVP_ADDR) */
--    stl_p(p++, 0x34a50000 | (ENVP_ADDR & 0xffff));               /* ori a1, a0, low(ENVP_ADDR) */
--    stl_p(p++, 0x3c060000 | (((ENVP_ADDR + 8) >> 16) & 0xffff)); /* lui a2, high(ENVP_ADDR + 8) */
--    stl_p(p++, 0x34c60000 | ((ENVP_ADDR + 8) & 0xffff));         /* ori a2, a2, low(ENVP_ADDR + 8) */
--    stl_p(p++, 0x3c070000 | (loaderparams.ram_size >> 16));      /* lui a3, high(env->ram_size) */
--    stl_p(p++, 0x34e70000 | (loaderparams.ram_size & 0xffff));   /* ori a3, a3, low(env->ram_size) */
--    stl_p(p++, 0x3c1f0000 | ((kernel_addr >> 16) & 0xffff));     /* lui ra, high(kernel_addr) */;
--    stl_p(p++, 0x37ff0000 | (kernel_addr & 0xffff));             /* ori ra, ra, low(kernel_addr) */
--    stl_p(p++, 0x03e00008);                                      /* jr ra */
--    stl_p(p++, 0x00000000);                                      /* nop */
-+    p = (uint32_t *)(base + 0x040);
-+
-+    /* lui a0, 0 */
-+    stl_p(p++, 0x3c040000);
-+    /* ori a0, a0, 2 */
-+    stl_p(p++, 0x34840002);
-+    /* lui a1, high(ENVP_ADDR) */
-+    stl_p(p++, 0x3c050000 | ((ENVP_ADDR >> 16) & 0xffff));
-+    /* ori a1, a0, low(ENVP_ADDR) */
-+    stl_p(p++, 0x34a50000 | (ENVP_ADDR & 0xffff));
-+    /* lui a2, high(ENVP_ADDR + 8) */
-+    stl_p(p++, 0x3c060000 | (((ENVP_ADDR + 8) >> 16) & 0xffff));
-+    /* ori a2, a2, low(ENVP_ADDR + 8) */
-+    stl_p(p++, 0x34c60000 | ((ENVP_ADDR + 8) & 0xffff));
-+    /* lui a3, high(env->ram_size) */
-+    stl_p(p++, 0x3c070000 | (loaderparams.ram_size >> 16));
-+    /* ori a3, a3, low(env->ram_size) */
-+    stl_p(p++, 0x34e70000 | (loaderparams.ram_size & 0xffff));
-+    /* lui ra, high(kernel_addr) */
-+    stl_p(p++, 0x3c1f0000 | ((kernel_addr >> 16) & 0xffff));
-+    /* ori ra, ra, low(kernel_addr) */
-+    stl_p(p++, 0x37ff0000 | (kernel_addr & 0xffff));
-+    /* jr ra */
-+    stl_p(p++, 0x03e00008);
-+    /* nop */
-+    stl_p(p++, 0x00000000);
- }
- 
--
- static void main_cpu_reset(void *opaque)
- {
-     MIPSCPU *cpu = opaque;
-@@ -252,11 +270,11 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
- }
- 
- /* Network support */
--static void network_init (PCIBus *pci_bus)
-+static void network_init(PCIBus *pci_bus)
- {
-     int i;
- 
--    for(i = 0; i < nb_nics; i++) {
-+    for (i = 0; i < nb_nics; i++) {
-         NICInfo *nd = &nd_table[i];
-         const char *default_devaddr = NULL;
- 
-@@ -308,15 +326,17 @@ static void mips_fulong2e_init(MachineState *machine)
-     memory_region_add_subregion(address_space_mem, 0, ram);
-     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
- 
--    /* We do not support flash operation, just loading pmon.bin as raw BIOS.
--     * Please use -L to set the BIOS path and -bios to set bios name. */
+-       This assumes the CPU model will internally reschedule threads
+-       if the active one goes to sleep. If there are no threads availabl=
+e
+-       the active one will be in a sleeping state, and we can turn off
+-       the entire VPE.  */
 +    /*
-+     * We do not support flash operation, just loading pmon.bin as raw BIOS.
-+     * Please use -L to set the BIOS path and -bios to set bios name.
++     * Now verify that there are active thread contexts in the VPE.
++     *
++     * This assumes the CPU model will internally reschedule threads
++     * if the active one goes to sleep. If there are no threads availabl=
+e
++     * the active one will be in a sleeping state, and we can turn off
++     * the entire VPE.
 +     */
- 
-     if (kernel_filename) {
-         loaderparams.ram_size = ram_size;
-         loaderparams.kernel_filename = kernel_filename;
-         loaderparams.kernel_cmdline = kernel_cmdline;
-         loaderparams.initrd_filename = initrd_filename;
--        kernel_entry = load_kernel (env);
-+        kernel_entry = load_kernel(env);
-         write_bootloader(env, memory_region_get_ram_ptr(bios), kernel_entry);
-     } else {
-         if (bios_name == NULL) {
--- 
+     if (!(env->active_tc.CP0_TCStatus & (1 << CP0TCSt_A))) {
+         /* TC is not activated.  */
+         active =3D 0;
+@@ -396,10 +407,12 @@ static inline void compute_hflags(CPUMIPSState *env=
+)
+             env->hflags |=3D MIPS_HFLAG_COP1X;
+         }
+     } else if (env->insn_flags & ISA_MIPS4) {
+-        /* All supported MIPS IV CPUs use the XX (CU3) to enable
+-           and disable the MIPS IV extensions to the MIPS III ISA.
+-           Some other MIPS IV CPUs ignore the bit, so the check here
+-           would be too restrictive for them.  */
++        /*
++         * All supported MIPS IV CPUs use the XX (CU3) to enable
++         * and disable the MIPS IV extensions to the MIPS III ISA.
++         * Some other MIPS IV CPUs ignore the bit, so the check here
++         * would be too restrictive for them.
++         */
+         if (env->CP0_Status & (1U << CP0St_CU3)) {
+             env->hflags |=3D MIPS_HFLAG_COP1X;
+         }
+--=20
 2.7.4
 
 
