@@ -2,81 +2,84 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A51CC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 275ABC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:15:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E00220B1F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:12:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E00220B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E372C20B1F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 14:15:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="isvDLlkY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E372C20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hudib-0003Gi-Ew
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 10:12:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34676)
+	id 1hudld-0005HY-4M
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 10:15:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35068)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hudiC-0002X3-Rb
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:11:45 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1hudks-0003q6-1E
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:14:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hudiB-0004zQ-Pi
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:11:44 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51229)
+ (envelope-from <mrolnik@gmail.com>) id 1hudkq-0006lX-9S
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:14:29 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37024)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hudiB-0004xT-KI
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:11:43 -0400
-Received: by mail-wm1-f66.google.com with SMTP id 207so74937220wma.1
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 07:11:42 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1hudkm-0006gl-75
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 10:14:26 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f17so73159622wme.2
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 07:14:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=isvDLlkYLB/Evf2U9xl1Zpm5DOptKGUfUED4DcCli/0ewO2uRo599mWtIq4Y0bZZhf
+ 2N4+bGkrURNOZ4yzdsqg+8ZCKnZfaQynU7ROdGJZSEjJlVongFo99+hJeK/tPYHfPltc
+ eWHE+8MBKal9g7LYLm5eDQ0g4BvKKiCy1g4PnXiSMATco6ai+eiHbm5r/Q3kSP2/2Uz+
+ rLwqEPmSCaYMDS6byIF1CYQcTdYJbiQySk5DQNy6JfyY+17HX037/RWHnRkcpByCYWZj
+ 6WbZrfZa81NdnbNTI6SKp0UMRS4YyH+2KQewIB2FuLdswzDS/jkl6zja1xXmVJKWI7u/
+ 8QkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rILzswBqMu16j/NeIYTzHXQwBt8vqrrkCja05tDmKvg=;
- b=JJOtdigZdpVCSEaEgOaigclSOMTmW6Ts5CmubVPZ6+0H5pRfFLl+aDTty6lYCikWQ7
- Brj7xW68DAzYjXRWiuPSTMug7n7S/kZT8PGvKYYgG9Gud1TCxhdcn2OTwYzWh/bXcZzu
- PfV7X9+VR67uJRxEM27icGwGad7BlsfVlo1v1dLQ0gCDnCOA5jRxHINTFDjKiEmm9nwy
- TPhlot5UVgPECMgjm2FYZbSo1SPMwd3Kn1rpDrYDNN9THDCYUAlNTsoguUU9qDOfKebG
- yFs0O3t4Wrz4Y3zC2ac1lhc4pebCFXhss8CP/bwrOcbenu/QoymfwTKGM1Eo/lZPU6mh
- uBuw==
-X-Gm-Message-State: APjAAAUbvgjExpGDq4K182udKFYp0sdAhs3FGSnMvUjq5MHfV2ma1ZW7
- 9Zg3nLqkTi4EwwUFhxrC8+aERg==
-X-Google-Smtp-Source: APXvYqzSkJd7126/1BwQNHwgPsltRtZQMKrrKHrX7uRk+Y6snUJ0YTtbPNwI0hfwvjRdq90is1PM4Q==
-X-Received: by 2002:a1c:9e4d:: with SMTP id h74mr19949582wme.9.1565014301358; 
- Mon, 05 Aug 2019 07:11:41 -0700 (PDT)
-Received: from [192.168.1.74] (67.23.27.109.rev.sfr.net. [109.27.23.67])
- by smtp.gmail.com with ESMTPSA id b8sm75855398wrr.43.2019.08.05.07.11.40
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 05 Aug 2019 07:11:40 -0700 (PDT)
-To: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190803082517.15035-1-philmd@redhat.com>
- <CAFEAcA_cPDdwXkSra_8vxE8c9M2y91s5FvpB7sZh12xF-LPUWA@mail.gmail.com>
- <a4158e8a-d67f-52b5-c082-681d21ac2599@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <19158743-5f00-f89c-d9af-5b991a581b6c@redhat.com>
-Date: Mon, 5 Aug 2019 16:11:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <a4158e8a-d67f-52b5-c082-681d21ac2599@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PULL 0/1] EDK2 firmware patches
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=oElsIV9jGIkcznG1hjJ8A0RR90Xk82sVn+s7o2gFZVw=;
+ b=gF4bq6QKSIy5pqFWAXzJVD06zyKxxAbVfqJ19YTAlACTXVCh2HgolgpO06ehnBwM6E
+ hdsFvhe1K63tvpyfgtn4UY5z45BlmmyczRfI4rNLmPFvzwBI7mC9m/dY/JSc3sMXuGxv
+ S5/9kr107rmtOYVwVWbGRUO/BJK6Nbb4mvQ2KPQIpHNjL9FB9EAQufSJB+UA1EYL4El3
+ kWjHJRTmwaCj4jCOckFdR86Zt9WKO+ja6A46cQR0yWACTblerqeWb6S/1qrtXmrDmkKR
+ beSUk87cXBrVPzM3nayXYauwj+yGcJZPVnzWDrZYiL9cZf4T3a6q28KJ7o6Knf+mAwhQ
+ eKzQ==
+X-Gm-Message-State: APjAAAW23QMOunNiRF36DqJh85vwIMivv+m5jDOSf9cyt4bNsphtJNxd
+ v6DuSB5F9Xg2jnsulirAIiOSUbVCmtxeWpn6
+X-Google-Smtp-Source: APXvYqxqKmJ13Q4AMkKEZJ90OgDciJXUvj6PM3UY+/D1ULCBE+PWRObBoWe9mHD5WDAZ7aU0Z75zbQ==
+X-Received: by 2002:a1c:4041:: with SMTP id n62mr19393120wma.100.1565014460237; 
+ Mon, 05 Aug 2019 07:14:20 -0700 (PDT)
+Received: from 8c859074c0ff.ant.amazon.com.com
+ (bzq-79-182-81-63.red.bezeqint.net. [79.182.81.63])
+ by smtp.gmail.com with ESMTPSA id v23sm75256211wmj.32.2019.08.05.07.14.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+ Mon, 05 Aug 2019 07:14:19 -0700 (PDT)
+From: Michael Rolnik <mrolnik@gmail.com>
+To: qemu-devel@nongnu.org
+Date: Mon,  5 Aug 2019 17:14:03 +0300
+Message-Id: <20190805141408.89268-4-mrolnik@gmail.com>
+X-Mailer: git-send-email 2.17.2 (Apple Git-113)
+In-Reply-To: <20190805141408.89268-1-mrolnik@gmail.com>
+References: <20190805141408.89268-1-mrolnik@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH for 4.2 v28 3/8] target/avr: Add instruction
+ decoding
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,56 +91,204 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: thuth@redhat.com, dovgaluk@ispras.ru, richard.henderson@linaro.org,
+ Michael Rolnik <mrolnik@gmail.com>, imammedo@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+This includes:
+- encoding of all 16 bit instructions
+- encoding of all 32 bit instructions
 
-On 8/5/19 3:13 PM, Michal Prívozník wrote:
-> On 8/3/19 12:22 PM, Peter Maydell wrote:
->> On Sat, 3 Aug 2019 at 09:26, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>>
->>> The following changes since commit 9bcf2dfa163f67b0fec6ee0fe88ad5dc5d69dc59:
->>>
->>>   Merge remote-tracking branch 'remotes/elmarco/tags/slirp-CVE-2019-14378-pull-request' into staging (2019-08-02 13:06:03 +0100)
->>>
->>> are available in the Git repository at:
->>>
->>>   https://gitlab.com/philmd/qemu.git tags/edk2-next-20190803
->>>
->>> for you to fetch changes up to 177cd674d6203d3c1a98e170ea56c5a904ac4ce8:
->>>
->>>   Makefile: remove DESTDIR from firmware file content (2019-08-03 09:52:32 +0200)
->>>
->>> ----------------------------------------------------------------
->>> A harmless build-sys patch that fixes a regression affecting Linux
->>> distributions packaging QEMU.
->>>
->>> ----------------------------------------------------------------
->>>
->>> Olaf Hering (1):
->>>   Makefile: remove DESTDIR from firmware file content
->>
->> Is this pullreq intended for 4.1 ?
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
+ create mode 100644 target/avr/insn.decode
 
-Sorry, I was not sure how to comment on the pullreq cover (everything
-between the '---' lines get include in the merge commit description).
+diff --git a/target/avr/insn.decode b/target/avr/insn.decode
+new file mode 100644
+index 0000000000..6b387762c6
+--- /dev/null
++++ b/target/avr/insn.decode
+@@ -0,0 +1,175 @@
++#
++#   A = [16 .. 31]
++#   B = [16 .. 23]
++#   C = [24, 26, 28, 30]
++#   D = [0, 2, 4, 6, 8, .. 30]
++
++%rd             4:5
++%rr             9:1 0:4
++
++&rd_rr          rd rr
++&rd_imm         rd imm
++
++@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=%rd rr=%rr
++ADD             0000 11 . ..... ....        @op_rd_rr
++ADC             0001 11 . ..... ....        @op_rd_rr
++AND             0010 00 . ..... ....        @op_rd_rr
++CP              0001 01 . ..... ....        @op_rd_rr
++CPC             0000 01 . ..... ....        @op_rd_rr
++CPSE            0001 00 . ..... ....        @op_rd_rr
++EOR             0010 01 . ..... ....        @op_rd_rr
++MOV             0010 11 . ..... ....        @op_rd_rr
++MUL             1001 11 . ..... ....        @op_rd_rr
++OR              0010 10 . ..... ....        @op_rd_rr
++SBC             0000 10 . ..... ....        @op_rd_rr
++SUB             0001 10 . ..... ....        @op_rd_rr
++
++
++%rd_c           4:2                         !function=to_C
++%imm6           6:2 0:4
++
++@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=%rd_c imm=%imm6
++ADIW            1001 0110 .. .. ....        @op_rd_imm6
++SBIW            1001 0111 .. .. ....        @op_rd_imm6
++
++
++%rd_a           4:4                         !function=to_A
++%rr_a           0:4                         !function=to_A
++%rd_d           4:4                         !function=to_D
++%rr_d           0:4                         !function=to_D
++%imm8           8:4 0:4
++
++@op_rd_imm8     .... .... .... ....         &rd_imm     rd=%rd_a imm=%imm8
++ANDI            0111 .... .... ....         @op_rd_imm8
++CPI             0011 .... .... ....         @op_rd_imm8
++LDI             1110 .... .... ....         @op_rd_imm8
++ORI             0110 .... .... ....         @op_rd_imm8
++SBCI            0100 .... .... ....         @op_rd_imm8
++SUBI            0101 .... .... ....         @op_rd_imm8
++
++
++@op_rd          .... ... rd:5 ....
++ASR             1001 010 ..... 0101         @op_rd
++COM             1001 010 ..... 0000         @op_rd
++DEC             1001 010 ..... 1010         @op_rd
++ELPM2           1001 000 ..... 0110         @op_rd
++ELPMX           1001 000 ..... 0111         @op_rd
++INC             1001 010 ..... 0011         @op_rd
++LDX1            1001 000 ..... 1100         @op_rd
++LDX2            1001 000 ..... 1101         @op_rd
++LDX3            1001 000 ..... 1110         @op_rd
++LDY2            1001 000 ..... 1001         @op_rd
++LDY3            1001 000 ..... 1010         @op_rd
++LDZ2            1001 000 ..... 0001         @op_rd
++LDZ3            1001 000 ..... 0010         @op_rd
++LPM2            1001 000 ..... 0100         @op_rd
++LPMX            1001 000 ..... 0101         @op_rd
++LSR             1001 010 ..... 0110         @op_rd
++NEG             1001 010 ..... 0001         @op_rd
++POP             1001 000 ..... 1111         @op_rd
++PUSH            1001 001 ..... 1111         @op_rd
++ROR             1001 010 ..... 0111         @op_rd
++STY2            1001 001 ..... 1001         @op_rd
++STY3            1001 001 ..... 1010         @op_rd
++STZ2            1001 001 ..... 0001         @op_rd
++STZ3            1001 001 ..... 0010         @op_rd
++SWAP            1001 010 ..... 0010         @op_rd
++
++
++@op_bit         .... .... . bit:3 ....
++BCLR            1001 0100 1 ... 1000        @op_bit
++BSET            1001 0100 0 ... 1000        @op_bit
++
++
++@op_rd_bit      .... ... rd:5 . bit:3
++BLD             1111 100 ..... 0 ...        @op_rd_bit
++BST             1111 101 ..... 0 ...        @op_rd_bit
++
++
++@op_bit_imm     .... .. imm:s7 bit:3
++BRBC            1111 01 ....... ...         @op_bit_imm
++BRBS            1111 00 ....... ...         @op_bit_imm
++
++
++BREAK           1001 0101 1001 1000
++EICALL          1001 0101 0001 1001
++EIJMP           1001 0100 0001 1001
++ELPM1           1001 0101 1101 1000
++ICALL           1001 0101 0000 1001
++IJMP            1001 0100 0000 1001
++LPM1            1001 0101 1100 1000
++NOP             0000 0000 0000 0000
++RET             1001 0101 0000 1000
++RETI            1001 0101 0001 1000
++SLEEP           1001 0101 1000 1000
++SPM             1001 0101 1110 1000
++SPMX            1001 0101 1111 1000
++WDR             1001 0101 1010 1000
++
++
++@op_reg_bit     .... .... reg:5 bit:3
++CBI             1001 1000 ..... ...         @op_reg_bit
++SBI             1001 1010 ..... ...         @op_reg_bit
++SBIC            1001 1001 ..... ...         @op_reg_bit
++SBIS            1001 1011 ..... ...         @op_reg_bit
++
++
++DES             1001 0100 imm:4 1011
++
++
++%rd_b           4:3                         !function=to_B
++%rr_b           0:3                         !function=to_B
++@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
++FMUL            0000 0011 0 ... 1 ...       @fmul
++FMULS           0000 0011 1 ... 0 ...       @fmul
++FMULSU          0000 0011 1 ... 1 ...       @fmul
++MULSU           0000 0011 0 ... 0 ...       @fmul
++
++
++%io_imm         9:2 0:4
++@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=%rd imm=%io_imm
++IN              1011 0 .. ..... ....        @io_rd_imm
++OUT             1011 1 .. ..... ....        @io_rd_imm
++
++
++XCH             1001 001 rd:5 0100
++LAC             1001 001 rd:5 0110
++LAS             1001 001 rd:5 0101
++LAT             1001 001 rd:5 0111
++STX1            1001 001 rr:5 1100
++STX2            1001 001 rr:5 1101
++STX3            1001 001 rr:5 1110
++
++
++%ldst_d_imm     13:1 10:2 0:3
++@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=%ldst_d_imm
++LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
++LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
++STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
++STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
++
++
++MOVW            0000 0001 .... ....         &rd_rr      rd=%rd_d rr=%rr_d
++MULS            0000 0010 .... ....         &rd_rr      rd=%rd_a rr=%rr_a
++
++RCALL           1101 imm:s12
++RJMP            1100 imm:s12
++
++SBRC            1111 110 rr:5 0 bit:3
++SBRS            1111 111 rr:5 0 bit:3
++
++# The 22-bit immediate is partially in the opcode word,
++# and partially in the next.  Use append_16 to build the
++# complete 22-bit value.
++%imm_call       4:5 0:1                     !function=append_16
++CALL            1001 010 ..... 111 .        imm=%imm_call
++JMP             1001 010 ..... 110 .        imm=%imm_call
++
++
++# The 16-bit immediate is completely in the next word.
++# Fields cannot be defined with no bits, so we cannot play
++# the same trick and append to a zero-bit value.
++# Defer reading the immediate until trans_{LDS,STS}.
++@ldst_s         .... ... rd:5 ....          imm=0
++LDS             1001 000 ..... 0000         @ldst_s
++STS             1001 001 ..... 0000         @ldst_s
+-- 
+2.17.2 (Apple Git-113)
 
-This fix a regression introduced during the current development cycle.
-Already 3 different distributions hit this issue and complained (Suse,
-ArchLinux and Fedora).
-This is not a critical/security issue and distributions can easily
-backport this patch, but since there is a RC4 planned, it would be nice
-regarding distributors to fix this if possible.
-
-> Please do pull it into 4.1 as the commit it fixes is aiming at 4.1 (just
-> like the whole feature). If not included then distros will need to
-> backport it anyway. Just my $0.02. Let's wait for Philippe's confirmation.
-Exactly.
-
-Thanks,
-
-Phil.
 
