@@ -3,59 +3,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BD6C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE15C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E7E42064A
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:41:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E7E42064A
+	by mail.kernel.org (Postfix) with ESMTPS id 215652064A
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:42:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 215652064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hug2y-0003Vl-Le
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:41:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37527)
+	id 1hug3k-0004NP-Bh
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:42:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37630)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hufzg-0005wl-Hj
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:37:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hufzn-0006Ke-8I
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:38:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hufzf-0005wi-GK
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:37:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41710)
+ (envelope-from <mreitz@redhat.com>) id 1hufzm-00062S-7R
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 12:38:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34984)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hufzd-0005vT-3h; Mon, 05 Aug 2019 12:37:53 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hufzj-0005zC-SE; Mon, 05 Aug 2019 12:38:00 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5C8A7301302E;
- Mon,  5 Aug 2019 16:37:52 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2FB523084045;
+ Mon,  5 Aug 2019 16:37:59 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E4AF25DC18;
- Mon,  5 Aug 2019 16:37:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BDEA25C1D8;
+ Mon,  5 Aug 2019 16:37:58 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Mon,  5 Aug 2019 18:37:37 +0200
-Message-Id: <20190805163740.23616-5-mreitz@redhat.com>
+Date: Mon,  5 Aug 2019 18:37:40 +0200
+Message-Id: <20190805163740.23616-8-mreitz@redhat.com>
 In-Reply-To: <20190805163740.23616-1-mreitz@redhat.com>
 References: <20190805163740.23616-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Mon, 05 Aug 2019 16:37:52 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Mon, 05 Aug 2019 16:37:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 4/7] iotests: Test incremental backup after
- truncation
+Subject: [Qemu-devel] [PULL 7/7] block/backup: disable copy_range for
+ compressed backup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,102 +73,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190805152840.32190-1-mreitz@redhat.com
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+Enabled by default copy_range ignores compress option. It's definitely
+unexpected for user.
+
+It's broken since introduction of copy_range usage in backup in
+9ded4a011496.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20190730163251.755248-3-vsementsov@virtuozzo.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/124     | 38 ++++++++++++++++++++++++++++++++++----
- tests/qemu-iotests/124.out |  4 ++--
- 2 files changed, 36 insertions(+), 6 deletions(-)
+ block/backup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 80b356f7bb..3440f54781 100755
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -212,25 +212,28 @@ class TestIncrementalBackupBase(iotests.QMPTestCase=
-):
-         return bitmap
-=20
-=20
--    def prepare_backup(self, bitmap=3DNone, parent=3DNone):
-+    def prepare_backup(self, bitmap=3DNone, parent=3DNone, **kwargs):
-         if bitmap is None:
-             bitmap =3D self.bitmaps[-1]
-         if parent is None:
-             parent, _ =3D bitmap.last_target()
-=20
-         target, _ =3D bitmap.new_target()
--        self.img_create(target, bitmap.drive['fmt'], parent=3Dparent)
-+        self.img_create(target, bitmap.drive['fmt'], parent=3Dparent,
-+                        **kwargs)
-         return target
-=20
-=20
-     def create_incremental(self, bitmap=3DNone, parent=3DNone,
--                           parentFormat=3DNone, validate=3DTrue):
-+                           parentFormat=3DNone, validate=3DTrue,
-+                           target=3DNone):
-         if bitmap is None:
-             bitmap =3D self.bitmaps[-1]
-         if parent is None:
-             parent, _ =3D bitmap.last_target()
-=20
--        target =3D self.prepare_backup(bitmap, parent)
-+        if target is None:
-+            target =3D self.prepare_backup(bitmap, parent)
-         res =3D self.do_qmp_backup(job_id=3Dbitmap.drive['id'],
-                                  device=3Dbitmap.drive['id'],
-                                  sync=3D'incremental', bitmap=3Dbitmap.n=
-ame,
-@@ -572,6 +575,33 @@ class TestIncrementalBackup(TestIncrementalBackupBas=
-e):
-                           'bitmap0', self.drives[0],
-                           granularity=3D64000)
-=20
-+    def test_growing_before_backup(self):
-+        '''
-+        Test: Add a bitmap, truncate the image, write past the old
-+              end, do a backup.
-+
-+        Incremental backup should not ignore dirty bits past the old
-+        image end.
-+        '''
-+        self.assert_no_active_block_jobs()
-+
-+        self.create_anchor_backup()
-+
-+        self.add_bitmap('bitmap0', self.drives[0])
-+
-+        res =3D self.vm.qmp('block_resize', device=3Dself.drives[0]['id'=
-],
-+                          size=3D(65 * 1048576))
-+        self.assert_qmp(res, 'return', {})
-+
-+        # Dirty the image past the old end
-+        self.vm.hmp_qemu_io(self.drives[0]['id'], 'write 64M 64k')
-+
-+        target =3D self.prepare_backup(size=3D'65M')
-+        self.create_incremental(target=3Dtarget)
-+
-+        self.vm.shutdown()
-+        self.check_backups()
-+
-=20
- class TestIncrementalBackupBlkdebug(TestIncrementalBackupBase):
-     '''Incremental backup tests that utilize a BlkDebug filter on drive0=
-.'''
-diff --git a/tests/qemu-iotests/124.out b/tests/qemu-iotests/124.out
-index 281b69efea..fa16b5ccef 100644
---- a/tests/qemu-iotests/124.out
-+++ b/tests/qemu-iotests/124.out
-@@ -1,5 +1,5 @@
--............
-+.............
- ----------------------------------------------------------------------
--Ran 12 tests
-+Ran 13 tests
-=20
- OK
+diff --git a/block/backup.c b/block/backup.c
+index 1ee271f9f1..b26c22c4b8 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -657,7 +657,7 @@ BlockJob *backup_job_create(const char *job_id, Block=
+DriverState *bs,
+     job->cluster_size =3D cluster_size;
+     job->copy_bitmap =3D copy_bitmap;
+     copy_bitmap =3D NULL;
+-    job->use_copy_range =3D true;
++    job->use_copy_range =3D !compress; /* compression isn't supported fo=
+r it */
+     job->copy_range_size =3D MIN_NON_ZERO(blk_get_max_transfer(job->comm=
+on.blk),
+                                         blk_get_max_transfer(job->target=
+));
+     job->copy_range_size =3D MAX(job->cluster_size,
 --=20
 2.21.0
 
