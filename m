@@ -2,82 +2,97 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8168C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 04:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B95D5C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85C822086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 04:44:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMV2q1Bl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85C822086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C7C12086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:10:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C7C12086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huUr3-00029C-O4
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 00:44:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41982)
+	id 1huVGq-0005TK-MG
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 01:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45799)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liq3ea@gmail.com>) id 1huUqL-0001ds-S8
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:43:34 -0400
+ (envelope-from <daniel@linux.ibm.com>) id 1huVGO-0004s9-BH
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1huUqK-0007uT-Ok
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 00:43:33 -0400
-Received: from mail-ot1-x32b.google.com ([2607:f8b0:4864:20::32b]:36463)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>)
- id 1huUqK-0007u5-Hp; Mon, 05 Aug 2019 00:43:32 -0400
-Received: by mail-ot1-x32b.google.com with SMTP id r6so83964067oti.3;
- Sun, 04 Aug 2019 21:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aK93g3QL2dG+tUnUCxSDwKdK7PX56Wj5Ql2kuCgjTrk=;
- b=jMV2q1Blsr4UTQXxW1YRj4f+Zx/EIWZCku8acGTtlCoXl3O8rPmCK3UUg2qz/Td+64
- sh/O6TZFB311Ry0lDnxjsaw+GE3C5v1xgjVU+k4FZXluHYyDYC/r88v4JcOZRXlE7Ibs
- u6nWqEj4zyi69Ri0W/rnK2BIwTg1xtUFBffgsKa6ah1B9b4EW5qk4DK2wSn/WhOKVg+p
- Q+f1IYZIu9DDFIH8h/RSDIZZinrizhOHh0DicIMNabgJg8VOp8KosXW0VI9CJcTMRqhQ
- Dsngp1Fzioxxsq3UO4zPzrCSgHYMhFDKyHY8ljlP0QcM5XksLOwj/L/SREG8Y/edaV40
- eFVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aK93g3QL2dG+tUnUCxSDwKdK7PX56Wj5Ql2kuCgjTrk=;
- b=O8WMfN85jfcZAEKM8w9Btu6UcJlHjdp6XlXiF2EOiK+KTS+dMiNNXmHwALcl9vW1qc
- +Gso6tnSva3OvlRSCGAwxWnAkhqijlTS4m0HLEeckZNJeVeyWNFs+Ok/UwVIZf0ONyav
- KIykCDzgrItrUKzhRZVfkrMX8609a2vDBKgcD4h83qh/jCxqL2xhqMiQw/6gIhGJDnI7
- XJIPPwkvj74q0A7IWw5K1+YbFUTLwxsZ4uInfB3G8MraW1YP4KSuzaMe48mOjRZLXBaG
- QEdkZQVFJXXCmfjSP5o/TTmV7k0wvX1cmR3oN6At7YEtE7hZjaWRMvstZf4trnSR6loB
- 30lg==
-X-Gm-Message-State: APjAAAVRhIYhCDkqQSMewAKyTiqv1wkUhrR89X9haBt2XGbPCAFv0WC4
- /YvDoIwB00YDUnDqv2HbryDXKIS5uOhtacx8OMc=
-X-Google-Smtp-Source: APXvYqzUGR8aDXlzPn+LyFfu12DSc+UPCc2fvUteUxO5x8MA56t41rMrh54svV9yfkSaTCNTE8sW9J9xhsFHStqdZW8=
-X-Received: by 2002:a05:6830:1291:: with SMTP id
- z17mr48407542otp.194.1564980211666; 
- Sun, 04 Aug 2019 21:43:31 -0700 (PDT)
+ (envelope-from <daniel@linux.ibm.com>) id 1huVGM-0006Fi-7n
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:10:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <daniel@linux.ibm.com>)
+ id 1huVGK-0006ET-GV
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:10:26 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7557uTa089684
+ for <qemu-devel@nongnu.org>; Mon, 5 Aug 2019 01:10:22 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2u680n3p47-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 01:10:21 -0400
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <daniel@linux.ibm.com>;
+ Mon, 5 Aug 2019 06:10:19 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 5 Aug 2019 06:10:18 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x755AHJR47186122
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 5 Aug 2019 05:10:17 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 283B74204B;
+ Mon,  5 Aug 2019 05:10:17 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8AC424204D;
+ Mon,  5 Aug 2019 05:10:16 +0000 (GMT)
+Received: from ozlabs.au.ibm.com (unknown [9.192.253.14])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  5 Aug 2019 05:10:16 +0000 (GMT)
+Received: from volution.ozlabs.ibm.com (haven.au.ibm.com [9.192.254.114])
+ (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ozlabs.au.ibm.com (Postfix) with ESMTPSA id 8DF63A0259;
+ Mon,  5 Aug 2019 15:10:15 +1000 (AEST)
+From: Daniel Black <daniel@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Date: Mon,  5 Aug 2019 15:09:58 +1000
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <7f455f0d.730d.16c5fdc21af.Coremail.hope2hope@163.com>
-In-Reply-To: <7f455f0d.730d.16c5fdc21af.Coremail.hope2hope@163.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 5 Aug 2019 12:42:55 +0800
-Message-ID: <CAKXe6SKMS__GaxTL4rkTBFpCpRkRS_bHoJx8=6w6WktFr5K9XQ@mail.gmail.com>
-To: ddm <hope2hope@163.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] How to configure QEMU to support APIC
- virtualization
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19080505-0008-0000-0000-0000030546C3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080505-0009-0000-0000-0000A17F4A9E
+Message-Id: <20190805050959.19935-1-daniel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-05_02:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908050057
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [PATCH v3] spapr: quantify error messages regarding
+ capability settings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,74 +104,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
+Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>, Greg Kurz <groug@kaod.org>,
+ Daniel Black <daniel@linux.ibm.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ddm <hope2hope@163.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=885=E6=97=A5=E5=91=A8=
-=E4=B8=80 =E4=B8=8A=E5=8D=8811:55=E5=86=99=E9=81=93=EF=BC=9A
+Its not immediately obvious how cap-X=Y setting need to be applied
+to the command line so, for spapr capability hints, this has been clarified to:
 
-> Hi guys,
->
->
-> I have tried via modprobe kvmintel enable_apicv=3DY  to adjust KVM
-> parameter, but it doesn't effect,  and
-> cat /sys/module/kvm_intel/parameters/enable_apicv always return "N".
-> I don't know how to configure KVM or QEMU to support APIC virtualizaion
-> feature?
->
->
-AFAICT APICv is hardware feature, but I still don't know accurately after
-which CPU support it.
-You may refer the code about 'enable_apicv' related code in kvm to see how
-to detect this capability.
+  ..try appending -machine cap-X=Y
 
-Thanks,
-Li Qiang
+The wrong value messages have been left as is, as the user has found the right
+location.
+
+Warning messages have been left as is for now.
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Daniel Black <daniel@linux.ibm.com>
+---
+tcg (broken only for cap-{cfpc|sbbc|ibs}:
+
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-cfpc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-sbbc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=workaround
+^Cqemu-system-ppc64: terminating on signal 2
+$  ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-cfpc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-sbbc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=workaround
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-sbbc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=workaround
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=fixed
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-cfpc=fixed
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-sbbc=workaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=workaround
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=fixed
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-sbbc=fixed
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=workaround
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=broken
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=workaround
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=broken  -machine   cap-ibs=fixed-ibs
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=fixed-ibs
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=broken  -machine   cap-ibs=fixed-ccd
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=fixed-ccd
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=broken  -machine   cap-ibs=fixed-na
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=fixed-na
+^Cqemu-system-ppc64: terminating on signal 2
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=broken  -machine   cap-ibs=fixed-broken
+qemu-system-ppc64: Invalid capability mode "fixed-broken" for cap-ibs
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries,accel=tcg -machine cap-cfpc=broken  -machine  cap-sbbc=broken  -machine   cap-ibs=broken
+^Cqemu-system-ppc64: terminating on signal 2
+
+result: No silly messages
+
+kvm (older firmware without features "for testing"):
+
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=workaround
+qemu-system-ppc64: Requested safe cache capability level not supported by kvm, try appending -machine cap-cfpc=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=fixed
+qemu-system-ppc64: Requested safe cache capability level not supported by kvm, try appending -machine cap-cfpc=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-sbbc=broken
+qemu-system-ppc64: Requested safe cache capability level not supported by kvm, try appending -machine cap-cfpc=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken
+qemu-system-ppc64: Requested safe indirect branch capability level not supported by kvm, try appending -machine cap-ibs=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=fixed
+qemu-system-ppc64: Requested safe bounds check capability level not supported by kvm, try appending -machine cap-sbbc=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=workaround
+qemu-system-ppc64: Requested safe bounds check capability level not supported by kvm, try appending -machine cap-sbbc=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken
+qemu-system-ppc64: Requested safe indirect branch capability level not supported by kvm, try appending -machine cap-ibs=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken -machine cap-ibs=workaround
+qemu-system-ppc64: Requested safe indirect branch capability level not supported by kvm, try appending -machine cap-ibs=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken -machine cap-ibs=fixed
+qemu-system-ppc64: Invalid capability mode "fixed" for cap-ibs
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken -machine cap-ibs=fixed-ibs
+qemu-system-ppc64: Requested safe indirect branch capability level not supported by kvm, try appending -machine cap-ibs=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken -machine cap-ibs=fixed-ccd
+qemu-system-ppc64: Requested safe indirect branch capability level not supported by kvm, try appending -machine cap-ibs=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken -machine cap-ibs=fixed-na
+qemu-system-ppc64: Requested safe indirect branch capability level not supported by kvm, try appending -machine cap-ibs=broken
+$ ppc64-softmmu/qemu-system-ppc64 -nodefaults -nographic -machine pseries -accel kvm -machine cap-cfpc=broken  -machine cap-sbbc=broken -machine cap-ibs=broken
+KVM: Failed to create TCE64 table for liobn 0x80000000
+
+result: instructions can be followed.
+
+v3 Hint, and not all messages, (can't use error_append_hint on
+error_fatal) from Greg Kurz
+v2 Improved error message thanks David Gibson
+---
+ hw/ppc/spapr_caps.c | 44 ++++++++++++++++++++++++++++++--------------
+ 1 file changed, 30 insertions(+), 14 deletions(-)
+
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index bbb001f84a..b06faee7f6 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -37,6 +37,8 @@
+ 
+ #include "hw/ppc/spapr.h"
+ 
++#define CAPABILITY_HINT(X) " try appending -machine " X
++
+ typedef struct SpaprCapPossible {
+     int num;            /* size of vals array below */
+     const char *help;   /* help text for vals */
+@@ -194,10 +196,12 @@ static void cap_htm_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+     }
+     if (tcg_enabled()) {
+         error_setg(errp,
+-                   "No Transactional Memory support in TCG, try cap-htm=off");
++                   "No Transactional Memory support in TCG,"
++                   CAPABILITY_HINT("cap-htm=off"));
+     } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
+         error_setg(errp,
+-"KVM implementation does not support Transactional Memory, try cap-htm=off"
++"KVM implementation does not support Transactional Memory,"
++                   CAPABILITY_HINT("cap-htm=off")
+             );
+     }
+ }
+@@ -215,7 +219,8 @@ static void cap_vsx_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+      * rid of anything that doesn't do VMX */
+     g_assert(env->insns_flags & PPC_ALTIVEC);
+     if (!(env->insns_flags2 & PPC2_VSX)) {
+-        error_setg(errp, "VSX support not available, try cap-vsx=off");
++        error_setg(errp, "VSX support not available,"
++                   CAPABILITY_HINT("cap-vsx=off"));
+     }
+ }
+ 
+@@ -229,7 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, uint8_t val, Error **errp)
+         return;
+     }
+     if (!(env->insns_flags2 & PPC2_DFP)) {
+-        error_setg(errp, "DFP support not available, try cap-dfp=off");
++        error_setg(errp, "DFP support not available,"
++                   CAPABILITY_HINT("cap-dfp=off"));
+     }
+ }
+ 
+@@ -253,7 +259,8 @@ static void cap_safe_cache_apply(SpaprMachineState *spapr, uint8_t val,
+                    cap_cfpc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe cache capability level not supported by kvm, try cap-cfpc=%s",
++                   "Requested safe cache capability level not supported by kvm,"
++                   CAPABILITY_HINT("cap-cfpc=%s"),
+                    cap_cfpc_possible.vals[kvm_val]);
+     }
+ 
+@@ -281,7 +288,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineState *spapr, uint8_t val,
+                    cap_sbbc_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe bounds check capability level not supported by kvm, try cap-sbbc=%s",
++"Requested safe bounds check capability level not supported by kvm,"
++                   CAPABILITY_HINT("cap-sbbc=%s"),
+                    cap_sbbc_possible.vals[kvm_val]);
+     }
+ 
+@@ -312,7 +320,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachineState *spapr,
+                    cap_ibs_possible.vals[val]);
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested safe indirect branch capability level not supported by kvm, try cap-ibs=%s",
++"Requested safe indirect branch capability level not supported by kvm,"
++                   CAPABILITY_HINT("cap-ibs=%s"),
+                    cap_ibs_possible.vals[kvm_val]);
+     }
+ 
+@@ -401,11 +410,13 @@ static void cap_nested_kvm_hv_apply(SpaprMachineState *spapr,
+ 
+     if (tcg_enabled()) {
+         error_setg(errp,
+-                   "No Nested KVM-HV support in tcg, try cap-nested-hv=off");
++                   "No Nested KVM-HV support in tcg,"
++                   CAPABILITY_HINT("cap-nested-hv=off"));
+     } else if (kvm_enabled()) {
+         if (!kvmppc_has_cap_nested_kvm_hv()) {
+             error_setg(errp,
+-"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=off");
++"KVM implementation does not support Nested KVM-HV,"
++                       CAPABILITY_HINT("cap-nested-hv=off"));
+         } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
+                 error_setg(errp,
+ "Error enabling cap-nested-hv with KVM, try cap-nested-hv=off");
+@@ -435,10 +446,12 @@ static void cap_large_decr_apply(SpaprMachineState *spapr,
+ 
+         if (!kvm_nr_bits) {
+             error_setg(errp,
+-                       "No large decrementer support, try cap-large-decr=off");
++                       "No large decrementer support,"
++                        CAPABILITY_HINT("cap-large-decr=off"));
+         } else if (pcc->lrg_decr_bits != kvm_nr_bits) {
+             error_setg(errp,
+-"KVM large decrementer size (%d) differs to model (%d), try -cap-large-decr=off",
++"KVM large decrementer size (%d) differs to model (%d),"
++                CAPABILITY_HINT("cap-large-decr=off"),
+                 kvm_nr_bits, pcc->lrg_decr_bits);
+         }
+     }
+@@ -454,7 +467,8 @@ static void cap_large_decr_cpu_apply(SpaprMachineState *spapr,
+     if (kvm_enabled()) {
+         if (kvmppc_enable_cap_large_decr(cpu, val)) {
+             error_setg(errp,
+-                       "No large decrementer support, try cap-large-decr=off");
++                       "No large decrementer support,"
++                       CAPABILITY_HINT("cap-large-decr=off"));
+         }
+     }
+ 
+@@ -474,10 +488,12 @@ static void cap_ccf_assist_apply(SpaprMachineState *spapr, uint8_t val,
+     if (tcg_enabled() && val) {
+         /* TODO - for now only allow broken for TCG */
+         error_setg(errp,
+-"Requested count cache flush assist capability level not supported by tcg, try cap-ccf-assist=off");
++"Requested count cache flush assist capability level not supported by tcg,"
++                   CAPABILITY_HINT("cap-ccf-assist=off"));
+     } else if (kvm_enabled() && (val > kvm_val)) {
+         error_setg(errp,
+-"Requested count cache flush assist capability level not supported by kvm, try cap-ccf-assist=off");
++"Requested count cache flush assist capability level not supported by kvm,"
++                   CAPABILITY_HINT("cap-ccf-assist=off"));
+     }
+ }
+ 
+-- 
+2.21.0
 
 
->
-> My host infos are as follows:
-> Architecture:          x86_64
-> CPU op-mode(s):        32-bit, 64-bit
-> Byte Order:            Little Endian
-> CPU(s):                1
-> On-line CPU(s) list:   0
-> Thread(s) per core:    1
-> Core(s) per socket:    1
-> Socket(s):             1
-> NUMA node(s):          1
-> Vendor ID:             GenuineIntel
-> CPU family:            6
-> Model:                 142
-> Model name:            Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
-> Stepping:              10
-> CPU MHz:               2112.001
-> BogoMIPS:              4224.00
-> Virtualization:        VT-x
-> Hypervisor vendor:     VMware
-> Virtualization type:   full
-> L1d cache:             32K
-> L1i cache:             32K
-> L2 cache:              256K
-> L3 cache:              8192K
-> NUMA node0 CPU(s):     0
-> Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
-> pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb
-> rdtscp lm constant_tsc arch_perfmon nopl xtopology tsc_reliable nonstop_t=
-sc
-> cpuid pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe
-> popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm ab=
-m
-> 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp
-> tpr_shadow vnmi ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2
-> invpcid rtm rdseed adx smap xsaveopt arat flush_l1d arch_capabilities
->
->
-> Could you tell me how to configure it?
->
->
-> Thanks!
->
->
