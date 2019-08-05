@@ -2,91 +2,82 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6195C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 17:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E27C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 17:02:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D9472054F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 17:01:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9472054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD3102075B
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 17:02:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s8McU0JI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD3102075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hugMX-0004ez-Tr
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 13:01:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41489)
+	id 1hugNS-0005gg-23
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 13:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41624)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hugM7-0004BG-Bh
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 13:01:08 -0400
+ (envelope-from <fintelia@gmail.com>) id 1hugMg-00050V-Fc
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 13:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hugM6-0008Nl-7T
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 13:01:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55232)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hugM3-0008ME-QL; Mon, 05 Aug 2019 13:01:04 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E1167793ED;
- Mon,  5 Aug 2019 17:01:02 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 439405D712;
- Mon,  5 Aug 2019 17:01:01 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190805163740.23616-1-mreitz@redhat.com>
- <d7a1adf8-d0a2-dead-b8d5-2576d9b05f47@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3a38f834-7759-fe3b-c5e7-d6232dc04e56@redhat.com>
-Date: Mon, 5 Aug 2019 19:00:59 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <fintelia@gmail.com>) id 1hugMe-0000AR-Tj
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 13:01:42 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:39067)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <fintelia@gmail.com>)
+ id 1hugMe-0000A0-J3; Mon, 05 Aug 2019 13:01:40 -0400
+Received: by mail-lf1-x141.google.com with SMTP id x3so4808099lfn.6;
+ Mon, 05 Aug 2019 10:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=O4vED/Px4TsmV1kmjJ6cY1xYEE+NYEHIDRkGEtFxaf4=;
+ b=s8McU0JIy003O4Dbdm8gf9tGdInrB/wF83mVmlFcvP7uUuOH70aVvJBvqToRCyeZ27
+ pZqM7eoSyiNOnLmNHKUNOoNjew5eEa4PcnaF+nMpMVslYmkx7BpvrEk2HRoqkkzHDHR8
+ PuwIhoAktIJhcNihtXa+5FYZu4IBBDC3iLVf4c2DOkZFbzZ+K2gs73d1UxWLnpCulZ6I
+ +3KoX4SNGc+f7u+HNLUoBKJU9dApJJ4J8QYtUpDJ2JK7X56ag2A2AO5zW4olcxeb/kWu
+ 8ubC95s47RyaGG6gso+KJ77xWoYbYu/Ar9UQwvwvpwk3ps3LRu42FAh3tFK00903iNqS
+ pv5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O4vED/Px4TsmV1kmjJ6cY1xYEE+NYEHIDRkGEtFxaf4=;
+ b=pq03msv/Phaj4vs6e55A6qZlKzicCJEL/WiI3dmwN1SmROchLcAQl0CUOtbDt/wrB2
+ nx/C+KEozvEKTdND8PxgDy8jz+IXrQR4k6Wr6QxtDlaEr3P3A0ho3BTF3VEAPRAjVhHM
+ TfJzVzFDZZ2gbTisZDkH+1E0zKyeOIp02h9QXOJNGlttwWv7gmF/FPlonDi/gX9GBgBv
+ Xveg6+vrAG8r54udWaMBUeCy9yvXgpBZIyAu8cJPeN/u3mgGopM+NFAfoHT4C+uhgWMZ
+ ON0TSxWjkpnlX15DW7NbLczJePkDyVCeb0qo4LvbxR+92R4wcTFdJni7rBcvm/i3fupX
+ 40iA==
+X-Gm-Message-State: APjAAAUw1z/U+N4Hu8uPpoXu3+lBTPcZHJnzIVhxYaHIfshl2OLPAPc2
+ cE8OV88na5FSOlp29ee8yKSGsy1xbMmTND8EqJk=
+X-Google-Smtp-Source: APXvYqwWgNT4x4TGgPTgW6WGzbnsOqNWaQl+In8vbraZWD40tWfrKK2LMDuhm3XnNJmSDcudnexoOCYXyo3tHYQVcd0=
+X-Received: by 2002:a19:7006:: with SMTP id h6mr71058166lfc.5.1565024498346;
+ Mon, 05 Aug 2019 10:01:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d7a1adf8-d0a2-dead-b8d5-2576d9b05f47@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Lg1NbNJAinkUHmIBTAdxRQxc4EF48AJgn"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 05 Aug 2019 17:01:03 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 0/7] Block patches for 4.1.0-rc4
+References: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
+ <1565020823-24223-27-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565020823-24223-27-git-send-email-bmeng.cn@gmail.com>
+From: Jonathan Behrens <fintelia@gmail.com>
+Date: Mon, 5 Aug 2019 13:00:52 -0400
+Message-ID: <CANnJOVHi4sZr5PQzhbOCBPs3-pvH-8Nk=j-g+Y4841dNOs63RQ@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH 26/28] riscv: hw: Update PLIC
+ device tree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,96 +89,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Lg1NbNJAinkUHmIBTAdxRQxc4EF48AJgn
-Content-Type: multipart/mixed; boundary="TAtKcvvXKX1FNno1FRIVrzwcMuGp10QRp";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <3a38f834-7759-fe3b-c5e7-d6232dc04e56@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/7] Block patches for 4.1.0-rc4
-References: <20190805163740.23616-1-mreitz@redhat.com>
- <d7a1adf8-d0a2-dead-b8d5-2576d9b05f47@virtuozzo.com>
-In-Reply-To: <d7a1adf8-d0a2-dead-b8d5-2576d9b05f47@virtuozzo.com>
+I was a little surprised to see the "riscv,max-priority" element removed,
+but there is no mention of it in the kernel documentation
+<https://github.com/torvalds/linux/blob/master/Documentation/devicetree/bindings/interrupt-controller/sifive%2Cplic-1.0.0.txt>
+so I guess that max-priority=7 is now assumed.
 
---TAtKcvvXKX1FNno1FRIVrzwcMuGp10QRp
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Jonathan Behrens <fintelia@gmail.com>
 
-On 05.08.19 18:59, Vladimir Sementsov-Ogievskiy wrote:
-> 05.08.2019 19:37, Max Reitz wrote:
->> The following changes since commit 9bb68d34dda9be60335e73e65c8fb61bca0=
-35362:
->>
->>    Merge remote-tracking branch 'remotes/philmd-gitlab/tags/edk2-next-=
-20190803' into staging (2019-08-05 11:05:36 +0100)
->>
->> are available in the Git repository at:
->>
->>    https://github.com/XanClic/qemu.git tags/pull-block-2019-08-05
->>
->> for you to fetch changes up to 07b0851c592efe188a87259adbda26a63c61dc9=
-2:
->>
->>    block/backup: disable copy_range for compressed backup (2019-08-05 =
-18:05:05 +0200)
->>
->> ----------------------------------------------------------------
->> Block patches for 4.1.0-rc4:
->> - Fix the backup block job when using copy offloading
->> - Fix the mirror block job when using the write-blocking copy mode
->> - Fix incremental backups after the image has been grown with the
->>    respective bitmap attached to it
->>
->> ----------------------------------------------------------------
->> Max Reitz (5):
->>    backup: Copy only dirty areas
->>    iotests: Test backup job with two guest writes
->>    iotests: Test incremental backup after truncation
->>    mirror: Only mirror granularity-aligned chunks
->>    iotests: Test unaligned blocking mirror write
->>
->> Vladimir Sementsov-Ogievskiy (2):
->>    util/hbitmap: update orig_size on truncate
->>    block/backup: disable copy_range for compressed backup
->>
->=20
-> As I understand, this all should go to stable too? CC it.
-Ah, yes.  Thanks.
+On Mon, Aug 5, 2019 at 12:10 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 
-Max
-
-
---TAtKcvvXKX1FNno1FRIVrzwcMuGp10QRp--
-
---Lg1NbNJAinkUHmIBTAdxRQxc4EF48AJgn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1IYMsACgkQ9AfbAGHV
-z0BOGQgAmFOSUYqE0GHyADRzoKXc57yHz+xzp6woFJpMKj/ckKJuH6Ip8+eit8xH
-m6VOqtUrMqppz8suG1GSL89gBMWT1Ru5GQUn8JYczRjgcvgk0x6aIJe6moOXrMh7
-drWjPBEN/cNWSqBvfVWVb7KR5IsRd343gWH+a23Vuxv9uz66Q/eyf3yEhttTr5PH
-+o8sJYpcG7tIMt1HuhXd1UFw0tF+zv7hmL+llU08mNTr6wGsJK9NSudDSTfl54Rr
-5XB6t68Y86HgOQl3J8lUPkUMkI0/FDhaFC2cFZAc2g6MgLkTlojwvGGdbQZ3SQJT
-Iil6A9PxORAGUq29Pmb2H7JuAbwhjA==
-=SfBh
------END PGP SIGNATURE-----
-
---Lg1NbNJAinkUHmIBTAdxRQxc4EF48AJgn--
-
+> This removes "reg-names" and "riscv,max-priority" properties of the
+> PLIC node from device tree, and updates its compatible string, to
+> keep in sync with the Linux kernel device tree.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> ---
+>
+>  hw/riscv/sifive_u.c | 4 +---
+>  hw/riscv/virt.c     | 4 +---
+>  2 files changed, 2 insertions(+), 6 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index d77b3c3..5ded3a0 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -229,15 +229,13 @@ static void create_fdt(SiFiveUState *s, const struct
+> MemmapEntry *memmap,
+>          (long)memmap[SIFIVE_U_PLIC].base);
+>      qemu_fdt_add_subnode(fdt, nodename);
+>      qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells", 1);
+> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
+> "sifive,plic-1.0.0");
+>      qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
+>      qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+>          cells, s->soc.cpus.num_harts * sizeof(uint32_t) * 4);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+>          0x0, memmap[SIFIVE_U_PLIC].base,
+>          0x0, memmap[SIFIVE_U_PLIC].size);
+> -    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
+> -    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
+>      qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 0x35);
+>      qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
+>      plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 127f005..f662100 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -237,15 +237,13 @@ static void *create_fdt(RISCVVirtState *s, const
+> struct MemmapEntry *memmap,
+>                            FDT_PLIC_ADDR_CELLS);
+>      qemu_fdt_setprop_cell(fdt, nodename, "#interrupt-cells",
+>                            FDT_PLIC_INT_CELLS);
+> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv,plic0");
+> +    qemu_fdt_setprop_string(fdt, nodename, "compatible",
+> "sifive,plic-1.0.0");
+>      qemu_fdt_setprop(fdt, nodename, "interrupt-controller", NULL, 0);
+>      qemu_fdt_setprop(fdt, nodename, "interrupts-extended",
+>          cells, s->soc.num_harts * sizeof(uint32_t) * 4);
+>      qemu_fdt_setprop_cells(fdt, nodename, "reg",
+>          0x0, memmap[VIRT_PLIC].base,
+>          0x0, memmap[VIRT_PLIC].size);
+> -    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
+> -    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
+>      qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
+>      qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
+>      plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> --
+> 2.7.4
+>
+>
+>
