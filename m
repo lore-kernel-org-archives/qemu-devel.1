@@ -2,68 +2,74 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2201C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 13:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB39C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 13:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C4692067D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 13:14:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C4692067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 107582067D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 13:21:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 107582067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hucp2-0006rr-RO
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 09:14:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53693)
+	id 1hucv9-0001Id-87
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 09:21:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54783)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mprivozn@redhat.com>) id 1hucoh-0006S6-B7
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 09:14:24 -0400
+ (envelope-from <bounces@canonical.com>) id 1hucun-0000sq-Ec
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 09:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mprivozn@redhat.com>) id 1hucog-00070a-6m
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 09:14:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53954)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1hucog-000709-1i
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 09:14:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 3CF6CA707;
- Mon,  5 Aug 2019 13:14:21 +0000 (UTC)
-Received: from [10.40.204.137] (ovpn-204-137.brq.redhat.com [10.40.204.137])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C26B5D6C8;
- Mon,  5 Aug 2019 13:14:14 +0000 (UTC)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <350c3150b25e0c44e24e0a3bd15dacc7284684c9.1565009145.git.mprivozn@redhat.com>
- <CAFEAcA8BfOw5Q3L8zqsw16C7askG7bdNVPoJT-aAE2Tr6-a=3Q@mail.gmail.com>
-From: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
-Message-ID: <fb8fea4d-461e-6cbe-91fd-83d0e762a5dd@redhat.com>
-Date: Mon, 5 Aug 2019 15:14:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bounces@canonical.com>) id 1hucum-0002oy-9d
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 09:20:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44092)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hucum-0002oL-4M
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 09:20:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hucuk-0004en-S1
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 13:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id B4E5F2E802E
+ for <qemu-devel@nongnu.org>; Mon,  5 Aug 2019 13:20:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8BfOw5Q3L8zqsw16C7askG7bdNVPoJT-aAE2Tr6-a=3Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: sk-SK
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Mon, 05 Aug 2019 13:14:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 05 Aug 2019 13:12:30 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: elouan-appere pmaydell
+X-Launchpad-Bug-Reporter: =?utf-8?q?Elouan_App=C3=A9r=C3=A9_=28elouan-apper?=
+ =?utf-8?q?e=29?=
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156496429682.24531.17468125820972523019.malonedeb@soybean.canonical.com>
+Message-Id: <156501075065.28708.17210262123716737861.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19014";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 826bc39a4eda9584c1e3f8d90421b7a9d31e7292
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] Makefile: Drop $(DESTDIR) from generated
- FW paths
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1838913] Re: Single-step exceptions incorrectly
+ routed to EL1 when ELD is EL2 (TDE = 1) (qemu version 3.1)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -72,25 +78,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Laszlo Ersek <lersek@redhat.com>
+Reply-To: Bug 1838913 <1838913@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/5/19 3:00 PM, Peter Maydell wrote:
-> <snip/>
-> Hi -- this looks like a duplicate of
-> https://patchew.org/QEMU/20190530192812.17637-1-olaf@aepfle.de/
-> 
-> (which Philippe has put in a pullreq which I guess is
-> destined for 4.1, though I'm still waiting for confirmation
-> of that, ie that it really is a for-4.1-worthy bug).
-> 
+I've just submitted this patchset:
+https://patchew.org/QEMU/20190805130952.4415-1-peter.maydell@linaro.org/
 
-Ah, did not realize that. Sorry. I've replied there.
+which I think should fix this bug. With those changes, the test image
+takes a single-step exception to EL2, and then (because there's no code
+at the exception entry point) takes a series of EL2-to-EL2 undef
+exceptions, which I think is expected and correct behaviour.
 
-Michal
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1838913
+
+Title:
+  Single-step exceptions incorrectly routed to EL1 when ELD is EL2 (TDE
+  =3D 1) (qemu version 3.1)
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  Hi,
+
+  I've been encountering issues with QEMU 3.1 when trying to single-step
+  EL1 code, with ELD =3D EL2 (MDCR_EL2.TDE =3D 1). I could test with latest
+  commit in a few hours, if you want.
+
+  EL1 is Aarch64.
+
+  This happens as soon as MDSCR_EL1.SS is set to 1 and ERET is executed:
+
+  - Single-step exceptions are routed to EL1
+
+  Exception return from AArch64 EL2 to AArch64 EL1 PC 0x4000005c
+  Taking exception 1 [Undefined Instruction]
+  ...from EL1 to EL1
+  ...with ESR 0x32/0xca000022
+  ...with ELR 0x4000005c
+  ...to EL1 PC 0x200 PSTATE 0x3c5
+
+  EC 0x32 (0b110010) is Exception_SoftwareStepLowerEl.
+
+  You can find enclosed minimal code (and resulting .elf) for
+  reproduction.
+
+  qemu-system-aarch64 -nographic -machine virt,virtualization=3Don -d
+  unimp,int -cpu cortex-a57 -kernel test_hyp.elf
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1838913/+subscriptions
 
