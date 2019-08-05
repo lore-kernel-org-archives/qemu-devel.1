@@ -2,65 +2,112 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D45C19759
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 02:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84306C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 03:13:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A11DB2086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 02:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A8DA2075C
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 03:13:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Rlmk0bty"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A11DB2086D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="gfxD6MTv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A8DA2075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huTDY-0002PU-Hq
-	for qemu-devel@archiver.kernel.org; Sun, 04 Aug 2019 22:59:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56376)
+	id 1huTRC-0004aO-K4
+	for qemu-devel@archiver.kernel.org; Sun, 04 Aug 2019 23:13:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57800)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1huTD7-0001ul-Vv
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:58:59 -0400
+ (envelope-from <alxndr@bu.edu>) id 1huTQp-0004BY-BY
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 23:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1huTD6-0007ul-MM
- for qemu-devel@nongnu.org; Sun, 04 Aug 2019 22:58:57 -0400
-Received: from ozlabs.org ([203.11.71.1]:45195)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1huTD5-0007sK-9a; Sun, 04 Aug 2019 22:58:56 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4622XV2LkSz9sDB; Mon,  5 Aug 2019 12:58:50 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1564973930;
- bh=hGNpndo8qO96RsjGxUkggparRDVgxf/f6kOGyKhlZ/Q=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Rlmk0btyIStThMNNqhCsjsG5kfZxv4PtWVh+dv48IALslCSvnYfRg0Ffo0dc0/EIr
- L3+8PjCof9r5/poWcy3qX7PHEcxkeiVkguNFUoKefRzwHdPgzjxNDU4y9rpGCOztdi
- LXCy8SXTuZsOTxvplZYtbJ9SjSuaZ7jMuG++WJJQ=
-Date: Mon, 5 Aug 2019 12:58:44 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Tao Xu <tao3.xu@intel.com>
-Message-ID: <20190805025844.GA29381@umbus.fritz.box>
-References: <20190801075258.19070-1-tao3.xu@intel.com>
- <20190802065538.GA2031@umbus.fritz.box>
- <27846884-9bf4-7729-7a9e-0392280ee67f@intel.com>
+ (envelope-from <alxndr@bu.edu>) id 1huTQo-0007pu-Bl
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 23:13:07 -0400
+Received: from mail-eopbgr760120.outbound.protection.outlook.com
+ ([40.107.76.120]:43669 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1huTQo-0007mb-48
+ for qemu-devel@nongnu.org; Sun, 04 Aug 2019 23:13:06 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j17vv6hzfxzePHyGHsFR7HKz6Ovcbv2q4+JoRoYFAXKguMCYPEt1IKUn//g/24eISfyK02/nbdfvODiBsfBqJXWvot+iYo4T5mJfIJsBrklTpzSNpV5eMFdTUiJIUqQ50CgRl5nzl/GTUZSv989dDofa2Nnqw+cnZHL3Mi39E+d327ulWkVo6+paOXQvRWcD9kQlVV5EeL+TjLrt7yOimBO7ApmAgKA9LKcf8mxDpKaxQzO0rZJTEllpDEVdGUW1O8m322vabC56OGmOK+j62PQc8I6XavOenK+24F2R5Pnp6rJADssHjdKDUj3HSRGO7Z2TvDwCbcTsUtTqpAdb3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MZ+uwPae1WRhp/i+GaZswWUDiVExYHybMfR6MwdbcwI=;
+ b=oaQCP/lbXc4Kl1BZy/znZAcvVlhEWEQlROI1iu/Zw7L9tiY3u8yQbwfRIXYPHNwKmDIteSxutrFjlXBAQ67b44aRIzK2phPM8l3JwRxUInyTrS+WHwC0XXL/UDhyJzT4kntpVunTO6WNRhqLrb8EllXPiXc0ZTOlvGBsKyiG8Dpm4H8ADZbbbA6jVWy0KQJUXbmJeOGEwcZQKiSZx8A0qgj9K81cpzULawXRXZFwR5HLulDxmbz5CeFDWoMBvfoZ8BvmXlKsEhJ5Kg2RoIhkNtfP8MokanOr4e7l3D2uhWKF/CanRjN6KX/qauo4TzyippLQ17Z0BfipZPXfDB3zwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=bu.edu;dmarc=pass action=none header.from=bu.edu;dkim=pass
+ header.d=bu.edu;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MZ+uwPae1WRhp/i+GaZswWUDiVExYHybMfR6MwdbcwI=;
+ b=gfxD6MTvGZxOEQ/PfGd87GHTwlmHW3qy5hc+nofUdzVh+u848ZqJeKLxd6xzWGSa5yFu0XRgMKzLvB11oWQUe9mCnUkk+9APNeLjrHvcPYeFYGaVOsRcTYvoVCSar7nPp6l2LviKXbyEj3oBorklTCtW1kCEA4bZ9ZaNZqhfk/8=
+Received: from CY4PR03MB2872.namprd03.prod.outlook.com (10.175.118.17) by
+ CY4PR03MB2853.namprd03.prod.outlook.com (10.175.116.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.13; Mon, 5 Aug 2019 03:13:01 +0000
+Received: from CY4PR03MB2872.namprd03.prod.outlook.com
+ ([fe80::6cce:cc85:9e3:d33a]) by CY4PR03MB2872.namprd03.prod.outlook.com
+ ([fe80::6cce:cc85:9e3:d33a%4]) with mapi id 15.20.2136.018; Mon, 5 Aug 2019
+ 03:13:01 +0000
+From: "Oleinik, Alexander" <alxndr@bu.edu>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [PATCH] qtest: Rename qtest.c:qtest_init()
+Thread-Index: AQHVSzuwXAo7kU22bEmHiss0yqO+mw==
+Date: Mon, 5 Aug 2019 03:13:01 +0000
+Message-ID: <20190805031240.6024-1-alxndr@bu.edu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.20.1
+x-originating-ip: [128.197.127.33]
+x-clientproxiedby: MN2PR19CA0068.namprd19.prod.outlook.com
+ (2603:10b6:208:19b::45) To CY4PR03MB2872.namprd03.prod.outlook.com
+ (2603:10b6:903:134::17)
+authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b3095de5-4aa5-4930-6b82-08d71952d2f0
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:CY4PR03MB2853; 
+x-ms-traffictypediagnostic: CY4PR03MB2853:
+x-microsoft-antispam-prvs: <CY4PR03MB2853DC4A0F161F1D4525338ABADA0@CY4PR03MB2853.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 01208B1E18
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(979002)(4636009)(39860400002)(376002)(346002)(366004)(396003)(136003)(199004)(189003)(36756003)(6486002)(75432002)(68736007)(6512007)(14454004)(478600001)(53936002)(66446008)(64756008)(66556008)(66476007)(6916009)(486006)(256004)(476003)(2616005)(71190400001)(71200400001)(5640700003)(6436002)(66946007)(66066001)(2906002)(5660300002)(102836004)(88552002)(99286004)(25786009)(786003)(316002)(8936002)(7736002)(54906003)(81166006)(81156014)(1076003)(2501003)(386003)(6506007)(305945005)(186003)(8676002)(4326008)(26005)(50226002)(2351001)(52116002)(3846002)(86362001)(6116002)(42522002)(969003)(989001)(999001)(1009001)(1019001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:CY4PR03MB2853;
+ H:CY4PR03MB2872.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: bu.edu does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: uYRgjDn/xISTpjc1l2bVjjiaTjGg5P61RTxI3lNKx/1Lnrcpsq1Jlb2qYBexziKe4gVtW5uKCEQKdHlEnVqmzC19mnl+pFMBotWkAMifyA/Ba9msqkonFZlxw0sJIe93MNGZlJY7NEhyclLb/Sz5BI3UcI32eA9FJNGu2x8Y5Am0eXpwEKk8mv1ZnpFMfdeFGImlMe8vRUuB2aKcH+oOZlI43+dLN4PZPmIkYscUOqWHPUPI4zE0zzy50VqwZ7cFam2ZlgS08Up9npsTiiZgRAUS7P7BUdhjAQq+Y3yw/XHYdoEX/MqDpV+yqH9fp7mhKlHjMwbOz5rNRT5UCmh0PC4wXTNJW6fu2ymjLjmINxkQdiKFoIiEqj1oph61V78viQU7w3lcFXxWH9UlU9ZMDhyCo60pUvT3JT7dPKCT9Dc=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Dxnq1zWXvFF0Q93v"
-Content-Disposition: inline
-In-Reply-To: <27846884-9bf4-7729-7a9e-0392280ee67f@intel.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [RFC PATCH] numa: add auto_enable_numa to fix
- broken check in spapr
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3095de5-4aa5-4930-6b82-08d71952d2f0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2019 03:13:01.6007 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: alxndr@bu.edu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR03MB2853
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.76.120
+Subject: [Qemu-devel] [PATCH] qtest: Rename qtest.c:qtest_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,165 +119,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: imammedo@redhat.com, qemu-ppc@nongnu.org, ehabkost@redhat.com,
- qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>, "thuth@redhat.com" <thuth@redhat.com>,
+ "Oleinik, Alexander" <alxndr@bu.edu>, "bsd@redhat.com" <bsd@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Both the qtest client, libqtest.c, and server, qtest.c, used the same
+name for initialization functions which can cause confusion.
 
---Dxnq1zWXvFF0Q93v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+---
+Thank you, Thomas Huth for the suggestion.
 
-On Mon, Aug 05, 2019 at 08:56:40AM +0800, Tao Xu wrote:
-> On 8/2/2019 2:55 PM, David Gibson wrote:
-> > On Thu, Aug 01, 2019 at 03:52:58PM +0800, Tao Xu wrote:
-> > > Introduce MachineClass::auto_enable_numa for one implicit NUMA node,
-> > > and enable it to fix broken check in spapr_validate_node_memory(), wh=
-en
-> > > spapr_populate_memory() creates a implicit node and info then use
-> > > nb_numa_nodes which is 0.
-> > >=20
-> > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> >=20
-> > The change here looks fine so,
-> >=20
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
-> > However, I'm not following what check in spapr is broken and why.
-> >=20
-> Sorry, may be I should update the commit message.
->=20
-> Because in spapr_populate_memory(), if numa node is 0
->=20
->     if (!nb_nodes) {
->         nb_nodes =3D 1;
->         ramnode.node_mem =3D machine->ram_size;
->         nodes =3D &ramnode;
->     }
->=20
-> it use a local 'nb_nodes' as 1 and update global nodes info, but
-> inpapr_validate_node_memory(), use the global nb_numa_nodes
->=20
->     for (i =3D 0; i < nb_numa_nodes; i++) {
->     	if (numa_info[i].node_mem % SPAPR_MEMORY_BLOCK_SIZE) {
->=20
-> so the global is 0 and skip the node_mem check.
+ include/sysemu/qtest.h | 2 +-
+ qtest.c                | 3 +--
+ vl.c                   | 2 +-
+ 3 files changed, 3 insertions(+), 4 deletions(-)
 
-Well, not really.  That loop is that each node has memory size a
-multiple of 256MiB.  But we've already checked that the whole memory
-size is a multiple of 256MiB, so in the case of one NUMA node, the
-per-node check doesn't actually do anything extra.
-
-And in the "non-NUMA" case, nb_numa_nodes =3D=3D 0, then I don't believe
-numa_info[] is populated anyway, so we couldn't do the check like
-this.
-
-
-> > > ---
-> > >=20
-> > > This patch has a dependency on
-> > > https://patchwork.kernel.org/cover/11063235/
-> > > ---
-> > >   hw/core/numa.c      | 9 +++++++--
-> > >   hw/ppc/spapr.c      | 9 +--------
-> > >   include/hw/boards.h | 1 +
-> > >   3 files changed, 9 insertions(+), 10 deletions(-)
-> > >=20
-> > > diff --git a/hw/core/numa.c b/hw/core/numa.c
-> > > index 75db35ac19..756d243d3f 100644
-> > > --- a/hw/core/numa.c
-> > > +++ b/hw/core/numa.c
-> > > @@ -580,9 +580,14 @@ void numa_complete_configuration(MachineState *m=
-s)
-> > >        *   guest tries to use it with that drivers.
-> > >        *
-> > >        * Enable NUMA implicitly by adding a new NUMA node automatical=
-ly.
-> > > +     *
-> > > +     * Or if MachineClass::auto_enable_numa is true and no NUMA node=
-s,
-> > > +     * assume there is just one node with whole RAM.
-> > >        */
-> > > -    if (ms->ram_slots > 0 && ms->numa_state->num_nodes =3D=3D 0 &&
-> > > -        mc->auto_enable_numa_with_memhp) {
-> > > +    if (ms->numa_state->num_nodes =3D=3D 0 &&
-> > > +        ((ms->ram_slots > 0 &&
-> > > +        mc->auto_enable_numa_with_memhp) ||
-> > > +        mc->auto_enable_numa)) {
-> > >               NumaNodeOptions node =3D { };
-> > >               parse_numa_node(ms, &node, &error_abort);
-> > >       }
-> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > index f607ca567b..e50343f326 100644
-> > > --- a/hw/ppc/spapr.c
-> > > +++ b/hw/ppc/spapr.c
-> > > @@ -400,14 +400,6 @@ static int spapr_populate_memory(SpaprMachineSta=
-te *spapr, void *fdt)
-> > >       hwaddr mem_start, node_size;
-> > >       int i, nb_nodes =3D machine->numa_state->num_nodes;
-> > >       NodeInfo *nodes =3D machine->numa_state->nodes;
-> > > -    NodeInfo ramnode;
-> > > -
-> > > -    /* No NUMA nodes, assume there is just one node with whole RAM */
-> > > -    if (!nb_nodes) {
-> > > -        nb_nodes =3D 1;
-> > > -        ramnode.node_mem =3D machine->ram_size;
-> > > -        nodes =3D &ramnode;
-> > > -    }
-> > >       for (i =3D 0, mem_start =3D 0; i < nb_nodes; ++i) {
-> > >           if (!nodes[i].node_mem) {
-> > > @@ -4369,6 +4361,7 @@ static void spapr_machine_class_init(ObjectClas=
-s *oc, void *data)
-> > >        */
-> > >       mc->numa_mem_align_shift =3D 28;
-> > >       mc->numa_mem_supported =3D true;
-> > > +    mc->auto_enable_numa =3D true;
-> > >       smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-> > >       smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
-> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > index 2eb9a0b4e0..4a350b87d2 100644
-> > > --- a/include/hw/boards.h
-> > > +++ b/include/hw/boards.h
-> > > @@ -220,6 +220,7 @@ struct MachineClass {
-> > >       bool smbus_no_migration_support;
-> > >       bool nvdimm_supported;
-> > >       bool numa_mem_supported;
-> > > +    bool auto_enable_numa;
-> > >       HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-> > >                                              DeviceState *dev);
-> >=20
->=20
-
+diff --git a/include/sysemu/qtest.h b/include/sysemu/qtest.h
+index cd114b8d80..5ed09c80b1 100644
+--- a/include/sysemu/qtest.h
++++ b/include/sysemu/qtest.h
+@@ -24,6 +24,6 @@ static inline bool qtest_enabled(void)
+=20
+ bool qtest_driver(void);
+=20
+-void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **e=
+rrp);
++void qtest_server_init(const char *qtest_chrdev, const char *qtest_log, Er=
+ror **errp);
+=20
+ #endif
+diff --git a/qtest.c b/qtest.c
+index 15e27e911f..c9681dbdf3 100644
+--- a/qtest.c
++++ b/qtest.c
+@@ -748,8 +748,7 @@ static void qtest_event(void *opaque, int event)
+         break;
+     }
+ }
+-
+-void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **e=
+rrp)
++void qtest_server_init(const char *qtest_chrdev, const char *qtest_log, Er=
+ror **errp)
+ {
+     Chardev *chr;
+=20
+diff --git a/vl.c b/vl.c
+index b426b32134..130a389712 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4197,7 +4197,7 @@ int main(int argc, char **argv, char **envp)
+     migration_object_init();
+=20
+     if (qtest_chrdev) {
+-        qtest_init(qtest_chrdev, qtest_log, &error_fatal);
++        qtest_server_init(qtest_chrdev, qtest_log, &error_fatal);
+     }
+=20
+     machine_opts =3D qemu_get_machine_opts();
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+2.20.1
 
---Dxnq1zWXvFF0Q93v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1Hm2EACgkQbDjKyiDZ
-s5LDFhAArqnm2QZDYC6+flTxt+wmkkFkiK8fkoav1lV0VQuAnh+fXg39885A7/e+
-HgIAWaHBDs8RJBXTTiT/bCeU8WOPqXOnvAYgTPub9DIZXrBEoRugiWF3HRMJqd0X
-dRuJL/qMtz02j20ZFwLsREB+IJzlhGL0UN3fzcBRLo11bPITkkGyOnmNWKpdh4S8
-YbTY5o/VzWzlALXlIOP5M4H/GFx5088QCKU6R3bcv+vcJHBxCGmLFoJo/k6KuoY0
-CBJlWpaT26Vkgt9wCMm/qstbRuSpOxds154eAmd/t+Ld2sXF3STPGsJuXueTX9My
-NIuVN6+QYsQ/6r3jWgmhXTF+28/SHQdJ4JXTX9KSZHdPhCcSTokQT93mMPoWtWx3
-AI6N0SlHvnPxxotwBy9gccwQXD/a94qfukxUX4o01gDVVYY+6zo+0knyAKpqgQS9
-WqDnZi8Cfl3oH5qGptf//NxKOTHB5ByGFaIt7lzRZhVJygE5HOcHLfkI2YHS4ENL
-albzMEEUD6ch81AgD82gZ7Kf7zKc9ttICrQU+LGQgY+3jFLEmSnP4kkeSVpT1rUw
-9gWiszP2NIS0RUt7pY/0rFiDwCz+hyFQhWvrrbl2ITd+0CloLw58hs9qlEiEIIjG
-KjAOf6Kzv1pxzdf4qUPkVxrLtLx77QcyVUhgfxoHz8LwT+aWj/s=
-=qB95
------END PGP SIGNATURE-----
-
---Dxnq1zWXvFF0Q93v--
 
