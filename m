@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E42C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2B28C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:00:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ACEE208C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 15:57:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ACEE208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 8A4DD20B1F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 16:00:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4DD20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hufMt-0006YX-Rl
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 11:57:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57549)
+	id 1hufPd-0008CM-9N
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 12:00:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58054)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hufMU-0005wi-Ag
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:57:27 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hufOp-000799-6S
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:59:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hufMT-0000wT-9h
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:57:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52434)
+ (envelope-from <mreitz@redhat.com>) id 1hufOn-0002EW-Gt
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 11:59:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46914)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hufMQ-0000uI-R9; Mon, 05 Aug 2019 11:57:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hufOl-0002DP-5B; Mon, 05 Aug 2019 11:59:47 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 98E6E83F4C;
- Mon,  5 Aug 2019 15:57:21 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7B29C88305;
+ Mon,  5 Aug 2019 15:59:46 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 77D285DA21;
- Mon,  5 Aug 2019 15:57:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE4AF10016EA;
+ Mon,  5 Aug 2019 15:59:42 +0000 (UTC)
 To: qemu-block@nongnu.org
-References: <20190805153308.2657-1-mreitz@redhat.com>
+References: <20190805113526.20319-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -69,22 +69,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <de38d7b0-8b41-4c2d-0ce4-9dbaea505dd6@redhat.com>
-Date: Mon, 5 Aug 2019 17:57:14 +0200
+Message-ID: <69aa0fe6-66d7-f486-ee40-fc8434c413fe@redhat.com>
+Date: Mon, 5 Aug 2019 17:59:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190805153308.2657-1-mreitz@redhat.com>
+In-Reply-To: <20190805113526.20319-1-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="pZe5fUb4h3HIVa9BW1mK1ZKCCaPPjCkJj"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="Eck2nqLS3DDTwCeEJsFdpkn41GKBrOEaC"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 05 Aug 2019 15:57:21 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Mon, 05 Aug 2019 15:59:46 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3] mirror: Only mirror granularity-aligned
- chunks
+Subject: Re: [Qemu-devel] [PATCH] iotests: Test unaligned blocking mirror
+ write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,77 +98,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+ John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pZe5fUb4h3HIVa9BW1mK1ZKCCaPPjCkJj
-Content-Type: multipart/mixed; boundary="hBfJiAmWqGnjeQGm0cDsqi8qscA622eKE";
+--Eck2nqLS3DDTwCeEJsFdpkn41GKBrOEaC
+Content-Type: multipart/mixed; boundary="cyiO8ApHjG8AzGKTmpdKPLnv91RMBPuj7";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- qemu-stable@nongnu.org
-Message-ID: <de38d7b0-8b41-4c2d-0ce4-9dbaea505dd6@redhat.com>
-Subject: Re: [PATCH v3] mirror: Only mirror granularity-aligned chunks
-References: <20190805153308.2657-1-mreitz@redhat.com>
-In-Reply-To: <20190805153308.2657-1-mreitz@redhat.com>
+ John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <69aa0fe6-66d7-f486-ee40-fc8434c413fe@redhat.com>
+Subject: Re: [PATCH] iotests: Test unaligned blocking mirror write
+References: <20190805113526.20319-1-mreitz@redhat.com>
+In-Reply-To: <20190805113526.20319-1-mreitz@redhat.com>
 
---hBfJiAmWqGnjeQGm0cDsqi8qscA622eKE
+--cyiO8ApHjG8AzGKTmpdKPLnv91RMBPuj7
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 05.08.19 17:33, Max Reitz wrote:
-> In write-blocking mode, all writes to the top node directly go to the
-> target.  We must only mirror chunks of data that are aligned to the
-> job's granularity, because that is how the dirty bitmap works.
-> Therefore, the request alignment for writes must be the job's
-> granularity (in write-blocking mode).
->=20
-> Unfortunately, this forces all reads and writes to have the same
-> granularity (we only need this alignment for writes to the target, not
-> the source), but that is something to be fixed another time.
->=20
-> Cc: qemu-stable@nongnu.org
+On 05.08.19 13:35, Max Reitz wrote:
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-> v3: Handle bdrv_refresh_limits() errors [Vladimir]
+> Hi, this is a test for the mirror bug Vladimir found.  Naturally, it
+> depends on some patch to fix it.
+>=20
+> Based-on: <20190802185830.74648-1-vsementsov@virtuozzo.com>
 > ---
->  block/mirror.c | 29 +++++++++++++++++++++++++++++
->  1 file changed, 29 insertions(+)
+>  tests/qemu-iotests/151     | 25 +++++++++++++++++++++++++
+>  tests/qemu-iotests/151.out |  4 ++--
+>  2 files changed, 27 insertions(+), 2 deletions(-)
 
-Thanks for the review, I=E2=80=99m taking the silence around =E2=80=9Cfix=
- unaligned
-reset=E2=80=9D as a sign to take this patch:
+Thanks for the review, applied to my block branch:
 
 https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 Max
 
 
---hBfJiAmWqGnjeQGm0cDsqi8qscA622eKE--
+--cyiO8ApHjG8AzGKTmpdKPLnv91RMBPuj7--
 
---pZe5fUb4h3HIVa9BW1mK1ZKCCaPPjCkJj
+--Eck2nqLS3DDTwCeEJsFdpkn41GKBrOEaC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1IUdoACgkQ9AfbAGHV
-z0CfHAf8D0g6HcEhQcuqAN+iEjgMO4MpzMNgBM4xtakf442YNudOTGm4kN8mb4tx
-TaiWqmVUhXtCe94TjMzxkzg6PjL3hifK9NzC/MB0ptbv/PJlJn0rbRCl+W/Z+PIL
-Y0t/YU497IqXFxWpoVcf1eX71UV+M8yRdxQGg4Yd4BSxENvYoIC6Dk6wC76dWX7B
-OI5Il/DS4qk1G9+fSqgbuKCEs/D454lHDatyE2L5dhOU7vHXhbZrDqRl7xdAKLhT
-ZOlM3m/GSee/gsEIYCWRyA1coGtCbKbEbFAlUAobgaAgZ0k1xy3eCoy+FhwOE3/F
-dmbFeCmC4tnwod0b5Fgo5nlk28RQxA==
-=N/RZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1IUm0ACgkQ9AfbAGHV
+z0A5pwgAtfXz+s0Su6aZQzmOQgzMFmjZIOXGrw6ukAo4Xj54tug9Tj8EuKJvhal7
+uR/8pmqHxMEHkNGzCMZv+pnbCumXyKnu8FFyMTX/khx8zU1sQGOkgjNsFNuT7H3T
+9P1Vvj9QBaw40Q/L84np9GS2M0hEG7dNL7BRrlvHD9BvBUGONoJIvscrC/dQMbf0
+ozha3YimckaMaRv/mG3eR1m0PjwCywQ5n/chalMi8o0ruvGje0677TajnEZVw0m1
+6dXCSjWi+1hWQzDNrWlUva7DxHnCaw00f4OlUJAMZ/My0G5QugojhwOy8ZefPz55
+vqIkoTQlOKj9eBQr5oQpNzftB3C8EA==
+=ecvG
 -----END PGP SIGNATURE-----
 
---pZe5fUb4h3HIVa9BW1mK1ZKCCaPPjCkJj--
+--Eck2nqLS3DDTwCeEJsFdpkn41GKBrOEaC--
 
