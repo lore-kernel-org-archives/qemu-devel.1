@@ -2,84 +2,80 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19064C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17098C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 06:14:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD33920657
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:56:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D77C1206C1
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 06:14:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kej8D3ak"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD33920657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="BKv1SsZ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77C1206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huVys-0005XK-68
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 01:56:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54194)
+	id 1huWGf-0000GF-W8
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 02:14:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57325)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <liq3ea@gmail.com>) id 1huVxl-0004CZ-Ko
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:55:18 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1huWGF-0008GL-Bm
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 02:14:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1huVxh-0000tO-VM
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:55:17 -0400
-Received: from mail-ot1-x330.google.com ([2607:f8b0:4864:20::330]:40807)
+ (envelope-from <chihmin.chao@sifive.com>) id 1huWGE-0004Hu-8V
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 02:14:23 -0400
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:35580)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>)
- id 1huVxh-0000q7-Ew; Mon, 05 Aug 2019 01:55:13 -0400
-Received: by mail-ot1-x330.google.com with SMTP id l15so26862823oth.7;
- Sun, 04 Aug 2019 22:55:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1huWGE-0004HW-2w
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 02:14:22 -0400
+Received: by mail-io1-xd41.google.com with SMTP id m24so164957314ioo.2
+ for <qemu-devel@nongnu.org>; Sun, 04 Aug 2019 23:14:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9hyi04J0H3wT5hTaXQ1DhUxm+HPNipAaYz5/GyRwLMg=;
- b=kej8D3akmIz7Log440nkQeFKb330sPr8VT82mBZgr8tD4HR8tFVJhqq/RGDL6VkU6o
- wDW/Iwk/qRprOnVWZR+q841iAT7u6PRDqW9a0sQnkMhZFxXuUaNfwQWvmr9mIiQVPY65
- k9EaiNxm8HE8uTRunABxL1r7xMXVLnICYq/hKtGu8Q/04nCxBfyzXZkhLOqpEMnHplAP
- nEbxzsAR9KWKJI7SF01gwUKTF4O+2Hr4aJDrK4mCtGvvDCfjtXtKTDP9bVfXPQfPe3sF
- JU1iVEdOOWgRacO0b5dWYr3HpzHch1pOEExxXm1Ogc256K0sKqu2/16Pad8KxgnbgMOr
- V27A==
+ :cc; bh=+Y7WcXkyB2SsSCuxnbdm58cZx75IvMUDQfLeylZQwF8=;
+ b=BKv1SsZ3DQft4EMwl0rdlX61+WUPZwPbxotZpozeU0puOcEwt04XMsOPzFWEgn4dxX
+ Itc8CIu23Q/D1qNqtH5JJIlPHWS8ekVjvPjHq7/j6+xZo2pzcm/51QKWqjiG+YvaWtsq
+ Jlqr9v5K1L/1X2ss7sUEPO919YdFSJ0WnadrRcFrbPcUIq70anC1wsmkR0oXFUJMr6ka
+ 2NimW2eJcdGdT2X4yZ8kJ5SW7J2ycLxLikdlEMzQzN9hTaYRYaupcCIuV5UGEm3PZesz
+ 7QOOOXjau8NOOjNWMZT3oViGDlx86NfVfk84yUNkc6z7ern2dK8kqv9BboI+G0LX1D4n
+ 8+ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=9hyi04J0H3wT5hTaXQ1DhUxm+HPNipAaYz5/GyRwLMg=;
- b=hgPpNCcYt0u16HWUAtOjzu+o2/X03iAMb/Ot6M+TVtZ3cfwvQnxTcd75RZPxIalf+U
- Adi+iXZZj7oybNX7Dq3FgSL4BormWcHzCecR1wOKb/Otq8hmanl/y9bHPuIS+iqNKaXz
- F0J3z1u98A9tFZnXX/5dGFKJHwu8BNK69lL++ngDg+6DdFdu4zJHDtspO8q4ZJaioTbs
- U5qbRaEktN/x4uB3IJiWSizjeWChd/MH94ko54wl6N4TiO43YYG9gmBLt6bDQAF3AHlh
- SN7wl2Ml3ult/nVzgi1euhzbJIiFwINihyr8fffTOAGahTRwvIluqhpmbnZxOMhDDLXZ
- TpqQ==
-X-Gm-Message-State: APjAAAVsjB6TZTwGwcvZ7lCvI3O9mgBIiqqp8FrbfOyH0IP2HGJW4vFh
- Nt9Ay3TTI0e8xGLvKyf3hcJ5RmZyzyHS7Wl3188=
-X-Google-Smtp-Source: APXvYqw/YNyXfjmzunOJ2rfP4diN2mWlj+Jj564CFqj8R/pABwC0JntvIqQXBkaa6yUbdnjdjZx4jywqc9Hkv5EAOtA=
-X-Received: by 2002:a05:6830:1291:: with SMTP id
- z17mr48610638otp.194.1564984512406; 
- Sun, 04 Aug 2019 22:55:12 -0700 (PDT)
+ bh=+Y7WcXkyB2SsSCuxnbdm58cZx75IvMUDQfLeylZQwF8=;
+ b=JkvajDEmtFZF7M8+aisui08Of/OoQRjM88i+3jf4m3X0TXXnGcL0FwB9S7HDlNHNyN
+ QCJsidA8tJcueYEmLf6RYaMv9aDFEa1q56/RrvXCieQcQr2FV0xcSpJRbnMBNpB/y4u/
+ yn9aZcOLrz3AvT7X5VG8OIjCQSl5S1NfWezZ21cFvjBl63l6WPVXfJCgma5BMqwKpRc+
+ dHnwdCT22xToigU3Pj+UTzFqn0p/04lozaChwUPgmbevP/i+luKpLoI3usa8GGTtoEyK
+ 3n1fiFZiOIlfspQ5EDzLJeg2iGw5qm4EFv88Pji0gwZx6Dnh0m8PXJyp8PF4pcXIYQdb
+ y0Yg==
+X-Gm-Message-State: APjAAAXIzuPvO6MRJKkMeGIHomEUg7/7vMKOu+b5RTnve0LnROOiG8QM
+ uh3kKl65JaFPJ6HPtZFDFQWLWN2shKWhz71lJ05GtQ==
+X-Google-Smtp-Source: APXvYqwhH8Gy7RhdSjCAEYn9//rXzJtQA1xuW178I6YEy+5tRPmnUKwI/tp7qCVhQML8iCdDcutWlMcG1tEtWdtcZYg=
+X-Received: by 2002:a02:b395:: with SMTP id p21mr37874965jan.31.1564985660493; 
+ Sun, 04 Aug 2019 23:14:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <7f455f0d.730d.16c5fdc21af.Coremail.hope2hope@163.com>
- <CAKXe6SKMS__GaxTL4rkTBFpCpRkRS_bHoJx8=6w6WktFr5K9XQ@mail.gmail.com>
- <70dbf96f.87bc.16c60385de4.Coremail.hope2hope@163.com>
-In-Reply-To: <70dbf96f.87bc.16c60385de4.Coremail.hope2hope@163.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 5 Aug 2019 13:54:36 +0800
-Message-ID: <CAKXe6S+Eu29SrVrGcCO-wrtQqmMa6Q-MXnsFV03ddx1LrXBYKA@mail.gmail.com>
-To: ddm <hope2hope@163.com>
+References: <1564792052-6469-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1564792052-6469-1-git-send-email-bmeng.cn@gmail.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Mon, 5 Aug 2019 14:14:07 +0800
+Message-ID: <CAEiOBXWQ02uRQQOpP=Rauq8WZnYtoxNqjM--Rpi5tHX2W0bGsw@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::330
+X-Received-From: 2607:f8b0:4864:20::d41
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] How to configure QEMU to support APIC
- virtualization
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] riscv: sifive_e: Correct
+ various SoC IP block sizes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,107 +87,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Qemu Developers <qemu-devel@nongnu.org>, qemu-discuss@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ddm <hope2hope@163.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=885=E6=97=A5=E5=91=A8=
-=E4=B8=80 =E4=B8=8B=E5=8D=881:20=E5=86=99=E9=81=93=EF=BC=9A
+On Sat, Aug 3, 2019 at 8:27 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 
-> Hi,
+> Some of the SoC IP block sizes are wrong. Correct them according
+> to the FE310 manual.
 >
-> As i know, KVM is based on passthrough host cpu to implement
-> full-virtualiztion,
-> if host cpu doesn't support this feature, it's impossible to turn on this
-> feature by KVM.
-> Wheher there are another ways in QEMU to emulate this feature=EF=BC=8Csuc=
-h as
-> emulate it based on pure software, not rely on hardware.
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> ---
+>
+>  hw/riscv/sifive_e.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 2a499d8..9655847 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -53,13 +53,13 @@ static const struct MemmapEntry {
+>      hwaddr base;
+>      hwaddr size;
+>  } sifive_e_memmap[] = {
+> -    [SIFIVE_E_DEBUG] =    {        0x0,      0x100 },
+> +    [SIFIVE_E_DEBUG] =    {        0x0,     0x1000 },
+>      [SIFIVE_E_MROM] =     {     0x1000,     0x2000 },
+>      [SIFIVE_E_OTP] =      {    0x20000,     0x2000 },
+>      [SIFIVE_E_CLINT] =    {  0x2000000,    0x10000 },
+>      [SIFIVE_E_PLIC] =     {  0xc000000,  0x4000000 },
+> -    [SIFIVE_E_AON] =      { 0x10000000,     0x8000 },
+> -    [SIFIVE_E_PRCI] =     { 0x10008000,     0x8000 },
+> +    [SIFIVE_E_AON] =      { 0x10000000,     0x1000 },
+> +    [SIFIVE_E_PRCI] =     { 0x10008000,     0x1000 },
+>      [SIFIVE_E_OTP_CTRL] = { 0x10010000,     0x1000 },
+>      [SIFIVE_E_GPIO0] =    { 0x10012000,     0x1000 },
+>      [SIFIVE_E_UART0] =    { 0x10013000,     0x1000 },
+> --
+> 2.7.4
 >
 >
-IIUC there is no APICv emulate.
+It seems the modification follows  E310-G002(Hifive1 Rev B) spec and the
+origin is for E310-G000(Hifive1) spec.
+There should be some way to specify different board version with different
+memory map or we have policy, always support the latest spec.
 
-
-Thanks,
-Li Qiang
-
-
-
-> Thanks!
->
->
-> At 2019-08-05 12:42:55, "Li Qiang" <liq3ea@gmail.com> wrote:
->
->
->
-> ddm <hope2hope@163.com> =E4=BA=8E2019=E5=B9=B48=E6=9C=885=E6=97=A5=E5=91=
-=A8=E4=B8=80 =E4=B8=8A=E5=8D=8811:55=E5=86=99=E9=81=93=EF=BC=9A
->
->> Hi guys,
->>
->>
->> I have tried via modprobe kvmintel enable_apicv=3DY  to adjust KVM
->> parameter, but it doesn't effect,  and
->> cat /sys/module/kvm_intel/parameters/enable_apicv always return "N".
->> I don't know how to configure KVM or QEMU to support APIC virtualizaion
->> feature?
->>
->>
-> AFAICT APICv is hardware feature, but I still don't know accurately after
-> which CPU support it.
-> You may refer the code about 'enable_apicv' related code in kvm to see ho=
-w
-> to detect this capability.
->
-> Thanks,
-> Li Qiang
->
->
->>
->> My host infos are as follows:
->> Architecture:          x86_64
->> CPU op-mode(s):        32-bit, 64-bit
->> Byte Order:            Little Endian
->> CPU(s):                1
->> On-line CPU(s) list:   0
->> Thread(s) per core:    1
->> Core(s) per socket:    1
->> Socket(s):             1
->> NUMA node(s):          1
->> Vendor ID:             GenuineIntel
->> CPU family:            6
->> Model:                 142
->> Model name:            Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz
->> Stepping:              10
->> CPU MHz:               2112.001
->> BogoMIPS:              4224.00
->> Virtualization:        VT-x
->> Hypervisor vendor:     VMware
->> Virtualization type:   full
->> L1d cache:             32K
->> L1i cache:             32K
->> L2 cache:              256K
->> L3 cache:              8192K
->> NUMA node0 CPU(s):     0
->> Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
->> pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss syscall nx pdpe1gb
->> rdtscp lm constant_tsc arch_perfmon nopl xtopology tsc_reliable nonstop_=
-tsc
->> cpuid pni pclmulqdq vmx ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe
->> popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm a=
-bm
->> 3dnowprefetch cpuid_fault invpcid_single pti ssbd ibrs ibpb stibp
->> tpr_shadow vnmi ept vpid fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2
->> invpcid rtm rdseed adx smap xsaveopt arat flush_l1d arch_capabilities
->>
->>
->> Could you tell me how to configure it?
->>
->>
->> Thanks!
->>
->>
->
->
->
+chihmin
