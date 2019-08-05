@@ -2,56 +2,85 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DB7C0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4716EC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF1742086D
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:32:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF1742086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 13E8520657
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 05:55:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="gH0Yqx/I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E8520657
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huVbv-0000sm-1O
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 01:32:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48849)
+	id 1huVy7-0004ZR-41
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 01:55:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53495)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1huVbY-0000SS-Mc
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:32:21 -0400
+ (envelope-from <jan.kiszka@web.de>) id 1huVxY-0003sJ-HE
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:55:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1huVbX-0001qr-OO
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:32:20 -0400
-Received: from mga17.intel.com ([192.55.52.151]:51590)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1huVbX-0001q1-GK
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:32:19 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 04 Aug 2019 22:32:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,348,1559545200"; d="scan'208";a="372966663"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga005.fm.intel.com with ESMTP; 04 Aug 2019 22:32:16 -0700
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: qemu-devel@nongnu.org
-Date: Mon,  5 Aug 2019 13:31:46 +0800
-Message-Id: <20190805053146.32326-1-richardw.yang@linux.intel.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.151
-Subject: [Qemu-devel] [PATCH v3] migration/postcopy: use mis->bh instead of
- allocating a QEMUBH
+ (envelope-from <jan.kiszka@web.de>) id 1huVxX-0000cC-JD
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:55:04 -0400
+Received: from mout.web.de ([212.227.15.3]:33223)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1huVxX-0000Y5-Ah
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 01:55:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1564984495;
+ bh=lR32kpDBJo3e07clQakH1YlWN5vRGa+qe46CvdhT5Xk=;
+ h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
+ b=gH0Yqx/Ik1akr3/+shOZ0nDJ/3Tlwh+JFjrrS3HklOZXxEcHeUv77OsDMumKofNYT
+ exvRWILsOFkL7LKkOv4E3ZbMakvR2WP6RkoXzC3PIncK9fKU68ciT7ixGh/3DpOTQT
+ 1P0vggNPOjeO1gS5fA6+HEkwfToP1n90Snh6mEY0=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.10] ([95.157.55.156]) by smtp.web.de (mrweb002
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0LkhUq-1iSTCE2vye-00aUZC; Mon, 05
+ Aug 2019 07:54:54 +0200
+To: qemu-devel <qemu-devel@nongnu.org>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <d938a62c-7538-9d2b-cc0a-13b240ab9141@web.de>
+Date: Mon, 5 Aug 2019 07:54:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:uMiBHAFbEqbRBFwA8NmGyfubxwMOKuHVefjpem3DQWUjWOK0IYy
+ 09SkZw3vz94KUbNhb03fWB1AEyPL8ygAzj6oxcwa5eWyyJ/mNP6ES/QnstcFnDTlhY9KSHA
+ wPsAqtKwK3r14VuiNREhC0Atj4xi2OytcAf3LyN8g0dQIeoXG4cDTaq6L/Q4lDpiDsgIh3H
+ uwpDrZbUL6yj8liaP8bVw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:LXIUFlXAf7g=:SVltVkaGnJYfO9C0BINb3m
+ Vd0/wad+Fl5B0bRLESSL0Rdp4n3rQ/KsxSxfm4WPCJhkyEvqQTNDuRxarSH+ZUvoO8Y/8zCbk
+ 6HSGykAn2fuTUy76CV8Y/FtqYlZf+ceCEDp58k40sosJLsrpRsgADol4CG0jR3tMyClX6bBno
+ ICFH3JHS2nbqkisBXXpSxD2yVz8u7C0LEsAuv5xzR5w38TrRoZPhmxMYUEr/gFrf2ldNCqTQi
+ XE+gCBGMYZgu8kIZL/gdkQTAKh62hjXAw6MrN7Jt1s3gWt5gJruVTnQKZgSZcBJOj23hopzkV
+ TNjYMMSRoZFOPitnWjrU1mKB+AbS46eLPuGOjbn7B7Yt/m8bfGRs3P/mwNgVbFp8g0pd8LRi2
+ SKSGRZmzEPFu7UVMYYJAUlwY7zA+qw5BV742qGeiR9my2jrqHaTAoe3j8pn1ru6C+6NkBuX0j
+ My0/5q+qmfyIfxnW2FbU5aECgLqtAp/8EB2BqNEgkji2+VNjx5DXfZz5XNVsyQURCkTRUQlnH
+ vsnxYzgm6YKqzmtYD7fd/8yiqEDb8SauGPcJoQD90dJN9nBhbrcU4cqP9dvJGYOwKA11ari2z
+ dg1V1d1ycd7GhjsjnsSZ+0v579hlOQV6RNHMAJ+SbV8jYfBXwD+Amcv5UeYGsD5cDNs9KLsl+
+ yiS275N0qmXmUO0902gSMOLnDzrQKu7lGxyIK7qiwK9PjxXywGf91FsaiRyjxM/13Q4OtTIOJ
+ 5WXCPc87CwW1GZz/dcnpWrzxsJ5+gj+FMK5VFPUKHnynqrk8zKuekORBMjDyaLL05hmnGB/NT
+ Zh/Rc+xCOYXomp3Mm3LbdELedhVY5Wa0ZejN/N/bWoaUJ2lZYFrEQrXinbVf7QnweaJeLzBrc
+ DoTbOe1xwUUCPmoEA4f+mX1BDKJtCPh7N04niTPvYMz9YsMVRt2wKiBmsh0i2yGmLdhn1BPP5
+ qTjuh1gHlNmTJuggBN2gjhYo5yZIyUzz7gpGIZlwLeuc1ybQnDSnKj4ncXePmR6SwsVN3ylca
+ JCh0bkS/67eNWf5RyFtJpeE2kzFlwzfVxAvB3uAYQSGp6noLw6MojOW9GxTNUdKXnmLOc/jeR
+ g3DB22btWdKiy8ku7wR+XJ0vyZMrLBmXjLilVa5aPiNP3G6P5vOTF7jBN4Bi3dSm7bf2hU1r8
+ O1zS8=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 212.227.15.3
+Subject: [Qemu-devel] [PATCH v2] ivshmem-server: Clean up shmem on shutdown
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,78 +92,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
- quintela@redhat.com
+Cc: Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For migration incoming side, it either quit in precopy or postcopy. It
-is safe to use the mis->bh for both instead of allocating a dedicated
-QEMUBH for postcopy.
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+So far, the server leaves the posix shared memory object behind when
+terminating, requiring the user to explicitly remove it in order to
+start a new instance.
 
----
-v3: rebase on latest upstream
-v2: fix a typo in change log
----
- migration/savevm.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+=2D--
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 621b6c0465..9bf9d2e5fe 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -1867,16 +1867,10 @@ static int loadvm_postcopy_handle_listen(MigrationIncomingState *mis)
-     return 0;
+Changes in v2:
+ - respect use_shm_open
+ - also clean up in ivshmem_server_start error path
+
+ contrib/ivshmem-server/ivshmem-server.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/contrib/ivshmem-server/ivshmem-server.c b/contrib/ivshmem-ser=
+ver/ivshmem-server.c
+index 77f97b209c..88daee812d 100644
+=2D-- a/contrib/ivshmem-server/ivshmem-server.c
++++ b/contrib/ivshmem-server/ivshmem-server.c
+@@ -353,6 +353,9 @@ ivshmem_server_start(IvshmemServer *server)
+ err_close_sock:
+     close(sock_fd);
+ err_close_shm:
++    if (server->use_shm_open) {
++        shm_unlink(server->shm_path);
++    }
+     close(shm_fd);
+     return -1;
  }
- 
--
--typedef struct {
--    QEMUBH *bh;
--} HandleRunBhData;
--
- static void loadvm_postcopy_handle_run_bh(void *opaque)
- {
-     Error *local_err = NULL;
--    HandleRunBhData *data = opaque;
--    MigrationIncomingState *mis = migration_incoming_get_current();
-+    MigrationIncomingState *mis = opaque;
- 
-     /* TODO we should move all of this lot into postcopy_ram.c or a shared code
-      * in migration.c
-@@ -1908,15 +1902,13 @@ static void loadvm_postcopy_handle_run_bh(void *opaque)
-         runstate_set(RUN_STATE_PAUSED);
+@@ -370,6 +373,9 @@ ivshmem_server_close(IvshmemServer *server)
      }
- 
--    qemu_bh_delete(data->bh);
--    g_free(data);
-+    qemu_bh_delete(mis->bh);
- }
- 
- /* After all discards we can start running and asking for pages */
- static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
- {
-     PostcopyState ps = postcopy_state_set(POSTCOPY_INCOMING_RUNNING);
--    HandleRunBhData *data;
- 
-     trace_loadvm_postcopy_handle_run();
-     if (ps != POSTCOPY_INCOMING_LISTENING) {
-@@ -1924,9 +1916,8 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
-         return -1;
-     }
- 
--    data = g_new(HandleRunBhData, 1);
--    data->bh = qemu_bh_new(loadvm_postcopy_handle_run_bh, data);
--    qemu_bh_schedule(data->bh);
-+    mis->bh = qemu_bh_new(loadvm_postcopy_handle_run_bh, mis);
-+    qemu_bh_schedule(mis->bh);
- 
-     /* We need to finish reading the stream from the package
-      * and also stop reading anything more from the stream that loaded the
--- 
-2.17.1
 
+     unlink(server->unix_sock_path);
++    if (server->use_shm_open) {
++        shm_unlink(server->shm_path);
++    }
+     close(server->sock_fd);
+     close(server->shm_fd);
+     server->sock_fd =3D -1;
+=2D-
+2.16.4
 
