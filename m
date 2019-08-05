@@ -2,105 +2,108 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4241C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2057C0650F
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:39:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 963B120856
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:22:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 963B120856
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D7B520679
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 10:39:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="ZR81vnp1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D7B520679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hua8F-0001JF-Us
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 06:22:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41256)
+	id 1huaP3-0005kt-IF
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 06:39:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46483)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <marc.zyngier@arm.com>) id 1hua7t-0000uX-3r
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:22:02 -0400
+ (envelope-from <amarkovic@wavecomp.com>) id 1huaOT-0005Kk-Qo
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marc.zyngier@arm.com>) id 1hua7r-0007yZ-Pw
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:22:01 -0400
-Received: from foss.arm.com ([217.140.110.172]:44142)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <marc.zyngier@arm.com>) id 1hua7r-0007xc-JZ
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:21:59 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BB77728;
- Mon,  5 Aug 2019 03:21:57 -0700 (PDT)
-Received: from [10.1.197.61] (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id
- 4A7183F694; Mon,  5 Aug 2019 03:21:56 -0700 (PDT)
-To: Linus Walleij <linus.walleij@linaro.org>,
- Geert Uytterhoeven <geert+renesas@glider.be>, christoffer.dall@arm.com
-References: <20190705160536.12047-1-geert+renesas@glider.be>
- <CACRpkdY6qAUkQW4YHN9HskvZS2P-viWYTHSb28ECh1p+itU=4Q@mail.gmail.com>
-From: Marc Zyngier <marc.zyngier@arm.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=marc.zyngier@arm.com; prefer-encrypt=mutual; keydata=
- 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
- Z46HaNmN2hZS/oJ69c1DI5Rcww==
-Organization: ARM Ltd
-Message-ID: <dc2016d4-b06c-aa8e-2644-90caa40fbd63@arm.com>
-Date: Mon, 5 Aug 2019 11:21:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CACRpkdY6qAUkQW4YHN9HskvZS2P-viWYTHSb28ECh1p+itU=4Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <amarkovic@wavecomp.com>) id 1huaOS-0007v5-0S
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:39:09 -0400
+Received: from mail-eopbgr740139.outbound.protection.outlook.com
+ ([40.107.74.139]:40096 helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1huaOR-0007qF-PU
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 06:39:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RNJzPhQJVaS/1ymZefzDRHw0L2fwdQtAUZ9JmmccgzE79UQ2jYSyJnC7tFuiHPcToK25xoZx/GVOjS7MQkVWyL+Ac1vXgVYmzmrJbkkL1hqw2k/ECzhseq4YJKKdf/SXgT8vd+6t3OsjkJtYzyObSHkZXYNOqFLfcu4pgceVYqUYsHZ+WvrzjmPkgJ708sY4G61SIZR8OPxlAR4d4Pj95XsC1hKhtwiap1TNgO/a5WkU7nNzAlm0jrmfmar7IfY9DwyPAY2N9COs2lVN9jWgHjV1zePGOzJ0x/MOJE4UEKX4QN6OB4N79FDfbgB+6mukp07IFyPKztGA4gFHOsaTAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ba/XpDWMADgFGQNVtFQooA8u62DgtddWzPIEdoSM4MQ=;
+ b=X2MSgw09CbfFu7ZzB05/QktyzmlW+u3Jcvez9k1pDNCRKFADEwshHkR9GfpRkQmaUFc9rcYvQKNlL7vo/RB5Vk+p7X6oTKDC0bBC2M5VeF4mGwpkuxp6BkJ8t6XeMA5mrOtgX2B14YgMEqg9BcXYZgx5qxXq0Kj30QRkExgqoceH0hwmhAPkOgHNnWoArO+36Cqq1v4X82JQNKc1v9s7Ctw+giVn4ENhLJq0+u0T0SsqHdXA2+Oe60FinNTNpJ/OLSdE/eOemWkDjrbrxDU75K04lIGt/q9/Dt/ons+r1pUibx7zgt5LqA/QcRBIPdzUaCocnJA2Jv7UlMvqoUGMxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=wavecomp.com;dmarc=pass action=none
+ header.from=wavecomp.com;dkim=pass header.d=wavecomp.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ba/XpDWMADgFGQNVtFQooA8u62DgtddWzPIEdoSM4MQ=;
+ b=ZR81vnp1+/UFPL/v85ksfqSRIRvvY2JW6KLDVvE5ur14Qfs/g7PQZtGIi14HxXfIly129WmYzZ5ToTwbldAFyAFYn23NncTQh0YTCX/e6GbCBseDDPF9oL0lLKP2z/zM2w74GEJmVWBLOGOsJCzUj95KL/WCv+1jYFZdcob2Kpk=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+ BN6PR2201MB1265.namprd22.prod.outlook.com (10.174.82.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.19; Mon, 5 Aug 2019 10:39:03 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::509b:7797:a22a:f2bb]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::509b:7797:a22a:f2bb%3]) with mapi id 15.20.2136.018; Mon, 5 Aug 2019
+ 10:39:03 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: [BUG] gcov support appears to be broken
+Thread-Index: AQHVS3iZjD+NiDYGdECgADXmGKMWkA==
+Date: Mon, 5 Aug 2019 10:39:03 +0000
+Message-ID: <BN6PR2201MB1251F757F3129C433E540F9AC6DA0@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 217.140.110.172
-Subject: Re: [Qemu-devel] [PATCH RFC] gpio: Add Virtual Aggregator GPIO
- Driver
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c82ba366-c530-49b9-5224-08d71991225f
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:BN6PR2201MB1265; 
+x-ms-traffictypediagnostic: BN6PR2201MB1265:
+x-microsoft-antispam-prvs: <BN6PR2201MB1265D7F76D75B09090B259B8C6DA0@BN6PR2201MB1265.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01208B1E18
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(346002)(39840400004)(366004)(136003)(376002)(199004)(189003)(9686003)(14454004)(68736007)(256004)(486006)(186003)(25786009)(99286004)(71190400001)(71200400001)(476003)(86362001)(2351001)(26005)(52536014)(55016002)(478600001)(66066001)(76116006)(66946007)(91956017)(66446008)(66556008)(64756008)(55236004)(6506007)(316002)(2501003)(4744005)(102836004)(5660300002)(33656002)(7696005)(5640700003)(6436002)(66476007)(6916009)(74316002)(53936002)(3846002)(81166006)(81156014)(8676002)(6116002)(8936002)(305945005)(7736002)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1265;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: g8mMds3nP06dzQqja1g8lttYshHxIPULza4B1Mw8Wx76gA+0TEATzm3EdRnYSAid84Atb4MtNOA0Z1GNw02HbfBv/hMA00MeuRgyg6H0c4u18yKj+FbC35G+yb8dJgT7ETJ6GKRdOrNG5NKWVdkQX8AGIGwXBstk8ibLpNVHWjgS8qcbwyUVkRzZvr8APRV8tyneE5vtabDUM2sjaz3so/wWu742l0TH2tNNRFcM78CUUUrppXNSszBNGK0wY7KsYJJrgsRBD1BRwh8hV2obsp+wfJ2VrAxFN6SVqdAclPraYds3zWMnaahGTyJ0pXEoc8FT+LMf2YpD+Hai2It+jVXePW52la7evRdtbLLAuogerHGa7oIORyEr8op42z83h/UmysVWlCc7qWoPriGQo6+XbkfxTEJlV45gnXqMOnY=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c82ba366-c530-49b9-5224-08d71991225f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Aug 2019 10:39:03.2729 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: amarkovic@wavecomp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1265
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.74.139
+Subject: [Qemu-devel] [BUG] gcov support appears to be broken
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,109 +115,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>, Alexander Graf <agraf@suse.de>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/08/2019 09:41, Linus Walleij wrote:
-> Hi Geert!
-> 
-> Thanks for this very interesting patch!
-> 
-> On Fri, Jul 5, 2019 at 6:05 PM Geert Uytterhoeven
-> <geert+renesas@glider.be> wrote:
-> 
->> GPIO controllers are exported to userspace using /dev/gpiochip*
->> character devices.  Access control to these devices is provided by
->> standard UNIX file system permissions, on an all-or-nothing basis:
->> either a GPIO controller is accessible for a user, or it is not.
->> Currently no mechanism exists to control access to individual GPIOs.
-> 
-> Yes, I did that decision deliberately, as the chip is one device
-> and the base system control is usually on a per-device granularity.
-> At one point some people were asking for individual GPIO line
-> permissions in the character device and my argument was something
-> like why can't I have individual control over the access rights on a block
-> device or the pixels on a graphics device then.
-> 
-> Jokes aside, filesystems do provide access control over individual
-> blocks on a block device in a way. So it is further up the stack.
-> 
-> The same goes for this: something above the GPIO chip provide
-> more granular access control, and as such it fits the need very well.
-> 
->> Hence add a virtual GPIO driver to aggregate existing GPIOs (up to 32),
->> and expose them as a new gpiochip.  This is useful for implementing
->> access control, and assigning a set of GPIOs to a specific user.
->> Furthermore, it would simplify and harden exporting GPIOs to a virtual
->> machine, as the VM can just grab the full virtual GPIO controller, and
->> no longer needs to care about which GPIOs to grab and which not,
->> reducing the attack surface.
-> 
-> Excellent approach.
-> 
-> I would even go so far as to call it "gpio-virtualization" or
-> "gpio-virtualized" rather than "gpio-virtual" so it is clear what the
-> intended usecase is. We have a bit of confusion in the kernel
-> because people misuse the word "virtual" left and right, like for
-> "virtual IRQ number" (Linux IRQ numbers) which are just some
-> random number space, but not really "virtual", it's a semantic
-> disease similar to the confusion of using the word "manual" in
-> computer code.
-
-I'd drop the notion of "virtual" altogether. Nothing is virtual in this
-thing at all (the GPIOs are very real, from what I gather). Instead (and
-assuming I got it right, which is a long shot), what you have is a
-"synthetic" GPIO controller, made from the GPIOs belonging to other
-controllers. I'd call it "GPIO aggregator".
-
-> 
-> Here it is however used correctly! (Maybe for the first time.)
-> 
->> Virtual GPIO controllers are instantiated by writing to the "new_device"
->> attribute file in sysfs:
->>
->>     $ echo "<gpiochipA> <gpioA1> [<gpioA2> ...]"
->>            "[, <gpiochipB> <gpioB1> [<gpioB2> ...]] ...]"
->>             > /sys/bus/platform/drivers/gpio-virt-agg/new_device
->>
->> Likewise, virtual GPIO controllers can be destroyed after use:
->>
->>     $ echo gpio-virt-agg.<N> \
->>             > /sys/bus/platform/drivers/gpio-virt-agg/delete_device
-> 
-> I suppose this is the right way to use sysfs.
-> 
-> I would check with some virtualization people (paged Marc Zyngier
-> and Christoffer Dall) so they can say whether this is the way any
-> virtual machine wants to populate its local GPIO chip for
-> use with a certain machine.
-> 
-> If QEMU can deal in a simple and straight-forward way with this
-> I see it quickly becoming a very useful tool for industrial automation
-> where you want to run each control system in isolation and just
-> respawn the virtual machine if something goes wrong.
-
-What the VMM (QEMU, kvmtool) would need to do is to present this as a
-"standard" GPIO IP, and use the backend aggregator to emulate it.
-Certainly doable. The nice part is that all the work is in userspace,
-and thus completely off my plate! ;-)
-
-You also may want to look into not emulating a standard IP, but use
-something virtio-based instead. The ACRN project seems to have something
-like this in progress, but I know nothing about it.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Hello, according to out docs, here is the procedure that should produce cov=
+erage report for execution of the complete "make check":=0A=
+=0A=
+#./configure --enable-gcov=0A=
+#make=0A=
+#make check=0A=
+#make coverage-report=0A=
+=0A=
+It seems that first three commands execute as expected. (For example, there=
+ are plenty of files generated by "make check" that would've not been gener=
+ated if "enable-gcov" hadn't been chosen.) However, the last command compla=
+ins about some missing files related to FP support. If those files are adde=
+d (for example, artificially, using "touch <missing-file"), that it starts =
+complaining about missing some decodetree-generated files. Other kinds of f=
+iles are involved too.=0A=
+=0A=
+It would be nice to have coverage support working. Please somebody take a l=
+ook, or explain if I make a mistake or misunderstood our gcov support.=0A=
+=0A=
+Yours,=0A=
+Aleksandar=
 
