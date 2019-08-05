@@ -2,71 +2,97 @@ Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D68C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 20:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 768A6C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 20:42:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1ABF20665
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 20:06:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1ABF20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 3EBF62086D
+	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 20:42:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EBF62086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hujFf-0001Um-Sf
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 16:06:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55395)
+	id 1hujoJ-0000DK-FV
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 16:42:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58008)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hujEu-000143-FB
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 16:05:56 -0400
+ (envelope-from <bala24@linux.ibm.com>) id 1huhbg-00018o-PO
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:21:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hujEq-0000ZX-Ic
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 16:05:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47044)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hujEq-0000ZK-BX
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 16:05:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hujEp-0006Pq-5b
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 20:05:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 14DA82E8048
- for <qemu-devel@nongnu.org>; Mon,  5 Aug 2019 20:05:47 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 05 Aug 2019 19:56:49 -0000
-From: Antony Rheneus <1838946@bugs.launchpad.net>
+ (envelope-from <bala24@linux.ibm.com>) id 1huhbf-0008S1-Qy
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:21:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37690)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1huhbf-0008Qf-Jr
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 14:21:15 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x75I3QY2082677
+ for <qemu-devel@nongnu.org>; Mon, 5 Aug 2019 14:21:13 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2u6qwyca40-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 14:21:12 -0400
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Mon, 5 Aug 2019 19:21:10 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 5 Aug 2019 19:21:09 +0100
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x75IL8ca15597794
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 5 Aug 2019 18:21:08 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4025F4C04E;
+ Mon,  5 Aug 2019 18:21:08 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 26FE74C050;
+ Mon,  5 Aug 2019 18:21:07 +0000 (GMT)
+Received: from localhost.localdomain.com (unknown [9.85.74.191])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon,  5 Aug 2019 18:21:06 +0000 (GMT)
+From: Balamuruhan S <bala24@linux.ibm.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: arheneus pmaydell
-X-Launchpad-Bug-Reporter: Antony Rheneus (arheneus)
-X-Launchpad-Bug-Modifier: Antony Rheneus (arheneus)
-References: <156499265611.25363.5857358041161895848.malonedeb@soybean.canonical.com>
-Message-Id: <156503501006.1270.13854679439172443778.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19014";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 541b9bc5b9889c2a98152d48ace90a7ded7f6011
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1838946] Re: qemu 3.10 golang crash
+Date: Mon,  5 Aug 2019 23:50:31 +0530
+X-Mailer: git-send-email 2.14.5
+In-Reply-To: <20190805182033.27578-1-bala24@linux.ibm.com>
+References: <20190805182033.27578-1-bala24@linux.ibm.com>
+X-TM-AS-GCONF: 00
+x-cbid: 19080518-4275-0000-0000-00000354B51A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080518-4276-0000-0000-00003865AF47
+Message-Id: <20190805182033.27578-2-bala24@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-05_09:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=543 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908050188
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+X-Mailman-Approved-At: Mon, 05 Aug 2019 16:41:38 -0400
+Subject: [Qemu-devel] [PATCH 1/3] tests/acceptance/migration: fix post
+ migration check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,729 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1838946 <1838946@bugs.launchpad.net>
+Cc: Balamuruhan S <bala24@linux.ibm.com>, clg@kaod.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Facing similar crash with the latest qemu, Can you give some pointers to
-debug further like backtrace/breakpoints or so
+assert `query-migrate` in target doesn't give migration
+status and test errors even if migration succeeds.
 
-$ ./qemu-4.1.0-rc3/arm-linux-user/qemu-arm --version
-qemu-arm version 4.0.93
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+In target:
+{'execute': 'query-migrate'}
+{"return": {}}
 
+Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+---
+ tests/acceptance/migration.py | 1 -
+ 1 file changed, 1 deletion(-)
 
-$ ./qemu-4.1.0-rc3/arm-linux-user/qemu-arm $GOROOT/bin/go  get -v github.co=
-m/Azure/sonic-telemetry/dialout/dialout_client_cli
-Fetching https://google.golang.org/grpc?go-get=3D1
+diff --git a/tests/acceptance/migration.py b/tests/acceptance/migration.py
+index 6115cf6c24..66941db3b3 100644
+--- a/tests/acceptance/migration.py
++++ b/tests/acceptance/migration.py
+@@ -47,7 +47,6 @@ class Migration(Test):
+             step=0.1,
+             args=(source_vm,)
+         )
+-        self.assertEqual(dest_vm.command('query-migrate')['status'], 'completed')
+         self.assertEqual(source_vm.command('query-migrate')['status'], 'completed')
+         self.assertEqual(dest_vm.command('query-status')['status'], 'running')
+         self.assertEqual(source_vm.command('query-status')['status'], 'postmigrate')
+-- 
+2.14.5
 
-<<<   LOG Truncated>>>
-
-Parsing meta tags from https://golang.org/x/net/context?go-get=3D1 (status =
-code 200)
-get "golang.org/x/net/context": found meta tag get.metaImport{Prefix:"golan=
-g.org/x/net", VCS:"git", RepoRoot:"https://go.googlesource.com/net"} at htt=
-ps://golang.org/x/net/context?go-get=3D1
-get "golang.org/x/net/context": verifying non-authoritative meta tag
-github.com/c9s/goprocinfo (download)
-github.com/go-redis/redis (download)
-github.com/golang/glog (download)
-github.com/workiva/go-datastructures (download)
-github.com/openconfig/ygot (download)
-github.com/kylelemons/godebug (download)
-github.com/openconfig/goyang (download)
-go tool compile: signal: aborted (core dumped)
-qemu: unhandled CPU exception 0x10004 - aborting
-R00=3D00000000 R01=3D0000001e R02=3D00e2b180 R03=3D00000000
-R04=3D00000001 R05=3D000000d8 R06=3D000000f6 R07=3Df6ffec64
-R08=3D00000000 R09=3D000000e0 R10=3D00e1e740 R11=3D00e3610c
-R12=3D00000034 R13=3Df6ffebc8 R14=3D00018d90 R15=3D0006668c
-PSR=3D20000010 --C- A usr32
-go tool compile: signal: aborted (core dumped)
-qemu: unhandled CPU exception 0x10004 - aborting
-R00=3D00000000 R01=3D0000001e R02=3D00e1e690 R03=3D00000000
-R04=3D00000001 R05=3D00000008 R06=3D00000004 R07=3D00000003
-R08=3Dda507899 R09=3D01070000 R10=3D01000540 R11=3D00e3610c
-R12=3Df67cc015 R13=3D01049f1c R14=3D00018d90 R15=3D0006668c
-PSR=3D20000010 --C- A usr32
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1838946
-
-Title:
-  qemu 3.10 golang crash
-
-Status in QEMU:
-  New
-
-Bug description:
-  Encountered below crashes in qemu 3.10 arm =
-
-  Also have raised the same in golang groups. But seems like in ARM32 hardw=
-are, the below commands works fine, only in qemu if crashes. =
-
-  https://groups.google.com/forum/?utm_medium=3Demail&utm_source=3Dfooter#!=
-topic/golang-nuts/1txPOGa4aGc
-
-  Need some pointers to narrow down
-
-  Please see log below.
-
-  $ qemu-arm-static --version
-  qemu-arm version 3.1.0 (qemu-3.1.0-6.fc30)
-  Copyright (c) 2003-2018 Fabrice Bellard and the QEMU Project developers
-
-
-  =
-
-  arheneus@bbdee4f6f57d:/sonic/src/telemetry/test$ /usr/local/go/bin/go get=
- -v github.com/Azure/sonic-telemetry/dialout/dialout_client_cli
-  github.com/openconfig/ygot (download)
-  github.com/kylelemons/godebug (download)
-  github.com/openconfig/goyang (download)
-  SIGSEGV: segmentation violation
-  PC=3D0x4512c m=3D12 sigcode=3D1
-
-  goroutine 15 [syscall]:
-  syscall.Syscall6(0x118, 0x1, 0x11c3, 0xf513b0, 0x1000004, 0x0, 0x0, 0x1c6=
-3c, 0x15e54, 0xe280a0)
-          /usr/local/go/src/syscall/asm_linux_arm.s:45 +0x8 fp=3D0xf51380 s=
-p=3D0xf5137c pc=3D0x88298
-  os.(*Process).blockUntilWaitable(0xf80300, 0xf80300, 0x0, 0x0)
-          /usr/local/go/src/os/wait_waitid.go:31 +0x64 fp=3D0xf51438 sp=3D0=
-xf51380 pc=3D0xa94a0
-  os.(*Process).wait(0xf80300, 0x13, 0xe6e1d0, 0xeba010)
-          /usr/local/go/src/os/exec_unix.go:22 +0x2c fp=3D0xf51470 sp=3D0xf=
-51438 pc=3D0xa2d58
-  os.(*Process).Wait(0xf80300, 0x4d5f58, 0x4d5f5c, 0x4d5f54)
-          /usr/local/go/src/os/exec.go:125 +0x1c fp=3D0xf51484 sp=3D0xf5147=
-0 pc=3D0xa2494
-  os/exec.(*Cmd).Wait(0xe14000, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:465 +0x40 fp=3D0xf514bc sp=3D0x=
-f51484 pc=3D0xf8620
-  os/exec.(*Cmd).Run(0xe14000, 0xd5c720, 0xf30000)
-          /usr/local/go/src/os/exec/exec.go:309 +0x44 fp=3D0xf514cc sp=3D0x=
-f514bc pc=3D0xf7e1c
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x497ee2, 0x7, 0x2c, 0x1=
-16f8e0)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0 fp=
-=3D0xf515bc sp=3D0xf514cc pc=3D0x3549bc
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177d90, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:223 +0xb8c fp=3D0x=
-f51978 sp=3D0xf515bc pc=3D0x3594fc
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177d90, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c fp=3D0=
-xf51f44 sp=3D0xf51978 pc=3D0x35e374
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177d90)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58 fp=3D0xf=
-51f84 sp=3D0xf51f44 pc=3D0x38287c
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84 fp=3D0xf=
-51fdc sp=3D0xf51f84 pc=3D0x382b24
-  runtime.goexit()
-          /usr/local/go/src/runtime/asm_arm.s:867 +0x4 fp=3D0xf51fdc sp=3D0=
-xf51fdc pc=3D0x67f44
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 1 [semacquire]:
-  sync.runtime_Semacquire(0xdf0078)
-          /usr/local/go/src/runtime/sema.go:56 +0x2c
-  sync.(*WaitGroup).Wait(0xdf0070)
-          /usr/local/go/src/sync/waitgroup.go:130 +0x84
-  cmd/go/internal/work.(*Builder).Do(0xd5cf60, 0x1177290)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:174 +0x304
-  cmd/go/internal/work.InstallPackages(0xc82078, 0x1, 0x1, 0xc0e938, 0x1, 0=
-x2)
-          /usr/local/go/src/cmd/go/internal/work/build.go:506 +0xa88
-  cmd/go/internal/get.runGet(0x810d78, 0xc82078, 0x1, 0x1)
-          /usr/local/go/src/cmd/go/internal/get/get.go:196 +0x1b0
-  main.main()
-          /usr/local/go/src/cmd/go/main.go:219 +0x93c
-
-  goroutine 19 [syscall]:
-  os/signal.signal_recv(0x0)
-          /usr/local/go/src/runtime/sigqueue.go:139 +0x130
-  os/signal.loop()
-          /usr/local/go/src/os/signal/signal_unix.go:23 +0x14
-  created by os/signal.init.0
-          /usr/local/go/src/os/signal/signal_unix.go:29 +0x30
-
-  goroutine 13 [syscall]:
-  syscall.Syscall6(0x118, 0x1, 0x11ec, 0x10153b0, 0x1000004, 0x0, 0x0, 0x1c=
-63c, 0x15e54, 0xe001e0)
-          /usr/local/go/src/syscall/asm_linux_arm.s:45 +0x8
-  os.(*Process).blockUntilWaitable(0xe62840, 0xe62840, 0x0, 0x0)
-          /usr/local/go/src/os/wait_waitid.go:31 +0x64
-  os.(*Process).wait(0xe62840, 0x1, 0xc0e360, 0xe00160)
-          /usr/local/go/src/os/exec_unix.go:22 +0x2c
-  os.(*Process).Wait(0xe62840, 0x4d5f58, 0x4d5f5c, 0x4d5f54)
-          /usr/local/go/src/os/exec.go:125 +0x1c
-  os/exec.(*Cmd).Wait(0xf8e0b0, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:465 +0x40
-  os/exec.(*Cmd).Run(0xf8e0b0, 0xca8060, 0xe6cd00)
-          /usr/local/go/src/os/exec/exec.go:309 +0x44
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x49631b, 0x3, 0x11, 0x1=
-015890)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0xfb6210, 0x0, 0x=
-0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:225 +0x11d4
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0xfb6210, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0xfb6210)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 14 [syscall]:
-  syscall.Syscall6(0x118, 0x1, 0x11ed, 0xe393b0, 0x1000004, 0x0, 0x0, 0x1c6=
-3c, 0x15e54, 0xd280f0)
-          /usr/local/go/src/syscall/asm_linux_arm.s:45 +0x8
-  os.(*Process).blockUntilWaitable(0x115c4e0, 0x115c4e0, 0x0, 0x0)
-          /usr/local/go/src/os/wait_waitid.go:31 +0x64
-  os.(*Process).wait(0x115c4e0, 0x1, 0xe78160, 0xd28070)
-          /usr/local/go/src/os/exec_unix.go:22 +0x2c
-  os.(*Process).Wait(0x115c4e0, 0x4d5f58, 0x4d5f5c, 0x4d5f54)
-          /usr/local/go/src/os/exec.go:125 +0x1c
-  os/exec.(*Cmd).Wait(0x10b8000, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:465 +0x40
-  os/exec.(*Cmd).Run(0x10b8000, 0xf3e060, 0xf0c000)
-          /usr/local/go/src/os/exec/exec.go:309 +0x44
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x49631b, 0x3, 0x11, 0xe=
-39890)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177b80, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:225 +0x11d4
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177b80, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177b80)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 16 [runnable]:
-  os/exec.(*Cmd).writerDescriptor(0x10b80b0, 0x54bd38, 0xf3e120, 0xf3e0c0, =
-0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:257 +0x484
-  os/exec.(*Cmd).stderr(0x10b80b0, 0x1112090, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:254 +0xac
-  os/exec.(*Cmd).Start(0x10b80b0, 0x496701, 0xf3e120)
-          /usr/local/go/src/os/exec/exec.go:372 +0xa8
-  os/exec.(*Cmd).Run(0x10b80b0, 0xf3e120, 0xf0c300)
-          /usr/local/go/src/os/exec/exec.go:306 +0x1c
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x49631b, 0x3, 0x11, 0xf=
-49890)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177ce0, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:225 +0x11d4
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177ce0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177ce0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 82 [runnable]:
-  syscall.Syscall(0x3, 0xb, 0x11c2000, 0x8000, 0x0, 0x0, 0x0)
-          /usr/local/go/src/syscall/asm_linux_arm.s:14 +0x8
-  syscall.read(0xb, 0x11c2000, 0x8000, 0x8000, 0x10ea501, 0x0, 0x0)
-          /usr/local/go/src/syscall/zsyscall_linux_arm.go:732 +0x40
-  syscall.Read(0xb, 0x11c2000, 0x8000, 0x8000, 0xdedf9577, 0xe9841d9d, 0xdb=
-b1d24e)
-          /usr/local/go/src/syscall/syscall_unix.go:172 +0x34
-  internal/poll.(*FD).Read(0xd9c140, 0x11c2000, 0x8000, 0x8000, 0x0, 0x0, 0=
-x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:165 +0xf0
-  os.(*File).read(0xcdc0f0, 0x11c2000, 0x8000, 0x8000, 0x11c3700, 0x1d, 0x6=
-940)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xcdc0f0, 0x11c2000, 0x8000, 0x8000, 0x171d, 0x0, 0x0)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  io.copyBuffer(0xe77be000, 0xe88380, 0x54c3f8, 0xcdc0f0, 0x11c2000, 0x8000=
-, 0x8000, 0x443d58, 0x47a900, 0x0, ...)
-          /usr/local/go/src/io/io.go:402 +0xd8
-  io.Copy(0xe77be000, 0xe88380, 0x54c3f8, 0xcdc0f0, 0xe88380, 0x0, 0x40, 0x=
-b)
-          /usr/local/go/src/io/io.go:364 +0x48
-  cmd/go/internal/cache.FileHash(0xe628a0, 0x25, 0x0, 0x0, 0x0, 0x0, 0x0, 0=
-x0, 0x0, 0x0, ...)
-          /usr/local/go/src/cmd/go/internal/cache/hash.go:149 +0x240
-  cmd/go/internal/work.(*Builder).fileHash(0xd5cf60, 0xe628a0, 0x25, 0xe628=
-a0, 0x25)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:396 +0x24
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177760, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:292 +0x5ec
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177760, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177760)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 83 [syscall]:
-  syscall.Syscall6(0x118, 0x1, 0x11d1, 0xf4d3b0, 0x1000004, 0x0, 0x0, 0x1c6=
-3c, 0x15e54, 0xe280b0)
-          /usr/local/go/src/syscall/asm_linux_arm.s:45 +0x8
-  os.(*Process).blockUntilWaitable(0xf80330, 0xf80330, 0x0, 0x0)
-          /usr/local/go/src/os/wait_waitid.go:31 +0x64
-  os.(*Process).wait(0xf80330, 0x1, 0xc7e1b0, 0xe28010)
-          /usr/local/go/src/os/exec_unix.go:22 +0x2c
-  os.(*Process).Wait(0xf80330, 0x4d5f58, 0x4d5f5c, 0x4d5f54)
-          /usr/local/go/src/os/exec.go:125 +0x1c
-  os/exec.(*Cmd).Wait(0x11760b0, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:465 +0x40
-  os/exec.(*Cmd).Run(0x11760b0, 0xfc8060, 0xefa800)
-          /usr/local/go/src/os/exec/exec.go:309 +0x44
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x497ee2, 0x7, 0x2c, 0xf=
-278e0)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177e40, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:223 +0xb8c
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177e40, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177e40)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 84 [syscall]:
-  syscall.Syscall6(0x118, 0x1, 0x11cf, 0xf453b0, 0x1000004, 0x0, 0x0, 0x1c6=
-3c, 0x15e54, 0xeba040)
-          /usr/local/go/src/syscall/asm_linux_arm.s:45 +0x8
-  os.(*Process).blockUntilWaitable(0xf74180, 0xf74180, 0x0, 0x0)
-          /usr/local/go/src/os/wait_waitid.go:31 +0x64
-  os.(*Process).wait(0xf74180, 0x1, 0x1112070, 0x100e010)
-          /usr/local/go/src/os/exec_unix.go:22 +0x2c
-  os.(*Process).Wait(0xf74180, 0x4d5f58, 0x4d5f5c, 0x4d5f54)
-          /usr/local/go/src/os/exec.go:125 +0x1c
-  os/exec.(*Cmd).Wait(0xfe8000, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:465 +0x40
-  os/exec.(*Cmd).Run(0xfe8000, 0xe10060, 0xf18000)
-          /usr/local/go/src/os/exec/exec.go:309 +0x44
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x497ee2, 0x7, 0x2c, 0x1=
-0878e0)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177a20, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:223 +0xb8c
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177a20, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177a20)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 85 [syscall]:
-  syscall.Syscall6(0x118, 0x1, 0x11d5, 0xe373b0, 0x1000004, 0x0, 0x0, 0x1c6=
-3c, 0x15e54, 0xeba050)
-          /usr/local/go/src/syscall/asm_linux_arm.s:45 +0x8
-  os.(*Process).blockUntilWaitable(0xf741b0, 0xf741b0, 0x0, 0x0)
-          /usr/local/go/src/os/wait_waitid.go:31 +0x64
-  os.(*Process).wait(0xf741b0, 0x50, 0xc0e290, 0xe00090)
-          /usr/local/go/src/os/exec_unix.go:22 +0x2c
-  os.(*Process).Wait(0xf741b0, 0x4d5f58, 0x4d5f5c, 0x4d5f54)
-          /usr/local/go/src/os/exec.go:125 +0x1c
-  os/exec.(*Cmd).Wait(0xf8e000, 0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:465 +0x40
-  os/exec.(*Cmd).Run(0xf8e000, 0xcb5e00, 0xe6ca00)
-          /usr/local/go/src/os/exec/exec.go:309 +0x44
-  cmd/go/internal/work.(*Builder).toolID(0xd5cf60, 0x497ee2, 0x7, 0x2c, 0xf=
-2b8e0)
-          /usr/local/go/src/cmd/go/internal/work/buildid.go:193 +0x2e0
-  cmd/go/internal/work.(*Builder).buildActionID(0xd5cf60, 0x1177ef0, 0x0, 0=
-x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:223 +0xb8c
-  cmd/go/internal/work.(*Builder).build(0xd5cf60, 0x1177ef0, 0x0, 0x0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:373 +0x3d3c
-  cmd/go/internal/work.(*Builder).Do.func1(0x1177ef0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:107 +0x58
-  cmd/go/internal/work.(*Builder).Do.func2(0xdf0070, 0xd5cf60, 0x10427a0)
-          /usr/local/go/src/cmd/go/internal/work/exec.go:165 +0x84
-  created by cmd/go/internal/work.(*Builder).Do
-          /usr/local/go/src/cmd/go/internal/work/exec.go:152 +0x2e4
-
-  goroutine 31 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac29c0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xd7c3d4, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xd7c3d4, 0x1040601, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xd7c3c0, 0x1040600, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xe78168, 0x1040600, 0x200, 0x200, 0x1040600, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xe78168, 0x1040600, 0x200, 0x200, 0xe9d2f000, 0xff667d78=
-, 0x3)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xf3e060, 0x54c3f8, 0xe78168, 0xe9d2f000, 0xf3e0=
-60, 0x1b001, 0xcf62b0)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xf3e060, 0x54c3f8, 0xe78168, 0x0, 0x0, 0x0, 0x0,=
- 0xcf60c0, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xf3e060, 0x54c3f8, 0xe78168, 0x19, 0xfa910, 0xcf6280, =
-0xf977dc)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0xcf6280, 0xf977dc)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0x10b8000, 0xd280c0)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 30 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac2dc0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xd7c354, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xd7c354, 0xddc001, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xd7c340, 0xddc000, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xe78148, 0xddc000, 0x200, 0x200, 0xddc000, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xe78148, 0xddc000, 0x200, 0x200, 0xe9d2f000, 0xff667d78,=
- 0x5)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xf3e000, 0x54c3f8, 0xe78148, 0xe9d2f000, 0xf3e0=
-00, 0x1b001, 0xcf62b0)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xf3e000, 0x54c3f8, 0xe78148, 0x0, 0x0, 0x0, 0x0,=
- 0xcf6140, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xf3e000, 0x54c3f8, 0xe78148, 0x0, 0xfa910, 0xcf6280, 0=
-xf95fdc)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0xcf6280, 0xf95fdc)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0x10b8000, 0xd280a0)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 37 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac2f40, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xdc8514, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xdc8514, 0x1040801, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xdc8500, 0x1040800, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xc0e338, 0x1040800, 0x200, 0x200, 0x1040800, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xc0e338, 0x1040800, 0x200, 0x200, 0xe9d2f000, 0xff669250=
-, 0x3)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xca8000, 0x54c3f8, 0xc0e338, 0xe9d2f000, 0xca80=
-00, 0x16601, 0xc36f54)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xca8000, 0x54c3f8, 0xc0e338, 0x0, 0x0, 0x0, 0x0,=
- 0xd9c0c0, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xca8000, 0x54c3f8, 0xc0e338, 0xd9c100, 0xfa910, 0xd9c1=
-00, 0xc36fdc)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0xd9c100, 0xc36fdc)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xf8e0b0, 0xe00190)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 114 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac23c0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xce8694, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xce8694, 0x108e001, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xce8680, 0x108e000, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xe6e1b8, 0x108e000, 0x200, 0x200, 0x108e000, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xe6e1b8, 0x108e000, 0x200, 0x200, 0xe9d2f000, 0x4e9d0, 0=
-xc37f18)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0x1024000, 0x54c3f8, 0xe6e1b8, 0xe9d2f000, 0x102=
-4000, 0x1177a01, 0xd5cf98)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0x1024000, 0x54c3f8, 0xe6e1b8, 0x0, 0x0, 0x0, 0x2=
-, 0x0, 0x1, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0x1024000, 0x54c3f8, 0xe6e1b8, 0x1, 0x0, 0x0, 0x0)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xe14000, 0x1042840)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 115 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac22c0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xce8714, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xce8714, 0x108e601, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xce8700, 0x108e600, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xe6e1d8, 0x108e600, 0x200, 0x200, 0x108e600, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xe6e1d8, 0x108e600, 0x200, 0x200, 0xe9d2f000, 0x0, 0x0)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xd5c720, 0x54c3f8, 0xe6e1d8, 0xe9d2f000, 0xd5c7=
-20, 0x1, 0x0)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xd5c720, 0x54c3f8, 0xe6e1d8, 0x0, 0x0, 0x0, 0x0,=
- 0x0, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xd5c720, 0x54c3f8, 0xe6e1d8, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xe14000, 0x1042860)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 116 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac2c40, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xc72214, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xc72214, 0xea4201, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xc72200, 0xea4200, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xc7e190, 0xea4200, 0x200, 0x200, 0xea4200, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xc7e190, 0xea4200, 0x200, 0x200, 0xe9d2f000, 0x3e206820,=
- 0x3331203e)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xfc8000, 0x54c3f8, 0xc7e190, 0xe9d2f000, 0xfc80=
-00, 0x61686d01, 0x32336873)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xfc8000, 0x54c3f8, 0xc7e190, 0x0, 0x0, 0x0, 0x34=
-202b20, 0x7361682a, 0x79656b68, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xfc8000, 0x54c3f8, 0xc7e190, 0x70283233, 0x68090a29, 0=
-x72203d20, 0x5f6c746f)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x203d5e20, 0x3e3e2068)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0x11760b0, 0xe28040)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 117 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac2740, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xc72294, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xc72294, 0xea4001, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xc72280, 0xea4000, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xc7e1b8, 0xea4000, 0x200, 0x200, 0xea4000, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xc7e1b8, 0xea4000, 0x200, 0x200, 0xe9d2f000, 0x0, 0x0)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xfc8060, 0x54c3f8, 0xc7e1b8, 0xe9d2f000, 0xfc80=
-60, 0x1, 0x0)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xfc8060, 0x54c3f8, 0xc7e1b8, 0x0, 0x0, 0x0, 0x0,=
- 0x0, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xfc8060, 0x54c3f8, 0xc7e1b8, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0x11760b0, 0xe28070)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 130 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac25c0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xc8a114, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xc8a114, 0xea4401, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xc8a100, 0xea4400, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0x1112058, 0xea4400, 0x200, 0x200, 0xea4400, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0x1112058, 0xea4400, 0x200, 0x200, 0xe9d2f000, 0x0, 0x0)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xe10000, 0x54c3f8, 0x1112058, 0xe9d2f000, 0xe10=
-000, 0x1177d01, 0xd5cf98)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xe10000, 0x54c3f8, 0x1112058, 0x0, 0x0, 0x0, 0x2=
-, 0x0, 0x1, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xe10000, 0x54c3f8, 0x1112058, 0x1, 0x0, 0x0, 0x0)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xfe8000, 0x100e040)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 131 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac24c0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xc8a214, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xc8a214, 0x1044001, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xc8a200, 0x1044000, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0x1112078, 0x1044000, 0x200, 0x200, 0x1044000, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0x1112078, 0x1044000, 0x200, 0x200, 0xe9d2f000, 0xa, 0x2)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xe10060, 0x54c3f8, 0x1112078, 0xe9d2f000, 0xe10=
-060, 0x1, 0x2)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xe10060, 0x54c3f8, 0x1112078, 0x0, 0x0, 0x0, 0xe=
-e3e90, 0x27, 0xd2, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xe10060, 0x54c3f8, 0x1112078, 0x2, 0xedca50, 0x2b, 0xb=
-c)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xfe8000, 0x100e060)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 132 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac2240, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xdc82d4, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xdc82d4, 0x1044201, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xdc82c0, 0x1044200, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xc0e270, 0x1044200, 0x200, 0x200, 0x1044200, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xc0e270, 0x1044200, 0x200, 0x200, 0xe9d2f000, 0x0, 0x0)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xcb5800, 0x54c3f8, 0xc0e270, 0xe9d2f000, 0xcb58=
-00, 0x1, 0x0)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xcb5800, 0x54c3f8, 0xc0e270, 0x0, 0x0, 0x0, 0x0,=
- 0x0, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xcb5800, 0x54c3f8, 0xc0e270, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0xcc9f80)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xf8e000, 0xe000c0)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-
-  goroutine 133 [IO wait]:
-  internal/poll.runtime_pollWait(0xecac27c0, 0x72, 0x9cc90)
-          /usr/local/go/src/runtime/netpoll.go:173 +0x44
-  internal/poll.(*pollDesc).wait(0xdc8354, 0x72, 0xffffff01, 0x54cc68, 0x7e=
-0240)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:85 +0x7c
-  internal/poll.(*pollDesc).waitRead(0xdc8354, 0x1040401, 0x200, 0x200)
-          /usr/local/go/src/internal/poll/fd_poll_runtime.go:90 +0x2c
-  internal/poll.(*FD).Read(0xdc8340, 0x1040400, 0x200, 0x200, 0x0, 0x0, 0x0)
-          /usr/local/go/src/internal/poll/fd_unix.go:169 +0x14c
-  os.(*File).read(0xc0e298, 0x1040400, 0x200, 0x200, 0x1040400, 0x0, 0x0)
-          /usr/local/go/src/os/file_unix.go:249 +0x3c
-  os.(*File).Read(0xc0e298, 0x1040400, 0x200, 0x200, 0xe9d2f000, 0x0, 0x10b=
-81d0)
-          /usr/local/go/src/os/file.go:108 +0x4c
-  bytes.(*Buffer).ReadFrom(0xcb5e00, 0x54c3f8, 0xc0e298, 0xe9d2f000, 0xcb5e=
-00, 0x1, 0x0)
-          /usr/local/go/src/bytes/buffer.go:206 +0xb0
-  io.copyBuffer(0x54bd38, 0xcb5e00, 0x54c3f8, 0xc0e298, 0x0, 0x0, 0x0, 0x0,=
- 0x0, 0x0, ...)
-          /usr/local/go/src/io/io.go:388 +0x300
-  io.Copy(0x54bd38, 0xcb5e00, 0x54c3f8, 0xc0e298, 0x0, 0x0, 0x0, 0x0)
-          /usr/local/go/src/io/io.go:364 +0x48
-  os/exec.(*Cmd).writerDescriptor.func1(0x0, 0x0)
-          /usr/local/go/src/os/exec/exec.go:279 +0x38
-  os/exec.(*Cmd).Start.func1(0xf8e000, 0xe000e0)
-          /usr/local/go/src/os/exec/exec.go:400 +0x1c
-  created by os/exec.(*Cmd).Start
-          /usr/local/go/src/os/exec/exec.go:399 +0x41c
-  qemu: uncaught target signal 11 (Segmentation fault) - core dumped
-  Segmentation fault (core dumped)
-
-
-  =
-
-  --------------
-
-  With newer golang version
-  go version
-  go version go1.11.9 linux/arm
-  - show quoted text -
-  GOGCCFLAGS=3D"-fPIC -marm -pthread -fmessage-length=3D0 -fdebug-prefix-ma=
-p=3D/tmp/go-build218432843=3D/tmp/go-build -gno-record-gcc-switches"
-
-  =
-
-  $ /usr/local/go/bin/go get -v github.com/Azure/sonic-telemetry/dialout/di=
-alout_client_cli
-  panic: runtime error: invalid memory address or nil pointer dereference
-  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x6618=
-0]
-
-  goroutine 11fatal error:  [malloc deadlock
-  , panic during panic
-  [signal SIGSEGV: segmentation violation code=3D0x1 addr=3D0x0 pc=3D0x6618=
-0]
-
-  108033889401^Ifatal error: unexpected signal during runtime execution
-  stack trace unavailable
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1838946/+subscriptions
 
