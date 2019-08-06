@@ -5,78 +5,77 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B715DC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC351C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:30:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F35220651
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:26:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9214720880
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:30:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ABegyfz6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F35220651
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brnDH+ea"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9214720880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hunJ3-0002zt-Rs
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:26:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36312)
+	id 1hunMi-0004J6-TY
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:30:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36996)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hunIg-0002Zd-VF
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:26:04 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hunMB-0003qv-1v
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:29:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hunIg-0006Ix-3Z
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:26:02 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:36885)
+ (envelope-from <alistair23@gmail.com>) id 1hunMA-0007ms-1O
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:29:38 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41684)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hunIf-0006Ig-Sn; Mon, 05 Aug 2019 20:26:02 -0400
-Received: by mail-lf1-x143.google.com with SMTP id c9so59420543lfh.4;
- Mon, 05 Aug 2019 17:26:01 -0700 (PDT)
+ id 1hunM9-0007mM-Qj; Mon, 05 Aug 2019 20:29:37 -0400
+Received: by mail-lj1-x241.google.com with SMTP id d24so80737171ljg.8;
+ Mon, 05 Aug 2019 17:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zTuGJ18z9ujmlfKCbaZ6SbiL8rm/4e/dR+fPA1EirD8=;
- b=ABegyfz611h/hlVGxkBtOMChBcOm6XJD3dQlVL+/1bkKkYi6VIU2cFa9rrt+i33SX/
- nkf5rEWiv8CzyKh9U0f/BCx/UQg3/s3AUFgc4xhzqMQt3XWyJuCToGzPJQxM4jfvJN5O
- XGhFquZyJLtagJKXfXFHJ4fQK5FSzkDlTLeQRvpI/XlHWPzKr0OI3KrdrJmu2+ju2OOJ
- uZme2vdUx3ii27q8wfgxXcDkkTtIH0ZRadw+bbmGZURLXmSD35XDQmzissWCRzvgbCSH
- Dsa2nR9aZKH1Xw+D2q0l+Hm17ArsE9zBGfhQE81bN8jsTiAm6TxKfGPWZ/gtznMeQKxA
- vQvQ==
+ :cc; bh=X7k5HPEhC+tqeqA3jeiuHdAzU9KLZWJrT3lUZzgOOyI=;
+ b=brnDH+eagOcy+pKW112BWM2ytGGIr5Vr+vMLwz5FEyeWabvKJeJHhUMfthERayJzVH
+ CUMNCcn0dMoyRfp4pbctJZcRIzS+qf71a9eDoOIrrlF8VuGAlOT/yyCSlbUZrsO83XNZ
+ +bonOiB+UPbHQTIpjr4vyF1rMrvyBiuT2CUr2oqtbnXKkA/d0luQOvTKLduu5VKB/gmE
+ vcjg3W9hnm6g5AioVHQ7ofIzIWrWGG6cudyH+TNOx81oYKBtUya127Xl0TnExYmJlsHI
+ AngrjqRLnKZhPSoUwDRx6CGC00I+KxPmMW4W0Rx+QvTh4PjZykfpsqjIfvWpPC5VVXW5
+ BgkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=zTuGJ18z9ujmlfKCbaZ6SbiL8rm/4e/dR+fPA1EirD8=;
- b=OulG8wJNdYCICKR4aRu9n1jhqivm+VkZ1QOjVtjZeHSDXBQV1w/Y34YQHOTtO/Vbxl
- MeT+ayhbkox/GottqHLGr/Vi0lsGU5hy9GPROMSWu0M9ZRGaW43tcs6dyq9PW8y2441+
- I1XekeqleM/A+I1TPg4uhbNh0RwpJojwq68xaezPymI6W0uIW/GEzOlwmD8/LNyfmvET
- HRSvWa57tKkLnbMIjcmszR7hUxFhIGZbCF8SCdNJWIHWcvNYAXSPV1jHM/qzTZIfUoQX
- 5KqizIU1pVUQ/hEsn/ZUJ/xlbUv9Zngbrpeb5Oy7uCPQbsuz2ThDrtVIEZ4FM9UeO7MV
- OGNA==
-X-Gm-Message-State: APjAAAVW/QNZmZVzcsiOxS7/cMgCcwPbpWXyhHthSy6RFcxYxQM8vqzI
- s6eAKS2ZsIvghPT7YZs+dxuuU/jZIBZsR+kyYLk=
-X-Google-Smtp-Source: APXvYqyiTUJ6ZZbNvp073NtBly+MwMAQ5Jtl3dOHY1OjJ1HXpR3POte9WgCPY/UWCxWBZp8YARO/gKHqwDW9mjwlSyU=
-X-Received: by 2002:a19:6904:: with SMTP id e4mr261676lfc.156.1565051160837;
- Mon, 05 Aug 2019 17:26:00 -0700 (PDT)
+ bh=X7k5HPEhC+tqeqA3jeiuHdAzU9KLZWJrT3lUZzgOOyI=;
+ b=BzgDTj0kD8zpWMFKN4W2MC0CBYQX7W3HRlDNw5xQ9wufDWi1qeABNg/qKWvEJ2vMv8
+ eFmr5d0zlv1kKJn8qUhBe/mx0iE7WoK3Rts7e2a3MNAfSFhTpa8b0iW+zJ9oEULKzCoh
+ /r1PiC6wRiRzdeVVJa9+oQRLjJ6OIJwacXRlbGckCfClqfzWp4pnobrdqBQeugiokgKb
+ u+H2MaEIWWSISgLyMXgTdKi8B7Rg1BiHC9X9Up/Mz48U+5HdRNUKTAjO0bkPzMJBF69S
+ C4oe0iPemWFvWOQ22ygzOyPMU0XXzMXDVomscd6sjXHehH92yT/RTRjJNyG/buFEZqe1
+ MrsA==
+X-Gm-Message-State: APjAAAUXqEUGndgUtWYW2KY92pCWJbT4zvk17dv7qeavi5TJQQTegfJQ
+ dZhOV8bQi6Mn/SNj0/jAX2BJzgMLYIEtJM7VrVE=
+X-Google-Smtp-Source: APXvYqyW3JmjMuYs6AR7DsUEOa/SH0Q0NikVFRYtR/+QChpW7WyxwuV9GpRxI+wkKApZGXnmThZrk+1iyFBsYkp+YLg=
+X-Received: by 2002:a2e:480a:: with SMTP id v10mr225910lja.94.1565051376564;
+ Mon, 05 Aug 2019 17:29:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
- <1565020823-24223-29-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1565020823-24223-29-git-send-email-bmeng.cn@gmail.com>
+ <1565020823-24223-24-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565020823-24223-24-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 5 Aug 2019 17:22:21 -0700
-Message-ID: <CAKmqyKNYSyxXaVdKJzH05W-s8nkf1T_QGwxxzXTP7B8xU=AoGw@mail.gmail.com>
+Date: Mon, 5 Aug 2019 17:25:27 -0700
+Message-ID: <CAKmqyKPa=Osu5jNcWNzt_jGbdf52KMkDjrJWdXFeDaAtU0Aw6Q@mail.gmail.com>
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH 28/28] riscv: sifive_u: Update model and
- compatible strings in device tree
+X-Received-From: 2a00:1450:4864:20::241
+Subject: Re: [Qemu-devel] [PATCH 23/28] riscv: sifive: Move
+ sifive_mmio_emulate() to a common place
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,39 +97,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 5, 2019 at 9:13 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Mon, Aug 5, 2019 at 9:08 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> This updates model and compatible strings to use the same strings
-> as used in the Linux kernel device tree (hifive-unleashed-a00.dts).
+> sifive_mmio_emulate() is currently only used in the sifive_e machine
+> codes. It can be helpful for other machines as well.
+>
+> Change it to an inline routine and move it to sifive_cpu.h, so that
+> other machines like sifive_u can use it.
 >
 > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+I don't like this. I don't think we should use this function. This
+seems like we can use create_unimplemented_device() instead.
 
 Alistair
 
->
 > ---
 >
->  hw/riscv/sifive_u.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  hw/riscv/sifive_e.c           |  8 --------
+>  include/hw/riscv/sifive_cpu.h | 10 +++++++++-
+>  2 files changed, 9 insertions(+), 9 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 5ded3a0..b7d4b4f 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -94,8 +94,9 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->          exit(1);
->      }
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 2d67670..7e0fe7b 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -74,14 +74,6 @@ static const struct MemmapEntry {
+>      [SIFIVE_E_DTIM] =     { 0x80000000,     0x4000 }
+>  };
 >
-> -    qemu_fdt_setprop_string(fdt, "/", "model", "ucbbar,spike-bare,qemu");
-> -    qemu_fdt_setprop_string(fdt, "/", "compatible", "ucbbar,spike-bare-dev");
-> +    qemu_fdt_setprop_string(fdt, "/", "model", "SiFive HiFive Unleashed A00");
-> +    qemu_fdt_setprop_string(fdt, "/", "compatible",
-> +                            "sifive,hifive-unleashed-a00");
->      qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
->      qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+> -static void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
+> -                             uintptr_t offset, uintptr_t length)
+> -{
+> -    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
+> -    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
+> -    memory_region_add_subregion(parent, offset, mock_mmio);
+> -}
+> -
+>  static void riscv_sifive_e_init(MachineState *machine)
+>  {
+>      const struct MemmapEntry *memmap = sifive_e_memmap;
+> diff --git a/include/hw/riscv/sifive_cpu.h b/include/hw/riscv/sifive_cpu.h
+> index 1367996..897b8f8 100644
+> --- a/include/hw/riscv/sifive_cpu.h
+> +++ b/include/hw/riscv/sifive_cpu.h
+> @@ -1,5 +1,5 @@
+>  /*
+> - * SiFive CPU types
+> + * SiFive CPU types and common utilities
+>   *
+>   * Copyright (c) 2017 SiFive, Inc.
+>   * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
+> @@ -28,4 +28,12 @@
+>  #define SIFIVE_U_CPU TYPE_RISCV_CPU_SIFIVE_U54
+>  #endif
 >
+> +static inline void sifive_mmio_emulate(MemoryRegion *parent, const char *name,
+> +                                       uintptr_t offset, uintptr_t length)
+> +{
+> +    MemoryRegion *mock_mmio = g_new(MemoryRegion, 1);
+> +    memory_region_init_ram(mock_mmio, NULL, name, length, &error_fatal);
+> +    memory_region_add_subregion(parent, offset, mock_mmio);
+> +}
+> +
+>  #endif /* HW_SIFIVE_CPU_H */
 > --
 > 2.7.4
 >
