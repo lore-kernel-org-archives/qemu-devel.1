@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D0C3C433FF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE4FC31E40
 	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 18:57:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F336B2075B
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 18:57:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F336B2075B
+	by mail.kernel.org (Postfix) with ESMTPS id 687612075B
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 18:57:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687612075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv4ec-0005zJ-5c
+	id 1hv4ec-00061e-LO
 	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 14:57:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41040)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41045)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sean.j.christopherson@intel.com>) id 1hv4dw-0004OA-Op
+ (envelope-from <sean.j.christopherson@intel.com>) id 1hv4dw-0004OB-Sn
  for qemu-devel@nongnu.org; Tue, 06 Aug 2019 14:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sean.j.christopherson@intel.com>) id 1hv4dv-00071r-BA
+ (envelope-from <sean.j.christopherson@intel.com>) id 1hv4dv-00072C-Gd
  for qemu-devel@nongnu.org; Tue, 06 Aug 2019 14:57:08 -0400
-Received: from mga11.intel.com ([192.55.52.93]:6393)
+Received: from mga14.intel.com ([192.55.52.115]:31803)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <sean.j.christopherson@intel.com>)
- id 1hv4dv-0006yu-33
+ id 1hv4dv-0006z4-6e
  for qemu-devel@nongnu.org; Tue, 06 Aug 2019 14:57:07 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Aug 2019 11:57:00 -0700
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Aug 2019 11:56:59 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,353,1559545200"; d="scan'208";a="176715087"
+X-IronPort-AV: E=Sophos;i="5.64,353,1559545200"; d="scan'208";a="176715063"
 Received: from sjchrist-coffee.jf.intel.com ([10.54.74.41])
  by orsmga003.jf.intel.com with ESMTP; 06 Aug 2019 11:56:59 -0700
 From: Sean Christopherson <sean.j.christopherson@intel.com>
@@ -51,8 +51,8 @@ To: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
  Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
  Markus Armbruster <armbru@redhat.com>,
  Marcelo Tosatti <mtosatti@redhat.com>
-Date: Tue,  6 Aug 2019 11:56:37 -0700
-Message-Id: <20190806185649.2476-9-sean.j.christopherson@intel.com>
+Date: Tue,  6 Aug 2019 11:56:30 -0700
+Message-Id: <20190806185649.2476-2-sean.j.christopherson@intel.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190806185649.2476-1-sean.j.christopherson@intel.com>
 References: <20190806185649.2476-1-sean.j.christopherson@intel.com>
@@ -60,9 +60,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [RFC PATCH 08/20] i386: Add get/set/migrate support
- for SGX LE public key hash MSRs
+X-Received-From: 192.55.52.115
+Subject: [Qemu-devel] [RFC PATCH 01/20] hostmem: Add hostmem-epc as a
+ backend for SGX EPC
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,117 +79,136 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Save/restore the SGX Launch Enclave Public Key Hash MSRs if SGX Launch
-Control (LC) is exposed to the guest.  KVM advertises SGX LC via CPUID
-if and only if the MSRs are writable.  KVM also resets the MSRs to a
-constant value (Intel's Skylake era key) when SGX LC is fully enabled,
-i.e. the vCPU MSRs won't be set to a random or hardware specific value.
+EPC (Enclave Page Cache) is a specialized type of memory used by Intel
+SGX (Software Guard Extensions).  The SDM desribes EPC as:
 
-Likewise, migrate the MSRs if they are exposed to the guest.
+    The Enclave Page Cache (EPC) is the secure storage used to store
+    enclave pages when they are a part of an executing enclave. For an
+    EPC page, hardware performs additional access control checks to
+    restrict access to the page. After the current page access checks
+    and translations are performed, the hardware checks that the EPC
+    page is accessible to the program currently executing. Generally an
+    EPC page is only accessed by the owner of the executing enclave or
+    an instruction which is setting up an EPC page.
+
+Because of its unique requirements, Linux manages EPC separately from
+normal memory.  Similar to memfd, the device /dev/sgx/virt_epc can be
+opened to obtain a file descriptor which can in turn be used to mmap()
+EPC memory.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 ---
- target/i386/cpu.h     |  1 +
- target/i386/kvm.c     | 21 +++++++++++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 3 files changed, 42 insertions(+)
+ backends/Makefile.objs |  1 +
+ backends/hostmem-epc.c | 91 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 backends/hostmem-epc.c
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 4139c94669..a4161b6d2b 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1247,6 +1247,7 @@ typedef struct CPUX86State {
-     uint64_t mcg_status;
-     uint64_t msr_ia32_misc_enable;
-     uint64_t msr_ia32_feature_control;
-+    uint64_t msr_ia32_sgxlepubkeyhash[4];
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 981e8e122f..6e96549c5e 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -17,3 +17,4 @@ endif
+ common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_VIRTIO)) += vhost-user.o
  
-     uint64_t msr_fixed_ctr_ctrl;
-     uint64_t msr_global_ctrl;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index dbbb13772a..07565820bd 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2643,6 +2643,17 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-             }
-         }
- 
-+        if (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_SGX_LC) {
-+            kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH0,
-+                              env->msr_ia32_sgxlepubkeyhash[0]);
-+            kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH1,
-+                              env->msr_ia32_sgxlepubkeyhash[1]);
-+            kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH2,
-+                              env->msr_ia32_sgxlepubkeyhash[2]);
-+            kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH3,
-+                              env->msr_ia32_sgxlepubkeyhash[3]);
-+        }
+ common-obj-$(CONFIG_LINUX) += hostmem-memfd.o
++common-obj-$(CONFIG_LINUX) += hostmem-epc.o
+diff --git a/backends/hostmem-epc.c b/backends/hostmem-epc.c
+new file mode 100644
+index 0000000000..24a22dede5
+--- /dev/null
++++ b/backends/hostmem-epc.c
+@@ -0,0 +1,91 @@
++/*
++ * QEMU host SGX EPC memory backend
++ *
++ * Copyright (C) 2019 Intel Corporation
++ *
++ * Authors:
++ *   Sean Christopherson <sean.j.christopherson@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include <sys/ioctl.h>
 +
-         /* Note: MSR_IA32_FEATURE_CONTROL is written separately, see
-          *       kvm_put_msr_feature_control. */
-     }
-@@ -2978,6 +2989,13 @@ static int kvm_get_msrs(X86CPU *cpu)
-         }
-     }
- 
-+    if (env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_SGX_LC) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH0, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH1, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH2, 0);
-+        kvm_msr_entry_add(cpu, MSR_IA32_SGXLEPUBKEYHASH3, 0);
-+    }
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qom/object_interfaces.h"
++#include "qapi/error.h"
++#include "sysemu/hostmem.h"
 +
-     ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MSRS, cpu->kvm_msr_buf);
-     if (ret < 0) {
-         return ret;
-@@ -3251,6 +3269,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_RTIT_ADDR0_A ... MSR_IA32_RTIT_ADDR3_B:
-             env->msr_rtit_addrs[index - MSR_IA32_RTIT_ADDR0_A] = msrs[i].data;
-             break;
-+        case MSR_IA32_SGXLEPUBKEYHASH0 ... MSR_IA32_SGXLEPUBKEYHASH3:
-+            env->msr_ia32_sgxlepubkeyhash[index - MSR_IA32_SGXLEPUBKEYHASH0] = msrs[i].data;
-+            break;
-         }
-     }
- 
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index b1146093b5..12e93c5b73 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1257,6 +1257,25 @@ static const VMStateDescription vmstate_efer32 = {
- };
- #endif
- 
-+static bool intel_sgx_msrs_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
++#define TYPE_MEMORY_BACKEND_EPC "memory-backend-epc"
 +
-+    return !!(env->features[FEAT_7_0_ECX] & CPUID_7_0_ECX_SGX_LC);
-+}
++#define MEMORY_BACKEND_EPC(obj)                                        \
++    OBJECT_CHECK(HostMemoryBackendEpc, (obj), TYPE_MEMORY_BACKEND_EPC)
 +
-+static const VMStateDescription vmstate_msr_intel_sgx = {
-+    .name = "cpu/intel_sgx",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = intel_sgx_msrs_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64_ARRAY(env.msr_ia32_sgxlepubkeyhash, X86CPU, 4),
-+        VMSTATE_END_OF_LIST()
-+    }
++typedef struct HostMemoryBackendEpc HostMemoryBackendEpc;
++
++struct HostMemoryBackendEpc {
++    HostMemoryBackend parent_obj;
 +};
 +
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -1389,6 +1408,7 @@ VMStateDescription vmstate_x86_cpu = {
- #ifdef CONFIG_KVM
-         &vmstate_nested_state,
- #endif
-+        &vmstate_msr_intel_sgx,
-         NULL
-     }
- };
++static void
++sgx_epc_backend_memory_alloc(HostMemoryBackend *backend, Error **errp)
++{
++    char *name;
++    int fd;
++
++    if (!backend->size) {
++        error_setg(errp, "can't create backend with size 0");
++        return;
++    }
++    backend->force_prealloc = mem_prealloc;
++
++    fd = open("/dev/sgx/virt_epc", O_RDWR);
++    if (fd < 0) {
++        error_setg_errno(errp, errno,
++                         "failed to open /dev/sgx/virt_epc to alloc SGX EPC");
++        return;
++    }
++
++    name = object_get_canonical_path(OBJECT(backend));
++    memory_region_init_ram_from_fd(&backend->mr, OBJECT(backend),
++                                   name, backend->size,
++                                   backend->share, fd, errp);
++    g_free(name);
++}
++
++static void sgx_epc_backend_instance_init(Object *obj)
++{
++    HostMemoryBackend *m = MEMORY_BACKEND(obj);
++
++    m->share = true;
++    m->merge = false;
++    m->dump = false;
++}
++
++static void sgx_epc_backend_class_init(ObjectClass *oc, void *data)
++{
++    HostMemoryBackendClass *bc = MEMORY_BACKEND_CLASS(oc);
++
++    bc->alloc = sgx_epc_backend_memory_alloc;
++}
++
++static const TypeInfo sgx_epc_backed_info = {
++    .name = TYPE_MEMORY_BACKEND_EPC,
++    .parent = TYPE_MEMORY_BACKEND,
++    .instance_init = sgx_epc_backend_instance_init,
++    .class_init = sgx_epc_backend_class_init,
++    .instance_size = sizeof(HostMemoryBackendEpc),
++};
++
++static void register_types(void)
++{
++    int fd = open("/dev/sgx/virt_epc", O_RDWR);
++    if (fd >= 0) {
++        close(fd);
++
++        type_register_static(&sgx_epc_backed_info);
++    }
++}
++
++type_init(register_types);
 -- 
 2.22.0
 
