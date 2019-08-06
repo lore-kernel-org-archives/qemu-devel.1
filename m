@@ -3,63 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4516C32754
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C39C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:21:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB84120717
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:20:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB84120717
+	by mail.kernel.org (Postfix) with ESMTPS id 5C9D620717
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:21:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9D620717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv1Gh-0007z5-0z
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:20:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51039)
+	id 1hv1Gt-0000Lw-M2
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:21:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51131)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hv1Ar-0004Hz-2A
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1hv1Aw-0004Zg-57
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hv1Ap-0004mL-Hl
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43350)
+ (envelope-from <armbru@redhat.com>) id 1hv1Au-0004pk-Un
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Ap-0004lm-6r
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Au-0004pQ-O3
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6DE8931CD7A;
- Tue,  6 Aug 2019 15:14:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 13945C05FFC9
+ for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-251.ams2.redhat.com
  [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B090E5C559;
- Tue,  6 Aug 2019 15:14:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F213608AB;
+ Tue,  6 Aug 2019 15:14:44 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id AA1791136431; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
+ id 63D4E11384AA; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 17:14:31 +0200
-Message-Id: <20190806151435.10740-26-armbru@redhat.com>
+Date: Tue,  6 Aug 2019 17:14:12 +0200
+Message-Id: <20190806151435.10740-7-armbru@redhat.com>
 In-Reply-To: <20190806151435.10740-1-armbru@redhat.com>
 References: <20190806151435.10740-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 06 Aug 2019 15:14:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 06 Aug 2019 15:14:56 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 25/29] numa: Move remaining NUMA
- declarations from sysemu.h to numa.h
+Subject: [Qemu-devel] [PATCH v2 06/29] trace: Eliminate use of TARGET_FMT_plx
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,148 +71,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit e35704ba9c "numa: Move NUMA declarations from sysemu.h to
-numa.h" left a few NUMA-related macros behind.  Move them now.
+hw/tpm/trace-events uses TARGET_FMT_plx formats with uint64_t
+arguments.  That's wrong, TARGET_FMT_plx takes hwaddr.  Since hwaddr
+happens to be uint64_t, it works anyway.  Messed up in commit
+ec427498da5, v2.12.0.  Clean up by replacing TARGET_FMT_plx with its
+macro expansion.
 
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+scripts/tracetool/format/log_stap.py (commit 62dd1048c0b, v4.0.0) has
+a special case for TARGET_FMT_plx.  Delete it.
+
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- exec.c                   | 2 +-
- hw/core/numa.c           | 1 +
- hw/mem/pc-dimm.c         | 1 +
- hw/pci/pci.c             | 2 +-
- hw/ppc/spapr.c           | 1 +
- include/sysemu/hostmem.h | 2 +-
- include/sysemu/numa.h    | 9 +++++++--
- include/sysemu/sysemu.h  | 7 -------
- 8 files changed, 13 insertions(+), 12 deletions(-)
+ hw/tpm/trace-events                  | 4 ++--
+ scripts/tracetool/format/log_stap.py | 3 ---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index c568bbe581..3e51e208a7 100644
---- a/exec.c
-+++ b/exec.c
-@@ -46,7 +46,7 @@
- #include "exec/memory.h"
- #include "exec/ioport.h"
- #include "sysemu/dma.h"
--#include "sysemu/numa.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/hw_accel.h"
- #include "exec/address-spaces.h"
- #include "sysemu/xen-mapcache.h"
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index d817f06ead..450c522dd8 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -23,6 +23,7 @@
-  */
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index 0b94aa1526..25e47a595a 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -1,8 +1,8 @@
+ # See docs/devel/tracing.txt for syntax documentation.
 =20
- #include "qemu/osdep.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/numa.h"
- #include "exec/cpu-common.h"
- #include "exec/ramlist.h"
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index dea48f9163..7c324a1329 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -28,6 +28,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "qemu/module.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/numa.h"
- #include "trace.h"
+ # tpm_crb.c
+-tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read =
+0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+-tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB writ=
+e 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
++tpm_crb_mmio_read(uint64_t addr, unsigned size, uint32_t val) "CRB read =
+0x016%" PRIx64 " len:%u val: 0x%" PRIx32
++tpm_crb_mmio_write(uint64_t addr, unsigned size, uint32_t val) "CRB writ=
+e 0x%016" PRIx64 " len:%u val: 0x%" PRIx32
 =20
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 9001b81daa..4b6ffab13d 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -34,7 +34,7 @@
- #include "migration/vmstate.h"
- #include "monitor/monitor.h"
- #include "net/net.h"
--#include "sysemu/sysemu.h"
-+#include "sysemu/numa.h"
- #include "hw/loader.h"
- #include "qemu/error-report.h"
- #include "qemu/range.h"
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 06d23a5004..4044e61a0c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -29,6 +29,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "sysemu/sysemu.h"
-+#include "sysemu/hostmem.h"
- #include "sysemu/numa.h"
- #include "sysemu/qtest.h"
- #include "sysemu/reset.h"
-diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
-index afeb5db1b1..4dbdadd39e 100644
---- a/include/sysemu/hostmem.h
-+++ b/include/sysemu/hostmem.h
-@@ -13,7 +13,7 @@
- #ifndef SYSEMU_HOSTMEM_H
- #define SYSEMU_HOSTMEM_H
+ # tpm_passthrough.c
+ tpm_passthrough_handle_request(void *cmd) "processing command %p"
+diff --git a/scripts/tracetool/format/log_stap.py b/scripts/tracetool/for=
+mat/log_stap.py
+index 3ccbc09d61..9ab0cf2cce 100644
+--- a/scripts/tracetool/format/log_stap.py
++++ b/scripts/tracetool/format/log_stap.py
+@@ -30,9 +30,6 @@ def c_macro_to_format(macro):
+     if macro.startswith("PRI"):
+         return macro[3]
 =20
--#include "sysemu/sysemu.h" /* for MAX_NODES */
-+#include "sysemu/numa.h"
- #include "qapi/qapi-types-machine.h"
- #include "qom/object.h"
- #include "exec/memory.h"
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 4c4c1dee9b..7a4ce89765 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -2,13 +2,18 @@
- #define SYSEMU_NUMA_H
-=20
- #include "qemu/bitmap.h"
--#include "sysemu/sysemu.h"
--#include "sysemu/hostmem.h"
- #include "qapi/qapi-types-machine.h"
- #include "exec/cpu-common.h"
-=20
- struct CPUArchId;
-=20
-+#define MAX_NODES 128
-+#define NUMA_NODE_UNASSIGNED MAX_NODES
-+#define NUMA_DISTANCE_MIN         10
-+#define NUMA_DISTANCE_DEFAULT     20
-+#define NUMA_DISTANCE_MAX         254
-+#define NUMA_DISTANCE_UNREACHABLE 255
-+
- extern int nb_numa_nodes;   /* Number of NUMA nodes */
- extern bool have_numa_distance;
-=20
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index ac18a1184a..227202999d 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -117,13 +117,6 @@ extern QEMUClockType rtc_clock;
- extern const char *mem_path;
- extern int mem_prealloc;
-=20
--#define MAX_NODES 128
--#define NUMA_NODE_UNASSIGNED MAX_NODES
--#define NUMA_DISTANCE_MIN         10
--#define NUMA_DISTANCE_DEFAULT     20
--#define NUMA_DISTANCE_MAX         254
--#define NUMA_DISTANCE_UNREACHABLE 255
+-    if macro =3D=3D "TARGET_FMT_plx":
+-        return "%016x"
 -
- #define MAX_OPTION_ROMS 16
- typedef struct QEMUOptionRom {
-     const char *name;
+     raise Exception("Unhandled macro '%s'" % macro)
+=20
+ def c_fmt_to_stap(fmt):
 --=20
 2.21.0
 
