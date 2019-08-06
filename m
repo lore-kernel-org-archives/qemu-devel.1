@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B57C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1DEC31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC65320717
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC65320717
+	by mail.kernel.org (Postfix) with ESMTPS id 31A4B20717
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31A4B20717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv1BV-0005c7-6O
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:15:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50914)
+	id 1hv1Bo-0005wK-DC
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:15:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50965)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hv1Ai-0003qb-9n
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:45 -0400
+ (envelope-from <armbru@redhat.com>) id 1hv1Am-000422-6r
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hv1Ah-0004fS-82
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43802)
+ (envelope-from <armbru@redhat.com>) id 1hv1Al-0004j5-6B
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60016)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Ah-0004f3-2A
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Al-0004ie-06
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:47 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6742B772C8
- for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 59233300BEAC
+ for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-251.ams2.redhat.com
  [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BBF510016E8;
- Tue,  6 Aug 2019 15:14:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 26C2860A35
+ for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6080E11385D5; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
+ id 7457B1136423; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 17:14:11 +0200
-Message-Id: <20190806151435.10740-6-armbru@redhat.com>
+Date: Tue,  6 Aug 2019 17:14:17 +0200
+Message-Id: <20190806151435.10740-12-armbru@redhat.com>
 In-Reply-To: <20190806151435.10740-1-armbru@redhat.com>
 References: <20190806151435.10740-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 06 Aug 2019 15:14:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 06 Aug 2019 15:14:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 05/29] queue: Drop superfluous #include
- qemu/atomic.h
+Subject: [Qemu-devel] [PATCH v2 11/29] typedefs: Separate incomplete types
+ and function types
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,35 +70,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When commit 5f7d05ecfda added QLIST_INSERT_HEAD_RCU() to qemu/queue.h,
-it had to include qemu/atomic.h.  Commit 341774fe6cc removed
-QLIST_INSERT_HEAD_RCU() again, but neglected to remove the #include.
-Do that now.
+While there, drop the obsolete file comment.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- include/qemu/queue.h | 2 --
- 1 file changed, 2 deletions(-)
+ include/qemu/typedefs.h | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 0379bd8fdb..73bf4a984d 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -78,8 +78,6 @@
-  * For details on the use of these macros, see the queue(3) manual page.
-  */
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index fcdaae58c4..29346648d4 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -1,10 +1,10 @@
+ #ifndef QEMU_TYPEDEFS_H
+ #define QEMU_TYPEDEFS_H
 =20
--#include "qemu/atomic.h" /* for smp_wmb() */
+-/* A load of opaque types so that device init declarations don't have to
+-   pull in all the real definitions.  */
 -
- /*
-  * List definitions.
-  */
+-/* Please keep this list in case-insensitive alphabetical order */
++/*
++ * Incomplete struct types
++ * Please keep this list in case-insensitive alphabetical order.
++ */
+ typedef struct AdapterInfo AdapterInfo;
+ typedef struct AddressSpace AddressSpace;
+ typedef struct AioContext AioContext;
+@@ -101,6 +101,10 @@ typedef struct SHPCDevice SHPCDevice;
+ typedef struct SSIBus SSIBus;
+ typedef struct VirtIODevice VirtIODevice;
+ typedef struct Visitor Visitor;
++
++/*
++ * Function types
++ */
+ typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+ typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+=20
 --=20
 2.21.0
 
