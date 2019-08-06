@@ -2,62 +2,144 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69984C31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA5D1C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:09:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E85320C01
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:09:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E85320C01
+	by mail.kernel.org (Postfix) with ESMTPS id 8009220C01
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:09:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8009220C01
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huzDL-0008OU-Ih
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 09:09:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53629)
+	id 1huzDm-0000sa-Rr
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 09:09:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53681)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1huzCu-0007uS-6V
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:08:53 -0400
+ (envelope-from <jsnow@redhat.com>) id 1huzDK-0008W2-Ez
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1huzCs-0005WM-KN
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:08:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56920)
+ (envelope-from <jsnow@redhat.com>) id 1huzDJ-0005dj-BX
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:09:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37860)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1huzCo-0005Ul-Ub; Tue, 06 Aug 2019 09:08:47 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1huzDG-0005cT-Ta; Tue, 06 Aug 2019 09:09:15 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DBC587F770;
- Tue,  6 Aug 2019 13:08:45 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0802A10018F9;
- Tue,  6 Aug 2019 13:08:40 +0000 (UTC)
-Date: Tue, 6 Aug 2019 15:08:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Message-ID: <20190806150839.350a5add@redhat.com>
-In-Reply-To: <20190726104519.23812-7-shameerali.kolothum.thodi@huawei.com>
-References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
- <20190726104519.23812-7-shameerali.kolothum.thodi@huawei.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 340A22CE953;
+ Tue,  6 Aug 2019 13:09:14 +0000 (UTC)
+Received: from [10.10.124.31] (ovpn-124-31.rdu2.redhat.com [10.10.124.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7EC6F5C28C;
+ Tue,  6 Aug 2019 13:09:13 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190801151744.798-1-kwolf@redhat.com>
+ <20190801151744.798-3-kwolf@redhat.com>
+ <976a878d-0344-8cb6-aa4b-d8e540bb1eaf@redhat.com>
+ <20190802140727.GD6379@localhost.localdomain>
+ <730161d3-4ed9-d213-9801-9cf38ce47446@redhat.com>
+ <20190806095106.GA5849@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <2d16845d-0f83-1717-2e49-dcb6ec35591d@redhat.com>
+Date: Tue, 6 Aug 2019 09:09:12 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190806095106.GA5849@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 06 Aug 2019 13:08:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 06 Aug 2019 13:09:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v8 6/9] hw/arm/virt: Enable device
- memory cold/hot plug with ACPI boot
+Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: Enable -d for Python
+ non-unittest tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,268 +151,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
- shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
- linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jul 2019 11:45:16 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
 
-> This initializes the GED device with base memory and irq, configures
-> ged memory hotplug event and builds the corresponding aml code. With
-> this, both hot and cold plug of device memory is enabled now for Guest
-> with ACPI boot.
+
+On 8/6/19 5:51 AM, Kevin Wolf wrote:
+> Am 06.08.2019 um 00:19 hat John Snow geschrieben:
+>>
+>>
+>> On 8/2/19 10:07 AM, Kevin Wolf wrote:
+>>> Am 01.08.2019 um 19:57 hat Max Reitz geschrieben:
+>>>> On 01.08.19 17:17, Kevin Wolf wrote:
+>>>>> The part of iotests.main() that is related to the implementation of the
+>>>>> debug option -d and enables QEMU and QMP logging is not only useful in
+>>>>> tests that use the Python unittest framework, but also in tests that
+>>>>> work by comparing with a reference output.
+>>>>>
+>>>>> Factor these parts out into iotests.init() and call it from the test
+>>>>> cases that currently lack support for debug output.
+>>>>
+>>>> How does this relate to
+>>>> https://lists.nongnu.org/archive/html/qemu-block/2019-07/msg01212.html ?
+>>>
+>>> Hm, no idea? :-)
+>>>
+>>> Looks like John's patch depends on some other patches which would then
+>>> conflict with mine, too, so maybe I'll just drop my patch and wait what
+>>> happens?
+>>>
+>>> John, any opinion?
+>>>
+>>> Kevin
+>>>
+>>
+>> My patches do roughly the same plus a little more. If you don't mind
+>> waiting, I can take care of this for you when the tree reopens?
 > 
-> Memory cold plug support with Guest DT boot is not yet supported.
+> Okay, I'll drop my patch then.
 > 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  -Changed no_acpi_dev to no_ged.
->  -Fixed 'dev' reference leak by object_new().
->  -Updated bios-tables-test-allowed-diff.h to avoid "make check"
->   failure.
+> Kevin
 > 
-> ---
->  hw/arm/Kconfig                        |  2 +
->  hw/arm/virt-acpi-build.c              | 14 +++++++
->  hw/arm/virt.c                         | 54 +++++++++++++++++++++++----
->  include/hw/arm/virt.h                 |  4 ++
->  tests/bios-tables-test-allowed-diff.h |  1 +
->  5 files changed, 68 insertions(+), 7 deletions(-)
-> 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 84961c17ab..ad7f7c089b 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -22,6 +22,8 @@ config ARM_VIRT
->      select ACPI_PCI
->      select MEM_DEVICE
->      select DIMM
-> +    select ACPI_MEMORY_HOTPLUG
-> +    select ACPI_HW_REDUCED
->  
->  config CHEETAH
->      bool
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 0afb372769..018b1e326d 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -40,6 +40,8 @@
->  #include "hw/acpi/aml-build.h"
->  #include "hw/acpi/utils.h"
->  #include "hw/acpi/pci.h"
-> +#include "hw/acpi/memory_hotplug.h"
-> +#include "hw/acpi/generic_event_device.h"
->  #include "hw/pci/pcie_host.h"
->  #include "hw/pci/pci.h"
->  #include "hw/arm/virt.h"
-> @@ -705,6 +707,7 @@ static void
->  build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->  {
->      Aml *scope, *dsdt;
-> +    MachineState *ms = MACHINE(vms);
->      const MemMapEntry *memmap = vms->memmap;
->      const int *irqmap = vms->irqmap;
->  
-> @@ -729,6 +732,17 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->                        vms->highmem, vms->highmem_ecam);
->      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
->                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
-> +    if (vms->acpi_dev) {
-> +        build_ged_aml(scope, "\\_SB."GED_DEVICE,
-> +                      HOTPLUG_HANDLER(vms->acpi_dev),
-> +                      irqmap[VIRT_ACPI_GED] + ARM_SPI_BASE, AML_SYSTEM_MEMORY);
-> +    }
-> +
-> +    if (vms->acpi_dev && ms->ram_slots) {
-> +        build_memory_hotplug_aml(scope, ms->ram_slots, "\\_SB", NULL,
-> +                                 AML_SYSTEM_MEMORY);
-> +    }
-> +
->      acpi_dsdt_add_power_button(scope);
->  
->      aml_append(dsdt, scope);
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index bbe156dc35..41386a6eb7 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -66,6 +66,7 @@
->  #include "target/arm/internals.h"
->  #include "hw/mem/pc-dimm.h"
->  #include "hw/mem/nvdimm.h"
-> +#include "hw/acpi/generic_event_device.h"
->  
->  #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
->      static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-> @@ -136,6 +137,8 @@ static const MemMapEntry base_memmap[] = {
->      [VIRT_GPIO] =               { 0x09030000, 0x00001000 },
->      [VIRT_SECURE_UART] =        { 0x09040000, 0x00001000 },
->      [VIRT_SMMU] =               { 0x09050000, 0x00020000 },
-> +    [VIRT_PCDIMM_ACPI] =        { 0x09070000, MEMORY_HOTPLUG_IO_LEN },
-> +    [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
->      [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
->      /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
->      [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
-> @@ -171,6 +174,7 @@ static const int a15irqmap[] = {
->      [VIRT_PCIE] = 3, /* ... to 6 */
->      [VIRT_GPIO] = 7,
->      [VIRT_SECURE_UART] = 8,
-> +    [VIRT_ACPI_GED] = 9,
->      [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
->      [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
->      [VIRT_SMMU] = 74,    /* ...to 74 + NUM_SMMU_IRQS - 1 */
-> @@ -520,6 +524,27 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
->      }
->  }
->  
-> +static inline DeviceState *create_acpi_ged(VirtMachineState *vms, qemu_irq *pic)
-> +{
-> +    DeviceState *dev;
-> +    int irq = vms->irqmap[VIRT_ACPI_GED];
-> +    uint32_t event = ACPI_GED_MEM_HOTPLUG_EVT;
-> +
-> +    dev = DEVICE(object_new(TYPE_ACPI_GED));
-> +    qdev_prop_set_uint64(dev, "memhp-base",
-> +                         vms->memmap[VIRT_PCDIMM_ACPI].base);
-> +    qdev_prop_set_uint64(dev, "ged-base", vms->memmap[VIRT_ACPI_GED].base);
-> +    qdev_prop_set_uint32(dev, "ged-event", event);
-> +    object_property_add_child(qdev_get_machine(), "acpi-ged",
-> +                              OBJECT(dev), NULL);
-> +    qdev_init_nofail(dev);
-> +    qdev_connect_gpio_out_named(dev, "ged-irq", 0, pic[irq]);
-> +
-> +    object_unref(OBJECT(dev));
-> +
-> +    return dev;
-> +}
 
-this function will need changes to accommodate for sysbus device
-init sequence [3/9].
+Thank you! I will try to fix my bitmaps branch ASAP in light of the
+recent fixes and get this staged in an easy to test way for the 4.2 branch.
 
-> +
->  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
->  {
->      const char *itsclass = its_class_name();
-> @@ -1483,6 +1508,7 @@ static void machvirt_init(MachineState *machine)
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      bool firmware_loaded;
->      bool aarch64 = true;
-> +    bool has_ged = !vmc->no_ged;
->      unsigned int smp_cpus = machine->smp.cpus;
->      unsigned int max_cpus = machine->smp.max_cpus;
->  
-> @@ -1697,6 +1723,10 @@ static void machvirt_init(MachineState *machine)
->  
->      create_gpio(vms, pic);
->  
-> +    if (has_ged && aarch64 && firmware_loaded && acpi_enabled) {
-> +        vms->acpi_dev = create_acpi_ged(vms, pic);
-> +    }
-> +
->      /* Create mmio transports, so the user can create virtio backends
->       * (which will be automatically plugged in to the transports). If
->       * no backend is created the transport will just sit harmlessly idle.
-> @@ -1876,27 +1906,34 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
->  static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->                                   Error **errp)
->  {
-> +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->  
-> -    /*
-> -     * The device memory is not yet exposed to the Guest either through
-> -     * DT or ACPI and hence both cold/hot plug of memory is explicitly
-> -     * disabled for now.
-> -     */
-> -    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> -        error_setg(errp, "memory cold/hot plug is not yet supported");
-> +    if (is_nvdimm) {
-> +        error_setg(errp, "nvdimm is not yet supported");
->          return;
->      }
->  
-> +    if (!vms->acpi_dev) {
-> +        error_setg(errp, "memory hotplug is not enabled: missing acpi device");
-> +        return;
-> +    }
-> +
-> +    hotplug_handler_pre_plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, errp);
-use local_error and check for error condition here. see pc_memory_pre_plug()
-
-> +
->      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
->  }
->  
->  static void virt_memory_plug(HotplugHandler *hotplug_dev,
->                               DeviceState *dev, Error **errp)
->  {
-> +    HotplugHandlerClass *hhc;
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->  
->      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);
-                                                ^^^^
->  
-> +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
-> +    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, NULL);
-                                                      ^^^^
-why errors are ignored here, pls check for errors and propagate
-them to the caller.
-
->  }
->  
->  static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-> @@ -2102,8 +2139,11 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
->  
->  static void virt_machine_4_1_options(MachineClass *mc)
->  {
-> +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> +
->      virt_machine_4_2_options(mc);
->      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_len);
-> +    vmc->no_ged = true;
->  }
->  DEFINE_VIRT_MACHINE(4, 1)
->  
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index a72094204e..577ee49b4b 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -77,6 +77,8 @@ enum {
->      VIRT_GPIO,
->      VIRT_SECURE_UART,
->      VIRT_SECURE_MEM,
-> +    VIRT_PCDIMM_ACPI,
-> +    VIRT_ACPI_GED,
->      VIRT_LOWMEMMAP_LAST,
->  };
->  
-> @@ -106,6 +108,7 @@ typedef struct {
->      bool claim_edge_triggered_timers;
->      bool smbios_old_sys_ver;
->      bool no_highmem_ecam;
-> +    bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device */
->  } VirtMachineClass;
->  
->  typedef struct {
-> @@ -133,6 +136,7 @@ typedef struct {
->      uint32_t iommu_phandle;
->      int psci_conduit;
->      hwaddr highest_gpa;
-> +    DeviceState *acpi_dev;
->  } VirtMachineState;
->  
->  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
-> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
-> index dfb8523c8b..7b4adbc822 100644
-> --- a/tests/bios-tables-test-allowed-diff.h
-> +++ b/tests/bios-tables-test-allowed-diff.h
-> @@ -1 +1,2 @@
->  /* List of comma-separated changed AML files to ignore */
-> +"tests/data/acpi/virt/DSDT",
-
+--js
 
