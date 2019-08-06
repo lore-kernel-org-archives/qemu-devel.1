@@ -2,66 +2,49 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F8A1C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 222AEC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:29:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70DE12070D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:28:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70DE12070D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E8A972070D
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:29:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8A972070D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv1ON-0006PE-Oa
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:28:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52556)
+	id 1hv1OW-0006s6-6x
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:29:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53331)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hv1H9-0001qN-7W
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:21:24 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hv1Lx-0002hl-DO
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:26:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hv1H8-0000Vl-6p
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:21:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51356)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hv1Lw-0002id-9F
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:26:21 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49618)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1hv1H7-0000VH-U9
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:21:22 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A373476A00;
- Tue,  6 Aug 2019 15:21:20 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-113.ams2.redhat.com
- [10.36.117.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 08DCA60C83;
- Tue,  6 Aug 2019 15:21:13 +0000 (UTC)
-Date: Tue, 6 Aug 2019 17:21:12 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <20190806152112.GC5849@localhost.localdomain>
-References: <20190628194512.21311-1-danielhb413@gmail.com>
- <20190628194512.21311-2-danielhb413@gmail.com>
- <20190802160731.GF6379@localhost.localdomain>
- <92e47934-88e0-5734-fa35-56ecd700e1d7@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92e47934-88e0-5734-fa35-56ecd700e1d7@gmail.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 06 Aug 2019 15:21:20 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v4 1/4] block: introducing
- 'bdrv_co_delete_file' interface
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hv1Lr-0002gM-KT; Tue, 06 Aug 2019 11:26:15 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hv1Ln-0006FV-IN; Tue, 06 Aug 2019 18:26:11 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Tue,  6 Aug 2019 18:26:11 +0300
+Message-Id: <20190806152611.280389-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v2] util/hbitmap: strict hbitmap_reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,53 +56,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jsnow@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 06.08.2019 um 15:27 hat Daniel Henrique Barboza geschrieben:
-> > > diff --git a/block.c b/block.c
-> > > index c139540f2b..6e2b0f528d 100644
-> > > --- a/block.c
-> > > +++ b/block.c
-> > > @@ -621,6 +621,17 @@ int get_tmp_filename(char *filename, int size)
-> > >   #endif
-> > >   }
-> > > +/**
-> > > + * Helper that checks if a given string represents a regular
-> > > + * local file.
-> > > + */
-> > > +bool bdrv_path_is_regular_file(const char *path)
-> > > +{
-> > > +    struct stat st;
-> > > +
-> > > +    return (stat(path, &st) == 0) && S_ISREG(st.st_mode);
-> > > +}
-> > > +
-> > >   /*
-> > >    * Detect host devices. By convention, /dev/cdrom[N] is always
-> > >    * recognized as a host CDROM.
-> > This hunk isn't generic, it belong in file-posix.c
-> 
-> Patch 3 uses this function as part of the core logic of this fix (do not
-> delete the file if the file already existed) inside block/cryptoc. This
-> is the reason it is exposed here. I assumed that we do not want a
-> public function inside file-posix.c (since there is none - everything
-> is done using the BD interfaces).
+hbitmap_reset has an unobvious property: it rounds requested region up.
+It may provoke bugs, like in recently fixed write-blocking mode of
+mirror: user calls reset on unaligned region, not keeping in mind that
+there are possible unrelated dirty bytes, covered by rounded-up region
+and information of this unrelated "dirtiness" will be lost.
 
-Hm... This doesn't feel right. crypto can't assume that it's working on
-a local file. It's working on some lower level BlockDriverState,
-whatever that may be. Remember that you could pass all kind of URLs e.g.
-for network protocols like NBD or gluster. You don't want to check
-whether a local filename exists then.
+Make hbitmap_reset strict: assert that arguments are aligned, allowing
+only one exception when @start + @count == hb->orig_size. It's needed
+to comfort users of hbitmap_next_dirty_area, which cares about
+hb->orig_size.
 
-In fact, I'm not sure if having a special case for an already existing
-file is even worth it: By the time we fail, we'll already have truncated
-the file, so the old data is lost anyway. Deleting that empty or
-half-initialised file doesn't seem much worse than leaving a broken file
-behind.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
 
-Kevin
+v2 based on Max's https://github.com/XanClic/qemu.git block
+which will be merged soon to 4.1, and this patch goes to 4.2
+Based-on: https://github.com/XanClic/qemu.git block
+
+v1 was "[PATCH] util/hbitmap: fix unaligned reset", and as I understand
+we all agreed to just assert alignment instead of aligning down
+automatically.
+
+ include/qemu/hbitmap.h | 5 +++++
+ tests/test-hbitmap.c   | 2 +-
+ util/hbitmap.c         | 4 ++++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 4afbe6292e..7865e819ca 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -132,6 +132,11 @@ void hbitmap_set(HBitmap *hb, uint64_t start, uint64_t count);
+  * @count: Number of bits to reset.
+  *
+  * Reset a consecutive range of bits in an HBitmap.
++ * @start and @count must be aligned to bitmap granularity. The only exception
++ * is resetting the tail of the bitmap: @count may be equal to @start +
++ * hb->orig_size, in this case @count may be not aligned. @start + @count
++ * allowed to be greater than hb->orig_size, but only if @start < hb->orig_size
++ * and @start + @count = ALIGN_UP(hb->orig_size, granularity).
+  */
+ void hbitmap_reset(HBitmap *hb, uint64_t start, uint64_t count);
+ 
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index 592d8219db..2be56d1597 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -423,7 +423,7 @@ static void test_hbitmap_granularity(TestHBitmapData *data,
+     hbitmap_test_check(data, 0);
+     hbitmap_test_set(data, 0, 3);
+     g_assert_cmpint(hbitmap_count(data->hb), ==, 4);
+-    hbitmap_test_reset(data, 0, 1);
++    hbitmap_test_reset(data, 0, 2);
+     g_assert_cmpint(hbitmap_count(data->hb), ==, 2);
+ }
+ 
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index bcc0acdc6a..586920cb52 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -476,6 +476,10 @@ void hbitmap_reset(HBitmap *hb, uint64_t start, uint64_t count)
+     /* Compute range in the last layer.  */
+     uint64_t first;
+     uint64_t last = start + count - 1;
++    uint64_t gran = 1ULL << hb->granularity;
++
++    assert(!(start & (gran - 1)));
++    assert(!(count & (gran - 1)) || (start + count == hb->orig_size));
+ 
+     trace_hbitmap_reset(hb, start, count,
+                         start >> hb->granularity, last >> hb->granularity);
+-- 
+2.18.0
+
 
