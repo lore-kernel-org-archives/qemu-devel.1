@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D412EC31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B57C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA17020717
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA17020717
+	by mail.kernel.org (Postfix) with ESMTPS id EC65320717
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:15:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC65320717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv1BR-0005TW-L7
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:15:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50887)
+	id 1hv1BV-0005c7-6O
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:15:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50914)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hv1Ag-0003pD-1c
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:43 -0400
+ (envelope-from <armbru@redhat.com>) id 1hv1Ai-0003qb-9n
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hv1Ae-0004eF-Sx
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37956)
+ (envelope-from <armbru@redhat.com>) id 1hv1Ah-0004fS-82
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43802)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Ae-0004dd-La
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Ah-0004f3-2A
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D18B430A010F
- for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6742B772C8
+ for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:42 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-251.ams2.redhat.com
  [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 00E585C28C;
- Tue,  6 Aug 2019 15:14:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BBF510016E8;
+ Tue,  6 Aug 2019 15:14:41 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5D68D11385D4; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
+ id 6080E11385D5; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 17:14:10 +0200
-Message-Id: <20190806151435.10740-5-armbru@redhat.com>
+Date: Tue,  6 Aug 2019 17:14:11 +0200
+Message-Id: <20190806151435.10740-6-armbru@redhat.com>
 In-Reply-To: <20190806151435.10740-1-armbru@redhat.com>
 References: <20190806151435.10740-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 06 Aug 2019 15:14:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 06 Aug 2019 15:14:42 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 04/29] memory: Fix type of
- IOMMUMemoryRegionClass member @parent_class
+Subject: [Qemu-devel] [PATCH v2 05/29] queue: Drop superfluous #include
+ qemu/atomic.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,114 +70,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TYPE_IOMMU_MEMORY_REGION is a direct subtype of TYPE_MEMORY_REGION.
-Its instance struct is IOMMUMemoryRegion, and its first member is a
-MemoryRegion.  Correct.  Its class struct is IOMMUMemoryRegionClass,
-and its first member is a DeviceClass.  Wrong.  Messed up when commit
-1221a474676 introduced the QOM type.  It even included hw/qdev-core.h
-just for that.
+When commit 5f7d05ecfda added QLIST_INSERT_HEAD_RCU() to qemu/queue.h,
+it had to include qemu/atomic.h.  Commit 341774fe6cc removed
+QLIST_INSERT_HEAD_RCU() again, but neglected to remove the #include.
+Do that now.
 
-TYPE_MEMORY_REGION doesn't bother to define a class struct.  This is
-fine, it simply defaults to its super-type TYPE_OBJECT's class struct
-ObjectClass.  Changing IOMMUMemoryRegionClass's first member's type to
-ObjectClass would be a minimal fix, if a bit brittle: if
-TYPE_MEMORY_REGION ever acquired own class struct, we'd have to update
-IOMMUMemoryRegionClass to use it.
-
-Fix it the clean and robust way instead: give TYPE_MEMORY_REGION its
-own class struct MemoryRegionClass now, and use it for
-IOMMUMemoryRegionClass's first member.
-
-Revert the include of hw/qdev-core.h, and fix the few files that have
-come to rely on it.
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/display/vga-isa-mm.c | 1 +
- hw/net/pcnet.h          | 1 +
- include/exec/memory.h   | 9 +++++++--
- memory.c                | 1 +
- 4 files changed, 10 insertions(+), 2 deletions(-)
+ include/qemu/queue.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-index 215e649719..a790f69b6d 100644
---- a/hw/display/vga-isa-mm.c
-+++ b/hw/display/vga-isa-mm.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
+diff --git a/include/qemu/queue.h b/include/qemu/queue.h
+index 0379bd8fdb..73bf4a984d 100644
+--- a/include/qemu/queue.h
++++ b/include/qemu/queue.h
+@@ -78,8 +78,6 @@
+  * For details on the use of these macros, see the queue(3) manual page.
   */
- #include "qemu/osdep.h"
-+#include "qemu/bitops.h"
- #include "qemu/units.h"
- #include "hw/hw.h"
- #include "hw/display/vga.h"
-diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
-index 40831a7845..28d19a5c6f 100644
---- a/hw/net/pcnet.h
-+++ b/hw/net/pcnet.h
-@@ -8,6 +8,7 @@
- #define PCNET_LOOPTEST_NOCRC	2
 =20
- #include "exec/memory.h"
-+#include "hw/irq.h"
-=20
- /* BUS CONFIGURATION REGISTERS */
- #define BCR_MSRDA    0
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index bb0961ddb9..238370a2ff 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -25,7 +25,6 @@
- #include "qemu/notify.h"
- #include "qom/object.h"
- #include "qemu/rcu.h"
--#include "hw/qdev-core.h"
-=20
- #define RAM_ADDR_INVALID (~(ram_addr_t)0)
-=20
-@@ -205,6 +204,12 @@ struct MemoryRegionOps {
-     } impl;
- };
-=20
-+typedef struct MemoryRegionClass {
-+    /* private */
-+    ObjectClass parent_class;
-+} MemoryRegionClass;
-+
-+
- enum IOMMUMemoryRegionAttr {
-     IOMMU_ATTR_SPAPR_TCE_FD
- };
-@@ -237,7 +242,7 @@ enum IOMMUMemoryRegionAttr {
+-#include "qemu/atomic.h" /* for smp_wmb() */
+-
+ /*
+  * List definitions.
   */
- typedef struct IOMMUMemoryRegionClass {
-     /* private */
--    struct DeviceClass parent_class;
-+    MemoryRegionClass parent_class;
-=20
-     /*
-      * Return a TLB entry that contains a given address.
-diff --git a/memory.c b/memory.c
-index 5d8c9a9234..09d9b254fd 100644
---- a/memory.c
-+++ b/memory.c
-@@ -3245,6 +3245,7 @@ void memory_region_init_rom_device(MemoryRegion *mr=
-,
- static const TypeInfo memory_region_info =3D {
-     .parent             =3D TYPE_OBJECT,
-     .name               =3D TYPE_MEMORY_REGION,
-+    .class_size         =3D sizeof(MemoryRegionClass),
-     .instance_size      =3D sizeof(MemoryRegion),
-     .instance_init      =3D memory_region_initfn,
-     .instance_finalize  =3D memory_region_finalize,
 --=20
 2.21.0
 
