@@ -2,82 +2,64 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98F32C31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90D7DC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:59:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 642C020651
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:55:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TGS0x2on"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 642C020651
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 669C120651
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:59:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 669C120651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huwC7-0008AW-OU
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 05:55:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37869)
+	id 1huwFy-0000mN-MQ
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 05:59:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38479)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1huwBf-0007eR-RT
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:55:24 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1huwFZ-0000MK-Ch
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1huwBe-0005QU-PB
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:55:23 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39601)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1huwBe-0005Nr-GZ
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:55:22 -0400
-Received: by mail-ot1-x344.google.com with SMTP id r21so84986650otq.6
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 02:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bPXYZJMTNoLajk96h5a6B0Oeqlu3okr2ghnhZP4/sgo=;
- b=TGS0x2onOOLm9F82P2Dy2vI58pxs0x0+O1VabogPfM3WLV3QtGYMZSaNtRVs7+8zs2
- WueVyR7iwRGEKq83GKXgKxNtAenE7SlTtER8GLlNtY3vGFP5tuplGEZKrDMYC5HduK9l
- xiLrkl4+sBJHhtVExPe18N86K0PFgBWx7HKw4BJTxCGwrfg7psngllQUNiPr5ps67jWb
- di6aV7XoY62EqfnnMf12rU4LrmiYYnWRkNVD2wRVtgAN44X5dCRkfTdsFJr3OAfa1+wr
- TGAz1DCVd1i7UGF0ilt531RbMyWsFDpxAc8DqEpXcC1ZEQsIWQfvv6jgK7ywfvTXTzDZ
- +ZvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=bPXYZJMTNoLajk96h5a6B0Oeqlu3okr2ghnhZP4/sgo=;
- b=cvna7Apf+EswbTWCIBCE09mU++RkILZ6xG8aSwPfWXkdM6/xWruCVpTxGX5lfIaSwd
- YxOM0V93P2aXPm6itiFPhpfuIPR76ZP5eLQ7M1ZupO9XSaIel9bIOJetygz9aYYPDvVr
- 9Z7vfQB6wTfQJgIZK0rEI0lkrPJxJunXqJ0XAieJHO+xlE+n3Kh6oO375RK2KGEzPXUn
- jdRRLogVNcMDBGOFB6+INbhSTWhLmYsstRCX8XTGwXtLpYuVbYd9mmfROkEToA9CVkY5
- z6JMYQSKHv1EvIghzRDTCA/ebz/xxboGmI3QLAR3kzj2fYFGBqIEjSASVQNdxRU6T2V4
- K4dg==
-X-Gm-Message-State: APjAAAU2ia5NhyuxHVEb1RP0XeBb6NxVV42KUL0dHD1yado/PSi4Y/Vm
- +5m2zhQz3kptbkenYJP+pzdZc4FnGdjIldhh/zy2QQ==
-X-Google-Smtp-Source: APXvYqzWZa1qsZqm+JYfZ5jXQWKLp/g48frTeyVJ7+fafdVZM3hKs+Bvm2JND1PMykpXrX19zEJrGGHWnP441N5X6Yc=
-X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr2477235oti.91.1565085321445; 
- Tue, 06 Aug 2019 02:55:21 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1huwFY-0007XT-2J
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:59:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55290)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1huwFX-0007Wk-GJ
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:59:24 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4B82B30FB8E9;
+ Tue,  6 Aug 2019 09:59:21 +0000 (UTC)
+Received: from work-vm (ovpn-117-206.ams2.redhat.com [10.36.117.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D77810018F9;
+ Tue,  6 Aug 2019 09:59:18 +0000 (UTC)
+Date: Tue, 6 Aug 2019 10:59:15 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?utf-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?= <dirty.ice.hu@gmail.com>
+Message-ID: <20190806095915.GD3066@work-vm>
+References: <cover.1564925486.git.DirtY.iCE.hu@gmail.com>
+ <ff28a2d4a61be1e7150556342a5fb83aa818c439.1564925486.git.DirtY.iCE.hu@gmail.com>
 MIME-Version: 1.0
-References: <20190726175032.6769-1-richard.henderson@linaro.org>
- <20190726175032.6769-5-richard.henderson@linaro.org>
- <CAFEAcA-W7idBRdD-DHxrVqfnBsKmAOPZoQAJkaUVOcjnLnGugw@mail.gmail.com>
- <c7a3ef78-d541-aa0a-21a5-8b4f48db1fd7@linaro.org>
-In-Reply-To: <c7a3ef78-d541-aa0a-21a5-8b4f48db1fd7@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 6 Aug 2019 10:55:10 +0100
-Message-ID: <CAFEAcA-QzmZ8aaKU_qYbTtphgQNmNNTPH_C7YMF0-yJ0ZxeUiA@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH 04/67] target/arm: Remove offset argument
- to gen_exception_internal_insn
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ff28a2d4a61be1e7150556342a5fb83aa818c439.1564925486.git.DirtY.iCE.hu@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Tue, 06 Aug 2019 09:59:21 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 03/14] audio: add audiodev property to
+ vnc and wav_capture
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,60 +71,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 30 Jul 2019 at 03:11, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 7/29/19 6:52 AM, Peter Maydell wrote:
-> > I'm not so convinced about this one -- gen_exception_insn()
-> > and gen_exception_internal_insn() shouldn't have the
-> > same pattern of function prototype but different semantics
-> > like this, it's confusing. It happens that both the cases
-> > of wanting to generate an "internal" exception happen to want
-> > it to be taken with the PC being for the following insn,
-> > not the current one, but that seems more coincidence to
-> > me than anything else.
->
-> I don't like "offsets", because they don't work as expected between different
-> modes.  Would you prefer the pc in full be passed in?  Would you prefer that
-> the previous patches also pass in a pc, instead of implicitly using
-> base.pc_next (you had rationale vs patch 2 for why it was ok as-is).
->
-> Shall we shuffle these patches later, after the Great Renaming of Things Named
-> PC, as discussed wrt patch 6 (pc_read and friends), so that the "offset"
-> parameter immediately becomes the Right Sort of PC, rather than some
-> intermediary confusion?
+* K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n (dirty.ice.hu@gmail.com) wrote:
+> Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.c=
+om>
+> ---
+>=20
+> Notes:
+>     Changes from v2:
+>    =20
+>     * audiodev parameter for wavcapture is now mandatory.
+>     * removed some unnecessary qdict_haskey calls from hmp_wavcapture
+>=20
+>  ui/vnc.h        |  2 ++
+>  monitor/misc.c  | 22 +++++++++++-----------
+>  ui/vnc.c        | 15 ++++++++++++++-
+>  hmp-commands.hx | 11 ++++++-----
+>  qemu-options.hx |  6 ++++++
+>  5 files changed, 39 insertions(+), 17 deletions(-)
 
-I think what we're really trying to distinguish here is two
-orthogonal sets of possibilities:
- * take an exception, with the PC pointing to the following insn
- * take an exception, with the PC pointing to the current insn
-and also
- * take an "internal" exception
- * take a guest-visible exception
+For HMP this looks reasonable
 
-(of which we happen to only want 2 of the 4 possible flavours at
-the moment). I don't particularly mind what API we use as long
-as the naming/parameter setup cleanly separates out the two
-orthogonal concerns such that you could have all four without
-having to rename anything. Possibilities:
- * have gen_exception{_internal,}_insn and
-   gen_exception{_internal,}_next_insn
- * have the functions take a bool for "exception on this insn
-   or on next insn?" (not ideal because 'bool' parameters are
-   a bit opaque in meaning at the callsites)
- * pass in the specific PC to use
 
-PS: the "_insn" part of the function name isn't sacrosanct:
-it sort of makes sense I think but if better names occur that
-don't include it that's fine.
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-thanks
--- PMM
+> diff --git a/ui/vnc.h b/ui/vnc.h
+> index 2f84db3142..6f54653455 100644
+> --- a/ui/vnc.h
+> +++ b/ui/vnc.h
+> @@ -183,6 +183,8 @@ struct VncDisplay
+>  #ifdef CONFIG_VNC_SASL
+>      VncDisplaySASL sasl;
+>  #endif
+> +
+> +    AudioState *audio_state;
+>  };
+> =20
+>  typedef struct VncTight {
+> diff --git a/monitor/misc.c b/monitor/misc.c
+> index e393333a0e..bdf857555f 100644
+> --- a/monitor/misc.c
+> +++ b/monitor/misc.c
+> @@ -1142,21 +1142,21 @@ static void hmp_stopcapture(Monitor *mon, const=
+ QDict *qdict)
+>  static void hmp_wavcapture(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *path =3D qdict_get_str(qdict, "path");
+> -    int has_freq =3D qdict_haskey(qdict, "freq");
+> -    int freq =3D qdict_get_try_int(qdict, "freq", -1);
+> -    int has_bits =3D qdict_haskey(qdict, "bits");
+> -    int bits =3D qdict_get_try_int(qdict, "bits", -1);
+> -    int has_channels =3D qdict_haskey(qdict, "nchannels");
+> -    int nchannels =3D qdict_get_try_int(qdict, "nchannels", -1);
+> +    int freq =3D qdict_get_try_int(qdict, "freq", 44100);
+> +    int bits =3D qdict_get_try_int(qdict, "bits", 16);
+> +    int nchannels =3D qdict_get_try_int(qdict, "nchannels", 2);
+> +    const char *audiodev =3D qdict_get_str(qdict, "audiodev");
+>      CaptureState *s;
+> +    AudioState *as =3D audio_state_by_name(audiodev);
+> +
+> +    if (!as) {
+> +        monitor_printf(mon, "Audiodev '%s' not found\n", audiodev);
+> +        return;
+> +    }
+> =20
+>      s =3D g_malloc0 (sizeof (*s));
+> =20
+> -    freq =3D has_freq ? freq : 44100;
+> -    bits =3D has_bits ? bits : 16;
+> -    nchannels =3D has_channels ? nchannels : 2;
+> -
+> -    if (wav_start_capture(NULL, s, path, freq, bits, nchannels)) {
+> +    if (wav_start_capture(as, s, path, freq, bits, nchannels)) {
+>          monitor_printf(mon, "Failed to add wave capture\n");
+>          g_free (s);
+>          return;
+> diff --git a/ui/vnc.c b/ui/vnc.c
+> index 140f364dda..24f9be5b5d 100644
+> --- a/ui/vnc.c
+> +++ b/ui/vnc.c
+> @@ -1222,7 +1222,7 @@ static void audio_add(VncState *vs)
+>      ops.destroy =3D audio_capture_destroy;
+>      ops.capture =3D audio_capture;
+> =20
+> -    vs->audio_cap =3D AUD_add_capture(NULL, &vs->as, &ops, vs);
+> +    vs->audio_cap =3D AUD_add_capture(vs->vd->audio_state, &vs->as, &o=
+ps, vs);
+>      if (!vs->audio_cap) {
+>          error_report("Failed to add audio capture");
+>      }
+> @@ -3369,6 +3369,9 @@ static QemuOptsList qemu_vnc_opts =3D {
+>          },{
+>              .name =3D "non-adaptive",
+>              .type =3D QEMU_OPT_BOOL,
+> +        },{
+> +            .name =3D "audiodev",
+> +            .type =3D QEMU_OPT_STRING,
+>          },
+>          { /* end of list */ }
+>      },
+> @@ -3806,6 +3809,7 @@ void vnc_display_open(const char *id, Error **err=
+p)
+>      const char *saslauthz;
+>      int lock_key_sync =3D 1;
+>      int key_delay_ms;
+> +    const char *audiodev;
+> =20
+>      if (!vd) {
+>          error_setg(errp, "VNC display not active");
+> @@ -3991,6 +3995,15 @@ void vnc_display_open(const char *id, Error **er=
+rp)
+>      }
+>      vd->ledstate =3D 0;
+> =20
+> +    audiodev =3D qemu_opt_get(opts, "audiodev");
+> +    if (audiodev) {
+> +        vd->audio_state =3D audio_state_by_name(audiodev);
+> +        if (!vd->audio_state) {
+> +            error_setg(errp, "Audiodev '%s' not found", audiodev);
+> +            goto fail;
+> +        }
+> +    }
+> +
+>      device_id =3D qemu_opt_get(opts, "display");
+>      if (device_id) {
+>          int head =3D qemu_opt_get_number(opts, "head", 0);
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index bfa5681dd2..cfcc044ce4 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -819,16 +819,17 @@ ETEXI
+> =20
+>      {
+>          .name       =3D "wavcapture",
+> -        .args_type  =3D "path:F,freq:i?,bits:i?,nchannels:i?",
+> -        .params     =3D "path [frequency [bits [channels]]]",
+> +        .args_type  =3D "path:F,audiodev:s,freq:i?,bits:i?,nchannels:i=
+?",
+> +        .params     =3D "path audiodev [frequency [bits [channels]]]",
+>          .help       =3D "capture audio to a wave file (default frequen=
+cy=3D44100 bits=3D16 channels=3D2)",
+>          .cmd        =3D hmp_wavcapture,
+>      },
+>  STEXI
+> -@item wavcapture @var{filename} [@var{frequency} [@var{bits} [@var{cha=
+nnels}]]]
+> +@item wavcapture @var{filename} @var{audiodev} [@var{frequency} [@var{=
+bits} [@var{channels}]]]
+>  @findex wavcapture
+> -Capture audio into @var{filename}. Using sample rate @var{frequency}
+> -bits per sample @var{bits} and number of channels @var{channels}.
+> +Capture audio into @var{filename} from @var{audiodev}, using sample ra=
+te
+> +@var{frequency} bits per sample @var{bits} and number of channels
+> +@var{channels}.
+> =20
+>  Defaults:
+>  @itemize @minus
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9621e934c0..a308e5f5aa 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1978,6 +1978,12 @@ can help the device and guest to keep up and not=
+ lose events in case
+>  events are arriving in bulk.  Possible causes for the latter are flaky
+>  network connections, or scripts for automated testing.
+> =20
+> +@item audiodev=3D@var{audiodev}
+> +
+> +Use the specified @var{audiodev} when the VNC client requests audio
+> +transmission. When not using an -audiodev argument, this option must
+> +be omitted, otherwise is must be present and specify a valid audiodev.
+> +
+>  @end table
+>  ETEXI
+> =20
+> --=20
+> 2.22.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
