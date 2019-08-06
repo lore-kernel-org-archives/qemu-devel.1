@@ -2,72 +2,89 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3800FC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 10:31:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05C5C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 10:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D37020B1F
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 10:31:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D37020B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B07AF20818
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 10:44:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKIkuFWc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B07AF20818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huwkW-0003LY-7G
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 06:31:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43419)
+	id 1huwwq-0005TE-Gk
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 06:44:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45179)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1huwk2-0002ws-7J
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 06:30:55 -0400
+ (envelope-from <nirsof@gmail.com>) id 1huwwD-0004y6-6d
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 06:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1huwk0-0003G9-5U
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 06:30:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56256)
+ (envelope-from <nirsof@gmail.com>) id 1huwwC-00005W-5F
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 06:43:29 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:34620)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1huwjy-0003EG-55
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 06:30:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1huwjv-0007Bf-7Q
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 10:30:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3614C2E804E
- for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 10:30:47 +0000 (UTC)
+ (Exim 4.71) (envelope-from <nirsof@gmail.com>)
+ id 1huww9-0008Ts-O8; Tue, 06 Aug 2019 06:43:25 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id w9so8643681wmd.1;
+ Tue, 06 Aug 2019 03:43:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=feX+OjGAd/Uoc4o5Rx9iSVvWGO9R185/t3wqxZsB3zM=;
+ b=XKIkuFWcvyNAsbq3C6Hk8HiUJPE8KorMtsj05DXDAL2fykC6m0RC4/FRuVSgF7j7jJ
+ pI6ZPAk9LHeiZ1KPmB/jVtzv/o41ItaWxAqvwX/QvEuKognitHRm/+fZbfgBvW7SrkUL
+ MsARz0RfM+8mpn1nLJvg4zG2z7+JG/aikcChvX8+4/0hoyjw1Zshnt7iELpogI+7xZl3
+ MH3ynU/q6vUydnugkiD1Do6P+TeVY/kok8KQyGVgnVGxI6sgYHDpDstZvm5lcM/62e30
+ Y4RBjNmLhDUn/dIDP10CWhal226IYsjbEeMMnUDtqEn6HC2yAsY5n49m9CJrj2vPkLr9
+ LehA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=feX+OjGAd/Uoc4o5Rx9iSVvWGO9R185/t3wqxZsB3zM=;
+ b=OMbWOKeC3PEz646s36EBNdI1Ekig4f26GAogrTa6DhTdPE7R8gty7bNn4Ah1b1RIWm
+ 8KJBdH/uj+B4zeVeBnWq/+4ojqyx0GWDKlBEtOsfZ42QTbZnY/JSQakZBv8LfMa1M8yL
+ rfWe86rxK5e5/ArquRegQd1dXWk+q8tsZsLtVJaiWxZFtejfL9oSKoE8sqSp/Bn491Ic
+ NsQNZou/lb6y7jL4YyA2qh5VTiEgT46WBhQD3lug5HwYJrDhGV04nMsMrAPNdZ4getkf
+ azHZd9z7HurnYS43R1X6Am7gfUaEdjMYUYIYYTrZz1Gc5qR7zBUsTkDp8EbDA7y0dClZ
+ z57g==
+X-Gm-Message-State: APjAAAVSQRVrOMIubp4eZ4pXmntP3a7NnwD94f1m2CgGPEH1i+JDAOE1
+ FIvqj7YdfnRTl0VtnmiZKSJRAxeLZ30=
+X-Google-Smtp-Source: APXvYqzZGJRqljYj2NqfMMSfGrRsusRKgtDJpUh2xwzja0g4x0CZJUJKIDhUioPyd6W/G3j9fOs3ng==
+X-Received: by 2002:a1c:f115:: with SMTP id p21mr3813277wmh.134.1565088203049; 
+ Tue, 06 Aug 2019 03:43:23 -0700 (PDT)
+Received: from localhost.localdomain (109-186-222-214.bb.netvision.net.il.
+ [109.186.222.214])
+ by smtp.gmail.com with ESMTPSA id c78sm122121781wmd.16.2019.08.06.03.43.21
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 06 Aug 2019 03:43:22 -0700 (PDT)
+From: Nir Soffer <nirsof@gmail.com>
+X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue,  6 Aug 2019 13:43:16 +0300
+Message-Id: <20190806104316.29328-1-nsoffer@redhat.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Aug 2019 10:21:51 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: manuelbaesler pmaydell
-X-Launchpad-Bug-Reporter: manuel baesler (manuelbaesler)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156021221413.18114.3680605096232908394.malonedeb@wampee.canonical.com>
-Message-Id: <156508691164.840.10951444317966549522.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19014";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b6fdb0308447723aa31b6bd2bd90bf1c3d5670db
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832281] Re: tcg bug master / 4.0.0 v8 operation
- >>> and |=
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32a
+Subject: [Qemu-devel] [PATCH] block: file-posix: Fix alignment probing on
+ glsuter
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,80 +93,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832281 <1832281@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-https://patchew.org/QEMU/20190805180332.10185-1-peter.maydell@linaro.org/
-is a patch which I think probably fixes this bug -- could you test it?
-(I don't have an x86 vm with node.js in it to test with.)
+On Gluster storage with sector size of 4096 bytes, buf_align may be
+wrong; reading 4096 bytes into unaligned buffer succeeds. This probably
+happens because the actual read happens on the Gluster node with aligned
+buffer, and Gluster client does not enforce any alignment on the host.
 
--- =
+However request_alignment is always right, since the same size is use on
+the Gluster node to perform the actual I/O. Use the maximum value for
+setting min_mem_alignment.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832281
+With this change we can provision a virtual machine with Gluster storage
+using VDO device and fuse mount.
 
-Title:
-  tcg bug master / 4.0.0 v8 operation >>> and |=3D
+This is a partial fix for https://bugzilla.redhat.com/1737256. To make
+this work, the management system must ensure that the first block of the
+image is allocated, for example:
 
-Status in QEMU:
-  New
+    qemu-img create -f raw test.img 1g
+    dd if=/dev/zero bs=4096 count=1 of=test.img conv=nortunc
 
-Bug description:
-  vm guest is linux, executed with tcg
-  running this Node.js snippet leads to
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+---
+ block/file-posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  $ node
-  > a =3D undefined
-  undefined
-  > a >>> 0
-  4294967295
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 4479cc7ab4..d29b9e5229 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1122,7 +1122,7 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+     }
+ 
+     raw_probe_alignment(bs, s->fd, errp);
+-    bs->bl.min_mem_alignment = s->buf_align;
++    bs->bl.min_mem_alignment = MAX(s->buf_align, bs->bl.request_alignment);
+     bs->bl.opt_mem_alignment = MAX(s->buf_align, getpagesize());
+ }
+ 
+-- 
+2.20.1
 
-  host node
-  $ node
-  > a =3D undefined
-  undefined
-  > a >>> 0
-  0
-
-  same with |=3D
-
-  node
-  Welcome to Node.js v12.4.0.
-  Type ".help" for more information.
-  > let buffer
-  undefined
-  > buffer |=3D 0
-  0
-
-  vm with tcg:
-
-  $ ./out/Release/node --version
-  v12.4.0
-  ./out/Release/node -e "let buffer; buffer |=3D 0; console.log(buffer);"
-  -1
-
-  vm guest is debian x86_64 latest release
-  vm guest is started with ./x86_64-softmmu/qemu-system-x86_64 -vnc :0 -cdr=
-om debian-9.9.0-amd64-netinst.iso -m 4G -smp cores=3D6,threads=3D1,sockets=
-=3D1 -nic user,hostfwd=3Dtcp:ipv4addr:2233-:22 -cpu qemu64 debian.img
-
-  git tag v4.0.0 and master, commit
-  a578cdfbdd8f9beff5ced52b7826ddb1669abbbf, for building qemu-system-
-  x86_64 was used.
-
-  Node.js is compiled on the vm guest (v12.4.0 / master)
-
-  see also
-  https://github.com/nodejs/node/issues/19348#issuecomment-500465502
-
-  I need further assistance to track down the cause of the bug.
-
-  Kind regards
-  Manuel
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832281/+subscriptions
 
