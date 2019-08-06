@@ -1,80 +1,87 @@
-Return-Path: <SRS0=vzij=WB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 073CDC0650F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 23:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7905C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:05:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C76F22054F
-	for <qemu-devel@archiver.kernel.org>; Mon,  5 Aug 2019 23:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C76F22054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 82EDC2147A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:05:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TC0/4oct"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82EDC2147A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1humRz-0008Kp-Sm
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 19:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58004)
+	id 1humzF-0005eN-O1
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:05:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33608)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1humRd-0007sc-AB
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 19:31:14 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1humyW-0003vO-Vr
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:05:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1humRc-0004BD-Eu
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 19:31:13 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37078)
+ (envelope-from <richard.henderson@linaro.org>) id 1humyV-0008De-Q0
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:05:12 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:37060)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1humRc-0004B3-9D
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 19:31:12 -0400
-Received: by mail-wm1-f67.google.com with SMTP id f17so74543959wme.2
- for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 16:31:12 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1humyV-0008Cj-Ic
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:05:11 -0400
+Received: by mail-pg1-x542.google.com with SMTP id d1so7730305pgp.4
+ for <qemu-devel@nongnu.org>; Mon, 05 Aug 2019 17:05:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=R+6Mvp82E0p6yB/libxbibUQjbVuKcqpL4edZewcAUM=;
+ b=TC0/4octsAFEwyWOWZmMJbyVxDCiiIZz70lFfhc1WCV07Ovs0pP11cEe3JrS1zXb6j
+ vPIcOREW7ql4OIafmbgxzRU0q2BdMkBlRTbSAXUY19yIwDVpD8RpJet4hg+ZQWeRxN51
+ ZQ6fKszWHIlzqE20SZknMNC5EMJoAtSIszRvJ+j17VxPhAYsP6iR3fI7r4dht+xNt8fi
+ Ibsbk4APXOPfYMHY9QEN6HeNzK29a88S3HQ5aAptO918BiG+d8F/go1z5UgkSe7x+UgL
+ JbkdmofWVQRG7SDrFsRsapeSaZ0tWnzaYmX00IU0N7XgMrCGsWrHvdOirUiEhQYmJKNP
+ Iqyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=vMyTapgrO8uSvzVs7nPxfGqfQqU7M06WAKfhHrA9mgg=;
- b=SKKntKqN6oJkZhPpuY1sZ+XADL3uaawp/433vBFjZtKiEQiqAIT3UAJudQzxzq6PZS
- 9bOfbpxbnwAavr3CAgXs61WErl5Ap3DROShGPmay6fUKk0E+AvvFN0cOE8W90MzWVckz
- 1UKewTchtXIP+3M2/He0faSddurIsij+L8kHmcY64nTJLMiNOG6cE+GamE4fRRtiO1rY
- htoIlr+dMmUam6pGAv4qMtmK8PnQwgTsdgvc5XKaEJfBGjKfzfQzoC7K/Cwa14HiR0qk
- UVYEr2uXyJj4xUrsqmkRYKMzGp8imgTxaSU48Ek/s4faZCAekG2+5jNoO46MYFAqcBKG
- QEcA==
-X-Gm-Message-State: APjAAAW9xaDWGRGVm6hOubKBW+25keZz9z5vQZgGAUo4iO3nuVbqDhZn
- 3EomZM5lhlrLLWYrdNvbE+AU6Q==
-X-Google-Smtp-Source: APXvYqzQNNcNvP8x+01jXf8uj/V32Wjxmm2HFQLkFl/HYkNiR75wfMBWmP2vTaDmrroXgPCZHt1T6w==
-X-Received: by 2002:a1c:c742:: with SMTP id x63mr556813wmf.0.1565047871224;
- Mon, 05 Aug 2019 16:31:11 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
- ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
- by smtp.gmail.com with ESMTPSA id v15sm78184557wrt.25.2019.08.05.16.31.09
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Mon, 05 Aug 2019 16:31:10 -0700 (PDT)
-To: Max Reitz <mreitz@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190802185830.74648-1-vsementsov@virtuozzo.com>
- <815da22c-e88e-e813-d342-9ad14191d052@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c262bc6f-1c8b-1c1c-6dec-13572b7ac69b@redhat.com>
-Date: Tue, 6 Aug 2019 01:31:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ bh=R+6Mvp82E0p6yB/libxbibUQjbVuKcqpL4edZewcAUM=;
+ b=HYtsYZYe8x/QicHkQXwYEOkzls2u2TQB38QjVzNWy8kznhkVDflBspjsAY9cBc6J6z
+ X2eRniHw0pa+yHA4h4VycM24SuoWAEFDNz/ojgN9IYY91ctKuA9MVSVOGWtpJIpZQLOZ
+ ylC22gY1v7rGRBLhEZAtk/zHre/90/nr7JVccUFrBqcCc3i+IvEq6QIQizk2DI/OlAdn
+ fygJuBZgkSnoAKJrH84YlukUct95xjvms4oTxZhNBo7Mxqpejsqhu6C42mXiedED4kbV
+ gBLRmLr7LJ/y0vtTX5JvSiaCLAWqHa8bGAC8AmJp2XjFbxSjQUKS8SMRnS+iqDwWMBWs
+ RVeQ==
+X-Gm-Message-State: APjAAAUTO8gzCu/gk+MroyeCU4BFZPLRqhgIPZES1ieBtkH/CbvvWAol
+ AVr+7wUyp/VJOTHiktWr5rTYq0ZphIs=
+X-Google-Smtp-Source: APXvYqxYpCnPp1BkbyIS4W04ASGt8dvWZB61o0QJserZ5yJSRonkVwEq7JXkFRX8k3G5uXKiqVa1yQ==
+X-Received: by 2002:a17:90a:fa07:: with SMTP id
+ cm7mr289075pjb.138.1565049909624; 
+ Mon, 05 Aug 2019 17:05:09 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id i3sm92149782pfo.138.2019.08.05.17.05.07
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 05 Aug 2019 17:05:08 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Mon,  5 Aug 2019 17:05:03 -0700
+Message-Id: <20190806000506.10833-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <815da22c-e88e-e813-d342-9ad14191d052@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH] util/hbitmap: fix unaligned reset
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: [Qemu-devel] [PATCH v4 0/3] target/arm: Reduce overhead of
+ cpu_get_tb_cpu_state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,22 +93,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
- den@openvz.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/08/19 23:19, Max Reitz wrote:
-> 
-> But I don’t know whether this patch is the best way forward still.  I
-> think call hbitmap_reset() with unaligned boundaries generally calls for
-> trouble, as John has laid out.  If mirror’s do_sync_target_write() is
-> the only offender right now, I’d prefer for hbitmap_reset() to assert
-> that the boundaries are aligned
+Version 3 was back in February:
+https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg06002.html
 
-I agree (it's not a bug, it's a feature though a nasty one).
+Changes since v3:
+  * Rebase.
+  * Do not cache XSCALE_CPAR now that it overlaps VECSTRIDE.
+  * Leave the new v7m bits as uncached.  I haven't figured
+    out all of the ways fpccr is modified.
 
-Paolo
+Changes since v2:
+  * Do not cache VECLEN, VECSTRIDE, VFPEN.
+    These variables come from VFP_FPSCR and VFP_FPEXC, not from
+    system control registers.
+  * Move HANDLER and STACKCHECK to rebuild_hflags_a32,
+    instead of building them in rebuild_hflags_common.
+
+Changes since v1:
+  * Apparently I had started a last-minute API change, and failed to
+    covert all of the users, and also failed to re-test afterward.
+  * Retain assertions for --enable-debug-tcg.
+
+
+r~
+
+
+Richard Henderson (3):
+  target/arm: Split out recompute_hflags et al
+  target/arm: Rebuild hflags at EL changes and MSR writes
+  target/arm: Rely on hflags correct in cpu_get_tb_cpu_state
+
+ target/arm/cpu.h           |  35 ++--
+ target/arm/helper.h        |   3 +
+ target/arm/internals.h     |   3 +
+ linux-user/syscall.c       |   1 +
+ target/arm/cpu.c           |   1 +
+ target/arm/helper-a64.c    |   3 +
+ target/arm/helper.c        | 334 ++++++++++++++++++++++---------------
+ target/arm/machine.c       |   1 +
+ target/arm/op_helper.c     |   1 +
+ target/arm/translate-a64.c |   6 +-
+ target/arm/translate.c     |  14 +-
+ 11 files changed, 254 insertions(+), 148 deletions(-)
+
+-- 
+2.17.1
 
 
