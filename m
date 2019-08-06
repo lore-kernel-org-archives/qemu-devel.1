@@ -2,65 +2,81 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A57C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5FE6C0650F
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:20:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C65E2070D
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:19:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D62F2173B
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:20:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="phlELFLr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C65E2070D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aKXY2s9C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D62F2173B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hunCB-0004jS-S7
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:19:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35039)
+	id 1hunDC-0005qI-TE
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:20:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35413)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hunBM-0003TF-6m
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:18:29 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hunCp-0005N5-S3
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hunBL-00030s-4C
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:18:28 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:57449)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hunBJ-0002vK-25; Mon, 05 Aug 2019 20:18:27 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 462Zwp4pDlz9sDB; Tue,  6 Aug 2019 10:18:18 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1565050698;
- bh=pL/BDGLbOEc3LhHUpAJJC0Xwn8WVetw38M94LO72pOs=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=phlELFLrOmCZSfT2NiSngUUAQl5SrRpvwx6NcWuGu2HCalGlx3eXtaXXTWuay0D6R
- EsfHAqoGTcffwlHywctIpHRPMgV8nZXRKDZNLiV1Ito17GWh1BqyY+Ml6xrvWpcWjH
- +c8A8W2241+Ef+0Hszqhv35nnS4GyBWy4fEBJBjo=
-Date: Mon, 5 Aug 2019 22:30:37 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Message-ID: <20190805123037.GB14494@umbus.fritz.box>
-References: <20190731141233.1340-1-clg@kaod.org>
- <20190731141233.1340-3-clg@kaod.org>
+ (envelope-from <alistair23@gmail.com>) id 1hunCp-00041Y-13
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:19:59 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:40816)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hunCn-000411-3g; Mon, 05 Aug 2019 20:19:57 -0400
+Received: by mail-lf1-x142.google.com with SMTP id b17so59478033lff.7;
+ Mon, 05 Aug 2019 17:19:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=G1ADZ7xZeqdDgNsll+f9xpstmMYBMPgBsF27016AAVY=;
+ b=aKXY2s9Cx/xE7vxetSztNDy+hYE9uFpb/hEot/TRsIxtkT/E8zJfR2z+oaqKZYt7wH
+ OJ6cj77tVtCHaVySBReRcoNr4WzKvbXCnvGFoBHLdL5Pvwc8LKKONkEXSD2P54WTUY8Q
+ 4L8u0lpSrriAwA+vHSz4D46UOYASxjmsjMoYRe3xRwpQA3wCMMrDVcgtqnpHpxgWQit0
+ 92vYA/6resrYUI5bus3SbaWrYq1d/EpKzVgZJnRcbpwY7Sw4exWDQoT+cRSziNCq3bdW
+ jdBhr81MFv8tmf2n4TbGldVgyxzcnf3UrTGdfC5kIq96geOJJQO/YSl6PNFkyUnZJweR
+ 8W0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=G1ADZ7xZeqdDgNsll+f9xpstmMYBMPgBsF27016AAVY=;
+ b=kbbAkodLpZ0Qk82lKuwKC8QE18gn7wXWTtW6drbnmNen60t6+9ZGS2duA6SUQQY8Qs
+ CONd8O+prUfi2R5rBpYpiX7NdtljaFiSS5zVW4amKc6rDUcYrMcIiTHJxV8GPgHLsrbi
+ i+rEUrTLHmVUGoe+A926qKzwHs8AVc4OPpsZH5EiPx68Fhs1uB2G3XPco3K3SD6OdMch
+ xD1c1VkG3dvGQUOO/cu8wP/VeSj9hVnEPqRM79B8QxxNlszT53eNGWgaYckYX35dtHNi
+ ruEV0Xw6FKhBzVhGSuwfKUBi0oDTXBRxq9ScLbkt4CxBUZ4PN5Ez2/p4zCDF2F7FvjM3
+ pP6w==
+X-Gm-Message-State: APjAAAW47rOUg3J7GGRL3MTMOUzz4ezVr+fml/vXnjebqSdWHvyGFWWV
+ 0jtMlb9qth5a/VWSQS1XpcQi9uYkyNKfxsOoUS+zFMZt
+X-Google-Smtp-Source: APXvYqz1ovigNOHOuoFZzp1uLMVz0x1gvQM+0fOeDcbBZezEkzjBw3ymfHFsiRjBo8uYCl3RJQS4uR2YWesUyQc7NpE=
+X-Received: by 2002:a19:7006:: with SMTP id h6mr241577lfc.5.1565050795819;
+ Mon, 05 Aug 2019 17:19:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="bCsyhTFzCvuiizWE"
-Content-Disposition: inline
-In-Reply-To: <20190731141233.1340-3-clg@kaod.org>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+References: <1565020823-24223-1-git-send-email-bmeng.cn@gmail.com>
+ <1565020823-24223-8-git-send-email-bmeng.cn@gmail.com>
+ <CANnJOVHeoqJ9pxVur3tTzEHf2kPBw4zHaiEzaUxgOvnTQJEVjQ@mail.gmail.com>
+In-Reply-To: <CANnJOVHeoqJ9pxVur3tTzEHf2kPBw4zHaiEzaUxgOvnTQJEVjQ@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 5 Aug 2019 17:16:14 -0700
+Message-ID: <CAKmqyKOeY0h6t6i-OvXgoPTWNK7xRRky+SLJaj56Otmrb6c0PQ@mail.gmail.com>
+To: Jonathan Behrens <fintelia@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v3 02/18] tests/boot-serial-test: add
- support for all the PowerNV machines
+X-Received-From: 2a00:1450:4864:20::142
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH 07/28] riscv: sifive_u: Set
+ the minimum number of cpus to 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,68 +88,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Mon, Aug 5, 2019 at 9:42 AM Jonathan Behrens <fintelia@gmail.com> wrote:
+>
+> I'm not familiar with QEMU conventions on this, but would it make sense to
+> require having exactly 5 CPUs to match the real board?
 
---bCsyhTFzCvuiizWE
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+SMP can sometimes cause failures, so I think it makes some sense to
+keep the default low.
 
-On Wed, Jul 31, 2019 at 04:12:17PM +0200, C=E9dric Le Goater wrote:
-> Use the machine names specifiying the CPU type, POWER8 and POWER9.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+Alistair
 
-Applied to ppc-for-4.2, thanks.
-
-> ---
->  tests/boot-serial-test.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-> index 24852d4c7d0b..a54d007298f7 100644
-> --- a/tests/boot-serial-test.c
-> +++ b/tests/boot-serial-test.c
-> @@ -103,7 +103,8 @@ static testdef_t tests[] =3D {
->      { "ppc64", "pseries",
->        "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken",
->        "Open Firmware" },
-> -    { "ppc64", "powernv", "-cpu POWER8", "OPAL" },
-> +    { "ppc64", "powernv8", "", "OPAL" },
-> +    { "ppc64", "powernv9", "", "OPAL" },
->      { "ppc64", "sam460ex", "-device e1000", "8086  100e" },
->      { "i386", "isapc", "-cpu qemu32 -device sga", "SGABIOS" },
->      { "i386", "pc", "-device sga", "SGABIOS" },
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---bCsyhTFzCvuiizWE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1IIWsACgkQbDjKyiDZ
-s5IvHA/8Cj8nAKIqytBbdoy50e9IcpTZXEzYrTKPEpjktxrIXDlcIhl0PrzREXlS
-dv2yony0BwAm2bZbc7XBfrt5Mp9L7fAngnjcd+bvEJpgITJiVsJRlUiz5IsOZuEa
-Nq51RFVESYFdLepI5/Kx3Y28amWB2S2IJqmElrZEoYRYKZY9baAsBS0XEuT8suoI
-KBRLq64FCMlO3NETw+4hiAi5fbGcBbkzlsKIUI9NcvUaR4SIO3rFv8YOR+I1O240
-3Bn/zZqsOl0JHQ8KrzM4yLPZtBzsFs9jlykLvsRTA2JOsm6zzvVuNiU04KOcb33N
-4+CkHfniAlTWdnxKUDgAacmfLe5xa+weHwf00/liREEV8Fk5cNjNq4B8NJvi0vtu
-RcjEc0IM5sbRnSvHWRgred5TbvWdrJB4fZYQYNAA3c5kmbIzN2Z4kJAagTRt2N0V
-JbYu+Vxpn/sTme96eofoR9xaCcw7i/JW/6mpl0SD1lpCXdbSTcjJWe3spkTTJ1Ns
-57QWVMPsXKCfsvGjjtW9ivDGEiRpKD3o9wNVPLO7Mfo5VWNpmPO/7+o4KKPbKOzM
-gKdHnMHfS1CkhHIPWNEMtv6l4yrZBCAkbYuQzSu6jjDnKCOxMTmkNqdNrnA57lfO
-L+9+KspJUtqZM8fstcf75GzysYDo8G3vQUkTYknp44h2fw3zCv0=
-=ikRq
------END PGP SIGNATURE-----
-
---bCsyhTFzCvuiizWE--
+>
+> Jonathan
+>
+>
+> On Mon, Aug 5, 2019 at 12:05 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> > It is not useful if we only have one management CPU.
+> >
+> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> > ---
+> >
+> >  hw/riscv/sifive_u.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> > index 08d406f..206eccc 100644
+> > --- a/hw/riscv/sifive_u.c
+> > +++ b/hw/riscv/sifive_u.c
+> > @@ -428,6 +428,8 @@ static void riscv_sifive_u_machine_init(MachineClass
+> > *mc)
+> >       * management CPU.
+> >       */
+> >      mc->max_cpus = 5;
+> > +    /* It is not useful if we only have one management CPU */
+> > +    mc->min_cpus = 2;
+> >  }
+> >
+> >  DEFINE_MACHINE("sifive_u", riscv_sifive_u_machine_init)
+> > --
+> > 2.7.4
+> >
+> >
+> >
 
