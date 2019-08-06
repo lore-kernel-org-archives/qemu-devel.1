@@ -6,64 +6,53 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EED00C31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F53C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:49:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA48A206A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:47:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA48A206A2
+	by mail.kernel.org (Postfix) with ESMTPS id C930720717
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 09:49:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C930720717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huw4V-0002sy-5K
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 05:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36657)
+	id 1huw5w-0004Gc-0u
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 05:49:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36842)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1huw46-0002NO-Sr
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:47:36 -0400
+ (envelope-from <imammedo@redhat.com>) id 1huw5E-0003LO-DN
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1huw45-00028t-Pt
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:47:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37550)
+ (envelope-from <imammedo@redhat.com>) id 1huw5D-0002eE-CO
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 05:48:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34304)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1huw43-000284-Bf; Tue, 06 Aug 2019 05:47:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1huw5D-0002dt-79; Tue, 06 Aug 2019 05:48:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id AD28EE8CDA;
- Tue,  6 Aug 2019 09:47:29 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D43DB60920;
- Tue,  6 Aug 2019 09:47:24 +0000 (UTC)
-Date: Tue, 6 Aug 2019 11:47:23 +0200
+ by mx1.redhat.com (Postfix) with ESMTPS id 803A630017A3;
+ Tue,  6 Aug 2019 09:48:42 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EDCB35D9C5;
+ Tue,  6 Aug 2019 09:48:38 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190806114723.04637d1b@redhat.com>
-In-Reply-To: <CAFEAcA-2LPngO8nXbzZBNTN6c60xG11ogUyqVM1N8Ct-bECqNQ@mail.gmail.com>
-References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
- <20190726104519.23812-4-shameerali.kolothum.thodi@huawei.com>
- <20190730172524.6cf566ed@Igors-MacBook-Pro>
- <5FC3163CFD30C246ABAA99954A238FA83F33D896@lhreml524-mbs.china.huawei.com>
- <20190805153045.60db7bf5@redhat.com>
- <CAFEAcA-+z4t75VwfWG1ezJm=4zfdWH6nz1Oe75Zs953+vKMvdQ@mail.gmail.com>
- <20190805174652.61e9852a@redhat.com>
- <CAFEAcA-2LPngO8nXbzZBNTN6c60xG11ogUyqVM1N8Ct-bECqNQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+To: qemu-devel@nongnu.org
+Date: Tue,  6 Aug 2019 05:48:32 -0400
+Message-Id: <20190806094834.7691-1-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 06 Aug 2019 09:47:29 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Tue, 06 Aug 2019 09:48:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v8 3/9] hw/acpi: Add ACPI Generic
- Event Device Support
+Subject: [Qemu-devel] [PATCH for-4.2 v4 0/2] s390: stop abusing
+ memory_region_allocate_system_memory()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,87 +64,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "sameo@linux.intel.com" <sameo@linux.intel.com>,
- "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
- "lersek@redhat.com" <lersek@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 5 Aug 2019 16:54:06 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> On Mon, 5 Aug 2019 at 16:47, Igor Mammedov <imammedo@redhat.com> wrote:
-> > On Mon, 5 Aug 2019 14:42:38 +0100
-> > Peter Maydell <peter.maydell@linaro.org> wrote:  
-> > > This is definitely a bad idea -- devices should not add their
-> > > own memory regions to the system memory MR. They should
-> > > expose their MRs (by being a sysbus-device) and let the board
-> > > code do the wiring up of the MRs into the right memory space
-> > > at the right address.  
-> >
-> > it's not the only place in GED that is trying to add to system address
-> > space, optionally if called acpi_memory_hotplug_init() will do the same,
-> > then later we could add cpu hotplug memory region over there.
-> >
-> > Perhaps we could use bus-less device plug code path,
-> > in that case memory_region_init_io()/qdev_init_gpio_out_named()
-> > should be moved to ged_initfn() and mapping part into specialized helper
-> > (similar to pc_dimm_plug() ) that's called by board (from virt_machine_device_plug_cb)
-> > callback during completing device realize stage, it would be something like:
-> >
-> > virt.c:
-> >    virt_machine_device_plug_cb()
-> >       if dev == GED_TYPE
-> >         machine_ged_plug_helper(system_memory)
-> >
-> > generic_event_device.c:
-> >    machine_ged_plug_helper(as, irq) // similar to sysbus_mmio_map() but ged specialized
-> >       connect_irq()
-> >       memory_region_add_subregion(as, ged->ged_base, &ged->io)
-> >       if ged->memory-hotplug-support
-> >           memory_region_add_subregion(as, ged->memhp_base , &ged->memhp_state.memhp_io)  
-> 
-> I don't really understand why we want to do this complicated
-> thing, rather than just doing the normal thing for devices
-> that live at particular addresses, ie make them sysbus devices
-> and have the board map their memory regions in the right place.
+Changelog:
+  since v3:
+    - fix compilation issue
+    - advance HVA along with GPA in kvm_set_phys_mem()
+  since v2:
+    - break migration from old QEMU (since 2.12-4.1) for guest with >8TB RAM
+      and drop migratable aliases patch as was agreed during v2 review
+    - drop 4.2 machines patch as it's not prerequisite anymore
+  since v1:
+    - include 4.2 machines patch for adding compat RAM layout on top
+    - 2/4 add missing in v1 patch for splitting too big MemorySection on
+          several memslots
+    - 3/4 amend code path on alias destruction to ensure that RAMBlock is
+          cleaned properly
+    - 4/4 add compat machine code to keep old layout (migration-wise) for
+          4.1 and older machines 
 
-hotplug path is basically the same as sysbus the only difference is
-that it uses machine's (pre_)plug handler to wire up devices and more
-flexible than sysbus.
- 
-> > in this case addresses could be normally hard-codded in board code if device is not optional
-> > (as in patch 6/9: create_acpi_ged() )
-> > or potentially they could come from CLI as -device parameters
-> > (/me thinking about building blocks that allow to create machine from config)  
-> 
-> I don't think we want to do this. The user should not have to
-> know anything about addresses or have to specify them on the
-> command line. (This is why you can't create sysbus devices
-> with -device except for some odd special cases to do with passthrough
-> of hardware.)
-> 
-> > sysbus device might be fine as shortcut if we are thinking about
-> > only creating device during machine_init (although I have a reservations towards
-> > sysbus interface (ex: caller of sysbus_mmio_map() has no clue when mapping N-th
-> > region at some address)).  
-> 
-> Not sure entirely what you have in mind here? (though yes, the
-> sysbus device API has its awkward corners, some of which are
-> just down to how old it is.)
-since it's a fixed device I don't mind using sysbus either,
-lets do it this way.
 
-> thanks
-> -- PMM
+While looking into unifying guest RAM allocation to use hostmem backends
+for initial RAM (especially when -mempath is used) and retiring
+memory_region_allocate_system_memory() API, leaving only single hostmem backend,
+I was inspecting how currently it is used by boards and it turns out several
+boards abuse it by calling the function several times (despite documented contract
+forbiding it).
+
+s390 is one of such boards where KVM limitation on memslot size got propagated
+to board design and memory_region_allocate_system_memory() was abused to satisfy
+KVM requirement for max RAM chunk where memory region alias would suffice.
+
+Unfortunately, memory_region_allocate_system_memory() usage created migration
+dependency where guest RAM is transferred in migration stream as several RAMBlocks
+if it's more than KVM_SLOT_MAX_BYTES. During v2 review it was agreed to ignore
+migration breakage (documenting it in release notes) and leaving only KVM fix.
+
+In order to replace these several RAM chunks with a single memdev and keep it
+working with KVM memslot size limit, following was done:
+   * [1/2] split too big RAM chunk inside of KVM code on several memory slots
+           if necessary
+   * [2/2] drop manual ram splitting in s390 code
+
+
+CC: pbonzini@redhat.com
+CC: qemu-s390x@nongnu.org
+CC: borntraeger@de.ibm.com
+CC: thuth@redhat.com
+CC: david@redhat.com
+CC: cohuck@redhat.com
+
+
+
+
+Igor Mammedov (2):
+  kvm: s390: split too big memory section on several memslots
+  s390: do not call memory_region_allocate_system_memory() multiple
+    times
+
+ include/sysemu/kvm_int.h   |  1 +
+ accel/kvm/kvm-all.c        | 80 +++++++++++++++++++++++---------------
+ hw/s390x/s390-virtio-ccw.c | 30 ++------------
+ target/s390x/kvm.c         | 12 ++++++
+ 4 files changed, 65 insertions(+), 58 deletions(-)
+
+-- 
+2.18.1
 
 
