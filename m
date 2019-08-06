@@ -2,64 +2,83 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A6AC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960D4C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:49:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36CBF20B1F
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:44:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36CBF20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D14D20B1F
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:49:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embecosm.com header.i=@embecosm.com header.b="FlGacSUu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D14D20B1F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=embecosm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huype-0001Bv-F7
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 08:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49658)
+	id 1huyu6-0002cf-J5
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 08:49:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50350)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1huyp9-0000kw-Rq
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:44:20 -0400
+ (envelope-from <maxim.blinov@embecosm.com>) id 1huytj-0002CO-Gt
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1huyp8-00015N-L4
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:44:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57096)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1huyp8-00014F-EG
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:44:18 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DEF283D962;
- Tue,  6 Aug 2019 12:44:16 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.132])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F1EBC1001B02;
- Tue,  6 Aug 2019 12:44:11 +0000 (UTC)
-Date: Tue, 6 Aug 2019 13:44:08 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Message-ID: <20190806124408.GE14887@redhat.com>
-References: <20190713165856.29883-1-philmd@redhat.com>
+ (envelope-from <maxim.blinov@embecosm.com>) id 1huyti-0003S1-Dk
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:49:03 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39408)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <maxim.blinov@embecosm.com>)
+ id 1huyti-0003QD-6k
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:49:02 -0400
+Received: by mail-wr1-x429.google.com with SMTP id x4so34610837wrt.6
+ for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 05:49:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=embecosm.com; s=google;
+ h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+ :user-agent; bh=SjcvDrrRWX9wfxIyquvZZsNHEQr86Hgl1KBjtw/uLpM=;
+ b=FlGacSUuasGsY1k5bNXrYI7mafzaVhZLHGWhwCmKhYSGorxi4o/3ZzIUGUCcoyYUk5
+ EtBHoiHDiHOOmUOnQ00xHxKiJH62BLk2hRLWr5beHEXsNU7RNogIgdtHrRh13nM4VCPP
+ ouspEwtjHPwhYX7ZPufKGDsTQXToMtkTJrzEcf1d/KO0/JmgnyJsTmbGqDVOMm+CC1Fo
+ oF1wrSn8UR+4PWZHF5DYEdpKYRvMwIIheDmoPGN+TUHrSlD9HzmskFr0qW709fxfm6dd
+ BoeWZ9bp69wXYDz06gHG2T51Cy3zZJDIdDjX4lRu5NShEZnwPn5bRjds9doCrY+NUuNg
+ Gw7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:user-agent;
+ bh=SjcvDrrRWX9wfxIyquvZZsNHEQr86Hgl1KBjtw/uLpM=;
+ b=nA1fBCklQRAetWlgAed1DZH3Y1wcwx9hYrEfANsAkV1HMb957EdEaoZo6rXK59fApe
+ wuDsBOi6fDUjC7ST5PJiJFRrME9GJBeZoPTH/fCT30e4uo7HJtkLNfWSsiXcr4lAJtrR
+ 3xjN3HxhLWxtUvZl9YiWNtaAxtPG8ry9wvSQ1x2RDIUa10Nd0kYuUemHZCeJm6ARE5Vk
+ /I/sW3Q0qwELDfj5Y/oX5TjuRWbYL6i5ZyaOFxFNSSkHT2CHMUBBJpSqhYkbORkxRpya
+ QsVf8TeYjG5laRoYZfHrfPtVyS5PDG+af8m//p9RpRhaQCvgbAN0sGEUT3I0shR5EBO1
+ EYaw==
+X-Gm-Message-State: APjAAAVAGTzNhNWSqP5Jj+b4v0tow0t+ezdylMcclLUIvIWK9Okhd+GI
+ Fid88EDL9u3R1aSnfYwYVyUUIIgTyr4=
+X-Google-Smtp-Source: APXvYqw25b88YRzFd+/x98ubmFIaFTHqhvAR6qbmK79kvJL9yOj1G2Nz0JRobvFXiSdiv06QPqX7AQ==
+X-Received: by 2002:adf:f050:: with SMTP id t16mr4541094wro.99.1565095740412; 
+ Tue, 06 Aug 2019 05:49:00 -0700 (PDT)
+Received: from maxim-ThinkPad-T490 (cust64-dsl91-135-5.idnet.net.
+ [91.135.5.64])
+ by smtp.gmail.com with ESMTPSA id a8sm76175317wma.31.2019.08.06.05.48.59
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 06 Aug 2019 05:48:59 -0700 (PDT)
+Date: Tue, 6 Aug 2019 13:48:57 +0100
+From: Maxim Blinov <maxim.blinov@embecosm.com>
+To: qemu-riscv@nongnu.org
+Message-ID: <20190806124857.GA18832@maxim-ThinkPad-T490>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190713165856.29883-1-philmd@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 06 Aug 2019 12:44:17 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH-for-4.1] Makefile: Fix the NSIS Windows
- builds
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::429
+Subject: [Qemu-devel] RISC-V: insn32.decode: Confusing encodings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,74 +90,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, Adam Baxter <voltagex@voltagex.org>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Stefan Weil <sw@weilnetz.de>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Jul 13, 2019 at 06:58:56PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> The qemu-nsis.bmp file was not listed with the other blobs, thus
-> not installed in the ${BINDIR} location.
->=20
-> This fixes:
->=20
->   $ make installer
->   [...]
->   (cd /tmp/qemu-nsis; \
->            for i in qemu-system-*.exe; do \
->              arch=3D${i%.exe}; \
->              arch=3D${arch#qemu-system-}; \
->              echo Section \"$arch\" Section_$arch; \
->              echo SetOutPath \"\$INSTDIR\"; \
->              echo File \"\${BINDIR}\\$i\"; \
->              echo SectionEnd; \
->            done \
->           ) >/tmp/qemu-nsis/system-emulations.nsh
->   makensis -V2 -NOCD \
->                   -DCONFIG_DOCUMENTATION=3D"y" \
->                    \
->                   -DBINDIR=3D"/tmp/qemu-nsis" \
->                    \
->                   -DSRCDIR=3D"/home/phil/source/qemu" \
->                   -DOUTFILE=3D"qemu-setup-4.0.90.exe" \
->                   -DDISPLAYVERSION=3D"4.0.90" \
->                   /home/phil/source/qemu/qemu.nsi
->   File: "/tmp/qemu-nsis\*.bmp" -> no files found.
->   Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...]=
- |
->      /oname=3Doutfile one_file_only)
->   Error in script "/home/phil/source/qemu/qemu.nsi" on line 122 -- abor=
-ting creation process
->   Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
->   make: *** [qemu-setup-4.0.90.exe] Error 1
->=20
-> Fixes: https://bugs.launchpad.net/bugs/1836453
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Based-on: 20190713163558.13204-1-philmd@redhat.com
-> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03204.html
->=20
-> $ file qemu-setup-4.0.90.exe
-> qemu-setup-4.0.90.exe: PE32 executable (GUI) Intel 80386 (stripped to e=
-xternal PDB), for MS Windows, Nullsoft Installer self-extracting archive
-> ---
->  Makefile | 1 +
->  1 file changed, 1 insertion(+)
+Hi all,
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+I've been going through the insn32.decode file, and found some
+confusing inconsistencies with the ISA spec that I don't understand. I
+hope some of you can clarify.
 
+There is a field defined called "%sh10" as follows:
+%sh10    20:10
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Which is used in the "@sh" format as follows:
+@sh ...... ...... .....  ... ..... ....... &shift  shamt=%sh10     %rs1 %rd
+
+And the "@sh" format specifier is used for the following rv32i
+instruction defs:
+
+slli     00.... ......    ..... 001 ..... 0010011 @sh
+srli     00.... ......    ..... 101 ..... 0010011 @sh
+srai     01.... ......    ..... 101 ..... 0010011 @sh
+
+First question: Why does the %sh10 field exist? There are no 10-bit
+shamt fields anywhere in the spec.
+
+Second question: For rv32i, "SLLI" is defined as follows in the spec:
+
+0000000 shamt[4:0] rs1[4:0] 001 rd[4:0] 0010011  |  SLLI
+
+That is, the first 7 bits *must* be zero. So why does the QEMU
+definition above only specify the first 2 bits, and treat the next 10
+bits as a so-called "sh10" field? Surely that shouldn't work and will
+catch false instructions right? And even if it does work, surely we
+would want an explicit definition, something more like
+
+%sh5    20:5
+@sh ...... ...... .....  ... ..... ....... &shift  shamt=%sh5     %rs1 %rd
+
+slli     0000000 .....    ..... 001 ..... 0010011 @sh
+srli     0000000 .....    ..... 101 ..... 0010011 @sh
+srai     0100000 .....    ..... 101 ..... 0010011 @sh
+
+Another thing I noticed is that the rv64i ISA redefines the slli, srli
+and srai encodings by stealing a bit from the immediate field, like
+so:
+
+000000 shamt[5:0] rs1[4:0] 001 rd[4:0] 0010011  |  SLLI
+
+Consider the case that we have a 32 bit cpu and we wanted to have a
+custom instruction encoded like so:
+
+      |This bit set
+      v
+0000001 shamt[4:0] rs1[4:0] 001 rd[4:0] 0010011  |  MY_INSN
+
+In 64 bit risc-v, we can't have that instruction because that bit is
+used in the shift field for the SLLI instruction.  But it should be
+fine to use in 32-bit risc-v.
+
+There are two files currently: insn32.decode, and insn32-64.decode.
+The insn32-64.decode file is additive, but some instructions as simply
+encoded differently in 64 bit mode.
+
+Why not have two separate insn32.decode and insn64.decode files?
+
+I hope I'm understanding the ISA correctly...
+
+Maxim
 
