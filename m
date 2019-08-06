@@ -3,62 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E348DC31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F516C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:20:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8DCA20717
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:18:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8DCA20717
+	by mail.kernel.org (Postfix) with ESMTPS id D949520717
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 15:20:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D949520717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv1Eg-0004Ul-1y
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:18:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51042)
+	id 1hv1GU-0007aJ-2Y
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 11:20:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51091)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hv1Ar-0004Im-Ay
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1hv1At-0004QV-Ig
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hv1Ap-0004mF-Fx
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42622)
+ (envelope-from <armbru@redhat.com>) id 1hv1Ar-0004nl-Po
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43384)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Ap-0004lq-8f
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:51 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hv1Ar-0004nI-HW
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 11:14:53 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 805EF8EA21
- for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 15:14:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D8FDC3DE04;
+ Tue,  6 Aug 2019 15:14:52 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-251.ams2.redhat.com
  [10.36.117.251])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 91E0B1C941;
- Tue,  6 Aug 2019 15:14:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A66B51C94A;
+ Tue,  6 Aug 2019 15:14:52 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8B3CE1136429; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
+ id A3A90113642F; Tue,  6 Aug 2019 17:14:35 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 17:14:23 +0200
-Message-Id: <20190806151435.10740-18-armbru@redhat.com>
+Date: Tue,  6 Aug 2019 17:14:29 +0200
+Message-Id: <20190806151435.10740-24-armbru@redhat.com>
 In-Reply-To: <20190806151435.10740-1-armbru@redhat.com>
 References: <20190806151435.10740-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 06 Aug 2019 15:14:50 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 06 Aug 2019 15:14:52 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 17/29] Include qom/object.h slightly less
+Subject: [Qemu-devel] [PATCH v2 23/29] numa: Don't include hw/boards.h into
+ sysemu/numa.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,47 +70,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hw/hw.h used to include headers hardware emulation "usually" needs.
-The previous commits removed all but one of them, to good effect.
-Only qom/object.h is left.  Remove that one, too.
+sysemu/numa.h includes hw/boards.h just for the CPUArchId typedef, at
+the cost of pulling in more than two dozen extra headers indirectly.
 
+I could move the typedef from hw/boards.h to qemu/typedefs.h.  But
+it's used in just two headers: boards.h and numa.h.
+
+I could move it to another header both its users include.
+exec/cpu-common.h seems to be the least bad fit.
+
+But I'm keeping this simple & stupid: declare the struct tag in
+numa.h.
+
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/display/edid.h | 2 +-
- include/hw/hw.h           | 2 --
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ exec.c                | 1 +
+ hw/mem/pc-dimm.c      | 1 +
+ include/hw/boards.h   | 2 +-
+ include/sysemu/numa.h | 9 +++++++--
+ 4 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/display/edid.h b/include/hw/display/edid.h
-index 7948bd2c40..ff99dc0a05 100644
---- a/include/hw/display/edid.h
-+++ b/include/hw/display/edid.h
-@@ -1,7 +1,7 @@
- #ifndef EDID_H
- #define EDID_H
+diff --git a/exec.c b/exec.c
+index 78f849de99..c568bbe581 100644
+--- a/exec.c
++++ b/exec.c
+@@ -42,6 +42,7 @@
+ #if defined(CONFIG_USER_ONLY)
+ #include "qemu.h"
+ #else /* !CONFIG_USER_ONLY */
++#include "hw/boards.h"
+ #include "exec/memory.h"
+ #include "exec/ioport.h"
+ #include "sysemu/dma.h"
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 1f3e676066..dea48f9163 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -19,6 +19,7 @@
+  */
 =20
--#include "hw/hw.h"
-+#include "qom/object.h"
+ #include "qemu/osdep.h"
++#include "hw/boards.h"
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 67e551636a..739d109fe1 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -86,7 +86,7 @@ void machine_class_allow_dynamic_sysbus_dev(MachineClas=
+s *mc, const char *type);
+  * @props - CPU object properties, initialized by board
+  * #vcpus_count - number of threads provided by @cpu object
+  */
+-typedef struct {
++typedef struct CPUArchId {
+     uint64_t arch_id;
+     int64_t vcpus_count;
+     CpuInstanceProperties props;
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 01a263eba2..4c4c1dee9b 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -4,7 +4,10 @@
+ #include "qemu/bitmap.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hostmem.h"
+-#include "hw/boards.h"
++#include "qapi/qapi-types-machine.h"
++#include "exec/cpu-common.h"
++
++struct CPUArchId;
 =20
- typedef struct qemu_edid_info {
-     const char *vendor; /* http://www.uefi.org/pnp_id_list */
-diff --git a/include/hw/hw.h b/include/hw/hw.h
-index 8e18358e6a..8079b911fa 100644
---- a/include/hw/hw.h
-+++ b/include/hw/hw.h
-@@ -6,8 +6,6 @@
- #error Cannot include hw/hw.h from user emulation
- #endif
-=20
--#include "qom/object.h"
--
- void QEMU_NORETURN hw_error(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-=20
+ extern int nb_numa_nodes;   /* Number of NUMA nodes */
+ extern bool have_numa_distance;
+@@ -32,5 +35,7 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, Node=
+Info *nodes,
+                                  int nb_nodes, ram_addr_t size);
+ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                   int nb_nodes, ram_addr_t size);
+-void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **=
+errp);
++void numa_cpu_pre_plug(const struct CPUArchId *slot, DeviceState *dev,
++                       Error **errp);
++
  #endif
 --=20
 2.21.0
