@@ -2,83 +2,61 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 960D4C31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C882C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:51:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D14D20B1F
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:49:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embecosm.com header.i=@embecosm.com header.b="FlGacSUu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D14D20B1F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=embecosm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 531D92064A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 12:51:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 531D92064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huyu6-0002cf-J5
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 08:49:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50350)
+	id 1huywA-0003kf-Gl
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 08:51:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <maxim.blinov@embecosm.com>) id 1huytj-0002CO-Gt
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:49:04 -0400
+ (envelope-from <imammedo@redhat.com>) id 1huyvd-0003Fc-QH
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maxim.blinov@embecosm.com>) id 1huyti-0003S1-Dk
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:49:03 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:39408)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <maxim.blinov@embecosm.com>)
- id 1huyti-0003QD-6k
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:49:02 -0400
-Received: by mail-wr1-x429.google.com with SMTP id x4so34610837wrt.6
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 05:49:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=embecosm.com; s=google;
- h=date:from:to:cc:subject:message-id:mime-version:content-disposition
- :user-agent; bh=SjcvDrrRWX9wfxIyquvZZsNHEQr86Hgl1KBjtw/uLpM=;
- b=FlGacSUuasGsY1k5bNXrYI7mafzaVhZLHGWhwCmKhYSGorxi4o/3ZzIUGUCcoyYUk5
- EtBHoiHDiHOOmUOnQ00xHxKiJH62BLk2hRLWr5beHEXsNU7RNogIgdtHrRh13nM4VCPP
- ouspEwtjHPwhYX7ZPufKGDsTQXToMtkTJrzEcf1d/KO0/JmgnyJsTmbGqDVOMm+CC1Fo
- oF1wrSn8UR+4PWZHF5DYEdpKYRvMwIIheDmoPGN+TUHrSlD9HzmskFr0qW709fxfm6dd
- BoeWZ9bp69wXYDz06gHG2T51Cy3zZJDIdDjX4lRu5NShEZnwPn5bRjds9doCrY+NUuNg
- Gw7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:user-agent;
- bh=SjcvDrrRWX9wfxIyquvZZsNHEQr86Hgl1KBjtw/uLpM=;
- b=nA1fBCklQRAetWlgAed1DZH3Y1wcwx9hYrEfANsAkV1HMb957EdEaoZo6rXK59fApe
- wuDsBOi6fDUjC7ST5PJiJFRrME9GJBeZoPTH/fCT30e4uo7HJtkLNfWSsiXcr4lAJtrR
- 3xjN3HxhLWxtUvZl9YiWNtaAxtPG8ry9wvSQ1x2RDIUa10Nd0kYuUemHZCeJm6ARE5Vk
- /I/sW3Q0qwELDfj5Y/oX5TjuRWbYL6i5ZyaOFxFNSSkHT2CHMUBBJpSqhYkbORkxRpya
- QsVf8TeYjG5laRoYZfHrfPtVyS5PDG+af8m//p9RpRhaQCvgbAN0sGEUT3I0shR5EBO1
- EYaw==
-X-Gm-Message-State: APjAAAVAGTzNhNWSqP5Jj+b4v0tow0t+ezdylMcclLUIvIWK9Okhd+GI
- Fid88EDL9u3R1aSnfYwYVyUUIIgTyr4=
-X-Google-Smtp-Source: APXvYqw25b88YRzFd+/x98ubmFIaFTHqhvAR6qbmK79kvJL9yOj1G2Nz0JRobvFXiSdiv06QPqX7AQ==
-X-Received: by 2002:adf:f050:: with SMTP id t16mr4541094wro.99.1565095740412; 
- Tue, 06 Aug 2019 05:49:00 -0700 (PDT)
-Received: from maxim-ThinkPad-T490 (cust64-dsl91-135-5.idnet.net.
- [91.135.5.64])
- by smtp.gmail.com with ESMTPSA id a8sm76175317wma.31.2019.08.06.05.48.59
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 06 Aug 2019 05:48:59 -0700 (PDT)
-Date: Tue, 6 Aug 2019 13:48:57 +0100
-From: Maxim Blinov <maxim.blinov@embecosm.com>
-To: qemu-riscv@nongnu.org
-Message-ID: <20190806124857.GA18832@maxim-ThinkPad-T490>
+ (envelope-from <imammedo@redhat.com>) id 1huyvc-0004ZZ-9D
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 08:51:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55248)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1huyvc-0004ZD-1l; Tue, 06 Aug 2019 08:51:00 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0FF8EC05AA67;
+ Tue,  6 Aug 2019 12:50:59 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4F0DD608AB;
+ Tue,  6 Aug 2019 12:50:57 +0000 (UTC)
+Date: Tue, 6 Aug 2019 14:50:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Message-ID: <20190806145055.4f645f60@redhat.com>
+In-Reply-To: <20190805071302.6260-1-tao3.xu@intel.com>
+References: <20190805071302.6260-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::429
-Subject: [Qemu-devel] RISC-V: insn32.decode: Confusing encodings
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Tue, 06 Aug 2019 12:50:59 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] numa: Introduce
+ MachineClass::auto_enable_numa for implicit NUMA node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,74 +68,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, ehabkost@redhat.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
+On Mon,  5 Aug 2019 15:13:02 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-I've been going through the insn32.decode file, and found some
-confusing inconsistencies with the ISA spec that I don't understand. I
-hope some of you can clarify.
+> Add MachineClass::auto_enable_numa field. When it is true, a NUMA node
+> is expected to be created implicitly.
+> 
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> This patch has a dependency on
+> https://patchwork.kernel.org/cover/11063235/
+> ---
+>  hw/core/numa.c      | 9 +++++++--
+>  hw/ppc/spapr.c      | 9 +--------
+>  include/hw/boards.h | 1 +
+>  3 files changed, 9 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/core/numa.c b/hw/core/numa.c
+> index 75db35ac19..756d243d3f 100644
+> --- a/hw/core/numa.c
+> +++ b/hw/core/numa.c
+> @@ -580,9 +580,14 @@ void numa_complete_configuration(MachineState *ms)
+>       *   guest tries to use it with that drivers.
+>       *
+>       * Enable NUMA implicitly by adding a new NUMA node automatically.
+> +     *
+> +     * Or if MachineClass::auto_enable_numa is true and no NUMA nodes,
+> +     * assume there is just one node with whole RAM.
+>       */
+> -    if (ms->ram_slots > 0 && ms->numa_state->num_nodes == 0 &&
+> -        mc->auto_enable_numa_with_memhp) {
+> +    if (ms->numa_state->num_nodes == 0 &&
+> +        ((ms->ram_slots > 0 &&
+> +        mc->auto_enable_numa_with_memhp) ||
+> +        mc->auto_enable_numa)) {
+>              NumaNodeOptions node = { };
+>              parse_numa_node(ms, &node, &error_abort);
+>      }
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f607ca567b..e50343f326 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -400,14 +400,6 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
+>      hwaddr mem_start, node_size;
+>      int i, nb_nodes = machine->numa_state->num_nodes;
+>      NodeInfo *nodes = machine->numa_state->nodes;
+> -    NodeInfo ramnode;
+> -
+> -    /* No NUMA nodes, assume there is just one node with whole RAM */
+> -    if (!nb_nodes) {
+> -        nb_nodes = 1;
+> -        ramnode.node_mem = machine->ram_size;
+> -        nodes = &ramnode;
+> -    }
+>  
+>      for (i = 0, mem_start = 0; i < nb_nodes; ++i) {
+>          if (!nodes[i].node_mem) {
+> @@ -4369,6 +4361,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>       */
+>      mc->numa_mem_align_shift = 28;
+>      mc->numa_mem_supported = true;
+> +    mc->auto_enable_numa = true;
 
-There is a field defined called "%sh10" as follows:
-%sh10    20:10
+this will always create a numa node (that will affect not only RAM but
+also all other components that depends on numa state (like CPUs)),
+where as spapr_populate_memory() was only faking numa node in DT for RAM.
+It makes non-numa configuration impossible.
+Seeing David's ACK on the patch it might be fine, but I believe
+commit message should capture that and explain why the change in
+behavior is fine.
 
-Which is used in the "@sh" format as follows:
-@sh ...... ...... .....  ... ..... ....... &shift  shamt=%sh10     %rs1 %rd
+>      smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+>      smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 2eb9a0b4e0..4a350b87d2 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -220,6 +220,7 @@ struct MachineClass {
+>      bool smbus_no_migration_support;
+>      bool nvdimm_supported;
+>      bool numa_mem_supported;
+> +    bool auto_enable_numa;
+>  
+>      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+>                                             DeviceState *dev);
 
-And the "@sh" format specifier is used for the following rv32i
-instruction defs:
-
-slli     00.... ......    ..... 001 ..... 0010011 @sh
-srli     00.... ......    ..... 101 ..... 0010011 @sh
-srai     01.... ......    ..... 101 ..... 0010011 @sh
-
-First question: Why does the %sh10 field exist? There are no 10-bit
-shamt fields anywhere in the spec.
-
-Second question: For rv32i, "SLLI" is defined as follows in the spec:
-
-0000000 shamt[4:0] rs1[4:0] 001 rd[4:0] 0010011  |  SLLI
-
-That is, the first 7 bits *must* be zero. So why does the QEMU
-definition above only specify the first 2 bits, and treat the next 10
-bits as a so-called "sh10" field? Surely that shouldn't work and will
-catch false instructions right? And even if it does work, surely we
-would want an explicit definition, something more like
-
-%sh5    20:5
-@sh ...... ...... .....  ... ..... ....... &shift  shamt=%sh5     %rs1 %rd
-
-slli     0000000 .....    ..... 001 ..... 0010011 @sh
-srli     0000000 .....    ..... 101 ..... 0010011 @sh
-srai     0100000 .....    ..... 101 ..... 0010011 @sh
-
-Another thing I noticed is that the rv64i ISA redefines the slli, srli
-and srai encodings by stealing a bit from the immediate field, like
-so:
-
-000000 shamt[5:0] rs1[4:0] 001 rd[4:0] 0010011  |  SLLI
-
-Consider the case that we have a 32 bit cpu and we wanted to have a
-custom instruction encoded like so:
-
-      |This bit set
-      v
-0000001 shamt[4:0] rs1[4:0] 001 rd[4:0] 0010011  |  MY_INSN
-
-In 64 bit risc-v, we can't have that instruction because that bit is
-used in the shift field for the SLLI instruction.  But it should be
-fine to use in 32-bit risc-v.
-
-There are two files currently: insn32.decode, and insn32-64.decode.
-The insn32-64.decode file is additive, but some instructions as simply
-encoded differently in 64 bit mode.
-
-Why not have two separate insn32.decode and insn64.decode files?
-
-I hope I'm understanding the ISA correctly...
-
-Maxim
 
