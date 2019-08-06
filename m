@@ -2,83 +2,83 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F55C31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 07:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B49B8C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 07:11:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E8CC2070C
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 07:08:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 803052070C
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 07:11:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lsWVHAC3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8CC2070C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ubBWT2iY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 803052070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huta4-0005Eu-Rf
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 03:08:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39118)
+	id 1hutdV-0006rL-Ql
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 03:11:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39642)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hutZ3-00037C-4L
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 03:07:22 -0400
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hutck-0005sa-Q6
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 03:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hutZ2-0008UZ-7W
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 03:07:21 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44121)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hutcj-0002FY-Vy
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 03:11:10 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46902)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hutZ2-0008U9-1s
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 03:07:20 -0400
-Received: by mail-wr1-x441.google.com with SMTP id p17so86713433wrf.11
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 00:07:19 -0700 (PDT)
+ id 1hutcj-0002Eq-Ll
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 03:11:09 -0400
+Received: by mail-wr1-x444.google.com with SMTP id z1so86737371wru.13
+ for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 00:11:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=B7jGggRJo9D2VuMgtcdSGsa/EIgx9yxFf4WgNNIcVso=;
- b=lsWVHAC3Q2t2jyz2+q+JukaX2sHSa+sHt0jVvfuulN/5tV25ibQs6G1slFuP/w+cMH
- CO808+hHEQ2nT8oPVg/G5+n4u/xG5/0QFqiddSYMiPpm5VK7VYnSirVktMfDtKo0jKuu
- Mw4EeZqSDNkbdVhM4BpJ7gLMmsNb3ru8fFA28qnr+i0Tf34+vKDSLzf+8HoJmxNGshvo
- YrKAauLZxffLO2CSGD8/0GxcCZ50f8PdVTe5e9IAslqmZkjRGp424r+LF8VtKMHcTnYT
- Q6eZw8hPcvuz9lNNGQRtLyGgazX2IhGlx+24GS1oxLmTuJB6M0EMQejUCD5sYxXAEG0M
- lT2g==
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=E89RPyrTZ7V/lbqpII0Gj6RHA4yZJOS7SOwQUORCcvQ=;
+ b=ubBWT2iYrhYpXp1KnkMLhRAh4sRnNH9ekjvGanspQ/XtfGygD8w+G/AH85aqlkHHSh
+ l+wjaq5ErRYhLa5Z5mBTXlTHRbNVNJwSBJOT3zOP4RJPzyktf21Klfe2zrueItntHbgn
+ C5Xs1SV/WnIl71UpSsCv9JoFBgeovXUeMdjD4dQsfn4ytBUSrIm02YPpnXz6WAcgNKNV
+ FGjByMpq1PwRxRta0TbiH2Zh8Pl3scOGBIzQgqzOynmxXmCHTtlSe8lcAQJrS3CDwJmJ
+ ZcSnKXL4E1ng42dLAfMy/6m2mwoNcOcsHV/KfundoaS7GBmuZhmaRpXFHZVLYmkxLTJ5
+ cevA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=B7jGggRJo9D2VuMgtcdSGsa/EIgx9yxFf4WgNNIcVso=;
- b=CCKwwVvoJbVnvMAgi+arMN/2LDHoHnAWuXbzrtlavGjAeKsTEjlzmFOv+TOt/HhHBw
- h3sQ08dx7zAIIWyLq+g9LjUpNJUj1ScVu0voBPXOaSILm+AtpAzIcnlwDauqqV3I+ks6
- xJDiycSgrGwqk9+Z7g32WTKq39Psdjpttduu7fa5Ob4h1AXuZ6+h6p2iS1sN7HxJ1+PJ
- KGjzne724Th2KsNYsr/46VriyOV/9Fds+waU5bg02dnJ2lK03afug6QuPnKOC6wPfmkC
- YiF3cNmolE3LUJ6GKDlzeLuT6z9oYf6ULpK02SOOl6iaCKGsFo2HOICZMLLFZHvYjYxw
- V12g==
-X-Gm-Message-State: APjAAAV23Q0K0MXqjgiJzzzG/XxIdXToTngISqjYrj+EVNVOi4cwRno/
- KeYHr0DbdkU0w1f6GSkdQsKRJCo8
-X-Google-Smtp-Source: APXvYqw81DTuoMoXw1uqJa3h5fW6gblVW4wBSmoRoxaMdXJHildTU2uc6Ulv6bmQwp5BLu+xEDYg+A==
-X-Received: by 2002:a5d:4602:: with SMTP id t2mr2718168wrq.340.1565075238788; 
- Tue, 06 Aug 2019 00:07:18 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=E89RPyrTZ7V/lbqpII0Gj6RHA4yZJOS7SOwQUORCcvQ=;
+ b=Q8a9QQLMwVXL6bh7hfPtuyqKdnxP6puJgyHWuvsVOZaTwU32ou+ikpouGgg8ChUE7V
+ ML38RLquj4pIBxzjAlp3UnbZQrBlIORF+nFOP5KDZyZUwhlvsIaNFY/nMna565QG8EcS
+ FK+sjVE0Iu4Yks2n0L48OsxoB1SCRbZ83uh06TIAS7Kj6sMXE+HP4e5IML7+Uk99+o8o
+ tyQJHMe1QqdIEsap04Wwe8fV5PHdjuZXWxlxq2/PtrnoxASRVBThvfQagMlT8HaUcMuZ
+ 1v+8YLoM2bhZAGEXqz1nbxtYHVCN7Uds7WP3yFWMQcWyHe993jyKS8QC1P+3v7dxvb5v
+ 22og==
+X-Gm-Message-State: APjAAAVuSf1rG/dRaAMluy1qe4Yh2JAcfPDvW8zx3hCT7H8sqcgL6IF7
+ JFFJLGySFUsUlLOhmB86ZWD+pmxF
+X-Google-Smtp-Source: APXvYqxaxxSBAMqrbMOBj9i1Yj49uh2E+PjVd3w+h1Y3hJirHiDL3SMT2UNELmEJq62cSQyV6DQt2Q==
+X-Received: by 2002:adf:c613:: with SMTP id n19mr2720383wrg.109.1565075468221; 
+ Tue, 06 Aug 2019 00:11:08 -0700 (PDT)
 Received: from 640k.localdomain.com ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id t13sm103637009wrr.0.2019.08.06.00.07.17
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id z6sm74944037wrw.2.2019.08.06.00.11.07
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 06 Aug 2019 00:07:18 -0700 (PDT)
+ Tue, 06 Aug 2019 00:11:07 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 09:07:13 +0200
-Message-Id: <1565075233-10882-3-git-send-email-pbonzini@redhat.com>
+Date: Tue,  6 Aug 2019 09:11:03 +0200
+Message-Id: <1565075466-14943-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1565075233-10882-1-git-send-email-pbonzini@redhat.com>
-References: <1565075233-10882-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
-Subject: [Qemu-devel] [PATCH 2/2] configure: define CONFIG_TOOLS here
+X-Received-From: 2a00:1450:4864:20::444
+Subject: [Qemu-devel] [PATCH 0/3] modules: cleanup and test
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +90,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Defining CONFIG_TOOLS on the basis of $(TOOLS) has the disadvantage
-of including it also if e.g. qemu-ga is requested.  The correct
-information is available in configure, define it there.
+Improve coverage for modules: add a test that asks QEMU to check that
+no symbols are missing from any of the modules.
 
-This also has the benefit of not installing the manpages for block layer
-tools if the only "tool" being built is the guest agent.
+Markus, is using qtest ok or should it use an x- qmp command instead?
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile  | 5 ++---
- configure | 3 +++
- 2 files changed, 5 insertions(+), 3 deletions(-)
+Paolo
 
-diff --git a/Makefile b/Makefile
-index e532043..dfd158c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -87,8 +87,7 @@ endif
- 
- include $(SRC_PATH)/rules.mak
- 
--# notempy and lor are defined in rules.mak
--CONFIG_TOOLS := $(call notempty,$(TOOLS))
-+# lor is defined in rules.mak
- CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
- 
- # Create QEMU_PKGVERSION and FULL_VERSION strings
-@@ -797,7 +796,7 @@ ifdef CONFIG_POSIX
- 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) docs/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) docs/qemu-cpu-models.7 "$(DESTDIR)$(mandir)/man7"
--ifneq ($(TOOLS),)
-+ifeq ($(CONFIG_TOOLS),y)
- 	$(INSTALL_DATA) qemu-img.1 "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
- 	$(INSTALL_DATA) qemu-nbd.8 "$(DESTDIR)$(mandir)/man8"
-diff --git a/configure b/configure
-index 8e17f44..c5a5b44 100755
---- a/configure
-+++ b/configure
-@@ -6597,6 +6597,9 @@ fi
- if test "$profiler" = "yes" ; then
-   echo "CONFIG_PROFILER=y" >> $config_host_mak
- fi
-+if test "$want_tools" = "yes" ; then
-+  echo "CONFIG_TOOLS=y" >> $config_host_mak
-+fi
- if test "$slirp" != "no"; then
-   echo "CONFIG_SLIRP=y" >> $config_host_mak
-   echo "CONFIG_SMBD_COMMAND=\"$smbd\"" >> $config_host_mak
+Marc-André Lureau (3):
+  module: use g_hash_table_add()
+  module: return success on module load
+  tests: add module loading test
+
+ include/qemu/module.h  |  2 +-
+ qtest.c                |  9 +++++++
+ tests/Makefile.include |  1 +
+ tests/libqtest.c       |  6 +++++
+ tests/libqtest.h       |  2 ++
+ tests/modules-test.c   | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ util/module.c          | 17 ++++++++----
+ 7 files changed, 102 insertions(+), 6 deletions(-)
+ create mode 100644 tests/modules-test.c
+
 -- 
 1.8.3.1
 
