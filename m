@@ -2,72 +2,92 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0DDAC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 21:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9E0C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 21:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1F532089E
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 21:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1F532089E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 71050217D9
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 21:33:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71050217D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36325 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv73P-0000Qh-To
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 17:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43646)
+	id 1hv75Q-0001Vk-Of
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 17:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43981)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hv732-0008S8-NE
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 17:31:13 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hv751-00011i-BU
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 17:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hv731-0002U3-ND
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 17:31:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46190)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hv731-0002Rw-HT
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 17:31:11 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hv72z-0003Gf-VG
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 21:31:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E9A292E80CB
- for <qemu-devel@nongnu.org>; Tue,  6 Aug 2019 21:31:09 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1hv750-000389-EW
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 17:33:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35954)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hv74y-00036h-A1; Tue, 06 Aug 2019 17:33:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1EB463067317;
+ Tue,  6 Aug 2019 21:33:11 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-49.brq.redhat.com
+ [10.40.204.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 51B525D6B2;
+ Tue,  6 Aug 2019 21:33:10 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190802140314.19001-1-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a1252aab-b6da-3297-f3ef-0741c76a9d2d@redhat.com>
+Date: Tue, 6 Aug 2019 23:33:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 06 Aug 2019 21:17:16 -0000
-From: manuel baesler <1832281@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: manuelbaesler pmaydell
-X-Launchpad-Bug-Reporter: manuel baesler (manuelbaesler)
-X-Launchpad-Bug-Modifier: manuel baesler (manuelbaesler)
-References: <156021221413.18114.3680605096232908394.malonedeb@wampee.canonical.com>
-Message-Id: <156512623654.15951.15576964760356213193.malone@soybean.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19015";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 7360c45b21718a5da03b9b8313dcd427edbfd03b
+In-Reply-To: <20190802140314.19001-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ydL4qtJx5u1njGxzjs2SK3ZRglAsHhxPZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.48]); Tue, 06 Aug 2019 21:33:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832281] Re: tcg bug master / 4.0.0 v8 operation
- >>> and |=
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] block: Simplify bdrv_filter_default_perms()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,93 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832281 <1832281@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-result:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ydL4qtJx5u1njGxzjs2SK3ZRglAsHhxPZ
+Content-Type: multipart/mixed; boundary="nvwBIXkoKUuPN6zGlJrZZhYFLk3TwgNcs";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <a1252aab-b6da-3297-f3ef-0741c76a9d2d@redhat.com>
+Subject: Re: [PATCH] block: Simplify bdrv_filter_default_perms()
+References: <20190802140314.19001-1-kwolf@redhat.com>
+In-Reply-To: <20190802140314.19001-1-kwolf@redhat.com>
 
-node
-Welcome to Node.js v12.4.0.
-Type ".help" for more information.
-> a =3D undefined
-undefined
-> a >>> 0
-0
-> let buffer
-undefined
-> buffer |=3D 0
-0
+--nvwBIXkoKUuPN6zGlJrZZhYFLk3TwgNcs
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 02.08.19 16:03, Kevin Wolf wrote:
+> The same change as commit 2b23f28639 ('block/copy-on-read: Fix
+> permissions for inactive node') made for the copy-on-read driver can be=
+
+> made for bdrv_filter_default_perms(): Retaining the old permissions fro=
+m
+> the BdrvChild if it is given complicates things unnecessary when in the=
+
+> end this only means that the options set in the c =3D=3D NULL case (i.e=
+=2E
+> during child creation) are retained.
+
+My best guess is that we had this code because this way any party could
+set or remove the GRAPH_MOD permission and it would be kept through
+=2Ebdrv_child_perm() invocations.  (But I think that=E2=80=99s kaputt.)
+
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c | 12 ++----------
+>  1 file changed, 2 insertions(+), 10 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-Thanks for the patch :-)
+--nvwBIXkoKUuPN6zGlJrZZhYFLk3TwgNcs--
 
--- =
+--ydL4qtJx5u1njGxzjs2SK3ZRglAsHhxPZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832281
+-----BEGIN PGP SIGNATURE-----
 
-Title:
-  tcg bug master / 4.0.0 v8 operation >>> and |=3D
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1J8hQACgkQ9AfbAGHV
+z0DprAf9GZgQtPVlouwqDu825l2d4F+54j7CL5xKlQPeMjD1UcgonAbQhgrTMnCW
+QUySnaCx4CgW/RhP2lSFLcM9GJAX4zp2DKp2b1PDn1TQmYKD8FGb2qJJeEO5R8vW
+AI0xchNrVwagiyekFiThbnGqxvHN78jZ/g0iRt69D+vzYxXOeZndrWBaoPTryEpW
+lst+XO3SzRavWFiGqrdkLWwBkUw51w/C1zyiO55RgcI37Kt3+2SgtmPVDa5Nc7Sx
+pbc6D/TqrX9X5MTdVMKcaTY8NBwh0BcKdW0TQLDgaKvRrP/T+upUtbuNO3acah6x
+gcIj/4XGUUDd8P1dL5qC/sjQox3Tlg==
+=Sbp/
+-----END PGP SIGNATURE-----
 
-Status in QEMU:
-  New
-
-Bug description:
-  vm guest is linux, executed with tcg
-  running this Node.js snippet leads to
-
-  $ node
-  > a =3D undefined
-  undefined
-  > a >>> 0
-  4294967295
-
-  host node
-  $ node
-  > a =3D undefined
-  undefined
-  > a >>> 0
-  0
-
-  same with |=3D
-
-  node
-  Welcome to Node.js v12.4.0.
-  Type ".help" for more information.
-  > let buffer
-  undefined
-  > buffer |=3D 0
-  0
-
-  vm with tcg:
-
-  $ ./out/Release/node --version
-  v12.4.0
-  ./out/Release/node -e "let buffer; buffer |=3D 0; console.log(buffer);"
-  -1
-
-  vm guest is debian x86_64 latest release
-  vm guest is started with ./x86_64-softmmu/qemu-system-x86_64 -vnc :0 -cdr=
-om debian-9.9.0-amd64-netinst.iso -m 4G -smp cores=3D6,threads=3D1,sockets=
-=3D1 -nic user,hostfwd=3Dtcp:ipv4addr:2233-:22 -cpu qemu64 debian.img
-
-  git tag v4.0.0 and master, commit
-  a578cdfbdd8f9beff5ced52b7826ddb1669abbbf, for building qemu-system-
-  x86_64 was used.
-
-  Node.js is compiled on the vm guest (v12.4.0 / master)
-
-  see also
-  https://github.com/nodejs/node/issues/19348#issuecomment-500465502
-
-  I need further assistance to track down the cause of the bug.
-
-  Kind regards
-  Manuel
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832281/+subscriptions
+--ydL4qtJx5u1njGxzjs2SK3ZRglAsHhxPZ--
 
