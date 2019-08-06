@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 270E0C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 16:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD51C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 16:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2EBE20578
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 16:58:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED19820578
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 16:58:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="YI2KJq6D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2EBE20578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="oL71u85O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED19820578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hv2nW-0003hm-6U
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 12:58:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50888)
+	id 1hv2nX-0003kl-87
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 12:58:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50999)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <brijesh.singh@amd.com>) id 1hv2je-0003zf-1y
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 12:54:55 -0400
+ (envelope-from <brijesh.singh@amd.com>) id 1hv2jj-0004BL-H8
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 12:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <brijesh.singh@amd.com>) id 1hv2jc-0003i3-Bf
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 12:54:54 -0400
-Received: from mail-eopbgr710055.outbound.protection.outlook.com
- ([40.107.71.55]:41284 helo=NAM05-BY2-obe.outbound.protection.outlook.com)
+ (envelope-from <brijesh.singh@amd.com>) id 1hv2jh-0003tl-TL
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 12:54:59 -0400
+Received: from mail-eopbgr810057.outbound.protection.outlook.com
+ ([40.107.81.57]:52144 helo=NAM01-BY2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <brijesh.singh@amd.com>)
- id 1hv2jc-0003ei-4c
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 12:54:52 -0400
+ id 1hv2jh-0003qo-KG
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 12:54:57 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UVF4OKkq/2GPUfwGX0cP5fxYcRq9WfP5QmgPDncjre9Ij84YbjHGRHqieScqZOHOn3z8HTozskAYjRUeQcANctNcSF7+ycUXEYXXenklTdkWYBP86RYYD0S6s7GAgIGfCn/kXGN1bQNHgCwBT0uONPvcvTTFvDwsEh5KW6LgdhCtyMMRm/JxCyh9KXBRWh2cwKCWY/xCgtUst/kjpyH1T0BC4KL5SDJ0wlB8a9frMFCg5frbnDSBvM+D2Nar82Yor4XSpfC4BHWHOA8ZZ2fEvy/VE4cqrdXb+CwmHaeBtt6sjrMtDUAUC3yxXAB+BQqC+SpXxrucGgRT09LC/52ktA==
+ b=KjNPovtETtqlyI6bj9sarSD1ukIZO72FQjjHCziQiXfzGsTls6tq1I38YoyzvwKSrzq2kfapUWof7S1qnDZ8m7D8xOrQxBgvdYFOzahN9uQeB2lk4vPZM3LGqHB+yLQn2LX0UYUgDyk24legVHkhA6RsFCX5ZYrUO1C35HauxHCRp4yASA+FTnr0bRDaXgnfPwxMFx6nYxOE81tPu6X7uqbObw7vdPUtnGwRDug1A+l7zyVN9cTzEAIo2cUSZGJqiMZ5MXIpeDMCqm6Z/ryw6VrHKQKTe6ybevcjfakuL7yjN61sCZ2uqihXXwR4uVCooyX83AyPbizlZm4EFJgvgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+xGY6k4izIRMq1nHfe74JtfJtz/xPoPEgZ4BQdYuLH8=;
- b=iwGQFW/45WCP6btpCRuG0CnvKMklZNrZy7CV9SrW5SvWRUjrIYlAomY5UGk6ttlfzIN+UoPrFNDLh9UEH/TAv0TEujmTT5s5+q4sd6rseGSSEel2tD//qYfrgjqusb7r//j7khjf5qlmcOeXgIR3pG2A/ewDHFgkUBWswkN4CTYNPHYWBeSPq2RQRobg5JlVd5X3rQUPsV5NUwq1AH37FZgm9/NYE7nC+BGwJs4pTbFJyQ+N30PIZ2FGNYSx8ZlTw9EgrCF1JPSTST94teWsdNxq2XIGq0MwvHYKCYhmIvY6pF33jf/Ixz/0aYeaRDEtZ/2UvtQ5u5uexB89gk0n+g==
+ bh=LX3Ec+pkZ67tVh+VH8XBXnTG63RCePAYrknKVcjoimI=;
+ b=JvjCojtdXZsdnwL3ubQZ50GEohNXubn4Hv+xS4E6guwQLDF31F7MuNr0aUHfFi2P1v9QuCXTgxwENqAI9AAWf6kAvf9xmxwvKQnPkIszSo3OTMdb+/28ZswE2fHz6pUERU7aKw/SiCPkX0+AMx1jHpYUSVi+3ucmaQgVtLxraogSnbX79Js93TH11dzKgCX6yZPg4di11XDVc01KikA/OeT/asJXly1ent5jY+GX3ho2i+pwXhCmfKSBn4tD77tO1GwYl7h65T/ez+7EH0ncf0giaTtP4URO+y7/Dq3k/BCnd6QB0V796pT34/KzdYcfIeYrJZocPsWtRHRQJXzMow==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=amd.com;dmarc=pass action=none header.from=amd.com;dkim=pass
  header.d=amd.com;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+xGY6k4izIRMq1nHfe74JtfJtz/xPoPEgZ4BQdYuLH8=;
- b=YI2KJq6D+iuI45YR96Xu4Mt4ViSfEZBiI5NVkj38gAUlGeoSkPoAudJQUJls4pyB8pOZljE+KIs2EznWFWv7bfrYEROpkSkdBtjpPtXdrI0OLN1o50CR6W3EOUl4KrTqsTKS8ONc7bJ3lliX/R39KxRlyLYCAgcwzL9fMfWcPos=
+ bh=LX3Ec+pkZ67tVh+VH8XBXnTG63RCePAYrknKVcjoimI=;
+ b=oL71u85Oj21qvWN+JENyQymX3OJJnlOZu17zw/fIiLqmCyCkFU+C7j3/CPzKH+nvzR+0tpDN84cZMqWrtO7SeYCoDZjNdtkW9XdqhxQLSROljh3wDThK9VbnT9BqgNBnM6RChcm6kxNMi2pTFyjw99GGJbkOT9r/rft9PjaTiII=
 Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
- DM6PR12MB4233.namprd12.prod.outlook.com (10.141.184.21) with Microsoft SMTP
+ DM6PR12MB2891.namprd12.prod.outlook.com (20.179.71.153) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2136.14; Tue, 6 Aug 2019 16:54:49 +0000
+ 15.20.2136.16; Tue, 6 Aug 2019 16:54:55 +0000
 Received: from DM6PR12MB2682.namprd12.prod.outlook.com
  ([fe80::7439:ea87:cc5d:71]) by DM6PR12MB2682.namprd12.prod.outlook.com
  ([fe80::7439:ea87:cc5d:71%7]) with mapi id 15.20.2136.018; Tue, 6 Aug 2019
- 16:54:49 +0000
+ 16:54:55 +0000
 From: "Singh, Brijesh" <brijesh.singh@amd.com>
 To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: [PATCH v3 03/14] migration.json: add AMD SEV specific migration
- parameters
-Thread-Index: AQHVTHeogJaMsuQ2A0iis34XZsrCEw==
-Date: Tue, 6 Aug 2019 16:54:48 +0000
-Message-ID: <20190806165429.19327-4-brijesh.singh@amd.com>
+Thread-Topic: [PATCH v3 11/14] migration: add support to migrate page
+ encryption bitmap
+Thread-Index: AQHVTHesETFK0p52pU+09bo5KhPqgw==
+Date: Tue, 6 Aug 2019 16:54:55 +0000
+Message-ID: <20190806165429.19327-12-brijesh.singh@amd.com>
 References: <20190806165429.19327-1-brijesh.singh@amd.com>
 In-Reply-To: <20190806165429.19327-1-brijesh.singh@amd.com>
 Accept-Language: en-US
@@ -82,39 +82,39 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.17.1
 x-originating-ip: [165.204.77.1]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0891bee3-2d8d-46f2-9f09-08d71a8eca86
+x-ms-office365-filtering-correlation-id: 83131def-4fe8-494b-c741-08d71a8eceae
 x-ms-office365-filtering-ht: Tenant
 x-microsoft-antispam: BCL:0; PCL:0;
  RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);
- SRVR:DM6PR12MB4233; 
-x-ms-traffictypediagnostic: DM6PR12MB4233:
-x-microsoft-antispam-prvs: <DM6PR12MB423360842B48A6EB3F36258EE5D50@DM6PR12MB4233.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2512;
+ SRVR:DM6PR12MB2891; 
+x-ms-traffictypediagnostic: DM6PR12MB2891:
+x-microsoft-antispam-prvs: <DM6PR12MB2891AAB87E1CB3EF3D683EAAE5D50@DM6PR12MB2891.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:466;
 x-forefront-prvs: 0121F24F22
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10009020)(4636009)(39860400002)(396003)(136003)(346002)(366004)(376002)(199004)(189003)(2501003)(71200400001)(36756003)(81166006)(71190400001)(81156014)(54906003)(5660300002)(1076003)(25786009)(7736002)(6116002)(305945005)(8676002)(76176011)(6916009)(68736007)(3846002)(8936002)(2351001)(99286004)(478600001)(102836004)(64756008)(66946007)(66446008)(66476007)(386003)(6506007)(66556008)(26005)(4326008)(50226002)(2616005)(186003)(476003)(6512007)(6486002)(486006)(86362001)(5640700003)(53936002)(66066001)(316002)(14454004)(11346002)(2906002)(446003)(256004)(14444005)(6436002)(52116002);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB4233;
+ SFS:(10009020)(4636009)(39860400002)(366004)(136003)(396003)(376002)(346002)(189003)(199004)(6116002)(3846002)(2906002)(6436002)(50226002)(54906003)(316002)(8676002)(81156014)(86362001)(81166006)(5640700003)(99286004)(76176011)(52116002)(6486002)(386003)(102836004)(71200400001)(71190400001)(2616005)(2501003)(476003)(8936002)(14444005)(11346002)(26005)(66066001)(256004)(6506007)(2351001)(446003)(186003)(486006)(6512007)(66556008)(478600001)(66476007)(64756008)(66946007)(7736002)(53936002)(1076003)(66446008)(6916009)(5660300002)(36756003)(68736007)(25786009)(4326008)(305945005)(14454004);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM6PR12MB2891;
  H:DM6PR12MB2682.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
+ PTR:InfoNoRecords; MX:1; A:1; 
 received-spf: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: MBBICxNqJE8AD+fGPVsnhvcX1tRoX0q17gLri9TvessKulVE8B09Koy1JSMvjpxrIbya5R/hkbC2IkF/GUUkOxEYtpLyh+QJ6/SZhd01Uq9j1fHc4JhQo2l6CqdBCk1I2mot6uAnplEelm2h0uE75OweYo645qqvZngpJQXNcRbhPdDNE+mcndcIOF6jkCuv7r+BKpZ4zZEqQhpio0nz2jIRtlWG/BovxwtPHuWkxErbNh/Cc16DCPtE/2Rh0wp73+S/pIboVTuxJW9xaGGSb+3v9kJaIE/+rbCHIh3klMnPcUyReeAMoTZFQe17PY30jl3CdPHzu6Il3EGW3pVeTihu9tkb0OvKn4MHPMFfJ90iOLTEkq4XGi502WwK51CH8E9dPmny0zBJG6gOIK4pX9MK7WfXqfsVr4EyTsFzEGo=
+x-microsoft-antispam-message-info: nAO/Fx/GH2if+2U8JqSV+EAfQdznLfKkRdwYBPWga9KyXykP8NzSwJfnUhjpUll3ZOmOl34SJFCdmLCnvzBBC8j+306Cexmkyh7URXIVNYlchEHmVw2gofsm1jEYyq//kY0TfjFR4BOsiSMFuX7vT1BYKHqbPjuTYwduPno2dJrVjYb/Fb1sdXTVGFrNaVYt+3AFNQEVOV4xjHabteZUAn5YGyvtbByFuU2rmCy6sRX+bBGIj7v4OLJfw0ycej69irG1d5CIyMKi1MKTHrpgCv6ZlAFrrySF9fV4T8TD66fooejfDAdBzSZFrvOE+wcD2au7F0TeON4vQybpEQUFl8irLXX32Arbd5L907ytTyNx9XHBfOLVadnxHia49tuo2DwZTCH44A5E972pVBmnzwA3d3W+8oyeQx/0mr3jLBw=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0891bee3-2d8d-46f2-9f09-08d71a8eca86
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Aug 2019 16:54:48.4791 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83131def-4fe8-494b-c741-08d71a8eceae
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Aug 2019 16:54:55.3612 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: sbrijesh@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4233
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2891
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.71.55
-Subject: [Qemu-devel] [PATCH v3 03/14] migration.json: add AMD SEV specific
- migration parameters
+X-Received-From: 40.107.81.57
+Subject: [Qemu-devel] [PATCH v3 11/14] migration: add support to migrate
+ page encryption bitmap
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,265 +134,241 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-AMD SEV migration flow requires that target machine's public Diffie-Hellman
-key (PDH) and certificate chain must be passed before initiating the guest
-migration. User can use QMP 'migrate-set-parameters' to pass the certificat=
-e
-chain. The certificate chain will be used while creating the outgoing
-encryption context.
+When memory encryption is enabled, the hypervisor maintains a page
+encryption bitmap which is referred by hypervisor during migratoin to check
+if page is private or shared. The bitmap is built during the VM bootup and
+must be migrated to the target host so that hypervisor on target host can
+use it for future migration. The KVM_{SET,GET}_PAGE_ENC_BITMAP can be used
+to get and set the bitmap for a given gfn range.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 ---
+ accel/kvm/kvm-all.c      | 27 ++++++++++++
+ accel/kvm/sev-stub.c     | 11 +++++
+ include/sysemu/sev.h     |  6 +++
+ target/i386/sev.c        | 93 ++++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events |  2 +
+ 5 files changed, 139 insertions(+)
 
-I was able to pass the certificate chain through the HMP but somehow
-QMP socket interface is not working for me. If anyone has any tips on
-what I am missing in the patch then please let me know. In meantime,
-I will also continue my investigation on why its not working for me.
-
- migration/migration.c | 61 +++++++++++++++++++++++++++++++++++++++++++
- monitor/hmp-cmds.c    | 18 +++++++++++++
- qapi/migration.json   | 41 ++++++++++++++++++++++++++---
- 3 files changed, 116 insertions(+), 4 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index 8a607fe1e2..de66a0eb7e 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -783,6 +783,12 @@ MigrationParameters *qmp_query_migrate_parameters(Erro=
-r **errp)
-     params->announce_rounds =3D s->parameters.announce_rounds;
-     params->has_announce_step =3D true;
-     params->announce_step =3D s->parameters.announce_step;
-+    params->has_sev_pdh =3D true;
-+    params->sev_pdh =3D g_strdup(s->parameters.sev_pdh);
-+    params->has_sev_plat_cert =3D true;
-+    params->sev_plat_cert =3D g_strdup(s->parameters.sev_plat_cert);
-+    params->has_sev_amd_cert =3D true;
-+    params->sev_amd_cert =3D g_strdup(s->parameters.sev_amd_cert);
-=20
-     return params;
- }
-@@ -1289,6 +1295,18 @@ static void migrate_params_test_apply(MigrateSetPara=
-meters *params,
-     if (params->has_announce_step) {
-         dest->announce_step =3D params->announce_step;
-     }
-+    if (params->has_sev_pdh) {
-+        assert(params->sev_pdh->type =3D=3D QTYPE_QSTRING);
-+        dest->sev_pdh =3D g_strdup(params->sev_pdh->u.s);
-+    }
-+    if (params->has_sev_plat_cert) {
-+        assert(params->sev_plat_cert->type =3D=3D QTYPE_QSTRING);
-+        dest->sev_plat_cert =3D g_strdup(params->sev_plat_cert->u.s);
-+    }
-+    if (params->has_sev_amd_cert) {
-+        assert(params->sev_amd_cert->type =3D=3D QTYPE_QSTRING);
-+        dest->sev_amd_cert =3D g_strdup(params->sev_amd_cert->u.s);
-+    }
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index ba0e7fa2be..f4d136b022 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -185,10 +185,37 @@ static int kvm_memcrypt_load_incoming_page(QEMUFile *=
+f, uint8_t *ptr)
+     return sev_load_incoming_page(kvm_state->memcrypt_handle, f, ptr);
  }
 =20
- static void migrate_params_apply(MigrateSetParameters *params, Error **err=
-p)
-@@ -1390,6 +1408,21 @@ static void migrate_params_apply(MigrateSetParameter=
-s *params, Error **errp)
-     if (params->has_announce_step) {
-         s->parameters.announce_step =3D params->announce_step;
-     }
-+    if (params->has_sev_pdh) {
-+        g_free(s->parameters.sev_pdh);
-+        assert(params->sev_pdh->type =3D=3D QTYPE_QSTRING);
-+        s->parameters.sev_pdh =3D g_strdup(params->sev_pdh->u.s);
-+    }
-+    if (params->has_sev_plat_cert) {
-+        g_free(s->parameters.sev_plat_cert);
-+        assert(params->sev_plat_cert->type =3D=3D QTYPE_QSTRING);
-+        s->parameters.sev_plat_cert =3D g_strdup(params->sev_plat_cert->u.=
-s);
-+    }
-+    if (params->has_sev_amd_cert) {
-+        g_free(s->parameters.sev_amd_cert);
-+        assert(params->sev_amd_cert->type =3D=3D QTYPE_QSTRING);
-+        s->parameters.sev_amd_cert =3D g_strdup(params->sev_amd_cert->u.s)=
-;
-+    }
- }
-=20
- void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp=
-)
-@@ -1410,6 +1443,27 @@ void qmp_migrate_set_parameters(MigrateSetParameters=
- *params, Error **errp)
-         params->tls_hostname->type =3D QTYPE_QSTRING;
-         params->tls_hostname->u.s =3D strdup("");
-     }
-+    /* TODO Rewrite "" to null instead */
-+    if (params->has_sev_pdh
-+        && params->sev_pdh->type =3D=3D QTYPE_QNULL) {
-+        qobject_unref(params->sev_pdh->u.n);
-+        params->sev_pdh->type =3D QTYPE_QSTRING;
-+        params->sev_pdh->u.s =3D strdup("");
-+    }
-+    /* TODO Rewrite "" to null instead */
-+    if (params->has_sev_plat_cert
-+        && params->sev_plat_cert->type =3D=3D QTYPE_QNULL) {
-+        qobject_unref(params->sev_plat_cert->u.n);
-+        params->sev_plat_cert->type =3D QTYPE_QSTRING;
-+        params->sev_plat_cert->u.s =3D strdup("");
-+    }
-+    /* TODO Rewrite "" to null instead */
-+    if (params->has_sev_amd_cert
-+        && params->sev_amd_cert->type =3D=3D QTYPE_QNULL) {
-+        qobject_unref(params->sev_amd_cert->u.n);
-+        params->sev_amd_cert->type =3D QTYPE_QSTRING;
-+        params->sev_amd_cert->u.s =3D strdup("");
-+    }
-=20
-     migrate_params_test_apply(params, &tmp);
-=20
-@@ -3466,6 +3520,9 @@ static void migration_instance_finalize(Object *obj)
-     qemu_mutex_destroy(&ms->qemu_file_lock);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-+    g_free(params->sev_pdh);
-+    g_free(params->sev_plat_cert);
-+    g_free(params->sev_amd_cert);
-     qemu_sem_destroy(&ms->rate_limit_sem);
-     qemu_sem_destroy(&ms->pause_sem);
-     qemu_sem_destroy(&ms->postcopy_pause_sem);
-@@ -3507,6 +3564,10 @@ static void migration_instance_init(Object *obj)
-     params->has_announce_rounds =3D true;
-     params->has_announce_step =3D true;
-=20
-+    params->sev_pdh =3D g_strdup("");
-+    params->sev_plat_cert =3D g_strdup("");
-+    params->sev_amd_cert =3D g_strdup("");
++static int kvm_memcrypt_save_outgoing_bitmap(QEMUFile *f)
++{
++    KVMMemoryListener *kml =3D &kvm_state->memory_listener;
++    KVMState *s =3D kvm_state;
++    int ret =3D 1, i;
 +
-     qemu_sem_init(&ms->postcopy_pause_sem, 0);
-     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
-     qemu_sem_init(&ms->rp_state.rp_sem, 0);
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 5ca3ebe942..354219f27a 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -1872,6 +1872,24 @@ void hmp_migrate_set_parameter(Monitor *mon, const Q=
-Dict *qdict)
-         p->has_announce_step =3D true;
-         visit_type_size(v, param, &p->announce_step, &err);
-         break;
-+    case MIGRATION_PARAMETER_SEV_PDH:
-+        p->has_sev_pdh =3D true;
-+        p->sev_pdh =3D g_new0(StrOrNull, 1);
-+        p->sev_pdh->type =3D QTYPE_QSTRING;
-+        visit_type_str(v, param, &p->sev_pdh->u.s, &err);
-+        break;
-+    case MIGRATION_PARAMETER_SEV_PLAT_CERT:
-+        p->has_sev_plat_cert =3D true;
-+        p->sev_plat_cert =3D g_new0(StrOrNull, 1);
-+        p->sev_plat_cert->type =3D QTYPE_QSTRING;
-+        visit_type_str(v, param, &p->sev_plat_cert->u.s, &err);
-+        break;
-+    case MIGRATION_PARAMETER_SEV_AMD_CERT:
-+        p->has_sev_amd_cert =3D true;
-+        p->sev_amd_cert =3D g_new0(StrOrNull, 1);
-+        p->sev_amd_cert->type =3D QTYPE_QSTRING;
-+        visit_type_str(v, param, &p->sev_amd_cert->u.s, &err);
-+        break;
-     default:
-         assert(0);
-     }
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 9cfbaf8c6c..bb07995d2c 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -580,6 +580,15 @@
- # @max-cpu-throttle: maximum cpu throttle percentage.
- #                    Defaults to 99. (Since 3.1)
- #
-+# @sev-pdh: The target host platform diffie-hellman key encoded in base64
-+#           (Since 4.2)
-+#
-+# @sev-plat-cert: The target host platform certificate chain encoded in ba=
-se64
-+#                 (Since 4.2)
-+#
-+# @sev-amd-cert: AMD certificate chain which include ASK and OCA encoded i=
-n
-+#                base64 (Since 4.2)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-@@ -592,7 +601,7 @@
-            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-            'multifd-channels',
-            'xbzrle-cache-size', 'max-postcopy-bandwidth',
--           'max-cpu-throttle' ] }
-+           'max-cpu-throttle', 'sev-pdh', 'sev-plat-cert', 'sev-amd-cert' =
-] }
++    /* iterate through all the registered slots and send the bitmap */
++    for (i =3D 0; i < s->nr_slots; i++) {
++        KVMSlot *mem =3D &kml->slots[i];
++        ret =3D sev_save_outgoing_bitmap(s->memcrypt_handle, f, mem->start=
+_addr,
++                                       mem->memory_size,
++                                       (i + 1) =3D=3D s->nr_slots);
++        if (ret) {
++            return 1;
++        }
++    }
++
++    return ret;
++}
++
++static int kvm_memcrypt_load_incoming_bitmap(QEMUFile *f)
++{
++    return sev_load_incoming_bitmap(kvm_state->memcrypt_handle, f);
++}
++
+ static struct MachineMemoryEncryptionOps sev_memory_encryption_ops =3D {
+     .save_setup =3D kvm_memcrypt_save_setup,
+     .save_outgoing_page =3D kvm_memcrypt_save_outgoing_page,
+     .load_incoming_page =3D kvm_memcrypt_load_incoming_page,
++    .save_outgoing_bitmap =3D kvm_memcrypt_save_outgoing_bitmap,
++    .load_incoming_bitmap =3D kvm_memcrypt_load_incoming_bitmap,
+ };
 =20
- ##
- # @MigrateSetParameters:
-@@ -682,6 +691,15 @@
- # @max-cpu-throttle: maximum cpu throttle percentage.
- #                    The default value is 99. (Since 3.1)
- #
-+# @sev-pdh: The target host platform diffie-hellman key encoded in base64
-+#           (Since 4.2)
-+#
-+# @sev-plat-cert: The target host platform certificate chain encoded in ba=
-se64
-+#                 (Since 4.2)
-+#
-+# @sev-amd-cert: AMD certificate chain which include ASK and OCA encoded i=
-n
-+#                base64 (Since 4.2)
-+#
- # Since: 2.4
- ##
- # TODO either fuse back into MigrationParameters, or make
-@@ -707,7 +725,10 @@
-             '*multifd-channels': 'int',
-             '*xbzrle-cache-size': 'size',
-             '*max-postcopy-bandwidth': 'size',
--	    '*max-cpu-throttle': 'int' } }
-+            '*max-cpu-throttle': 'int',
-+            '*sev-pdh':'StrOrNull',
-+            '*sev-plat-cert': 'StrOrNull',
-+            '*sev-amd-cert' : 'StrOrNull' } }
+ int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
+diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
+index 1b6773ef72..fa96225abc 100644
+--- a/accel/kvm/sev-stub.c
++++ b/accel/kvm/sev-stub.c
+@@ -41,3 +41,14 @@ int sev_load_incoming_page(void *handle, QEMUFile *f, ui=
+nt8_t *ptr)
+ {
+     return 1;
+ }
++
++int sev_save_outgoing_bitmap(void *handle, QEMUFile *f,
++                             unsigned long start, uint64_t length, bool la=
+st)
++{
++    return 1;
++}
++
++int sev_load_incoming_bitmap(void *handle, QEMUFile *f)
++{
++    return 1;
++}
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index e9371bd2dd..f777083c94 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -16,6 +16,9 @@
 =20
- ##
- # @migrate-set-parameters:
-@@ -817,6 +838,15 @@
- #                    Defaults to 99.
- #                     (Since 3.1)
- #
-+# @sev-pdh: The target host platform diffie-hellman key encoded in base64
-+#           (Since 4.2)
-+#
-+# @sev-plat-cert: The target host platform certificate chain encoded in ba=
-se64
-+#                 (Since 4.2)
-+#
-+# @sev-amd-cert: AMD certificate chain which include ASK and OCA encoded i=
-n
-+#                base64 (Since 4.2)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -839,8 +869,11 @@
-             '*block-incremental': 'bool' ,
-             '*multifd-channels': 'uint8',
-             '*xbzrle-cache-size': 'size',
--	    '*max-postcopy-bandwidth': 'size',
--            '*max-cpu-throttle':'uint8'} }
-+            '*max-postcopy-bandwidth': 'size',
-+            '*max-cpu-throttle':'uint8',
-+            '*sev-pdh':'str',
-+            '*sev-plat-cert': 'str',
-+            '*sev-amd-cert' : 'str'} }
+ #include "sysemu/kvm.h"
 =20
- ##
- # @query-migrate-parameters:
++#define RAM_SAVE_ENCRYPTED_PAGE        0x1
++#define RAM_SAVE_ENCRYPTED_BITMAP      0x2
++
+ void *sev_guest_init(const char *id);
+ int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
+ int sev_save_setup(void *handle, const char *pdh, const char *plat_cert,
+@@ -23,4 +26,7 @@ int sev_save_setup(void *handle, const char *pdh, const c=
+har *plat_cert,
+ int sev_save_outgoing_page(void *handle, QEMUFile *f, uint8_t *ptr,
+                            uint32_t size, uint64_t *bytes_sent);
+ int sev_load_incoming_page(void *handle, QEMUFile *f, uint8_t *ptr);
++int sev_load_incoming_bitmap(void *handle, QEMUFile *f);
++int sev_save_outgoing_bitmap(void *handle, QEMUFile *f, unsigned long star=
+t,
++                             uint64_t length, bool last);
+ #endif
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index a689011991..9d643e720c 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -65,6 +65,8 @@ static const char *const sev_fw_errlist[] =3D {
+ #define SEV_FW_MAX_ERROR      ARRAY_SIZE(sev_fw_errlist)
+=20
+ #define SEV_FW_BLOB_MAX_SIZE            0x4000          /* 16KB */
++#define ENCRYPTED_BITMAP_CONTINUE       0x1
++#define ENCRYPTED_BITMAP_END            0x2
+=20
+ static int
+ sev_ioctl(int fd, int cmd, void *data, int *error)
+@@ -1232,6 +1234,97 @@ int sev_load_incoming_page(void *handle, QEMUFile *f=
+, uint8_t *ptr)
+     return sev_receive_update_data(f, ptr);
+ }
+=20
++#define ALIGN(x, y)  (((x) + (y) - 1) & ~((y) - 1))
++
++int sev_load_incoming_bitmap(void *handle, QEMUFile *f)
++{
++    void *bmap;
++    unsigned long bmap_size, base_gpa;
++    unsigned long npages, expected_size, length;
++    struct kvm_page_enc_bitmap e =3D {};
++    int status;
++
++    status =3D qemu_get_be32(f);
++
++    while (status !=3D ENCRYPTED_BITMAP_END) {
++        base_gpa =3D qemu_get_be64(f);
++        npages =3D qemu_get_be64(f);
++        bmap_size =3D qemu_get_be64(f);
++
++        /*
++         * Before allocating the bitmap buffer, lets do some bound check t=
+o
++         * ensure that we are not dealing with corrupted stream.
++         */
++        length =3D npages << TARGET_PAGE_BITS;
++        expected_size =3D ALIGN((length >> TARGET_PAGE_BITS), 64) / 8;
++        if (expected_size !=3D bmap_size) {
++            error_report("corrupted bitmap expected size %ld got %ld",
++                    expected_size, bmap_size);
++            return 1;
++        }
++
++        bmap =3D g_malloc0(bmap_size);
++        qemu_get_buffer(f, (uint8_t *)bmap, bmap_size);
++
++        trace_kvm_sev_load_bitmap(base_gpa, npages << TARGET_PAGE_BITS);
++
++        e.start_gfn =3D base_gpa >> TARGET_PAGE_BITS;
++        e.num_pages =3D npages;
++        e.enc_bitmap =3D bmap;
++        if (kvm_vm_ioctl(kvm_state, KVM_SET_PAGE_ENC_BITMAP, &e) =3D=3D -1=
+) {
++            error_report("KVM_SET_PAGE_ENC_BITMAP ioctl failed %d", errno)=
+;
++            g_free(bmap);
++            return 1;
++        }
++
++        g_free(bmap);
++
++        status =3D qemu_get_be32(f);
++    }
++
++    return 0;
++}
++
++int sev_save_outgoing_bitmap(void *handle, QEMUFile *f,
++                             unsigned long start, uint64_t length, bool la=
+st)
++{
++    uint64_t size;
++    struct kvm_page_enc_bitmap e =3D {};
++
++    if (!length) {
++        /* nothing to send */
++        goto done;
++    }
++
++    size =3D ALIGN((length >> TARGET_PAGE_BITS), 64) / 8;
++    e.enc_bitmap =3D g_malloc0(size);
++    e.start_gfn =3D start >> TARGET_PAGE_BITS;
++    e.num_pages =3D length >> TARGET_PAGE_BITS;
++
++    trace_kvm_sev_save_bitmap(start, length);
++
++    if (kvm_vm_ioctl(kvm_state, KVM_GET_PAGE_ENC_BITMAP, &e) =3D=3D -1) {
++        error_report("%s: KVM_GET_PAGE_ENC_BITMAP ioctl failed %d",
++                    __func__, errno);
++        g_free(e.enc_bitmap);
++        return 1;
++    }
++
++    qemu_put_be32(f, ENCRYPTED_BITMAP_CONTINUE);
++    qemu_put_be64(f, start);
++    qemu_put_be64(f, e.num_pages);
++    qemu_put_be64(f, size);
++    qemu_put_buffer(f, (uint8_t *)e.enc_bitmap, size);
++
++    g_free(e.enc_bitmap);
++
++done:
++    if (last) {
++        qemu_put_be32(f, ENCRYPTED_BITMAP_END);
++    }
++    return 0;
++}
++
+ static void
+ sev_register_types(void)
+ {
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index 609752cca7..853a3870ab 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -21,3 +21,5 @@ kvm_sev_send_finish(void) ""
+ kvm_sev_receive_start(int policy, void *session, void *pdh) "policy 0x%x s=
+ession %p pdh %p"
+ kvm_sev_receive_update_data(void *src, void *dst, int len, void *hdr, int =
+hdr_len) "guest %p trans %p len %d hdr %p hdr_len %d"
+ kvm_sev_receive_finish(void) ""
++kvm_sev_save_bitmap(uint64_t start, uint64_t len) "start 0x%" PRIx64 " len=
+ 0x%" PRIx64
++kvm_sev_load_bitmap(uint64_t start, uint64_t len) "start 0x%" PRIx64 " len=
+ 0x%" PRIx64
 --=20
 2.17.1
 
