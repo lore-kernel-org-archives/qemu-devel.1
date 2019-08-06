@@ -2,56 +2,56 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47127C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A76D6C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:48:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 180982147A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:38:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180982147A
+	by mail.kernel.org (Postfix) with ESMTPS id 7CFF72147A
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 00:48:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CFF72147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hunUT-0006gC-Ds
-	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:38:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38361)
+	id 1huneF-0000PB-IT
+	for qemu-devel@archiver.kernel.org; Mon, 05 Aug 2019 20:48:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39750)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hunTw-0006GS-Gu
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:37:41 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hundM-0007wH-1r
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1hunTv-0004aB-IT
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:37:40 -0400
-Received: from mga11.intel.com ([192.55.52.93]:49199)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hundL-0002K7-7C
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:47:24 -0400
+Received: from mga03.intel.com ([134.134.136.65]:38669)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1hunTv-0004Zp-9f
- for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:37:39 -0400
+ id 1hundK-0002JX-U0
+ for qemu-devel@nongnu.org; Mon, 05 Aug 2019 20:47:23 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 05 Aug 2019 17:37:38 -0700
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 05 Aug 2019 17:47:21 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,350,1559545200"; d="scan'208";a="202636269"
+X-IronPort-AV: E=Sophos;i="5.64,350,1559545200"; d="scan'208";a="202637801"
 Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by fmsmga002.fm.intel.com with ESMTP; 05 Aug 2019 17:37:37 -0700
+ by fmsmga002.fm.intel.com with ESMTP; 05 Aug 2019 17:47:19 -0700
 From: Wei Yang <richardw.yang@linux.intel.com>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 08:36:45 +0800
-Message-Id: <20190806003645.8426-1-richardw.yang@linux.intel.com>
+Date: Tue,  6 Aug 2019 08:46:46 +0800
+Message-Id: <20190806004648.8659-1-richardw.yang@linux.intel.com>
 X-Mailer: git-send-email 2.17.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.93
-Subject: [Qemu-devel] [PATCH v3] hmp: Remove migration capabilities from
- "info migrate"
+X-Received-From: 134.134.136.65
+Subject: [Qemu-devel] [PATCH 0/2] migration/postcopy: simplify
+ postcopy_chunk_hostpages_pass
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,64 +64,22 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Wei Yang <richardw.yang@linux.intel.com>, dgilbert@redhat.com,
- armbru@redhat.com
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With the growth of migration capabilities, it is not proper to display
-them in "info migrate". Users are recommended to use "info
-migrate_capabiltiies" to list them.
+When looking into function postcopy_chunk_hostpages_pass(), we could use
+alignment calculation to simplify it.
 
-Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Suggested-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Wei Yang (2):
+  migration/postcopy: simplify calculation of run_start and
+    fixup_start_addr
+  migration/postcopy: use QEMU_IS_ALIGNED to replace host_offset
 
----
-v3:
-  * remove un-used variable caps
-v2:
-  * remove capabilities from "info migrate"
----
- monitor/hmp-cmds.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ migration/ram.c | 37 +++++++------------------------------
+ 1 file changed, 7 insertions(+), 30 deletions(-)
 
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 5ca3ebe942..35788c0645 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -220,24 +220,11 @@ static char *SocketAddress_to_str(SocketAddress *addr)
- void hmp_info_migrate(Monitor *mon, const QDict *qdict)
- {
-     MigrationInfo *info;
--    MigrationCapabilityStatusList *caps, *cap;
- 
-     info = qmp_query_migrate(NULL);
--    caps = qmp_query_migrate_capabilities(NULL);
- 
-     migration_global_dump(mon);
- 
--    /* do not display parameters during setup */
--    if (info->has_status && caps) {
--        monitor_printf(mon, "capabilities: ");
--        for (cap = caps; cap; cap = cap->next) {
--            monitor_printf(mon, "%s: %s ",
--                           MigrationCapability_str(cap->value->capability),
--                           cap->value->state ? "on" : "off");
--        }
--        monitor_printf(mon, "\n");
--    }
--
-     if (info->has_status) {
-         monitor_printf(mon, "Migration status: %s",
-                        MigrationStatus_str(info->status));
-@@ -370,7 +357,6 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "]\n");
-     }
-     qapi_free_MigrationInfo(info);
--    qapi_free_MigrationCapabilityStatusList(caps);
- }
- 
- void hmp_info_migrate_capabilities(Monitor *mon, const QDict *qdict)
 -- 
 2.17.1
 
