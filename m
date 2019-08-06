@@ -2,62 +2,92 @@ Return-Path: <SRS0=MhU4=WC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 763A5C31E40
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4A5C31E40
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:24:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 471C72064A
-	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:22:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 471C72064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 97A5620C01
+	for <qemu-devel@archiver.kernel.org>; Tue,  6 Aug 2019 13:24:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZ8HciTl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A5620C01
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1huzPt-0003rI-72
-	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 09:22:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55589)
+	id 1huzRk-00055i-Qv
+	for qemu-devel@archiver.kernel.org; Tue, 06 Aug 2019 09:24:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55886)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1huzPP-0003Lp-Vk
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:21:48 -0400
+ (envelope-from <groeck7@gmail.com>) id 1huzRI-0004Mm-LO
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:23:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1huzPO-0001wG-SU
- for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:21:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36784)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1huzPM-0001v9-Fx; Tue, 06 Aug 2019 09:21:44 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C115B8E92E;
- Tue,  6 Aug 2019 13:21:42 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2761419C78;
- Tue,  6 Aug 2019 13:21:38 +0000 (UTC)
-Date: Tue, 6 Aug 2019 15:21:36 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Message-ID: <20190806152136.3afbfb4b@redhat.com>
-In-Reply-To: <20190726104519.23812-8-shameerali.kolothum.thodi@huawei.com>
-References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
- <20190726104519.23812-8-shameerali.kolothum.thodi@huawei.com>
+ (envelope-from <groeck7@gmail.com>) id 1huzRH-00034T-It
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:23:44 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:33476)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1huzRH-00033H-Dg
+ for qemu-devel@nongnu.org; Tue, 06 Aug 2019 09:23:43 -0400
+Received: by mail-pf1-x441.google.com with SMTP id g2so41516515pfq.0
+ for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 06:23:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=1X+KJzZdF1h/+qkJF98PmRQ3tlXWYL+KJvdnoOekqXM=;
+ b=BZ8HciTlk40PxCefGd3z9kuxKJAXe3r2tzi9n69XNzVuS30dddIUfjJ3DChR6vDlWD
+ xbvYUmFQqiVe3yBIm239xRY7s/nGUeQZWMU3U6Js7tKR9WsRtInar4G3vGgWVDrFbygl
+ F87EPZCX/Sd3v1TUuyLhkbr2VHLQ5pFFY88GjhDr4C2x9Li++oSrsAmZNy6ohmv9mKQz
+ Pt0xMbSy0e2IIvCydteAMrMQmD5ZpLCG0WvH19bB3DofVyqEL0u0DCnxKSa4X/VJV1Cm
+ WJ/zObKScOzYZHawjnFXePzmoOWXjSbxBMDK+9rIrAi3erFIHzOyE7y/4xosIi8d8BRQ
+ Y2GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1X+KJzZdF1h/+qkJF98PmRQ3tlXWYL+KJvdnoOekqXM=;
+ b=EBbqVc8Mm49HImetgQ8w6kQb3CT9InAizQAiZsCNSSsGhDAPlupUhs7iwjRWtxxiTn
+ OY1Io3V9Nq0iyLq8w7PMeAjwsOZhnCYwnY8M8oSuVtyBWMqAEs3HDyBLzrO9kQ3X69hU
+ A7WIJklkTHqkIOnBw2ab+EKfVnJ/V7Bu8Z8d4cMsZPBCIAeOKPzs1GhvDISo8L5oA3G/
+ pASKZckyl2S7FQ+m3rvTx3x9IGo1Y97XvLs3dsjSz+MZxo2VGBDS1o/k6vYOkgKAMeOV
+ yfFJe89Y3qNp9ntn7YjUulooj7X/1hO7L6onL+N7H7sWXEEmVBQemWe+Dlq3A4mf3uPX
+ e5jQ==
+X-Gm-Message-State: APjAAAWjr9rmFyWKvyk17O3gA7cv+mPwIuXjf3Lf1VU+J5GA2/04bRNS
+ PpTGpz+8fV034gUJw68uoPo=
+X-Google-Smtp-Source: APXvYqxyNGV+1zCeczWT4rTapFoHEhwxcu0NdSshN+LqkuJCGTPkgum3Wt/0XUFjK3cJ5ZpsRvV3ag==
+X-Received: by 2002:a63:904:: with SMTP id 4mr2850493pgj.19.1565097821435;
+ Tue, 06 Aug 2019 06:23:41 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ w132sm89992755pfd.78.2019.08.06.06.23.39
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 06 Aug 2019 06:23:40 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <1564508710-22909-1-git-send-email-linux@roeck-us.net>
+ <160cda6c-63b3-4d52-018e-d282514be2a3@redhat.com>
+ <20190802141149.dj7zv5p5wscftvnr@sirius.home.kraxel.org>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <14dfe5ce-d74c-dccd-a62b-753b2efa924b@roeck-us.net>
+Date: Tue, 6 Aug 2019 06:23:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Tue, 06 Aug 2019 13:21:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v8 7/9] hw/arm/virt-acpi-build: Add
- PC-DIMM in SRAT
+In-Reply-To: <20190802141149.dj7zv5p5wscftvnr@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH] ehci: Ensure that device is not NULL
+ before calling usb_ep_get
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,62 +99,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sameo@linux.intel.com, ard.biesheuvel@linaro.org,
- shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, xuwei5@hisilicon.com,
- linuxarm@huawei.com, eric.auger@redhat.com, qemu-arm@nongnu.org,
- sebastien.boeuf@intel.com, lersek@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 26 Jul 2019 11:45:17 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-
-> Generate Memory Affinity Structures for PC-DIMM ranges.
+On 8/2/19 7:11 AM, Gerd Hoffmann wrote:
+> On Wed, Jul 31, 2019 at 01:08:50PM +0200, Philippe Mathieu-Daudé wrote:
+>> On 7/30/19 7:45 PM, Guenter Roeck wrote:
+>>> The following assert is seen once in a while while resetting the
+>>> Linux kernel.
+>>>
+>>> qemu-system-x86_64: hw/usb/core.c:734: usb_ep_get:
+>>> 	Assertion `dev != NULL' failed.
+>>>
+>>> The call to usb_ep_get() originates from ehci_execute().
+>>> Analysis and debugging shows that p->queue->dev can indeed be NULL
+>>> in this function. Add check for this condition and return an error
+>>> if it is seen.
+>>
+>> Your patch is not wrong as it corrects your case, but I wonder why we
+>> get there. This assert seems to have catched a bug.
 > 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  hw/arm/virt-acpi-build.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> https://bugzilla.redhat.com//show_bug.cgi?id=1715801 maybe.
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 018b1e326d..75657caa36 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -518,6 +518,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      int i, srat_start;
->      uint64_t mem_base;
->      MachineClass *mc = MACHINE_GET_CLASS(vms);
-> +    MachineState *ms = MACHINE(vms);
->      const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
->  
->      srat_start = table_data->len;
-> @@ -543,6 +544,14 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          }
->      }
->  
-> +    if (ms->device_memory) {
-> +        numamem = acpi_data_push(table_data, sizeof *numamem);
-> +        build_srat_memory(numamem, ms->device_memory->base,
-> +                          memory_region_size(&ms->device_memory->mr),
-> +                          nb_numa_nodes - 1,
-> +                          MEM_AFFINITY_HOTPLUGGABLE | MEM_AFFINITY_ENABLED);
+>> Gerd, shouldn't we call usb_packet_cleanup() in ehci_reset() rather than
+>> ehci_finalize()? Then we shouldn't need this patch.
+> 
+> The two ehci_queues_rip_all() calls in ehci_reset() should clean up everything
+> properly.
+> 
+> Can you try the patch below to see whenever a ehci_find_device failure is the
+> root cause?
+> 
+> thanks,
+>    Gerd
+> 
+> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+> index 62dab0592fa2..2b0a57772ed5 100644
+> --- a/hw/usb/hcd-ehci.c
+> +++ b/hw/usb/hcd-ehci.c
+> @@ -1644,6 +1644,10 @@ static EHCIQueue *ehci_state_fetchqh(EHCIState *ehci, int async)
+>           q->dev = ehci_find_device(q->ehci,
+>                                     get_field(q->qh.epchar, QH_EPCHAR_DEVADDR));
+>       }
+> +    if (q->dev == NULL) {
+> +        fprintf(stderr, "%s: device %d not found\n", __func__,
+> +                get_field(q->qh.epchar, QH_EPCHAR_DEVADDR));
 > +    }
-> +
->      build_header(linker, table_data, (void *)(table_data->data + srat_start),
->                   "SRAT", table_data->len - srat_start, 3, NULL, NULL);
->  }
+>   
+Turns out I end up seeing that message hundreds of times early on each boot,
+no matter which architecture. It is quite obviously a normal operating condition.
 
-missing entry in
-  tests/bios-tables-test-allowed-diff.h
-
-PS:
-I don't really know what ARM guest kernel expects but on x86 we had to enable numa
-for guest to figure out max_possible_pfn
-(see: in linux.git: 8dd330300197 / ec941c5ffede).
-
-It's worth to check if we might need a patch for turning on NUMA
-(how to do it in QEMU see: auto_enable_numa_with_memhp)
+Guenter
 
