@@ -2,91 +2,91 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38054C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 21:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8A7C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 21:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D09F217D7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 21:07:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D09F217D7
+	by mail.kernel.org (Postfix) with ESMTPS id E92152186A
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 21:27:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E92152186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvT9a-0004LO-B0
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 17:07:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38652)
+	id 1hvTT3-0000XX-0r
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 17:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41599)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hvT96-0003fZ-BF
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 17:06:57 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hvTSd-0008Vb-6y
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 17:27:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hvT95-00041i-Af
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 17:06:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47698)
+ (envelope-from <mreitz@redhat.com>) id 1hvTSc-000803-71
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 17:27:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39138)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hvT95-00040W-2D
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 17:06:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hvTSa-0007xw-1a; Wed, 07 Aug 2019 17:27:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0EFD5307D97F;
- Wed,  7 Aug 2019 21:06:54 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6828B5D9CD;
- Wed,  7 Aug 2019 21:06:51 +0000 (UTC)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-13-armbru@redhat.com>
- <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id E4E34C034DF3;
+ Wed,  7 Aug 2019 21:27:02 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-24.brq.redhat.com
+ [10.40.204.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D5E4360852;
+ Wed,  7 Aug 2019 21:27:00 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190807144628.4988-1-kwolf@redhat.com>
+ <20190807144628.4988-3-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <fd6a172e-1c79-5c0a-c9ba-3dbc671dc72f@redhat.com>
-Date: Wed, 7 Aug 2019 16:06:50 -0500
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <b5fc43d9-6a67-38e9-d24a-93d5646fdf6d@redhat.com>
+Date: Wed, 7 Aug 2019 23:26:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
+In-Reply-To: <20190807144628.4988-3-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="H4qqdgganj88iVvIT4vzQAkQCyVnM8NLL"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="aixYN0erR78p5ebHFSGeJ4EKRy7QKbg8m"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 07 Aug 2019 21:06:54 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Wed, 07 Aug 2019 21:27:03 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 12/29] Include hw/irq.h a lot less
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] mirror: Keep mirror_top_bs drained
+ after dropping permissions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,81 +98,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>
+Cc: qemu-devel@nongnu.org, dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com,
+ den@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---H4qqdgganj88iVvIT4vzQAkQCyVnM8NLL
-Content-Type: multipart/mixed; boundary="EXt4R9iApdw0vj7dTbedNBmdCFsCLklGz";
+--aixYN0erR78p5ebHFSGeJ4EKRy7QKbg8m
+Content-Type: multipart/mixed; boundary="X8KNy67oDeSdpoJvIycMQovcW193laVQz";
  protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@wdc.com>
-Message-ID: <fd6a172e-1c79-5c0a-c9ba-3dbc671dc72f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 12/29] Include hw/irq.h a lot less
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-13-armbru@redhat.com>
- <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
-In-Reply-To: <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: eblake@redhat.com, dplotnikov@virtuozzo.com, vsementsov@virtuozzo.com,
+ den@virtuozzo.com, qemu-devel@nongnu.org
+Message-ID: <b5fc43d9-6a67-38e9-d24a-93d5646fdf6d@redhat.com>
+Subject: Re: [PATCH v2 2/3] mirror: Keep mirror_top_bs drained after dropping
+ permissions
+References: <20190807144628.4988-1-kwolf@redhat.com>
+ <20190807144628.4988-3-kwolf@redhat.com>
+In-Reply-To: <20190807144628.4988-3-kwolf@redhat.com>
 
---EXt4R9iApdw0vj7dTbedNBmdCFsCLklGz
+--X8KNy67oDeSdpoJvIycMQovcW193laVQz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 8/7/19 8:04 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 8/6/19 5:14 PM, Markus Armbruster wrote:
->> In my "build everything" tree, changing hw/irq.h triggers a recompile
->> of some 5400 out of 6600 objects (not counting tests and objects that
->> don't depend on qemu/osdep.h).
->>
->> hw/hw.h supposedly includes it for convenience.  Several other headers=
+On 07.08.19 16:46, Kevin Wolf wrote:
+> mirror_top_bs is currently implicitly drained through its connection to=
 
->> include it just to get qemu_irq and.or qemu_irq_handler.
->>
->> Move the qemu_irq and qemu_irq_handler typedefs from hw/irq.h to
->> qemu/typedefs.h, and then include hw/irq.h only where it's still
->> needed.  Touching it now recompiles only some 500 objects.
->>
+> the source or the target node. However, the drain section for target_bs=
 
->>  /*
->>   * Function types
->>   */
->>  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
->>  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_i=
-d);
->> +typedef void (*qemu_irq_handler)(void *opaque, int n, int level);
+> ends early after moving mirror_top_bs from src to target_bs, so that
+> requests can already be restarted while mirror_top_bs is still present
+> in the chain, but has dropped all permissions and therefore runs into a=
+n
+> assertion failure like this:
+>=20
+>     qemu-system-x86_64: block/io.c:1634: bdrv_co_write_req_prepare:
+>     Assertion `child->perm & BLK_PERM_WRITE' failed.
+>=20
+> Keep mirror_top_bs drained until all graph changes have completed.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block/mirror.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/block/mirror.c b/block/mirror.c
+> index 9f5c59ece1..642d6570cc 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -656,7 +656,10 @@ static int mirror_exit_common(Job *job)
+>      s->target =3D NULL;
+> =20
+>      /* We don't access the source any more. Dropping any WRITE/RESIZE =
+is
+> -     * required before it could become a backing file of target_bs. */=
 
-Should we prefer a consistent form for function pointer typedefs?  Here,
-we've mixed 'rettype Name(params)' with 'rettype (*name)(params)'.
+> +     * required before it could become a backing file of target_bs. No=
+t having
+> +     * these permissions any more means that we can't allow any new re=
+quests on
+> +     * mirror_top_bs from now on, so keep it drained. */
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+You=E2=80=99re lucky Patchew broke or it would have complained about mult=
+i-line
+comments needing /* and */ on separate lines. :-)
+
+I=E2=80=99m perfectly happy with this style, though:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+> +    bdrv_drained_begin(mirror_top_bs);
+>      bs_opaque->stop =3D true;
+>      bdrv_child_refresh_perms(mirror_top_bs, mirror_top_bs->backing,
+>                               &error_abort);
+> @@ -724,6 +727,7 @@ static int mirror_exit_common(Job *job)
+>      bs_opaque->job =3D NULL;
+> =20
+>      bdrv_drained_end(src);
+> +    bdrv_drained_end(mirror_top_bs);
+>      s->in_drain =3D false;
+>      bdrv_unref(mirror_top_bs);
+>      bdrv_unref(src);
+>=20
 
 
---EXt4R9iApdw0vj7dTbedNBmdCFsCLklGz--
 
---H4qqdgganj88iVvIT4vzQAkQCyVnM8NLL
+--X8KNy67oDeSdpoJvIycMQovcW193laVQz--
+
+--aixYN0erR78p5ebHFSGeJ4EKRy7QKbg8m
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1LPWoACgkQp6FrSiUn
-Q2oaswf/Rm6uht9KhfDXILQN3FZ02/ooHudzuAhEE5YBmUmkNLK3Sy2fRTHltViL
-TWItdpaPGghp9oaWPX+fsv2FMDL03t6GJrHcR53/YCYd6bx0ubhuTJD8Xh4UgOMm
-s7G4aOhjglsw6nBIiBBJe2NFob5lOxIW0V0qs7RTZcjgc9Sx4fXnz8ITKS7XWCXo
-mvgTMyBv6wEMAsTRtJg24VtQ/IPL1WV6jwF5uYSxbO+1AOxw8oyJWknKUAlDqidu
-k9Fk0i0uVz8GTaep9UbwtSCCex+v5zUgxQXC/J3CDUIUsgkFhTT+dpDi8fivXOUD
-gcEzuDimewRRr5dsaDrB7LBmAFUxVg==
-=Oc/H
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1LQiMACgkQ9AfbAGHV
+z0BH2AgAqB2X647c90rL/EenZNxb7XNzJT/d/MBnTJpbaFfYMo11sMSCfPIH6Chj
+l/wVX0vxvUN6e4emefuC3f1FSZJD7DUhWfUkunq4xJj6U0ybGIlYse9c/oyU9eKX
+GNA6yVFxjRDKlOG3vBasdbhlHCapWRR27anJXvhhP7eCMuOEY13n5tMFkNIZr4vC
+r53ZyWaHOUDpzbjCRouGscm1FKr3EQykzakRpTiNvrH7u+kv7GdVRzMtnUpQvFLB
+b7gHW3yrv/Rpzj4ELhZMDkmRjnsoNY7LMzIgFAo+WiV8L5+kScck3UnwVphcXJMw
+9lXNezWNFr8d1D8cKj19lGhmfOZZpQ==
+=XT3P
 -----END PGP SIGNATURE-----
 
---H4qqdgganj88iVvIT4vzQAkQCyVnM8NLL--
+--aixYN0erR78p5ebHFSGeJ4EKRy7QKbg8m--
 
