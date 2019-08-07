@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D3DC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:19:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E54C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64A0F21E73
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FFBE22296
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:21:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nCqkdfOW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A0F21E73
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Xs8waVsU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FFBE22296
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNie-0007TB-Ja
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:19:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51781)
+	id 1hvNku-0000g0-Dh
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:21:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52325)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hvNi5-0006c9-UF
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:18:43 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hvNkQ-0008Tc-If
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hvNi3-0006vj-Rc
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:18:41 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39286)
+ (envelope-from <peter.maydell@linaro.org>) id 1hvNkP-0008PE-FW
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:21:06 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:39403)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hvNi3-0006uw-K3
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:18:39 -0400
-Received: by mail-ot1-x342.google.com with SMTP id r21so99757385otq.6
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:18:39 -0700 (PDT)
+ id 1hvNkP-0008Oi-Ah
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:21:05 -0400
+Received: by mail-ot1-x343.google.com with SMTP id r21so99791001otq.6
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/3goy7jwv3jhlXZ6iqzuJ6FnnNayKsh8Ov6Om64DEbg=;
- b=nCqkdfOWUSOOHrh/49bO5iS9y/BXGIvciLlidMa440NRoTvpMTNF6LP81UvSv7rPZP
- WWcQEJwemwJujGsgcQPDMrAFVt4TOIfJZ3E6XUrCIMKmFAX7LZMrS05e+dgDzHHkQfI0
- lNqTgcRfT2dgrP3GHDij+jDKXr1ffb6hDE3UvvFSBViHeFfWNtRjj43rGMk08Hzk1W96
- G+6pYtO+HGfXGExrHrcX6oebeDUwuH4nNOWP/I3rD8++iRBgeN8aGyxajWO3N8MHtp4e
- VWoQLYCnAMuuQFDMuCRyL6iYsbQxFM/VWl6EA3Kal5gGFxHmoD6xTUSD1YGeK0ya5BfR
- u02g==
+ :cc; bh=wMCZbVGi32cLcaIU8X3prpRc8h3j08xiAQ7zMlrbE5Y=;
+ b=Xs8waVsUIH9jcHFuq5XEc/S+F28sJjvMFQWWCCIbIbEZzb3QpFGXMOeqynFvZBL+8c
+ THhtkyLDHo93i9+r7RkLLjTlPm57K6ei5q7HIH9QHjYD+3vXh9kYXQ+lqMqlUCn6971r
+ OSBaJpxTXA4L4prEC5cqkpxMrelHHQ/aNeU7lTVJLdRgR3m1PkUrnMgsLOG9iDT8oF62
+ y+Hwyb1kSA0vIinkE3eyNZim3VanWj1xEJPonrVbdyleaX7wPn4BiwAS/8yUkc9ojgct
+ UjGXVMe2YyfWFxsSXZjvm3OX27/69IKhLyXdNpFSf632n+wljFVlIvjTUU2sWqByyW+c
+ 2wrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=/3goy7jwv3jhlXZ6iqzuJ6FnnNayKsh8Ov6Om64DEbg=;
- b=IEH9Qvy5+9iZdIQDQ0KkuVhufbCYHnfgB9eUR8stxQhUTbeYPjnFkVXLA2tVvGX2mp
- WGqsB+oJa83GrL6BYsmpPjoWP1iU9DgXtFmce5LDFW12pQA5ztqOu7CrmOT12Xyntw2J
- qKtcxBFeQ99npPxi3+A2tUDLoLmeP1Q2p+s9CzzS2I1aj5rIWHxDhDq1m3GDyzecx2rc
- gBexRjydIpnFK71zuzhLE5PUozq5K2UpdEvmXRy+eSp2SYZlgmmSG5xZgwWqjSvc68jc
- Zm6jpVSsWuwPGJBjQtXt34b93uY1JHMDDg/cTswb2bWh8zyVjSN9rHS3J+xU7P5h0RoF
- CgTQ==
-X-Gm-Message-State: APjAAAW+aG7q1mBXAb6QtfXqEqCTW1fnkoSQp0QygEiVK0XgMP4UFUll
- sEtd7HHgmh++ucuIuDHD4fqy2wDJk3RYYzY3MmonbA==
-X-Google-Smtp-Source: APXvYqwhcfmFi6B5Hhzl/GHr6l1KAeN3HdoL9N2iDfwBYEG6IKA9KPaAHlBRwVj8tf8Jr1dr9O7Lt/jx98fmr4xXBaI=
-X-Received: by 2002:a5e:9319:: with SMTP id k25mr10419005iom.137.1565191118479; 
- Wed, 07 Aug 2019 08:18:38 -0700 (PDT)
+ bh=wMCZbVGi32cLcaIU8X3prpRc8h3j08xiAQ7zMlrbE5Y=;
+ b=I+aCIH2SNDWHvzRfBtYYSPAbdrqvzMMbcG7lkibMfCn2V8PWFkINiP5M5dnzAN+/eZ
+ ct8+8W/Zys3uAfCeOTjoE9AbwVT8V1x9wvC/l62Xa+7caJtP42oLgw87JjAUEYjSBWhO
+ tANGDggGvOksP+AQNPoRE6FDVBkAfyUaBufec4KyPMf1EgHPf8PhuxjFxZZI/8E8qq7f
+ AWOUFOiw6EQM42+zNPAzBYPbwk0Y8+IWurNVeKVgbdFX4b7W9TV1LrA4RwycdKqnP1P+
+ ZggRjmCjmYhQ1mZJxmcE2FvFWdCrA0pq9yWD/r2GIqZypgmy6M2TfQNhFEMZXwV0cHc2
+ zdzg==
+X-Gm-Message-State: APjAAAWKzHe0BmtIjMneJQ40iQ/6+Vl0OPdc6jrAuinzZ6r+Zz64wRLU
+ tnezh+EZGzvhVqjfUcDvsl5JK3qgKEvoFZhnX6YXjQ==
+X-Google-Smtp-Source: APXvYqwFDw7jDI++ABGd7FWsACLgFSRR9PC3oQIiVLlVGMPIMi9jmws+xbo4TYDM/OTEg/OjWp0H15ZvJQkHrhrtbQE=
+X-Received: by 2002:a5e:db0a:: with SMTP id q10mr708925iop.168.1565191264638; 
+ Wed, 07 Aug 2019 08:21:04 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-9-damien.hedde@greensocs.com>
-In-Reply-To: <20190729145654.14644-9-damien.hedde@greensocs.com>
+ <20190729145654.14644-11-damien.hedde@greensocs.com>
+In-Reply-To: <20190729145654.14644-11-damien.hedde@greensocs.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Aug 2019 16:18:27 +0100
-Message-ID: <CAFEAcA_M5fOoQ8yN_1QhJ-WOLxra6B-Ltwh2DHtq6erz4V0a2A@mail.gmail.com>
+Date: Wed, 7 Aug 2019 16:20:53 +0100
+Message-ID: <CAFEAcA_uKg7iBJ-9yANEaHyS4zqNaESUG0F0Fg20T-DKZ2bofQ@mail.gmail.com>
 To: Damien Hedde <damien.hedde@greensocs.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v3 08/33] Add function to control reset
- with gpio inputs
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v3 10/33] vl.c: remove qbus_reset_all
+ registration
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,145 +113,50 @@ Sender: "Qemu-devel"
 
 On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
 >
-> It adds the possibility to add 2 gpios to control the warm and cold reset.
-> With theses ios, the reset can be maintained during some time.
-> Each io is associated with a state to detect level changes.
->
-> Vmstate subsections are also added to the existsing device_reset
-> subsection.
+> Replace deprecated qbus_reset_all by resettable_reset_cold_fn for
+> the sysbus reset registration.
+> This does not impact the behavior.
 >
 > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 > ---
->  hw/core/qdev-vmstate.c | 15 ++++++++++
->  hw/core/qdev.c         | 65 ++++++++++++++++++++++++++++++++++++++++++
->  include/hw/qdev-core.h | 57 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 137 insertions(+)
+>  vl.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 >
-> diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
-> index 24f8465c61..72f84c6cee 100644
-> --- a/hw/core/qdev-vmstate.c
-> +++ b/hw/core/qdev-vmstate.c
-> @@ -24,10 +24,23 @@ static int device_vmstate_reset_post_load(void *opaque, int version_id)
->  {
->      DeviceState *dev = (DeviceState *) opaque;
->      BusState *bus;
-> +    uint32_t io_count = 0;
-> +
->      QLIST_FOREACH(bus, &dev->child_bus, sibling) {
->          bus->resetting = dev->resetting;
->          bus->reset_is_cold = dev->reset_is_cold;
->      }
-> +
-> +    if (dev->cold_reset_input.state) {
-> +        io_count += 1;
-> +    }
-> +    if (dev->warm_reset_input.state) {
-> +        io_count += 1;
-> +    }
-> +    /* ensure resetting count is coherent with io states */
-> +    if (dev->resetting < io_count) {
-> +        return -1;
-> +    }
->      return 0;
->  }
+> diff --git a/vl.c b/vl.c
+> index b426b32134..5a465c8236 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4421,7 +4421,11 @@ int main(int argc, char **argv, char **envp)
 >
-> @@ -40,6 +53,8 @@ const struct VMStateDescription device_vmstate_reset = {
->      .fields = (VMStateField[]) {
->          VMSTATE_UINT32(resetting, DeviceState),
->          VMSTATE_BOOL(reset_is_cold, DeviceState),
-> +        VMSTATE_BOOL(cold_reset_input.state, DeviceState),
-> +        VMSTATE_BOOL(warm_reset_input.state, DeviceState),
+>      /* TODO: once all bus devices are qdevified, this should be done
+>       * when bus is created by qdev.c */
+> -    qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
+> +    /*
+> +     * TODO: when we have a main reset container/domain object, use
+> +     * it to fully benefit from multi-phase reset
+> +     */
 
-If we're just adding these fields to this VMStateDescription
-then this patch should come earlier in the series than the
-patch where we create and start using the fields. Otherwise
-there's a migration compat break between a QEMU just
-before this patch and a QEMU with it. I think the simplest
-fix is to put this patch before patches 6/7 and have a note
-in the commit message that this functionality can't be used
-until after the patch which adds the migration support.
+Let's be a bit more specific with the todo comment while the
+detail is fresh in our minds:
 
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 88387d3743..11a4de55ea 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -450,6 +450,67 @@ void qdev_init_gpio_in(DeviceState *dev, qemu_irq_handler handler, int n)
->      qdev_init_gpio_in_named(dev, handler, NULL, n);
->  }
+/*
+ * TODO: If we had a main 'reset container' that the whole system
+ * lived in, we could reset that using the multi-phase reset
+ * APIs. For the moment, we just reset the sysbus, which will cause
+ * all devices hanging off it (and all their child buses, recursively)
+ * to be reset. Note that this will *not* reset any Device objects
+ * which are not attached to some part of the qbus tree!
+ */
+
+> +    qemu_register_reset(resettable_reset_cold_fn, sysbus_get_default());
+>      qemu_run_machine_init_done_notifiers();
 >
-> +static DeviceResetInputState *device_get_reset_input_state(DeviceState *dev,
-> +                                                            bool cold)
-> +{
-> +    return cold ? &dev->cold_reset_input : &dev->warm_reset_input;
-> +}
-> +
-> +static void device_reset_handler(DeviceState *dev, bool cold, bool level)
-> +{
-> +    DeviceResetInputState *dris = device_get_reset_input_state(dev, cold);
-> +
-> +    if (dris->type == DEVICE_RESET_ACTIVE_LOW) {
-> +        level = !level;
-> +    }
-> +
-> +    if (dris->state == level) {
-> +        /* io state has not changed */
-> +        return;
-> +    }
-> +
-> +    dris->state = level;
-> +
-> +    if (level) {
-> +        resettable_assert_reset(OBJECT(dev), cold);
-> +    } else {
-> +        resettable_deassert_reset(OBJECT(dev));
-> +    }
-> +}
-> +
-> +static void device_cold_reset_handler(void *opaque, int n, int level)
-> +{
-> +    device_reset_handler((DeviceState *) opaque, true, level);
-> +}
-> +
-> +static void device_warm_reset_handler(void *opaque, int n, int level)
-> +{
-> +    device_reset_handler((DeviceState *) opaque, false, level);
-> +}
-> +
-> +void qdev_init_reset_gpio_in_named(DeviceState *dev, const char *name,
-> +                                   bool cold, DeviceResetActiveType type)
-> +{
-> +    DeviceResetInputState *dris = device_get_reset_input_state(dev, cold);
-> +    qemu_irq_handler handler;
-> +
-> +    switch (type) {
-> +    case DEVICE_RESET_ACTIVE_LOW:
-> +    case DEVICE_RESET_ACTIVE_HIGH:
-> +        break;
-> +    default:
-> +        assert(false);
-> +        break;
+>      if (rom_check_and_register_reset() != 0) {
+> --
+> 2.22.0
 
-The usual way to write this is
-    g_assert_not_reached();
-(and no following 'break').
-
-
-But the whole switch statement seems to be a complicated way
-of writing
-   assert(type == DEVICE_RESET_ACTIVE_LOW || type == DEVICE_RESET_ACTIVE_HIGH);
-
-> +    }
-> +
-> +    assert(!dris->exists);
-> +    dris->exists = true;
-> +    dris->type = type;
-> +
-> +    handler = cold ? device_cold_reset_handler : device_warm_reset_handler;
-> +    qdev_init_gpio_in_named(dev, handler, name, 1);
-> +}
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
