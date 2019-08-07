@@ -2,81 +2,92 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46369C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B13CC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B88B22305
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:06:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B88B22305
+	by mail.kernel.org (Postfix) with ESMTPS id 71B6E22296
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:06:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B6E22296
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvQKN-0000Zd-Ew
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:06:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34159)
+	id 1hvQKX-0000xc-Pd
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:06:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34228)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvQJt-0008Jn-RN
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:05:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hvQK2-0008T5-23
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvQJs-0002Z5-Tg
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:05:53 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:44369)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvQJs-0002XF-NV
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:05:52 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p17so92261140wrf.11
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 11:05:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Vi8wC7X/GDwqvPqza7CDmHXpjr8HhwAnG+jiaCgia9Q=;
- b=tNVhmwXdAaFV0POjNF0xO4N0F0fe5AYkA0ot3EwUCS7sMP8gNNC6+aIib3LverdqDN
- Ad8KLZHgXeXl/c5S+KEHkyDKqciTFL4IFD9bAchetKHczzYElVGFqeb4/LXzXB8YqTB4
- /yf3HfzUjTEYciO6XQkSM2eFT26FWJT2lIf5VJhdvvqZVuMICNkE81d6wNZ+jXePmAqy
- K5UNxxJf5Gq8B5fthBqQKqFho4ysVXqzfu/l2BiCe5BN5wjhOTVfO06dP3NjRup2V7Rq
- 7VByRqeFYIbgYsgRJIG6IQcsPcpVWun3yyTzwTdUgpHBRPJ2TMfCWqZ7WUK3Sl2Ajq12
- g8aA==
-X-Gm-Message-State: APjAAAUdDWyNpGFyJm//klBCpSppJW9cTCq2WKhiDR3euysFyYy6eZLS
- 74Dno5fRq+s3xaLwG2zAy2331FOrpfs=
-X-Google-Smtp-Source: APXvYqyKoZXJa47M0Sc5GdZON4ru8ps67WCUIQJzqtt0Ri/koUR1wW0WFb8fV3g9XcfOTqmST4uovQ==
-X-Received: by 2002:adf:de8b:: with SMTP id w11mr12242158wrl.134.1565201151530; 
- Wed, 07 Aug 2019 11:05:51 -0700 (PDT)
-Received: from [192.168.1.115] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id t63sm1128306wmf.24.2019.08.07.11.05.50
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 11:05:51 -0700 (PDT)
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-23-armbru@redhat.com>
- <de7f547d-1c97-135f-654f-3856fa2eec2f@redhat.com>
- <20190807175708.GE4669@habkost.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <647e2542-2042-26de-d768-cdf13afa0ec4@redhat.com>
-Date: Wed, 7 Aug 2019 20:05:50 +0200
+ (envelope-from <mreitz@redhat.com>) id 1hvQK1-0002rW-8X
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:06:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60966)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hvQJz-0002mo-3x; Wed, 07 Aug 2019 14:05:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 47814308A98C;
+ Wed,  7 Aug 2019 18:05:58 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-24.brq.redhat.com
+ [10.40.204.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A5ADD5D772;
+ Wed,  7 Aug 2019 18:05:49 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
+ <20190807080750.15950-6-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <801ee983-9f57-4641-9ee6-03104bed84ac@redhat.com>
+Date: Wed, 7 Aug 2019 20:05:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190807175708.GE4669@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190807080750.15950-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="pFV5YeSNSXCLS2UqQD2AlfCB5ChDjOSkQ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Wed, 07 Aug 2019 18:05:58 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 22/29] Include hw/boards.h a bit less
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 5/8] block/backup: fix
+ backup_cow_with_offload for last cluster
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,60 +99,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/7/19 7:57 PM, Eduardo Habkost wrote:
-> On Wed, Aug 07, 2019 at 07:26:56PM +0200, Philippe Mathieu-Daudé wrote:
->> On 8/6/19 5:14 PM, Markus Armbruster wrote:
->>> hw/boards.h pulls in almost 60 headers.  The less we include it into
->>> headers, the better.  As a first step, drop superfluous inclusions,
->>> and downgrade some more to what's actually needed.  Gets rid of just
->>> one inclusion into a header.
->>>
->>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
-> [...]
->>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
->>> index bcacdd1d8f..34a9f6f7a9 100644
->>> --- a/target/i386/hax-all.c
->>> +++ b/target/i386/hax-all.c
->>> @@ -33,7 +33,6 @@
->>>  #include "sysemu/reset.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "qemu/main-loop.h"
->>> -#include "hw/boards.h"
->>>  
->>>  #define DEBUG_HAX 0
->>
->> include/sysemu/hax.h misses to include "hw/boards.h":
-> 
-> I don't understand.  I don't see any reason for the sysemu/hax.h
-> header to include hw/boards.h.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pFV5YeSNSXCLS2UqQD2AlfCB5ChDjOSkQ
+Content-Type: multipart/mixed; boundary="C4mHwGxM8VTdj7mAi85dt09UBOlPVco8l";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+Message-ID: <801ee983-9f57-4641-9ee6-03104bed84ac@redhat.com>
+Subject: Re: [PATCH 5/8] block/backup: fix backup_cow_with_offload for last
+ cluster
+References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
+ <20190807080750.15950-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190807080750.15950-6-vsementsov@virtuozzo.com>
 
-Ah, you are right, the AccelClass is defined in include/sysemu/accel.h:
+--C4mHwGxM8VTdj7mAi85dt09UBOlPVco8l
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-typedef struct AccelClass {
-    /*< private >*/
-    ObjectClass parent_class;
-    /*< public >*/
+On 07.08.19 10:07, Vladimir Sementsov-Ogievskiy wrote:
+> We shouldn't try to copy bytes beyond EOF. Fix it.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-    const char *name;
-    int (*init_machine)(MachineState *ms);
-    ...
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-So this is where "hw/boards.h" has to be included (it is where
-MachineState is defined).
 
->>
->> target/i386/hax-all.c: In function 'hax_accel_init':
->> target/i386/hax-all.c:354:26: error: dereferencing pointer to incomplete
->> type 'MachineState {aka struct MachineState}'
->>      int ret = hax_init(ms->ram_size);
->>                           ^
-> 
+--C4mHwGxM8VTdj7mAi85dt09UBOlPVco8l--
+
+--pFV5YeSNSXCLS2UqQD2AlfCB5ChDjOSkQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1LEvwACgkQ9AfbAGHV
+z0ChmQf+MzfaFzDq609xVJwwer+yj1HdydVLjK3i2C9cC6wi1SQCPhlRRoSTFkr7
++L4G0U8Ict3htfmPRX/oi9/0wkqDOTgHHmVrl2NSFThkpRzWjlgz+uIjU8g7ZTwW
+pCPevHblaig9NQgFegyQeVBFGsK5L5MKTVWzbh8Shod1m2h0IkhOvL/D5UNBl7z0
+yksPhXGAZTbp9hiYFNlNimLFdgCaHzOZO4BHMcoICvT7jfUmdSSsdc3FyUlzXokW
+ddldHhtMoeMGuKodwp6njqhCeh/CwpDgpdl/WmB06efBSa5pKD9bpK/40mHrEOX6
+JdPO8k4BKbBWIOfowWklQBBTJFTStg==
+=vrlz
+-----END PGP SIGNATURE-----
+
+--pFV5YeSNSXCLS2UqQD2AlfCB5ChDjOSkQ--
 
