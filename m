@@ -2,91 +2,86 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B4EC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCD85C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:57:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 135B3222FC
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:53:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 135B3222FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93979222FC
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:57:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Yho5747o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93979222FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvPCJ-0000Fu-4c
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 12:53:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48810)
+	id 1hvPFl-0001zJ-Op
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 12:57:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49329)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hvPBg-0008BD-0H
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:53:20 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hvPFL-0001P3-84
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:57:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hvPBf-000733-5x
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:53:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56184)
+ (envelope-from <damien.hedde@greensocs.com>) id 1hvPFJ-0004OX-VU
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:57:07 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:35182)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hvPBd-0006wK-6o; Wed, 07 Aug 2019 12:53:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC7DFC0092D1;
- Wed,  7 Aug 2019 16:53:14 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-24.brq.redhat.com
- [10.40.204.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 021345D71C;
- Wed,  7 Aug 2019 16:53:07 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
- <20190807080750.15950-3-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7c2f4838-637e-b59c-45fa-9893a9788151@redhat.com>
-Date: Wed, 7 Aug 2019 18:53:05 +0200
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hvPFE-0004Em-8g; Wed, 07 Aug 2019 12:57:00 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 3415296F50;
+ Wed,  7 Aug 2019 16:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1565197017;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JXY7K4YIlJui1wCXpDlV3I+Oqpy2MwzkeCka4cjwYn8=;
+ b=Yho5747ojy5/6V1iP4phjGjCN1ktpQVkq1bQYc5yG9buJ9GGViz1bI6POH/7ILpXIySHz+
+ H9i2FWYeu3OexK93xHFTYzshLYKnRsPe9JPnmojBveukIFZLEZAemO6mbLQvN++K/GN342
+ 9CDFX2pGQFWkkR+TuiQqfbwwTZZFTgo=
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-9-damien.hedde@greensocs.com>
+ <CAFEAcA_M5fOoQ8yN_1QhJ-WOLxra6B-Ltwh2DHtq6erz4V0a2A@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <4958551b-0202-f82b-9133-457c8051e5aa@greensocs.com>
+Date: Wed, 7 Aug 2019 18:56:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190807080750.15950-3-vsementsov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="HquIMIWw0FpnxjpcRyW4g09z35j8iKn0N"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Wed, 07 Aug 2019 16:53:15 +0000 (UTC)
+In-Reply-To: <CAFEAcA_M5fOoQ8yN_1QhJ-WOLxra6B-Ltwh2DHtq6erz4V0a2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1565197018;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JXY7K4YIlJui1wCXpDlV3I+Oqpy2MwzkeCka4cjwYn8=;
+ b=61AVsz7zqLUFkN7BIfUVT8fBWXRM+POfnb7qv9KgmZ3QA48uaKuLCLP/znF8qEL7fS2qH7
+ te+awcniYql1A1wryXGmDISY27u/v0haKL0XfNMRT0yJOdXelkmvY1tYWqMpKkHWYmWZrP
+ rH4fyIiyL93t+1IxZtE79mzGZI21aP8=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1565197018; a=rsa-sha256; cv=none;
+ b=KwTYywea0LmbjsmozgCLPolJ4X58HGkBelUk2XYAzWuTyz0YR46sITCn1Eb2ZttN6yVvt2
+ RtnJ0Al2UM+B+zh/TvtO9xgpSwZE1hyFHYj4qkfN8XSJrD32ahPrY5SDcilW2zwSxQ1kIS
+ 66cAsP+TYZmfhxdDhGCaOzrLNfCwxLs=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/8] block/backup: refactor write_flags
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH v3 08/33] Add function to control reset
+ with gpio inputs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,64 +93,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
+ Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HquIMIWw0FpnxjpcRyW4g09z35j8iKn0N
-Content-Type: multipart/mixed; boundary="uVIulT5FE93YHaFaiKSxdKYSwMIy7Ue1M";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
- stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <7c2f4838-637e-b59c-45fa-9893a9788151@redhat.com>
-Subject: Re: [PATCH 2/8] block/backup: refactor write_flags
-References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
- <20190807080750.15950-3-vsementsov@virtuozzo.com>
-In-Reply-To: <20190807080750.15950-3-vsementsov@virtuozzo.com>
-
---uVIulT5FE93YHaFaiKSxdKYSwMIy7Ue1M
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 07.08.19 10:07, Vladimir Sementsov-Ogievskiy wrote:
-> write flags are constant, let's store it in BackupBlockJob instead of
-> recalculating. It also makes two boolean fields to be unused, so,
-> drop them.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> ---
->  block/backup.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---uVIulT5FE93YHaFaiKSxdKYSwMIy7Ue1M--
+On 8/7/19 5:18 PM, Peter Maydell wrote:
+> On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>> It adds the possibility to add 2 gpios to control the warm and cold reset.
+>> With theses ios, the reset can be maintained during some time.
+>> Each io is associated with a state to detect level changes.
+>>
+>> Vmstate subsections are also added to the existsing device_reset
+>> subsection.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> ---
+>>  hw/core/qdev-vmstate.c | 15 ++++++++++
+>>  hw/core/qdev.c         | 65 ++++++++++++++++++++++++++++++++++++++++++
+>>  include/hw/qdev-core.h | 57 ++++++++++++++++++++++++++++++++++++
+>>  3 files changed, 137 insertions(+)
+>>
+>> diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
+>> index 24f8465c61..72f84c6cee 100644
+>> --- a/hw/core/qdev-vmstate.c
+>> +++ b/hw/core/qdev-vmstate.c
+>> @@ -24,10 +24,23 @@ static int device_vmstate_reset_post_load(void *opaque, int version_id)
+>>  {
+>>      DeviceState *dev = (DeviceState *) opaque;
+>>      BusState *bus;
+>> +    uint32_t io_count = 0;
+>> +
+>>      QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+>>          bus->resetting = dev->resetting;
+>>          bus->reset_is_cold = dev->reset_is_cold;
+>>      }
+>> +
+>> +    if (dev->cold_reset_input.state) {
+>> +        io_count += 1;
+>> +    }
+>> +    if (dev->warm_reset_input.state) {
+>> +        io_count += 1;
+>> +    }
+>> +    /* ensure resetting count is coherent with io states */
+>> +    if (dev->resetting < io_count) {
+>> +        return -1;
+>> +    }
+>>      return 0;
+>>  }
+>>
+>> @@ -40,6 +53,8 @@ const struct VMStateDescription device_vmstate_reset = {
+>>      .fields = (VMStateField[]) {
+>>          VMSTATE_UINT32(resetting, DeviceState),
+>>          VMSTATE_BOOL(reset_is_cold, DeviceState),
+>> +        VMSTATE_BOOL(cold_reset_input.state, DeviceState),
+>> +        VMSTATE_BOOL(warm_reset_input.state, DeviceState),
+> 
+> If we're just adding these fields to this VMStateDescription
+> then this patch should come earlier in the series than the
+> patch where we create and start using the fields. Otherwise
+> there's a migration compat break between a QEMU just
+> before this patch and a QEMU with it. I think the simplest
+> fix is to put this patch before patches 6/7 and have a note
+> in the commit message that this functionality can't be used
+> until after the patch which adds the migration support.
 
---HquIMIWw0FpnxjpcRyW4g09z35j8iKn0N
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Independently of the compat break you mention, maybe it is better to
+have 'conditional' subsection for each input ?
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1LAfEACgkQ9AfbAGHV
-z0Ds+gf/Tj1/GwuElvJR7ehYiE3Dx19v23h3aDtiFNFB8W+F98ZlaFptqHZhHgZR
-8K+AzobTrus5CvozdRjSxdeF70XMu3NOySJ0vd7yX5TeafoFoNq8RXQVA4SYpymn
-7BJDBji1JswUGj9+j7EeVM2WmVRJ9aLWjqEGbms5mlWgd6i850HRxVc0IgNH++kw
-ybyD5LqNk2h50VreSSmVxvuF6uG8Ykgi5goh9bA6vL3ljhE56w6xg0GUKLS2ut7L
-gkDp9Dhr1SmdTiFecJd04oKrYclE92MmaKZN4Z3pvo1Vc4/YD+mIDx43daFU6IKi
-UTbCcExx5An3awMuQJyP38A0hcFxVQ==
-=CQvS
------END PGP SIGNATURE-----
-
---HquIMIWw0FpnxjpcRyW4g09z35j8iKn0N--
+> 
+>>          VMSTATE_END_OF_LIST()
+>>      },
+>>  };
+>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>> index 88387d3743..11a4de55ea 100644
+>> --- a/hw/core/qdev.c
+>> +++ b/hw/core/qdev.c
+>> @@ -450,6 +450,67 @@ void qdev_init_gpio_in(DeviceState *dev, qemu_irq_handler handler, int n)
+>>      qdev_init_gpio_in_named(dev, handler, NULL, n);
+>>  }
+>>
+>> +static DeviceResetInputState *device_get_reset_input_state(DeviceState *dev,
+>> +                                                            bool cold)
+>> +{
+>> +    return cold ? &dev->cold_reset_input : &dev->warm_reset_input;
+>> +}
+>> +
+>> +static void device_reset_handler(DeviceState *dev, bool cold, bool level)
+>> +{
+>> +    DeviceResetInputState *dris = device_get_reset_input_state(dev, cold);
+>> +
+>> +    if (dris->type == DEVICE_RESET_ACTIVE_LOW) {
+>> +        level = !level;
+>> +    }
+>> +
+>> +    if (dris->state == level) {
+>> +        /* io state has not changed */
+>> +        return;
+>> +    }
+>> +
+>> +    dris->state = level;
+>> +
+>> +    if (level) {
+>> +        resettable_assert_reset(OBJECT(dev), cold);
+>> +    } else {
+>> +        resettable_deassert_reset(OBJECT(dev));
+>> +    }
+>> +}
+>> +
+>> +static void device_cold_reset_handler(void *opaque, int n, int level)
+>> +{
+>> +    device_reset_handler((DeviceState *) opaque, true, level);
+>> +}
+>> +
+>> +static void device_warm_reset_handler(void *opaque, int n, int level)
+>> +{
+>> +    device_reset_handler((DeviceState *) opaque, false, level);
+>> +}
+>> +
+>> +void qdev_init_reset_gpio_in_named(DeviceState *dev, const char *name,
+>> +                                   bool cold, DeviceResetActiveType type)
+>> +{
+>> +    DeviceResetInputState *dris = device_get_reset_input_state(dev, cold);
+>> +    qemu_irq_handler handler;
+>> +
+>> +    switch (type) {
+>> +    case DEVICE_RESET_ACTIVE_LOW:
+>> +    case DEVICE_RESET_ACTIVE_HIGH:
+>> +        break;
+>> +    default:
+>> +        assert(false);
+>> +        break;
+> 
+> The usual way to write this is
+>     g_assert_not_reached();
+> (and no following 'break').
+> 
+> 
+> But the whole switch statement seems to be a complicated way
+> of writing
+>    assert(type == DEVICE_RESET_ACTIVE_LOW || type == DEVICE_RESET_ACTIVE_HIGH);
+> 
+>> +    }
+>> +
+>> +    assert(!dris->exists);
+>> +    dris->exists = true;
+>> +    dris->type = type;
+>> +
+>> +    handler = cold ? device_cold_reset_handler : device_warm_reset_handler;
+>> +    qdev_init_gpio_in_named(dev, handler, name, 1);
+>> +}
+> 
+> thanks
+> -- PMM
+> 
 
