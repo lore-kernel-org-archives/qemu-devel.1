@@ -2,93 +2,92 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79553C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D27AC32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:26:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44FD0219BE
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:26:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kqHzF1HB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44FD0219BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E9527219BE
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:26:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9527219BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvQeB-0000yl-Gh
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:26:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38824)
+	id 1hvQeG-0001AR-9y
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:26:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38851)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvQdS-0008WU-51
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:26:07 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hvQdV-00007E-I4
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:26:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvQdR-0000ju-6E
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:26:06 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39527)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvQdQ-0000az-Ug
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:26:05 -0400
-Received: by mail-pl1-x644.google.com with SMTP id b7so42084355pls.6
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 11:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=O6ZVVVnFK8gMP42dZaFj7U87HAGu+ffS7XGWfusThcY=;
- b=kqHzF1HB/XqXehEyAGwHuWapyLBzqxoUwslq9VHFHjepNTexylmqXBrOrsDI0j8R+q
- MhDVlTqbMcNZMwOdM9cThzY1WIDKKbNDN/nDAoM75sUjnIEMhJMjrUeZLcok/qE4qzDs
- 5a746AGfupRavS08skbNZZxSwywYJnCg6MW3o1BO8RtSo8rxhYn1ozye3G1lLBErFdYo
- jPFxn0fMcK4r1Wl/RZQh/eH4a4nf7a0kJPkza1jNnLb1ZTqJt2S4ztABGqVnbfxIT8C1
- uEqHYGpvGg9fg7w+UVe4acEmbsGXyMBe/5z7WU4s/kPi44IOTtyrIvloef3RSr9K7JJg
- 0xzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=O6ZVVVnFK8gMP42dZaFj7U87HAGu+ffS7XGWfusThcY=;
- b=gN+266HEc3S45QFdr1MwU0bPsl4+En+l3s0AMMwH1mm7d32N4im0ZskoJ1Em3oO6lW
- ErLmDwTmKe0KBueEHgymLEyYfj0bWgT4/JVn+fgZfJBwaht0hFM/73H+Rlqd9YxfW4Fs
- RLp2YduB4pX9ovgx+IFQyJef0pXi8Zy2c7UOmXC52EmWb1r8+9SccG/3WC3Or6u6Th8d
- HzsF8QzJTgQjWFn6pZHmjRz6d6oYsP+NT5QEzsAxlwk6nj2x24X5mr3W9OZ3K/PjjK7r
- awgeM19ZbpRlSlnOQ3rBcWWjAW5IHItiMvdIwDOLtSxa+3xlZaMkkCLQKiL+9ROdKBAg
- A0KQ==
-X-Gm-Message-State: APjAAAWMrKa7UMDnqvBVEMnpfglLTgOhaSu8jk2ZphouiVm8el6ttAq3
- +pn7nF76vctbsqt4NnNlXCk+xw==
-X-Google-Smtp-Source: APXvYqyejmRMvJIKXeq/VCoXVFO/2uOzSeVPNLOfkOlZaQk2RRXhvA3MAQbShkrPuu6ScpNmd4VrYw==
-X-Received: by 2002:a63:4a04:: with SMTP id x4mr1628068pga.411.1565202361099; 
- Wed, 07 Aug 2019 11:26:01 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id b68sm113296790pfb.149.2019.08.07.11.26.00
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 11:26:00 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190807045335.1361-1-richard.henderson@linaro.org>
- <20190807045335.1361-4-richard.henderson@linaro.org>
- <CAFEAcA_MFg1_gpaT5+X71s8r5SYZFTizdXs2vQ_6mLooP7E+kg@mail.gmail.com>
- <061145be-4cd4-b8e6-ae5c-562a59e8088f@linaro.org>
- <CAFEAcA8fCL4VTJYdWGbDySzT9zkgmjcMGqBj0fo9gN4x4B-WcQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1hvQdU-0000tK-LE
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:26:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46326)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hvQdS-0000ik-04; Wed, 07 Aug 2019 14:26:06 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id CF6413082149;
+ Wed,  7 Aug 2019 18:26:04 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-24.brq.redhat.com
+ [10.40.204.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B76DF608A7;
+ Wed,  7 Aug 2019 18:25:56 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
+ <20190807080750.15950-7-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <5bcd1a92-d8a7-0dac-bc25-a0db23bb2eaf@linaro.org>
-Date: Wed, 7 Aug 2019 11:25:58 -0700
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3ca4a9e1-3889-dfba-71b9-22c828e59661@redhat.com>
+Date: Wed, 7 Aug 2019 20:25:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8fCL4VTJYdWGbDySzT9zkgmjcMGqBj0fo9gN4x4B-WcQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH 03/11] target/arm: Introduce read_pc
+In-Reply-To: <20190807080750.15950-7-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="EHAahlV88l9mWLhR1uIRDvz7Lile3gNvh"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.42]); Wed, 07 Aug 2019 18:26:04 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 6/8] block/backup: teach
+ backup_cow_with_bounce_buffer to copy more at once
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,26 +99,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/7/19 11:16 AM, Peter Maydell wrote:
-> How about we add this to the commit message?
-> 
-> This changes the behaviour for load_reg() and load_reg_var()
-> when called with reg==15 from a 32-bit Thumb instruction:
-> previously they would have returned the incorrect value
-> of pc_curr + 6, and now they will return the architecturally
-> correct value of PC, which is pc_curr + 4. This will not
-> affect well-behaved guest software, because all of the places
-> we call these functions from T32 code are instructions where
-> using r15 is UNPREDICTABLE. Using the architectural PC value
-> here is more consistent with the T16 and A32 behaviour.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--EHAahlV88l9mWLhR1uIRDvz7Lile3gNvh
+Content-Type: multipart/mixed; boundary="15uiX06kbmhaXAjQjW4unooWfnWB3MNtA";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+Message-ID: <3ca4a9e1-3889-dfba-71b9-22c828e59661@redhat.com>
+Subject: Re: [PATCH 6/8] block/backup: teach backup_cow_with_bounce_buffer to
+ copy more at once
+References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
+ <20190807080750.15950-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20190807080750.15950-7-vsementsov@virtuozzo.com>
 
-Looks good to me.
+--15uiX06kbmhaXAjQjW4unooWfnWB3MNtA
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 07.08.19 10:07, Vladimir Sementsov-Ogievskiy wrote:
+> backup_cow_with_offload can transfer more than on cluster. Let
+> backup_cow_with_bounce_buffer behave similarly. It reduces number
+> of IO and there are no needs to copy cluster by cluster.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/backup.c | 30 +++++++++++++++---------------
+>  1 file changed, 15 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/block/backup.c b/block/backup.c
+> index eb41e4af4f..c765c073ad 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -104,22 +104,24 @@ static int coroutine_fn backup_cow_with_bounce_bu=
+ffer(BackupBlockJob *job,
+>                                                        int64_t start,
+>                                                        int64_t end,
+>                                                        bool is_write_no=
+tifier,
+> -                                                      bool *error_is_r=
+ead,
+> -                                                      void **bounce_bu=
+ffer)
+> +                                                      bool *error_is_r=
+ead)
+>  {
+>      int ret;
+>      BlockBackend *blk =3D job->common.blk;
+>      int nbytes;
+>      int read_flags =3D is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0=
+;
+> +    void *bounce_buffer =3D blk_try_blockalign(blk, end);
+
+s/end/end - start/ (or probably rather s/end/nbytes/ after that has been
+set).
+
+Rest looks good.
+
+Max
+
+> =20
+> -    assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+> -    bdrv_reset_dirty_bitmap(job->copy_bitmap, start, job->cluster_size=
+);
+> -    nbytes =3D MIN(job->cluster_size, job->len - start);
+> -    if (!*bounce_buffer) {
+> -        *bounce_buffer =3D blk_blockalign(blk, job->cluster_size);
+> +    if (!bounce_buffer) {
+> +        return -ENOMEM;
+>      }
 
 
-r~
+--15uiX06kbmhaXAjQjW4unooWfnWB3MNtA--
+
+--EHAahlV88l9mWLhR1uIRDvz7Lile3gNvh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1LF7MACgkQ9AfbAGHV
+z0BQGAgAnb67vLMrRP5iKY1vjHvLGtDRc/l367GQMFwJtvJCYQsJOpdduATBEX9m
+wk9KkDvkMz26HYmOBVHO8xVd4Ji82BnjDxeqlY6b7D/F8MElTWD0PTc2VGAHM8mU
+dq6z9C8Endqu3OrL1G4gb9GnMCWtXp4HFtlpt6V2P4dKwYH4TR9v+x7tJYZ26i3H
+g6ftNwcwygTEx3O92F6M17rgcjLeYKSHM0dS7sfdQG3DPzaA53VxA+5VlqoXpLuY
+dYTLVy7hqHbetu1hHfpgigJEVvByrH87CfyhAiDAgT9Lf7wZsdj2WmZvtn1Cjobt
+MY90LkPHHFLtHz2Q1yEkDgA60ZeUdA==
+=Sg1t
+-----END PGP SIGNATURE-----
+
+--EHAahlV88l9mWLhR1uIRDvz7Lile3gNvh--
 
