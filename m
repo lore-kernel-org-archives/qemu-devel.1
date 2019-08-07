@@ -2,59 +2,92 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE59C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EAD5C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B19C921BF6
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:36:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B19C921BF6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E28F6218FD
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:37:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pm0ASyo6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E28F6218FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNzC-0003LV-J3
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:36:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55187)
+	id 1hvNzr-0004VC-7j
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55360)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hvNvo-0007Bf-TQ
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:32:54 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvNw3-0007Me-DG
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hvNvn-0005uy-Fi
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:32:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44622)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1hvNvn-0005uN-8i; Wed, 07 Aug 2019 11:32:51 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1FA72305B41C;
- Wed,  7 Aug 2019 15:32:50 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F91067627;
- Wed,  7 Aug 2019 15:32:45 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed,  7 Aug 2019 11:32:41 -0400
-Message-Id: <20190807153241.24050-1-imammedo@redhat.com>
-In-Reply-To: <20190806094834.7691-2-imammedo@redhat.com>
-References: <20190806094834.7691-2-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 07 Aug 2019 15:32:50 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH for-4.2 v5 1/2] kvm: s390: split too big memory
- section on several memslots
+ (envelope-from <richard.henderson@linaro.org>) id 1hvNw1-00062J-9J
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:33:07 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41656)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hvNw1-0005yl-3R
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:33:05 -0400
+Received: by mail-pl1-x644.google.com with SMTP id m9so41210064pls.8
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:32:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=YOHdOx7/Stz8Tdbo6EdPl4datS5Q3j4t5VdIxcMP+xM=;
+ b=Pm0ASyo6gkiTF1odBo/wLrQ9b3UHH+oZYk7XYC9NpzMYsKNFRl52Mu4JBUmbB+BDUC
+ kugOta70MyufphqLT2e2rAFQlAMXXx/T62QwK4Lw14rDNpI1qgpWJDlfCh16Bp6y9Xel
+ mJXUOrkRGAipCUzXVV/qLiOQXqU0vb99giE+3bio6CSDCZhWKUAVmaCeI0UxJJKXjC+4
+ vzIDp/gid/yWVx5jKdm6f4cv+zKGh7V2mpFEm3RFp89koj4WSK+bjzIPfZPscO8D7spO
+ Im60t3LUpqFn9Bs+C2BATyFHuRB00RprI8qgwMoyfcTuEdki6RVRyD9HwdrAJ5I1yEZ+
+ ZO4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YOHdOx7/Stz8Tdbo6EdPl4datS5Q3j4t5VdIxcMP+xM=;
+ b=svK8kgUtTiHehMnU3CoOAKRQpmzzlzADMYADqE6l7wQpIb26CPq1jCdoYjJqO3tdXW
+ Ou3TYq4V4eMTch/23g8ehab0a6pRlT2V74kagdperGaTUaVdGbKj0wmnbS23d9idk4LH
+ EE8LNGMN2BVR8hRsGVIHnbKwOxbKV6eb/yNwR6SMhM0UjkMhyrS5T4mlecxaAVwzWyIN
+ Z0+oVI9R/z8jSgXIS3wHw2eiPCz6LeNVAR/LmslIdjAopB6ZL7ctmWn+JR9ICBz/fkNw
+ 5eKyCEcVF9xZ1UYz/XVehmLm0/uRJSsCXi0X+q9miOKTSbAk5ww2riD6asyH4VKI5dzY
+ fYPg==
+X-Gm-Message-State: APjAAAXUZMESo2gxygklwZTR40+4TblQQyiE19HKyborENq/wqL5AFVV
+ u8+bTrcSSlt2/5ZYY+KVcpUxMw==
+X-Google-Smtp-Source: APXvYqxZDmuQ1/uBp64/WjLXtTgxvrI6W4xVriZ8CSJVCoy0a/msLNTPxIMU/toN0D9wtJfEhe90IA==
+X-Received: by 2002:a62:64d4:: with SMTP id y203mr9807270pfb.91.1565191977649; 
+ Wed, 07 Aug 2019 08:32:57 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id 131sm112852110pfx.57.2019.08.07.08.32.55
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 08:32:56 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
+References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
+ <1565166562774.65589@bt.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <b1ac6757-94aa-2358-2802-4cb3a3aef1d2@linaro.org>
+Date: Wed, 7 Aug 2019 08:32:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <1565166562774.65589@bt.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v6 10/26] cputlb: Access MemoryRegion with
+ MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,228 +99,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, imammedo@redhat.com, sagark@eecs.berkeley.edu,
+ david@redhat.com, jasowang@redhat.com, palmer@sifive.com,
+ mark.cave-ayland@ilande.co.uk, laurent@vivier.eu, keith.busch@intel.com,
+ jcmvbkbc@gmail.com, frederic.konrad@adacore.com, pbonzini@redhat.com,
+ kraxel@redhat.com, edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn,
+ pburton@wavecomp.com, marex@denx.de, robh@kernel.org, hare@suse.com,
+ sstabellini@kernel.org, berto@igalia.com, proljc@gmail.com,
+ qemu-block@nongnu.org, arikalo@wavecomp.com, jslaby@suse.cz, deller@gmx.de,
+ mst@redhat.com, magnus.damm@gmail.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, mreitz@redhat.com, hpoussin@reactos.org,
+ joel@jms.id.au, anthony.perard@citrix.com, xen-devel@lists.xenproject.org,
+ rth@twiddle.net, philmd@redhat.com, green@moxielogic.com, atar4qemu@gmail.com,
+ antonynpavlov@gmail.com, jiri@resnulli.us, ehabkost@redhat.com,
+ minyard@acm.org, sw@weilnetz.de, alistair@alistair23.me, chouteau@adacore.com,
+ b.galvani@gmail.com, eric.auger@redhat.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, peter.chubb@nicta.com.au, yuval.shaia@oracle.com,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, shorne@gmail.com,
+ sundeep.lkml@gmail.com, jsnow@redhat.com, david@gibson.dropbear.id.au,
+ kwolf@redhat.com, crwulff@gmail.com, qemu-riscv@nongnu.org,
+ xiaoguangrong.eric@gmail.com, i.mitsyanko@gmail.com, lersek@redhat.com,
+ cohuck@redhat.com, alex.williamson@redhat.com, Andrew.Baumann@microsoft.com,
+ jcd@tribudubois.net, andrew@aj.id.au, michael@walle.cc,
+ paul.durrant@citrix.com, qemu-ppc@nongnu.org, huth@tuxfamily.org,
+ amarkovic@wavecomp.com, kbastian@mail.uni-paderborn.de, jan.kiszka@web.de,
+ stefanb@linux.ibm.com, andrew.smirnov@gmail.com, aurelien@aurel32.net,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Max memslot size supported by kvm on s390 is 8Tb,
-move logic of splitting RAM in chunks upto 8T to KVM code.
+On 8/7/19 1:29 AM, tony.nguyen@bt.com wrote:
+> The memory_region_dispatch_{read|write} operand "unsigned size" is
+> being converted into a "MemOp op".
+> 
+> Convert interfaces by using no-op size_memop.
+> 
+> After all interfaces are converted, size_memop will be implemented
+> and the memory_region_dispatch_{read|write} operand "unsigned size"
+> will be converted into a "MemOp op".
+> 
+> As size_memop is a no-op, this patch does not change any behaviour.
+> 
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> ---
+>  accel/tcg/cputlb.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-This way it will hide KVM specific restrictions in KVM code
-and won't affect baord level design decisions. Which would allow
-us to avoid misusing memory_region_allocate_system_memory() API
-and eventually use a single hostmem backend for guest RAM.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v5:
-  * move computation 'size -= slot_size' inside of loop body
-          (David Hildenbrand <david@redhat.com>)
-v4:
-  * fix compilation issue
-          (Christian Borntraeger <borntraeger@de.ibm.com>)
-  * advance HVA along with GPA in kvm_set_phys_mem()
-          (Christian Borntraeger <borntraeger@de.ibm.com>)
 
-patch prepares only KVM side for switching to single RAM memory region
-another patch will take care of  dropping manual RAM partitioning in
-s390 code.
----
- include/sysemu/kvm_int.h   |  1 +
- accel/kvm/kvm-all.c        | 82 ++++++++++++++++++++++++--------------
- hw/s390x/s390-virtio-ccw.c |  9 -----
- target/s390x/kvm.c         | 12 ++++++
- 4 files changed, 64 insertions(+), 40 deletions(-)
-
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 31df465fdc..7f7520bce2 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -41,4 +41,5 @@ typedef struct KVMMemoryListener {
- void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
-                                   AddressSpace *as, int as_id);
- 
-+void kvm_set_max_memslot_size(hwaddr max_slot_size);
- #endif
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f450f25295..8153556335 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -138,6 +138,7 @@ bool kvm_direct_msi_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
- static bool kvm_immediate_exit;
-+static hwaddr kvm_max_slot_size = ~0;
- 
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-     KVM_CAP_INFO(USER_MEMORY),
-@@ -951,6 +952,14 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
-     return NULL;
- }
- 
-+void kvm_set_max_memslot_size(hwaddr max_slot_size)
-+{
-+    g_assert(
-+        ROUND_UP(max_slot_size, qemu_real_host_page_size) == max_slot_size
-+    );
-+    kvm_max_slot_size = max_slot_size;
-+}
-+
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
- {
-@@ -958,7 +967,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     int err;
-     MemoryRegion *mr = section->mr;
-     bool writeable = !mr->readonly && !mr->rom_device;
--    hwaddr start_addr, size;
-+    hwaddr start_addr, size, slot_size;
-     void *ram;
- 
-     if (!memory_region_is_ram(mr)) {
-@@ -983,41 +992,52 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-     kvm_slots_lock(kml);
- 
-     if (!add) {
--        mem = kvm_lookup_matching_slot(kml, start_addr, size);
--        if (!mem) {
--            goto out;
--        }
--        if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
--            kvm_physical_sync_dirty_bitmap(kml, section);
--        }
-+        do {
-+            slot_size = kvm_max_slot_size < size ? kvm_max_slot_size : size;
-+            mem = kvm_lookup_matching_slot(kml, start_addr, slot_size);
-+            if (!mem) {
-+                goto out;
-+            }
-+            if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+                kvm_physical_sync_dirty_bitmap(kml, section);
-+            }
- 
--        /* unregister the slot */
--        g_free(mem->dirty_bmap);
--        mem->dirty_bmap = NULL;
--        mem->memory_size = 0;
--        mem->flags = 0;
--        err = kvm_set_user_memory_region(kml, mem, false);
--        if (err) {
--            fprintf(stderr, "%s: error unregistering slot: %s\n",
--                    __func__, strerror(-err));
--            abort();
--        }
-+            /* unregister the slot */
-+            g_free(mem->dirty_bmap);
-+            mem->dirty_bmap = NULL;
-+            mem->memory_size = 0;
-+            mem->flags = 0;
-+            err = kvm_set_user_memory_region(kml, mem, false);
-+            if (err) {
-+                fprintf(stderr, "%s: error unregistering slot: %s\n",
-+                        __func__, strerror(-err));
-+                abort();
-+            }
-+            start_addr += slot_size;
-+            size -= slot_size;
-+        } while (size);
-         goto out;
-     }
- 
-     /* register the new slot */
--    mem = kvm_alloc_slot(kml);
--    mem->memory_size = size;
--    mem->start_addr = start_addr;
--    mem->ram = ram;
--    mem->flags = kvm_mem_flags(mr);
--
--    err = kvm_set_user_memory_region(kml, mem, true);
--    if (err) {
--        fprintf(stderr, "%s: error registering slot: %s\n", __func__,
--                strerror(-err));
--        abort();
--    }
-+    do {
-+        slot_size = kvm_max_slot_size < size ? kvm_max_slot_size : size;
-+        mem = kvm_alloc_slot(kml);
-+        mem->memory_size = slot_size;
-+        mem->start_addr = start_addr;
-+        mem->ram = ram;
-+        mem->flags = kvm_mem_flags(mr);
-+
-+        err = kvm_set_user_memory_region(kml, mem, true);
-+        if (err) {
-+            fprintf(stderr, "%s: error registering slot: %s\n", __func__,
-+                    strerror(-err));
-+            abort();
-+        }
-+        start_addr += slot_size;
-+        ram += slot_size;
-+        size -= slot_size;
-+    } while (size);
- 
- out:
-     kvm_slots_unlock(kml);
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 5b6a9a4e55..0c03ffb7c7 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -151,15 +151,6 @@ static void virtio_ccw_register_hcalls(void)
-                                    virtio_ccw_hcall_early_printk);
- }
- 
--/*
-- * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-- * as the dirty bitmap must be managed by bitops that take an int as
-- * position indicator. If we have a guest beyond that we will split off
-- * new subregions. The split must happen on a segment boundary (1MB).
-- */
--#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
--#define SEG_MSK (~0xfffffULL)
--#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
- static void s390_memory_init(ram_addr_t mem_size)
- {
-     MemoryRegion *sysmem = get_system_memory();
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 6e814c230b..6b1428a760 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -28,6 +28,7 @@
- #include "cpu.h"
- #include "internal.h"
- #include "kvm_s390x.h"
-+#include "sysemu/kvm_int.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/timer.h"
-@@ -122,6 +123,16 @@
- #define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
-                                      (max_cpus + NR_LOCAL_IRQS))
- 
-+/*
-+ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
-+ * as the dirty bitmap must be managed by bitops that take an int as
-+ * position indicator. If we have a guest beyond that we will split off
-+ * new subregions. The split must happen on a segment boundary (1MB).
-+ */
-+#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
-+#define SEG_MSK (~0xfffffULL)
-+#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
-+
- static CPUWatchpoint hw_watchpoint;
- /*
-  * We don't use a list because this structure is also used to transmit the
-@@ -347,6 +358,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-      */
-     /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
- 
-+    kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
-     return 0;
- }
- 
--- 
-2.18.1
+r~
 
 
