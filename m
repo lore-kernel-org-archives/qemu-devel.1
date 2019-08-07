@@ -2,81 +2,65 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 652C9C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2657C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:19:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31CD521E70
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:17:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eiFitDSz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31CD521E70
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 993BB21E70
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:19:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993BB21E70
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvQUu-0004Yv-F9
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:17:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36121)
+	id 1hvQXK-0005i9-Tv
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:19:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36651)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hvQUI-00042b-AA
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:16:40 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hvQWq-0005I7-0c
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hvQUD-0002Jy-Gj
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:16:35 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34928)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hvQUD-0002Ha-7k
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:16:33 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j19so31357799otq.2
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 11:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1NHsKJO7D2MJzWRTGF95uuoJZ5g7HBLubckVRHO3rys=;
- b=eiFitDSzHjsHRQY+BIhi64E4z8aP94vvImqhcEo8wox+h5Vfo+yW9FmxsSwNH/sdMH
- PzbFzz7owk/Q/qLLJrgFOAyQ2o+G8MIienLSbaqkXDtEiKi+G4jYbaiNn4o0+G9G9VOd
- Cmlt2GbVn1YgmtFSS55UKxkPb/EXXe9PlUo+PAuMsFPcwBvqCAxxzI+VKrAnMehRMK50
- vem32PxqKrsICec3Axay+d++8ZhETcnlerX1oyZABypT/GZyDOAUWESNZT8AF4r8nXYQ
- tuTZT1+iBRkxDBqzTKaERqmvJ6R3UNM5PXXzL36UjefIeqxwA/zZWplS9j9Sr4We7kju
- 4Fog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1NHsKJO7D2MJzWRTGF95uuoJZ5g7HBLubckVRHO3rys=;
- b=h3OSxmflWJwoB9FaYBAHMzYlo97verjGPS+LcxCs+RuXp2pR9umjPnDm0J8N2yO+w8
- gUMdVlA6bp0E7OcV3/39xrviIs9nnc9HR4cM7W570ZRBFTiDwqC04cT+mi5V4zikI4R6
- xYwWLjUkRprNr5E0YVsez3jRUiio8WVOPpm7seNbOEVwLQx+8XbrikIQQLGFDdXZwDoj
- 8RER5SCJZ595XhJcIRMidO8mlH+c60A6hY92wVI5dVLyRfPO1hyLZjvDVXkXrRl1pSqI
- aKJPcoERBxbFpTRQUfJhlu4B2xQVXxZTUal2ua2RB3XFGU5RgtBsBhC8JHl24Fb3TMrf
- ydJQ==
-X-Gm-Message-State: APjAAAUOKvybdm7Hw+bqUzSCBRYeknsNt0DHe95CNfLjiXX98yE/Rh1u
- ZSkHUXJeV0jXX3gmBw5Br2lV0RppIBJuNTPG+4KEUQ==
-X-Google-Smtp-Source: APXvYqxviOrvGJCJUJfdRmeEGS2UvXQtugkELP3MsDEsv8aZ6UvO+EAsc7N63vvEwZbGNdfblTO/+D1zCrl5I+hL5U4=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr8299729otj.97.1565201792249; 
- Wed, 07 Aug 2019 11:16:32 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hvQWo-0008Uy-Tz
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:19:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54978)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hvQWo-0008Sp-Om
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:19:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1A61452149
+ for <qemu-devel@nongnu.org>; Wed,  7 Aug 2019 18:19:14 +0000 (UTC)
+Received: from localhost (ovpn-121-66.rdu2.redhat.com [10.10.121.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99E665C557;
+ Wed,  7 Aug 2019 18:19:11 +0000 (UTC)
+Date: Wed, 7 Aug 2019 15:19:09 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190807181909.GH4669@habkost.net>
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-23-armbru@redhat.com>
+ <de7f547d-1c97-135f-654f-3856fa2eec2f@redhat.com>
+ <20190807175708.GE4669@habkost.net>
+ <647e2542-2042-26de-d768-cdf13afa0ec4@redhat.com>
 MIME-Version: 1.0
-References: <20190807045335.1361-1-richard.henderson@linaro.org>
- <20190807045335.1361-4-richard.henderson@linaro.org>
- <CAFEAcA_MFg1_gpaT5+X71s8r5SYZFTizdXs2vQ_6mLooP7E+kg@mail.gmail.com>
- <061145be-4cd4-b8e6-ae5c-562a59e8088f@linaro.org>
-In-Reply-To: <061145be-4cd4-b8e6-ae5c-562a59e8088f@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Aug 2019 19:16:21 +0100
-Message-ID: <CAFEAcA8fCL4VTJYdWGbDySzT9zkgmjcMGqBj0fo9gN4x4B-WcQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH 03/11] target/arm: Introduce read_pc
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <647e2542-2042-26de-d768-cdf13afa0ec4@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Wed, 07 Aug 2019 18:19:14 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 22/29] Include hw/boards.h a bit less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,66 +72,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 7 Aug 2019 at 19:04, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 8/7/19 10:27 AM, Peter Maydell wrote:
-> >> +/* The architectural value of PC.  */
-> >> +static uint32_t read_pc(DisasContext *s)
-> >> +{
-> >> +    return s->pc_curr + (s->thumb ? 4 : 8);
-> >> +}
-> >> +
-> >>  /* Set a variable to the value of a CPU register.  */
-> >>  static void load_reg_var(DisasContext *s, TCGv_i32 var, int reg)
-> >>  {
-> >>      if (reg == 15) {
-> >> -        uint32_t addr;
-> >> -        /* normally, since we updated PC, we need only to add one insn */
-> >> -        if (s->thumb)
-> >> -            addr = (long)s->pc + 2;
-> >> -        else
-> >> -            addr = (long)s->pc + 4;
-> >> -        tcg_gen_movi_i32(var, addr);
-> >> +        tcg_gen_movi_i32(var, read_pc(s));
-> >
-> > So previously:
-> >  * for A32 we would return s->pc + 4, which is the same as s->pc_curr + 8
-> >  * for T16 we would return s->pc + 2, which is the same as s->pc_curr + 4
-> >  * for T32 we would return s->pc + 2 -- but that's not the same as
-> >    s->pc_curr + 4, it's s->pc_curr + 6...
-> >
-> > Since s->pc_curr + 4 is the right architectural answer, are we
-> > fixing a bug here? Or are all the places where T32 code calls
-> > this function UNPREDICTABLE for the reg == 15 case ?
->
-> I believe that this is UNPREDICTABLE.
->
-> The T32 cases that reference the PC that are not UNPREDICTABLE, literal memory
-> references and adr, are all of the form (s->pc & ~3) and do not come through
-> load_reg_var().  Those will be unified by add_reg_for_lit() in the next patch.
+On Wed, Aug 07, 2019 at 08:05:50PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 8/7/19 7:57 PM, Eduardo Habkost wrote:
+> > On Wed, Aug 07, 2019 at 07:26:56PM +0200, Philippe Mathieu-Daud=E9 wr=
+ote:
+> >> On 8/6/19 5:14 PM, Markus Armbruster wrote:
+> >>> hw/boards.h pulls in almost 60 headers.  The less we include it int=
+o
+> >>> headers, the better.  As a first step, drop superfluous inclusions,
+> >>> and downgrade some more to what's actually needed.  Gets rid of jus=
+t
+> >>> one inclusion into a header.
+> >>>
+> >>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> >>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >>> ---
+> > [...]
+> >>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+> >>> index bcacdd1d8f..34a9f6f7a9 100644
+> >>> --- a/target/i386/hax-all.c
+> >>> +++ b/target/i386/hax-all.c
+> >>> @@ -33,7 +33,6 @@
+> >>>  #include "sysemu/reset.h"
+> >>>  #include "sysemu/sysemu.h"
+> >>>  #include "qemu/main-loop.h"
+> >>> -#include "hw/boards.h"
+> >>> =20
+> >>>  #define DEBUG_HAX 0
+> >>
+> >> include/sysemu/hax.h misses to include "hw/boards.h":
+> >=20
+> > I don't understand.  I don't see any reason for the sysemu/hax.h
+> > header to include hw/boards.h.
+>=20
+> Ah, you are right, the AccelClass is defined in include/sysemu/accel.h:
+>=20
+> typedef struct AccelClass {
+>     /*< private >*/
+>     ObjectClass parent_class;
+>     /*< public >*/
+>=20
+>     const char *name;
+>     int (*init_machine)(MachineState *ms);
+>     ...
+>=20
+> So this is where "hw/boards.h" has to be included (it is where
+> MachineState is defined).
 
-Yeah, that was my assumption -- at some previous point rather
-than making load_reg/load_reg_var do the right thing for 32-bit
-Thumb insns we just fixed up all the callsites to specialcase 15...
+As far as I can see, accel.h doesn't need the full MachineState
+struct definition and doesn't need boards.h.  It just needs the
+MachineState typedef, which is defined at typedefs.h.
 
-How about we add this to the commit message?
+hax-all.c, on the other hand, needs the full MachineState struct
+definition and is expected to include hw/boards.h.
 
-This changes the behaviour for load_reg() and load_reg_var()
-when called with reg==15 from a 32-bit Thumb instruction:
-previously they would have returned the incorrect value
-of pc_curr + 6, and now they will return the architecturally
-correct value of PC, which is pc_curr + 4. This will not
-affect well-behaved guest software, because all of the places
-we call these functions from T32 code are instructions where
-using r15 is UNPREDICTABLE. Using the architectural PC value
-here is more consistent with the T16 and A32 behaviour.
+>=20
+> >>
+> >> target/i386/hax-all.c: In function 'hax_accel_init':
+> >> target/i386/hax-all.c:354:26: error: dereferencing pointer to incomp=
+lete
+> >> type 'MachineState {aka struct MachineState}'
+> >>      int ret =3D hax_init(ms->ram_size);
+> >>                           ^
+> >=20
 
-thanks
--- PMM
+--=20
+Eduardo
 
