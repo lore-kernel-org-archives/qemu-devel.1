@@ -2,80 +2,92 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCE3C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE9DC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:28:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6912E2229C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:28:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JJMmGeE/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6912E2229C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 235BC2229C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:28:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 235BC2229C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvPjH-0004xj-Ja
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:28:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54762)
+	id 1hvPk3-0005vE-AL
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:28:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54947)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hvPit-0004Oq-4o
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:27:40 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hvPje-0005RE-J4
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:28:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hvPis-0003EL-3m
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:27:39 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:47092)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hvPir-0003DZ-UY
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:27:38 -0400
-Received: by mail-ot1-x343.google.com with SMTP id z23so79099873ote.13
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 10:27:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AHdOn7vFi2h++gG3kKrp+8meZRPHwwmLn9Dt/7//sJo=;
- b=JJMmGeE/Xe81+uVR1YItaVDeRa20wwlm1Va4/XnOoVzu2+9YwKP8K0xDGqdGjFKfan
- JVs2FUnsUMXoAaR+caeviE+ZD00DJxDU8YrXEz53RTI/1pjCYWAUxZEgwEzInriyMt9t
- 9ntFRnctFFVG1cao4Ouyb3Z2GVuU4o3EUJVQ/QVsd5IEIULRqYOgPtJuCAScdGHAuNFw
- LAuF9XFisDp5D/WYde2Fn+Mji0LM4dWOXJvaFCn1GheRDmklEvrgEXLoj5lrkmDrmfq4
- XmfDQS9kktlZ45Z6lbsIhRzFgKp+tPGx+53q3rkSgM1EyxA5ih2QkUYRiovggSupiED/
- Ng0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AHdOn7vFi2h++gG3kKrp+8meZRPHwwmLn9Dt/7//sJo=;
- b=QTVXzcmXma+jWs3WdLnEatvg/3B2P/1dPBnFCg4TbxxPceHsDm3N8xEYHFXDvP6N1v
- GF9FZIpjnLcDSKfpvEXROBQWcVW/NECwRAbjBEoU6Boq0BU5mVFA9ltZuqkj5fVk9wJ6
- mVjeXdyX9TSr2h3CpeIvRO8IgAKev4PVzGCwmsslAfAkkn0NFPg2eSNGhMi6IY64kdoe
- 0zILzmun21Uo/URN215vsL/3+fa0VfqDmORAO0s1KNiolcllEZDQdkd3/tn1yqGAqOgb
- p2BSOBedzMBMNgNYRkPQ8Aw1UiYiniL4p1HbR99OyUHi4fANE579QhAgOY+MOLmwnpUF
- WH+g==
-X-Gm-Message-State: APjAAAWNT85zfP0ctaxoXy97pFSV4x/p3AfyP9oSGG/qdiooY/Iqab07
- DxBbIwrSS8ZcUQBXEjGXqqNvyHD/Y199KZ6eZRW16w==
-X-Google-Smtp-Source: APXvYqyotskf8azvAj3q5ZZjjCxdAXe5PWo4tahPvxownBDz0FfYX2RzNqDuBzoGowzdHV/SpEntDjhaymcE8gE3tKQ=
-X-Received: by 2002:a05:6808:d4:: with SMTP id
- t20mr731905oic.170.1565198857134; 
- Wed, 07 Aug 2019 10:27:37 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1hvPjd-0004he-LC
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:28:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35974)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hvPjb-0004Zr-FW; Wed, 07 Aug 2019 13:28:23 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 929EE30C3400;
+ Wed,  7 Aug 2019 17:28:22 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-24.brq.redhat.com
+ [10.40.204.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 658835D71C;
+ Wed,  7 Aug 2019 17:28:15 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
+ <20190807080750.15950-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <8472029e-a7e1-b5aa-d6d6-7fbfb39460c1@redhat.com>
+Date: Wed, 7 Aug 2019 19:28:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190807045335.1361-1-richard.henderson@linaro.org>
- <20190807045335.1361-4-richard.henderson@linaro.org>
-In-Reply-To: <20190807045335.1361-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Aug 2019 18:27:26 +0100
-Message-ID: <CAFEAcA_MFg1_gpaT5+X71s8r5SYZFTizdXs2vQ_6mLooP7E+kg@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH 03/11] target/arm: Introduce read_pc
+In-Reply-To: <20190807080750.15950-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="uTqVVJK9UNx8CrZO9qa3pqT9b2sHbzTpd"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Wed, 07 Aug 2019 17:28:22 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/8] block/io: handle alignment and
+ max_transfer for copy_range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,67 +99,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 7 Aug 2019 at 05:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> We currently have 3 different ways of computing the architectural
-> value of "PC" as seen in the ARM ARM.
->
-> The value of s->pc has been incremented past the current insn,
-> but that is all.  Thus for a32, PC = s->pc + 4; for t32, PC = s->pc;
-> for t16, PC = s->pc + 2.  These differing computations make it
-> impossible at present to unify the various code paths.
->
-> With the newly introduced s->pc_curr, we can compute the correct
-> value for all cases, using the formula given in the ARM ARM.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--uTqVVJK9UNx8CrZO9qa3pqT9b2sHbzTpd
+Content-Type: multipart/mixed; boundary="QMDFkJbmPrQaVkTUyd1no4l7fRg1T7hCG";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+Message-ID: <8472029e-a7e1-b5aa-d6d6-7fbfb39460c1@redhat.com>
+Subject: Re: [PATCH 3/8] block/io: handle alignment and max_transfer for
+ copy_range
+References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
+ <20190807080750.15950-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190807080750.15950-4-vsementsov@virtuozzo.com>
+
+--QMDFkJbmPrQaVkTUyd1no4l7fRg1T7hCG
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 07.08.19 10:07, Vladimir Sementsov-Ogievskiy wrote:
+> copy_range ignores these limitations, let's improve it. block/backup
+> code handles max_transfer for copy_range by itself, now it's not needed=
+
+> more, drop it.
+
+Shouldn=E2=80=99t this be two separate patches?
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  target/arm/translate.c | 59 ++++++++++++++++--------------------------
->  1 file changed, 23 insertions(+), 36 deletions(-)
->
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 59e35aafbf..61933865d5 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -196,17 +196,17 @@ static inline void store_cpu_offset(TCGv_i32 var, int offset)
->  #define store_cpu_field(var, name) \
->      store_cpu_offset(var, offsetof(CPUARMState, name))
->
-> +/* The architectural value of PC.  */
-> +static uint32_t read_pc(DisasContext *s)
-> +{
-> +    return s->pc_curr + (s->thumb ? 4 : 8);
-> +}
-> +
->  /* Set a variable to the value of a CPU register.  */
->  static void load_reg_var(DisasContext *s, TCGv_i32 var, int reg)
+>  block/backup.c | 11 ++---------
+>  block/io.c     | 41 +++++++++++++++++++++++++++++++++--------
+>  2 files changed, 35 insertions(+), 17 deletions(-)
+
+[...]
+
+> diff --git a/block/io.c b/block/io.c
+> index 06305c6ea6..5abbd0fff2 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -3005,6 +3005,12 @@ static int coroutine_fn bdrv_co_copy_range_inter=
+nal(
 >  {
->      if (reg == 15) {
-> -        uint32_t addr;
-> -        /* normally, since we updated PC, we need only to add one insn */
-> -        if (s->thumb)
-> -            addr = (long)s->pc + 2;
-> -        else
-> -            addr = (long)s->pc + 4;
-> -        tcg_gen_movi_i32(var, addr);
-> +        tcg_gen_movi_i32(var, read_pc(s));
+>      BdrvTrackedRequest req;
+>      int ret;
+> +    uint32_t align =3D MAX(src->bs->bl.request_alignment,
+> +                         dst->bs->bl.request_alignment);
+> +    uint32_t max_transfer =3D
+> +            QEMU_ALIGN_DOWN(MIN_NON_ZERO(MIN_NON_ZERO(src->bs->bl.max_=
+transfer,
+> +                                                      dst->bs->bl.max_=
+transfer),
+> +                                         INT_MAX), align);
 
-So previously:
- * for A32 we would return s->pc + 4, which is the same as s->pc_curr + 8
- * for T16 we would return s->pc + 2, which is the same as s->pc_curr + 4
- * for T32 we would return s->pc + 2 -- but that's not the same as
-   s->pc_curr + 4, it's s->pc_curr + 6...
+I suppose the outer QEMU_ALIGN_DOWN() may result in @max_transfer of 0
+(in theory, if one=E2=80=99s max_transfer is smaller than the other=E2=80=
+=99s alignment).
 
-Since s->pc_curr + 4 is the right architectural answer, are we
-fixing a bug here? Or are all the places where T32 code calls
-this function UNPREDICTABLE for the reg == 15 case ?
+Not likely, but should still be handled.
 
-thanks
--- PMM
+The rest looks good to me.
+
+Max
+
+>      /* TODO We can support BDRV_REQ_NO_FALLBACK here */
+>      assert(!(read_flags & BDRV_REQ_NO_FALLBACK));
+
+
+--QMDFkJbmPrQaVkTUyd1no4l7fRg1T7hCG--
+
+--uTqVVJK9UNx8CrZO9qa3pqT9b2sHbzTpd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1LCi0ACgkQ9AfbAGHV
+z0ApRQgAoa0wImFox/sE9fic/L88/eTdfX2axH5NBJZ9j3iYRius9BuZvQgpeFRR
+l8W7Lb/2AdOk3bCELE2p5aJzjo6JDFHLGqW5L7LzbchVNCf1JUvFJeLpFq4CbQmR
+wUIw8PF6zKRxTf3bR7JXmSyc9iudVUYeABXPWbhql1lupWcVDfR5wAGfd3XeTiHF
+JqBnfJA5J+KOT7tEVoJPbb3rCBiGOcb9ANBtsT3UEIvVHIfAqYv954ftYCc9pCyk
+Hdx+J3hGb+GMNwOhSnEYiMTF4bAe/YVrKIHBAMvHSDz2DukV9QCOnA0VTGfEZjdA
+H+93xfCTvUocNv65PfvFOHA1VszN4w==
+=+sNn
+-----END PGP SIGNATURE-----
+
+--uTqVVJK9UNx8CrZO9qa3pqT9b2sHbzTpd--
 
