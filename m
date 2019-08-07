@@ -2,79 +2,102 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE21C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB0F8C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:23:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 544C621E6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:23:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 544C621E6B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C073C21E6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:23:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C073C21E6B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvJ63-0004E5-Jq
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:23:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43050)
+	id 1hvJ6l-0005Fw-3X
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:23:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43144)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hvJ5a-0003hY-Dk
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:22:39 -0400
+ (envelope-from <bala24@linux.ibm.com>) id 1hvJ62-0004MM-9D
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hvJ5Z-00011N-J4
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:22:38 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40943)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hvJ5Z-00010u-Ck
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:22:37 -0400
-Received: by mail-wm1-f67.google.com with SMTP id v19so79443002wmj.5
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:22:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0XSyHvDMekjafpUZd/bGO/uyC3MKHMOWHaWq6AQGhdI=;
- b=cJIGSsH4f7gnTsZnj/FPxjAk7UF7ksYs0qQg7k3ke83b5Wpi+iHRTrV5jExnvhOsP1
- 4/9tLI663YLv92+vUriuqf9eTMeYftAPNk3aE/9WK+XRi4Nt/JHe/3b9ORBHLJa8DKbj
- vHLKe6T/l/dcGjheL353rOu9volUS+8uibH/rpYXpIigb/6twNbfiCWcQfHA4eCpP+Bp
- vHDnb9s9eTATpWhuR0MhdKN3vQ1jw/ixSTn9Rh+5BRFp/W3bHhCt4mPfgyTrRh6Aumup
- pQ1SJuxWWQd4b/pW117y+nuvbQQdXr/y1vdlxFWIi5+HopP0NHZcBr0ZHoT0f7grrwD0
- k/Ug==
-X-Gm-Message-State: APjAAAXVcmKV3JFDH6HRfT17zet9SHKbFg5CLVMSxf2xbKu76K6lqQVj
- S5LBjI2sRafRbpO95JsGVMFUaA==
-X-Google-Smtp-Source: APXvYqyVdY+KG9VE8VYjZChr/Tap/FiuNTb/CIypvYv6TYC5AN3XTQir8qL5hSYXXEgG+OiXanVDmA==
-X-Received: by 2002:a05:600c:10ce:: with SMTP id
- l14mr9662688wmd.118.1565173356318; 
- Wed, 07 Aug 2019 03:22:36 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
- ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
- by smtp.gmail.com with ESMTPSA id c15sm12952891wrb.80.2019.08.07.03.22.32
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 03:22:35 -0700 (PDT)
-To: tony.nguyen@bt.com, qemu-devel@nongnu.org
-References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
- <1565166771281.2734@bt.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <efbf3560-76d3-62ba-0f8f-3e8ca8686f1d@redhat.com>
-Date: Wed, 7 Aug 2019 12:22:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <bala24@linux.ibm.com>) id 1hvJ61-0001CK-7X
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:23:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23940
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1hvJ61-0001BH-2u
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:23:05 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x77AM5C5038487
+ for <qemu-devel@nongnu.org>; Wed, 7 Aug 2019 06:23:03 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2u7v58hxaq-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 06:23:02 -0400
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Wed, 7 Aug 2019 11:23:01 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 7 Aug 2019 11:22:58 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id x77AMvNe35455470
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 7 Aug 2019 10:22:57 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 57F3411C04A;
+ Wed,  7 Aug 2019 10:22:57 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0784F11C050;
+ Wed,  7 Aug 2019 10:22:56 +0000 (GMT)
+Received: from dhcp-9-109-247-185.in.ibm.com (unknown [9.124.35.43])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Wed,  7 Aug 2019 10:22:55 +0000 (GMT)
+Date: Wed, 7 Aug 2019 15:52:53 +0530
+From: Balamuruhan S <bala24@linux.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+References: <20190807071445.4109-1-bala24@linux.ibm.com>
+ <20190807071445.4109-6-bala24@linux.ibm.com>
+ <a2f067c4-d1a7-e729-baa6-dc4f31a8b882@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <1565166771281.2734@bt.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH v6 19/26] exec: Delete DEVICE_HOST_ENDIAN
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <a2f067c4-d1a7-e729-baa6-dc4f31a8b882@kaod.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19080710-0016-0000-0000-0000029B2149
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080710-0017-0000-0000-000032FA32F8
+Message-Id: <20190807102253.GD10532@dhcp-9-109-247-185.in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-07_02:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908070114
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0b-001b2d01.pphosted.com id x77AM5C5038487
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.158.5
+Subject: Re: [Qemu-devel] [RFC PATCH 5/6] hw/ppc/pnv_xscom: retrieve
+ homer/occ base address from PBA BARs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +109,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
- cohuck@redhat.com, sagark@eecs.berkeley.edu, david@redhat.com,
- jasowang@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
- i.mitsyanko@gmail.com, keith.busch@intel.com, jcmvbkbc@gmail.com,
- frederic.konrad@adacore.com, dmitry.fleytman@gmail.com, kraxel@redhat.com,
- edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn, pburton@wavecomp.com,
- xiaoguangrong.eric@gmail.com, peter.chubb@nicta.com.au, philmd@redhat.com,
- robh@kernel.org, hare@suse.com, sstabellini@kernel.org, berto@igalia.com,
- chouteau@adacore.com, qemu-block@nongnu.org, arikalo@wavecomp.com,
- jslaby@suse.cz, deller@gmx.de, mst@redhat.com, magnus.damm@gmail.com,
- jcd@tribudubois.net, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- mreitz@redhat.com, hpoussin@reactos.org, joel@jms.id.au,
- anthony.perard@citrix.com, xen-devel@lists.xenproject.org,
- david@gibson.dropbear.id.au, lersek@redhat.com, green@moxielogic.com,
- atar4qemu@gmail.com, antonynpavlov@gmail.com, marex@denx.de, jiri@resnulli.us,
- ehabkost@redhat.com, minyard@acm.org, qemu-s390x@nongnu.org, sw@weilnetz.de,
- alistair@alistair23.me, yuval.shaia@oracle.com, b.galvani@gmail.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
- jan.kiszka@web.de, clg@kaod.org, stefanha@redhat.com,
- marcandre.lureau@redhat.com, shorne@gmail.com, jsnow@redhat.com,
- rth@twiddle.net, kwolf@redhat.com, qemu-riscv@nongnu.org, proljc@gmail.com,
- andrew@aj.id.au, kbastian@mail.uni-paderborn.de, crwulff@gmail.com,
- laurent@vivier.eu, Andrew.Baumann@microsoft.com, sundeep.lkml@gmail.com,
- andrew.smirnov@gmail.com, michael@walle.cc, paul.durrant@citrix.com,
- qemu-ppc@nongnu.org, huth@tuxfamily.org, amarkovic@wavecomp.com,
- imammedo@redhat.com, aurelien@aurel32.net, stefanb@linux.ibm.com
+Cc: hari@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, qemu-devel@nongnu.org,
+ maddy@linux.vnet.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/19 10:32, tony.nguyen@bt.com wrote:
-> +#if defined(HOST_WORDS_BIGENDIAN)
-> +    .endianness = MO_BE,
-> +#else
-> +    .endianness = MO_LE,
-> +#endif
+On Wed, Aug 07, 2019 at 10:01:58AM +0200, C=E9dric Le Goater wrote:
+> On 07/08/2019 09:14, Balamuruhan S wrote:
+> > During PowerNV boot skiboot populates the device tree by retrieving
+> > base address of homer/occ common area from PBA BARs and prd ipoll
+> > mask by accessing xscom read/write accesses.
+>=20
+> This looks good. If you could add defines it would be better.
 
-Host endianness is just 0, isn't it?
+sure.
 
-Paolo
+>=20
+> Our common XSCOM ops is starting to be a bit messy. May we should think
+> about introducing one for P9 and one for P8.
+
+yes, point taken.
+
+Thanks Cedric.
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+> > Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> > ---
+> >  hw/ppc/pnv_xscom.c | 27 +++++++++++++++++++++++----
+> >  1 file changed, 23 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> > index 5d5b5e9884..18a780bcdf 100644
+> > --- a/hw/ppc/pnv_xscom.c
+> > +++ b/hw/ppc/pnv_xscom.c
+> > @@ -77,6 +77,29 @@ static uint64_t xscom_read_default(PnvChip *chip, =
+uint32_t pcba)
+> >      case 0x18002:       /* ECID2 */
+> >          return 0;
+> > =20
+> > +    /* PBA BAR0 */
+> > +    case 0x5012b00: /* P9 homer base address */
+> > +        return PNV9_HOMER_BASE(chip);
+> > +    case 0x2013f00: /* P8 homer base address */
+> > +        return PNV_HOMER_BASE(chip);
+> > +
+> > +    /* PBA BARMASK0 */
+> > +    case 0x5012b04: /* P9 homer region size */
+> > +    case 0x2013f04: /* P8 homer region size */
+> > +        return PNV_HOMER_SIZE;
+> > +
+> > +    /* PBA BAR2 */
+> > +    case 0x5012b02: /* P9 occ common area */
+> > +        return PNV9_OCC_COMMON_AREA(chip);
+> > +    case 0x2013f02: /* P8 occ common area */
+> > +        return PNV_OCC_COMMON_AREA(chip);
+> > +
+> > +    /* PBA BARMASK2 */
+> > +    case 0x5012b06: /* P9 occ common area size */
+> > +    case 0x2013f06: /* P8 occ common area size */
+> > +        return PNV_OCC_COMMON_AREA_SIZE;
+> > +
+> > +
+> >      case 0x1010c00:     /* PIBAM FIR */
+> >      case 0x1010c03:     /* PIBAM FIR MASK */
+> > =20
+> > @@ -96,13 +119,9 @@ static uint64_t xscom_read_default(PnvChip *chip,=
+ uint32_t pcba)
+> >      case 0x2020009:     /* ADU stuff, error register */
+> >      case 0x202000f:     /* ADU stuff, receive status register*/
+> >          return 0;
+> > -    case 0x2013f00:     /* PBA stuff */
+> >      case 0x2013f01:     /* PBA stuff */
+> > -    case 0x2013f02:     /* PBA stuff */
+> >      case 0x2013f03:     /* PBA stuff */
+> > -    case 0x2013f04:     /* PBA stuff */
+> >      case 0x2013f05:     /* PBA stuff */
+> > -    case 0x2013f06:     /* PBA stuff */
+> >      case 0x2013f07:     /* PBA stuff */
+> >          return 0;
+> >      case 0x2013028:     /* CAPP stuff */
+> >=20
+>=20
+
 
