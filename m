@@ -2,65 +2,95 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2657C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D869AC32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 993BB21E70
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:19:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993BB21E70
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A40B321E70
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:24:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sfk5+alw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A40B321E70
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvQXK-0005i9-Tv
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:19:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36651)
+	id 1hvQbq-0007rI-1M
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:24:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38142)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hvQWq-0005I7-0c
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:19:16 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvQbM-0006pw-3k
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:23:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hvQWo-0008Uy-Tz
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:19:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54978)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hvQWo-0008Sp-Om
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:19:14 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1A61452149
- for <qemu-devel@nongnu.org>; Wed,  7 Aug 2019 18:19:14 +0000 (UTC)
-Received: from localhost (ovpn-121-66.rdu2.redhat.com [10.10.121.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 99E665C557;
- Wed,  7 Aug 2019 18:19:11 +0000 (UTC)
-Date: Wed, 7 Aug 2019 15:19:09 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190807181909.GH4669@habkost.net>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-23-armbru@redhat.com>
- <de7f547d-1c97-135f-654f-3856fa2eec2f@redhat.com>
- <20190807175708.GE4669@habkost.net>
- <647e2542-2042-26de-d768-cdf13afa0ec4@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hvQbK-0003tQ-UG
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:23:56 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41449)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hvQbK-0003qS-JY
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:23:54 -0400
+Received: by mail-pl1-x641.google.com with SMTP id m9so41870464pls.8
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 11:23:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=1fcVkXbnMuANrk+Ur0WezzXveYqWqDlQYB2JE2gMdvY=;
+ b=Sfk5+alwu1VCU0qrulKu6QmaIsYdKxIU7Gg69SUf6UnahW78yEvPIcfLCY4kSDNXMq
+ f4WymZm+Doh+AICi8mIVzgHEDU0rk9qd7RKt04rG8f+IhrZsp8Bf49iJNYEBZ3PN1lu8
+ WMZp7duBLer60rzUM5QJpc44UkEmKYH3GCppCxHQYJJFjopiEku84fRjo83FdwueRLYl
+ IMxR4+iqzD0yqZSMsGwkNYKbg2rwyP6LSkwZRHkL3azdqJ0J5NePyNBVYiojjJM5pB2i
+ Pk7TEOzV5+PlvYyiEd4k+Q2XlHH+0AqyvWllLRUz9wgva39L6j9er0haVzJ57gmopyCP
+ puQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1fcVkXbnMuANrk+Ur0WezzXveYqWqDlQYB2JE2gMdvY=;
+ b=KSqvqIx8v+X5N/Qrc8ANRe7gh2QcdP0WSkvycKpV1hiqS41mQngsZVcfVERnF5kZCb
+ 15DuRYbZEAEdt0tuAY37NriaIUuNSwYxatCbq8KnTXQJuCX5jKmic4I3TkVef81L7yai
+ YYC/Lq7SNXB6mUsasKkyKbWd/vSWUBIa49/TxgC9BHgzwTd9ytJqFIrSuphvs1hmsHtC
+ kCCZ0hwKC6J6QMAh8SZvkDR4NhUwRNLbu8U97kHKZppCzzSpWzpU14HlelFm500FToAk
+ wDylmkh8vNaKZjWAKA0RTAyOhZRmF57RolimFrhPM8Ny3GdGxG136+6isQoJBEVPONTC
+ VyRQ==
+X-Gm-Message-State: APjAAAWv8i9ipFNdQVVpvFZv/ng7XEJ8hEbpMLoL09sWlzu7IuTTxbvx
+ +l9X3Gq9G7cRQvmsZ16tGoMdGA==
+X-Google-Smtp-Source: APXvYqxDnUiT2rafpEFrD9HngKcg+IeotfqUm0tJV4yP2eo54JFJv3aC6EECEHSGCSIObNhiKzxfzA==
+X-Received: by 2002:a17:90a:a404:: with SMTP id
+ y4mr1264188pjp.58.1565202233346; 
+ Wed, 07 Aug 2019 11:23:53 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id h14sm121761477pfq.22.2019.08.07.11.23.50
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 11:23:52 -0700 (PDT)
+To: Paolo Bonzini <pbonzini@redhat.com>, tony.nguyen@bt.com,
+ qemu-devel@nongnu.org
+References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
+ <1565166794966.57397@bt.com>
+ <27c692bf-45af-afbe-27ba-1e8f7f936121@linaro.org>
+ <528a22e6-25a6-30c2-44e2-82df90bfa2da@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <92720e5e-5bb9-a4be-a652-39e710071db1@linaro.org>
+Date: Wed, 7 Aug 2019 11:23:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <647e2542-2042-26de-d768-cdf13afa0ec4@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 07 Aug 2019 18:19:14 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 22/29] Include hw/boards.h a bit less
+In-Reply-To: <528a22e6-25a6-30c2-44e2-82df90bfa2da@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH v6 20/26] memory: Access MemoryRegion with
+ endianness
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,76 +102,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, imammedo@redhat.com, sagark@eecs.berkeley.edu,
+ david@redhat.com, jasowang@redhat.com, palmer@sifive.com,
+ mark.cave-ayland@ilande.co.uk, laurent@vivier.eu, keith.busch@intel.com,
+ jcmvbkbc@gmail.com, frederic.konrad@adacore.com, kraxel@redhat.com,
+ edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn, pburton@wavecomp.com,
+ marex@denx.de, robh@kernel.org, hare@suse.com, sstabellini@kernel.org,
+ berto@igalia.com, proljc@gmail.com, qemu-block@nongnu.org,
+ arikalo@wavecomp.com, jslaby@suse.cz, deller@gmx.de, mst@redhat.com,
+ magnus.damm@gmail.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ mreitz@redhat.com, hpoussin@reactos.org, joel@jms.id.au,
+ anthony.perard@citrix.com, xen-devel@lists.xenproject.org, rth@twiddle.net,
+ philmd@redhat.com, green@moxielogic.com, atar4qemu@gmail.com,
+ antonynpavlov@gmail.com, jiri@resnulli.us, ehabkost@redhat.com,
+ minyard@acm.org, sw@weilnetz.de, alistair@alistair23.me, chouteau@adacore.com,
+ b.galvani@gmail.com, eric.auger@redhat.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, peter.chubb@nicta.com.au, yuval.shaia@oracle.com,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, shorne@gmail.com,
+ sundeep.lkml@gmail.com, jsnow@redhat.com, david@gibson.dropbear.id.au,
+ kwolf@redhat.com, crwulff@gmail.com, qemu-riscv@nongnu.org,
+ xiaoguangrong.eric@gmail.com, i.mitsyanko@gmail.com, lersek@redhat.com,
+ cohuck@redhat.com, alex.williamson@redhat.com, Andrew.Baumann@microsoft.com,
+ jcd@tribudubois.net, andrew@aj.id.au, michael@walle.cc,
+ paul.durrant@citrix.com, qemu-ppc@nongnu.org, huth@tuxfamily.org,
+ amarkovic@wavecomp.com, kbastian@mail.uni-paderborn.de, jan.kiszka@web.de,
+ stefanb@linux.ibm.com, andrew.smirnov@gmail.com, aurelien@aurel32.net,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 07, 2019 at 08:05:50PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 8/7/19 7:57 PM, Eduardo Habkost wrote:
-> > On Wed, Aug 07, 2019 at 07:26:56PM +0200, Philippe Mathieu-Daud=E9 wr=
-ote:
-> >> On 8/6/19 5:14 PM, Markus Armbruster wrote:
-> >>> hw/boards.h pulls in almost 60 headers.  The less we include it int=
-o
-> >>> headers, the better.  As a first step, drop superfluous inclusions,
-> >>> and downgrade some more to what's actually needed.  Gets rid of jus=
-t
-> >>> one inclusion into a header.
-> >>>
-> >>> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> >>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >>> ---
-> > [...]
-> >>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> >>> index bcacdd1d8f..34a9f6f7a9 100644
-> >>> --- a/target/i386/hax-all.c
-> >>> +++ b/target/i386/hax-all.c
-> >>> @@ -33,7 +33,6 @@
-> >>>  #include "sysemu/reset.h"
-> >>>  #include "sysemu/sysemu.h"
-> >>>  #include "qemu/main-loop.h"
-> >>> -#include "hw/boards.h"
-> >>> =20
-> >>>  #define DEBUG_HAX 0
-> >>
-> >> include/sysemu/hax.h misses to include "hw/boards.h":
-> >=20
-> > I don't understand.  I don't see any reason for the sysemu/hax.h
-> > header to include hw/boards.h.
->=20
-> Ah, you are right, the AccelClass is defined in include/sysemu/accel.h:
->=20
-> typedef struct AccelClass {
->     /*< private >*/
->     ObjectClass parent_class;
->     /*< public >*/
->=20
->     const char *name;
->     int (*init_machine)(MachineState *ms);
->     ...
->=20
-> So this is where "hw/boards.h" has to be included (it is where
-> MachineState is defined).
+On 8/7/19 11:00 AM, Paolo Bonzini wrote:
+> On 07/08/19 19:49, Richard Henderson wrote:
+>> On 8/7/19 1:33 AM, tony.nguyen@bt.com wrote:
+>>> @@ -551,6 +551,7 @@ void virtio_address_space_write(VirtIOPCIProxy *proxy, hwaddr addr,
+>>>          /* As length is under guest control, handle illegal values. */
+>>>          return;
+>>>      }
+>>> +    /* FIXME: memory_region_dispatch_write ignores MO_BSWAP.  */
+>>>      memory_region_dispatch_write(mr, addr, val, size_memop(len),
+>>>                                   MEMTXATTRS_UNSPECIFIED);
+>>>  }
+>>
+>> Here is an example of where Paolo is quite right -- you cannot simply add MO_TE
+>> via size_memop().  In patch 22 we see
+>>
+>>> @@ -542,16 +542,15 @@ void virtio_address_space_write(VirtIOPCIProxy *proxy, hwaddr addr,
+>>>          val = pci_get_byte(buf);
+>>>          break;
+>>>      case 2:
+>>> -        val = cpu_to_le16(pci_get_word(buf));
+>>> +        val = pci_get_word(buf);
+>>>          break;
+>>>      case 4:
+>>> -        val = cpu_to_le32(pci_get_long(buf));
+>>> +        val = pci_get_long(buf);
+>>>          break;
+>>>      default:
+>>>          /* As length is under guest control, handle illegal values. */
+>>>          return;
+>>>      }
+>>> -    /* FIXME: memory_region_dispatch_write ignores MO_BSWAP.  */
+>>>      memory_region_dispatch_write(mr, addr, val, size_memop(len),
+>>>                                   MEMTXATTRS_UNSPECIFIED);
+>>
+>> This is a little-endian store -- MO_LE not MO_TE.
+> 
+> Or leave the switch statement aside and request host endianness.  Either
+> is fine.
 
-As far as I can see, accel.h doesn't need the full MachineState
-struct definition and doesn't need boards.h.  It just needs the
-MachineState typedef, which is defined at typedefs.h.
+The goal is to minimize the number of places and the number of times that
+bswaps happen.  That's why I think pushing the cpu_to_le16 into
+memory_region_dispatch_write is a good thing.
 
-hax-all.c, on the other hand, needs the full MachineState struct
-definition and is expected to include hw/boards.h.
+However, leaving a host-endian might be the easiest short-term solution for the
+more complicated cases.  It also seems like a way to split the patch further if
+we think that's desirable.
 
->=20
-> >>
-> >> target/i386/hax-all.c: In function 'hax_accel_init':
-> >> target/i386/hax-all.c:354:26: error: dereferencing pointer to incomp=
-lete
-> >> type 'MachineState {aka struct MachineState}'
-> >>      int ret =3D hax_init(ms->ram_size);
-> >>                           ^
-> >=20
 
---=20
-Eduardo
+r~
 
