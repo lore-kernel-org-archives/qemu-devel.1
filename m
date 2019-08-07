@@ -2,89 +2,59 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B24CC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE59C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB55D21BF6
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:35:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Vw+NcrWj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB55D21BF6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id B19C921BF6
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B19C921BF6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNxu-0001Ac-4v
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:35:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53709)
+	id 1hvNzC-0003LV-J3
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:36:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55187)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paul.walmsley@sifive.com>) id 1hvNqh-0007z8-Mb
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:27:36 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hvNvo-0007Bf-TQ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:32:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paul.walmsley@sifive.com>) id 1hvNqf-0002pf-9O
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:27:34 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36621)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paul.walmsley@sifive.com>)
- id 1hvNqf-0002oN-37
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:27:33 -0400
-Received: by mail-ot1-x342.google.com with SMTP id r6so105844674oti.3
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:27:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=date:from:to:cc:subject:in-reply-to:message-id:references
- :user-agent:mime-version;
- bh=L96TWPaJYFlpZCiROwFK/mYFAS/viHJGKOgXlgDH/nU=;
- b=Vw+NcrWjAHn2jfsVFLiExSl1jusii1oYjEFgSRw3vwpOoK9fCBD3M8jV6p9+2nMQIu
- a390UkepVDsqeuui6oLdDYKXatxJZFwgcNQr6VSdW6XwcknqAFc+kNzPD3vfIyiGvIyr
- i86kgARFjFTNJOXMV5h43K1dTn0scyOun6tWgO9da5I8/O01Qgx508PVsnH8NRbEF0hb
- YlFws8vGAa0rVf+1XejvQo8HPy2JWGWMJjueSMPtIY1eaTBCq7a5nPW0DtGE8ojAUjED
- wYl60PhjvxTG9xkUK+DjcdAkey/TEdQaIGlRYmPyzYmoYMtv8Hu1XaBt1ftjVZNWq/Rb
- LR/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
- :references:user-agent:mime-version;
- bh=L96TWPaJYFlpZCiROwFK/mYFAS/viHJGKOgXlgDH/nU=;
- b=jd3icXXkJ2uDR7WvX8QMlZw/rFKjLUB/ryqZP9QZ4bumPj7iYp0d0HXKn7723EIE1q
- 908blp7213nkxSY2vor6eCuj4k1DqdO9XReoBLtO7ULpYkLg1olrGAGEUdMnUtFvqB9E
- GepQdV7+ffrEE8vHVmOHdPpjs1jgkGjdjozWAw67yuHVTQWOgozj7EIhItLROXbOeWC4
- dXxS98T7vFxcKxmEcVRVGmft4H84yMbsM9hneBM4xS5RTJVTwZtM6I8deN/VsGGoiX55
- Gbqb0eHU1MfKYEdZzH6lOdY3mI+6n4FGQ7AiqxtjHjfwmqAtYeDk2Wms380VLxsuiS9+
- +XrQ==
-X-Gm-Message-State: APjAAAUA71b6ocPwui8PCn3TigHm6O8BBk6j/jnAin9QPw6tOzl6fVBn
- F8IcYCXoptTemWr8sSsO8bGatg==
-X-Google-Smtp-Source: APXvYqwOaZHXOluKL+d+v4jUYs4oVh5qXNZ/McfL8yfctWXtVm/fm/kOeuDO1BGacotTjrHEOxW5Vg==
-X-Received: by 2002:a6b:917:: with SMTP id t23mr4775074ioi.174.1565191651605; 
- Wed, 07 Aug 2019 08:27:31 -0700 (PDT)
-Received: from localhost (c-73-95-159-87.hsd1.co.comcast.net. [73.95.159.87])
- by smtp.gmail.com with ESMTPSA id
- j25sm122664152ioj.67.2019.08.07.08.27.30
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 07 Aug 2019 08:27:30 -0700 (PDT)
-Date: Wed, 7 Aug 2019 08:27:30 -0700 (PDT)
-From: Paul Walmsley <paul.walmsley@sifive.com>
-X-X-Sender: paulw@viisi.sifive.com
-To: Palmer Dabbelt <palmer@sifive.com>
-In-Reply-To: <20190807145939.1281-1-palmer@sifive.com>
-Message-ID: <alpine.DEB.2.21.9999.1908070804400.13971@viisi.sifive.com>
-References: <20190807145939.1281-1-palmer@sifive.com>
-User-Agent: Alpine 2.21.9999 (DEB 301 2018-08-15)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-X-Mailman-Approved-At: Wed, 07 Aug 2019 11:32:54 -0400
-Subject: Re: [Qemu-devel] [PATCH for 4.1] RISC-V: Ignore the S and U
- extensions when formatting ISA strings
+ (envelope-from <imammedo@redhat.com>) id 1hvNvn-0005uy-Fi
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:32:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44622)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hvNvn-0005uN-8i; Wed, 07 Aug 2019 11:32:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1FA72305B41C;
+ Wed,  7 Aug 2019 15:32:50 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F91067627;
+ Wed,  7 Aug 2019 15:32:45 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed,  7 Aug 2019 11:32:41 -0400
+Message-Id: <20190807153241.24050-1-imammedo@redhat.com>
+In-Reply-To: <20190806094834.7691-2-imammedo@redhat.com>
+References: <20190806094834.7691-2-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Wed, 07 Aug 2019 15:32:50 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH for-4.2 v5 1/2] kvm: s390: split too big memory
+ section on several memslots
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,43 +66,228 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 7 Aug 2019, Palmer Dabbelt wrote:
+Max memslot size supported by kvm on s390 is 8Tb,
+move logic of splitting RAM in chunks upto 8T to KVM code.
 
-> The ISA strings we're providing from QEMU aren't actually legal RISC-V
-> ISA strings, as both the S and U extensions cannot exist as
-> single-letter extensions and must instead be multi-letter strings.
-> We're still using the ISA strings inside QEMU to track the availiable
-> extensions, so this patch just strips out the S and U extensions when
-> formatting ISA strings.
-> 
-> This boots Linux on top of 4.1-rc3, which no longer has the U extension
-> in /proc/cpuinfo.
-> 
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> ---
-> This is another late one, but I'd like to target it for 4.1 as we're
-> providing illegal ISA strings and I don't want to bake that into a bunch
-> of other code.
+This way it will hide KVM specific restrictions in KVM code
+and won't affect baord level design decisions. Which would allow
+us to avoid misusing memory_region_allocate_system_memory() API
+and eventually use a single hostmem backend for guest RAM.
 
-I'm unfamiliar with the underlying QEMU code beyond the patch posted here, 
-but I can review the intention expressed in the patch description.  The 
-described intent is aligned with Section 22.6 and Table 22.1 of the RISC-V 
-User-Level ISA Specification version 2.2:
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v5:
+  * move computation 'size -= slot_size' inside of loop body
+          (David Hildenbrand <david@redhat.com>)
+v4:
+  * fix compilation issue
+          (Christian Borntraeger <borntraeger@de.ibm.com>)
+  * advance HVA along with GPA in kvm_set_phys_mem()
+          (Christian Borntraeger <borntraeger@de.ibm.com>)
 
-  https://github.com/riscv/riscv-isa-manual/blob/master/release/riscv-spec-v2.2.pdf
+patch prepares only KVM side for switching to single RAM memory region
+another patch will take care of  dropping manual RAM partitioning in
+s390 code.
+---
+ include/sysemu/kvm_int.h   |  1 +
+ accel/kvm/kvm-all.c        | 82 ++++++++++++++++++++++++--------------
+ hw/s390x/s390-virtio-ccw.c |  9 -----
+ target/s390x/kvm.c         | 12 ++++++
+ 4 files changed, 64 insertions(+), 40 deletions(-)
 
-And on the Linux kernel side we've also recognized that our current 
-parsing code is handling "s" and "u" incorrectly and that we'll need to 
-fix it:
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 31df465fdc..7f7520bce2 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -41,4 +41,5 @@ typedef struct KVMMemoryListener {
+ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+                                   AddressSpace *as, int as_id);
+ 
++void kvm_set_max_memslot_size(hwaddr max_slot_size);
+ #endif
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f450f25295..8153556335 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -138,6 +138,7 @@ bool kvm_direct_msi_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
+ static bool kvm_immediate_exit;
++static hwaddr kvm_max_slot_size = ~0;
+ 
+ static const KVMCapabilityInfo kvm_required_capabilites[] = {
+     KVM_CAP_INFO(USER_MEMORY),
+@@ -951,6 +952,14 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
+     return NULL;
+ }
+ 
++void kvm_set_max_memslot_size(hwaddr max_slot_size)
++{
++    g_assert(
++        ROUND_UP(max_slot_size, qemu_real_host_page_size) == max_slot_size
++    );
++    kvm_max_slot_size = max_slot_size;
++}
++
+ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                              MemoryRegionSection *section, bool add)
+ {
+@@ -958,7 +967,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+     int err;
+     MemoryRegion *mr = section->mr;
+     bool writeable = !mr->readonly && !mr->rom_device;
+-    hwaddr start_addr, size;
++    hwaddr start_addr, size, slot_size;
+     void *ram;
+ 
+     if (!memory_region_is_ram(mr)) {
+@@ -983,41 +992,52 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+     kvm_slots_lock(kml);
+ 
+     if (!add) {
+-        mem = kvm_lookup_matching_slot(kml, start_addr, size);
+-        if (!mem) {
+-            goto out;
+-        }
+-        if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+-            kvm_physical_sync_dirty_bitmap(kml, section);
+-        }
++        do {
++            slot_size = kvm_max_slot_size < size ? kvm_max_slot_size : size;
++            mem = kvm_lookup_matching_slot(kml, start_addr, slot_size);
++            if (!mem) {
++                goto out;
++            }
++            if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++                kvm_physical_sync_dirty_bitmap(kml, section);
++            }
+ 
+-        /* unregister the slot */
+-        g_free(mem->dirty_bmap);
+-        mem->dirty_bmap = NULL;
+-        mem->memory_size = 0;
+-        mem->flags = 0;
+-        err = kvm_set_user_memory_region(kml, mem, false);
+-        if (err) {
+-            fprintf(stderr, "%s: error unregistering slot: %s\n",
+-                    __func__, strerror(-err));
+-            abort();
+-        }
++            /* unregister the slot */
++            g_free(mem->dirty_bmap);
++            mem->dirty_bmap = NULL;
++            mem->memory_size = 0;
++            mem->flags = 0;
++            err = kvm_set_user_memory_region(kml, mem, false);
++            if (err) {
++                fprintf(stderr, "%s: error unregistering slot: %s\n",
++                        __func__, strerror(-err));
++                abort();
++            }
++            start_addr += slot_size;
++            size -= slot_size;
++        } while (size);
+         goto out;
+     }
+ 
+     /* register the new slot */
+-    mem = kvm_alloc_slot(kml);
+-    mem->memory_size = size;
+-    mem->start_addr = start_addr;
+-    mem->ram = ram;
+-    mem->flags = kvm_mem_flags(mr);
+-
+-    err = kvm_set_user_memory_region(kml, mem, true);
+-    if (err) {
+-        fprintf(stderr, "%s: error registering slot: %s\n", __func__,
+-                strerror(-err));
+-        abort();
+-    }
++    do {
++        slot_size = kvm_max_slot_size < size ? kvm_max_slot_size : size;
++        mem = kvm_alloc_slot(kml);
++        mem->memory_size = slot_size;
++        mem->start_addr = start_addr;
++        mem->ram = ram;
++        mem->flags = kvm_mem_flags(mr);
++
++        err = kvm_set_user_memory_region(kml, mem, true);
++        if (err) {
++            fprintf(stderr, "%s: error registering slot: %s\n", __func__,
++                    strerror(-err));
++            abort();
++        }
++        start_addr += slot_size;
++        ram += slot_size;
++        size -= slot_size;
++    } while (size);
+ 
+ out:
+     kvm_slots_unlock(kml);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 5b6a9a4e55..0c03ffb7c7 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -151,15 +151,6 @@ static void virtio_ccw_register_hcalls(void)
+                                    virtio_ccw_hcall_early_printk);
+ }
+ 
+-/*
+- * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
+- * as the dirty bitmap must be managed by bitops that take an int as
+- * position indicator. If we have a guest beyond that we will split off
+- * new subregions. The split must happen on a segment boundary (1MB).
+- */
+-#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
+-#define SEG_MSK (~0xfffffULL)
+-#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
+ static void s390_memory_init(ram_addr_t mem_size)
+ {
+     MemoryRegion *sysmem = get_system_memory();
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 6e814c230b..6b1428a760 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -28,6 +28,7 @@
+ #include "cpu.h"
+ #include "internal.h"
+ #include "kvm_s390x.h"
++#include "sysemu/kvm_int.h"
+ #include "qapi/error.h"
+ #include "qemu/error-report.h"
+ #include "qemu/timer.h"
+@@ -122,6 +123,16 @@
+ #define VCPU_IRQ_BUF_SIZE(max_cpus) (sizeof(struct kvm_s390_irq) * \
+                                      (max_cpus + NR_LOCAL_IRQS))
+ 
++/*
++ * KVM does only support memory slots up to KVM_MEM_MAX_NR_PAGES pages
++ * as the dirty bitmap must be managed by bitops that take an int as
++ * position indicator. If we have a guest beyond that we will split off
++ * new subregions. The split must happen on a segment boundary (1MB).
++ */
++#define KVM_MEM_MAX_NR_PAGES ((1ULL << 31) - 1)
++#define SEG_MSK (~0xfffffULL)
++#define KVM_SLOT_MAX_BYTES ((KVM_MEM_MAX_NR_PAGES * TARGET_PAGE_SIZE) & SEG_MSK)
++
+ static CPUWatchpoint hw_watchpoint;
+ /*
+  * We don't use a list because this structure is also used to transmit the
+@@ -347,6 +358,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+      */
+     /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
+ 
++    kvm_set_max_memslot_size(KVM_SLOT_MAX_BYTES);
+     return 0;
+ }
+ 
+-- 
+2.18.1
 
-  https://lore.kernel.org/linux-riscv/alpine.DEB.2.21.9999.1908061818360.13971@viisi.sifive.com/
-
-
-- Paul
 
