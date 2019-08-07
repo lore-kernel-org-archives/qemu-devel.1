@@ -2,70 +2,91 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64828C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5314C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:03:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 327E821E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:02:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 327E821E6C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EDD921BF2
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:03:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EJqW5NmA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDD921BF2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNSJ-0002pB-Du
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:02:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47286)
+	id 1hvNTT-0004cV-Uo
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:03:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48053)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hvNQF-00013j-LA
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:00:17 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hvNT4-0004Bs-9k
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:03:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hvNQD-0005kj-DM
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:00:15 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:40554)
+ (envelope-from <alex.bennee@linaro.org>) id 1hvNT2-0007Qn-SB
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:03:10 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55229)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hvNQB-0005j8-Ex
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:00:13 -0400
-Received: by mail-pl1-f193.google.com with SMTP id a93so41164191pla.7
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:00:09 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hvNT2-0007P2-JS
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:03:08 -0400
+Received: by mail-wm1-x342.google.com with SMTP id p74so375821wme.4
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:03:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=GLwuD/7nNH6oo4arkdSDHGaRMItZKY2noIBBPJQsHwM=;
+ b=EJqW5NmAFRNU8GEWOeXYHQjCK8j7BLYxmMkOxlN8FFKMzVE/WKFJFmXlmf3fd1/laB
+ pyLFCczOyndG/lcdUuhquxI1FITQbCAHdS7kiVejwVNcBSupP1ZsprTfPsRBZFk4uoYm
+ OQO34n8eoSs7AYE4B9W8ZeH8IpB8P7MuCKjNOb0WAEQFRsa1EO7z+rGu1avaLNA84i+g
+ V8r+D4xol7uIptXlUaPI9jUEfzPcHx0uBLDYPNxT9lkpA9vFm5Ry9HZcMLTtr5QS5vyL
+ YnNlDU4jnkjsd9PkWORNDZzwyxdfeSg3NJh28lROhIo+oNnDfx0bG1gXCGUmxdcvSFRO
+ /B6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=/z3SaXELBbM1r0WgxX2Aa0ZqhKzjlwWQ5XV4JiXHSQc=;
- b=T+ifxtVXck/HQOtxRcOw8c0P/5ftMopRg4/oNKGho+MQzcQqbau/w25JQj6oAPX3KG
- osd65U6RCp+2tnJxO16qMYk8If5+rW1hvJqfzcEU6ZSz5tXwTZHOmg5CWzFRRGwF4MoY
- pJ8vSKLpyPaI+TkdMXb7k1rZI105XKLC9h+2qTAmVZVuTsvM6hnTLO1+GLw3mKO1XX4G
- H1Pj+hgV5PjVS/VbdWhh2X2fkgFM6KIIyjPfp00SQIWrH2HdaX72CoT3oHtKep8Wa8TP
- SMhAfw722jP+FRk8mhJ0Uxbbe3e44wXSr3Yeiv9JcjHi1kPVXxO5KY7PcvgcMuC6Hgr6
- g2HA==
-X-Gm-Message-State: APjAAAWqEW8Su1zS/LOxEzvbUtHIioof9IAy8dwJaqkxgEVqj5VrgHcX
- o958tJizyQoo7l+fBz7J/UoX4g==
-X-Google-Smtp-Source: APXvYqxpvrcPP1rXQEzW5s408YNpQQayr5I9ZkLIuETds3ak6LOeEHY0CdB/jHuNnjkwjNRqXoe3VA==
-X-Received: by 2002:a62:e815:: with SMTP id c21mr10089381pfi.244.1565190008346; 
- Wed, 07 Aug 2019 08:00:08 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id 64sm93539840pfe.128.2019.08.07.08.00.07
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=GLwuD/7nNH6oo4arkdSDHGaRMItZKY2noIBBPJQsHwM=;
+ b=auVf/09Ag3WFPc5JFlSNCa1pjuNnyt1pKVXGUtAOFzvDmXccC2+cHriqXrignBZlkR
+ 1NHIpoTl+idWWzJPWacuW/fDAI5kRa0dvSy9smKHeoysqtxrKKe/BSxyTfnqzMyut1h6
+ 2Kdp2vBLl4kUEUAqOlNIDVIPLA4o5uHOyxO7S5PaQn+hLFz/W3Pq1Cy8/J5VVQQ03nJn
+ GbAdqh/m0NzUG07YXWDf50xSeIki9WIVH+V6BiPGBlW76TwGMsDG1B0hLAjey/7E8AWo
+ YjpVGHma6imlnp/3GKZzQ+xhO8wCW5JvqT8S8hOu+p06qIneqLsPcHTGOcgVgnBwLT9P
+ lPvA==
+X-Gm-Message-State: APjAAAWe/hmsVcxv81ekF5iv6cmKsvzE/m2Q0f9W2HB0MQhRYixQwXIs
+ PywhanUMmo2WMPJsAAH39oZuxKwIujs=
+X-Google-Smtp-Source: APXvYqzDQM5WRu7xKwHqvBwUr+38WRjluRQ1kckxlqqGNwd2oF66gR9byplnlmCxIgqMA7hpbMFCpw==
+X-Received: by 2002:a1c:e341:: with SMTP id a62mr365928wmh.165.1565190186535; 
+ Wed, 07 Aug 2019 08:03:06 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id c78sm426657wmd.16.2019.08.07.08.03.05
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 07 Aug 2019 08:00:07 -0700 (PDT)
-Date: Wed,  7 Aug 2019 07:59:39 -0700
-Message-Id: <20190807145939.1281-1-palmer@sifive.com>
-X-Mailer: git-send-email 2.21.0
+ Wed, 07 Aug 2019 08:03:05 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 729B61FF87;
+ Wed,  7 Aug 2019 16:03:05 +0100 (BST)
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-2-armbru@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190806151435.10740-2-armbru@redhat.com>
+Date: Wed, 07 Aug 2019 16:03:05 +0100
+Message-ID: <87k1bphvbq.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@sifive.com>
-To: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.214.193
-Subject: [Qemu-devel] [PATCH for 4.1] RISC-V: Ignore the S and U extensions
- when formatting ISA strings
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v2 01/29] include: Make headers more
+ self-contained
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,60 +98,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Atish Patra <Atish.Patra@wdc.com>, Palmer Dabbelt <palmer@sifive.com>,
- qemu-devel@nongnu.org, Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ISA strings we're providing from QEMU aren't actually legal RISC-V
-ISA strings, as both the S and U extensions cannot exist as
-single-letter extensions and must instead be multi-letter strings.
-We're still using the ISA strings inside QEMU to track the availiable
-extensions, so this patch just strips out the S and U extensions when
-formatting ISA strings.
 
-This boots Linux on top of 4.1-rc3, which no longer has the U extension
-in /proc/cpuinfo.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
-This is another late one, but I'd like to target it for 4.1 as we're
-providing illegal ISA strings and I don't want to bake that into a bunch
-of other code.
----
- target/riscv/cpu.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+> Back in 2016, we discussed[1] rules for headers, and these were
+> generally liked:
+>
+> 1. Have a carefully curated header that's included everywhere first.  We
+>    got that already thanks to Peter: osdep.h.
+>
+> 2. Headers should normally include everything they need beyond osdep.h.
+>    If exceptions are needed for some reason, they must be documented in
+>    the header.  If all that's needed from a header is typedefs, put
+>    those into qemu/typedefs.h instead of including the header.
+>
+> 3. Cyclic inclusion is forbidden.
+>
+> This patch gets include/ closer to obeying 2.
+>
+> It's actually extracted from my "[RFC] Baby steps towards saner
+> headers" series[2], which demonstrates a possible path towards
+> checking 2 automatically.  It passes the RFC test there.
+>
+> [1] Message-ID: <87h9g8j57d.fsf@blackfin.pond.sub.org>
+>     https://lists.nongnu.org/archive/html/qemu-devel/2016-03/msg03345.html
+> [2] Message-Id: <20190711122827.18970-1-armbru@redhat.com>
+>     https://lists.nongnu.org/archive/html/qemu-devel/2019-07/msg02715.html
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+<snip>
+>  include/exec/cputlb.h                 | 2 ++
+>  include/exec/exec-all.h               | 1 +
+>  include/exec/ioport.h                 | 2 ++
+>  include/exec/memory-internal.h        | 2 ++
+>  include/exec/ram_addr.h               | 1 +
+>  include/exec/softmmu-semi.h           | 2 ++
+>  include/exec/tb-hash.h                | 2 ++
+>  include/exec/user/thunk.h             | 1 +
+>  include/fpu/softfloat-macros.h        | 2 ++
+<snip>
+>
+>  /*
+>   * bdrv_write_threshold_set:
+> diff --git a/include/disas/disas.h b/include/disas/disas.h
+> index 15da511f49..ba47e9197c 100644
+> --- a/include/disas/disas.h
+> +++ b/include/disas/disas.h
+> @@ -1,6 +1,7 @@
+>  #ifndef QEMU_DISAS_H
+>  #define QEMU_DISAS_H
+>
+> +#include "exec/hwaddr.h"
+>
+>  #ifdef NEED_CPU_H
+>  #include "cpu.h"
+> diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
+> index 5373188be3..23abd71579 100644
+> --- a/include/exec/cputlb.h
+> +++ b/include/exec/cputlb.h
+> @@ -19,6 +19,8 @@
+>  #ifndef CPUTLB_H
+>  #define CPUTLB_H
+>
+> +#include "exec/cpu-common.h"
+> +
+>  #if !defined(CONFIG_USER_ONLY)
+>  /* cputlb.c */
+>  void tlb_protect_code(ram_addr_t ram_addr);
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 16034ee651..135aeaab0d 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -20,6 +20,7 @@
+>  #ifndef EXEC_ALL_H
+>  #define EXEC_ALL_H
+>
+> +#include "cpu.h"
+>  #include "exec/tb-context.h"
+>  #include "sysemu/cpus.h"
+>
+> diff --git a/include/exec/ioport.h b/include/exec/ioport.h
+> index a298b89ce1..97feb296d2 100644
+> --- a/include/exec/ioport.h
+> +++ b/include/exec/ioport.h
+> @@ -24,6 +24,8 @@
+>  #ifndef IOPORT_H
+>  #define IOPORT_H
+>
+> +#include "exec/memory.h"
+> +
+>  #define MAX_IOPORTS     (64 * 1024)
+>  #define IOPORTS_MASK    (MAX_IOPORTS - 1)
+>
+> diff --git a/include/exec/memory-internal.h b/include/exec/memory-interna=
+l.h
+> index d1a9dd1ec8..ef4fb92371 100644
+> --- a/include/exec/memory-internal.h
+> +++ b/include/exec/memory-internal.h
+> @@ -20,6 +20,8 @@
+>  #ifndef MEMORY_INTERNAL_H
+>  #define MEMORY_INTERNAL_H
+>
+> +#include "cpu.h"
+> +
+>  #ifndef CONFIG_USER_ONLY
+>  static inline AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv)
+>  {
+> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> index b7b2e60ff6..a327a80cfe 100644
+> --- a/include/exec/ram_addr.h
+> +++ b/include/exec/ram_addr.h
+> @@ -20,6 +20,7 @@
+>  #define RAM_ADDR_H
+>
+>  #ifndef CONFIG_USER_ONLY
+> +#include "cpu.h"
+>  #include "hw/xen/xen.h"
+>  #include "sysemu/tcg.h"
+>  #include "exec/ramlist.h"
+> diff --git a/include/exec/softmmu-semi.h b/include/exec/softmmu-semi.h
+> index 970837992e..fbcae88f4b 100644
+> --- a/include/exec/softmmu-semi.h
+> +++ b/include/exec/softmmu-semi.h
+> @@ -10,6 +10,8 @@
+>  #ifndef SOFTMMU_SEMI_H
+>  #define SOFTMMU_SEMI_H
+>
+> +#include "cpu.h"
+> +
+>  static inline uint64_t softmmu_tget64(CPUArchState *env, target_ulong ad=
+dr)
+>  {
+>      uint64_t val;
+> diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
+> index 4f3a37d927..805235d321 100644
+> --- a/include/exec/tb-hash.h
+> +++ b/include/exec/tb-hash.h
+> @@ -20,6 +20,8 @@
+>  #ifndef EXEC_TB_HASH_H
+>  #define EXEC_TB_HASH_H
+>
+> +#include "exec/cpu-defs.h"
+> +#include "exec/exec-all.h"
+>  #include "qemu/xxhash.h"
+>
+>  #ifdef CONFIG_SOFTMMU
+> diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+> index 8d3af5a3be..d05a8a4dab 100644
+> --- a/include/exec/user/thunk.h
+> +++ b/include/exec/user/thunk.h
+> @@ -20,6 +20,7 @@
+>  #define THUNK_H
+>
+>  #include "cpu.h"
+> +#include "exec/user/abitypes.h"
+>
+>  /* types enums definitions */
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index f8d07bd20ad7..4df14433d789 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -501,7 +501,22 @@ char *riscv_isa_string(RISCVCPU *cpu)
-     char *p = isa_str + snprintf(isa_str, maxlen, "rv%d", TARGET_LONG_BITS);
-     for (i = 0; i < sizeof(riscv_exts); i++) {
-         if (cpu->env.misa & RV(riscv_exts[i])) {
--            *p++ = qemu_tolower(riscv_exts[i]);
-+            char lower = qemu_tolower(riscv_exts[i]);
-+            switch (lower) {
-+            case 's':
-+            case 'u':
-+                /*
-+                 * The 's' and 'u' extensions shouldn't be passed in the device
-+                 * tree, but we still use them internally to track extension
-+                 * sets.  Here we just explicitly remove them when formatting
-+                 * an ISA string.
-+                 */
-+                break;
-+
-+            default:
-+                *p++ = qemu_tolower(riscv_exts[i]);
-+                break;
-+            }
-         }
-     }
-     *p = '\0';
--- 
-2.21.0
+These all seem OK.
 
+>
+> diff --git a/include/fpu/softfloat-macros.h b/include/fpu/softfloat-macro=
+s.h
+> index c55aa6d174..be83a833ec 100644
+> --- a/include/fpu/softfloat-macros.h
+> +++ b/include/fpu/softfloat-macros.h
+> @@ -82,6 +82,8 @@ this code that are retained.
+>  #ifndef FPU_SOFTFLOAT_MACROS_H
+>  #define FPU_SOFTFLOAT_MACROS_H
+>
+> +#include "fpu/softfloat.h"
+> +
+
+What does softfloat-macros actually need from the core softfloat API?
+These are lower level functions used by softfloat itself (and m68k for
+it's own bit fiddling).
+
+--
+Alex Benn=C3=A9e
 
