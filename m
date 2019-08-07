@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F40B2C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1B4C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:17:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBBCD21E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:15:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBBCD21E6C
+	by mail.kernel.org (Postfix) with ESMTPS id 7844B21BF6
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:17:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7844B21BF6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvMjK-0007Pe-1Y
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:15:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36652)
+	id 1hvMkP-00019x-Of
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:17:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36702)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg8-0007oq-Qc
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:37 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hvMgA-0007v2-DP
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg7-0003Kr-Hh
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:40642)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg8-0003MP-Kx
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:38 -0400
+Received: from relay.sw.ru ([185.231.240.75]:40628)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hvMg4-0003D1-Bj; Wed, 07 Aug 2019 10:12:32 -0400
+ id 1hvMg4-0003Cv-9n; Wed, 07 Aug 2019 10:12:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1hvMfz-0005oH-T2; Wed, 07 Aug 2019 17:12:27 +0300
+ id 1hvMg0-0005oH-5i; Wed, 07 Aug 2019 17:12:28 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Wed,  7 Aug 2019 17:12:21 +0300
-Message-Id: <20190807141226.193501-6-vsementsov@virtuozzo.com>
+Date: Wed,  7 Aug 2019 17:12:24 +0300
+Message-Id: <20190807141226.193501-9-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190807141226.193501-1-vsementsov@virtuozzo.com>
 References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v4 05/10] block/qcow2-bitmap: get rid of
- bdrv_has_changed_persistent_bitmaps
+Subject: [Qemu-devel] [PATCH v4 08/10] iotests: add test 260 to check bitmap
+ life after snapshot + commit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,110 +64,178 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Firstly, no reason to optimize failure path. Then, function name is
-ambiguous: it checks for readonly and similar things, but someone may
-think that it will ignore normal bitmaps which was just unchanged, and
-this is in bad relation with the fact that we should drop IN_USE flag
-for unchanged bitmaps in the image.
+Two testcases with persistent bitmaps are not added here, as there are
+bugs to be fixed soon.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- include/block/dirty-bitmap.h |  1 -
- block/dirty-bitmap.c         | 12 ------------
- block/qcow2-bitmap.c         | 23 +++++++++++++----------
- 3 files changed, 13 insertions(+), 23 deletions(-)
+ tests/qemu-iotests/260     | 87 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/260.out | 52 +++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 140 insertions(+)
+ create mode 100755 tests/qemu-iotests/260
+ create mode 100644 tests/qemu-iotests/260.out
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 62682eb865..acca86d0fc 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -104,7 +104,6 @@ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
- bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_get_persistence(BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap);
--bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap);
- char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 95a9c2a5d8..2e0cecf5ff 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -774,18 +774,6 @@ bool bdrv_dirty_bitmap_inconsistent(const BdrvDirtyBitmap *bitmap)
-     return bitmap->inconsistent;
- }
- 
--bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs)
--{
--    BdrvDirtyBitmap *bm;
--    QLIST_FOREACH(bm, &bs->dirty_bitmaps, list) {
--        if (bm->persistent && !bm->readonly && !bm->migration) {
--            return true;
--        }
--    }
--
--    return false;
--}
--
- BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
-                                         BdrvDirtyBitmap *bitmap)
- {
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b2487101ed..60b79f1dac 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1456,16 +1456,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-     Qcow2Bitmap *bm;
-     QSIMPLEQ_HEAD(, Qcow2BitmapTable) drop_tables;
-     Qcow2BitmapTable *tb, *tb_next;
--
--    if (!bdrv_has_changed_persistent_bitmaps(bs)) {
--        /* nothing to do */
--        return;
--    }
--
--    if (!can_write(bs)) {
--        error_setg(errp, "No write access");
--        return;
--    }
-+    bool need_write = false;
- 
-     QSIMPLEQ_INIT(&drop_tables);
- 
-@@ -1493,6 +1484,8 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-             continue;
-         }
- 
-+        need_write = true;
+diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
+new file mode 100755
+index 0000000000..d8fcf4567a
+--- /dev/null
++++ b/tests/qemu-iotests/260
+@@ -0,0 +1,87 @@
++#!/usr/bin/env python
++#
++# Tests for temporary external snapshot when we have bitmaps.
++#
++# Copyright (c) 2019 Virtuozzo International GmbH. All rights reserved.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-         if (check_constraints_on_bitmap(bs, name, granularity, errp) < 0) {
-             error_prepend(errp, "Bitmap '%s' doesn't satisfy the constraints: ",
-                           name);
-@@ -1531,6 +1524,15 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         bm->dirty_bitmap = bitmap;
-     }
- 
-+    if (!need_write) {
-+        goto success;
-+    }
++import iotests
++from iotests import qemu_img_create, file_path, log
 +
-+    if (!can_write(bs)) {
-+        error_setg(errp, "No write access");
-+        goto fail;
-+    }
++iotests.verify_image_format(supported_fmts=['qcow2'])
 +
-     /* allocate clusters and store bitmaps */
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-         if (bm->dirty_bitmap == NULL) {
-@@ -1572,6 +1574,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-     }
- 
-+success:
-     bitmap_list_free(bm_list);
-     return;
- 
++base, top = file_path('base', 'top')
++size = 64 * 1024 * 3
++
++
++def print_bitmap(msg, vm):
++    result = vm.qmp('query-block')['return'][0]
++    if 'dirty-bitmaps' in result:
++        bitmap = result['dirty-bitmaps'][0]
++        log('{}: name={} dirty-clusters={}'.format(msg, bitmap['name'],
++            bitmap['count'] // 64 // 1024))
++    else:
++        log(msg + ': not found')
++
++
++def test(persistent, restart):
++    assert persistent or not restart
++    log("\nTestcase {}persistent {} restart\n".format(
++            '' if persistent else 'non-', 'with' if restart else 'without'))
++
++    qemu_img_create('-f', iotests.imgfmt, base, str(size))
++
++    vm = iotests.VM().add_drive(base)
++    vm.launch()
++
++    vm.qmp_log('block-dirty-bitmap-add', node='drive0', name='bitmap0',
++               persistent=persistent)
++    vm.hmp_qemu_io('drive0', 'write 0 64K')
++    print_bitmap('initial bitmap', vm)
++
++    vm.qmp_log('blockdev-snapshot-sync', device='drive0', snapshot_file=top,
++               format=iotests.imgfmt, filters=[iotests.filter_qmp_testfiles])
++    vm.hmp_qemu_io('drive0', 'write 64K 512')
++    print_bitmap('check that no bitmaps are in snapshot', vm)
++
++    if restart:
++        log("... Restart ...")
++        vm.shutdown()
++        vm = iotests.VM().add_drive(top)
++        vm.launch()
++
++    vm.qmp_log('block-commit', device='drive0', top=top,
++               filters=[iotests.filter_qmp_testfiles])
++    ev = vm.events_wait_log((('BLOCK_JOB_READY', None),
++                             ('BLOCK_JOB_COMPLETED', None)))
++    if (ev['event'] == 'BLOCK_JOB_COMPLETED'):
++        vm.shutdown()
++        log(vm.get_log())
++        exit()
++
++    vm.qmp_log('block-job-complete', device='drive0')
++    vm.event_wait_log('BLOCK_JOB_COMPLETED')
++    print_bitmap('check bitmap after commit', vm)
++
++    vm.hmp_qemu_io('drive0', 'write 128K 64K')
++    print_bitmap('check updated bitmap', vm)
++
++    vm.shutdown()
++
++
++test(persistent=False, restart=False)
++test(persistent=True, restart=False)
++test(persistent=True, restart=True)
+diff --git a/tests/qemu-iotests/260.out b/tests/qemu-iotests/260.out
+new file mode 100644
+index 0000000000..2f0d98d036
+--- /dev/null
++++ b/tests/qemu-iotests/260.out
+@@ -0,0 +1,52 @@
++
++Testcase non-persistent without restart
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": false}}
++{"return": {}}
++initial bitmap: name=bitmap0 dirty-clusters=1
++{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
++{"return": {}}
++check that no bitmaps are in snapshot: not found
++{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
++{"return": {}}
++{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
++{"return": {}}
++{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++check bitmap after commit: name=bitmap0 dirty-clusters=2
++check updated bitmap: name=bitmap0 dirty-clusters=3
++
++Testcase persistent without restart
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": true}}
++{"return": {}}
++initial bitmap: name=bitmap0 dirty-clusters=1
++{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
++{"return": {}}
++check that no bitmaps are in snapshot: not found
++{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
++{"return": {}}
++{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
++{"return": {}}
++{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++check bitmap after commit: name=bitmap0 dirty-clusters=2
++check updated bitmap: name=bitmap0 dirty-clusters=3
++
++Testcase persistent with restart
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"name": "bitmap0", "node": "drive0", "persistent": true}}
++{"return": {}}
++initial bitmap: name=bitmap0 dirty-clusters=1
++{"execute": "blockdev-snapshot-sync", "arguments": {"device": "drive0", "format": "qcow2", "snapshot-file": "TEST_DIR/PID-top"}}
++{"return": {}}
++check that no bitmaps are in snapshot: not found
++... Restart ...
++{"execute": "block-commit", "arguments": {"device": "drive0", "top": "TEST_DIR/PID-top"}}
++{"return": {}}
++{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"execute": "block-job-complete", "arguments": {"device": "drive0"}}
++{"return": {}}
++{"data": {"device": "drive0", "len": 65536, "offset": 65536, "speed": 0, "type": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++check bitmap after commit: name=bitmap0 dirty-clusters=2
++check updated bitmap: name=bitmap0 dirty-clusters=3
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index f13e5f2e23..06f1ea904c 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -271,3 +271,4 @@
+ 254 rw backing quick
+ 255 rw quick
+ 256 rw quick
++260 rw auto quick
 -- 
 2.18.0
 
