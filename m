@@ -2,85 +2,72 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87742C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C42C32754
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:31:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D95E21E6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:30:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D95E21E6B
+	by mail.kernel.org (Postfix) with ESMTPS id 636372086D
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:31:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 636372086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvJDP-0000k9-N8
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:30:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44544)
+	id 1hvJET-0001qz-JX
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:31:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44613)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvJD0-0000Ew-Rm
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:30:19 -0400
+ (envelope-from <bounces@canonical.com>) id 1hvJDp-00013i-EF
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:31:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvJCz-0006Tp-QY
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:30:18 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40592)
+ (envelope-from <bounces@canonical.com>) id 1hvJDn-0006qY-FY
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:31:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53378)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvJCz-0006TU-Km
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:30:17 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r1so90771838wrl.7
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:30:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UM5YvCew+HQNPMQHOpJg9h3QnMPIpS38TT8+gIz4DCg=;
- b=rwmR8sXsVaF1klIJatuqKw4Xm8wrkAq6F4lPL3mPqweo4age6adnUeAGHFd7owPfFp
- lxAMmM25qziEyXT4VmelWsw1abl24LWMbKD0DbwqMKqVBMk7EEwYHD0+yXDCczZBC3u7
- Z5xpk7i2IPox3hm/E1bgwwXyqW0hapYeExr9lbKCxOKuc98BUpvYHxUZDyg3I/QMjpmA
- PkZrIJ32KcvmURyxegLnkKVJZg88wMCM7bGYTH75mMJF0b/peKuWWf/iqIhXANsYh9Ph
- U06EKhI7U3RyM6ikV+aSe5Vyv7lLoVKSkuDIkSd/jthsxo78jglbDe64JyO1qmSAKm5m
- /47g==
-X-Gm-Message-State: APjAAAUzya/cZ77RN7vG+qtwUHWnzaq1QLuMkYDZwJHbtIHFWPHh0j6O
- bMGlw6DfWRifKt84gv7QCpiAeJDZEyQ=
-X-Google-Smtp-Source: APXvYqyUPkkIsEuOcD+mN4yZxUWTskeczD4JB2gKkmcO6boKgj6vqlrswrVOaaC65OkYzN/rqKyKfg==
-X-Received: by 2002:adf:eb4e:: with SMTP id u14mr9922394wrn.168.1565173816417; 
- Wed, 07 Aug 2019 03:30:16 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id u6sm87439734wml.9.2019.08.07.03.30.15
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 03:30:15 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-8-armbru@redhat.com>
- <20190807093222.GE13267@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <e9cf5ea6-8699-d527-cb52-8d497706c299@redhat.com>
-Date: Wed, 7 Aug 2019 12:30:15 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hvJDl-0006oX-HP
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:31:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hvJDh-0002KX-7J
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 10:31:01 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F197C2E80CB
+ for <qemu-devel@nongnu.org>; Wed,  7 Aug 2019 10:31:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20190807093222.GE13267@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 07 Aug 2019 10:18:39 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bjoern-teipel dgilbert-h
+X-Launchpad-Bug-Reporter: Bjoern Teipel (bjoern-teipel)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <156460681322.6584.3709701644111615718.malonedeb@soybean.canonical.com>
+Message-Id: <156517311944.16542.4521636132971914031.malone@soybean.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19015";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 767927b6501af597b1fd23b2b378e90b91f2ddc4
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.66
-Subject: Re: [Qemu-devel] [PATCH v2 07/29] trace: Do not include qom/cpu.h
- into generated trace.h
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1838569] Re: virtio-balloon change breaks post
+ 4.0 upgrade
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,57 +76,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1838569 <1838569@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/7/19 11:32 AM, Stefan Hajnoczi wrote:
-> On Tue, Aug 06, 2019 at 05:14:13PM +0200, Markus Armbruster wrote:
->> docs/devel/tracing.txt explains "since many source files include
->> trace.h, [the generated trace.h use] a minimum of types and other
->> header files included to keep the namespace clean and compile times
->> and dependencies down."
->>
->> Commit 4815185902 "trace: Add per-vCPU tracing states for events with
->> the 'vcpu' property" made them all include qom/cpu.h via
->> control-internal.h.  qom/cpu.h in turn includes about thirty headers.
->> Ouch.
->>
->> Per-vCPU tracing is currently not supported in sub-directories'
->> trace-events.  In other words, qom/cpu.h can only be used in
->> trace-root.h, not in any trace.h.
->>
->> Split trace/control-vcpu.h off trace/control.h and
->> trace/control-internal.h.  Have the generated trace.h include
->> trace/control.h (which no longer includes qom/cpu.h), and trace-root.h
->> include trace/control-vcpu.h (which includes it).
->>
->> The resulting improvement is a bit disappointing: in my "build
->> everything" tree, some 1100 out of 6600 objects (not counting tests
->> and objects that don't depend on qemu/osdep.h) depend on a trace.h,
->> and about 600 of them no longer depend on qom/cpu.h.  But more than
->> 1300 others depend on trace-root.h.  More work is clearly needed.
->> Left for another day.
->>
->> Cc: Stefan Hajnoczi <stefanha@redhat.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  block/block-backend.c         |  1 +
->>  qom/object.c                  |  1 +
->>  scripts/tracetool/format/c.py |  1 +
->>  scripts/tracetool/format/h.py |  7 +++-
->>  trace/control-internal.h      | 25 --------------
->>  trace/control-vcpu.h          | 63 +++++++++++++++++++++++++++++++++++
->>  trace/control.h               | 24 -------------
->>  trace/qmp.c                   |  2 +-
->>  ui/vnc.c                      |  1 +
->>  9 files changed, 74 insertions(+), 51 deletions(-)
->>  create mode 100644 trace/control-vcpu.h
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Hi Bjoern,
+  I don't think this is the same bug as the one you reference; that's a con=
+fig space disagreement, not a virtio queue disagreeement.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+It almost feels like the old 4a1e48becab81020adfb74b22c76a595f2d02a01
+stats migration fix; but that went in with 2.8 so shouldn't be a problem
+going 2.10 to 2.11
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1838569
+
+Title:
+  virtio-balloon change breaks post 4.0 upgrade
+
+Status in QEMU:
+  New
+
+Bug description:
+  We upgraded the libvirt UCA packages from 3.6 to 4.0 and qemu 2.10 to 2.1=
+1  as part of a queens upgrade and noticed that
+  virtio-ballon is broken when instances live migrate (started with a prior=
+ 3.6 version)  with:
+
+  2019-07-24T06:46:49.487109Z qemu-system-x86_64: warning: Unknown firmware=
+ file in legacy mode: etc/msr_feature_control
+  2019-07-24T06:47:22.187749Z qemu-system-x86_64: VQ 2 size 0x80 < last_ava=
+il_idx 0xb57 - used_idx 0xb59
+  2019-07-24T06:47:22.187768Z qemu-system-x86_64: Failed to load virtio-bal=
+loon:virtio
+  2019-07-24T06:47:22.187771Z qemu-system-x86_64: error while loading state=
+ for instance 0x0 of device '0000:00:05.0/virtio-balloon'
+  2019-07-24T06:47:22.188194Z qemu-system-x86_64: load of migration failed:=
+ Operation not permitted
+  2019-07-24 06:47:22.430+0000: shutting down, reason=3Dfailed
+
+  This seem to be the exact problem as reported by
+  https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg02228.html
+
+  Listed the packages which changed:
+
+  Start-Date: 2019-07-06  06:40:55
+  Commandline: /usr/bin/apt-get -y -o Dpkg::Options::=3D--force-confdef -o =
+Dpkg::Options::=3D--force-confold install libvirt-bin python-libvirt qemu q=
+emu-utils qemu-system qemu-system-arm qemu-system-mips qemu-system-ppc qemu=
+-system-sparc qemu-system-x86 qemu-system-misc qemu-block-extra qemu-utils =
+qemu-user qemu-kvm
+  Install: librdmacm1:amd64 (17.1-1ubuntu0.1~cloud0, automatic), libvirt-da=
+emon-driver-storage-rbd:amd64 (4.0.0-1ubuntu8.10~cloud0, automatic), ipxe-q=
+emu-256k-compat-efi-roms:amd64 (1.0.0+git-20150424.a25a16d-0ubuntu2~cloud0,=
+ automatic)
+  Upgrade: qemu-system-mips:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+df=
+sg-1ubuntu7.13~cloud0), qemu-system-misc:amd64 (1:2.10+dfsg-0ubuntu3.8~clou=
+d1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-ppc:amd64 (1:2.10+dfsg-0ub=
+untu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), python-libvirt:amd64 (3.5.=
+0-1build1~cloud0, 4.0.0-1~cloud0), qemu-system-x86:amd64 (1:2.10+dfsg-0ubun=
+tu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-clients:amd64 (3.6.0=
+-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-user:amd64 (1:2.10+dfsg=
+-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-bin:amd64 (3.6=
+.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu:amd64 (1:2.10+dfsg-0u=
+buntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-utils:amd64 (1:2.10+=
+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon-sys=
+tem:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0), qemu-system-=
+sparc:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0)=
+, qemu-user-binfmt:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubunt=
+u7.13~cloud0), qemu-kvm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1=
+ubuntu7.13~cloud0), libvirt0:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8=
+.10~cloud0), qemu-system-arm:amd64 (1:2.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+d=
+fsg-1ubuntu7.13~cloud0), qemu-block-extra:amd64 (1:2.10+dfsg-0ubuntu3.8~clo=
+ud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system-common:amd64 (1:2.10+dfsg=
+-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), qemu-system:amd64 (1:2=
+.10+dfsg-0ubuntu3.8~cloud1, 1:2.11+dfsg-1ubuntu7.13~cloud0), libvirt-daemon=
+:amd64 (3.6.0-1ubuntu6.8~cloud0, 4.0.0-1ubuntu8.10~cloud0)
+  End-Date: 2019-07-06  06:41:08
+
+  At this point the instances would have to be hard rebooted or
+  stopped/started to fix the issue for future live migration attemps
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1838569/+subscriptions
 
