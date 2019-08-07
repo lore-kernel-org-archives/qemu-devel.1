@@ -6,48 +6,50 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28277C19759
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 837D5C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:36:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3F17229F7
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:35:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3F17229F7
+	by mail.kernel.org (Postfix) with ESMTPS id 5A2AD229F5
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:36:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A2AD229F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvHPY-0005y3-9H
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:35:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44978)
+	id 1hvHQX-0007sT-LW
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:36:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45676)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hvHMH-0007jn-Da
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:31:47 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hvHOo-0004aK-1S
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:34:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hvHME-0002A3-LD
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:31:45 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.234]:36079)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <tony.nguyen@bt.com>) id 1hvHOi-0003Wd-BQ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:34:21 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.72]:22696)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hvHM3-000220-EU; Wed, 07 Aug 2019 04:31:31 -0400
+ id 1hvHNo-0002tF-T3; Wed, 07 Aug 2019 04:33:22 -0400
+Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ BWP09926077.bt.com (10.36.82.108) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Wed, 7 Aug
+ 2019 09:32:54 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- RDW083A012ED68.bt.com (10.187.98.38) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 7 Aug 2019 09:31:06 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 09:31:28 +0100
+ tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 09:33:15 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Wed, 7 Aug 2019
- 09:31:28 +0100
+ 09:33:15 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v6 16/26] exec: Map device_endian onto MemOp
-Thread-Index: AQHVTPqBizwOZ0pOOka1lx5iTeYAMw==
-Date: Wed, 7 Aug 2019 08:31:28 +0000
-Message-ID: <1565166687895.25037@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v6 20/26] memory: Access MemoryRegion with
+ endianness
+Thread-Index: AQHVTPrBMLYYco2250O7I7O3jldIgg==
+Date: Wed, 7 Aug 2019 08:33:15 +0000
+Message-ID: <1565166794966.57397@bt.com>
 References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -57,13 +59,13 @@ X-MS-TNEF-Correlator:
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.44]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 62.239.224.234
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.72
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel]  [PATCH v6 16/26] exec: Map device_endian onto MemOp
+Subject: [Qemu-devel] [PATCH v6 20/26] memory: Access MemoryRegion with
+ endianness
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,90 +108,189 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Preparation to replace device_endian with MemOp.
+Preparation for collapsing the two byte swaps adjust_endianness and
+handle_bswap into the former.
 
-Mapping device_endian onto MemOp limits behaviour changes to this
-relatively smaller patch.
+Call memory_region_dispatch_{read|write} with endianness encoded into
+the "MemOp op" operand.
 
-The next patch will replace all device_endian usages with the
-equivalent MemOp. That patch will be large but have no behaviour
-changes.
+This patch does not change any behaviour as
+memory_region_dispatch_{read|write} is yet to handle the endianness.
 
-A subsequent patch will then delete unused device_endian.
+Once it does handle endianness, callers with byte swaps need to
+collapse them into adjust_endianness.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- hw/char/serial.c          | 18 ++++++------------
- include/exec/cpu-common.h | 10 +++++++---
- 2 files changed, 13 insertions(+), 15 deletions(-)
+ hw/s390x/s390-pci-inst.c |  3 ++-
+ hw/virtio/virtio-pci.c   |  2 ++
+ include/exec/memop.h     |  4 ++++
+ memory_ldst.inc.c        | 20 +++++++++++++-------
+ target/mips/op_helper.c  |  4 ++--
+ 5 files changed, 23 insertions(+), 10 deletions(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 7c42a2a..7345f69 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -1012,22 +1012,15 @@ static void serial_mm_write(void *opaque, hwaddr ad=
-dr,
-     serial_ioport_write(s, addr >> s->it_shift, value, 1);
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index 0e92a37..d322b86 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -782,7 +782,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8=
+_t r3, uint64_t gaddr,
+     for (i =3D 0; i < len / 8; i++) {
+         result =3D memory_region_dispatch_write(mr, offset + i * 8,
+                                               ldq_p(buffer + i * 8),
+-                                              MO_64, MEMTXATTRS_UNSPECIFIE=
+D);
++                                              MO_64 | MO_TE,
++                                              MEMTXATTRS_UNSPECIFIED);
+         if (result !=3D MEMTX_OK) {
+             s390_program_interrupt(env, PGM_OPERAND, 6, ra);
+             return 0;
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index b929e44..70eb161 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -551,6 +551,7 @@ void virtio_address_space_write(VirtIOPCIProxy *proxy, =
+hwaddr addr,
+         /* As length is under guest control, handle illegal values. */
+         return;
+     }
++    /* FIXME: memory_region_dispatch_write ignores MO_BSWAP.  */
+     memory_region_dispatch_write(mr, addr, val, size_memop(len),
+                                  MEMTXATTRS_UNSPECIFIED);
  }
+@@ -575,6 +576,7 @@ virtio_address_space_read(VirtIOPCIProxy *proxy, hwaddr=
+ addr,
+     /* Make sure caller aligned buf properly */
+     assert(!(((uintptr_t)buf) & (len - 1)));
 
--static const MemoryRegionOps serial_mm_ops[3] =3D {
--    [DEVICE_NATIVE_ENDIAN] =3D {
--        .read =3D serial_mm_read,
--        .write =3D serial_mm_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
--        .valid.max_access_size =3D 8,
--        .impl.max_access_size =3D 8,
--    },
--    [DEVICE_LITTLE_ENDIAN] =3D {
-+static const MemoryRegionOps serial_mm_ops[2] =3D {
-+    [0] =3D {
-         .read =3D serial_mm_read,
-         .write =3D serial_mm_write,
-         .endianness =3D DEVICE_LITTLE_ENDIAN,
-         .valid.max_access_size =3D 8,
-         .impl.max_access_size =3D 8,
-     },
--    [DEVICE_BIG_ENDIAN] =3D {
-+    [1] =3D {
-         .read =3D serial_mm_read,
-         .write =3D serial_mm_write,
-         .endianness =3D DEVICE_BIG_ENDIAN,
-@@ -1053,8 +1046,9 @@ SerialState *serial_mm_init(MemoryRegion *address_spa=
-ce,
-     serial_realize_core(s, &error_fatal);
-     vmstate_register(NULL, base, &vmstate_serial, s);
-
--    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
--                          "serial", 8 << it_shift);
-+    memory_region_init_io(&s->io, NULL,
-+                          &serial_mm_ops[end =3D=3D DEVICE_LITTLE_ENDIAN ?=
- 0 : 1],
-+                          s, "serial", 8 << it_shift);
-     memory_region_add_subregion(address_space, base, &s->io);
-     return s;
- }
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index f7dbe75..c388453 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -16,10 +16,14 @@ void tcg_flush_softmmu_tlb(CPUState *cs);
-
- #if !defined(CONFIG_USER_ONLY)
-
-+#include "exec/memop.h"
-+
- enum device_endian {
--    DEVICE_NATIVE_ENDIAN,
--    DEVICE_BIG_ENDIAN,
--    DEVICE_LITTLE_ENDIAN,
++    /* FIXME: memory_region_dispatch_read ignores MO_BSWAP.  */
+     memory_region_dispatch_read(mr, addr, &val, size_memop(len),
+                                 MEMTXATTRS_UNSPECIFIED);
+     switch (len) {
+diff --git a/include/exec/memop.h b/include/exec/memop.h
+index 4a4212d..47a5500 100644
+--- a/include/exec/memop.h
++++ b/include/exec/memop.h
+@@ -122,7 +122,11 @@ static inline MemOp size_memop(unsigned size)
+     /* Power of 2 up to 8.  */
+     assert((size & (size - 1)) =3D=3D 0 && size >=3D 1 && size <=3D 8);
+ #endif
 +#ifdef NEED_CPU_H
-+    DEVICE_NATIVE_ENDIAN =3D MO_TE,
++    return ctz32(size) | MO_TE;
++#else
+     return ctz32(size);
 +#endif
-+    DEVICE_BIG_ENDIAN =3D MO_BE,
-+    DEVICE_LITTLE_ENDIAN =3D MO_LE,
- };
+ }
 
- #if defined(HOST_WORDS_BIGENDIAN)
+ #endif
+diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+index d7e28d0..ff28b30 100644
+--- a/memory_ldst.inc.c
++++ b/memory_ldst.inc.c
+@@ -37,7 +37,8 @@ static inline uint32_t glue(address_space_ldl_internal, S=
+UFFIX)(ARG1_DECL,
+         release_lock |=3D prepare_mmio_access(mr);
+
+         /* I/O case */
+-        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_32, attrs);
++        /* FIXME: memory_region_dispatch_read ignores MO_BSWAP.  */
++        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_32 | endian,=
+ attrs);
+ #if defined(TARGET_WORDS_BIGENDIAN)
+         if (endian =3D=3D MO_LE) {
+             val =3D bswap32(val);
+@@ -112,7 +113,8 @@ static inline uint64_t glue(address_space_ldq_internal,=
+ SUFFIX)(ARG1_DECL,
+         release_lock |=3D prepare_mmio_access(mr);
+
+         /* I/O case */
+-        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_64, attrs);
++        /* FIXME: memory_region_dispatch_read ignores MO_BSWAP.  */
++        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_64 | endian,=
+ attrs);
+ #if defined(TARGET_WORDS_BIGENDIAN)
+         if (endian =3D=3D MO_LE) {
+             val =3D bswap64(val);
+@@ -221,7 +223,8 @@ static inline uint32_t glue(address_space_lduw_internal=
+, SUFFIX)(ARG1_DECL,
+         release_lock |=3D prepare_mmio_access(mr);
+
+         /* I/O case */
+-        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_16, attrs);
++        /* FIXME: memory_region_dispatch_read ignores MO_BSWAP.  */
++        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_16 | endian,=
+ attrs);
+ #if defined(TARGET_WORDS_BIGENDIAN)
+         if (endian =3D=3D MO_LE) {
+             val =3D bswap16(val);
+@@ -297,7 +300,7 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL=
+,
+     if (l < 4 || !memory_access_is_direct(mr, true)) {
+         release_lock |=3D prepare_mmio_access(mr);
+
+-        r =3D memory_region_dispatch_write(mr, addr1, val, MO_32, attrs);
++        r =3D memory_region_dispatch_write(mr, addr1, val, MO_32 | MO_TE, =
+attrs);
+     } else {
+         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+         stl_p(ptr, val);
+@@ -343,7 +346,8 @@ static inline void glue(address_space_stl_internal, SUF=
+FIX)(ARG1_DECL,
+             val =3D bswap32(val);
+         }
+ #endif
+-        r =3D memory_region_dispatch_write(mr, addr1, val, MO_32, attrs);
++        /* FIXME: memory_region_dispatch_write ignores MO_BSWAP.  */
++        r =3D memory_region_dispatch_write(mr, addr1, val, MO_32 | endian,=
+ attrs);
+     } else {
+         /* RAM case */
+         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+@@ -448,7 +452,8 @@ static inline void glue(address_space_stw_internal, SUF=
+FIX)(ARG1_DECL,
+             val =3D bswap16(val);
+         }
+ #endif
+-        r =3D memory_region_dispatch_write(mr, addr1, val, MO_16, attrs);
++        /* FIXME: memory_region_dispatch_write ignores MO_BSWAP.  */
++        r =3D memory_region_dispatch_write(mr, addr1, val, MO_16 | endian,=
+ attrs);
+     } else {
+         /* RAM case */
+         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+@@ -521,7 +526,8 @@ static void glue(address_space_stq_internal, SUFFIX)(AR=
+G1_DECL,
+             val =3D bswap64(val);
+         }
+ #endif
+-        r =3D memory_region_dispatch_write(mr, addr1, val, MO_64, attrs);
++        /* FIXME: memory_region_dispatch_write ignores MO_BSWAP.  */
++        r =3D memory_region_dispatch_write(mr, addr1, val, MO_64 | endian,=
+ attrs);
+     } else {
+         /* RAM case */
+         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index e79f99d..1b475f3 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -4741,11 +4741,11 @@ void helper_cache(CPUMIPSState *env, target_ulong a=
+ddr, uint32_t op)
+     if (op =3D=3D 9) {
+         /* Index Store Tag */
+         memory_region_dispatch_write(env->itc_tag, index, env->CP0_TagLo,
+-                                     MO_64, MEMTXATTRS_UNSPECIFIED);
++                                     MO_64 | MO_TE, MEMTXATTRS_UNSPECIFIED=
+);
+     } else if (op =3D=3D 5) {
+         /* Index Load Tag */
+         memory_region_dispatch_read(env->itc_tag, index, &env->CP0_TagLo,
+-                                    MO_64, MEMTXATTRS_UNSPECIFIED);
++                                    MO_64 | MO_TE, MEMTXATTRS_UNSPECIFIED)=
+;
+     }
+ #endif
+ }
 --
 1.8.3.1
 
