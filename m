@@ -2,64 +2,68 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF7FC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 972C8C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:18:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54F9F21BE6
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:17:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F9F21BE6
+	by mail.kernel.org (Postfix) with ESMTPS id 6C2E221BE6
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:18:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C2E221BE6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvI4c-0001fb-Iq
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 05:17:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52532)
+	id 1hvI5Q-0002ex-ML
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 05:18:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52749)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hvI2f-0000rs-G9
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:15:35 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1hvI38-00013x-4k
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hvI2d-0005Hn-RK
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:15:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53256)
+ (envelope-from <jfreimann@redhat.com>) id 1hvI36-0005gt-Kz
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:16:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58064)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>)
- id 1hvI2a-0005Bk-J7; Wed, 07 Aug 2019 05:15:28 -0400
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1hvI36-0005Ty-Eo
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:16:00 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DCD4030BEBE8;
- Wed,  7 Aug 2019 09:15:26 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EBBAA600C6;
- Wed,  7 Aug 2019 09:15:21 +0000 (UTC)
-Date: Wed, 7 Aug 2019 11:15:20 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Message-ID: <20190807111520.40592817@redhat.com>
-In-Reply-To: <5FC3163CFD30C246ABAA99954A238FA83F347054@lhreml524-mbs.china.huawei.com>
-References: <20190726104519.23812-1-shameerali.kolothum.thodi@huawei.com>
- <20190726104519.23812-7-shameerali.kolothum.thodi@huawei.com>
- <20190806150839.350a5add@redhat.com>
- <5FC3163CFD30C246ABAA99954A238FA83F347054@lhreml524-mbs.china.huawei.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2194112AC9
+ for <qemu-devel@nongnu.org>; Wed,  7 Aug 2019 09:15:49 +0000 (UTC)
+Received: from localhost (dhcp-192-230.str.redhat.com [10.33.192.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3EDC600CC;
+ Wed,  7 Aug 2019 09:15:46 +0000 (UTC)
+Date: Wed, 7 Aug 2019 11:15:45 +0200
+From: Jens Freimann <jfreimann@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20190807091545.l7eirnlmymmjp6yt@jenstp.localdomain>
+References: <20190802150605.5880-1-jfreimann@redhat.com>
+ <20190802112047-mutt-send-email-mst@kernel.org>
+ <20190805131215.c6cl3lgvcpnzfx3x@jenstp.localdomain>
+ <20190805102148-mutt-send-email-mst@kernel.org>
+ <20190805184949.kmv7qra67jfxie2j@jenstp.localdomain>
+ <20190806043953-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20190806043953-mutt-send-email-mst@kernel.org>
+User-Agent: NeoMutt/20180716-1376-5d6ed1
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 07 Aug 2019 09:15:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Wed, 07 Aug 2019 09:15:49 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v8 6/9] hw/arm/virt: Enable device
- memory cold/hot plug with ACPI boot
+Subject: Re: [Qemu-devel] [PATCH v2 0/9] add failover feature for assigned
+ network devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,229 +75,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "sameo@linux.intel.com" <sameo@linux.intel.com>,
- "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "sebastien.boeuf@intel.com" <sebastien.boeuf@intel.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 7 Aug 2019 08:19:16 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
+On Tue, Aug 06, 2019 at 04:43:35AM -0400, Michael S. Tsirkin wrote:
+>On Mon, Aug 05, 2019 at 08:49:49PM +0200, Jens Freimann wrote:
+>> On Mon, Aug 05, 2019 at 10:22:25AM -0400, Michael S. Tsirkin wrote:
+>> > On Mon, Aug 05, 2019 at 03:12:15PM +0200, Jens Freimann wrote:
+>> > > On Fri, Aug 02, 2019 at 11:22:10AM -0400, Michael S. Tsirkin wrote:
+>> > > > On Fri, Aug 02, 2019 at 05:05:56PM +0200, Jens Freimann wrote:
+>> > > > > This is implementing the host side of the net_failover concept
+>> > > > > (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
+>> > > > >
+>> > > > > Changes since v1:
+>> > >
+>> > > [...]
+>> > >
+>> > > > Didn't read this yet, one question: how do migration commands look
+>> > > > like?
+>> > >
+>> > > You mean the hmp commands I think:
+>> > >
+>> > > migrate -d tcp:host:port
+>> > >
+>> > > and to cancel
+>> > >
+>> > > migrate_cancel
+>> > >
+>> > >
+>> > > regards,
+>> > > Jens
+>> >
+>> > Sorry, no. I mean the command line on the incoming side.
+>>
+>> It looks the same with -incoming tcp:0:4444 added. Pci address of
+>> vfio-pci device can be changed.
+>
+>
+>Sounds good. And I assume one can also skip the vfio device and
+>hotplug it later, right?
 
-> Hi Igor,
-> 
-> > -----Original Message-----
-> > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > Sent: 06 August 2019 14:09
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
-> > eric.auger@redhat.com; peter.maydell@linaro.org; sameo@linux.intel.com;
-> > ard.biesheuvel@linaro.org; Linuxarm <linuxarm@huawei.com>; xuwei (O)
-> > <xuwei5@huawei.com>; shannon.zhaosl@gmail.com;
-> > sebastien.boeuf@intel.com; lersek@redhat.com
-> > Subject: Re: [Qemu-devel] [PATCH-for-4.2 v8 6/9] hw/arm/virt: Enable device
-> > memory cold/hot plug with ACPI boot  
->  
-> [...]
-> 
-> > > +static inline DeviceState *create_acpi_ged(VirtMachineState *vms,  
-> > qemu_irq *pic)  
-> > > +{
-> > > +    DeviceState *dev;
-> > > +    int irq = vms->irqmap[VIRT_ACPI_GED];
-> > > +    uint32_t event = ACPI_GED_MEM_HOTPLUG_EVT;
-> > > +
-> > > +    dev = DEVICE(object_new(TYPE_ACPI_GED));
-> > > +    qdev_prop_set_uint64(dev, "memhp-base",
-> > > +                         vms->memmap[VIRT_PCDIMM_ACPI].base);
-> > > +    qdev_prop_set_uint64(dev, "ged-base",  
-> > vms->memmap[VIRT_ACPI_GED].base);  
-> > > +    qdev_prop_set_uint32(dev, "ged-event", event);
-> > > +    object_property_add_child(qdev_get_machine(), "acpi-ged",
-> > > +                              OBJECT(dev), NULL);
-> > > +    qdev_init_nofail(dev);
-> > > +    qdev_connect_gpio_out_named(dev, "ged-irq", 0, pic[irq]);
-> > > +
-> > > +    object_unref(OBJECT(dev));
-> > > +
-> > > +    return dev;
-> > > +}  
-> > 
-> > this function will need changes to accommodate for sysbus device
-> > init sequence [3/9].  
-> 
-> Yes. I think we are proposing to use sysbus_mmio_map() here for "ged-base".
-> But what about " memhp-base"? Is it ok to invoke
-> acpi_memory_hotplug_init(get_system_memoty(), ...) from ged device?
-no it's not ok.
+yes, the vfio device can be hotplugged later both on target and
+source.
 
-One could expose container memory region as sysbus mmio and then put
-ged-io and AcpiGedState::memhp_state::io within it.
-something like:
-
-        board:
-            sysbus_mmio_map(ged, 0 /* io_contaner number */, ged-base)     
-
-        ged_initfn()
-            register io_container as sysbus mmio region
-
-        ged_realize()
-            memory_region_add_subregion(&ged->io_container, 0, &ged_st->io);
-            acpi_memory_hotplug_init(&ged->io_container,, &ged->acpi_memory_hotplug, AFTER_GED_IO_OFFSET)
-    
-that would make GED's MMIO available to guest at ged-base and memhp IO
-will be available at address after it.
-You can go even further (more flexible) and register ged_st->io as separate
-sysbus mmio and use a container exclusively for memhp, in this case you'd be
-able to map memhp io from board independently from ged-base.
-
-
-> Or go with _set_link() function to pass the address space ?
-> 
-> Thanks,
-> Shameer
-> 
->  
-> > > +
-> > >  static void create_its(VirtMachineState *vms, DeviceState *gicdev)
-> > >  {
-> > >      const char *itsclass = its_class_name();
-> > > @@ -1483,6 +1508,7 @@ static void machvirt_init(MachineState *machine)
-> > >      MemoryRegion *ram = g_new(MemoryRegion, 1);
-> > >      bool firmware_loaded;
-> > >      bool aarch64 = true;
-> > > +    bool has_ged = !vmc->no_ged;
-> > >      unsigned int smp_cpus = machine->smp.cpus;
-> > >      unsigned int max_cpus = machine->smp.max_cpus;
-> > >
-> > > @@ -1697,6 +1723,10 @@ static void machvirt_init(MachineState  
-> > *machine)  
-> > >
-> > >      create_gpio(vms, pic);
-> > >
-> > > +    if (has_ged && aarch64 && firmware_loaded && acpi_enabled) {
-> > > +        vms->acpi_dev = create_acpi_ged(vms, pic);
-> > > +    }
-> > > +
-> > >      /* Create mmio transports, so the user can create virtio backends
-> > >       * (which will be automatically plugged in to the transports). If
-> > >       * no backend is created the transport will just sit harmlessly idle.
-> > > @@ -1876,27 +1906,34 @@ static const CPUArchIdList  
-> > *virt_possible_cpu_arch_ids(MachineState *ms)  
-> > >  static void virt_memory_pre_plug(HotplugHandler *hotplug_dev,  
-> > DeviceState *dev,  
-> > >                                   Error **errp)
-> > >  {
-> > > +    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> > > +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev),  
-> > TYPE_NVDIMM);  
-> > >
-> > > -    /*
-> > > -     * The device memory is not yet exposed to the Guest either through
-> > > -     * DT or ACPI and hence both cold/hot plug of memory is explicitly
-> > > -     * disabled for now.
-> > > -     */
-> > > -    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> > > -        error_setg(errp, "memory cold/hot plug is not yet supported");
-> > > +    if (is_nvdimm) {
-> > > +        error_setg(errp, "nvdimm is not yet supported");
-> > >          return;
-> > >      }
-> > >
-> > > +    if (!vms->acpi_dev) {
-> > > +        error_setg(errp, "memory hotplug is not enabled: missing acpi  
-> > device");  
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    hotplug_handler_pre_plug(HOTPLUG_HANDLER(vms->acpi_dev), dev,  
-> > errp);
-> > use local_error and check for error condition here. see pc_memory_pre_plug()
-> >   
-> > > +
-> > >      pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL,  
-> > errp);  
-> > >  }
-> > >
-> > >  static void virt_memory_plug(HotplugHandler *hotplug_dev,
-> > >                               DeviceState *dev, Error **errp)
-> > >  {
-> > > +    HotplugHandlerClass *hhc;
-> > >      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-> > >
-> > >      pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), NULL);  
-> >                                                 ^^^^  
-> > >
-> > > +    hhc = HOTPLUG_HANDLER_GET_CLASS(vms->acpi_dev);
-> > > +    hhc->plug(HOTPLUG_HANDLER(vms->acpi_dev), dev, NULL);  
-> >                                                       ^^^^
-> > why errors are ignored here, pls check for errors and propagate
-> > them to the caller.
-> >   
-> > >  }
-> > >
-> > >  static void virt_machine_device_pre_plug_cb(HotplugHandler  
-> > *hotplug_dev,  
-> > > @@ -2102,8 +2139,11 @@ DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
-> > >
-> > >  static void virt_machine_4_1_options(MachineClass *mc)
-> > >  {
-> > > +    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-> > > +
-> > >      virt_machine_4_2_options(mc);
-> > >      compat_props_add(mc->compat_props, hw_compat_4_1,  
-> > hw_compat_4_1_len);  
-> > > +    vmc->no_ged = true;
-> > >  }
-> > >  DEFINE_VIRT_MACHINE(4, 1)
-> > >
-> > > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> > > index a72094204e..577ee49b4b 100644
-> > > --- a/include/hw/arm/virt.h
-> > > +++ b/include/hw/arm/virt.h
-> > > @@ -77,6 +77,8 @@ enum {
-> > >      VIRT_GPIO,
-> > >      VIRT_SECURE_UART,
-> > >      VIRT_SECURE_MEM,
-> > > +    VIRT_PCDIMM_ACPI,
-> > > +    VIRT_ACPI_GED,
-> > >      VIRT_LOWMEMMAP_LAST,
-> > >  };
-> > >
-> > > @@ -106,6 +108,7 @@ typedef struct {
-> > >      bool claim_edge_triggered_timers;
-> > >      bool smbios_old_sys_ver;
-> > >      bool no_highmem_ecam;
-> > > +    bool no_ged;   /* Machines < 4.2 has no support for ACPI GED device  
-> > */  
-> > >  } VirtMachineClass;
-> > >
-> > >  typedef struct {
-> > > @@ -133,6 +136,7 @@ typedef struct {
-> > >      uint32_t iommu_phandle;
-> > >      int psci_conduit;
-> > >      hwaddr highest_gpa;
-> > > +    DeviceState *acpi_dev;
-> > >  } VirtMachineState;
-> > >
-> > >  #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM :  
-> > VIRT_PCIE_ECAM)  
-> > > diff --git a/tests/bios-tables-test-allowed-diff.h  
-> > b/tests/bios-tables-test-allowed-diff.h  
-> > > index dfb8523c8b..7b4adbc822 100644
-> > > --- a/tests/bios-tables-test-allowed-diff.h
-> > > +++ b/tests/bios-tables-test-allowed-diff.h
-> > > @@ -1 +1,2 @@
-> > >  /* List of comma-separated changed AML files to ignore */
-> > > +"tests/data/acpi/virt/DSDT",  
-> 
-
+regards,
+Jens 
 
