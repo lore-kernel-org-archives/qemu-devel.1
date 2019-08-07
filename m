@@ -2,90 +2,79 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7271C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 847B5C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:35:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF46721E73
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:34:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF46721E73
+	by mail.kernel.org (Postfix) with ESMTPS id 5979B21E6C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:35:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5979B21E6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvM57-0000f6-Uk
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 09:34:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58060)
+	id 1hvM5t-0001aE-LX
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 09:35:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hvM4j-0000CO-AQ
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:33:58 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvM5R-00015q-FC
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hvM4i-0000Ud-8Y
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:33:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37978)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hvM4i-0000UL-0o
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:33:56 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2679D4D2E6;
- Wed,  7 Aug 2019 13:33:55 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BF484600CC;
- Wed,  7 Aug 2019 13:33:54 +0000 (UTC)
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20190730123759.21723-1-pbonzini@redhat.com>
- <87r25xi1y7.fsf@linaro.org> <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <35301c4b-8743-1e29-0f6e-968afec5faa7@redhat.com>
-Date: Wed, 7 Aug 2019 08:33:53 -0500
+ (envelope-from <philmd@redhat.com>) id 1hvM5K-0000kn-3H
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:34:37 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36199)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvM5J-0000kH-Se
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:34:34 -0400
+Received: by mail-wr1-f68.google.com with SMTP id n4so91492957wrs.3
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 06:34:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=OzNZ3TuBBaUSt7AFSANl7iXtLVFoQW+p9Wo9m/sc8zY=;
+ b=lLZU76eAa8NgYpPv/oC/k6uDQo/Kd2XNMk4M9O7rwPFY0P4O87XLHDQ8J80L+iAUFV
+ KLrcQotIFXTLVogDyQ9d94P5S+RtWdmdk5Izv0HR2vZMs40RTT8NsJZuUX2F1s8MwJKv
+ Lsqf0nn7Z3XIvfbLnQHIIzmJJMcS14zBNyMi7UdN8Wt9LKupBd3O4yk2CLfMf/HxjoUQ
+ MSpW/rjicF11vyT1/jHbBjqVRnOzpfQDmwnuSWiNHFqbXlz3E+5OsGyNuk2D5fxOjuSO
+ 2zswrzV8Y5KL0A4nmQ5AcJnel+OkKGyT+xY+qaspaM3hJLH//BvTEXk1NdMPk6hbzTGd
+ JCPw==
+X-Gm-Message-State: APjAAAUSasdAZ9yMvzEU0fRjBF9ZkiYfQM6wTKDh+nbdPOcbNEZGTbpZ
+ AcCoLwv00vq1oBrC8ecDsCTJgA==
+X-Google-Smtp-Source: APXvYqzKk1Q/uJbJXxiZd3Ewsgi01IBw/asJSVyKPc/8ov9CBCsfOLmPXfIz931UA4lVEistVVMg1A==
+X-Received: by 2002:adf:aa85:: with SMTP id h5mr1577898wrc.329.1565184872809; 
+ Wed, 07 Aug 2019 06:34:32 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id h8sm20067wmf.12.2019.08.07.06.34.32
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 06:34:32 -0700 (PDT)
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20190807084048.4258-1-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <19e4a0b7-d21e-c243-202d-c1f6708cab1f@redhat.com>
+Date: Wed, 7 Aug 2019 15:34:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Wed, 07 Aug 2019 13:33:55 +0000 (UTC)
+In-Reply-To: <20190807084048.4258-1-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/3] tests/tcg: disentangle makefiles
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH] usbredir: fix buffer-overflow on vmload
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,90 +86,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M
-Content-Type: multipart/mixed; boundary="4sDijFRhjO5aInhBquqnfMtaPhL1tt0ZC";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
-Message-ID: <35301c4b-8743-1e29-0f6e-968afec5faa7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] tests/tcg: disentangle makefiles
-References: <20190730123759.21723-1-pbonzini@redhat.com>
- <87r25xi1y7.fsf@linaro.org> <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
-In-Reply-To: <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
-
---4sDijFRhjO5aInhBquqnfMtaPhL1tt0ZC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/7/19 8:06 AM, Paolo Bonzini wrote:
-> On 07/08/19 14:40, Alex Benn=C3=A9e wrote:
->>
->> Paolo Bonzini <pbonzini@redhat.com> writes:
->>
->>> The tests/tcg rely a lot on per-target informations from
->>> the QEMU makefiles, but most of the definitions in there
->>> aren't really relevant to TCG tests.
->>>
->>> This series is just a cleanup, but it could also be
->>> a useful start in making it possible to compile tests/tcg
->>> out of QEMU's tree, and/or making it a submodule, and/or
->>> unifying the system emulation tests with kvm-unit-tests.
->>
->> Hmm something is throwing off configure and making it use my login she=
-ll
->> instead of /bin/sh:
->>
->>   libpmem support   no
->>   libudev           yes
->>   default devices   yes
->>   ~/lsrc/qemu.git/tests/tcg/configure.sh (line 63): 'case' builtin not=
- inside of switch block
->>     case $arch in
->>     ^
->>   <W> fish: Error while reading file /home/alex/lsrc/qemu.git/tests/tc=
-g/configure.sh
->=20
-> It's the ${SHELL} you found in patch 3.  The disadvantage of relying on=
-
-> #! is that some people have bash in /usr/bin/bash rather than /bin/bash=
-=2E
->  But we already assume /bin/bash elsewhere so I can drop it.
-
-Rather, we use '#!/usr/bin/env bash' to find bash anywhere.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
 
 
---4sDijFRhjO5aInhBquqnfMtaPhL1tt0ZC--
+On 8/7/19 10:40 AM, Marc-André Lureau wrote:
+> If interface_count is NO_INTERFACE_INFO, let's not access the arrays
+> out-of-bounds.
+> 
+> ==994==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x625000243930 at pc 0x5642068086a8 bp 0x7f0b6f9ffa50 sp 0x7f0b6f9ffa40
+> READ of size 1 at 0x625000243930 thread T0
+>     #0 0x5642068086a7 in usbredir_check_bulk_receiving /home/elmarco/src/qemu/hw/usb/redirect.c:1503
+>     #1 0x56420681301c in usbredir_post_load /home/elmarco/src/qemu/hw/usb/redirect.c:2154
+>     #2 0x5642068a56c2 in vmstate_load_state /home/elmarco/src/qemu/migration/vmstate.c:168
+>     #3 0x56420688e2ac in vmstate_load /home/elmarco/src/qemu/migration/savevm.c:829
+>     #4 0x5642068980cb in qemu_loadvm_section_start_full /home/elmarco/src/qemu/migration/savevm.c:2211
+>     #5 0x564206899645 in qemu_loadvm_state_main /home/elmarco/src/qemu/migration/savevm.c:2395
+>     #6 0x5642068998cf in qemu_loadvm_state /home/elmarco/src/qemu/migration/savevm.c:2467
+>     #7 0x56420685f3e9 in process_incoming_migration_co /home/elmarco/src/qemu/migration/migration.c:449
+>     #8 0x564207106c47 in coroutine_trampoline /home/elmarco/src/qemu/util/coroutine-ucontext.c:115
+>     #9 0x7f0c0604e37f  (/lib64/libc.so.6+0x4d37f)
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/usb/redirect.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+> index 998fc6e4b0..9764a57987 100644
+> --- a/hw/usb/redirect.c
+> +++ b/hw/usb/redirect.c
+> @@ -1495,6 +1495,11 @@ static void usbredir_check_bulk_receiving(USBRedirDevice *dev)
+>      for (i = EP2I(USB_DIR_IN); i < MAX_ENDPOINTS; i++) {
+>          dev->endpoint[i].bulk_receiving_enabled = 0;
+>      }
+> +
+> +    if (dev->interface_info.interface_count == NO_INTERFACE_INFO) {
+> +        return;
+> +    }
+> +
+>      for (i = 0; i < dev->interface_info.interface_count; i++) {
+>          quirks = usb_get_quirks(dev->device_info.vendor_id,
+>                                  dev->device_info.product_id,
+> 
 
---5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1K00EACgkQp6FrSiUn
-Q2qDJgf+McMQkwWnoZbWgUSIdS3iM1GNwOIrLmsg8MAx9LtIhrhIeEFCLx2puZBW
-3h96nU1C6Dgec8/RwWS8do343GT8ETYm4OOmNPaWD5WRuS+RfeO6U2l5fwnQKUas
-KS+zPftBK/o32klJLPYY1svqyWriNoQqmRRAU7vVBCbWHibxMUy2ZhaW1PA+slYE
-AcNsCyEq6b1Tpf6GAeCLc9BQqJxTdAfruhiFn+UlPXMZwHeJK4SsmgPmEHsnhaMr
-WoArQQSstALUVHE4YPIW7WinFw+6I0cQFEBGpuDYlyw+riMIAXsjJcqsYLCm+Mlu
-LhFXY977KYy37kSk3dCIPiunLxMpJA==
-=GRIK
------END PGP SIGNATURE-----
-
---5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M--
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
