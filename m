@@ -6,58 +6,75 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE675C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 775ECC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7439721EF2
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:09:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7439721EF2
+	by mail.kernel.org (Postfix) with ESMTPS id 4C77321EF2
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:11:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C77321EF2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvPRL-000898-NA
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:09:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51939)
+	id 1hvPTJ-00010s-KX
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52177)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hvPQr-0007So-Dx
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:09:03 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvPSr-0000bw-0I
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hvPQp-0005mY-Ff
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:09:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35210)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hvPQp-0005m1-6w
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:08:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7546D300BEA5;
- Wed,  7 Aug 2019 17:08:58 +0000 (UTC)
-Received: from work-vm (ovpn-117-204.ams2.redhat.com [10.36.117.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E7A415D9DC;
- Wed,  7 Aug 2019 17:08:56 +0000 (UTC)
-Date: Wed, 7 Aug 2019 18:08:54 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Yury Kotov <yury-kotov@yandex-team.ru>
-Message-ID: <20190807170854.GA27871@work-vm>
-References: <20190422103420.15686-1-yury-kotov@yandex-team.ru>
+ (envelope-from <philmd@redhat.com>) id 1hvPSp-0000Xk-Tl
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:11:04 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44191)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvPSp-0000W9-OO
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:11:03 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p17so92110969wrf.11
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 10:11:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+jPV2sCSK9wrFFo/ulYP7qlKRrk9o6gS3KKV+Oo6niI=;
+ b=ulWOG+qcuv2b+SjpcVUw6V8UzGrW0UiLrTIG2GGCh8xS9rjFCwNxvbjmhpStEBiVxi
+ +jmcO7qboLlAKXzJvp8T5+kXulq6AWvRl1517HxtUddzhuscpFc0GsqEtzZRElOhjE63
+ yMOVfiGSfpu/nRtuAv2NyxIBaMES5+m/piabvDn6VChA4XlsFxf/8ExIpgv4ZjCaDbxn
+ b/20Kkgs9m0UcJoo148PB9oXLKPweKuCWgvEZkJGZDuhemniJCTlK62yDjOe2pHZDGkB
+ nvvNhU2/QxHvmW+NvqMvJGWF5K2SOTMzG0VpE94uuegOpOKlPXESEoBrHkwY3qtCq7Vh
+ RmvA==
+X-Gm-Message-State: APjAAAVI1AXCsS4eL7G6zPz0AKIZVF+itK17QpJ3qEFnbvOd+FLhouNQ
+ ai1fYaaPgjyykTgwKhkk6Mt2YNfzQs0=
+X-Google-Smtp-Source: APXvYqyzjYfI1mxTbqa2sBA8l0cNplNvUsOXDWwCvToz917mRaSgKC7xGiQ783QMjrRSqOctK+uDDA==
+X-Received: by 2002:adf:ea82:: with SMTP id s2mr11810992wrm.91.1565197862464; 
+ Wed, 07 Aug 2019 10:11:02 -0700 (PDT)
+Received: from [192.168.1.115] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id g19sm884377wmg.10.2019.08.07.10.11.01
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 10:11:01 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-18-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <53292d1d-34b8-e541-5a5b-ec19f3bf24f3@redhat.com>
+Date: Wed, 7 Aug 2019 19:11:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190422103420.15686-1-yury-kotov@yandex-team.ru>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 07 Aug 2019 17:08:58 +0000 (UTC)
+In-Reply-To: <20190806151435.10740-18-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migration: Add error_desc for file channel
- errors
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2 17/29] Include qom/object.h slightly less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,446 +86,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:All patches CC here" <qemu-devel@nongnu.org>,
- yc-core@yandex-team.ru, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Yury Kotov (yury-kotov@yandex-team.ru) wrote:
-> Currently, there is no information about error if outgoing migration was failed
-> because of file channel errors.
-> Example (QMP session):
-> -> { "execute": "migrate", "arguments": { "uri": "exec:head -c 1" }}
-> <- { "return": {} }
-> ...
-> -> { "execute": "query-migrate" }
-> <- { "return": { "status": "failed" }} // There is not error's description
+On 8/6/19 5:14 PM, Markus Armbruster wrote:
+> hw/hw.h used to include headers hardware emulation "usually" needs.
+> The previous commits removed all but one of them, to good effect.
+> Only qom/object.h is left.  Remove that one, too.
 > 
-> And even in the QEMU's output there is nothing.
-> 
-> This patch
-> 1) Adds errp for the most of QEMUFileOps
-> 2) Adds qemu_file_get_error_obj/qemu_file_set_error_obj
-> 3) And finally using of qemu_file_get_error_obj in migration.c
-> 
-> And now, the status for the mentioned fail will be:
-> -> { "execute": "query-migrate" }
-> <- { "return": { "status": "failed",
->                  "error-desc": "Unable to write to command: Broken pipe" }}
-> 
-> Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
-
-Quued for 4.2
-
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  migration/migration.c         | 10 ++++--
->  migration/qemu-file-channel.c | 30 +++++++++--------
->  migration/qemu-file.c         | 63 ++++++++++++++++++++++++++++-------
->  migration/qemu-file.h         | 15 ++++++---
->  migration/savevm.c            |  6 ++--
->  5 files changed, 88 insertions(+), 36 deletions(-)
+>  include/hw/display/edid.h | 2 +-
+>  include/hw/hw.h           | 2 --
+>  2 files changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 609e0df5d0..7bcdc4613b 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2949,6 +2949,7 @@ static MigThrError migration_detect_error(MigrationState *s)
->  {
->      int ret;
->      int state = s->state;
-> +    Error *local_error = NULL;
+> diff --git a/include/hw/display/edid.h b/include/hw/display/edid.h
+> index 7948bd2c40..ff99dc0a05 100644
+> --- a/include/hw/display/edid.h
+> +++ b/include/hw/display/edid.h
+> @@ -1,7 +1,7 @@
+>  #ifndef EDID_H
+>  #define EDID_H
 >  
->      if (state == MIGRATION_STATUS_CANCELLING ||
->          state == MIGRATION_STATUS_CANCELLED) {
-> @@ -2957,13 +2958,18 @@ static MigThrError migration_detect_error(MigrationState *s)
->      }
+> -#include "hw/hw.h"
+> +#include "qom/object.h"
 >  
->      /* Try to detect any file errors */
-> -    ret = qemu_file_get_error(s->to_dst_file);
+>  typedef struct qemu_edid_info {
+>      const char *vendor; /* http://www.uefi.org/pnp_id_list */
+> diff --git a/include/hw/hw.h b/include/hw/hw.h
+> index 8e18358e6a..8079b911fa 100644
+> --- a/include/hw/hw.h
+> +++ b/include/hw/hw.h
+> @@ -6,8 +6,6 @@
+>  #error Cannot include hw/hw.h from user emulation
+>  #endif
+>  
+> -#include "qom/object.h"
 > -
-> +    ret = qemu_file_get_error_obj(s->to_dst_file, &local_error);
->      if (!ret) {
->          /* Everything is fine */
-> +        assert(!local_error);
->          return MIG_THR_ERR_NONE;
->      }
+>  void QEMU_NORETURN hw_error(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
 >  
-> +    if (local_error) {
-> +        migrate_set_error(s, local_error);
-> +        error_free(local_error);
-> +    }
-> +
->      if (state == MIGRATION_STATUS_POSTCOPY_ACTIVE && ret == -EIO) {
->          /*
->           * For postcopy, we allow the network to be down for a
-> diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.c
-> index 8e639eb496..c382ea2d78 100644
-> --- a/migration/qemu-file-channel.c
-> +++ b/migration/qemu-file-channel.c
-> @@ -33,7 +33,8 @@
->  static ssize_t channel_writev_buffer(void *opaque,
->                                       struct iovec *iov,
->                                       int iovcnt,
-> -                                     int64_t pos)
-> +                                     int64_t pos,
-> +                                     Error **errp)
->  {
->      QIOChannel *ioc = QIO_CHANNEL(opaque);
->      ssize_t done = 0;
-> @@ -47,7 +48,7 @@ static ssize_t channel_writev_buffer(void *opaque,
->  
->      while (nlocal_iov > 0) {
->          ssize_t len;
-> -        len = qio_channel_writev(ioc, local_iov, nlocal_iov, NULL);
-> +        len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
->          if (len == QIO_CHANNEL_ERR_BLOCK) {
->              if (qemu_in_coroutine()) {
->                  qio_channel_yield(ioc, G_IO_OUT);
-> @@ -57,7 +58,6 @@ static ssize_t channel_writev_buffer(void *opaque,
->              continue;
->          }
->          if (len < 0) {
-> -            /* XXX handle Error objects */
->              done = -EIO;
->              goto cleanup;
->          }
-> @@ -75,13 +75,14 @@ static ssize_t channel_writev_buffer(void *opaque,
->  static ssize_t channel_get_buffer(void *opaque,
->                                    uint8_t *buf,
->                                    int64_t pos,
-> -                                  size_t size)
-> +                                  size_t size,
-> +                                  Error **errp)
->  {
->      QIOChannel *ioc = QIO_CHANNEL(opaque);
->      ssize_t ret;
->  
->      do {
-> -        ret = qio_channel_read(ioc, (char *)buf, size, NULL);
-> +        ret = qio_channel_read(ioc, (char *)buf, size, errp);
->          if (ret < 0) {
->              if (ret == QIO_CHANNEL_ERR_BLOCK) {
->                  if (qemu_in_coroutine()) {
-> @@ -90,7 +91,6 @@ static ssize_t channel_get_buffer(void *opaque,
->                      qio_channel_wait(ioc, G_IO_IN);
->                  }
->              } else {
-> -                /* XXX handle Error * object */
->                  return -EIO;
->              }
->          }
-> @@ -100,18 +100,20 @@ static ssize_t channel_get_buffer(void *opaque,
->  }
->  
->  
-> -static int channel_close(void *opaque)
-> +static int channel_close(void *opaque, Error **errp)
->  {
-> +    int ret;
->      QIOChannel *ioc = QIO_CHANNEL(opaque);
-> -    qio_channel_close(ioc, NULL);
-> +    ret = qio_channel_close(ioc, errp);
->      object_unref(OBJECT(ioc));
-> -    return 0;
-> +    return ret;
->  }
->  
->  
->  static int channel_shutdown(void *opaque,
->                              bool rd,
-> -                            bool wr)
-> +                            bool wr,
-> +                            Error **errp)
->  {
->      QIOChannel *ioc = QIO_CHANNEL(opaque);
->  
-> @@ -125,8 +127,7 @@ static int channel_shutdown(void *opaque,
->          } else {
->              mode = QIO_CHANNEL_SHUTDOWN_WRITE;
->          }
-> -        if (qio_channel_shutdown(ioc, mode, NULL) < 0) {
-> -            /* XXX handler Error * object */
-> +        if (qio_channel_shutdown(ioc, mode, errp) < 0) {
->              return -EIO;
->          }
->      }
-> @@ -135,11 +136,12 @@ static int channel_shutdown(void *opaque,
->  
->  
->  static int channel_set_blocking(void *opaque,
-> -                                bool enabled)
-> +                                bool enabled,
-> +                                Error **errp)
->  {
->      QIOChannel *ioc = QIO_CHANNEL(opaque);
->  
-> -    if (qio_channel_set_blocking(ioc, enabled, NULL) < 0) {
-> +    if (qio_channel_set_blocking(ioc, enabled, errp) < 0) {
->          return -1;
->      }
->      return 0;
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> index 977b9ae07c..c52160e08b 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -29,6 +29,7 @@
->  #include "migration.h"
->  #include "qemu-file.h"
->  #include "trace.h"
-> +#include "qapi/error.h"
->  
->  #define IO_BUF_SIZE 32768
->  #define MAX_IOV_SIZE MIN(IOV_MAX, 64)
-> @@ -52,6 +53,7 @@ struct QEMUFile {
->      unsigned int iovcnt;
->  
->      int last_error;
-> +    Error *last_error_obj;
->  };
->  
->  /*
-> @@ -63,7 +65,7 @@ int qemu_file_shutdown(QEMUFile *f)
->      if (!f->ops->shut_down) {
->          return -ENOSYS;
->      }
-> -    return f->ops->shut_down(f->opaque, true, true);
-> +    return f->ops->shut_down(f->opaque, true, true, NULL);
->  }
->  
->  /*
-> @@ -108,24 +110,55 @@ void qemu_file_set_hooks(QEMUFile *f, const QEMUFileHooks *hooks)
->  }
->  
->  /*
-> - * Get last error for stream f
-> + * Get last error for stream f with optional Error*
->   *
->   * Return negative error value if there has been an error on previous
->   * operations, return 0 if no error happened.
-> + * Optional, it returns Error* in errp, but it may be NULL even if return value
-> + * is not 0.
->   *
->   */
-> -int qemu_file_get_error(QEMUFile *f)
-> +int qemu_file_get_error_obj(QEMUFile *f, Error **errp)
->  {
-> +    if (errp) {
-> +        *errp = f->last_error_obj ? error_copy(f->last_error_obj) : NULL;
-> +    }
->      return f->last_error;
->  }
->  
-> -void qemu_file_set_error(QEMUFile *f, int ret)
-> +/*
-> + * Set the last error for stream f with optional Error*
-> + */
-> +void qemu_file_set_error_obj(QEMUFile *f, int ret, Error *err)
->  {
-> -    if (f->last_error == 0) {
-> +    if (f->last_error == 0 && ret) {
->          f->last_error = ret;
-> +        error_propagate(&f->last_error_obj, err);
-> +    } else if (err) {
-> +        error_report_err(err);
->      }
->  }
->  
-> +/*
-> + * Get last error for stream f
-> + *
-> + * Return negative error value if there has been an error on previous
-> + * operations, return 0 if no error happened.
-> + *
-> + */
-> +int qemu_file_get_error(QEMUFile *f)
-> +{
-> +    return qemu_file_get_error_obj(f, NULL);
-> +}
-> +
-> +/*
-> + * Set the last error for stream f
-> + */
-> +void qemu_file_set_error(QEMUFile *f, int ret)
-> +{
-> +    qemu_file_set_error_obj(f, ret, NULL);
-> +}
-> +
->  bool qemu_file_is_writable(QEMUFile *f)
->  {
->      return f->ops->writev_buffer;
-> @@ -177,6 +210,7 @@ void qemu_fflush(QEMUFile *f)
->  {
->      ssize_t ret = 0;
->      ssize_t expect = 0;
-> +    Error *local_error = NULL;
->  
->      if (!qemu_file_is_writable(f)) {
->          return;
-> @@ -184,7 +218,8 @@ void qemu_fflush(QEMUFile *f)
->  
->      if (f->iovcnt > 0) {
->          expect = iov_size(f->iov, f->iovcnt);
-> -        ret = f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f->pos);
-> +        ret = f->ops->writev_buffer(f->opaque, f->iov, f->iovcnt, f->pos,
-> +                                    &local_error);
->  
->          qemu_iovec_release_ram(f);
->      }
-> @@ -196,7 +231,7 @@ void qemu_fflush(QEMUFile *f)
->       * data set we requested, so sanity check that.
->       */
->      if (ret != expect) {
-> -        qemu_file_set_error(f, ret < 0 ? ret : -EIO);
-> +        qemu_file_set_error_obj(f, ret < 0 ? ret : -EIO, local_error);
->      }
->      f->buf_index = 0;
->      f->iovcnt = 0;
-> @@ -284,6 +319,7 @@ static ssize_t qemu_fill_buffer(QEMUFile *f)
->  {
->      int len;
->      int pending;
-> +    Error *local_error = NULL;
->  
->      assert(!qemu_file_is_writable(f));
->  
-> @@ -295,14 +331,16 @@ static ssize_t qemu_fill_buffer(QEMUFile *f)
->      f->buf_size = pending;
->  
->      len = f->ops->get_buffer(f->opaque, f->buf + pending, f->pos,
-> -                        IO_BUF_SIZE - pending);
-> +                             IO_BUF_SIZE - pending, &local_error);
->      if (len > 0) {
->          f->buf_size += len;
->          f->pos += len;
->      } else if (len == 0) {
-> -        qemu_file_set_error(f, -EIO);
-> +        qemu_file_set_error_obj(f, -EIO, local_error);
->      } else if (len != -EAGAIN) {
-> -        qemu_file_set_error(f, len);
-> +        qemu_file_set_error_obj(f, len, local_error);
-> +    } else {
-> +        error_free(local_error);
->      }
->  
->      return len;
-> @@ -328,7 +366,7 @@ int qemu_fclose(QEMUFile *f)
->      ret = qemu_file_get_error(f);
->  
->      if (f->ops->close) {
-> -        int ret2 = f->ops->close(f->opaque);
-> +        int ret2 = f->ops->close(f->opaque, NULL);
->          if (ret >= 0) {
->              ret = ret2;
->          }
-> @@ -339,6 +377,7 @@ int qemu_fclose(QEMUFile *f)
->      if (f->last_error) {
->          ret = f->last_error;
->      }
-> +    error_free(f->last_error_obj);
->      g_free(f);
->      trace_qemu_file_fclose();
->      return ret;
-> @@ -784,6 +823,6 @@ void qemu_put_counted_string(QEMUFile *f, const char *str)
->  void qemu_file_set_blocking(QEMUFile *f, bool block)
->  {
->      if (f->ops->set_blocking) {
-> -        f->ops->set_blocking(f->opaque, block);
-> +        f->ops->set_blocking(f->opaque, block, NULL);
->      }
->  }
-> diff --git a/migration/qemu-file.h b/migration/qemu-file.h
-> index 13baf896bd..eb886db65f 100644
-> --- a/migration/qemu-file.h
-> +++ b/migration/qemu-file.h
-> @@ -32,7 +32,8 @@
->   * bytes actually read should be returned.
->   */
->  typedef ssize_t (QEMUFileGetBufferFunc)(void *opaque, uint8_t *buf,
-> -                                        int64_t pos, size_t size);
-> +                                        int64_t pos, size_t size,
-> +                                        Error **errp);
->  
->  /* Close a file
->   *
-> @@ -41,7 +42,7 @@ typedef ssize_t (QEMUFileGetBufferFunc)(void *opaque, uint8_t *buf,
->   * The meaning of return value on success depends on the specific back-end being
->   * used.
->   */
-> -typedef int (QEMUFileCloseFunc)(void *opaque);
-> +typedef int (QEMUFileCloseFunc)(void *opaque, Error **errp);
->  
->  /* Called to return the OS file descriptor associated to the QEMUFile.
->   */
-> @@ -49,14 +50,15 @@ typedef int (QEMUFileGetFD)(void *opaque);
->  
->  /* Called to change the blocking mode of the file
->   */
-> -typedef int (QEMUFileSetBlocking)(void *opaque, bool enabled);
-> +typedef int (QEMUFileSetBlocking)(void *opaque, bool enabled, Error **errp);
->  
->  /*
->   * This function writes an iovec to file. The handler must write all
->   * of the data or return a negative errno value.
->   */
->  typedef ssize_t (QEMUFileWritevBufferFunc)(void *opaque, struct iovec *iov,
-> -                                           int iovcnt, int64_t pos);
-> +                                           int iovcnt, int64_t pos,
-> +                                           Error **errp);
->  
->  /*
->   * This function provides hooks around different
-> @@ -97,7 +99,8 @@ typedef QEMUFile *(QEMURetPathFunc)(void *opaque);
->   * Existing blocking reads/writes must be woken
->   * Returns 0 on success, -err on error
->   */
-> -typedef int (QEMUFileShutdownFunc)(void *opaque, bool rd, bool wr);
-> +typedef int (QEMUFileShutdownFunc)(void *opaque, bool rd, bool wr,
-> +                                   Error **errp);
->  
->  typedef struct QEMUFileOps {
->      QEMUFileGetBufferFunc *get_buffer;
-> @@ -149,6 +152,8 @@ void qemu_update_position(QEMUFile *f, size_t size);
->  void qemu_file_reset_rate_limit(QEMUFile *f);
->  void qemu_file_set_rate_limit(QEMUFile *f, int64_t new_rate);
->  int64_t qemu_file_get_rate_limit(QEMUFile *f);
-> +int qemu_file_get_error_obj(QEMUFile *f, Error **errp);
-> +void qemu_file_set_error_obj(QEMUFile *f, int ret, Error *err);
->  void qemu_file_set_error(QEMUFile *f, int ret);
->  int qemu_file_shutdown(QEMUFile *f);
->  QEMUFile *qemu_file_get_return_path(QEMUFile *f);
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 34bcad3807..a619af744d 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -124,7 +124,7 @@ static struct mig_cmd_args {
->  /* savevm/loadvm support */
->  
->  static ssize_t block_writev_buffer(void *opaque, struct iovec *iov, int iovcnt,
-> -                                   int64_t pos)
-> +                                   int64_t pos, Error **errp)
->  {
->      int ret;
->      QEMUIOVector qiov;
-> @@ -139,12 +139,12 @@ static ssize_t block_writev_buffer(void *opaque, struct iovec *iov, int iovcnt,
->  }
->  
->  static ssize_t block_get_buffer(void *opaque, uint8_t *buf, int64_t pos,
-> -                                size_t size)
-> +                                size_t size, Error **errp)
->  {
->      return bdrv_load_vmstate(opaque, buf, pos, size);
->  }
->  
-> -static int bdrv_fclose(void *opaque)
-> +static int bdrv_fclose(void *opaque, Error **errp)
->  {
->      return bdrv_flush(opaque);
->  }
-> -- 
-> 2.21.0
+>  #endif
 > 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+2560 objects improved by this tiny patch :)
+
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
