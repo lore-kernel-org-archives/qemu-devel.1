@@ -2,82 +2,86 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FC3C41514
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC8DC32751
 	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50CA721E71
+	by mail.kernel.org (Postfix) with ESMTPS id 43A2F21E70
 	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:36:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8S+nmc7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50CA721E71
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uAMd6s8z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A2F21E70
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvN2w-0004eb-ES
+	id 1hvN2w-0004eR-Bq
 	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:36:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41736)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41740)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hvN2H-0003Wk-7B
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hvN2H-0003Wl-KS
  for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1hvN2G-0006af-37
+ (envelope-from <paolo.bonzini@gmail.com>) id 1hvN2G-0006b2-Ho
  for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:35:29 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34145)
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:51472)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1hvN2F-0006ZO-TJ
+ id 1hvN2G-0006aP-A2
  for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:35:28 -0400
-Received: by mail-wr1-x443.google.com with SMTP id 31so91672246wrm.1
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 07:35:27 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 207so301521wma.1
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 07:35:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=g3k/h6Z/qWjEAJpRG1w1mf95HfntbrdREbdJcqPGBPA=;
- b=Y8S+nmc7WZMfWckeQMsc94TAUpMNuwtvLDxPRGoy0p/PYWykDzx4M5zNXcqdAo234d
- ++PUrwUP72YzUHc2ej19Cu0nAVD5tJabqhZNqIdKjAjzgA8Pp5/9Q5a4Z0YSI7Vmqo5x
- ALzeM2td15eXEUg9Xm3jsquS0g0ffPDDna8fBrZ//d3mGgNslurIqABLUIIu8V+1wnZ7
- FMrXxoL/l5bO38TdfmnhSVK1ND4XyUyOWZoHEvYpE6Aq+3JXts3as1jTKjvFj2oTKFMO
- 2R1UjoD74o0Bvmhz0J/Cooiq03qAPWr8cTy+r3wNwBC/hzZ4wC86QEmFFRFxFSXwBcjP
- DRyA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=17S8+srOfxdrNTILDf4H97ECt1wzvAyOrkiP+8O9a4E=;
+ b=uAMd6s8zvT8O9YKfO0CKczpOpo5SW8ErgsFw6sLovdNkx6b0uzfJ8vVKt+hJIowx0X
+ 7ff5MuTW2MyeOOGnas5STSIKgzv565qTUhpRsqDKHOhVM5M6WHFFxofxWyUJuaFPxgCz
+ ZFlRFAitu8PdhugYNkfIQV8YbQ2MHC2nhnDeDR9x4i+EcsP19i9O7hIc9TFpY5uKp8/I
+ 09hjxTjWCYS2I48f9PFJ0LGIiBeT/EdmDGWy1q17ufbZty8G5vjfQqwQSvYubXPr0ZqO
+ dPv+6LU6o/qklpqyHWNPqUH7jaB+XFK18PDaBq3XGBD0rMVsGu/ZnEKJ8gWHa4UEDliR
+ JQwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=g3k/h6Z/qWjEAJpRG1w1mf95HfntbrdREbdJcqPGBPA=;
- b=SrkPn3P8/3559A4iWfl/ha1kqjXXmvyFqtpsJuhZ7UffT3ns75uTMfZFEwwu/ndCyb
- 04wg2HAOb1312YRZy/Yy64JLeg5K2e6XZzMhrw0dsJLJPPTqb27SuDoHAh6/R/usCnkS
- 9COze8lYYK00z53eRT6fKJNmbr54Ao0aYFIrT6w88lXp+WKba/4qP2RRs7cvNHlHoUrS
- N/QhIZf2m05ci1EljvgdepSbynxBSzxFQsQ3e8lYWjHbIodSKxUCg8zbhpd9FAbkeY/A
- D6DsvDdVXlMxYHQmIWrmG/LlRQCfD624zBsBDbeEBvzMMnQ8ozFKZe2YU4RBKZR5O++W
- LXWw==
-X-Gm-Message-State: APjAAAUeZuco/Be+ZKDdZBpohVXbf9G+XnB1AKh00oeUVvLM3CHti2is
- Gm1jdMJ6qSqbYewI2IY9UxpBJGhb
-X-Google-Smtp-Source: APXvYqydzo885uMbZM1OPKLKBl4Gmc+NkQo4iVgcyJ5CfI7eB6CTCsvUF/p27jwSAHcREJnggwBgxA==
-X-Received: by 2002:adf:e841:: with SMTP id d1mr11469443wrn.204.1565188525550; 
- Wed, 07 Aug 2019 07:35:25 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=17S8+srOfxdrNTILDf4H97ECt1wzvAyOrkiP+8O9a4E=;
+ b=qhLvZR8iX6wxyxtRbL50Jfrp9EVBwKDihzzDe2NEIXgOX8TCQPmFOdCL7vSMQIbyxU
+ CkOOmaOWW19rFach5CZbu22zzJGioVCoARmMu8TCBxql7QqdUpIhTxHe26Vw6iJuwG4/
+ nSA3E4mWXOnJ0JGPIVxh3lQWxZ4dnTHlYyXELd8senBwQkwJMgtmrVmqucLQKohzDZ1X
+ htaaN2RrG9gCO/b6hTu7jMIPciGLut15fgADQ0OdAe9ZY2Ozc6MP20Ol8HqfmcUQ9Sse
+ 0lbDB2Og9P5KhHoym+QwhJaBNMqy74QMoGUgyp/zUbzZ07jyn6dQyFPa2S+44poYnAHc
+ Ilng==
+X-Gm-Message-State: APjAAAUfeVRgqeomq9LDcxRaZYfhVJ4L69zqVb+H7IkSsj+O8qU5cDQ3
+ jJoP4IhVfqe7hu2a+GMN1dAXWZIS
+X-Google-Smtp-Source: APXvYqx4vw73+kgqNmdsYuZ6EtxyiELi5Wz5jc4HF2mlCixm1EWg+CBbwZm1HWifG/8TOeL94eWkXQ==
+X-Received: by 2002:a05:600c:230c:: with SMTP id
+ 12mr245534wmo.151.1565188526825; 
+ Wed, 07 Aug 2019 07:35:26 -0700 (PDT)
 Received: from donizetti.lan ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
- by smtp.gmail.com with ESMTPSA id o4sm86004wmh.35.2019.08.07.07.35.23
+ by smtp.gmail.com with ESMTPSA id o4sm86004wmh.35.2019.08.07.07.35.25
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 07 Aug 2019 07:35:24 -0700 (PDT)
+ Wed, 07 Aug 2019 07:35:26 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed,  7 Aug 2019 16:35:20 +0200
-Message-Id: <20190807143523.15917-1-pbonzini@redhat.com>
+Date: Wed,  7 Aug 2019 16:35:21 +0200
+Message-Id: <20190807143523.15917-2-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190807143523.15917-1-pbonzini@redhat.com>
+References: <20190807143523.15917-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH v2 0/3] tests/tcg: disentangle makefiles
+X-Received-From: 2a00:1450:4864:20::332
+Subject: [Qemu-devel] [PATCH v2 1/3] tests/tcg: use EXTRA_CFLAGS everywhere
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,82 +98,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The tests/tcg rely a lot on per-target informations from
-the QEMU makefiles, but most of the definitions in there
-aren't really relevant to TCG tests.
+For i386 specifically, this allows using the host GCC
+to compile the i386 tests.  But, it should really be
+done for all targets, unless we want to pass $(EXTRA_CFLAGS)
+directly as part of $(CC).
 
-This series is just a cleanup, but it could also be
-a useful start in making it possible to compile tests/tcg
-out of QEMU's tree, and/or making it a submodule, and/or
-unifying the system emulation tests with kvm-unit-tests.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/tcg/aarch64/Makefile.softmmu-target | 4 ++--
+ tests/tcg/alpha/Makefile.softmmu-target   | 4 ++--
+ tests/tcg/arm/Makefile.softmmu-target     | 2 +-
+ tests/tcg/i386/Makefile.softmmu-target    | 4 ++--
+ tests/tcg/minilib/Makefile.target         | 2 +-
+ tests/tcg/xtensa/Makefile.softmmu-target  | 4 ++--
+ 6 files changed, 10 insertions(+), 10 deletions(-)
 
-Paolo
-
-v1->v2: fix configure from fresh directory, do not use $SHELL
-
-Paolo Bonzini (3):
-  tests/tcg: use EXTRA_CFLAGS everywhere
-  tests/tcg: cleanup Makefile inclusions
-  tests/tcg: move configuration to a sub-shell script
-
- Makefile                                  |   1 +
- Makefile.target                           |   3 -
- configure                                 | 155 ++-------------
- tests/Makefile.include                    |  25 +--
- tests/tcg/Makefile.include                |  88 ---------
- tests/tcg/Makefile.prereqs                |  18 ++
- tests/tcg/Makefile.probe                  |  31 ---
- tests/tcg/Makefile.qemu                   |  95 +++++++++
- tests/tcg/{Makefile => Makefile.target}   |  15 +-
- tests/tcg/aarch64/Makefile.include        |   8 -
- tests/tcg/aarch64/Makefile.softmmu-target |   4 +-
- tests/tcg/aarch64/Makefile.target         |  12 +-
- tests/tcg/alpha/Makefile.include          |   2 -
- tests/tcg/alpha/Makefile.softmmu-target   |   4 +-
- tests/tcg/arm/Makefile.include            |   8 -
- tests/tcg/arm/Makefile.softmmu-target     |   6 +-
- tests/tcg/configure.sh                    | 228 ++++++++++++++++++++++
- tests/tcg/cris/Makefile.include           |   6 -
- tests/tcg/hppa/Makefile.include           |   2 -
- tests/tcg/i386/Makefile.include           |   9 -
- tests/tcg/i386/Makefile.softmmu-target    |  12 +-
- tests/tcg/i386/Makefile.target            |  13 +-
- tests/tcg/m68k/Makefile.include           |   2 -
- tests/tcg/minilib/Makefile.target         |   2 +-
- tests/tcg/mips/Makefile.include           |  20 --
- tests/tcg/ppc/Makefile.include            |  10 -
- tests/tcg/riscv/Makefile.include          |  10 -
- tests/tcg/s390x/Makefile.include          |   2 -
- tests/tcg/sh4/Makefile.include            |   4 -
- tests/tcg/sparc64/Makefile.include        |   2 -
- tests/tcg/x86_64/Makefile.softmmu-target  |  36 ++++
- tests/tcg/x86_64/Makefile.target          |   7 +-
- tests/tcg/xtensa/Makefile.include         |  11 --
- tests/tcg/xtensa/Makefile.softmmu-target  |   4 +-
- 34 files changed, 435 insertions(+), 420 deletions(-)
- delete mode 100644 tests/tcg/Makefile.include
- create mode 100644 tests/tcg/Makefile.prereqs
- delete mode 100644 tests/tcg/Makefile.probe
- create mode 100644 tests/tcg/Makefile.qemu
- rename tests/tcg/{Makefile => Makefile.target} (90%)
- delete mode 100644 tests/tcg/aarch64/Makefile.include
- delete mode 100644 tests/tcg/alpha/Makefile.include
- delete mode 100644 tests/tcg/arm/Makefile.include
- create mode 100644 tests/tcg/configure.sh
- delete mode 100644 tests/tcg/cris/Makefile.include
- delete mode 100644 tests/tcg/hppa/Makefile.include
- delete mode 100644 tests/tcg/i386/Makefile.include
- delete mode 100644 tests/tcg/m68k/Makefile.include
- delete mode 100644 tests/tcg/mips/Makefile.include
- delete mode 100644 tests/tcg/ppc/Makefile.include
- delete mode 100644 tests/tcg/riscv/Makefile.include
- delete mode 100644 tests/tcg/s390x/Makefile.include
- delete mode 100644 tests/tcg/sh4/Makefile.include
- delete mode 100644 tests/tcg/sparc64/Makefile.include
- create mode 100644 tests/tcg/x86_64/Makefile.softmmu-target
- delete mode 100644 tests/tcg/xtensa/Makefile.include
-
+diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch64/Makefile.softmmu-target
+index 2e560e4d08..4c4aaf61dd 100644
+--- a/tests/tcg/aarch64/Makefile.softmmu-target
++++ b/tests/tcg/aarch64/Makefile.softmmu-target
+@@ -22,11 +22,11 @@ LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
+ .PRECIOUS: $(CRT_OBJS)
+ 
+ %.o: $(CRT_PATH)/%.S
+-	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -x assembler-with-cpp -c $< -o $@
+ 
+ # Build and link the tests
+ %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
+-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
+ 
+ memory: CFLAGS+=-DCHECK_UNALIGNED=1
+ 
+diff --git a/tests/tcg/alpha/Makefile.softmmu-target b/tests/tcg/alpha/Makefile.softmmu-target
+index 3c0f34cc69..09193a62d6 100644
+--- a/tests/tcg/alpha/Makefile.softmmu-target
++++ b/tests/tcg/alpha/Makefile.softmmu-target
+@@ -22,11 +22,11 @@ LDFLAGS+=-static -nostdlib $(CRT_OBJS) $(MINILIB_OBJS) -lgcc
+ .PRECIOUS: $(CRT_OBJS)
+ 
+ %.o: $(CRT_PATH)/%.S
+-	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -x assembler-with-cpp -c $< -o $@
+ 
+ # Build and link the tests
+ %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
+-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
+ 
+ memory: CFLAGS+=-DCHECK_UNALIGNED=0
+ 
+diff --git a/tests/tcg/arm/Makefile.softmmu-target b/tests/tcg/arm/Makefile.softmmu-target
+index 49d48d8a1c..2deb06e6e4 100644
+--- a/tests/tcg/arm/Makefile.softmmu-target
++++ b/tests/tcg/arm/Makefile.softmmu-target
+@@ -18,7 +18,7 @@ CFLAGS+=-Wl,--build-id=none -x assembler-with-cpp
+ LDFLAGS+=-nostdlib -N -static
+ 
+ %: %.S %.ld
+-	$(CC) $(CFLAGS) $(ASFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM_SRC)/$@.ld
++	$(CC) $(CFLAGS) $(ASFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM_SRC)/$@.ld
+ 
+ # Specific Test Rules
+ 
+diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Makefile.softmmu-target
+index 0a4364868c..cee342017e 100644
+--- a/tests/tcg/i386/Makefile.softmmu-target
++++ b/tests/tcg/i386/Makefile.softmmu-target
+@@ -32,11 +32,11 @@ TESTS+=$(MULTIARCH_TESTS)
+ .PRECIOUS: $(CRT_OBJS)
+ 
+ %.o: $(CRT_PATH)/%.S
+-	$(CC) $(CFLAGS) -c $< -o $@
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
+ 
+ # Build and link the tests
+ %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
+-	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
+ 
+ memory: CFLAGS+=-DCHECK_UNALIGNED=1
+ 
+diff --git a/tests/tcg/minilib/Makefile.target b/tests/tcg/minilib/Makefile.target
+index 3ed8077d0f..c821d2806a 100644
+--- a/tests/tcg/minilib/Makefile.target
++++ b/tests/tcg/minilib/Makefile.target
+@@ -18,4 +18,4 @@ MINILIB_INC=-isystem $(SYSTEM_MINILIB_SRC)
+ .PRECIOUS: $(MINILIB_OBJS)
+ 
+ %.o: $(SYSTEM_MINILIB_SRC)/%.c
+-	$(CC) $(CFLAGS) -c $< -o $@
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
+diff --git a/tests/tcg/xtensa/Makefile.softmmu-target b/tests/tcg/xtensa/Makefile.softmmu-target
+index 8212d96b81..9530cac2ad 100644
+--- a/tests/tcg/xtensa/Makefile.softmmu-target
++++ b/tests/tcg/xtensa/Makefile.softmmu-target
+@@ -34,9 +34,9 @@ $(XTENSA_USABLE_TESTS): linker.ld macros.inc $(CRT) Makefile.softmmu-target
+ 
+ # special rule for common blobs
+ %.o: %.S
+-	$(CC) $(XTENSA_INC) $($*_ASFLAGS) $(ASFLAGS) -c $< -o $@
++	$(CC) $(XTENSA_INC) $($*_ASFLAGS) $(ASFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
+ 
+ %: %.S
+-	$(CC) $(XTENSA_INC) $(ASFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
++	$(CC) $(XTENSA_INC) $(ASFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
+ 
+ endif
 -- 
 2.21.0
+
 
 
