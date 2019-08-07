@@ -2,66 +2,81 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BC96C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D3DC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21409218FE
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:12:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21409218FE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 64A0F21E73
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:19:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nCqkdfOW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A0F21E73
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNbz-0004ye-Da
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:12:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50217)
+	id 1hvNie-0007TB-Ja
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:19:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51781)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hvNaB-00044f-JT
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:10:33 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hvNi5-0006c9-UF
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:18:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hvNa9-0003IC-DQ
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:10:31 -0400
-Resent-Date: Wed, 07 Aug 2019 11:10:30 -0400
-Resent-Message-Id: <E1hvNa9-0003IC-DQ@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21520)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hvNa3-0003Ez-0J; Wed, 07 Aug 2019 11:10:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1565190605; cv=none; d=zoho.com; s=zohoarc; 
- b=QTn/gR5u7VynTAizKHIg4Lx93TkrZa4qKVegDhaqrF+W+mcmSdVhH1fmlQPT1lRlRsS/Tt4s2vjewo81XT0Nk55kOV9AHm+z+KgmowUyD6dooRTQWaL80f3pNca0MZTPe0FnIbfjiXRlYl/GIEZ05M3OJMlTD+cTDdBLaZC3rCY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1565190605;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=M4wKdGXpX3mS4yTjCenQ3Ewf335HoplQAMeU/DIaPrA=; 
- b=HLvqR1eEUGh8g/d1KaTIL0FdVd5nPsBTFjh68jO7dDCmOuuUySRE67pucD/YFPoCfVAAImDyOavpYeV0nNWdF3Kd7W0LVvn3u7WADEtNBScZL3yJ6MN8Y5g4p71hJftx0XRSD/54EGqgPVQug2kzfQ9QwJ+AIaXgEReKgN+jLyA=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1565190604877168.45033724717928;
- Wed, 7 Aug 2019 08:10:04 -0700 (PDT)
-In-Reply-To: <20190807144628.4988-1-kwolf@redhat.com>
-Message-ID: <156519060347.6126.3635589187292243655@b08f24806b7e>
+ (envelope-from <peter.maydell@linaro.org>) id 1hvNi3-0006vj-Rc
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:18:41 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39286)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hvNi3-0006uw-K3
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:18:39 -0400
+Received: by mail-ot1-x342.google.com with SMTP id r21so99757385otq.6
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/3goy7jwv3jhlXZ6iqzuJ6FnnNayKsh8Ov6Om64DEbg=;
+ b=nCqkdfOWUSOOHrh/49bO5iS9y/BXGIvciLlidMa440NRoTvpMTNF6LP81UvSv7rPZP
+ WWcQEJwemwJujGsgcQPDMrAFVt4TOIfJZ3E6XUrCIMKmFAX7LZMrS05e+dgDzHHkQfI0
+ lNqTgcRfT2dgrP3GHDij+jDKXr1ffb6hDE3UvvFSBViHeFfWNtRjj43rGMk08Hzk1W96
+ G+6pYtO+HGfXGExrHrcX6oebeDUwuH4nNOWP/I3rD8++iRBgeN8aGyxajWO3N8MHtp4e
+ VWoQLYCnAMuuQFDMuCRyL6iYsbQxFM/VWl6EA3Kal5gGFxHmoD6xTUSD1YGeK0ya5BfR
+ u02g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/3goy7jwv3jhlXZ6iqzuJ6FnnNayKsh8Ov6Om64DEbg=;
+ b=IEH9Qvy5+9iZdIQDQ0KkuVhufbCYHnfgB9eUR8stxQhUTbeYPjnFkVXLA2tVvGX2mp
+ WGqsB+oJa83GrL6BYsmpPjoWP1iU9DgXtFmce5LDFW12pQA5ztqOu7CrmOT12Xyntw2J
+ qKtcxBFeQ99npPxi3+A2tUDLoLmeP1Q2p+s9CzzS2I1aj5rIWHxDhDq1m3GDyzecx2rc
+ gBexRjydIpnFK71zuzhLE5PUozq5K2UpdEvmXRy+eSp2SYZlgmmSG5xZgwWqjSvc68jc
+ Zm6jpVSsWuwPGJBjQtXt34b93uY1JHMDDg/cTswb2bWh8zyVjSN9rHS3J+xU7P5h0RoF
+ CgTQ==
+X-Gm-Message-State: APjAAAW+aG7q1mBXAb6QtfXqEqCTW1fnkoSQp0QygEiVK0XgMP4UFUll
+ sEtd7HHgmh++ucuIuDHD4fqy2wDJk3RYYzY3MmonbA==
+X-Google-Smtp-Source: APXvYqwhcfmFi6B5Hhzl/GHr6l1KAeN3HdoL9N2iDfwBYEG6IKA9KPaAHlBRwVj8tf8Jr1dr9O7Lt/jx98fmr4xXBaI=
+X-Received: by 2002:a5e:9319:: with SMTP id k25mr10419005iom.137.1565191118479; 
+ Wed, 07 Aug 2019 08:18:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kwolf@redhat.com
-Date: Wed, 7 Aug 2019 08:10:04 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] block-backend: Queue requests while
- drained
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-9-damien.hedde@greensocs.com>
+In-Reply-To: <20190729145654.14644-9-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Aug 2019 16:18:27 +0100
+Message-ID: <CAFEAcA_M5fOoQ8yN_1QhJ-WOLxra6B-Ltwh2DHtq6erz4V0a2A@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v3 08/33] Add function to control reset
+ with gpio inputs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,140 +88,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- dplotnikov@virtuozzo.com
+Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
+ Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwNzE0NDYyOC40OTg4
-LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8z
-XSBibG9jay1iYWNrZW5kOiBRdWV1ZSByZXF1ZXN0cyB3aGlsZSBkcmFpbmVkCk1lc3NhZ2UtaWQ6
-IDIwMTkwODA3MTQ0NjI4LjQ5ODgtMS1rd29sZkByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
-eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
-NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
-dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwODA3MTQ0NjI4LjQ5ODgtMS1rd29s
-ZkByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA4MDcxNDQ2MjguNDk4OC0xLWt3b2xmQHJlZGhh
-dC5jb20KU3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBz
-dG9uZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0Yycg
-KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdk
-dGMnClN1Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9RZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1h
-Y0RyaXZlcnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
-L1NMT0YuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9t
-cy9lZGsyJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2VkazIuZ2l0KSByZWdpc3RlcmVkIGZv
-ciBwYXRoICdyb21zL2VkazInClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2lweGUnClN1Ym1v
-ZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5n
-aXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9v
-cGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmhhY2t3YXJlLmdpdCkg
-cmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1Ym1vZHVsZSAncm9tcy9v
-cGVuc2JpJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5zYmkuZ2l0KSByZWdpc3RlcmVk
-IGZvciBwYXRoICdyb21zL29wZW5zYmknClN1Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnICho
-dHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
-cGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6
-Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9t
-cy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXQucWVt
-dS5vcmcvZ2l0L3NlYWJpb3MtaHBwYS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2Vh
-Ymlvcy1ocHBhJwpTdWJtb2R1bGUgJ3JvbXMvc2dhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9zZ2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJt
-b2R1bGUgJ3JvbXMvc2tpYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9za2lib290Lmdp
-dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9za2lib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1i
-b290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvdS1ib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0
-cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC1zYW00NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9y
-IHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JwpTdWJtb2R1bGUgJ3NsaXJwJyAoaHR0cHM6Ly9n
-aXQucWVtdS5vcmcvZ2l0L2xpYnNsaXJwLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnc2xpcnAn
-ClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dpdC5x
-ZW11Lm9yZy9naXQvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
-ICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJr
-ZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9iZXJrZWxleS10ZXN0
-ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3Rm
-bG9hdC0zJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
-L2dpdC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFw
-ZGInCkNsb25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6
-IGNoZWNrZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpD
-bG9uaW5nIGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4
-OGYxODkwOWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGludG8gJ3Jv
-bXMvUWVtdU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJz
-JzogY2hlY2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDljOGUyNjYn
-CkNsb25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9TTE9GJzog
-Y2hlY2tlZCBvdXQgJ2JhMWFiMzYwZWViZTYzMzhiYjhkN2Q4M2E5MjIwY2NmN2UyMTNhZjMnCkNs
-b25pbmcgaW50byAncm9tcy9lZGsyJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyJzogY2hl
-Y2tlZCBvdXQgJzIwZDJlNWExMjVlMzRmYzg1MDEwMjY2MTNhNzE1NDliMmExYTNlNTQnClN1Ym1v
-ZHVsZSAnU29mdEZsb2F0JyAoaHR0cHM6Ly9naXRodWIuY29tL3VjYi1iYXIvYmVya2VsZXktc29m
-dGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0
-RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAnQ3J5cHRvUGtnL0xpYnJh
-cnkvT3BlbnNzbExpYi9vcGVuc3NsJyAoaHR0cHM6Ly9naXRodWIuY29tL29wZW5zc2wvb3BlbnNz
-bCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVu
-c3NsJwpDbG9uaW5nIGludG8gJ0FybVBrZy9MaWJyYXJ5L0FybVNvZnRGbG9hdExpYi9iZXJrZWxl
-eS1zb2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9Bcm1Qa2cvTGlicmFy
-eS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0
-YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICdDcnlw
-dG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21z
-L2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJzogY2hlY2tlZCBvdXQg
-JzUwZWFhYzlmMzMzNzY2NzI1OWRlNzI1NDUxZjIwMWU3ODQ1OTk2ODcnClN1Ym1vZHVsZSAnYm9y
-aW5nc3NsJyAoaHR0cHM6Ly9ib3Jpbmdzc2wuZ29vZ2xlc291cmNlLmNvbS9ib3Jpbmdzc2wpIHJl
-Z2lzdGVyZWQgZm9yIHBhdGggJ2JvcmluZ3NzbCcKU3VibW9kdWxlICdrcmI1JyAoaHR0cHM6Ly9n
-aXRodWIuY29tL2tyYjUva3JiNSkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAna3JiNScKU3VibW9kdWxl
-ICdweWNhLmNyeXB0b2dyYXBoeScgKGh0dHBzOi8vZ2l0aHViLmNvbS9weWNhL2NyeXB0b2dyYXBo
-eS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3B5Y2EtY3J5cHRvZ3JhcGh5JwpDbG9uaW5nIGlu
-dG8gJ2JvcmluZ3NzbCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGli
-cmFyeS9PcGVuc3NsTGliL29wZW5zc2wvYm9yaW5nc3NsJzogY2hlY2tlZCBvdXQgJzIwNzBmOGFk
-OTE1MWRjOGYzYTczYmZmYWExNDZiNWU2OTM3YTU4M2YnCkNsb25pbmcgaW50byAna3JiNScuLi4K
-U3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29w
-ZW5zc2wva3JiNSc6IGNoZWNrZWQgb3V0ICdiOWFkNmM0OTUwNWM5NmEwODgzMjZiNjJhNTI1Njhl
-MzQ4NGYyMTY4JwpDbG9uaW5nIGludG8gJ3B5Y2EtY3J5cHRvZ3JhcGh5Jy4uLgpTdWJtb2R1bGUg
-cGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbC9weWNh
-LWNyeXB0b2dyYXBoeSc6IGNoZWNrZWQgb3V0ICcwOTQwMzEwMGRlMmY2ZjFjZGQwZDQ4NGRjYjhl
-NjIwZjFjMzM1YzhmJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGgg
-J3JvbXMvaXB4ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2Vl
-OTAxYmI2ZTE3JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRo
-ICdyb21zL29wZW5iaW9zJzogY2hlY2tlZCBvdXQgJ2M3OWUwZWNiODRmNGYxZWUzZjczZjUyMTYy
-MmUyNjRlZGQxYmYxNzQnCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1v
-ZHVsZSBwYXRoICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1
-ZTQ1ZWYxZjY3OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbnNiaScu
-Li4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbnNiaSc6IGNoZWNrZWQgb3V0ICdjZTIyOGVlMDkx
-OWRlYjk5NTcxOTJkNzIzZWVjYzhhYWFlMjY5N2M2JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1w
-YWxjb2RlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91
-dCAnYmYwZTEzNjk4ODcyNDUwMTY0ZmE3MDQwZGEzNmE5NWQyZDRiMzI2ZicKQ2xvbmluZyBpbnRv
-ICdyb21zL3NlYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2Vk
-IG91dCAnYTVjYWI1OGU5YTNmYjZlMTY4YWJhOTE5YzU2NjliZWE0MDY1NzNiNCcKQ2xvbmluZyBp
-bnRvICdyb21zL3NlYWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1o
-cHBhJzogY2hlY2tlZCBvdXQgJzBmNGZlODQ2NTgxNjVlOTZjZTM1ODcwZmQxOWZjNjM0ZTE4MmU3
-N2InCkNsb25pbmcgaW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9z
-Z2FiaW9zJzogY2hlY2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFj
-OTAxNWEnCkNsb25pbmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
-cy9za2lib290JzogY2hlY2tlZCBvdXQgJzI2MWNhOGU3NzllNTEzODg2OWE0NWYxNzRjYWE0OWJl
-NmEyNzQ1MDEnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdy
-b21zL3UtYm9vdCc6IGNoZWNrZWQgb3V0ICdkMzY4OTI2N2Y5MmM1OTU2ZTA5Y2M3ZDFiYWE0NzAw
-MTQxNjYyYmZmJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgplcnJvcjog
-UlBDIGZhaWxlZDsgcmVzdWx0PTE4LCBIVFRQIGNvZGUgPSAyMDAKZmF0YWw6IFRoZSByZW1vdGUg
-ZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CmZhdGFsOiBwcm90b2NvbCBlcnJvcjogYmFkIHBhY2sg
-aGVhZGVyCkNsb25lIG9mICdodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LXNhbTQ2MGV4
-LmdpdCcgaW50byBzdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIGZhaWxlZApU
-cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi9wYXRjaGV3LWNsaSIs
-IGxpbmUgNTA0LCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8i
-XSwgclsiaGVhZCJdLCBsb2dmKQogIEZpbGUgIi4vcGF0Y2hldy1jbGkiLCBsaW5lIDUwLCBpbiBn
-aXRfY2xvbmVfcmVwbwogICAgc3RkZXJyPWxvZ2YsIHN0ZG91dD1sb2dmKQogIEZpbGUgIi91c3Iv
-bGliNjQvcHl0aG9uMy40L3N1YnByb2Nlc3MucHkiLCBsaW5lIDU1OCwgaW4gY2hlY2tfY2FsbAog
-ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
-ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ2Nsb25lJywgJy1xJywgJy0tcmVjdXJz
-aXZlJywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3BhdGNoZXctZ2l0LWNhY2hlL2h0dHBzZ2l0aHVi
-Y29tcGF0Y2hld3Byb2plY3RxZW11LTNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWVjbWdjejYyL3NyYyddJyByZXR1
-cm5lZCBub24temVybyBleGl0IHN0YXR1cyAxCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA4MDcxNDQ2MjguNDk4OC0xLWt3b2xmQHJl
-ZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> It adds the possibility to add 2 gpios to control the warm and cold reset.
+> With theses ios, the reset can be maintained during some time.
+> Each io is associated with a state to detect level changes.
+>
+> Vmstate subsections are also added to the existsing device_reset
+> subsection.
+>
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> ---
+>  hw/core/qdev-vmstate.c | 15 ++++++++++
+>  hw/core/qdev.c         | 65 ++++++++++++++++++++++++++++++++++++++++++
+>  include/hw/qdev-core.h | 57 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 137 insertions(+)
+>
+> diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
+> index 24f8465c61..72f84c6cee 100644
+> --- a/hw/core/qdev-vmstate.c
+> +++ b/hw/core/qdev-vmstate.c
+> @@ -24,10 +24,23 @@ static int device_vmstate_reset_post_load(void *opaque, int version_id)
+>  {
+>      DeviceState *dev = (DeviceState *) opaque;
+>      BusState *bus;
+> +    uint32_t io_count = 0;
+> +
+>      QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+>          bus->resetting = dev->resetting;
+>          bus->reset_is_cold = dev->reset_is_cold;
+>      }
+> +
+> +    if (dev->cold_reset_input.state) {
+> +        io_count += 1;
+> +    }
+> +    if (dev->warm_reset_input.state) {
+> +        io_count += 1;
+> +    }
+> +    /* ensure resetting count is coherent with io states */
+> +    if (dev->resetting < io_count) {
+> +        return -1;
+> +    }
+>      return 0;
+>  }
+>
+> @@ -40,6 +53,8 @@ const struct VMStateDescription device_vmstate_reset = {
+>      .fields = (VMStateField[]) {
+>          VMSTATE_UINT32(resetting, DeviceState),
+>          VMSTATE_BOOL(reset_is_cold, DeviceState),
+> +        VMSTATE_BOOL(cold_reset_input.state, DeviceState),
+> +        VMSTATE_BOOL(warm_reset_input.state, DeviceState),
 
+If we're just adding these fields to this VMStateDescription
+then this patch should come earlier in the series than the
+patch where we create and start using the fields. Otherwise
+there's a migration compat break between a QEMU just
+before this patch and a QEMU with it. I think the simplest
+fix is to put this patch before patches 6/7 and have a note
+in the commit message that this functionality can't be used
+until after the patch which adds the migration support.
+
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 88387d3743..11a4de55ea 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -450,6 +450,67 @@ void qdev_init_gpio_in(DeviceState *dev, qemu_irq_handler handler, int n)
+>      qdev_init_gpio_in_named(dev, handler, NULL, n);
+>  }
+>
+> +static DeviceResetInputState *device_get_reset_input_state(DeviceState *dev,
+> +                                                            bool cold)
+> +{
+> +    return cold ? &dev->cold_reset_input : &dev->warm_reset_input;
+> +}
+> +
+> +static void device_reset_handler(DeviceState *dev, bool cold, bool level)
+> +{
+> +    DeviceResetInputState *dris = device_get_reset_input_state(dev, cold);
+> +
+> +    if (dris->type == DEVICE_RESET_ACTIVE_LOW) {
+> +        level = !level;
+> +    }
+> +
+> +    if (dris->state == level) {
+> +        /* io state has not changed */
+> +        return;
+> +    }
+> +
+> +    dris->state = level;
+> +
+> +    if (level) {
+> +        resettable_assert_reset(OBJECT(dev), cold);
+> +    } else {
+> +        resettable_deassert_reset(OBJECT(dev));
+> +    }
+> +}
+> +
+> +static void device_cold_reset_handler(void *opaque, int n, int level)
+> +{
+> +    device_reset_handler((DeviceState *) opaque, true, level);
+> +}
+> +
+> +static void device_warm_reset_handler(void *opaque, int n, int level)
+> +{
+> +    device_reset_handler((DeviceState *) opaque, false, level);
+> +}
+> +
+> +void qdev_init_reset_gpio_in_named(DeviceState *dev, const char *name,
+> +                                   bool cold, DeviceResetActiveType type)
+> +{
+> +    DeviceResetInputState *dris = device_get_reset_input_state(dev, cold);
+> +    qemu_irq_handler handler;
+> +
+> +    switch (type) {
+> +    case DEVICE_RESET_ACTIVE_LOW:
+> +    case DEVICE_RESET_ACTIVE_HIGH:
+> +        break;
+> +    default:
+> +        assert(false);
+> +        break;
+
+The usual way to write this is
+    g_assert_not_reached();
+(and no following 'break').
+
+
+But the whole switch statement seems to be a complicated way
+of writing
+   assert(type == DEVICE_RESET_ACTIVE_LOW || type == DEVICE_RESET_ACTIVE_HIGH);
+
+> +    }
+> +
+> +    assert(!dris->exists);
+> +    dris->exists = true;
+> +    dris->type = type;
+> +
+> +    handler = cold ? device_cold_reset_handler : device_warm_reset_handler;
+> +    qdev_init_gpio_in_named(dev, handler, name, 1);
+> +}
+
+thanks
+-- PMM
 
