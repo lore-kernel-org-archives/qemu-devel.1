@@ -2,75 +2,143 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3932C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CDC6C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:27:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CC1621E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:25:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CC1621E6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA5F22297
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:27:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA5F22297
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvOkq-0003KF-Qe
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 12:25:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41801)
+	id 1hvOmx-0005Dy-G1
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 12:27:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42426)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sebastien.boeuf@intel.com>) id 1hvOjy-0002MG-8K
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:24:43 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hvOmS-0004jb-Rt
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sebastien.boeuf@intel.com>) id 1hvOjx-0006JE-1R
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:24:42 -0400
-Received: from mga14.intel.com ([192.55.52.115]:25299)
+ (envelope-from <jsnow@redhat.com>) id 1hvOmR-0000tc-Ds
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:27:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55528)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sebastien.boeuf@intel.com>)
- id 1hvOjw-0006F2-Ot
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:24:40 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 07 Aug 2019 09:24:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,357,1559545200"; d="scan'208";a="374463221"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
- by fmsmga006.fm.intel.com with ESMTP; 07 Aug 2019 09:24:37 -0700
-Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 7 Aug 2019 09:24:37 -0700
-Received: from orsmsx115.amr.corp.intel.com ([169.254.4.6]) by
- ORSMSX153.amr.corp.intel.com ([169.254.12.99]) with mapi id 14.03.0439.000;
- Wed, 7 Aug 2019 09:24:36 -0700
-From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>
-Thread-Topic: libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD check
-Thread-Index: AQHVTSw+I7kmgADAmUOtvYF7P6PObabwT+2AgAAETwA=
-Date: Wed, 7 Aug 2019 16:24:36 +0000
-Message-ID: <e99d520edca6deca1ff6b838fd43f1bde00761ee.camel@intel.com>
-References: <8df105774471bc72bca1397b4058ecc66d963848.camel@intel.com>
- <20190807160917.GI2867@work-vm>
-In-Reply-To: <20190807160917.GI2867@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.7.199.52]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BEB46965F1C5DE428F956B75D873A672@intel.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hvOmO-0000p3-KG; Wed, 07 Aug 2019 12:27:12 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 486373078856;
+ Wed,  7 Aug 2019 16:27:11 +0000 (UTC)
+Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1DDB2600C6;
+ Wed,  7 Aug 2019 16:27:10 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+References: <20190806152611.280389-1-vsementsov@virtuozzo.com>
+ <fa5f14a1-e05d-24e7-a51e-ad7737d5f4a1@redhat.com>
+ <c0f0831f-851b-a76d-208c-22d97e4392d8@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <57111ad3-6acc-1027-2e5a-f203929e48b6@redhat.com>
+Date: Wed, 7 Aug 2019 12:27:09 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
-Subject: Re: [Qemu-devel] libvhost-user: Fix the
- VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD check
+In-Reply-To: <c0f0831f-851b-a76d-208c-22d97e4392d8@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Wed, 07 Aug 2019 16:27:11 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2] util/hbitmap: strict hbitmap_reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,59 +150,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gV2VkLCAyMDE5LTA4LTA3IGF0IDE3OjA5ICswMTAwLCBEci4gRGF2aWQgQWxhbiBHaWxiZXJ0
-IHdyb3RlOg0KPiAqIEJvZXVmLCBTZWJhc3RpZW4gKHNlYmFzdGllbi5ib2V1ZkBpbnRlbC5jb20p
-IHdyb3RlOg0KPiA+IEZyb20gMGE1M2E4MWRiNmRkMDY5ZjliN2JjZGNkMzg2ODQ1YmNlYjNhMmFj
-NiBNb24gU2VwIDE3IDAwOjAwOjAwDQo+ID4gMjAwMQ0KPiA+IEZyb206IFNlYmFzdGllbiBCb2V1
-ZiA8c2ViYXN0aWVuLmJvZXVmQGludGVsLmNvbT4NCj4gPiBEYXRlOiBXZWQsIDcgQXVnIDIwMTkg
-MDc6MTU6MzIgLTA3MDANCj4gPiBTdWJqZWN0OiBbUEFUQ0hdIGxpYnZob3N0LXVzZXI6IEZpeCB0
-aGUNCj4gPiBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfU0xBVkVfU0VORF9GRA0KPiA+ICBjaGVjaw0K
-PiA+IA0KPiA+IFZob3N0IHVzZXIgcHJvdG9jb2wgZmVhdHVyZXMgYXJlIHNldCBhcyBhIGJpdG1h
-c2suIEFuZCB0aGUNCj4gPiBmb2xsb3dpbmcNCj4gPiBjb25zdGFudCBWSE9TVF9VU0VSX1BST1RP
-Q09MX0ZfU0xBVkVfU0VORF9GRCB2YWx1ZSBpcyAxMCBiZWNhdXNlDQo+ID4gdGhlDQo+ID4gYml0
-DQo+ID4gMTAgaW5kaWNhdGVzIGlmIHRoZSBmZWF0dXJlcyBpcyBzZXQgb3Igbm90Lg0KPiA+IA0K
-PiA+IFRoZSBwcm9wZXIgd2F5IHRvIGNoZWNrIGZvciB0aGUgcHJlc2VuY2Ugb3IgYWJzZW5jZSBv
-ZiB0aGlzIGZlYXR1cmUNCj4gPiBpcw0KPiA+IHRvIHNoaWZ0IDEgYnkgdGhlIHZhbHVlIG9mIHRo
-aXMgY29uc3RhbnQgYW5kIHRoZW4gbWFzayBpdCB3aXRoIHRoZQ0KPiA+IGFjdHVhbCBiaXRtYXNr
-IHJlcHJlc2VudGluZyB0aGUgc3VwcG9ydGVkIHByb3RvY29sIGZlYXR1cmVzLg0KPiA+IA0KPiA+
-IFRoaXMgcGF0Y2ggYWltcyB0byBmaXggdGhlIGN1cnJlbnQgY29kZSBhcyBpdCB3YXMgbm90IGRv
-aW5nIHRoZQ0KPiA+IHNoaWZ0aW5nLCBidXQgaW5zdGVhZCBpdCB3YXMgbWFza2luZyBkaXJlY3Rs
-eSB3aXRoIHRoZSB2YWx1ZSBvZiB0aGUNCj4gPiBjb25zdGFudCBpdHNlbGYuDQo+ID4gDQo+ID4g
-U2lnbmVkLW9mZi1ieTogU2ViYXN0aWVuIEJvZXVmIDxzZWJhc3RpZW4uYm9ldWZAaW50ZWwuY29t
-Pg0KPiANCj4gTmljZWx5IHNwb3R0ZWQuDQo+IA0KPiBUd28gdGhpbmdzOw0KPiAgIGEpIEkgdGhp
-bmsgeW91ciBtYWlsIGNsaWVudCBoYXMgd3JhcHBlZCB0aGUgbGluZXMgYXQgc29tZSBwb2ludC4N
-Cj4gICBiKSBJIHRoaW5rIHRoaXMgaXMgd2h5IHRoZSBoYXNfZmVhdHVyZSgpIGZ1bmN0aW9uZSBl
-eGlzdHMsIHNvIGRvZXMNCj4gICAgICB0aGF0IGJlY29tZQ0KPiANCj4gICAgICAgaWYgKCFoYXNf
-ZmVhdHVyZShkZXYtPnByb3RvY29sX2ZlYXR1cmVzLA0KPiBWSE9TVF9VU0VSX1BST1RPQ09MX0Zf
-U0xBVkVfU0VORF9GRCkpDQoNCkFoIHllcyBidXQgdGhhdCdzIGJlY2F1c2UgSSBmb3Jnb3QgdG8g
-Y2hlY2sgdGhlIHBhdGNoIGZvcm1hdCBmaXJzdCA6KA0KDQpJJ20gZ29pbmcgdG8gdXBkYXRlIHRo
-ZSBwYXRjaC4NCg0KVGhhbmtzLA0KU2ViYXN0aWVuDQo+IA0KPiBEYXZlDQo+IA0KPiA+IC0tLQ0K
-PiA+ICBjb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jIHwgNCArKy0tDQo+ID4g
-IDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4gDQo+
-ID4gZGlmZiAtLWdpdCBhL2NvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMNCj4g
-PiBiL2NvbnRyaWIvbGlidmhvc3QtDQo+ID4gdXNlci9saWJ2aG9zdC11c2VyLmMNCj4gPiBpbmRl
-eCBmYjYxMTQyYmNjLi4xMTkwOWZiN2MxIDEwMDY0NA0KPiA+IC0tLSBhL2NvbnRyaWIvbGlidmhv
-c3QtdXNlci9saWJ2aG9zdC11c2VyLmMNCj4gPiArKysgYi9jb250cmliL2xpYnZob3N0LXVzZXIv
-bGlidmhvc3QtdXNlci5jDQo+ID4gQEAgLTExMTIsNyArMTExMiw3IEBAIGJvb2wgdnVfc2V0X3F1
-ZXVlX2hvc3Rfbm90aWZpZXIoVnVEZXYgKmRldiwNCj4gPiBWdVZpcnRxICp2cSwgaW50IGZkLA0K
-PiA+ICANCj4gPiAgICAgIHZtc2cuZmRfbnVtID0gZmRfbnVtOw0KPiA+ICANCj4gPiAtICAgIGlm
-ICgoZGV2LT5wcm90b2NvbF9mZWF0dXJlcyAmDQo+ID4gVkhPU1RfVVNFUl9QUk9UT0NPTF9GX1NM
-QVZFX1NFTkRfRkQpDQo+ID4gPT0gMCkgew0KPiA+ICsgICAgaWYgKChkZXYtPnByb3RvY29sX2Zl
-YXR1cmVzICYgKDFVTEwgPDwNCj4gPiBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfU0xBVkVfU0VORF9G
-RCkpID09IDApIHsNCj4gPiAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ID4gICAgICB9DQo+ID4g
-IA0KPiA+IEBAIC0yNTM3LDcgKzI1MzcsNyBAQCBpbnQ2NF90IHZ1X2ZzX2NhY2hlX3JlcXVlc3Qo
-VnVEZXYgKmRldiwNCj4gPiBWaG9zdFVzZXJTbGF2ZVJlcXVlc3QgcmVxLCBpbnQgZmQsDQo+ID4g
-IA0KPiA+ICAgICAgdm1zZy5mZF9udW0gPSBmZF9udW07DQo+ID4gIA0KPiA+IC0gICAgaWYgKChk
-ZXYtPnByb3RvY29sX2ZlYXR1cmVzICYNCj4gPiBWSE9TVF9VU0VSX1BST1RPQ09MX0ZfU0xBVkVf
-U0VORF9GRCkNCj4gPiA9PSAwKSB7DQo+ID4gKyAgICBpZiAoKGRldi0+cHJvdG9jb2xfZmVhdHVy
-ZXMgJiAoMVVMTCA8PA0KPiA+IFZIT1NUX1VTRVJfUFJPVE9DT0xfRl9TTEFWRV9TRU5EX0ZEKSkg
-PT0gMCkgew0KPiA+ICAgICAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICAgICAgfQ0KPiA+ICAN
-Cj4gPiAtLSANCj4gPiAyLjE3LjENCj4gDQo+IC0tDQo+IERyLiBEYXZpZCBBbGFuIEdpbGJlcnQg
-LyBkZ2lsYmVydEByZWRoYXQuY29tIC8gTWFuY2hlc3RlciwgVUsNCg==
+
+
+On 8/6/19 12:19 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 06.08.2019 19:09, Max Reitz wrote:
+>> On 06.08.19 17:26, Vladimir Sementsov-Ogievskiy wrote:
+>>> hbitmap_reset has an unobvious property: it rounds requested region up.
+>>> It may provoke bugs, like in recently fixed write-blocking mode of
+>>> mirror: user calls reset on unaligned region, not keeping in mind that
+>>> there are possible unrelated dirty bytes, covered by rounded-up region
+>>> and information of this unrelated "dirtiness" will be lost.
+>>>
+>>> Make hbitmap_reset strict: assert that arguments are aligned, allowing
+>>> only one exception when @start + @count == hb->orig_size. It's needed
+>>> to comfort users of hbitmap_next_dirty_area, which cares about
+>>> hb->orig_size.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>
+>>> v2 based on Max's https://github.com/XanClic/qemu.git block
+>>> which will be merged soon to 4.1, and this patch goes to 4.2
+>>> Based-on: https://github.com/XanClic/qemu.git block
+>>>
+>>> v1 was "[PATCH] util/hbitmap: fix unaligned reset", and as I understand
+>>> we all agreed to just assert alignment instead of aligning down
+>>> automatically.
+>>>
+>>>   include/qemu/hbitmap.h | 5 +++++
+>>>   tests/test-hbitmap.c   | 2 +-
+>>>   util/hbitmap.c         | 4 ++++
+>>>   3 files changed, 10 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+>>> index 4afbe6292e..7865e819ca 100644
+>>> --- a/include/qemu/hbitmap.h
+>>> +++ b/include/qemu/hbitmap.h
+>>> @@ -132,6 +132,11 @@ void hbitmap_set(HBitmap *hb, uint64_t start, uint64_t count);
+>>>    * @count: Number of bits to reset.
+>>>    *
+>>>    * Reset a consecutive range of bits in an HBitmap.
+>>> + * @start and @count must be aligned to bitmap granularity. The only exception
+>>> + * is resetting the tail of the bitmap: @count may be equal to @start +
+>>> + * hb->orig_size,
+>>
+>> s/@start + hb->orig_size/hb->orig_size - @start/, I think.
+> 
+> Ha, I wanted to say start + count equal to orig_size. Yours is OK too of course.
+> 
+>>
+>>>      in this case @count may be not aligned. @start + @count
+>>
+>> +are
+>>
+>> With those fixed:
+>>
+>> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> 
+> Thanks!
+> 
+
+I'll add this to the pile for 4.2, after I fix the rebase conflicts that
+arose from 4.1-rc4.
+
+--js
 
