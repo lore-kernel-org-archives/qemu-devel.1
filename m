@@ -2,73 +2,79 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C75D9C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49ADCC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:31:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E62B21E70
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:28:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E62B21E70
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19F0E21E70
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:31:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F0E21E70
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41883 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvMvJ-0006GI-UL
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:28:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40007)
+	id 1hvMyC-0001NS-Bd
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:31:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40763)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sebastien.boeuf@intel.com>) id 1hvMui-0004dt-Vv
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:27:41 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hvMxH-0000Be-0G
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sebastien.boeuf@intel.com>) id 1hvMuh-0002To-VM
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:27:40 -0400
-Received: from mga04.intel.com ([192.55.52.120]:55153)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sebastien.boeuf@intel.com>)
- id 1hvMuh-0002Ns-ME
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:27:39 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 07 Aug 2019 07:27:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,357,1559545200"; 
- d="scan'208,223";a="198683676"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
- by fmsmga004.fm.intel.com with ESMTP; 07 Aug 2019 07:27:31 -0700
-Received: from orsmsx163.amr.corp.intel.com (10.22.240.88) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 7 Aug 2019 07:27:30 -0700
-Received: from orsmsx115.amr.corp.intel.com ([169.254.4.6]) by
- ORSMSX163.amr.corp.intel.com ([169.254.9.86]) with mapi id 14.03.0439.000;
- Wed, 7 Aug 2019 07:27:30 -0700
-From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Thread-Topic: libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD check
-Thread-Index: AQHVTSw+I7kmgADAmUOtvYF7P6PObQ==
-Date: Wed, 7 Aug 2019 14:27:30 +0000
-Message-ID: <8df105774471bc72bca1397b4058ecc66d963848.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.7.199.52]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <003861F2EF38D24C942BA3DEB02163C0@intel.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <pbonzini@redhat.com>) id 1hvMxF-0003gj-C1
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:30:18 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:34682)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hvMxE-0003eV-Tr
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:30:17 -0400
+Received: by mail-wr1-f66.google.com with SMTP id 31so91653610wrm.1
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 07:30:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=inpRVJG9V7YMIy/G/lQyU+9pCZGwO5E7/wYny9PixLU=;
+ b=Mr4qKLv06YGbTZiXtxXzxY9CDUAoA2CY74LQUh7bhSCce6g2zJKazL4zi74gMdxghm
+ Po0JORHNp+HPBkhrABa0GZU8rwtqfAu7W3C7mLyV8ukR4VfNoqcGfH6R2K7yHigrPUMX
+ mJThYN9xT/oc2uKrTxTp00tcZ00U79A2WrdTUCH0gKj8+IGTCuqQRiWRYbkgAIHw/vdl
+ eozsxrJ/lORfNGVLeFjEpj2eRlzZtwVQpfjdFBXVvTrRGcf39weQ4HRi1tgbSpeHpTqF
+ f8759R6zQqotjQyK1tS85sSuig2dOfwAR0Tp/AoB1PymWagsbqMhHTVtoXGOCIYKTli1
+ yrvA==
+X-Gm-Message-State: APjAAAW5uvFGFprWV7OQjRdBDQ7IRlKWYvNg2BoFPl7YChBhPgStXY0X
+ Ao33CS4+t9/EHIXdKBRTD0O9Xrc3XDM=
+X-Google-Smtp-Source: APXvYqzKETLBxaTQEKy1Dh7elMdSIG6huPbzpEn4EwLwfmksmW8LIxO+iT9C0D1hF05rQcrfFUtJig==
+X-Received: by 2002:a5d:4e90:: with SMTP id e16mr11199463wru.339.1565188212484; 
+ Wed, 07 Aug 2019 07:30:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
+ ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
+ by smtp.gmail.com with ESMTPSA id 32sm85350297wrh.76.2019.08.07.07.30.11
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 07:30:11 -0700 (PDT)
+To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20190730123759.21723-1-pbonzini@redhat.com>
+ <87r25xi1y7.fsf@linaro.org> <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
+ <35301c4b-8743-1e29-0f6e-968afec5faa7@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5882e101-19cb-8092-5248-1762625fdcb3@redhat.com>
+Date: Wed, 7 Aug 2019 16:30:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
-Subject: [Qemu-devel] libvhost-user: Fix the
- VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD check
+In-Reply-To: <35301c4b-8743-1e29-0f6e-968afec5faa7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH 0/3] tests/tcg: disentangle makefiles
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,43 +86,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RnJvbSAwYTUzYTgxZGI2ZGQwNjlmOWI3YmNkY2QzODY4NDViY2ViM2EyYWM2IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQ0KRnJvbTogU2ViYXN0aWVuIEJvZXVmIDxzZWJhc3RpZW4uYm9ldWZAaW50
-ZWwuY29tPg0KRGF0ZTogV2VkLCA3IEF1ZyAyMDE5IDA3OjE1OjMyIC0wNzAwDQpTdWJqZWN0OiBb
-UEFUQ0hdIGxpYnZob3N0LXVzZXI6IEZpeCB0aGUNClZIT1NUX1VTRVJfUFJPVE9DT0xfRl9TTEFW
-RV9TRU5EX0ZEDQogY2hlY2sNCg0KVmhvc3QgdXNlciBwcm90b2NvbCBmZWF0dXJlcyBhcmUgc2V0
-IGFzIGEgYml0bWFzay4gQW5kIHRoZSBmb2xsb3dpbmcNCmNvbnN0YW50IFZIT1NUX1VTRVJfUFJP
-VE9DT0xfRl9TTEFWRV9TRU5EX0ZEIHZhbHVlIGlzIDEwIGJlY2F1c2UgdGhlDQpiaXQNCjEwIGlu
-ZGljYXRlcyBpZiB0aGUgZmVhdHVyZXMgaXMgc2V0IG9yIG5vdC4NCg0KVGhlIHByb3BlciB3YXkg
-dG8gY2hlY2sgZm9yIHRoZSBwcmVzZW5jZSBvciBhYnNlbmNlIG9mIHRoaXMgZmVhdHVyZSBpcw0K
-dG8gc2hpZnQgMSBieSB0aGUgdmFsdWUgb2YgdGhpcyBjb25zdGFudCBhbmQgdGhlbiBtYXNrIGl0
-IHdpdGggdGhlDQphY3R1YWwgYml0bWFzayByZXByZXNlbnRpbmcgdGhlIHN1cHBvcnRlZCBwcm90
-b2NvbCBmZWF0dXJlcy4NCg0KVGhpcyBwYXRjaCBhaW1zIHRvIGZpeCB0aGUgY3VycmVudCBjb2Rl
-IGFzIGl0IHdhcyBub3QgZG9pbmcgdGhlDQpzaGlmdGluZywgYnV0IGluc3RlYWQgaXQgd2FzIG1h
-c2tpbmcgZGlyZWN0bHkgd2l0aCB0aGUgdmFsdWUgb2YgdGhlDQpjb25zdGFudCBpdHNlbGYuDQoN
-ClNpZ25lZC1vZmYtYnk6IFNlYmFzdGllbiBCb2V1ZiA8c2ViYXN0aWVuLmJvZXVmQGludGVsLmNv
-bT4NCi0tLQ0KIGNvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMgfCA0ICsrLS0N
-CiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KDQpkaWZm
-IC0tZ2l0IGEvY29udHJpYi9saWJ2aG9zdC11c2VyL2xpYnZob3N0LXVzZXIuYyBiL2NvbnRyaWIv
-bGlidmhvc3QtDQp1c2VyL2xpYnZob3N0LXVzZXIuYw0KaW5kZXggZmI2MTE0MmJjYy4uMTE5MDlm
-YjdjMSAxMDA2NDQNCi0tLSBhL2NvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMN
-CisrKyBiL2NvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmMNCkBAIC0xMTEyLDcg
-KzExMTIsNyBAQCBib29sIHZ1X3NldF9xdWV1ZV9ob3N0X25vdGlmaWVyKFZ1RGV2ICpkZXYsDQpW
-dVZpcnRxICp2cSwgaW50IGZkLA0KIA0KICAgICB2bXNnLmZkX251bSA9IGZkX251bTsNCiANCi0g
-ICAgaWYgKChkZXYtPnByb3RvY29sX2ZlYXR1cmVzICYgVkhPU1RfVVNFUl9QUk9UT0NPTF9GX1NM
-QVZFX1NFTkRfRkQpDQo9PSAwKSB7DQorICAgIGlmICgoZGV2LT5wcm90b2NvbF9mZWF0dXJlcyAm
-ICgxVUxMIDw8DQpWSE9TVF9VU0VSX1BST1RPQ09MX0ZfU0xBVkVfU0VORF9GRCkpID09IDApIHsN
-CiAgICAgICAgIHJldHVybiBmYWxzZTsNCiAgICAgfQ0KIA0KQEAgLTI1MzcsNyArMjUzNyw3IEBA
-IGludDY0X3QgdnVfZnNfY2FjaGVfcmVxdWVzdChWdURldiAqZGV2LA0KVmhvc3RVc2VyU2xhdmVS
-ZXF1ZXN0IHJlcSwgaW50IGZkLA0KIA0KICAgICB2bXNnLmZkX251bSA9IGZkX251bTsNCiANCi0g
-ICAgaWYgKChkZXYtPnByb3RvY29sX2ZlYXR1cmVzICYgVkhPU1RfVVNFUl9QUk9UT0NPTF9GX1NM
-QVZFX1NFTkRfRkQpDQo9PSAwKSB7DQorICAgIGlmICgoZGV2LT5wcm90b2NvbF9mZWF0dXJlcyAm
-ICgxVUxMIDw8DQpWSE9TVF9VU0VSX1BST1RPQ09MX0ZfU0xBVkVfU0VORF9GRCkpID09IDApIHsN
-CiAgICAgICAgIHJldHVybiAtRUlOVkFMOw0KICAgICB9DQogDQotLSANCjIuMTcuMQ0K
+On 07/08/19 15:33, Eric Blake wrote:
+> On 8/7/19 8:06 AM, Paolo Bonzini wrote:
+>> On 07/08/19 14:40, Alex Bennée wrote:
+>>>
+>>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>>
+>>>> The tests/tcg rely a lot on per-target informations from
+>>>> the QEMU makefiles, but most of the definitions in there
+>>>> aren't really relevant to TCG tests.
+>>>>
+>>>> This series is just a cleanup, but it could also be
+>>>> a useful start in making it possible to compile tests/tcg
+>>>> out of QEMU's tree, and/or making it a submodule, and/or
+>>>> unifying the system emulation tests with kvm-unit-tests.
+>>>
+>>> Hmm something is throwing off configure and making it use my login shell
+>>> instead of /bin/sh:
+>>>
+>>>   libpmem support   no
+>>>   libudev           yes
+>>>   default devices   yes
+>>>   ~/lsrc/qemu.git/tests/tcg/configure.sh (line 63): 'case' builtin not inside of switch block
+>>>     case $arch in
+>>>     ^
+>>>   <W> fish: Error while reading file /home/alex/lsrc/qemu.git/tests/tcg/configure.sh
+>>
+>> It's the ${SHELL} you found in patch 3.  The disadvantage of relying on
+>> #! is that some people have bash in /usr/bin/bash rather than /bin/bash.
+>>  But we already assume /bin/bash elsewhere so I can drop it.
+> 
+> Rather, we use '#!/usr/bin/env bash' to find bash anywhere.
+
+Nevermind - this script is pure Bourne shell.  The only fix needed should be
+
+diff --git a/configure b/configure
+index eeeda8760a..f216f3f9d9 100755
+--- a/configure
++++ b/configure
+@@ -6468,12 +6468,6 @@ if ! $python -c 'import sys; sys.exit(sys.version_info < (3,0))'; then
+   echo "warning: Python 3 will be required for building future versions of QEMU" >&2
+ fi
+ 
+-(for i in $cross_cc_vars; do
+-  export $i
+-done
+-export target_list source_path
+-${SHELL-/bin/sh} $source_path/tests/tcg/configure.sh)
+-
+ config_host_mak="config-host.mak"
+ 
+ echo "# Automatically generated by configure - do not modify" >config-all-disas.mak
+@@ -7844,6 +7838,12 @@ for f in $LINKS ; do
+     fi
+ done
+ 
++(for i in $cross_cc_vars; do
++  export $i
++done
++export target_list source_path
++$source_path/tests/tcg/configure.sh)
++
+ # temporary config to build submodules
+ for rom in seabios vgabios ; do
+     config_mak=roms/$rom/config.mak
 
