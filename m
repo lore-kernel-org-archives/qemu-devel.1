@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4746BC19759
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:54:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE2BC19759
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:54:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1138021743
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:54:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B57D21743
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:54:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a7oeOzFR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1138021743
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Eu3OOrlO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B57D21743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvDy4-0002fz-AY
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 00:54:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40563)
+	id 1hvDyP-0003Oi-De
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 00:54:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40618)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvDxM-00012U-8G
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:49 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvDxO-00016a-ON
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvDxK-0004iY-EZ
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:48 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41508)
+ (envelope-from <richard.henderson@linaro.org>) id 1hvDxN-0004nR-7e
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:50 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:45717)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvDxK-0004hh-9B
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:46 -0400
-Received: by mail-pf1-x442.google.com with SMTP id m30so42774759pff.8
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 21:53:46 -0700 (PDT)
+ id 1hvDxN-0004le-22
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:49 -0400
+Received: by mail-pg1-x541.google.com with SMTP id o13so42775669pgp.12
+ for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 21:53:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=sTmPUIypnziYaVGRFy0ALsWEJTPu9wrCWxAaqC9PPBw=;
- b=a7oeOzFRGXtuyzqaFWdbCMWvJXEENm+AagrmWV5f4ziqMOwceC8DCKliWoyOQN/wqK
- DyEybt0iOtL7E4bl6MgQSonlrbKd1cm9XH8uuFhwzzl3xTRhp5qD8LyV55UlntCMITWQ
- YGbgzwa+mj+PFWq1NSTnF7+SgWgOsZN8d0ciZs7dqTqxJky2iyvI2+2oHe9liYkjIyPE
- zvVHMu4gBHN/kjqnwQ65S2p4yniXLuLytHYn8qA8L8XsXtutSALGK9pBxscoCglFvI8e
- KyUfrk34QknjqIXIgiygCQzilJZssWbEsbm3VIj4GNlXN3ek1k64ZVzz5W3XXLuTQS5b
- 0u5Q==
+ bh=1zzimgpgSpr/kyzutrALdKavhpYiAUiw3e1Jv+/dxZI=;
+ b=Eu3OOrlOz2UgnxrLF/PsCxjK42U+FsE/Kh/qrZ0XKPdKP4J+7ys7ZOP3i4bf3Xd9qH
+ U5LWOu3WIM+w3goJBqnBafHzPhXZcQCIEpLGII/a83mwGu39xWUipdf5ajmGuLqxGfbx
+ Geb2PHAkOgrMzUwONpUhspbccujgjnCWtavPO2tL2AZuRZ8L8sMuTv6s6F3kPMdjtFnG
+ MQjQeDvDhQP+m7jS7A4zaaxZjkYmV/XcGGrKwO3n9+VX/2xRrU+FkuznHhLJRvVPypNj
+ nzJn3wQoYBlig13plZoFjpC0KLdSWBjTV37tcoQH6ELktpsu4R1XTa6thcPXfjOwrcNR
+ yQQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=sTmPUIypnziYaVGRFy0ALsWEJTPu9wrCWxAaqC9PPBw=;
- b=GfauLBSKHBXn69k8YU5V9YZFY4VZdRpAshWzkvrM0QM34Pc3z+3QGyst7r8//zzulc
- DQv92ud/efubb138dUEyiLHAn/5jSRXGt/1IMGLwF21BZL3DnxikOKvY0Mh4NI8lB+GI
- lPoFYS4/FztJ0yTkJTuIpY5ezeuvp2X3SKfI2HuE+RxvKYMyNJs3LSHtGidCoInRIV1w
- JWVphiYUGvrwyWYsLLlGersp2bcUpS2+6Xbrj034s0LjdLJLC7YVmqsYt/AtxGO0Kyhz
- M4fEkwGZtIvYp6JZk42iSEbaGbRTSpGdBLy/KzTqt/G1YVqMmku/QfNEk5UOihrPI8G1
- 5IvQ==
-X-Gm-Message-State: APjAAAU0vBE0CIkd3Ere0CnZJKrBLNKyuQAV2G68qC0U4aXcv83fJtEq
- 0GypipY8QIr8xigHPSKx2Rdn01/ZsHk=
-X-Google-Smtp-Source: APXvYqzRD0LvDC5Z4IDb8BPFg0/ezNm9Xny6F3ipFGZSQlbfL97b+juRlBs1aXXuBgqdeDloOa4glw==
-X-Received: by 2002:a17:90a:8d0c:: with SMTP id
- c12mr6350022pjo.140.1565153624961; 
- Tue, 06 Aug 2019 21:53:44 -0700 (PDT)
+ bh=1zzimgpgSpr/kyzutrALdKavhpYiAUiw3e1Jv+/dxZI=;
+ b=PFGEkvfsT1wQiStihuCXZGsPzJH1naoil8p0oGjthHX63HYDVS4rcmzdSImoY6sfWi
+ AbxRusbmY3QlNuHC7eVV3NYWJaSXuf7kJnD6GNTLbLMYITESoDnpkVkyQ8IZ6ZjiWx2V
+ LmmZmEgjQBV3p9RDXad6n1IAX+7C6xAiEKotszNdXz3s9+Rr3bJbeo/BlPdGhXPMDkns
+ C1Fkzh5LjMKJ/JF/qY/EAs6B5Nwx9J596XFLjBgZjZLnjZsGIiTPkj31jMUS7L1bsPVz
+ 3E3hAMTH/IRKljyvV0L925WOVHllgMVXFkbGA2F/N2S9/inlDUGrv+ur70iPUzNHW0WX
+ kSzQ==
+X-Gm-Message-State: APjAAAXEWPeOGSZHvHyLrszfCnzC+B5lPADE2J0Cmr2jeQeA7u9wXdpA
+ e34SLJoxHHX/L4PXWGQVNKjxkG13/lI=
+X-Google-Smtp-Source: APXvYqwOaU4nlvS2gVRJfO6b6IwNvcfm5er6WWbRf0ZVoufB+NF23mkG5VZsCW/PJMNzlj0OjrmPUA==
+X-Received: by 2002:a65:5342:: with SMTP id w2mr5999727pgr.261.1565153627374; 
+ Tue, 06 Aug 2019 21:53:47 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t9sm24347921pji.18.2019.08.06.21.53.43
+ by smtp.gmail.com with ESMTPSA id t9sm24347921pji.18.2019.08.06.21.53.46
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 06 Aug 2019 21:53:44 -0700 (PDT)
+ Tue, 06 Aug 2019 21:53:46 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 21:53:25 -0700
-Message-Id: <20190807045335.1361-2-richard.henderson@linaro.org>
+Date: Tue,  6 Aug 2019 21:53:27 -0700
+Message-Id: <20190807045335.1361-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190807045335.1361-1-richard.henderson@linaro.org>
 References: <20190807045335.1361-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH 01/11] target/arm: Pass in pc to
- thumb_insn_is_16bit
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH 03/11] target/arm: Introduce read_pc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,61 +95,200 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function is used in two different contexts, and it will be
-clearer if the function is given the address to which it applies.
+We currently have 3 different ways of computing the architectural
+value of "PC" as seen in the ARM ARM.
+
+The value of s->pc has been incremented past the current insn,
+but that is all.  Thus for a32, PC = s->pc + 4; for t32, PC = s->pc;
+for t16, PC = s->pc + 2.  These differing computations make it
+impossible at present to unify the various code paths.
+
+With the newly introduced s->pc_curr, we can compute the correct
+value for all cases, using the formula given in the ARM ARM.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ target/arm/translate.c | 59 ++++++++++++++++--------------------------
+ 1 file changed, 23 insertions(+), 36 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 7853462b21..1f15f14022 100644
+index 59e35aafbf..61933865d5 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -9261,11 +9261,11 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-     }
- }
+@@ -196,17 +196,17 @@ static inline void store_cpu_offset(TCGv_i32 var, int offset)
+ #define store_cpu_field(var, name) \
+     store_cpu_offset(var, offsetof(CPUARMState, name))
  
--static bool thumb_insn_is_16bit(DisasContext *s, uint32_t insn)
-+static bool thumb_insn_is_16bit(DisasContext *s, uint32_t pc, uint32_t insn)
++/* The architectural value of PC.  */
++static uint32_t read_pc(DisasContext *s)
++{
++    return s->pc_curr + (s->thumb ? 4 : 8);
++}
++
+ /* Set a variable to the value of a CPU register.  */
+ static void load_reg_var(DisasContext *s, TCGv_i32 var, int reg)
  {
--    /* Return true if this is a 16 bit instruction. We must be precise
--     * about this (matching the decode).  We assume that s->pc still
--     * points to the first 16 bits of the insn.
-+    /*
-+     * Return true if this is a 16 bit instruction. We must be precise
-+     * about this (matching the decode).
-      */
-     if ((insn >> 11) < 0x1d) {
-         /* Definitely a 16-bit instruction */
-@@ -9285,7 +9285,7 @@ static bool thumb_insn_is_16bit(DisasContext *s, uint32_t insn)
-         return false;
+     if (reg == 15) {
+-        uint32_t addr;
+-        /* normally, since we updated PC, we need only to add one insn */
+-        if (s->thumb)
+-            addr = (long)s->pc + 2;
+-        else
+-            addr = (long)s->pc + 4;
+-        tcg_gen_movi_i32(var, addr);
++        tcg_gen_movi_i32(var, read_pc(s));
+     } else {
+         tcg_gen_mov_i32(var, cpu_R[reg]);
      }
+@@ -7868,16 +7868,14 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+             /* branch link and change to thumb (blx <offset>) */
+             int32_t offset;
  
--    if ((insn >> 11) == 0x1e && s->pc - s->page_start < TARGET_PAGE_SIZE - 3) {
-+    if ((insn >> 11) == 0x1e && pc - s->page_start < TARGET_PAGE_SIZE - 3) {
-         /* 0b1111_0xxx_xxxx_xxxx : BL/BLX prefix, and the suffix
-          * is not on the next page; we merge this into a 32-bit
-          * insn.
-@@ -11824,7 +11824,7 @@ static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
-      */
-     uint16_t insn = arm_lduw_code(env, s->pc, s->sctlr_b);
+-            val = (uint32_t)s->pc;
+             tmp = tcg_temp_new_i32();
+-            tcg_gen_movi_i32(tmp, val);
++            tcg_gen_movi_i32(tmp, s->pc);
+             store_reg(s, 14, tmp);
+             /* Sign-extend the 24-bit offset */
+             offset = (((int32_t)insn) << 8) >> 8;
++            val = read_pc(s);
+             /* offset * 4 + bit24 * 2 + (thumb bit) */
+             val += (offset << 2) | ((insn >> 23) & 2) | 1;
+-            /* pipeline offset */
+-            val += 4;
+             /* protected by ARCH(5); above, near the start of uncond block */
+             gen_bx_im(s, val);
+             return;
+@@ -9153,10 +9151,8 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                         } else {
+                             /* store */
+                             if (i == 15) {
+-                                /* special case: r15 = PC + 8 */
+-                                val = (long)s->pc + 4;
+                                 tmp = tcg_temp_new_i32();
+-                                tcg_gen_movi_i32(tmp, val);
++                                tcg_gen_movi_i32(tmp, read_pc(s));
+                             } else if (user) {
+                                 tmp = tcg_temp_new_i32();
+                                 tmp2 = tcg_const_i32(i);
+@@ -9222,15 +9218,13 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                 int32_t offset;
  
--    return !thumb_insn_is_16bit(s, insn);
-+    return !thumb_insn_is_16bit(s, s->pc, insn);
- }
+                 /* branch (and link) */
+-                val = (int32_t)s->pc;
+                 if (insn & (1 << 24)) {
+                     tmp = tcg_temp_new_i32();
+-                    tcg_gen_movi_i32(tmp, val);
++                    tcg_gen_movi_i32(tmp, s->pc);
+                     store_reg(s, 14, tmp);
+                 }
+                 offset = sextract32(insn << 2, 0, 26);
+-                val += offset + 4;
+-                gen_jmp(s, val);
++                gen_jmp(s, read_pc(s) + offset);
+             }
+             break;
+         case 0xc:
+@@ -9588,12 +9582,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 tcg_temp_free_i32(addr);
+             } else if ((insn & (7 << 5)) == 0) {
+                 /* Table Branch.  */
+-                if (rn == 15) {
+-                    addr = tcg_temp_new_i32();
+-                    tcg_gen_movi_i32(addr, s->pc);
+-                } else {
+-                    addr = load_reg(s, rn);
+-                }
++                addr = load_reg(s, rn);
+                 tmp = load_reg(s, rm);
+                 tcg_gen_add_i32(addr, addr, tmp);
+                 if (insn & (1 << 4)) {
+@@ -9609,7 +9598,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 }
+                 tcg_temp_free_i32(addr);
+                 tcg_gen_shli_i32(tmp, tmp, 1);
+-                tcg_gen_addi_i32(tmp, tmp, s->pc);
++                tcg_gen_addi_i32(tmp, tmp, read_pc(s));
+                 store_reg(s, 15, tmp);
+             } else {
+                 bool is_lasr = false;
+@@ -10342,7 +10331,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     tcg_gen_movi_i32(cpu_R[14], s->pc | 1);
+                 }
  
- static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-@@ -12122,7 +12122,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+-                offset += s->pc;
++                offset += read_pc(s);
+                 if (insn & (1 << 12)) {
+                     /* b/bl */
+                     gen_jmp(s, offset);
+@@ -10583,7 +10572,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                 offset |= (insn & (1 << 11)) << 8;
+ 
+                 /* jump to the offset */
+-                gen_jmp(s, s->pc + offset);
++                gen_jmp(s, read_pc(s) + offset);
+             }
+         } else {
+             /*
+@@ -11077,7 +11066,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+         if (insn & (1 << 11)) {
+             rd = (insn >> 8) & 7;
+             /* load pc-relative.  Bit 1 of PC is ignored.  */
+-            val = s->pc + 2 + ((insn & 0xff) * 4);
++            val = read_pc(s) + ((insn & 0xff) * 4);
+             val &= ~(uint32_t)2;
+             addr = tcg_temp_new_i32();
+             tcg_gen_movi_i32(addr, val);
+@@ -11464,7 +11453,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+         } else {
+             /* PC. bit 1 is ignored.  */
+             tmp = tcg_temp_new_i32();
+-            tcg_gen_movi_i32(tmp, (s->pc + 2) & ~(uint32_t)2);
++            tcg_gen_movi_i32(tmp, read_pc(s) & ~(uint32_t)2);
+         }
+         val = (insn & 0xff) * 4;
+         tcg_gen_addi_i32(tmp, tmp, val);
+@@ -11584,9 +11573,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+                 tcg_gen_brcondi_i32(TCG_COND_NE, tmp, 0, s->condlabel);
+             tcg_temp_free_i32(tmp);
+             offset = ((insn & 0xf8) >> 2) | (insn & 0x200) >> 3;
+-            val = (uint32_t)s->pc + 2;
+-            val += offset;
+-            gen_jmp(s, val);
++            gen_jmp(s, read_pc(s) + offset);
+             break;
+ 
+         case 15: /* IT, nop-hint.  */
+@@ -11750,7 +11737,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+         arm_skip_unless(s, cond);
+ 
+         /* jump to the offset */
+-        val = (uint32_t)s->pc + 2;
++        val = read_pc(s);
+         offset = ((int32_t)insn << 24) >> 24;
+         val += offset << 1;
+         gen_jmp(s, val);
+@@ -11776,9 +11763,9 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+             break;
+         }
+         /* unconditional branch */
+-        val = (uint32_t)s->pc;
++        val = read_pc(s);
+         offset = ((int32_t)insn << 21) >> 21;
+-        val += (offset << 1) + 2;
++        val += offset << 1;
+         gen_jmp(s, val);
+         break;
+ 
+@@ -11802,7 +11789,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
+             /* 0b1111_0xxx_xxxx_xxxx : BL/BLX prefix */
+             uint32_t uoffset = ((int32_t)insn << 21) >> 9;
+ 
+-            tcg_gen_movi_i32(cpu_R[14], s->pc + 2 + uoffset);
++            tcg_gen_movi_i32(cpu_R[14], read_pc(s) + uoffset);
+         }
+         break;
      }
- 
-     insn = arm_lduw_code(env, dc->pc, dc->sctlr_b);
--    is_16bit = thumb_insn_is_16bit(dc, insn);
-+    is_16bit = thumb_insn_is_16bit(dc, dc->pc, insn);
-     dc->pc += 2;
-     if (!is_16bit) {
-         uint32_t insn2 = arm_lduw_code(env, dc->pc, dc->sctlr_b);
 -- 
 2.17.1
 
