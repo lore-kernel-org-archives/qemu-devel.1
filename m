@@ -2,80 +2,66 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA44AC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BC96C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B58FA21BF2
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:08:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XCLEwwbw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B58FA21BF2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 21409218FE
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:12:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21409218FE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNYW-0002fH-Ur
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:08:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49321)
+	id 1hvNbz-0004ye-Da
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:12:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50217)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hvNXm-0001Kz-2s
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:08:03 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hvNaB-00044f-JT
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:10:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hvNXk-0001tF-Jm
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:08:01 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37584)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hvNXk-0001se-Bt
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:08:00 -0400
-Received: by mail-ot1-x342.google.com with SMTP id s20so40087990otp.4
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:08:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=h5na1YqadXDFBRFP9m9NOGDLGc+2pkzDG9ETypEMJvg=;
- b=XCLEwwbwiDnKwLmkG8o3eRnOoERzguUFVtB6pWVBd7s17pv1c/mdcnyvz7tsykyT9o
- HfQ+sKL6xweJrYtaxI9TXh+HTnvFC9QQdESyH0+kIA6hdlMeTkULLGt2Vd27ULzPZfke
- CIQ9FHmP0y+KVyKX1iszhKIAOVCus7dYGLaRYZqLTuJjuauzupm+fjN61OP/yMpE9WQ7
- 5rrNfH62+iP4XzEKFYLjdjMjY/4N8ox8p0/hCg+welZiTLkgCySRw1M3LYjM3XyAvBbL
- QDPq8p6boeQE17JYvwRUDDwNWRuGjxfaz/4RQ+vRzXHLg4S+IkIMoHWGH7hQinWww/iY
- J9HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=h5na1YqadXDFBRFP9m9NOGDLGc+2pkzDG9ETypEMJvg=;
- b=UhdyUC2OMb1rM9hg0Dev1zBaux6L2TJl2+lnwAU3aGtZLNNVTDn+0cN2I4SiabHDtz
- MOH+ndjIoUjZ8IUGkN46zIESrrtVw9AWt9L+tL2TvJIzIsZBucXPSn1pB0pCcD8LuFm3
- GMDMk578pi9T5Bt5sbZgRFrUtUbr+KR2bYmaVFzHjW0/Yh7V+htuC6kuILpA/Ea9warq
- V8T5an7FLQmr1CW4PPoYjLO2+liqdN8eLTtZyATYK0yqQRXYUxfQsFA+Vo+hkPXlEBtu
- Gx73HY7rG/X3dcpnxnw/D6TZDIORcQxK0Swew+F1nJ/5k3BwAz5AihyKV05XLtyJQgpi
- p8Yg==
-X-Gm-Message-State: APjAAAWimP1t7Jw9FHGbrvF+sE3RFKh8Ia3pbBYQXkMFmDeSyeqcKUkr
- dTByktx+xyf/0B9nEt6yD1cJnDpyoFJhz1XaLKqPPw==
-X-Google-Smtp-Source: APXvYqy5biMHiNZljCJP5duG7y3jLY33KzwQBJqgBpqwl9EdE90ShqJ4LkaokAdXBTTOYA9MtzkzTbJMwGDPzMtRWBM=
-X-Received: by 2002:a5d:948f:: with SMTP id v15mr9171463ioj.93.1565190479332; 
- Wed, 07 Aug 2019 08:07:59 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1hvNa9-0003IC-DQ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:10:31 -0400
+Resent-Date: Wed, 07 Aug 2019 11:10:30 -0400
+Resent-Message-Id: <E1hvNa9-0003IC-DQ@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21520)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hvNa3-0003Ez-0J; Wed, 07 Aug 2019 11:10:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565190605; cv=none; d=zoho.com; s=zohoarc; 
+ b=QTn/gR5u7VynTAizKHIg4Lx93TkrZa4qKVegDhaqrF+W+mcmSdVhH1fmlQPT1lRlRsS/Tt4s2vjewo81XT0Nk55kOV9AHm+z+KgmowUyD6dooRTQWaL80f3pNca0MZTPe0FnIbfjiXRlYl/GIEZ05M3OJMlTD+cTDdBLaZC3rCY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565190605;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=M4wKdGXpX3mS4yTjCenQ3Ewf335HoplQAMeU/DIaPrA=; 
+ b=HLvqR1eEUGh8g/d1KaTIL0FdVd5nPsBTFjh68jO7dDCmOuuUySRE67pucD/YFPoCfVAAImDyOavpYeV0nNWdF3Kd7W0LVvn3u7WADEtNBScZL3yJ6MN8Y5g4p71hJftx0XRSD/54EGqgPVQug2kzfQ9QwJ+AIaXgEReKgN+jLyA=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565190604877168.45033724717928;
+ Wed, 7 Aug 2019 08:10:04 -0700 (PDT)
+In-Reply-To: <20190807144628.4988-1-kwolf@redhat.com>
+Message-ID: <156519060347.6126.3635589187292243655@b08f24806b7e>
 MIME-Version: 1.0
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-8-damien.hedde@greensocs.com>
-In-Reply-To: <20190729145654.14644-8-damien.hedde@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Aug 2019 16:07:47 +0100
-Message-ID: <CAFEAcA-W0SaaGbUnGZ0b61ngxKY8R9xjwGXeN+=MaUi4bMDgNg@mail.gmail.com>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v3 07/33] automatically add vmstate for
- reset support in devices
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kwolf@redhat.com
+Date: Wed, 7 Aug 2019 08:10:04 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] block-backend: Queue requests while
+ drained
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,196 +73,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, den@virtuozzo.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ dplotnikov@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
->
-> This add the reset related sections for every QOM
-> device.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwNzE0NDYyOC40OTg4
+LTEta3dvbGZAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
+bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
+bWF0aW9uOgoKVHlwZTogc2VyaWVzClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC8z
+XSBibG9jay1iYWNrZW5kOiBRdWV1ZSByZXF1ZXN0cyB3aGlsZSBkcmFpbmVkCk1lc3NhZ2UtaWQ6
+IDIwMTkwODA3MTQ0NjI4LjQ5ODgtMS1rd29sZkByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
+eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdm
+NDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVt
+dQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMTkwODA3MTQ0NjI4LjQ5ODgtMS1rd29s
+ZkByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxOTA4MDcxNDQ2MjguNDk4OC0xLWt3b2xmQHJlZGhh
+dC5jb20KU3VibW9kdWxlICdjYXBzdG9uZScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9jYXBz
+dG9uZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2NhcHN0b25lJwpTdWJtb2R1bGUgJ2R0Yycg
+KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9kdGMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdk
+dGMnClN1Ym1vZHVsZSAncm9tcy9RZW11TWFjRHJpdmVycycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9RZW11TWFjRHJpdmVycy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvUWVtdU1h
+Y0RyaXZlcnMnClN1Ym1vZHVsZSAncm9tcy9TTE9GJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0
+L1NMT0YuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1NMT0YnClN1Ym1vZHVsZSAncm9t
+cy9lZGsyJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L2VkazIuZ2l0KSByZWdpc3RlcmVkIGZv
+ciBwYXRoICdyb21zL2VkazInClN1Ym1vZHVsZSAncm9tcy9pcHhlJyAoaHR0cHM6Ly9naXQucWVt
+dS5vcmcvZ2l0L2lweGUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL2lweGUnClN1Ym1v
+ZHVsZSAncm9tcy9vcGVuYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuYmlvcy5n
+aXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmJpb3MnClN1Ym1vZHVsZSAncm9tcy9v
+cGVuaGFja3dhcmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmhhY2t3YXJlLmdpdCkg
+cmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnClN1Ym1vZHVsZSAncm9tcy9v
+cGVuc2JpJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5zYmkuZ2l0KSByZWdpc3RlcmVk
+IGZvciBwYXRoICdyb21zL29wZW5zYmknClN1Ym1vZHVsZSAncm9tcy9xZW11LXBhbGNvZGUnICho
+dHRwczovL2dpdC5xZW11Lm9yZy9naXQvcWVtdS1wYWxjb2RlLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAncm9tcy9xZW11LXBhbGNvZGUnClN1Ym1vZHVsZSAncm9tcy9zZWFiaW9zJyAoaHR0cHM6
+Ly9naXQucWVtdS5vcmcvZ2l0L3NlYWJpb3MuZ2l0LykgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9t
+cy9zZWFiaW9zJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcy1ocHBhJyAoaHR0cHM6Ly9naXQucWVt
+dS5vcmcvZ2l0L3NlYWJpb3MtaHBwYS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2Vh
+Ymlvcy1ocHBhJwpTdWJtb2R1bGUgJ3JvbXMvc2dhYmlvcycgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9zZ2FiaW9zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9zZ2FiaW9zJwpTdWJt
+b2R1bGUgJ3JvbXMvc2tpYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9za2lib290Lmdp
+dCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9za2lib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1i
+b290JyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC5naXQpIHJlZ2lzdGVyZWQgZm9y
+IHBhdGggJ3JvbXMvdS1ib290JwpTdWJtb2R1bGUgJ3JvbXMvdS1ib290LXNhbTQ2MGV4JyAoaHR0
+cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3UtYm9vdC1zYW00NjBleC5naXQpIHJlZ2lzdGVyZWQgZm9y
+IHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JwpTdWJtb2R1bGUgJ3NsaXJwJyAoaHR0cHM6Ly9n
+aXQucWVtdS5vcmcvZ2l0L2xpYnNsaXJwLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnc2xpcnAn
+ClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvYmVya2VsZXktc29mdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0ZmxvYXQtMycKU3VibW9kdWxlICd0ZXN0cy9mcC9iZXJr
+ZWxleS10ZXN0ZmxvYXQtMycgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9iZXJrZWxleS10ZXN0
+ZmxvYXQtMy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3Rm
+bG9hdC0zJwpTdWJtb2R1bGUgJ3VpL2tleWNvZGVtYXBkYicgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9rZXljb2RlbWFwZGIuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd1aS9rZXljb2RlbWFw
+ZGInCkNsb25pbmcgaW50byAnY2Fwc3RvbmUnLi4uClN1Ym1vZHVsZSBwYXRoICdjYXBzdG9uZSc6
+IGNoZWNrZWQgb3V0ICcyMmVhZDNlMGJmZGI4NzUxNjY1NjQ1MzMzNjE2MGUwYTM3YjA2NmJmJwpD
+bG9uaW5nIGludG8gJ2R0YycuLi4KU3VibW9kdWxlIHBhdGggJ2R0Yyc6IGNoZWNrZWQgb3V0ICc4
+OGYxODkwOWRiNzMxYTYyNzQ1NmYyNmQ3Nzk0NDVmODRlNDQ5NTM2JwpDbG9uaW5nIGludG8gJ3Jv
+bXMvUWVtdU1hY0RyaXZlcnMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL1FlbXVNYWNEcml2ZXJz
+JzogY2hlY2tlZCBvdXQgJzkwYzQ4OGQ1ZjRhNDA3MzQyMjQ3YjllYTg2OWRmMWMyZDljOGUyNjYn
+CkNsb25pbmcgaW50byAncm9tcy9TTE9GJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9TTE9GJzog
+Y2hlY2tlZCBvdXQgJ2JhMWFiMzYwZWViZTYzMzhiYjhkN2Q4M2E5MjIwY2NmN2UyMTNhZjMnCkNs
+b25pbmcgaW50byAncm9tcy9lZGsyJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyJzogY2hl
+Y2tlZCBvdXQgJzIwZDJlNWExMjVlMzRmYzg1MDEwMjY2MTNhNzE1NDliMmExYTNlNTQnClN1Ym1v
+ZHVsZSAnU29mdEZsb2F0JyAoaHR0cHM6Ly9naXRodWIuY29tL3VjYi1iYXIvYmVya2VsZXktc29m
+dGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0
+RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAnQ3J5cHRvUGtnL0xpYnJh
+cnkvT3BlbnNzbExpYi9vcGVuc3NsJyAoaHR0cHM6Ly9naXRodWIuY29tL29wZW5zc2wvb3BlbnNz
+bCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVu
+c3NsJwpDbG9uaW5nIGludG8gJ0FybVBrZy9MaWJyYXJ5L0FybVNvZnRGbG9hdExpYi9iZXJrZWxl
+eS1zb2Z0ZmxvYXQtMycuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9Bcm1Qa2cvTGlicmFy
+eS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29mdGZsb2F0LTMnOiBjaGVja2VkIG91dCAnYjY0
+YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4ODAzNycKQ2xvbmluZyBpbnRvICdDcnlw
+dG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5zc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21z
+L2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJzogY2hlY2tlZCBvdXQg
+JzUwZWFhYzlmMzMzNzY2NzI1OWRlNzI1NDUxZjIwMWU3ODQ1OTk2ODcnClN1Ym1vZHVsZSAnYm9y
+aW5nc3NsJyAoaHR0cHM6Ly9ib3Jpbmdzc2wuZ29vZ2xlc291cmNlLmNvbS9ib3Jpbmdzc2wpIHJl
+Z2lzdGVyZWQgZm9yIHBhdGggJ2JvcmluZ3NzbCcKU3VibW9kdWxlICdrcmI1JyAoaHR0cHM6Ly9n
+aXRodWIuY29tL2tyYjUva3JiNSkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAna3JiNScKU3VibW9kdWxl
+ICdweWNhLmNyeXB0b2dyYXBoeScgKGh0dHBzOi8vZ2l0aHViLmNvbS9weWNhL2NyeXB0b2dyYXBo
+eS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3B5Y2EtY3J5cHRvZ3JhcGh5JwpDbG9uaW5nIGlu
+dG8gJ2JvcmluZ3NzbCcuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGli
+cmFyeS9PcGVuc3NsTGliL29wZW5zc2wvYm9yaW5nc3NsJzogY2hlY2tlZCBvdXQgJzIwNzBmOGFk
+OTE1MWRjOGYzYTczYmZmYWExNDZiNWU2OTM3YTU4M2YnCkNsb25pbmcgaW50byAna3JiNScuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29w
+ZW5zc2wva3JiNSc6IGNoZWNrZWQgb3V0ICdiOWFkNmM0OTUwNWM5NmEwODgzMjZiNjJhNTI1Njhl
+MzQ4NGYyMTY4JwpDbG9uaW5nIGludG8gJ3B5Y2EtY3J5cHRvZ3JhcGh5Jy4uLgpTdWJtb2R1bGUg
+cGF0aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbC9weWNh
+LWNyeXB0b2dyYXBoeSc6IGNoZWNrZWQgb3V0ICcwOTQwMzEwMGRlMmY2ZjFjZGQwZDQ4NGRjYjhl
+NjIwZjFjMzM1YzhmJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvaXB4ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAxZjMzMWJlM2Vl
+OTAxYmI2ZTE3JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1vZHVsZSBwYXRo
+ICdyb21zL29wZW5iaW9zJzogY2hlY2tlZCBvdXQgJ2M3OWUwZWNiODRmNGYxZWUzZjczZjUyMTYy
+MmUyNjRlZGQxYmYxNzQnCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUnLi4uClN1Ym1v
+ZHVsZSBwYXRoICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5ZGE3YzhlZWM1
+ZTQ1ZWYxZjY3OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbnNiaScu
+Li4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbnNiaSc6IGNoZWNrZWQgb3V0ICdjZTIyOGVlMDkx
+OWRlYjk5NTcxOTJkNzIzZWVjYzhhYWFlMjY5N2M2JwpDbG9uaW5nIGludG8gJ3JvbXMvcWVtdS1w
+YWxjb2RlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBjaGVja2VkIG91
+dCAnYmYwZTEzNjk4ODcyNDUwMTY0ZmE3MDQwZGEzNmE5NWQyZDRiMzI2ZicKQ2xvbmluZyBpbnRv
+ICdyb21zL3NlYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3MnOiBjaGVja2Vk
+IG91dCAnYTVjYWI1OGU5YTNmYjZlMTY4YWJhOTE5YzU2NjliZWE0MDY1NzNiNCcKQ2xvbmluZyBp
+bnRvICdyb21zL3NlYWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvc2VhYmlvcy1o
+cHBhJzogY2hlY2tlZCBvdXQgJzBmNGZlODQ2NTgxNjVlOTZjZTM1ODcwZmQxOWZjNjM0ZTE4MmU3
+N2InCkNsb25pbmcgaW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9z
+Z2FiaW9zJzogY2hlY2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUwYTAwYjZjNGFj
+OTAxNWEnCkNsb25pbmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUgcGF0aCAncm9t
+cy9za2lib290JzogY2hlY2tlZCBvdXQgJzI2MWNhOGU3NzllNTEzODg2OWE0NWYxNzRjYWE0OWJl
+NmEyNzQ1MDEnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVsZSBwYXRoICdy
+b21zL3UtYm9vdCc6IGNoZWNrZWQgb3V0ICdkMzY4OTI2N2Y5MmM1OTU2ZTA5Y2M3ZDFiYWE0NzAw
+MTQxNjYyYmZmJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4uLgplcnJvcjog
+UlBDIGZhaWxlZDsgcmVzdWx0PTE4LCBIVFRQIGNvZGUgPSAyMDAKZmF0YWw6IFRoZSByZW1vdGUg
+ZW5kIGh1bmcgdXAgdW5leHBlY3RlZGx5CmZhdGFsOiBwcm90b2NvbCBlcnJvcjogYmFkIHBhY2sg
+aGVhZGVyCkNsb25lIG9mICdodHRwczovL2dpdC5xZW11Lm9yZy9naXQvdS1ib290LXNhbTQ2MGV4
+LmdpdCcgaW50byBzdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnIGZhaWxlZApU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi9wYXRjaGV3LWNsaSIs
+IGxpbmUgNTA0LCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8i
+XSwgclsiaGVhZCJdLCBsb2dmKQogIEZpbGUgIi4vcGF0Y2hldy1jbGkiLCBsaW5lIDUwLCBpbiBn
+aXRfY2xvbmVfcmVwbwogICAgc3RkZXJyPWxvZ2YsIHN0ZG91dD1sb2dmKQogIEZpbGUgIi91c3Iv
+bGliNjQvcHl0aG9uMy40L3N1YnByb2Nlc3MucHkiLCBsaW5lIDU1OCwgaW4gY2hlY2tfY2FsbAog
+ICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxs
+ZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ2Nsb25lJywgJy1xJywgJy0tcmVjdXJz
+aXZlJywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3BhdGNoZXctZ2l0LWNhY2hlL2h0dHBzZ2l0aHVi
+Y29tcGF0Y2hld3Byb2plY3RxZW11LTNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWVjbWdjejYyL3NyYyddJyByZXR1
+cm5lZCBub24temVybyBleGl0IHN0YXR1cyAxCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA4MDcxNDQ2MjguNDk4OC0xLWt3b2xmQHJl
+ZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-A bit more detail in the commit message would help, I think --
-this is adding extra machinery which has to copy and modify
-the VMStateDescription passed in by the device in order to
-add the subsection that handles reset.
-
-I've added Dave Gilbert to the already long cc list since this
-is migration related.
-
-> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> ---
->  hw/core/qdev-vmstate.c | 41 +++++++++++++++++++++++++++++++++++++++++
->  hw/core/qdev.c         | 12 +++++++++++-
->  include/hw/qdev-core.h |  3 +++
->  stubs/Makefile.objs    |  1 +
->  stubs/device.c         |  7 +++++++
->  5 files changed, 63 insertions(+), 1 deletion(-)
->  create mode 100644 stubs/device.c
->
-> diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
-> index 07b010811f..24f8465c61 100644
-> --- a/hw/core/qdev-vmstate.c
-> +++ b/hw/core/qdev-vmstate.c
-> @@ -43,3 +43,44 @@ const struct VMStateDescription device_vmstate_reset = {
->          VMSTATE_END_OF_LIST()
->      },
->  };
-> +
-> +static VMStateDescription *vmsd_duplicate_and_append(
-> +        const VMStateDescription *old_vmsd,
-> +        const VMStateDescription *new_subsection)
-> +{
-> +    VMStateDescription *vmsd;
-> +    int n = 0;
-> +
-> +    assert(old_vmsd && new_subsection);
-> +
-> +    vmsd = (VMStateDescription *) g_memdup(old_vmsd, sizeof(*vmsd));
-> +
-> +    if (old_vmsd->subsections) {
-> +        while (old_vmsd->subsections[n]) {
-> +            n += 1;
-> +        }
-> +    }
-> +    vmsd->subsections = g_new(const VMStateDescription *, n + 2);
-> +
-> +    if (old_vmsd->subsections) {
-> +        memcpy(vmsd->subsections, old_vmsd->subsections,
-> +               sizeof(VMStateDescription *) * n);
-> +    }
-> +    vmsd->subsections[n] = new_subsection;
-> +    vmsd->subsections[n + 1] = NULL;
-> +
-> +    return vmsd;
-> +}
-> +
-> +void device_class_build_extended_vmsd(DeviceClass *dc)
-> +{
-> +    assert(dc->vmsd);
-> +    assert(!dc->vmsd_ext);
-> +
-> +    /* forge a subsection with proper name */
-> +    VMStateDescription *reset;
-> +    reset = g_memdup(&device_vmstate_reset, sizeof(*reset));
-> +    reset->name = g_strdup_printf("%s/device_reset", dc->vmsd->name);
-> +
-> +    dc->vmsd_ext = vmsd_duplicate_and_append(dc->vmsd, reset);
-> +}
-
-This will allocate memory, but there is no corresponding
-code which frees it. This means you'll have a memory leak
-across device realize->unrealize for hotplug devices.
-
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index e9e5f2d5f9..88387d3743 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -45,7 +45,17 @@ bool qdev_hot_removed = false;
->  const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
->  {
->      DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> -    return dc->vmsd;
-> +
-> +    if (!dc->vmsd) {
-> +        return NULL;
-> +    }
-> +
-> +    if (!dc->vmsd_ext) {
-> +        /* build it first time we need it */
-> +        device_class_build_extended_vmsd(dc);
-> +    }
-> +
-> +    return dc->vmsd_ext;
->  }
-
-Unfortunately not everything that wants the VMSD calls
-this function. migration/savevm.c:dump_vmstate_json_to_file()
-does a direct access to dc->vmsd, so we need to fix that first.
-
-Devices which don't use dc->vmsd won't get this and so
-their reset state won't be migrated. That's OK for anything
-that's still not yet a QOM device, I guess -- it's not possible
-for them to be in a 'held in reset' state anyway, so the
-extra subsection would never be needed.
-
-The one I'm less sure about is the 'virtio' devices, which
-have to do something odd with migration state for backwards
-compat reasons. At the moment they can't be in a situation
-where they're being held in reset when we do a migration,
-but since they're PCI devices they might in future be possible
-to put into new boards/pci controllers that would let them
-be in that situation.
-
->  static void bus_remove_child(BusState *bus, DeviceState *child)
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 1670ae41bb..926d4bbcb1 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -120,6 +120,7 @@ typedef struct DeviceClass {
->
->      /* device state */
->      const struct VMStateDescription *vmsd;
-> +    const struct VMStateDescription *vmsd_ext;
->
->      /* Private to qdev / bus.  */
->      const char *bus_type;
-> @@ -520,6 +521,8 @@ void device_class_set_parent_unrealize(DeviceClass *dc,
->
->  const struct VMStateDescription *qdev_get_vmsd(DeviceState *dev);
->
-> +void device_class_build_extended_vmsd(DeviceClass *dc);
-> +
->  const char *qdev_fw_name(DeviceState *dev);
->
->  Object *qdev_get_machine(void);
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 9c7393b08c..432b56f290 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -40,4 +40,5 @@ stub-obj-y += pci-host-piix.o
->  stub-obj-y += ram-block.o
->  stub-obj-y += ramfb.o
->  stub-obj-y += fw_cfg.o
-> +stub-obj-y += device.o
->  stub-obj-$(CONFIG_SOFTMMU) += semihost.o
-> diff --git a/stubs/device.c b/stubs/device.c
-> new file mode 100644
-> index 0000000000..e9b4f57e5f
-> --- /dev/null
-> +++ b/stubs/device.c
-> @@ -0,0 +1,7 @@
-> +#include "qemu/osdep.h"
-> +#include "hw/qdev-core.h"
-> +
-> +void device_class_build_extended_vmsd(DeviceClass *dc)
-> +{
-> +    return;
-> +}
-> --
-> 2.22.0
-
-
-thanks
--- PMM
 
