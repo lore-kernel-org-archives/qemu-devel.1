@@ -2,62 +2,80 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B470BC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25591C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:14:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8726E21EF2
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:14:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8726E21EF2
+	by mail.kernel.org (Postfix) with ESMTPS id ED01F21EF2
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:14:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED01F21EF2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvPVq-0003HG-OF
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:14:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52634)
+	id 1hvPWJ-000473-83
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:14:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52706)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hvPVT-0002qy-9t
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:13:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvPVj-0003Gp-VX
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hvPVS-0004ld-Ad
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:13:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59028)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hvPVS-0004ku-2x
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:13:46 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 69C94882F2;
- Wed,  7 Aug 2019 17:13:45 +0000 (UTC)
-Received: from work-vm (ovpn-117-204.ams2.redhat.com [10.36.117.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EA90600CC;
- Wed,  7 Aug 2019 17:13:43 +0000 (UTC)
-Date: Wed, 7 Aug 2019 18:13:41 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Message-ID: <20190807171341.GC27871@work-vm>
-References: <20190716005411.4156-1-richardw.yang@linux.intel.com>
+ (envelope-from <philmd@redhat.com>) id 1hvPVi-0005EJ-S1
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:14:03 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46185)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvPVi-0005Cm-ML
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:14:02 -0400
+Received: by mail-wr1-f66.google.com with SMTP id z1so92138982wru.13
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 10:14:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ApFUr7iLGkM9f6Hg9lBnoU65H8XzLr3MZnfZRKAeeXo=;
+ b=IL8SMWfMDKsDcRWIc5gtERcPK2KoWnLEvH2vsL2bdL8hVqcd5fMZbPhxircPCwkqHt
+ RBz7VFoufggPjabpWthK56ttSgh3s/8zVuOE1GMdrVALedlMbUCvq2/8TNCl/qQ+DpA5
+ HHBZRRX+qyg1WJHoKJWr+4rrwoGlPhNP+ioPhbKHqKJXVgIQqhJocli+QrYWx4Qmawc9
+ 7MWQHIv59aySv8Yh+6LzDg5saQzH8qAuhCQYNHAeB40vQ3DXbqeuWq2tY8agRyeMh91N
+ kza655t4SN/ruULlSziwtkqahvuRqeBnG7A/RWz6/JBqlGmBw/oIzpeESgC7+YElQnwV
+ 4ENQ==
+X-Gm-Message-State: APjAAAVP6ZogIfkDBAohoAGZ5fBWNMa+CZqvIsQ0o+hw6gRtFNwUn19x
+ qdW9pvBVQ3SZZsGMSGDWevrCu9VG9d0=
+X-Google-Smtp-Source: APXvYqx7d1e8X5Bz6Hd7t9yfko7G9GzTLzqvXTZtfJjD2TwijgvUpEzGh+R+NS8EveFV3jtEpb9RZQ==
+X-Received: by 2002:adf:fd08:: with SMTP id e8mr12602951wrr.147.1565198041191; 
+ Wed, 07 Aug 2019 10:14:01 -0700 (PDT)
+Received: from [192.168.1.115] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id v5sm138330619wre.50.2019.08.07.10.14.00
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 10:14:00 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-15-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <608c2043-0e1d-f57e-6c79-a4f8438601f8@redhat.com>
+Date: Wed, 7 Aug 2019 19:13:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190716005411.4156-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 07 Aug 2019 17:13:45 +0000 (UTC)
+In-Reply-To: <20190806151435.10740-15-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] migration: consolidate time info into
- populate_time_info
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v2 14/29] migration: Move the
+ VMStateDescription typedef to typedefs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,92 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> Consolidate time information fill up into its function for better
-> readability.
+On 8/6/19 5:14 PM, Markus Armbruster wrote:
+> We declare incomplete struct VMStateDescription in a couple of places
+> so we don't have to include migration/vmstate.h for the typedef.
+> That's fine with me.  However, the next commit will drop
+> migration/vmstate.h from a massive number of compiles.  Move the
+> typedef to qemu/typedefs.h now, so I don't have to insert struct in
+> front of VMStateDescription all over the place then.
 > 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-
-Queued
-
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  migration/migration.c | 40 ++++++++++++++++++++++------------------
->  1 file changed, 22 insertions(+), 18 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 47fe22d327..18ef933105 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -822,6 +822,25 @@ bool migration_is_setup_or_active(int state)
->      }
->  }
->  
-> +static void populate_time_info(MigrationInfo *info, MigrationState *s)
-> +{
-> +    info->has_status = true;
-> +    info->has_setup_time = true;
-> +    info->setup_time = s->setup_time;
-> +    if (s->state == MIGRATION_STATUS_COMPLETED) {
-> +        info->has_total_time = true;
-> +        info->total_time = s->total_time;
-> +        info->has_downtime = true;
-> +        info->downtime = s->downtime;
-> +    } else {
-> +        info->has_total_time = true;
-> +        info->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) -
-> +                           s->start_time;
-> +        info->has_expected_downtime = true;
-> +        info->expected_downtime = s->expected_downtime;
-> +    }
-> +}
-> +
->  static void populate_ram_info(MigrationInfo *info, MigrationState *s)
->  {
->      info->has_ram = true;
-> @@ -907,16 +926,8 @@ static void fill_source_migration_info(MigrationInfo *info)
->      case MIGRATION_STATUS_DEVICE:
->      case MIGRATION_STATUS_POSTCOPY_PAUSED:
->      case MIGRATION_STATUS_POSTCOPY_RECOVER:
-> -         /* TODO add some postcopy stats */
-> -        info->has_status = true;
-> -        info->has_total_time = true;
-> -        info->total_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME)
-> -            - s->start_time;
-> -        info->has_expected_downtime = true;
-> -        info->expected_downtime = s->expected_downtime;
-> -        info->has_setup_time = true;
-> -        info->setup_time = s->setup_time;
-> -
-> +        /* TODO add some postcopy stats */
-> +        populate_time_info(info, s);
->          populate_ram_info(info, s);
->          populate_disk_info(info);
->          break;
-> @@ -925,14 +936,7 @@ static void fill_source_migration_info(MigrationInfo *info)
->          /* TODO: display COLO specific information (checkpoint info etc.) */
->          break;
->      case MIGRATION_STATUS_COMPLETED:
-> -        info->has_status = true;
-> -        info->has_total_time = true;
-> -        info->total_time = s->total_time;
-> -        info->has_downtime = true;
-> -        info->downtime = s->downtime;
-> -        info->has_setup_time = true;
-> -        info->setup_time = s->setup_time;
-> -
-> +        populate_time_info(info, s);
->          populate_ram_info(info, s);
->          break;
->      case MIGRATION_STATUS_FAILED:
-> -- 
-> 2.17.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  include/hw/qdev-core.h      | 6 ++----
+>  include/migration/vmstate.h | 1 -
+>  include/qemu/typedefs.h     | 1 +
+>  include/qom/cpu.h           | 4 ++--
+>  target/alpha/cpu.h          | 2 +-
+>  target/arm/cpu.h            | 2 +-
+>  target/cris/cpu.h           | 2 +-
+>  target/hppa/cpu.h           | 2 +-
+>  target/i386/cpu.h           | 2 +-
+>  target/lm32/cpu.h           | 2 +-
+>  target/mips/internal.h      | 2 +-
+>  target/openrisc/cpu.h       | 2 +-
+>  target/ppc/cpu-qom.h        | 2 +-
+>  target/ppc/cpu.h            | 2 +-
+>  target/s390x/cpu.h          | 2 +-
+>  target/sparc/cpu.h          | 2 +-
+>  16 files changed, 17 insertions(+), 19 deletions(-)
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
