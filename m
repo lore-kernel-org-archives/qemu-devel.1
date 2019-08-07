@@ -2,90 +2,70 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6705C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB74C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:46:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 840F221E6A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:42:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RUCjEiRh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840F221E6A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EABD021BF6
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:46:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EABD021BF6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvLHN-0005S6-SS
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 08:42:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46816)
+	id 1hvLLA-0008Fv-6A
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 08:46:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48082)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hvLGz-00051z-KG
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:42:34 -0400
+ (envelope-from <lersek@redhat.com>) id 1hvLKA-00078V-EH
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hvLGy-0000qU-NK
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:42:33 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45900)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hvLGy-0000pZ-G4
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:42:32 -0400
-Received: by mail-wr1-x442.google.com with SMTP id q12so960057wrj.12
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 05:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=9Bb8vb6J7sHdQ0mOAQgopc35eYhTKZ7e+0yLXHRBn7k=;
- b=RUCjEiRh0MQkDGLckr3oowu6dT8364GZIVxASR9+JyO2qCkL9PAFeAwCV3z1JtjXJ2
- o+/lqyjDJYF4aOsPvsJNo58yybm0v2Gt8mqWy0kH7wVEHNTZlwYff1nYmhrjAPm4Rtev
- zQeFGb4oAh8FwWQiB60GRTipIRhd1aXulMzj6/oTGkQXhUK+qZsCVk12yIV1yP0/ffX6
- t0lac0Uw4yyRCEsJKG/VYfapOXlNFuVU3YK77PLtIQPGQV74ns8RoeKzhKdVaDXRdmtd
- I2yvFddsRI62EDa8voj4ZSBDQKaLlJndu3o4fJsp21tzHEsjP/ujh/10YpcTVXkzcdiu
- tBiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=9Bb8vb6J7sHdQ0mOAQgopc35eYhTKZ7e+0yLXHRBn7k=;
- b=AYqixx1erzD/9NRzSmvSjqfjIwlaQ0VptGDf4ufs0vk6EDIrgEfLhsAmEqZ8ZBkiNl
- QClrpFNcC9bRmS7rxOJllr4XHnXA2ZfF4NWnCNqLul6ncSDDVuPZuNC4XTBniLJlLnrk
- FVzNTLjtbBL40gZVWpTi7BWlyXe0robHaXoy6jmazRbYqs4p6+RaUZiAEkkKN2XFVscN
- qE6K0E3uH8iAGcSJdRlDJuHfdCbFQU1ZQpMKYlYusjRGOmYdklWDsgUKU/UAb2H+AzG8
- nCEag8A7L2DFZ4G6F6v3GrZgxfX5pOPL2ZuBWseoDMKLNzUqeyLl1QJ+rpBxbW1FzJjP
- +mZA==
-X-Gm-Message-State: APjAAAV0a5EnPSJ7vM2nRPK2yfXfBX6gHyTaxtRQCs+P9kpOq5ckHoCu
- TszB4zPukdiQRMFCrF0YkWqrGJUd2rg=
-X-Google-Smtp-Source: APXvYqxEAw2Kit4NaaRFavBd8+9ry22iejWzCDSlQ4Oo3oxkyPoDyjsJ3m429izluMUnS+OcdViwYw==
-X-Received: by 2002:adf:cd81:: with SMTP id q1mr11158784wrj.16.1565181750930; 
- Wed, 07 Aug 2019 05:42:30 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id g19sm160899294wrb.52.2019.08.07.05.42.30
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 07 Aug 2019 05:42:30 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E5E041FF87;
- Wed,  7 Aug 2019 13:42:29 +0100 (BST)
-References: <20190730123759.21723-1-pbonzini@redhat.com>
- <20190730123759.21723-4-pbonzini@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <20190730123759.21723-4-pbonzini@redhat.com>
-Date: Wed, 07 Aug 2019 13:42:29 +0100
-Message-ID: <87pnlhi1u2.fsf@linaro.org>
+ (envelope-from <lersek@redhat.com>) id 1hvLK9-0003gS-6r
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:45:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36248)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1hvLK8-0003dT-U3
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:45:49 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3CE018FAB4;
+ Wed,  7 Aug 2019 12:45:47 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.36.118.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EC71C5D9CD;
+ Wed,  7 Aug 2019 12:45:43 +0000 (UTC)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190803082517.15035-1-philmd@redhat.com>
+ <CAFEAcA_cPDdwXkSra_8vxE8c9M2y91s5FvpB7sZh12xF-LPUWA@mail.gmail.com>
+ <a4158e8a-d67f-52b5-c082-681d21ac2599@redhat.com>
+ <19158743-5f00-f89c-d9af-5b991a581b6c@redhat.com>
+ <CAFEAcA9zm-JXkzG05oHAfXQpEnW4x+Bi13TA7Hr1KQtEXSHWvg@mail.gmail.com>
+ <9625d2b7-e61f-ead6-78ef-e2ca7b88b878@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c4221994-f66d-8d51-ea9b-444b98857c70@redhat.com>
+Date: Wed, 7 Aug 2019 14:45:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
+In-Reply-To: <9625d2b7-e61f-ead6-78ef-e2ca7b88b878@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Wed, 07 Aug 2019 12:45:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
-Subject: Re: [Qemu-devel] [PATCH 3/3] tests/tcg: move configuration to a
- sub-shell script
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PULL 0/1] EDK2 firmware patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,43 +77,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 08/05/19 16:29, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 8/5/19 4:14 PM, Peter Maydell wrote:
+>> On Mon, 5 Aug 2019 at 15:11, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com> wrote:
+>>>
+>>> Hi Peter,
+>>>
+>>> On 8/5/19 3:13 PM, Michal Pr=C3=ADvozn=C3=ADk wrote:
+>>>> On 8/3/19 12:22 PM, Peter Maydell wrote:
+>>>>> On Sat, 3 Aug 2019 at 09:26, Philippe Mathieu-Daud=C3=A9 <philmd@re=
+dhat.com> wrote:
+>>>>>>
+>>>>>> The following changes since commit 9bcf2dfa163f67b0fec6ee0fe88ad5d=
+c5d69dc59:
+>>>>>>
+>>>>>>   Merge remote-tracking branch 'remotes/elmarco/tags/slirp-CVE-201=
+9-14378-pull-request' into staging (2019-08-02 13:06:03 +0100)
+>>>>>>
+>>>>>> are available in the Git repository at:
+>>>>>>
+>>>>>>   https://gitlab.com/philmd/qemu.git tags/edk2-next-20190803
+>>>>>>
+>>>>>> for you to fetch changes up to 177cd674d6203d3c1a98e170ea56c5a904a=
+c4ce8:
+>>>>>>
+>>>>>>   Makefile: remove DESTDIR from firmware file content (2019-08-03 =
+09:52:32 +0200)
+>>>>>>
+>>>>>> ----------------------------------------------------------------
+>>>>>> A harmless build-sys patch that fixes a regression affecting Linux
+>>>>>> distributions packaging QEMU.
+>>>>>>
+>>>>>> ----------------------------------------------------------------
+>>>>>>
+>>>>>> Olaf Hering (1):
+>>>>>>   Makefile: remove DESTDIR from firmware file content
+>>>>>
+>>>>> Is this pullreq intended for 4.1 ?
+>>>
+>>> Sorry, I was not sure how to comment on the pullreq cover (everything
+>>> between the '---' lines get include in the merge commit description).
+>>
+>> Depends on your workflow. For me my pull-request-creation
+>> script creates a bunch of files which will be the emails
+>> to be sent out, and I can manually edit the 'cover letter'
+>> email before sending everything.
+>=20
+> OK (I don't want to give you extra manual work).
+>=20
+>>> This fix a regression introduced during the current development cycle=
+.
+>>> Already 3 different distributions hit this issue and complained (Suse=
+,
+>>> ArchLinux and Fedora).
+>>> This is not a critical/security issue and distributions can easily
+>>> backport this patch, but since there is a RC4 planned, it would be ni=
+ce
+>>> regarding distributors to fix this if possible.
+>>
+>> OK, sounds good -- I just wanted to check. I've pushed the
+>> pullreq to master.
+>=20
+> Thank you!
+>=20
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Thank you all, I've updated <https://bugs.launchpad.net/qemu/+bug/1838703=
+>.
 
-> Avoid the repeated inclusions of config-target.mak, which have
-> risks of namespace pollution, and instead build minimal configuration
-> files in a configuration script.  The same configuration files can
-> also be included in Makefile and Makefile.qemu
->
-<snip>
-> diff --git a/configure b/configure
-> index 714e7fb..b0bd308 100755
-> --- a/configure
-> +++ b/configure
-<snip>
->
->  if test "$libpmem" !=3D "no"; then
-> @@ -6516,6 +6468,12 @@ if ! $python -c 'import sys; sys.exit(sys.version_=
-info < (3,0))'; then
->    echo "warning: Python 3 will be required for building future versions =
-of QEMU" >&2
->  fi
->
-> +(for i in $cross_cc_vars; do
-> +  export $i
-> +done
-> +export target_list source_path
-> +${SHELL-/bin/sh} $source_path/tests/tcg/configure.sh)
-> +
-
-Do we really want to use the users SHELL here? What's wrong with just
-calling it and letting the OS derive things from the #!?
-
---
-Alex Benn=C3=A9e
+Laszlo
 
