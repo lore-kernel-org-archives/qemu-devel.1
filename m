@@ -6,49 +6,49 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDAD5C19759
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F2BC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A822E2238C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A822E2238C
+	by mail.kernel.org (Postfix) with ESMTPS id A0F012238C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F012238C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvHSJ-0003EM-Vx
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:37:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45882)
+	id 1hvHSj-0003ml-QD
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:38:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45297)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hvHPQ-0006Mi-TW
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:35:03 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hvHNG-0001p5-Go
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:32:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hvHPN-0003pI-UJ
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:35:00 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.234]:12698)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <tony.nguyen@bt.com>) id 1hvHNF-0002cR-4p
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:32:46 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.77]:9795)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hvHPC-0003jG-Qy; Wed, 07 Aug 2019 04:34:47 -0400
-Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
- RDW083A012ED68.bt.com (10.187.98.38) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Wed, 7 Aug 2019 09:34:22 +0100
+ id 1hvHN0-0002VN-8U; Wed, 07 Aug 2019 04:32:30 -0400
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 09:34:41 +0100
+ BWP09926082.bt.com (10.36.82.113) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Wed, 7 Aug
+ 2019 09:32:14 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 09:32:27 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Wed, 7 Aug 2019
- 09:34:41 +0100
+ 09:32:27 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v6 24/26] cputlb: Byte swap memory
- transaction attribute
-Thread-Index: AQHVTPr0XHOobhwzF02y9V3sLlC8dA==
-Date: Wed, 7 Aug 2019 08:34:40 +0000
-Message-ID: <1565166880633.15851@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v6 18/26] exec: Delete device_endian
+Thread-Index: AQHVTPqlw4QCqX/rC0CPqHm682cCsg==
+Date: Wed, 7 Aug 2019 08:32:27 +0000
+Message-ID: <1565166747494.26346@bt.com>
 References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -58,14 +58,12 @@ X-MS-TNEF-Correlator:
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.44]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 62.239.224.234
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.77
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v6 24/26] cputlb: Byte swap memory transaction
- attribute
+Subject: [Qemu-devel]  [PATCH v6 18/26] exec: Delete device_endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,75 +106,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Notice new attribute, byte swap, and force the transaction through the
-memory slow path.
+device_endian has been made redundant by MemOp.
 
-Required by architectures that can invert endianness of memory
-transaction, e.g. SPARC64 has the Invert Endian TTE bit.
-
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/cputlb.c      | 11 +++++++++++
- include/exec/memattrs.h |  2 ++
- 2 files changed, 13 insertions(+)
+ include/exec/cpu-common.h | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-index 473b8e6..f6f4dd5 100644
---- a/accel/tcg/cputlb.c
-+++ b/accel/tcg/cputlb.c
-@@ -738,6 +738,9 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulon=
-g vaddr,
-          */
-         address |=3D TLB_RECHECK;
-     }
-+    if (attrs.byte_swap) {
-+        address |=3D TLB_FORCE_SLOW;
-+    }
-     if (!memory_region_is_ram(section->mr) &&
-         !memory_region_is_romd(section->mr)) {
-         /* IO memory case */
-@@ -891,6 +894,10 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEn=
-try *iotlbentry,
-     bool locked =3D false;
-     MemTxResult r;
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 01a29ba..7eeb78c 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -18,14 +18,6 @@ void tcg_flush_softmmu_tlb(CPUState *cs);
 
-+    if (iotlbentry->attrs.byte_swap) {
-+        op ^=3D MO_BSWAP;
-+    }
-+
-     section =3D iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs)=
-;
-     mr =3D section->mr;
-     mr_offset =3D (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-@@ -933,6 +940,10 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry=
- *iotlbentry,
-     bool locked =3D false;
-     MemTxResult r;
+ #include "exec/memop.h"
 
-+    if (iotlbentry->attrs.byte_swap) {
-+        op ^=3D MO_BSWAP;
-+    }
-+
-     section =3D iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs)=
-;
-     mr =3D section->mr;
-     mr_offset =3D (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-diff --git a/include/exec/memattrs.h b/include/exec/memattrs.h
-index d4a3477..95f2d20 100644
---- a/include/exec/memattrs.h
-+++ b/include/exec/memattrs.h
-@@ -37,6 +37,8 @@ typedef struct MemTxAttrs {
-     unsigned int user:1;
-     /* Requester ID (for MSI for example) */
-     unsigned int requester_id:16;
-+    /* Invert endianness for this page */
-+    unsigned int byte_swap:1;
-     /*
-      * The following are target-specific page-table bits.  These are not
-      * related to actual memory transactions at all.  However, this struct=
-ure
+-enum device_endian {
+-#ifdef NEED_CPU_H
+-    DEVICE_NATIVE_ENDIAN =3D MO_TE,
+-#endif
+-    DEVICE_BIG_ENDIAN =3D MO_BE,
+-    DEVICE_LITTLE_ENDIAN =3D MO_LE,
+-};
+-
+ #if defined(HOST_WORDS_BIGENDIAN)
+ #define DEVICE_HOST_ENDIAN MO_BE
+ #else
 --
 1.8.3.1
 
