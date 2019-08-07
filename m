@@ -2,63 +2,63 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 797FCC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 11:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3480AC32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 11:06:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E5FF21E6A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 11:02:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E5FF21E6A
+	by mail.kernel.org (Postfix) with ESMTPS id BCA9A2199C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 11:06:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCA9A2199C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvJhl-0008Dq-Eb
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 07:02:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49500)
+	id 1hvJmQ-0001Nu-PB
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 07:06:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50289)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hvJhG-0007nj-6l
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 07:01:36 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hvJm2-0000zH-RG
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 07:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hvJhE-0005wT-UL
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 07:01:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42494)
+ (envelope-from <dgilbert@redhat.com>) id 1hvJm1-0008Cd-8t
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 07:06:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55704)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hvJhB-0005uk-KI
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 07:01:30 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hvJm1-0008CO-0o
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 07:06:29 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 755EC300C03B;
- Wed,  7 Aug 2019 11:01:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 44FD9309DEFC;
+ Wed,  7 Aug 2019 11:06:28 +0000 (UTC)
 Received: from work-vm (ovpn-117-204.ams2.redhat.com [10.36.117.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5356819C5B;
- Wed,  7 Aug 2019 11:01:25 +0000 (UTC)
-Date: Wed, 7 Aug 2019 12:01:22 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CEF3D60BE0;
+ Wed,  7 Aug 2019 11:06:26 +0000 (UTC)
+Date: Wed, 7 Aug 2019 12:06:24 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Message-ID: <20190807110122.GA2867@work-vm>
+Message-ID: <20190807110624.GB2867@work-vm>
 References: <20190806165429.19327-1-brijesh.singh@amd.com>
- <20190806165429.19327-3-brijesh.singh@amd.com>
+ <20190806165429.19327-4-brijesh.singh@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190806165429.19327-3-brijesh.singh@amd.com>
+In-Reply-To: <20190806165429.19327-4-brijesh.singh@amd.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 07 Aug 2019 11:01:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Wed, 07 Aug 2019 11:06:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 02/14] doc: update AMD SEV to include
- Live migration flow
+Subject: Re: [Qemu-devel] [PATCH v3 03/14] migration.json: add AMD SEV
+ specific migration parameters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,65 +79,253 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Singh, Brijesh (brijesh.singh@amd.com) wrote:
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  docs/amd-memory-encryption.txt | 40 +++++++++++++++++++++++++++++++++-
->  1 file changed, 39 insertions(+), 1 deletion(-)
+> AMD SEV migration flow requires that target machine's public Diffie-Hellman
+> key (PDH) and certificate chain must be passed before initiating the guest
+> migration. User can use QMP 'migrate-set-parameters' to pass the certificate
+> chain. The certificate chain will be used while creating the outgoing
+> encryption context.
 > 
-> diff --git a/docs/amd-memory-encryption.txt b/docs/amd-memory-encryption.txt
-> index 8822cadda1..01d95089a8 100644
-> --- a/docs/amd-memory-encryption.txt
-> +++ b/docs/amd-memory-encryption.txt
-> @@ -89,7 +89,45 @@ TODO
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+> 
+> I was able to pass the certificate chain through the HMP but somehow
+> QMP socket interface is not working for me. If anyone has any tips on
+> what I am missing in the patch then please let me know. In meantime,
+> I will also continue my investigation on why its not working for me.
+
+It looks OK to me; what's the qmp you're trying and what's the failure
+error?
+
+Dave
+
+>  migration/migration.c | 61 +++++++++++++++++++++++++++++++++++++++++++
+>  monitor/hmp-cmds.c    | 18 +++++++++++++
+>  qapi/migration.json   | 41 ++++++++++++++++++++++++++---
+>  3 files changed, 116 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 8a607fe1e2..de66a0eb7e 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -783,6 +783,12 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+>      params->announce_rounds = s->parameters.announce_rounds;
+>      params->has_announce_step = true;
+>      params->announce_step = s->parameters.announce_step;
+> +    params->has_sev_pdh = true;
+> +    params->sev_pdh = g_strdup(s->parameters.sev_pdh);
+> +    params->has_sev_plat_cert = true;
+> +    params->sev_plat_cert = g_strdup(s->parameters.sev_plat_cert);
+> +    params->has_sev_amd_cert = true;
+> +    params->sev_amd_cert = g_strdup(s->parameters.sev_amd_cert);
 >  
->  Live Migration
->  ----------------
-> -TODO
-> +AMD SEV encrypts the memory of VMs and because a different key is used
-> +in each VM, the hypervisor will be unable to simply copy the
-> +ciphertext from one VM to another to migrate the VM. Instead the AMD SEV Key
-> +Management API provides sets of function which the hypervisor can use
-> +to package a guest page for migration, while maintaining the confidentiality
-> +provided by AMD SEV.
-> +
-> +SEV guest VMs have the concept of private and shared memory. The private
-> +memory is encrypted with the guest-specific key, while shared memory may
-> +be encrypted with the hypervisor key. The migration APIs provided by the
-> +SEV API spec should be used for migrating the private pages. The
-> +KVM_GET_PAGE_ENC_BITMAP ioctl can be used to get the guest page encryption
-> +bitmap. The bitmap can be used to check if the given guest page is
-> +private or shared.
-> +
-> +Before initiating the migration, we need to know the targets machine's public
-> +Diffie-Hellman key (PDH) and certificate chain. It can be retrieved
-> +with the 'query-sev-capabilities' QMP command or using the sev-tool. The
-> +migrate-set-parameter can be used to pass the target machine's PDH and
-> +certificate chain.
-> +
-> +During the migration flow, the SEND_START is called on the source hypervisor
-> +to create an outgoing encryption context. The SEV guest policy dictates whether
-> +the certificate passed through the migrate-sev-set-info command will be
-> +validated. SEND_UPDATE_DATA is called to encrypt the guest private pages.
-> +After migration is completed, SEND_FINISH is called to destroy the encryption
-> +context and make the VM non-runnable to protect it against cloning.
-> +
-> +On the target machine, RECEIVE_START is called first to create an
-> +incoming encryption context. The RECEIVE_UPDATE_DATA is called to copy
-> +the received encrypted page into guest memory. After migration has
-> +completed, RECEIVE_FINISH is called to make the VM runnable.
-> +
-> +For more information about the migration see SEV API Appendix A
-> +Usage flow (Live migration section).
-> +
-> +NOTE:
-> +To protect against the memory clone SEV APIs are designed to make the VM
-> +unrunnable in case of the migration failure.
+>      return params;
+>  }
+> @@ -1289,6 +1295,18 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+>      if (params->has_announce_step) {
+>          dest->announce_step = params->announce_step;
+>      }
+> +    if (params->has_sev_pdh) {
+> +        assert(params->sev_pdh->type == QTYPE_QSTRING);
+> +        dest->sev_pdh = g_strdup(params->sev_pdh->u.s);
+> +    }
+> +    if (params->has_sev_plat_cert) {
+> +        assert(params->sev_plat_cert->type == QTYPE_QSTRING);
+> +        dest->sev_plat_cert = g_strdup(params->sev_plat_cert->u.s);
+> +    }
+> +    if (params->has_sev_amd_cert) {
+> +        assert(params->sev_amd_cert->type == QTYPE_QSTRING);
+> +        dest->sev_amd_cert = g_strdup(params->sev_amd_cert->u.s);
+> +    }
+>  }
 >  
->  References
->  -----------------
+>  static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+> @@ -1390,6 +1408,21 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+>      if (params->has_announce_step) {
+>          s->parameters.announce_step = params->announce_step;
+>      }
+> +    if (params->has_sev_pdh) {
+> +        g_free(s->parameters.sev_pdh);
+> +        assert(params->sev_pdh->type == QTYPE_QSTRING);
+> +        s->parameters.sev_pdh = g_strdup(params->sev_pdh->u.s);
+> +    }
+> +    if (params->has_sev_plat_cert) {
+> +        g_free(s->parameters.sev_plat_cert);
+> +        assert(params->sev_plat_cert->type == QTYPE_QSTRING);
+> +        s->parameters.sev_plat_cert = g_strdup(params->sev_plat_cert->u.s);
+> +    }
+> +    if (params->has_sev_amd_cert) {
+> +        g_free(s->parameters.sev_amd_cert);
+> +        assert(params->sev_amd_cert->type == QTYPE_QSTRING);
+> +        s->parameters.sev_amd_cert = g_strdup(params->sev_amd_cert->u.s);
+> +    }
+>  }
+>  
+>  void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+> @@ -1410,6 +1443,27 @@ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+>          params->tls_hostname->type = QTYPE_QSTRING;
+>          params->tls_hostname->u.s = strdup("");
+>      }
+> +    /* TODO Rewrite "" to null instead */
+> +    if (params->has_sev_pdh
+> +        && params->sev_pdh->type == QTYPE_QNULL) {
+> +        qobject_unref(params->sev_pdh->u.n);
+> +        params->sev_pdh->type = QTYPE_QSTRING;
+> +        params->sev_pdh->u.s = strdup("");
+> +    }
+> +    /* TODO Rewrite "" to null instead */
+> +    if (params->has_sev_plat_cert
+> +        && params->sev_plat_cert->type == QTYPE_QNULL) {
+> +        qobject_unref(params->sev_plat_cert->u.n);
+> +        params->sev_plat_cert->type = QTYPE_QSTRING;
+> +        params->sev_plat_cert->u.s = strdup("");
+> +    }
+> +    /* TODO Rewrite "" to null instead */
+> +    if (params->has_sev_amd_cert
+> +        && params->sev_amd_cert->type == QTYPE_QNULL) {
+> +        qobject_unref(params->sev_amd_cert->u.n);
+> +        params->sev_amd_cert->type = QTYPE_QSTRING;
+> +        params->sev_amd_cert->u.s = strdup("");
+> +    }
+>  
+>      migrate_params_test_apply(params, &tmp);
+>  
+> @@ -3466,6 +3520,9 @@ static void migration_instance_finalize(Object *obj)
+>      qemu_mutex_destroy(&ms->qemu_file_lock);
+>      g_free(params->tls_hostname);
+>      g_free(params->tls_creds);
+> +    g_free(params->sev_pdh);
+> +    g_free(params->sev_plat_cert);
+> +    g_free(params->sev_amd_cert);
+>      qemu_sem_destroy(&ms->rate_limit_sem);
+>      qemu_sem_destroy(&ms->pause_sem);
+>      qemu_sem_destroy(&ms->postcopy_pause_sem);
+> @@ -3507,6 +3564,10 @@ static void migration_instance_init(Object *obj)
+>      params->has_announce_rounds = true;
+>      params->has_announce_step = true;
+>  
+> +    params->sev_pdh = g_strdup("");
+> +    params->sev_plat_cert = g_strdup("");
+> +    params->sev_amd_cert = g_strdup("");
+> +
+>      qemu_sem_init(&ms->postcopy_pause_sem, 0);
+>      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+>      qemu_sem_init(&ms->rp_state.rp_sem, 0);
+> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+> index 5ca3ebe942..354219f27a 100644
+> --- a/monitor/hmp-cmds.c
+> +++ b/monitor/hmp-cmds.c
+> @@ -1872,6 +1872,24 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+>          p->has_announce_step = true;
+>          visit_type_size(v, param, &p->announce_step, &err);
+>          break;
+> +    case MIGRATION_PARAMETER_SEV_PDH:
+> +        p->has_sev_pdh = true;
+> +        p->sev_pdh = g_new0(StrOrNull, 1);
+> +        p->sev_pdh->type = QTYPE_QSTRING;
+> +        visit_type_str(v, param, &p->sev_pdh->u.s, &err);
+> +        break;
+> +    case MIGRATION_PARAMETER_SEV_PLAT_CERT:
+> +        p->has_sev_plat_cert = true;
+> +        p->sev_plat_cert = g_new0(StrOrNull, 1);
+> +        p->sev_plat_cert->type = QTYPE_QSTRING;
+> +        visit_type_str(v, param, &p->sev_plat_cert->u.s, &err);
+> +        break;
+> +    case MIGRATION_PARAMETER_SEV_AMD_CERT:
+> +        p->has_sev_amd_cert = true;
+> +        p->sev_amd_cert = g_new0(StrOrNull, 1);
+> +        p->sev_amd_cert->type = QTYPE_QSTRING;
+> +        visit_type_str(v, param, &p->sev_amd_cert->u.s, &err);
+> +        break;
+>      default:
+>          assert(0);
+>      }
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 9cfbaf8c6c..bb07995d2c 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -580,6 +580,15 @@
+>  # @max-cpu-throttle: maximum cpu throttle percentage.
+>  #                    Defaults to 99. (Since 3.1)
+>  #
+> +# @sev-pdh: The target host platform diffie-hellman key encoded in base64
+> +#           (Since 4.2)
+> +#
+> +# @sev-plat-cert: The target host platform certificate chain encoded in base64
+> +#                 (Since 4.2)
+> +#
+> +# @sev-amd-cert: AMD certificate chain which include ASK and OCA encoded in
+> +#                base64 (Since 4.2)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'enum': 'MigrationParameter',
+> @@ -592,7 +601,7 @@
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+>             'multifd-channels',
+>             'xbzrle-cache-size', 'max-postcopy-bandwidth',
+> -           'max-cpu-throttle' ] }
+> +           'max-cpu-throttle', 'sev-pdh', 'sev-plat-cert', 'sev-amd-cert' ] }
+>  
+>  ##
+>  # @MigrateSetParameters:
+> @@ -682,6 +691,15 @@
+>  # @max-cpu-throttle: maximum cpu throttle percentage.
+>  #                    The default value is 99. (Since 3.1)
+>  #
+> +# @sev-pdh: The target host platform diffie-hellman key encoded in base64
+> +#           (Since 4.2)
+> +#
+> +# @sev-plat-cert: The target host platform certificate chain encoded in base64
+> +#                 (Since 4.2)
+> +#
+> +# @sev-amd-cert: AMD certificate chain which include ASK and OCA encoded in
+> +#                base64 (Since 4.2)
+> +#
+>  # Since: 2.4
+>  ##
+>  # TODO either fuse back into MigrationParameters, or make
+> @@ -707,7 +725,10 @@
+>              '*multifd-channels': 'int',
+>              '*xbzrle-cache-size': 'size',
+>              '*max-postcopy-bandwidth': 'size',
+> -	    '*max-cpu-throttle': 'int' } }
+> +            '*max-cpu-throttle': 'int',
+> +            '*sev-pdh':'StrOrNull',
+> +            '*sev-plat-cert': 'StrOrNull',
+> +            '*sev-amd-cert' : 'StrOrNull' } }
+>  
+>  ##
+>  # @migrate-set-parameters:
+> @@ -817,6 +838,15 @@
+>  #                    Defaults to 99.
+>  #                     (Since 3.1)
+>  #
+> +# @sev-pdh: The target host platform diffie-hellman key encoded in base64
+> +#           (Since 4.2)
+> +#
+> +# @sev-plat-cert: The target host platform certificate chain encoded in base64
+> +#                 (Since 4.2)
+> +#
+> +# @sev-amd-cert: AMD certificate chain which include ASK and OCA encoded in
+> +#                base64 (Since 4.2)
+> +#
+>  # Since: 2.4
+>  ##
+>  { 'struct': 'MigrationParameters',
+> @@ -839,8 +869,11 @@
+>              '*block-incremental': 'bool' ,
+>              '*multifd-channels': 'uint8',
+>              '*xbzrle-cache-size': 'size',
+> -	    '*max-postcopy-bandwidth': 'size',
+> -            '*max-cpu-throttle':'uint8'} }
+> +            '*max-postcopy-bandwidth': 'size',
+> +            '*max-cpu-throttle':'uint8',
+> +            '*sev-pdh':'str',
+> +            '*sev-plat-cert': 'str',
+> +            '*sev-amd-cert' : 'str'} }
+>  
+>  ##
+>  # @query-migrate-parameters:
 > -- 
 > 2.17.1
 > 
