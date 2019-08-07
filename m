@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36313C32751
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D38C41514
 	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:13:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DF1521E6C
+	by mail.kernel.org (Postfix) with ESMTPS id 8F11E21E6C
 	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:13:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF1521E6C
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F11E21E6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvMh8-0001mm-Bb
+	id 1hvMh8-0001nH-LL
 	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:13:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36618)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36615)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg8-0007lo-5X
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg8-0007le-3S
  for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg6-0003K5-RL
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:40618)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg6-0003KA-RR
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:40620)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hvMg4-0003Cu-2b; Wed, 07 Aug 2019 10:12:32 -0400
+ id 1hvMg3-0003Cs-VD; Wed, 07 Aug 2019 10:12:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1hvMg0-0005oH-15; Wed, 07 Aug 2019 17:12:28 +0300
+ id 1hvMfz-0005oH-HZ; Wed, 07 Aug 2019 17:12:27 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Wed,  7 Aug 2019 17:12:22 +0300
-Message-Id: <20190807141226.193501-7-vsementsov@virtuozzo.com>
+Date: Wed,  7 Aug 2019 17:12:19 +0300
+Message-Id: <20190807141226.193501-4-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190807141226.193501-1-vsementsov@virtuozzo.com>
 References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v4 06/10] block/qcow2-bitmap: drop
- qcow2_reopen_bitmaps_rw_hint()
+Subject: [Qemu-devel] [PATCH v4 03/10] iotests: add test-case to 165 to test
+ reopening qcow2 bitmaps to RW
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,75 +64,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The function is unused, drop it.
+Reopening bitmaps to RW was broken prior to previous commit. Check that
+it works now.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block/qcow2.h        |  2 --
- block/qcow2-bitmap.c | 15 +--------------
- 2 files changed, 1 insertion(+), 16 deletions(-)
+ tests/qemu-iotests/165     | 46 ++++++++++++++++++++++++++++++++++++--
+ tests/qemu-iotests/165.out |  4 ++--
+ 2 files changed, 46 insertions(+), 4 deletions(-)
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index fc1b0d3c1e..a5b24f4eec 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -736,8 +736,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
- bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-                                                 Error **errp);
--int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
--                                 Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 60b79f1dac..fbeee37243 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1102,8 +1102,7 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
-     return list;
- }
+diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
+index 88f62d3c6d..dd93b5a2d0 100755
+--- a/tests/qemu-iotests/165
++++ b/tests/qemu-iotests/165
+@@ -43,10 +43,10 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
+         os.remove(disk)
  
--int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
--                                 Error **errp)
-+int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
- {
-     BDRVQcow2State *s = bs->opaque;
-     Qcow2BitmapList *bm_list;
-@@ -1111,10 +1110,6 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-     GSList *ro_dirty_bitmaps = NULL;
-     int ret = 0;
+     def mkVm(self):
+-        return iotests.VM().add_drive(disk)
++        return iotests.VM().add_drive(disk, opts='node-name=node0')
  
--    if (header_updated != NULL) {
--        *header_updated = false;
--    }
--
-     if (s->nb_bitmaps == 0) {
-         /* No bitmaps - nothing to do */
-         return 0;
-@@ -1156,9 +1151,6 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-             error_setg_errno(errp, -ret, "Can't update bitmap directory");
-             goto out;
-         }
--        if (header_updated != NULL) {
--            *header_updated = true;
--        }
-         g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-     }
+     def mkVmRo(self):
+-        return iotests.VM().add_drive(disk, opts='readonly=on')
++        return iotests.VM().add_drive(disk, opts='readonly=on,node-name=node0')
  
-@@ -1169,11 +1161,6 @@ out:
-     return ret;
- }
+     def getSha256(self):
+         result = self.vm.qmp('x-debug-block-dirty-bitmap-sha256',
+@@ -102,5 +102,47 @@ class TestPersistentDirtyBitmap(iotests.QMPTestCase):
  
--int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
--{
--    return qcow2_reopen_bitmaps_rw_hint(bs, NULL, errp);
--}
--
- /* Checks to see if it's safe to resize bitmaps */
- int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp)
- {
+         self.vm.shutdown()
+ 
++    def test_reopen_rw(self):
++        self.vm = self.mkVm()
++        self.vm.launch()
++        self.qmpAddBitmap()
++
++        # Calculate sha256 corresponding to regions1
++        self.writeRegions(regions1)
++        sha256 = self.getSha256()
++        result = self.vm.qmp('block-dirty-bitmap-clear', node='drive0',
++                             name='bitmap0')
++        self.assert_qmp(result, 'return', {})
++
++        self.vm.shutdown()
++
++        self.vm = self.mkVmRo()
++        self.vm.launch()
++
++        # We've loaded empty bitmap
++        assert sha256 != self.getSha256()
++
++        # Check that we are in RO mode
++        self.writeRegions(regions1)
++        assert sha256 != self.getSha256()
++
++        result = self.vm.qmp('x-blockdev-reopen', **{
++            'node-name': 'node0',
++            'driver': iotests.imgfmt,
++            'file': {
++                'driver': 'file',
++                'filename': disk
++            },
++            'read-only': False
++        })
++        self.assert_qmp(result, 'return', {})
++
++        # Check that bitmap is reopened to RW and we can write to it.
++        self.writeRegions(regions1)
++        assert sha256 == self.getSha256()
++
++        self.vm.shutdown()
++
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2'])
+diff --git a/tests/qemu-iotests/165.out b/tests/qemu-iotests/165.out
+index ae1213e6f8..fbc63e62f8 100644
+--- a/tests/qemu-iotests/165.out
++++ b/tests/qemu-iotests/165.out
+@@ -1,5 +1,5 @@
+-.
++..
+ ----------------------------------------------------------------------
+-Ran 1 tests
++Ran 2 tests
+ 
+ OK
 -- 
 2.18.0
 
