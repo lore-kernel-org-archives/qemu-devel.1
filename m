@@ -2,80 +2,90 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8FBC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7271C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:34:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 863C621BE3
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:26:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 863C621BE3
+	by mail.kernel.org (Postfix) with ESMTPS id AF46721E73
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:34:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF46721E73
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvLxg-0006xx-So
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 09:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56765)
+	id 1hvM57-0000f6-Uk
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 09:34:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58060)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hvLxJ-0006Xs-9b
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:26:18 -0400
+ (envelope-from <eblake@redhat.com>) id 1hvM4j-0000CO-AQ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hvLxH-00059p-Ou
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:26:17 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45877)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hvLxH-00059B-Ih
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:26:15 -0400
-Received: by mail-wr1-f67.google.com with SMTP id q12so1113149wrj.12
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 06:26:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ELWBVRe8LKXltQTmIZV4RzgxZRLwcTTzj7GQpENBNpk=;
- b=FZeQ5QnyjEr0/m1D4toPbslhsdY9+YchY1+pA+m/HCOjR3N2zZc21kHTQH8f2e6ZFR
- 20SZMSt0TYYlZSzH/YcvHM3xo1kd6JsB9Nio3NW1OmJFjK94ephlixFXEyqiDIEbRqKz
- pVY0vNl/1z4s4ZkUXpX3XL32cQqPGLkzPv/nc/kNcNzou9lXjsv0QGCJ1lN1gHjxobgH
- Q9CStTwe4CNXSQGh7MJ5nL0YYxZM5mzeoRq7wvLbaW6CWSOlKoR5TaU4LAcu9bBMCqN8
- NUnUJyeUe1RHNgJBi6403K0OOWBm51HnbNYw73qlQTwoHkepUHLyancV+8++Dn5Ojhdv
- hmXA==
-X-Gm-Message-State: APjAAAXMj7y8OopHt+WhQ2DqMSCCTLYLG7dRmEUEA2BqT1INRQJABEjT
- 6SQpJ3he4M7V5ktBTGgDVfnEaDnSJnE=
-X-Google-Smtp-Source: APXvYqxjZfRXnpdzUsUix5/yc3S68ao5dGUGwHlW0TC14EszfVBKX5am7hmAiDJktfcrbwce7vQXnw==
-X-Received: by 2002:a5d:518d:: with SMTP id k13mr10988257wrv.40.1565184374287; 
- Wed, 07 Aug 2019 06:26:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
- ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
- by smtp.gmail.com with ESMTPSA id o4sm72729460wmh.35.2019.08.07.06.26.13
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 06:26:13 -0700 (PDT)
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1hvM4i-0000Ud-8Y
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:33:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37978)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hvM4i-0000UL-0o
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:33:56 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2679D4D2E6;
+ Wed,  7 Aug 2019 13:33:55 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BF484600CC;
+ Wed,  7 Aug 2019 13:33:54 +0000 (UTC)
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
 References: <20190730123759.21723-1-pbonzini@redhat.com>
- <20190730123759.21723-4-pbonzini@redhat.com> <87lfw5i0j1.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
+ <87r25xi1y7.fsf@linaro.org> <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <8b9e239c-a047-1d76-04ad-3304ff44b7a0@redhat.com>
-Date: Wed, 7 Aug 2019 15:26:12 +0200
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <35301c4b-8743-1e29-0f6e-968afec5faa7@redhat.com>
+Date: Wed, 7 Aug 2019 08:33:53 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <87lfw5i0j1.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.30]); Wed, 07 Aug 2019 13:33:55 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH 3/3] tests/tcg: move configuration to a
- sub-shell script
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 0/3] tests/tcg: disentangle makefiles
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,159 +102,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 07/08/19 15:10, Alex Bennée wrote:
->> -DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
->> +DIRS="tests tests/tcg tests/tcg/lm32 tests/libqos tests/qapi-schema tests/qemu-iotests tests/vm"
->>  DIRS="$DIRS tests/fp tests/qgraph"
->>  DIRS="$DIRS docs docs/interop fsdev scsi"
->>  DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
->>  DIRS="$DIRS roms/seabios roms/vgabios"
->> -LINKS="Makefile tests/tcg/Makefile"
->> -LINKS="$LINKS tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
->> -LINKS="$LINKS tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
->> -LINKS="$LINKS tests/fp/Makefile"
->> +LINKS="Makefile"
->> +LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
->> +LINKS="$LINKS tests/tcg/Makefile.target tests/fp/Makefile"
-> 
-> Is this why I get complaints on a clean tree:
-> 
->   libpmem support   no
->   libudev           yes
->   default devices   yes
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 179: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 180: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 183: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 184: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 193: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 213: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
->   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 179: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-arm-linux-user.mak: Directory nonexist
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M
+Content-Type: multipart/mixed; boundary="4sDijFRhjO5aInhBquqnfMtaPhL1tt0ZC";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
+Message-ID: <35301c4b-8743-1e29-0f6e-968afec5faa7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] tests/tcg: disentangle makefiles
+References: <20190730123759.21723-1-pbonzini@redhat.com>
+ <87r25xi1y7.fsf@linaro.org> <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
+In-Reply-To: <3bcecd49-bf0e-8503-12d7-ac9dfeb444cb@redhat.com>
 
-configure.sh is invoked too early.
+--4sDijFRhjO5aInhBquqnfMtaPhL1tt0ZC
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> 
->>  LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
->>  LINKS="$LINKS pc-bios/spapr-rtas/Makefile"
->>  LINKS="$LINKS pc-bios/s390-ccw/Makefile"
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 8bb5c97..a3ee649 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -1058,30 +1058,28 @@ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
->>  CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(TARGET_DIRS))
->>  RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(TARGET_DIRS))
+On 8/7/19 8:06 AM, Paolo Bonzini wrote:
+> On 07/08/19 14:40, Alex Benn=C3=A9e wrote:
 >>
->> -ifeq ($(HAVE_USER_DOCKER),y)
->>  # Probe for the Docker Builds needed for each build
->>  $(foreach PROBE_TARGET,$(TARGET_DIRS), 				\
->>  	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.prereqs))
->> -endif
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
 >>
->>  build-tcg-tests-%:
->>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
->>  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
->>  		SRC_PATH=$(SRC_PATH) \
->> -	       	V="$(V)" TARGET_DIR="$*/" guest-tests, \
->> +	       	V="$(V)" TARGET="$*" guest-tests, \
->>  		"BUILD", "TCG tests for $*")
+>>> The tests/tcg rely a lot on per-target informations from
+>>> the QEMU makefiles, but most of the definitions in there
+>>> aren't really relevant to TCG tests.
+>>>
+>>> This series is just a cleanup, but it could also be
+>>> a useful start in making it possible to compile tests/tcg
+>>> out of QEMU's tree, and/or making it a submodule, and/or
+>>> unifying the system emulation tests with kvm-unit-tests.
 >>
->>  run-tcg-tests-%: build-tcg-tests-% %/all
->>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
->>  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
->>  		SRC_PATH=$(SRC_PATH) SPEED="$(SPEED)" \
->> -		V="$(V)" TARGET_DIR="$*/" run-guest-tests, \
->> +		V="$(V)" TARGET="$*" run-guest-tests, \
->>  		"RUN", "TCG tests for $*")
+>> Hmm something is throwing off configure and making it use my login she=
+ll
+>> instead of /bin/sh:
 >>
->>  clean-tcg-tests-%:
->>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
->>  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
->> -		SRC_PATH=$(SRC_PATH) TARGET_DIR="$*/" clean-guest-tests, \
->> +		SRC_PATH=$(SRC_PATH) TARGET="$*" clean-guest-tests, \
->>  		"RUN", "TCG tests for $*")
->>
->>  .PHONY: build-tcg
->> diff --git a/tests/tcg/Makefile.prereqs b/tests/tcg/Makefile.prereqs
->> index 53b0196..7494b31 100644
->> --- a/tests/tcg/Makefile.prereqs
->> +++ b/tests/tcg/Makefile.prereqs
->> @@ -7,24 +7,12 @@
->>  # selection of required docker targets before we invoke a sub-make for
->>  # each target.
->>
->> -# First we need the target makefile which tells us the target architecture
->> -CROSS_CC_GUEST:=
->> --include $(BUILD_DIR)/$(PROBE_TARGET)/config-target.mak
->> -
->> -# Then we load up the target architecture makefiles which tell us
->> -# about the compilers
->>  DOCKER_IMAGE:=
->>
->> --include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
->> --include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
->> +-include $(BUILD_DIR)/tests/tcg/config-$(PROBE_TARGET).mak
->>
->> -ifndef CROSS_CC_GUEST
->>  ifneq ($(DOCKER_IMAGE),)
->>  build-tcg-tests-$(PROBE_TARGET): docker-image-$(DOCKER_IMAGE)
->> +$(BUILD_DIR)/tests/tcg/config_$(PROBE_TARGET).mak: config-host.mak
->> +config-host.mak: $(SRC_PATH)/tests/tcg/configure.sh
->>  endif
->> -endif
->> -
->> -# Clean-up
->> -# undefine TARGET_NAME
->> -# undefine TARGET_BASE_ARCH
->> -# undefine TARGET_ABI_DIR
->> diff --git a/tests/tcg/Makefile.qemu b/tests/tcg/Makefile.qemu
->> index d3f3437..c8bec7b 100644
->> --- a/tests/tcg/Makefile.qemu
->> +++ b/tests/tcg/Makefile.qemu
->> @@ -8,17 +8,22 @@
->>  # to do it for us.
->>  #
->>
->> -# The per ARCH makefile, if it exists, holds extra information about
->> +include $(SRC_PATH)/rules.mak
->> +
->> +# The configure script fills in extra information about
->>  # useful docker images or alternative compiler flags.
->>
->> -include $(TARGET_DIR)config-target.mak
->> -include $(SRC_PATH)/rules.mak
->> -include $(wildcard \
->> -	$(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include \
->> -	$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include)
->> +CROSS_CC_GUEST:=
->> +DOCKER_IMAGE:=
->> +-include $(BUILD_DIR)/tests/tcg/config-$(TARGET).mak
->>
->>  GUEST_BUILD=
->>  TCG_MAKE=../Makefile.target
->> +
->> +# We also need the Docker make rules to depend on
->> +SKIP_DOCKER_BUILD=1
->> +include $(SRC_PATH)/tests/docker/Makefile.include
->> +
->>  # Support installed Cross Compilers
->>
->>  ifdef CROSS_CC_GUEST
->> @@ -26,11 +31,11 @@ ifdef CROSS_CC_GUEST
->>  .PHONY: cross-build-guest-tests
->>  cross-build-guest-tests:
->>  	$(call quiet-command, \
->> -	   (mkdir -p tests/tcg/$(TARGET_DIR) && cd tests/tcg/$(TARGET_DIR) && \
->> -	    $(MAKE) -f $(TCG_MAKE) TARGET_DIR="$(TARGET_DIR)" CC="$(CROSS_CC_GUEST)" \
->> +	   (mkdir -p tests/tcg/$(TARGET) && cd tests/tcg/$(TARGET) && \
->> +	    $(MAKE) -f $(TCG_MAKE) TARGET="$(TARGET)" CC="$(CROSS_CC_GUEST)" \
->>  			SRC_PATH="$(SRC_PATH)" BUILD_STATIC=$(CROSS_CC_GUEST_STATIC) \
->> -			EXTRA_CFLAGS=$(CROSS_CC_GUEST_CFLAGS)), \
-> 
-> I expect given we need config-FOO.mak files before that these mkdir's are in the wrong place.
+>>   libpmem support   no
+>>   libudev           yes
+>>   default devices   yes
+>>   ~/lsrc/qemu.git/tests/tcg/configure.sh (line 63): 'case' builtin not=
+ inside of switch block
+>>     case $arch in
+>>     ^
+>>   <W> fish: Error while reading file /home/alex/lsrc/qemu.git/tests/tc=
+g/configure.sh
+>=20
+> It's the ${SHELL} you found in patch 3.  The disadvantage of relying on=
 
-These are mkdirs for tests/tcg/FOO, but I do need to add mkdir -p
-tests/tcg to the configure.sh script.
+> #! is that some people have bash in /usr/bin/bash rather than /bin/bash=
+=2E
+>  But we already assume /bin/bash elsewhere so I can drop it.
 
-Paolo
+Rather, we use '#!/usr/bin/env bash' to find bash anywhere.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--4sDijFRhjO5aInhBquqnfMtaPhL1tt0ZC--
+
+--5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1K00EACgkQp6FrSiUn
+Q2qDJgf+McMQkwWnoZbWgUSIdS3iM1GNwOIrLmsg8MAx9LtIhrhIeEFCLx2puZBW
+3h96nU1C6Dgec8/RwWS8do343GT8ETYm4OOmNPaWD5WRuS+RfeO6U2l5fwnQKUas
+KS+zPftBK/o32klJLPYY1svqyWriNoQqmRRAU7vVBCbWHibxMUy2ZhaW1PA+slYE
+AcNsCyEq6b1Tpf6GAeCLc9BQqJxTdAfruhiFn+UlPXMZwHeJK4SsmgPmEHsnhaMr
+WoArQQSstALUVHE4YPIW7WinFw+6I0cQFEBGpuDYlyw+riMIAXsjJcqsYLCm+Mlu
+LhFXY977KYy37kSk3dCIPiunLxMpJA==
+=GRIK
+-----END PGP SIGNATURE-----
+
+--5w6qu4gSRiScKtwjZ5WFO0Ii1TFuzmB9M--
 
