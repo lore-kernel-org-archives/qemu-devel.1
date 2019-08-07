@@ -6,76 +6,97 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D35C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4596EC32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:12:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E39E221E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:11:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39E221E6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E3C621E6C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:12:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E3C621E6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvIuw-00041x-6k
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:11:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39510)
+	id 1hvIwE-0005Vb-Fb
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:12:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40202)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvIuQ-000387-Dj
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:07 -0400
+ (envelope-from <bala24@linux.ibm.com>) id 1hvIvm-00054z-Kf
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvIuP-00020y-8q
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:06 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38467)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvIuO-0001zw-WE
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:05 -0400
-Received: by mail-wr1-f67.google.com with SMTP id g17so90743449wrr.5
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:11:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fV4g7mbDZHsCPADbAoRhrxSei5JcIFUCEAuLE1zzvlc=;
- b=TK5O0JyQH06vkEhFKxzqnp0WK/li+G5piKRBsr5OLNh1kGXYCJIrl6O8j5jysSNWsg
- 7TvGUY0CeLM7WZeOYksTSoh67LkJs987N0ogrkV/In9dMVVzoMA9qyfFPQYoP/oKSgr9
- +7C9s+QRtxWfilddpYdyTJnGXEh1ftOXWWG22JRysIx3/8cIcpyTiUzuQYG8Rtx4bvEA
- Wb0kcqXGDBnksXMzkNw6yNTjHWpq9CPYf+msBv7bDOhaTapVttj6QSzy1hD56vdUKNrL
- xR5a738Y2gYhdDLP/JG2Avzp2EHzywZhxWGD57l+UkgcHlEm9Lq+6mEXkTqsJYgQTMhA
- NjYw==
-X-Gm-Message-State: APjAAAV//XqtYFUvO4amhXKkhz9DkIUo45Nbt7CkGVHYYoQcOEzyfss4
- S+MpMG0f9HWHtWU4QvHhYZ2+SA==
-X-Google-Smtp-Source: APXvYqzzpQEp0qvvhGOadsl6h0hTGq93+xWZf7bQl9Aktl2k6WEDZ0gR71M34BLURSH+55hqA03GLQ==
-X-Received: by 2002:adf:de10:: with SMTP id b16mr9448205wrm.296.1565172663957; 
- Wed, 07 Aug 2019 03:11:03 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id y12sm65839909wru.30.2019.08.07.03.11.03
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 03:11:03 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-5-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <4c43b5ba-4204-6a28-d3f1-348d8d25c6d5@redhat.com>
-Date: Wed, 7 Aug 2019 12:11:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <bala24@linux.ibm.com>) id 1hvIvl-0002oc-CF
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:12:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49396)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1hvIvl-0002ns-1Y
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:12:29 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x77ACPu4029513
+ for <qemu-devel@nongnu.org>; Wed, 7 Aug 2019 06:12:27 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2u7v2q9g8c-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 06:12:26 -0400
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Wed, 7 Aug 2019 11:12:21 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 7 Aug 2019 11:12:18 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x77ACHCF58196128
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 7 Aug 2019 10:12:17 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AD5B2A4057;
+ Wed,  7 Aug 2019 10:12:17 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6425EA404D;
+ Wed,  7 Aug 2019 10:12:16 +0000 (GMT)
+Received: from dhcp-9-109-247-185.in.ibm.com (unknown [9.124.35.43])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Wed,  7 Aug 2019 10:12:16 +0000 (GMT)
+Date: Wed, 7 Aug 2019 15:42:14 +0530
+From: Balamuruhan S <bala24@linux.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+References: <20190807071445.4109-1-bala24@linux.ibm.com>
+ <20190807071445.4109-5-bala24@linux.ibm.com>
+ <555de06b-a959-76ce-ee89-05c4b7cab25a@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20190806151435.10740-5-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 04/29] memory: Fix type of
- IOMMUMemoryRegionClass member @parent_class
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <555de06b-a959-76ce-ee89-05c4b7cab25a@kaod.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19080710-0028-0000-0000-0000038C8614
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080710-0029-0000-0000-0000244CEA5B
+Message-Id: <20190807101214.GB10532@dhcp-9-109-247-185.in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-07_02:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=11 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908070112
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id x77ACPu4029513
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: Re: [Qemu-devel] [RFC PATCH 4/6] hw/ppc/pnv: initialize and realize
+ homer/occ common area
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,115 +108,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: hari@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, qemu-devel@nongnu.org,
+ maddy@linux.vnet.ibm.com, pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/19 5:14 PM, Markus Armbruster wrote:
-> TYPE_IOMMU_MEMORY_REGION is a direct subtype of TYPE_MEMORY_REGION.
-> Its instance struct is IOMMUMemoryRegion, and its first member is a
-> MemoryRegion.  Correct.  Its class struct is IOMMUMemoryRegionClass,
-> and its first member is a DeviceClass.  Wrong.  Messed up when commit
-> 1221a474676 introduced the QOM type.  It even included hw/qdev-core.h
-> just for that.
-> 
-> TYPE_MEMORY_REGION doesn't bother to define a class struct.  This is
-> fine, it simply defaults to its super-type TYPE_OBJECT's class struct
-> ObjectClass.  Changing IOMMUMemoryRegionClass's first member's type to
-> ObjectClass would be a minimal fix, if a bit brittle: if
-> TYPE_MEMORY_REGION ever acquired own class struct, we'd have to update
-> IOMMUMemoryRegionClass to use it.
-> 
-> Fix it the clean and robust way instead: give TYPE_MEMORY_REGION its
-> own class struct MemoryRegionClass now, and use it for
-> IOMMUMemoryRegionClass's first member.
-> 
-> Revert the include of hw/qdev-core.h, and fix the few files that have
-> come to rely on it.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Wed, Aug 07, 2019 at 09:59:26AM +0200, C=E9dric Le Goater wrote:
+> On 07/08/2019 09:14, Balamuruhan S wrote:
+> > homer and occ common area region base address are initialized
+> > to create device tree and realized to map the address with
+> > mmio callbacks during `pnv_chip_realize()`.
+> >=20
+> > `SysBusNum` enum is introduced to set sysbus for XSCOM, ICP,
+> > HOMER and OCC appropriately and chip_num to initialize and
+> > retrieve base address + size contiguously on a PowerNV with
+> > multichip boot.
+>=20
+> Can't you use the chip_id ?=20
 
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+if the chip_id is contiguous always we can use it. I was not
+sure about it.
 
-> ---
->  hw/display/vga-isa-mm.c | 1 +
->  hw/net/pcnet.h          | 1 +
->  include/exec/memory.h   | 9 +++++++--
->  memory.c                | 1 +
->  4 files changed, 10 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-> index 215e649719..a790f69b6d 100644
-> --- a/hw/display/vga-isa-mm.c
-> +++ b/hw/display/vga-isa-mm.c
-> @@ -22,6 +22,7 @@
->   * THE SOFTWARE.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/bitops.h"
->  #include "qemu/units.h"
->  #include "hw/hw.h"
->  #include "hw/display/vga.h"
-> diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
-> index 40831a7845..28d19a5c6f 100644
-> --- a/hw/net/pcnet.h
-> +++ b/hw/net/pcnet.h
-> @@ -8,6 +8,7 @@
->  #define PCNET_LOOPTEST_NOCRC	2
->  
->  #include "exec/memory.h"
-> +#include "hw/irq.h"
->  
->  /* BUS CONFIGURATION REGISTERS */
->  #define BCR_MSRDA    0
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index bb0961ddb9..238370a2ff 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -25,7 +25,6 @@
->  #include "qemu/notify.h"
->  #include "qom/object.h"
->  #include "qemu/rcu.h"
-> -#include "hw/qdev-core.h"
->  
->  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
->  
-> @@ -205,6 +204,12 @@ struct MemoryRegionOps {
->      } impl;
->  };
->  
-> +typedef struct MemoryRegionClass {
-> +    /* private */
-> +    ObjectClass parent_class;
-> +} MemoryRegionClass;
-> +
-> +
->  enum IOMMUMemoryRegionAttr {
->      IOMMU_ATTR_SPAPR_TCE_FD
->  };
-> @@ -237,7 +242,7 @@ enum IOMMUMemoryRegionAttr {
->   */
->  typedef struct IOMMUMemoryRegionClass {
->      /* private */
-> -    struct DeviceClass parent_class;
-> +    MemoryRegionClass parent_class;
->  
->      /*
->       * Return a TLB entry that contains a given address.
-> diff --git a/memory.c b/memory.c
-> index 5d8c9a9234..09d9b254fd 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -3245,6 +3245,7 @@ void memory_region_init_rom_device(MemoryRegion *mr,
->  static const TypeInfo memory_region_info = {
->      .parent             = TYPE_OBJECT,
->      .name               = TYPE_MEMORY_REGION,
-> +    .class_size         = sizeof(MemoryRegionClass),
->      .instance_size      = sizeof(MemoryRegion),
->      .instance_init      = memory_region_initfn,
->      .instance_finalize  = memory_region_finalize,
-> 
+>=20
+> >=20
+> > Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> > ---
+> >  hw/ppc/pnv.c         | 49 ++++++++++++++++++++++++++++++++++++++++++=
++++----
+> >  include/hw/ppc/pnv.h |  1 +
+> >  2 files changed, 46 insertions(+), 4 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> > index bd4531c822..f6e56e915d 100644
+> > --- a/hw/ppc/pnv.c
+> > +++ b/hw/ppc/pnv.c
+> > @@ -675,6 +675,7 @@ static void pnv_init(MachineState *machine)
+> >          Object *chip =3D object_new(chip_typename);
+> > =20
+> >          pnv->chips[i] =3D PNV_CHIP(chip);
+> > +        PNV_CHIP(chip)->chip_num =3D i;
+> >
+> >          /* TODO: put all the memory in one node on chip 0 until we f=
+ind a
+> >           * way to specify different ranges for each chip
+> > @@ -824,18 +825,20 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip=
+8, Error **errp)
+> >   {
+> >      PnvChip *chip =3D PNV_CHIP(chip8);
+> >      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+> > +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(chip);
+> >      const char *typename =3D pnv_chip_core_typename(chip);
+> >      size_t typesize =3D object_type_get_instance_size(typename);
+> >      int i, j;
+> >      char *name;
+> >      XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+> > =20
+> > +    sbd->num_mmio =3D PNV_ICP_SYSBUS;
+>=20
+> OK. I think I know why you want this but it probably means that you nee=
+d=20
+> a new PnvHomer model and that you should use PnvOCC instead.=20
+
+okay, I will have to work on it.
+
+>=20
+> >      name =3D g_strdup_printf("icp-%x", chip->chip_id);
+> >      memory_region_init(&chip8->icp_mmio, OBJECT(chip), name, PNV_ICP=
+_SIZE);
+> > -    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip8->icp_mmio);
+> > +    sysbus_init_mmio(sbd, &chip8->icp_mmio);
+> >      g_free(name);
+> > =20
+> > -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
+> > +    sysbus_mmio_map(sbd, PNV_ICP_SYSBUS, PNV_ICP_BASE(chip));
+> > =20
+> >      /* Map the ICP registers for each thread */
+> >      for (i =3D 0; i < chip->nr_cores; i++) {
+> > @@ -866,7 +869,26 @@ static void pnv_chip_power8_realize(DeviceState =
+*dev, Error **errp)
+> >          error_propagate(errp, local_err);
+> >          return;
+> >      }
+> > -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_XSCOM_SYSBUS,
+> > +                                   PNV_XSCOM_BASE(chip));
+> > +
+> > +    /* homer */
+> > +    pnv_homer_realize(chip, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_HOMER_SYSBUS,
+> > +                    PNV_HOMER_BASE(chip));
+> > +    /* occ common area */
+> > +    pnv_occ_common_area_realize(chip, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_OCC_COMMON_AREA_SYSBUS=
+,
+> > +                    PNV_OCC_COMMON_AREA(chip));
+> > =20
+> >      pcc->parent_realize(dev, &local_err);
+> >      if (local_err) {
+> > @@ -1035,7 +1057,26 @@ static void pnv_chip_power9_realize(DeviceStat=
+e *dev, Error **errp)
+> >          error_propagate(errp, local_err);
+> >          return;
+> >      }
+> > -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV9_XSCOM_BASE(chip));
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_XSCOM_SYSBUS,
+> > +                    PNV9_XSCOM_BASE(chip));
+> > +
+> > +    /* homer */
+> > +    pnv_homer_realize(chip, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_HOMER_SYSBUS,
+> > +                    PNV9_HOMER_BASE(chip));
+> > +
+> > +    /* occ common area */
+> > +    pnv_occ_common_area_realize(chip, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_OCC_COMMON_AREA_SYSBUS=
+,
+> > +                    PNV9_OCC_COMMON_AREA(chip));
+> > =20
+> >      pcc->parent_realize(dev, &local_err);
+> >      if (local_err) {
+> > diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> > index 6464e32892..dea6772988 100644
+> > --- a/include/hw/ppc/pnv.h
+> > +++ b/include/hw/ppc/pnv.h
+> > @@ -57,6 +57,7 @@ typedef struct PnvChip {
+> > =20
+> >      /*< public >*/
+> >      uint32_t     chip_id;
+> > +    uint32_t     chip_num;
+> >      uint64_t     ram_start;
+> >      uint64_t     ram_size;
+> > =20
+> >=20
+>=20
+
 
