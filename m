@@ -2,89 +2,71 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DB2C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BD5C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:55:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 341F521E6B
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:52:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tI/Km8X2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341F521E6B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 26D8221BE3
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 12:55:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26D8221BE3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40733 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40766 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvLQh-0006ng-Ha
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 08:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50001)
+	id 1hvLTO-0008KL-FH
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 08:55:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50889)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hvLPU-0004cG-H2
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:51:21 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hvLSk-0007Z3-0P
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:54:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hvLPT-0007rp-1M
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:51:20 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39942)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hvLPS-0007qj-PE
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:51:18 -0400
-Received: by mail-wm1-x342.google.com with SMTP id v19so79923435wmj.5
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 05:51:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=yiJn4Oq0suMZvK/DdKaxh+JnBlGPVM2CYzG7YsuW46E=;
- b=tI/Km8X24D3C/uxjJ78/csq9XSi+wE3Z9MfEv2mwxAuwOtJp8bhdWykd1n+XrtbY/m
- 6ecdafCWL0gY8D6lo48H+8+h+v6FjU5EPzUs4tvLs3g61HcEtyhNGOfW8YJP2Ks/qZLp
- FQjT9RngBxNquzOUrVcRdj9jQTbW5/dOvlt/vi4zr/0r2QbpqiqlNoZkYO//l8HYMTvs
- PHZf6amXsswPLQR4PzVPYVg5tIiMg/0NImsPBXnTcrlbG4eTfgKeiXWwRW+0yYe42zeL
- Wdckq2Dwt9sRSJx6t6WyjEnipk6+6OL5h/wCJtoAKrkRLS3V73nzA/o0SJDXCV7611lg
- B1rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=yiJn4Oq0suMZvK/DdKaxh+JnBlGPVM2CYzG7YsuW46E=;
- b=nGvt3ZwZrHZ/6xt1zemBVv1Q3mxkfTvBVV6i2RZKwW+AeuOhCrQ4Wkax6F7sDTOZaZ
- fiVzdKHUohp+IsuveR6xUcb1vp/PXtiufakzYQFzMsHBqKTDXH7UmkwPsUK62wQkzsuG
- KV0zvYc11AqBQsrpfvarMlfw1Sieik4IRsEvRigQHUBz1Y1heVHN3yAhiGzs4asU3/QF
- KCpOrfSBtCri4i5+YWX8fLRiJL/oL+si+JAxkvzH0jbPdZXHboNUTgHcZGBa5xClXdBS
- 5jx3/w/1F1d7kqup1+erKzgoQsrZJEHaLD8RExj5Jqnfw7UcHxoklSVqQh2d2NUSqoG1
- 3jYA==
-X-Gm-Message-State: APjAAAV1/bjlMSaJ9ZEN2I4+zLWEfWoRrNOQ4BkA4M8zX7LmDchr9rFi
- EJjSanpMGAT4hn9hncfsHWmDVF9N+k8=
-X-Google-Smtp-Source: APXvYqyo7DriqcF8CiyxNvErMST1njKH9C7AHIkWWiXoGVdqe1/c8uKPB7ztAjRx19yMznlBu1bK0w==
-X-Received: by 2002:a1c:618b:: with SMTP id v133mr4681872wmb.47.1565182276638; 
- Wed, 07 Aug 2019 05:51:16 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id h16sm106310245wrv.88.2019.08.07.05.51.16
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 07 Aug 2019 05:51:16 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BC26B1FF87;
- Wed,  7 Aug 2019 13:51:15 +0100 (BST)
-References: <20190730123759.21723-1-pbonzini@redhat.com>
- <20190730123759.21723-2-pbonzini@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-In-reply-to: <20190730123759.21723-2-pbonzini@redhat.com>
-Date: Wed, 07 Aug 2019 13:51:15 +0100
-Message-ID: <87o911i1fg.fsf@linaro.org>
+ (envelope-from <tony.nguyen@bt.com>) id 1hvLSi-0001hX-VB
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 08:54:41 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.75]:47769)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
+ id 1hvLSS-0001W7-HJ; Wed, 07 Aug 2019 08:54:25 -0400
+Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ BWP09926080.bt.com (10.36.82.111) with Microsoft SMTP Server (version=TLS1_2, 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Wed, 7 Aug
+ 2019 13:54:09 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 13:54:22 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
+ ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Wed, 7 Aug 2019
+ 13:54:21 +0100
+From: <tony.nguyen@bt.com>
+To: <qemu-devel@nongnu.org>
+Thread-Topic: [Qemu-devel] [PATCH v6 06/26] hw/intc/armv7m_nic: Access
+ MemoryRegion with MemOp
+Thread-Index: AQHVTPo9Nitkix1nrECC/c6xbRw536bvpFu4
+Date: Wed, 7 Aug 2019 12:54:21 +0000
+Message-ID: <1565182461098.338@bt.com>
+References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>,
+ <1565166476779.68828@bt.com>
+In-Reply-To: <1565166476779.68828@bt.com>
+Accept-Language: en-AU, en-GB, en-US
+Content-Language: en-AU
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.187.101.44]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 213.121.35.75
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH 1/3] tests/tcg: use EXTRA_CFLAGS everywhere
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v6 06/26] hw/intc/armv7m_nic: Access
+ MemoryRegion with MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,147 +78,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, imammedo@redhat.com, sagark@eecs.berkeley.edu,
+ david@redhat.com, jasowang@redhat.com, palmer@sifive.com,
+ mark.cave-ayland@ilande.co.uk, laurent@vivier.eu, keith.busch@intel.com,
+ jcmvbkbc@gmail.com, frederic.konrad@adacore.com, pbonzini@redhat.com,
+ kraxel@redhat.com, edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn,
+ pburton@wavecomp.com, marex@denx.de, robh@kernel.org, hare@suse.com,
+ sstabellini@kernel.org, berto@igalia.com, proljc@gmail.com,
+ qemu-block@nongnu.org, arikalo@wavecomp.com, jslaby@suse.cz, deller@gmx.de,
+ mst@redhat.com, magnus.damm@gmail.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, mreitz@redhat.com, hpoussin@reactos.org,
+ joel@jms.id.au, anthony.perard@citrix.com, xen-devel@lists.xenproject.org,
+ rth@twiddle.net, philmd@redhat.com, green@moxielogic.com, atar4qemu@gmail.com,
+ antonynpavlov@gmail.com, jiri@resnulli.us, ehabkost@redhat.com,
+ minyard@acm.org, sw@weilnetz.de, alistair@alistair23.me, chouteau@adacore.com,
+ b.galvani@gmail.com, eric.auger@redhat.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, peter.chubb@nicta.com.au, yuval.shaia@oracle.com,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, shorne@gmail.com,
+ sundeep.lkml@gmail.com, jsnow@redhat.com, david@gibson.dropbear.id.au,
+ kwolf@redhat.com, crwulff@gmail.com, qemu-riscv@nongnu.org,
+ xiaoguangrong.eric@gmail.com, i.mitsyanko@gmail.com, lersek@redhat.com,
+ cohuck@redhat.com, alex.williamson@redhat.com, Andrew.Baumann@microsoft.com,
+ jcd@tribudubois.net, andrew@aj.id.au, michael@walle.cc,
+ paul.durrant@citrix.com, qemu-ppc@nongnu.org, huth@tuxfamily.org,
+ amarkovic@wavecomp.com, kbastian@mail.uni-paderborn.de, jan.kiszka@web.de,
+ stefanb@linux.ibm.com, andrew.smirnov@gmail.com, aurelien@aurel32.net,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> For i386 specifically, this allows using the host GCC
-> to compile the i386 tests.  But, it should really be
-> done for all targets, unless we want to pass $(EXTRA_CFLAGS)
-> directly as part of $(CC).
-
-Hmm well for softmmu the tests take the decision:
-
-  # For softmmu targets we include a different Makefile fragement as the
-  # build options for bare programs are usually pretty different. They
-  # are expected to provide their own build recipes.
-
-So we are not expecting to handle multi-classing the system compiler to
-generate different binaries with a common build string. To be honest I
-wonder if we should just drop the EXTRA_CFLAGS shenanigans in favour of
-an explicit compiler per target?
-
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/tcg/aarch64/Makefile.softmmu-target | 4 ++--
->  tests/tcg/alpha/Makefile.softmmu-target   | 4 ++--
->  tests/tcg/arm/Makefile.softmmu-target     | 2 +-
->  tests/tcg/i386/Makefile.softmmu-target    | 4 ++--
->  tests/tcg/minilib/Makefile.target         | 2 +-
->  tests/tcg/xtensa/Makefile.softmmu-target  | 4 ++--
->  6 files changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/tests/tcg/aarch64/Makefile.softmmu-target b/tests/tcg/aarch6=
-4/Makefile.softmmu-target
-> index 2e560e4..4c4aaf6 100644
-> --- a/tests/tcg/aarch64/Makefile.softmmu-target
-> +++ b/tests/tcg/aarch64/Makefile.softmmu-target
-> @@ -22,11 +22,11 @@ LDFLAGS+=3D-static -nostdlib $(CRT_OBJS) $(MINILIB_OB=
-JS) -lgcc
->  .PRECIOUS: $(CRT_OBJS)
->
->  %.o: $(CRT_PATH)/%.S
-> -	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -x assembler-with-cpp -c $< -o $@
->
->  # Build and link the tests
->  %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
-> -	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
->
->  memory: CFLAGS+=3D-DCHECK_UNALIGNED=3D1
->
-> diff --git a/tests/tcg/alpha/Makefile.softmmu-target b/tests/tcg/alpha/Ma=
-kefile.softmmu-target
-> index 3c0f34c..09193a6 100644
-> --- a/tests/tcg/alpha/Makefile.softmmu-target
-> +++ b/tests/tcg/alpha/Makefile.softmmu-target
-> @@ -22,11 +22,11 @@ LDFLAGS+=3D-static -nostdlib $(CRT_OBJS) $(MINILIB_OB=
-JS) -lgcc
->  .PRECIOUS: $(CRT_OBJS)
->
->  %.o: $(CRT_PATH)/%.S
-> -	$(CC) $(CFLAGS) -x assembler-with-cpp -c $< -o $@
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -x assembler-with-cpp -c $< -o $@
->
->  # Build and link the tests
->  %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
-> -	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
->
->  memory: CFLAGS+=3D-DCHECK_UNALIGNED=3D0
->
-> diff --git a/tests/tcg/arm/Makefile.softmmu-target b/tests/tcg/arm/Makefi=
-le.softmmu-target
-> index 49d48d8..2deb06e 100644
-> --- a/tests/tcg/arm/Makefile.softmmu-target
-> +++ b/tests/tcg/arm/Makefile.softmmu-target
-> @@ -18,7 +18,7 @@ CFLAGS+=3D-Wl,--build-id=3Dnone -x assembler-with-cpp
->  LDFLAGS+=3D-nostdlib -N -static
->
->  %: %.S %.ld
-> -	$(CC) $(CFLAGS) $(ASFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM_SRC)/$@.ld
-> +	$(CC) $(CFLAGS) $(ASFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS) -T $(ARM=
-_SRC)/$@.ld
->
->  # Specific Test Rules
->
-> diff --git a/tests/tcg/i386/Makefile.softmmu-target b/tests/tcg/i386/Make=
-file.softmmu-target
-> index 0a43648..cee3420 100644
-> --- a/tests/tcg/i386/Makefile.softmmu-target
-> +++ b/tests/tcg/i386/Makefile.softmmu-target
-> @@ -32,11 +32,11 @@ TESTS+=3D$(MULTIARCH_TESTS)
->  .PRECIOUS: $(CRT_OBJS)
->
->  %.o: $(CRT_PATH)/%.S
-> -	$(CC) $(CFLAGS) -c $< -o $@
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
->
->  # Build and link the tests
->  %: %.c $(LINK_SCRIPT) $(CRT_OBJS) $(MINILIB_OBJS)
-> -	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
->
->  memory: CFLAGS+=3D-DCHECK_UNALIGNED=3D1
->
-> diff --git a/tests/tcg/minilib/Makefile.target b/tests/tcg/minilib/Makefi=
-le.target
-> index 3ed8077..c821d28 100644
-> --- a/tests/tcg/minilib/Makefile.target
-> +++ b/tests/tcg/minilib/Makefile.target
-> @@ -18,4 +18,4 @@ MINILIB_INC=3D-isystem $(SYSTEM_MINILIB_SRC)
->  .PRECIOUS: $(MINILIB_OBJS)
->
->  %.o: $(SYSTEM_MINILIB_SRC)/%.c
-> -	$(CC) $(CFLAGS) -c $< -o $@
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
-> diff --git a/tests/tcg/xtensa/Makefile.softmmu-target b/tests/tcg/xtensa/=
-Makefile.softmmu-target
-> index 8212d96..9530cac 100644
-> --- a/tests/tcg/xtensa/Makefile.softmmu-target
-> +++ b/tests/tcg/xtensa/Makefile.softmmu-target
-> @@ -34,9 +34,9 @@ $(XTENSA_USABLE_TESTS): linker.ld macros.inc $(CRT) Mak=
-efile.softmmu-target
->
->  # special rule for common blobs
->  %.o: %.S
-> -	$(CC) $(XTENSA_INC) $($*_ASFLAGS) $(ASFLAGS) -c $< -o $@
-> +	$(CC) $(XTENSA_INC) $($*_ASFLAGS) $(ASFLAGS) $(EXTRA_CFLAGS) -c $< -o $@
->
->  %: %.S
-> -	$(CC) $(XTENSA_INC) $(ASFLAGS) $< -o $@ $(LDFLAGS) $(NOSTDFLAGS) $(CRT)
-> +	$(CC) $(XTENSA_INC) $(ASFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS) $(NO=
-STDFLAGS) $(CRT)
->
->  endif
+Sorry, I missed a tag.
 
 
---
-Alex Benn=C3=A9e
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>?
 
