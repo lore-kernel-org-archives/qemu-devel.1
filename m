@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07A9C19759
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5188C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADB4D21743
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:56:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 822CC2075B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:56:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QAEn9u0Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADB4D21743
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ua3pUkWX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 822CC2075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvDzr-0006j4-0U
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 00:56:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
+	id 1hvE0B-0007IA-Rj
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 00:56:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40664)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvDxV-0001Ry-7v
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:58 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvDxQ-0001E9-Ke
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvDxU-0004u1-53
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:57 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42006)
+ (envelope-from <richard.henderson@linaro.org>) id 1hvDxP-0004pe-LV
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:52 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:45067)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvDxT-0004tP-Uc
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:56 -0400
-Received: by mail-pf1-x442.google.com with SMTP id q10so42748180pff.9
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 21:53:55 -0700 (PDT)
+ id 1hvDxP-0004p0-GP
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:51 -0400
+Received: by mail-pf1-x443.google.com with SMTP id r1so42756480pfq.12
+ for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 21:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=UlqJA+9OtOIxQsXhtvfeB1bXxV7N+Aorv6VBupensFc=;
- b=QAEn9u0Ym0ad5dh9yIMsWRcOVWzhx0B4Z1kznE3zTtN3t5ogG33OKegtSs1Rnb+wi0
- rTUaWmKP/mDnNkhhYqDO4kJsoaeuj4MIyu9fnVRIgZW9Lguw+R6LBwd0z8DEtcxTHjJD
- exxXpMx9mo6RtOITA2yqLj+6AEXwHa5iHl97IwlfSPfAtgLO1GwWGP+ghtHdhWtj4OHw
- z8fogGbqZpskzAObq8DFtQdxQV8JjfGX1I9OLXi5jESbTPFwuzRJw9nwdAukzmpLkHlS
- rJSBIWnSI8UDIoguqba/3nZdnoWmrpdG4xq6+F50m9O4kUAJceX9b0Wk8Y92aHRq/3G/
- MGPA==
+ bh=4bDE+Hq+chnI8wPbuqNYe22C+ZJ9SH+TnuzWZSpaQbg=;
+ b=Ua3pUkWXv2z/gC4cHUT+sHLFhoLP+71LGQbIIarkscRJMXHvRTz/AQqr1V8CKLbY/9
+ ND6tXeih6OeGhS3myNqIEKDNKXKR+7R2EuBKQrVgzdClouFQ2i1OpDd4G/oeAI7ffcsY
+ /l0JGZT/W8H6f1Pybp0itHvEUbpUVgUBzaW/tiFETrbU4SXjEwAfcb+U4wWQvpyFTdgq
+ 0J7wH6t0Co+Sgy3+iWkr6OQjbOHrmBZynzKSgrVa92L/B/tVPp0sPTv8Y+fb2Gz/3bQz
+ +GihBac0ibkdWi2zOi6VQjp13rDC6BjjOs562PAxEuMf/RP5f9Kr2bAkKBtZlJf7k+jm
+ zGeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=UlqJA+9OtOIxQsXhtvfeB1bXxV7N+Aorv6VBupensFc=;
- b=Ps/N7xDo732IzS5wmZVgK1SMx1lL8oXYXK5ENTATDqrHKN0aPcGSY33JdGO3D5IU4X
- fTokzb3SCXNt4JJQYAns5u+6DLhFzIzZxkfVvAx9FH20ZUf73kRwug793sxT3BwDI7+v
- bKIBAKcrUgOEikUfzVOIe09dJKbMU0ZvXsr2AXjIo6LQXhyoNeGjyWE0QMIUfZBiTvhp
- NfowGz2vky9Q87r6umdWDDckQZKAUMhQ0vLkW+5t4QisGYKL7hL3qenWB/S+ob9KOKGh
- 4OJ/9zi4P21bxF+gyhfNuctHRBnsNYUvqS10NExbujX90nYtaYuurrCTS6BbF1KFhSzw
- h0Tw==
-X-Gm-Message-State: APjAAAUYLFM11ob4XujRHeKxI3rWhP2F2w0QAF1oJSLGLeTMJE34/fbD
- QREI8kVYSakFK9DYNH8zQzRJC/Lct+c=
-X-Google-Smtp-Source: APXvYqw9y/8Grgf3T3eqt2OFzDL/MgUU3XD75Y5we4DlEW+3ogWEgfnXYbIK7GZTEhtTkVGQTS6/LA==
-X-Received: by 2002:a62:1d11:: with SMTP id d17mr7453663pfd.249.1565153634726; 
- Tue, 06 Aug 2019 21:53:54 -0700 (PDT)
+ bh=4bDE+Hq+chnI8wPbuqNYe22C+ZJ9SH+TnuzWZSpaQbg=;
+ b=fCx163GIqaM3KQDEv2T+8mcDaP5ZapsFNLsWRYqYcxIK5WNU37K1i9fJYeHKM6m/wL
+ NeZG8tcSoPYZ0YDT9IdE7k01QqODdrb4SF+yReqJ0+4X5dmJPOI7TraQn6QYKAGNRNQl
+ Vk6dOQ0XclBCQOzdu4uVKbUvjVH9KxwHIOfKHxB+sfcCFjQ3ZYV4N+K6nCu5fi0xIHD+
+ dg14+OIkfAP16tLHyOo8rV1XAvNaTih38EhgGhCQ8I6oU53WBQx+ckW0TBNLuy7odk0q
+ IABEbfzUBireeFvFc6fB4Cu/IMN32vyP82JkTAuu9MtnS8qXkpLiBLGyceLzLRKnYNWF
+ vITw==
+X-Gm-Message-State: APjAAAU5cIh6PEgW19cv+FUvjIgo510s5AZshRU0y/MbVVoz1L37Qp9g
+ ppSN8ms2djkjUw4G6mkX3KwW/nzE914=
+X-Google-Smtp-Source: APXvYqxtDorDAw1cc/C8KP4PPNnV9ED16LJE5zcsML7JThdKJEsyqtusG5uWp+LB8uNhsAMp8S4b7w==
+X-Received: by 2002:a62:1444:: with SMTP id 65mr7297001pfu.145.1565153630212; 
+ Tue, 06 Aug 2019 21:53:50 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t9sm24347921pji.18.2019.08.06.21.53.53
+ by smtp.gmail.com with ESMTPSA id t9sm24347921pji.18.2019.08.06.21.53.48
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 06 Aug 2019 21:53:54 -0700 (PDT)
+ Tue, 06 Aug 2019 21:53:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 21:53:33 -0700
-Message-Id: <20190807045335.1361-10-richard.henderson@linaro.org>
+Date: Tue,  6 Aug 2019 21:53:29 -0700
+Message-Id: <20190807045335.1361-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190807045335.1361-1-richard.henderson@linaro.org>
 References: <20190807045335.1361-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
-Subject: [Qemu-devel] [PATCH 09/11] target/arm: Remove offset argument to
- gen_exception_bkpt_insn
+X-Received-From: 2607:f8b0:4864:20::443
+Subject: [Qemu-devel] [PATCH 05/11] target/arm: Remove redundant s->pc & ~1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,80 +95,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unlike the other more generic gen_exception{,_internal}_insn
-interfaces, breakpoints always refer to the current instruction.
+The thumb bit has already been removed from s->pc, and is always even.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate-a64.c | 7 +++----
- target/arm/translate.c     | 8 ++++----
- 2 files changed, 7 insertions(+), 8 deletions(-)
+ target/arm/translate.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index c8504d221a..d68bfc66d3 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -281,12 +281,11 @@ static void gen_exception_insn(DisasContext *s, uint64_t pc, int excp,
-     s->base.is_jmp = DISAS_NORETURN;
- }
- 
--static void gen_exception_bkpt_insn(DisasContext *s, int offset,
--                                    uint32_t syndrome)
-+static void gen_exception_bkpt_insn(DisasContext *s, uint32_t syndrome)
- {
-     TCGv_i32 tcg_syn;
- 
--    gen_a64_set_pc_im(s->base.pc_next - offset);
-+    gen_a64_set_pc_im(s->pc_curr);
-     tcg_syn = tcg_const_i32(syndrome);
-     gen_helper_exception_bkpt_insn(cpu_env, tcg_syn);
-     tcg_temp_free_i32(tcg_syn);
-@@ -1914,7 +1913,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
-             break;
-         }
-         /* BRK */
--        gen_exception_bkpt_insn(s, 4, syn_aa64_bkpt(imm16));
-+        gen_exception_bkpt_insn(s, syn_aa64_bkpt(imm16));
-         break;
-     case 2:
-         if (op2_ll != 0) {
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e6b18ecdaf..d6b0ab7247 100644
+index 71d94c053b..100f958e33 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -1273,12 +1273,12 @@ static void gen_exception_insn(DisasContext *s, uint32_t pc, int excp,
-     s->base.is_jmp = DISAS_NORETURN;
+@@ -1288,7 +1288,7 @@ static void gen_exception_bkpt_insn(DisasContext *s, int offset, uint32_t syn)
+ /* Force a TB lookup after an instruction that changes the CPU state.  */
+ static inline void gen_lookup_tb(DisasContext *s)
+ {
+-    tcg_gen_movi_i32(cpu_R[15], s->pc & ~1);
++    tcg_gen_movi_i32(cpu_R[15], s->pc);
+     s->base.is_jmp = DISAS_EXIT;
  }
  
--static void gen_exception_bkpt_insn(DisasContext *s, int offset, uint32_t syn)
-+static void gen_exception_bkpt_insn(DisasContext *s, uint32_t syn)
- {
-     TCGv_i32 tcg_syn;
- 
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->base.pc_next - offset);
-+    gen_set_pc_im(s, s->pc_curr);
-     tcg_syn = tcg_const_i32(syn);
-     gen_helper_exception_bkpt_insn(cpu_env, tcg_syn);
-     tcg_temp_free_i32(tcg_syn);
-@@ -8155,7 +8155,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             case 1:
-                 /* bkpt */
-                 ARCH(5);
--                gen_exception_bkpt_insn(s, 4, syn_aa32_bkpt(imm16, false));
-+                gen_exception_bkpt_insn(s, syn_aa32_bkpt(imm16, false));
-                 break;
-             case 2:
-                 /* Hypervisor call (v7) */
-@@ -11581,7 +11581,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-         {
-             int imm8 = extract32(insn, 0, 8);
-             ARCH(5);
--            gen_exception_bkpt_insn(s, 2, syn_aa32_bkpt(imm8, true));
-+            gen_exception_bkpt_insn(s, syn_aa32_bkpt(imm8, true));
-             break;
-         }
- 
+@@ -7819,7 +7819,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                  * self-modifying code correctly and also to take
+                  * any pending interrupts immediately.
+                  */
+-                gen_goto_tb(s, 0, s->pc & ~1);
++                gen_goto_tb(s, 0, s->pc);
+                 return;
+             case 7: /* sb */
+                 if ((insn & 0xf) || !dc_isar_feature(aa32_sb, s)) {
+@@ -7830,7 +7830,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                  * for TCG; MB and end the TB instead.
+                  */
+                 tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+-                gen_goto_tb(s, 0, s->pc & ~1);
++                gen_goto_tb(s, 0, s->pc);
+                 return;
+             default:
+                 goto illegal_op;
+@@ -10464,7 +10464,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                              * and also to take any pending interrupts
+                              * immediately.
+                              */
+-                            gen_goto_tb(s, 0, s->pc & ~1);
++                            gen_goto_tb(s, 0, s->pc);
+                             break;
+                         case 7: /* sb */
+                             if ((insn & 0xf) || !dc_isar_feature(aa32_sb, s)) {
+@@ -10475,7 +10475,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                              * for TCG; MB and end the TB instead.
+                              */
+                             tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+-                            gen_goto_tb(s, 0, s->pc & ~1);
++                            gen_goto_tb(s, 0, s->pc);
+                             break;
+                         default:
+                             goto illegal_op;
 -- 
 2.17.1
 
