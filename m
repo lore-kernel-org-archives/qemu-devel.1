@@ -2,79 +2,80 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4371AC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE8FBC32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:26:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1220821BE3
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:24:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1220821BE3
+	by mail.kernel.org (Postfix) with ESMTPS id 863C621BE3
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 13:26:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 863C621BE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvLvy-0005xW-5N
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 09:24:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56400)
+	id 1hvLxg-0006xx-So
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 09:26:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56765)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvLvS-0005Wc-Mr
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:24:24 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hvLxJ-0006Xs-9b
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:26:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvLvR-0004KR-Df
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:24:22 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35337)
+ (envelope-from <pbonzini@redhat.com>) id 1hvLxH-00059p-Ou
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:26:17 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45877)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvLvR-0004K6-70
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:24:21 -0400
-Received: by mail-wr1-f67.google.com with SMTP id k2so5519813wrq.2
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 06:24:21 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hvLxH-00059B-Ih
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 09:26:15 -0400
+Received: by mail-wr1-f67.google.com with SMTP id q12so1113149wrj.12
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 06:26:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=b6KPpo+ug99vOAqR4otVRS2JMRpeqaLi7HxQyZWfBFA=;
- b=roEQxGghsiEoe7i7t7TCbRdkV1C9sD5bjrnPmY0s032tVf+1r7hHUmhDAm9K4NnNPW
- DdhSJukGF0PXeDtjbdFxkYGqYj9O+z5aqkPp4j3N9X/xadfq0xqu3ikOiqJx04J6nYZq
- ab8eMBZy3zSDZiuCcrzjhNV+JfzhqCshqW67q0BxeWioXorp8F+q/SO5rZYQKQf8GZvR
- DG1WvZIAfB2+OqNSxU4XE0ZQPfaR1I8fPeApSKvg95wVXF5PGX1qCOmeE9UxJEoExITX
- 6rzEDOlEdgc8ZjLVIV2YGmHnR50XbnKXkNQPNoqixk8jKAO5GZ5w2N3kHVVh8gGzwFsB
- cdmQ==
-X-Gm-Message-State: APjAAAWN3mgWYCzMJS8TZkADSSariBU4YOW3KwABuaT9cdu9H4AqM2x+
- EJQPe9/jb3RHGVEUEMUn0Va6eA==
-X-Google-Smtp-Source: APXvYqxjO7wKj+shQCZDrliuqiKfhmEgeG1KmI7f6p2YubB4/60SPRxVd3HJ5VF6BfI6s70loSkGPA==
-X-Received: by 2002:adf:f68b:: with SMTP id v11mr10568907wrp.116.1565184260080; 
- Wed, 07 Aug 2019 06:24:20 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id v23sm82458613wmj.32.2019.08.07.06.24.19
+ bh=ELWBVRe8LKXltQTmIZV4RzgxZRLwcTTzj7GQpENBNpk=;
+ b=FZeQ5QnyjEr0/m1D4toPbslhsdY9+YchY1+pA+m/HCOjR3N2zZc21kHTQH8f2e6ZFR
+ 20SZMSt0TYYlZSzH/YcvHM3xo1kd6JsB9Nio3NW1OmJFjK94ephlixFXEyqiDIEbRqKz
+ pVY0vNl/1z4s4ZkUXpX3XL32cQqPGLkzPv/nc/kNcNzou9lXjsv0QGCJ1lN1gHjxobgH
+ Q9CStTwe4CNXSQGh7MJ5nL0YYxZM5mzeoRq7wvLbaW6CWSOlKoR5TaU4LAcu9bBMCqN8
+ NUnUJyeUe1RHNgJBi6403K0OOWBm51HnbNYw73qlQTwoHkepUHLyancV+8++Dn5Ojhdv
+ hmXA==
+X-Gm-Message-State: APjAAAXMj7y8OopHt+WhQ2DqMSCCTLYLG7dRmEUEA2BqT1INRQJABEjT
+ 6SQpJ3he4M7V5ktBTGgDVfnEaDnSJnE=
+X-Google-Smtp-Source: APXvYqxjZfRXnpdzUsUix5/yc3S68ao5dGUGwHlW0TC14EszfVBKX5am7hmAiDJktfcrbwce7vQXnw==
+X-Received: by 2002:a5d:518d:: with SMTP id k13mr10988257wrv.40.1565184374287; 
+ Wed, 07 Aug 2019 06:26:14 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
+ ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
+ by smtp.gmail.com with ESMTPSA id o4sm72729460wmh.35.2019.08.07.06.26.13
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 06:24:19 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-28-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <dd5a7bd9-a9b6-b388-855c-36755a74fa55@redhat.com>
-Date: Wed, 7 Aug 2019 15:24:18 +0200
+ Wed, 07 Aug 2019 06:26:13 -0700 (PDT)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190730123759.21723-1-pbonzini@redhat.com>
+ <20190730123759.21723-4-pbonzini@redhat.com> <87lfw5i0j1.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8b9e239c-a047-1d76-04ad-3304ff44b7a0@redhat.com>
+Date: Wed, 7 Aug 2019 15:26:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190806151435.10740-28-armbru@redhat.com>
+In-Reply-To: <87lfw5i0j1.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH v2 27/29] Include sysemu/sysemu.h a lot less
+Subject: Re: [Qemu-devel] [PATCH 3/3] tests/tcg: move configuration to a
+ sub-shell script
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,144 +87,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/19 5:14 PM, Markus Armbruster wrote:
-> In my "build everything" tree, changing sysemu/sysemu.h triggers a
-> recompile of some 5400 out of 6600 objects (not counting tests and
-> objects that don't depend on qemu/osdep.h).
+On 07/08/19 15:10, Alex Bennée wrote:
+>> -DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
+>> +DIRS="tests tests/tcg tests/tcg/lm32 tests/libqos tests/qapi-schema tests/qemu-iotests tests/vm"
+>>  DIRS="$DIRS tests/fp tests/qgraph"
+>>  DIRS="$DIRS docs docs/interop fsdev scsi"
+>>  DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
+>>  DIRS="$DIRS roms/seabios roms/vgabios"
+>> -LINKS="Makefile tests/tcg/Makefile"
+>> -LINKS="$LINKS tests/tcg/cris/Makefile tests/tcg/cris/.gdbinit"
+>> -LINKS="$LINKS tests/tcg/lm32/Makefile tests/tcg/xtensa/Makefile po/Makefile"
+>> -LINKS="$LINKS tests/fp/Makefile"
+>> +LINKS="Makefile"
+>> +LINKS="$LINKS tests/tcg/lm32/Makefile po/Makefile"
+>> +LINKS="$LINKS tests/tcg/Makefile.target tests/fp/Makefile"
 > 
-> hw/qdev-core.h includes sysemu/sysemu.h since recent commit e965ffa70a
-> "qdev: add qdev_add_vm_change_state_handler()".  This is a bad idea:
-> hw/qdev-core.h is widely included.
+> Is this why I get complaints on a clean tree:
 > 
-> Move the declaration of qdev_add_vm_change_state_handler() to
-> sysemu/sysemu.h, and drop the problematic include from hw/qdev-core.h.
-> 
-> Touching sysemu/sysemu.h now recompiles some 1800 objects.
-> qemu/uuid.h also drops from 5400 to 1800.  A few more headers show
-> smaller improvement: qemu/notify.h drops from 5600 to 5200,
-> qemu/timer.h from 5600 to 4500, and qapi/qapi-types-run-state.h from
-> 5500 to 5000.
-> 
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  accel/kvm/kvm-all.c               | 1 +
->  backends/hostmem.c                | 1 +
->  cpus.c                            | 1 +
->  hw/arm/allwinner-a10.c            | 1 +
->  hw/arm/aspeed_soc.c               | 1 +
->  hw/arm/kzm.c                      | 1 +
->  hw/arm/msf2-soc.c                 | 1 +
->  hw/arm/stm32f205_soc.c            | 1 +
->  hw/char/serial-isa.c              | 1 +
->  hw/char/xen_console.c             | 1 +
->  hw/core/numa.c                    | 1 +
->  hw/core/vm-change-state-handler.c | 1 +
->  hw/display/qxl-render.c           | 1 +
->  hw/i386/xen/xen-hvm.c             | 1 +
->  hw/i386/xen/xen-mapcache.c        | 1 +
->  hw/intc/ioapic.c                  | 1 +
->  hw/pci/pci.c                      | 1 +
->  hw/riscv/sifive_e.c               | 1 +
->  hw/riscv/sifive_u.c               | 1 +
->  hw/riscv/spike.c                  | 1 +
->  hw/riscv/virt.c                   | 1 +
->  hw/sparc64/niagara.c              | 2 +-
->  hw/usb/hcd-ehci.h                 | 1 +
->  hw/xen/xen-common.c               | 1 +
->  hw/xen/xen_devconfig.c            | 1 +
->  hw/xenpv/xen_machine_pv.c         | 1 +
->  include/hw/qdev-core.h            | 5 -----
->  include/sysemu/sysemu.h           | 3 +++
->  migration/global_state.c          | 1 +
->  migration/migration.c             | 1 +
->  migration/savevm.c                | 1 +
->  31 files changed, 32 insertions(+), 6 deletions(-)
-> 
-[...]
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index e5b62dd2fc..de70b7a19a 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -5,7 +5,6 @@
->  #include "qemu/bitmap.h"
->  #include "qom/object.h"
->  #include "hw/hotplug.h"
-> -#include "sysemu/sysemu.h"
+>   libpmem support   no
+>   libudev           yes
+>   default devices   yes
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 179: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 180: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 183: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 184: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 193: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 213: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-aarch64-linux-user.mak: Directory nonexistent
+>   /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: 179: /home/alex/lsrc/qemu.git/tests/tcg/configure.sh: cannot create tests/tcg/config-arm-linux-user.mak: Directory nonexist
 
-Another build errors on OSX:
+configure.sh is invoked too early.
 
-ui/cocoa.m:445:10: error: use of undeclared identifier 'cursor_hide'
-    if (!cursor_hide) {
-         ^
-ui/cocoa.m:453:10: error: use of undeclared identifier 'cursor_hide'
-    if (!cursor_hide) {
-         ^
-ui/cocoa.m:596:13: error: use of undeclared identifier 'qemu_name'
-        if (qemu_name)
-            ^
-warning: format specifies type 'char *' but the argument has type
-'<dependent type>' [-Wformat]
-ui/cocoa.m:597:75: error: use of undeclared identifier 'qemu_name'
-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU
-%s", qemu_name]];
-                                                                         ^
-ui/cocoa.m:995:13: error: use of undeclared identifier 'qemu_name'
-        if (qemu_name)
-            ^
-warning: format specifies type 'char *' but the argument has type
-'<dependent type>' [-Wformat]
-ui/cocoa.m:996:117: error: use of undeclared identifier 'qemu_name'
-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU %s
-- (Press ctrl + alt + g to release Mouse)", qemu_name]];
+> 
+> 
+>>  LINKS="$LINKS pc-bios/optionrom/Makefile pc-bios/keymaps"
+>>  LINKS="$LINKS pc-bios/spapr-rtas/Makefile"
+>>  LINKS="$LINKS pc-bios/s390-ccw/Makefile"
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 8bb5c97..a3ee649 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -1058,30 +1058,28 @@ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
+>>  CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(TARGET_DIRS))
+>>  RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(TARGET_DIRS))
+>>
+>> -ifeq ($(HAVE_USER_DOCKER),y)
+>>  # Probe for the Docker Builds needed for each build
+>>  $(foreach PROBE_TARGET,$(TARGET_DIRS), 				\
+>>  	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.prereqs))
+>> -endif
+>>
+>>  build-tcg-tests-%:
+>>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
+>>  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
+>>  		SRC_PATH=$(SRC_PATH) \
+>> -	       	V="$(V)" TARGET_DIR="$*/" guest-tests, \
+>> +	       	V="$(V)" TARGET="$*" guest-tests, \
+>>  		"BUILD", "TCG tests for $*")
+>>
+>>  run-tcg-tests-%: build-tcg-tests-% %/all
+>>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
+>>  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
+>>  		SRC_PATH=$(SRC_PATH) SPEED="$(SPEED)" \
+>> -		V="$(V)" TARGET_DIR="$*/" run-guest-tests, \
+>> +		V="$(V)" TARGET="$*" run-guest-tests, \
+>>  		"RUN", "TCG tests for $*")
+>>
+>>  clean-tcg-tests-%:
+>>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) \
+>>  		-f $(SRC_PATH)/tests/tcg/Makefile.qemu \
+>> -		SRC_PATH=$(SRC_PATH) TARGET_DIR="$*/" clean-guest-tests, \
+>> +		SRC_PATH=$(SRC_PATH) TARGET="$*" clean-guest-tests, \
+>>  		"RUN", "TCG tests for $*")
+>>
+>>  .PHONY: build-tcg
+>> diff --git a/tests/tcg/Makefile.prereqs b/tests/tcg/Makefile.prereqs
+>> index 53b0196..7494b31 100644
+>> --- a/tests/tcg/Makefile.prereqs
+>> +++ b/tests/tcg/Makefile.prereqs
+>> @@ -7,24 +7,12 @@
+>>  # selection of required docker targets before we invoke a sub-make for
+>>  # each target.
+>>
+>> -# First we need the target makefile which tells us the target architecture
+>> -CROSS_CC_GUEST:=
+>> --include $(BUILD_DIR)/$(PROBE_TARGET)/config-target.mak
+>> -
+>> -# Then we load up the target architecture makefiles which tell us
+>> -# about the compilers
+>>  DOCKER_IMAGE:=
+>>
+>> --include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
+>> --include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
+>> +-include $(BUILD_DIR)/tests/tcg/config-$(PROBE_TARGET).mak
+>>
+>> -ifndef CROSS_CC_GUEST
+>>  ifneq ($(DOCKER_IMAGE),)
+>>  build-tcg-tests-$(PROBE_TARGET): docker-image-$(DOCKER_IMAGE)
+>> +$(BUILD_DIR)/tests/tcg/config_$(PROBE_TARGET).mak: config-host.mak
+>> +config-host.mak: $(SRC_PATH)/tests/tcg/configure.sh
+>>  endif
+>> -endif
+>> -
+>> -# Clean-up
+>> -# undefine TARGET_NAME
+>> -# undefine TARGET_BASE_ARCH
+>> -# undefine TARGET_ABI_DIR
+>> diff --git a/tests/tcg/Makefile.qemu b/tests/tcg/Makefile.qemu
+>> index d3f3437..c8bec7b 100644
+>> --- a/tests/tcg/Makefile.qemu
+>> +++ b/tests/tcg/Makefile.qemu
+>> @@ -8,17 +8,22 @@
+>>  # to do it for us.
+>>  #
+>>
+>> -# The per ARCH makefile, if it exists, holds extra information about
+>> +include $(SRC_PATH)/rules.mak
+>> +
+>> +# The configure script fills in extra information about
+>>  # useful docker images or alternative compiler flags.
+>>
+>> -include $(TARGET_DIR)config-target.mak
+>> -include $(SRC_PATH)/rules.mak
+>> -include $(wildcard \
+>> -	$(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include \
+>> -	$(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include)
+>> +CROSS_CC_GUEST:=
+>> +DOCKER_IMAGE:=
+>> +-include $(BUILD_DIR)/tests/tcg/config-$(TARGET).mak
+>>
+>>  GUEST_BUILD=
+>>  TCG_MAKE=../Makefile.target
+>> +
+>> +# We also need the Docker make rules to depend on
+>> +SKIP_DOCKER_BUILD=1
+>> +include $(SRC_PATH)/tests/docker/Makefile.include
+>> +
+>>  # Support installed Cross Compilers
+>>
+>>  ifdef CROSS_CC_GUEST
+>> @@ -26,11 +31,11 @@ ifdef CROSS_CC_GUEST
+>>  .PHONY: cross-build-guest-tests
+>>  cross-build-guest-tests:
+>>  	$(call quiet-command, \
+>> -	   (mkdir -p tests/tcg/$(TARGET_DIR) && cd tests/tcg/$(TARGET_DIR) && \
+>> -	    $(MAKE) -f $(TCG_MAKE) TARGET_DIR="$(TARGET_DIR)" CC="$(CROSS_CC_GUEST)" \
+>> +	   (mkdir -p tests/tcg/$(TARGET) && cd tests/tcg/$(TARGET) && \
+>> +	    $(MAKE) -f $(TCG_MAKE) TARGET="$(TARGET)" CC="$(CROSS_CC_GUEST)" \
+>>  			SRC_PATH="$(SRC_PATH)" BUILD_STATIC=$(CROSS_CC_GUEST_STATIC) \
+>> -			EXTRA_CFLAGS=$(CROSS_CC_GUEST_CFLAGS)), \
+> 
+> I expect given we need config-FOO.mak files before that these mkdir's are in the wrong place.
 
-                                            ^
-ui/cocoa.m:1013:13: error: use of undeclared identifier 'qemu_name'
-        if (qemu_name)
-            ^
-warning: format specifies type 'char *' but the argument has type
-'<dependent type>' [-Wformat]
-ui/cocoa.m:1014:75: error: use of undeclared identifier 'qemu_name'
-            [normalWindow setTitle:[NSString stringWithFormat:@"QEMU
-%s", qemu_name]];
-                                                                          ^
-ui/cocoa.m:1164:5: warning: implicit declaration of function
-'qemu_system_shutdown_request' is invalid in C99
-[-Wimplicit-function-declaration]
-    qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
-    ^
-ui/cocoa.m:1164:5: warning: this function declaration is not a prototype
-[-Wstrict-prototypes]
-make: *** [ui/cocoa.o] Error 1
+These are mkdirs for tests/tcg/FOO, but I do need to add mkdir -p
+tests/tcg to the configure.sh script.
 
->  
->  enum {
->      DEV_NVECTORS_UNSPECIFIED = -1,
-> @@ -451,8 +450,4 @@ static inline bool qbus_is_hotpluggable(BusState *bus)
->  void device_listener_register(DeviceListener *listener);
->  void device_listener_unregister(DeviceListener *listener);
->  
-> -VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
-> -                                                     VMChangeStateHandler *cb,
-> -                                                     void *opaque);
-> -
->  #endif
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index 227202999d..908f158677 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -29,6 +29,9 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandler *cb,
->                                                       void *opaque);
->  VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
->          VMChangeStateHandler *cb, void *opaque, int priority);
-> +VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
-> +                                                     VMChangeStateHandler *cb,
-> +                                                     void *opaque);
->  void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
->  void vm_state_notify(int running, RunState state);
+Paolo
 
