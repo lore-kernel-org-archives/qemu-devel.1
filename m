@@ -2,83 +2,66 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 981B5C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B32C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 06:12:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6733521743
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 04:59:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mTR4UeG7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6733521743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DE8C22199C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 06:12:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE8C22199C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvE2q-0004Nf-Og
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 00:59:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40828)
+	id 1hvFBC-0003hg-QM
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 02:12:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51165)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvDxX-0001Zb-K2
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:54:00 -0400
+ (envelope-from <armbru@redhat.com>) id 1hvFAn-0003Hn-Ok
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 02:11:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvDxW-0004w8-Hk
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:59 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36209)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvDxW-0004vZ-CE
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 00:53:58 -0400
-Received: by mail-pl1-x643.google.com with SMTP id k8so38798915plt.3
- for <qemu-devel@nongnu.org>; Tue, 06 Aug 2019 21:53:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=S3x0I1syk+FpjUOME51Sa5kikQHI1eNJn5aK0q1qog4=;
- b=mTR4UeG7b76CFYD3I7WgV0qeo73dQZRYHu9XVs893lIFwhdZf4GADDX0WNwRFdT424
- 0JyCDnNk9Nvotd7uo3z6yyYNp5ikuETD1mFFCC9nCnCxj7K7LrMTtCuWyj7F2zBSXyeX
- drvs4t5v8+5m1PSkHSF3+6cRiAuyNUjrsPDo/Y7bLeSL8fVEON0ItlIboRTpsuTXDLE7
- gBvXgvHp3PNpdxyarqAnMsFYrwosedT0Q/q1YhnMG4jOdsDQhMfQF/UG3Mi6CNl7yB/b
- 0xpkCFHyvGMh1OYgLZzCm3DGYOa9O2x/YyARbxkVq+7xzxKBB5kUmL/Y1zp0g1guLZ5i
- CMDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=S3x0I1syk+FpjUOME51Sa5kikQHI1eNJn5aK0q1qog4=;
- b=Yos9KOxgRkuWRoWJ/G7f9Js16peT2a33mzX7coIWNlkakZCicMNJy+mCGkE3wyXmyh
- BaCjv9MXOGyCxfadNyrRkWunPfk3lFvW7JfFjoQaddzSDnhYmp1rdJ6UoDjJpNnlTRZU
- QBln42unlqwhh4s0KGhLaBqkUG62W0EYDmARo1s9WCr48QgxAjX173eNmlY7f/5qxI/G
- sOJbGEbrWPpLPhwh0L9QbrvvScEbpGdqlIMFxc3ozfJuul1ylPabA2e3hKTuaa8Nlj27
- hU5RrPJ4fZa4yiDHccXdbMyK9/+gKy32LR8A3zVjLDFXSt7HQppsU26iFps+5pxDpx2J
- q4Pw==
-X-Gm-Message-State: APjAAAVmn7Ca3pm56VFmkYDSUILiTrc1b5tDZViQF3N2wpZLW1nrtQfq
- pWfSq0qvfIDRmj9udX2BsVukAgS7OkQ=
-X-Google-Smtp-Source: APXvYqwdRZYuoimb6ewuGO8wIlZejE5t0VqYNgrd7w0HdaH3WcE19tDYMI6LboqaEQjIEQrK5A1tfA==
-X-Received: by 2002:a17:902:24c:: with SMTP id 70mr6452993plc.2.1565153637091; 
- Tue, 06 Aug 2019 21:53:57 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t9sm24347921pji.18.2019.08.06.21.53.56
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 06 Aug 2019 21:53:56 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue,  6 Aug 2019 21:53:35 -0700
-Message-Id: <20190807045335.1361-12-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190807045335.1361-1-richard.henderson@linaro.org>
-References: <20190807045335.1361-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
-Subject: [Qemu-devel] [PATCH 11/11] target/arm: Remove helper_double_saturate
+ (envelope-from <armbru@redhat.com>) id 1hvFAm-0004Fu-3P
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 02:11:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48226)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvFAl-0004Ej-Qo
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 02:11:44 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 460BD30A0101;
+ Wed,  7 Aug 2019 06:11:42 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-197.ams2.redhat.com
+ [10.36.116.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 362041FD3B;
+ Wed,  7 Aug 2019 06:11:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9F1B1113864E; Wed,  7 Aug 2019 07:57:59 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+References: <20190806185649.2476-1-sean.j.christopherson@intel.com>
+ <20190806185649.2476-3-sean.j.christopherson@intel.com>
+Date: Wed, 07 Aug 2019 07:57:59 +0200
+In-Reply-To: <20190806185649.2476-3-sean.j.christopherson@intel.com> (Sean
+ Christopherson's message of "Tue, 6 Aug 2019 11:56:31 -0700")
+Message-ID: <87a7clbjq0.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Wed, 07 Aug 2019 06:11:42 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH 02/20] i386: Add 'sgx-epc' device to
+ expose EPC sections to guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,82 +73,348 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace x = double_saturate(y) with x = add_saturate(y, y).
-There is no need for a separate more specialized helper.
+Quick QAPI schema sanity check, mostly.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/helper.h    |  1 -
- target/arm/op_helper.c | 15 ---------------
- target/arm/translate.c |  4 ++--
- 3 files changed, 2 insertions(+), 18 deletions(-)
+Sean Christopherson <sean.j.christopherson@intel.com> writes:
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 132aa1682e..1fb2cb5a77 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -6,7 +6,6 @@ DEF_HELPER_3(add_saturate, i32, env, i32, i32)
- DEF_HELPER_3(sub_saturate, i32, env, i32, i32)
- DEF_HELPER_3(add_usaturate, i32, env, i32, i32)
- DEF_HELPER_3(sub_usaturate, i32, env, i32, i32)
--DEF_HELPER_2(double_saturate, i32, env, s32)
- DEF_HELPER_FLAGS_2(sdiv, TCG_CALL_NO_RWG_SE, s32, s32, s32)
- DEF_HELPER_FLAGS_2(udiv, TCG_CALL_NO_RWG_SE, i32, i32, i32)
- DEF_HELPER_FLAGS_1(rbit, TCG_CALL_NO_RWG_SE, i32, i32)
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index 5e1625a1c8..0fd4bd0238 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -135,21 +135,6 @@ uint32_t HELPER(sub_saturate)(CPUARMState *env, uint32_t a, uint32_t b)
-     return res;
- }
- 
--uint32_t HELPER(double_saturate)(CPUARMState *env, int32_t val)
--{
--    uint32_t res;
--    if (val >= 0x40000000) {
--        res = ~SIGNBIT;
--        env->QF = 1;
--    } else if (val <= (int32_t)0xc0000000) {
--        res = SIGNBIT;
--        env->QF = 1;
--    } else {
--        res = val << 1;
--    }
--    return res;
--}
--
- uint32_t HELPER(add_usaturate)(CPUARMState *env, uint32_t a, uint32_t b)
- {
-     uint32_t res = a + b;
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 2d447d4b90..846052acea 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -8122,7 +8122,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             tmp = load_reg(s, rm);
-             tmp2 = load_reg(s, rn);
-             if (op1 & 2)
--                gen_helper_double_saturate(tmp2, cpu_env, tmp2);
-+                gen_helper_add_saturate(tmp2, cpu_env, tmp2, tmp2);
-             if (op1 & 1)
-                 gen_helper_sub_saturate(tmp, cpu_env, tmp, tmp2);
-             else
-@@ -9965,7 +9965,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                 tmp = load_reg(s, rn);
-                 tmp2 = load_reg(s, rm);
-                 if (op & 1)
--                    gen_helper_double_saturate(tmp, cpu_env, tmp);
-+                    gen_helper_add_saturate(tmp, cpu_env, tmp, tmp);
-                 if (op & 2)
-                     gen_helper_sub_saturate(tmp, cpu_env, tmp2, tmp);
-                 else
--- 
-2.17.1
+> SGX EPC is enumerated through CPUID, i.e. EPC "devices" need to be
+> realized prior to realizing the vCPUs themselves, which occurs long
+> before generic devices are parsed and realized.  Because of this,
+> do not allow 'sgx-epc' devices to be instantiated after vCPUS have
+> been created.
+>
+> The 'sgx-epc' device is essentially a placholder at this time, it will
+> be fully implemented in a future patch along with a dedicated command
+> to create 'sgx-epc' devices.
+>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> ---
+>  hw/i386/Makefile.objs     |   1 +
+>  hw/i386/sgx-epc.c         | 169 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/i386/sgx-epc.h |  44 ++++++++++
+>  qapi/misc.json            |  32 +++++++-
+>  4 files changed, 244 insertions(+), 2 deletions(-)
+>  create mode 100644 hw/i386/sgx-epc.c
+>  create mode 100644 include/hw/i386/sgx-epc.h
+>
+> diff --git a/hw/i386/Makefile.objs b/hw/i386/Makefile.objs
+> index 5d9c9efd5f..18c9693d9d 100644
+> --- a/hw/i386/Makefile.objs
+> +++ b/hw/i386/Makefile.objs
+> @@ -13,3 +13,4 @@ obj-$(CONFIG_VMMOUSE) += vmmouse.o
+>  
+>  obj-y += kvmvapic.o
+>  obj-y += acpi-build.o
+> +obj-y += sgx-epc.o
+> diff --git a/hw/i386/sgx-epc.c b/hw/i386/sgx-epc.c
+> new file mode 100644
+> index 0000000000..73221ba86b
+> --- /dev/null
+> +++ b/hw/i386/sgx-epc.c
+> @@ -0,0 +1,169 @@
+> +/*
+> + * SGX EPC device
+> + *
+> + * Copyright (C) 2019 Intel Corporation
+> + *
+> + * Authors:
+> + *   Sean Christopherson <sean.j.christopherson@intel.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "hw/i386/pc.h"
+> +#include "hw/i386/sgx-epc.h"
+> +#include "hw/mem/memory-device.h"
+> +#include "monitor/qdev.h"
+> +#include "qapi/error.h"
+> +#include "qapi/visitor.h"
+> +#include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+> +#include "qemu/option.h"
+> +#include "qemu/units.h"
+> +#include "target/i386/cpu.h"
+> +
+> +static Property sgx_epc_properties[] = {
+> +    DEFINE_PROP_UINT64(SGX_EPC_ADDR_PROP, SGXEPCDevice, addr, 0),
+> +    DEFINE_PROP_LINK(SGX_EPC_MEMDEV_PROP, SGXEPCDevice, hostmem,
+> +                     TYPE_MEMORY_BACKEND, HostMemoryBackend *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+> +static void sgx_epc_get_size(Object *obj, Visitor *v, const char *name,
+> +                             void *opaque, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    uint64_t value;
+> +
+> +    value = memory_device_get_region_size(MEMORY_DEVICE(obj), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    visit_type_uint64(v, name, &value, errp);
+> +}
+> +
+> +static void sgx_epc_init(Object *obj)
+> +{
+> +    object_property_add(obj, SGX_EPC_SIZE_PROP, "uint64", sgx_epc_get_size,
+> +                        NULL, NULL, NULL, &error_abort);
+> +}
+> +
+> +static void sgx_epc_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+> +    SGXEPCDevice *epc = SGX_EPC(dev);
+> +
+> +    if (pcms->boot_cpus != 0) {
+> +        error_setg(errp,
+> +            "'" TYPE_SGX_EPC "' can't be created after vCPUs, e.g. via -device");
+> +        return;
+> +    }
+> +
+> +    if (!epc->hostmem) {
+> +        error_setg(errp, "'" SGX_EPC_MEMDEV_PROP "' property is not set");
+> +        return;
+> +    } else if (host_memory_backend_is_mapped(epc->hostmem)) {
+> +        char *path = object_get_canonical_path_component(OBJECT(epc->hostmem));
+> +        error_setg(errp, "can't use already busy memdev: %s", path);
+> +        g_free(path);
+> +        return;
+> +    }
 
+
+Please avoid "return; else":
+
+       if (!epc->hostmem) {
+           error_setg(errp, "'" SGX_EPC_MEMDEV_PROP "' property is not set");
+           return;
+       }
+       if (host_memory_backend_is_mapped(epc->hostmem)) {
+           char *path = object_get_canonical_path_component(OBJECT(epc->hostmem));
+           error_setg(errp, "can't use already busy memdev: %s", path);
+           g_free(path);
+           return;
+       }
+
+> +
+> +    error_setg(errp, "'" TYPE_SGX_EPC "' not supported");
+> +}
+> +
+> +static void sgx_epc_unrealize(DeviceState *dev, Error **errp)
+> +{
+> +    SGXEPCDevice *epc = SGX_EPC(dev);
+> +
+> +    host_memory_backend_set_mapped(epc->hostmem, false);
+> +}
+> +
+> +static uint64_t sgx_epc_md_get_addr(const MemoryDeviceState *md)
+> +{
+> +    const SGXEPCDevice *epc = SGX_EPC(md);
+> +
+> +    return epc->addr;
+> +}
+> +
+> +static void sgx_epc_md_set_addr(MemoryDeviceState *md, uint64_t addr,
+> +                                Error **errp)
+> +{
+> +    object_property_set_uint(OBJECT(md), addr, SGX_EPC_ADDR_PROP, errp);
+> +}
+> +
+> +static uint64_t sgx_epc_md_get_plugged_size(const MemoryDeviceState *md,
+> +                                            Error **errp)
+> +{
+> +    return 0;
+> +}
+> +
+> +static MemoryRegion *sgx_epc_md_get_memory_region(MemoryDeviceState *md,
+> +                                                  Error **errp)
+> +{
+> +    SGXEPCDevice *epc = SGX_EPC(md);
+> +
+> +    if (!epc->hostmem) {
+> +        error_setg(errp, "'" SGX_EPC_MEMDEV_PROP "' property must be set");
+> +        return NULL;
+> +    }
+> +
+> +    return host_memory_backend_get_memory(epc->hostmem);
+> +}
+> +
+> +static void sgx_epc_md_fill_device_info(const MemoryDeviceState *md,
+> +                                        MemoryDeviceInfo *info)
+> +{
+> +    SGXEPCDeviceInfo *di = g_new0(SGXEPCDeviceInfo, 1);
+> +    const SGXEPCDevice *epc = SGX_EPC(md);
+> +    const DeviceState *dev = DEVICE(md);
+> +
+> +    if (dev->id) {
+> +        di->has_id = true;
+> +        di->id = g_strdup(dev->id);
+> +    }
+> +    di->addr = epc->addr;
+> +    di->node = 0 /* TODO: EPC NUMA spec not yet defined */;
+> +    di->size = memory_device_get_region_size(MEMORY_DEVICE(epc), &error_fatal);
+> +    di->memdev = object_get_canonical_path(OBJECT(epc->hostmem));
+> +}
+> +
+> +static void sgx_epc_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    MemoryDeviceClass *mdc = MEMORY_DEVICE_CLASS(oc);
+> +
+> +    dc->hotpluggable = false;
+> +    dc->realize = sgx_epc_realize;
+> +    dc->unrealize = sgx_epc_unrealize;
+> +    dc->props = sgx_epc_properties;
+> +    dc->desc = "SGX EPC section";
+> +
+> +    mdc->get_addr = sgx_epc_md_get_addr;
+> +    mdc->set_addr = sgx_epc_md_set_addr;
+> +    mdc->get_plugged_size = sgx_epc_md_get_plugged_size;
+> +    mdc->get_memory_region = sgx_epc_md_get_memory_region;
+> +    mdc->fill_device_info = sgx_epc_md_fill_device_info;
+> +}
+> +
+> +static TypeInfo sgx_epc_info = {
+> +    .name          = TYPE_SGX_EPC,
+> +    .parent        = TYPE_DEVICE,
+> +    .instance_size = sizeof(SGXEPCDevice),
+> +    .instance_init = sgx_epc_init,
+> +    .class_init    = sgx_epc_class_init,
+> +    .class_size    = sizeof(DeviceClass),
+> +    .interfaces = (InterfaceInfo[]) {
+> +        { TYPE_MEMORY_DEVICE },
+> +        { }
+> +    },
+> +};
+> +
+> +static void sgx_epc_register_types(void)
+> +{
+> +    type_register_static(&sgx_epc_info);
+> +}
+> +
+> +type_init(sgx_epc_register_types)
+> diff --git a/include/hw/i386/sgx-epc.h b/include/hw/i386/sgx-epc.h
+> new file mode 100644
+> index 0000000000..5fd9ae2d0c
+> --- /dev/null
+> +++ b/include/hw/i386/sgx-epc.h
+> @@ -0,0 +1,44 @@
+> +/*
+> + * SGX EPC device
+> + *
+> + * Copyright (C) 2019 Intel Corporation
+> + *
+> + * Authors:
+> + *   Sean Christopherson <sean.j.christopherson@intel.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +#ifndef QEMU_SGX_EPC_H
+> +#define QEMU_SGX_EPC_H
+> +
+> +#include "sysemu/hostmem.h"
+> +
+> +#define TYPE_SGX_EPC "sgx-epc"
+> +#define SGX_EPC(obj) \
+> +    OBJECT_CHECK(SGXEPCDevice, (obj), TYPE_SGX_EPC)
+> +#define SGX_EPC_CLASS(oc) \
+> +    OBJECT_CLASS_CHECK(SGXEPCDeviceClass, (oc), TYPE_SGX_EPC)
+> +#define SGX_EPC_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(SGXEPCDeviceClass, (obj), TYPE_SGX_EPC)
+> +
+> +#define SGX_EPC_ADDR_PROP "addr"
+> +#define SGX_EPC_SIZE_PROP "size"
+> +#define SGX_EPC_MEMDEV_PROP "memdev"
+> +
+> +/**
+> + * SGXEPCDevice:
+> + * @addr: starting guest physical address, where @SGXEPCDevice is mapped.
+> + *         Default value: 0, means that address is auto-allocated.
+> + * @hostmem: host memory backend providing memory for @SGXEPCDevice
+> + */
+> +typedef struct SGXEPCDevice {
+> +    /* private */
+> +    DeviceState parent_obj;
+> +
+> +    /* public */
+> +    uint64_t addr;
+> +    HostMemoryBackend *hostmem;
+> +} SGXEPCDevice;
+> +
+> +#endif
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index a7fba7230c..965905c9e8 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -1573,19 +1573,47 @@
+>            }
+>  }
+>  
+> +##
+> +# @SGXEPCDeviceInfo:
+> +#
+> +# SGX EPC state information
+> +#
+> +# @id: device's ID
+> +#
+> +# @addr: physical address, where device is mapped
+> +#
+> +# @size: size of memory that the device provides
+> +#
+> +# @node: NUMA node number where device is plugged in
+> +#
+> +# @memdev: memory backend linked with device
+> +#
+> +# Since: TBD
+> +##
+> +{ 'struct': 'SGXEPCDeviceInfo',
+> +  'data': { '*id': 'str',
+> +            'addr': 'int',
+> +            'size': 'int',
+> +            'node': 'int',
+> +            'memdev': 'str'
+> +          }
+> +}
+> +
+>  ##
+>  # @MemoryDeviceInfo:
+>  #
+>  # Union containing information about a memory device
+>  #
+> -# nvdimm is included since 2.12. virtio-pmem is included since 4.1.
+> +# nvdimm is included since 2.12. virtio-pmem is included since 4.1,
+> +# sgx-epc is included since TBD.
+>  #
+>  # Since: 2.1
+>  ##
+>  { 'union': 'MemoryDeviceInfo',
+>    'data': { 'dimm': 'PCDIMMDeviceInfo',
+>              'nvdimm': 'PCDIMMDeviceInfo',
+> -            'virtio-pmem': 'VirtioPMEMDeviceInfo'
+> +            'virtio-pmem': 'VirtioPMEMDeviceInfo',
+> +            'sgx-epc': 'SGXEPCDeviceInfo'
+>            }
+>  }
+
+This adds a fourth kind of MemoryDeviceInfo.  Their doc comments all
+neglect to tell us what a "DIMM Device" is, why it's a "PC DIMM Device",
+how that differs from an "NVDIMM Device", what a "Virtio PMEM Device"
+is, and now what an "SGX EPC Device" is.
+
+I'd appreciate a brief explanation, possibly with a reference to
+pertinent documentation elsewhere.  I'm not demanding you do that for
+the existing kinds, too.  Igor, perhaps?
 
