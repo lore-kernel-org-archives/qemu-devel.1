@@ -2,79 +2,81 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 419BBC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F0FC32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:27:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1CA2F21E70
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:25:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CA2F21E70
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A653921E70
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:27:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X16MA+P6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A653921E70
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvMsH-0002sS-BM
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:25:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39450)
+	id 1hvMur-0004f7-Vf
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:27:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39876)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pbonzini@redhat.com>) id 1hvMrs-0002Sf-P4
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:24:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hvMuK-0003c0-LK
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:27:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hvMrr-0001B8-Pg
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:24:44 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53496)
+ (envelope-from <peter.maydell@linaro.org>) id 1hvMuJ-0002EC-Jt
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:27:16 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40109)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hvMrr-0001Av-Jb
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:24:43 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 10so250171wmp.3
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 07:24:43 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hvMuJ-0002DB-CR
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:27:15 -0400
+Received: by mail-ot1-x341.google.com with SMTP id l15so47784814oth.7
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 07:27:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2ozGHsPkd1Go5zDyxLtjbOQCpEDoE85m9DKFLiNy74I=;
+ b=X16MA+P6k8AmHk/FIwDn3tCMXZ/H8VKs5XuaNBQ4077f5F3DOQCRxKiU5j+ix4ob6D
+ 1lBE62swr0ejYv7arUqNTXLAzf2UfttycI/Cw5fCOIgbjSnVcaRV74RUG0FzoL+fAbaq
+ jCW+YvCdrTcZJ91PTqJgkR90T8VV7QPvtPluEABYf3eqgF0koKZ9P3m4ov1TLHBetwJS
+ 05pgquFociCesAuVbkTYyQ5iJ5+b49hxt0Qql1pipdU2htgDwUWKHp+w5OyaKd96VZDB
+ o3z0OliJUm4rbp5x1JSgJzW0UlPEVIv11BbVkRLiE/McoZT21vZFFYmayhHck74sGuz4
+ NozQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=iPK78WhUW7TbgbE0qVF5B4DyVagI1LChDonVI6DoGys=;
- b=DWqIggdrn8jaLzmdTquMitXFF3v/8T66xI3Zqv+WZEdG1vH+ef/g/TL9wzdxDoy9Nr
- aeeZ7Tu3/Gu6EUnlELU3JkOWLhc6BvX3hn3n4SmH9MtcDy+oMZq5FSwLBe6mnCOaxIg/
- xjBtPW5uVS8vsrrFdkj4nbf0eTarjN/gWKEALDpXspOL6t+gfGIDo619U1/l8rbZt1qi
- 5jfZsUwdHNc3iDIys+BpUElcULRKpJTtrVMErZiluaXUAQM/lHsExffOfcTJbXOOnjwk
- 4SuoySaPXPv1rQh42BfcxLtHlK1OLVvhXXqL7HuoFApuKHhY07PHCQo5fIpluIC4Bw3t
- CPHQ==
-X-Gm-Message-State: APjAAAV9S3zD65A241hcW6O9+gi61V1z2enNClcGp9WcA+2M936i7XoC
- K1eNAH8y1BAEE9uPD9z1//JhKg==
-X-Google-Smtp-Source: APXvYqysx3zQyCMhgW47bS/8aah0PGHpmNO7e4aJVJS/0MQ1Ifgy4gMTMszBjbn/WHD/Yc00rSBsVw==
-X-Received: by 2002:a1c:407:: with SMTP id 7mr227789wme.113.1565187882409;
- Wed, 07 Aug 2019 07:24:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
- ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
- by smtp.gmail.com with ESMTPSA id 15sm145127wmk.34.2019.08.07.07.24.41
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 07:24:41 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190729214717.6616-1-pbonzini@redhat.com>
- <CAFEAcA-gtfK1AwSFKo9XatJ_E9345Cd9+MS+1uu2WYG0i32sVA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <680dc43c-328f-ea59-553c-6e277c388d7c@redhat.com>
-Date: Wed, 7 Aug 2019 16:24:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2ozGHsPkd1Go5zDyxLtjbOQCpEDoE85m9DKFLiNy74I=;
+ b=CxN3j/tX+AzABBmzucp//XfzXXWyWwITW4vhEFNdbelG169GKyfEfRjEktZDfbBEic
+ 51fDDc2kq7dU8v5gIkUNmC5hswruxm1xvR5QLpt0uaA3YQxqtiQ381TdhsGzLyWtOmdC
+ IuLc7TezLv5VoEDUxRmdKsQaHu8gIy1tBehYY5ugr8FPs2u7q4O2Bbmr0yF47BDsUUGQ
+ dBCB0S8cLeB/BwHrFAonPBuGeAItETxkkhJ4Ms137eCgdw9yDkUO4wkR+aMRojjMoJUd
+ ZV6+ypDxMBZv2TC0nD7/tQ1+xyp5AeIYNN+26CpQO4AACb0Ppm5q5z0rGdGZhNwe8eOY
+ wlCg==
+X-Gm-Message-State: APjAAAWkLR/I2mmV2OmrsUZe/GWa8OVR6bheuWseF/IiA+dKkQh2zWeu
+ XtYJQJkSGxDQDYyDT26Q6R4Jzj7cEtJ3AuPNOXUN3Q==
+X-Google-Smtp-Source: APXvYqxaLQB2PhInv8JL2VTkzPP0pUZEPdNyWq2y4SDZIVza/QOWW4Qijzbf3EiYu0WXuX03BSx0X48b1xTlxKCnq+I=
+X-Received: by 2002:a05:6830:1653:: with SMTP id
+ h19mr8491893otr.232.1565188034240; 
+ Wed, 07 Aug 2019 07:27:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-gtfK1AwSFKo9XatJ_E9345Cd9+MS+1uu2WYG0i32sVA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] [PATCH untested for-4.2] memory: fix race between
- TCG and accesses to dirty bitmap
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-3-damien.hedde@greensocs.com>
+In-Reply-To: <20190729145654.14644-3-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Aug 2019 15:27:03 +0100
+Message-ID: <CAFEAcA9puHxUvxbSBsFrEQ6QN=fq3GJH4SgzcpQWQB60PTVR=g@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v3 02/33] add temporary device_legacy_reset
+ function to replace device_reset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,54 +88,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
+ Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/08/19 16:23, Peter Maydell wrote:
-> On Mon, 29 Jul 2019 at 22:47, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> The race is as follows:
->>
->>       vCPU thread                  reader thread
->>       -----------------------      -----------------------
->>       TLB check -> slow path
->>         notdirty_mem_write
->>           write to RAM
->>           set dirty flag
->>                                    clear dirty flag
->>       TLB check -> fast path
->>                                    read memory
->>         write to RAM
->>
->> and the second write is missed by the reader.
->>
->> Fortunately, in order to fix it, no change is required to the
->> vCPU thread.  However, the reader thread must delay the read after
->> the vCPU thread has finished the write.  This can be approximated
->> conservatively by run_on_cpu, which waits for the end of the current
->> translation block.
->>
->> A similar technique is used by KVM, which has to do a synchronous TLB
->> flush after doing a test-and-clear of the dirty-page flags.
->>
->> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>         I tested this some time ago, and enough has changed that I don't
->>         really trust those old results.  Nevertheless, I am throwing out
->>         the patch so that it is not forgotten.
-> 
-> This patch looks almost the same (maybe identical except for the
-> commit message title?) as the patch "memory: introduce
-> memory_global_after_dirty_log_sync" which you sent out at almost
-> the same time as this one. Which patch should we be reviewing?
+On Mon, 29 Jul 2019 at 15:58, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> Provide a temporary function doing what device_reset does to do the
+> transition with Resettable API which will trigger a prototype change
+> of device_reset.
 
-Yes, it's the same except for the commit message title.  I forgot a "-1"
-after editing the .patch file.
+The other point here is that device_legacy_reset() resets
+only that device, not any of its qbus children, right?
+So the new function which we eventually replace the callsites
+with also has different semantics, which is why we do the
+changes one by one in patches 10-28.
 
-Paolo
+So you could add:
 
+The new resettable API function also has different semantics
+(resetting child buses as well as the specified device).
+Subsequent commits will make the changeover for each callsite
+individually; once that is complete device_legacy_reset() will be
+removed.
+
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+
+I agree with David that patch 3 could be squashed into this one.
+
+If you do that and tweak the commit message you can have
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
