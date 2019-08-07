@@ -2,77 +2,85 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BADDC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFC2C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EFE12229C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:23:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EFE12229C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id CA6692229C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 17:25:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="CmVP0vSg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA6692229C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvPeu-0000Ys-JJ
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:23:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54019)
+	id 1hvPh6-00029c-1c
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 13:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54333)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <sebastien.boeuf@intel.com>) id 1hvPeU-0008QN-5q
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:23:07 -0400
+ (envelope-from <palmer@sifive.com>) id 1hvPgc-0001dV-8Y
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sebastien.boeuf@intel.com>) id 1hvPeS-0003En-MP
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:23:06 -0400
-Received: from mga17.intel.com ([192.55.52.151]:28661)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sebastien.boeuf@intel.com>)
- id 1hvPeS-000398-Dr
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:23:04 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 07 Aug 2019 10:23:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; 
- d="scan'208,223";a="192955844"
-Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
- by fmsmga001.fm.intel.com with ESMTP; 07 Aug 2019 10:23:00 -0700
-Received: from orsmsx112.amr.corp.intel.com (10.22.240.13) by
- ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 7 Aug 2019 10:23:00 -0700
-Received: from orsmsx115.amr.corp.intel.com ([169.254.4.6]) by
- ORSMSX112.amr.corp.intel.com ([169.254.3.253]) with mapi id 14.03.0439.000;
- Wed, 7 Aug 2019 10:23:00 -0700
-From: "Boeuf, Sebastien" <sebastien.boeuf@intel.com>
-To: "dgilbert@redhat.com" <dgilbert@redhat.com>
-Thread-Topic: libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD check
-Thread-Index: AQHVTSw+I7kmgADAmUOtvYF7P6PObabwT+2AgAAETwD//42QwYAADVrn
-Date: Wed, 7 Aug 2019 17:23:00 +0000
-Message-ID: <1E91073893EF8F498411079ED374F912460D551D@ORSMSX115.amr.corp.intel.com>
-References: <8df105774471bc72bca1397b4058ecc66d963848.camel@intel.com>
- <20190807160917.GI2867@work-vm>,
- <e99d520edca6deca1ff6b838fd43f1bde00761ee.camel@intel.com>,
- <1E91073893EF8F498411079ED374F912460D54E7@ORSMSX115.amr.corp.intel.com>
-In-Reply-To: <1E91073893EF8F498411079ED374F912460D54E7@ORSMSX115.amr.corp.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.22.254.138]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
+ (envelope-from <palmer@sifive.com>) id 1hvPgb-0007Nn-8x
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:25:18 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:37261)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hvPgb-0007La-1Z
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 13:25:17 -0400
+Received: by mail-pl1-x641.google.com with SMTP id b3so41836238plr.4
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 10:25:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Qia39A3RdeKMzCgJmI5iAQYq9gFiR+QJM6Y430p4Wx8=;
+ b=CmVP0vSgzkVJm5GjoKJNhsNJiqjjNRHPEIpPQWY87w5WF3bJWMhCFTWHn5nwCJgxzQ
+ EndnCSz8hFqDKaT0KR8ogieFEtQB/zZ4g8ier/JDCgs023FA2v9o95qziEpXdOM4lTxV
+ 0POfpte/EyVFqEwO/USd3fYSyUi/X4g2p0En4UW8o2RN5T57dBqrZTiHEnwJRpVIQdvv
+ MRbc0519iGd4e+BnsZd7ZFTAokrnjzuikIXW03wvzNbLQuMqGEbqaBbhyu85KZmUKkut
+ 7gcPqF0cshkZ3WP9mdOuLLLyoSf5tn3mFD+XUsZ4F76u7bEEgDyl00xt4N1lRKKutxUd
+ 003w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=Qia39A3RdeKMzCgJmI5iAQYq9gFiR+QJM6Y430p4Wx8=;
+ b=uNASzdrrLqocDqlk1b3/F91FwTbSOVGRD8g29ftu2AT4qVodYR68j93RsXJ9oTE0B6
+ yvZ7gbhEL+tuSyJTp/ck/yqtKyxnlunp1SYNh3mIUlzDD9DXkdt5hq7Fx7jbraMqQQZX
+ uZFvVqlUrga1Io8GuRyHfmkh0hROY/k/MtvrBY5S+Y1fkN5ZB904s1YzFXrCw/e3QTxV
+ EdaGmsG9+1gDGtFOoGaXKNRh94JWirO3GRJTF2OGEePVgbvjYleU3B5rj0V/isjMfT7g
+ 6E8HZc3wGIPqiI+X8cSU4r5/4sa8QMh8/GsfesA61+3pzJQ2VUSmuJSKLRHNVF10q6SJ
+ FT9Q==
+X-Gm-Message-State: APjAAAU5a9O7UOhDHT5iKsgRIfsx7mSt3IdqY8m5+mVjORkfZ4vf+BfM
+ Oytr8YgYvxwVPSUZ1uKaDTvvcA==
+X-Google-Smtp-Source: APXvYqxkoomxIRUSdPFpwpyii3DyXZwp58FvrgerHVRBt7lfd/vU2ESWVsXt+eXUJgkSBVRC6lV5UQ==
+X-Received: by 2002:a63:c84d:: with SMTP id l13mr8666342pgi.154.1565198715353; 
+ Wed, 07 Aug 2019 10:25:15 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id 67sm72433878pfd.177.2019.08.07.10.25.14
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 07 Aug 2019 10:25:14 -0700 (PDT)
+Date: Wed, 07 Aug 2019 10:25:14 -0700 (PDT)
+X-Google-Original-Date: Wed, 07 Aug 2019 09:53:36 PDT (-0700)
+In-Reply-To: <CAFEAcA9YeuvQPnvG1+Cdb+-JbsbKaRpa0Frv5zz+Vb3q0prAeQ@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <mhng-21b84257-7bfd-4a52-b6f2-cefa6fcf703a@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.151
-Subject: Re: [Qemu-devel] libvhost-user: Fix the
- VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD check
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: Re: [Qemu-devel] [PATCH for 4.1] RISC-V: Ignore the S and U
+ extensions when formatting ISA strings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,235 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From 734625fe0c031d26e612800cd9331235f58ae2e0 Mon Sep 17 00:00:00 2001=0A=
-From: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
-Date: Wed, 7 Aug 2019 07:15:32 -0700=0A=
-Subject: [PATCH] libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD=
-=0A=
- check=0A=
-=0A=
-Vhost user protocol features are set as a bitmask. And the following=0A=
-constant VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD value is 10 because the bit=0A=
-10 indicates if the features is set or not.=0A=
-=0A=
-The proper way to check for the presence or absence of this feature is=0A=
-to shift 1 by the value of this constant and then mask it with the=0A=
-actual bitmask representing the supported protocol features.=0A=
-=0A=
-This patch aims to fix the current code as it was not doing the=0A=
-shifting, but instead it was masking directly with the value of the=0A=
-constant itself.=0A=
-=0A=
-Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
----=0A=
- contrib/libvhost-user/libvhost-user.c | 6 ++++--=0A=
- 1 file changed, 4 insertions(+), 2 deletions(-)=0A=
-=0A=
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c=0A=
-index fb61142bcc..d75a9c86ed 100644=0A=
---- a/contrib/libvhost-user/libvhost-user.c=0A=
-+++ b/contrib/libvhost-user/libvhost-user.c=0A=
-@@ -1112,7 +1112,8 @@ bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *=
-vq, int fd,=0A=
- =0A=
-     vmsg.fd_num =3D fd_num;=0A=
- =0A=
--    if ((dev->protocol_features & VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD) =3D=
-=3D 0) {=0A=
-+    if ((dev->protocol_features &=0A=
-+        (1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) =3D=3D 0) {=0A=
-         return false;=0A=
-     }=0A=
- =0A=
-@@ -2537,7 +2538,8 @@ int64_t vu_fs_cache_request(VuDev *dev, VhostUserSlav=
-eRequest req, int fd,=0A=
- =0A=
-     vmsg.fd_num =3D fd_num;=0A=
- =0A=
--    if ((dev->protocol_features & VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD) =3D=
-=3D 0) {=0A=
-+    if ((dev->protocol_features &=0A=
-+        (1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) =3D=3D 0) {=0A=
-         return -EINVAL;=0A=
-     }=0A=
- =0A=
--- =0A=
-2.17.1=0A=
-=0A=
-________________________________________=0A=
-From: Boeuf, Sebastien=0A=
-Sent: Wednesday, August 07, 2019 9:35 AM=0A=
-To: dgilbert@redhat.com=0A=
-Cc: marcandre.lureau@redhat.com; qemu-devel@nongnu.org=0A=
-Subject: RE: libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD che=
-ck=0A=
-=0A=
-From 950c62dd450c8f6c3fc04269bbefa3a368bb39b6 Mon Sep 17 00:00:00 2001=0A=
-From: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
-Date: Wed, 7 Aug 2019 07:15:32 -0700=0A=
-Subject: [PATCH] libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD=
-=0A=
- check=0A=
-=0A=
-Vhost user protocol features are set as a bitmask. And the following=0A=
-constant VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD value is 10 because the bit=0A=
-10 indicates if the features is set or not.=0A=
-=0A=
-The proper way to check for the presence or absence of this feature is=0A=
-to shift 1 by the value of this constant and then mask it with the=0A=
-actual bitmask representing the supported protocol features.=0A=
-=0A=
-This patch aims to fix the current code as it was not doing the=0A=
-shifting, but instead it was masking directly with the value of the=0A=
-constant itself.=0A=
-=0A=
-Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
----=0A=
- contrib/libvhost-user/libvhost-user.c | 8 +++++---=0A=
- 1 file changed, 5 insertions(+), 3 deletions(-)=0A=
-=0A=
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c=0A=
-index fb61142bcc..8ff387deff 100644=0A=
---- a/contrib/libvhost-user/libvhost-user.c=0A=
-+++ b/contrib/libvhost-user/libvhost-user.c=0A=
-@@ -71,7 +71,7 @@=0A=
-=0A=
- /* The version of the protocol we support */=0A=
- #define VHOST_USER_VERSION 1=0A=
--#define LIBVHOST_USER_DEBUG 0=0A=
-+#define LIBVHOST_USER_DEBUG 1=0A=
-=0A=
- #define DPRINT(...)                             \=0A=
-     do {                                        \=0A=
-@@ -1112,7 +1112,8 @@ bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *=
-vq, int fd,=0A=
-=0A=
-     vmsg.fd_num =3D fd_num;=0A=
-=0A=
--    if ((dev->protocol_features & VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD) =3D=
-=3D 0) {=0A=
-+    if ((dev->protocol_features &=0A=
-+        (1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) =3D=3D 0) {=0A=
-         return false;=0A=
-     }=0A=
-=0A=
-@@ -2537,7 +2538,8 @@ int64_t vu_fs_cache_request(VuDev *dev, VhostUserSlav=
-eRequest req, int fd,=0A=
-=0A=
-     vmsg.fd_num =3D fd_num;=0A=
-=0A=
--    if ((dev->protocol_features & VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD) =3D=
-=3D 0) {=0A=
-+    if ((dev->protocol_features &=0A=
-+        (1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) =3D=3D 0) {=0A=
-         return -EINVAL;=0A=
-     }=0A=
-=0A=
---=0A=
-2.17.1=0A=
-=0A=
-________________________________________=0A=
-From: Boeuf, Sebastien=0A=
-Sent: Wednesday, August 07, 2019 9:24 AM=0A=
-To: dgilbert@redhat.com=0A=
-Cc: marcandre.lureau@redhat.com; qemu-devel@nongnu.org=0A=
-Subject: Re: libvhost-user: Fix the VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD che=
-ck=0A=
-=0A=
-On Wed, 2019-08-07 at 17:09 +0100, Dr. David Alan Gilbert wrote:=0A=
-> * Boeuf, Sebastien (sebastien.boeuf@intel.com) wrote:=0A=
-> > From 0a53a81db6dd069f9b7bcdcd386845bceb3a2ac6 Mon Sep 17 00:00:00=0A=
-> > 2001=0A=
-> > From: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
-> > Date: Wed, 7 Aug 2019 07:15:32 -0700=0A=
-> > Subject: [PATCH] libvhost-user: Fix the=0A=
-> > VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD=0A=
-> >  check=0A=
-> >=0A=
-> > Vhost user protocol features are set as a bitmask. And the=0A=
-> > following=0A=
-> > constant VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD value is 10 because=0A=
-> > the=0A=
-> > bit=0A=
-> > 10 indicates if the features is set or not.=0A=
-> >=0A=
-> > The proper way to check for the presence or absence of this feature=0A=
-> > is=0A=
-> > to shift 1 by the value of this constant and then mask it with the=0A=
-> > actual bitmask representing the supported protocol features.=0A=
-> >=0A=
-> > This patch aims to fix the current code as it was not doing the=0A=
-> > shifting, but instead it was masking directly with the value of the=0A=
-> > constant itself.=0A=
-> >=0A=
-> > Signed-off-by: Sebastien Boeuf <sebastien.boeuf@intel.com>=0A=
->=0A=
-> Nicely spotted.=0A=
->=0A=
-> Two things;=0A=
->   a) I think your mail client has wrapped the lines at some point.=0A=
->   b) I think this is why the has_feature() functione exists, so does=0A=
->      that become=0A=
->=0A=
->       if (!has_feature(dev->protocol_features,=0A=
-> VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD))=0A=
-=0A=
-Ah yes but that's because I forgot to check the patch format first :(=0A=
-=0A=
-I'm going to update the patch.=0A=
-=0A=
-Thanks,=0A=
-Sebastien=0A=
->=0A=
-> Dave=0A=
->=0A=
-> > ---=0A=
-> >  contrib/libvhost-user/libvhost-user.c | 4 ++--=0A=
-> >  1 file changed, 2 insertions(+), 2 deletions(-)=0A=
-> >=0A=
-> > diff --git a/contrib/libvhost-user/libvhost-user.c=0A=
-> > b/contrib/libvhost-=0A=
-> > user/libvhost-user.c=0A=
-> > index fb61142bcc..11909fb7c1 100644=0A=
-> > --- a/contrib/libvhost-user/libvhost-user.c=0A=
-> > +++ b/contrib/libvhost-user/libvhost-user.c=0A=
-> > @@ -1112,7 +1112,7 @@ bool vu_set_queue_host_notifier(VuDev *dev,=0A=
-> > VuVirtq *vq, int fd,=0A=
-> >=0A=
-> >      vmsg.fd_num =3D fd_num;=0A=
-> >=0A=
-> > -    if ((dev->protocol_features &=0A=
-> > VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)=0A=
-> > =3D=3D 0) {=0A=
-> > +    if ((dev->protocol_features & (1ULL <<=0A=
-> > VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) =3D=3D 0) {=0A=
-> >          return false;=0A=
-> >      }=0A=
-> >=0A=
-> > @@ -2537,7 +2537,7 @@ int64_t vu_fs_cache_request(VuDev *dev,=0A=
-> > VhostUserSlaveRequest req, int fd,=0A=
-> >=0A=
-> >      vmsg.fd_num =3D fd_num;=0A=
-> >=0A=
-> > -    if ((dev->protocol_features &=0A=
-> > VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)=0A=
-> > =3D=3D 0) {=0A=
-> > +    if ((dev->protocol_features & (1ULL <<=0A=
-> > VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD)) =3D=3D 0) {=0A=
-> >          return -EINVAL;=0A=
-> >      }=0A=
-> >=0A=
-> > --=0A=
-> > 2.17.1=0A=
->=0A=
-> --=0A=
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK=0A=
+On Wed, 07 Aug 2019 09:41:17 PDT (-0700), Peter Maydell wrote:
+> On Wed, 7 Aug 2019 at 16:02, Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> The ISA strings we're providing from QEMU aren't actually legal RISC-V
+>> ISA strings, as both the S and U extensions cannot exist as
+>> single-letter extensions and must instead be multi-letter strings.
+>> We're still using the ISA strings inside QEMU to track the availiable
+>> extensions, so this patch just strips out the S and U extensions when
+>> formatting ISA strings.
+>>
+>> This boots Linux on top of 4.1-rc3, which no longer has the U extension
+>> in /proc/cpuinfo.
+>>
+>> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>> ---
+>> This is another late one, but I'd like to target it for 4.1 as we're
+>> providing illegal ISA strings and I don't want to bake that into a bunch
+>> of other code.
+>> ---
+>>  target/riscv/cpu.c | 17 ++++++++++++++++-
+>>  1 file changed, 16 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+>> index f8d07bd20ad7..4df14433d789 100644
+>> --- a/target/riscv/cpu.c
+>> +++ b/target/riscv/cpu.c
+>> @@ -501,7 +501,22 @@ char *riscv_isa_string(RISCVCPU *cpu)
+>>      char *p = isa_str + snprintf(isa_str, maxlen, "rv%d", TARGET_LONG_BITS);
+>>      for (i = 0; i < sizeof(riscv_exts); i++) {
+>>          if (cpu->env.misa & RV(riscv_exts[i])) {
+>> -            *p++ = qemu_tolower(riscv_exts[i]);
+>> +            char lower = qemu_tolower(riscv_exts[i]);
+>> +            switch (lower) {
+>> +            case 's':
+>> +            case 'u':
+>> +                /*
+>> +                 * The 's' and 'u' extensions shouldn't be passed in the device
+>> +                 * tree, but we still use them internally to track extension
+>> +                 * sets.  Here we just explicitly remove them when formatting
+>> +                 * an ISA string.
+>> +                 */
+>> +                break;
+>> +
+>> +            default:
+>> +                *p++ = qemu_tolower(riscv_exts[i]);
+>
+>  *p++ = lower;  ?
+
+Yes, thanks -- that's why I pulled the variable out in the first place :)
+
+>
+> thanks
+> -- PMM
 
