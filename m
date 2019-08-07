@@ -2,63 +2,85 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAEFC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E30D5C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86A8D222FC
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:15:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A8D222FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id ADE392229C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 16:20:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="C6hsf++5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADE392229C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvOab-0004rs-La
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 12:15:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39626)
+	id 1hvOgI-0006nl-1A
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 12:20:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40633)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hvOaE-0004Rt-V9
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:14:39 -0400
+ (envelope-from <palmer@sifive.com>) id 1hvOft-0006ND-MY
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:20:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hvOaE-0004My-0D
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:14:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50874)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hvOaD-0004MG-RD
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:14:37 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D28837BDB1;
- Wed,  7 Aug 2019 16:14:36 +0000 (UTC)
-Received: from work-vm (ovpn-117-204.ams2.redhat.com [10.36.117.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A81F5D70D;
- Wed,  7 Aug 2019 16:14:35 +0000 (UTC)
-Date: Wed, 7 Aug 2019 17:14:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Message-ID: <20190807161432.GJ2867@work-vm>
-References: <20190806165429.19327-1-brijesh.singh@amd.com>
- <20190806165429.19327-6-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190806165429.19327-6-brijesh.singh@amd.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Wed, 07 Aug 2019 16:14:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 05/14] hw/machine: add helper to query
- the memory encryption state
+ (envelope-from <palmer@sifive.com>) id 1hvOfr-0001bs-Lc
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:20:29 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41397)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hvOfp-0001XI-Jo
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 12:20:25 -0400
+Received: by mail-pl1-x642.google.com with SMTP id m9so41393776pls.8
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 09:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=wmtlTJ2PpsGte4ZT3WDWrcjPOSh5JWo89KaQNHqHsB4=;
+ b=C6hsf++5Kn5CJ166WzCUMDoH9cVQ3G0qOc0H4nt6U9qCb6r4x7tFhr0D/rJDzgOkwl
+ DKMOBrwcKNKOtY6V/pQs7GtmpVSmRqknoYkRwVMSelQBoYG8A+4LaSsS7ei6nNGtMLwc
+ Kv11RHXYZx7cAR8AL90o3wZDW8IyZTwFtmZBoT+6UeU2xJ8PR5az7Yb2G1G4xop4IuhV
+ o8/qyBiDbFcRhanwwe4LknDGMLORrnaCmmeKbCzMC7HLmBYft6ZNHvJz7mSP+h/Z4zxa
+ Uzbw9Fnpx5GGjqNS41faWjT+CVkHjaY9er4unxNOfkPpLHQWItFsViV79KEb13rse9Qd
+ 1s0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=wmtlTJ2PpsGte4ZT3WDWrcjPOSh5JWo89KaQNHqHsB4=;
+ b=diVzCLYua4sN+2sHc3/tVAxFA7VsDbbLN/pLW2qJoYHbxthUF7hWH9DbcPK4hjpx57
+ DqPKQYE02GwSXZWXsECfiKmajx1ZaYwAiUQ3dkAK/vIsYsHIROmbkriWj+iZfEhf3Kcl
+ nsUc28BLaJ/v6tynRKB9VNQS6ramYi03SAWS7r/b7RWxJ4khyY8eKA97GsEs/zIPdUxd
+ jaE3cR9YRIgl6E7GyMACRX4AIxdzr3nb3Mz9YqqzR3gY6p27B4+jRRUzx175/i/hk3Z6
+ 0Kvd79AI4Kg8aoswjoPJvVvrwOQco4mHt4jQOP3cGy2V0jTWPiskeVbn9HNuYDoAXRKv
+ c/nQ==
+X-Gm-Message-State: APjAAAVkg3GRi//i144M0r/f0eevt/5UkH33olpQUGJDrvjlG3q7bHnv
+ PaXcH05Tq3DbWlxhutcE05QhRQ==
+X-Google-Smtp-Source: APXvYqywbE6l2fW7mmfgMu4pK4fTvpf6BdQFQ2/jE2k5040hfbZx5ML4/U3p52k+FtFDNCmAsU02Zg==
+X-Received: by 2002:a17:902:2983:: with SMTP id
+ h3mr9029249plb.45.1565194822755; 
+ Wed, 07 Aug 2019 09:20:22 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id x26sm116717148pfq.69.2019.08.07.09.20.21
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 07 Aug 2019 09:20:22 -0700 (PDT)
+Date: Wed, 07 Aug 2019 09:20:22 -0700 (PDT)
+X-Google-Original-Date: Wed, 07 Aug 2019 09:19:59 PDT (-0700)
+In-Reply-To: <CAFEAcA8q-NSx51TkcbLSgVTyHNYjDe5pK5+u9HXABxANQEhT1w@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <mhng-c7e7ab85-6684-4319-85fe-a468eb08a5eb@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: Re: [Qemu-devel] [PATCH for 4.1] RISC-V: Ignore the S and U
+ extensions when formatting ISA strings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,72 +92,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
- Thomas" <Thomas.Lendacky@amd.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: Alistair Francis <Alistair.Francis@wdc.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, Atish Patra <Atish.Patra@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Singh, Brijesh (brijesh.singh@amd.com) wrote:
-> To enable a memory encryption inside a VM, user must pass the object
-> name used for the encryption in command line parameter as shown below.
-> 
-> # $(QEMU) \
->   -machine memory-encryption=<object_name>
-> 
-> Add a helper machine_memory_encryption_enabled() which will return a bool
-> indicating whether the encryption object has been specified in the command
-> line parameter.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, 07 Aug 2019 09:08:20 PDT (-0700), Peter Maydell wrote:
+> On Wed, 7 Aug 2019 at 16:02, Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> The ISA strings we're providing from QEMU aren't actually legal RISC-V
+>> ISA strings, as both the S and U extensions cannot exist as
+>> single-letter extensions and must instead be multi-letter strings.
+>> We're still using the ISA strings inside QEMU to track the availiable
+>> extensions, so this patch just strips out the S and U extensions when
+>> formatting ISA strings.
+>>
+>> This boots Linux on top of 4.1-rc3, which no longer has the U extension
+>> in /proc/cpuinfo.
+>>
+>> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+>> ---
+>> This is another late one, but I'd like to target it for 4.1 as we're
+>> providing illegal ISA strings and I don't want to bake that into a bunch
+>> of other code.
+>
+> Sorry, you've missed the 4.1 train by about 24 hours. There
+> will be no further changes to 4.1 unless they are absolute
+> showstoppers (security bugs, bad data loss, etc), and this doesn't
+> count, judging by the description.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-There's a check in accel/kvm/kvm-all.c:kvm_init which has:
-       if (ms->memory_encryption) {
-
-which you might want to replace by this.
-
-Dave
-
-> ---
->  hw/core/machine.c   | 5 +++++
->  include/hw/boards.h | 1 +
->  2 files changed, 6 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index c58a8e594e..f1e1b3661f 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -1031,6 +1031,11 @@ bool machine_mem_merge(MachineState *machine)
->      return machine->mem_merge;
->  }
->  
-> +bool machine_memory_encryption_enabled(MachineState *machine)
-> +{
-> +    return machine->memory_encryption ? true : false;
-> +}
-> +
->  static char *cpu_slot_to_string(const CPUArchId *cpu)
->  {
->      GString *s = g_string_new(NULL);
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index a71d1a53a5..c5446a39cf 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -76,6 +76,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
->                                 Error **errp);
->  
->  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type);
-> +bool machine_memory_encryption_enabled(MachineState *machine);
->  
->  
->  /**
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+OK, no problem.
 
