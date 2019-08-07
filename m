@@ -2,80 +2,79 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8EAC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F18C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF9CF2086D
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:35:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cpDKUiw1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF9CF2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0C39321E6A
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:38:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C39321E6A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvJHw-0003Nb-4Q
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:35:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45024)
+	id 1hvJL8-00055H-6o
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:38:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45600)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hvJHT-0002hS-DB
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:34:56 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvJKU-000458-GR
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hvJHR-00006T-Nv
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:34:55 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38155)
+ (envelope-from <philmd@redhat.com>) id 1hvJKT-0001bj-AH
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:38:02 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35505)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hvJHR-00005U-Hd
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:34:53 -0400
-Received: by mail-ot1-x344.google.com with SMTP id d17so102380499oth.5
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:34:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GHi1f+voEbXN8hKlRxap0utKOX1Tjporwl0c9C0XDl4=;
- b=cpDKUiw1I/jyIsGTm+dDejVGNs94pPIqMuqaOXCMaBHSDS9cchAV+uye19rqEnDQpe
- VHk2UVwa2JadUGiFnUQgMNzlafT+8BTb7mhNUepAHiSQGz0KmM3cB60SdYp6DwBA97LR
- mZPX73Cl3/ZLthzBFgX7tEkMx5ibJVZiKQWPmrlJhx6DhT4T0F2uxefQtlCxhyU2sLQn
- StUMCgnHaygIDZjGAK0RkVvlZOXqUPa5pDbUPbz5jOavbRgABH8HTsp58Hf/aohI63V5
- 49T7/cC69N1HjLFABicgvPhgNsCVQNSOy4NuyjISiQEqpaOZZaejL4OmVtsJx61QvRhZ
- 0H2w==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvJKT-0001b8-3C
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:38:01 -0400
+Received: by mail-wr1-f66.google.com with SMTP id k2so4975520wrq.2
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:38:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GHi1f+voEbXN8hKlRxap0utKOX1Tjporwl0c9C0XDl4=;
- b=G8dJwiBGZptZqA0CoHGfor7Qi/0gzD6j32hJ9idvrX12tAENe/IHJ88NriKZy0qNNW
- YsxjMOuBtWJOfP4xZOIWQqp3hw6dgV2DqkVO6O4QsVN16ArHFGP8QRuFghqbXWEn+Bkh
- 12HOn5huUSm825Nb3f12iVSYQdyVh3f3a8blTGN3+o/D2km3wVKn1W5J7GiQ/lwRiaCa
- P4wgYTrUQaSKs+Nb9YJmdmoBJhsgrb1pF/dCZIhhnjCW+JmOfEfLC1Py15Q84LHxzC28
- scTxDIpSyunFBDq2l/TfQtJ4beMCmjmW9a5pNQ2eebvpLn7Aax+HcwkOzWsWvWZooxnn
- jc4w==
-X-Gm-Message-State: APjAAAU15UtDdLUkbB7KryCADSFbuuvtT7ymVFYAk+wNbwWw6JZcLjG6
- xFEe04U/2mICkxGeqAA8/iJASuG7gh3MpaeFt1I90A==
-X-Google-Smtp-Source: APXvYqzgKBVaFc7+ZzBSemdPEhqcLzr3H63/JJXF+IJf02F1bSlSaDJac0QtDR6QrRQipjBcIDNpCJp/E0Pekyc/d/0=
-X-Received: by 2002:a9d:711e:: with SMTP id n30mr6609741otj.97.1565174092162; 
- Wed, 07 Aug 2019 03:34:52 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xGIMuvKiRWGAighMeIoXICvoM84+mSRh6SCMOKg4t50=;
+ b=k+MCfbYSDGzlvT9ITtWoHTKEtnIcJxoPU79dKU3TAfjlrVojs1IQWJmAUCox4ff9/O
+ 7esc22aFNqo3E5l6HHIpMphCo7Qfnc5AlOqdttssmZKryTU0NoBrKWKxlt+YggRWF9mE
+ FYJcDrP93pbgnxJGYRsl0ltrrEVh39ep6IO9X9XQWd2VTWHmaPYI9ZarPq3DCyzmYrW2
+ aBG+XBA7OxAF0yNrn2R/iuC6nsfcYc5yFDZ/6DbAUF0ODujEvBf76W4+caqljjVE6G8X
+ 9ryWQNy3t2vF4QcNpbulcJo3OuHn2zBPi60bx7y22D9nyDN3jIvKGC00OYSsTEvADBtL
+ ONrg==
+X-Gm-Message-State: APjAAAWEWmWUGRoD4HN2EK5xWVuZu0DgRsJRFbtzS6w8Xth3+t98XdLu
+ Hy6z/iZ26ptTpzlp8yhajTbkwQ==
+X-Google-Smtp-Source: APXvYqy4PVePIQDOvyWhEAtzNmLdItuCVcldRUW9KfALbPXIzDY7t2Ssr5gwLrhAtbji1xjO4Hfrdw==
+X-Received: by 2002:adf:f481:: with SMTP id l1mr3615709wro.123.1565174280079; 
+ Wed, 07 Aug 2019 03:38:00 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id c187sm4719394wmd.39.2019.08.07.03.37.56
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 03:37:59 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
+References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <2397186a-a28e-85dd-131c-900e777a60ad@redhat.com>
+Date: Wed, 7 Aug 2019 12:37:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-10-damien.hedde@greensocs.com>
- <20190731063044.GG2032@umbus.fritz.box>
-In-Reply-To: <20190731063044.GG2032@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 7 Aug 2019 11:34:41 +0100
-Message-ID: <CAFEAcA-=rMgKuhtq4AT+QohRXf71biNFDRQaxMctrro7mTV4kQ@mail.gmail.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v3 09/33] add doc about Resettable interface
+In-Reply-To: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.66
+Subject: Re: [Qemu-devel] [PATCH v6 00/26] Invert Endian bit in SPARCv9 MMU
+ TTE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,44 +86,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Damien Hedde <damien.hedde@greensocs.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, sagark@eecs.berkeley.edu, mst@redhat.com,
+ green@moxielogic.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
+ keith.busch@intel.com, jcmvbkbc@gmail.com, frederic.konrad@adacore.com,
+ pbonzini@redhat.com, kraxel@redhat.com, edgar.iglesias@gmail.com,
+ mreitz@redhat.com, pburton@wavecomp.com, marex@denx.de, robh@kernel.org,
+ hare@suse.com, gxt@mprc.pku.edu.cn, berto@igalia.com, proljc@gmail.com,
+ qemu-block@nongnu.org, arikalo@wavecomp.com, jslaby@suse.cz, deller@gmx.de,
+ david@redhat.com, magnus.damm@gmail.com, yuval.shaia@oracle.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, hpoussin@reactos.org,
+ joel@jms.id.au, anthony.perard@citrix.com, marcandre.lureau@redhat.com,
+ david@gibson.dropbear.id.au, jasowang@redhat.com, atar4qemu@gmail.com,
+ antonynpavlov@gmail.com, jiri@resnulli.us, ehabkost@redhat.com,
+ minyard@acm.org, jcd@tribudubois.net, sw@weilnetz.de, alistair@alistair23.me,
+ chouteau@adacore.com, b.galvani@gmail.com, eric.auger@redhat.com,
+ alex.williamson@redhat.com, sstabellini@kernel.org, jan.kiszka@web.de,
+ clg@kaod.org, stefanha@redhat.com, imammedo@redhat.com,
+ xen-devel@lists.xenproject.org, shorne@gmail.com, andrew.smirnov@gmail.com,
+ jsnow@redhat.com, rth@twiddle.net, kwolf@redhat.com, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, xiaoguangrong.eric@gmail.com, qemu-riscv@nongnu.org,
+ andrew@aj.id.au, lersek@redhat.com, crwulff@gmail.com, laurent@vivier.eu,
+ Andrew.Baumann@microsoft.com, sundeep.lkml@gmail.com, i.mitsyanko@gmail.com,
+ michael@walle.cc, paul.durrant@citrix.com, qemu-ppc@nongnu.org,
+ huth@tuxfamily.org, amarkovic@wavecomp.com, kbastian@mail.uni-paderborn.de,
+ cohuck@redhat.com, peter.chubb@nicta.com.au, aurelien@aurel32.net,
+ stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 31 Jul 2019 at 07:33, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> On Mon, Jul 29, 2019 at 04:56:30PM +0200, Damien Hedde wrote:
-> > +The function *resettable_reset* is used to trigger a reset on a given
-> > +object.
-> > +void resettable_reset(Object *obj, bool cold)
-> > +
-> > +The parameter *obj* must implement the Resettable interface.
->
-> And what happens if it doesn't?  This function has no way to report an
-> error.
+On 8/7/19 10:23 AM, tony.nguyen@bt.com wrote:
+[...]
+> v3:
+> - Like v1, the entire TCGMemOp enum is now MemOp.
+> - MemOp target dependant attributes are conditional upon NEED_CPU_H
+> 
+> v4:
+> - Added Paolo Bonzini as include/exec/memop.h maintainer
+> 
+> v5:
+> - Improved commit messages to clarify how interface to access
+>   MemoryRegion will be converted from "unsigned size" to "MemOp op".
+> - Moved cpu_transaction_failed() MemOp conversion from patch #11 to #9
+>   to make review easier.
+> 
+> v6:
+> - Improved commit messages.
+> - Include as patch #1 an earlier posted TARGET_ALIGNED_ONLY configure patch.
+> - Typeless macro SIZE_MEMOP is now inline.
+> - size_memop now includes CONFIG_DEBUG_TCG code.
+> - size_memop now also encodes endianness via MO_TE.
+> - Reverted size_memop operand "unsigned long" back to "unsigned".
+> - Second pass of size_memop to replace no-op place holder with MO_{8|16|32|64}.
+> - Delay memory_region_dispatch_{read,write} operand conversion until no-op
+>   size_memop is implemented so we have proper typing at all points in between.
+> - Fixed bug where not all memory_region_dispatch_{read,write} callers where
+>   encoding endianness into the MemOp operand, see patch #20.
+> - Fixed bug where not all memory_region_dispatch_{read,write} callers were
+>   collapsing their byte swap into adjust_endianness, see patch #20 and #22.
+> - Split byte swap collapsing patch (v5 #11) into #21 and #22.
+> - Corrected non-common *-common-obj to *-obj.
+> - Replaced enum device_endian with MemOp to simplify endianness checks. A
+>   straight forward sed but touched *alot* of files. See patch #16 and #17.
+> - Deleted enum device_endian.
+> - Deleted DEVICE_HOST_ENDIAN definition.
+> - Generalized the description of introduced MemTxAttrs attribute byte_swap.
 
-Trying to reset an object that isn't actually resettable would
-be a programming error -- I think asserting is a reasonable
-response to that.
-
-thanks
--- PMM
+I'm confused I think I already reviewed various patches of your previous
+series but don't see my Reviewed-by tags.
 
