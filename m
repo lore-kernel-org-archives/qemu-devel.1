@@ -2,80 +2,79 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DFEC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE21C32751
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:23:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2730321E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:22:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2730321E6C
+	by mail.kernel.org (Postfix) with ESMTPS id 544C621E6B
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:23:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 544C621E6B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvJ5A-0003Ah-Ge
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:22:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42872)
+	id 1hvJ63-0004E5-Jq
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:23:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43050)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvJ4O-00025o-Sa
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:21:25 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hvJ5a-0003hY-Dk
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:22:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvJ4N-0000VY-Uk
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:21:24 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41242)
+ (envelope-from <pbonzini@redhat.com>) id 1hvJ5Z-00011N-J4
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:22:38 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40943)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvJ4N-0000VD-P9
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:21:23 -0400
-Received: by mail-wr1-f68.google.com with SMTP id c2so87559891wrm.8
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:21:23 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hvJ5Z-00010u-Ck
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:22:37 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v19so79443002wmj.5
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:22:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Ut8rKdsCGjwoDcQe1WfdHDD3p9bP4Zc5XPGg5dYQmXg=;
- b=HxLkA9YqIw6m0RSjQJCN8cO59XrF2hq/ZYzBWXe5qPDqqKna82ZXyLztmhAMGFtpBL
- 7Oa+2UW8qntRhX+nZy8W/ZB8xpID2CGZklMhG/ZfsyOBhJuVKmx3z1pvtKSqfUtt3wCq
- 5F9ClAoQEkK+b075NkCwTOE4wQgZE5JvzhFS/Ae7/4QcK4XVUpgCJpXU9rocKVCVOM2O
- 9JsVX+xlTxbUEfqNkS7xG6+z0dyZoJnxLaA030sIJTJnI9LQfbM2zJphbFMsvhKdVYYE
- 94h8ZzZhP+y6INHoA7RPgdDDK/5obJyGkGqtVfjQO41SGyFdUQ51Ci6Xn1fqOAmumW8X
- cJwQ==
-X-Gm-Message-State: APjAAAUpbBftCBa6/1jFWdmyas3C1zMKp8r1siYmchz1JaSokG7LmV1x
- O/Kr1v+mtHUGxP+YL2MIfwEFSg==
-X-Google-Smtp-Source: APXvYqxiVW/618AkUlNgKntXHr0JvaqLp+UaRw0p49XSvbe07Xv21nAv9fGCt0D56y8Vt6jR37c5MQ==
-X-Received: by 2002:adf:dcc2:: with SMTP id x2mr9834417wrm.55.1565173282052;
- Wed, 07 Aug 2019 03:21:22 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id g17sm71882718wrm.7.2019.08.07.03.21.21
+ bh=0XSyHvDMekjafpUZd/bGO/uyC3MKHMOWHaWq6AQGhdI=;
+ b=cJIGSsH4f7gnTsZnj/FPxjAk7UF7ksYs0qQg7k3ke83b5Wpi+iHRTrV5jExnvhOsP1
+ 4/9tLI663YLv92+vUriuqf9eTMeYftAPNk3aE/9WK+XRi4Nt/JHe/3b9ORBHLJa8DKbj
+ vHLKe6T/l/dcGjheL353rOu9volUS+8uibH/rpYXpIigb/6twNbfiCWcQfHA4eCpP+Bp
+ vHDnb9s9eTATpWhuR0MhdKN3vQ1jw/ixSTn9Rh+5BRFp/W3bHhCt4mPfgyTrRh6Aumup
+ pQ1SJuxWWQd4b/pW117y+nuvbQQdXr/y1vdlxFWIi5+HopP0NHZcBr0ZHoT0f7grrwD0
+ k/Ug==
+X-Gm-Message-State: APjAAAXVcmKV3JFDH6HRfT17zet9SHKbFg5CLVMSxf2xbKu76K6lqQVj
+ S5LBjI2sRafRbpO95JsGVMFUaA==
+X-Google-Smtp-Source: APXvYqyVdY+KG9VE8VYjZChr/Tap/FiuNTb/CIypvYv6TYC5AN3XTQir8qL5hSYXXEgG+OiXanVDmA==
+X-Received: by 2002:a05:600c:10ce:: with SMTP id
+ l14mr9662688wmd.118.1565173356318; 
+ Wed, 07 Aug 2019 03:22:36 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:dc26:ed70:9e4c:3810?
+ ([2001:b07:6468:f312:dc26:ed70:9e4c:3810])
+ by smtp.gmail.com with ESMTPSA id c15sm12952891wrb.80.2019.08.07.03.22.32
  (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 03:21:21 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-6-armbru@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <5a03da74-d9f0-40c2-b961-62a3a63a0330@redhat.com>
-Date: Wed, 7 Aug 2019 12:21:20 +0200
+ Wed, 07 Aug 2019 03:22:35 -0700 (PDT)
+To: tony.nguyen@bt.com, qemu-devel@nongnu.org
+References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
+ <1565166771281.2734@bt.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <efbf3560-76d3-62ba-0f8f-3e8ca8686f1d@redhat.com>
+Date: Wed, 7 Aug 2019 12:22:31 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190806151435.10740-6-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1565166771281.2734@bt.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v2 05/29] queue: Drop superfluous #include
- qemu/atomic.h
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PATCH v6 19/26] exec: Delete DEVICE_HOST_ENDIAN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,39 +86,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ cohuck@redhat.com, sagark@eecs.berkeley.edu, david@redhat.com,
+ jasowang@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
+ i.mitsyanko@gmail.com, keith.busch@intel.com, jcmvbkbc@gmail.com,
+ frederic.konrad@adacore.com, dmitry.fleytman@gmail.com, kraxel@redhat.com,
+ edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn, pburton@wavecomp.com,
+ xiaoguangrong.eric@gmail.com, peter.chubb@nicta.com.au, philmd@redhat.com,
+ robh@kernel.org, hare@suse.com, sstabellini@kernel.org, berto@igalia.com,
+ chouteau@adacore.com, qemu-block@nongnu.org, arikalo@wavecomp.com,
+ jslaby@suse.cz, deller@gmx.de, mst@redhat.com, magnus.damm@gmail.com,
+ jcd@tribudubois.net, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ mreitz@redhat.com, hpoussin@reactos.org, joel@jms.id.au,
+ anthony.perard@citrix.com, xen-devel@lists.xenproject.org,
+ david@gibson.dropbear.id.au, lersek@redhat.com, green@moxielogic.com,
+ atar4qemu@gmail.com, antonynpavlov@gmail.com, marex@denx.de, jiri@resnulli.us,
+ ehabkost@redhat.com, minyard@acm.org, qemu-s390x@nongnu.org, sw@weilnetz.de,
+ alistair@alistair23.me, yuval.shaia@oracle.com, b.galvani@gmail.com,
+ eric.auger@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ jan.kiszka@web.de, clg@kaod.org, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, shorne@gmail.com, jsnow@redhat.com,
+ rth@twiddle.net, kwolf@redhat.com, qemu-riscv@nongnu.org, proljc@gmail.com,
+ andrew@aj.id.au, kbastian@mail.uni-paderborn.de, crwulff@gmail.com,
+ laurent@vivier.eu, Andrew.Baumann@microsoft.com, sundeep.lkml@gmail.com,
+ andrew.smirnov@gmail.com, michael@walle.cc, paul.durrant@citrix.com,
+ qemu-ppc@nongnu.org, huth@tuxfamily.org, amarkovic@wavecomp.com,
+ imammedo@redhat.com, aurelien@aurel32.net, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/6/19 5:14 PM, Markus Armbruster wrote:
-> When commit 5f7d05ecfda added QLIST_INSERT_HEAD_RCU() to qemu/queue.h,
-> it had to include qemu/atomic.h.  Commit 341774fe6cc removed
-> QLIST_INSERT_HEAD_RCU() again, but neglected to remove the #include.
-> Do that now.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 07/08/19 10:32, tony.nguyen@bt.com wrote:
+> +#if defined(HOST_WORDS_BIGENDIAN)
+> + † †.endianness = MO_BE,
+> +#else
+> + † †.endianness = MO_LE,
+> +#endif
 
-Reviewed-by: Philippe Mathieu-Daud√© <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud√© <philmd@redhat.com>
+Host endianness is just 0, isn't it?
 
-> ---
->  include/qemu/queue.h | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-> index 0379bd8fdb..73bf4a984d 100644
-> --- a/include/qemu/queue.h
-> +++ b/include/qemu/queue.h
-> @@ -78,8 +78,6 @@
->   * For details on the use of these macros, see the queue(3) manual page.
->   */
->  
-> -#include "qemu/atomic.h" /* for smp_wmb() */
-> -
->  /*
->   * List definitions.
->   */
-> 
+Paolo
 
