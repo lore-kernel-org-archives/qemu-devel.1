@@ -2,81 +2,80 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B412DC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D35C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FB8221E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:11:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NlSIClBw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FB8221E6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E39E221E6C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 10:11:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39E221E6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvIus-0003tv-PG
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:11:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39485)
+	id 1hvIuw-00041x-6k
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 06:11:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39510)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hvIuO-000381-B9
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:05 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvIuQ-000387-Dj
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hvIuN-0001zB-57
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:04 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:33358)
+ (envelope-from <philmd@redhat.com>) id 1hvIuP-00020y-8q
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:06 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38467)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hvIuM-0001wr-Uc; Wed, 07 Aug 2019 06:11:03 -0400
-Received: by mail-ed1-x541.google.com with SMTP id i11so22193257edq.0;
- Wed, 07 Aug 2019 03:11:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0KnN+XMpD1S23kPFeDkskQsy53U1k3iUrqNXMO5WEB0=;
- b=NlSIClBwKiqwEXVvJKhhuIXPXkK+gSE30EtinpBa0ncvX30sAF5Rjs6ilXyLoXW69m
- m5PclRpVS3fDatPCX9dCushfMToZHOxH9oifrU53cT4dYWS4f/7qDy6AnaFYNwd6Mxod
- F4CNmykJLmkgcCm9y3g7m6EtTcbUk9WoZ52O550+sLnHFDWOgdWMrZQvlCNJCcJapBfn
- 0wEJacSQg8xCRBD+gIDjWFC9XyUZ5wZH7+YsDfzMRr57FMNIEgXW2gHAPaeTr3uD51KC
- hbRUFjaeMHgN4tnQ1qowX24rw9J5wtYPGZdPZA5SMkAqcDk7b9pRhv6pl5OJsA1+4JnZ
- uh2Q==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvIuO-0001zw-WE
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 06:11:05 -0400
+Received: by mail-wr1-f67.google.com with SMTP id g17so90743449wrr.5
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 03:11:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0KnN+XMpD1S23kPFeDkskQsy53U1k3iUrqNXMO5WEB0=;
- b=OJeHF+Ufmdq3YwA+t/mD+sV3BRQ/84k5EU5kA/p27jlOBlcgC9D+8xuuyvgWjsbEYC
- NOeMLrd+U088Ac+iYkrk3c5NeULFSzFphxA9jtkjoy09/Xxbn0nZXabbbIxRCBImYZst
- rVBJdCyOXjKV6e46IDw+SKoTFraqA9zBsQyadoJ5ptEN2K3QYlcgu6vS31avCcd/JUhp
- q/UlcMjF77z9xFyGqUKFZBacDBfZ0oTf/bs65NSF6DPwqrlSh6+p7B8LWXwTEhmxnnHH
- N0YavN9L1Ft1bYjJdiHuUJX16qVkczAWcrqs9uDzALdtiH6xIFLe1pmZdaS2DH8miAx0
- dFFQ==
-X-Gm-Message-State: APjAAAVzVU5HueycS3Q6jlqTP8VE1c98mPpq4ZcVQMNYmXzc+ZoqE7T3
- 8QBAqoFhFrdnFxa8eJ8Mtz3Q4Ud7LQ1Y8YnxHe4=
-X-Google-Smtp-Source: APXvYqx9/phD50K9YF1FAGvyVXiu1GoaTryEilkioa9ZXRZw2xxqf73AU+d8tSB5gnBZN/RkH9uAdXxq32IQ4yw+goI=
-X-Received: by 2002:a50:b388:: with SMTP id s8mr8664469edd.15.1565172661869;
- Wed, 07 Aug 2019 03:11:01 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fV4g7mbDZHsCPADbAoRhrxSei5JcIFUCEAuLE1zzvlc=;
+ b=TK5O0JyQH06vkEhFKxzqnp0WK/li+G5piKRBsr5OLNh1kGXYCJIrl6O8j5jysSNWsg
+ 7TvGUY0CeLM7WZeOYksTSoh67LkJs987N0ogrkV/In9dMVVzoMA9qyfFPQYoP/oKSgr9
+ +7C9s+QRtxWfilddpYdyTJnGXEh1ftOXWWG22JRysIx3/8cIcpyTiUzuQYG8Rtx4bvEA
+ Wb0kcqXGDBnksXMzkNw6yNTjHWpq9CPYf+msBv7bDOhaTapVttj6QSzy1hD56vdUKNrL
+ xR5a738Y2gYhdDLP/JG2Avzp2EHzywZhxWGD57l+UkgcHlEm9Lq+6mEXkTqsJYgQTMhA
+ NjYw==
+X-Gm-Message-State: APjAAAV//XqtYFUvO4amhXKkhz9DkIUo45Nbt7CkGVHYYoQcOEzyfss4
+ S+MpMG0f9HWHtWU4QvHhYZ2+SA==
+X-Google-Smtp-Source: APXvYqzzpQEp0qvvhGOadsl6h0hTGq93+xWZf7bQl9Aktl2k6WEDZ0gR71M34BLURSH+55hqA03GLQ==
+X-Received: by 2002:adf:de10:: with SMTP id b16mr9448205wrm.296.1565172663957; 
+ Wed, 07 Aug 2019 03:11:03 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id y12sm65839909wru.30.2019.08.07.03.11.03
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 03:11:03 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-5-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <4c43b5ba-4204-6a28-d3f1-348d8d25c6d5@redhat.com>
+Date: Wed, 7 Aug 2019 12:11:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <1565163924-18621-1-git-send-email-bmeng.cn@gmail.com>
- <1565163924-18621-12-git-send-email-bmeng.cn@gmail.com>
- <CAEiOBXU9UXEGYjEDP-LJ5mEY-bF+OtMKt4O+LGJh9qQt3OPaew@mail.gmail.com>
-In-Reply-To: <CAEiOBXU9UXEGYjEDP-LJ5mEY-bF+OtMKt4O+LGJh9qQt3OPaew@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 7 Aug 2019 18:10:49 +0800
-Message-ID: <CAEUhbmUO2aFrGXbZDB4uXAKe9kq5NJuwS9mMM6-Pwvn_8h++aA@mail.gmail.com>
-To: Chih-Min Chao <chihmin.chao@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH v2 11/28] riscv: sifive: Rename
- sifive_prci.{c, h} to sifive_e_prci.{c, h}
+In-Reply-To: <20190806151435.10740-5-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2 04/29] memory: Fix type of
+ IOMMUMemoryRegionClass member @parent_class
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,92 +87,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 7, 2019 at 4:54 PM Chih-Min Chao <chihmin.chao@sifive.com> wrote:
->
->
->
-> On Wed, Aug 7, 2019 at 3:49 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->>
->> Current SiFive PRCI model only works with sifive_e machine, as it
->> only emulates registers or PRCI block in the FE310 SoC.
->>
->> Rename the file name to make it clear that it is for sifive_e.
->>
->> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->> ---
->>
->> Changes in v2: None
->>
->>  hw/riscv/Makefile.objs                              |  2 +-
->>  hw/riscv/sifive_e.c                                 |  4 ++--
->>  hw/riscv/{sifive_prci.c => sifive_e_prci.c}         | 14 +++++++-------
->>  include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} | 14 +++++++-------
->>  4 files changed, 17 insertions(+), 17 deletions(-)
->>  rename hw/riscv/{sifive_prci.c => sifive_e_prci.c} (90%)
->>  rename include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} (82%)
->>
->> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
->> index eb9d4f9..c859697 100644
->> --- a/hw/riscv/Makefile.objs
->> +++ b/hw/riscv/Makefile.objs
->> @@ -2,9 +2,9 @@ obj-y += boot.o
->>  obj-$(CONFIG_SPIKE) += riscv_htif.o
->>  obj-$(CONFIG_HART) += riscv_hart.o
->>  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
->> +obj-$(CONFIG_SIFIVE_E) += sifive_e_prci.o
->>  obj-$(CONFIG_SIFIVE) += sifive_clint.o
->>  obj-$(CONFIG_SIFIVE) += sifive_gpio.o
->> -obj-$(CONFIG_SIFIVE) += sifive_prci.o
->>  obj-$(CONFIG_SIFIVE) += sifive_plic.o
->>  obj-$(CONFIG_SIFIVE) += sifive_test.o
->>  obj-$(CONFIG_SIFIVE_U) += sifive_u.o
->> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
->> index 2a499d8..2d67670 100644
->> --- a/hw/riscv/sifive_e.c
->> +++ b/hw/riscv/sifive_e.c
->> @@ -41,9 +41,9 @@
->>  #include "hw/riscv/riscv_hart.h"
->>  #include "hw/riscv/sifive_plic.h"
->>  #include "hw/riscv/sifive_clint.h"
->> -#include "hw/riscv/sifive_prci.h"
->>  #include "hw/riscv/sifive_uart.h"
->>  #include "hw/riscv/sifive_e.h"
->> +#include "hw/riscv/sifive_e_prci.h"
->>  #include "hw/riscv/boot.h"
->>  #include "chardev/char.h"
->>  #include "sysemu/arch_init.h"
->> @@ -174,7 +174,7 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
->>          SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
->>      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.aon",
->>          memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
->> -    sifive_prci_create(memmap[SIFIVE_E_PRCI].base);
->> +    sifive_e_prci_create(memmap[SIFIVE_E_PRCI].base);
->>
->>      /* GPIO */
->>
->
-> I  think adding infix to function name is sufficient and keeping the filename the same may be better.
-> The U board PRCI or variant implementation in future could be included in the same files with different create function
->
+On 8/6/19 5:14 PM, Markus Armbruster wrote:
+> TYPE_IOMMU_MEMORY_REGION is a direct subtype of TYPE_MEMORY_REGION.
+> Its instance struct is IOMMUMemoryRegion, and its first member is a
+> MemoryRegion.  Correct.  Its class struct is IOMMUMemoryRegionClass,
+> and its first member is a DeviceClass.  Wrong.  Messed up when commit
+> 1221a474676 introduced the QOM type.  It even included hw/qdev-core.h
+> just for that.
+> 
+> TYPE_MEMORY_REGION doesn't bother to define a class struct.  This is
+> fine, it simply defaults to its super-type TYPE_OBJECT's class struct
+> ObjectClass.  Changing IOMMUMemoryRegionClass's first member's type to
+> ObjectClass would be a minimal fix, if a bit brittle: if
+> TYPE_MEMORY_REGION ever acquired own class struct, we'd have to update
+> IOMMUMemoryRegionClass to use it.
+> 
+> Fix it the clean and robust way instead: give TYPE_MEMORY_REGION its
+> own class struct MemoryRegionClass now, and use it for
+> IOMMUMemoryRegionClass's first member.
+> 
+> Revert the include of hw/qdev-core.h, and fix the few files that have
+> come to rely on it.
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I considered such approach when working on this one, but later I chose
-to implement a new file for SiFive U machine.
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The SiFive U and E PRCI blocks have different register blocks so if we
-put two variants into one file, their functions don't have much in
-common and we end up just merely physically put them into one file
-which does not bring too much benefit IMHO.
-
-Regards,
-Bin
+> ---
+>  hw/display/vga-isa-mm.c | 1 +
+>  hw/net/pcnet.h          | 1 +
+>  include/exec/memory.h   | 9 +++++++--
+>  memory.c                | 1 +
+>  4 files changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
+> index 215e649719..a790f69b6d 100644
+> --- a/hw/display/vga-isa-mm.c
+> +++ b/hw/display/vga-isa-mm.c
+> @@ -22,6 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/bitops.h"
+>  #include "qemu/units.h"
+>  #include "hw/hw.h"
+>  #include "hw/display/vga.h"
+> diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
+> index 40831a7845..28d19a5c6f 100644
+> --- a/hw/net/pcnet.h
+> +++ b/hw/net/pcnet.h
+> @@ -8,6 +8,7 @@
+>  #define PCNET_LOOPTEST_NOCRC	2
+>  
+>  #include "exec/memory.h"
+> +#include "hw/irq.h"
+>  
+>  /* BUS CONFIGURATION REGISTERS */
+>  #define BCR_MSRDA    0
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index bb0961ddb9..238370a2ff 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -25,7 +25,6 @@
+>  #include "qemu/notify.h"
+>  #include "qom/object.h"
+>  #include "qemu/rcu.h"
+> -#include "hw/qdev-core.h"
+>  
+>  #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+>  
+> @@ -205,6 +204,12 @@ struct MemoryRegionOps {
+>      } impl;
+>  };
+>  
+> +typedef struct MemoryRegionClass {
+> +    /* private */
+> +    ObjectClass parent_class;
+> +} MemoryRegionClass;
+> +
+> +
+>  enum IOMMUMemoryRegionAttr {
+>      IOMMU_ATTR_SPAPR_TCE_FD
+>  };
+> @@ -237,7 +242,7 @@ enum IOMMUMemoryRegionAttr {
+>   */
+>  typedef struct IOMMUMemoryRegionClass {
+>      /* private */
+> -    struct DeviceClass parent_class;
+> +    MemoryRegionClass parent_class;
+>  
+>      /*
+>       * Return a TLB entry that contains a given address.
+> diff --git a/memory.c b/memory.c
+> index 5d8c9a9234..09d9b254fd 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -3245,6 +3245,7 @@ void memory_region_init_rom_device(MemoryRegion *mr,
+>  static const TypeInfo memory_region_info = {
+>      .parent             = TYPE_OBJECT,
+>      .name               = TYPE_MEMORY_REGION,
+> +    .class_size         = sizeof(MemoryRegionClass),
+>      .instance_size      = sizeof(MemoryRegion),
+>      .instance_init      = memory_region_initfn,
+>      .instance_finalize  = memory_region_finalize,
+> 
 
