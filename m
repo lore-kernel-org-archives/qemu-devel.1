@@ -2,92 +2,63 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E48C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8ECC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5908922305
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:02:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5908922305
+	by mail.kernel.org (Postfix) with ESMTPS id 612C922305
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 18:04:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 612C922305
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44179 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvQGM-0005MB-LY
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:02:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33252)
+	id 1hvQIe-0006lj-GB
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 14:04:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33768)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hvQFS-0004Iz-CD
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:01:19 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hvQI5-00061T-VW
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:04:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hvQFR-0000lj-8S
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:01:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60276)
+ (envelope-from <stefanha@redhat.com>) id 1hvQI4-0006wa-VK
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:04:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60206)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hvQFO-0000eE-LE; Wed, 07 Aug 2019 14:01:14 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hvQI4-0006u3-Pn
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 14:04:00 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9A489641C9;
- Wed,  7 Aug 2019 18:01:13 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-24.brq.redhat.com
- [10.40.204.24])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B5C2160BE1;
- Wed,  7 Aug 2019 18:01:06 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
- <20190807080750.15950-5-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <23fd227d-9074-3a9e-b6c7-09f4abadc021@redhat.com>
-Date: Wed, 7 Aug 2019 20:01:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id E8668316D8C3;
+ Wed,  7 Aug 2019 18:03:59 +0000 (UTC)
+Received: from localhost (ovpn-116-50.ams2.redhat.com [10.36.116.50])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB21310016E8;
+ Wed,  7 Aug 2019 18:03:55 +0000 (UTC)
+Date: Wed, 7 Aug 2019 19:03:55 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: virtio-fs@redhat.com, qemu-devel@nongnu.org
+Message-ID: <20190807180355.GA22758@stefanha-x1.localdomain>
+References: <20190801165409.20121-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190807080750.15950-5-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="eY5UdLN4bLnK0UE2iRSemEcBU9aJbuTFJ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
+Content-Disposition: inline
+In-Reply-To: <20190801165409.20121-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Wed, 07 Aug 2019 18:01:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Wed, 07 Aug 2019 18:04:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/8] block/backup: improve unallocated
- clusters skipping
+Subject: Re: [Qemu-devel] [PATCH 0/4] virtiofsd: multithreading preparation
+ part 3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,156 +70,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
+Cc: Liu Bo <bo.liu@linux.alibaba.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eY5UdLN4bLnK0UE2iRSemEcBU9aJbuTFJ
-Content-Type: multipart/mixed; boundary="g2szmPiiB0ykmyTTWHdjAI74Ls3aegkit";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
- stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <23fd227d-9074-3a9e-b6c7-09f4abadc021@redhat.com>
-Subject: Re: [PATCH 4/8] block/backup: improve unallocated clusters skipping
-References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
- <20190807080750.15950-5-vsementsov@virtuozzo.com>
-In-Reply-To: <20190807080750.15950-5-vsementsov@virtuozzo.com>
 
---g2szmPiiB0ykmyTTWHdjAI74Ls3aegkit
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+--RnlQjJ0d97Da+TV1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 07.08.19 10:07, Vladimir Sementsov-Ogievskiy wrote:
-> Limit block_status querying to request bounds on write notifier to
-> avoid extra seeking.
+On Thu, Aug 01, 2019 at 05:54:05PM +0100, Stefan Hajnoczi wrote:
+> Performance
+> -----------
+> Please try these patches out and share your results.
 
-I don=E2=80=99t understand this reasoning.  Checking whether something is=
+Here are the performance numbers:
 
-allocated for qcow2 should just mean an L2 cache lookup.  Which we have
-to do anyway when we try to copy data off the source.
+  Threadpool | iodepth | iodepth
+     size    |    1    |   64
+  -----------+---------+--------
+  None       |   4451  |  4876
+  1          |   4360  |  4858
+  64         |   4359  | 33,266
 
-I could understand saying this makes the code easier, but I actually
-don=E2=80=99t think it does.  If you implemented checking the allocation =
-status
-only for areas where the bitmap is reset (which I think this patch
-should), then it=E2=80=99d just duplicate the existing loop.
+A graph is available here:
+https://vmsplice.net/~stefan/virtiofsd-threadpool-performance.png
 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/backup.c | 38 +++++++++++++++++++++-----------------
->  1 file changed, 21 insertions(+), 17 deletions(-)
->=20
-> diff --git a/block/backup.c b/block/backup.c
-> index 11e27c844d..a4d37d2d62 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
+Summary:
 
-[...]
+ * iodepth=64 performance is increased by 6.8 times.
+ * iodepth=1 performance degrades by 2%.
+ * DAX is bottlenecked by QEMU's single-threaded
+   VHOST_USER_SLAVE_FS_MAP/UNMAP handler.
 
-> @@ -267,6 +267,18 @@ static int coroutine_fn backup_do_cow(BackupBlockJ=
-ob *job,
->      wait_for_overlapping_requests(job, start, end);
->      cow_request_begin(&cow_request, job, start, end);
-> =20
-> +    if (job->initializing_bitmap) {
-> +        int64_t off, chunk;
-> +
-> +        for (off =3D offset; offset < end; offset +=3D chunk) {
+Threadpool size "none" is virtiofsd commit 813a824b707 ("virtiofsd: use
+fuse_lowlevel_is_virtio() in fuse_session_destroy()") without any of the
+multithreading preparation patches.  I benchmarked this to check whether
+the patches introduce a regression for iodepth=1.  They do, but it's
+only around 2%.
 
-This is what I=E2=80=99m referring to, I think this loop should skip area=
-s that
-are clean.
+I also ran with DAX but found there was not much difference between
+iodepth=1 and iodepth=64.  This might be because the host mmap(2)
+syscall becomes the bottleneck and a serialization point.  QEMU only
+processes one VHOST_USER_SLAVE_FS_MAP/UNMAP at a time.  If we want to
+accelerate DAX it may be necessary to parallelize mmap, assuming the
+host kernel can do them in parallel on a single file.  This performance
+optimization is future work and not directly related to this patch
+series.
 
-> +            ret =3D backup_bitmap_reset_unallocated(job, off, end - of=
-f, &chunk);
-> +            if (ret < 0) {
-> +                chunk =3D job->cluster_size;
-> +            }
-> +        }
-> +    }
-> +    ret =3D 0;
-> +
->      while (start < end) {
->          int64_t dirty_end;
-> =20
-> @@ -276,15 +288,6 @@ static int coroutine_fn backup_do_cow(BackupBlockJ=
-ob *job,
->              continue; /* already copied */
->          }
-> =20
-> -        if (job->initializing_bitmap) {
-> -            ret =3D backup_bitmap_reset_unallocated(job, start, &skip_=
-bytes);
-> -            if (ret =3D=3D 0) {
-> -                trace_backup_do_cow_skip_range(job, start, skip_bytes)=
-;
-> -                start +=3D skip_bytes;
-> -                continue;
-> -            }
-> -        }
-> -
->          dirty_end =3D bdrv_dirty_bitmap_next_zero(job->copy_bitmap, st=
-art,
->                                                  end - start);
->          if (dirty_end < 0) {
+The following fio job was run with cache=none and no DAX:
 
-Hm, you resolved that conflict differently from me.
+  [global]
+  runtime=60
+  ramp_time=30
+  filename=/var/tmp/fio.dat
+  direct=1
+  rw=randread
+  bs=4k
+  size=4G
+  ioengine=libaio
+  iodepth=1
 
-I decided the bdrv_dirty_bitmap_next_zero() call should go before the
-backup_bitmap_reset_unallocated() call so that we can then do a
+  [read]
 
-  dirty_end =3D MIN(dirty_end, start + skip_bytes);
+Guest configuration:
+1 vCPU
+4 GB RAM
+Linux 5.1 (vivek-aug-06-2019)
 
-because we probably don=E2=80=99t want to copy anything past what
-backup_bitmap_reset_unallocated() has inquired.
+Host configuration:
+Intel(R) Core(TM) i7-5600U CPU @ 2.60GHz (2 cores x 2 threads)
+8 GB RAM
+Linux 5.1.20-300.fc30.x86_64
+XFS + dm-thin + dm-crypt
+Toshiba THNSFJ256GDNU (256 GB SATA SSD)
 
+Stefan
 
-But then again this patch eliminates the difference anyway...
-
-Max
-
-> @@ -546,7 +549,8 @@ static int coroutine_fn backup_run(Job *job, Error =
-**errp)
->                  goto out;
->              }
-> =20
-> -            ret =3D backup_bitmap_reset_unallocated(s, offset, &count)=
-;
-> +            ret =3D backup_bitmap_reset_unallocated(s, offset, s->len =
-- offset,
-> +                                                  &count);
->              if (ret < 0) {
->                  goto out;
->              }
->=20
-
-
-
---g2szmPiiB0ykmyTTWHdjAI74Ls3aegkit--
-
---eY5UdLN4bLnK0UE2iRSemEcBU9aJbuTFJ
+--RnlQjJ0d97Da+TV1
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1LEeEACgkQ9AfbAGHV
-z0DFOQf/ZqlolhoQr9bg13lKH/idiVUVUF0wdEjb1aobuX6lnaRNgLtb+SYOmk/o
-/PoOBG/FsUgZRBc+/prcC3SEyskIjkmhyUiKIaI16DeXGNPstDTqhSQajIlqHxi1
-37BE2d/EnayLkm0GeA2bGZZhE3MLgQhHJnrk5+hvYZ0/PGCV6Njz3CmDjSIne49a
-qCUXycUAxtb/SnveYc+j/rO4t6g4XiK8lStM+l25EZUGxURyrcl2mwWWqjtk++nS
-PcE7db1EXbz8L215anOvpwU1py20bbsn+vCl4i2iZb2B+vArB19x+6xD5+gzIWSh
-bENyE6Pw2EcxkLE95Yiaw2BwTLFkgw==
-=pI3O
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1LEmwACgkQnKSrs4Gr
+c8gLjQf/UBAHjyJ/mHomkCbE3SaeaZIwfXNA9Zm278DVu9a2vAOhjZ1shtV5b21g
+yDlesefwzFb9u/McYTwf1hbUiYweSy2bNqaRFb9ZsI4EWxqDJRirpTGlioWESzjy
+kdQ3Gh9PRwgdgfXZMBUN01ut07dQKEDSTzlBISHkS5GT56to9NbzprHZh+bwy8NG
+9UenaGzcvEwTxGxEjSekF/UkGwXVnsBOE4Do1MsBK5WJf+T919kUW5043yz1HUyB
+7YfoTtKMo+cyUJaQcyGOOXCs2vhoAVqY/KUYM92RH31shnwbBZK5nAa9wVACGcu2
+fslfzmFxRovmbI6U+QjZrfs+lgQGCg==
+=swFN
 -----END PGP SIGNATURE-----
 
---eY5UdLN4bLnK0UE2iRSemEcBU9aJbuTFJ--
+--RnlQjJ0d97Da+TV1--
 
