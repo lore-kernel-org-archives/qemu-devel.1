@@ -2,92 +2,86 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1877CC32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39279C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:28:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCF2821E73
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:27:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD9A421BF6
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 15:28:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X4q5ZJst"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF2821E73
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="p6ennENR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD9A421BF6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvNqc-0007MI-7I
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:27:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53526)
+	id 1hvNrW-0000p6-7l
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 11:28:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53773)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hvNpl-0006qW-I4
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:26:39 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hvNqx-0008Fa-M4
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hvNpk-0002UX-1S
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:26:37 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39816)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hvNpj-0002Tx-Ni
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:26:35 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t16so1686630wra.6
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 08:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:subject:in-reply-to:date:message-id
- :mime-version:content-transfer-encoding;
- bh=WOTg5KF7EyuEsieJmh6DVJae/NStRnQMDOzZRsN38Kw=;
- b=X4q5ZJstpKGyqf57Fmv0OCEApcUw8DbnFoYsyG/0o0b8IqnfXJZ4TPz5RSwt6iPsTT
- lLcuN9cboggvQSMMaAkbzLySjBtmdy5SaK17irV6TdzRrPvlTYdpRNqfILlVKCOt9TYr
- zsGQ0TQMMgnFI1sbIwxd2wMZXjUIXCxVGOLVa1aZzlabiPbbSCODxxD5Kc2sN/Zrac0y
- yQzs47GU+udG9EUDxXnDxjyrOUBLQiS2r4yT3akkmTiofSH/QfNyUib24SaFzRURjru1
- O+Eaykfbg7zgYoTnr5klXSiikVr7Hybc4Rlxfiq0qtcU+mWdJxLHbpZ2C3Viw8tYutZh
- HNbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=WOTg5KF7EyuEsieJmh6DVJae/NStRnQMDOzZRsN38Kw=;
- b=nIGHoncV8Z745ZiR/BTCeNq3oGSTmXVz6L9sauRKyLNpG5VgWVNKFu3seK1bM1e/4e
- YvgIwU/ia+gTdGjXrlXf1um3Lu5YhxMnKgSRonJiUuF/uZCoIRCIT43hEn6wHmkLPKkS
- sQmQ+mVhadDHwur9B4dkAwHgqmyxT/FF7VKjXZ7vhCA9j9YdJL9AG5wt+QdeGYjtYHJd
- 1qREaM1w4wIa85kuU0ak0jYQOEKu3d+tTePxGsgp38VYKVe6SNlycMAEdBDwkst5PHtN
- Epd0KoMSn9FU04UE9dffDK2TkPVsujlPiNCEu74FYeIxpNv5oTkVeaPVdifyBnDQ7qy1
- jx8w==
-X-Gm-Message-State: APjAAAVIoaXMzjUKUE/bxg22qKQqwwpCbIMM/3I/Za6oJdrjDs7c1tCD
- kkqfrYiqK2XMDHRQ9dYcH4H/D8xSbXM=
-X-Google-Smtp-Source: APXvYqxWfg4/rMetvqasEg4zggLAWz1Xnj28NUub5Wo0SAJm3YV7TjchbGAzmp+P+Q6VFq5wP9+f9w==
-X-Received: by 2002:adf:f281:: with SMTP id k1mr11690782wro.154.1565191594083; 
- Wed, 07 Aug 2019 08:26:34 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x8sm180164wmc.5.2019.08.07.08.26.33
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 07 Aug 2019 08:26:33 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 069321FF87
- for <qemu-devel@nongnu.org>; Wed,  7 Aug 2019 16:26:33 +0100 (BST)
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-29-armbru@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190806151435.10740-29-armbru@redhat.com>
-Date: Wed, 07 Aug 2019 16:26:32 +0100
-Message-ID: <87h86thu8n.fsf@linaro.org>
+ (envelope-from <damien.hedde@greensocs.com>) id 1hvNqw-000314-Jc
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 11:27:51 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:58808)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hvNqs-0002xH-5c; Wed, 07 Aug 2019 11:27:46 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id EC3B796F51;
+ Wed,  7 Aug 2019 15:27:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1565191665;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=h7lZm82hPeFXdiuA9kDLc9kVj83kGNIjYR0pBvnH5gw=;
+ b=p6ennENRvOK9M8ngecsDohdeLyNmzOukYnxBMF4S3vN5ScMdLO3ODx2IPlGGOtc7e0F63T
+ ynBfdzmF+BR9lQECHXN2YQxKVgjYt0d/AaqKgJSPqgPU4g58UYYadnH/4mwxpd5sore7Sn
+ bImjfLi21OMb2QFWLGT52BgaopMYQCY=
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-7-damien.hedde@greensocs.com>
+ <CAFEAcA_PdOUTFAHBWxEvWLa1oP0BCMNs1zBJo-DV3OjrMLpPkA@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <aa5be9e7-8754-8bab-fc90-b5f712647aa1@greensocs.com>
+Date: Wed, 7 Aug 2019 17:27:43 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_PdOUTFAHBWxEvWLa1oP0BCMNs1zBJo-DV3OjrMLpPkA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH v2 28/29] sysemu: Move the
- VMChangeStateEntry typedef to qemu/typedefs.h
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1565191665;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=h7lZm82hPeFXdiuA9kDLc9kVj83kGNIjYR0pBvnH5gw=;
+ b=lOp4JXJqqkVXNCqKFHSocH6PpogmzsEcwShpdA1Vz0F/1hVkly7f/ZnlCvOICgw8Tsw4Fx
+ mOik0k61pbcHY2FLKc9zCQ0z8BMWD1dlAGCk/scpyFIZwP9Dl7UVpjQ+5BecJD9jekNOGD
+ V0tth8GCh3Wi72J5DkOy3k464tXO8SU=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1565191665; a=rsa-sha256; cv=none;
+ b=p0UBGVu+v6MAB/H8enTgws4FSVzQhtAHcfAfjWVQwBYWuq2Xm3byDtVojG6e6osR37huLG
+ NsbjVMwQx1AlViJLRj8sNoxYVYhsy4Lk/gxT944RM5DWgaCttB/bLNTrU/2vEQr32lSxNi
+ x/3gyVKHKqcn0DMQ3eH3o8p1LjpOPH8=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH v3 06/33] add the vmstate description for
+ device reset state
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,224 +93,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
+ Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Markus Armbruster <armbru@redhat.com> writes:
 
-> In my "build everything" tree, changing sysemu/sysemu.h triggers a
-> recompile of some 1800 out of 6600 objects (not counting tests and
-> objects that don't depend on qemu/osdep.h, down from 5400 due to the
-> previous commit).
->
-> Several headers include sysemu/sysemu.h just to get typedef
-> VMChangeStateEntry.  Move it from sysemu/sysemu.h to qemu/typedefs.h.
-> Spell its structure tag the same while there.
->
-> Touching sysemu/sysemu.h now recompiles some 1100 objects.
-> qemu/uuid.h also drops from 1800 to 1100, and
-> qapi/qapi-types-run-state.h from 5000 to 4400.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/block/vhost-user-blk.c   | 1 +
->  hw/block/virtio-blk.c       | 1 +
->  hw/display/virtio-gpu.c     | 1 +
->  hw/misc/macio/macio.c       | 1 +
->  hw/net/virtio-net.c         | 1 +
->  hw/s390x/s390-ccw.c         | 1 +
->  hw/s390x/s390-virtio-ccw.c  | 1 +
->  hw/scsi/scsi-bus.c          | 1 +
->  hw/scsi/vhost-scsi.c        | 1 +
->  hw/scsi/vhost-user-scsi.c   | 1 +
->  hw/usb/hcd-ehci.c           | 1 +
->  hw/usb/hcd-ehci.h           | 1 -
->  hw/virtio/virtio-rng.c      | 1 +
->  hw/virtio/virtio.c          | 1 +
->  include/hw/ide/internal.h   | 3 ++-
->  include/hw/ppc/spapr_xive.h | 1 -
->  include/hw/scsi/scsi.h      | 1 -
->  include/hw/virtio/virtio.h  | 1 -
->  include/qemu/typedefs.h     | 1 +
->  include/sysemu/sysemu.h     | 1 -
->  vl.c                        | 6 +++---
->  21 files changed, 19 insertions(+), 9 deletions(-)
->
-> diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-> index 7b44cca6d9..6b6cd07362 100644
-> --- a/hw/block/vhost-user-blk.c
-> +++ b/hw/block/vhost-user-blk.c
-> @@ -28,6 +28,7 @@
->  #include "hw/virtio/virtio.h"
->  #include "hw/virtio/virtio-bus.h"
->  #include "hw/virtio/virtio-access.h"
-> +#include "sysemu/sysemu.h"
->
->  static const int user_feature_bits[] =3D {
->      VIRTIO_BLK_F_SIZE_MAX,
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 8cc2a232e0..78ac371eba 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -20,6 +20,7 @@
->  #include "hw/block/block.h"
->  #include "hw/qdev-properties.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/sysemu.h"
->  #include "hw/virtio/virtio-blk.h"
->  #include "dataplane/virtio-blk.h"
->  #include "scsi/constants.h"
-> diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-> index 6de9689a30..28e868c021 100644
-> --- a/hw/display/virtio-gpu.c
-> +++ b/hw/display/virtio-gpu.c
-> @@ -17,6 +17,7 @@
->  #include "ui/console.h"
->  #include "trace.h"
->  #include "sysemu/dma.h"
-> +#include "sysemu/sysemu.h"
->  #include "hw/virtio/virtio.h"
->  #include "migration/qemu-file-types.h"
->  #include "hw/virtio/virtio-gpu.h"
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index b59df4e3b8..50f20d8206 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -35,6 +35,7 @@
->  #include "hw/char/escc.h"
->  #include "hw/misc/macio/macio.h"
->  #include "hw/intc/heathrow_pic.h"
-> +#include "sysemu/sysemu.h"
->  #include "trace.h"
->
->  /* Note: this code is strongly inspirated from the corresponding code
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 4113729fcf..9f11422337 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -31,6 +31,7 @@
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/misc.h"
->  #include "standard-headers/linux/ethtool.h"
-> +#include "sysemu/sysemu.h"
->  #include "trace.h"
->
->  #define VIRTIO_NET_VM_VERSION    11
-> diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
-> index 22c6878b84..0c5a5b60bd 100644
-> --- a/hw/s390x/s390-ccw.c
-> +++ b/hw/s390x/s390-ccw.c
-> @@ -19,6 +19,7 @@
->  #include "hw/s390x/css.h"
->  #include "hw/s390x/css-bridge.h"
->  #include "hw/s390x/s390-ccw.h"
-> +#include "sysemu/sysemu.h"
->
->  IOInstEnding s390_ccw_cmd_request(SubchDev *sch)
->  {
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index a543b64e56..434d933ec9 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -40,6 +40,7 @@
->  #include "hw/nmi.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/s390x/tod.h"
-> +#include "sysemu/sysemu.h"
->
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-> index db785e6001..cb8e8d1f36 100644
-> --- a/hw/scsi/scsi-bus.c
-> +++ b/hw/scsi/scsi-bus.c
-> @@ -10,6 +10,7 @@
->  #include "scsi/constants.h"
->  #include "sysemu/block-backend.h"
->  #include "sysemu/blockdev.h"
-> +#include "sysemu/sysemu.h"
->  #include "trace.h"
->  #include "sysemu/dma.h"
->  #include "qemu/cutils.h"
-> diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-> index cd5cf1679d..c693fc748a 100644
-> --- a/hw/scsi/vhost-scsi.c
-> +++ b/hw/scsi/vhost-scsi.c
-> @@ -30,6 +30,7 @@
->  #include "hw/fw-path-provider.h"
->  #include "hw/qdev-properties.h"
->  #include "qemu/cutils.h"
-> +#include "sysemu/sysemu.h"
->
->  /* Features supported by host kernel. */
->  static const int kernel_feature_bits[] =3D {
-> diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-> index a5be128b54..31c9d34637 100644
-> --- a/hw/scsi/vhost-user-scsi.c
-> +++ b/hw/scsi/vhost-user-scsi.c
-> @@ -28,6 +28,7 @@
->  #include "hw/virtio/virtio.h"
->  #include "hw/virtio/virtio-access.h"
->  #include "chardev/char-fe.h"
-> +#include "sysemu/sysemu.h"
->
->  /* Features supported by the host application */
->  static const int user_feature_bits[] =3D {
-> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-> index d7d1ecd45d..e76c939751 100644
-> --- a/hw/usb/hcd-ehci.c
-> +++ b/hw/usb/hcd-ehci.c
-> @@ -35,6 +35,7 @@
->  #include "trace.h"
->  #include "qemu/error-report.h"
->  #include "qemu/main-loop.h"
-> +#include "sysemu/sysemu.h"
->
->  #define FRAME_TIMER_FREQ 1000
->  #define FRAME_TIMER_NS   (NANOSECONDS_PER_SECOND / FRAME_TIMER_FREQ)
-> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-> index fdbcfdcbeb..0298238f0b 100644
-> --- a/hw/usb/hcd-ehci.h
-> +++ b/hw/usb/hcd-ehci.h
-> @@ -21,7 +21,6 @@
->  #include "qemu/timer.h"
->  #include "hw/usb.h"
->  #include "sysemu/dma.h"
-> -#include "sysemu/sysemu.h"
->  #include "hw/pci/pci.h"
->  #include "hw/sysbus.h"
->
-> diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
-> index 34b4619fd3..c9c2414b7b 100644
-> --- a/hw/virtio/virtio-rng.c
-> +++ b/hw/virtio/virtio-rng.c
-> @@ -17,6 +17,7 @@
->  #include "hw/qdev-properties.h"
->  #include "hw/virtio/virtio-rng.h"
->  #include "sysemu/rng.h"
-> +#include "sysemu/sysemu.h"
->  #include "qom/object_interfaces.h"
->  #include "trace.h"
->
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 721dcccc96..0ce142bc04 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -26,6 +26,7 @@
->  #include "hw/qdev-properties.h"
->  #include "hw/virtio/virtio-access.h"
->  #include "sysemu/dma.h"
-> +#include "sysemu/sysemu.h"
+On 8/7/19 4:54 PM, Peter Maydell wrote:
+> On Mon, 29 Jul 2019 at 15:58, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>> It contains the resetting counter and cold flag status.
+>>
+>> At this point, migration of bus reset related state (counter and cold/warm
+>> flag) is handled by parent device. This done using the post_load
+>> function in the vmsd subsection.
+>>
+>> This is last point allow to add an initial support of migration with part of
+>> qdev/qbus tree in reset state under the following condition:
+>> + time-lasting reset are asserted on Device only
+>>
+>> Note that if this condition is not respected, migration will succeed and
+>> no failure will occurs. The only impact is that the resetting counter
+>> of a bus may lower afer a migration.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> 
+> 
+>> +const struct VMStateDescription device_vmstate_reset = {
+>> +    .name = "device_reset",
+>> +    .version_id = 0,
+>> +    .minimum_version_id = 0,
+>> +    .needed = device_vmstate_reset_needed,
+>> +    .post_load = device_vmstate_reset_post_load,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_UINT32(resetting, DeviceState),
+>> +        VMSTATE_BOOL(reset_is_cold, DeviceState),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> -
+> 
+> Forgot to ask -- why don't we migrate the hold_needed flags?
 
-I'm confused - why do these now need to include sysemu.h if the only
-change to sysemu.h is to drop:
+The flag is only used to keep the info between executing the init
+and hold phases. We can't interrupt the code in between since this
+mess is during resettable_assert_reset method which is atomic.
+I can add a comment to explain that.
 
- typedef struct vm_change_state_entry VMChangeStateEntry;
-
-in favour of the typedefs header?
-
---
-Alex Benn=C3=A9e
+> 
+> thanks
+> -- PMM
+> 
 
