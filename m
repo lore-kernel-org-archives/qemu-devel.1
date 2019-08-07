@@ -2,51 +2,48 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473E1C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FBE3C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:14:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B92521E6C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:14:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B92521E6C
+	by mail.kernel.org (Postfix) with ESMTPS id 4769A21E6C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 14:14:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4769A21E6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41635 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvMhy-0004Wo-AJ
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:14:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36638)
+	id 1hvMiD-0004hl-IM
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 10:14:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36609)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg8-0007nt-Ks
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg8-0007lN-1e
  for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg7-0003Kk-EL
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:36 -0400
-Received: from relay.sw.ru ([185.231.240.75]:40638)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hvMg6-0003Jo-Nc
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 10:12:35 -0400
+Received: from relay.sw.ru ([185.231.240.75]:40654)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hvMg4-0003D0-Bh; Wed, 07 Aug 2019 10:12:32 -0400
+ id 1hvMg4-0003D2-1Z; Wed, 07 Aug 2019 10:12:32 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1hvMg0-0005oH-8Q; Wed, 07 Aug 2019 17:12:28 +0300
+ id 1hvMfz-0005oH-6E; Wed, 07 Aug 2019 17:12:27 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Wed,  7 Aug 2019 17:12:25 +0300
-Message-Id: <20190807141226.193501-10-vsementsov@virtuozzo.com>
+Date: Wed,  7 Aug 2019 17:12:16 +0300
+Message-Id: <20190807141226.193501-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190807141226.193501-1-vsementsov@virtuozzo.com>
-References: <20190807141226.193501-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v4 09/10] block/qcow2-bitmap: fix and improve
- qcow2_reopen_bitmaps_rw
+Subject: [Qemu-devel] [PATCH v4 00/10] qcow2-bitmaps: rewrite reopening logic
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,112 +61,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-- Correct check for write access to file child, and in correct place
-  (only if we want to write).
-- Support reopen rw -> rw (which will be used in following commit),
-  for example, !bdrv_dirty_bitmap_readonly() is not a corruption if
-  bitmap is marked IN_USE in the image.
-- Consider unexpected bitmap as a corruption and check other
-  combinations of in-image and in-RAM bitmaps.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/qcow2-bitmap.c | 56 +++++++++++++++++++++++++++++---------------
- 1 file changed, 37 insertions(+), 19 deletions(-)
+Bitmaps reopening is buggy, reopening-rw just not working at all and
+reopening-ro may lead to producing broken incremental
+backup if we do temporary snapshot in a meantime.
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index a636dc50ca..e276a95154 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1108,18 +1108,14 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
-     Qcow2BitmapList *bm_list;
-     Qcow2Bitmap *bm;
-     GSList *ro_dirty_bitmaps = NULL;
--    int ret = 0;
-+    int ret = -EINVAL;
-+    bool need_header_update = false;
- 
-     if (s->nb_bitmaps == 0) {
-         /* No bitmaps - nothing to do */
-         return 0;
-     }
- 
--    if (!can_write(bs)) {
--        error_setg(errp, "Can't write to the image on reopening bitmaps rw");
--        return -EINVAL;
--    }
--
-     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-                                s->bitmap_directory_size, errp);
-     if (bm_list == NULL) {
-@@ -1128,32 +1124,54 @@ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
- 
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-         BdrvDirtyBitmap *bitmap = bdrv_find_dirty_bitmap(bs, bm->name);
--        if (bitmap == NULL) {
--            continue;
--        }
- 
--        if (!bdrv_dirty_bitmap_readonly(bitmap)) {
--            error_setg(errp, "Bitmap %s was loaded prior to rw-reopen, but was "
--                       "not marked as readonly. This is a bug, something went "
--                       "wrong. All of the bitmaps may be corrupted", bm->name);
--            ret = -EINVAL;
-+        if (!bitmap) {
-+            error_setg(errp, "Unexpected bitmap '%s' in the image '%s'",
-+                       bm->name, bs->filename);
-             goto out;
-         }
- 
--        bm->flags |= BME_FLAG_IN_USE;
--        ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
-+        if (!(bm->flags & BME_FLAG_IN_USE)) {
-+            if (!bdrv_dirty_bitmap_readonly(bitmap)) {
-+                error_setg(errp, "Corruption: bitmap '%s' is not marked IN_USE "
-+                           "in the image '%s' and not marked readonly in RAM",
-+                           bm->name, bs->filename);
-+                goto out;
-+            }
-+            if (bdrv_dirty_bitmap_inconsistent(bitmap)) {
-+                error_setg(errp, "Corruption: bitmap '%s' is inconsistent but "
-+                           "is not marked IN_USE in the image '%s'", bm->name,
-+                           bs->filename);
-+                goto out;
-+            }
-+
-+            bm->flags |= BME_FLAG_IN_USE;
-+            need_header_update = true;
-+        }
-+
-+        if (bdrv_dirty_bitmap_readonly(bitmap)) {
-+            ro_dirty_bitmaps = g_slist_append(ro_dirty_bitmaps, bitmap);
-+        }
-     }
- 
--    if (ro_dirty_bitmaps != NULL) {
-+    if (need_header_update) {
-+        if (!can_write(bs->file->bs) || !(bs->file->perm & BLK_PERM_WRITE)) {
-+            error_setg(errp, "Failed to reopen bitmaps rw: no write access "
-+                       "the protocol file");
-+            goto out;
-+        }
-+
-         /* in_use flags must be updated */
-         ret = update_ext_header_and_dir_in_place(bs, bm_list);
-         if (ret < 0) {
--            error_setg_errno(errp, -ret, "Can't update bitmap directory");
-+            error_setg_errno(errp, -ret, "Cannot update bitmap directory");
-             goto out;
-         }
--        g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-     }
- 
-+    g_slist_foreach(ro_dirty_bitmaps, set_readonly_helper, false);
-+    ret = 0;
-+
- out:
-     g_slist_free(ro_dirty_bitmaps);
-     bitmap_list_free(bm_list);
+v4: Drop complicated solution around reopening logic [Kevin], fix
+    the existing bug in a simplest way
+
+Structure:
+
+02: fix reopen to RW
+03: test reopen to RW
+
+07: fix reopen to RO
+08: test reopen to RO
+
+Others are less significant improvements and refactoring
+
+Changelog:
+
+01-03: new patches, to fix reopening bitmaps to RW and personal test for
+       this bug
+08: merged test from v3, it covers both bugs (reopen to RW and reopen to RO)
+10: instead of moving bitmap-reopening to prepare(as in 09 in v3) we now keep it
+    in commit, but in right place
+others: unchanged
+
+v3:
+02: John's events_wait already merged in, so my 02 from v2 is not needed.
+    Instead, add two simple logging wrappers here
+03: rebase on 02 - use new wrappers, move to 260
+05: add John's r-b
+06: improve function docs [John], add John's r-b
+
+v2:
+01: new
+02-03: test: splat into two patches, some wording
+       improvements and event_wait improved
+04: add John's r-b
+05: new
+06-09: fixes: changed, splat, use patch 01
+
+Vladimir Sementsov-Ogievskiy (10):
+  block: switch reopen queue from QSIMPLEQ to QTAILQ
+  block: reverse order for reopen commits
+  iotests: add test-case to 165 to test reopening qcow2 bitmaps to RW
+  iotests.py: add event_wait_log and events_wait_log helpers
+  block/qcow2-bitmap: get rid of bdrv_has_changed_persistent_bitmaps
+  block/qcow2-bitmap: drop qcow2_reopen_bitmaps_rw_hint()
+  block/qcow2-bitmap: do not remove bitmaps on reopen-ro
+  iotests: add test 260 to check bitmap life after snapshot + commit
+  block/qcow2-bitmap: fix and improve qcow2_reopen_bitmaps_rw
+  qcow2-bitmap: move bitmap reopen-rw code to qcow2_reopen_commit
+
+ block/qcow2.h                 |   5 +-
+ include/block/block.h         |   2 +-
+ include/block/block_int.h     |   6 --
+ include/block/dirty-bitmap.h  |   1 -
+ block.c                       |  51 +++++-------
+ block/dirty-bitmap.c          |  12 ---
+ block/qcow2-bitmap.c          | 143 ++++++++++++++++++++--------------
+ block/qcow2.c                 |  17 +++-
+ tests/qemu-iotests/165        |  46 ++++++++++-
+ tests/qemu-iotests/165.out    |   4 +-
+ tests/qemu-iotests/260        |  87 +++++++++++++++++++++
+ tests/qemu-iotests/260.out    |  52 +++++++++++++
+ tests/qemu-iotests/group      |   1 +
+ tests/qemu-iotests/iotests.py |  10 +++
+ 14 files changed, 318 insertions(+), 119 deletions(-)
+ create mode 100755 tests/qemu-iotests/260
+ create mode 100644 tests/qemu-iotests/260.out
+
 -- 
 2.18.0
 
