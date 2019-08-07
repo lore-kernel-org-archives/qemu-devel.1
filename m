@@ -6,49 +6,50 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F2BC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B299C19759
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0F012238C
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0F012238C
+	by mail.kernel.org (Postfix) with ESMTPS id 60AF02238C
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:38:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60AF02238C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvHSj-0003ml-QD
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:38:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45297)
+	id 1hvHTD-0005Io-N7
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:38:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46305)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tony.nguyen@bt.com>) id 1hvHNG-0001p5-Go
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:32:47 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hvHQd-0000Lf-Rc
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:36:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hvHNF-0002cR-4p
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:32:46 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.77]:9795)
+ (envelope-from <tony.nguyen@bt.com>) id 1hvHQb-0004hY-AQ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:36:15 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.78]:48605)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hvHN0-0002VN-8U; Wed, 07 Aug 2019 04:32:30 -0400
+ id 1hvHQ8-0004KN-7j; Wed, 07 Aug 2019 04:35:44 -0400
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- BWP09926082.bt.com (10.36.82.113) with Microsoft SMTP Server (version=TLS1_2, 
+ BWP09926083.bt.com (10.36.82.114) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Wed, 7 Aug
- 2019 09:32:14 +0100
+ 2019 09:35:32 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
  tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 09:32:27 +0100
+ Server (TLS) id 15.0.1395.4; Wed, 7 Aug 2019 09:35:41 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Wed, 7 Aug 2019
- 09:32:27 +0100
+ 09:35:41 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v6 18/26] exec: Delete device_endian
-Thread-Index: AQHVTPqlw4QCqX/rC0CPqHm682cCsg==
-Date: Wed, 7 Aug 2019 08:32:27 +0000
-Message-ID: <1565166747494.26346@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v6 26/26] target/sparc: sun4u Invert Endian
+ TTE bit
+Thread-Index: AQHVTPsYByi6svInOEeTzdAlz34bIw==
+Date: Wed, 7 Aug 2019 08:35:41 +0000
+Message-ID: <1565166941186.41868@bt.com>
 References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -59,11 +60,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.44]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.77
+X-Received-From: 213.121.35.78
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel]  [PATCH v6 18/26] exec: Delete device_endian
+Subject: [Qemu-devel] [PATCH v6 26/26] target/sparc: sun4u Invert Endian TTE
+ bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,32 +108,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-device_endian has been made redundant by MemOp.
+This bit configures endianness of PCI MMIO devices. It is used by
+Solaris and OpenBSD sunhme drivers.
+
+Tested working on OpenBSD.
+
+Unfortunately Solaris 10 had a unrelated keyboard issue blocking
+testing... another inch towards Solaris 10 on SPARC64 =3D)
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/cpu-common.h | 8 --------
- 1 file changed, 8 deletions(-)
+ target/sparc/cpu.h        | 2 ++
+ target/sparc/mmu_helper.c | 8 +++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
-index 01a29ba..7eeb78c 100644
---- a/include/exec/cpu-common.h
-+++ b/include/exec/cpu-common.h
-@@ -18,14 +18,6 @@ void tcg_flush_softmmu_tlb(CPUState *cs);
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 1406f0b..c6bafa8 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -275,6 +275,7 @@ enum {
 
- #include "exec/memop.h"
+ #define TTE_VALID_BIT       (1ULL << 63)
+ #define TTE_NFO_BIT         (1ULL << 60)
++#define TTE_IE_BIT          (1ULL << 59)
+ #define TTE_USED_BIT        (1ULL << 41)
+ #define TTE_LOCKED_BIT      (1ULL <<  6)
+ #define TTE_SIDEEFFECT_BIT  (1ULL <<  3)
+@@ -291,6 +292,7 @@ enum {
 
--enum device_endian {
--#ifdef NEED_CPU_H
--    DEVICE_NATIVE_ENDIAN =3D MO_TE,
--#endif
--    DEVICE_BIG_ENDIAN =3D MO_BE,
--    DEVICE_LITTLE_ENDIAN =3D MO_LE,
--};
--
- #if defined(HOST_WORDS_BIGENDIAN)
- #define DEVICE_HOST_ENDIAN MO_BE
- #else
+ #define TTE_IS_VALID(tte)   ((tte) & TTE_VALID_BIT)
+ #define TTE_IS_NFO(tte)     ((tte) & TTE_NFO_BIT)
++#define TTE_IS_IE(tte)      ((tte) & TTE_IE_BIT)
+ #define TTE_IS_USED(tte)    ((tte) & TTE_USED_BIT)
+ #define TTE_IS_LOCKED(tte)  ((tte) & TTE_LOCKED_BIT)
+ #define TTE_IS_SIDEEFFECT(tte) ((tte) & TTE_SIDEEFFECT_BIT)
+diff --git a/target/sparc/mmu_helper.c b/target/sparc/mmu_helper.c
+index 826e14b..77dc86a 100644
+--- a/target/sparc/mmu_helper.c
++++ b/target/sparc/mmu_helper.c
+@@ -537,6 +537,10 @@ static int get_physical_address_data(CPUSPARCState *en=
+v, hwaddr *physical,
+         if (ultrasparc_tag_match(&env->dtlb[i], address, context, physical=
+)) {
+             int do_fault =3D 0;
+
++            if (TTE_IS_IE(env->dtlb[i].tte)) {
++                attrs->byte_swap =3D true;
++            }
++
+             /* access ok? */
+             /* multiple bits in SFSR.FT may be set on TT_DFAULT */
+             if (TTE_IS_PRIV(env->dtlb[i].tte) && is_user) {
+@@ -792,7 +796,7 @@ void dump_mmu(CPUSPARCState *env)
+             }
+             if (TTE_IS_VALID(env->dtlb[i].tte)) {
+                 qemu_printf("[%02u] VA: %" PRIx64 ", PA: %llx"
+-                            ", %s, %s, %s, %s, ctx %" PRId64 " %s\n",
++                            ", %s, %s, %s, %s, ie %s, ctx %" PRId64 " %s\n=
+",
+                             i,
+                             env->dtlb[i].tag & (uint64_t)~0x1fffULL,
+                             TTE_PA(env->dtlb[i].tte),
+@@ -801,6 +805,8 @@ void dump_mmu(CPUSPARCState *env)
+                             TTE_IS_W_OK(env->dtlb[i].tte) ? "RW" : "RO",
+                             TTE_IS_LOCKED(env->dtlb[i].tte) ?
+                             "locked" : "unlocked",
++                            TTE_IS_IE(env->dtlb[i].tte) ?
++                            "yes" : "no",
+                             env->dtlb[i].tag & (uint64_t)0x1fffULL,
+                             TTE_IS_GLOBAL(env->dtlb[i].tte) ?
+                             "global" : "local");
 --
 1.8.3.1
 
