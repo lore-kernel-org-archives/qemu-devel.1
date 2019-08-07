@@ -2,67 +2,82 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AE0C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:53:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64316C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:55:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA1E8223CB
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:53:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA1E8223CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3546D223CB
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 08:55:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Hfy+1sA8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3546D223CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvHhE-0006xt-W8
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:53:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48413)
+	id 1hvHj5-00083Z-DQ
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 04:55:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48593)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hvHgo-0006Y1-6K
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:52:59 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1hvHid-0007dG-Mt
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:54:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hvHgm-0006aC-US
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:52:58 -0400
-Resent-Date: Wed, 07 Aug 2019 04:52:58 -0400
-Resent-Message-Id: <E1hvHgm-0006aC-US@eggs.gnu.org>
-Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21599)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hvHgm-0006Va-Lx
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:52:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1565167899; cv=none; d=zoho.com; s=zohoarc; 
- b=MIKkL08Iv8zR2QvEbFgvL/dRnNMfQSq8kBM0MVKIpcrRSMj8jBpLxKF6O3HGG20jSgzC0hW7YEZP/nGJNPBZSr9F9OzaZCtEzJYVsewmZAV05DEDhBHIXhDRl7pli6YA5ZFmbeajnaQi0czhuQ32WwqVBneWFPWewd051vdJZ40=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1565167899;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=oUANY1ZLhe1x6kBAhH55vA9bVzgXdr01ZemRSdfCfKU=; 
- b=hexRrjrhRax3MdSVtaal57LhnuEyBgcpvOpOgBNtqJ/utQ8V+CHKOIikjxGbOkEfTXWnEHN2ZC53bUdL761zcxRzmBG2UYuoYJ0hdU/qIhPEyNiGmhNRW5NlSIBOAFQRbqemZOl/1QGk8q5wu/5gX8Yg/4WhpHmUsL1pcsAG+vc=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1565167898924603.2411763861518;
- Wed, 7 Aug 2019 01:51:38 -0700 (PDT)
-In-Reply-To: <20190807071445.4109-1-bala24@linux.ibm.com>
-Message-ID: <156516789741.4245.4299712311905095744@b08f24806b7e>
+ (envelope-from <chihmin.chao@sifive.com>) id 1hvHib-0007Qh-N6
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:54:51 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41864)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1hvHib-0007QD-FA
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 04:54:49 -0400
+Received: by mail-ot1-x341.google.com with SMTP id o101so101329778ota.8
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 01:54:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=NasqwgARd8VqeJUNiKe6yXRna1Oyz8d5wdX3A0iFcSM=;
+ b=Hfy+1sA81qPuqLCEEY3zV+Jh5KipkcZFM4eHHUOO0iYUnDrTS9odESmefm624XPq7R
+ SI2uYqg032mthAOAK/mXueOm2T1LqIb7dA5EO7p1EvoZnYeqcC3Uw0lUuxu/0rOZKrY5
+ NfDA6R556XGxJ++ZAh0uThUiZ5b5jOGAJIwEoEGCcHLwTp0BivMbVvHf+7zAU3a7frGO
+ RhVzvw9Jhxa/HKcckx95ZvblEi4n9PHeZus872MNjJyWJvJVQn1u8nrYnDUgX7ikFaXK
+ UGEpXtMHfUJMZJmiR1+eskn9q/Hl4Z0tRVudxln2msi9NsvF/JekpcYQr/AMwLDZoGld
+ RMkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=NasqwgARd8VqeJUNiKe6yXRna1Oyz8d5wdX3A0iFcSM=;
+ b=sTnwFT7mHmJU2k3zZ7TnyZGah4V0vVi37HRZwQREi3bn5QZZNQtpRtGMdWAgtJ6RbR
+ t2dSqS5zCHoElVF0fGq51x+pvIXtmgIukPefXKmTL52tozKcfkDABdmGohC1JqlajyW0
+ UYs2mQyecMYjaZtHQ7Oy6RwBl5Wx9vJi5cUJtAJf677gOd+XgWTnAsrF3SBsxDeNrtdy
+ gp7QTWhQgCaR0N6vasNcM4udLm46cX10RzakxM9yavD1RiHh/1l2XTXDv0DameJArs72
+ IIfbVhPAHS+R5L2iF3fpeGbzecFqVOYHVUv1Muff/mhIW3gtFpicPBNnAdQwHNu59n5x
+ ySQg==
+X-Gm-Message-State: APjAAAWXY+A3H3m+7YmUdph+ZuV+m0oBgRyUqH8EbshZceKLOab4pYMR
+ c9WKUSMp4JV0v6BauvhaLarzYLXz5mC4eX7mRwLONg==
+X-Google-Smtp-Source: APXvYqxzmAumR0YcMB/ITwbBV/92yIAV/Zl+GqaWtVNt3RpdKqbsTlfI/0CS6pIql8WXxG0SQz5DopAa5wqsQte7npo=
+X-Received: by 2002:a02:a07:: with SMTP id 7mr9083419jaw.65.1565168087481;
+ Wed, 07 Aug 2019 01:54:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: bala24@linux.ibm.com
-Date: Wed, 7 Aug 2019 01:51:38 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 136.143.188.55
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] Enhancing Qemu MMIO emulation with
- scripting interface
+References: <1565163924-18621-1-git-send-email-bmeng.cn@gmail.com>
+ <1565163924-18621-12-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565163924-18621-12-git-send-email-bmeng.cn@gmail.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Wed, 7 Aug 2019 16:54:36 +0800
+Message-ID: <CAEiOBXU9UXEGYjEDP-LJ5mEY-bF+OtMKt4O+LGJh9qQt3OPaew@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 11/28] riscv: sifive: Rename
+ sifive_prci.{c, h} to sifive_e_prci.{c, h}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,38 +89,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: maddy@linux.vnet.ibm.com, qemu-devel@nongnu.org, bala24@linux.ibm.com,
- anju@linux.vnet.ibm.com, clg@kaod.org, hari@linux.vnet.ibm.com,
- pbonzini@redhat.com, david@gibson.dropbear.id.au
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwNzA3MTQ0NS40MTA5
-LTEtYmFsYTI0QGxpbnV4LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxk
-IHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBi
-ZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8g
-YSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMg
-YnJhbmNoCnNldCAtZQoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8gIj09
-PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKCmVjaG8KZWNobyAiPT09IFVOQU1FID09PSIKdW5hbWUg
-LWEKCkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxk
-Cm1rZGlyIC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1
-cmUgLS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAtajQKIyBYWFg6IHdlIG5lZWQgcmVs
-aWFibGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEKbWFrZSBpbnN0YWxsCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdXRpbC9maWxlbW9uaXRvci1pbm90aWZ5Lm8KICBD
-QyAgICAgIHV0aWwvdmZpby1oZWxwZXJzLm8KL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWpf
-cTNhdWNmL3NyYy91dGlsL3B5dGhvbl9hcGkuYzogSW4gZnVuY3Rpb24g4oCYcHl0aG9uX2NhbGxi
-YWNrX3N0cuKAmToKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWpfcTNhdWNmL3NyYy91dGls
-L3B5dGhvbl9hcGkuYzo3MjoxMjogZXJyb3I6IHJldHVybiBkaXNjYXJkcyDigJhjb25zdOKAmSBx
-dWFsaWZpZXIgZnJvbSBwb2ludGVyIHRhcmdldCB0eXBlIFstV2Vycm9yPWRpc2NhcmRlZC1xdWFs
-aWZpZXJzXQogICA3MiB8ICAgICByZXR1cm4gUHlVbmljb2RlX0FzVVRGOChyZXN1bHQpOwogICAg
-ICB8ICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdz
-IGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MDgwNzA3MTQ0NS40MTA5LTEtYmFsYTI0QGxpbnV4
-LmlibS5jb20vdGVzdGluZy5zMzkweC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVk
-IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
-c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Wed, Aug 7, 2019 at 3:49 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+
+> Current SiFive PRCI model only works with sifive_e machine, as it
+> only emulates registers or PRCI block in the FE310 SoC.
+>
+> Rename the file name to make it clear that it is for sifive_e.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> ---
+>
+> Changes in v2: None
+>
+>  hw/riscv/Makefile.objs                              |  2 +-
+>  hw/riscv/sifive_e.c                                 |  4 ++--
+>  hw/riscv/{sifive_prci.c => sifive_e_prci.c}         | 14 +++++++-------
+>  include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} | 14 +++++++-------
+>  4 files changed, 17 insertions(+), 17 deletions(-)
+>  rename hw/riscv/{sifive_prci.c => sifive_e_prci.c} (90%)
+>  rename include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} (82%)
+>
+> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+> index eb9d4f9..c859697 100644
+> --- a/hw/riscv/Makefile.objs
+> +++ b/hw/riscv/Makefile.objs
+> @@ -2,9 +2,9 @@ obj-y += boot.o
+>  obj-$(CONFIG_SPIKE) += riscv_htif.o
+>  obj-$(CONFIG_HART) += riscv_hart.o
+>  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
+> +obj-$(CONFIG_SIFIVE_E) += sifive_e_prci.o
+>  obj-$(CONFIG_SIFIVE) += sifive_clint.o
+>  obj-$(CONFIG_SIFIVE) += sifive_gpio.o
+> -obj-$(CONFIG_SIFIVE) += sifive_prci.o
+>  obj-$(CONFIG_SIFIVE) += sifive_plic.o
+>  obj-$(CONFIG_SIFIVE) += sifive_test.o
+>  obj-$(CONFIG_SIFIVE_U) += sifive_u.o
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 2a499d8..2d67670 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -41,9 +41,9 @@
+>  #include "hw/riscv/riscv_hart.h"
+>  #include "hw/riscv/sifive_plic.h"
+>  #include "hw/riscv/sifive_clint.h"
+> -#include "hw/riscv/sifive_prci.h"
+>  #include "hw/riscv/sifive_uart.h"
+>  #include "hw/riscv/sifive_e.h"
+> +#include "hw/riscv/sifive_e_prci.h"
+>  #include "hw/riscv/boot.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+> @@ -174,7 +174,7 @@ static void riscv_sifive_e_soc_realize(DeviceState
+> *dev, Error **errp)
+>          SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+>      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.aon",
+>          memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
+> -    sifive_prci_create(memmap[SIFIVE_E_PRCI].base);
+> +    sifive_e_prci_create(memmap[SIFIVE_E_PRCI].base);
+>
+>      /* GPIO */
+>
+>
+I  think adding infix to function name is sufficient and keeping the
+filename the same may be better.
+The U board PRCI or variant implementation in future could be included in
+the same files with different create function
+
+chihmin
 
 
+
+> diff --git a/hw/riscv/sifive_prci.c b/hw/riscv/sifive_e_prci.c
+> similarity index 90%
+> rename from hw/riscv/sifive_prci.c
+> rename to hw/riscv/sifive_e_prci.c
+> index f406682..acb914d 100644
+> --- a/hw/riscv/sifive_prci.c
+> +++ b/hw/riscv/sifive_e_prci.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt)
+> + * QEMU SiFive E PRCI (Power, Reset, Clock, Interrupt)
+>   *
+>   * Copyright (c) 2017 SiFive, Inc.
+>   *
+> @@ -22,7 +22,7 @@
+>  #include "hw/sysbus.h"
+>  #include "qemu/module.h"
+>  #include "target/riscv/cpu.h"
+> -#include "hw/riscv/sifive_prci.h"
+> +#include "hw/riscv/sifive_e_prci.h"
+>
+>  static uint64_t sifive_prci_read(void *opaque, hwaddr addr, unsigned int
+> size)
+>  {
+> @@ -82,10 +82,10 @@ static const MemoryRegionOps sifive_prci_ops = {
+>
+>  static void sifive_prci_init(Object *obj)
+>  {
+> -    SiFivePRCIState *s = SIFIVE_PRCI(obj);
+> +    SiFivePRCIState *s = SIFIVE_E_PRCI(obj);
+>
+>      memory_region_init_io(&s->mmio, obj, &sifive_prci_ops, s,
+> -                          TYPE_SIFIVE_PRCI, 0x8000);
+> +                          TYPE_SIFIVE_E_PRCI, 0x8000);
+>      sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
+>
+>      s->hfrosccfg = (SIFIVE_PRCI_HFROSCCFG_RDY | SIFIVE_PRCI_HFROSCCFG_EN);
+> @@ -97,7 +97,7 @@ static void sifive_prci_init(Object *obj)
+>  }
+>
+>  static const TypeInfo sifive_prci_info = {
+> -    .name          = TYPE_SIFIVE_PRCI,
+> +    .name          = TYPE_SIFIVE_E_PRCI,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(SiFivePRCIState),
+>      .instance_init = sifive_prci_init,
+> @@ -114,9 +114,9 @@ type_init(sifive_prci_register_types)
+>  /*
+>   * Create PRCI device.
+>   */
+> -DeviceState *sifive_prci_create(hwaddr addr)
+> +DeviceState *sifive_e_prci_create(hwaddr addr)
+>  {
+> -    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_PRCI);
+> +    DeviceState *dev = qdev_create(NULL, TYPE_SIFIVE_E_PRCI);
+>      qdev_init_nofail(dev);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, addr);
+>      return dev;
+> diff --git a/include/hw/riscv/sifive_prci.h
+> b/include/hw/riscv/sifive_e_prci.h
+> similarity index 82%
+> rename from include/hw/riscv/sifive_prci.h
+> rename to include/hw/riscv/sifive_e_prci.h
+> index bd51c4a..7932fe7 100644
+> --- a/include/hw/riscv/sifive_prci.h
+> +++ b/include/hw/riscv/sifive_e_prci.h
+> @@ -1,5 +1,5 @@
+>  /*
+> - * QEMU SiFive PRCI (Power, Reset, Clock, Interrupt) interface
+> + * QEMU SiFive E PRCI (Power, Reset, Clock, Interrupt) interface
+>   *
+>   * Copyright (c) 2017 SiFive, Inc.
+>   *
+> @@ -16,8 +16,8 @@
+>   * this program.  If not, see <http://www.gnu.org/licenses/>.
+>   */
+>
+> -#ifndef HW_SIFIVE_PRCI_H
+> -#define HW_SIFIVE_PRCI_H
+> +#ifndef HW_SIFIVE_E_PRCI_H
+> +#define HW_SIFIVE_E_PRCI_H
+>
+>  enum {
+>      SIFIVE_PRCI_HFROSCCFG   = 0x0,
+> @@ -47,10 +47,10 @@ enum {
+>      SIFIVE_PRCI_PLLOUTDIV_DIV1  = (1 << 8)
+>  };
+>
+> -#define TYPE_SIFIVE_PRCI "riscv.sifive.prci"
+> +#define TYPE_SIFIVE_E_PRCI      "riscv.sifive.e.prci"
+>
+> -#define SIFIVE_PRCI(obj) \
+> -    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_PRCI)
+> +#define SIFIVE_E_PRCI(obj) \
+> +    OBJECT_CHECK(SiFivePRCIState, (obj), TYPE_SIFIVE_E_PRCI)
+>
+>  typedef struct SiFivePRCIState {
+>      /*< private >*/
+> @@ -64,6 +64,6 @@ typedef struct SiFivePRCIState {
+>      uint32_t plloutdiv;
+>  } SiFivePRCIState;
+>
+> -DeviceState *sifive_prci_create(hwaddr addr);
+> +DeviceState *sifive_e_prci_create(hwaddr addr);
+>
+>  #endif
+> --
+> 2.7.4
+>
+>
+>
