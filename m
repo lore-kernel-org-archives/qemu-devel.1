@@ -2,87 +2,89 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA16C19759
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 07:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F98C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 07:57:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CD7221BE3
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 07:56:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBA8C21BE3
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 07:57:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="KH/BTfDg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CD7221BE3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fvOU2b5G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBA8C21BE3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvGo9-0007O7-B6
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 03:56:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38519)
+	id 1hvGog-0000nt-0S
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 03:57:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36892)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hvGn7-0005G1-4M
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 03:55:26 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hvGdz-0001LE-Fh
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 03:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hvGn5-0003j5-Nc
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 03:55:25 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:39954)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hvGmz-0003dh-Q1; Wed, 07 Aug 2019 03:55:18 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 2D8F496F50;
- Wed,  7 Aug 2019 07:55:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1565164515;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Cmr5cHNGizkApLgOIIl0Cz/28sApj9LgWJnIN9Hcs0U=;
- b=KH/BTfDgUA7tkbzJE676oOOKArxWsr7DVZa5KASk8k8AcBK1c0C1NUF2lOjah9OOtGiEna
- J6xCU3SvonYOTuhAZWM68lbYym303mnfgElc7hPTVOnMrACVj8Vg0Oax6I2TpO70X9Pt97
- DVCWEdG49umCNkZGZKFm1XSj/1BM85U=
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-5-damien.hedde@greensocs.com>
- <20190731055640.GC2032@umbus.fritz.box>
- <98250dc3-c2db-844d-f9f5-46a27488e94f@greensocs.com>
- <20190806003504.GC14494@umbus.fritz.box>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <5da257a8-6d35-8618-2fa2-38cb2ed19fb4@greensocs.com>
-Date: Wed, 7 Aug 2019 09:55:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190806003504.GC14494@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1565164515;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Cmr5cHNGizkApLgOIIl0Cz/28sApj9LgWJnIN9Hcs0U=;
- b=2mIwbpJJwiz8i72AkpAHsOISbiNXRJhNrDapqiT5W7ttEWqEKSKFFFlPK3h0wmxrwTmbKp
- gndkz08mP2CLp6OIk0ZfPxxZNKwb2TOWDty02HgtbB6G97ANLeTKpumG9yWN7TnbOGMT7s
- rQnP5h9exOKdPmKzEmnVit3pRGltgA4=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1565164515; a=rsa-sha256; cv=none;
- b=3Yzo68Sz/Iyb+Myf9gfVkoIUdyJi+fylI+FsGXcTUEYlNtjKMXZQJZE4c13CJ8oNdaJLEO
- 3x9Q/LCRK70ufZiwN3/md+6ErO0gGDYOKekqSz73Yd2brFkMDfBe+FS5HjXhC+Hp9YQfgh
- a0xFLT+7TGTuc/AxCZuEK42EqXiMWao=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH v3 04/33] make Device and Bus Resettable
+ (envelope-from <bmeng.cn@gmail.com>) id 1hvGdy-0008FS-FZ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 03:45:59 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:34043)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hvGdy-0008Ex-7r; Wed, 07 Aug 2019 03:45:58 -0400
+Received: by mail-pl1-x642.google.com with SMTP id i2so39505839plt.1;
+ Wed, 07 Aug 2019 00:45:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id:in-reply-to:references;
+ bh=++PxAHxQgFZf8IyF1BGk/O95LoL/ngMnCoTtc4g0wvo=;
+ b=fvOU2b5G7Fn4yreeUSmOZWhPFpAb80Ab8ytG8FEdMh38P80XKIcE/OV2rt6jo4Fga6
+ r5jMzKb2b3UtQGqK4FdPEgsupLJI4idFnF1hJaWBP7m+b/ilLm4v7bIRkQcaXEJ1KzMM
+ dnin1pjQ5e/SiqgAoJRIs9gBKh2WfqfWzzfqi82+jcw33tuhpwTPh1hQTX+/Cu9ITH9A
+ BZMOgwKzUYqIUHKqEnam1l7aY/cdQnpWgM/bOI/Lmr1vDlsx1tTGX0PjY8TzrTZ96duu
+ 05Z/mv71QBuD95D7/GSAEQLdnqU1zuLRGyTdl/E15U4nm64GKrQS9sP013Pa2t6zXr6D
+ CqNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references;
+ bh=++PxAHxQgFZf8IyF1BGk/O95LoL/ngMnCoTtc4g0wvo=;
+ b=q7wbSlK6fVZhPxFNbi/wzOHrFoMzUDoXt6GceIEdlGhGf6JpKOeZdFY6K+82Dmb4DB
+ 6Xrgc00ZxIOeRCr4EPbl1bYb+7HpxQ/K71acxJ8a3ZIIm/EivVzRiDTfIy31GbfRd0sA
+ KtyhOxeD/bErSlFFKwWPgfrkAmuiXqUGVEyHlL+Krm7wK/2QgJDVJ0/gF+XyFYJoKdXN
+ bNkh39v18LtJYM3A+3IjIh8E6D6b0YgEpRuIl1RjbG2eSbcA9X0xLmPtMj5+tIClyHFJ
+ 4aVCr/pxmNVb9c6SZp4LG5bnzumFUYVH6heGwEY0MbXgCnhtNVxOeuKkMGm+iM5Ae+xF
+ 0RDg==
+X-Gm-Message-State: APjAAAXC/YfycallARaUBmku5Ifw3jH1CxdCmyhVHnj6l/9+qcKlqmSs
+ I7KlRJuq325oTk+E1Esj1fM=
+X-Google-Smtp-Source: APXvYqyr1PduyJmCzUkySTrPTWD9ZFg9tqHu8eYkwq7q7kA4lOfth/MNZvtCfba5wM6AEnuyRO2RZQ==
+X-Received: by 2002:a17:902:7791:: with SMTP id
+ o17mr7040085pll.27.1565163957541; 
+ Wed, 07 Aug 2019 00:45:57 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id l44sm20154449pje.29.2019.08.07.00.45.56
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Wed, 07 Aug 2019 00:45:56 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Date: Wed,  7 Aug 2019 00:45:20 -0700
+Message-Id: <1565163924-18621-25-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1565163924-18621-1-git-send-email-bmeng.cn@gmail.com>
+References: <1565163924-18621-1-git-send-email-bmeng.cn@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
+Subject: [Qemu-devel] [PATCH v2 24/28] riscv: sifive_u: Support loading
+ initramfs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,166 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
- dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
- qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
- hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, marcandre.lureau@redhat.com, thuth@redhat.com,
- ehabkost@redhat.com, alistair@alistair23.me, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com, rth@twiddle.net,
- berrange@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
- qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The loading of initramfs is currently not supported on 'sifive_u'.
+Add the support to make '-initrd' command line parameter useful.
 
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+---
 
-On 8/6/19 2:35 AM, David Gibson wrote:
-> On Wed, Jul 31, 2019 at 11:09:05AM +0200, Damien Hedde wrote:
->>
->>
->> On 7/31/19 7:56 AM, David Gibson wrote:
->>> On Mon, Jul 29, 2019 at 04:56:25PM +0200, Damien Hedde wrote:
->>>> This add Resettable interface implementation for both Bus and Device.
->>>>
->>>> *resetting* counter and *reset_is_cold* flag are added in DeviceState
->>>> and BusState.
->>>>
->>>> Compatibility with existing code base is ensured.
->>>> The legacy bus or device reset method is called in the new exit phase
->>>> and the other 2 phases are let empty. Using the exit phase guarantee that
->>>> legacy resets are called in the "post" order (ie: children then parent)
->>>> in hierarchical reset. That is the same order as legacy qdev_reset_all
->>>> or qbus_reset_all were using.
->>>>
->>>> New *device_reset* and *bus_reset* function are proposed with an
->>>> additional boolean argument telling whether the reset is cold or warm.
->>>> Helper functions *device_reset_[warm|cold]* and *bus_reset_[warm|cold]*
->>>> are defined also as helpers.
->>>>
->>>> Also add a [device|bus]_is_resetting and [device|bus]_is_reset_cold
->>>> functions telling respectively whether the object is currently under reset and
->>>> if the current reset is cold or not.
->>>>
->>>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->>>> ---
->>>>  hw/core/bus.c          | 85 ++++++++++++++++++++++++++++++++++++++++++
->>>>  hw/core/qdev.c         | 82 ++++++++++++++++++++++++++++++++++++++++
->>>>  include/hw/qdev-core.h | 84 ++++++++++++++++++++++++++++++++++++++---
->>>>  tests/Makefile.include |  1 +
->>>>  4 files changed, 247 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/hw/core/bus.c b/hw/core/bus.c
->>>> index 17bc1edcde..08a97addb6 100644
->>>> --- a/hw/core/bus.c
->>>> +++ b/hw/core/bus.c
->>>> @@ -22,6 +22,7 @@
->>>>  #include "qemu/module.h"
->>>>  #include "hw/qdev.h"
->>>>  #include "qapi/error.h"
->>>> +#include "hw/resettable.h"
->>>>  
->>>>  void qbus_set_hotplug_handler(BusState *bus, Object *handler, Error **errp)
->>>>  {
->>>> @@ -68,6 +69,75 @@ int qbus_walk_children(BusState *bus,
->>>>      return 0;
->>>>  }
->>>>  
->>>> +void bus_reset(BusState *bus, bool cold)
->>>> +{
->>>> +    resettable_reset(OBJECT(bus), cold);
->>>> +}
->>>> +
->>>> +bool bus_is_resetting(BusState *bus)
->>>> +{
->>>> +    return (bus->resetting != 0);
->>>> +}
->>>> +
->>>> +bool bus_is_reset_cold(BusState *bus)
->>>> +{
->>>> +    return bus->reset_is_cold;
->>>> +}
->>>> +
->>>> +static uint32_t bus_get_reset_count(Object *obj)
->>>> +{
->>>> +    BusState *bus = BUS(obj);
->>>> +    return bus->resetting;
->>>> +}
->>>> +
->>>> +static uint32_t bus_increment_reset_count(Object *obj)
->>>> +{
->>>> +    BusState *bus = BUS(obj);
->>>> +    return ++bus->resetting;
->>>> +}
->>>> +
->>>> +static uint32_t bus_decrement_reset_count(Object *obj)
->>>> +{
->>>> +    BusState *bus = BUS(obj);
->>>> +    return --bus->resetting;
->>>> +}
->>>> +
->>>> +static bool bus_set_reset_cold(Object *obj, bool cold)
->>>> +{
->>>> +    BusState *bus = BUS(obj);
->>>> +    bool old = bus->reset_is_cold;
->>>> +    bus->reset_is_cold = cold;
->>>> +    return old;
->>>> +}
->>>> +
->>>> +static bool bus_set_hold_needed(Object *obj, bool hold_needed)
->>>> +{
->>>> +    BusState *bus = BUS(obj);
->>>> +    bool old = bus->reset_hold_needed;
->>>> +    bus->reset_hold_needed = hold_needed;
->>>> +    return old;
->>>> +}
->>>> +
->>>> +static void bus_foreach_reset_child(Object *obj, void (*func)(Object *))
->>>> +{
->>>> +    BusState *bus = BUS(obj);
->>>> +    BusChild *kid;
->>>> +
->>>> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
->>>> +        func(OBJECT(kid->child));
->>>> +    }
->>>> +}
->>>
->>> IIUC, every resettable class would need more or less identical
->>> implementations of the above.  That seems like an awful lot of
->>> boilerplate.
->>
->> Do you mean the get/increment_count/decrement_count, set_cold/hold part ?
->> True, but it's limited to the base classes.
->> Since Resettable is an interface, we have no state there to store what
->> we need. Only alternative is to have some kind of single
->> get_resettable_state method returning a pointer to the state (allowing
->> us to keep the functions in the interface code).
->> Beyond Device and Bus, which are done here, there is probably not so
->> many class candidates for the Resettable interface.
-> 
-> Right.  I can't immediately see a better way to handle this, but it
-> still seems like a mild code smell.
-> 
+Changes in v2: None
 
-Only definitive solution to this would be to make DeviceClass and
-BusClass inherit from a common Resettable object.
+ hw/riscv/sifive_u.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-Would it be better if I use a common struct (eg: ResettableState)
-holding the different fields ?
-Then I can have a single implementation of the method and do for example:
-static uint32_t bus_decrement_reset_count(Object *obj)
-{
-     return decrement_reset_count(&(BUS(obj))->reset_state);
-}
-static uint32_t device_decrement_reset_count(Object *obj)
-{
-     return decrement_reset_count(&(DEV(dev))->reset_state);
-}
-
-I can also merge the 3 count related method into one if it helps.
-
---
-Damien
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index ce6eba5..30e6c43 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -328,7 +328,18 @@ static void riscv_sifive_u_init(MachineState *machine)
+                                  memmap[SIFIVE_U_DRAM].base);
+ 
+     if (machine->kernel_filename) {
+-        riscv_load_kernel(machine->kernel_filename);
++        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
++
++        if (machine->initrd_filename) {
++            hwaddr start;
++            hwaddr end = riscv_load_initrd(machine->initrd_filename,
++                                           machine->ram_size, kernel_entry,
++                                           &start);
++            qemu_fdt_setprop_cell(s->fdt, "/chosen",
++                                  "linux,initrd-start", start);
++            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
++                                  end);
++        }
+     }
+ 
+     /* reset vector */
+-- 
+2.7.4
 
 
