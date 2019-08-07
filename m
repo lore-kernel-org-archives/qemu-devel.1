@@ -2,63 +2,81 @@ Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F72C32751
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEF7C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:34:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3C9321E6E
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:33:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3C9321E6E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DAD1821E6E
+	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 09:34:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J43tOgj3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD1821E6E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvIJq-00027R-4t
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 05:33:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57742)
+	id 1hvIKa-0003Aj-82
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 05:34:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57827)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@redhat.com>) id 1hvIJ0-0001g6-7m
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:32:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hvIJp-0002Fp-M0
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1hvIIz-0000oy-7B
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:32:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55266)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hvIIz-0000oS-1z
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:32:25 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4E337307BCC4
- for <qemu-devel@nongnu.org>; Wed,  7 Aug 2019 09:32:24 +0000 (UTC)
-Received: from localhost (ovpn-117-144.ams2.redhat.com [10.36.117.144])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A4C215D9E1;
- Wed,  7 Aug 2019 09:32:23 +0000 (UTC)
-Date: Wed, 7 Aug 2019 10:32:22 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Message-ID: <20190807093222.GE13267@stefanha-x1.localdomain>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-8-armbru@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1hvIJo-0001Gu-L8
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:33:17 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33035)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hvIJo-0001GA-En
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 05:33:16 -0400
+Received: by mail-ot1-x343.google.com with SMTP id q20so101583735otl.0
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 02:33:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6j1brw/JDjSUv3md8bS30d2/5N/78wTkxYE/O/zj6cI=;
+ b=J43tOgj3BghWr49bCyQuuyrIhHNByOqaOUWUzm8dUVwzcMpeGJAaniUHeeeKqCNRGt
+ +ZtdFW/+qa3ZDtWcT0h/7NBoIZqpX/ZxXoPnA5c02HowEsIIvC5KBYHVNNg/UplOztu6
+ 68D0fdYP7KHc8zim4xObBzgo58/prFqkFkZgY/P7lW0sBuAw4wS64vz/sQnDL8oPRSKx
+ G+yHnq3EZUgBjvv4y3cHs3wI++o0NC3gWng/ntpQNzI9oQt5CzoQePba2i+5lZQT8Ey8
+ advKEfRk/LONuNjUsmxR2B6kmFWpEgSckMp1ejifPWMvBivDOiHSMnNUyLIRxmhJP3CP
+ ShgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6j1brw/JDjSUv3md8bS30d2/5N/78wTkxYE/O/zj6cI=;
+ b=lOeNdGbdT7TFo8cmbqMKhX0yTx0lKyT6hgKsjADAap4i+ZZR8enA2e1piKOhMFIjfE
+ Ml5zNtiG/BqqQ+omFzULICLAXW/k31AlfBdKIolZO8AmaP3tMFVSB4hUyIkNQp67KWUb
+ j6Ae8MR0oAbTK0590J/pSwRsVNVVOvNUPNhyvkYJs+n4bFhQ4vAcAAAdv73RinAIF0n+
+ csz7Whd+2OsctH/nT8cLUKt9OFkMDv1IQ2/HvaWzYSqZ2TxaiiIEPhmlYLE7IfmEqTAV
+ H/Xk6XlLYSYcZf40YhP0zwupVo4qx3amCf9Y51C0OAvfKdlhLLKKfbB7w76peL7+3+gr
+ Q0ng==
+X-Gm-Message-State: APjAAAVTUDOEUbartB6JMdgNHggEQfXCSN4No/doatXV5EPAdWVmE3E4
+ wA991aEEnor5CX4jpDqv0iKi9q6Rsk6G0mM0QyD13g==
+X-Google-Smtp-Source: APXvYqzTSt9TwozaqeGhWKoD50WLqz7Rqq0zSr40AoxwI/Hf3GotAPM2M0UHzf4ly3uQFgLDIsizKVnUbrH7zE1fYf0=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id
+ k2mr5457633oij.98.1565170395357; 
+ Wed, 07 Aug 2019 02:33:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190806151435.10740-8-armbru@redhat.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 07 Aug 2019 09:32:24 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 07/29] trace: Do not include qom/cpu.h
- into generated trace.h
+References: <1561574604-1204-1-git-send-email-eajames@linux.ibm.com>
+ <CAFEAcA8W44gYFgU7qP9wOUSwZ7xFqqZ+2eWr=0hjKps=qvQMnw@mail.gmail.com>
+ <057e55ed-c8f1-8c69-f7f0-c95df5955525@linux.ibm.com>
+In-Reply-To: <057e55ed-c8f1-8c69-f7f0-c95df5955525@linux.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 7 Aug 2019 10:33:04 +0100
+Message-ID: <CAFEAcA_W_9bn3RRLTorrE6uK4WUMwyu5F0Eg2sk6U6P7D3JrUg@mail.gmail.com>
+To: Eddie James <eajames@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH] hw/sd/aspeed_sdhci: New device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,52 +88,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 06, 2019 at 05:14:13PM +0200, Markus Armbruster wrote:
-> docs/devel/tracing.txt explains "since many source files include
-> trace.h, [the generated trace.h use] a minimum of types and other
-> header files included to keep the namespace clean and compile times
-> and dependencies down."
-> 
-> Commit 4815185902 "trace: Add per-vCPU tracing states for events with
-> the 'vcpu' property" made them all include qom/cpu.h via
-> control-internal.h.  qom/cpu.h in turn includes about thirty headers.
-> Ouch.
-> 
-> Per-vCPU tracing is currently not supported in sub-directories'
-> trace-events.  In other words, qom/cpu.h can only be used in
-> trace-root.h, not in any trace.h.
-> 
-> Split trace/control-vcpu.h off trace/control.h and
-> trace/control-internal.h.  Have the generated trace.h include
-> trace/control.h (which no longer includes qom/cpu.h), and trace-root.h
-> include trace/control-vcpu.h (which includes it).
-> 
-> The resulting improvement is a bit disappointing: in my "build
-> everything" tree, some 1100 out of 6600 objects (not counting tests
-> and objects that don't depend on qemu/osdep.h) depend on a trace.h,
-> and about 600 of them no longer depend on qom/cpu.h.  But more than
-> 1300 others depend on trace-root.h.  More work is clearly needed.
-> Left for another day.
-> 
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  block/block-backend.c         |  1 +
->  qom/object.c                  |  1 +
->  scripts/tracetool/format/c.py |  1 +
->  scripts/tracetool/format/h.py |  7 +++-
->  trace/control-internal.h      | 25 --------------
->  trace/control-vcpu.h          | 63 +++++++++++++++++++++++++++++++++++
->  trace/control.h               | 24 -------------
->  trace/qmp.c                   |  2 +-
->  ui/vnc.c                      |  1 +
->  9 files changed, 74 insertions(+), 51 deletions(-)
->  create mode 100644 trace/control-vcpu.h
+On Tue, 6 Aug 2019 at 23:12, Eddie James <eajames@linux.ibm.com> wrote:
+>
+>
+> On 8/5/19 9:31 AM, Peter Maydell wrote:
+> > On Wed, 26 Jun 2019 at 19:43, Eddie James <eajames@linux.ibm.com> wrote:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >> diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+> >> index 7b80b1d..51a733b 100644
+> >> --- a/hw/sd/sdhci.c
+> >> +++ b/hw/sd/sdhci.c
+> >> @@ -213,7 +213,13 @@ static uint8_t sdhci_slotint(SDHCIState *s)
+> >>
+> >>   static inline void sdhci_update_irq(SDHCIState *s)
+> >>   {
+> >> -    qemu_set_irq(s->irq, sdhci_slotint(s));
+> >> +    int level = sdhci_slotint(s);
+> >> +
+> >> +    qemu_set_irq(s->irq, level);
+> >> +
+> >> +    if (s->irq_notify) {
+> >> +        s->irq_notify(s, level);
+> >> +    }
+> > Rather than doing this, just wire the irq lines from
+> > the SDHCIState device up to your AspeedSDHCIState device,
+> > and then have that update the register state and assert
+> > its own irq lines outbound.
+>
+>
+> Sorry I don't follow you at all. Isn't that what I'm doing here? Surely
+> I need to take action when sdhci_update_irq is called. I don't see any
+> way other way to have my code called at this time.
+
+The way to 'take action when sdhci_update_irq is called'
+is to be the function on the other end of the qemu_set_irq()
+call, ie be the device at the other end of the qemu_irq line.
+You don't need to modify this code in sdhci.c at all.
+
+thanks
+-- PMM
 
