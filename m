@@ -6,66 +6,65 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF073C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA73AC0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:17:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 859662173C
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:58:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 859662173C
+	by mail.kernel.org (Postfix) with ESMTPS id AF620214C6
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:17:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF620214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvh3s-0000ww-On
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 07:58:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49443)
+	id 1hvhMT-0006ta-Ux
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:17:41 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:34122)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hvh3Q-0000YS-Md
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:58:01 -0400
+ (envelope-from <armbru@redhat.com>) id 1hvhLo-0006Th-NP
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hvh3P-0000b9-NC
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:58:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27170)
+ (envelope-from <armbru@redhat.com>) id 1hvhLn-0005lr-HT
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:17:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60514)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvh3P-0000ar-Fr
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:57:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvhLn-0005kP-9m
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:16:59 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BF46330FB8CA
- for <qemu-devel@nongnu.org>; Thu,  8 Aug 2019 11:57:58 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 76903300895B
+ for <qemu-devel@nongnu.org>; Thu,  8 Aug 2019 12:16:57 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BA3C6D0AC;
- Thu,  8 Aug 2019 11:57:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB0D2194B9;
+ Thu,  8 Aug 2019 12:16:53 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E1D97113864E; Thu,  8 Aug 2019 13:57:45 +0200 (CEST)
+ id 25428113864E; Thu,  8 Aug 2019 14:16:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-23-armbru@redhat.com>
- <de7f547d-1c97-135f-654f-3856fa2eec2f@redhat.com>
- <20190807175708.GE4669@habkost.net>
- <647e2542-2042-26de-d768-cdf13afa0ec4@redhat.com>
- <20190807181909.GH4669@habkost.net>
-Date: Thu, 08 Aug 2019 13:57:45 +0200
-In-Reply-To: <20190807181909.GH4669@habkost.net> (Eduardo Habkost's message of
- "Wed, 7 Aug 2019 15:19:09 -0300")
-Message-ID: <877e7nhnt2.fsf@dusky.pond.sub.org>
+ <20190806151435.10740-17-armbru@redhat.com>
+ <2739ad81-5e97-a7a6-8888-587224032a80@redhat.com>
+Date: Thu, 08 Aug 2019 14:16:51 +0200
+In-Reply-To: <2739ad81-5e97-a7a6-8888-587224032a80@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 7 Aug 2019 16:50:44
+ +0200")
+Message-ID: <87y303g8cs.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Thu, 08 Aug 2019 11:57:58 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Thu, 08 Aug 2019 12:16:57 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 22/29] Include hw/boards.h a bit less
+Subject: Re: [Qemu-devel] [PATCH v2 16/29] Include exec/memory.h slightly
+ less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,73 +76,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> On Wed, Aug 07, 2019 at 08:05:50PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> On 8/7/19 7:57 PM, Eduardo Habkost wrote:
->> > On Wed, Aug 07, 2019 at 07:26:56PM +0200, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->> >> On 8/6/19 5:14 PM, Markus Armbruster wrote:
->> >>> hw/boards.h pulls in almost 60 headers.  The less we include it into
->> >>> headers, the better.  As a first step, drop superfluous inclusions,
->> >>> and downgrade some more to what's actually needed.  Gets rid of just
->> >>> one inclusion into a header.
->> >>>
->> >>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> >>> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> >>> ---
->> > [...]
->> >>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
->> >>> index bcacdd1d8f..34a9f6f7a9 100644
->> >>> --- a/target/i386/hax-all.c
->> >>> +++ b/target/i386/hax-all.c
->> >>> @@ -33,7 +33,6 @@
->> >>>  #include "sysemu/reset.h"
->> >>>  #include "sysemu/sysemu.h"
->> >>>  #include "qemu/main-loop.h"
->> >>> -#include "hw/boards.h"
->> >>>=20=20
->> >>>  #define DEBUG_HAX 0
->> >>
->> >> include/sysemu/hax.h misses to include "hw/boards.h":
->> >=20
->> > I don't understand.  I don't see any reason for the sysemu/hax.h
->> > header to include hw/boards.h.
+> On 8/6/19 5:14 PM, Markus Armbruster wrote:
+>> Drop unnecessary inclusions from headers.  Downgrade a few more to
+>> exec/hwaddr.h.
 >>=20
->> Ah, you are right, the AccelClass is defined in include/sysemu/accel.h:
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  hw/audio/lm4549.h                   | 1 +
+>>  hw/display/edid-region.c            | 1 +
+>>  hw/display/tc6393xb.c               | 1 +
+>>  hw/net/can/can_sja1000.h            | 1 +
+>>  hw/net/ne2000.c                     | 1 +
+>>  hw/xtensa/xtensa_memory.h           | 1 -
+>>  include/hw/arm/boot.h               | 1 -
+>>  include/hw/arm/fsl-imx7.h           | 1 -
+>>  include/hw/arm/soc_dma.h            | 2 +-
+>>  include/hw/block/flash.h            | 2 +-
+>>  include/hw/boards.h                 | 1 +
+>>  include/hw/char/parallel.h          | 1 -
+>>  include/hw/display/milkymist_tmu2.h | 1 +
+>>  include/hw/display/tc6393xb.h       | 2 --
+>>  include/hw/display/vga.h            | 2 +-
+>>  include/hw/hw.h                     | 1 -
+>>  include/hw/i2c/pm_smbus.h           | 1 +
+>>  include/hw/i2c/smbus_eeprom.h       | 1 +
+>>  include/hw/misc/auxbus.h            | 1 +
+>>  include/hw/ppc/xics.h               | 1 +
+>>  include/hw/usb.h                    | 1 +
+>>  include/hw/virtio/virtio.h          | 1 +
+>>  migration/colo.c                    | 1 +
+>>  migration/migration.h               | 1 +
+>>  migration/postcopy-ram.c            | 1 +
+>>  migration/rdma.c                    | 1 +
+>>  26 files changed, 20 insertions(+), 10 deletions(-)
 >>=20
->> typedef struct AccelClass {
->>     /*< private >*/
->>     ObjectClass parent_class;
->>     /*< public >*/
+> [...]> diff --git a/migration/colo.c b/migration/colo.c
+>> index 9f84b1fa3c..0b5b620391 100644
+>> --- a/migration/colo.c
+>> +++ b/migration/colo.c
+>> @@ -23,6 +23,7 @@
+>>  #include "io/channel-buffer.h"
+>>  #include "trace.h"
+>>  #include "qemu/error-report.h"
+>> +#include "qemu/rcu.h"
+>>  #include "migration/failover.h"
+>>  #ifdef CONFIG_REPLICATION
+>>  #include "replication.h"
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 26f01d00f6..a7882af67a 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -14,6 +14,7 @@
+>>  #ifndef QEMU_MIGRATION_H
+>>  #define QEMU_MIGRATION_H
+>>=20=20
+>> +#include "exec/cpu-common.h"
+>>  #include "qapi/qapi-types-migration.h"
+>>  #include "qemu/thread.h"
+>>  #include "qemu/coroutine_int.h"
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index 9faacacc9e..56054d0a73 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -25,6 +25,7 @@
+>>  #include "ram.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu/notify.h"
+>> +#include "qemu/rcu.h"
+>>  #include "sysemu/sysemu.h"
+>>  #include "sysemu/balloon.h"
+>>  #include "qemu/error-report.h"
+>> diff --git a/migration/rdma.c b/migration/rdma.c
+>> index 3036221ee8..b0e27b6174 100644
+>> --- a/migration/rdma.c
+>> +++ b/migration/rdma.c
+>> @@ -25,6 +25,7 @@
+>>  #include "qemu/error-report.h"
+>>  #include "qemu/main-loop.h"
+>>  #include "qemu/module.h"
+>> +#include "qemu/rcu.h"
+>>  #include "qemu/sockets.h"
+>>  #include "qemu/bitmap.h"
+>>  #include "qemu/coroutine.h"
 >>=20
->>     const char *name;
->>     int (*init_machine)(MachineState *ms);
->>     ...
->>=20
->> So this is where "hw/boards.h" has to be included (it is where
->> MachineState is defined).
 >
-> As far as I can see, accel.h doesn't need the full MachineState
-> struct definition and doesn't need boards.h.  It just needs the
-> MachineState typedef, which is defined at typedefs.h.
->
-> hax-all.c, on the other hand, needs the full MachineState struct
-> definition and is expected to include hw/boards.h.
+> To keep this patch cleaner, can you use a preparatory patch adding the
+> various "qemu/rcu.h"?
 
-Yes, and I'll fix it.  Thanks!
+How would I explain that new patch?
 
->> >> target/i386/hax-all.c: In function 'hax_accel_init':
->> >> target/i386/hax-all.c:354:26: error: dereferencing pointer to incompl=
-ete
->> >> type 'MachineState {aka struct MachineState}'
->> >>      int ret =3D hax_init(ms->ram_size);
+Other patches that drop includes from headers also fix up their users by
+adding the includes that are actually needed there, e.g.:
+
+* PATCH 03: hw/qdev-core.h dropped, fixups add only qemu/bitops.h or
+  hw/irq.h.
+
+* PATCH 10: hw/ide/internal.h dropped, some fixups add only
+  exec/address-spaces.h or sysemu/sysemu.h.
+
+* PATCH 17: qom/object.h dropped, fixup adds only hw/hw.h.
+
+* PATCH 20: qemu/main-loop.h dropped, some fixups add only block/aio.h
+  or qemu/thread.h.  Touches five times as many files as this one...
+
+* More.
+
+Does each of them need preparatory patches?
+
+Would it help if their commit messages explained the fixups more
+clearly?
 
