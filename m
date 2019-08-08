@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC20C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 20:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B8CC41514
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 20:28:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C69BC2173C
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 20:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DBA72173C
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 20:28:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AI5BNglK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C69BC2173C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WnwvmjTr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DBA72173C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvp0J-0000Wr-1t
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 16:27:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59877)
+	id 1hvp1M-0003Km-En
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 16:28:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59817)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvozT-00078q-Gv
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 16:26:28 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvozR-00071Z-0g
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 16:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvozS-0001Ju-KW
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 16:26:27 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37152)
+ (envelope-from <richard.henderson@linaro.org>) id 1hvozQ-0001Ho-0F
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 16:26:24 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44742)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvozS-0001JR-Dp
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 16:26:26 -0400
-Received: by mail-pg1-x543.google.com with SMTP id d1so11820218pgp.4
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 13:26:26 -0700 (PDT)
+ id 1hvozP-0001G4-Qy
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 16:26:23 -0400
+Received: by mail-pf1-x444.google.com with SMTP id t16so44696427pfe.11
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 13:26:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RskjHA12b+UCLX2htP8k3zX7fIXUBDlXhLLJAVERdC0=;
- b=AI5BNglKzJ2nl0bwk9cg0D/RBrxrCsZPjYtJwwhMbI6xLE29xO9oKjooujma6sBJDH
- x2TUbnqhBThgU9jAt4HatoRJLmXHeXgo5yIkfDaPdIm1Vsq7X7zMIunrC2IIgbBR93Fr
- wOilkONR8MFHcXpVSAGnr4kaG2RBJbv+DQMQeh79a66RbhJZG5UrT0LX//EMqTqlXAwD
- fbkfNYZd8LKN5OlCz1UJzA8gX+uF0PyEG06FvnJJRaLm25VVk73Y70SR0bYd6LjBTr2k
- nu9JHSO92ppTRl3J5IT74hgWQR1bcMKiX5V+FP/7jwhtSD3BEsAZ3i9l7uQa8KL1FQ8B
- SKbQ==
+ bh=KppSBSLgqldeUIFCtJ9vyMILLmhpVP0HjXn8WOkkAA4=;
+ b=WnwvmjTrnJNDu8FpkcTfajv3YXkp1HDXgKJRDnJsh4LeprPE+rotaDg4ArlBy1pUqi
+ MZLBz7rc+F9xOy/MNt81VkGgqzO4Jdw8I394H1auRIe6ugilnMZs6WQBakXrAZebVnOp
+ smUm8YPLbU5Vi9kD5cFR3zfwYvniUefvxMMqshlui48xAy59hVauPkjscWOFwMRyl1ZY
+ YT1bQp7hM+l0T6qpOP7uH9oGv81z0mAKikO87668goWxo3r6FHp8MtDg6aUy1Rk9KOr/
+ ++9updJ2Yp6+tALpTW8JV1s47nUe0LrhWt9jmdUvdrSLGVm4ce9DYHCu+PSvZoKu5QSy
+ mCBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=RskjHA12b+UCLX2htP8k3zX7fIXUBDlXhLLJAVERdC0=;
- b=GvrjGOMiwmXHfs+6dHXhZjJGT0er3Dw1vzLYR/hVGffPfOf0jqNMjWoNMbvU/OHunI
- clDnmD8ULjylD7BbmuKCl0AEbxjllx34JusHG8iIsqsh998vilVjV1Bm1kclCcM3ExBK
- lbAN3prS3T1SoXjopHr+S22GTqTlV4kpu+1IxOL8VwoBCDpcREbKqX7zDkdzaqOgi/8b
- de3qFZRnht+2XFV1PiAUoT0BYlItmacQWrLY/DDwAqoqS8YeFgf2OD5ruOkkWMkT57GO
- SqjFubg/5scBmBS3zZ1OYg+DQpbljSJOeoBueyH+1l+HseLGdPp+8aLMFFtXrWON+Wy3
- 4Vpw==
-X-Gm-Message-State: APjAAAV6/bXTzeE6S7SHjYaoauf5eSTLjZP342i5T6edmUx8WK99HNi5
- xsGLDHQ/IaDYZ925PYjRWmY93GXUTQA=
-X-Google-Smtp-Source: APXvYqx3IbAmTAUljRT3n2vxLgD+LJf7v1V+KLJeb9XaYVru7wLRBwWXMuzN9B5pdU089+acRCaAJg==
-X-Received: by 2002:a17:90a:9bc5:: with SMTP id
- b5mr5853080pjw.109.1565295985125; 
- Thu, 08 Aug 2019 13:26:25 -0700 (PDT)
+ bh=KppSBSLgqldeUIFCtJ9vyMILLmhpVP0HjXn8WOkkAA4=;
+ b=snEYsuxS1X9GW5PtwQB2N67POEddrc9JEAnHbJGtJVx2SSOjeL0MEaSMRrXm/3tbZB
+ isqZuoBOTbi2WeBBPvb4mb87qXuVAqftvsAJE7QoexBsZFiqVw9JRtyE4NX0iRhQUbFp
+ Rb5HeWwhFH0183LZMnLlAmbW999tP0b5cJsDPv3I9hsUW8XPU/tdmZRbsSiarmPJhIqb
+ 3YjtlLA7PyW3EgfO7hVzMENEjWehywmZevlVL/XVBjNGPWgN+sBosOpCU6mkByDNEHq+
+ hnf1hIUcyR2jO/G7hiB9VrRiMEuvHZjWQoS/hWqgD99F4rK3mszfUUSPsGilrYdX8X/c
+ R/TA==
+X-Gm-Message-State: APjAAAXUbhxnVsX4s4PnQWKkRk8yUzNuGjQbXxOiDHHy38OQheT6CKvB
+ ghW5SPKQbZQvjHZi+S+ynqHFOdFzQLA=
+X-Google-Smtp-Source: APXvYqyRqEzzbb30wen7bTbdUzD/fS5VaTAp+LTO/o6EPXhMrHB7vKvkSGhFZOBNiYUp+Bld5dhnjQ==
+X-Received: by 2002:a17:90a:2305:: with SMTP id
+ f5mr6123614pje.128.1565295982598; 
+ Thu, 08 Aug 2019 13:26:22 -0700 (PDT)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id v12sm2850146pjk.13.2019.08.08.13.26.23
+ by smtp.gmail.com with ESMTPSA id v12sm2850146pjk.13.2019.08.08.13.26.21
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 08 Aug 2019 13:26:24 -0700 (PDT)
+ Thu, 08 Aug 2019 13:26:21 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  8 Aug 2019 13:26:14 -0700
-Message-Id: <20190808202616.13782-6-richard.henderson@linaro.org>
+Date: Thu,  8 Aug 2019 13:26:12 -0700
+Message-Id: <20190808202616.13782-4-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190808202616.13782-1-richard.henderson@linaro.org>
 References: <20190808202616.13782-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
-Subject: [Qemu-devel] [PATCH 5/7] target/arm: Use tcg_gen_rotri_i32 for
- gen_swap_half
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH 3/7] target/arm: Remove redundant shift tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,31 +96,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rotate is the more compact and obvious way to swap 16-bit
-elements of a 32-bit word.
+The immediate shift generator functions already test for,
+and eliminate, the case of a shift by zero.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ target/arm/translate.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index b40f163bab..ddc54e77e4 100644
+index 94170af134..3ddc404b3b 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -459,11 +459,7 @@ static TCGv_i64 gen_muls_i64_i32(TCGv_i32 a, TCGv_i32 b)
- /* Swap low and high halfwords.  */
- static void gen_swap_half(TCGv_i32 var)
- {
--    TCGv_i32 tmp = tcg_temp_new_i32();
--    tcg_gen_shri_i32(tmp, var, 16);
--    tcg_gen_shli_i32(var, var, 16);
--    tcg_gen_or_i32(var, var, tmp);
--    tcg_temp_free_i32(tmp);
-+    tcg_gen_rotri_i32(var, var, 16);
- }
- 
- /* Dual 16-bit add.  Result placed in t0 and t1 is marked as dead.
+@@ -8826,8 +8826,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                         shift = (insn >> 10) & 3;
+                         /* ??? In many cases it's not necessary to do a
+                            rotate, a shift is sufficient.  */
+-                        if (shift != 0)
+-                            tcg_gen_rotri_i32(tmp, tmp, shift * 8);
++                        tcg_gen_rotri_i32(tmp, tmp, shift * 8);
+                         op1 = (insn >> 20) & 7;
+                         switch (op1) {
+                         case 0: gen_sxtb16(tmp);  break;
+@@ -9904,8 +9903,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+             shift = (insn >> 4) & 3;
+             /* ??? In many cases it's not necessary to do a
+                rotate, a shift is sufficient.  */
+-            if (shift != 0)
+-                tcg_gen_rotri_i32(tmp, tmp, shift * 8);
++            tcg_gen_rotri_i32(tmp, tmp, shift * 8);
+             op = (insn >> 20) & 7;
+             switch (op) {
+             case 0: gen_sxth(tmp);   break;
+@@ -10632,11 +10630,10 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     case 7:
+                         goto illegal_op;
+                     default: /* Saturate.  */
+-                        if (shift) {
+-                            if (op & 1)
+-                                tcg_gen_sari_i32(tmp, tmp, shift);
+-                            else
+-                                tcg_gen_shli_i32(tmp, tmp, shift);
++                        if (op & 1) {
++                            tcg_gen_sari_i32(tmp, tmp, shift);
++                        } else {
++                            tcg_gen_shli_i32(tmp, tmp, shift);
+                         }
+                         tmp2 = tcg_const_i32(imm);
+                         if (op & 4) {
+@@ -10827,9 +10824,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                     goto illegal_op;
+                 }
+                 tmp = load_reg(s, rm);
+-                if (shift) {
+-                    tcg_gen_shli_i32(tmp, tmp, shift);
+-                }
++                tcg_gen_shli_i32(tmp, tmp, shift);
+                 tcg_gen_add_i32(addr, addr, tmp);
+                 tcg_temp_free_i32(tmp);
+                 break;
 -- 
 2.17.1
 
