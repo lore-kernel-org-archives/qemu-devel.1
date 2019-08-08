@@ -4,63 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.2 required=3.0 tests=DATE_IN_PAST_12_24,
 	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80767C0650F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DABDC0650F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D858214C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:11:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A12C214C6
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HR/mAY70"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D858214C6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EbHsC4RQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A12C214C6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvsVR-0006nv-In
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 20:11:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56511)
+	id 1hvsVa-0007Bj-CD
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 20:11:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56589)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hvsUg-0005Pf-0J
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:54 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hvsUj-0005UX-Eg
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hvsUf-0004m0-7w
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:53 -0400
-Received: from ozlabs.org ([203.11.71.1]:52787)
+ (envelope-from <dgibson@ozlabs.org>) id 1hvsUi-0004os-Ku
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:57 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46525 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hvsUe-0004k8-6k; Thu, 08 Aug 2019 20:10:53 -0400
+ id 1hvsUe-0004kC-D3; Thu, 08 Aug 2019 20:10:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 464Qck5LKxz9sNC; Fri,  9 Aug 2019 10:10:46 +1000 (AEST)
+ id 464Qck63dtz9sBF; Fri,  9 Aug 2019 10:10:46 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1565309446;
- bh=/A5p4D93UzcXt3DXlr5wmK66eUBvz9+7eH5r/seQfoM=;
+ bh=AN94QMwsieMhIsnCFXfNJtGDm7IVYYOGo4Ng0rCno5g=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HR/mAY70wq51WPzVeBTz6S0GZN1nvRV3Mi0mhDYVu+SvfeFxThRIvE69+Kzk9BadI
- DhATAFoCQHdauAKIddCAQAc1vP3Ew4EbJ1tcmWaNwdb89JKOjPMSijd/a2l6qsvpOZ
- 648B94DlT/61N3T5mmNs/4yIDjUW0P0E6DZy9y6w=
-Date: Thu, 8 Aug 2019 16:35:00 +1000
+ b=EbHsC4RQSES79jjCvDvd+K5j/MyZfLaBHkJEUVz3/yvNcDtVlJPPo2u/9UPlgqNlB
+ WmG4gp8pFUUJaSSZ3iqtCOI3V0JWZqoRgrSEYjFSyx5fS0TFu14HpKwTlOnfdPWjCt
+ QaeIYX14rK1ZLzP4h924b4laNmah7QEJO/YJwVWA=
+Date: Thu, 8 Aug 2019 16:47:12 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190808063500.GB5465@umbus.fritz.box>
-References: <20190805071302.6260-1-tao3.xu@intel.com>
- <20190806145055.4f645f60@redhat.com>
- <20190807175256.GD4669@habkost.net>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190808064712.GD5465@umbus.fritz.box>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-6-damien.hedde@greensocs.com>
+ <20190731060533.GD2032@umbus.fritz.box>
+ <51aa7e6d-3568-8485-4b67-a598a24a1f3d@greensocs.com>
+ <e7b05c24-ecd1-a437-7d97-07d69ab759ec@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
+ protocol="application/pgp-signature"; boundary="KdquIMZPjGJQvRdI"
 Content-Disposition: inline
-In-Reply-To: <20190807175256.GD4669@habkost.net>
+In-Reply-To: <e7b05c24-ecd1-a437-7d97-07d69ab759ec@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] numa: Introduce
- MachineClass::auto_enable_numa for implicit NUMA node
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] [PATCH v3 05/33] Switch to new api in qdev/bus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,71 +74,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Tao Xu <tao3.xu@intel.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
+ hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, thuth@redhat.com,
+ ehabkost@redhat.com, alistair@alistair23.me, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com, rth@twiddle.net,
+ Damien Hedde <damien.hedde@greensocs.com>, berrange@redhat.com,
+ cohuck@redhat.com, mark.burton@greensocs.com, qemu-ppc@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---z6Eq5LdranGa6ru8
-Content-Type: text/plain; charset=us-ascii
+--KdquIMZPjGJQvRdI
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 07, 2019 at 02:52:56PM -0300, Eduardo Habkost wrote:
-> On Tue, Aug 06, 2019 at 02:50:55PM +0200, Igor Mammedov wrote:
-> > On Mon,  5 Aug 2019 15:13:02 +0800
-> > Tao Xu <tao3.xu@intel.com> wrote:
-> >=20
-> > > Add MachineClass::auto_enable_numa field. When it is true, a NUMA node
-> > > is expected to be created implicitly.
-> > >=20
-> > > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> [...]
-> > > +    mc->auto_enable_numa =3D true;
-> >=20
-> > this will always create a numa node (that will affect not only RAM but
-> > also all other components that depends on numa state (like CPUs)),
-> > where as spapr_populate_memory() was only faking numa node in DT for RA=
-M.
-> > It makes non-numa configuration impossible.
-> > Seeing David's ACK on the patch it might be fine, but I believe
-> > commit message should capture that and explain why the change in
-> > behavior is fine.
+On Wed, Jul 31, 2019 at 01:31:28PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> On 7/31/19 11:29 AM, Damien Hedde wrote:
+> > On 7/31/19 8:05 AM, David Gibson wrote:
+> >> On Mon, Jul 29, 2019 at 04:56:26PM +0200, Damien Hedde wrote:
+> >>> Deprecate old reset apis and make them use the new one while they
+> >>> are still used somewhere.
+> >>>
+> >>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> >>> ---
+> >>>  hw/core/qdev.c         | 22 +++-------------------
+> >>>  include/hw/qdev-core.h | 28 ++++++++++++++++++++++------
+> >>>  2 files changed, 25 insertions(+), 25 deletions(-)
+> >>>
+> >>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >>> index 559ced070d..e9e5f2d5f9 100644
+> >>> --- a/hw/core/qdev.c
+> >>> +++ b/hw/core/qdev.c
+> >>> @@ -312,25 +312,9 @@ static void device_foreach_reset_child(Object *o=
+bj, void (*func)(Object *))
+> >>>      }
+> >>>  }
+> >>> =20
+> >>> -static int qdev_reset_one(DeviceState *dev, void *opaque)
+> >>> -{
+> >>> -    device_legacy_reset(dev);
+> >>> -
+> >>> -    return 0;
+> >>> -}
+> >>> -
+> >>> -static int qbus_reset_one(BusState *bus, void *opaque)
+> >>> -{
+> >>> -    BusClass *bc =3D BUS_GET_CLASS(bus);
+> >>> -    if (bc->reset) {
+> >>> -        bc->reset(bus);
+> >>> -    }
+> >>> -    return 0;
+> >>> -}
+> >>> -
+> >>>  void qdev_reset_all(DeviceState *dev)
+> >>>  {
+> >>> -    qdev_walk_children(dev, NULL, NULL, qdev_reset_one, qbus_reset_o=
+ne, NULL);
+> >>> +    device_reset(dev, false);
+> >>>  }
+> >>> =20
+> >>>  void qdev_reset_all_fn(void *opaque)
+> >>> @@ -340,7 +324,7 @@ void qdev_reset_all_fn(void *opaque)
+> >>> =20
+> >>>  void qbus_reset_all(BusState *bus)
+> >>>  {
+> >>> -    qbus_walk_children(bus, NULL, NULL, qdev_reset_one, qbus_reset_o=
+ne, NULL);
+> >>> +    bus_reset(bus, false);
+> >>>  }
+> >>> =20
+> >>>  void qbus_reset_all_fn(void *opaque)
+> >>> @@ -922,7 +906,7 @@ static void device_set_realized(Object *obj, bool=
+ value, Error **errp)
+> >>>              }
+> >>>          }
+> >>>          if (dev->hotplugged) {
+> >>> -            device_legacy_reset(dev);
+> >>> +            device_reset(dev, true);
+> >>
+> >> So.. is this change in the device_reset() signature really necessary?
+> >> Even if there are compelling reasons to handle warm reset in the new
+> >> API, that doesn't been you need to change device_reset() itself from
+> >> its established meaning of a cold (i.e. as per power cycle) reset.
+> >> Warm resets are generally called in rather more specific circumstances
+> >> (often under guest software direction) so it seems likely that users
+> >> would want to engage with the new reset API directly.  Or we could
+> >> just create a device_warm_reset() wrapper.  That would also avoid the
+> >> bare boolean parameter, which is not great for readability (you have
+> >> to look up the signature to have any idea what it means).
 >=20
-> After a quick look, all spapr code seems to have the same
-> behavior when nb_numa_nodes=3D=3D0 and nb_numa_nodes=3D=3D1, but I'd like
-> to be sure.
+> If the boolean is not meaningful, we can use an enum...
 
-That's certainly the intention.  If there are cases where it doesn't
-behave that way, it's a bug - although possible one we have to
-maintainer for machine compatibility.
-
-> David and/or Tao Xu: do you confirm there's no ABI change at all
-> on spapr after implicitly creating a NUMA node?
-
-I don't believe there is, no.
+That's certainly better, but I'm not seeing a compelling reason not to
+have separate function names.  It's just as clear and means less churn.
 
 >=20
+> > I've added device_reset_cold/warm wrapper functions to avoid having to
+> > pass the boolean parameter. it seems I forgot to use them in qdev.c
+> > I suppose, like you said, we could live with
+> > + no function with the boolean parameter
+> > + device_reset doing cold reset
+> > + device_reset_warm (or device_warm_reset) for the warm version
 > >=20
-> > >      smc->default_caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-> > >      smc->default_caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_ON;
-> > > diff --git a/include/hw/boards.h b/include/hw/boards.h
-> > > index 2eb9a0b4e0..4a350b87d2 100644
-> > > --- a/include/hw/boards.h
-> > > +++ b/include/hw/boards.h
-> > > @@ -220,6 +220,7 @@ struct MachineClass {
-> > >      bool smbus_no_migration_support;
-> > >      bool nvdimm_supported;
-> > >      bool numa_mem_supported;
-> > > +    bool auto_enable_numa;
-> > > =20
-> > >      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-> > >                                             DeviceState *dev);
+> > Damien
 > >=20
 >=20
 
@@ -146,25 +192,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---z6Eq5LdranGa6ru8
+--KdquIMZPjGJQvRdI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1LwpIACgkQbDjKyiDZ
-s5JDyw/8DuPUSfy/0vhR8vHsuLOfOMq6wgG0EZ6RJOZmN5xBXQfgtkJNL3QwfMjQ
-+o7Fj0nznrSH0Xd/jJPetl+b4PUQ6IMlHxEp2p6N0+yFGmNxc6FCCXT/Ozn1I0uk
-Y77RJ1MW7DnY1coaCASl/YUPtSqC+O1RBwkVRhxaqJRIu1pMfNPjGCaiAj8lqNYa
-Xx6bCxKy9xTjbCXyS5M+KokeWuS2zQ0G36LuqEOP5kMiQyhO63d0b3YWzLmMgtPt
-nLKEVQoyo5qkNEByDh/BlI0iFXw1h5NOQGBUWcA4o4A5wlLTZgcxEix2k+BJePI4
-xYl4cB+KQashg74usS6jDY2lNcJWfD+rHRWy8w4VA5U2yCzyoBaFoLc2DILpJCkO
-vcV1lOGipWM5T5iLvDEGB8wx6xCZhgNs/GUjO/LFT7jz5XKUw/9nM0AEhocpJKev
-L1gRz/qZQdsRIb9O84U92QtxP+QV/teBhbRu6QLVOT3PYH8k8Yzh2wAT5Y7ykdYk
-dko+EaHJVQAwMBKQBw1wvcP9Zq6E1IGaIdYn/4UgQFVG+mlbm2pOEwMWmSudSAW2
-m5l6kl37GCDBBTex1wDQY2lSneoftJE0nYfcwOVDl5PRF2Sv417Eoz5xOgMs5Mwx
-voxrRGpaMA4pWyNgVsxsPL9jgJJusy+fSI5tjxBeaGpWjrh8REc=
-=M4h5
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1LxW0ACgkQbDjKyiDZ
+s5Jxfw//WtrJvoUNYAdiXZaOZxpcyKgroiTlPM+S9ursS8mv4OIeIl1MkJiNfw7F
+ODFJENo9pbSsq9mDKvowt6O1kmuzRBIsaM3vo0ClFDMl49bYEWkP3W6m+YUDnteD
+FLJmJeIXyOAlYmURmvslDWB4fXB1JWDCPKGYU/qjrWe/kP3PKMbsyrSML4GtWyZg
+rk9sx/7evi8xTmQpjBqy/Kkbr5eKvSZrd+2gNJpmK9/pBbKxBXeZubIs2yGC9TU0
+6e+VxkZYq2TOHoPgWHktU8aj/71oyc0W/IWSKfMqeLdekB1zVW47qEnqz9l4Hg9w
+Cz/y6S94habmB/Xi4RERzw4VgYQhNZksyjqgAV5XYTODeDxoELk/hXJMqwtKE/FS
+lxU1eyvaU2KPhf5lKmTd2ZaZb8AXYY1wiTvOO5xK7Pq0afISIWzCT3IXutV3HRaZ
+pi6dggaAgORM7CbcgB4AAI+woHr8gQXhJn2cnv6fivIK/BrGJ7mPfbHi0r7C9AM3
+kdLXDoOQ2hl4vuM49ywREtxCywxzIPt4cht+yVUF+rVkvZIv1RmaFkxJLxtIcsmC
+f6cH0Vqdp0JvFmTZ0RVUzjEkK9j53Kd1FUDtWrqNHMAGpXG/ePQqAGgifprm1aE1
+Eqw7sTaca+/3n8arKRo+x62y7knpAv/7pzRVKzj+WVS0kUyW6yA=
+=wzJJ
 -----END PGP SIGNATURE-----
 
---z6Eq5LdranGa6ru8--
+--KdquIMZPjGJQvRdI--
 
