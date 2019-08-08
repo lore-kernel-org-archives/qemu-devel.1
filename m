@@ -2,94 +2,84 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E175C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 05:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D741C0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 05:22:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D85172186A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 05:10:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hpp9q7hS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D85172186A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id D08BB2186A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 05:22:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D08BB2186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvagf-0000gD-3k
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 01:10:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55818)
+	id 1hvasM-0004SH-0e
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 01:22:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57616)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvagC-0000Fa-0x
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:09:36 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvarm-0003vq-H1
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:21:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvagB-0001dH-0C
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:09:35 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33717)
+ (envelope-from <philmd@redhat.com>) id 1hvarl-0006ro-Fz
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:21:34 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36501)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvagA-0001d1-PG
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:09:34 -0400
-Received: by mail-pl1-x644.google.com with SMTP id c14so42918696plo.0
- for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 22:09:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ki0an8t+XycXtBkdcydgbnQPkp64g6Uoo4kwWAslmZo=;
- b=hpp9q7hSj+5+p8yAhBntyH7luXypM1AM/siXXJq1Ltrp8ODZNLr7iBEy5IJre+1dx/
- 1hOWsr5Z+uMNVHC6JOhimSePY52/HQ7vi5KH7CCPQlQ1OWfYmKBp8SwEUcSx+7iGm6Y8
- B4heo9cwbf7Kd8IRjAu1JWJeoQW6EAsTag6deSf6HlWk2mTXeZT7fUyclIba0O3qpCOO
- 7Jwul4OD4PcV8sYQU3sxh21LxzjKYK5P2xTDv0AVW2SWbh38mLioZQKogOE40fnjdk8V
- 6fOic5gZRxs6+UYL0AnRN+jph1MWhmaZRhpuhXvCzl9oG2qSLj8/OdyQELRMhPuSjlFi
- zPtQ==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvarl-0006qX-Al
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:21:33 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n4so93623138wrs.3
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 22:21:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ki0an8t+XycXtBkdcydgbnQPkp64g6Uoo4kwWAslmZo=;
- b=BaW/aVv6i13Z0UbTSRWqjiDNUNM1SFsFMgWTdN8soUERorgzbb8H06me+VkY2E3CAD
- Ee8eZaYA+NekTJlVS3bYBx8GLP9EPhLPY+a1Nw49JUr7OMrR5cC358OsRYYImpyYpYyn
- oSr95U6m4Wlg9rwI/merd3uYiMC0Mpe7zY13On+nCfapOOgehwmmb5HuIQV6/WVMGFV1
- f1U6BZFBC0RtnuW7upZ0pvevl/6qVIzSRumnZQbioTnbwGBGkppCpG+jllWVPmR4nNvZ
- KL/EscFXJ3Cq87+iavfMr5r0bAJO8CzTfEo+nB6HjX0T5Z0ziai8RhOktmPff4UDBFhm
- plFw==
-X-Gm-Message-State: APjAAAXAAWBPF4rCZVVwiaSbKYS13gZhJY13EQtI14zzZpqc3lZZ8oWu
- /nkd/bJH9RGsRyzElNZ4HJBY7KWiTQE=
-X-Google-Smtp-Source: APXvYqyDHpQEHzmoeGP9qqKyX96vGV6bMGcm591jk2whUVLJ2IwloRiKAl3TL0SuAm0Kj6F7Q7FR4g==
-X-Received: by 2002:a17:902:e613:: with SMTP id
- cm19mr10894436plb.299.1565240973340; 
- Wed, 07 Aug 2019 22:09:33 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id h1sm121799064pfg.55.2019.08.07.22.09.31
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 07 Aug 2019 22:09:31 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-13-armbru@redhat.com>
- <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
- <fd6a172e-1c79-5c0a-c9ba-3dbc671dc72f@redhat.com>
- <87pnlgl1sr.fsf@dusky.pond.sub.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <83f142c4-99cd-5d60-2547-1c0e608f638b@linaro.org>
-Date: Wed, 7 Aug 2019 22:09:29 -0700
+ bh=sTDFPUDFP7hahK5sGbqaKrywZqQt9tr3raO6bZ+pFmI=;
+ b=t4OxEPPF/qamIWHgymQPxNkko3n/K0xiQDSxeDa3T8ltN7JbqCK+32/sRqNjA0Q2al
+ yTW6x2/qCuv1EqQ2IjQTcwrtHpWBo8vkCEtrE10x5j7Pb5jy9KyOyTIEsMtYVgkFvvie
+ mHfB1HabX+1kGoflD1f4PKWXqJcJVih32j5wo+NDEjtQrHTplMBMOSRTwu0wZZBUA9Bl
+ um/CB0Bere+NqdCTqIu7M4lR3rtA73J8GyRaYrsxzBCGJmc8xN6AFQg70TIYoiUge0HW
+ oYUlZfrOH3RL0RTKL+AGPTQ5QN4NPIZRuYURpBtqH82C36cjLEpugXe+JXuDuUEaOHM0
+ UPPQ==
+X-Gm-Message-State: APjAAAVISFqbllxR84CuR+A8GJlHv7+4eimYFkoGJCK7iFOJzTHpiqG+
+ h3k1UbDaqeJyXMNopdsALpiY7w==
+X-Google-Smtp-Source: APXvYqwbaruhccrsUsfjZgRNwigBcXiiL4wlJotBQyaX6Zg7K0EzDhjjEWSYyI/KJpxGWcIU/yJm7g==
+X-Received: by 2002:adf:fe10:: with SMTP id n16mr14035141wrr.92.1565241691805; 
+ Wed, 07 Aug 2019 22:21:31 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id j33sm215874921wre.42.2019.08.07.22.21.30
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 22:21:31 -0700 (PDT)
+To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
+ <Alistair.Francis@wdc.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+References: <1565020374-23888-1-git-send-email-bmeng.cn@gmail.com>
+ <1565239479-2130-1-git-send-email-bmeng.cn@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <d0ca78ec-c5d4-bc80-6f2e-3e933013b5f4@redhat.com>
+Date: Thu, 8 Aug 2019 07:21:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <87pnlgl1sr.fsf@dusky.pond.sub.org>
+In-Reply-To: <1565239479-2130-1-git-send-email-bmeng.cn@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::644
-Subject: Re: [Qemu-devel] [PATCH v2 12/29] Include hw/irq.h a lot less
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [PATCH v2] hw: net: cadence_gem: Fix build errors
+ in DB_PRINT()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,30 +91,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/7/19 9:27 PM, Markus Armbruster wrote:
->>>>  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
->>>>  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
->>>> +typedef void (*qemu_irq_handler)(void *opaque, int n, int level);
->>
->> Should we prefer a consistent form for function pointer typedefs?  Here,
->> we've mixed 'rettype Name(params)' with 'rettype (*name)(params)'.
+Hi,
+
+On 8/8/19 6:44 AM, Bin Meng wrote:
+> When CADENCE_GEM_ERR_DEBUG is turned on, there are several
+> compilation errors in DB_PRINT(). Fix them.
 > 
-> Which of the two difference I can see do you mean?
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> 
+> ---
+> 
+> Changes in v2:
 
-Eric asked about function type vs pointer-to-function type.
+Please don't reply to previous version, post as a new thread (it is
+harder to notice your new versions in a emails threaded view).
 
-In usage,
+> - use HWADDR_PRIx instead of TARGET_FMT_plx for consistency
+> - use 'z' modifier to print sizeof(..)
+> 
+>  hw/net/cadence_gem.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+> index d412085..b6ff2c1 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -983,8 +983,9 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+>              return -1;
+>          }
+>  
+> -        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy, rxbufsize),
+> -                rx_desc_get_buffer(s->rx_desc[q]));
+> +        DB_PRINT("copy %d bytes to 0x%" HWADDR_PRIx "\n",
 
-  SaveStateHandler *variable;
-vs
-  qemu_irq_handler variable;
+rx_desc_get_buffer() returns a uint64_t, shouldn't you use a PRIx64
+format here?
 
+> +                 MIN(bytes_to_copy, rxbufsize),
 
-r~
+Nitpick #1: since you are cleaning this file up, bytes_to_copy and
+rxbufsize are both unsigned, so the first format should be %u instead of %d.
+
+> +                 rx_desc_get_buffer(s, s->rx_desc[q]));
+>  
+>          /* Copy packet data to emulated DMA buffer */
+>          address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
+> @@ -1157,7 +1158,7 @@ static void gem_transmit(CadenceGEMState *s)
+>              if (tx_desc_get_length(desc) > sizeof(tx_packet) -
+>                                                 (p - tx_packet)) {
+>                  DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x space " \
+> -                         "0x%x\n", (unsigned)packet_desc_addr,
+> +                         "0x%zx\n", (unsigned)packet_desc_addr,
+
+Nitpick #2: packet_desc_addr is of type hwaddr, so removing the cast the
+1st format is HWADDR_PRIx, also removing the 2nd cast the 2nd format is
+PRIx64.
+
+Then the 3rd format is now correct.
+
+>                           (unsigned)tx_desc_get_length(desc),
+>                           sizeof(tx_packet) - (p - tx_packet));
+>                  break;
+> 
 
