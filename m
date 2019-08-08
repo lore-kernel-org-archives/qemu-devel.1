@@ -2,93 +2,94 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09DBC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 17:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6520C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 17:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A081121743
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 17:29:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 807FE21743
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 17:31:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WAl1iYGI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A081121743
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PtKl4N0F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807FE21743
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvmEB-0001Xw-TT
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 13:29:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34453)
+	id 1hvmGa-0002ck-PT
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 13:31:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34786)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hvmDn-00018B-HT
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 13:29:04 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvmFo-0002Ce-3i
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 13:31:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hvmDm-0004sW-Gy
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 13:29:03 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34104)
+ (envelope-from <richard.henderson@linaro.org>) id 1hvmFn-0006Py-66
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 13:31:08 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:46003)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hvmDm-0004s0-AJ
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 13:29:02 -0400
-Received: by mail-pf1-x444.google.com with SMTP id b13so44475650pfo.1
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 10:29:02 -0700 (PDT)
+ id 1hvmFn-0006PN-0o
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 13:31:07 -0400
+Received: by mail-pl1-x644.google.com with SMTP id y8so1704497plr.12
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 10:31:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=c68VHGrRsl0wReanWvU77ZKK0T9KeGcaCFyjPLxQe48=;
- b=WAl1iYGIlaDqRy9f1UsYrLTeU4RlcYjCkMxadv5bQlnDXT/Q9kjCLFZddVdVCAmIzu
- rqX1xD3N+nsBKoxHNdFiHk85q6xLXmeQWn5VSF97IldkFmaRtmMulq8UEfysbV3qhG+f
- K77Q+P7uSOn80bX7iNybBhheoAFOKqZSIfw0xGH70lv9F0Q49KO+a4w185CDNnH9wI9E
- iN7CEqab4YnwMGrh8QCSh09rsIPq0A5+iW9H/i+lcdf1TVhTXsiGneTESVnTRW5BHLgX
- XER1HSH8u7zANi/u+PYYZJ+S6oywxvTfg9KWAyRYei8FMpOxui5DfB5BeVASwKKQfzVQ
- gv4Q==
+ bh=tVKbRGuIm21zFPhY/ggcKxcxU9bVhWAuCLXVfXVkKzg=;
+ b=PtKl4N0FdMVjv6HLGNjGuwniqPWWxL/+llc7y/tP7OB5Zxi4gjnjIhVhGAhBVSRXb+
+ Yovw6V9bLGLREDFzAThtOt6EHSu/XL7szI+SRcqnuindQu2nMoVaB0aDPvXWEqqQwQnX
+ XysMjQgQbPQQE5s6lhOoexCh4cPreDkvQy4C3Lu6cXQa7hSbg83ikyR0KFBs1VX/ZDez
+ VTvtOuiUlnaW6Tyc4QtK6p2C/fv7J83i7vIAQ+HeefCe3E8AOhXrSjcmiKwXtybQsNK1
+ 6BlWtHMz2nwRvHtTRYXApCimgTcTfaNJ+JVTMQsYrnKh4IQj71m2m+9OVC9lwKMsy0MV
+ UoyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=c68VHGrRsl0wReanWvU77ZKK0T9KeGcaCFyjPLxQe48=;
- b=LjLOdIFJGpIxpvqoyZhF7cgaKDk7LAPa/MjWDlB2GJwDzIOIh3UAxahn3wvscEvm9X
- r4LQBzyGJkm32H+PVIk/eZbGBiO9KZPCI4/ONieGQjbB4cmGHYpMCjl5J7hROLTBo3Ah
- sdKq0wl6wo99oWpdREpiWFS0P9AFZIyRqsLULiTJHjAVCj2TkO0LQQeDfnHQbEcJj2SO
- r5beM2kASG+tGaWUfGvrnPwHsjhfilv4NYMsnKuuna5IMhfk/RuIKOvbX5JjdTYJfJ53
- LnjSwzAMtsx00xKg4z9vv97fkt7duOKjQ+DFGvGfajAoyQwTFk7tAieroDo3NJ5yEZLQ
- Odhw==
-X-Gm-Message-State: APjAAAWoElykvx0vzuYYc/NU9kXjNh82/+jqPXawS7acDOkWTDROL2I5
- EMdIcLvOmILkLX2ASDhGLBMRdw==
-X-Google-Smtp-Source: APXvYqwzIBGVGopOJIAjIZvCKDOZgRy+mcfEjTfKRqDMU2Bd/jhSWvp/2nNjweK0w1byfO/CtabHeQ==
-X-Received: by 2002:a62:2c8e:: with SMTP id s136mr16915087pfs.3.1565285340558; 
- Thu, 08 Aug 2019 10:29:00 -0700 (PDT)
+ bh=tVKbRGuIm21zFPhY/ggcKxcxU9bVhWAuCLXVfXVkKzg=;
+ b=hBrX9ZLnNQin+Iq2KTxS7Zr5URgq67P7abUZF9j4ddkr1f55EgL+zaya5i+wL4OrXQ
+ dNcs1SbcGMSdOZ6N6qJfROFWbkU34S2HMC1Y6KqWFuV8oVjthHf73dmfjxXTKq0chFtY
+ j93lj7lI7uhIUo6J6xWdXQnv7g98iQVzWxgH0AkeIXaAJ1plTCCtSgYVnZTaI1rHBg4y
+ yCVUJaMY/8nkj0Ue+F+mzxcpZ9avHmURtg3h5cY9bo1WH4LNve4G6CPtAYrQ8mkniQP0
+ f94rfv8NJAiTkXQIB00TE6lTz/YLmqjMY/cJKv7ytjD5MvVfhgQK+XCXcrXKAwR1DlJQ
+ qkAg==
+X-Gm-Message-State: APjAAAVwKDAn1aFOPRb4o6sQpg9A0Qipy3VtBcNl/a77Oa0UuHKnYfC5
+ SDr7uuI/Zl2zm13yhWxUvaGbmw==
+X-Google-Smtp-Source: APXvYqxbVjwwVGhJVc1W//TTkzb+JOppp9ANwlLEg8HyjfP1i/dH+euJGV2QUjh2D+s1OckUcdi7ow==
+X-Received: by 2002:a17:902:36e:: with SMTP id
+ 101mr4500345pld.51.1565285466078; 
+ Thu, 08 Aug 2019 10:31:06 -0700 (PDT)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id w1sm3146422pjt.30.2019.08.08.10.28.58
+ by smtp.gmail.com with ESMTPSA id 195sm147843513pfu.75.2019.08.08.10.31.04
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 08 Aug 2019 10:28:59 -0700 (PDT)
+ Thu, 08 Aug 2019 10:31:05 -0700 (PDT)
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20190808164117.23348-1-alex.bennee@linaro.org>
- <20190808164117.23348-2-alex.bennee@linaro.org>
+ <20190808164117.23348-3-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <58444302-0862-10c3-eff5-5244e6dad783@linaro.org>
-Date: Thu, 8 Aug 2019 10:28:57 -0700
+Message-ID: <25d1668b-1256-2ba6-0fce-d8675e21f43f@linaro.org>
+Date: Thu, 8 Aug 2019 10:31:03 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190808164117.23348-2-alex.bennee@linaro.org>
+In-Reply-To: <20190808164117.23348-3-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH v1 1/7] fpu: move LIT64 helper to
- softfloat-types
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v1 2/7] fpu: move inline helpers into a
+ separate header
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,29 +108,21 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/8/19 9:41 AM, Alex Bennée wrote:
-> This simple pasting helper can be used by those who don't need the
-> entire softfloat api. Move it to the smaller types header.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  include/fpu/softfloat-types.h | 2 ++
->  include/fpu/softfloat.h       | 2 --
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/fpu/softfloat-types.h b/include/fpu/softfloat-types.h
-> index 2aae6a89b19..7e88152dfc4 100644
-> --- a/include/fpu/softfloat-types.h
-> +++ b/include/fpu/softfloat-types.h
-> @@ -80,6 +80,8 @@ this code that are retained.
->  #ifndef SOFTFLOAT_TYPES_H
->  #define SOFTFLOAT_TYPES_H
->  
-> +#define LIT64( a ) a##LL
+> +static inline void set_float_detect_tininess(int val, float_status *status)
+> +{
+> +    status->float_detect_tininess = val;
+> +}
+> +static inline void set_float_rounding_mode(int val, float_status *status)
+> +{
+> +    status->float_rounding_mode = val;
+> +}
+> +static inline void set_float_exception_flags(int val, float_status *status)
+> +{
+> +    status->float_exception_flags = val;
+> +}
 
-Better would be to replace all uses with {,U}INT64_C from <stdint.h>.
-
-But if you prefer this smaller patch for now,
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Can you please fix the spacing at the same time?  Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
