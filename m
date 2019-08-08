@@ -2,82 +2,82 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0A1C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E11C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:45:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6CFF2189E
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:36:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6CFF2189E
+	by mail.kernel.org (Postfix) with ESMTPS id 991E321874
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:45:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 991E321874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvhf8-000451-VY
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:36:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56985)
+	id 1hvhnV-0007VS-OT
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:45:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58281)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvheb-0003fC-Vx
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:36:27 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvhn0-00070u-SU
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvhea-0000Ly-Qk
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:36:25 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38847)
+ (envelope-from <philmd@redhat.com>) id 1hvhmz-0006Xc-Iu
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:45:06 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:35183)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvhea-0000Lh-Kg
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:36:24 -0400
-Received: by mail-wr1-f68.google.com with SMTP id g17so94755744wrr.5
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 05:36:24 -0700 (PDT)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvhmz-0006XA-DP
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:45:05 -0400
+Received: by mail-wm1-f65.google.com with SMTP id l2so2299433wmg.0
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 05:45:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ZshjD4jboO6BcWhGHrKDroDgRhpaBMBgKh1+7YIRwck=;
- b=aCMjz5OgiqPTWQ97gK+sDXteDUTTe/Qt3+gxnEZepYzbXFwtcvzndhUofvouMTGMf4
- orr4KahkVfLzPuKPy8/DkTGzKpxvwFGzM9p8TvNp79yewUvt6kY93UHO1igFJfTlmkbk
- Ea/owGJX5cNTlV71ASN+L0wQn0HL1wUq3BiOBVflJsVwcK2E5wxwleLlI06/5gHu86Tq
- QkfFbLNKkhs4AdOuWB2T369RWhORIBiK0btOvy3xgjfl8mLoCqShUjByluUMsmMzBy+f
- plDJcZdyXnNWHVTjil0DEe+GMYdZrB7aUpjmvM4qluL8Z1/aQxc2225IBnCWhc5roiaO
- B0zQ==
-X-Gm-Message-State: APjAAAVhpnklHJawKyLAQN0RREGNweg3tai7ilqEGqosoRV2QmXN9AAw
- TkEkOfgTqZPMjDOXMG1dYRSjVOXiO+s=
-X-Google-Smtp-Source: APXvYqyXc0EU+4JQJcoQjCXpmd6U7dA33o5y4HodmCg+b15M9jMbo2iS5S9SD69OZMd9USbUnZ+KeQ==
-X-Received: by 2002:adf:b1d0:: with SMTP id r16mr17274996wra.332.1565267783423; 
- Thu, 08 Aug 2019 05:36:23 -0700 (PDT)
+ bh=53Q3q447XzLKCoXf2C31qp3mSGpPh0Hmi1gehkOCIkQ=;
+ b=SNWcs5Wo0YIjlsrgTWdFSfl+2J2x/7aHZciJMd1rpVEwetKARc6oygF0qpvgCqfeC7
+ lyrXHmGFMCkdGobi4ggJcEFMefOqtbXzdmWd9gy//Bjhgzgz0xXGAcWHOz9JfZrGqUZh
+ FtwcKe/Wy2sk1uZnneF2YejEFuJqk4txMw4h+m8yrfmu81W9KtVyumRZ3SA8xcAx+7qA
+ 0II9g1qSPem8atI9JE+Y72YzFCujM2+loaYCFlo+wNNsZ/0nb1NO8A4FcruQQXfFrl/z
+ 0hK8pbVNNf0p1HE75T5c9YiGWeYWSijekNOC/kGU28jvFIsYC/PTpJXvSMYgThzi+Vcg
+ hBBA==
+X-Gm-Message-State: APjAAAVeaRlhBAIDDV2Coyzt9BB9aZHxDhiVGQx+IGjF+2ujGP2Ac0cO
+ s+I7y1bTQ8YM26LFirXY06yoUw==
+X-Google-Smtp-Source: APXvYqyW8sChRXeghe608Htk3PNYXXBjDjbo34L4U+UJklhofB8ptQn70GSHFJBQNWpUQJDjnq9u4w==
+X-Received: by 2002:a1c:238d:: with SMTP id j135mr4463480wmj.39.1565268303984; 
+ Thu, 08 Aug 2019 05:45:03 -0700 (PDT)
 Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
  [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id o16sm3090543wrp.23.2019.08.08.05.36.22
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 08 Aug 2019 05:36:22 -0700 (PDT)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-17-armbru@redhat.com>
- <2739ad81-5e97-a7a6-8888-587224032a80@redhat.com>
- <87y303g8cs.fsf@dusky.pond.sub.org>
+ by smtp.gmail.com with ESMTPSA id c3sm97046084wrx.19.2019.08.08.05.45.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 08 Aug 2019 05:45:03 -0700 (PDT)
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Balamuruhan S <bala24@linux.ibm.com>
+References: <20190807071445.4109-1-bala24@linux.ibm.com>
+ <20190807071445.4109-2-bala24@linux.ibm.com>
+ <20190808104904.GD2534@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
  url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1a6d8a72-14e6-243f-1176-392e430d91e8@redhat.com>
-Date: Thu, 8 Aug 2019 14:36:21 +0200
+Message-ID: <5b5eb81f-86c7-30c3-16e3-7be969e45fde@redhat.com>
+Date: Thu, 8 Aug 2019 14:45:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <87y303g8cs.fsf@dusky.pond.sub.org>
+In-Reply-To: <20190808104904.GD2534@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH v2 16/29] Include exec/memory.h slightly
- less
+X-Received-From: 209.85.128.65
+Subject: Re: [Qemu-devel] [RFC PATCH 1/6] utils/python_api: add scripting
+ interface for Qemu with python lib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,135 +89,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Damien Hedde <damien.hedde@greensocs.com>, maddy@linux.vnet.ibm.com,
+ anju@linux.vnet.ibm.com, qemu-devel@nongnu.org, hari@linux.vnet.ibm.com,
+ clg@kaod.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/8/19 2:16 PM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+On 8/8/19 12:49 PM, Daniel P. Berrangé wrote:
+> On Wed, Aug 07, 2019 at 12:44:40PM +0530, Balamuruhan S wrote:
+>> Adds scripting interface with python library to call functions in
+>> python modules from Qemu that can be used to feed input externally
+>> and without recompiling Qemu that can be used for early development,
+>> testing and can be extended to abstract some of Qemu code out to a
+>> python script to ease maintenance.
 > 
->> On 8/6/19 5:14 PM, Markus Armbruster wrote:
->>> Drop unnecessary inclusions from headers.  Downgrade a few more to
->>> exec/hwaddr.h.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->>>  hw/audio/lm4549.h                   | 1 +
->>>  hw/display/edid-region.c            | 1 +
->>>  hw/display/tc6393xb.c               | 1 +
->>>  hw/net/can/can_sja1000.h            | 1 +
->>>  hw/net/ne2000.c                     | 1 +
->>>  hw/xtensa/xtensa_memory.h           | 1 -
->>>  include/hw/arm/boot.h               | 1 -
->>>  include/hw/arm/fsl-imx7.h           | 1 -
->>>  include/hw/arm/soc_dma.h            | 2 +-
->>>  include/hw/block/flash.h            | 2 +-
->>>  include/hw/boards.h                 | 1 +
->>>  include/hw/char/parallel.h          | 1 -
->>>  include/hw/display/milkymist_tmu2.h | 1 +
->>>  include/hw/display/tc6393xb.h       | 2 --
->>>  include/hw/display/vga.h            | 2 +-
->>>  include/hw/hw.h                     | 1 -
->>>  include/hw/i2c/pm_smbus.h           | 1 +
->>>  include/hw/i2c/smbus_eeprom.h       | 1 +
->>>  include/hw/misc/auxbus.h            | 1 +
->>>  include/hw/ppc/xics.h               | 1 +
->>>  include/hw/usb.h                    | 1 +
->>>  include/hw/virtio/virtio.h          | 1 +
->>>  migration/colo.c                    | 1 +
->>>  migration/migration.h               | 1 +
->>>  migration/postcopy-ram.c            | 1 +
->>>  migration/rdma.c                    | 1 +
->>>  26 files changed, 20 insertions(+), 10 deletions(-)
->>>
->> [...]> diff --git a/migration/colo.c b/migration/colo.c
->>> index 9f84b1fa3c..0b5b620391 100644
->>> --- a/migration/colo.c
->>> +++ b/migration/colo.c
->>> @@ -23,6 +23,7 @@
->>>  #include "io/channel-buffer.h"
->>>  #include "trace.h"
->>>  #include "qemu/error-report.h"
->>> +#include "qemu/rcu.h"
->>>  #include "migration/failover.h"
->>>  #ifdef CONFIG_REPLICATION
->>>  #include "replication.h"
->>> diff --git a/migration/migration.h b/migration/migration.h
->>> index 26f01d00f6..a7882af67a 100644
->>> --- a/migration/migration.h
->>> +++ b/migration/migration.h
->>> @@ -14,6 +14,7 @@
->>>  #ifndef QEMU_MIGRATION_H
->>>  #define QEMU_MIGRATION_H
->>>  
->>> +#include "exec/cpu-common.h"
->>>  #include "qapi/qapi-types-migration.h"
->>>  #include "qemu/thread.h"
->>>  #include "qemu/coroutine_int.h"
->>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->>> index 9faacacc9e..56054d0a73 100644
->>> --- a/migration/postcopy-ram.c
->>> +++ b/migration/postcopy-ram.c
->>> @@ -25,6 +25,7 @@
->>>  #include "ram.h"
->>>  #include "qapi/error.h"
->>>  #include "qemu/notify.h"
->>> +#include "qemu/rcu.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "sysemu/balloon.h"
->>>  #include "qemu/error-report.h"
->>> diff --git a/migration/rdma.c b/migration/rdma.c
->>> index 3036221ee8..b0e27b6174 100644
->>> --- a/migration/rdma.c
->>> +++ b/migration/rdma.c
->>> @@ -25,6 +25,7 @@
->>>  #include "qemu/error-report.h"
->>>  #include "qemu/main-loop.h"
->>>  #include "qemu/module.h"
->>> +#include "qemu/rcu.h"
->>>  #include "qemu/sockets.h"
->>>  #include "qemu/bitmap.h"
->>>  #include "qemu/coroutine.h"
->>>
->>
->> To keep this patch cleaner, can you use a preparatory patch adding the
->> various "qemu/rcu.h"?
+> I admit the use case is interesting, but this is opening a can of
+> worms...
 > 
-> How would I explain that new patch?
+> Historically the project has held the view that we do not wish
+> to have an mechanism to support loading out of tree code into the
+> QEMU process. Much previously talk was around dlopen'd C plugins,
+> but dynanically loaded Python plugins are doing the same thing
+> at a conceptual level.
 > 
-> Other patches that drop includes from headers also fix up their users by
-> adding the includes that are actually needed there, e.g.:
+> We didn't wish to expose internals of QEMU in a plugin API to
+> avoid having any kind of API promise across releases.
 > 
-> * PATCH 03: hw/qdev-core.h dropped, fixups add only qemu/bitops.h or
->   hw/irq.h.
+> There was also the question of licensing with plugins opening
+> the door for people to extend QEMU with non-free/closed source
+> functionality.
 > 
-> * PATCH 10: hw/ide/internal.h dropped, some fixups add only
->   exec/address-spaces.h or sysemu/sysemu.h.
+> While this series only uses the plugin for one fairly obscure
+> device, once a python plugin feature is intergrated in QEMU
+> there will inevitably be requests to use it in further areas
+> of QEMU.
 > 
-> * PATCH 17: qom/object.h dropped, fixup adds only hw/hw.h.
-> 
-> * PATCH 20: qemu/main-loop.h dropped, some fixups add only block/aio.h
->   or qemu/thread.h.  Touches five times as many files as this one...
-> 
-> * More.
+> IOW, acceptance of this patch is a significant question for
+> the project, and a broader discussion point, than just this
+> PPC feature patch series.
 
-I See.
+Since performance is not an issue, we can use a QMP-PyMMIO bridge.
+Most of the functions required are already exposed, Damien completed the
+missing ones in his 'FAULT INJECTION FRAMEWORK' series:
+https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06230.html
 
-> Does each of them need preparatory patches?
-
-If those are only 4, why not... However this series is already big
-enough, and what matters more: bisectable. Preparatory 3-lines patch
-makes no difference, I was just aiming at perfection ;)
-
-I am happy with the current organization.
-
-> Would it help if their commit messages explained the fixups more
-> clearly?
-
-No, not that much, each commit is already well explained.
-
-Sorry for the noise!
-
-Phil,
+Maybe we simply need a clearer (better documented) QMP 'MMIO' API?
 
