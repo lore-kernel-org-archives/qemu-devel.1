@@ -2,66 +2,65 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=DATE_IN_PAST_12_24,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DATE_IN_PAST_12_24,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA15DC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE32C0650F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:13:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89152214C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:12:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0135214C6
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 00:12:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IRu64QSK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89152214C6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Nd1getES"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0135214C6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvsWY-0001MD-Rm
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 20:12:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56514)
+	id 1hvsWh-0001kq-A0
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 20:12:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56596)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hvsUg-0005Pg-1V
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:55 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hvsUj-0005W7-Vz
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hvsUf-0004lz-7v
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:53 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38629 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1hvsUj-0004p9-5t
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 20:10:57 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:53875 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hvsUe-0004kB-5A; Thu, 08 Aug 2019 20:10:53 -0400
+ id 1hvsUe-0004kF-8Z; Thu, 08 Aug 2019 20:10:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 464Qck6r8yz9sNF; Fri,  9 Aug 2019 10:10:46 +1000 (AEST)
+ id 464Qcl0YNtz9sND; Fri,  9 Aug 2019 10:10:46 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1565309446;
- bh=1ke8JD3ZSVwGuzGXk1wLieiqK+LtCo54Db+ej8F4zic=;
+ d=gibson.dropbear.id.au; s=201602; t=1565309447;
+ bh=KtXmz4IYJ3+XqNaZdl9jHL1w1VOiuY+sMi9L/IYw0PE=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=IRu64QSKDzTLtS9FjWRAXWfr/wdSSZw6gwAxJ4BQoZKzTpKNgpfsthEMN4d6zTJsX
- zvO/DWiZL3ST3MeaowqXxZUK6x6k5jEiwTHEYD+uqAQYO8MjZre6iJclFtSCGvNT2O
- ++AGhLzXmoKjVO6hVQCpNahb8vXNPrO0YWNAhxo8=
-Date: Thu, 8 Aug 2019 16:35:58 +1000
+ b=Nd1getESQFGwndwJBCcNnM0nCtOeR2lc9G3RcZlS8Pa1Cc+xgu3eQ6JMro+2MbYRr
+ UYy8aITePj4A76R7fcAKw9E9RGupxJmWXnBl3wauDkBCJTCmyGplY3CW/B8X01spGc
+ N2fvCa5qKoSZHEu+n6wWtF1a1fD1bSmTQVqzBM9w=
+Date: Thu, 8 Aug 2019 16:48:10 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20190808063558.GC5465@umbus.fritz.box>
-References: <20190805071302.6260-1-tao3.xu@intel.com>
- <20190806145055.4f645f60@redhat.com>
- <20190807175256.GD4669@habkost.net>
- <20190808063500.GB5465@umbus.fritz.box>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <20190808064810.GE5465@umbus.fritz.box>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-6-damien.hedde@greensocs.com>
+ <20190731060533.GD2032@umbus.fritz.box>
+ <51aa7e6d-3568-8485-4b67-a598a24a1f3d@greensocs.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="L6iaP+gRLNZHKoI4"
+ protocol="application/pgp-signature"; boundary="ZInfyf7laFu/Kiw7"
 Content-Disposition: inline
-In-Reply-To: <20190808063500.GB5465@umbus.fritz.box>
+In-Reply-To: <51aa7e6d-3568-8485-4b67-a598a24a1f3d@greensocs.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 203.11.71.1
-Subject: Re: [Qemu-devel] [PATCH] numa: Introduce
- MachineClass::auto_enable_numa for implicit NUMA node
+Subject: Re: [Qemu-devel] [PATCH v3 05/33] Switch to new api in qdev/bus
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,61 +72,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Tao Xu <tao3.xu@intel.com>,
- qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
+ hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, thuth@redhat.com,
+ ehabkost@redhat.com, alistair@alistair23.me, qemu-s390x@nongnu.org,
+ qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com, rth@twiddle.net,
+ berrange@redhat.com, cohuck@redhat.com, mark.burton@greensocs.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---L6iaP+gRLNZHKoI4
+--ZInfyf7laFu/Kiw7
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 08, 2019 at 04:35:00PM +1000, David Gibson wrote:
-> On Wed, Aug 07, 2019 at 02:52:56PM -0300, Eduardo Habkost wrote:
-> > On Tue, Aug 06, 2019 at 02:50:55PM +0200, Igor Mammedov wrote:
-> > > On Mon,  5 Aug 2019 15:13:02 +0800
-> > > Tao Xu <tao3.xu@intel.com> wrote:
-> > >=20
-> > > > Add MachineClass::auto_enable_numa field. When it is true, a NUMA n=
-ode
-> > > > is expected to be created implicitly.
-> > > >=20
-> > > > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> > > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> > > > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> > [...]
-> > > > +    mc->auto_enable_numa =3D true;
-> > >=20
-> > > this will always create a numa node (that will affect not only RAM but
-> > > also all other components that depends on numa state (like CPUs)),
-> > > where as spapr_populate_memory() was only faking numa node in DT for =
-RAM.
-> > > It makes non-numa configuration impossible.
-> > > Seeing David's ACK on the patch it might be fine, but I believe
-> > > commit message should capture that and explain why the change in
-> > > behavior is fine.
+On Wed, Jul 31, 2019 at 11:29:36AM +0200, Damien Hedde wrote:
+>=20
+>=20
+> On 7/31/19 8:05 AM, David Gibson wrote:
+> > On Mon, Jul 29, 2019 at 04:56:26PM +0200, Damien Hedde wrote:
+> >> Deprecate old reset apis and make them use the new one while they
+> >> are still used somewhere.
+> >>
+> >> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> >> ---
+> >>  hw/core/qdev.c         | 22 +++-------------------
+> >>  include/hw/qdev-core.h | 28 ++++++++++++++++++++++------
+> >>  2 files changed, 25 insertions(+), 25 deletions(-)
+> >>
+> >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >> index 559ced070d..e9e5f2d5f9 100644
+> >> --- a/hw/core/qdev.c
+> >> +++ b/hw/core/qdev.c
+> >> @@ -312,25 +312,9 @@ static void device_foreach_reset_child(Object *ob=
+j, void (*func)(Object *))
+> >>      }
+> >>  }
+> >> =20
+> >> -static int qdev_reset_one(DeviceState *dev, void *opaque)
+> >> -{
+> >> -    device_legacy_reset(dev);
+> >> -
+> >> -    return 0;
+> >> -}
+> >> -
+> >> -static int qbus_reset_one(BusState *bus, void *opaque)
+> >> -{
+> >> -    BusClass *bc =3D BUS_GET_CLASS(bus);
+> >> -    if (bc->reset) {
+> >> -        bc->reset(bus);
+> >> -    }
+> >> -    return 0;
+> >> -}
+> >> -
+> >>  void qdev_reset_all(DeviceState *dev)
+> >>  {
+> >> -    qdev_walk_children(dev, NULL, NULL, qdev_reset_one, qbus_reset_on=
+e, NULL);
+> >> +    device_reset(dev, false);
+> >>  }
+> >> =20
+> >>  void qdev_reset_all_fn(void *opaque)
+> >> @@ -340,7 +324,7 @@ void qdev_reset_all_fn(void *opaque)
+> >> =20
+> >>  void qbus_reset_all(BusState *bus)
+> >>  {
+> >> -    qbus_walk_children(bus, NULL, NULL, qdev_reset_one, qbus_reset_on=
+e, NULL);
+> >> +    bus_reset(bus, false);
+> >>  }
+> >> =20
+> >>  void qbus_reset_all_fn(void *opaque)
+> >> @@ -922,7 +906,7 @@ static void device_set_realized(Object *obj, bool =
+value, Error **errp)
+> >>              }
+> >>          }
+> >>          if (dev->hotplugged) {
+> >> -            device_legacy_reset(dev);
+> >> +            device_reset(dev, true);
 > >=20
-> > After a quick look, all spapr code seems to have the same
-> > behavior when nb_numa_nodes=3D=3D0 and nb_numa_nodes=3D=3D1, but I'd li=
-ke
-> > to be sure.
+> > So.. is this change in the device_reset() signature really necessary?
+> > Even if there are compelling reasons to handle warm reset in the new
+> > API, that doesn't been you need to change device_reset() itself from
+> > its established meaning of a cold (i.e. as per power cycle) reset.
+> > Warm resets are generally called in rather more specific circumstances
+> > (often under guest software direction) so it seems likely that users
+> > would want to engage with the new reset API directly.  Or we could
+> > just create a device_warm_reset() wrapper.  That would also avoid the
+> > bare boolean parameter, which is not great for readability (you have
+> > to look up the signature to have any idea what it means).
 >=20
-> That's certainly the intention.  If there are cases where it doesn't
-> behave that way, it's a bug - although possible one we have to
-> maintainer for machine compatibility.
->=20
-> > David and/or Tao Xu: do you confirm there's no ABI change at all
-> > on spapr after implicitly creating a NUMA node?
->=20
-> I don't believe there is, no.
+> I've added device_reset_cold/warm wrapper functions to avoid having to
+> pass the boolean parameter. it seems I forgot to use them in qdev.c
+> I suppose, like you said, we could live with
+> + no function with the boolean parameter
+> + device_reset doing cold reset
+> + device_reset_warm (or device_warm_reset) for the warm version
 
-Oh, FWIW, the PAPR interface which is what defines the guest
-environment has no notion of "non NUMA" except in the sense of a
-system with exactly one NUMA node.
+Ok, good.
+
+I'm afraid the whole series still makes me pretty uncomfortable,
+though, since the whole "warm reset" concept still seems way to vague
+to me.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -135,25 +186,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---L6iaP+gRLNZHKoI4
+--ZInfyf7laFu/Kiw7
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1Lws4ACgkQbDjKyiDZ
-s5IYkg/7BsEjnQpBYnBYSBjluREWEnM1FWXzmP0xh/LRX/0tkmye2By2rRvOtHzl
-RhyP/coKx46m4Y+XkjddJ9ZKo1TiAGtMFzuz/438nOAKLL/1+viGA+5734XuQ/Mh
-GTXwvKPtQcufD5buDxRDLqxWldOxmdBl1clpnOLpcjav4zuUZ0KLkzFkGYzctgFv
-Hd1ukD5uZw+ZgjLEAJx+bg3QAGFYyuJ1T4DqHUWKkTVFVZ6bkHYGb+OviImQ0SIo
-WCwpBaWrPkw6DvX8eZ5FUO+KBvnPfIAAYYbrbMAk+G4TWE4zwVACHcX+4umx2TvF
-TO2K+Mwf1rV/IoECWCxodlO888elvTnCVqArU+PBSRncaEVcPp9Le4yVyHk0z7al
-6w3+wWWQR1pDVhXIbt/VoufI0j/9mswR84jOS45gWIhu83nkyfSwZGBe/3OWtP/Q
-kEmPBc7jyfvbT6xlM9mzSQdLAAR2BOE8LbTl79rK3M6YU5pzFCh4Z/9JA2mSl2vv
-VLE0iJCImlrh8uDGW9ubrrN+Ipv29/8jqqpDu7Nc2+iDD1eMG900zMB4EzfVgOea
-nPwvgcQU1+XWqGX2Un2s9WRftRrRS4VcPZmbxsa4qLGKD3WIVSP9hvHj+66LTXUT
-w41lZkdPHvh+SwbAYcXAIntVf2anwXRmUxkxssje4KEc4gozfCM=
-=wLmW
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1LxaoACgkQbDjKyiDZ
+s5LvXxAAwXnl73bl68b4Lmgt0Bw16kNIKHsIAv/Lp6RnpjIV1j4qDW/8hky3adKM
+uqFMCAZJshIXddlkab6Ga/qZt05ymPbJK/JUQHCXbg5sTn9LX0ae5QkOlFcCg5FY
+Pr47tAsAXfVOMyA04kre7gnS9ocgYhtCd3tVanbP+Guc8mBc2tfr/FdpyFwC2y0N
+JNZRqjEP9Aa5aER7GHw5sRlc1FcfrLBYJp9lo2QAWLld+glmOkjQ6U7gDpDDauAc
+ofFH7uAhvhnBYwqqnfEAXAQrQqDljwvVICuDMF2vFApuaXhCQga6tLIhV4We4XHY
+KDnum0Vbp6707x5nilF2CL1fcRWeEJeeyuGuOwjrFabRnVIhY9dUfAPadlRx9GgF
+rcOo5Tf4LXY/C43BlkVg6NvOC9EF4/E19UQkWJYfQLvvBGfpD3KtZuxcmL74ogLz
+eb0m+DKg9uWxynux43YGVIyg7Gjk5dtSimHTXLCidqBwMP+G3IrulFbjtgrgOg6N
+x6KXqqfa+1wYD9sg6kKIq90U5K+Zd/BEHkh367VIHY8usSuXFp5DExVSr2GijpT1
+H8do/Dkeflov6uxD3CkkOKgMDNOZQVtLXLmpK17AM9SjNzRMFvBKYdrNx3VhSkJD
+SC7cpFOCC/GEbtDE7RPto6KfMJW2uZaBMdq5OffPcN5fp1cTFY4=
+=mxkY
 -----END PGP SIGNATURE-----
 
---L6iaP+gRLNZHKoI4--
+--ZInfyf7laFu/Kiw7--
 
