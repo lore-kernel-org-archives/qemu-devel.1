@@ -2,51 +2,50 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F97C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53A3C0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A95721874
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:49:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A95721874
+	by mail.kernel.org (Postfix) with ESMTPS id 7A12D21874
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:51:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A12D21874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvhqq-0000cZ-M1
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:49:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58839)
+	id 1hvhso-0001kf-QK
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:51:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59653)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hvhqG-00005h-JL
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:48:29 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hvhsL-0001GU-SR
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hvhqF-0000W8-JQ
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:48:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60053)
+ (envelope-from <mreitz@redhat.com>) id 1hvhsK-0002Jw-SH
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:50:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54355)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hvhqD-0000Sf-6E; Thu, 08 Aug 2019 08:48:25 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hvhsH-0002GA-UO; Thu, 08 Aug 2019 08:50:34 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 294DB30A00E9;
- Thu,  8 Aug 2019 12:48:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 03BE7C028329;
+ Thu,  8 Aug 2019 12:50:33 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.128])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 39A9960A35;
- Thu,  8 Aug 2019 12:48:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AF935C219;
+ Thu,  8 Aug 2019 12:50:30 +0000 (UTC)
 To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
  <dplotnikov@virtuozzo.com>, kwolf@redhat.com, armbru@redhat.com
 References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
  <20190704130949.14017-2-dplotnikov@virtuozzo.com>
- <f7f3b12c-2c04-87bc-a88f-f89a2e50bc4e@redhat.com>
- <8f43b3ab-7c90-0965-4707-9aae1be787a0@redhat.com>
+ <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <082f08e5-7c3b-9e6a-5bdb-8785158a82a7@redhat.com>
-Date: Thu, 8 Aug 2019 14:48:19 +0200
+Message-ID: <82193040-c2ac-93fc-4230-8bbe136aef3c@redhat.com>
+Date: Thu, 8 Aug 2019 14:50:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <8f43b3ab-7c90-0965-4707-9aae1be787a0@redhat.com>
+In-Reply-To: <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="9PRHFNXmprfxeEaqhZE3ip2sZ0bRjWLtv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Thu, 08 Aug 2019 12:48:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.31]); Thu, 08 Aug 2019 12:50:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH v2 1/3] qcow2: introduce compression type
@@ -107,120 +106,111 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9PRHFNXmprfxeEaqhZE3ip2sZ0bRjWLtv
-Content-Type: multipart/mixed; boundary="2nJEtp54P8pTdXwmR5lM735OK5E3ohMfD";
+--GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P
+Content-Type: multipart/mixed; boundary="Nu2GKNNz2cazKTGwBjVXt9eTAT46q1OqA";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
  <dplotnikov@virtuozzo.com>, kwolf@redhat.com, armbru@redhat.com
 Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
  qemu-devel@nongnu.org
-Message-ID: <082f08e5-7c3b-9e6a-5bdb-8785158a82a7@redhat.com>
+Message-ID: <82193040-c2ac-93fc-4230-8bbe136aef3c@redhat.com>
 Subject: Re: [PATCH v2 1/3] qcow2: introduce compression type feature
 References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
  <20190704130949.14017-2-dplotnikov@virtuozzo.com>
- <f7f3b12c-2c04-87bc-a88f-f89a2e50bc4e@redhat.com>
- <8f43b3ab-7c90-0965-4707-9aae1be787a0@redhat.com>
-In-Reply-To: <8f43b3ab-7c90-0965-4707-9aae1be787a0@redhat.com>
+ <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
+In-Reply-To: <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
 
---2nJEtp54P8pTdXwmR5lM735OK5E3ohMfD
+--Nu2GKNNz2cazKTGwBjVXt9eTAT46q1OqA
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 08.08.19 02:09, Eric Blake wrote:
-> On 8/7/19 6:12 PM, Max Reitz wrote:
+On 08.08.19 02:18, Eric Blake wrote:
+> On 7/4/19 8:09 AM, Denis Plotnikov wrote:
+>> The patch adds some preparation parts for incompatible compression typ=
+e
+>> feature to QCOW2 header that indicates that *all* compressed clusters
+>> must be (de)compressed using a certain compression type.
+>>
+>> It is implied that the compression type is set on the image creation a=
+nd
+>> can be changed only later by image conversion, thus compression type
+>> defines the only compression algorithm used for the image.
+>>
+>> The goal of the feature is to add support of other compression algorit=
+hms
+>> to qcow2. For example, ZSTD which is more effective on compression tha=
+n ZLIB.
+>> It works roughly 2x faster than ZLIB providing a comparable compressio=
+n ratio
+>> and therefore provide a performance advantage in backup scenarios.
 >=20
->>> =20
->>> +static int check_compression_type(BDRVQcow2State *s, Error **errp)
->>> +{
->>> +    switch (s->compression_type) {
->>> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
->>> +        break;
->>> +
->>> +    default:
->>> +        error_setg(errp, "qcow2: unknown compression type: %u",
->>> +                   s->compression_type);
->>> +        return -ENOTSUP;
->>> +    }
->>> +
->>> +    /*
->>> +     * if the compression type differs from QCOW2_COMPRESSION_TYPE_Z=
-LIB
->>> +     * the incompatible feature flag must be set
->>> +     */
->>> +
->>> +    if (s->compression_type !=3D QCOW2_COMPRESSION_TYPE_ZLIB &&
->>> +        !(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_TYPE=
-)) {
->>> +            error_setg(errp, "qcow2: Invalid compression type settin=
-g");
->>> +            return -EINVAL;
->>
->> (1) Why is this block indented twice?
->>
->> (2) Do we need this at all?  Sure, it=E2=80=99s a corruption, but do w=
-e need to
->> reject the image because of it?
+> provides
 >=20
-> Yes, because otherwise there is a high risk of some application
-> misinterpreting the contents (whether an older qemu that silently
-> ignores unrecognized headers, and so assumes it can decode compressed
-> clusters with zlib even though the decode will only succeed with zstd,
-> or can write a compressed cluster with zlib which then causes corruptio=
-n
-> when the newer qemu tries to read it with zstd).  The whole point of an=
-
-> incompatible bit is to reject opening an image that can't be interprete=
-d
-> correctly, and where writing may break later readers.
-
-Fair enough.
-
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
 >>
->> Overall, I don=E2=80=99t see the purpose of this function.  I don=E2=80=
-=99t see any need
->> to call it in qcow2_update_header().  And without =E2=80=9Cdoes non-zl=
-ib
->> compression imply the respective incompatible flag?=E2=80=9D check, yo=
-u can just
->> inline the rest (checking that we recognize the compression type) into=
-
->> qcow2_do_open().
+>> The default compression is ZLIB. Images created with ZLIB compression =
+type
+>> are backward compatible with older qemu versions.
 >>
+>> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
 >=20
-> Inlining may indeed be possible; the real question is whether the
-> function expands later in the series to the point that inlining no
-> longer makes sense.
+>> +++ b/docs/interop/qcow2.txt
+>> @@ -109,7 +109,12 @@ in the description of a field.
+>>                                  An External Data File Name header ext=
+ension may
+>>                                  be present if this bit is set.
+>> =20
+>> -                    Bits 3-63:  Reserved (set to 0)
+>> +                    Bit 3:      Compression type bit. The bit must be=
+ set if
+>> +                                the compression type differs from def=
+ault: zlib.
+>=20
+> I'd word this 'from the default of zlib.'
+>=20
+>> +                                If the compression type is default th=
+e bit must
+>> +                                be unset.
+>=20
+> Why? I see no reason to forbid a qcow2 image that has the incompatible
+> bit set but still uses zlib compression.  True, such an image is not as=
 
-A quick search says no.
+> friendly to older clients, but it is not technically wrong, and newer
+> clients would still be able to use the image if not for this sentence
+> telling them they must not.
+
+Just because an image doesn=E2=80=99t adhere to the specification doesn=E2=
+=80=99t mean
+you have to reject it, if the intention is clear.
+
+> I'd drop this sentence.
+
+I wouldn=E2=80=99t, I like it (in essence).  Though maybe the =E2=80=9Cmu=
+st=E2=80=9D is indeed
+too strong and it should be a =E2=80=9Cshould=E2=80=9D instead.
 
 Max
 
 
---2nJEtp54P8pTdXwmR5lM735OK5E3ohMfD--
+--Nu2GKNNz2cazKTGwBjVXt9eTAT46q1OqA--
 
---9PRHFNXmprfxeEaqhZE3ip2sZ0bRjWLtv
+--GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1MGhQACgkQ9AfbAGHV
-z0Az+wf8CX+2WfQyUV1LULkrIeUOcqcekNkyTGDe2LWz8IuqDVClH28BU5v4j1MT
-RqPjleMj6FFS4772xw9+1i1LOPNc5a2x/exAp9FNse/A7wYQD+Xtd/j+XeC2k/8b
-A82bxE1NF2XTbutG/bjxdh/mNxOq0QmjIe4XpOGeE3TLN4Kdlfe411wWWoxtzM26
-1XnLOYPRykhJU1H8oUkTgzJO8mS0GzMy8S9hzVLIGy58/BFjEvifRULsNlnmIisj
-cm2uE2VxuNeFcg5lNoLBy40w56sDb7TDIaP+U64rT7QEwnhctKZqF2+/y0hyb35/
-ftIjkvGsnsJWzsktkXdropjYWVl/XQ==
-=wmOA
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1MGpUACgkQ9AfbAGHV
+z0A2Iwf/XIdvsNGlTnHQ57JR/p2w5hDnQLNyGjasQZa+RkOvE2RWx1hzL06zfXDo
+7JaZPRPz8GtaV8MtcdlTOglYy3ZuFUj2EhyP9gq6OHqnT9q7gUWHZTPtNQe4Upvl
+fLxByU5xf/QjtnNr8N+guIKjKfo0PJ/DemkVkPbMBwcBqxp5MKYj93rT4MwjSETo
+JA+e4XsTTrUDMwhBENlDdkiDedAcm0PH/k+SI8zhSpiEPNSrJvvc5AQ2z3jouquz
+eBR/5HeHZZ+RRApQkjuP4A3U90z1aM4Jm6xlBKalcDgPnsvsbit/aYl8MfFuImcP
+59EB7eD+XafgdM+tupeBUv64TAdbXw==
+=j9pi
 -----END PGP SIGNATURE-----
 
---9PRHFNXmprfxeEaqhZE3ip2sZ0bRjWLtv--
+--GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P--
 
