@@ -2,71 +2,94 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 260CDC0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 04:49:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E175C0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 05:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDAD8217D7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 04:49:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDAD8217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D85172186A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 05:10:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hpp9q7hS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D85172186A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvaMa-00053T-5J
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 00:49:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52393)
+	id 1hvagf-0000gD-3k
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 01:10:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55818)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hvaLt-00047Q-PH
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:48:38 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvagC-0000Fa-0x
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hvaLq-0005zk-46
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:48:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60304)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvaLp-0005za-Vg
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:48:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F14B9309BF13;
- Thu,  8 Aug 2019 04:48:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D0CC5C21F;
- Thu,  8 Aug 2019 04:48:27 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EE617113864E; Thu,  8 Aug 2019 06:48:25 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hvagB-0001dH-0C
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:09:35 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33717)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hvagA-0001d1-PG
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 01:09:34 -0400
+Received: by mail-pl1-x644.google.com with SMTP id c14so42918696plo.0
+ for <qemu-devel@nongnu.org>; Wed, 07 Aug 2019 22:09:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ki0an8t+XycXtBkdcydgbnQPkp64g6Uoo4kwWAslmZo=;
+ b=hpp9q7hSj+5+p8yAhBntyH7luXypM1AM/siXXJq1Ltrp8ODZNLr7iBEy5IJre+1dx/
+ 1hOWsr5Z+uMNVHC6JOhimSePY52/HQ7vi5KH7CCPQlQ1OWfYmKBp8SwEUcSx+7iGm6Y8
+ B4heo9cwbf7Kd8IRjAu1JWJeoQW6EAsTag6deSf6HlWk2mTXeZT7fUyclIba0O3qpCOO
+ 7Jwul4OD4PcV8sYQU3sxh21LxzjKYK5P2xTDv0AVW2SWbh38mLioZQKogOE40fnjdk8V
+ 6fOic5gZRxs6+UYL0AnRN+jph1MWhmaZRhpuhXvCzl9oG2qSLj8/OdyQELRMhPuSjlFi
+ zPtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ki0an8t+XycXtBkdcydgbnQPkp64g6Uoo4kwWAslmZo=;
+ b=BaW/aVv6i13Z0UbTSRWqjiDNUNM1SFsFMgWTdN8soUERorgzbb8H06me+VkY2E3CAD
+ Ee8eZaYA+NekTJlVS3bYBx8GLP9EPhLPY+a1Nw49JUr7OMrR5cC358OsRYYImpyYpYyn
+ oSr95U6m4Wlg9rwI/merd3uYiMC0Mpe7zY13On+nCfapOOgehwmmb5HuIQV6/WVMGFV1
+ f1U6BZFBC0RtnuW7upZ0pvevl/6qVIzSRumnZQbioTnbwGBGkppCpG+jllWVPmR4nNvZ
+ KL/EscFXJ3Cq87+iavfMr5r0bAJO8CzTfEo+nB6HjX0T5Z0ziai8RhOktmPff4UDBFhm
+ plFw==
+X-Gm-Message-State: APjAAAXAAWBPF4rCZVVwiaSbKYS13gZhJY13EQtI14zzZpqc3lZZ8oWu
+ /nkd/bJH9RGsRyzElNZ4HJBY7KWiTQE=
+X-Google-Smtp-Source: APXvYqyDHpQEHzmoeGP9qqKyX96vGV6bMGcm591jk2whUVLJ2IwloRiKAl3TL0SuAm0Kj6F7Q7FR4g==
+X-Received: by 2002:a17:902:e613:: with SMTP id
+ cm19mr10894436plb.299.1565240973340; 
+ Wed, 07 Aug 2019 22:09:33 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id h1sm121799064pfg.55.2019.08.07.22.09.31
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 07 Aug 2019 22:09:31 -0700 (PDT)
+To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-28-armbru@redhat.com>
- <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
- <87a7ckrat7.fsf@dusky.pond.sub.org>
- <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
-Date: Thu, 08 Aug 2019 06:48:25 +0200
-In-Reply-To: <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 7 Aug 2019 23:05:36
- +0200")
-Message-ID: <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ <20190806151435.10740-13-armbru@redhat.com>
+ <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
+ <fd6a172e-1c79-5c0a-c9ba-3dbc671dc72f@redhat.com>
+ <87pnlgl1sr.fsf@dusky.pond.sub.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <83f142c4-99cd-5d60-2547-1c0e608f638b@linaro.org>
+Date: Wed, 7 Aug 2019 22:09:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <87pnlgl1sr.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 08 Aug 2019 04:48:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] Is network backend netmap worth keeping? (was: [PATCH
- v2 27/29] Include sysemu/sysemu.h a lot less)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
+Subject: Re: [Qemu-devel] [PATCH v2 12/29] Include hw/irq.h a lot less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,48 +101,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, Vincenzo Maffione <v.maffione@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Please excuse the attention-grabbing subject.
+On 8/7/19 9:27 PM, Markus Armbruster wrote:
+>>>>  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+>>>>  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+>>>> +typedef void (*qemu_irq_handler)(void *opaque, int n, int level);
+>>
+>> Should we prefer a consistent form for function pointer typedefs?  Here,
+>> we've mixed 'rettype Name(params)' with 'rettype (*name)(params)'.
+> 
+> Which of the two difference I can see do you mean?
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Eric asked about function type vs pointer-to-function type.
 
-> On 8/7/19 10:16 PM, Markus Armbruster wrote:
-[...]
->> Can you tell me offhand what I have to install so configure enables
->> CONFIG_NETMAP?
->
-> The steps are listed in tests/docker/dockerfiles/debian-amd64.docker,
-> but you can get to this point running:
->
->   $ make docker-image-debian-amd64 V=3D1 DEBUG=3D1
->
-> This will build the docker image with netmap (so you don't have to mess
-> with your workstation setup), then build QEMU within the image.
+In usage,
 
-So, to make use of QEMU's netmap backend (CONFIG_NETMAP), you have to
-build and install netmap software from sources.  Which pretty much
-ensures nobody uses it.  It was added in commit 58952137b0b (Nov 2013).
-The commit message points to <http://info.iet.unipi.it/~luigi/netmap/>,
-which gives me "connection timed out" right now.
+  SaveStateHandler *variable;
+vs
+  qemu_irq_handler variable;
 
-On the other hand, it's covered in MAINTAINERS, and has seen
-non-janitorial activity as late as Dec 2018 (commit c693fc748a).
 
-Luigi, Giuseppe, Vincenzo, what's the status of the netmap project?
-
-Why is the QEMU netmap backend worth keeping?
-
-Who is using the netmap backend?
-
-How do they obtain a netmap-enabled QEMU?  Compile it from sources
-themselves?
-
-Would it make sense to have netmap packaged in common Linux distros?
+r~
 
