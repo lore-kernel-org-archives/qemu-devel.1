@@ -2,90 +2,82 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99DFC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 09:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED651C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 09:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 723822173C
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 09:28:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VvoYNSr3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 723822173C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C4FC92173C
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 09:31:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4FC92173C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hveiN-0000pP-Lu
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 05:28:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49819)
+	id 1hvelh-0003Ct-51
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 05:31:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50530)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hvehn-0000Nv-Lu
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 05:27:32 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvelH-0002f2-If
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 05:31:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hvehm-0001Wu-Ad
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 05:27:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44094)
+ (envelope-from <philmd@redhat.com>) id 1hvelG-0002zL-58
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 05:31:07 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:36675)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hvehm-0001Wc-2S
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 05:27:30 -0400
-Received: by mail-wr1-x444.google.com with SMTP id p17so94160887wrf.11
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 02:27:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=7ifbAcQ+KaC/pBtCQncXmg3xRiLT7aw+NxetxtXedJk=;
- b=VvoYNSr3Yyx4DY9ZHStfC2DzfggFt77NkgWZ4n2l7KJswn2oehBFYnicPbaDprunL6
- ZSgoQIoSkgdGVH/hsJ3fF0f2uS1D96At88zoCZnR8qHawYJyWL7J0VaNr1LHQYo7dye7
- s+hcpGrOQ8SFST26xqVVXYDLkUic3kLCZDXZMHvR4l5sqRteB6smxmMWiLZLdvTSVat1
- Ogca4tkwQhvh2KdqGfIcTmayjjr5a4zoa8CpNgLkb8pHInX2dywYPPAx1hgptrXygzqw
- /bnUHzQP0GqIiXSVrWko6+aM63T7GKvuoOqz+cjuUf/+tP41jHpiHf2Vx14RP2aAoKqO
- Q4EQ==
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvelF-0002z1-VD
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 05:31:06 -0400
+Received: by mail-wm1-f66.google.com with SMTP id g67so1700481wme.1
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 02:31:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=7ifbAcQ+KaC/pBtCQncXmg3xRiLT7aw+NxetxtXedJk=;
- b=g8luSmgd2VaQ7Orgn/eoWzZlktXpuNPvPmyvOwe0k4BSeWUcOQ8yzQlzfDm/Q1h2Bg
- xIS29FCr558Laq9Pqr+ffszM5/4S6a2zCEw0TOrBf/LL2PnUXI444GiG74C1SLMUoE3y
- 2wEncZkzep81VOWc0aJ/CcQACdVvP3yUmdH63WzUDmDO9s0aHAAJ32sLbGj3SJ1KrNpf
- ugAFIfJYdE580IdEuXPsY3AR8ALI+fIkRvv6lyJEoJP/3vodTNnRgWV+KRKT/ePpQkK7
- EKPNyhaTzVaUH1MDLUxVhpU2CdTH8CMf8MPh9XRxGeXZKOK7EETOHCF4yRrY88NsgNbe
- n3Jg==
-X-Gm-Message-State: APjAAAXtOI7XG3R2DGXRcGzzi1+j+pgUc7aGFwfEFu3o9+F36oAycRSI
- KyyRkjBJ/kN1PxZlTUv+BbZ2gg==
-X-Google-Smtp-Source: APXvYqx8dDeKAf7KQEI9XzmQ3L2FclPeE6eh+U/rAH8cHzHziibXiQdk+a59QiIZFerb58L707GxpA==
-X-Received: by 2002:adf:dbce:: with SMTP id e14mr6436304wrj.9.1565256447968;
- Thu, 08 Aug 2019 02:27:27 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id z2sm6723258wrt.17.2019.08.08.02.27.27
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 08 Aug 2019 02:27:27 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D60201FF87;
- Thu,  8 Aug 2019 10:27:26 +0100 (BST)
-References: <20190729214717.6616-1-pbonzini@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190729214717.6616-1-pbonzini@redhat.com>
-Date: Thu, 08 Aug 2019 10:27:26 +0100
-Message-ID: <875zn8hurl.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Re9TnnEQp9ZEEl2gdC3Pom7E9eq3hLjygIm0ednaP3U=;
+ b=QdhT81e2HAAQgF5Vpnpd43Gw3azhcn40JKAFC1HCjnin8ARI1eiKXZ9Kxugl+A1Cfp
+ 0dACnrq0vXpuC05jEehAtaSFmoEspGU+NkikRhpNVPMWYpbWWb40LAoSLyIIc+eMm94b
+ nHVxCeNfTrxTrXQo+RvnOO5am4Spo+ZGTWuj2BovxYRqwG9cXcgPiA8Tprkgg/HJsmD9
+ wdA3s7GWmfiHZlo9fQDQ6klfIMeQCcTO49pEGri/TW7aKLmxbWf9PeXEF88O2rXqAgLU
+ vB+X67met1xPNJcLK2XJ4goqvltKsX2/JBKw9WOs6CzfE2xNtLVUn8QJOaoop9g+UFU3
+ NQ1g==
+X-Gm-Message-State: APjAAAXhqgvEpzoR4Jn8L9fNd0S2BoqEqMalkeu5PXyx0QJ+3QVr+pUH
+ MF+PDa1qmnK1wYGAMh2fGVgh5g==
+X-Google-Smtp-Source: APXvYqwoW7GCuHoW1G/bNOdmFkLdzdwlGQPb0Gy0iYJvZre3C+aXlD/J7OpzoD4o5LcvtZzFQ1reBg==
+X-Received: by 2002:a05:600c:218d:: with SMTP id
+ e13mr3282886wme.29.1565256664453; 
+ Thu, 08 Aug 2019 02:31:04 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id o7sm59803445wru.58.2019.08.08.02.31.03
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Thu, 08 Aug 2019 02:31:03 -0700 (PDT)
+To: P J P <ppandit@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>
+References: <20190808090652.2478-1-ppandit@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <39a5c98f-f402-2985-2d49-800e73f53f4f@redhat.com>
+Date: Thu, 8 Aug 2019 11:31:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
+In-Reply-To: <20190808090652.2478-1-ppandit@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH untested for-4.2] memory: fix race between
- TCG and accesses to dirty bitmap
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.128.66
+Subject: Re: [Qemu-devel] [PATCH v2] scsi: lsi: exit infinite loop while
+ executing script (CVE-2019-12068)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,199 +89,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Prasad J Pandit <pjp@fedoraproject.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Bugs SysSec <bugs-syssec@rub.de>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Paolo Bonzini <pbonzini@redhat.com> writes:
-
-> The race is as follows:
->
->       vCPU thread                  reader thread
->       -----------------------      -----------------------
->       TLB check -> slow path
->         notdirty_mem_write
->           write to RAM
->           set dirty flag
->                                    clear dirty flag
->       TLB check -> fast path
->                                    read memory
->         write to RAM
->
-> and the second write is missed by the reader.
->
-> Fortunately, in order to fix it, no change is required to the
-> vCPU thread.  However, the reader thread must delay the read after
-> the vCPU thread has finished the write.  This can be approximated
-> conservatively by run_on_cpu, which waits for the end of the current
-> translation block.
->
-> A similar technique is used by KVM, which has to do a synchronous TLB
-> flush after doing a test-and-clear of the dirty-page flags.
->
-> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
+On 8/8/19 11:06 AM, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> When executing script in lsi_execute_script(), the LSI scsi
+> adapter emulator advances 's->dsp' index to read next opcode.
+> This can lead to an infinite loop if the next opcode is empty.
+> Exit such loop after reading 10k empty opcodes.
+> 
+> Reported-by: Bugs SysSec <bugs-syssec@rub.de>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 > ---
->         I tested this some time ago, and enough has changed that I don't
->         really trust those old results.  Nevertheless, I am throwing out
->         the patch so that it is not forgotten.
->
->  exec.c                | 31 +++++++++++++++++++++++++++++++
->  include/exec/memory.h | 12 ++++++++++++
->  memory.c              | 10 +++++++++-
->  migration/ram.c       |  1 +
->  4 files changed, 53 insertions(+), 1 deletion(-)
->
-> diff --git a/exec.c b/exec.c
-> index 3e78de3b8f..ae68f72da4 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -198,6 +198,7 @@ typedef struct subpage_t {
->
->  static void io_mem_init(void);
->  static void memory_map_init(void);
-> +static void tcg_log_global_after_sync(MemoryListener *listener);
->  static void tcg_commit(MemoryListener *listener);
->
->  static MemoryRegion io_mem_watch;
-> @@ -906,6 +907,7 @@ void cpu_address_space_init(CPUState *cpu, int asidx,
->      newas->cpu =3D cpu;
->      newas->as =3D as;
->      if (tcg_enabled()) {
-> +        newas->tcg_as_listener.log_global_after_sync =3D tcg_log_global_=
-after_sync;
->          newas->tcg_as_listener.commit =3D tcg_commit;
->          memory_listener_register(&newas->tcg_as_listener, as);
+>  hw/scsi/lsi53c895a.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> Update v2: define LSI_MAX_INSN 10000
+>   -> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg01370.html
+> 
+> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+> index 10468c1ec1..2adab341b1 100644
+> --- a/hw/scsi/lsi53c895a.c
+> +++ b/hw/scsi/lsi53c895a.c
+> @@ -185,6 +185,9 @@ static const char *names[] = {
+>  /* Flag set if this is a tagged command.  */
+>  #define LSI_TAG_VALID     (1 << 16)
+>  
+> +/* Maximum instructions to process. */
+> +#define LSI_MAX_INSN    10000
+> +
+>  typedef struct lsi_request {
+>      SCSIRequest *req;
+>      uint32_t tag;
+> @@ -1132,7 +1135,10 @@ static void lsi_execute_script(LSIState *s)
+>  
+>      s->istat1 |= LSI_ISTAT1_SRUN;
+>  again:
+> -    insn_processed++;
+> +    if (++insn_processed > LSI_MAX_INSN) {
+> +        s->waiting = LSI_NOWAIT;
+> +        goto exitloop;
+> +    }
+
+If I understand the datasheet correctly, the model should set the
+DSTAT.IID bit.
+
+  Illegal Instruction Detected
+
+  This status bit is set any time an illegal or reserved
+  instruction opcode is detected, whether the LSI53C895A
+  is operating in single step mode or automatically
+  executing SCSI SCRIPTS.
+
+We already have:
+
+    trace_lsi_execute_script_tc_illegal();
+    lsi_script_dma_interrupt(s, LSI_DSTAT_IID);
+
+Cc'ing Marcelo Tosatti since it is hard to understand the "Windows SCSI
+driver hack":
+
+$ git show ee4d919f30f
+commit ee4d919f30f1378cda697dd94d5a21b2a7f4d90d
+Author: aliguori <aliguori@c046a42c-6fe2-441c-8c8c-71466251a162>
+Date:   Mon Sep 22 16:04:16 2008 +0000
+
+    LSI SCSI: raise UDC on infinite loop (Marcelo Tosatti)
+
+    Raise UDC (Unexpected Disconnect) when a large enough number of
+    instructions has been executed by the SCRIPTS processor. This "solution"
+    is much simpler than temporarily interrupting execution.
+
+    This remedies the situation with Windows which downloads SCRIPTS code
+    that busy loops on guest main memory. Their drivers _do_ handle UDC
+    appropriately (at least XP and 2003).
+
+    It would be nicer to actually detect infinite loops, but until then,
+    this bandaid seems acceptable.
+
+    Since the situation seems to be rare enough, raise the number
+    of instructions to 10000 (previously 1000).
+
+    Three people other than myself had success with this patch.
+
+    Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+    Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+
+$ git show 64c68080da4
+commit 64c68080da429edf30a9857e3a698cb9ed335bd3
+Author: pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
+Date:   Mon Sep 22 16:30:29 2008 +0000
+
+    Add comment to windows SCSI hack.
+
+diff --git a/hw/lsi53c895a.c b/hw/lsi53c895a.c
+index e45eefaef7..53a2add0df 100644
+--- a/hw/lsi53c895a.c
++++ b/hw/lsi53c895a.c
+@@ -1199,6 +1199,11 @@ again:
+         }
+     }
+     if (insn_processed > 10000 && !s->waiting) {
++        /* Some windows drivers make the device spin waiting for a memory
++           location to change.  If we have been executed a lot of code then
++           assume this is the case and force an unexpected device
+disconnect.
++           This is apparently sufficient to beat the drivers into
+submission.
++         */
+         if (!(s->sien0 & LSI_SIST0_UDC))
+             fprintf(stderr, "inf. loop with UDC masked\n");
+         lsi_script_scsi_interrupt(s, LSI_SIST0_UDC, 0);
+
+>      insn = read_dword(s, s->dsp);
+>      if (!insn) {
+>          /* If we receive an empty opcode increment the DSP by 4 bytes
+> @@ -1569,7 +1575,8 @@ again:
+>              }
+>          }
 >      }
-> @@ -3143,6 +3145,35 @@ void address_space_dispatch_free(AddressSpaceDispa=
-tch *d)
->      g_free(d);
->  }
->
-> +static void do_nothing(CPUState *cpu, run_on_cpu_data d)
-> +{
-> +}
-> +
-> +static void tcg_log_global_after_sync(MemoryListener *listener)
-> +{
-> +    CPUAddressSpace *cpuas;
-> +
-> +    /* Wait for the CPU to end the current TB.  This avoids the following
-> +     * incorrect race:
-> +     *
-> +     *      vCPU                         migration
-> +     *      ----------------------       -------------------------
-> +     *      TLB check -> slow path
-> +     *        notdirty_mem_write
-> +     *          write to RAM
-> +     *          mark dirty
-> +     *                                   clear dirty flag
-> +     *      TLB check -> fast path
-> +     *                                   read memory
-> +     *        write to RAM
-> +     *
-> +     * by pushing the migration thread's memory read after the vCPU thre=
-ad has
-> +     * written the memory.
-> +     */
-> +    cpuas =3D container_of(listener, CPUAddressSpace, tcg_as_listener);
-> +    run_on_cpu(cpuas->cpu, do_nothing, RUN_ON_CPU_NULL);
-> +}
-> +
->  static void tcg_commit(MemoryListener *listener)
->  {
->      CPUAddressSpace *cpuas;
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index bb0961ddb9..b6bcf31b0a 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -419,6 +419,7 @@ struct MemoryListener {
->      void (*log_clear)(MemoryListener *listener, MemoryRegionSection *sec=
-tion);
->      void (*log_global_start)(MemoryListener *listener);
->      void (*log_global_stop)(MemoryListener *listener);
-> +    void (*log_global_after_sync)(MemoryListener *listener);
->      void (*eventfd_add)(MemoryListener *listener, MemoryRegionSection *s=
-ection,
->                          bool match_data, uint64_t data, EventNotifier *e=
-);
->      void (*eventfd_del)(MemoryListener *listener, MemoryRegionSection *s=
-ection,
-> @@ -1681,6 +1682,17 @@ MemoryRegionSection memory_region_find(MemoryRegio=
-n *mr,
->   */
->  void memory_global_dirty_log_sync(void);
->
-> +/**
-> + * memory_global_dirty_log_sync: synchronize the dirty log for all memory
-> + *
-> + * Synchronizes the vCPUs with a thread that is reading the dirty bitmap.
-> + * This function must be called after the dirty log bitmap is cleared, a=
-nd
-> + * before dirty guest memory pages are read.  If you are using
-> + * #DirtyBitmapSnapshot, memory_region_snapshot_and_clear_dirty() takes
-> + * care of doing this.
-> + */
-> +void memory_global_after_dirty_log_sync(void);
-> +
->  /**
->   * memory_region_transaction_begin: Start a transaction.
->   *
-> diff --git a/memory.c b/memory.c
-> index e42d63a3a0..edd0c13c38 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2127,9 +2127,12 @@ DirtyBitmapSnapshot *memory_region_snapshot_and_cl=
-ear_dirty(MemoryRegion *mr,
->                                                              hwaddr size,
->                                                              unsigned cli=
-ent)
->  {
-> +    DirtyBitmapSnapshot *snapshot;
->      assert(mr->ram_block);
->      memory_region_sync_dirty_bitmap(mr);
-> -    return cpu_physical_memory_snapshot_and_clear_dirty(mr, addr, size, =
-client);
-> +    snapshot =3D cpu_physical_memory_snapshot_and_clear_dirty(mr, addr, =
-size, client);
-> +    memory_global_after_dirty_log_sync();
-> +    return snapshot;
->  }
->
->  bool memory_region_snapshot_get_dirty(MemoryRegion *mr, DirtyBitmapSnaps=
-hot *snap,
-> @@ -2620,6 +2623,11 @@ void memory_global_dirty_log_sync(void)
->      memory_region_sync_dirty_bitmap(NULL);
->  }
->
-> +void memory_global_after_dirty_log_sync(void)
-> +{
-> +    MEMORY_LISTENER_CALL_GLOBAL(log_global_after_sync, Forward);
-> +}
-> +
->  static VMChangeStateEntry *vmstate_change;
->
->  void memory_global_dirty_log_start(void)
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 2b0774c2bf..b9d6a3921d 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1801,6 +1801,7 @@ static void migration_bitmap_sync(RAMState *rs)
->      rcu_read_unlock();
->      qemu_mutex_unlock(&rs->bitmap_mutex);
->
-> +    memory_global_after_dirty_log_sync();
->      trace_migration_bitmap_sync_end(rs->num_dirty_pages_period);
->
->      end_time =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-
-
---
-Alex Benn=C3=A9e
+> -    if (insn_processed > 10000 && s->waiting == LSI_NOWAIT) {
+> +exitloop:
+> +    if (insn_processed > LSI_MAX_INSN && s->waiting == LSI_NOWAIT) {
+>          /* Some windows drivers make the device spin waiting for a memory
+>             location to change.  If we have been executed a lot of code then
+>             assume this is the case and force an unexpected device disconnect.
+> 
 
