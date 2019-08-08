@@ -2,78 +2,85 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97749C32751
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 01:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C0EC32751
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 01:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B731217F5
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 01:42:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B731217F5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AA364217F5
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 01:50:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwBaaAGi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA364217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvXSC-0004tS-OK
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 21:42:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50156)
+	id 1hvXZH-0007Ec-Rn
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 21:50:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51112)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <star.zeng@intel.com>) id 1hvXRm-0004TC-GT
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:42:32 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hvXYp-0006Wk-Ny
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:49:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <star.zeng@intel.com>) id 1hvXRk-0002tn-Ix
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:42:30 -0400
-Received: from mga05.intel.com ([192.55.52.43]:15159)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <star.zeng@intel.com>) id 1hvXRi-0002re-MS
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:42:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 07 Aug 2019 18:42:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; d="scan'208";a="203404457"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by fmsmga002.fm.intel.com with ESMTP; 07 Aug 2019 18:42:18 -0700
-Received: from fmsmsx155.amr.corp.intel.com (10.18.116.71) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 7 Aug 2019 18:42:17 -0700
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX155.amr.corp.intel.com (10.18.116.71) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 7 Aug 2019 18:42:17 -0700
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.19]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.204]) with mapi id 14.03.0439.000;
- Thu, 8 Aug 2019 09:42:15 +0800
-From: "Zeng, Star" <star.zeng@intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to
- use goto for the last check
-Thread-Index: AQHVRm8sI9RcDIduCkeWmeFT3LDTHabwhy4g
-Date: Thu, 8 Aug 2019 01:42:14 +0000
-Message-ID: <0C09AFA07DD0434D9E2A0C6AEB0483104038F59D@shsmsx102.ccr.corp.intel.com>
-References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
- <20190730003740.20694-2-richardw.yang@linux.intel.com>
-In-Reply-To: <20190730003740.20694-2-richardw.yang@linux.intel.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <bmeng.cn@gmail.com>) id 1hvXYo-0006GT-OZ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:49:47 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37563)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hvXYo-0006GB-IU; Wed, 07 Aug 2019 21:49:46 -0400
+Received: by mail-ed1-x544.google.com with SMTP id w13so88544763eds.4;
+ Wed, 07 Aug 2019 18:49:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=J7ISMZ0v61lDO7u7LIiTD5traq8L9JDwd8ZcKfq0ZvA=;
+ b=WwBaaAGipJN9VaDjvJxucrLCnBzAftGJCKvhiYKULE7CK8UA9c28ovIDWkw9OWkgME
+ rmAOtPMR3SuhN1DXUNP30rar+ue/tvHerxUTvcw1QJjDq3mxrebg9IO5QXfDLYhp9BWQ
+ BuIFFs1Tak6b1SvEFJErx/ep+kvUPxwat8j6EaVb1UvD6QhtOrxgTj4kBERkx7PmVZsq
+ PB+Rg+FA4Tpn9SJCr8x2ia0xrkD4+SfVMH1Mtrw47pYPfH6e50g4w6FNnhrj2PZxmNo6
+ g84AhNQHAqDZcdBPIpHgnz1Wt9f03a8l1KyntNcczMh3CrIhYcXzyYDuKk4fPd5SQTtY
+ dqYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=J7ISMZ0v61lDO7u7LIiTD5traq8L9JDwd8ZcKfq0ZvA=;
+ b=j+RBgd1qSUv4feY2i5dsZ1hM0cKlTtger3yRgZRMM+YQk/764OrWV7AqHsRbfwTkFf
+ wUO8FH6O5w5HjThd0ouXAFpuOAvnxm18fTMN0d+WORJ7FmVjqkgeKHoPwQGFW6NUgKoa
+ YpQ3TXjaa1s9Y2UjQDPaHkPjmh+kmfAfrLedkAzLod9A+2urEOIIeaW2nu+Xwgy0nSYI
+ Wdb8Q9PKC3cbERkGwruibN1WgfmS61yqp9f1b65Fo/wA7DkL2XKNZ9ETfjqVUF0UljBt
+ rAKU1iXIzB/DilM9+TPGZRwg36pUvNbiu+ZF4/IF0pmWfRNNX1JPDP1EM2HmlQ058nPi
+ 01jQ==
+X-Gm-Message-State: APjAAAUxo3SiMl4M6wGsxgsjixJ09Lem498GnAgkGgqadq0CO8Wp7NlZ
+ eRnELRuM3+5YFUx/YtlhoASpnuOUXqe0mu1tcPE=
+X-Google-Smtp-Source: APXvYqwccFEwgrTaLcPG9Yk7YYyyeoxlavRQE6Iiq0Efoysosu+YfhI44WubRhYxmQyVX/VIL4qPRSQQQS5j+BdLQSc=
+X-Received: by 2002:a17:906:340e:: with SMTP id
+ c14mr11306605ejb.170.1565228985039; 
+ Wed, 07 Aug 2019 18:49:45 -0700 (PDT)
 MIME-Version: 1.0
+References: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
+ <581a0284-c658-265f-1b0f-6f4be5406cee@linaro.org>
+ <CAEUhbmVXC6GeHYFST514cLRJHQOo5ki=ZPG=OsLzV2YA0ChQgA@mail.gmail.com>
+ <ac4453de-81cd-c32a-17f8-283fa3569ed0@linaro.org>
+ <CAEUhbmX2C_FbW_m=Mri19hpz0c74SQTt3ogsatGgveH09t3_4g@mail.gmail.com>
+ <CANs6eMkRQ1-Gb42DhHGz++4Q79JbH4S3MnccwmwKKEB-sdozag@mail.gmail.com>
+In-Reply-To: <CANs6eMkRQ1-Gb42DhHGz++4Q79JbH4S3MnccwmwKKEB-sdozag@mail.gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Thu, 8 Aug 2019 09:49:34 +0800
+Message-ID: <CAEUhbmVe=wRZfJmXx2XP4a-OpEgB0uAHP=x6NrdfCq_y7DSr8w@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to use
- goto for the last check
+X-Received-From: 2a00:1450:4864:20::544
+Subject: Re: [Qemu-devel] [PATCH] riscv: rv32: Root page table address can
+ be larger than 32-bit
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,57 +92,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "imammedo@redhat.com" <imammedo@redhat.com>,
- "mst@redhat.com" <mst@redhat.com>, "Zeng, Star" <star.zeng@intel.com>,
- "david@redhat.com" <david@redhat.com>
+Cc: QEMU riscv <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU devel <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Qemu-devel [mailto:qemu-devel-
-> bounces+star.zeng=3Dintel.com@nongnu.org] On Behalf Of Wei Yang
-> Sent: Tuesday, July 30, 2019 8:38 AM
-> To: qemu-devel@nongnu.org
-> Cc: imammedo@redhat.com; david@redhat.com; Wei Yang
-> <richardw.yang@linux.intel.com>; mst@redhat.com
-> Subject: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to use
-> goto for the last check
->=20
-> We are already at the last condition check.
->=20
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/mem/memory-device.c | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c index
-> 5f2c408036..df3261b32a 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -186,7 +186,6 @@ static uint64_t
-> memory_device_get_free_addr(MachineState *ms,
->      if (!range_contains_range(&as, &new)) {
->          error_setg(errp, "could not find position in guest address space=
- for "
->                     "memory device - memory fragmented due to alignments"=
-);
-> -        goto out;
+Hi Palmer,
 
-Is it better to return 0 (or set new_addr to 0) for this error path and ano=
-ther remaining "goto out" path?
+On Thu, Aug 8, 2019 at 4:55 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Thu, Aug 1, 2019 at 7:58 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>>
+>> On Thu, Aug 1, 2019 at 10:16 PM Richard Henderson
+>> <richard.henderson@linaro.org> wrote:
+>> >
+>> > On 7/31/19 6:53 PM, Bin Meng wrote:
+>> > > I am not sure how (idx * ptesize) could overflow. It represents the
+>> > > offset by a page table which is [0, 4096).
+>> >
+>> > You're right, I mis-read what was going on there.
+>> >
+>> > However, lower down, "target_ulong ppn" needs to be promoted to hwaddr, so that
+>> >
+>> >     ppn = pte >> PTE_PPN_SHIFT;
+>> >     ...
+>> >     base = ppn << PGSHIFT;
+>> >
+>> > does not overflow.  (Which is the part of the page table walk that I thought I
+>> > had gleaned from the patch without actually reading the entire function.)
+>>
+>> Ah, yes. ppn should be promoted. Thanks for the review!
+>
+>
+> Did I miss a v2?
 
+No, I will send a v2 soon.
 
-Thanks,
-Star
-
->      }
->  out:
->      g_slist_free(list);
-> --
-> 2.17.1
->=20
-
+Regards,
+Bin
 
