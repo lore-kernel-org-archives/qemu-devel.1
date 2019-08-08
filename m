@@ -2,82 +2,84 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80324C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD91BC0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53BAC21874
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:00:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53BAC21874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2072173E
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:02:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Su/a/pJl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2072173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvixo-0005Du-GT
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 10:00:20 -0400
-Received: from eggs.gnu.org ([209.51.188.92]:58593)
+	id 1hvizW-000749-Qc
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 10:02:06 -0400
+Received: from eggs.gnu.org ([209.51.188.92]:58798)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvixA-0004hs-VC
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 09:59:43 -0400
+ (envelope-from <chihmin.chao@sifive.com>) id 1hvixo-0005RL-Ei
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvix9-0001IF-GX
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 09:59:40 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35565)
+ (envelope-from <chihmin.chao@sifive.com>) id 1hvixm-0001dt-Es
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:00:20 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34248)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvix9-0001Hk-AN
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 09:59:39 -0400
-Received: by mail-wm1-f68.google.com with SMTP id l2so2549639wmg.0
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 06:59:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <chihmin.chao@sifive.com>)
+ id 1hvixk-0001d4-Pm
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:00:17 -0400
+Received: by mail-ot1-x343.google.com with SMTP id n5so119011867otk.1
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 07:00:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5Hw9bxFD9i04O5ml4rRUZAdxoo9EgWI9Gk4h6e91qJg=;
+ b=Su/a/pJl2Ks582G6RhTVv5ullfWsYcVpnYhBc2V9WSBpTU0RBEn7uIicIQLU+sGY9h
+ dAw4qC2026A2U6Ow4o4RRm+YmM7D2x1qgy8pKzwWghDPKIi1l5iMe+EZogGZbsC5sp8o
+ SKgLbXNVHy5+TqdjdSCerWa8qmkgXaGvJgRZbLr4s9WXwNLhEvjgyWppPEBf86Ouadq+
+ y9+Avox+8HK68J3SGU2arFkL8eZIf1ahVoDh6EMixe/mbSnl8dGtMvlWYwzn74h9rAxw
+ +O5QK4RGFkIJl0/heVhQQ39BenxPfYHsAFa+IGKYkY11Kgvh+tELObZGTxPukA0RXUWS
+ aTKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6sXO4Qj3cGT4zD/QKycIWPqFJ7ou/1KvGjEoMZC0CH4=;
- b=nLPC3Pcg0g6waE+RXdNTl2TIUlpVSEpxzrEIZYDqVIKY6zXy/ZtuZv4dWHeICn4VNn
- 6C2s5O9R260qZns4ThnexNCEI2x/yUisGSkYQXW3EvuIfUXDe3sTVHtxBS7DBgkr4uV8
- b3Y72gHDeT6mStu3/lQrNBoJ/jHziSwi1zY/7uEFaPibifg9UslZKllaQEBg3sZIhxxg
- Xh9sk6vj3PqhabdNBln2JZjbs0uZt5mQE7lTUTgw/KvEOrcZhooj9BXJtfcV8H8gnChU
- evbZaEhr3lbq/58nBIrPnK5vF3sTGcvLZ8BLYnU0XGCGyjh+MO2dcIOKvuL7VaWdjOXc
- MmNg==
-X-Gm-Message-State: APjAAAVOfiumWbk13mQhSMuqR6ypAQU/fSbZrpsvs0uTGvjPD+Kd6jBZ
- N4fYxpuHTZQdzxk8tYMD7HuFsQ==
-X-Google-Smtp-Source: APXvYqyXKkZs450reJJBPrT0XZOx7MS1L53a6pZeq1rGEH8uS7JmaCfCKImDfbbRSOFAne6hnODsWQ==
-X-Received: by 2002:a1c:a1c1:: with SMTP id k184mr4769081wme.81.1565272777879; 
- Thu, 08 Aug 2019 06:59:37 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id 66sm16177568wrc.83.2019.08.08.06.59.36
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 08 Aug 2019 06:59:37 -0700 (PDT)
-To: Marcelo Tosatti <mtosatti@redhat.com>
-References: <20190808090652.2478-1-ppandit@redhat.com>
- <39a5c98f-f402-2985-2d49-800e73f53f4f@redhat.com>
- <20190808134646.GA6915@amt.cnet>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <84440ce1-374d-e612-c7a9-184e55242ffe@redhat.com>
-Date: Thu, 8 Aug 2019 15:59:36 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5Hw9bxFD9i04O5ml4rRUZAdxoo9EgWI9Gk4h6e91qJg=;
+ b=VfaUy02i0wViXu54cEq4nXnY1zPm5yVb6LFEYIJxj56RXbHb0+y4ob2ck0ZzANybGc
+ 3KydtKpZuGDMhvx91W04ySFUGy121+V1reWtgK34u5eFlB2T+xx4aXOCn0G+bbjQQ8Ba
+ g4x+dfI0BfveemGlgVrDEFydRnb/4obN0qf1dEPjGwhnCDocFCd/NdK6r9BMI0SydGPp
+ H+u1teR6OaiQr+nLnSFWTPB5MrUM88fyJKjZsoKAOOmnfqwHiHt8rCDyrECF0bqam1kQ
+ EW2ViPEcX5M1s3UoLuHlPZIEusegBwTpo6OIHCpz3RfIEkSCIa6RLWYMh36WMXjIoBBo
+ r8fA==
+X-Gm-Message-State: APjAAAXdJNtXR8nzXbyXAS/3+QQeGDERCIbjkTFPfwiulIFkYh74jnwp
+ S3F4cOACwyfXVrU8KwvxhKk5xqnBIiunjOGBzumRoQ==
+X-Google-Smtp-Source: APXvYqyL3zCC/3M1DScoVoVO9kI3pBLHLLFvvSWcnCDDN2eTucNEdfKwxry+sEjRl8YPqJCxpxKh95DOl6ZuHoIJXrs=
+X-Received: by 2002:a5e:a70b:: with SMTP id b11mr11256434iod.286.1565272815632; 
+ Thu, 08 Aug 2019 07:00:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190808134646.GA6915@amt.cnet>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v2] scsi: lsi: exit infinite loop while
- executing script (CVE-2019-12068)
+References: <1565163924-18621-1-git-send-email-bmeng.cn@gmail.com>
+ <1565163924-18621-12-git-send-email-bmeng.cn@gmail.com>
+ <CAEiOBXU9UXEGYjEDP-LJ5mEY-bF+OtMKt4O+LGJh9qQt3OPaew@mail.gmail.com>
+ <CAEUhbmUO2aFrGXbZDB4uXAKe9kq5NJuwS9mMM6-Pwvn_8h++aA@mail.gmail.com>
+In-Reply-To: <CAEUhbmUO2aFrGXbZDB4uXAKe9kq5NJuwS9mMM6-Pwvn_8h++aA@mail.gmail.com>
+From: Chih-Min Chao <chihmin.chao@sifive.com>
+Date: Thu, 8 Aug 2019 22:00:04 +0800
+Message-ID: <CAEiOBXXAvxSbDN-vLiwK2dtK_s8wm08MLb5yD7dVWvQpz-5=Yw@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v2 11/28] riscv: sifive: Rename
+ sifive_prci.{c, h} to sifive_e_prci.{c, h}
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,150 +91,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Prasad J Pandit <pjp@fedoraproject.org>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, P J P <ppandit@redhat.com>,
- Bugs SysSec <bugs-syssec@rub.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/8/19 3:46 PM, Marcelo Tosatti wrote:
-> On Thu, Aug 08, 2019 at 11:31:02AM +0200, Philippe Mathieu-Daudé wrote:
->> On 8/8/19 11:06 AM, P J P wrote:
->>> From: Prasad J Pandit <pjp@fedoraproject.org>
->>>
->>> When executing script in lsi_execute_script(), the LSI scsi
->>> adapter emulator advances 's->dsp' index to read next opcode.
->>> This can lead to an infinite loop if the next opcode is empty.
->>> Exit such loop after reading 10k empty opcodes.
->>>
->>> Reported-by: Bugs SysSec <bugs-syssec@rub.de>
->>> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
->>> ---
->>>  hw/scsi/lsi53c895a.c | 11 +++++++++--
->>>  1 file changed, 9 insertions(+), 2 deletions(-)
->>>
->>> Update v2: define LSI_MAX_INSN 10000
->>>   -> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg01370.html
->>>
->>> diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
->>> index 10468c1ec1..2adab341b1 100644
->>> --- a/hw/scsi/lsi53c895a.c
->>> +++ b/hw/scsi/lsi53c895a.c
->>> @@ -185,6 +185,9 @@ static const char *names[] = {
->>>  /* Flag set if this is a tagged command.  */
->>>  #define LSI_TAG_VALID     (1 << 16)
->>>  
->>> +/* Maximum instructions to process. */
->>> +#define LSI_MAX_INSN    10000
->>> +
->>>  typedef struct lsi_request {
->>>      SCSIRequest *req;
->>>      uint32_t tag;
->>> @@ -1132,7 +1135,10 @@ static void lsi_execute_script(LSIState *s)
->>>  
->>>      s->istat1 |= LSI_ISTAT1_SRUN;
->>>  again:
->>> -    insn_processed++;
->>> +    if (++insn_processed > LSI_MAX_INSN) {
->>> +        s->waiting = LSI_NOWAIT;
->>> +        goto exitloop;
->>> +    }
->>
->> If I understand the datasheet correctly, the model should set the
->> DSTAT.IID bit.
->>
->>   Illegal Instruction Detected
->>
->>   This status bit is set any time an illegal or reserved
->>   instruction opcode is detected, whether the LSI53C895A
->>   is operating in single step mode or automatically
->>   executing SCSI SCRIPTS.
-> 
-> Sounds the correct thing to do (exiting the loop seems arbitrary). 
-> 
->> We already have:
->>
->>     trace_lsi_execute_script_tc_illegal();
->>     lsi_script_dma_interrupt(s, LSI_DSTAT_IID);
->>
->> Cc'ing Marcelo Tosatti since it is hard to understand the "Windows SCSI
->> driver hack":
-> 
-> What this patch is, if an infinite loop is detected, to raise UDC
-> exception (Unexpected Disconnect). This would cause the driver to 
-> restart processing, which would work around the infinite loop problem.
+On Wed, Aug 7, 2019 at 6:11 PM Bin Meng <bmeng.cn@gmail.com> wrote:
 
-Thanks for the explanation.
-So we agree using DSTAT.IID is the correct thing to do.
-Any volunteer to fix this? :)
+> On Wed, Aug 7, 2019 at 4:54 PM Chih-Min Chao <chihmin.chao@sifive.com>
+> wrote:
+> >
+> >
+> >
+> > On Wed, Aug 7, 2019 at 3:49 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+> >>
+> >> Current SiFive PRCI model only works with sifive_e machine, as it
+> >> only emulates registers or PRCI block in the FE310 SoC.
+> >>
+> >> Rename the file name to make it clear that it is for sifive_e.
+> >>
+> >> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> >> ---
+> >>
+> >> Changes in v2: None
+> >>
+> >>  hw/riscv/Makefile.objs                              |  2 +-
+> >>  hw/riscv/sifive_e.c                                 |  4 ++--
+> >>  hw/riscv/{sifive_prci.c => sifive_e_prci.c}         | 14 +++++++-------
+> >>  include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} | 14 +++++++-------
+> >>  4 files changed, 17 insertions(+), 17 deletions(-)
+> >>  rename hw/riscv/{sifive_prci.c => sifive_e_prci.c} (90%)
+> >>  rename include/hw/riscv/{sifive_prci.h => sifive_e_prci.h} (82%)
+> >>
+> >> diff --git a/hw/riscv/Makefile.objs b/hw/riscv/Makefile.objs
+> >> index eb9d4f9..c859697 100644
+> >> --- a/hw/riscv/Makefile.objs
+> >> +++ b/hw/riscv/Makefile.objs
+> >> @@ -2,9 +2,9 @@ obj-y += boot.o
+> >>  obj-$(CONFIG_SPIKE) += riscv_htif.o
+> >>  obj-$(CONFIG_HART) += riscv_hart.o
+> >>  obj-$(CONFIG_SIFIVE_E) += sifive_e.o
+> >> +obj-$(CONFIG_SIFIVE_E) += sifive_e_prci.o
+> >>  obj-$(CONFIG_SIFIVE) += sifive_clint.o
+> >>  obj-$(CONFIG_SIFIVE) += sifive_gpio.o
+> >> -obj-$(CONFIG_SIFIVE) += sifive_prci.o
+> >>  obj-$(CONFIG_SIFIVE) += sifive_plic.o
+> >>  obj-$(CONFIG_SIFIVE) += sifive_test.o
+> >>  obj-$(CONFIG_SIFIVE_U) += sifive_u.o
+> >> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> >> index 2a499d8..2d67670 100644
+> >> --- a/hw/riscv/sifive_e.c
+> >> +++ b/hw/riscv/sifive_e.c
+> >> @@ -41,9 +41,9 @@
+> >>  #include "hw/riscv/riscv_hart.h"
+> >>  #include "hw/riscv/sifive_plic.h"
+> >>  #include "hw/riscv/sifive_clint.h"
+> >> -#include "hw/riscv/sifive_prci.h"
+> >>  #include "hw/riscv/sifive_uart.h"
+> >>  #include "hw/riscv/sifive_e.h"
+> >> +#include "hw/riscv/sifive_e_prci.h"
+> >>  #include "hw/riscv/boot.h"
+> >>  #include "chardev/char.h"
+> >>  #include "sysemu/arch_init.h"
+> >> @@ -174,7 +174,7 @@ static void riscv_sifive_e_soc_realize(DeviceState
+> *dev, Error **errp)
+> >>          SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+> >>      sifive_mmio_emulate(sys_mem, "riscv.sifive.e.aon",
+> >>          memmap[SIFIVE_E_AON].base, memmap[SIFIVE_E_AON].size);
+> >> -    sifive_prci_create(memmap[SIFIVE_E_PRCI].base);
+> >> +    sifive_e_prci_create(memmap[SIFIVE_E_PRCI].base);
+> >>
+> >>      /* GPIO */
+> >>
+> >
+> > I  think adding infix to function name is sufficient and keeping the
+> filename the same may be better.
+> > The U board PRCI or variant implementation in future could be included
+> in the same files with different create function
+> >
+>
+> I considered such approach when working on this one, but later I chose
+> to implement a new file for SiFive U machine.
+>
+> The SiFive U and E PRCI blocks have different register blocks so if we
+> put two variants into one file, their functions don't have much in
+> common and we end up just merely physically put them into one file
+> which does not bring too much benefit IMHO.
+>
+> Regards,
+> Bin
+>
 
->> $ git show ee4d919f30f
->> commit ee4d919f30f1378cda697dd94d5a21b2a7f4d90d
->> Author: aliguori <aliguori@c046a42c-6fe2-441c-8c8c-71466251a162>
->> Date:   Mon Sep 22 16:04:16 2008 +0000
->>
->>     LSI SCSI: raise UDC on infinite loop (Marcelo Tosatti)
->>
->>     Raise UDC (Unexpected Disconnect) when a large enough number of
->>     instructions has been executed by the SCRIPTS processor. This "solution"
->>     is much simpler than temporarily interrupting execution.
->>
->>     This remedies the situation with Windows which downloads SCRIPTS code
->>     that busy loops on guest main memory. Their drivers _do_ handle UDC
->>     appropriately (at least XP and 2003).
->>
->>     It would be nicer to actually detect infinite loops, but until then,
->>     this bandaid seems acceptable.
->>
->>     Since the situation seems to be rare enough, raise the number
->>     of instructions to 10000 (previously 1000).
->>
->>     Three people other than myself had success with this patch.
->>
->>     Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
->>     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
->>
->> $ git show 64c68080da4
->> commit 64c68080da429edf30a9857e3a698cb9ed335bd3
->> Author: pbrook <pbrook@c046a42c-6fe2-441c-8c8c-71466251a162>
->> Date:   Mon Sep 22 16:30:29 2008 +0000
->>
->>     Add comment to windows SCSI hack.
->>
->> diff --git a/hw/lsi53c895a.c b/hw/lsi53c895a.c
->> index e45eefaef7..53a2add0df 100644
->> --- a/hw/lsi53c895a.c
->> +++ b/hw/lsi53c895a.c
->> @@ -1199,6 +1199,11 @@ again:
->>          }
->>      }
->>      if (insn_processed > 10000 && !s->waiting) {
->> +        /* Some windows drivers make the device spin waiting for a memory
->> +           location to change.  If we have been executed a lot of code then
->> +           assume this is the case and force an unexpected device
->> disconnect.
->> +           This is apparently sufficient to beat the drivers into
->> submission.
->> +         */
->>          if (!(s->sien0 & LSI_SIST0_UDC))
->>              fprintf(stderr, "inf. loop with UDC masked\n");
->>          lsi_script_scsi_interrupt(s, LSI_SIST0_UDC, 0);
->>
->>>      insn = read_dword(s, s->dsp);
->>>      if (!insn) {
->>>          /* If we receive an empty opcode increment the DSP by 4 bytes
->>> @@ -1569,7 +1575,8 @@ again:
->>>              }
->>>          }
->>>      }
->>> -    if (insn_processed > 10000 && s->waiting == LSI_NOWAIT) {
->>> +exitloop:
->>> +    if (insn_processed > LSI_MAX_INSN && s->waiting == LSI_NOWAIT) {
->>>          /* Some windows drivers make the device spin waiting for a memory
->>>             location to change.  If we have been executed a lot of code then
->>>             assume this is the case and force an unexpected device disconnect.
->>>
+agree that the difference between u and e prci are  a lot and it make sense
+to separate it
 
+Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
