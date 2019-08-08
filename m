@@ -2,92 +2,63 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC692C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B29B0C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:33:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92D6E217D7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:21:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cVm3QevV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92D6E217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 88918217F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:33:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88918217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvjIg-0000yg-Te
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 10:21:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54450)
+	id 1hvjTT-0005zM-Oa
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 10:33:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56125)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hvjIG-0000Yc-Ia
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:21:29 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hvjSM-0004aD-4V
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:31:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hvjIF-0004aM-HQ
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:21:28 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55561)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hvjIF-0004Ya-9C
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:21:27 -0400
-Received: by mail-wm1-x341.google.com with SMTP id f72so2595541wmf.5
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 07:21:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=qqHvfP8cv/03fxWwFmpCHAYh5U8ckvWevbI7IFSRiVE=;
- b=cVm3QevVDvcbPMMryYFGm+OYTK3BLbxPDxUiLwY4KplGOzfXhfdfCHkRAuqdq5Qcid
- mpyyk4+8BPUrf1+slQxTIeFIVDQ8CRn+6mt7qNqjaCHo1rKmPmdrPTGrOImcMoDBzh5R
- 36P4mhhIZTcGTxWa3QD1YvwzShuCLhFbjU5/3Psp8Guf/D9g8VfFW67tAR/m5Nni+3Nj
- NJL9IkHl7L1uUrXnq4GEMxmHqNdYxSzTbhda+/Sog9M/WVTZ+yTrhl3RSiZEhUpf47OG
- XyDALneFUTpKrAsd9VQucTY94DsjSMW+XU/ueoMaNkXk5vrj5aa976zEs8IfWG9Vm1UI
- +hPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=qqHvfP8cv/03fxWwFmpCHAYh5U8ckvWevbI7IFSRiVE=;
- b=mAUkJ+g9xNgi6JINuC4M4tXIsXkSz/yV/4T+cqHb1bz/h6Xv9bM+Ul8BzIrOQd3oj0
- aKTQEOS9IcEQs0vQMQpFi1kxf5yKnSGL1VozsXU5PqWu4xNXBg52H27mZAc0Q24+wikM
- Vr5/bv2i5WlGA4JV1O/oT69SChNWnj1dp16Dm3M7fpv3I3EW1maocDeqMe7ONtSdPEl4
- 1ByfK4xK1e1dp5UNJfKlx5z6D0DSrbRCj4ONVO+lw0rNUSZ1fXH2Ac/ti5M+Nv4SRnKU
- tiGioADqfPa7vX+buOTYiXtwyxoHy0FZcNUXZHqsYQeXyH7hWsjTnF0wXhJDp+BTMNBV
- yErQ==
-X-Gm-Message-State: APjAAAVmXkFntEuNkFuGMNgzMGr509SSFPCQYFRwjSgQQNQft2wNDbIJ
- t4stUBA2f5O+bNO/fpbvglbz0n0GZ68=
-X-Google-Smtp-Source: APXvYqw/obGU124OF556pQZXoThWIZp3lLn2DBDbpt1OcWTcpO/Gs1YeTFPz1Qiog6/68jR55JUMxg==
-X-Received: by 2002:a1c:c747:: with SMTP id x68mr4763932wmf.138.1565274085315; 
- Thu, 08 Aug 2019 07:21:25 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id o6sm203916586wra.27.2019.08.08.07.21.24
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Thu, 08 Aug 2019 07:21:24 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4482D1FF87;
- Thu,  8 Aug 2019 15:21:24 +0100 (BST)
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-27-armbru@redhat.com> <87ef1xhta7.fsf@linaro.org>
- <87h86srb2u.fsf@dusky.pond.sub.org>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Markus Armbruster <armbru@redhat.com>
-In-reply-to: <87h86srb2u.fsf@dusky.pond.sub.org>
-Date: Thu, 08 Aug 2019 15:21:24 +0100
-Message-ID: <874l2rivq3.fsf@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1hvjSK-0002Ja-CO
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:31:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54922)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hvjSB-0002DO-SA; Thu, 08 Aug 2019 10:31:43 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5EC4FC04D293;
+ Thu,  8 Aug 2019 14:31:41 +0000 (UTC)
+Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B8EFA194B9;
+ Thu,  8 Aug 2019 14:31:04 +0000 (UTC)
+Date: Thu, 8 Aug 2019 16:31:02 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: <tony.nguyen@bt.com>
+Message-ID: <20190808163102.47c8f056.cohuck@redhat.com>
+In-Reply-To: <1565166454836.5266@bt.com>
+References: <45ec4924e0b34a3d9124e2db06af75b4@tpw09926dag18e.domain1.systemhost.net>
+ <1565166454836.5266@bt.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 26/29] Clean up inclusion of
- sysemu/sysemu.h
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Thu, 08 Aug 2019 14:31:42 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 05/26] hw/s390x: Access MemoryRegion
+ with MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,88 +70,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ i.mitsyanko@gmail.com, sagark@eecs.berkeley.edu, david@redhat.com,
+ jasowang@redhat.com, palmer@sifive.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, keith.busch@intel.com, jcmvbkbc@gmail.com,
+ frederic.konrad@adacore.com, dmitry.fleytman@gmail.com, kraxel@redhat.com,
+ edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn, pburton@wavecomp.com,
+ xiaoguangrong.eric@gmail.com, peter.chubb@nicta.com.au, philmd@redhat.com,
+ robh@kernel.org, hare@suse.com, sstabellini@kernel.org, berto@igalia.com,
+ chouteau@adacore.com, qemu-block@nongnu.org, arikalo@wavecomp.com,
+ jslaby@suse.cz, deller@gmx.de, mst@redhat.com, magnus.damm@gmail.com,
+ jcd@tribudubois.net, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ mreitz@redhat.com, hpoussin@reactos.org, joel@jms.id.au,
+ anthony.perard@citrix.com, xen-devel@lists.xenproject.org,
+ david@gibson.dropbear.id.au, lersek@redhat.com, green@moxielogic.com,
+ atar4qemu@gmail.com, antonynpavlov@gmail.com, marex@denx.de, jiri@resnulli.us,
+ ehabkost@redhat.com, minyard@acm.org, qemu-s390x@nongnu.org, sw@weilnetz.de,
+ alistair@alistair23.me, yuval.shaia@oracle.com, b.galvani@gmail.com,
+ eric.auger@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org,
+ jan.kiszka@web.de, clg@kaod.org, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, shorne@gmail.com, jsnow@redhat.com,
+ rth@twiddle.net, kwolf@redhat.com, qemu-riscv@nongnu.org, proljc@gmail.com,
+ pbonzini@redhat.com, andrew@aj.id.au, kbastian@mail.uni-paderborn.de,
+ crwulff@gmail.com, laurent@vivier.eu, Andrew.Baumann@microsoft.com,
+ sundeep.lkml@gmail.com, andrew.smirnov@gmail.com, michael@walle.cc,
+ paul.durrant@citrix.com, qemu-ppc@nongnu.org, huth@tuxfamily.org,
+ amarkovic@wavecomp.com, imammedo@redhat.com, aurelien@aurel32.net,
+ stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 7 Aug 2019 08:27:35 +0000
+<tony.nguyen@bt.com> wrote:
 
-Markus Armbruster <armbru@redhat.com> writes:
+> The memory_region_dispatch_{read|write} operand "unsigned size" is
+> being converted into a "MemOp op".
+> 
+> Convert interfaces by using no-op size_memop.
+> 
+> After all interfaces are converted, size_memop will be implemented
+> and the memory_region_dispatch_{read|write} operand "unsigned size"
+> will be converted into a "MemOp op".
+> 
+> As size_memop is a no-op, this patch does not change any behaviour.
+> 
+> Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  hw/s390x/s390-pci-inst.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->
->> Markus Armbruster <armbru@redhat.com> writes:
->>
->>> In my "build everything" tree, changing sysemu/sysemu.h triggers a
->>> recompile of some 5400 out of 6600 objects (not counting tests and
->>> objects that don't depend on qemu/osdep.h).
->>>
->>> 119 of 380 #include directives are actually superfluous.  Delete them.
->>> Downgrade two more to qapi/qapi-types-run-state.h, and move one from
->>> char/serial.h to char/serial.c.
->>>
->>> This doesn't reduce actual use much, as it's still included into
->>> widely included headers.  The next commit will tackle that.
->>>
->>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>> ---
->> <snip>
->>>  hw/semihosting/config.c             | 1 +
->> <snip>
->>>  stubs/semihost.c                    | 1 +
->> <snip>
->>> diff --git a/hw/semihosting/config.c b/hw/semihosting/config.c
->>> index 2a8e7e1045..9807f10cb0 100644
->>> --- a/hw/semihosting/config.c
->>> +++ b/hw/semihosting/config.c
->>> @@ -24,6 +24,7 @@
->>>  #include "qemu/error-report.h"
->>>  #include "hw/semihosting/semihost.h"
->>>  #include "chardev/char.h"
->>> +#include "sysemu/sysemu.h"
->>>
->>>  QemuOptsList qemu_semihosting_config_opts =3D {
->>>      .name =3D "semihosting-config",
->>> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
->>> index b8332150f1..9f3cff5fb6 100644
->> <snip>
->>>
->>> diff --git a/stubs/semihost.c b/stubs/semihost.c
->>> index 4d5b3c0653..f90589259c 100644
->>> --- a/stubs/semihost.c
->>> +++ b/stubs/semihost.c
->>> @@ -12,6 +12,7 @@
->>>  #include "qemu/option.h"
->>>  #include "qemu/error-report.h"
->>>  #include "hw/semihosting/semihost.h"
->>> +#include "sysemu/sysemu.h"
->> <snip>
->>
->> These additions seem out of place. If I comment them out I can still
->> build fine
->
-> sysemu/sysemu.h declares qemu_semihosting_config_opts,
-> hw/semihosting/config.c and stubs/semihost.c define it.
->
-> Gcc warns when you do that for functions (-Wmissing-declarations
-> -Wmissing-prototypes), but not for variables.  I like to include the
-> header anyway, to make sure the compiler checks the declaration is
-> consistent with the definition.
->
->>            - I think the only place that needs them is vl.c so it has a
->> typedef for the semihosting configure options. Arguably the extern
->> declaration could be moved into semihostings own headers to avoid
->> polluting sysemu.h more than it needs to?
->
-> I'm not sure I'm following you.
->
-> What would you like me to move where?
-
-extern QemuOptsList qemu_semihosting_config_opts;
-
-from sysemu.h to semihosting.h - but given other options externs are
-there maybe that is the best place for it.
-
---
-Alex Benn=C3=A9e
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
