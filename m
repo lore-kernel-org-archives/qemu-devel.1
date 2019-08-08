@@ -6,78 +6,111 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB83C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 07:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24935C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 07:07:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 623AB20665
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 07:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623AB20665
+	by mail.kernel.org (Postfix) with ESMTPS id ECAD82086D
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 07:07:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECAD82086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvcRD-0003D1-Nn
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 03:02:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51265)
+	id 1hvcVp-0004if-AU
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 03:07:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52182)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvcQH-0002fO-7x
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 03:01:18 -0400
+ (envelope-from <david@redhat.com>) id 1hvcVI-0004He-2C
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 03:06:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvcQF-0003MH-Sq
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 03:01:17 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40084)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvcQF-0003Lx-Lw
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 03:01:15 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r1so93714330wrl.7
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 00:01:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=G/ZL4e4iz98TCLCwtf4XenPuZv9ljfcx/ZJabDdJRrE=;
- b=GQkw+GmLRIAhybBQh0Tmetez4Q1q6CkNFdT0gHl+HujUMXfqJ/LJIMiYtdXrEfXSWj
- NwM4cCUYbJYhE3YlsHQYmXqVv4AFNYkUQa7t6CpKPmTvYR317gTBZmlSbc+vplip/sLD
- 37zkENDZ+PbhwjR27gSod7KR+hFqrglVu6GnucMO2CZGkF9iPFyEF9WfkQsTZW8Q5UAX
- pG6ZLUnwn25BNNzpPl+tYoT/nhp9a77YAWPGasr4lEfZLJE4dUrW4iSj2TJEVyx+EHsm
- 8C6mStRStHWI4oxr2fm9BCV/lNS7obVusZvrt6wTgnZkZJQyl/wVXB0V4EdPqtLrMsxE
- TOQg==
-X-Gm-Message-State: APjAAAUNyitiCeHfCaP7jVWj3DG+GtcnIEx/LB+i2qsK/JMFjuPt1uif
- 2aGLT7D+Wy0t7Vse1fciXXOnGQ==
-X-Google-Smtp-Source: APXvYqynYKwjswlYrsx+tzQn9PJWHVUM3Pa2hIzEvgty/qoRk86UZzbQQUH/PegJDPMw3dh/kVwJGQ==
-X-Received: by 2002:adf:f68b:: with SMTP id v11mr14343924wrp.116.1565247674613; 
- Thu, 08 Aug 2019 00:01:14 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id e4sm8429179wrh.39.2019.08.08.00.01.13
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Thu, 08 Aug 2019 00:01:14 -0700 (PDT)
-To: Bin Meng <bmeng.cn@gmail.com>
-References: <1565020374-23888-1-git-send-email-bmeng.cn@gmail.com>
- <1565239479-2130-1-git-send-email-bmeng.cn@gmail.com>
- <d0ca78ec-c5d4-bc80-6f2e-3e933013b5f4@redhat.com>
- <CAEUhbmVKnUkJ66A-mULpkqZppb=2c8NVAFJhZhOMpOdyRRxSQQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <1070f952-68d2-8849-bac8-4b58ab10ed9b@redhat.com>
-Date: Thu, 8 Aug 2019 09:01:13 +0200
+ (envelope-from <david@redhat.com>) id 1hvcVG-00062K-R9
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 03:06:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55462)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1hvcVG-000625-J9
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 03:06:26 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id B84737BDD4;
+ Thu,  8 Aug 2019 07:06:25 +0000 (UTC)
+Received: from [10.36.117.55] (ovpn-117-55.ams2.redhat.com [10.36.117.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 62362600C8;
+ Thu,  8 Aug 2019 07:06:22 +0000 (UTC)
+To: Wei Yang <richardw.yang@linux.intel.com>, "Zeng, Star"
+ <star.zeng@intel.com>
+References: <20190730003740.20694-1-richardw.yang@linux.intel.com>
+ <20190730003740.20694-2-richardw.yang@linux.intel.com>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104038F59D@shsmsx102.ccr.corp.intel.com>
+ <20190808021329.GC26938@richard>
+ <0C09AFA07DD0434D9E2A0C6AEB0483104038F61B@shsmsx102.ccr.corp.intel.com>
+ <20190808023802.GD26938@richard>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <a73f638c-e33d-c3d8-0b4a-0fa78943a30d@redhat.com>
+Date: Thu, 8 Aug 2019 09:06:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-In-Reply-To: <CAEUhbmVKnUkJ66A-mULpkqZppb=2c8NVAFJhZhOMpOdyRRxSQQ@mail.gmail.com>
+In-Reply-To: <20190808023802.GD26938@richard>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.26]); Thu, 08 Aug 2019 07:06:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.65
-Subject: Re: [Qemu-devel] [PATCH v2] hw: net: cadence_gem: Fix build errors
- in DB_PRINT()
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to use
+ goto for the last check
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,97 +122,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- qemu-arm@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: "imammedo@redhat.com" <imammedo@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/8/19 8:36 AM, Bin Meng wrote:
-> On Thu, Aug 8, 2019 at 1:21 PM Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
->>
->> Hi,
->>
->> On 8/8/19 6:44 AM, Bin Meng wrote:
->>> When CADENCE_GEM_ERR_DEBUG is turned on, there are several
->>> compilation errors in DB_PRINT(). Fix them.
+On 08.08.19 04:38, Wei Yang wrote:
+> On Thu, Aug 08, 2019 at 02:30:02AM +0000, Zeng, Star wrote:
+>>> -----Original Message-----
+>>> From: Wei Yang [mailto:richardw.yang@linux.intel.com]
+>>> Sent: Thursday, August 8, 2019 10:13 AM
+>>> To: Zeng, Star <star.zeng@intel.com>
+>>> Cc: Wei Yang <richardw.yang@linux.intel.com>; qemu-devel@nongnu.org;
+>>> imammedo@redhat.com; david@redhat.com; mst@redhat.com
+>>> Subject: Re: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to
+>>> use goto for the last check
 >>>
->>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>>> On Thu, Aug 08, 2019 at 01:42:14AM +0000, Zeng, Star wrote:
+>>>>> -----Original Message-----
+>>>>> From: Qemu-devel [mailto:qemu-devel-
+>>>>> bounces+star.zeng=intel.com@nongnu.org] On Behalf Of Wei Yang
+>>>>> Sent: Tuesday, July 30, 2019 8:38 AM
+>>>>> To: qemu-devel@nongnu.org
+>>>>> Cc: imammedo@redhat.com; david@redhat.com; Wei Yang
+>>>>> <richardw.yang@linux.intel.com>; mst@redhat.com
+>>>>> Subject: [Qemu-devel] [PATCH v2 1/2] memory-device: not necessary to
+>>>>> use goto for the last check
+>>>>>
+>>>>> We are already at the last condition check.
+>>>>>
+>>>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>>>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>>>>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>  hw/mem/memory-device.c | 1 -
+>>>>>  1 file changed, 1 deletion(-)
+>>>>>
+>>>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+>>> index
+>>>>> 5f2c408036..df3261b32a 100644
+>>>>> --- a/hw/mem/memory-device.c
+>>>>> +++ b/hw/mem/memory-device.c
+>>>>> @@ -186,7 +186,6 @@ static uint64_t
+>>>>> memory_device_get_free_addr(MachineState *ms,
+>>>>>      if (!range_contains_range(&as, &new)) {
+>>>>>          error_setg(errp, "could not find position in guest address space for "
+>>>>>                     "memory device - memory fragmented due to alignments");
+>>>>> -        goto out;
+>>>>
+>>>> Is it better to return 0 (or set new_addr to 0) for this error path and another
+>>> remaining "goto out" path?
+>>>>
 >>>
->>> ---
+>>> I may not get your point.
 >>>
->>> Changes in v2:
+>>> We set errp which is handled in its caller. By doing so, the error is propagated.
+>>>
+>>> Do I miss something?
 >>
->> Please don't reply to previous version, post as a new thread (it is
->> harder to notice your new versions in a emails threaded view).
+>> Yes, you are right. Currently, the caller is checking errp, but not the returned address, so there should be no issue.
+>> But when you see other error paths, you will find they all return 0. To be aligned (return 0 when error), so just suggest also returning 0 for these two "goto out" error path. :)
 >>
 > 
-> OK.
+> You may have some point.
 > 
->>> - use HWADDR_PRIx instead of TARGET_FMT_plx for consistency
->>> - use 'z' modifier to print sizeof(..)
->>>
->>>  hw/net/cadence_gem.c | 7 ++++---
->>>  1 file changed, 4 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
->>> index d412085..b6ff2c1 100644
->>> --- a/hw/net/cadence_gem.c
->>> +++ b/hw/net/cadence_gem.c
->>> @@ -983,8 +983,9 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
->>>              return -1;
->>>          }
->>>
->>> -        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy, rxbufsize),
->>> -                rx_desc_get_buffer(s->rx_desc[q]));
->>> +        DB_PRINT("copy %d bytes to 0x%" HWADDR_PRIx "\n",
->>
->> rx_desc_get_buffer() returns a uint64_t, shouldn't you use a PRIx64
->> format here?
+> Let's see whether others have the same taste, or we can refine it separately.
 > 
-> HWADDR_PRIx expands to PRIx64. I got your point that since it does not
-> return hwaddr, so we should use PRIx64 directly. Correct?
-> 
->>
->>> +                 MIN(bytes_to_copy, rxbufsize),
->>
->> Nitpick #1: since you are cleaning this file up, bytes_to_copy and
->> rxbufsize are both unsigned, so the first format should be %u instead of %d.
-> 
-> Sure, will do in v3.
-> 
->>
->>> +                 rx_desc_get_buffer(s, s->rx_desc[q]));
->>>
->>>          /* Copy packet data to emulated DMA buffer */
->>>          address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
->>> @@ -1157,7 +1158,7 @@ static void gem_transmit(CadenceGEMState *s)
->>>              if (tx_desc_get_length(desc) > sizeof(tx_packet) -
->>>                                                 (p - tx_packet)) {
->>>                  DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x space " \
->>> -                         "0x%x\n", (unsigned)packet_desc_addr,
->>> +                         "0x%zx\n", (unsigned)packet_desc_addr,
->>
->> Nitpick #2: packet_desc_addr is of type hwaddr, so removing the cast the
->> 1st format is HWADDR_PRIx, also removing the 2nd cast the 2nd format is
->> PRIx64.
-> 
-> packet_desc_addr() return unsigned, so %x should be OK.
 
-'packet_desc_addr' is of type hwaddr,
-'(unsigned)packet_desc_addr' is casted to type unsigned.
+I don't think that's necessary (callers really should check for errors
+before using the return values), but I would also not object to that change.
 
-Anyhow I now remember I already reviewed this patch:
-https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg03263.html
+-- 
 
->>
->> Then the 3rd format is now correct.
->>
->>>                           (unsigned)tx_desc_get_length(desc),
->>>                           sizeof(tx_packet) - (p - tx_packet));
->>>                  break;
->>>
+Thanks,
+
+David / dhildenb
 
