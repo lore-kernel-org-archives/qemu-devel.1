@@ -2,61 +2,82 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19DD6C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 08:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28221C0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 08:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC7812187F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 08:10:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC7812187F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id F07592187F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 08:13:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F07592187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvdVX-0007KS-0m
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 04:10:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34319)
+	id 1hvdYD-0000gG-7F
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 04:13:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34768)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <piaojun@huawei.com>) id 1hvdV8-0006uN-W3
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 04:10:24 -0400
+ (envelope-from <sgarzare@redhat.com>) id 1hvdXh-0000GE-IQ
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 04:13:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <piaojun@huawei.com>) id 1hvdV7-0008B5-7J
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 04:10:22 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2249 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <piaojun@huawei.com>) id 1hvdV6-000880-S9
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 04:10:21 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id DB81E942BA9F4AB7F688;
- Thu,  8 Aug 2019 16:10:11 +0800 (CST)
-Received: from [10.177.253.249] (10.177.253.249) by smtp.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 8 Aug 2019
- 16:10:08 +0800
-To: Stefan Hajnoczi <stefanha@redhat.com>, <virtio-fs@redhat.com>,
- <qemu-devel@nongnu.org>
-References: <20190801165409.20121-1-stefanha@redhat.com>
- <20190807180355.GA22758@stefanha-x1.localdomain>
-From: piaojun <piaojun@huawei.com>
-Message-ID: <5D4BD8D8.5080402@huawei.com>
-Date: Thu, 8 Aug 2019 16:10:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.2.0
+ (envelope-from <sgarzare@redhat.com>) id 1hvdXg-0000ea-Ab
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 04:13:01 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54209)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1hvdXg-0000ds-4E
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 04:13:00 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 10so1441779wmp.3
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 01:12:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=mYXm9UDJhY/ywqZDWE7f+3A+nfgqkEyihOXfqai7YEQ=;
+ b=bcRMJrekxiKtIxTw7ZSdVzyk40byUZLDT+A64f1ApHBHNoTDQU4yfJ/gQCS+Gb1cOE
+ g8Ce43qc6MQ8dju9zbbJUV0pf1wiupEsfGHZjnzjkZMNVIOlpFr7gmLT5WtotjCUD8Ag
+ f17pYyU8Hh5x3HxHW+vtj034loYwd1Y0VcjBoU2/ClISuIXImdnOUkhwKQL+5rOqX0Ld
+ cBHtHtzOGMflzM/YZU4kaX8yMceGMOf8rvcvFsKgFUTm4JdlPKl/24KtMbGntOS6sFsd
+ cz5yXP82K/JM7DmIWFPhp7KNp0bNC0rWz5AutYRwRloyPexk/OZP9Ls+wGQ1nTsd4Yg7
+ Eraw==
+X-Gm-Message-State: APjAAAUQZV8Lmd+RRxFDqDGK38ypdEIdB9GnpEEpvXjqWZLtfVWztrVc
+ 3EP3tPIR9LiKRCvSSgyYjKveYQ==
+X-Google-Smtp-Source: APXvYqxFPLb+PR4EbYvNw4rlnUoDkTHRkmutGXCeG1JtnvqRRi4lNAVPGSkWpYDWTces6+n5e7W30g==
+X-Received: by 2002:a05:600c:254b:: with SMTP id
+ e11mr2599351wma.171.1565251977389; 
+ Thu, 08 Aug 2019 01:12:57 -0700 (PDT)
+Received: from steredhat (host122-201-dynamic.13-79-r.retail.telecomitalia.it.
+ [79.13.201.122])
+ by smtp.gmail.com with ESMTPSA id o7sm59435241wru.58.2019.08.08.01.12.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Thu, 08 Aug 2019 01:12:56 -0700 (PDT)
+Date: Thu, 8 Aug 2019 10:12:54 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190808081254.acqwu2m4mhyxctjz@steredhat>
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-28-armbru@redhat.com>
+ <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
+ <87a7ckrat7.fsf@dusky.pond.sub.org>
+ <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
+ <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20190807180355.GA22758@stefanha-x1.localdomain>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.253.249]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
+User-Agent: NeoMutt/20180716
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.191
-Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH 0/4] virtiofsd: multithreading
- preparation part 3
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] Is network backend netmap worth keeping? (was:
+ [PATCH v2 27/29] Include sysemu/sysemu.h a lot less)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,119 +89,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Luigi Rizzo <rizzo@iet.unipi.it>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+On Thu, Aug 08, 2019 at 06:48:25AM +0200, Markus Armbruster wrote:
+> Please excuse the attention-grabbing subject.
+> 
+> Philippe Mathieu-Daudé <philmd@redhat.com> writes:
+> 
+> > On 8/7/19 10:16 PM, Markus Armbruster wrote:
+> [...]
+> >> Can you tell me offhand what I have to install so configure enables
+> >> CONFIG_NETMAP?
+> >
+> > The steps are listed in tests/docker/dockerfiles/debian-amd64.docker,
+> > but you can get to this point running:
+> >
+> >   $ make docker-image-debian-amd64 V=1 DEBUG=1
+> >
+> > This will build the docker image with netmap (so you don't have to mess
+> > with your workstation setup), then build QEMU within the image.
+> 
+> So, to make use of QEMU's netmap backend (CONFIG_NETMAP), you have to
+> build and install netmap software from sources.  Which pretty much
+> ensures nobody uses it.  It was added in commit 58952137b0b (Nov 2013).
+> The commit message points to <http://info.iet.unipi.it/~luigi/netmap/>,
+> which gives me "connection timed out" right now.
+> 
+> On the other hand, it's covered in MAINTAINERS, and has seen
+> non-janitorial activity as late as Dec 2018 (commit c693fc748a).
+> 
+> Luigi, Giuseppe, Vincenzo, what's the status of the netmap project?
 
-From my test, your patch set of multithreading improves iops greatly as
-below:
+I think Giuseppe and Vincenzo are currently maintain netmap.
+I worked with them on my master's thesis. :) I can give you some information,
+but I'm sure they can be more specific.
 
-Guest configuration:
-8 vCPU
-8GB RAM
-Linux 5.1 (vivek-aug-06-2019)
+More info here: https://github.com/luigirizzo/netmap
 
-Host configuration:
-Intel(R) Xeon(R) CPU E5-2670 0 @ 2.60GHz (8 cores x 4 threads)
-32GB RAM
-Linux 3.10.0
-EXT4 + LVM + local HDD
+> 
+> Why is the QEMU netmap backend worth keeping?
 
----
-Before:
-# fio -direct=1 -time_based -iodepth=64 -rw=randread -ioengine=libaio -bs=4k -size=1G -numjob=1 -runtime=30 -group_reporting -name=file -filename=/mnt/virtiofs/file
-Jobs: 1 (f=1): [r(1)] [100.0% done] [1177KB/0KB/0KB /s] [294/0/0 iops] [eta 00m:00s]
-file: (groupid=0, jobs=1): err= 0: pid=6037: Thu Aug  8 23:18:59 2019
-  read : io=35148KB, bw=1169.9KB/s, iops=292, runt= 30045msec
+Netmap provides a virtual switch (VALE) and netmap pipes that can be
+useful for VMs and the netmap backend allows us to use them.
 
-After:
-Jobs: 1 (f=1): [r(1)] [100.0% done] [6246KB/0KB/0KB /s] [1561/0/0 iops] [eta 00m:00s]
-file: (groupid=0, jobs=1): err= 0: pid=5850: Thu Aug  8 23:21:22 2019
-  read : io=191216KB, bw=6370.7KB/s, iops=1592, runt= 30015msec
----
+> 
+> Who is using the netmap backend?
+> 
+> How do they obtain a netmap-enabled QEMU?  Compile it from sources
+> themselves?
 
-But there is no iops improvment when I change from HDD to ramdisk. I
-guess this is because ramdisk has no iodepth.
+Yes, I think so.
 
-Thanks,
-Jun
+> 
+> Would it make sense to have netmap packaged in common Linux distros?
+> 
 
-On 2019/8/8 2:03, Stefan Hajnoczi wrote:
-> On Thu, Aug 01, 2019 at 05:54:05PM +0100, Stefan Hajnoczi wrote:
->> Performance
->> -----------
->> Please try these patches out and share your results.
-> 
-> Here are the performance numbers:
-> 
->   Threadpool | iodepth | iodepth
->      size    |    1    |   64
->   -----------+---------+--------
->   None       |   4451  |  4876
->   1          |   4360  |  4858
->   64         |   4359  | 33,266
-> 
-> A graph is available here:
-> https://vmsplice.net/~stefan/virtiofsd-threadpool-performance.png
-> 
-> Summary:
-> 
->  * iodepth=64 performance is increased by 6.8 times.
->  * iodepth=1 performance degrades by 2%.
->  * DAX is bottlenecked by QEMU's single-threaded
->    VHOST_USER_SLAVE_FS_MAP/UNMAP handler.
-> 
-> Threadpool size "none" is virtiofsd commit 813a824b707 ("virtiofsd: use
-> fuse_lowlevel_is_virtio() in fuse_session_destroy()") without any of the
-> multithreading preparation patches.  I benchmarked this to check whether
-> the patches introduce a regression for iodepth=1.  They do, but it's
-> only around 2%.
-> 
-> I also ran with DAX but found there was not much difference between
-> iodepth=1 and iodepth=64.  This might be because the host mmap(2)
-> syscall becomes the bottleneck and a serialization point.  QEMU only
-> processes one VHOST_USER_SLAVE_FS_MAP/UNMAP at a time.  If we want to
-> accelerate DAX it may be necessary to parallelize mmap, assuming the
-> host kernel can do them in parallel on a single file.  This performance
-> optimization is future work and not directly related to this patch
-> series.
-> 
-> The following fio job was run with cache=none and no DAX:
-> 
->   [global]
->   runtime=60
->   ramp_time=30
->   filename=/var/tmp/fio.dat
->   direct=1
->   rw=randread
->   bs=4k
->   size=4G
->   ioengine=libaio
->   iodepth=1
-> 
->   [read]
-> 
-> Guest configuration:
-> 1 vCPU
-> 4 GB RAM
-> Linux 5.1 (vivek-aug-06-2019)
-> 
-> Host configuration:
-> Intel(R) Core(TM) i7-5600U CPU @ 2.60GHz (2 cores x 2 threads)
-> 8 GB RAM
-> Linux 5.1.20-300.fc30.x86_64
-> XFS + dm-thin + dm-crypt
-> Toshiba THNSFJ256GDNU (256 GB SATA SSD)
-> 
-> Stefan
-> 
-> 
-> 
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
-> 
+Maybe yes, for the virtual switch (VALE) and netmap pipes there shouldn't
+be a problem. To use the network cards, however, you would need the modified
+drivers.
+
+Cheers,
+Stefano
 
