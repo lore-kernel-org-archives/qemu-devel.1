@@ -2,89 +2,79 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DD6C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00672C0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05889217F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:27:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05889217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BC054217F4
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:29:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lw8HkL41"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC054217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvgaK-0008IU-7g
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 07:27:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44313)
+	id 1hvgcA-00016V-3M
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 07:29:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44544)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hvgZv-0007se-BW
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:27:32 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hvgbn-0000gW-1M
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:29:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hvgZu-0008N2-1q
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:27:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36538)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hvgZt-0008Lu-Po
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:27:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F10EC769E1;
- Thu,  8 Aug 2019 11:27:28 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 481D060FA1;
- Thu,  8 Aug 2019 11:27:28 +0000 (UTC)
-To: "Richard W.M. Jones" <rjones@redhat.com>, ivo welch <ivo.welch@ucla.edu>
-References: <CAJrNScTufw-809ag5-DoqhDVJs4aRyYm9EQxSO4aqPVgT_+8gA@mail.gmail.com>
- <20190808074105.GD3888@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <e8cfc534-e922-fe65-4ed0-c9284a00aaa8@redhat.com>
-Date: Thu, 8 Aug 2019 06:27:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hvgbl-0000yW-TL
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:29:26 -0400
+Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:36736)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hvgbl-0000y5-MD; Thu, 08 Aug 2019 07:29:25 -0400
+Received: by mail-ot1-x329.google.com with SMTP id r6so117092737oti.3;
+ Thu, 08 Aug 2019 04:29:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=65T6irR93j3o1VJcC82y3rfX/tr7CMxrI07g2y2C2D8=;
+ b=lw8HkL41ObGdPfULnTR4ObPDSIITp9VSjynNiA4G4vsoX1ATCjNxES4rH9Yx1rQBP4
+ 6jspzObs5UkPKVQsvDptu/tOcxo1s6trIPYcfK9vrGX0MiwN+ZWPfgvZlnDSqNsugrV/
+ iocymHcid0bkDrfQz7vTorvVru8A8eSg8ekdu7E8B9vnhR+Vx5GP6shaOMuMsiyJpI+D
+ ysI/0f6IoL4XPT1E4Ccexhpg4N1Jh7EOtTrXaeo4mb9jmUI3LQCKEAoBHTKo6q4Bha1j
+ Qm/Kk+BbLYs8xbRfdbgSUnlNyo31QN9qOAEAnxQFS86J7SRQtXv6oQ10DytAutIY5Z4J
+ GwkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=65T6irR93j3o1VJcC82y3rfX/tr7CMxrI07g2y2C2D8=;
+ b=IylGpSqH4I7bMRVTiS/ol8GixHBKTeY8am9jOrIn6V9WVoMFQ9Vjb55rmYJuEgKvUF
+ NrI9gZ+4Gg+1OWMceUBnwLNAwveuhP5Be2nB+C4BQLK1q+9DaUh+F0ZobHYq1n0XNk7V
+ 8kVv8b8NVJJS+OuX9Xo7RumZgpF4cv/awqwAV2654o3Cosr5SdZ1zl46h3zg2fuRZotU
+ CucEM/x5u8g+Mi6ss8ObE2r/MDusITJmyolY2dfDPSZ6XU665XCLon+/aO7/xoPQecjk
+ 3vkXoPq4Oy7o787rsYpM5KwNS1VMMxoUF4MCei2c2Ovmkn7xass6uzCprEb0rAwK/LLJ
+ RUSg==
+X-Gm-Message-State: APjAAAVq31NbIYHfsZBaoHJB5F1gsvSrn/qTKh5EcHLSzMMQSwHGnYYG
+ qXPRtj8me8k8SD/wzLJtb5z6Akvq24IHHkqs5Ac=
+X-Google-Smtp-Source: APXvYqybs91oDjdeadFRoI4qIHVBQcyjiBy5qxm7UrdGTvV51z+nRjaGhL5PhB/xNTIuuMxQMYYN9CZrO90GCGrZsG4=
+X-Received: by 2002:a9d:6ad7:: with SMTP id m23mr1501828otq.306.1565263764509; 
+ Thu, 08 Aug 2019 04:29:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190808074105.GD3888@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WY3zjrs1ScszL3wN2I3qlLhcnvij6R00T"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Thu, 08 Aug 2019 11:27:29 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Quick nbdkit question
+References: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
+In-Reply-To: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 8 Aug 2019 13:29:13 +0200
+Message-ID: <CAL1e-=jceerbvam57mmXoKWHzepB-qUFL08gBEnSws_ohewLzw@mail.gmail.com>
+To: liuzhiwei <zhiwei_liu@c-sky.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::329
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,103 +86,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
+ sagark@eecs.berkeley.edu, bastian@mail.uni-paderborn.de,
+ Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WY3zjrs1ScszL3wN2I3qlLhcnvij6R00T
-Content-Type: multipart/mixed; boundary="hnbAoonAXSZ2sOYMTj69FCGndkkjRQQCJ";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: "Richard W.M. Jones" <rjones@redhat.com>, ivo welch <ivo.welch@ucla.edu>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com
-Message-ID: <e8cfc534-e922-fe65-4ed0-c9284a00aaa8@redhat.com>
-Subject: Re: Quick nbdkit question
-References: <CAJrNScTufw-809ag5-DoqhDVJs4aRyYm9EQxSO4aqPVgT_+8gA@mail.gmail.com>
- <20190808074105.GD3888@redhat.com>
-In-Reply-To: <20190808074105.GD3888@redhat.com>
+On Thu, Aug 8, 2019 at 11:52 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
 
---hnbAoonAXSZ2sOYMTj69FCGndkkjRQQCJ
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/8/19 2:41 AM, Richard W.M. Jones wrote:
-> On Wed, Aug 07, 2019 at 02:30:18PM -0700, ivo welch wrote:
->> hi richard---please forgive us.  another quickie.  we created an nbd
->> device.  just a block device...no partitions, etc.  in the guest vm, w=
-e
->> wrote a short C program that writes one sector (open file, fseek, fwri=
-te,
->> close file) and then does it again.  all is working just fine.  the ho=
-st
->> console (filter) prints out the write requests, as it should.  (we add=
-ed
->> some more print code.)
->>
->> but we are confused about that after the first [but not the second] wr=
-ite,
->> we see about 30 (4096b) sector reads, starting from 4096, 12288, ... .=
-
->> (the file below has both the C code and the nbdkit messages.)
->=20
-> I guess it's happening because of readahead in the qemu NBD driver, or
-> generally in the QEMU block layer.  Eric or Kevin will probably have a
-> better idea.
-
-More likely, it's happening in the guest OS.  The kernel probes a lot of
-sectors when first mounting block storage, to determine what lives on
-that storage.  Rich even has a graphical demonstration of that probing
-in his FOSDEM 2019 presentation.
-https://rwmj.wordpress.com/2019/02/04/video-take-your-loop-mounts-to-the-=
-next-level-with-nbdkit/
-around the 21:20 mark.
-
->=20
->> there is no file system layer here, just an nbdkit block device. what =
-is
->> reading sectors here?  is it the stdio.h library in the guest, somethi=
-ng
->> magic about access into an unformatted block device in the guest VM li=
-nux,
->> or nbdkit itself?!     does this sound familiar?
-
-In order to determine if storage is formatted or not, the guest VM Linux
-kernel reads a lot of sectors.  Qemu is not doing readahead, so much as
-faithfully reproducing the read requests from the guest.  There are
-places where qemu tries to consolidate consecutive actions from the
-guest into one larger action to the storage, and we also have ideas
-about adding a caching filter which can perform readahead and such for
-performance, but I don't think they can be universally enabled in qemu
-without penalizing some users, so it should be obvious when you are
-opting in to those sorts of qemu features.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+> Hi all,
+>
+>     My workmate  and I have been working on Vector & Dsp extension, and
+> I'd like to share develop status  with folks.
+>
+>     The spec references for  Vector extension is riscv-v-spec-0.7.1, and
+> riscv-p-spec-0.5 for DSP extension.
 
 
---hnbAoonAXSZ2sOYMTj69FCGndkkjRQQCJ--
+Hello, Liu.
 
---WY3zjrs1ScszL3wN2I3qlLhcnvij6R00T
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+I will not answer your questions directly, however I want to bring to you
+and others another perspective on this situation.
 
------BEGIN PGP SIGNATURE-----
+First, please provide the link to the specifications. Via Google, I found
+that "riscv-v-spec-0.7.1" is titled "Working draft of the proposed RISC-V V
+vector extension". I could not find "riscv-p-spec-0.5".
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1MBx8ACgkQp6FrSiUn
-Q2pkDgf/ectWoEj3StNSZx4k85agiZP0LKFjyBdMMJArSL/8lMztyjDTe2ibuAyT
-DpfaEnsBisiiClFethVsR66KCPbmPsSsZMV+zitb2nhXt5ud/ci2z669aH2l0KpS
-p0rdpIQFJvSHjyw24fdPdU/2HlDmczYOWlO+VsC1e2bEfHHAgo13iuNcYkOExC0+
-LM6f2IHyfJejtYpyVoaLN3+uP1wcmTMFLUfwC+xUQ36W73bT9HfLxyd5unt9HQg9
-/Q2pF+rJkzDS56Toh8RuqaSlHdGZ+m6AUDsstJtFGIkj5TzmLFQl0I59V1ScDCyw
-szNTIEOoXH/EuRuyq7M9CngQ+2pCqw==
-=yjHq
------END PGP SIGNATURE-----
+I am not sure what the QEMU policy towards "working draft proposal" type of
+specification is. Peter, can you perhaps clarify that or any other related
+issue?
 
---WY3zjrs1ScszL3wN2I3qlLhcnvij6R00T--
+I would advice some caution in these cases. The major issue is backward
+compatibility, but there are other issues too. Let's say, fairness. If we
+let emulation of a component based on a "working draft proposal" be
+integrated into QEMU, this will set a precedent, and many other developer
+would rightfully ask for their contributions based on drafts to be
+integrated into QEMU. Our policy should be as equal as possible to all
+contribution, large or small, riscv or alpha, cpu or device, tcg or kvm -
+in my honest opinion. QEMU upstream should not be a collecting place for
+all imaginable experimentations, certain criteria on what is appropriate
+for upstreaming exist and must continue to exist.
 
+Yours,
+Aleksandar
+
+
+
+
+> The code of vector extension is
+> ready and under testing,  the first patch will be sent about two weeks
+> later. After that we will forward working on DSP extension, and send the
+> first patch in middle  October.
+>
+>      Could the maintainers  tell me whether the specs referenced are
+> appropriate? Is anyone working on these extensions?  I'd like to get
+> your status, and maybe discuss questions and work togather.
+>
+> Best Regards
+>
+> LIU Zhiwei
+>
+>
+>
+>
