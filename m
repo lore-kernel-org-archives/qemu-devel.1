@@ -2,90 +2,62 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E51BC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E1BC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 01:01:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4168021872
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:25:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4168021872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B0471217D7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 01:01:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0471217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvWEu-0004HM-IT
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 20:25:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35864)
+	id 1hvWnf-0004QI-VX
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 21:01:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43265)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hvWEU-0003mj-Nh
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:24:43 -0400
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hvWml-0003tu-3K
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:00:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hvWET-0006XP-2M
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:24:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40008)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1hvWmk-00016g-3B
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:00:07 -0400
+Received: from mga07.intel.com ([134.134.136.100]:60472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hvWEQ-0006Vz-GQ; Wed, 07 Aug 2019 20:24:38 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A6CFC3086202;
- Thu,  8 Aug 2019 00:24:37 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D2AEB600CC;
- Thu,  8 Aug 2019 00:24:36 +0000 (UTC)
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com, armbru@redhat.com
-References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
- <20190704130949.14017-4-dplotnikov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <24146f62-84b9-c585-0618-d039ae95e273@redhat.com>
-Date: Wed, 7 Aug 2019 19:24:35 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1hvWmj-000102-RQ
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 21:00:06 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+ by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 07 Aug 2019 17:59:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; d="scan'208";a="374675020"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga006.fm.intel.com with ESMTP; 07 Aug 2019 17:59:57 -0700
+Date: Thu, 8 Aug 2019 08:59:35 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190808005935.GA3084@richard>
+References: <20190805053146.32326-1-richardw.yang@linux.intel.com>
+ <20190807183534.GN27871@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190704130949.14017-4-dplotnikov@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Thu, 08 Aug 2019 00:24:37 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] qcow2: add zstd cluster compression
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190807183534.GN27871@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.100
+Subject: Re: [Qemu-devel] [PATCH v3] migration/postcopy: use mis->bh instead
+ of allocating a QEMUBH
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,144 +69,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: quintela@redhat.com, Wei Yang <richardw.yang@linux.intel.com>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx
-Content-Type: multipart/mixed; boundary="HffF4z0T3jwlZiEonf3xvqt8N2iskjOmI";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
- mreitz@redhat.com, armbru@redhat.com
-Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <24146f62-84b9-c585-0618-d039ae95e273@redhat.com>
-Subject: Re: [PATCH v2 3/3] qcow2: add zstd cluster compression
-References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
- <20190704130949.14017-4-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190704130949.14017-4-dplotnikov@virtuozzo.com>
+On Wed, Aug 07, 2019 at 07:35:34PM +0100, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> For migration incoming side, it either quit in precopy or postcopy. It
+>> is safe to use the mis->bh for both instead of allocating a dedicated
+>> QEMUBH for postcopy.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>
+>Hi Wei,
+>  Can you check this, the patchew tests came back with a failure which
+>seems bh related; I've not tried it, but can you just see if you can
+>reproduce it?
 
---HffF4z0T3jwlZiEonf3xvqt8N2iskjOmI
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Hmm... the error message in mail is a little confusion.
 
-On 7/4/19 8:09 AM, Denis Plotnikov wrote:
-> zstd significantly reduces cluster compression time.
-> It provides better compression performance maintaining
-> the same level of compression ratio in comparison with
-> zlib, which, by the moment, has been the only compression
+I see following error, but have no idea about what it is.
 
-s/by/at/
+==8174==ERROR: AddressSanitizer: heap-use-after-free on address 0x61200002c7f0 at pc 0x5566916cbf76 bp 0x7fc74f4b8680 sp 0x7fc74f4b8678
+WRITE of size 1 at 0x61200002c7f0 thread T9
+==8179==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+PASS 3 ahci-test /x86_64/ahci/pci_enable
+==8192==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+    #0 0x5566916cbf75 in aio_notify /tmp/qemu-test/src/util/async.c:351:9
+    #1 0x5566916cdbab in qemu_bh_schedule /tmp/qemu-test/src/util/async.c:167:9
+    #2 0x5566916d0db0 in aio_co_schedule /tmp/qemu-test/src/util/async.c:464:5
+---
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==8174==ABORTING
+ERROR - too few tests run (expected 40, got 18)
+make: *** [/tmp/qemu-test/src/tests/Makefile.include:904: check-unit] Error 1
+make: *** Waiting for unfinished jobs....
+PASS 4 ahci-test /x86_64/ahci/hba_spec
 
-> method available.
->=20
-> The performance test results:
-> Test compresses and decompresses qemu qcow2 image with just
-> installed rhel-7.6 guest.
-> Image cluster size: 64K. Image on disk size: 2.2G
->=20
-> The test was conducted with brd disk to reduce the influence
-> of disk subsystem to the test results.
-> The results is given in seconds.
->=20
-> compress cmd:
->   time ./qemu-img convert -O qcow2 -c -o compression_type=3D[zlib|zstd]=
+I am trying to reproduce it. I guess docker should be used. Would you mind
+sharing some link on setup the environment.
 
->                   src.img [zlib|zstd]_compressed.img
-> decompress cmd
->   time ./qemu-img convert -O qcow2
->                   [zlib|zstd]_compressed.img uncompressed.img
->=20
->            compression               decompression
->          zlib       zstd           zlib         zstd
-> ------------------------------------------------------------
-> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
-> user     65.0       15.8            5.3          2.5
-> sys       3.3        0.2            2.0          2.0
->=20
-> Both ZLIB and ZSTD gave the same compression ratio: 1.57
-> compressed image size in both cases: 1.4G
->=20
+Thanks
 
-Nice numbers.
-
-> +++ b/docs/interop/qcow2.txt
-> @@ -538,6 +538,9 @@ Compressed Clusters Descriptor (x =3D 62 - (cluster=
-_bits - 8)):
->                      Another compressed cluster may map to the tail of =
-the final
->                      sector used by this compressed cluster.
-> =20
-> +                    The layout of the compressed data depends on the c=
-ompression
-> +                    type used for the image (see compressed cluster la=
-yout).
-> +
->  If a cluster is unallocated, read requests shall read the data from th=
-e backing
->  file (except if bit 0 in the Standard Cluster Descriptor is set). If t=
-here is
->  no backing file or the backing file is smaller than the image, they sh=
-all read
-> @@ -790,3 +793,19 @@ In the image file the 'enabled' state is reflected=
- by the 'auto' flag. If this
->  flag is set, the software must consider the bitmap as 'enabled' and st=
-art
->  tracking virtual disk changes to this bitmap from the first write to t=
-he
->  virtual disk. If this flag is not set then the bitmap is disabled.
-> +
-> +=3D=3D=3D Compressed cluster layout =3D=3D=3D
-> +
-> +The compressed cluster data may have a different layout depending on t=
-he
-> +compression type used for the image, and store specific data for the p=
-articular
-> +compression type.
-> +
-> +Compressed data layout for the available compression types:
-> +(x =3D data_space_length - 1)
-> +
-> +    zlib:
-> +        Byte  0 -  x:     the compressed data content
-> +                          all the space provided used for compressed d=
-ata
-> +    zstd:
-> +        Byte  0 -  3:     the length of compressed data
-> +              4 -  x:     the compressed data content
-
-Missing a change to the header description at bytes 104-107 calling out
-'1' as meaning zstd (it only calls out '0' or absent as meaning zlib).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---HffF4z0T3jwlZiEonf3xvqt8N2iskjOmI--
-
---ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1La8QACgkQp6FrSiUn
-Q2rbdQf+J45wP6pNcU+Y12Hhim7eXgh8wv++FimUl1Ypm5rPJ5WNVbWMHy7Bf4BN
-fOxDLIe8P7TqPSHUltAHY5T93VrbpySHQAPj4e6j4yRzvfFL3wYV4YmqQZ9dqFuw
-y9nbBEa/tEETOxY0z2HTHmiNE6atN0uIUDvVK2Bv0m6fgOGmlEmveeOw2FQGv52v
-LtYNKvIhOXf/b33120D3TPii0/1OWhXSUAlUUF+dGLSDl9GTYGZw7/lCnCrTDzdR
-+bLFVZEgZIddZkBs41MucJtg0BotFSmlH27XRFxoaL+snCik1ZMLHPG4kXngDW/p
-XRGBfeHxoB4oA081mIYTrVHSFqOn4g==
-=7VX7
------END PGP SIGNATURE-----
-
---ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx--
+-- 
+Wei Yang
+Help you, Help me
 
