@@ -2,64 +2,63 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 840C7C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 10:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 383A6C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 10:52:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 574B8217F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 10:49:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 574B8217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 0B7E321874
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 10:52:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B7E321874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvfzQ-0002Gg-MI
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 06:49:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37423)
+	id 1hvg1k-0003sx-Cb
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 06:52:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37747)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hvfyq-0001Rs-NK
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 06:49:13 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hvg0u-00033r-J1
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 06:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hvfyp-0004sG-JH
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 06:49:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45782)
+ (envelope-from <cohuck@redhat.com>) id 1hvg0t-0005tG-JM
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 06:51:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41552)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hvfyp-0004qK-Dr
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 06:49:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hvg0o-0005ps-Q3; Thu, 08 Aug 2019 06:51:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D60B8830F;
- Thu,  8 Aug 2019 10:49:10 +0000 (UTC)
-Received: from redhat.com (ovpn-112-28.ams2.redhat.com [10.36.112.28])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 03C905D9D3;
- Thu,  8 Aug 2019 10:49:07 +0000 (UTC)
-Date: Thu, 8 Aug 2019 11:49:04 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Balamuruhan S <bala24@linux.ibm.com>
-Message-ID: <20190808104904.GD2534@redhat.com>
-References: <20190807071445.4109-1-bala24@linux.ibm.com>
- <20190807071445.4109-2-bala24@linux.ibm.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id D8451C0546D5;
+ Thu,  8 Aug 2019 10:51:13 +0000 (UTC)
+Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E52E55C219;
+ Thu,  8 Aug 2019 10:50:57 +0000 (UTC)
+Date: Thu, 8 Aug 2019 12:50:55 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <20190808125055.3d4b04bb.cohuck@redhat.com>
+In-Reply-To: <20190729145654.14644-15-damien.hedde@greensocs.com>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-15-damien.hedde@greensocs.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190807071445.4109-2-bala24@linux.ibm.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 08 Aug 2019 10:49:10 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Thu, 08 Aug 2019 10:51:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC PATCH 1/6] utils/python_api: add scripting
- interface for Qemu with python lib
+Subject: Re: [Qemu-devel] [PATCH v3 14/33] hw/s390x/s390-virtio-ccw.c:
+ remove qdev_reset_all call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,60 +70,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: maddy@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, qemu-devel@nongnu.org,
- hari@linux.vnet.ibm.com, clg@kaod.org, pbonzini@redhat.com,
- david@gibson.dropbear.id.au
+Cc: fam@euphon.net, peter.maydell@linaro.org, walling@linux.ibm.com,
+ dmitry.fleytman@gmail.com, mst@redhat.com, mark.cave-ayland@ilande.co.uk,
+ qemu-devel@nongnu.org, kraxel@redhat.com, edgar.iglesias@xilinx.com,
+ hare@suse.com, qemu-block@nongnu.org, david@redhat.com, pasic@linux.ibm.com,
+ borntraeger@de.ibm.com, marcandre.lureau@redhat.com, rth@twiddle.net,
+ thuth@redhat.com, ehabkost@redhat.com, alistair@alistair23.me,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org, clg@kaod.org, jsnow@redhat.com,
+ david@gibson.dropbear.id.au, berrange@redhat.com, mark.burton@greensocs.com,
+ qemu-ppc@nongnu.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 07, 2019 at 12:44:40PM +0530, Balamuruhan S wrote:
-> Adds scripting interface with python library to call functions in
-> python modules from Qemu that can be used to feed input externally
-> and without recompiling Qemu that can be used for early development,
-> testing and can be extended to abstract some of Qemu code out to a
-> python script to ease maintenance.
+On Mon, 29 Jul 2019 16:56:35 +0200
+Damien Hedde <damien.hedde@greensocs.com> wrote:
 
-I admit the use case is interesting, but this is opening a can of
-worms...
+> Replace deprecated qdev_reset_all by device_reset_warm.
+> 
+> This does not impact the behavior.
 
-Historically the project has held the view that we do not wish
-to have an mechanism to support loading out of tree code into the
-QEMU process. Much previously talk was around dlopen'd C plugins,
-but dynanically loaded Python plugins are doing the same thing
-at a conceptual level.
+Not so sure about that; see below.
 
-We didn't wish to expose internals of QEMU in a plugin API to
-avoid having any kind of API promise across releases.
-
-There was also the question of licensing with plugins opening
-the door for people to extend QEMU with non-free/closed source
-functionality.
-
-While this series only uses the plugin for one fairly obscure
-device, once a python plugin feature is intergrated in QEMU
-there will inevitably be requests to use it in further areas
-of QEMU.
-
-IOW, acceptance of this patch is a significant question for
-the project, and a broader discussion point, than just this
-PPC feature patch series.
-
-> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> 
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 > ---
->  configure                   |  10 +++++
->  include/sysemu/python_api.h |  30 +++++++++++++
->  util/Makefile.objs          |   1 +
->  util/python_api.c           | 100 ++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 141 insertions(+)
->  create mode 100644 include/sysemu/python_api.h
->  create mode 100644 util/python_api.c
+>  hw/s390x/s390-virtio-ccw.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 5b6a9a4e55..1d6b966817 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -104,7 +104,7 @@ static void subsystem_reset(void)
+>      for (i = 0; i < ARRAY_SIZE(reset_dev_types); i++) {
+>          dev = DEVICE(object_resolve_path_type("", reset_dev_types[i], NULL));
+>          if (dev) {
+> -            qdev_reset_all(dev);
+> +            device_reset_warm(dev);
+>          }
+>      }
+>  }
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+This resets various different devices:
+
+- the diag288 watchdog, which does not have kids
+- the flic also seems fine (both non-kvm and kvm versions)
+- the sclp event facility, however, does have kids:
+  - I'm a bit unsure about the sclp cpu hotplug thing; it does not have
+    a ->reset function, though
+  - the quiesce event does have a ->reset callback; so presumably this
+    is already called in a different path
+- the css bridge is basically the root of all things css; its ->reset
+  function currently calls css_reset(), which resets some state of the
+  css per se, but does not call down into the device tree
+  - might we end up with calling some stuff twice for devices in the
+    css?
+
+Would be good if someone else from the s390 folks could take a look,
+just to make sure I'm not confused here.
 
