@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B06C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 16:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E784C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 16:45:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2225021881
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 16:45:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E07E21881
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 16:45:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UB8rBUr8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2225021881
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EKyvj/8+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E07E21881
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvlXt-0002Q7-EM
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 12:45:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55170)
+	id 1hvlXu-0002Rq-EI
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 12:45:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55154)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hvlTk-0004Ta-7L
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 12:41:29 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hvlTi-0007e2-7t
+ (envelope-from <alex.bennee@linaro.org>) id 1hvlTi-0004TJ-HX
  for qemu-devel@nongnu.org; Thu, 08 Aug 2019 12:41:28 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35411)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <alex.bennee@linaro.org>) id 1hvlTg-0007aj-H8
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 12:41:26 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51178)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hvlTh-0007aQ-Im
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 12:41:25 -0400
-Received: by mail-wr1-x444.google.com with SMTP id k2so9730848wrq.2
- for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 09:41:24 -0700 (PDT)
+ id 1hvlTg-0007WT-Aa
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 12:41:24 -0400
+Received: by mail-wm1-x343.google.com with SMTP id v15so3054017wml.0
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 09:41:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cJ7b4qbxHqVbTw2rsvioZwlEmWolzTmmuvqu1NwPYKI=;
- b=UB8rBUr8ukI8R6l4C6lBKbeHFZ4hGmWH95TQrChszpTCHJWnIkPLFSD+DQmzJBIwNe
- v9pIueEK6FpFToRnuxPnEBeSRpP1DQ/Dk5fF5lIFVg+2nORMtIN+SwW8zQgAICEPvOzj
- P5+dWrBB9tFAhVtfKRhO0PkjdSoe9+I73RRchQyd2XBMKXKDC56rJoJKT0jWKvI3HF4I
- sEMCV1oDl5Z5KLbBtMdX+fm0SGEZd3F8S6Qpukb9S8KBumwBK7oMIdGaXXiECiADfCzF
- AUOxxYID9FbyijuHp0eroBKMlpCJQbvn6Be+I6/R/nY2EmKu5Fpp4tJa0FtxnkvQWtmL
- RwHQ==
+ bh=LIEv4P2C0/9YawvAT5IGyHCWDJnkHqheUeFneAyCCc4=;
+ b=EKyvj/8+60PxD75cfBZDjxeJr/WUJFAsLaDwf7Ub5i3HIyCVIrtlNXVuQ/WDivflGV
+ sRyYFmWy8hERER1LXm6YAtRNcwSR6EBZgx/Uz69nOfJUyUiZJU3oqGZEJyxy1KGlLpcG
+ CEt7Q6LcN4wgfWspEVynO7vJJ0yjv0yH9mLy1im/j9dpt6EsDR82zkwe86NHIzkFkTaG
+ r7xt6n0Hr4th50lpdcdRLq/mSFA9GhowVGvKMhE1/+bUmz16KFC0dBw649XbsSyHlUlV
+ HEoAwhcobzcK8xDiLv6ehqWFIuSAerWuY5Ewq2QeSdv2OLFEHYNZuPE37Sjt0rvm6EBu
+ 6hCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cJ7b4qbxHqVbTw2rsvioZwlEmWolzTmmuvqu1NwPYKI=;
- b=YD8IGmyj1p08R/vWnEidaLlcAVjk5Q+rswtBTA+wKGgxrFEmio2VUuI5dkkAomj0Cz
- 5ylo+TSI1X1dsRSPDHdorv2aqlYmVQ5bs/HnwgyWksvdRJQ2mHzu6WfjVMa4j9gkqqHg
- 3bfV35KBi+ICG9vxzjbSxQUKhjNBYpNk4YbtmGcPiLXVLBexXZNBdCNEwLSPohaUXFNG
- BmEAHHXzBN6Fo628s3kTdOL6W2MpMqK3tyRe+dOPNbLLRezj2CtY+9xwox1tL5HW+VQI
- UihLMwSlQqs1DfOaUqOQmIocdsBWKITy9fGKvACn71gE7589lpQGrNKi85gY00T/KWpv
- q8+Q==
-X-Gm-Message-State: APjAAAVtI8m1lh+7KSS579lptpqD89WIQFVgn0jyUiNAbWRYTTlN7ZfD
- IzDcPnG0yvltXTgg+LR0ZsifTw==
-X-Google-Smtp-Source: APXvYqyL+VCFjSPpRggH8CjP4pPGzFzU5GCf43Qj/YCwM+greLywkxEEGmbsyDQz6H7TUUaL46MPiQ==
-X-Received: by 2002:adf:dd01:: with SMTP id a1mr17623099wrm.12.1565282483812; 
- Thu, 08 Aug 2019 09:41:23 -0700 (PDT)
+ bh=LIEv4P2C0/9YawvAT5IGyHCWDJnkHqheUeFneAyCCc4=;
+ b=npdrHADPa2VmiyG461HPynu0Eln5n5SHc1LZ+jWW1HWojo/n8Tvk+aPFKkb4KY1QfK
+ cQ2x7z9xMBckFL7ir1j/JLC7ojXf2AWCgzJ9hWFjuBsR1VkkE56ZvV8cGn5tRdOn5imh
+ mO+cQ9iDUNfqLoedS9OWB6NpGSo3ddR1F43B2ocQ384FSV+KnP1FDXbg6uGp9exM0zk7
+ /9RdN+Oq1WMlPvT8aYvsAqycBWtiTU035CQ6c/STXAosAGd8BlVvZUogoLpLxikvxeLP
+ j1N61vVfSTk57BHdHoare9L4DIDQOuznQ/OK0GMcIdxUYTKh1jMt35C71RM1JAvXSuzo
+ dk7Q==
+X-Gm-Message-State: APjAAAXS3RvDxWN9hEaT7JDlvzVarGHnj+QgUCZm5xg35KOHGZwplqEI
+ k6UIXmjvxj8WVe/lVCxvOe4eyfdwlxw=
+X-Google-Smtp-Source: APXvYqyasgvoSpX7I4Vl+Rd8yiXIKjEiQpDMn4SFWBuMF/KiH5lCINnEuL4WFbyZsMTUwBHBeN3/Qw==
+X-Received: by 2002:a7b:c4c1:: with SMTP id g1mr5591465wmk.14.1565282482437;
+ Thu, 08 Aug 2019 09:41:22 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id 66sm17049115wrc.83.2019.08.08.09.41.19
+ by smtp.gmail.com with ESMTPSA id h8sm3438803wmf.12.2019.08.08.09.41.19
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
  Thu, 08 Aug 2019 09:41:21 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4A4661FF87;
- Thu,  8 Aug 2019 17:41:19 +0100 (BST)
+ by zen.linaroharston (Postfix) with ESMTP id E3A721FF92;
+ Thu,  8 Aug 2019 17:41:18 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Thu,  8 Aug 2019 17:41:17 +0100
-Message-Id: <20190808164117.23348-8-alex.bennee@linaro.org>
+Date: Thu,  8 Aug 2019 17:41:15 +0100
+Message-Id: <20190808164117.23348-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190808164117.23348-1-alex.bennee@linaro.org>
 References: <20190808164117.23348-1-alex.bennee@linaro.org>
@@ -83,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH v1 7/7] targets (various): use
- softfloat-helpers.h where we can
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PATCH v1 5/7] target/mips: rationalise softfloat
+ includes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,110 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
- "open list:S390 TCG CPUs" <qemu-s390x@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, armbru@redhat.com,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Generally the cpu and non-FP helper files just want to manipulate the
-softfloat flags. For this they can just use the -helpers.h include
-which brings in a minimal number of inline helpers.
+We should avoid including the whole of softfloat headers in cpu.h and
+explicitly include it only where we will be calling softfloat
+functions. We can use the -types.h and -helpers.h in cpu.h for the few
+bits that are global.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- target/alpha/helper.c   | 2 +-
- target/microblaze/cpu.c | 2 +-
- target/s390x/cpu.c      | 2 +-
- target/sh4/cpu.c        | 3 +--
- target/tricore/helper.c | 2 +-
- target/unicore32/cpu.c  | 1 -
- 6 files changed, 5 insertions(+), 7 deletions(-)
+ target/mips/cpu.h        | 3 ++-
+ target/mips/msa_helper.c | 1 +
+ target/mips/op_helper.c  | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index 93b8e788b18..c6998348df4 100644
---- a/target/alpha/helper.c
-+++ b/target/alpha/helper.c
-@@ -21,7 +21,7 @@
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 21c0615e020..f146924623c 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -5,7 +5,8 @@
  
- #include "cpu.h"
- #include "exec/exec-all.h"
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
 -#include "fpu/softfloat.h"
 +#include "fpu/softfloat-types.h"
++#include "fpu/softfloat-helpers.h"
+ #include "mips-defs.h"
+ 
+ #define TCG_GUEST_DEFAULT_MO (0)
+diff --git a/target/mips/msa_helper.c b/target/mips/msa_helper.c
+index a5a86572b4a..f24061e2af7 100644
+--- a/target/mips/msa_helper.c
++++ b/target/mips/msa_helper.c
+@@ -22,6 +22,7 @@
+ #include "internal.h"
+ #include "exec/exec-all.h"
  #include "exec/helper-proto.h"
- #include "qemu/qemu-print.h"
++#include "fpu/softfloat.h"
  
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 0bec54b2f8a..9cfd7445e7d 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -28,7 +28,7 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
+ /* Data format min and max values */
+ #define DF_BITS(df) (1 << ((df) + 3))
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 9e2e02f8586..f88a3ab9043 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -25,6 +25,7 @@
  #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-helpers.h"
+ #include "exec/cpu_ldst.h"
+ #include "sysemu/kvm.h"
++#include "fpu/softfloat.h"
  
- static const struct {
-     const char *name;
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 736a7903e22..5db016672bb 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -42,7 +42,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
- #endif
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-helpers.h"
- 
- #define CR0_RESET       0xE0UL
- #define CR14_RESET      0xC2000000UL;
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 816d6d7f311..d0a7707991f 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -25,8 +25,7 @@
- #include "cpu.h"
- #include "migration/vmstate.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
--
-+#include "fpu/softfloat-helpers.h"
- 
- static void superh_cpu_set_pc(CPUState *cs, vaddr value)
- {
-diff --git a/target/tricore/helper.c b/target/tricore/helper.c
-index a6803368506..d5db7b2c03f 100644
---- a/target/tricore/helper.c
-+++ b/target/tricore/helper.c
-@@ -19,7 +19,7 @@
- 
- #include "cpu.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-helpers.h"
- #include "qemu/qemu-print.h"
- 
- enum {
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index 802e2f1eba5..b27fb9689ff 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -17,7 +17,6 @@
- #include "cpu.h"
- #include "migration/vmstate.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
- 
- static void uc32_cpu_set_pc(CPUState *cs, vaddr value)
- {
+ /*****************************************************************************/
+ /* Exceptions processing helpers */
 -- 
 2.20.1
 
