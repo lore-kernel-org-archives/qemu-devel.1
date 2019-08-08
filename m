@@ -2,79 +2,68 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00672C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6AC5C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC054217F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:29:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lw8HkL41"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC054217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8BC852171F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 11:37:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC852171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvgcA-00016V-3M
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 07:29:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44544)
+	id 1hvgj9-0002vc-TM
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 07:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45489)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hvgbn-0000gW-1M
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:29:28 -0400
+ (envelope-from <armbru@redhat.com>) id 1hvgik-0002VJ-K2
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hvgbl-0000yW-TL
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:29:26 -0400
-Received: from mail-ot1-x329.google.com ([2607:f8b0:4864:20::329]:36736)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hvgbl-0000y5-MD; Thu, 08 Aug 2019 07:29:25 -0400
-Received: by mail-ot1-x329.google.com with SMTP id r6so117092737oti.3;
- Thu, 08 Aug 2019 04:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=65T6irR93j3o1VJcC82y3rfX/tr7CMxrI07g2y2C2D8=;
- b=lw8HkL41ObGdPfULnTR4ObPDSIITp9VSjynNiA4G4vsoX1ATCjNxES4rH9Yx1rQBP4
- 6jspzObs5UkPKVQsvDptu/tOcxo1s6trIPYcfK9vrGX0MiwN+ZWPfgvZlnDSqNsugrV/
- iocymHcid0bkDrfQz7vTorvVru8A8eSg8ekdu7E8B9vnhR+Vx5GP6shaOMuMsiyJpI+D
- ysI/0f6IoL4XPT1E4Ccexhpg4N1Jh7EOtTrXaeo4mb9jmUI3LQCKEAoBHTKo6q4Bha1j
- Qm/Kk+BbLYs8xbRfdbgSUnlNyo31QN9qOAEAnxQFS86J7SRQtXv6oQ10DytAutIY5Z4J
- GwkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=65T6irR93j3o1VJcC82y3rfX/tr7CMxrI07g2y2C2D8=;
- b=IylGpSqH4I7bMRVTiS/ol8GixHBKTeY8am9jOrIn6V9WVoMFQ9Vjb55rmYJuEgKvUF
- NrI9gZ+4Gg+1OWMceUBnwLNAwveuhP5Be2nB+C4BQLK1q+9DaUh+F0ZobHYq1n0XNk7V
- 8kVv8b8NVJJS+OuX9Xo7RumZgpF4cv/awqwAV2654o3Cosr5SdZ1zl46h3zg2fuRZotU
- CucEM/x5u8g+Mi6ss8ObE2r/MDusITJmyolY2dfDPSZ6XU665XCLon+/aO7/xoPQecjk
- 3vkXoPq4Oy7o787rsYpM5KwNS1VMMxoUF4MCei2c2Ovmkn7xass6uzCprEb0rAwK/LLJ
- RUSg==
-X-Gm-Message-State: APjAAAVq31NbIYHfsZBaoHJB5F1gsvSrn/qTKh5EcHLSzMMQSwHGnYYG
- qXPRtj8me8k8SD/wzLJtb5z6Akvq24IHHkqs5Ac=
-X-Google-Smtp-Source: APXvYqybs91oDjdeadFRoI4qIHVBQcyjiBy5qxm7UrdGTvV51z+nRjaGhL5PhB/xNTIuuMxQMYYN9CZrO90GCGrZsG4=
-X-Received: by 2002:a9d:6ad7:: with SMTP id m23mr1501828otq.306.1565263764509; 
- Thu, 08 Aug 2019 04:29:24 -0700 (PDT)
+ (envelope-from <armbru@redhat.com>) id 1hvgij-0003yx-4j
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:36:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47214)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvgii-0003yD-Sz
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 07:36:37 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1F6C130253EC;
+ Thu,  8 Aug 2019 11:36:35 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 265BB1F2;
+ Thu,  8 Aug 2019 11:36:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7C493113864E; Thu,  8 Aug 2019 13:36:28 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+References: <20190806151435.10740-1-armbru@redhat.com>
+ <20190806151435.10740-16-armbru@redhat.com>
+ <3cec7bcc-984f-bc82-6366-d530ae48b356@redhat.com>
+Date: Thu, 08 Aug 2019 13:36:28 +0200
+In-Reply-To: <3cec7bcc-984f-bc82-6366-d530ae48b356@redhat.com> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 7 Aug 2019 16:44:48
+ +0200")
+Message-ID: <87ftmbhosj.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
-In-Reply-To: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 8 Aug 2019 13:29:13 +0200
-Message-ID: <CAL1e-=jceerbvam57mmXoKWHzepB-qUFL08gBEnSws_ohewLzw@mail.gmail.com>
-To: liuzhiwei <zhiwei_liu@c-sky.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::329
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Thu, 08 Aug 2019 11:36:35 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 15/29] Include migration/vmstate.h less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,68 +75,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-riscv@nongnu.org,
- sagark@eecs.berkeley.edu, bastian@mail.uni-paderborn.de,
- Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 8, 2019 at 11:52 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> Hi all,
+> On 8/6/19 5:14 PM, Markus Armbruster wrote:
+>> In my "build everything" tree, changing migration/vmstate.h triggers a
+>> recompile of some 2700 out of 6600 objects (not counting tests and
+>> objects that don't depend on qemu/osdep.h).
+>>=20
+>> hw/hw.h supposedly includes it for convenience.  Several other headers
+>> include it just to get VMStateDescription.  The previous commit made
+>> that unnecessary.
+>>=20
+>> Include migration/vmstate.h only where it's still needed.  Touching it
+>> now recompiles only some 1600 objects.
+>>=20
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+>> ---
+[...]
+>>  target/alpha/machine.c             | 1 +
+>>  target/arm/machine.c               | 1 +
+>>  target/cris/machine.c              | 1 +
+>>  target/hppa/machine.c              | 1 +
+>>  target/i386/machine.c              | 1 +
+>>  target/lm32/machine.c              | 1 +
+>>  target/mips/machine.c              | 1 +
+>>  target/moxie/machine.c             | 1 +
+>>  target/openrisc/machine.c          | 1 +
+>>  target/ppc/machine.c               | 1 +
+>>  target/s390x/machine.c             | 1 +
+>>  target/sparc/machine.c             | 1 +
 >
->     My workmate  and I have been working on Vector & Dsp extension, and
-> I'd like to share develop status  with folks.
+> target/*/machine.c are odd files... Find a common pattern is not obvious.
 >
->     The spec references for  Vector extension is riscv-v-spec-0.7.1, and
-> riscv-p-spec-0.5 for DSP extension.
-
-
-Hello, Liu.
-
-I will not answer your questions directly, however I want to bring to you
-and others another perspective on this situation.
-
-First, please provide the link to the specifications. Via Google, I found
-that "riscv-v-spec-0.7.1" is titled "Working draft of the proposed RISC-V V
-vector extension". I could not find "riscv-p-spec-0.5".
-
-I am not sure what the QEMU policy towards "working draft proposal" type of
-specification is. Peter, can you perhaps clarify that or any other related
-issue?
-
-I would advice some caution in these cases. The major issue is backward
-compatibility, but there are other issues too. Let's say, fairness. If we
-let emulation of a component based on a "working draft proposal" be
-integrated into QEMU, this will set a precedent, and many other developer
-would rightfully ask for their contributions based on drafts to be
-integrated into QEMU. Our policy should be as equal as possible to all
-contribution, large or small, riscv or alpha, cpu or device, tcg or kvm -
-in my honest opinion. QEMU upstream should not be a collecting place for
-all imaginable experimentations, certain criteria on what is appropriate
-for upstreaming exist and must continue to exist.
-
-Yours,
-Aleksandar
-
-
-
-
-> The code of vector extension is
-> ready and under testing,  the first patch will be sent about two weeks
-> later. After that we will forward working on DSP extension, and send the
-> first patch in middle  October.
+> $ git grep 'cc..vmsd =3D'
+> target/arm/cpu.c:2604:    cc->vmsd =3D &vmstate_arm_cpu;
+> target/i386/cpu.c:5953:    cc->vmsd =3D &vmstate_x86_cpu;
+> target/lm32/cpu.c:235:    cc->vmsd =3D &vmstate_lm32_cpu;
+> target/mips/cpu.c:203:    cc->vmsd =3D &vmstate_mips_cpu;
+> target/moxie/cpu.c:116:    cc->vmsd =3D &vmstate_moxie_cpu;
+> target/ppc/translate_init.inc.c:10597:    cc->vmsd =3D &vmstate_ppc_cpu;
+> target/riscv/cpu.c:492:    cc->vmsd =3D &vmstate_riscv_cpu;
+> target/s390x/cpu.c:491:    cc->vmsd =3D &vmstate_s390_cpu;
+> target/sparc/cpu.c:883:    cc->vmsd =3D &vmstate_sparc_cpu;
 >
->      Could the maintainers  tell me whether the specs referenced are
-> appropriate? Is anyone working on these extensions?  I'd like to get
-> your status, and maybe discuss questions and work togather.
+> Various machine.c are not justified and could go into cpu.c.
+> (Not this patch problem).
 >
-> Best Regards
+> However I wonder if "migration/vmstate.h" shouldn't be included in
+> include/migration/cpu.h instead.
+
+Hmm...
+
+    $ git-grep migration/cpu
+    target/alpha/machine.c:#include "migration/cpu.h"
+    target/arm/machine.c:#include "migration/cpu.h"
+    target/cris/machine.c:#include "migration/cpu.h"
+    target/hppa/machine.c:#include "migration/cpu.h"
+    target/i386/machine.c:#include "migration/cpu.h"
+    target/lm32/machine.c:#include "migration/cpu.h"
+    target/mips/machine.c:#include "migration/cpu.h"
+    target/moxie/machine.c:#include "migration/cpu.h"
+    target/openrisc/machine.c:#include "migration/cpu.h"
+    target/ppc/machine.c:#include "migration/cpu.h"
+    target/sparc/machine.c:#include "migration/cpu.h"
+
+Can do.
+
+The odd one out: target/s390x/machine.c does not include
+migration/cpu.h.
+
+>>  util/fifo8.c                       | 1 +
+>>  435 files changed, 436 insertions(+), 8 deletions(-)
+> [...]
+>> diff --git a/target/moxie/machine.c b/target/moxie/machine.c
+>> index 322a724e6f..0d6012603e 100644
+>> --- a/target/moxie/machine.c
+>> +++ b/target/moxie/machine.c
+>> @@ -4,6 +4,7 @@
+>>  #include "hw/boards.h"
+>>  #include "machine.h"
+>>  #include "migration/cpu.h"
+>> +#include "migration/vmstate.h"
 >
-> LIU Zhiwei
->
->
->
->
+> Hmm this one seems to belong to target/moxie/machine.h... which happens
+> to be also odd.
+
+Yes, other targets declare vmstate_FOO_cpu in cpu.h.
+
+>>  const VMStateDescription vmstate_moxie_cpu =3D {
+>>      .name =3D "cpu",
+[...]
+
