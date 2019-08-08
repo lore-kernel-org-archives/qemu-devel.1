@@ -1,51 +1,50 @@
-Return-Path: <SRS0=g8gL=WD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3701C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 23:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E2AC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:05:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 965042186A
-	for <qemu-devel@archiver.kernel.org>; Wed,  7 Aug 2019 23:52:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 965042186A
+	by mail.kernel.org (Postfix) with ESMTPS id DE83F2186A
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:05:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE83F2186A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvVji-0002Jq-P2
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 19:52:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60773)
+	id 1hvVvS-0006IW-1Y
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 20:05:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hvVjA-0001fR-Dr
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 19:52:21 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hvVv3-0005ot-EA
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:04:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hvVj9-0005pg-9o
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 19:52:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56338)
+ (envelope-from <jsnow@redhat.com>) id 1hvVv2-0004rz-84
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:04:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52450)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hvVj6-0005oC-Py; Wed, 07 Aug 2019 19:52:16 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ id 1hvVuz-0004pQ-8s; Wed, 07 Aug 2019 20:04:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CAB7230A5A62;
- Wed,  7 Aug 2019 23:52:15 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DF07930BCBBB;
+ Thu,  8 Aug 2019 00:04:31 +0000 (UTC)
 Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C500860BE1;
- Wed,  7 Aug 2019 23:52:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A4A7B5C21E;
+ Thu,  8 Aug 2019 00:04:30 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190730163251.755248-1-vsementsov@virtuozzo.com>
- <c78b645a-e79b-1335-0e6e-44db4953417d@redhat.com>
- <877c1717-738e-f3a2-2cb4-3aa11e738fc0@virtuozzo.com>
+ qemu-block@nongnu.org
+References: <20190805164652.42409-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -122,21 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <d8280b20-1bfd-3311-639c-65baed866a7c@redhat.com>
-Date: Wed, 7 Aug 2019 19:52:14 -0400
+Message-ID: <f7d9be28-73d8-af63-55af-4ed33e17d0cb@redhat.com>
+Date: Wed, 7 Aug 2019 20:04:29 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <877c1717-738e-f3a2-2cb4-3aa11e738fc0@virtuozzo.com>
+In-Reply-To: <20190805164652.42409-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Wed, 07 Aug 2019 23:52:15 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Thu, 08 Aug 2019 00:04:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 0/3] backup fixes for 4.1?
+Subject: Re: [Qemu-devel] [PATCH] tests/test-hbitmap: test next_zero and
+ _next_dirty_area after truncate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,48 +148,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, fam@euphon.net, den@openvz.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 7/31/19 6:29 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 30.07.2019 21:41, John Snow wrote:
->>
->>
->> On 7/30/19 12:32 PM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi all!
->>>
->>> Here are two small fixes.
->>>
->>> 01 is not a degradation at all, so it's OK for 4.2
->>> 02 is degradation of 3.0, so it's possibly OK for 4.2 too,
->>>     but it seems to be real bug and fix is very simple, so,
->>>     may be 4.1 is better
->>>
->>> Or you may take the whole series to 4.1 if you want.
->>>
->>
->> I think (1) and (2) can go in for stable after review, but they're not
->> crucial for 4.1 especially at this late of a stage. Should be cataclysms
->> only right now.
-
-You found a cataclysm :(
-
->>
->> --js
->>
+On 8/5/19 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Test that hbitmap_next_zero and hbitmap_next_dirty_area can find things
+> after old bitmap end.
 > 
-> I can rebase it than on your bitmaps branch. Or, if we want it for stable, maybe,
-> I shouldn't?
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> 
+> It's a follow-up for 
+> 
+>     [PATCH for-4.1] util/hbitmap: update orig_size on truncate
+> 
+>  tests/test-hbitmap.c | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+> 
+> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+> index 592d8219db..eed5d288cb 100644
+> --- a/tests/test-hbitmap.c
+> +++ b/tests/test-hbitmap.c
+> @@ -1004,6 +1004,15 @@ static void test_hbitmap_next_zero_4(TestHBitmapData *data, const void *unused)
+>      test_hbitmap_next_zero_do(data, 4);
+>  }
+>  
+> +static void test_hbitmap_next_zero_after_truncate(TestHBitmapData *data,
+> +                                                  const void *unused)
+> +{
+> +    hbitmap_test_init(data, L1, 0);
+> +    hbitmap_test_truncate_impl(data, L1 * 2);
+> +    hbitmap_set(data->hb, 0, L1);
+> +    test_hbitmap_next_zero_check(data, 0);
+> +}
+> +
+>  static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
+>                                                 uint64_t offset,
+>                                                 uint64_t count)
+> @@ -1104,6 +1113,15 @@ static void test_hbitmap_next_dirty_area_4(TestHBitmapData *data,
+>      test_hbitmap_next_dirty_area_do(data, 4);
+>  }
+>  
+> +static void test_hbitmap_next_dirty_area_after_truncate(TestHBitmapData *data,
+> +                                                        const void *unused)
+> +{
+> +    hbitmap_test_init(data, L1, 0);
+> +    hbitmap_test_truncate_impl(data, L1 * 2);
+> +    hbitmap_set(data->hb, L1 + 1, 1);
+> +    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>      g_test_init(&argc, &argv, NULL);
+> @@ -1169,6 +1187,8 @@ int main(int argc, char **argv)
+>                       test_hbitmap_next_zero_0);
+>      hbitmap_test_add("/hbitmap/next_zero/next_zero_4",
+>                       test_hbitmap_next_zero_4);
+> +    hbitmap_test_add("/hbitmap/next_zero/next_zero_after_truncate",
+> +                     test_hbitmap_next_zero_after_truncate);
+>  
+>      hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_0",
+>                       test_hbitmap_next_dirty_area_0);
+> @@ -1176,6 +1196,8 @@ int main(int argc, char **argv)
+>                       test_hbitmap_next_dirty_area_1);
+>      hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_4",
+>                       test_hbitmap_next_dirty_area_4);
+> +    hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_after_truncate",
+> +                     test_hbitmap_next_dirty_area_after_truncate);
+>  
+>      g_test_run();
+>  
 > 
 
-I rebased these two patches (1 and 3) on top of bitmaps, on top of rc4.
+Tested-by: John Snow <jsnow@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+
+And staged:
 
 Thanks, applied to my bitmaps tree:
 
