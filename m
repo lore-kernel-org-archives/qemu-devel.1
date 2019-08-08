@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 990C6C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E551C0650F
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E925217F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:37:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E925217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 6C7272184E
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 14:37:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C7272184E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvjXS-0002XA-O8
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 10:37:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57011)
+	id 1hvjXo-0003iQ-Je
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 10:37:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57146)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hvjWh-00019p-SP
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:36:25 -0400
+ (envelope-from <philmd@redhat.com>) id 1hvjX8-0001zB-Fx
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:36:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hvjWg-0005rg-HE
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:36:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54474)
+ (envelope-from <philmd@redhat.com>) id 1hvjX7-00062t-9Q
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:36:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42208)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvjWf-0005qz-VV
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:36:22 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hvjX5-00061v-Ax
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 10:36:47 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 33BFC316E532;
- Thu,  8 Aug 2019 14:36:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 68E0330A00DC;
+ Thu,  8 Aug 2019 14:36:46 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.205.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 470451001956;
- Thu,  8 Aug 2019 14:35:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F31E51001956;
+ Thu,  8 Aug 2019 14:36:20 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu,  8 Aug 2019 16:34:54 +0200
-Message-Id: <20190808143457.14111-4-philmd@redhat.com>
+Date: Thu,  8 Aug 2019 16:34:55 +0200
+Message-Id: <20190808143457.14111-5-philmd@redhat.com>
 In-Reply-To: <20190808143457.14111-1-philmd@redhat.com>
 References: <20190808143457.14111-1-philmd@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 08 Aug 2019 14:36:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Thu, 08 Aug 2019 14:36:46 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 3/6] net/filter-rewriter: Use the tcp_header
+Subject: [Qemu-devel] [RFC PATCH 4/6] hw/net/vmxnet3: Use the tcp_header
  structure
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,146 +79,72 @@ Sender: "Qemu-devel"
 The tcp_header structure comes convenient macros to avoid
 manipulating the TCP header flags/offset bits manually.
 Replace the tcp_hdr structure by the tcp_header equivalent,
-and use the TCP_HEADER_FLAGS macro.
+and use the macros.
+
+Since we will remove the duplicated TCP_FLAG_ACK definition
+in the next commit, replace its use now.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- net/filter-rewriter.c | 37 +++++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 16 deletions(-)
+RFC: Verify th_off endianess
 
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index 31da08a2f4..62e0de1293 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -73,23 +73,26 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
-                                   Connection *conn,
-                                   Packet *pkt, ConnectionKey *key)
+ hw/net/net_rx_pkt.c | 2 +-
+ hw/net/net_tx_pkt.c | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/hw/net/net_rx_pkt.c b/hw/net/net_rx_pkt.c
+index 98a5030ace..7558f0646a 100644
+--- a/hw/net/net_rx_pkt.c
++++ b/hw/net/net_rx_pkt.c
+@@ -376,7 +376,7 @@ bool net_rx_pkt_is_tcp_ack(struct NetRxPkt *pkt)
+     assert(pkt);
+=20
+     if (pkt->istcp) {
+-        return TCP_HEADER_FLAGS(&pkt->l4hdr_info.hdr.tcp) & TCP_FLAG_ACK=
+;
++        return TCP_HEADER_FLAGS(&pkt->l4hdr_info.hdr.tcp) & TH_ACK;
+     }
+=20
+     return false;
+diff --git a/hw/net/net_tx_pkt.c b/hw/net/net_tx_pkt.c
+index 162f802dd7..fc4514416c 100644
+--- a/hw/net/net_tx_pkt.c
++++ b/hw/net/net_tx_pkt.c
+@@ -307,7 +307,7 @@ func_exit:
+ void net_tx_pkt_build_vheader(struct NetTxPkt *pkt, bool tso_enable,
+     bool csum_enable, uint32_t gso_size)
  {
--    struct tcp_hdr *tcp_pkt;
-+    struct tcp_header *tcp_pkt;
-+    uint8_t tcp_flags;
-+
-+    tcp_pkt =3D (struct tcp_header *)pkt->transport_header;
-+    tcp_flags =3D TCP_HEADER_FLAGS(tcp_pkt);
+-    struct tcp_hdr l4hdr;
++    struct tcp_header l4hdr;
+     assert(pkt);
 =20
--    tcp_pkt =3D (struct tcp_hdr *)pkt->transport_header;
-     if (trace_event_get_state_backends(TRACE_COLO_FILTER_REWRITER_DEBUG)=
-) {
-         trace_colo_filter_rewriter_pkt_info(__func__,
-                     inet_ntoa(pkt->ip->ip_src), inet_ntoa(pkt->ip->ip_ds=
-t),
-                     ntohl(tcp_pkt->th_seq), ntohl(tcp_pkt->th_ack),
--                    tcp_pkt->th_flags);
-+                    tcp_flags);
-         trace_colo_filter_rewriter_conn_offset(conn->offset);
-     }
+     /* csum has to be enabled if tso is. */
+@@ -330,7 +330,8 @@ void net_tx_pkt_build_vheader(struct NetTxPkt *pkt, b=
+ool tso_enable,
+     case VIRTIO_NET_HDR_GSO_TCPV6:
+         iov_to_buf(&pkt->vec[NET_TX_PKT_PL_START_FRAG], pkt->payload_fra=
+gs,
+                    0, &l4hdr, sizeof(l4hdr));
+-        pkt->virt_hdr.hdr_len =3D pkt->hdr_len + l4hdr.th_off * sizeof(u=
+int32_t);
++        pkt->virt_hdr.hdr_len =3D pkt->hdr_len
++                            + TCP_HEADER_DATA_OFFSET(&l4hdr) * sizeof(ui=
+nt32_t);
+         pkt->virt_hdr.gso_size =3D gso_size;
+         break;
 =20
--    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) =3D=3D (TH_ACK | TH_SYN=
-)) &&
-+    if (((tcp_flags & (TH_ACK | TH_SYN)) =3D=3D (TH_ACK | TH_SYN)) &&
-         conn->tcp_state =3D=3D TCPS_SYN_SENT) {
-         conn->tcp_state =3D TCPS_ESTABLISHED;
-     }
-=20
--    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) =3D=3D TH_SYN)) {
-+    if (((tcp_flags & (TH_ACK | TH_SYN)) =3D=3D TH_SYN)) {
-         /*
-          * we use this flag update offset func
-          * run once in independent tcp connection
-@@ -97,7 +100,7 @@ static int handle_primary_tcp_pkt(RewriterState *rf,
-         conn->tcp_state =3D TCPS_SYN_RECEIVED;
-     }
-=20
--    if (((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) =3D=3D TH_ACK)) {
-+    if (((tcp_flags & (TH_ACK | TH_SYN)) =3D=3D TH_ACK)) {
-         if (conn->tcp_state =3D=3D TCPS_SYN_RECEIVED) {
-             /*
-              * offset =3D secondary_seq - primary seq
-@@ -119,13 +122,13 @@ static int handle_primary_tcp_pkt(RewriterState *rf=
-,
-          * Passive close step 3
-          */
-         if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
--            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))) {
-+            (ldl_be_p(&tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1)))=
- {
-             conn->tcp_state =3D TCPS_CLOSED;
-             g_hash_table_remove(rf->connection_track_table, key);
-         }
-     }
-=20
--    if ((tcp_pkt->th_flags & TH_FIN) =3D=3D TH_FIN) {
-+    if ((tcp_flags & TH_FIN) =3D=3D TH_FIN) {
-         /*
-          * Passive close.
-          * Step 1:
-@@ -176,20 +179,22 @@ static int handle_secondary_tcp_pkt(RewriterState *=
-rf,
-                                     Connection *conn,
-                                     Packet *pkt, ConnectionKey *key)
- {
--    struct tcp_hdr *tcp_pkt;
-+    struct tcp_header *tcp_pkt;
-+    uint8_t tcp_flags;
-=20
--    tcp_pkt =3D (struct tcp_hdr *)pkt->transport_header;
-+    tcp_pkt =3D (struct tcp_header *)pkt->transport_header;
-+    tcp_flags =3D TCP_HEADER_FLAGS(tcp_pkt);
-=20
-     if (trace_event_get_state_backends(TRACE_COLO_FILTER_REWRITER_DEBUG)=
-) {
-         trace_colo_filter_rewriter_pkt_info(__func__,
-                     inet_ntoa(pkt->ip->ip_src), inet_ntoa(pkt->ip->ip_ds=
-t),
-                     ntohl(tcp_pkt->th_seq), ntohl(tcp_pkt->th_ack),
--                    tcp_pkt->th_flags);
-+                    tcp_flags);
-         trace_colo_filter_rewriter_conn_offset(conn->offset);
-     }
-=20
-     if (conn->tcp_state =3D=3D TCPS_SYN_RECEIVED &&
--        ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) =3D=3D (TH_ACK | TH_SYN=
-))) {
-+        ((tcp_flags & (TH_ACK | TH_SYN)) =3D=3D (TH_ACK | TH_SYN))) {
-         /*
-          * save offset =3D secondary_seq and then
-          * in handle_primary_tcp_pkt make offset
-@@ -200,11 +205,11 @@ static int handle_secondary_tcp_pkt(RewriterState *=
-rf,
-=20
-     /* VM active connect */
-     if (conn->tcp_state =3D=3D TCPS_CLOSED &&
--        ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) =3D=3D TH_SYN)) {
-+        ((tcp_flags & (TH_ACK | TH_SYN)) =3D=3D TH_SYN)) {
-         conn->tcp_state =3D TCPS_SYN_SENT;
-     }
-=20
--    if ((tcp_pkt->th_flags & (TH_ACK | TH_SYN)) =3D=3D TH_ACK) {
-+    if ((tcp_flags & (TH_ACK | TH_SYN)) =3D=3D TH_ACK) {
-         /* Only need to adjust seq while offset is Non-zero */
-         if (conn->offset) {
-             /* handle packets to the primary from the secondary*/
-@@ -219,7 +224,7 @@ static int handle_secondary_tcp_pkt(RewriterState *rf=
-,
-      * Passive close step 2:
-      */
-     if (conn->tcp_state =3D=3D TCPS_CLOSE_WAIT &&
--        (tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FIN)=
-) {
-+        (tcp_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FIN)) {
-         conn->fin_ack_seq =3D ntohl(tcp_pkt->th_seq);
-         conn->tcp_state =3D TCPS_LAST_ACK;
-     }
-@@ -237,7 +242,7 @@ static int handle_secondary_tcp_pkt(RewriterState *rf=
-,
-      * CLOSING status.
-      */
-     if (conn->tcp_state =3D=3D TCPS_ESTABLISHED &&
--        (tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D TH_FIN) {
-+        (tcp_flags & (TH_ACK | TH_FIN)) =3D=3D TH_FIN) {
-         conn->tcp_state =3D TCPS_FIN_WAIT_1;
-     }
-=20
+@@ -343,7 +344,7 @@ void net_tx_pkt_build_vheader(struct NetTxPkt *pkt, b=
+ool tso_enable,
+         case IP_PROTO_TCP:
+             pkt->virt_hdr.flags =3D VIRTIO_NET_HDR_F_NEEDS_CSUM;
+             pkt->virt_hdr.csum_start =3D pkt->hdr_len;
+-            pkt->virt_hdr.csum_offset =3D offsetof(struct tcp_hdr, th_su=
+m);
++            pkt->virt_hdr.csum_offset =3D offsetof(struct tcp_header, th=
+_sum);
+             break;
+         case IP_PROTO_UDP:
+             pkt->virt_hdr.flags =3D VIRTIO_NET_HDR_F_NEEDS_CSUM;
 --=20
 2.20.1
 
