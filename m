@@ -2,49 +2,49 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B89C8C32751
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:18:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E51BC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91194217D7
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:18:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91194217D7
+	by mail.kernel.org (Postfix) with ESMTPS id 4168021872
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:25:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4168021872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvW8m-0001vL-SQ
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 20:18:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35242)
+	id 1hvWEu-0004HM-IT
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 20:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35864)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hvW8K-0001Rn-Ih
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:18:21 -0400
+ (envelope-from <eblake@redhat.com>) id 1hvWEU-0003mj-Nh
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:24:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hvW8J-0002wo-Be
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:18:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55840)
+ (envelope-from <eblake@redhat.com>) id 1hvWET-0006XP-2M
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:24:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40008)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hvW8G-0002vv-Rs; Wed, 07 Aug 2019 20:18:17 -0400
+ id 1hvWEQ-0006Vz-GQ; Wed, 07 Aug 2019 20:24:38 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1A8453002889;
- Thu,  8 Aug 2019 00:18:16 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A6CFC3086202;
+ Thu,  8 Aug 2019 00:24:37 +0000 (UTC)
 Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D3B5600C6;
- Thu,  8 Aug 2019 00:18:15 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D2AEB600CC;
+ Thu,  8 Aug 2019 00:24:36 +0000 (UTC)
 To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
  mreitz@redhat.com, armbru@redhat.com
 References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
- <20190704130949.14017-2-dplotnikov@virtuozzo.com>
+ <20190704130949.14017-4-dplotnikov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -71,22 +71,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
-Date: Wed, 7 Aug 2019 19:18:14 -0500
+Message-ID: <24146f62-84b9-c585-0618-d039ae95e273@redhat.com>
+Date: Wed, 7 Aug 2019 19:24:35 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190704130949.14017-2-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190704130949.14017-4-dplotnikov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="BaTOtfpfpachJiROxzmnbHgXysb5lPYSG"
+ boundary="ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Thu, 08 Aug 2019 00:18:16 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Thu, 08 Aug 2019 00:24:37 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qcow2: introduce compression type
- feature
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] qcow2: add zstd cluster compression
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,118 +104,112 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BaTOtfpfpachJiROxzmnbHgXysb5lPYSG
-Content-Type: multipart/mixed; boundary="Rr2ui2UNApMBaxv4WJJgOQdzjB5dm6f9m";
+--ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx
+Content-Type: multipart/mixed; boundary="HffF4z0T3jwlZiEonf3xvqt8N2iskjOmI";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Denis Plotnikov <dplotnikov@virtuozzo.com>, kwolf@redhat.com,
  mreitz@redhat.com, armbru@redhat.com
 Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
  qemu-devel@nongnu.org
-Message-ID: <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
-Subject: Re: [PATCH v2 1/3] qcow2: introduce compression type feature
+Message-ID: <24146f62-84b9-c585-0618-d039ae95e273@redhat.com>
+Subject: Re: [PATCH v2 3/3] qcow2: add zstd cluster compression
 References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
- <20190704130949.14017-2-dplotnikov@virtuozzo.com>
-In-Reply-To: <20190704130949.14017-2-dplotnikov@virtuozzo.com>
+ <20190704130949.14017-4-dplotnikov@virtuozzo.com>
+In-Reply-To: <20190704130949.14017-4-dplotnikov@virtuozzo.com>
 
---Rr2ui2UNApMBaxv4WJJgOQdzjB5dm6f9m
+--HffF4z0T3jwlZiEonf3xvqt8N2iskjOmI
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 7/4/19 8:09 AM, Denis Plotnikov wrote:
-> The patch adds some preparation parts for incompatible compression type=
+> zstd significantly reduces cluster compression time.
+> It provides better compression performance maintaining
+> the same level of compression ratio in comparison with
+> zlib, which, by the moment, has been the only compression
 
-> feature to QCOW2 header that indicates that *all* compressed clusters
-> must be (de)compressed using a certain compression type.
->=20
-> It is implied that the compression type is set on the image creation an=
-d
-> can be changed only later by image conversion, thus compression type
-> defines the only compression algorithm used for the image.
->=20
-> The goal of the feature is to add support of other compression algorith=
-ms
-> to qcow2. For example, ZSTD which is more effective on compression than=
- ZLIB.
-> It works roughly 2x faster than ZLIB providing a comparable compression=
- ratio
-> and therefore provide a performance advantage in backup scenarios.
+s/by/at/
 
-provides
+> method available.
+>=20
+> The performance test results:
+> Test compresses and decompresses qemu qcow2 image with just
+> installed rhel-7.6 guest.
+> Image cluster size: 64K. Image on disk size: 2.2G
+>=20
+> The test was conducted with brd disk to reduce the influence
+> of disk subsystem to the test results.
+> The results is given in seconds.
+>=20
+> compress cmd:
+>   time ./qemu-img convert -O qcow2 -c -o compression_type=3D[zlib|zstd]=
 
+>                   src.img [zlib|zstd]_compressed.img
+> decompress cmd
+>   time ./qemu-img convert -O qcow2
+>                   [zlib|zstd]_compressed.img uncompressed.img
 >=20
-> The default compression is ZLIB. Images created with ZLIB compression t=
-ype
-> are backward compatible with older qemu versions.
+>            compression               decompression
+>          zlib       zstd           zlib         zstd
+> ------------------------------------------------------------
+> real     65.5       16.3 (-75 %)    1.9          1.6 (-16 %)
+> user     65.0       15.8            5.3          2.5
+> sys       3.3        0.2            2.0          2.0
 >=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> Both ZLIB and ZSTD gave the same compression ratio: 1.57
+> compressed image size in both cases: 1.4G
+>=20
+
+Nice numbers.
 
 > +++ b/docs/interop/qcow2.txt
-> @@ -109,7 +109,12 @@ in the description of a field.
->                                  An External Data File Name header exte=
-nsion may
->                                  be present if this bit is set.
+> @@ -538,6 +538,9 @@ Compressed Clusters Descriptor (x =3D 62 - (cluster=
+_bits - 8)):
+>                      Another compressed cluster may map to the tail of =
+the final
+>                      sector used by this compressed cluster.
 > =20
-> -                    Bits 3-63:  Reserved (set to 0)
-> +                    Bit 3:      Compression type bit. The bit must be =
-set if
-> +                                the compression type differs from defa=
-ult: zlib.
-
-I'd word this 'from the default of zlib.'
-
-> +                                If the compression type is default the=
- bit must
-> +                                be unset.
-
-Why? I see no reason to forbid a qcow2 image that has the incompatible
-bit set but still uses zlib compression.  True, such an image is not as
-friendly to older clients, but it is not technically wrong, and newer
-clients would still be able to use the image if not for this sentence
-telling them they must not.  I'd drop this sentence.
-
+> +                    The layout of the compressed data depends on the c=
+ompression
+> +                    type used for the image (see compressed cluster la=
+yout).
 > +
-> +                    Bits 4-63:  Reserved (set to 0)
-> =20
->           80 -  87:  compatible_features
->                      Bitmask of compatible features. An implementation =
-can
-> @@ -165,6 +170,20 @@ in the description of a field.
->                      Length of the header structure in bytes. For versi=
-on 2
->                      images, the length is always assumed to be 72 byte=
-s.
-> =20
-> +        104 - 107:  compression_type
-> +                    Defines the compression method used for compressed=
- clusters.
-> +                    A single compression type is applied to all compre=
-ssed image
-> +                    clusters.
-> +                    The compression type is set on image creation only=
-=2E
-> +                    The default compression type is zlib (value: 0).
-> +                    When the compression type differs from the default=
+>  If a cluster is unallocated, read requests shall read the data from th=
+e backing
+>  file (except if bit 0 in the Standard Cluster Descriptor is set). If t=
+here is
+>  no backing file or the backing file is smaller than the image, they sh=
+all read
+> @@ -790,3 +793,19 @@ In the image file the 'enabled' state is reflected=
+ by the 'auto' flag. If this
+>  flag is set, the software must consider the bitmap as 'enabled' and st=
+art
+>  tracking virtual disk changes to this bitmap from the first write to t=
+he
+>  virtual disk. If this flag is not set then the bitmap is disabled.
+> +
+> +=3D=3D=3D Compressed cluster layout =3D=3D=3D
+> +
+> +The compressed cluster data may have a different layout depending on t=
+he
+> +compression type used for the image, and store specific data for the p=
+articular
+> +compression type.
+> +
+> +Compressed data layout for the available compression types:
+> +(x =3D data_space_length - 1)
+> +
+> +    zlib:
+> +        Byte  0 -  x:     the compressed data content
+> +                          all the space provided used for compressed d=
+ata
+> +    zstd:
+> +        Byte  0 -  3:     the length of compressed data
+> +              4 -  x:     the compressed data content
 
-> +                    the compression type bit (incompatible feature bit=
- 3)
-> +                    must be set.
-
-So far, so good.
-
-> +                    Qemu versions older than 4.1 can use images create=
-d with
-> +                    the default compression type without any additiona=
-l
-> +                    preparations and cannot use images created with an=
-y other
-> +                    compression type.
-
-I'm wondering whether we need to spell this out in the spec.  Yes, I
-know we spell out other qemu limitations elsewhere, but with a version
-number.  But the spec would not be any less correct if you omitted this
-sentence.
+Missing a change to the header description at bytes 104-107 calling out
+'1' as meaning zstd (it only calls out '0' or absent as meaning zlib).
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -224,24 +217,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---Rr2ui2UNApMBaxv4WJJgOQdzjB5dm6f9m--
+--HffF4z0T3jwlZiEonf3xvqt8N2iskjOmI--
 
---BaTOtfpfpachJiROxzmnbHgXysb5lPYSG
+--ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1LakYACgkQp6FrSiUn
-Q2p9qgf+PD2c0smfCi7cDcFIaQPD9c5hfILgSxUWpbOfRPq7khBnL13a/YMAHY56
-tgIE4kfkGREVPgGpdHnJU7pymI2SM1l/D2EkemzWzj5N92zhv+sVOUeFHrIedlYG
-YmEKTyNl7AbOvexbTSIsQVy7EnuHcuE8d8iN9jHSFH6ugDsK3JmcT1FSe4Yoh2++
-Ta22AxB7msoEJwtlyvARdIUDCCWiOVoLsx7O6K7UqUr6q+qs8n/KznQAEYpmbN1j
-KnjwLFwuSa7o8LkbnNfRwvjI2MwL2gX++hpeMVfdjehqBNEELPXZ4/qNspl9kNQS
-Hf0LwtmvDkXa+32PiZUyCKUB1gcrWA==
-=4Ay2
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1La8QACgkQp6FrSiUn
+Q2rbdQf+J45wP6pNcU+Y12Hhim7eXgh8wv++FimUl1Ypm5rPJ5WNVbWMHy7Bf4BN
+fOxDLIe8P7TqPSHUltAHY5T93VrbpySHQAPj4e6j4yRzvfFL3wYV4YmqQZ9dqFuw
+y9nbBEa/tEETOxY0z2HTHmiNE6atN0uIUDvVK2Bv0m6fgOGmlEmveeOw2FQGv52v
+LtYNKvIhOXf/b33120D3TPii0/1OWhXSUAlUUF+dGLSDl9GTYGZw7/lCnCrTDzdR
++bLFVZEgZIddZkBs41MucJtg0BotFSmlH27XRFxoaL+snCik1ZMLHPG4kXngDW/p
+XRGBfeHxoB4oA081mIYTrVHSFqOn4g==
+=7VX7
 -----END PGP SIGNATURE-----
 
---BaTOtfpfpachJiROxzmnbHgXysb5lPYSG--
+--ISVtZiLvRvurQsN1DNdgrqlKpcchmKoBx--
 
