@@ -2,68 +2,89 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EBBC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 04:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FA47C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 04:46:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3687A21743
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 04:27:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3687A21743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7EF0217D7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 04:46:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUON9jRV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7EF0217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hva1r-0006NM-Iv
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 00:27:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48311)
+	id 1hvaJN-0002dN-Ud
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 00:46:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52048)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hva1U-0005yH-MO
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:27:33 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hvaIs-0001iz-03
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:45:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hva1T-0005F8-On
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:27:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41402)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hva1T-0005Ep-Jo
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:27:31 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C48EA64D28;
- Thu,  8 Aug 2019 04:27:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4D3695C21A;
- Thu,  8 Aug 2019 04:27:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A4596113864E; Thu,  8 Aug 2019 06:27:16 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-13-armbru@redhat.com>
- <d822b034-f283-5945-da5d-4fe3bc767f2b@redhat.com>
- <fd6a172e-1c79-5c0a-c9ba-3dbc671dc72f@redhat.com>
-Date: Thu, 08 Aug 2019 06:27:16 +0200
-In-Reply-To: <fd6a172e-1c79-5c0a-c9ba-3dbc671dc72f@redhat.com> (Eric Blake's
- message of "Wed, 7 Aug 2019 16:06:50 -0500")
-Message-ID: <87pnlgl1sr.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Thu, 08 Aug 2019 04:27:30 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 12/29] Include hw/irq.h a lot less
+ (envelope-from <bmeng.cn@gmail.com>) id 1hvaIq-00057c-VL
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 00:45:29 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41238)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hvaIq-00057B-O0; Thu, 08 Aug 2019 00:45:28 -0400
+Received: by mail-pl1-x641.google.com with SMTP id m9so42825644pls.8;
+ Wed, 07 Aug 2019 21:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:message-id:in-reply-to:references;
+ bh=E6yxnr+XaLfykr9binetZruI0I2aHRyZR2ZqXqM16+Q=;
+ b=hUON9jRVNF7N/A24B0IPUEFT28l8jnaBbCe5NxkH6Ul/h8+XxuLBlhXnjki8xVcquw
+ zxrQ0yp0ywDQCwjutT7YOgpQSiOTbe/VFujGo5OdnbQMq1H3srkdDc8yRtRlk5IggUWm
+ 0AmESPv3m7T+duoVP2Rd1OF6dDV1Jp+387GHVgLqNTRWtSmNVAyuRDAUtbUpv+jiV9M5
+ hgS3PIpvAj+jVSZdI850JvEGGWGSyd+VKATwjDKqQqdFXcQUq8DXNSJikHaN4841nC5K
+ lSViqGmiahEDc6DQaZvewY1lquNwZ8pxQsbzkuMU3hlPlbdjrRwPWRJKH79Nmp9VpdtX
+ GKeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references;
+ bh=E6yxnr+XaLfykr9binetZruI0I2aHRyZR2ZqXqM16+Q=;
+ b=lbp8o+Gn5yGT6M+Oi4GBRkTfmWDtSdfZAaWI8svK1X9QBmgidAu2gPZFpBOpTtT1j8
+ pmW1jPjB5TF7r6JPj21mCWW7obX7fcw2G5f6NSVCJJh/vIsmuraKbdG6btQAeQs8WSoN
+ 4S7MgP9N+EwqnyXjkVedsvEfbKp1I90yzzK4pURkgFCYn3zEBtv1VcXkRnzK8Tpa01aU
+ W2FTO3hXIwXSLOZwiIsarH7fthpb4ocICHPHFIjfRA/wWSwYB5u7Q02SlXb2FXzQFPLY
+ K0DerqHafc4ELZKEuo5eA/aAfJeOZTBfdRGm2zU+3VHqsK7bXsdG/ikz6wzsZal7kPzq
+ JUkA==
+X-Gm-Message-State: APjAAAUwB3Qyd/zZgGcAlyzOXQyt26mDvGpZn744VmoMrgl/J9Kugrjq
+ aPJF1X7KOJ2gUczH2etgfdE=
+X-Google-Smtp-Source: APXvYqw4z9WWpJ45iE0nPmX+JnmRsVo9AeOAKqblWrZWfPh+jxTnQc8XRWzz2T+12bm2cya6y5P8Hw==
+X-Received: by 2002:a17:902:b949:: with SMTP id
+ h9mr10738694pls.120.1565239527351; 
+ Wed, 07 Aug 2019 21:45:27 -0700 (PDT)
+Received: from localhost.localdomain (unknown-224-80.windriver.com.
+ [147.11.224.80])
+ by smtp.gmail.com with ESMTPSA id h26sm98458499pfq.64.2019.08.07.21.45.26
+ (version=TLS1 cipher=AES128-SHA bits=128/128);
+ Wed, 07 Aug 2019 21:45:26 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefano Garzarella <sgarzare@redhat.com>, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org
+Date: Wed,  7 Aug 2019 21:44:39 -0700
+Message-Id: <1565239479-2130-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1565020374-23888-1-git-send-email-bmeng.cn@gmail.com>
+References: <1565020374-23888-1-git-send-email-bmeng.cn@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::641
+Subject: [Qemu-devel] [PATCH v2] hw: net: cadence_gem: Fix build errors in
+ DB_PRINT()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,44 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+When CADENCE_GEM_ERR_DEBUG is turned on, there are several
+compilation errors in DB_PRINT(). Fix them.
 
-> On 8/7/19 8:04 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 8/6/19 5:14 PM, Markus Armbruster wrote:
->>> In my "build everything" tree, changing hw/irq.h triggers a recompile
->>> of some 5400 out of 6600 objects (not counting tests and objects that
->>> don't depend on qemu/osdep.h).
->>>
->>> hw/hw.h supposedly includes it for convenience.  Several other headers
->>> include it just to get qemu_irq and.or qemu_irq_handler.
->>>
->>> Move the qemu_irq and qemu_irq_handler typedefs from hw/irq.h to
->>> qemu/typedefs.h, and then include hw/irq.h only where it's still
->>> needed.  Touching it now recompiles only some 500 objects.
->>>
->
->>>  /*
->>>   * Function types
->>>   */
->>>  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
->>>  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id=
-);
->>> +typedef void (*qemu_irq_handler)(void *opaque, int n, int level);
->
-> Should we prefer a consistent form for function pointer typedefs?  Here,
-> we've mixed 'rettype Name(params)' with 'rettype (*name)(params)'.
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
-Which of the two difference I can see do you mean?
+---
 
-CamelCase vs. lower_case_with_underscore?
+Changes in v2:
+- use HWADDR_PRIx instead of TARGET_FMT_plx for consistency
+- use 'z' modifier to print sizeof(..)
 
-Parenthesis around the type name?  I wouldn't call that inconsistent, we
-simply use parenthesis only when needed.
+ hw/net/cadence_gem.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index d412085..b6ff2c1 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -983,8 +983,9 @@ static ssize_t gem_receive(NetClientState *nc, const uint8_t *buf, size_t size)
+             return -1;
+         }
+ 
+-        DB_PRINT("copy %d bytes to 0x%x\n", MIN(bytes_to_copy, rxbufsize),
+-                rx_desc_get_buffer(s->rx_desc[q]));
++        DB_PRINT("copy %d bytes to 0x%" HWADDR_PRIx "\n",
++                 MIN(bytes_to_copy, rxbufsize),
++                 rx_desc_get_buffer(s, s->rx_desc[q]));
+ 
+         /* Copy packet data to emulated DMA buffer */
+         address_space_write(&s->dma_as, rx_desc_get_buffer(s, s->rx_desc[q]) +
+@@ -1157,7 +1158,7 @@ static void gem_transmit(CadenceGEMState *s)
+             if (tx_desc_get_length(desc) > sizeof(tx_packet) -
+                                                (p - tx_packet)) {
+                 DB_PRINT("TX descriptor @ 0x%x too large: size 0x%x space " \
+-                         "0x%x\n", (unsigned)packet_desc_addr,
++                         "0x%zx\n", (unsigned)packet_desc_addr,
+                          (unsigned)tx_desc_get_length(desc),
+                          sizeof(tx_packet) - (p - tx_packet));
+                 break;
+-- 
+2.7.4
+
 
