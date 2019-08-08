@@ -2,141 +2,92 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E2AC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74180C32751
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:10:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE83F2186A
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:05:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE83F2186A
+	by mail.kernel.org (Postfix) with ESMTPS id 45268217D7
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 00:10:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45268217D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvVvS-0006IW-1Y
-	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 20:05:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
+	id 1hvW0d-00081b-H1
+	for qemu-devel@archiver.kernel.org; Wed, 07 Aug 2019 20:10:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34341)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hvVv3-0005ot-EA
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:04:38 -0400
+ (envelope-from <eblake@redhat.com>) id 1hvW0D-0007Xk-15
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hvVv2-0004rz-84
- for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:04:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52450)
+ (envelope-from <eblake@redhat.com>) id 1hvW0B-00071J-QA
+ for qemu-devel@nongnu.org; Wed, 07 Aug 2019 20:09:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:3039)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hvVuz-0004pQ-8s; Wed, 07 Aug 2019 20:04:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hvW09-0006yU-7S; Wed, 07 Aug 2019 20:09:53 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DF07930BCBBB;
- Thu,  8 Aug 2019 00:04:31 +0000 (UTC)
-Received: from [10.18.17.230] (dhcp-17-230.bos.redhat.com [10.18.17.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A4A7B5C21E;
- Thu,  8 Aug 2019 00:04:30 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190805164652.42409-1-vsementsov@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id AD328C05AA67;
+ Thu,  8 Aug 2019 00:09:51 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E61441001925;
+ Thu,  8 Aug 2019 00:09:50 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, Denis Plotnikov
+ <dplotnikov@virtuozzo.com>, kwolf@redhat.com, armbru@redhat.com
+References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
+ <20190704130949.14017-2-dplotnikov@virtuozzo.com>
+ <f7f3b12c-2c04-87bc-a88f-f89a2e50bc4e@redhat.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f7d9be28-73d8-af63-55af-4ed33e17d0cb@redhat.com>
-Date: Wed, 7 Aug 2019 20:04:29 -0400
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <8f43b3ab-7c90-0965-4707-9aae1be787a0@redhat.com>
+Date: Wed, 7 Aug 2019 19:09:49 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190805164652.42409-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <f7f3b12c-2c04-87bc-a88f-f89a2e50bc4e@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="75qPwd86LLsCdoPROigiwGZCK0WQTdWtm"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 08 Aug 2019 00:04:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Thu, 08 Aug 2019 00:09:51 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] tests/test-hbitmap: test next_zero and
- _next_dirty_area after truncate
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qcow2: introduce compression type
+ feature
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,93 +99,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, den@openvz.org, qemu-devel@nongnu.org,
- mreitz@redhat.com
+Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--75qPwd86LLsCdoPROigiwGZCK0WQTdWtm
+Content-Type: multipart/mixed; boundary="E0CQQAovJY1VGc88GCeDj89CPbBENzG0P";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Denis Plotnikov
+ <dplotnikov@virtuozzo.com>, kwolf@redhat.com, armbru@redhat.com
+Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <8f43b3ab-7c90-0965-4707-9aae1be787a0@redhat.com>
+Subject: Re: [PATCH v2 1/3] qcow2: introduce compression type feature
+References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
+ <20190704130949.14017-2-dplotnikov@virtuozzo.com>
+ <f7f3b12c-2c04-87bc-a88f-f89a2e50bc4e@redhat.com>
+In-Reply-To: <f7f3b12c-2c04-87bc-a88f-f89a2e50bc4e@redhat.com>
+
+--E0CQQAovJY1VGc88GCeDj89CPbBENzG0P
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 8/7/19 6:12 PM, Max Reitz wrote:
+
+>> =20
+>> +static int check_compression_type(BDRVQcow2State *s, Error **errp)
+>> +{
+>> +    switch (s->compression_type) {
+>> +    case QCOW2_COMPRESSION_TYPE_ZLIB:
+>> +        break;
+>> +
+>> +    default:
+>> +        error_setg(errp, "qcow2: unknown compression type: %u",
+>> +                   s->compression_type);
+>> +        return -ENOTSUP;
+>> +    }
+>> +
+>> +    /*
+>> +     * if the compression type differs from QCOW2_COMPRESSION_TYPE_ZL=
+IB
+>> +     * the incompatible feature flag must be set
+>> +     */
+>> +
+>> +    if (s->compression_type !=3D QCOW2_COMPRESSION_TYPE_ZLIB &&
+>> +        !(s->incompatible_features & QCOW2_INCOMPAT_COMPRESSION_TYPE)=
+) {
+>> +            error_setg(errp, "qcow2: Invalid compression type setting=
+");
+>> +            return -EINVAL;
+>=20
+> (1) Why is this block indented twice?
+>=20
+> (2) Do we need this at all?  Sure, it=E2=80=99s a corruption, but do we=
+ need to
+> reject the image because of it?
+
+Yes, because otherwise there is a high risk of some application
+misinterpreting the contents (whether an older qemu that silently
+ignores unrecognized headers, and so assumes it can decode compressed
+clusters with zlib even though the decode will only succeed with zstd,
+or can write a compressed cluster with zlib which then causes corruption
+when the newer qemu tries to read it with zstd).  The whole point of an
+incompatible bit is to reject opening an image that can't be interpreted
+correctly, and where writing may break later readers.
+
+>=20
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>=20
+> Overall, I don=E2=80=99t see the purpose of this function.  I don=E2=80=
+=99t see any need
+> to call it in qcow2_update_header().  And without =E2=80=9Cdoes non-zli=
+b
+> compression imply the respective incompatible flag?=E2=80=9D check, you=
+ can just
+> inline the rest (checking that we recognize the compression type) into
+> qcow2_do_open().
+>=20
+
+Inlining may indeed be possible; the real question is whether the
+function expands later in the series to the point that inlining no
+longer makes sense.
+
+>>  /* Called with s->lock held.  */
+>>  static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *op=
+tions,
+>>                                        int flags, Error **errp)
+>> @@ -1318,6 +1344,35 @@ static int coroutine_fn qcow2_do_open(BlockDriv=
+erState *bs, QDict *options,
+>>      s->compatible_features      =3D header.compatible_features;
+>>      s->autoclear_features       =3D header.autoclear_features;
+>> =20
+>> +    /*
+>> +     * Handle compression type
+>> +     * Older qcow2 images don't contain the compression type header.
+>> +     * Distinguish them by the header length and use
+>> +     * the only valid (default) compression type in that case
+>> +     */
+>> +    if (header.header_length > offsetof(QCowHeader, compression_type)=
+) {
+>> +        /* sanity check that we can read a compression type */
+>> +        size_t min_len =3D offsetof(QCowHeader, compression_type) +
+>> +                         sizeof(header.compression_type);
+>> +        if (header.header_length < min_len) {
+>> +            error_setg(errp,
+>> +                       "Could not read compression type."
+>> +                       "qcow2 header is too short");
+>=20
+> This will read as =E2=80=9CCould not read compression type.qcow2 header=
+ is too
+> short=E2=80=9D.  There should be a space after the full stop (and the f=
+ull stop
+> should maybe be a comma instead).
+
+Indeed, error_setg() should generally not contain '.'
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
-On 8/5/19 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
-> Test that hbitmap_next_zero and hbitmap_next_dirty_area can find things
-> after old bitmap end.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
-> 
-> It's a follow-up for 
-> 
->     [PATCH for-4.1] util/hbitmap: update orig_size on truncate
-> 
->  tests/test-hbitmap.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-> index 592d8219db..eed5d288cb 100644
-> --- a/tests/test-hbitmap.c
-> +++ b/tests/test-hbitmap.c
-> @@ -1004,6 +1004,15 @@ static void test_hbitmap_next_zero_4(TestHBitmapData *data, const void *unused)
->      test_hbitmap_next_zero_do(data, 4);
->  }
->  
-> +static void test_hbitmap_next_zero_after_truncate(TestHBitmapData *data,
-> +                                                  const void *unused)
-> +{
-> +    hbitmap_test_init(data, L1, 0);
-> +    hbitmap_test_truncate_impl(data, L1 * 2);
-> +    hbitmap_set(data->hb, 0, L1);
-> +    test_hbitmap_next_zero_check(data, 0);
-> +}
-> +
->  static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
->                                                 uint64_t offset,
->                                                 uint64_t count)
-> @@ -1104,6 +1113,15 @@ static void test_hbitmap_next_dirty_area_4(TestHBitmapData *data,
->      test_hbitmap_next_dirty_area_do(data, 4);
->  }
->  
-> +static void test_hbitmap_next_dirty_area_after_truncate(TestHBitmapData *data,
-> +                                                        const void *unused)
-> +{
-> +    hbitmap_test_init(data, L1, 0);
-> +    hbitmap_test_truncate_impl(data, L1 * 2);
-> +    hbitmap_set(data->hb, L1 + 1, 1);
-> +    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->      g_test_init(&argc, &argv, NULL);
-> @@ -1169,6 +1187,8 @@ int main(int argc, char **argv)
->                       test_hbitmap_next_zero_0);
->      hbitmap_test_add("/hbitmap/next_zero/next_zero_4",
->                       test_hbitmap_next_zero_4);
-> +    hbitmap_test_add("/hbitmap/next_zero/next_zero_after_truncate",
-> +                     test_hbitmap_next_zero_after_truncate);
->  
->      hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_0",
->                       test_hbitmap_next_dirty_area_0);
-> @@ -1176,6 +1196,8 @@ int main(int argc, char **argv)
->                       test_hbitmap_next_dirty_area_1);
->      hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_4",
->                       test_hbitmap_next_dirty_area_4);
-> +    hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_after_truncate",
-> +                     test_hbitmap_next_dirty_area_after_truncate);
->  
->      g_test_run();
->  
-> 
+--E0CQQAovJY1VGc88GCeDj89CPbBENzG0P--
 
-Tested-by: John Snow <jsnow@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+--75qPwd86LLsCdoPROigiwGZCK0WQTdWtm
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-And staged:
+-----BEGIN PGP SIGNATURE-----
 
-Thanks, applied to my bitmaps tree:
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1LaE0ACgkQp6FrSiUn
+Q2ouXAgAhvSf1/maWwm0ogliDr/PI5OiJAREIzk++U55vw2OQ5ImUJqTfbSKQhHL
+ltw4RUV/ejXyP6SIM7FkPG9LqHDREqgP2gsvPS+780rf4rT/srpvfYmCX/ELGqgO
+BPaidjCOzoGizmmDfPryDRFv2qfEYjGeK0iRwpA+0bp33Oi3jwQc4hi1+n0VPxUZ
+gvXHEqtOUWlZC1DHIQ+hANtSEzQ3PdiHywyaIAsmH3bFktAvcLm0tLAjy5dK6UNf
+kvZnxQQwu1iH/VH+13PaUdnVQxm3X3zExPxGnfH11raLy1RROVCTur+O0xu02CgE
+GFgbx98nz/SW5c/EELC/h7oKap8ttQ==
+=zx0E
+-----END PGP SIGNATURE-----
 
-https://github.com/jnsnow/qemu/commits/bitmaps
-https://github.com/jnsnow/qemu.git
-
---js
+--75qPwd86LLsCdoPROigiwGZCK0WQTdWtm--
 
