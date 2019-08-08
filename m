@@ -2,92 +2,68 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A53A3C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC47CC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:53:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A12D21874
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:51:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A12D21874
+	by mail.kernel.org (Postfix) with ESMTPS id 90F2721880
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 12:53:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F2721880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvhso-0001kf-QK
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:51:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59653)
+	id 1hvhvX-0002iV-Rs
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 08:53:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60016)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hvhsL-0001GU-SR
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:50:38 -0400
+ (envelope-from <vgoyal@redhat.com>) id 1hvhv6-0002Ia-MH
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:53:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hvhsK-0002Jw-SH
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:50:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54355)
+ (envelope-from <vgoyal@redhat.com>) id 1hvhv4-0004qm-8X
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:53:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56122)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hvhsH-0002GA-UO; Thu, 08 Aug 2019 08:50:34 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1hvhv4-0004q8-0X
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 08:53:26 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 03BE7C028329;
- Thu,  8 Aug 2019 12:50:33 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.128])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AF935C219;
- Thu,  8 Aug 2019 12:50:30 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
- <dplotnikov@virtuozzo.com>, kwolf@redhat.com, armbru@redhat.com
-References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
- <20190704130949.14017-2-dplotnikov@virtuozzo.com>
- <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <82193040-c2ac-93fc-4230-8bbe136aef3c@redhat.com>
-Date: Thu, 8 Aug 2019 14:50:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 5B1EE51F0C
+ for <qemu-devel@nongnu.org>; Thu,  8 Aug 2019 12:53:25 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.158])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 00EF260BE1;
+ Thu,  8 Aug 2019 12:53:21 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 7D5A4220ACF; Thu,  8 Aug 2019 08:53:20 -0400 (EDT)
+Date: Thu, 8 Aug 2019 08:53:20 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20190808125320.GB3147@redhat.com>
+References: <20190801165409.20121-1-stefanha@redhat.com>
+ <20190807180355.GA22758@stefanha-x1.localdomain>
+ <20190807205715.GE18557@redhat.com>
+ <20190808090213.GD31476@stefanha-x1.localdomain>
+ <20190808095316.GC2852@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190808095316.GC2852@work-vm>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 08 Aug 2019 12:50:33 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 08 Aug 2019 12:53:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] qcow2: introduce compression type
- feature
+Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH 0/4] virtiofsd: multithreading
+ preparation part 3
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,118 +75,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, den@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P
-Content-Type: multipart/mixed; boundary="Nu2GKNNz2cazKTGwBjVXt9eTAT46q1OqA";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Eric Blake <eblake@redhat.com>, Denis Plotnikov
- <dplotnikov@virtuozzo.com>, kwolf@redhat.com, armbru@redhat.com
-Cc: den@virtuozzo.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <82193040-c2ac-93fc-4230-8bbe136aef3c@redhat.com>
-Subject: Re: [PATCH v2 1/3] qcow2: introduce compression type feature
-References: <20190704130949.14017-1-dplotnikov@virtuozzo.com>
- <20190704130949.14017-2-dplotnikov@virtuozzo.com>
- <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
-In-Reply-To: <325bf443-64fb-ecde-f08a-978e9bede31b@redhat.com>
+On Thu, Aug 08, 2019 at 10:53:16AM +0100, Dr. David Alan Gilbert wrote:
+> * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > On Wed, Aug 07, 2019 at 04:57:15PM -0400, Vivek Goyal wrote:
+> > > Kernel also serializes MAP/UNMAP on one inode. So you will need to run
+> > > multiple jobs operating on different inodes to see parallel MAP/UNMAP
+> > > (atleast from kernel's point of view).
+> > 
+> > Okay, there is still room to experiment with how MAP and UNMAP are
+> > handled by virtiofsd and QEMU even if the host kernel ultimately becomes
+> > the bottleneck.
+> > 
+> > One possible optimization is to eliminate REMOVEMAPPING requests when
+> > the guest driver knows a SETUPMAPPING will follow immediately.  I see
+> > the following request pattern in a fio randread iodepth=64 job:
+> > 
+> >   unique: 995348, opcode: SETUPMAPPING (48), nodeid: 135, insize: 80, pid: 1351
+> >   lo_setupmapping(ino=135, fi=0x(nil), foffset=3860856832, len=2097152, moffset=859832320, flags=0)
+> >      unique: 995348, success, outsize: 16
+> >   unique: 995350, opcode: REMOVEMAPPING (49), nodeid: 135, insize: 60, pid: 12
+> >      unique: 995350, success, outsize: 16
+> >   unique: 995352, opcode: SETUPMAPPING (48), nodeid: 135, insize: 80, pid: 1351
+> >   lo_setupmapping(ino=135, fi=0x(nil), foffset=16777216, len=2097152, moffset=861929472, flags=0)
+> >      unique: 995352, success, outsize: 16
+> >   unique: 995354, opcode: REMOVEMAPPING (49), nodeid: 135, insize: 60, pid: 12
+> >      unique: 995354, success, outsize: 16
+> >   virtio_send_msg: elem 9: with 1 in desc of length 16
+> >   unique: 995356, opcode: SETUPMAPPING (48), nodeid: 135, insize: 80, pid: 1351
+> >   lo_setupmapping(ino=135, fi=0x(nil), foffset=383778816, len=2097152, moffset=864026624, flags=0)
+> >      unique: 995356, success, outsize: 16
+> >   unique: 995358, opcode: REMOVEMAPPING (49), nodeid: 135, insize: 60, pid: 12
+> > 
+> > The REMOVEMAPPING requests are unnecessary since we can map over the top
+> > of the old mapping instead of taking the extra step of removing it
+> > first.
+> 
+> Yep, those should go - I think Vivek likes to keep them for testing
+> since they make things fail more completely if there's a screwup.
 
---Nu2GKNNz2cazKTGwBjVXt9eTAT46q1OqA
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I like to keep them because otherwise they keep the resources busy
+on host. If DAX range is being used immediately, then this optimization
+makes more sense. I will keep this in mind.
 
-On 08.08.19 02:18, Eric Blake wrote:
-> On 7/4/19 8:09 AM, Denis Plotnikov wrote:
->> The patch adds some preparation parts for incompatible compression typ=
-e
->> feature to QCOW2 header that indicates that *all* compressed clusters
->> must be (de)compressed using a certain compression type.
->>
->> It is implied that the compression type is set on the image creation a=
-nd
->> can be changed only later by image conversion, thus compression type
->> defines the only compression algorithm used for the image.
->>
->> The goal of the feature is to add support of other compression algorit=
-hms
->> to qcow2. For example, ZSTD which is more effective on compression tha=
-n ZLIB.
->> It works roughly 2x faster than ZLIB providing a comparable compressio=
-n ratio
->> and therefore provide a performance advantage in backup scenarios.
->=20
-> provides
->=20
->>
->> The default compression is ZLIB. Images created with ZLIB compression =
-type
->> are backward compatible with older qemu versions.
->>
->> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
->=20
->> +++ b/docs/interop/qcow2.txt
->> @@ -109,7 +109,12 @@ in the description of a field.
->>                                  An External Data File Name header ext=
-ension may
->>                                  be present if this bit is set.
->> =20
->> -                    Bits 3-63:  Reserved (set to 0)
->> +                    Bit 3:      Compression type bit. The bit must be=
- set if
->> +                                the compression type differs from def=
-ault: zlib.
->=20
-> I'd word this 'from the default of zlib.'
->=20
->> +                                If the compression type is default th=
-e bit must
->> +                                be unset.
->=20
-> Why? I see no reason to forbid a qcow2 image that has the incompatible
-> bit set but still uses zlib compression.  True, such an image is not as=
+> 
+> > Some more questions to consider for DAX performance optimization:
+> > 
+> > 1. Is FUSE_READ/FUSE_WRITE more efficient than DAX for some I/O patterns?
+> 
+> Probably for cases where the data is only accessed once, and you can't
+> preemptively map.
+> Another variant on (1) is whether we could do read/writes while the mmap
+> is happening to absorb the latency.
 
-> friendly to older clients, but it is not technically wrong, and newer
-> clients would still be able to use the image if not for this sentence
-> telling them they must not.
+For small random I/O, dax might not be very effective. Overhead of
+setting up mapping and tearing it down is significant.
 
-Just because an image doesn=E2=80=99t adhere to the specification doesn=E2=
-=80=99t mean
-you have to reject it, if the intention is clear.
-
-> I'd drop this sentence.
-
-I wouldn=E2=80=99t, I like it (in essence).  Though maybe the =E2=80=9Cmu=
-st=E2=80=9D is indeed
-too strong and it should be a =E2=80=9Cshould=E2=80=9D instead.
-
-Max
-
-
---Nu2GKNNz2cazKTGwBjVXt9eTAT46q1OqA--
-
---GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1MGpUACgkQ9AfbAGHV
-z0A2Iwf/XIdvsNGlTnHQ57JR/p2w5hDnQLNyGjasQZa+RkOvE2RWx1hzL06zfXDo
-7JaZPRPz8GtaV8MtcdlTOglYy3ZuFUj2EhyP9gq6OHqnT9q7gUWHZTPtNQe4Upvl
-fLxByU5xf/QjtnNr8N+guIKjKfo0PJ/DemkVkPbMBwcBqxp5MKYj93rT4MwjSETo
-JA+e4XsTTrUDMwhBENlDdkiDedAcm0PH/k+SI8zhSpiEPNSrJvvc5AQ2z3jouquz
-eBR/5HeHZZ+RRApQkjuP4A3U90z1aM4Jm6xlBKalcDgPnsvsbit/aYl8MfFuImcP
-59EB7eD+XafgdM+tupeBUv64TAdbXw==
-=j9pi
------END PGP SIGNATURE-----
-
---GbHsLBUspUAoSw3SvuctFXPlZdJRB2s3P--
+Vivek
 
