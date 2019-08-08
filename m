@@ -2,64 +2,93 @@ Return-Path: <SRS0=Rh1V=WE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1F1C0650F
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 15:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6DBC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 15:44:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E2A21743
-	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 15:43:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E2A21743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C39362173E
+	for <qemu-devel@archiver.kernel.org>; Thu,  8 Aug 2019 15:44:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="stX8bg6K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C39362173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvkZQ-0001nK-IZ
-	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 11:43:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40783)
+	id 1hvkaT-0003Bv-4q
+	for qemu-devel@archiver.kernel.org; Thu, 08 Aug 2019 11:44:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40996)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hvkZ1-0001EX-CD
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 11:42:52 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvka0-0002ay-Mi
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 11:43:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hvkYz-0000A3-Un
- for qemu-devel@nongnu.org; Thu, 08 Aug 2019 11:42:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56548)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>)
- id 1hvkYt-0008WA-Pj; Thu, 08 Aug 2019 11:42:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E7904309BF04;
- Thu,  8 Aug 2019 15:42:41 +0000 (UTC)
-Received: from work-vm (ovpn-117-208.ams2.redhat.com [10.36.117.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DE365D772;
- Thu,  8 Aug 2019 15:42:22 +0000 (UTC)
-Date: Thu, 8 Aug 2019 16:42:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190808154219.GK2852@work-vm>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-8-damien.hedde@greensocs.com>
- <CAFEAcA-W0SaaGbUnGZ0b61ngxKY8R9xjwGXeN+=MaUi4bMDgNg@mail.gmail.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hvkZz-000151-Nr
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 11:43:52 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:41242)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hvkZz-00013Z-Ft
+ for qemu-devel@nongnu.org; Thu, 08 Aug 2019 11:43:51 -0400
+Received: by mail-pf1-x442.google.com with SMTP id m30so44331399pff.8
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 08:43:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9d84VbIVt4jjibDMNJI2YnvtvcFe4PhCYXQq/m+rW9s=;
+ b=stX8bg6KKmAt8OjkgL3Wxsz9JeeJKPpg6wYsqROe0aSyI29F+3G5HnFLYJLXyJrVVV
+ dHhZnMWVJCA8KsBEqiGkZnQ8sVE7TfkTCnvRtGEbYbJKc3r3YaTuUOJggg23IGBRKHNM
+ YNE0ZxKXCyA4Txxx+W7md2+D2SCkkZPXO3UTD3GMFAtQClz5R5ZO5zYkFLAyBvCb4D9t
+ Mpgxd/FDvMd+qzW+xrlg+AG+0/+Dk/A+p8DOL4mOgbcJvA5TPslnXnuupH/45fzTPnop
+ hACseYyUPEHVM9YhbBIwOemouF0iDlaggk5qbrY2cPDIvf9JO7eEAkZ5ZejiJrfT4Q1+
+ /+3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9d84VbIVt4jjibDMNJI2YnvtvcFe4PhCYXQq/m+rW9s=;
+ b=LCwQ5DKuzfK1ASEYzqF72et2eNqOrBUreN2Zc25CqgyWFLmq6Dw9ZXgBopRKTliOoI
+ 1QLigHhlWpC+jEyrQa19T2Rpl2vmKycwrdQ6PZ2cxiYEtV3wWG9uGnDXsmh77i2CPvMg
+ BDKQd9FZ9CZR2qcuT8x5nGyvN2VD3DQn2zMUXWVeVUNUZctzV+NJh3kNyCoCBqX8tVxo
+ u72JcJs5bMFWySSmInZbDVXANQKXyXSYb6P3ZP52Ki3gpf509fuXOc44WjNKWYiRRatz
+ TQnowjrJiHxDfGqdehJ1Ur6QYB2B/CEp1dSUBkn0xsQwSmq2kZY+3ZN93YeMIQWCYXLx
+ Af7g==
+X-Gm-Message-State: APjAAAXnQeSouPMoXzOeMxGJvwmeNnu+M10y9VJZsU1hsXujkrMLnbig
+ 8eRbfHZedgtSDVr9zA6Xnf61UQ==
+X-Google-Smtp-Source: APXvYqxfg1F7BJ0gks9TCbVT+vJgoaHQqdsON63JGGJ8nxrEKehhMotNDSDcWkac9W0lpIfK8SqiKg==
+X-Received: by 2002:a17:90a:db52:: with SMTP id
+ u18mr4727536pjx.107.1565279029109; 
+ Thu, 08 Aug 2019 08:43:49 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id b136sm125480578pfb.73.2019.08.08.08.43.47
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 08 Aug 2019 08:43:48 -0700 (PDT)
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20190726175032.6769-1-richard.henderson@linaro.org>
+ <20190726175032.6769-12-richard.henderson@linaro.org>
+ <CAL1e-=gwyGB4ibo_B5W1MpFy-9bB7=5juqTJVBdD9N6XFOOsSQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0f37edc5-2fb6-c92d-fb47-a381af649072@linaro.org>
+Date: Thu, 8 Aug 2019 08:43:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-W0SaaGbUnGZ0b61ngxKY8R9xjwGXeN+=MaUi4bMDgNg@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 08 Aug 2019 15:42:42 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 07/33] automatically add vmstate for
- reset support in devices
+In-Reply-To: <CAL1e-=gwyGB4ibo_B5W1MpFy-9bB7=5juqTJVBdD9N6XFOOsSQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
+Subject: Re: [Qemu-devel] [PATCH 11/67] target/arm: Add stubs for aa32
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,212 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, quintela@redhat.com,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- Damien Hedde <damien.hedde@greensocs.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:Stellaris" <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> >
-> > This add the reset related sections for every QOM
-> > device.
+On 8/8/19 4:41 AM, Aleksandar Markovic wrote:
+>     +/*
+>     + * Include the generated decoders.
+>     + * Note that the T32 decoder reuses some of the trans_* functions
+>     + * initially declared by the A32 decoder, which results in duplicate
+>     + * declaration warnings.  Suppress them.
+>     + */
+>     +
+>     +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+>     +# pragma GCC diagnostic push
+>     +# pragma GCC diagnostic ignored "-Wredundant-decls"
+>     +# ifdef __clang__
+>     +#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
+>     +# endif
+>     +#endif
+>     +
 > 
-> A bit more detail in the commit message would help, I think --
-> this is adding extra machinery which has to copy and modify
-> the VMStateDescription passed in by the device in order to
-> add the subsection that handles reset.
 > 
-> I've added Dave Gilbert to the already long cc list since this
-> is migration related.
+> This looks more like a "band aid" solution rather than the right one.
 
-I don't like dynamically modifying all the vmsds.
-Aren't you going to have to understand each devices reset behaviour
-and make sure it does something sane? e.g. it might have a postload
-that registers a timer or something that you wouldn't want to do if it's
-in reset.
+What would the "right" solution be, would you say?
 
-The easiest way is to write a macro that you can easily add to devices
-you've checked subsection list (like the way we have a
-VMSTATE_USB_DEVICE).
+A couple of days ago Phil suggested moving these pragmas into the generated
+code, so that this need not be done by hand in the several targets that use
+multiple decoders.  That sounds reasonable to me.
 
-Dave
 
-> 
-> > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> > ---
-> >  hw/core/qdev-vmstate.c | 41 +++++++++++++++++++++++++++++++++++++++++
-> >  hw/core/qdev.c         | 12 +++++++++++-
-> >  include/hw/qdev-core.h |  3 +++
-> >  stubs/Makefile.objs    |  1 +
-> >  stubs/device.c         |  7 +++++++
-> >  5 files changed, 63 insertions(+), 1 deletion(-)
-> >  create mode 100644 stubs/device.c
-> >
-> > diff --git a/hw/core/qdev-vmstate.c b/hw/core/qdev-vmstate.c
-> > index 07b010811f..24f8465c61 100644
-> > --- a/hw/core/qdev-vmstate.c
-> > +++ b/hw/core/qdev-vmstate.c
-> > @@ -43,3 +43,44 @@ const struct VMStateDescription device_vmstate_reset = {
-> >          VMSTATE_END_OF_LIST()
-> >      },
-> >  };
-> > +
-> > +static VMStateDescription *vmsd_duplicate_and_append(
-> > +        const VMStateDescription *old_vmsd,
-> > +        const VMStateDescription *new_subsection)
-> > +{
-> > +    VMStateDescription *vmsd;
-> > +    int n = 0;
-> > +
-> > +    assert(old_vmsd && new_subsection);
-> > +
-> > +    vmsd = (VMStateDescription *) g_memdup(old_vmsd, sizeof(*vmsd));
-> > +
-> > +    if (old_vmsd->subsections) {
-> > +        while (old_vmsd->subsections[n]) {
-> > +            n += 1;
-> > +        }
-> > +    }
-> > +    vmsd->subsections = g_new(const VMStateDescription *, n + 2);
-> > +
-> > +    if (old_vmsd->subsections) {
-> > +        memcpy(vmsd->subsections, old_vmsd->subsections,
-> > +               sizeof(VMStateDescription *) * n);
-> > +    }
-> > +    vmsd->subsections[n] = new_subsection;
-> > +    vmsd->subsections[n + 1] = NULL;
-> > +
-> > +    return vmsd;
-> > +}
-> > +
-> > +void device_class_build_extended_vmsd(DeviceClass *dc)
-> > +{
-> > +    assert(dc->vmsd);
-> > +    assert(!dc->vmsd_ext);
-> > +
-> > +    /* forge a subsection with proper name */
-> > +    VMStateDescription *reset;
-> > +    reset = g_memdup(&device_vmstate_reset, sizeof(*reset));
-> > +    reset->name = g_strdup_printf("%s/device_reset", dc->vmsd->name);
-> > +
-> > +    dc->vmsd_ext = vmsd_duplicate_and_append(dc->vmsd, reset);
-> > +}
-> 
-> This will allocate memory, but there is no corresponding
-> code which frees it. This means you'll have a memory leak
-> across device realize->unrealize for hotplug devices.
-> 
-> > diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > index e9e5f2d5f9..88387d3743 100644
-> > --- a/hw/core/qdev.c
-> > +++ b/hw/core/qdev.c
-> > @@ -45,7 +45,17 @@ bool qdev_hot_removed = false;
-> >  const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
-> >  {
-> >      DeviceClass *dc = DEVICE_GET_CLASS(dev);
-> > -    return dc->vmsd;
-> > +
-> > +    if (!dc->vmsd) {
-> > +        return NULL;
-> > +    }
-> > +
-> > +    if (!dc->vmsd_ext) {
-> > +        /* build it first time we need it */
-> > +        device_class_build_extended_vmsd(dc);
-> > +    }
-> > +
-> > +    return dc->vmsd_ext;
-> >  }
-> 
-> Unfortunately not everything that wants the VMSD calls
-> this function. migration/savevm.c:dump_vmstate_json_to_file()
-> does a direct access to dc->vmsd, so we need to fix that first.
-> 
-> Devices which don't use dc->vmsd won't get this and so
-> their reset state won't be migrated. That's OK for anything
-> that's still not yet a QOM device, I guess -- it's not possible
-> for them to be in a 'held in reset' state anyway, so the
-> extra subsection would never be needed.
-> 
-> The one I'm less sure about is the 'virtio' devices, which
-> have to do something odd with migration state for backwards
-> compat reasons. At the moment they can't be in a situation
-> where they're being held in reset when we do a migration,
-> but since they're PCI devices they might in future be possible
-> to put into new boards/pci controllers that would let them
-> be in that situation.
-> 
-> >  static void bus_remove_child(BusState *bus, DeviceState *child)
-> > diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> > index 1670ae41bb..926d4bbcb1 100644
-> > --- a/include/hw/qdev-core.h
-> > +++ b/include/hw/qdev-core.h
-> > @@ -120,6 +120,7 @@ typedef struct DeviceClass {
-> >
-> >      /* device state */
-> >      const struct VMStateDescription *vmsd;
-> > +    const struct VMStateDescription *vmsd_ext;
-> >
-> >      /* Private to qdev / bus.  */
-> >      const char *bus_type;
-> > @@ -520,6 +521,8 @@ void device_class_set_parent_unrealize(DeviceClass *dc,
-> >
-> >  const struct VMStateDescription *qdev_get_vmsd(DeviceState *dev);
-> >
-> > +void device_class_build_extended_vmsd(DeviceClass *dc);
-> > +
-> >  const char *qdev_fw_name(DeviceState *dev);
-> >
-> >  Object *qdev_get_machine(void);
-> > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> > index 9c7393b08c..432b56f290 100644
-> > --- a/stubs/Makefile.objs
-> > +++ b/stubs/Makefile.objs
-> > @@ -40,4 +40,5 @@ stub-obj-y += pci-host-piix.o
-> >  stub-obj-y += ram-block.o
-> >  stub-obj-y += ramfb.o
-> >  stub-obj-y += fw_cfg.o
-> > +stub-obj-y += device.o
-> >  stub-obj-$(CONFIG_SOFTMMU) += semihost.o
-> > diff --git a/stubs/device.c b/stubs/device.c
-> > new file mode 100644
-> > index 0000000000..e9b4f57e5f
-> > --- /dev/null
-> > +++ b/stubs/device.c
-> > @@ -0,0 +1,7 @@
-> > +#include "qemu/osdep.h"
-> > +#include "hw/qdev-core.h"
-> > +
-> > +void device_class_build_extended_vmsd(DeviceClass *dc)
-> > +{
-> > +    return;
-> > +}
-> > --
-> > 2.22.0
-> 
-> 
-> thanks
-> -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+r~
 
