@@ -6,55 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C68C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CC1C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:28:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B84720C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:28:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B84720C01
+	by mail.kernel.org (Postfix) with ESMTPS id 206D920C01
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:28:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 206D920C01
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw7kM-00078y-Rg
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:28:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57585)
+	id 1hw7kZ-000821-Cg
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:28:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57887)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hw7Y7-0003ho-01
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:28 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hw7Yc-0004gN-Ce
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hw7Y5-0004b5-OE
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54880)
+ (envelope-from <mreitz@redhat.com>) id 1hw7Yb-0004pp-C0
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48470)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hw7Y2-0004Z1-TX; Fri, 09 Aug 2019 12:15:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hw7YZ-0004oa-1G; Fri, 09 Aug 2019 12:15:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 341D330ADBA6;
- Fri,  9 Aug 2019 16:15:22 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5E3EE3058359;
+ Fri,  9 Aug 2019 16:15:54 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9FDE17C4A;
- Fri,  9 Aug 2019 16:15:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 94F245D772;
+ Fri,  9 Aug 2019 16:15:52 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri,  9 Aug 2019 18:13:55 +0200
-Message-Id: <20190809161407.11920-31-mreitz@redhat.com>
+Date: Fri,  9 Aug 2019 18:14:07 +0200
+Message-Id: <20190809161407.11920-43-mreitz@redhat.com>
 In-Reply-To: <20190809161407.11920-1-mreitz@redhat.com>
 References: <20190809161407.11920-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 09 Aug 2019 16:15:22 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Fri, 09 Aug 2019 16:15:54 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 30/42] qemu-img: Use child access functions
+Subject: [Qemu-devel] [PATCH v6 42/42] iotests: Test committing to
+ overridden backing
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,151 +74,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This changes iotest 204's output, because blkdebug on top of a COW node
-used to make qemu-img map disregard the rest of the backing chain (the
-backing chain was broken by the filter).  With this patch, the
-allocation in the base image is reported correctly.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qemu-img.c                 | 33 ++++++++++++++++++++-------------
- tests/qemu-iotests/204.out |  1 +
- 2 files changed, 21 insertions(+), 13 deletions(-)
+ tests/qemu-iotests/040     | 61 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/040.out |  4 +--
+ 2 files changed, 63 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 79983772de..3b30c5ae70 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1012,7 +1012,7 @@ static int img_commit(int argc, char **argv)
-         /* This is different from QMP, which by default uses the deepest=
- file in
-          * the backing chain (i.e., the very base); however, the traditi=
-onal
-          * behavior of qemu-img commit is using the immediate backing fi=
-le. */
--        base_bs =3D backing_bs(bs);
-+        base_bs =3D bdrv_backing_chain_next(bs);
-         if (!base_bs) {
-             error_setg(&local_err, "Image does not have a backing file")=
-;
-             goto done;
-@@ -1632,18 +1632,20 @@ static int convert_iteration_sectors(ImgConvertSt=
-ate *s, int64_t sector_num)
-     if (s->sector_next_status <=3D sector_num) {
-         uint64_t offset =3D (sector_num - src_cur_offset) * BDRV_SECTOR_=
-SIZE;
-         int64_t count;
-+        BlockDriverState *src_bs =3D blk_bs(s->src[src_cur]);
-+        BlockDriverState *base;
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index a0a0db8889..558fdb9a09 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -605,5 +605,66 @@ class TestCommitWithFilters(iotests.QMPTestCase):
+         # 3 has been comitted into 2
+         self.pattern_files[3] =3D self.img2
+=20
++class TestCommitWithOverriddenBacking(iotests.QMPTestCase):
++    img_base_a =3D os.path.join(iotests.test_dir, 'base_a.img')
++    img_base_b =3D os.path.join(iotests.test_dir, 'base_b.img')
++    img_top =3D os.path.join(iotests.test_dir, 'top.img')
 +
-+        if (s->target_has_backing) {
-+            base =3D bdrv_filtered_cow_bs(bdrv_skip_rw_filters(src_bs));
-+        } else {
-+            base =3D NULL;
-+        }
-=20
-         do {
-             count =3D n * BDRV_SECTOR_SIZE;
-=20
--            if (s->target_has_backing) {
--                ret =3D bdrv_block_status(blk_bs(s->src[src_cur]), offse=
-t,
--                                        count, &count, NULL, NULL);
--            } else {
--                ret =3D bdrv_block_status_above(blk_bs(s->src[src_cur]),=
- NULL,
--                                              offset, count, &count, NUL=
-L,
--                                              NULL);
--            }
-+            ret =3D bdrv_block_status_above(src_bs, base, offset, count,=
- &count,
-+                                          NULL, NULL);
-=20
-             if (ret < 0) {
-                 if (s->salvage) {
-@@ -2490,7 +2492,8 @@ static int img_convert(int argc, char **argv)
-          * s.target_backing_sectors has to be negative, which it will
-          * be automatically).  The backing file length is used only
-          * for optimizations, so such a case is not fatal. */
--        s.target_backing_sectors =3D bdrv_nb_sectors(out_bs->backing->bs=
-);
-+        s.target_backing_sectors =3D
-+            bdrv_nb_sectors(bdrv_filtered_cow_bs(out_bs));
-     } else {
-         s.target_backing_sectors =3D -1;
-     }
-@@ -2853,6 +2856,7 @@ static int get_block_status(BlockDriverState *bs, i=
-nt64_t offset,
-=20
-     depth =3D 0;
-     for (;;) {
-+        bs =3D bdrv_skip_rw_filters(bs);
-         ret =3D bdrv_block_status(bs, offset, bytes, &bytes, &map, &file=
-);
-         if (ret < 0) {
-             return ret;
-@@ -2861,7 +2865,7 @@ static int get_block_status(BlockDriverState *bs, i=
-nt64_t offset,
-         if (ret & (BDRV_BLOCK_ZERO|BDRV_BLOCK_DATA)) {
-             break;
-         }
--        bs =3D backing_bs(bs);
-+        bs =3D bdrv_filtered_cow_bs(bs);
-         if (bs =3D=3D NULL) {
-             ret =3D 0;
-             break;
-@@ -3216,6 +3220,7 @@ static int img_rebase(int argc, char **argv)
-     uint8_t *buf_old =3D NULL;
-     uint8_t *buf_new =3D NULL;
-     BlockDriverState *bs =3D NULL, *prefix_chain_bs =3D NULL;
-+    BlockDriverState *unfiltered_bs;
-     char *filename;
-     const char *fmt, *cache, *src_cache, *out_basefmt, *out_baseimg;
-     int c, flags, src_flags, ret;
-@@ -3350,6 +3355,8 @@ static int img_rebase(int argc, char **argv)
-     }
-     bs =3D blk_bs(blk);
-=20
-+    unfiltered_bs =3D bdrv_skip_rw_filters(bs);
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, self.img_base_a, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, self.img_base_b, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, '-b', self.img_base_a, =
+\
++                 self.img_top)
 +
-     if (out_basefmt !=3D NULL) {
-         if (bdrv_find_format(out_basefmt) =3D=3D NULL) {
-             error_report("Invalid format name: '%s'", out_basefmt);
-@@ -3361,7 +3368,7 @@ static int img_rebase(int argc, char **argv)
-     /* For safe rebasing we need to compare old and new backing file */
-     if (!unsafe) {
-         QDict *options =3D NULL;
--        BlockDriverState *base_bs =3D backing_bs(bs);
-+        BlockDriverState *base_bs =3D bdrv_filtered_cow_bs(unfiltered_bs=
-);
++        self.vm =3D iotests.VM()
++        self.vm.launch()
++
++        # Use base_b instead of base_a as the backing of top
++        result =3D self.vm.qmp('blockdev-add', **{
++                                'node-name': 'top',
++                                'driver': iotests.imgfmt,
++                                'file': {
++                                    'driver': 'file',
++                                    'filename': self.img_top
++                                },
++                                'backing': {
++                                    'node-name': 'base',
++                                    'driver': iotests.imgfmt,
++                                    'file': {
++                                        'driver': 'file',
++                                        'filename': self.img_base_b
++                                    }
++                                }
++                            })
++        self.assert_qmp(result, 'return', {})
++
++    def tearDown(self):
++        self.vm.shutdown()
++        os.remove(self.img_top)
++        os.remove(self.img_base_a)
++        os.remove(self.img_base_b)
++
++    def test_commit_to_a(self):
++        # Try committing to base_a (which should fail, as top's
++        # backing image is base_b instead)
++        result =3D self.vm.qmp('block-commit',
++                             job_id=3D'commit',
++                             device=3D'top',
++                             base=3Dself.img_base_a)
++        self.assert_qmp(result, 'error/class', 'GenericError')
++
++    def test_commit_to_b(self):
++        # Try committing to base_b (which should work, since that is
++        # actually top's backing image)
++        result =3D self.vm.qmp('block-commit',
++                             job_id=3D'commit',
++                             device=3D'top',
++                             base=3Dself.img_base_b)
++        self.assert_qmp(result, 'return', {})
++
++        self.vm.event_wait('BLOCK_JOB_READY')
++        self.vm.qmp('block-job-complete', device=3D'commit')
++        self.vm.event_wait('BLOCK_JOB_COMPLETED')
++
+ if __name__ =3D=3D '__main__':
+     iotests.main(supported_fmts=3D['qcow2', 'qed'])
+diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
+index fe58934d7a..499af0e2ff 100644
+--- a/tests/qemu-iotests/040.out
++++ b/tests/qemu-iotests/040.out
+@@ -1,5 +1,5 @@
+-...................................................
++.....................................................
+ ----------------------------------------------------------------------
+-Ran 51 tests
++Ran 53 tests
 =20
-         if (base_bs) {
-             blk_old_backing =3D blk_new(qemu_get_aio_context(),
-@@ -3517,7 +3524,7 @@ static int img_rebase(int argc, char **argv)
-                  * If cluster wasn't changed since prefix_chain, we don'=
-t need
-                  * to take action
-                  */
--                ret =3D bdrv_is_allocated_above(backing_bs(bs), prefix_c=
-hain_bs,
-+                ret =3D bdrv_is_allocated_above(unfiltered_bs, prefix_ch=
-ain_bs,
-                                               false, offset, n, &n);
-                 if (ret < 0) {
-                     error_report("error while reading image metadata: %s=
-",
-diff --git a/tests/qemu-iotests/204.out b/tests/qemu-iotests/204.out
-index f3a10fbe90..684774d763 100644
---- a/tests/qemu-iotests/204.out
-+++ b/tests/qemu-iotests/204.out
-@@ -59,5 +59,6 @@ Offset          Length          File
- 0x900000        0x2400000       TEST_DIR/t.IMGFMT
- 0x3c00000       0x1100000       TEST_DIR/t.IMGFMT
- 0x6a00000       0x400000        TEST_DIR/t.IMGFMT
-+0x6e00000       0x1200000       TEST_DIR/t.IMGFMT.base
- No errors were found on the image.
- *** done
+ OK
 --=20
 2.21.0
 
