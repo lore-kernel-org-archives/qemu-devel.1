@@ -2,90 +2,81 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9625CC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B26A8C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:12:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5990C214C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:08:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5990C214C6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7DC8F20820
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:12:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OAh8az9D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC8F20820
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw8NI-0002kp-GC
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 13:08:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37325)
+	id 1hw8RD-0004OY-Nu
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 13:12:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37943)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hw8Mu-00028L-OW
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:07:57 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hw8Qr-0003pc-3U
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hw8Mt-0004Uf-PE
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:07:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42464)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hw8Mr-0004TS-Pd; Fri, 09 Aug 2019 13:07:53 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0CE7781DE0;
- Fri,  9 Aug 2019 17:07:53 +0000 (UTC)
-Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9965D19C70;
- Fri,  9 Aug 2019 17:07:52 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-7-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <ab4fbe49-7315-dfbd-7fcd-993950d1a199@redhat.com>
-Date: Fri, 9 Aug 2019 12:07:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190809161407.11920-7-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="mRh1eH4s747Dc70Rz0t83baC0KgH7Nkpt"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Fri, 09 Aug 2019 17:07:53 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 06/42] qcow2: Implement
- .bdrv_storage_child()
+ (envelope-from <richard.henderson@linaro.org>) id 1hw8Qq-0006cy-0j
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:12:01 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43669)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hw8Qp-0006cV-O6
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:11:59 -0400
+Received: by mail-pg1-x541.google.com with SMTP id r26so10209992pgl.10
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 10:11:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=ytkVX0l93V8o0cYS4Oq6t62B9ZsJBOcYFtRg7HNNvw8=;
+ b=OAh8az9D3ZF272uDEsz4bf6PbWDxKUa72Iouu7bUj/0XwOG8R+ydJ66Qp1idhNsXWk
+ VSkNV7s+SVOGcxCDS6IaWeqPk0pvrP95MqKBGM2TkY/x3nfbgIds97F5yNTuhgdqvFf/
+ iFpChpPIBb29wnBb27DeAe7XnBTuijCLhKScout51dRJnNNT5uSbHHlO6B5dt+W6Cq+/
+ wUln9RomXdU52Edlrc7MzgllELLd7LprsH/Eps/gjn7oPwA1iwku1dGgGO2O4Re+K2CO
+ PnZ0NfdbGMM9t94dS5dz0deW6v0S6O4Zhbiaojy4E2WkGcW4c2cYRTkO/4DQT7j1sAZL
+ oQaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=ytkVX0l93V8o0cYS4Oq6t62B9ZsJBOcYFtRg7HNNvw8=;
+ b=dSWTj1pgSwXcH+hTj6PItGuv613aKIpbKLIiCh8jwQOYPL81G2HCTSzzOue26YJ0rI
+ 5BaSqKpvKRb/aQWWZVcWcnMcU/akwNiQwPAbtUNchKeP9Nw/2ANrMNq10jHzvO7T8/u9
+ umf9Uf88pLITrVMvQX+bTe9vKNA17K0d8hAkD33MOymbTe+eFq2dr1NAg49hetCopg/p
+ wzgR0Hn3023JLzX57mxaPxt1c3mwMfEG+JmDydeeuNXS1w/qyr3SzPbycj3Mof3CMtc5
+ oH7V7KcCXTqIQ060cMU3mK6bb2sGQ/lhxNeLggB2he+Z+11bfAXSuMt6y+plcb4MCcQ/
+ qp2w==
+X-Gm-Message-State: APjAAAX9XxxDn/TRqvVUmpjFKiPpBmD8MBI7EBC3SFZYlMkcsiaWtQBy
+ 9g2kbN+erAByxRd3cFGNUtwOfxNGQNM=
+X-Google-Smtp-Source: APXvYqySxdZhIkOeZjsh+xEfUzMrOT9e9uqx6jgRH9jodXLonQ9Ds0TYzh8cPkIhj/P+RcDQ+1szew==
+X-Received: by 2002:a62:874d:: with SMTP id i74mr22155960pfe.94.1565370718261; 
+ Fri, 09 Aug 2019 10:11:58 -0700 (PDT)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id l189sm119049433pfl.7.2019.08.09.10.11.56
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 09 Aug 2019 10:11:57 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri,  9 Aug 2019 10:11:56 -0700
+Message-Id: <20190809171156.3476-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: [Qemu-devel] [PATCH] linux-user: Add AT_HWCAP2 for
+ aarch64-linux-user
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,67 +88,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mRh1eH4s747Dc70Rz0t83baC0KgH7Nkpt
-Content-Type: multipart/mixed; boundary="u8bxQlOwrDWJAG8DyzhnweWBC9fLKhsf4";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org
-Message-ID: <ab4fbe49-7315-dfbd-7fcd-993950d1a199@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 06/42] qcow2: Implement
- .bdrv_storage_child()
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-7-mreitz@redhat.com>
-In-Reply-To: <20190809161407.11920-7-mreitz@redhat.com>
+Add the HWCAP2_* bits from kernel version v5.3-rc3.
+Enable the bits corresponding to ARMv8.5-CondM and ARMv8.5-FRINT.
 
---u8bxQlOwrDWJAG8DyzhnweWBC9fLKhsf4
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/elfload.c | 31 +++++++++++++++++++++++++++----
+ 1 file changed, 27 insertions(+), 4 deletions(-)
+---
 
-On 8/9/19 11:13 AM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+The HWCAP2_FLAGM2 and HWCAP2_FRINT bits came in during the 
+last merge window and will be in the upcoming v5.3 release.
+We don't yet implement any of the other extensions that make
+up the rest of the HWCAP2 bits.
 
 
---u8bxQlOwrDWJAG8DyzhnweWBC9fLKhsf4--
+r~
 
---mRh1eH4s747Dc70Rz0t83baC0KgH7Nkpt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index bd43c4817d..4fd2f46f18 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -606,9 +606,23 @@ enum {
+     ARM_HWCAP_A64_SB            = 1 << 29,
+     ARM_HWCAP_A64_PACA          = 1 << 30,
+     ARM_HWCAP_A64_PACG          = 1UL << 31,
++
++    ARM_HWCAP2_A64_DCPODP       = 1 << 0,
++    ARM_HWCAP2_A64_SVE2         = 1 << 1,
++    ARM_HWCAP2_A64_SVEAES       = 1 << 2,
++    ARM_HWCAP2_A64_SVEPMULL     = 1 << 3,
++    ARM_HWCAP2_A64_SVEBITPERM   = 1 << 4,
++    ARM_HWCAP2_A64_SVESHA3      = 1 << 5,
++    ARM_HWCAP2_A64_SVESM4       = 1 << 6,
++    ARM_HWCAP2_A64_FLAGM2       = 1 << 7,
++    ARM_HWCAP2_A64_FRINT        = 1 << 8,
+ };
+ 
+-#define ELF_HWCAP get_elf_hwcap()
++#define ELF_HWCAP   get_elf_hwcap()
++#define ELF_HWCAP2  get_elf_hwcap2()
++
++#define GET_FEATURE_ID(feat, hwcap) \
++    do { if (cpu_isar_feature(feat, cpu)) { hwcaps |= hwcap; } } while (0)
+ 
+ static uint32_t get_elf_hwcap(void)
+ {
+@@ -620,8 +634,6 @@ static uint32_t get_elf_hwcap(void)
+     hwcaps |= ARM_HWCAP_A64_CPUID;
+ 
+     /* probe for the extra features */
+-#define GET_FEATURE_ID(feat, hwcap) \
+-    do { if (cpu_isar_feature(feat, cpu)) { hwcaps |= hwcap; } } while (0)
+ 
+     GET_FEATURE_ID(aa64_aes, ARM_HWCAP_A64_AES);
+     GET_FEATURE_ID(aa64_pmull, ARM_HWCAP_A64_PMULL);
+@@ -644,11 +656,22 @@ static uint32_t get_elf_hwcap(void)
+     GET_FEATURE_ID(aa64_sb, ARM_HWCAP_A64_SB);
+     GET_FEATURE_ID(aa64_condm_4, ARM_HWCAP_A64_FLAGM);
+ 
+-#undef GET_FEATURE_ID
++    return hwcaps;
++}
++
++static uint32_t get_elf_hwcap2(void)
++{
++    ARMCPU *cpu = ARM_CPU(thread_cpu);
++    uint32_t hwcaps = 0;
++
++    GET_FEATURE_ID(aa64_condm_5, ARM_HWCAP2_A64_FLAGM2);
++    GET_FEATURE_ID(aa64_frint, ARM_HWCAP2_A64_FRINT);
+ 
+     return hwcaps;
+ }
+ 
++#undef GET_FEATURE_ID
++
+ #endif /* not TARGET_AARCH64 */
+ #endif /* TARGET_ARM */
+ 
+-- 
+2.17.1
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1NqGcACgkQp6FrSiUn
-Q2rFdAf/WHjx/smMiQS/RZctjVfPXPmV7fqCDNcSLml5/WtVIjUTtLWrR6aZySic
-Xu4ugPTppAO8kZ1EWrWy5UFEYcaTtx+SXmE9lzoTBoCQLzSmEdEY/CovCa8PAZxN
-VfoTHYqCR99Z97quL4cWTKdK5DN9sCAL5lb9O4vMCdqCDuf0AWP/BUw+D56ck9fE
-IK1OMxMpDQPHuX3SIDGXgHoX+r2EFh/HszFxzo6Lx1uTgLfaOeMB5UYX3Wwfj2Ha
-dLoEfMBdkPfSuqbitXxMum75/pIqjbkxV4bJpPKDuOWjgNZpSGVd9CXHGN3HPIIq
-of9ZXOu17bZ+kJ/aDWoxTo3gPRTPWg==
-=ESIz
------END PGP SIGNATURE-----
-
---mRh1eH4s747Dc70Rz0t83baC0KgH7Nkpt--
 
