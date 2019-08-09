@@ -2,111 +2,86 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85255C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE921C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:31:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12945204EC
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:18:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12945204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bsdio.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB71620C01
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:31:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dedc/AJm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB71620C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw6f4-0005Zn-KU
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:18:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46750)
+	id 1hw6rL-00025b-VR
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48700)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rebecca@bsdio.com>) id 1hw6eT-00052q-O8
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:17:58 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hw6qd-0001YM-QZ
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rebecca@bsdio.com>) id 1hw6eS-0007fP-TA
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:17:57 -0400
-Received: from muon.bsdio.com ([65.103.231.193]:55648)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rebecca@bsdio.com>)
- id 1hw6eS-0007eN-Jy; Fri, 09 Aug 2019 11:17:56 -0400
-Received: from muon.bsdio.com (localhost [127.0.0.1])
- by muon.bsdio.com (Postfix) with ESMTP id DEBAF8286F;
- Fri,  9 Aug 2019 09:17:55 -0600 (MDT)
-Received: from muon.bsdio.com ([127.0.0.1])
- by muon.bsdio.com (muon.bsdio.com [127.0.0.1]) (amavisd-new, port 10026)
- with ESMTP id Errg4ILl3tyV; Fri,  9 Aug 2019 09:17:55 -0600 (MDT)
-Received: from photon.int.bluestop.org (unknown [10.0.10.120])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits))
- (No client certificate requested)
- by muon.bsdio.com (Postfix) with ESMTPSA;
- Fri,  9 Aug 2019 09:17:54 -0600 (MDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- qemu-trivial@nongnu.org
-References: <20190809041952.57302-1-rebecca@bsdio.com>
- <57083e0b-2853-7f5b-16ec-83bc22f237fa@linaro.org>
-From: Rebecca Cran <rebecca@bsdio.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=rebecca@bsdio.com; keydata=
- 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 DtU=
-Message-ID: <71dd9613-491f-bad3-c31e-231bf51df115@bsdio.com>
-Date: Fri, 9 Aug 2019 09:17:54 -0600
-User-Agent: Mozilla/5.0 (X11; FreeBSD amd64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hw6qc-00085X-7b
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:30:31 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39404)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hw6qc-000851-1w; Fri, 09 Aug 2019 11:30:30 -0400
+Received: by mail-ot1-x344.google.com with SMTP id r21so128131149otq.6;
+ Fri, 09 Aug 2019 08:30:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Ku8xseFYZ6gO8QVrGjY4WccKor9H1541AceJ4ihjarg=;
+ b=Dedc/AJmDXIu6IYp7H4c2kgcOEZAUt7Et3ojVYcvWiJPMORJlUDGuBdPrzZ1Is9Zzh
+ avowI8N2AlSRVB7G+hzcdmc+3stFlAIKM5jIFjcaHoPJHIMaDOyU9rFcwLt7BVNV6zLB
+ Wb+M2cKXBP9kEPoGfo9zhYInK7okvYAmYBU2IkIZJt0OzskzXQFrmQ2+AmSIUTKGkLEC
+ kEE653dQrVyecYoYpzzqEXS2s0CvkUBjHxj8likJand+3SPu+wAo0vatydF8v56ynzlF
+ lk3Gaq7BypQvsjPfGsRnA5N0qgzjekVjATcQpD/Zx4jYaOHtYeYfwO4s385Wp94w9X4V
+ Pa3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Ku8xseFYZ6gO8QVrGjY4WccKor9H1541AceJ4ihjarg=;
+ b=iBcO1cMSJGR4Dty54Trv35q9Tnp18LTuAtemJ//UVh4r0M77SJGJ8wOahCyUbn5PSk
+ q2H3iJ6P90Gw9UmGQcPLWE38AYh+IlFp9xZr6E11MYdZo+WX9JND05p70Pr489HncEN1
+ JLhgz50bE4WtDqHK3GUX9mmU6JWg6bKF8NcEFsSJyKloIADtOKqjRjaz3GO6IQb8K5jf
+ kVF+yjlMvdOFmw6bSOBu6mldsyUa82/vNpfVaeX2bzRtur6PyRiHF1njtViUBpmw22Yg
+ UemeaEzVAVbQC73ODdK160l/PRwzeaXcYxyLKBgL9sJy9Z38Ryn7e/LyJipi66V+a7tE
+ tEKA==
+X-Gm-Message-State: APjAAAVLBAaOcMtsmet42EE7sLD6ecn3KCbrSe4F+kMUZwMt2/bO6zZo
+ PBiqO7z6A14b83UdGLAqy3+CMMfYvqpGckcsdPE=
+X-Google-Smtp-Source: APXvYqyfEAZ+VCz6HidZzoL42scRoygHD+uvXitRMWr7mdPEw31GWrsD6OQ+L+e1BNUkvFXreMkhflIbyzxYak3Gmfo=
+X-Received: by 2002:a05:6830:c6:: with SMTP id
+ x6mr17188765oto.64.1565364628979; 
+ Fri, 09 Aug 2019 08:30:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <57083e0b-2853-7f5b-16ec-83bc22f237fa@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 65.103.231.193
-Subject: Re: [Qemu-devel] [PATCH] Update the avx2 configure test to be
- compatible with clang
+References: <20190726175032.6769-1-richard.henderson@linaro.org>
+ <20190726175032.6769-12-richard.henderson@linaro.org>
+ <CAL1e-=gwyGB4ibo_B5W1MpFy-9bB7=5juqTJVBdD9N6XFOOsSQ@mail.gmail.com>
+ <0f37edc5-2fb6-c92d-fb47-a381af649072@linaro.org>
+ <CAL1e-=hWVfYVYySkMCF4NUkHbe=47qUTuAA0vK23TGMBzuA+PQ@mail.gmail.com>
+ <0b6556a5-7db8-bedf-89f3-7ead8e9b19e6@linaro.org>
+In-Reply-To: <0b6556a5-7db8-bedf-89f3-7ead8e9b19e6@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Fri, 9 Aug 2019 17:30:18 +0200
+Message-ID: <CAL1e-=jsEtmWHA1aOzfRVqnh6VVYV6OMA7wAriXTd32vkFuJdA@mail.gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset="UTF-8"
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH 11/67] target/arm: Add stubs for aa32
+ decodetree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,28 +93,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:Stellaris" <qemu-arm@nongnu.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-08-08 23:22, Richard Henderson wrote:
+On Fri, Aug 9, 2019 at 4:55 PM Richard Henderson <
+richard.henderson@linaro.org> wrote:
+
+> On 8/9/19 3:31 AM, Aleksandar Markovic wrote:
+> >
+> >
+> > On Thu, Aug 8, 2019 at 5:43 PM Richard Henderson <
+> richard.henderson@linaro.org
+> > <mailto:richard.henderson@linaro.org>> wrote:
+> >
+> >     On 8/8/19 4:41 AM, Aleksandar Markovic wrote:
+> >     >     +/*
+> >     >     + * Include the generated decoders.
+> >     >     + * Note that the T32 decoder reuses some of the trans_*
+> functions
+> >     >     + * initially declared by the A32 decoder, which results in
+> duplicate
+> >     >     + * declaration warnings.  Suppress them.
+> >     >     + */
+> >     >     +
+> >     >     +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
+> >     >     +# pragma GCC diagnostic push
+> >     >     +# pragma GCC diagnostic ignored "-Wredundant-decls"
+> >     >     +# ifdef __clang__
+> >     >     +#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
+> >     >     +# endif
+> >     >     +#endif
+> >     >     +
+> >     >
+> >     >
+> >     > This looks more like a "band aid" solution rather than the right
+> one.
+> >
+> >     What would the "right" solution be, would you say?
+> >
+> >
+> > The right (without quotation marks) solution is not to generate the code
+> that
+> > generates compiler complaints.
 >
-> No, this means we're not testing what we need:
+> That would be impossible with the information supplied.
 >
-> We need to compile exactly one function using avx2.
+
+That limitation is a fault of decodetree design, not an obstacle per se.
+
+
+> Emitting zero declarations will result in invalid C.  We ensure that each
+> individual decodetree file does not emit duplicates.  However, there is no
+> knowledge across separate decodetree files about which declarations are
+> duplicate.
 >
-> The other functions should be compiled with sse4 and sse2, respectively, and we
-> choose between them by testing cpuid bits at startup.  If you supply -mavx2 to
-> the entire compilation, then the routine that is supposed to use only sse2 will
-> in fact use avx2, and then the runtime selection is moot.
+> In this particular case, I do not even agree that the warnings themselves
+> are
+> useful.  I suppose it's not impossible that they could diagnose some
+> weirdness
+> in a code base, where a function is declared in multiple headers or a patch
+> application has gone awry leaving multiple sequential declarations, but
+> honestly how often does that happen?
+>
+> I suppose with some work, we could not invoke decodetree multiple times,
+> but
+> give it all of the input files at once, producing a single output file.
+>
+>
+> > Obviously, in this case, decodetree-generated code shows that it is
+> > inferior to human-generated code.
+>
+> That is not obvious at all.  Moreover, I disagree strongly.
+>
+>
+OK. I'm fine with your disagreeing. That why open source exists - to have
+opportunities to hear different views.
+
+Yours,
+Aleksandar
 
 
-Oh, sorry, I hadn't fully realized there's runtime selection. Fixing
-this would require significant rework in that case, so I'll just build
-with GCC instead for now!
-
-
--- 
-Rebecca Cran
-
-
+> r~
+>
