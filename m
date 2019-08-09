@@ -2,66 +2,65 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E685C31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FDBC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:52:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD8592171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 72B29214C6
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:52:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="mfdzpjGL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD8592171F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pnihszFn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B29214C6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvwsD-0001q8-2O
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 00:51:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58465)
+	id 1hvwt5-0002sy-Oz
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 00:52:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58459)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hvwqP-00079M-9V
+ (envelope-from <dgibson@ozlabs.org>) id 1hvwqP-00079J-4U
  for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hvwqN-0008Qz-Ml
+ (envelope-from <dgibson@ozlabs.org>) id 1hvwqN-0008R9-NK
  for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:49:37 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:52179)
+Received: from ozlabs.org ([2401:3900:2:1::2]:33177)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hvwqM-0008PG-IP
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hvwqM-0008PH-HV
  for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:49:35 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 464XpL4q3nz9sN4; Fri,  9 Aug 2019 14:49:30 +1000 (AEST)
+ id 464XpL6R04z9sNF; Fri,  9 Aug 2019 14:49:30 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1565326170;
- bh=QJuOF95NcuCVQwqtS+jns6Ki7y7qQd7Am/qZCYwut54=;
+ bh=Dtz5KawBEAgx1Pz9ZToQAf2TCj278tu4WlSEOOUUG2U=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=mfdzpjGL23/kDhoE3slfxNhfxNDJ7nCzQizroZF+qwH/BhFlFwonc2tB8lIMBTwTT
- KPj44I3mAqBn/qrihXTWHNsk4jjPOtVIrVA+wHE0qGlOvImITzRaxYcnc+NAatUIt9
- sn2tKfzXK2Ei9YcHiWRC8Cv245xyZ/l3gCDF0V3M=
-Date: Fri, 9 Aug 2019 14:39:55 +1000
+ b=pnihszFnuR+DqpZoS29uYqbOpboeGF4HFIXw9LF4UMnY6tkqSFng5Ir/1poQ1M0xa
+ YU9/NhEH7oaKAKvjjv8L5TN2z9sN2G2zD5fDx38fb+4Llw0NgRQlsDmQnLaUCVQb0E
+ oVM17NC7loHYCOEYLSE8E+MePWkXFHodgVxo3Hdc=
+Date: Fri, 9 Aug 2019 14:45:23 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190809043955.GJ5465@umbus.fritz.box>
+To: Balamuruhan S <bala24@linux.ibm.com>
+Message-ID: <20190809044523.GL5465@umbus.fritz.box>
 References: <20190807071445.4109-1-bala24@linux.ibm.com>
- <20190807071445.4109-2-bala24@linux.ibm.com>
- <20190808104904.GD2534@redhat.com>
- <5b5eb81f-86c7-30c3-16e3-7be969e45fde@redhat.com>
+ <20190807071445.4109-5-bala24@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="EVh9lyqKgK19OcEf"
+ protocol="application/pgp-signature"; boundary="AQNmCumFClRcGgHG"
 Content-Disposition: inline
-In-Reply-To: <5b5eb81f-86c7-30c3-16e3-7be969e45fde@redhat.com>
+In-Reply-To: <20190807071445.4109-5-bala24@linux.ibm.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [RFC PATCH 1/6] utils/python_api: add scripting
- interface for Qemu with python lib
+Subject: Re: [Qemu-devel] [RFC PATCH 4/6] hw/ppc/pnv: initialize and realize
+ homer/occ common area
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,68 +72,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, maddy@linux.vnet.ibm.com,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Balamuruhan S <bala24@linux.ibm.com>,
- anju@linux.vnet.ibm.com, clg@kaod.org, hari@linux.vnet.ibm.com,
- pbonzini@redhat.com
+Cc: maddy@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, qemu-devel@nongnu.org,
+ hari@linux.vnet.ibm.com, clg@kaod.org, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---EVh9lyqKgK19OcEf
-Content-Type: text/plain; charset=iso-8859-1
+--AQNmCumFClRcGgHG
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 08, 2019 at 02:45:02PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 8/8/19 12:49 PM, Daniel P. Berrang=E9 wrote:
-> > On Wed, Aug 07, 2019 at 12:44:40PM +0530, Balamuruhan S wrote:
-> >> Adds scripting interface with python library to call functions in
-> >> python modules from Qemu that can be used to feed input externally
-> >> and without recompiling Qemu that can be used for early development,
-> >> testing and can be extended to abstract some of Qemu code out to a
-> >> python script to ease maintenance.
-> >=20
-> > I admit the use case is interesting, but this is opening a can of
-> > worms...
-> >=20
-> > Historically the project has held the view that we do not wish
-> > to have an mechanism to support loading out of tree code into the
-> > QEMU process. Much previously talk was around dlopen'd C plugins,
-> > but dynanically loaded Python plugins are doing the same thing
-> > at a conceptual level.
-> >=20
-> > We didn't wish to expose internals of QEMU in a plugin API to
-> > avoid having any kind of API promise across releases.
-> >=20
-> > There was also the question of licensing with plugins opening
-> > the door for people to extend QEMU with non-free/closed source
-> > functionality.
-> >=20
-> > While this series only uses the plugin for one fairly obscure
-> > device, once a python plugin feature is intergrated in QEMU
-> > there will inevitably be requests to use it in further areas
-> > of QEMU.
-> >=20
-> > IOW, acceptance of this patch is a significant question for
-> > the project, and a broader discussion point, than just this
-> > PPC feature patch series.
+On Wed, Aug 07, 2019 at 12:44:43PM +0530, Balamuruhan S wrote:
+> homer and occ common area region base address are initialized
+> to create device tree and realized to map the address with
+> mmio callbacks during `pnv_chip_realize()`.
 >=20
-> Since performance is not an issue, we can use a QMP-PyMMIO bridge.
-> Most of the functions required are already exposed, Damien completed the
-> missing ones in his 'FAULT INJECTION FRAMEWORK' series:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg06230.html
->=20
-> Maybe we simply need a clearer (better documented) QMP 'MMIO' API?
+> `SysBusNum` enum is introduced to set sysbus for XSCOM, ICP,
+> HOMER and OCC appropriately and chip_num to initialize and
+> retrieve base address + size contiguously on a PowerNV with
+> multichip boot.
 
-I tend to agree.  If performance is not a consideration to the point
-that we can use an embedded Python interpreter, it should also not be
-an issue to the point that we can move the processing to an entirely
-different process with a vetted protocol in between them (QMP or an
-extension thereof being the obvious choice).  That seems safer than
-embeddeding arbitrary scripting right into the MMIO paths.
+Same comments here as on the previous patch - I don't think this
+belongs in the series with the scripting extensions.
+
+>=20
+> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> ---
+>  hw/ppc/pnv.c         | 49 +++++++++++++++++++++++++++++++++++++++++++++-=
+---
+>  include/hw/ppc/pnv.h |  1 +
+>  2 files changed, 46 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index bd4531c822..f6e56e915d 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -675,6 +675,7 @@ static void pnv_init(MachineState *machine)
+>          Object *chip =3D object_new(chip_typename);
+> =20
+>          pnv->chips[i] =3D PNV_CHIP(chip);
+> +        PNV_CHIP(chip)->chip_num =3D i;
+> =20
+>          /* TODO: put all the memory in one node on chip 0 until we find a
+>           * way to specify different ranges for each chip
+> @@ -824,18 +825,20 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, E=
+rror **errp)
+>   {
+>      PnvChip *chip =3D PNV_CHIP(chip8);
+>      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(chip);
+>      const char *typename =3D pnv_chip_core_typename(chip);
+>      size_t typesize =3D object_type_get_instance_size(typename);
+>      int i, j;
+>      char *name;
+>      XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+> =20
+> +    sbd->num_mmio =3D PNV_ICP_SYSBUS;
+>      name =3D g_strdup_printf("icp-%x", chip->chip_id);
+>      memory_region_init(&chip8->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZ=
+E);
+> -    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip8->icp_mmio);
+> +    sysbus_init_mmio(sbd, &chip8->icp_mmio);
+>      g_free(name);
+> =20
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
+> +    sysbus_mmio_map(sbd, PNV_ICP_SYSBUS, PNV_ICP_BASE(chip));
+> =20
+>      /* Map the ICP registers for each thread */
+>      for (i =3D 0; i < chip->nr_cores; i++) {
+> @@ -866,7 +869,26 @@ static void pnv_chip_power8_realize(DeviceState *dev=
+, Error **errp)
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_XSCOM_SYSBUS,
+> +                                   PNV_XSCOM_BASE(chip));
+> +
+> +    /* homer */
+> +    pnv_homer_realize(chip, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_HOMER_SYSBUS,
+> +                    PNV_HOMER_BASE(chip));
+> +
+> +    /* occ common area */
+> +    pnv_occ_common_area_realize(chip, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_OCC_COMMON_AREA_SYSBUS,
+> +                    PNV_OCC_COMMON_AREA(chip));
+> =20
+>      pcc->parent_realize(dev, &local_err);
+>      if (local_err) {
+> @@ -1035,7 +1057,26 @@ static void pnv_chip_power9_realize(DeviceState *d=
+ev, Error **errp)
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV9_XSCOM_BASE(chip));
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_XSCOM_SYSBUS,
+> +                    PNV9_XSCOM_BASE(chip));
+> +
+> +    /* homer */
+> +    pnv_homer_realize(chip, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_HOMER_SYSBUS,
+> +                    PNV9_HOMER_BASE(chip));
+> +
+> +    /* occ common area */
+> +    pnv_occ_common_area_realize(chip, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_OCC_COMMON_AREA_SYSBUS,
+> +                    PNV9_OCC_COMMON_AREA(chip));
+> =20
+>      pcc->parent_realize(dev, &local_err);
+>      if (local_err) {
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 6464e32892..dea6772988 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -57,6 +57,7 @@ typedef struct PnvChip {
+> =20
+>      /*< public >*/
+>      uint32_t     chip_id;
+> +    uint32_t     chip_num;
+>      uint64_t     ram_start;
+>      uint64_t     ram_size;
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -142,25 +219,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---EVh9lyqKgK19OcEf
+--AQNmCumFClRcGgHG
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1M+RoACgkQbDjKyiDZ
-s5JGtxAA4k3eRK5MctlBW4dMo0gBS8U6czJwfE05gJjjAHtBQw4DxrxP8bjWzLGw
-1LS3FvQmezdd4DnIeOLFrWfKYUuj1cGB/5PhM9v/tSDryR4OWcL0oVUCrSBEUZiA
-mnoK+4OtybZw8mOSl9ExzzSDei/JWbyFlY3dSAnsTRDm/JHIvmLhzJxEmJOhdoQg
-bPI18kzhKgHSUfuNpV5oCrY4sh12nfFkg701w2fOStKEENL1a4X7B3aF+74FACIb
-9G+/POQPvvVvL7cMZZuSY1gyAzRffufjfr+bZcab/ADboXZsUmmaOftSewhHC0nk
-kqXVDMOl+9De5NdPEF9x2X+muQAmYFlRkMXg8yDBah6goK/wOxEkJHe8SPU5Bxut
-v4QEzeLXF1cHylUO2FCmWPUdc33UMTGoZJ0W2OuBh1RJ2a7Wv2iLflqFvT3Ayqhv
-qfWy1Kr7hblXmOAr+9wxJoabcd7hceoG4FcEuu2mLjUrKjt3MCtmE9O4L3UaM873
-vYT0/7g5zTRz4QGVsOQsyKd/tD9w7mS/l09Ivdt8lzn5McegaciXITb0HY2Q8SwU
-Dq8tIYFYashmvf/8t5Jo/kHxJ4Sbppzs21qcQRjJqYYRUqmqfE9/ueAqWSP+GrX2
-9Fj9q7C/UaRxT0yfzthrQCkbKJABa0+CDbCmNt+u/SEszFj4jc8=
-=OauQ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1M+mMACgkQbDjKyiDZ
+s5KNjhAAv1CpsYwCRhTh3WxvslQYTDhlKx/1PgOOXJsNYkfsv+Ek+zKewKo4pql9
+VTIsqYiFoXjhYreJV8TzaYSEDWT9oL4hdIyJg/sj0HSAvYU5PZfjokuuH3vee1Hc
+f4wExN+kCyx8ONnQLzkur7Iu1CQxvWogXe/Kc4qCT6JO2waZxaLwhcrrPjVS7UNc
+mp9QKQmNRelz66wbNrz+LWzT/4Uk3Qd0xescaPtRPAgpgSZE52KdTCXnJWMFuxuv
+mrjjTz63o4rkurazRqq0mjizQEY1YOzYTRmd9TbZ7sIgkoC+VCRStlmRSoFKBAV4
+nffWLGUwtygV3Kwtc49qgWhyZvkX3cHiYhQP42/k/loSpbiWKNpnFLaV4OcDZ82T
+6haIG6ig22CwAQh3jwAQBdw6HmCxJ5P5PZO2APZAUXNXhHCX54+JMjvy+RyCFOsk
+Y59v5zSfsjv2GYKEvMA6XbLPrNyy9u/luXuRRDKp9Ln1ybbHNbbWwl9Qi2FoyGiY
+yDJk1jZ1hbrmwJ+rCMXwW4N4FN2Y7pyuz51LG3oChYZvuhJYNc6Q3DgF9nB/2sKS
+hV3dVCP1ljOaYIA0iidJAvecFSHQIuT3SwRu3gfpYTpH/9guwMHPzoto8UkV5MH6
+buoVCjxxsFgfTPHrr8P8CkxPvPN4f+Ke4f7YQm/qLTUyP+YXpb0=
+=TJ3j
 -----END PGP SIGNATURE-----
 
---EVh9lyqKgK19OcEf--
+--AQNmCumFClRcGgHG--
 
