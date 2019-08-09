@@ -2,88 +2,81 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1233BC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70265C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCB652166E
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:29:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="Hw7UAQmi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB652166E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43C1821743
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:31:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43C1821743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw29W-0003eX-0f
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 06:29:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58432)
+	id 1hw2Az-0004oi-Hh
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 06:31:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58745)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hw293-00034H-0f
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:29:13 -0400
+ (envelope-from <philmd@redhat.com>) id 1hw29u-000436-IO
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:30:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hw292-00033c-1A
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:29:12 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:51732)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hw28x-00030E-7N; Fri, 09 Aug 2019 06:29:07 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 44EAE96F50;
- Fri,  9 Aug 2019 10:29:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1565346544;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hgH8+Jtmb8Flk6Bl2dKnmZkcQbQKlmxYOkiF91XUwaA=;
- b=Hw7UAQmi3c/Xh/c602SGXucij37xyGq0I9R8neKC08MMyyCzUWYy6iQmkMaY5C7v4u256G
- HOS8iryjDt6Q/42icn03tX3FmHW0LbIEKwiN1zYPKNP2/ZMVhhxW0rjiFbKcFkrR59rQEv
- CQo20cfwJXwERfaOGrcLR68zCe3ISd4=
-To: Peter Maydell <peter.maydell@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-8-damien.hedde@greensocs.com>
- <CAFEAcA-W0SaaGbUnGZ0b61ngxKY8R9xjwGXeN+=MaUi4bMDgNg@mail.gmail.com>
- <20190808154219.GK2852@work-vm>
- <CAFEAcA8L2YVMCu3Gb+eQTDfCpgVwA_WwVPrqPLV2iQ9rZ4HuTA@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <f400248f-7a3b-83e9-3355-77de359e3f43@greensocs.com>
-Date: Fri, 9 Aug 2019 12:29:02 +0200
+ (envelope-from <philmd@redhat.com>) id 1hw29n-0003YS-3i
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:30:04 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38219)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hw29l-0003WE-Dg
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:29:57 -0400
+Received: by mail-wr1-f68.google.com with SMTP id g17so97756064wrr.5
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 03:29:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=21DNx6pUP64Pip3rhPvcX5LACsjDHaNUmr2vca/URd0=;
+ b=oj1EfKQzbJhgmkan6fs0Z5RgJ4KHZCdmfC0ALorY7HbWWSne37Kyep9h1Thr8+kHS3
+ iNU4s6m3PehOZozOvgfKPbqcvCocvmTV9PzM3avvlIwMwNNwuEPyoi3H595wYqbRkcjf
+ mKj8Am75h4dEBhGIZ59UzUlicUJkjCKXUQkgkz2qL7WAbUSUTDFzwzpKYrQwAziyXCbm
+ arOAFghIU3NK5vl2bwPuPaxZVbHU4AWLru2gHjCjLFSkGnawWW2Wf3kXI8gJjUglidxS
+ c+ir1LNWpRmuuA2kr5DGbYOllwuLmGaRmPSJdSAvvIhvp0paWAg+52BnmS4fZXYtsfNg
+ HAfg==
+X-Gm-Message-State: APjAAAVSVTuAU1t8y7GYsLE17j/11/kKwG4FtjjDBoJqFpq0Ci5AQut9
+ 7G5yBbMBS7IL65blDY5gKH1IXw==
+X-Google-Smtp-Source: APXvYqwhLk6AmeExnzqjqVTpPQiqa77zrF1GO1CkCXbJQMXMl0HuG0Pye5o+5NHYW2nDYzAMZFJaBw==
+X-Received: by 2002:adf:fbce:: with SMTP id d14mr1756529wrs.65.1565346595651; 
+ Fri, 09 Aug 2019 03:29:55 -0700 (PDT)
+Received: from [192.168.50.36] (243.red-88-26-246.staticip.rima-tde.net.
+ [88.26.246.243])
+ by smtp.gmail.com with ESMTPSA id p7sm69304227wrs.6.2019.08.09.03.29.54
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 09 Aug 2019 03:29:55 -0700 (PDT)
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20190809064645.22656-1-armbru@redhat.com>
+ <20190809064645.22656-21-armbru@redhat.com>
+ <c76aaebc-d4bf-cb25-fe27-7a9c9ba644c9@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <7f824b69-d506-e6ad-8fa9-3d3c232db02c@redhat.com>
+Date: Fri, 9 Aug 2019 12:29:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8L2YVMCu3Gb+eQTDfCpgVwA_WwVPrqPLV2iQ9rZ4HuTA@mail.gmail.com>
+In-Reply-To: <c76aaebc-d4bf-cb25-fe27-7a9c9ba644c9@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1565346544;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hgH8+Jtmb8Flk6Bl2dKnmZkcQbQKlmxYOkiF91XUwaA=;
- b=EVsGV7ketZz3CBHQJ2PdJUiirtxLhK6uVQtUQc5XVN5VSJAo63LigQqa1+DEMHDuUs/7Uy
- NwcNVzqhLSG4Nhqai2Hp3e6q7myvKs+EmklfWD1UKsJu1Zlu+wXYoJNyMLNxmSU8PSyrAD
- J/Km6RTi+yqCkvrN00cK6eEO9X2zfM0=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1565346544; a=rsa-sha256; cv=none;
- b=toQRxkOobF7nRY1Gh5DESWmF5PogFrAKijyEdi7QxAUAimMch9pm7r+CPK3H4D/5yMJop+
- 3oqEzMD8hespC9DhxDjEzcsPdHnkVwbZCNIrtt87ymkQhCt0s34hdNg2u7L0n8tR+TFO/N
- eLb57aPTPKPhImHqelFH6n8QESueU9g=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH v3 07/33] automatically add vmstate for
- reset support in devices
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH v3 20/29] Include qemu/main-loop.h less
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,76 +88,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 8/9/19 12:07 PM, Peter Maydell wrote:
-> On Thu, 8 Aug 2019 at 16:42, Dr. David Alan Gilbert <dgilbert@redhat.com> wrote:
->>
->> * Peter Maydell (peter.maydell@linaro.org) wrote:
->>> On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>>>
->>>> This add the reset related sections for every QOM
->>>> device.
->>>
->>> A bit more detail in the commit message would help, I think --
->>> this is adding extra machinery which has to copy and modify
->>> the VMStateDescription passed in by the device in order to
->>> add the subsection that handles reset.
->>>
->>> I've added Dave Gilbert to the already long cc list since this
->>> is migration related.
->>
->> I don't like dynamically modifying all the vmsds.
+On 8/9/19 11:42 AM, Philippe Mathieu-Daudé wrote:
+[...]
+> netmap failing again :S
 > 
-> Yeah, I'm not a huge fan of it either, but it does mean that
-> the state gets migrated and we don't have a pile of really
-> easy to miss bugs where we forgot to say "this device needs to
-> migrate the reset state" and it means we don't have every
-> device we ever write in the future needing to say "this device
-> needs to migrate reset state"...
-> 
->> Aren't you going to have to understand each devices reset behaviour
->> and make sure it does something sane? e.g. it might have a postload
->> that registers a timer or something that you wouldn't want to do if it's
->> in reset.
->>
->> The easiest way is to write a macro that you can easily add to devices
->> you've checked subsection list (like the way we have a
->> VMSTATE_USB_DEVICE).
-> 
-> One problem is that as soon as somebody writes a USB controller
-> or PCI controller model that can be held in reset, every
-> device that could sat behind it automatically now could find
-> that it's migrated while it's in reset.
-> 
+> $ make docker-image-debian-amd64 V=1 DEBUG=1
+> [...]
+>   CC      net/netmap.o
+> net/netmap.c: In function 'netmap_update_fd_handler':
+> net/netmap.c:109:5: error: implicit declaration of function
+> 'qemu_set_fd_handler' [-Werror=implicit-function-declaration]
+>      qemu_set_fd_handler(s->nmd->fd,
+>      ^~~~~~~~~~~~~~~~~~~
+> net/netmap.c:109:5: error: nested extern declaration of
+> 'qemu_set_fd_handler' [-Werror=nested-externs]
 
-One way to keep the feature without copy-pasting vmsd would be to add
-a new vmstate_register with an additional argument to pass the base
-class vmsd section and handle the whole thing there.
+Since it might not be obvious to see how helpful/powerful is Docker, I
+gathered few notes (already posted once) about how I use it (often
+bisecting).
 
---
-Damien
+# Automatically create a base image (the image is then cached)
+$ make docker-image-debian-s390x-cross
+
+# Create a out-of-tree build directory
+$ mkdir build/docker_s390x
+
+# Run ./configure
+#
+# --rm  : Use a temp copy of the base image (do not modify it)
+# -v ...: Mount the current directory within the container
+# -w ...: Start the shell in the out-of-tree directory
+# -u ...: Use same UID as my user so I can remove the files after
+# $QEMU_CONFIGURE_OPTS contains the cross-compile options
+#
+$ docker run --rm \
+  -v $PWD:$PWD \
+  -w $PWD/build/docker_s390x \
+  -u $UID \
+  qemu:debian-s390x-cross \
+    \
+    sh -c "../../configure \$QEMU_CONFIGURE_OPTS"
+
+I use 'sh -c' to escape $QEMU_CONFIGURE_OPTS, there might be a cleaner
+way to do this.
+
+# Stupid step to speed up bisection
+# This will:
+# - clone submodules if necessary
+# - build slirp
+# - build fdt
+# - build capstone
+# - generated bunch of headers
+# - generated bunch of trace files
+$ docker run --rm \
+  -v $PWD:$PWD \
+  -w $PWD/build/docker_s390x \
+  -u $UID \
+  qemu:debian-s390x-cross \
+    \
+    make stubs/qtest.o
+
+Now the directory is ready for building/bisecting.
+
+I.e. build a single file:
+
+$ docker run --rm \
+  -v $PWD:$PWD \
+  -w $PWD/build/docker_s390x \
+  -u $UID \
+  qemu:debian-s390x-cross \
+    \
+    make -C s390x-softmmu hw/intc/s390_flic_kvm.o
+
+make: Entering directory 'build/docker_s390x/s390x-softmmu'
+  CC      hw/intc/s390_flic_kvm.o
+hw/intc/s390_flic_kvm.c: In function 'kvm_flic_save':
+hw/intc/s390_flic_kvm.c:395:9: error: implicit declaration of function
+'qemu_put_be64' [-Werror=implicit-function-declaration]
+         qemu_put_be64(f, FLIC_FAILED);
+         ^~~~~~~~~~~~~
+hw/intc/s390_flic_kvm.c:395:9: error: nested extern declaration of
+'qemu_put_be64' [-Werror=nested-externs]
+hw/intc/s390_flic_kvm.c:410:9: error: implicit declaration of function
+'qemu_put_buffer' [-Werror=implicit-function-declaration]
+         qemu_put_buffer(f, (uint8_t *) buf,
+         ^~~~~~~~~~~~~~~
+hw/intc/s390_flic_kvm.c:410:9: error: nested extern declaration of
+'qemu_put_buffer' [-Werror=nested-externs]
+hw/intc/s390_flic_kvm.c: In function 'kvm_flic_load':
+hw/intc/s390_flic_kvm.c:438:13: error: implicit declaration of function
+'qemu_get_be64' [-Werror=implicit-function-declaration]
+     count = qemu_get_be64(f);
+             ^~~~~~~~~~~~~
+hw/intc/s390_flic_kvm.c:438:5: error: nested extern declaration of
+'qemu_get_be64' [-Werror=nested-externs]
+     count = qemu_get_be64(f);
+     ^~~~~
+hw/intc/s390_flic_kvm.c:454:9: error: implicit declaration of function
+'qemu_get_buffer' [-Werror=implicit-function-declaration]
+     if (qemu_get_buffer(f, (uint8_t *) buf, len) != len) {
+         ^~~~~~~~~~~~~~~
+hw/intc/s390_flic_kvm.c:454:5: error: nested extern declaration of
+'qemu_get_buffer' [-Werror=nested-externs]
+     if (qemu_get_buffer(f, (uint8_t *) buf, len) != len) {
+     ^~
+cc1: all warnings being treated as errors
+rules.mak:69: recipe for target 'hw/intc/s390_flic_kvm.o' failed
+make: *** [hw/intc/s390_flic_kvm.o] Error 1
+make: Leaving directory 'build/docker_s390x/s390x-softmmu'
+
+Hope that help!
+
+Regards,
+
+Phil.
 
