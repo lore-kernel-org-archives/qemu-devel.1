@@ -2,65 +2,66 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FDBC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D6B1C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:53:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72B29214C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:52:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="pnihszFn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72B29214C6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id E571C214C6
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:53:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E571C214C6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvwt5-0002sy-Oz
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 00:52:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58459)
+	id 1hvwu8-0004P6-7e
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 00:53:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58794)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hvwqP-00079J-4U
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:49:38 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hvwt7-0003CQ-VL
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hvwqN-0008R9-NK
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:49:37 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:33177)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hvwqM-0008PH-HV
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:49:35 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 464XpL6R04z9sNF; Fri,  9 Aug 2019 14:49:30 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1565326170;
- bh=Dtz5KawBEAgx1Pz9ZToQAf2TCj278tu4WlSEOOUUG2U=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pnihszFnuR+DqpZoS29uYqbOpboeGF4HFIXw9LF4UMnY6tkqSFng5Ir/1poQ1M0xa
- YU9/NhEH7oaKAKvjjv8L5TN2z9sN2G2zD5fDx38fb+4Llw0NgRQlsDmQnLaUCVQb0E
- oVM17NC7loHYCOEYLSE8E+MePWkXFHodgVxo3Hdc=
-Date: Fri, 9 Aug 2019 14:45:23 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Balamuruhan S <bala24@linux.ibm.com>
-Message-ID: <20190809044523.GL5465@umbus.fritz.box>
-References: <20190807071445.4109-1-bala24@linux.ibm.com>
- <20190807071445.4109-5-bala24@linux.ibm.com>
+ (envelope-from <no-reply@patchew.org>) id 1hvwt6-0002IA-MB
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:52:25 -0400
+Resent-Date: Fri, 09 Aug 2019 00:52:25 -0400
+Resent-Message-Id: <E1hvwt6-0002IA-MB@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21897)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hvwt6-0002H2-Ec; Fri, 09 Aug 2019 00:52:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565326336; cv=none; d=zoho.com; s=zohoarc; 
+ b=E87/PysUjd4KlHtRnqXcmGwd+lG0gGH+exfGxyicFtdI0aEazVvFfgs3e6pMA9fnMsMLoEBnJ6dYZ/lp/NenMMtbqbXeCZFoubJZrJxqOIrczOIibU/9tEQVbPglY9uORBYZyerE0+qbGidItdG6dMBATxnyEwdo6XG9pxjomrk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565326336;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=cyCaOyeYAAKyIiohxyN4foswcRbCGOq0h57FAmazftw=; 
+ b=Hdz6hDizK4nbv92QRKEqw0qLSoMMBFMySwQ8Z9ayzN8Vh1J8IUa1I3JV98JAJWEwT2wyDQcZljlqJrGOn+MmD0WGe5bm+emobJqxFoPNwIE9Ge/UOSs0XLKiqokolxm3Ah03uZGqCiUp/MbJh643qGACv4Ban+wEaE1Oiwccbs4=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565326334093260.07771065423503;
+ Thu, 8 Aug 2019 21:52:14 -0700 (PDT)
+In-Reply-To: <20190809041952.57302-1-rebecca@bsdio.com>
+Message-ID: <156532633286.12874.928655968593675018@b08f24806b7e>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="AQNmCumFClRcGgHG"
-Content-Disposition: inline
-In-Reply-To: <20190807071445.4109-5-bala24@linux.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [RFC PATCH 4/6] hw/ppc/pnv: initialize and realize
- homer/occ common area
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: rebecca@bsdio.com
+Date: Thu, 8 Aug 2019 21:52:14 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH] Update the avx2 configure test to be
+ compatible with clang
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,172 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: maddy@linux.vnet.ibm.com, anju@linux.vnet.ibm.com, qemu-devel@nongnu.org,
- hari@linux.vnet.ibm.com, clg@kaod.org, pbonzini@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, rebecca@bsdio.com, mjt@tls.msk.ru,
+ qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwOTA0MTk1Mi41NzMw
+Mi0xLXJlYmVjY2FAYnNkaW8uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
+biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
+b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
+Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2Ug
+ZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdXRpbC9xZW11LXNv
+Y2tldHMubwogIENDICAgICAgdXRpbC91cmkubwogIENDICAgICAgdXRpbC9ub3RpZnkubwovdG1w
+L3FlbXUtdGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzo3MToxMzogZXJyb3I6IHVua25vd24g
+cHJhZ21hIGlnbm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEgR0NDIHB1
+c2hfb3B0aW9ucwogICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy91dGlsL2J1ZmZlcmlz
+emVyby5jOjcyOjEzOiBlcnJvcjogdW5rbm93biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vu
+a25vd24tcHJhZ21hc10KI3ByYWdtYSBHQ0MgdGFyZ2V0KCJzc2UyIikKICAgICAgICAgICAgXgov
+dG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzoxMDg6MTM6IGVycm9yOiB1bmtu
+b3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93bi1wcmFnbWFzXQojcHJhZ21hIEdD
+QyBwb3Bfb3B0aW9ucwogICAgICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy91dGlsL2J1ZmZl
+cmlzemVyby5jOjExNjoxMzogZXJyb3I6IHVua25vd24gcHJhZ21hIGlnbm9yZWQgWy1XZXJyb3Is
+LVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEgR0NDIHB1c2hfb3B0aW9ucwogICAgICAgICAgICBe
+Ci90bXAvcWVtdS10ZXN0L3NyYy91dGlsL2J1ZmZlcmlzemVyby5jOjExNzoxMzogZXJyb3I6IHVu
+a25vd24gcHJhZ21hIGlnbm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEg
+R0NDIHRhcmdldCgic3NlNCIpCiAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwv
+YnVmZmVyaXN6ZXJvLmM6MTQ4OjEzOiBlcnJvcjogdW5rbm93biBwcmFnbWEgaWdub3JlZCBbLVdl
+cnJvciwtV3Vua25vd24tcHJhZ21hc10KI3ByYWdtYSBHQ0MgcG9wX29wdGlvbnMKICAgICAgICAg
+ICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzoxNDk6MTM6IGVycm9y
+OiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93bi1wcmFnbWFzXQojcHJh
+Z21hIEdDQyBwdXNoX29wdGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdXRp
+bC9idWZmZXJpc3plcm8uYzoxNTA6MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFst
+V2Vycm9yLC1XdW5rbm93bi1wcmFnbWFzXQojcHJhZ21hIEdDQyB0YXJnZXQoImF2eDIiKQogICAg
+ICAgICAgICBeCi90bXAvcWVtdS10ZXN0L3NyYy91dGlsL2J1ZmZlcmlzemVyby5jOjE4NzoxMzog
+ZXJyb3I6IHVua25vd24gcHJhZ21hIGlnbm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNd
+CiNwcmFnbWEgR0NDIHBvcF9vcHRpb25zCiAgICAgICAgICAgIF4KOSBlcnJvcnMgZ2VuZXJhdGVk
+LgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3Mv
+MjAxOTA4MDkwNDE5NTIuNTczMDItMS1yZWJlY2NhQGJzZGlvLmNvbS90ZXN0aW5nLmFzYW4vP3R5
+cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
 
---AQNmCumFClRcGgHG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Aug 07, 2019 at 12:44:43PM +0530, Balamuruhan S wrote:
-> homer and occ common area region base address are initialized
-> to create device tree and realized to map the address with
-> mmio callbacks during `pnv_chip_realize()`.
->=20
-> `SysBusNum` enum is introduced to set sysbus for XSCOM, ICP,
-> HOMER and OCC appropriately and chip_num to initialize and
-> retrieve base address + size contiguously on a PowerNV with
-> multichip boot.
-
-Same comments here as on the previous patch - I don't think this
-belongs in the series with the scripting extensions.
-
->=20
-> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
-> ---
->  hw/ppc/pnv.c         | 49 +++++++++++++++++++++++++++++++++++++++++++++-=
----
->  include/hw/ppc/pnv.h |  1 +
->  2 files changed, 46 insertions(+), 4 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index bd4531c822..f6e56e915d 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -675,6 +675,7 @@ static void pnv_init(MachineState *machine)
->          Object *chip =3D object_new(chip_typename);
-> =20
->          pnv->chips[i] =3D PNV_CHIP(chip);
-> +        PNV_CHIP(chip)->chip_num =3D i;
-> =20
->          /* TODO: put all the memory in one node on chip 0 until we find a
->           * way to specify different ranges for each chip
-> @@ -824,18 +825,20 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, E=
-rror **errp)
->   {
->      PnvChip *chip =3D PNV_CHIP(chip8);
->      PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> +    SysBusDevice *sbd =3D SYS_BUS_DEVICE(chip);
->      const char *typename =3D pnv_chip_core_typename(chip);
->      size_t typesize =3D object_type_get_instance_size(typename);
->      int i, j;
->      char *name;
->      XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-> =20
-> +    sbd->num_mmio =3D PNV_ICP_SYSBUS;
->      name =3D g_strdup_printf("icp-%x", chip->chip_id);
->      memory_region_init(&chip8->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZ=
-E);
-> -    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip8->icp_mmio);
-> +    sysbus_init_mmio(sbd, &chip8->icp_mmio);
->      g_free(name);
-> =20
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
-> +    sysbus_mmio_map(sbd, PNV_ICP_SYSBUS, PNV_ICP_BASE(chip));
-> =20
->      /* Map the ICP registers for each thread */
->      for (i =3D 0; i < chip->nr_cores; i++) {
-> @@ -866,7 +869,26 @@ static void pnv_chip_power8_realize(DeviceState *dev=
-, Error **errp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_XSCOM_SYSBUS,
-> +                                   PNV_XSCOM_BASE(chip));
-> +
-> +    /* homer */
-> +    pnv_homer_realize(chip, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_HOMER_SYSBUS,
-> +                    PNV_HOMER_BASE(chip));
-> +
-> +    /* occ common area */
-> +    pnv_occ_common_area_realize(chip, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_OCC_COMMON_AREA_SYSBUS,
-> +                    PNV_OCC_COMMON_AREA(chip));
-> =20
->      pcc->parent_realize(dev, &local_err);
->      if (local_err) {
-> @@ -1035,7 +1057,26 @@ static void pnv_chip_power9_realize(DeviceState *d=
-ev, Error **errp)
->          error_propagate(errp, local_err);
->          return;
->      }
-> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV9_XSCOM_BASE(chip));
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_XSCOM_SYSBUS,
-> +                    PNV9_XSCOM_BASE(chip));
-> +
-> +    /* homer */
-> +    pnv_homer_realize(chip, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_HOMER_SYSBUS,
-> +                    PNV9_HOMER_BASE(chip));
-> +
-> +    /* occ common area */
-> +    pnv_occ_common_area_realize(chip, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), PNV_OCC_COMMON_AREA_SYSBUS,
-> +                    PNV9_OCC_COMMON_AREA(chip));
-> =20
->      pcc->parent_realize(dev, &local_err);
->      if (local_err) {
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 6464e32892..dea6772988 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -57,6 +57,7 @@ typedef struct PnvChip {
-> =20
->      /*< public >*/
->      uint32_t     chip_id;
-> +    uint32_t     chip_num;
->      uint64_t     ram_start;
->      uint64_t     ram_size;
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---AQNmCumFClRcGgHG
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1M+mMACgkQbDjKyiDZ
-s5KNjhAAv1CpsYwCRhTh3WxvslQYTDhlKx/1PgOOXJsNYkfsv+Ek+zKewKo4pql9
-VTIsqYiFoXjhYreJV8TzaYSEDWT9oL4hdIyJg/sj0HSAvYU5PZfjokuuH3vee1Hc
-f4wExN+kCyx8ONnQLzkur7Iu1CQxvWogXe/Kc4qCT6JO2waZxaLwhcrrPjVS7UNc
-mp9QKQmNRelz66wbNrz+LWzT/4Uk3Qd0xescaPtRPAgpgSZE52KdTCXnJWMFuxuv
-mrjjTz63o4rkurazRqq0mjizQEY1YOzYTRmd9TbZ7sIgkoC+VCRStlmRSoFKBAV4
-nffWLGUwtygV3Kwtc49qgWhyZvkX3cHiYhQP42/k/loSpbiWKNpnFLaV4OcDZ82T
-6haIG6ig22CwAQh3jwAQBdw6HmCxJ5P5PZO2APZAUXNXhHCX54+JMjvy+RyCFOsk
-Y59v5zSfsjv2GYKEvMA6XbLPrNyy9u/luXuRRDKp9Ln1ybbHNbbWwl9Qi2FoyGiY
-yDJk1jZ1hbrmwJ+rCMXwW4N4FN2Y7pyuz51LG3oChYZvuhJYNc6Q3DgF9nB/2sKS
-hV3dVCP1ljOaYIA0iidJAvecFSHQIuT3SwRu3gfpYTpH/9guwMHPzoto8UkV5MH6
-buoVCjxxsFgfTPHrr8P8CkxPvPN4f+Ke4f7YQm/qLTUyP+YXpb0=
-=TJ3j
------END PGP SIGNATURE-----
-
---AQNmCumFClRcGgHG--
 
