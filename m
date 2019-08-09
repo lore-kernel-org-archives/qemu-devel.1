@@ -2,88 +2,85 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0299C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D74C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:48:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B76E2171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:46:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCE1D2171F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:48:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="td9RMTXP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B76E2171F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="bhbsPiBO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE1D2171F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw1U4-000407-HO
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 05:46:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52513)
+	id 1hw1VL-0005ce-7C
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 05:48:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52744)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hw1Td-0003aH-H3
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:46:26 -0400
+ (envelope-from <damien.hedde@greensocs.com>) id 1hw1Un-0004ZB-7t
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:47:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hw1Tc-0001wR-IW
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:46:25 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54956)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hw1Tc-0001w1-Br
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:46:24 -0400
-Received: by mail-wm1-x342.google.com with SMTP id p74so5052039wme.4
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 02:46:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=0/LzhshBg+Gd0OI+uQ1Z5T8gXCVGKmZJGXugHby8sRc=;
- b=td9RMTXPudr6Tiixn/Lg4h9l1XQqMF5C59f4ekRCECiOMY8VwfWZQoT68k550QdGr8
- hOtBmVsjbQ80b513IrkMkbtW4k+Dwd2z9JF70u9U7TCnv+LggdpMhJY8N9H7paheHsk1
- 8pWaEVKRRJktmT3e8jB5xDiGQn7CyK/9FZIQQRt3BPrzu30iQHkuTdNqlAZYyNGYNhZ8
- AW5AwsyUz6lx3QZHNdDJCGGvMx7DLR/hCVu3NEGOmK4RzoGXiRL30GndvTCO1W1DvD22
- A+1gYuj1i+VlU61du8FXXFHjJ2Yw7nNc4klPzeVYfFNWqFwVYqRS1KtNETeWwGYVvAND
- Wkvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=0/LzhshBg+Gd0OI+uQ1Z5T8gXCVGKmZJGXugHby8sRc=;
- b=adNpcidYrHrWEZZVt62+KtgEFYLrBso8i9L+So6BG/g/LR4kGS6wvRHK6hOVYP+HkP
- ZIekNs/nTn9jma+Y/OrWivSSDB+tRYh2YU69Iei7KgfNy0iYVvSEDK8aJR2blpl+p5n/
- CpgtyHVDnjLo+qzC13oNukLWlIRbmgEnU/LAMOLgfrXbZj7OeRqsR+1tXxEwtDLEncN5
- qAremqW+MQfupvwaNPdZ+e0UwGQPRkjg7wBSk2Q0We9U3/jPxsqs0mCyUayxdgFYxuzM
- Vp1VfCnZh0W6zaYx0gbw6pg3XnikRd6Y2n2osFqTVZIKNPaexo1xi+d3o2kLhcdJIJNh
- 7PJA==
-X-Gm-Message-State: APjAAAV8MU2kMpvmKIY8maHft74al7jDkwVzy2tG/hlS9Uli3G1KOtjQ
- XdUvIDNb+zsoqccwHhQX/yA=
-X-Google-Smtp-Source: APXvYqw8wrGMg+nOqym6zaqYfA6WdTq3Hso99RIWYkdlNdVz+0RAH6Qlu2OzMee51o3pojQljNuQdg==
-X-Received: by 2002:a1c:f913:: with SMTP id x19mr9802596wmh.139.1565343983192; 
- Fri, 09 Aug 2019 02:46:23 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id d17sm5273637wrm.52.2019.08.09.02.46.22
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 02:46:22 -0700 (PDT)
-Date: Fri, 9 Aug 2019 10:46:21 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190809094621.GM25286@stefanha-x1.localdomain>
-References: <20190805071038.32146-1-alxndr@bu.edu>
- <20190805071038.32146-15-alxndr@bu.edu>
+ (envelope-from <damien.hedde@greensocs.com>) id 1hw1Um-0002Kp-8d
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:47:37 -0400
+Received: from beetle.greensocs.com ([5.135.226.135]:50342)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1hw1Ue-0002Fp-OD; Fri, 09 Aug 2019 05:47:29 -0400
+Received: from [172.16.11.117] (unknown [172.16.11.117])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 84A1996F50;
+ Fri,  9 Aug 2019 09:47:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1565344044;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=t9M1Nz6sxUlKbZ1HX+3au/ichE/NEuolDV2QNeNMOGI=;
+ b=bhbsPiBOb5JJx67zFgJcpUPc7IpmkDXLLVHtEf3X2mFvaFcMnrpj9kd70dDTGLYI5n8Mfs
+ eHHDtauS68u4r0oMFZ9BHpP/VXQ3Gx15FmXBBy7Re7m2/btNQd2/YPa7VXt1smvI0+nuKP
+ 1KaE79OdSGsixzJQxhcBXCHa+IM8g5w=
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-13-damien.hedde@greensocs.com>
+ <CAFEAcA95fPLh=KgYFgtCxrXR5Vm89-=2fPq-psYYiiJ84j4qvQ@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <6ae5b161-46b4-9587-773b-62485b4b32d1@greensocs.com>
+Date: Fri, 9 Aug 2019 11:47:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="YIwHDYD8sUXtBKvt"
-Content-Disposition: inline
-In-Reply-To: <20190805071038.32146-15-alxndr@bu.edu>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [RFC PATCH v2 14/17] fuzz: Add forking support to
- the fuzzer
+In-Reply-To: <CAFEAcA95fPLh=KgYFgtCxrXR5Vm89-=2fPq-psYYiiJ84j4qvQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1565344044;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=t9M1Nz6sxUlKbZ1HX+3au/ichE/NEuolDV2QNeNMOGI=;
+ b=LPnbzZ5kXxChttQ540gN9i/wfcIucjUXhsBAji+Qzsgm0qkXn9BcMJGGYTQ3MKVj83ZL25
+ jrYy6ZJ1ohkPWnpQRlqZjApTmIJCw/i0bpc5UlS7s7IHxUbEdd13yUEdOO+XKruB7skhxG
+ rO8HOiTq3UJWl/MDENxp9T3MytdPdtw=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1565344044; a=rsa-sha256; cv=none;
+ b=TXC5ixYIOu5VjsIyqvXroq70LAYWLs3HG6/Tz9oJu7S7PUPsC3EtZggJiqZDe5yY0ewX+i
+ vgs+LAPkQwDjAcrww/rrXWIhiUQP4iA5X3VTKoMgXulg+CUVLdHMere/oMvfAWK3yG/dt0
+ p2vStFJ/vJFlOj0IXUGxw5bBKUExRsE=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 5.135.226.135
+Subject: Re: [Qemu-devel] [PATCH v3 12/33] hw/pci/: remove
+ qdev/qbus_reset_all call
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,53 +92,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
+ Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---YIwHDYD8sUXtBKvt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-On Mon, Aug 05, 2019 at 07:11:15AM +0000, Oleinik, Alexander wrote:
-> +void *counter_shm;
-> +size_t feature_shm_len;
-> +uintptr_t feature_shm;
-> +size_t offset;
-> +
-> +typedef struct CoverageRegion {
-> +    uint8_t *start;
-> +    size_t length;
-> +    bool store; /* Set this if it needs to be copied to the forked process */
-> +} CoverageRegion;
-> +
-> +CoverageRegion regions[10];
-> +int region_index;
-> +
+On 8/7/19 5:31 PM, Peter Maydell wrote:
+> On Mon, 29 Jul 2019 at 15:59, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>> Replace deprecated qdev/bus_reset_all by device/bus_reset_warm.
+>>
+>> This does not impact the behavior.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> 
+> I'll come back to patches 12-28 later. They're all ok
+> in principle, we just need to check that in each individual
+> case:
+>  * we've made the right choice of cold vs warm reset
+>  * we're ok to switch to 'reset including children' from
+>    the legacy 'reset not including children' semantics
 
-The global variable names in this file are likely to cause naming
-collisions.  Do they need to be global?  If yes, please prefix with
-"fuzz_".
+I'm working on a patch reroll to fix what's been reviewed so far. Should
+I put aside the patches 12-28 for now ? They could be part of 1 or 2
+separate following series or I can re-add them later on when we agree on
+the api.
 
---YIwHDYD8sUXtBKvt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1NQOwACgkQnKSrs4Gr
-c8gvhwf+IZFZu1y08AmOJo4SXjRCd98FTE1ztmpps1xUnkgl3iw+cFt9qE0Ksi8F
-7X0Znz7hXxmmqwNwdyEDK+IVZo7Vv5Ztiievv/7gp122GoXvqFvMwIj6wJSR3MbC
-HiIENTcOI/t6JO7m9Ldzft0f4R6oR4SNkoBTTcCOiwklujo+bc76W1QiNrE0I3pR
-ZWWU+Tq0uyzgXH0j4rWfFHsCYUa8IIhtzWV7XFrbJRUgu+/I65z0cMYmnTci3Cb7
-++ABsEOPrCJHAR1pQNRXhO6J8qRYYOm1MBlx4bCAoJwlQS/eMlPUmpO+u9+LNmmF
-1mTo4BdNYvA0D/aZpdDoEQ5lOOhCuA==
-=NBBu
------END PGP SIGNATURE-----
-
---YIwHDYD8sUXtBKvt--
+--
+Damien
 
