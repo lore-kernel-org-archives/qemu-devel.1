@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEBEC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B65F6C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3087E2086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:54:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3087E2086A
+	by mail.kernel.org (Postfix) with ESMTPS id 8E13F2086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:55:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E13F2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw8AA-0003pE-9Y
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:54:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35718)
+	id 1hw8B7-0004sv-SB
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:55:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35847)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hw89i-0003Kc-0h
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:54:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hw8Ag-0004OJ-OH
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hw89h-00067X-4r
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:54:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45458)
+ (envelope-from <mreitz@redhat.com>) id 1hw8Af-0006er-Og
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:55:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37888)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hw89f-00066E-2I; Fri, 09 Aug 2019 12:54:15 -0400
+ id 1hw8Ad-0006dL-ON; Fri, 09 Aug 2019 12:55:15 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 596E8C08E2B3;
- Fri,  9 Aug 2019 16:54:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EDFE4308FEC1;
+ Fri,  9 Aug 2019 16:55:14 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C99C60872;
- Fri,  9 Aug 2019 16:54:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8623E60600;
+ Fri,  9 Aug 2019 16:55:10 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190809153207.49288-1-vsementsov@virtuozzo.com>
- <20190809153207.49288-4-vsementsov@virtuozzo.com>
+ <20190809153207.49288-5-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,21 +71,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3a00c722-b075-a098-101b-50d1669bb6af@redhat.com>
-Date: Fri, 9 Aug 2019 18:54:05 +0200
+Message-ID: <e1ce8b5b-d443-36a7-d979-cce9b440e69c@redhat.com>
+Date: Fri, 9 Aug 2019 18:55:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190809153207.49288-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190809153207.49288-5-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="scp06loMc064cRTrKV2V4bXgcXp5AExjZ"
+ boundary="wfbDmbWUYoZjuN2PN5mivkV7DxrTMWnW5"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Fri, 09 Aug 2019 16:54:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Fri, 09 Aug 2019 16:55:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/io: handle alignment and
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] block/backup: drop handling of
  max_transfer for copy_range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,55 +105,56 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---scp06loMc064cRTrKV2V4bXgcXp5AExjZ
-Content-Type: multipart/mixed; boundary="Fd6X4SkvWBETbivxk2ywU61yqgHACrRpD";
+--wfbDmbWUYoZjuN2PN5mivkV7DxrTMWnW5
+Content-Type: multipart/mixed; boundary="7stLnomdFLKOOsD6wJ7oTcdyamFbkiTSB";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
  stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
-Message-ID: <3a00c722-b075-a098-101b-50d1669bb6af@redhat.com>
-Subject: Re: [PATCH v2 3/7] block/io: handle alignment and max_transfer for
+Message-ID: <e1ce8b5b-d443-36a7-d979-cce9b440e69c@redhat.com>
+Subject: Re: [PATCH v2 4/7] block/backup: drop handling of max_transfer for
  copy_range
 References: <20190809153207.49288-1-vsementsov@virtuozzo.com>
- <20190809153207.49288-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190809153207.49288-4-vsementsov@virtuozzo.com>
+ <20190809153207.49288-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20190809153207.49288-5-vsementsov@virtuozzo.com>
 
---Fd6X4SkvWBETbivxk2ywU61yqgHACrRpD
+--7stLnomdFLKOOsD6wJ7oTcdyamFbkiTSB
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 09.08.19 17:32, Vladimir Sementsov-Ogievskiy wrote:
-> copy_range ignores these limitations, let's improve it.
+> Since previous commit, copy_range supports max_transfer, so we don't
+> need to handle it by hand.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/io.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 40 insertions(+), 8 deletions(-)
+>  block/backup.c | 11 ++---------
+>  1 file changed, 2 insertions(+), 9 deletions(-)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---Fd6X4SkvWBETbivxk2ywU61yqgHACrRpD--
+--7stLnomdFLKOOsD6wJ7oTcdyamFbkiTSB--
 
---scp06loMc064cRTrKV2V4bXgcXp5AExjZ
+--wfbDmbWUYoZjuN2PN5mivkV7DxrTMWnW5
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1NpS0ACgkQ9AfbAGHV
-z0DEGggAwWuiaCgppk/vSnHybIrmgiX9U4RG67QixVS3YBHdlR15F392UwJpMxqW
-JQr7jg2HF47s85lXiA4elLK24IbDXEFukmd5TyUUPIbyPtYue83Ah7zu1M8Ljz4y
-N4JWy8ByP4Uj+J6ydtJX29qGtFKU9zYCQyl5soxmyaEb8VSVHx7gdvUgZ3T3iq0p
-pX19PhWIacDP4vau7KAVyBVtJ1Da8Vz6E3p4zgvoNXy/MOdEAHnQmJHueH7tucyI
-xRxp1xLqWHUv1yLcPM5ody1nV6FQXVhWVorHOAGJ38zIGD84Fl7c+skVsogvGb6o
-sHd6Ctx14JbDMUw86wJ+7AQ+BbHijw==
-=rtjm
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1NpWwACgkQ9AfbAGHV
+z0A/AwgAmQutcNWoip9swNCohuE8UiGmZf8CCq9y7FwBKkd1EfbROOGLXMNtgjpN
+yYTu3m5bwc8QcIOrIbtWcM2IOCA5nOPfTLCHhA4cyyaeAyft4twfDAGlxn5YerP+
+mhK3oLzQV+pNYg28zGv9kHqY20EFLMFvPObwYrEq+Wt018l4z7EUZNZ7wEFn5ldg
+U9tr1f5vrYSFgl3Jj/SJMR3v4Q6rv+K1LptWurWwA4PTJB/WHGm/T/x86jnaA0wb
++66/3ci3vFpU/Wwquy6ukGxvtm1z7FyNfNP7zzsFKk2L/xThjQf2B+T0V1ZBrOJH
+5VrjstXVt7G2dZ+FzI5Vaf1TdCp51g==
+=VIk8
 -----END PGP SIGNATURE-----
 
---scp06loMc064cRTrKV2V4bXgcXp5AExjZ--
+--wfbDmbWUYoZjuN2PN5mivkV7DxrTMWnW5--
 
