@@ -2,88 +2,64 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AB5BC31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6021FC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:30:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 011CC20C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:24:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRIBS/9c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011CC20C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7111320C01
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:30:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7111320C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw18U-0006ne-BJ
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 05:24:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49017)
+	id 1hw1EX-0000r7-LO
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 05:30:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49722)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hw17a-0005hq-En
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:23:39 -0400
+ (envelope-from <imammedo@redhat.com>) id 1hw1Dq-0000E3-4e
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:30:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hw17Z-0004Tu-Db
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:23:38 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38425)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hw17Z-0004TI-4M
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:23:37 -0400
-Received: by mail-wm1-x344.google.com with SMTP id m125so933553wmm.3
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 02:23:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=WHJW2o9zigOPE6Mq08bjgPX8Hpa1kkbV0Nh6Mvwf4do=;
- b=BRIBS/9cheZcR54I1Vaw0zaO9OIvBQjF2XZ6QxypVx14SGgWl4RxtvyA/ZcGg2J5Es
- B4l8ai7ocIMhm8MJNbHtY5KD5ZpqVsllPF/HPUEr/C9KlrGlgXKW1G2tkXUTQ4XXphtq
- 6p6ZoCxEcFSZtMbS8fyp6+8vuPyUog5waYQcSthleotq4V6pMRPIR+M/Gzu0pgtbFXEo
- M/0r0APPSo9oNSFdreUk3XS9cQwFYiTvPqEzURTXX42rmjuA8/UAQghY4TP4qfZNM0AE
- UCq0+KbT9gmt6562n2SeeQeNbMzgfsJylSTNOCcpAARBEXSVXuwV0PcU1UnDkGog4wVS
- /70g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=WHJW2o9zigOPE6Mq08bjgPX8Hpa1kkbV0Nh6Mvwf4do=;
- b=IXiIBpixub++5rrcPksRil2QagR3muQhYpow7V82jG3ro8B0zxnmx1i68SjDEcgQ0T
- QF3uDiinatXxvgoKfnCNuGSIJR44DIOH8oWreqc4LKBu3s0Pd2OitJJaqq2zKyuedeTn
- Mp7KgdzKlPGLUZVZzS/W6wTdP5Y+X1E4GWwqkoyiL0MCnJCcYm9wcu8ZHyROr9lRBkqG
- JrzpxGqsOEek4kEvMKcfi/A9EHKkB9dIua6Xp7upUmHz7DLuFj0IaFwlCFyuOrXHvAD3
- QqbieHR78zwlmwblCcr4WV3kBFwmM3DhGo6jPGidYuJEi3iLX5bfnW/iorFblSfynEMF
- Kvrg==
-X-Gm-Message-State: APjAAAVuDt+kgnf8cu0T+OYQ1tgiWEatXo2bVvsqEAapprB22Uv39enR
- g0rAIALPB4TYij0rYWxMlnOAX2XPSLrQug==
-X-Google-Smtp-Source: APXvYqz//muCf8aspnyYBgLk1XfsMaGYXGh9U9XzyETzzyDDHGwBv1dUowR2nuOA1ASHfbq7re+J+Q==
-X-Received: by 2002:a1c:2302:: with SMTP id j2mr9335968wmj.174.1565342616220; 
- Fri, 09 Aug 2019 02:23:36 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id n5sm4092926wmi.21.2019.08.09.02.23.35
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 02:23:35 -0700 (PDT)
-Date: Fri, 9 Aug 2019 10:23:34 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190809092334.GI25286@stefanha-x1.localdomain>
-References: <20190805071038.32146-1-alxndr@bu.edu>
- <20190805071038.32146-6-alxndr@bu.edu>
+ (envelope-from <imammedo@redhat.com>) id 1hw1Dp-00037X-0L
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:30:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44418)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>)
+ id 1hw1Do-000367-Qt; Fri, 09 Aug 2019 05:30:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C4C2630BCB94;
+ Fri,  9 Aug 2019 09:30:02 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9F0325D9D6;
+ Fri,  9 Aug 2019 09:30:01 +0000 (UTC)
+Date: Fri, 9 Aug 2019 11:29:59 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20190809112959.027855a0@redhat.com>
+In-Reply-To: <20190808063500.GB5465@umbus.fritz.box>
+References: <20190805071302.6260-1-tao3.xu@intel.com>
+ <20190806145055.4f645f60@redhat.com>
+ <20190807175256.GD4669@habkost.net>
+ <20190808063500.GB5465@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zqjkMoGlbUJ91oFe"
-Content-Disposition: inline
-In-Reply-To: <20190805071038.32146-6-alxndr@bu.edu>
-User-Agent: Mutt/1.12.0 (2019-05-25)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [RFC PATCH v2 05/17] fuzz: Add direct receive
- function for qtest server
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Fri, 09 Aug 2019 09:30:03 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] numa: Introduce
+ MachineClass::auto_enable_numa for implicit NUMA node
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,69 +71,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Tao Xu <tao3.xu@intel.com>, qemu-ppc@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 8 Aug 2019 16:35:00 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---zqjkMoGlbUJ91oFe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Wed, Aug 07, 2019 at 02:52:56PM -0300, Eduardo Habkost wrote:
+> > On Tue, Aug 06, 2019 at 02:50:55PM +0200, Igor Mammedov wrote:  
+> > > On Mon,  5 Aug 2019 15:13:02 +0800
+> > > Tao Xu <tao3.xu@intel.com> wrote:
+> > >   
+> > > > Add MachineClass::auto_enable_numa field. When it is true, a NUMA node
+> > > > is expected to be created implicitly.
+> > > > 
+> > > > Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > Suggested-by: Igor Mammedov <imammedo@redhat.com>
+> > > > Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> > > > Signed-off-by: Tao Xu <tao3.xu@intel.com>  
+> > [...]  
+> > > > +    mc->auto_enable_numa = true;  
+> > > 
+> > > this will always create a numa node (that will affect not only RAM but
+> > > also all other components that depends on numa state (like CPUs)),
+> > > where as spapr_populate_memory() was only faking numa node in DT for RAM.
+> > > It makes non-numa configuration impossible.
+> > > Seeing David's ACK on the patch it might be fine, but I believe
+> > > commit message should capture that and explain why the change in
+> > > behavior is fine.  
+> > 
+> > After a quick look, all spapr code seems to have the same
+> > behavior when nb_numa_nodes==0 and nb_numa_nodes==1, but I'd like
+> > to be sure.  
+> 
+> That's certainly the intention.  If there are cases where it doesn't
+> behave that way, it's a bug - although possible one we have to
+> maintainer for machine compatibility.
 
-On Mon, Aug 05, 2019 at 07:11:06AM +0000, Oleinik, Alexander wrote:
-> The direct receive function qtest_server_recv is directly invoked by the
-> qtest client, when the server and client exist within the same process.
->=20
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
->  include/sysemu/qtest.h |  4 ++++
->  qtest.c                | 14 ++++++++++++++
->  2 files changed, 18 insertions(+)
+considering DT is firmware we typically do not add any compat
+code for the later.
 
-qtest.c has two parts:
-1. The qtest protocol handler
-2. The chardev/qtest_init() code
+> 
+> > David and/or Tao Xu: do you confirm there's no ABI change at all
+> > on spapr after implicitly creating a NUMA node?  
+> 
+> I don't believe there is, no.
 
-This patch uses #ifdefs to leave most of the code unmodified, but this
-is hacky since we need to pass around a NULL CharBackend pointer in
-order to reuse the code.  There is a danger that someone will modify the
-core code and operate on chr not knowing it will break fuzzing.
+Also seeing your next reply, it seems there is no non-numa
+usecase is spec so it would be a bug to begin with, hence:
 
-A cleaner approach is to refactor the qtest protocol handler code to be
-transport-independent with a send(void *opaque, const char *str, size_t
-len) function pointer provided by the actual transport.  That way the
-core code doesn't know about CharBackend and can never accidentally
-touch it.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-One way of doing this is to introduce a global qtest_send() function
-pointer and pass a void *opaque value through the core qtest protocol
-handler code.
 
-If you introduce a separate qtest-fuzz.c file then no #ifdefs are
-necessary because the conditional compilation can be performed by
-CONFIG_FUZZ in Makefile.objs:
+> >   
+> > >   
+> > > >      smc->default_caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+> > > >      smc->default_caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_ON;
+> > > > diff --git a/include/hw/boards.h b/include/hw/boards.h
+> > > > index 2eb9a0b4e0..4a350b87d2 100644
+> > > > --- a/include/hw/boards.h
+> > > > +++ b/include/hw/boards.h
+> > > > @@ -220,6 +220,7 @@ struct MachineClass {
+> > > >      bool smbus_no_migration_support;
+> > > >      bool nvdimm_supported;
+> > > >      bool numa_mem_supported;
+> > > > +    bool auto_enable_numa;
+> > > >  
+> > > >      HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
+> > > >                                             DeviceState *dev);  
+> > >   
+> >   
+> 
 
-  obj-$(CONFIG_FUZZ) +=3D qtest-fuzz.o
-
---zqjkMoGlbUJ91oFe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1NO5YACgkQnKSrs4Gr
-c8gT4AgAwcg/7MHIkTYSKK0oSMMRMUUrhUIWolmESX9JOHAjRq1/bnHu7kEXKpi8
-BkmcO/2f8I/+o11tYZgNVHmr1tu4CpU9oQzlOMGBtNA6PbMojbeKwqB0dcWJ1P1g
-Sh/c9LEPossdThOzDFRXOvlrrIEhHdLdreoKJfQHTVJLyxraKlKZTgMWkw6ogcCr
-EjTfkr5exxzazDE8ST3LtX/LwnDUTqk5p72m8T90I1LDbc/lXhsxNSGezzJpIHjj
-hSv5NsT58yLmdUbhgeLEPTz5zU2oauMhhEJYnHe8Jm23ZAgJzZcifVerW6wd7Ghj
-HNzz2QLKEBb3bHTkXFywKn7TdUNExw==
-=VIkI
------END PGP SIGNATURE-----
-
---zqjkMoGlbUJ91oFe--
 
