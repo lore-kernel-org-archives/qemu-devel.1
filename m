@@ -2,58 +2,79 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A91CDC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 20:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6E7C32757
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 20:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CAA520B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 20:14:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAA520B7C
+	by mail.kernel.org (Postfix) with ESMTPS id DA5C02171F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 20:22:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA5C02171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33666 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwBH7-0002pw-Oo
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 16:14:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38030)
+	id 1hwBPC-0006QU-BC
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 16:22:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39249)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hwBGf-0001vJ-OI
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:13:42 -0400
+ (envelope-from <philmd@redhat.com>) id 1hwBOo-0005uz-4M
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hwBGe-00058n-LK
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:13:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2997)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hwBGb-00056p-VD; Fri, 09 Aug 2019 16:13:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4212230A76BE;
- Fri,  9 Aug 2019 20:13:37 +0000 (UTC)
-Received: from probe.bos.redhat.com (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC8525DC1E;
- Fri,  9 Aug 2019 20:13:33 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Date: Fri,  9 Aug 2019 16:13:33 -0400
-Message-Id: <20190809201333.29033-1-jsnow@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hwBOn-0001VM-3v
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:22:06 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54431)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hwBOm-0001Uw-Tb
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:22:05 -0400
+Received: by mail-wm1-f68.google.com with SMTP id p74so6842863wme.4
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 13:22:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wfFUisYao/CObVSSiozPR0j1fe4VzwBjemIAiGRc/3I=;
+ b=rhiVcwAdwIo9p5Qx9DoQG863iEInVawPk8ooILS0cA7WlVgJYd8rd8U1uYc1rdB3Yb
+ 0+JDEyN+RWVE1sz2uybESoGflIN4P/CgV4eYGhdGg6XzfsPgIPl+WMI2LufsVeXRU8dD
+ Lj/jzeHjkMaHxyLkMNNSPWS/K1EVL3nvGLmBomG7/J2WL6o0ZHqrnG4MqyCud/3PzPJ5
+ VqtUlQosQhYDSs+PkVQbBzlQ2GypGQKxWNZwIkrQP8i54n/Fimf06hvNlyUaT+yDggzy
+ 0sN25v4LElZG8Ivkokx3N5IFQt5dvjySjC98dz+o4pOxhwiGRqK1qt3+mrSOtVh9xo3n
+ aRyg==
+X-Gm-Message-State: APjAAAWMm/GUKSgBAGc2u/iIDIsroXGlwSmA5Zo73KYEOKWTSpm1kzmX
+ /pIVZoZh8oxMRVItenNJzVUjpw==
+X-Google-Smtp-Source: APXvYqwaWOyDjiD1e3P7VI2ZmVGax+mPdqfK2xNPEp0Ydmc8ANaeAnkP69uvjNyAmvCXKGcGA3NQ6g==
+X-Received: by 2002:a1c:1d08:: with SMTP id d8mr12368266wmd.22.1565382123803; 
+ Fri, 09 Aug 2019 13:22:03 -0700 (PDT)
+Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
+ [83.51.160.214])
+ by smtp.gmail.com with ESMTPSA id 15sm4585995wmk.34.2019.08.09.13.22.02
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Fri, 09 Aug 2019 13:22:03 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190701194942.10092-1-philmd@redhat.com>
+ <CAFEAcA_bWHAe_aoaN1+1RFm3zEvAxmzQtVm1zbatJHG_+CgqmA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <07662a67-b4cf-e681-fffa-98a03a26e0fb@redhat.com>
+Date: Fri, 9 Aug 2019 22:22:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Fri, 09 Aug 2019 20:13:37 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAFEAcA_bWHAe_aoaN1+1RFm3zEvAxmzQtVm1zbatJHG_+CgqmA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH] block/backup: install notifier during creation
+ [fuzzy]
+X-Received-From: 209.85.128.68
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] Support disabling TCG on ARM
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,140 +86,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-stable@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Yang Zhong <yang.zhong@intel.com>, Andrew Jones <drjones@redhat.com>,
+ Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Backup jobs may yield prior to installing their handler, because of the
-job_co_entry shim which guarantees that a job won't begin work until
-we are ready to start an entire transaction.
+Hi Peter, Paolo, Alex, Thomas :)
 
-Unfortunately, this makes proving correctness about transactional
-points-in-time for backup hard to reason about. Make it explicitly clear
-by moving the handler registration to creation time, and changing the
-write notifier to a no-op until the job is started.
+On 7/2/19 4:08 PM, Peter Maydell wrote:
+> On Mon, 1 Jul 2019 at 20:49, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+[...]
+>> $ git backport-diff -u v3 -r target-arm.next..v4
+>> Key:
+>> [----] : patches are identical
+>> [####] : number of functional differences between upstream/downstream patch
+>> [down] : patch is downstream-only
+>> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+>>
+[skipping patches already applied...]
 
-Reported-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/backup.c     | 32 +++++++++++++++++++++++---------
- include/qemu/job.h |  5 +++++
- job.c              |  2 +-
- 3 files changed, 29 insertions(+), 10 deletions(-)
+>> 004/8:[----] [--] 'RFC target/arm: Restrict pre-ARMv7 cpus to TCG'
+>> 005/8:[----] [--] 'RFC target/arm: Do not build pre-ARMv7 cpus when using KVM'
+>> 006/8:[----] [--] 'RFC target/arm: Restrict R and M profiles to TCG'
+>> 007/8:[----] [--] 'RFC target/arm: Do not build A/M-profile cpus when using KVM'
+>> 008/8:[----] [--] 'target/arm: Do not build TCG objects when TCG is off'
+> 
+> I'm going to apply patches 1 and 2 to target-arm.next for rc0 (since
+> 2 is helpful to redhat downstream and taking 1 now reduces the
+> amount of code-movement patches you'll need to rebase). Patch 3
+> doesn't compile and 4-8 are rfc.
 
-diff --git a/block/backup.c b/block/backup.c
-index 07d751aea4..4df5b95415 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -344,6 +344,13 @@ static int coroutine_fn backup_before_write_notify(
-     assert(QEMU_IS_ALIGNED(req->offset, BDRV_SECTOR_SIZE));
-     assert(QEMU_IS_ALIGNED(req->bytes, BDRV_SECTOR_SIZE));
-=20
-+    /* The handler is installed at creation time; the actual point-in-ti=
-me
-+     * starts at job_start(). Transactions guarantee those two points ar=
-e
-+     * the same point in time. */
-+    if (!job_started(&job->common.job)) {
-+        return 0;
-+    }
-+
-     return backup_do_cow(job, req->offset, req->bytes, NULL, true);
- }
-=20
-@@ -398,6 +405,12 @@ static void backup_clean(Job *job)
-     BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job);
-     BlockDriverState *bs =3D blk_bs(s->common.blk);
-=20
-+    /* cancelled before job_start: remove write_notifier */
-+    if (s->before_write.notify) {
-+        notifier_with_return_remove(&s->before_write);
-+        s->before_write.notify =3D NULL;
-+    }
-+
-     if (s->copy_bitmap) {
-         bdrv_release_dirty_bitmap(bs, s->copy_bitmap);
-         s->copy_bitmap =3D NULL;
-@@ -527,17 +540,8 @@ static void backup_init_copy_bitmap(BackupBlockJob *=
-job)
- static int coroutine_fn backup_run(Job *job, Error **errp)
- {
-     BackupBlockJob *s =3D container_of(job, BackupBlockJob, common.job);
--    BlockDriverState *bs =3D blk_bs(s->common.blk);
-     int ret =3D 0;
-=20
--    QLIST_INIT(&s->inflight_reqs);
--    qemu_co_rwlock_init(&s->flush_rwlock);
--
--    backup_init_copy_bitmap(s);
--
--    s->before_write.notify =3D backup_before_write_notify;
--    bdrv_add_before_write_notifier(bs, &s->before_write);
--
-     if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-         int64_t offset =3D 0;
-         int64_t count;
-@@ -572,6 +576,7 @@ static int coroutine_fn backup_run(Job *job, Error **=
-errp)
-=20
-  out:
-     notifier_with_return_remove(&s->before_write);
-+    s->before_write.notify =3D NULL;
-=20
-     /* wait until pending backup_do_cow() calls have completed */
-     qemu_co_rwlock_wrlock(&s->flush_rwlock);
-@@ -767,6 +772,15 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-                        &error_abort);
-     job->len =3D len;
-=20
-+    /* Finally, install a write notifier that takes effect after job_sta=
-rt() */
-+    backup_init_copy_bitmap(job);
-+
-+    QLIST_INIT(&job->inflight_reqs);
-+    qemu_co_rwlock_init(&job->flush_rwlock);
-+
-+    job->before_write.notify =3D backup_before_write_notify;
-+    bdrv_add_before_write_notifier(bs, &job->before_write);
-+
-     return &job->common;
-=20
-  error:
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 9e7cd1e4a0..733afb696b 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -394,6 +394,11 @@ void job_enter_cond(Job *job, bool(*fn)(Job *job));
-  */
- void job_start(Job *job);
-=20
-+/**
-+ * job_started returns true if the @job has started.
-+ */
-+bool job_started(Job *job);
-+
- /**
-  * @job: The job to enter.
-  *
-diff --git a/job.c b/job.c
-index 28dd48f8a5..745af659ff 100644
---- a/job.c
-+++ b/job.c
-@@ -243,7 +243,7 @@ bool job_is_completed(Job *job)
-     return false;
- }
-=20
--static bool job_started(Job *job)
-+bool job_started(Job *job)
- {
-     return job->co;
- }
---=20
-2.21.0
+The remaining patches can be applied without conflict, so no need to
+respin (yet) IMO.
 
+Paolo/Thomas, do you mind reviewing patches 5 and 7? They are kconfig
+related.
+
+Peter/Alex, do you mind reviewing patches 4 and 6 first, then 5 and 7 (5
+and 7 can wait for Paolo/Thomas' review first).
+
+Thanks!
+
+Phil.
 
