@@ -2,95 +2,115 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C843C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8BCC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 515A42086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:06:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 515A42086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA86E21743
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:18:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KR//Ww7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA86E21743
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw4bF-0001MK-KC
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 09:06:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53819)
+	id 1hw4nE-0005Iz-Sx
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 09:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57936)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hw4Ou-00044R-Bo
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:53:45 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hw4mq-0004sZ-4W
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:18:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hw4Ot-0004Bo-Ak
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:53:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49308)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hw4Or-0004A7-2s; Fri, 09 Aug 2019 08:53:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 62966308FFB1;
- Fri,  9 Aug 2019 12:53:40 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 46F455D9D3;
- Fri,  9 Aug 2019 12:53:33 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
- <20190807080750.15950-5-vsementsov@virtuozzo.com>
- <23fd227d-9074-3a9e-b6c7-09f4abadc021@redhat.com>
- <ba8ea007-06dd-03fb-9f9c-6e31a4764156@virtuozzo.com>
- <b3b788fc-cf2d-8fe4-df35-a3fd8f18995f@redhat.com>
- <7783cb6f-4e71-c789-3105-4a6dc3b1533d@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <07f45d08-33dd-b49c-6a71-58fc84876697@redhat.com>
-Date: Fri, 9 Aug 2019 14:53:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hw4mp-0000hP-6o
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:18:28 -0400
+Received: from mail-eopbgr150121.outbound.protection.outlook.com
+ ([40.107.15.121]:35909 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hw4mo-0000gK-Mx; Fri, 09 Aug 2019 09:18:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=El7UBxo3DXomz27OHCtaEvwm+6J162+dIyX85ebPG2+frujRziAG6qWkIA64b1U7zWrqoSqNJHkUCSQqsWyAAvTpMhXJCCe+QNIVQidXo0N5ehQEC3kDqIOo7De2CkbmzmPNvbKBEeTNM+3Ssc6vwCxknl46887KrpC9rndd0ILp29bjK20VaNAAFvV7Mye6SbV1MO4+6lrG35Y5q/4j3gGDYDZChyEAcQ+ZiIE9by/T3aQ/0nVtRlJkWtVo61J1ET6F/UvTtZDiZbyC/sT8hSoBr7FGyNzIsg+SaC7nuzTKMaIpPIagcBXepcE261WrXF+sRTvGNQQmuYT9IaKT6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vtpRmdSLji0JVzVyBC9OGGNS5HuMJFs8Qt813Ev7bkM=;
+ b=YqZv5d2VfB/Sd5eFP0Q+Wkh5Rr+fnhMnD3/awNcDhFW2kDxm2btj0r6Vr3zjKt1aR96/1WLLQXRfhN1noyUjUd4BpfipZP6WCX/2qREmmiSggpHYLoZ+qV90PPc4ppgVvjQsxDy47VbzcgTE1/uch8RZwHn4YNjS7EHxrgAaog3g5selaXhIt9oukGcXV1QaS1nf9/dX0lQ+obUwBTy67yy2exPprGnqmbx8+Ka5yRlRV/20qcdr3PmGsi+FyAkLfCF8FrlgfqiyaCAtnO9MMww8qN65sJFvXRRW7KXR0Gp0uFv8d6nqrK3iDbXhid+icx2o3KkRZn3jUHkuQ+X63A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vtpRmdSLji0JVzVyBC9OGGNS5HuMJFs8Qt813Ev7bkM=;
+ b=KR//Ww7qf9nd29VyENzC8CHyim6hVhHf38mAg6pFrTXSuGmSTX99tuNiZUL/HLgrTyq5ZbTCLWj4Q+vtpfWP2lOgkOO+mHJTNPY8/43s6TP2fp6ZsBneEpeEicR9iNDiy1C2Sh9wjF9doDaUxZgQzz/hJqHIrIkQkxsVLC+4gWU=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4939.eurprd08.prod.outlook.com (10.255.4.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.16; Fri, 9 Aug 2019 13:18:23 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.015; Fri, 9 Aug 2019
+ 13:18:23 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow
+ <jsnow@redhat.com>
+Thread-Topic: backup bug or question
+Thread-Index: AQHVTrTrc8JESPxQGUmDMebwH05otA==
+Date: Fri, 9 Aug 2019 13:18:23 +0000
+Message-ID: <6826e3c2-bc6e-b2a2-1bf1-3ed31079f0ee@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0301CA0005.eurprd03.prod.outlook.com
+ (2603:10a6:3:76::15) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b213423a-015b-47ab-db31-08d71ccc0e63
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4939; 
+x-ms-traffictypediagnostic: DB8PR08MB4939:
+x-microsoft-antispam-prvs: <DB8PR08MB493971BFD8B46975955D1EEBC1D60@DB8PR08MB4939.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 01244308DF
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(346002)(376002)(39850400004)(136003)(366004)(189003)(199004)(6116002)(8676002)(66066001)(14444005)(4744005)(7736002)(476003)(3480700005)(305945005)(256004)(2616005)(3846002)(6512007)(478600001)(53936002)(386003)(66476007)(66556008)(64756008)(66446008)(186003)(66946007)(81166006)(26005)(81156014)(99286004)(71200400001)(71190400001)(110136005)(25786009)(6436002)(52116002)(31686004)(5660300002)(86362001)(31696002)(486006)(102836004)(14454004)(316002)(6506007)(36756003)(6486002)(8936002)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4939;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: UyfrYazVqNHrQvE2v5zcKoTurd3DvMYYljvyv4gsiKkBAo+AntU9Ygmf2RBWicRDesuF2DeVbBkBSwNVPJW+vNF8WZatnwIm6ELoU+WVQHODJfd5OLsnm+oulPfnC0o/9wWKJnv9DGb+ax0fijb0FRIIDtpHHEd9TIYP+KsinLnK9CAlizlLgAFEtUwaZ5CWxiVYR2M7oxr7/76pf4i5YFj+bviB0qS3uwgEKfeV/HNPkO9yIODlJXhlxuwJ0Vhc10RsekQAPVpmf8HBWEYfcQEGdGzG1MURZEolACDHlYxvbN92HV0dmo9reLz8igd9uU537ozghpfE2+u/IOj/bUnSnp04D825Ptkgb4e8EWTZR1ykl793S8Mzqw43lxQG4l18nM8rZTc7QNHNT86j3QhjKFhikKfBDdU6zEAWz3s=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <00FFE2FCBB8D62489A0D8139610ABD5C@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <7783cb6f-4e71-c789-3105-4a6dc3b1533d@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="RDR7tmmdkpJoXjrrv67ZiGAbadZDnNvkn"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 09 Aug 2019 12:53:40 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/8] block/backup: improve unallocated
- clusters skipping
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b213423a-015b-47ab-db31-08d71ccc0e63
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 13:18:23.8147 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: QKB+paPq2CzIhc/cfyCS2aoGcH598mtBKunx+WwrE0kpUt+eS6b4maAEV9Ut2nuKnFFw6ceiUvwDwqAIhkpefQBtVpWUqrBYOJs2wjghLXc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4939
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.15.121
+Subject: [Qemu-devel] backup bug or question
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,111 +122,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RDR7tmmdkpJoXjrrv67ZiGAbadZDnNvkn
-Content-Type: multipart/mixed; boundary="846srVejgHDJbo1MgXslFWaJt5okTOadu";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <07f45d08-33dd-b49c-6a71-58fc84876697@redhat.com>
-Subject: Re: [PATCH 4/8] block/backup: improve unallocated clusters skipping
-References: <20190807080750.15950-1-vsementsov@virtuozzo.com>
- <20190807080750.15950-5-vsementsov@virtuozzo.com>
- <23fd227d-9074-3a9e-b6c7-09f4abadc021@redhat.com>
- <ba8ea007-06dd-03fb-9f9c-6e31a4764156@virtuozzo.com>
- <b3b788fc-cf2d-8fe4-df35-a3fd8f18995f@redhat.com>
- <7783cb6f-4e71-c789-3105-4a6dc3b1533d@virtuozzo.com>
-In-Reply-To: <7783cb6f-4e71-c789-3105-4a6dc3b1533d@virtuozzo.com>
-
---846srVejgHDJbo1MgXslFWaJt5okTOadu
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 09.08.19 14:47, Vladimir Sementsov-Ogievskiy wrote:
-> 09.08.2019 15:25, Max Reitz wrote:
->> On 09.08.19 09:50, Vladimir Sementsov-Ogievskiy wrote:
->>> 07.08.2019 21:01, Max Reitz wrote:
->>>> On 07.08.19 10:07, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Limit block_status querying to request bounds on write notifier to
->>>>> avoid extra seeking.
->>>>
->>>> I don=E2=80=99t understand this reasoning.  Checking whether somethi=
-ng is
->>>> allocated for qcow2 should just mean an L2 cache lookup.  Which we h=
-ave
->>>> to do anyway when we try to copy data off the source.
->>>
->>> But for raw it's seeking.
->>
->> (1) That=E2=80=99s a bug in block_status then, isn=E2=80=99t it?
->>
->> file-posix cannot determine the allocation status, or rather, everythi=
-ng
->> is allocated.  bdrv_co_block_status() should probably pass @want_zero =
-on
->> to the driver=E2=80=99s implementation, and file-posix should just
->> unconditionally return DATA if it=E2=80=99s false.
->>
->> (2) Why would you even use sync=3Dtop for raw nodes?
->>
->=20
-> As I described in parallel letters, raw was bad example. NBD is good.
-
-Does NBD support backing files?
-
-> Anyway, now I'm refactoring cluster skipping more deeply for v2.
->=20
-> About top-mode: finally block-status should be used to improve other
-> modes too. In virtuozzo we skip unallocated for full mode too, for exam=
-ple.
-
-But this patch here is about sync=3Dtop.
-
-Skipping is an optimization, the block_status querying here happens
-because copying anything that isn=E2=80=99t allocated in the top layer wo=
-uld be
-wrong.
-
-Max
-
-> Unfortunately, backup is most long-term thing to upstream for me..
-
-
---846srVejgHDJbo1MgXslFWaJt5okTOadu--
-
---RDR7tmmdkpJoXjrrv67ZiGAbadZDnNvkn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1NbMsACgkQ9AfbAGHV
-z0CyKwf9EwKWp0iQMIAC4lu0Bb6YkkUTZzCQ2cj4Zq7m07fel4CX+zOFmmqc7fPS
-II2Qc8vMAtL/lWMWc53iVYscIi3txqtp0bEeRc9moXWevAC+phpqxMHdntlHQJnI
-n/eXl2W2UWKmr1cwBWmt7ebywQMguvdrK3G5m2n5A4Y6AoUZFQ1zt8WkSxMalfCT
-CrXZuOyPl0YgsvFVpdKz4o8Q5JOvYCHLX8P2g2J1J+73dZH1gZXe6aAPlBw4gok3
-/XP/dWRLaJNMp55ykPLLlo9XAcpeTJpaCJx8dUJ/6RjIvBHho89KsIF/WrR6XXLe
-RtAPdiqyY+wi243chB0Pg+TA3yigFQ==
-=mYi8
------END PGP SIGNATURE-----
-
---RDR7tmmdkpJoXjrrv67ZiGAbadZDnNvkn--
+SGkhDQoNCkhtbSwgaGFja2luZyBhcm91bmQgYmFja3VwIEkgaGF2ZSBhIHF1ZXN0aW9uOg0KDQpX
+aGF0IHByZXZlbnRzIGd1ZXN0IHdyaXRlIHJlcXVlc3QgYWZ0ZXIgam9iX3N0YXJ0IGJ1dCBiZWZv
+cmUgc2V0dGluZw0Kd3JpdGUgbm90aWZpZXI/DQoNCmNvZGUgcGF0aDoNCg0KcW1wX2RyaXZlX2Jh
+Y2t1cCBvciB0cmFuc2FjdGlvbiB3aXRoIGJhY2t1cA0KDQogICAgam9iX3N0YXJ0DQogICAgICAg
+YWlvX2NvX2VudGVyKGpvYl9jb19lbnRyeSkgLyogbWF5IG9ubHkgc2NoZWR1bGUgZXhlY3V0aW9u
+LCBpc24ndCBpdCA/ICovDQoNCi4uLi4NCg0Kam9iX2NvX2VudHJ5DQogICAgam9iX3BhdXNlX3Bv
+aW50KCkgLyogaXQgZGVmaW5pdGVseSB5aWVsZHMsIGlzbid0IGl0IGJhZD8gKi8NCiAgICBqb2It
+PmRyaXZlci0+cnVuKCkgLyogYmFja3VwX3J1biAqLw0KDQotLS0tDQoNCmJhY2t1cF9ydW4oKQ0K
+ICAgIGJkcnZfYWRkX2JlZm9yZV93cml0ZV9ub3RpZmllcigpDQoNCi4uLg0KDQpBbmQgd2hhdCBn
+dWFyYW50ZWVzIHdlIGdpdmUgdG8gdGhlIHVzZXI/IElzIGl0IGd1YXJhbnRlZWQgdGhhdCB3cml0
+ZSBub3RpZmllciBpcw0Kc2V0IHdoZW4gcW1wIGNvbW1hbmQgcmV0dXJucz8NCg0KQW5kIEkgZ3Vl
+c3MsIGlmIHdlIHN0YXJ0IHNldmVyYWwgYmFja3VwcyBpbiBhIHRyYW5zYWN0aW9uIGl0IHNob3Vs
+ZCBiZSBndWFyYW50ZWVkDQp0aGF0IHRoZSBzZXQgb2YgYmFja3VwcyBpcyBjb25zaXN0ZW50IGFu
+ZCBjb3JyZXNwb25kIHRvIG9uZSBwb2ludCBpbiB0aW1lLi4uDQoNCi0tIA0KQmVzdCByZWdhcmRz
+LA0KVmxhZGltaXINCg==
 
