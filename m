@@ -2,72 +2,67 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 843A9C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:51:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1873EC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 18:33:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DCFC2171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:51:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DCFC2171F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
+	by mail.kernel.org (Postfix) with ESMTPS id E8E5120C01
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 18:33:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E5120C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw92f-0001Ra-FA
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 13:51:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43347)
+	id 1hw9hR-0000U2-9C
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 14:33:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48927)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hw92F-00011Z-Ow
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:50:40 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hw9h4-0008Tm-3Z
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 14:32:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hw92E-0005gI-I7
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:50:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41932)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hw92E-0005fb-CV
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:50:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hw92C-0002MF-WA
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 17:50:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F24A52E80C7
- for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 17:50:36 +0000 (UTC)
+ (envelope-from <dgilbert@redhat.com>) id 1hw9h3-0003dk-1O
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 14:32:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40134)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hw9h2-0003d4-S6
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 14:32:48 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F2BA24628B
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 18:32:47 +0000 (UTC)
+Received: from work-vm (ovpn-117-184.ams2.redhat.com [10.36.117.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 70DC5608A7;
+ Fri,  9 Aug 2019 18:32:43 +0000 (UTC)
+Date: Fri, 9 Aug 2019 19:32:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <20190809183240.GG2840@work-vm>
+References: <20190808150325.21939-1-marcandre.lureau@redhat.com>
+ <20190808150325.21939-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20190808150325.21939-2-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.29]); Fri, 09 Aug 2019 18:32:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Aug 2019 17:38:19 -0000
-From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: glaubitz pmaydell
-X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
-X-Launchpad-Bug-Modifier: John Paul Adrian Glaubitz (glaubitz)
-References: <156518306048.32528.10373743991208371347.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156537229923.17710.15768508043152572915.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19021";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 17fb77cdc6aed0dc95dc096249b5c4206f67c523
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1839325] Re: Go programs crash on qemu-sh4 due to
- issues with atomics
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] qemu-file: move qemu_{get,
+ put}_counted_string() declarations
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,106 +71,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1839325 <1839325@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks. I will report this to Go/gcc upstream.
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Move migration helpers for strings under include/, so they can be used
+> outside of migration/
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
--- =
+I've queued this one (just 1/2) for the migration pull I'll do as soon
+as 4.2 opens.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1839325
-
-Title:
-  Go programs crash on qemu-sh4 due to issues with atomics
-
-Status in QEMU:
-  New
-
-Bug description:
-  After #1738545 [1] was fixed, Go applications work fine on qemu-arm
-  but still crash on qemu-sh4. From the backtrace, it looks like an
-  issue with the atomics in qemu-sh4:
-
-  (sid-sh4-sbuild)root@epyc:/# cat hello.go
-  package main
-
-  import "fmt"
-
-  func main() {
-        fmt.Println("hello world")
-  }
-
-  (sid-sh4-sbuild)root@epyc:/# gccgo-9 hello.go -o hello
-  (sid-sh4-sbuild)root@epyc:/# ./hello =
-
-  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
-  fatal error: panic on system stack
-  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
-  fatal error: panic on system stack
-
-  runtime stack:
-  runtime..z2finternal..z2fatomic.Load64
-          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
-  runtime_mstart
-          ../../../src/libgo/runtime/proc.c:596
-
-  goroutine 1 [running]:
-          goroutine running on other thread; stack unavailable
-
-  runtime stack:
-  runtime..z2finternal..z2fatomic.Load64
-          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
-  runtime_mstart
-          ../../../src/libgo/runtime/proc.c:596
-  (sid-sh4-sbuild)root@epyc:/#
-
-  The same sample Go program runs fine on my SH7785LCR SH4 evaluation
-  board:
-
-  root@tirpitz:~> uname -a
-  Linux tirpitz 3.16.7-ckt7 #8 PREEMPT Fri Oct 21 18:47:41 CEST 2016 sh4a G=
-NU/Linux
-  root@tirpitz:~> cat hello.go
-  package main
-
-  import "fmt"
-
-  func main() {
-        fmt.Println("hello world")
-  }
-
-  root@tirpitz:~> gccgo-9 hello.go -o hello
-  root@tirpitz:~> ./hello =
-
-  hello world
-  root@tirpitz:~>
-
-  Please note: In order to be able to reproduce this, one also needs to
-  revert commit 61dedf2af7 [2], otherwise the Go application crashes
-  differently:
-
-  (sid-sh4-sbuild)root@epyc:/# ./hello        =
-
-  Unhandled trap: 0x180
-  pc=3D0x7e5f7f9e sr=3D0x00000000 pr=3D0x7ee3d582 fpscr=3D0x00080004
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0x7e590480 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x7e5f7f60 fpul=3D0x00034f=
-3b
-  r0=3D0x008007d4 r1=3D0x00000000 r2=3D0xfffe0b2a r3=3D0x00000002
-  r4=3D0x008006e4 r5=3D0x00872000 r6=3D0x00200000 r7=3D0x00000000
-  r8=3D0x7f7bca7c r9=3D0x7fffebd4 r10=3D0x00800480 r11=3D0x7f7bc0f0
-  r12=3D0x7f7a3fa4 r13=3D0x008004c0 r14=3D0x7f7b2238 r15=3D0x7fffebd0
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  (sid-sh4-sbuild)root@epyc:/#
-
-  > [1] https://bugs.launchpad.net/bugs/1738545
-  > [2] https://bugs.launchpad.net/bugs/1796520
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1839325/+subscriptions
+> ---
+>  include/migration/qemu-file-types.h | 4 ++++
+>  migration/qemu-file.h               | 4 ----
+>  2 files changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/include/migration/qemu-file-types.h b/include/migration/qe=
+mu-file-types.h
+> index c0a1988155..2867e3da84 100644
+> --- a/include/migration/qemu-file-types.h
+> +++ b/include/migration/qemu-file-types.h
+> @@ -161,6 +161,10 @@ static inline void qemu_get_sbe64s(QEMUFile *f, in=
+t64_t *pv)
+>      qemu_get_be64s(f, (uint64_t *)pv);
+>  }
+> =20
+> +size_t qemu_get_counted_string(QEMUFile *f, char buf[256]);
+> +
+> +void qemu_put_counted_string(QEMUFile *f, const char *name);
+> +
+>  int qemu_file_rate_limit(QEMUFile *f);
+> =20
+>  #endif
+> diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+> index 13baf896bd..185d3de505 100644
+> --- a/migration/qemu-file.h
+> +++ b/migration/qemu-file.h
+> @@ -155,8 +155,6 @@ QEMUFile *qemu_file_get_return_path(QEMUFile *f);
+>  void qemu_fflush(QEMUFile *f);
+>  void qemu_file_set_blocking(QEMUFile *f, bool block);
+> =20
+> -size_t qemu_get_counted_string(QEMUFile *f, char buf[256]);
+> -
+>  void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
+>  void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
+>  void ram_control_load_hook(QEMUFile *f, uint64_t flags, void *data);
+> @@ -175,6 +173,4 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_=
+t block_offset,
+>                               ram_addr_t offset, size_t size,
+>                               uint64_t *bytes_sent);
+> =20
+> -void qemu_put_counted_string(QEMUFile *f, const char *name);
+> -
+>  #endif
+> --=20
+> 2.23.0.rc1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
