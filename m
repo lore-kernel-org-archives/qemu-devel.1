@@ -2,56 +2,57 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E484C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:53:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF14C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:53:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4202F20B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:53:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4202F20B7C
+	by mail.kernel.org (Postfix) with ESMTPS id B397A21743
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:53:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B397A21743
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw4Of-0002dJ-Hh
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 08:53:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53018)
+	id 1hw4Oh-0002jI-0c
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 08:53:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52940)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4K3-0002Gg-9n
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:49 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4K0-0002Fs-5G
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4K0-0001Gd-G8
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:43 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:52666 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4Jy-0001EA-LA
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:40 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52520 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hw4K0-0001AB-4l
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:40 -0400
+ id 1hw4Jy-00018r-Az
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:38 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D32401A21D6;
+ by mail.rt-rk.com (Postfix) with ESMTP id 3B7B11A206F;
  Fri,  9 Aug 2019 14:48:25 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A7FAB1A217E;
- Fri,  9 Aug 2019 14:48:25 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id F36931A20C6;
+ Fri,  9 Aug 2019 14:48:24 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  9 Aug 2019 14:46:52 +0200
-Message-Id: <1565354819-1495-20-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  9 Aug 2019 14:46:45 +0200
+Message-Id: <1565354819-1495-13-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1565354819-1495-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1565354819-1495-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v7 19/26] target/mips: Clean up
- handling of CP0 register 5
+Subject: [Qemu-devel] [PATCH for 4.2 v7 12/26] target/mips: Style
+ improvements in mips_fulong2e.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,239 +71,202 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-Clean up handling of CP0 register 5.
+Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- target/mips/cpu.h       |  6 +++++
- target/mips/translate.c | 64 ++++++++++++++++++++++++-------------------------
- 2 files changed, 38 insertions(+), 32 deletions(-)
+ hw/mips/mips_fulong2e.c | 96 +++++++++++++++++++++++++++++--------------------
+ 1 file changed, 58 insertions(+), 38 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index eebdc9f..2ab388b 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -312,6 +312,12 @@ typedef struct mips_def_t mips_def_t;
- /* CP0 Register 05 */
- #define CP0_REG05__PAGEMASK        0
- #define CP0_REG05__PAGEGRAIN       1
-+#define CP0_REG05__SEGCTL0         2
-+#define CP0_REG05__SEGCTL1         3
-+#define CP0_REG05__SEGCTL2         4
-+#define CP0_REG05__PWBASE          5
-+#define CP0_REG05__PWFIELD         6
-+#define CP0_REG05__PWSIZE          7
- /* CP0 Register 06 */
- #define CP0_REG06__WIRED           0
- /* CP0 Register 07 */
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 3fb3757..ea2d4b1 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -7042,44 +7042,44 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_05:
-         switch (sel) {
--        case 0:
-+        case CP0_REG05__PAGEMASK:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageMask));
-             register_name = "PageMask";
-             break;
--        case 1:
-+        case CP0_REG05__PAGEGRAIN:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageGrain));
-             register_name = "PageGrain";
-             break;
--        case 2:
-+        case CP0_REG05__SEGCTL0:
-             CP0_CHECK(ctx->sc);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl0));
-             tcg_gen_ext32s_tl(arg, arg);
-             register_name = "SegCtl0";
-             break;
--        case 3:
-+        case CP0_REG05__SEGCTL1:
-             CP0_CHECK(ctx->sc);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl1));
-             tcg_gen_ext32s_tl(arg, arg);
-             register_name = "SegCtl1";
-             break;
--        case 4:
-+        case CP0_REG05__SEGCTL2:
-             CP0_CHECK(ctx->sc);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
-             tcg_gen_ext32s_tl(arg, arg);
-             register_name = "SegCtl2";
-             break;
--        case 5:
-+        case CP0_REG05__PWBASE:
-             check_pw(ctx);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWBase));
-             register_name = "PWBase";
-             break;
--        case 6:
-+        case CP0_REG05__PWFIELD:
-             check_pw(ctx);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWField));
-             register_name = "PWField";
-             break;
--        case 7:
-+        case CP0_REG05__PWSIZE:
-             check_pw(ctx);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PWSize));
-             register_name = "PWSize";
-@@ -7783,42 +7783,42 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_05:
-         switch (sel) {
--        case 0:
-+        case CP0_REG05__PAGEMASK:
-             gen_helper_mtc0_pagemask(cpu_env, arg);
-             register_name = "PageMask";
-             break;
--        case 1:
-+        case CP0_REG05__PAGEGRAIN:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_helper_mtc0_pagegrain(cpu_env, arg);
-             register_name = "PageGrain";
-             ctx->base.is_jmp = DISAS_STOP;
-             break;
--        case 2:
-+        case CP0_REG05__SEGCTL0:
-             CP0_CHECK(ctx->sc);
-             gen_helper_mtc0_segctl0(cpu_env, arg);
-             register_name = "SegCtl0";
-             break;
--        case 3:
-+        case CP0_REG05__SEGCTL1:
-             CP0_CHECK(ctx->sc);
-             gen_helper_mtc0_segctl1(cpu_env, arg);
-             register_name = "SegCtl1";
-             break;
--        case 4:
-+        case CP0_REG05__SEGCTL2:
-             CP0_CHECK(ctx->sc);
-             gen_helper_mtc0_segctl2(cpu_env, arg);
-             register_name = "SegCtl2";
-             break;
--        case 5:
-+        case CP0_REG05__PWBASE:
-             check_pw(ctx);
-             gen_mtc0_store32(arg, offsetof(CPUMIPSState, CP0_PWBase));
-             register_name = "PWBase";
-             break;
--        case 6:
-+        case CP0_REG05__PWFIELD:
-             check_pw(ctx);
-             gen_helper_mtc0_pwfield(cpu_env, arg);
-             register_name = "PWField";
-             break;
--        case 7:
-+        case CP0_REG05__PWSIZE:
-             check_pw(ctx);
-             gen_helper_mtc0_pwsize(cpu_env, arg);
-             register_name = "PWSize";
-@@ -8534,41 +8534,41 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_05:
-         switch (sel) {
--        case 0:
-+        case CP0_REG05__PAGEMASK:
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageMask));
-             register_name = "PageMask";
-             break;
--        case 1:
-+        case CP0_REG05__PAGEGRAIN:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_mfc0_load32(arg, offsetof(CPUMIPSState, CP0_PageGrain));
-             register_name = "PageGrain";
-             break;
--        case 2:
-+        case CP0_REG05__SEGCTL0:
-             CP0_CHECK(ctx->sc);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl0));
-             register_name = "SegCtl0";
-             break;
--        case 3:
-+        case CP0_REG05__SEGCTL1:
-             CP0_CHECK(ctx->sc);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl1));
-             register_name = "SegCtl1";
-             break;
--        case 4:
-+        case CP0_REG05__SEGCTL2:
-             CP0_CHECK(ctx->sc);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_SegCtl2));
-             register_name = "SegCtl2";
-             break;
--        case 5:
-+        case CP0_REG05__PWBASE:
-             check_pw(ctx);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWBase));
-             register_name = "PWBase";
-             break;
--        case 6:
-+        case CP0_REG05__PWFIELD:
-             check_pw(ctx);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWField));
-             register_name = "PWField";
-             break;
--        case 7:
-+        case CP0_REG05__PWSIZE:
-             check_pw(ctx);
-             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWSize));
-             register_name = "PWSize";
-@@ -9255,41 +9255,41 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
-         break;
-     case CP0_REGISTER_05:
-         switch (sel) {
--        case 0:
-+        case CP0_REG05__PAGEMASK:
-             gen_helper_mtc0_pagemask(cpu_env, arg);
-             register_name = "PageMask";
-             break;
--        case 1:
-+        case CP0_REG05__PAGEGRAIN:
-             check_insn(ctx, ISA_MIPS32R2);
-             gen_helper_mtc0_pagegrain(cpu_env, arg);
-             register_name = "PageGrain";
-             break;
--        case 2:
-+        case CP0_REG05__SEGCTL0:
-             CP0_CHECK(ctx->sc);
-             gen_helper_mtc0_segctl0(cpu_env, arg);
-             register_name = "SegCtl0";
-             break;
--        case 3:
-+        case CP0_REG05__SEGCTL1:
-             CP0_CHECK(ctx->sc);
-             gen_helper_mtc0_segctl1(cpu_env, arg);
-             register_name = "SegCtl1";
-             break;
--        case 4:
-+        case CP0_REG05__SEGCTL2:
-             CP0_CHECK(ctx->sc);
-             gen_helper_mtc0_segctl2(cpu_env, arg);
-             register_name = "SegCtl2";
-             break;
--        case 5:
-+        case CP0_REG05__PWBASE:
-             check_pw(ctx);
-             tcg_gen_st_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_PWBase));
-             register_name = "PWBase";
-             break;
--        case 6:
-+        case CP0_REG05__PWFIELD:
-             check_pw(ctx);
-             gen_helper_mtc0_pwfield(cpu_env, arg);
-             register_name = "PWField";
-             break;
--        case 7:
-+        case CP0_REG05__PWSIZE:
-             check_pw(ctx);
-             gen_helper_mtc0_pwsize(cpu_env, arg);
-             register_name = "PWSize";
+diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
+index 5dbaa3b..0c3d947 100644
+--- a/hw/mips/mips_fulong2e.c
++++ b/hw/mips/mips_fulong2e.c
+@@ -48,13 +48,13 @@
+ 
+ #define DEBUG_FULONG2E_INIT
+ 
+-#define ENVP_ADDR       0x80002000l
+-#define ENVP_NB_ENTRIES	 	16
+-#define ENVP_ENTRY_SIZE	 	256
++#define ENVP_ADDR               0x80002000l
++#define ENVP_NB_ENTRIES         16
++#define ENVP_ENTRY_SIZE         256
+ 
+ /* fulong 2e has a 512k flash: Winbond W39L040AP70Z */
+-#define BIOS_SIZE (512 * KiB)
+-#define MAX_IDE_BUS 2
++#define BIOS_SIZE               (512 * KiB)
++#define MAX_IDE_BUS             2
+ 
+ /*
+  * PMON is not part of qemu and released with BSD license, anyone
+@@ -83,14 +83,15 @@ static struct _loaderparams {
+     const char *initrd_filename;
+ } loaderparams;
+ 
+-static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
++static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t *prom_buf, int index,
+                                         const char *string, ...)
+ {
+     va_list ap;
+     int32_t table_addr;
+ 
+-    if (index >= ENVP_NB_ENTRIES)
++    if (index >= ENVP_NB_ENTRIES) {
+         return;
++    }
+ 
+     if (string == NULL) {
+         prom_buf[index] = 0;
+@@ -105,7 +106,7 @@ static void GCC_FMT_ATTR(3, 4) prom_set(uint32_t* prom_buf, int index,
+     va_end(ap);
+ }
+ 
+-static int64_t load_kernel (CPUMIPSState *env)
++static int64_t load_kernel(CPUMIPSState *env)
+ {
+     int64_t kernel_entry, kernel_low, kernel_high, initrd_size;
+     int index = 0;
+@@ -130,16 +131,18 @@ static int64_t load_kernel (CPUMIPSState *env)
+     initrd_size = 0;
+     initrd_offset = 0;
+     if (loaderparams.initrd_filename) {
+-        initrd_size = get_image_size (loaderparams.initrd_filename);
++        initrd_size = get_image_size(loaderparams.initrd_filename);
+         if (initrd_size > 0) {
+-            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
++            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) &
++                            INITRD_PAGE_MASK;
+             if (initrd_offset + initrd_size > ram_size) {
+                 error_report("memory too small for initial ram disk '%s'",
+                              loaderparams.initrd_filename);
+                 exit(1);
+             }
+             initrd_size = load_image_targphys(loaderparams.initrd_filename,
+-                                     initrd_offset, ram_size - initrd_offset);
++                                              initrd_offset,
++                                              ram_size - initrd_offset);
+         }
+         if (initrd_size == (target_ulong) -1) {
+             error_report("could not load initial ram disk '%s'",
+@@ -154,9 +157,10 @@ static int64_t load_kernel (CPUMIPSState *env)
+ 
+     prom_set(prom_buf, index++, "%s", loaderparams.kernel_filename);
+     if (initrd_size > 0) {
+-        prom_set(prom_buf, index++, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
+-                 cpu_mips_phys_to_kseg0(NULL, initrd_offset), initrd_size,
+-                 loaderparams.kernel_cmdline);
++        prom_set(prom_buf, index++,
++                 "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
++                 cpu_mips_phys_to_kseg0(NULL, initrd_offset),
++                 initrd_size, loaderparams.kernel_cmdline);
+     } else {
+         prom_set(prom_buf, index++, "%s", loaderparams.kernel_cmdline);
+     }
+@@ -175,34 +179,48 @@ static int64_t load_kernel (CPUMIPSState *env)
+     return kernel_entry;
+ }
+ 
+-static void write_bootloader (CPUMIPSState *env, uint8_t *base, int64_t kernel_addr)
++static void write_bootloader(CPUMIPSState *env, uint8_t *base,
++                             int64_t kernel_addr)
+ {
+     uint32_t *p;
+ 
+     /* Small bootloader */
+-    p = (uint32_t *) base;
++    p = (uint32_t *)base;
+ 
+-    stl_p(p++, 0x0bf00010);                                      /* j 0x1fc00040 */
+-    stl_p(p++, 0x00000000);                                      /* nop */
++    /* j 0x1fc00040 */
++    stl_p(p++, 0x0bf00010);
++    /* nop */
++    stl_p(p++, 0x00000000);
+ 
+     /* Second part of the bootloader */
+-    p = (uint32_t *) (base + 0x040);
+-
+-    stl_p(p++, 0x3c040000);                                      /* lui a0, 0 */
+-    stl_p(p++, 0x34840002);                                      /* ori a0, a0, 2 */
+-    stl_p(p++, 0x3c050000 | ((ENVP_ADDR >> 16) & 0xffff));       /* lui a1, high(ENVP_ADDR) */
+-    stl_p(p++, 0x34a50000 | (ENVP_ADDR & 0xffff));               /* ori a1, a0, low(ENVP_ADDR) */
+-    stl_p(p++, 0x3c060000 | (((ENVP_ADDR + 8) >> 16) & 0xffff)); /* lui a2, high(ENVP_ADDR + 8) */
+-    stl_p(p++, 0x34c60000 | ((ENVP_ADDR + 8) & 0xffff));         /* ori a2, a2, low(ENVP_ADDR + 8) */
+-    stl_p(p++, 0x3c070000 | (loaderparams.ram_size >> 16));      /* lui a3, high(env->ram_size) */
+-    stl_p(p++, 0x34e70000 | (loaderparams.ram_size & 0xffff));   /* ori a3, a3, low(env->ram_size) */
+-    stl_p(p++, 0x3c1f0000 | ((kernel_addr >> 16) & 0xffff));     /* lui ra, high(kernel_addr) */;
+-    stl_p(p++, 0x37ff0000 | (kernel_addr & 0xffff));             /* ori ra, ra, low(kernel_addr) */
+-    stl_p(p++, 0x03e00008);                                      /* jr ra */
+-    stl_p(p++, 0x00000000);                                      /* nop */
++    p = (uint32_t *)(base + 0x040);
++
++    /* lui a0, 0 */
++    stl_p(p++, 0x3c040000);
++    /* ori a0, a0, 2 */
++    stl_p(p++, 0x34840002);
++    /* lui a1, high(ENVP_ADDR) */
++    stl_p(p++, 0x3c050000 | ((ENVP_ADDR >> 16) & 0xffff));
++    /* ori a1, a0, low(ENVP_ADDR) */
++    stl_p(p++, 0x34a50000 | (ENVP_ADDR & 0xffff));
++    /* lui a2, high(ENVP_ADDR + 8) */
++    stl_p(p++, 0x3c060000 | (((ENVP_ADDR + 8) >> 16) & 0xffff));
++    /* ori a2, a2, low(ENVP_ADDR + 8) */
++    stl_p(p++, 0x34c60000 | ((ENVP_ADDR + 8) & 0xffff));
++    /* lui a3, high(env->ram_size) */
++    stl_p(p++, 0x3c070000 | (loaderparams.ram_size >> 16));
++    /* ori a3, a3, low(env->ram_size) */
++    stl_p(p++, 0x34e70000 | (loaderparams.ram_size & 0xffff));
++    /* lui ra, high(kernel_addr) */
++    stl_p(p++, 0x3c1f0000 | ((kernel_addr >> 16) & 0xffff));
++    /* ori ra, ra, low(kernel_addr) */
++    stl_p(p++, 0x37ff0000 | (kernel_addr & 0xffff));
++    /* jr ra */
++    stl_p(p++, 0x03e00008);
++    /* nop */
++    stl_p(p++, 0x00000000);
+ }
+ 
+-
+ static void main_cpu_reset(void *opaque)
+ {
+     MIPSCPU *cpu = opaque;
+@@ -252,11 +270,11 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
+ }
+ 
+ /* Network support */
+-static void network_init (PCIBus *pci_bus)
++static void network_init(PCIBus *pci_bus)
+ {
+     int i;
+ 
+-    for(i = 0; i < nb_nics; i++) {
++    for (i = 0; i < nb_nics; i++) {
+         NICInfo *nd = &nd_table[i];
+         const char *default_devaddr = NULL;
+ 
+@@ -308,15 +326,17 @@ static void mips_fulong2e_init(MachineState *machine)
+     memory_region_add_subregion(address_space_mem, 0, ram);
+     memory_region_add_subregion(address_space_mem, 0x1fc00000LL, bios);
+ 
+-    /* We do not support flash operation, just loading pmon.bin as raw BIOS.
+-     * Please use -L to set the BIOS path and -bios to set bios name. */
++    /*
++     * We do not support flash operation, just loading pmon.bin as raw BIOS.
++     * Please use -L to set the BIOS path and -bios to set bios name.
++     */
+ 
+     if (kernel_filename) {
+         loaderparams.ram_size = ram_size;
+         loaderparams.kernel_filename = kernel_filename;
+         loaderparams.kernel_cmdline = kernel_cmdline;
+         loaderparams.initrd_filename = initrd_filename;
+-        kernel_entry = load_kernel (env);
++        kernel_entry = load_kernel(env);
+         write_bootloader(env, memory_region_get_ram_ptr(bios), kernel_entry);
+     } else {
+         if (bios_name == NULL) {
 -- 
 2.7.4
 
