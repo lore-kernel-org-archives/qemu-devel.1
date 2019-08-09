@@ -4,49 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 494A2C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE525C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:34:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CFF22086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:34:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CFF22086A
+	by mail.kernel.org (Postfix) with ESMTPS id A443A2086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A443A2086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw6uB-0005kL-Bf
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:34:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49052)
+	id 1hw6uT-0006fk-UB
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:34:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49087)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hw6sL-0003v2-IN
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:32:18 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hw6sN-00041j-IJ
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hw6sK-0002oh-CT
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:32:17 -0400
-Received: from relay.sw.ru ([185.231.240.75]:57606)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hw6sK-0002p3-Rv
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:32:19 -0400
+Received: from relay.sw.ru ([185.231.240.75]:57586)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hw6sI-0002il-0r; Fri, 09 Aug 2019 11:32:14 -0400
+ id 1hw6sI-0002ij-1i; Fri, 09 Aug 2019 11:32:14 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1hw6sD-0004Cp-7J; Fri, 09 Aug 2019 18:32:09 +0300
+ id 1hw6sC-0004Cp-7N; Fri, 09 Aug 2019 18:32:08 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Fri,  9 Aug 2019 18:32:05 +0300
-Message-Id: <20190809153207.49288-6-vsementsov@virtuozzo.com>
+Date: Fri,  9 Aug 2019 18:32:01 +0300
+Message-Id: <20190809153207.49288-2-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20190809153207.49288-1-vsementsov@virtuozzo.com>
 References: <20190809153207.49288-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v2 5/7] block/backup: fix
- backup_cow_with_offload for last cluster
+Subject: [Qemu-devel] [PATCH v2 1/7] block/backup: deal with zero detection
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,27 +64,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We shouldn't try to copy bytes beyond EOF. Fix it.
+We have detect_zeroes option, so at least for blockdev-backup user
+should define it if zero-detection is needed. For drive-backup leave
+detection enabled by default but do it through existing option instead
+of open-coding.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block/backup.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/backup.c | 15 ++++++---------
+ blockdev.c     |  8 ++++----
+ 2 files changed, 10 insertions(+), 13 deletions(-)
 
 diff --git a/block/backup.c b/block/backup.c
-index 228ba9423c..d482d93458 100644
+index adc4d44244..d815436455 100644
 --- a/block/backup.c
 +++ b/block/backup.c
-@@ -155,7 +155,7 @@ static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-     int ret;
-     int nr_clusters;
+@@ -113,7 +113,10 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
      BlockBackend *blk = job->common.blk;
--    int nbytes = end - start;
-+    int nbytes = MIN(end - start, job->len - start);
+     int nbytes;
      int read_flags = is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0;
+-    int write_flags = job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0;
++    int write_flags =
++            (job->serialize_target_writes ? BDRV_REQ_SERIALISING : 0) |
++            (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
++
  
-     assert(end - start < INT_MAX);
+     assert(QEMU_IS_ALIGNED(start, job->cluster_size));
+     bdrv_reset_dirty_bitmap(job->copy_bitmap, start, job->cluster_size);
+@@ -131,14 +134,8 @@ static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
+         goto fail;
+     }
+ 
+-    if (buffer_is_zero(*bounce_buffer, nbytes)) {
+-        ret = blk_co_pwrite_zeroes(job->target, start,
+-                                   nbytes, write_flags | BDRV_REQ_MAY_UNMAP);
+-    } else {
+-        ret = blk_co_pwrite(job->target, start,
+-                            nbytes, *bounce_buffer, write_flags |
+-                            (job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0));
+-    }
++    ret = blk_co_pwrite(job->target, start, nbytes, *bounce_buffer,
++                        write_flags);
+     if (ret < 0) {
+         trace_backup_do_cow_write_fail(job, start, ret);
+         if (error_is_read) {
+diff --git a/blockdev.c b/blockdev.c
+index 29c6c6044a..2d7e7be538 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3613,7 +3613,7 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+     BlockDriverState *source = NULL;
+     BlockJob *job = NULL;
+     AioContext *aio_context;
+-    QDict *options = NULL;
++    QDict *options;
+     Error *local_err = NULL;
+     int flags;
+     int64_t size;
+@@ -3686,10 +3686,10 @@ static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+         goto out;
+     }
+ 
++    options = qdict_new();
++    qdict_put_str(options, "discard", "unmap");
++    qdict_put_str(options, "detect-zeroes", "unmap");
+     if (backup->format) {
+-        if (!options) {
+-            options = qdict_new();
+-        }
+         qdict_put_str(options, "driver", backup->format);
+     }
+ 
 -- 
 2.18.0
 
