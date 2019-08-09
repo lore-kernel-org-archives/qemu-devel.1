@@ -2,83 +2,84 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F50C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5009CC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F07021743
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:32:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1840B208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 10:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZCmHOc+3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F07021743
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QLv7g4ng"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1840B208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw2C2-0005jZ-Ti
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 06:32:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58926)
+	id 1hw2DO-000701-Do
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 06:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59297)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hw2B8-00056u-SM
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:31:24 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hw2Cl-0006Lk-Ky
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hw2B7-0004Hq-4i
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:31:22 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35185)
+ (envelope-from <peter.maydell@linaro.org>) id 1hw2Ck-000535-KJ
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:33:03 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33311)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hw2B6-0004Ha-VU; Fri, 09 Aug 2019 06:31:21 -0400
-Received: by mail-ot1-x343.google.com with SMTP id j19so54062131otq.2;
- Fri, 09 Aug 2019 03:31:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hw2Ck-00052a-E0
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 06:33:02 -0400
+Received: by mail-ot1-x343.google.com with SMTP id q20so130616220otl.0
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 03:33:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=x9z4SEeQla6rmDACSJZleWM2O1lvW+qJMcmmRggvV8A=;
- b=ZCmHOc+31wYa1C2mWsjR2WKpoTjG0gVRHTjX3lhibOAv7Q/MwCpCf7ZkIGx00opFSs
- fsGUoJLvTcN/KHrUZ4GLgQDOt5+mLO71OeA1MGfbCayeFagkO4YmipxqE/EAPL/fStX1
- n4QCEn37h4KO7zZo0NQVujKCQwll2FrgXUIVkYCE5mdaLJEb0/kH15xR8LV1wdieohwE
- ViJ1qTW401mpdpGbXwWnHQU/FCMzatZluBt3SFkl+kit1XPNti6lO/b9dV8e2GQ2eAAq
- 1ZWE1mb24WwGO3nSa1x7zxkYgD31YNXfKMWnjDqBMJz0UQ8phCn3Ft2ST9zSWMnz3GBl
- wCEw==
+ :cc; bh=iHVoPg+8BuMUDlRpKhiGjRvydQMjhoEPdvVwBi/uiOQ=;
+ b=QLv7g4ng3lh5Qnv5En7uENfWjgwQA8fKIhZfE7YIk4MrGSJ8fbPy+0SogZ71vUvRzD
+ QfUTB3Lv03aTFnQwjGISq8gw0AA1QXQ9tfl1qtPIa3G8MX5Vt/5ApEbWa+rwYBycFWdU
+ Bp4fpfUiFXWfDw880ZGbWctruf0vDHu9F7NTUpNKOff+nlNtOD9cMPgZkZm9Yyt0rEAD
+ rIQBQpnDyiKDc6oEYB1pn64bqfcK2t67/GS180/UNZefgt/G5hACwOjVhekv56Xmli0l
+ 9HKTybXNq0t1DMPx+ZjZC9fLUrjl5shlLps6NhvI1KwyXVKqyWjCRP63pKPdWkOPmkeX
+ 9j4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=x9z4SEeQla6rmDACSJZleWM2O1lvW+qJMcmmRggvV8A=;
- b=M2LKnhHnWg8soJoakN8r3QCcvFwk+8V8dRKGrpPUyxvoKP96KZE8i+fqWrWVkvaB1V
- zRmE16FmGO9gmFtm2yqP8taJQiXTtyw5r1FdL8lyHqMUz0aNIjXs6VcKHiiHqIXySG1C
- zAbMpGSMPO2nuKzCeM9jgL811B+fGdVcHeeLzM1AditTbMmGx6bhIl4haOLn0NIAOpOI
- cbIltUyqMM42G8KuYHsXQZ1OqP9tMwpywZgcgEK+3bkg9jq8UyZrtIlD8j73Nu/rP+CC
- 3+SMoQolFpiDStSmgEmFzDSonODXAedIE6+DaXUYwQ+ovg6KkXgVe3sgB2qO6AZAO7AX
- Wvnw==
-X-Gm-Message-State: APjAAAWp9pgjjXKfZxwjoFad+yfcq3poGkTNfkvyh2/Or9BQm0PZv7hl
- 4Y/FE6kzaq6GfRnVqVrmJOQJLknYVDRIotLDNrRdUc/r
-X-Google-Smtp-Source: APXvYqzNlWaNh5Lv0/Bgk5d7T1R2xoFclTJ2DVuy86C7yreL661K+oTgMEz56iG5gOw8Qkwu5kLr/wYxSaqaLpgsFtg=
-X-Received: by 2002:aca:abd8:: with SMTP id u207mr5883409oie.136.1565346679795; 
- Fri, 09 Aug 2019 03:31:19 -0700 (PDT)
+ bh=iHVoPg+8BuMUDlRpKhiGjRvydQMjhoEPdvVwBi/uiOQ=;
+ b=TsUD2/uaHtWMQiMvYYAZ1OF8aUtKQPSlqMdcVUO07+oBadvvymaWLC55LRfyMoKxyJ
+ GtjPYCxKXeTqZYJepB4Adc6lhCHfYeTB3v9LAYg23D9cy26sOuRCirqx9XsBEA1PeHvE
+ OXdLuBIZCgROhj3BDabyy9+r4uiFsedxWtD1N6P7ChU8wt596psf7E3/qTuqHcwn9eJc
+ S6l4JtuIShHOi0ZG/YWx6Q/JwC4Dkk5R600VKOkn6Vb83Oy5fNF4wkzjxelWcJ9XgFKo
+ ugORalYe0lcGyMMobjhTLIfZkZU79lP2tr7T7/Uy07trdiAIqQ51TfPtQnCMVYrPhk6g
+ Wp2Q==
+X-Gm-Message-State: APjAAAWhls40afTpFvVeKWLaheb0d3iXz6HnhmbvyAXcvNYR22xAmzjn
+ R/PDz9R4MuTUNY2JZ7WtRHaLjPGCaDpJR5cbPNrCqg==
+X-Google-Smtp-Source: APXvYqwB0pVAE7PlOcKu7KFUe0zDVZNXri0BWEvY9oxZWQOyah9YI6RXaQESd7f6jfYabkMIXqJ+9LWSPe9G2bZ2Vdc=
+X-Received: by 2002:a9d:5f1a:: with SMTP id f26mr17853726oti.91.1565346781848; 
+ Fri, 09 Aug 2019 03:33:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190726175032.6769-1-richard.henderson@linaro.org>
- <20190726175032.6769-12-richard.henderson@linaro.org>
- <CAL1e-=gwyGB4ibo_B5W1MpFy-9bB7=5juqTJVBdD9N6XFOOsSQ@mail.gmail.com>
- <0f37edc5-2fb6-c92d-fb47-a381af649072@linaro.org>
-In-Reply-To: <0f37edc5-2fb6-c92d-fb47-a381af649072@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 9 Aug 2019 12:31:09 +0200
-Message-ID: <CAL1e-=hWVfYVYySkMCF4NUkHbe=47qUTuAA0vK23TGMBzuA+PQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
+References: <20190729145654.14644-1-damien.hedde@greensocs.com>
+ <20190729145654.14644-8-damien.hedde@greensocs.com>
+ <CAFEAcA-W0SaaGbUnGZ0b61ngxKY8R9xjwGXeN+=MaUi4bMDgNg@mail.gmail.com>
+ <20190808154219.GK2852@work-vm>
+ <CAFEAcA8L2YVMCu3Gb+eQTDfCpgVwA_WwVPrqPLV2iQ9rZ4HuTA@mail.gmail.com>
+ <f400248f-7a3b-83e9-3355-77de359e3f43@greensocs.com>
+In-Reply-To: <f400248f-7a3b-83e9-3355-77de359e3f43@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 9 Aug 2019 11:32:51 +0100
+Message-ID: <CAFEAcA-YjLA25wPBgWOB_c2fV2o7C8n=1-uUVe6xgiP=j5+Fgw@mail.gmail.com>
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::343
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 11/67] target/arm: Add stubs for aa32
- decodetree
+Subject: Re: [Qemu-devel] [PATCH v3 07/33] automatically add vmstate for
+ reset support in devices
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,58 +91,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:Stellaris" <qemu-arm@nongnu.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
+ Qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 8, 2019 at 5:43 PM Richard Henderson <
-richard.henderson@linaro.org> wrote:
-
-> On 8/8/19 4:41 AM, Aleksandar Markovic wrote:
-> >     +/*
-> >     + * Include the generated decoders.
-> >     + * Note that the T32 decoder reuses some of the trans_* functions
-> >     + * initially declared by the A32 decoder, which results in duplicate
-> >     + * declaration warnings.  Suppress them.
-> >     + */
-> >     +
-> >     +#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-> >     +# pragma GCC diagnostic push
-> >     +# pragma GCC diagnostic ignored "-Wredundant-decls"
-> >     +# ifdef __clang__
-> >     +#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
-> >     +# endif
-> >     +#endif
-> >     +
-> >
-> >
-> > This looks more like a "band aid" solution rather than the right one.
+On Fri, 9 Aug 2019 at 11:29, Damien Hedde <damien.hedde@greensocs.com> wrote:
 >
-> What would the "right" solution be, would you say?
->
->
-The right (without quotation marks) solution is not to generate the code
-that generates compiler complaints.
+> One way to keep the feature without copy-pasting vmsd would be to add
+> a new vmstate_register with an additional argument to pass the base
+> class vmsd section and handle the whole thing there.
 
-However, I do not say that this is a stopping issue for this series.
-Perhaps at some time in future you can think of ways that would achieve not
-resorting to pragmas. Obviously, in this case, decodetree-generated code
-shows that it is inferior to human-generated code. Still, for now, go ahead
-with this patch, as far as I am concerned.
+If we have a vmstate section which contains no actual data,
+only subsections with 'needed' functions, is it migration
+compatible with previous versions in the same way that
+tacking a subsection onto an existing function is?
 
-Yours,
-Aleksandar
+thanks
+-- PMM
 
-
-
-> A couple of days ago Phil suggested moving these pragmas into the generated
-> code, so that this need not be done by hand in the several targets that use
-> multiple decoders.  That sounds reasonable to me.
->
->
-> r~
->
