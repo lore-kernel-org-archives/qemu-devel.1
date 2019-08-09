@@ -2,64 +2,66 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 838CEC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 735DEC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:15:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DF5B214C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:01:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HNLk3PVL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF5B214C6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 3FAFD2166E
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:15:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FAFD2166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvx1x-0008Vm-Ce
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 01:01:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59888)
+	id 1hvxFN-0003oJ-As
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 01:15:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33458)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgibson@ozlabs.org>) id 1hvx0o-00082y-Nd
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:00:24 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hvxEH-0003J7-B8
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:14:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1hvx0n-0008RS-4y
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:00:22 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:59577)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1hvx0m-0008OG-En; Fri, 09 Aug 2019 01:00:21 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 464Y2n614kz9sN4; Fri,  9 Aug 2019 15:00:17 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1565326817;
- bh=nKbb1o5NWpU+Q0sxeXxTwUPM/I28n5Y9KyzOHTXHarM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HNLk3PVLlkuMXy7c8YX1+bLsJavbk1uu+Go85s22RWjwJ4tfmcEo8ZtKdhzDqYPBr
- FqeIyOnXUGxnOF8mV4LsFm8lKAiRYaxjthcV384iPPwvy7Xh1NovGoxZtidabGR6HI
- cBcyXVfWmnTfd3vU6+xoLuRuhYEMboLdGUd/QNBc=
-Date: Fri, 9 Aug 2019 14:58:25 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Black <daniel@linux.ibm.com>
-Message-ID: <20190809045825.GQ5465@umbus.fritz.box>
-References: <20190805050959.19935-1-daniel@linux.ibm.com>
+ (envelope-from <no-reply@patchew.org>) id 1hvxEG-0003MU-9W
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:14:17 -0400
+Resent-Date: Fri, 09 Aug 2019 01:14:17 -0400
+Resent-Message-Id: <E1hvxEG-0003MU-9W@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21827)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hvxEG-0003J1-1k; Fri, 09 Aug 2019 01:14:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565327646; cv=none; d=zoho.com; s=zohoarc; 
+ b=ffOvaKg1g4VOnWr2xCtKQee2TiS9fge3V/nUpxa1X8zM0A2/qax2+Ma+0lmgzzKASt0tSZ5TNsVjoIxKGZgN33Ibz68F3mIIjjbaVhG+qfQnbSF1tk2TibWRW0mOmHjft2scRZe2PU6/bFWZcLb8KfotTCtSfiK2t+/Px5XEKs0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565327646;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=SLH2Zf2+ApKlpaCtdSLJN6M7y+5Xhk/o4Ijng6kaguY=; 
+ b=Sqbrbwg+9EF3YSvf67aqQLyHNxgMN3lJFzvLIiCS1rAoAPuGIXA9JK7SQkSvy8aXyVTdy/lIZ0PggYY/SmqKoyD/6G/i6IkgpcyoUUPqOwFagGx9ZZiI/BNZyRc63/IYnjhEPyAS1RE14oxB274JzHzSuAJdb5BFq7HbpRKe1aw=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565327645137271.8518030906167;
+ Thu, 8 Aug 2019 22:14:05 -0700 (PDT)
+In-Reply-To: <20190809042909.74988-1-rebecca@bsdio.com>
+Message-ID: <156532764399.12874.720972209018325901@b08f24806b7e>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="oDto3OTLsk6uOlQH"
-Content-Disposition: inline
-In-Reply-To: <20190805050959.19935-1-daniel@linux.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
-Subject: Re: [Qemu-devel] [PATCH v3] spapr: quantify error messages
- regarding capability settings
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: rebecca@bsdio.com
+Date: Thu, 8 Aug 2019 22:14:05 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH v2] Update the avx2 configure test to be
+ compatible with clang
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,226 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, rebecca@bsdio.com, mjt@tls.msk.ru,
+ qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwOTA0MjkwOS43NDk4
+OC0xLXJlYmVjY2FAYnNkaW8uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
+biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
+b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
+Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2Ug
+ZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdXRpbC9vc2xpYi1w
+b3NpeC5vCiAgQ0MgICAgICB1dGlsL3FlbXUtb3BlbnB0eS5vCiAgQ0MgICAgICB1dGlsL3FlbXUt
+dGhyZWFkLXBvc2l4Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6ZXJvLmM6NzE6
+MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93bi1wcmFn
+bWFzXQojcHJhZ21hIEdDQyBwdXNoX29wdGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
+dC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzo3MjoxMzogZXJyb3I6IHVua25vd24gcHJhZ21hIGln
+bm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEgR0NDIHRhcmdldCgic3Nl
+MiIpCiAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6ZXJvLmM6
+MTA4OjEzOiBlcnJvcjogdW5rbm93biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vua25vd24t
+cHJhZ21hc10KI3ByYWdtYSBHQ0MgcG9wX29wdGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUt
+dGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzoxMTY6MTM6IGVycm9yOiB1bmtub3duIHByYWdt
+YSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93bi1wcmFnbWFzXQojcHJhZ21hIEdDQyBwdXNoX29w
+dGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8u
+YzoxMTc6MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93
+bi1wcmFnbWFzXQojcHJhZ21hIEdDQyB0YXJnZXQoInNzZTQiKQogICAgICAgICAgICBeCi90bXAv
+cWVtdS10ZXN0L3NyYy91dGlsL2J1ZmZlcmlzemVyby5jOjE0ODoxMzogZXJyb3I6IHVua25vd24g
+cHJhZ21hIGlnbm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEgR0NDIHBv
+cF9vcHRpb25zCiAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6
+ZXJvLmM6MTQ5OjEzOiBlcnJvcjogdW5rbm93biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vu
+a25vd24tcHJhZ21hc10KI3ByYWdtYSBHQ0MgcHVzaF9vcHRpb25zCiAgICAgICAgICAgIF4KL3Rt
+cC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6ZXJvLmM6MTUwOjEzOiBlcnJvcjogdW5rbm93
+biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vua25vd24tcHJhZ21hc10KI3ByYWdtYSBHQ0Mg
+dGFyZ2V0KCJhdngyIikKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9idWZm
+ZXJpc3plcm8uYzoxODc6MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9y
+LC1XdW5rbm93bi1wcmFnbWFzXQojcHJhZ21hIEdDQyBwb3Bfb3B0aW9ucwogICAgICAgICAgICBe
+CjkgZXJyb3JzIGdlbmVyYXRlZC4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
+Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwODA5MDQyOTA5Ljc0OTg4LTEtcmViZWNjYUBic2Rpby5j
+b20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
---oDto3OTLsk6uOlQH
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Aug 05, 2019 at 03:09:58PM +1000, Daniel Black wrote:
-> Its not immediately obvious how cap-X=3DY setting need to be applied
-> to the command line so, for spapr capability hints, this has been clarifi=
-ed to:
->=20
->   ..try appending -machine cap-X=3DY
->=20
-> The wrong value messages have been left as is, as the user has found the =
-right
-> location.
->=20
-> Warning messages have been left as is for now.
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Daniel Black <daniel@linux.ibm.com>
-
-So, I'm sorry to nitpick, but..
-[snip]
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index bbb001f84a..b06faee7f6 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -37,6 +37,8 @@
-> =20
->  #include "hw/ppc/spapr.h"
-> =20
-> +#define CAPABILITY_HINT(X) " try appending -machine " X
-
-=2E. I'd prefer to see the new messages just written inline rather than
-this macro.  I think the increased duplication is less important than
-the reduced greppability that the macro introduces.
-
-> +
->  typedef struct SpaprCapPossible {
->      int num;            /* size of vals array below */
->      const char *help;   /* help text for vals */
-> @@ -194,10 +196,12 @@ static void cap_htm_apply(SpaprMachineState *spapr,=
- uint8_t val, Error **errp)
->      }
->      if (tcg_enabled()) {
->          error_setg(errp,
-> -                   "No Transactional Memory support in TCG, try cap-htm=
-=3Doff");
-> +                   "No Transactional Memory support in TCG,"
-> +                   CAPABILITY_HINT("cap-htm=3Doff"));
->      } else if (kvm_enabled() && !kvmppc_has_cap_htm()) {
->          error_setg(errp,
-> -"KVM implementation does not support Transactional Memory, try cap-htm=
-=3Doff"
-> +"KVM implementation does not support Transactional Memory,"
-> +                   CAPABILITY_HINT("cap-htm=3Doff")
->              );
->      }
->  }
-> @@ -215,7 +219,8 @@ static void cap_vsx_apply(SpaprMachineState *spapr, u=
-int8_t val, Error **errp)
->       * rid of anything that doesn't do VMX */
->      g_assert(env->insns_flags & PPC_ALTIVEC);
->      if (!(env->insns_flags2 & PPC2_VSX)) {
-> -        error_setg(errp, "VSX support not available, try cap-vsx=3Doff");
-> +        error_setg(errp, "VSX support not available,"
-> +                   CAPABILITY_HINT("cap-vsx=3Doff"));
->      }
->  }
-> =20
-> @@ -229,7 +234,8 @@ static void cap_dfp_apply(SpaprMachineState *spapr, u=
-int8_t val, Error **errp)
->          return;
->      }
->      if (!(env->insns_flags2 & PPC2_DFP)) {
-> -        error_setg(errp, "DFP support not available, try cap-dfp=3Doff");
-> +        error_setg(errp, "DFP support not available,"
-> +                   CAPABILITY_HINT("cap-dfp=3Doff"));
->      }
->  }
-> =20
-> @@ -253,7 +259,8 @@ static void cap_safe_cache_apply(SpaprMachineState *s=
-papr, uint8_t val,
->                     cap_cfpc_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested safe cache capability level not supported by kvm, try cap-cfp=
-c=3D%s",
-> +                   "Requested safe cache capability level not supported =
-by kvm,"
-> +                   CAPABILITY_HINT("cap-cfpc=3D%s"),
->                     cap_cfpc_possible.vals[kvm_val]);
->      }
-> =20
-> @@ -281,7 +288,8 @@ static void cap_safe_bounds_check_apply(SpaprMachineS=
-tate *spapr, uint8_t val,
->                     cap_sbbc_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested safe bounds check capability level not supported by kvm, try =
-cap-sbbc=3D%s",
-> +"Requested safe bounds check capability level not supported by kvm,"
-> +                   CAPABILITY_HINT("cap-sbbc=3D%s"),
->                     cap_sbbc_possible.vals[kvm_val]);
->      }
-> =20
-> @@ -312,7 +320,8 @@ static void cap_safe_indirect_branch_apply(SpaprMachi=
-neState *spapr,
->                     cap_ibs_possible.vals[val]);
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested safe indirect branch capability level not supported by kvm, t=
-ry cap-ibs=3D%s",
-> +"Requested safe indirect branch capability level not supported by kvm,"
-> +                   CAPABILITY_HINT("cap-ibs=3D%s"),
->                     cap_ibs_possible.vals[kvm_val]);
->      }
-> =20
-> @@ -401,11 +410,13 @@ static void cap_nested_kvm_hv_apply(SpaprMachineSta=
-te *spapr,
-> =20
->      if (tcg_enabled()) {
->          error_setg(errp,
-> -                   "No Nested KVM-HV support in tcg, try cap-nested-hv=
-=3Doff");
-> +                   "No Nested KVM-HV support in tcg,"
-> +                   CAPABILITY_HINT("cap-nested-hv=3Doff"));
->      } else if (kvm_enabled()) {
->          if (!kvmppc_has_cap_nested_kvm_hv()) {
->              error_setg(errp,
-> -"KVM implementation does not support Nested KVM-HV, try cap-nested-hv=3D=
-off");
-> +"KVM implementation does not support Nested KVM-HV,"
-> +                       CAPABILITY_HINT("cap-nested-hv=3Doff"));
->          } else if (kvmppc_set_cap_nested_kvm_hv(val) < 0) {
->                  error_setg(errp,
->  "Error enabling cap-nested-hv with KVM, try cap-nested-hv=3Doff");
-> @@ -435,10 +446,12 @@ static void cap_large_decr_apply(SpaprMachineState =
-*spapr,
-> =20
->          if (!kvm_nr_bits) {
->              error_setg(errp,
-> -                       "No large decrementer support, try cap-large-decr=
-=3Doff");
-> +                       "No large decrementer support,"
-> +                        CAPABILITY_HINT("cap-large-decr=3Doff"));
->          } else if (pcc->lrg_decr_bits !=3D kvm_nr_bits) {
->              error_setg(errp,
-> -"KVM large decrementer size (%d) differs to model (%d), try -cap-large-d=
-ecr=3Doff",
-> +"KVM large decrementer size (%d) differs to model (%d),"
-> +                CAPABILITY_HINT("cap-large-decr=3Doff"),
->                  kvm_nr_bits, pcc->lrg_decr_bits);
->          }
->      }
-> @@ -454,7 +467,8 @@ static void cap_large_decr_cpu_apply(SpaprMachineStat=
-e *spapr,
->      if (kvm_enabled()) {
->          if (kvmppc_enable_cap_large_decr(cpu, val)) {
->              error_setg(errp,
-> -                       "No large decrementer support, try cap-large-decr=
-=3Doff");
-> +                       "No large decrementer support,"
-> +                       CAPABILITY_HINT("cap-large-decr=3Doff"));
->          }
->      }
-> =20
-> @@ -474,10 +488,12 @@ static void cap_ccf_assist_apply(SpaprMachineState =
-*spapr, uint8_t val,
->      if (tcg_enabled() && val) {
->          /* TODO - for now only allow broken for TCG */
->          error_setg(errp,
-> -"Requested count cache flush assist capability level not supported by tc=
-g, try cap-ccf-assist=3Doff");
-> +"Requested count cache flush assist capability level not supported by tc=
-g,"
-> +                   CAPABILITY_HINT("cap-ccf-assist=3Doff"));
->      } else if (kvm_enabled() && (val > kvm_val)) {
->          error_setg(errp,
-> -"Requested count cache flush assist capability level not supported by kv=
-m, try cap-ccf-assist=3Doff");
-> +"Requested count cache flush assist capability level not supported by kv=
-m,"
-> +                   CAPABILITY_HINT("cap-ccf-assist=3Doff"));
->      }
->  }
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---oDto3OTLsk6uOlQH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1M/XEACgkQbDjKyiDZ
-s5I43A//QBlVZRhtAN9zRe4D4XOcb4Ju9KLjhNhj6vzS+rphBSX0NI6Z5ZlFhwlB
-RDwxImxqleUspmFplrdpHIXIRjyQgYHaEhN8nzOfS5ztEIcXYwgTOK2olnn1nya3
-WhXu34Q6jh+JieEykgH0r6lP7oK51n9E5J1ILjuxntlXaiDLbNobBOv6ZhHY2kgb
-5pnw/NF4PSGBxMGqNZlOc9vJtbt0Xp4Kdz7VkQEaYnlNReOwRFY9vVl68DPHNYsN
-MdEsCudNDMASkQeP+JlIIabJf2RKj05nSRMpZyok6VfkJNhVVpEd1J5vK9nimfJB
-ZG5RGUPHG9yJQXGQCaj3XKgH1O/8HwA2r/0/Wgc3haGlVxLMKz6ZN/qFpFADSDn3
-YkEkbRVpSJfIROWTEhFC3A58kbeey1uf4FP7opT+W7wYXSUv9+jHmWk9aeE2RXez
-vXnt7hAJbp5XP5oRA9PH6/rIKd96vHS/vnB/sKERqkm5FO65I0pQfm0I3lQ4DvYd
-kbnG4AihR3DBPzv5TE8hKAGMbtIvgWtW57fmz/Lv7KLlJH01AUP9WUBapIL+7kqo
-wVtBKd/EKYhrYHbQBP2wbDAFSVlYYVVURzizNs3SCDB7b/7zh5XQm1ruym1aktUC
-0eLQKNw46UQhLFEXIsk0ts5mysmocc5aUEE1xUCCzo1dX05/STA=
-=wesd
------END PGP SIGNATURE-----
-
---oDto3OTLsk6uOlQH--
 
