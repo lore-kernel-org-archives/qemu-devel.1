@@ -2,64 +2,88 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CBBC31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3E7CC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:42:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72CD5214C6
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:35:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72CD5214C6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 712E520B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 13:42:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rui0fwr4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 712E520B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw53a-0004PT-Nb
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 09:35:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60227)
+	id 1hw59g-0007CQ-Eq
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 09:42:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33232)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <berrange@redhat.com>) id 1hw53C-0003y1-HU
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:35:23 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hw59H-0006gt-LY
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:41:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1hw53A-0001Ug-SS
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:35:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29789)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1hw53A-0001UB-L3
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:35:20 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 60C79C085537;
- Fri,  9 Aug 2019 13:35:19 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F2BC1001E91;
- Fri,  9 Aug 2019 13:35:17 +0000 (UTC)
-Date: Fri, 9 Aug 2019 14:35:14 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <20190809133514.GF13660@redhat.com>
-References: <87r25vd5y1.fsf@dusky.pond.sub.org>
- <CAFEAcA-3X0s-mxaD27HWQa7ysiEb6Uo-BD+Yxo0QhBV_yb9WLA@mail.gmail.com>
- <CAFEAcA-e2aW33GeuganVSnu9epuqt57rnZ_KgEHwDNqrWrTHuA@mail.gmail.com>
+ (envelope-from <stefanha@gmail.com>) id 1hw59G-0004bT-LB
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:41:39 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53716)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hw59G-0004aU-CO
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 09:41:38 -0400
+Received: by mail-wm1-x342.google.com with SMTP id 10so5771539wmp.3
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 06:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=ge9uy71wu24DAY9WE4GjffdoFT7bxiIKnwYte6dNnIM=;
+ b=rui0fwr4HJn5KEfIVep6pH8B6C9XvhiiI/Stxh+2iD9dxf03VIlV8j9C5AGJPlEpjO
+ lL8d1eZyHVOPyTqMpxehjCdygN1jqcTdBJjnsSrS53AJxpXXoyfTJ0m4HLr1wE0uw1Oq
+ w6DWKD2TnfHVcowtHjDmcIScd43KRgpgoQ5zJMauWCZ/ilAejYPhSx9LoT/Hvad1M4FK
+ mfi0VQRniW2oY+uBtOmdHTOvfotKjlNxPbGwFbXliujbVGw51GI5CXlI+vCAHnDYtIP3
+ jwqPmDyTBQOveYdGcItR8oOHUDvM13pXq7s8tHkPpm1eQsiFFU4XHAZLJGP7Cwc+Ac73
+ XnYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=ge9uy71wu24DAY9WE4GjffdoFT7bxiIKnwYte6dNnIM=;
+ b=InypmXALsaL9XpTSISobWJQ4aIQxlyUHmam/q1WypYoDBrYSwDTYTMD4BCbgNPSleS
+ l0XxhKetqu5XIhqXN8tWFRX1aAhcxjE1HYpuybEDPrMAQvCe3Ib58vMKviZ6Nkvw7ZWv
+ KRt/9euIU5NiMLI0gYJ+cDvzjKcTP7HpvY7uxp7GXzM4HSH6WDfcHDOru8KleffcaVA0
+ B0aIWvqEgC4tIy43wcDOys4aQRkK8V06JMjN2hT3rPEBQLJLJH8V9CQBEMa6+Q80l0GE
+ 7ONtWIWIpzqnt8DdoqsrB5ar3kKCglLWZNQJ1qAghi86YoOyfmFrzfIZpaxvVSjltwDr
+ Ko3w==
+X-Gm-Message-State: APjAAAV3XpaZEP+3w6yw45vJDnrSiB7gc9eL19IWYvlzURXqyo3L6Obu
+ UDxejYHYDbjYDNEC9K1lh4g=
+X-Google-Smtp-Source: APXvYqxmT2Id8HfE0g6XYO7OiHUZbgskFJNoQuH3CKEl3NYfuWBtwgw2vkNEiZlYETD69X1npgWfCw==
+X-Received: by 2002:a7b:c149:: with SMTP id z9mr11471082wmi.0.1565358096812;
+ Fri, 09 Aug 2019 06:41:36 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id e10sm16446141wrn.33.2019.08.09.06.41.35
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 09 Aug 2019 06:41:35 -0700 (PDT)
+Date: Fri, 9 Aug 2019 14:41:34 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Ning Bo <ning.bo9@zte.com.cn>
+Message-ID: <20190809134134.GA8594@stefanha-x1.localdomain>
+References: <1564975951-29263-1-git-send-email-ning.bo9@zte.com.cn>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="/04w6evG8XlLl3ft"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA-e2aW33GeuganVSnu9epuqt57rnZ_KgEHwDNqrWrTHuA@mail.gmail.com>
+In-Reply-To: <1564975951-29263-1-git-send-email-ning.bo9@zte.com.cn>
 User-Agent: Mutt/1.12.0 (2019-05-25)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Fri, 09 Aug 2019 13:35:19 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Does i386-linux-user build on an i686 host?
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-vsock: report QMP event when set
+ running
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,93 +95,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <Laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: mst@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 09, 2019 at 01:49:07PM +0100, Peter Maydell wrote:
-> On Fri, 9 Aug 2019 at 13:22, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> >
-> > On Thu, 8 Aug 2019 at 16:37, Markus Armbruster <armbru@redhat.com> wr=
-ote:
-> > >
-> > > Fails for me, but perhaps I'm doing it wrong:
-> >
-> >
-> > > NOTE: cross-compilers enabled:  'cc'
-> > > $ make
-> > >   CC      i386-linux-user/linux-user/syscall.o
-> > > /home/armbru/qemu/linux-user/ioctls.h:306:9: error: =E2=80=98SNDCTL=
-_DSP_MAPINBUF=E2=80=99 undeclared here (not in a function)
-> > >    IOCTL(SNDCTL_DSP_MAPINBUF, IOC_R, MK_PTR(MK_STRUCT(STRUCT_buffme=
-m_desc)))
-> > >          ^
-> > > /home/armbru/qemu/linux-user/syscall.c:5023:23: note: in definition=
- of macro =E2=80=98IOCTL=E2=80=99
-> > >      { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-> > >                        ^
-> > > /home/armbru/qemu/linux-user/ioctls.h:307:9: error: =E2=80=98SNDCTL=
-_DSP_MAPOUTBUF=E2=80=99 undeclared here (not in a function)
-> > >    IOCTL(SNDCTL_DSP_MAPOUTBUF, IOC_R, MK_PTR(MK_STRUCT(STRUCT_buffm=
-em_desc)))
-> > >          ^
-> > > /home/armbru/qemu/linux-user/syscall.c:5023:23: note: in definition=
- of macro =E2=80=98IOCTL=E2=80=99
-> > >      { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-> > >                        ^
-> > > /home/armbru/qemu/linux-user/ioctls.h:362:9: error: =E2=80=98SOUND_=
-MIXER_ACCESS=E2=80=99 undeclared here (not in a function)
-> > >    IOCTL(SOUND_MIXER_ACCESS, 0, TYPE_PTRVOID)
-> > >          ^
-> > > /home/armbru/qemu/linux-user/syscall.c:5023:23: note: in definition=
- of macro =E2=80=98IOCTL=E2=80=99
-> > >      { TARGET_ ## cmd, cmd, #cmd, access, 0, {  __VA_ARGS__ } },
-> > >                        ^
-> >
-> > We expect these to be provided by the system's "linux/soundcard.h".
-> > For my Debian system that's provided by the linux-libc-dev package,
-> > but I imagine you have that installed or you wouldn't have got
-> > this far in the configure/compile process...
->=20
-> Further investigation shows that this is because the system has
-> the 'oss4-dev' package installed, which diverts /usr/include/linux/soun=
-dcard.h
-> and installs its own version which doesn't provide all the symbols
-> that the kernel one does.
->=20
-> Easy fix: uninstall oss4-dev.
 
-Perhaps also make 'configure' exit with an error if it detects the
-broken soundcard.h ?
+--/04w6evG8XlLl3ft
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Better fix: patch QEMU to provide its own versions of these constants
-> if the system headers don't.
+On Mon, Aug 05, 2019 at 11:32:31AM +0800, Ning Bo wrote:
+> If a program in host communicates with a vsock device in guest via
+> 'vsock://', but the device is not ready, the 'connect' syscall will
+> block and then timeout after 2 second default.(the timeout is defined
+> in kernel: #define VSOCK_DEFAULT_CONNECT_TIMEOUT (2 * HZ)).
+> We can avoid this case if qemu reports an event when the vsock is
+> ready and the program waits the event before connecting.
 >=20
-> Utopian fix: I've wondered occasionally whether for cases like this
-> where the constant is known to be the same for the host and the guest
-> we should have some sort of approach which lets us use the QEMU
-> copies of the linux kernel headers rather than having to rely on
-> the host system, which might have an older version that restricts
-> us unnecessarily on what we could support...
->=20
-> Issue previously reported in 2016:
-> https://lists.gnu.org/archive/html/qemu-devel/2016-12/msg01421.html
->=20
-> thanks
-> -- PMM
->=20
+> Report vsock running event so that the upper application can
+> control boot sequence.
+> see https://github.com/kata-containers/runtime/pull/1918
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Please describe the issue with connect(2) in detail.  Are you observing
+that connect(2) always times out when called before the guest driver
+hasn't set the virtio-vsock status register to
+VIRTIO_CONFIG_S_DRIVER_OK?
+
+I think that adding a QMP event is working around the issue rather than
+fixing the root cause.  This is probably a vhost_vsock.ko problem and
+should be fixed there.
+
+Stefan
+
+--/04w6evG8XlLl3ft
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1NeA4ACgkQnKSrs4Gr
+c8heagf/Y7aB9rifZK1g8Xb+Jck2Jz0I4dOQaDNqy/21ogKJ8EEIkg2gEOtTF1LT
+EbE7dsSlP9kl/yCYMcoP8Vm07MiszZutc25IFut9iHJjtwF2MDIfp7KujSvTb2/9
+JGitxA6mev3x8ONaEK/0gdetq1vTKAg8Ayf/a1zbbZ+lHwdqsZfiBmTA7Byg4QSt
+ppsMIRc9QvsrxYMNqUc7OjurCEkj+tN68GxsAwpp8/FBaMbduIImsH8EsvZPVrjS
+mpa4TAsNLeErtRdp1CAHg4dvQp5Wegs1IqcRcWUxLag0xsS8w/0Vg3Mv5RcDGEH5
+4m08JhiBYJ8GRoQdOnLEDZpely0K9A==
+=PoPv
+-----END PGP SIGNATURE-----
+
+--/04w6evG8XlLl3ft--
 
