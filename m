@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FFAC31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F73C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:20:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7294B2086A
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:20:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7294B2086A
+	by mail.kernel.org (Postfix) with ESMTPS id 42C37214C6
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:20:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C37214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60893 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw7cY-0004k3-Kn
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:20:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56839)
+	id 1hw7cc-0004yn-IG
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:20:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57290)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hw7XE-0000jQ-C9
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:14:33 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hw7Xh-0002Gx-D8
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hw7XD-00040T-Bg
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:14:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36366)
+ (envelope-from <mreitz@redhat.com>) id 1hw7Xg-0004IK-Bv
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58998)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hw7XA-0003zJ-Io; Fri, 09 Aug 2019 12:14:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hw7Xe-0004Gq-8N; Fri, 09 Aug 2019 12:14:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C84B060AD4;
- Fri,  9 Aug 2019 16:14:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 91657309E5B4;
+ Fri,  9 Aug 2019 16:14:57 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 644C55C578;
- Fri,  9 Aug 2019 16:14:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D7CC608C2;
+ Fri,  9 Aug 2019 16:14:57 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri,  9 Aug 2019 18:13:33 +0200
-Message-Id: <20190809161407.11920-9-mreitz@redhat.com>
+Date: Fri,  9 Aug 2019 18:13:46 +0200
+Message-Id: <20190809161407.11920-22-mreitz@redhat.com>
 In-Reply-To: <20190809161407.11920-1-mreitz@redhat.com>
 References: <20190809161407.11920-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Fri, 09 Aug 2019 16:14:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Fri, 09 Aug 2019 16:14:57 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 08/42] block: bdrv_set_backing_hd() is about
- bs->backing
+Subject: [Qemu-devel] [PATCH v6 21/42] block: Use CAFs for debug breakpoints
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,43 +73,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_set_backing_hd() is a function that explicitly cares about the
-bs->backing child.  Highlight that in its description and use
-child_bs(bs->backing) instead of backing_bs(bs) to make it more obvious.
+When looking for a blkdebug node (which implements debug breakpoints),
+use bdrv_primary_bs() to iterate through the graph, because that is
+where a blkdebug node would be.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/block.c b/block.c
-index 486c75d847..adf82efb0e 100644
+index a467b175c6..1070aa1ba9 100644
 --- a/block.c
 +++ b/block.c
-@@ -2539,7 +2539,7 @@ static bool bdrv_inherits_from_recursive(BlockDrive=
-rState *child,
- }
-=20
- /*
-- * Sets the backing file link of a BDS. A new reference is created; call=
-ers
-+ * Sets the bs->backing link of a BDS. A new reference is created; calle=
-rs
-  * which don't need their own reference any more must call bdrv_unref().
-  */
- void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing=
-_hd,
-@@ -2548,7 +2548,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, Bloc=
-kDriverState *backing_hd,
-     bool update_inherits_from =3D bdrv_chain_contains(bs, backing_hd) &&
-         bdrv_inherits_from_recursive(backing_hd, bs);
-=20
--    if (bdrv_is_backing_chain_frozen(bs, backing_bs(bs), errp)) {
-+    if (bdrv_is_backing_chain_frozen(bs, child_bs(bs->backing), errp)) {
-         return;
+@@ -5218,7 +5218,7 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, con=
+st char *event,
+                           const char *tag)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_breakpoint) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_primary_bs(bs);
      }
 =20
+     if (bs && bs->drv && bs->drv->bdrv_debug_breakpoint) {
+@@ -5231,7 +5231,7 @@ int bdrv_debug_breakpoint(BlockDriverState *bs, con=
+st char *event,
+ int bdrv_debug_remove_breakpoint(BlockDriverState *bs, const char *tag)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_remove_breakpoint) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_primary_bs(bs);
+     }
+=20
+     if (bs && bs->drv && bs->drv->bdrv_debug_remove_breakpoint) {
+@@ -5244,7 +5244,7 @@ int bdrv_debug_remove_breakpoint(BlockDriverState *=
+bs, const char *tag)
+ int bdrv_debug_resume(BlockDriverState *bs, const char *tag)
+ {
+     while (bs && (!bs->drv || !bs->drv->bdrv_debug_resume)) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_primary_bs(bs);
+     }
+=20
+     if (bs && bs->drv && bs->drv->bdrv_debug_resume) {
+@@ -5257,7 +5257,7 @@ int bdrv_debug_resume(BlockDriverState *bs, const c=
+har *tag)
+ bool bdrv_debug_is_suspended(BlockDriverState *bs, const char *tag)
+ {
+     while (bs && bs->drv && !bs->drv->bdrv_debug_is_suspended) {
+-        bs =3D bs->file ? bs->file->bs : NULL;
++        bs =3D bdrv_primary_bs(bs);
+     }
+=20
+     if (bs && bs->drv && bs->drv->bdrv_debug_is_suspended) {
 --=20
 2.21.0
 
