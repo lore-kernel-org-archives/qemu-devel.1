@@ -2,93 +2,91 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 160DFC31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:08:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F0FC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:13:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D66462171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:08:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pFUWhPJm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D66462171F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1C27D2171F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:13:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C27D2171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw6Vd-0008G2-TF
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:08:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45504)
+	id 1hw6a9-000382-VI
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:13:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46240)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hw6Uy-0007fD-2p
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:08:08 -0400
+ (envelope-from <eblake@redhat.com>) id 1hw6ZP-0001s6-8k
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:12:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hw6Ux-0002GU-3x
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:08:07 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43814)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hw6Uw-0002Fb-SR
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:08:07 -0400
-Received: by mail-pf1-x444.google.com with SMTP id i189so46215731pfg.10
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 08:08:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=YpRqjcQKhm6IQBdYAtFahqS6Fx4MEgw+xF1y50+3TSA=;
- b=pFUWhPJmeef18ocqbbW2QX78DInbj9Nd/wN+B7eqCtkcZffI9dCa28+M5mHybc6FLQ
- 6/7AMA7bHm7AjjxMhZiH9qssXRXombEfIAOLmQ5dRfC068B4j1xZJ8dBdUL0K/zhH3VG
- ltSXKtwkjBaYaH+CuYu/0m/kbQ0+N2HVrSuJDmsI/WOaojZ6vlCxmjGLf0BAozZK6m82
- dABE7Wehi1BreplYWojpX52dFUMjSQEDwoE1p+FzrN3FQ43S+WMB4UCq/dNZth/D+lAt
- kjj+hGah4GsfNxKU2QSA74nfyH3tHExRHRfnrnUpMFxTgaRWdJkIQ7n2HcsTZLRKZXWz
- QiZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YpRqjcQKhm6IQBdYAtFahqS6Fx4MEgw+xF1y50+3TSA=;
- b=gyn5yYG0PFSpc9qiwlxI6gaIfxc/BeRfcYHFgAYNSfs2YaMwdgA5AWpefj4Ld679xh
- 91pvaQO6O32daMcwXBQO5HF2lauanrZaGPKJhRVWvQr6h3EQFCSmP+Hr4RiXMn9lXgku
- bsDU/g2E4kUOSZKc/+Lw+hljVgoOG5a5xcVV1uN2sJC6y6zTxYvdoGsgw+N16pBPRTF9
- 6LwNS/p0slTZd1vfbfzccX9VnDiLXe9U/9FrfCmeXDvLvbSwKE2wOuxztQq6afkf18d4
- nGr3bbzdr+cZi98I91V5PEgnl83/JOzMqbiX5cOfPFXoEA/iiA+vaeXuHGqI5y1HbNn8
- zsJA==
-X-Gm-Message-State: APjAAAWQiIVM/CtvgHqzsWC3Tr3UE0Z5O2ZFU9uGy8tl+kh/rBjflOzW
- KVnNYTvkFGeAlQCYVnuJUO7uynMtVL8=
-X-Google-Smtp-Source: APXvYqy148uUg6OykZaSBtJTva+HTBOcxBlVTSy+MSfzjCCVA+Z00QFGluSy8Pks0gJOHPhqL8psoQ==
-X-Received: by 2002:a17:90a:258b:: with SMTP id
- k11mr9541401pje.110.1565363284997; 
- Fri, 09 Aug 2019 08:08:04 -0700 (PDT)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id x25sm134382666pfa.90.2019.08.09.08.08.03
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 09 Aug 2019 08:08:04 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <20190305165051.26860-1-peter.maydell@linaro.org>
- <20190305165051.26860-10-peter.maydell@linaro.org>
- <CAFEAcA8vfxjW6hVnKiBu7jeiFSGXzqdaQ_ytUXgEwJ91JLDf=g@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1hw6ZO-0005IR-80
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:12:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35852)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hw6ZL-0005Gn-9D; Fri, 09 Aug 2019 11:12:39 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 13FC83002F44;
+ Fri,  9 Aug 2019 15:12:38 +0000 (UTC)
+Received: from [10.3.116.93] (ovpn-116-93.phx2.redhat.com [10.3.116.93])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C582608C2;
+ Fri,  9 Aug 2019 15:12:34 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
+ <20190618114328.55249-6-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <a4857913-8551-14a0-aa5c-f0cc089d79ec@linaro.org>
-Date: Fri, 9 Aug 2019 08:08:02 -0700
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <f49e0d24-4b00-0b58-6d72-a865910bc514@redhat.com>
+Date: Fri, 9 Aug 2019 10:12:33 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8vfxjW6hVnKiBu7jeiFSGXzqdaQ_ytUXgEwJ91JLDf=g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::444
-Subject: Re: [Qemu-devel] [PULL 09/22] target/arm: Implement ARMv8.5-CondM
+In-Reply-To: <20190618114328.55249-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="pEIGa389cuGIqq2oJ5IYc1yggaLWKUoeW"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Fri, 09 Aug 2019 15:12:38 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v7 5/9] block/nbd: refactor nbd connection
+ parameters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,27 +98,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, stefanha@redhat.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/9/19 2:53 AM, Peter Maydell wrote:
-> Hi -- it's just been pointed out to me that if our 'max' CPU
-> supports v8.5-CondM then we ought to be setting the HWCAP2_FLAGM2
-> bit in the hwcaps for linux-user mode. (Maybe we implemented this
-> before the kernel defined the hwcap bit?)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pEIGa389cuGIqq2oJ5IYc1yggaLWKUoeW
+Content-Type: multipart/mixed; boundary="GTrsvRoUxEfKZzngxb2R3dn0C2OaykJct";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, stefanha@redhat.com, mreitz@redhat.com,
+ kwolf@redhat.com, den@openvz.org
+Message-ID: <f49e0d24-4b00-0b58-6d72-a865910bc514@redhat.com>
+Subject: Re: [PATCH v7 5/9] block/nbd: refactor nbd connection parameters
+References: <20190618114328.55249-1-vsementsov@virtuozzo.com>
+ <20190618114328.55249-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20190618114328.55249-6-vsementsov@virtuozzo.com>
 
-Yep.  We added CondM in March and this hwcap bit was added in June.
+--GTrsvRoUxEfKZzngxb2R3dn0C2OaykJct
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-I keep thinking that they'll stop adding hwcap bits that can now just as easily
-be "read" (trap and emulated) from id registers.  They've filled up HWCAP, and
-only have 23 left in HWCAP2.
+On 6/18/19 6:43 AM, Vladimir Sementsov-Ogievskiy wrote:
+> We'll need some connection parameters to be available all the time to
+> implement nbd reconnect. So, let's refactor them: define additional
+> parameters in BDRVNBDState, drop them from function parameters, drop
+> nbd_client_init and separate options parsing instead from nbd_open.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd.c | 125 +++++++++++++++++++++++++++-------------------------=
 
-> I guess we should also cross check whether there are any other
-> recently introduced hwcap bits we now should be setting.
+>  1 file changed, 64 insertions(+), 61 deletions(-)
+>=20
 
-I'll have a look.
+> @@ -1659,20 +1630,19 @@ static int nbd_open(BlockDriverState *bs, QDict=
+ *options, int flags,
+>              error_setg(errp, "TLS only supported over IP sockets");
+>              goto error;
+>          }
+> -        hostname =3D s->saddr->u.inet.host;
+> +        s->hostname =3D s->saddr->u.inet.host;
+>      }
+> =20
+> -    /* NBD handshake */
+> -    ret =3D nbd_client_init(bs, s->saddr, s->export, tlscreds, hostnam=
+e,
+> -                          qemu_opt_get(opts, "x-dirty-bitmap"),
+> -                          qemu_opt_get_number(opts, "reconnect-delay",=
+ 0),
+> -                          errp);
+> +    s->x_dirty_bitmap =3D g_strdup(qemu_opt_get(opts, "x-dirty-bitmap"=
+));
+> +    s->reconnect_delay =3D qemu_opt_get_number(opts, "reconnect-delay"=
+, 0);
+> +
+> +    ret =3D 0;
+> =20
+>   error:
+> -    if (tlscreds) {
+> -        object_unref(OBJECT(tlscreds));
+> -    }
+>      if (ret < 0) {
+> +        if (s->tlscreds) {
+> +            object_unref(OBJECT(s->tlscreds));
+> +        }
+
+Pre-existing, but object_unref(NULL) is safe, making this a useless 'if'.=
 
 
-r~
+
+> @@ -1726,9 +1725,13 @@ static void nbd_close(BlockDriverState *bs)
+> =20
+>      nbd_client_close(bs);
+> =20
+> +    if (s->tlscreds) {
+> +        object_unref(OBJECT(s->tlscreds));
+> +    }
+
+and copied here.
+
+>      qapi_free_SocketAddress(s->saddr);
+>      g_free(s->export);
+>      g_free(s->tlscredsid);
+> +    g_free(s->x_dirty_bitmap);
+
+Do we need to duplicate s->x_dirty_bitmap with s->info.x_dirty_bitmap,
+or make the latter be const char * and reuse the pointer from the former
+rather than strdup'ing it? (I don't think it affects the refactoring
+done in this patch, but is possibly worth a separate cleanup patch).
+
+I can fix up the two useless 'if's.
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--GTrsvRoUxEfKZzngxb2R3dn0C2OaykJct--
+
+--pEIGa389cuGIqq2oJ5IYc1yggaLWKUoeW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1NjWEACgkQp6FrSiUn
+Q2rHAgf+MPpqYp7hJ7OIveFQXyJs3mHZcN6fOHtOuAHuovMl41OdD2uYIiM25kd/
+Az997tH+bbiiIQXUtbSoh0dmtlQGc4JRNnr2joYKZ23FoBPL5QlwnKMLf6rfUXYq
+CMucJDtgCgdXsV9KMhWMfFXq9H3B0NzYKKtiA9G7i4cZhRBaMFt7LEr4g7Gq1hz8
+pabx++65W679mm0FNVi6oopKn1jT+XgQTt7yxkuXGUbt6rjkkbXogePVrZi2VjyN
+2jjt3A2m36Ygd3A/N1r2J845bR2MLfvREOriRSGtHc3VuV17EPdD7oQL5zBrVcKc
+1d3fFUrXJ6CwfEmxdUa68vWT9pn6kg==
+=XHnK
+-----END PGP SIGNATURE-----
+
+--pEIGa389cuGIqq2oJ5IYc1yggaLWKUoeW--
 
