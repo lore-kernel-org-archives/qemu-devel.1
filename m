@@ -2,88 +2,67 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A465C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 08:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93164C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 08:46:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1719720C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 08:46:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="pRtTP7ZV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1719720C01
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6926C20C01
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 08:46:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6926C20C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw0Xv-0003w3-D6
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 04:46:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41477)
+	id 1hw0Y6-0004M5-OE
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 04:46:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41582)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <damien.hedde@greensocs.com>) id 1hw0X2-0002nE-Sc
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 04:45:53 -0400
+ (envelope-from <stefanha@redhat.com>) id 1hw0XY-0003Lj-3N
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 04:46:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1hw0X1-0000IU-Pa
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 04:45:52 -0400
-Received: from beetle.greensocs.com ([5.135.226.135]:48248)
+ (envelope-from <stefanha@redhat.com>) id 1hw0XV-000174-VI
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 04:46:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54666)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1hw0Wx-0000C5-5l; Fri, 09 Aug 2019 04:45:47 -0400
-Received: from [172.16.11.117] (unknown [172.16.11.117])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 9209796F50;
- Fri,  9 Aug 2019 08:45:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1565340344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zH2GCR90nlrb6642sacXGWJuMxDwtb/WWQmlYkgUsPs=;
- b=pRtTP7ZVaFLc80fvNDaR1uQicQgNBqo50aVhFBdSSNugLCx6bBDyZMAun870loHgYzP34q
- mMWDMhga9VLlFgzLdAHG5f3pF8ztbmH7g4+Ds8mqSBhB6nyGfu2yuNrz5QHf0z5mUjCGSo
- gEJl9BRk/Jnztq2+mfJmQVJ0qiMnrB4=
-To: David Gibson <david@gibson.dropbear.id.au>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190729145654.14644-1-damien.hedde@greensocs.com>
- <20190729145654.14644-9-damien.hedde@greensocs.com>
- <20190731061108.GF2032@umbus.fritz.box>
- <CAFEAcA-dSBpAVfjn7VnCRgnZabBP226ZVuSJYW1bwzEr5mNktw@mail.gmail.com>
- <20190809055132.GT5465@umbus.fritz.box>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <5ba72330-dbbc-fdae-d003-9f7d08ba4600@greensocs.com>
-Date: Fri, 9 Aug 2019 10:45:43 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1hw0XT-0000vS-SM
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 04:46:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 174364E8AC;
+ Fri,  9 Aug 2019 08:46:12 +0000 (UTC)
+Received: from localhost (ovpn-116-125.ams2.redhat.com [10.36.116.125])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AB7CC5D9DC;
+ Fri,  9 Aug 2019 08:46:06 +0000 (UTC)
+Date: Fri, 9 Aug 2019 09:46:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Message-ID: <20190809084605.GE25286@stefanha-x1.localdomain>
+References: <20190807071445.4109-1-bala24@linux.ibm.com>
+ <20190807071445.4109-2-bala24@linux.ibm.com>
+ <5839fa4e-b6f3-9547-e71d-50be75c4f9fc@redhat.com>
+ <20190808101013.GD1999@stefanha-x1.localdomain>
+ <20190808105307.GE2534@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190809055132.GT5465@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1565340344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zH2GCR90nlrb6642sacXGWJuMxDwtb/WWQmlYkgUsPs=;
- b=YQCtrTT3PydaKnal38MASFwn5Hwr2MMPCBKOBxqsh9FNShjL5ZhVSl0U4j6tpW0aaCrI7n
- qW0BS7W/02tMMLudSEQPTiIpsX3GTGh+9XxKJ/xcLogtFVgZ946Yr06M6GcZCIY//vk98R
- FptUpJqoMIBe4FLOw2CiqmjWyO0nzY4=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1565340344; a=rsa-sha256; cv=none;
- b=XllIP/eq0D/WO1uh+oMOpikYU03kJTp8GkJvVL8xjQ12T4ga5+tDZu+1llLAHrjj09Xupo
- Z7CWtmV9alj+6q2vjORG11VDtmqmTphkVveKA9CYxqzCcsPS+N0lM+juJMmeYM/ZWxkmOT
- bcgzyWIl+hjXSeNDyljehOxIzhUBCZk=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Dzs2zDY0zgkG72+7"
+Content-Disposition: inline
+In-Reply-To: <20190808105307.GE2534@redhat.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.38]); Fri, 09 Aug 2019 08:46:12 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 5.135.226.135
-Subject: Re: [Qemu-devel] [PATCH v3 08/33] Add function to control reset
- with gpio inputs
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [RFC PATCH 1/6] utils/python_api: add scripting
+ interface for Qemu with python lib
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,66 +74,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Collin Walling <walling@linux.ibm.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>, Hannes Reinecke <hare@suse.com>,
- Qemu-block <qemu-block@nongnu.org>, David Hildenbrand <david@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>, qemu-s390x <qemu-s390x@nongnu.org>,
- qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Mark Burton <mark.burton@greensocs.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, maddy@linux.vnet.ibm.com,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Balamuruhan S <bala24@linux.ibm.com>, anju@linux.vnet.ibm.com, clg@kaod.org,
+ hari@linux.vnet.ibm.com, pbonzini@redhat.com,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--Dzs2zDY0zgkG72+7
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 8/9/19 7:51 AM, David Gibson wrote:
-> On Wed, Aug 07, 2019 at 11:37:51AM +0100, Peter Maydell wrote:
->> On Wed, 31 Jul 2019 at 07:33, David Gibson <david@gibson.dropbear.id.au> wrote:
->>>
->>> On Mon, Jul 29, 2019 at 04:56:29PM +0200, Damien Hedde wrote:
->>>> It adds the possibility to add 2 gpios to control the warm and cold reset.
->>>> With theses ios, the reset can be maintained during some time.
->>>> Each io is associated with a state to detect level changes.
->>>>
->>>> Vmstate subsections are also added to the existsing device_reset
->>>> subsection.
->>>
->>> This doesn't seem like a thing that should be present on every single
->>> DeviceState.
->>
->> It's a facility that's going to be useful to multiple different
->> subclasses of DeviceState, so it seems to me cleaner to
->> have base class support for the common feature rather than
->> to reimplement it entirely from scratch in every subclass
->> that wants it.
-> 
-> Hm, I suppose so.  Would it really have to be from scratch, though?
-> Couldn't some suitable helper functions make adding such GPIOs to a
-> device pretty straightforward?
-> 
+On Thu, Aug 08, 2019 at 11:53:07AM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, Aug 08, 2019 at 11:10:13AM +0100, Stefan Hajnoczi wrote:
+> > On Wed, Aug 07, 2019 at 12:20:47PM +0200, Philippe Mathieu-Daud=E9 wrot=
+e:
+> > > > +void python_args_clean(char *args[], int nargs)
+> > > > +{
+> > > > +    for (int i =3D 0; i < nargs; i++) {
+> > > > +        g_free(args[i]);
+> > > > +    }
+> > > > +}
+> > > >=20
+> > >=20
+> > > Wondering about security, is this feature safe to enable in production
+> > > environment? It seems to bypass all the hard effort to harden QEMU se=
+curity.
+> >=20
+> > This seems like a feature that distros would not enable.  Only users
+> > building QEMU from source could enable it.
+>=20
+> Well that's true when this scripting is only used from one obscure ppc
+> device. Once merged though, its inevitable that people will want to
+> extend scripting to more & more parts of QEMU code. This is a big can
+> of worms...
 
-This patch does that. A device does have to use the helper to add the
-gpio. Either qdev_init_warm_reset_gpio(...) or
-qdev_init_cold_reset_gpio(...) , like any another gpio.
+When it gets used in new contexts it will be necessary to address
+problems or accept that it is unsuitable for those use cases.  Starting
+simple and dealing with challenges as and when necessary seems okay to
+me.
 
-The mechanics to control the reset with gpio change is done in the base
-class and there is some state pre-allocated (and associated vmstate
-description) to it.
+I think we should give features a chance in QEMU if there is a
+maintainer to support them.  I don't want to use this feature myself and
+I see lots of issues with it for my use cases, but if it is compiled out
+and doesn't place many requirements on code that does not use it, let's
+give it a chance.
 
-If that's a problem I can only provide helpers and let devices handle
-state allocation and vmstate addition.
+My main concern is licensing.  I think the QEMU Python API should be GPL
+licensed because these scripts are executing as part of the QEMU
+process.
 
-Damien
+Beyond that, let's see if people find this feature useful.  Maybe it
+will die and be removed, maybe it will become popular and we'll have to
+change our perspective :).
+
+Stefan
+
+--Dzs2zDY0zgkG72+7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1NMs0ACgkQnKSrs4Gr
+c8jz7wgAp3isgnapUAhkRT2BDo8Ix7oQWlNeP6HTfyKrr0blJv0rX0e05s/hm6YP
+q5MkF7lAmDfM1+4hovPO/Jq/2j+mUSH7AAPhv37VwVHaO36j55LDL/FcXIKpMNDF
+G9QnQ8V0j88ggY7SkFTo4bXJ/ys4OVwqHz6rqSjh+tBAUlPmIoVFLIogixw+J+5A
+8OQz8CMmOMyjiLk9q5Gh1aHwl0EuyVDrfi6RGWyr/hWusqnk2EkZplL50bzgWi9F
+OKAWkd8X/yHFqoQo3vwofGcvd450daNrTWh7eHXWeBD9PmgIgpQc693krr0Y+XAc
+0SVkdVhP80G/paEQ16Qsfpaw4KzDXw==
+=yF+N
+-----END PGP SIGNATURE-----
+
+--Dzs2zDY0zgkG72+7--
 
