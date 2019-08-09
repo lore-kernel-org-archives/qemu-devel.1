@@ -2,72 +2,94 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171A3C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEBEC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:54:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E26F920B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:46:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26F920B7C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3087E2086A
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:54:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3087E2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw82M-00011O-3M
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:46:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34607)
+	id 1hw8AA-0003pE-9Y
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:54:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35718)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hw81o-0000bz-9R
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:46:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hw89i-0003Kc-0h
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:54:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hw81n-0004yP-3H
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:46:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54332)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hw81m-0004uc-N1
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:46:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hw81j-0000gz-NV
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 16:46:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 852C02E81A0
- for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 16:46:01 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1hw89h-00067X-4r
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:54:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45458)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hw89f-00066E-2I; Fri, 09 Aug 2019 12:54:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 596E8C08E2B3;
+ Fri,  9 Aug 2019 16:54:14 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C99C60872;
+ Fri,  9 Aug 2019 16:54:07 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190809153207.49288-1-vsementsov@virtuozzo.com>
+ <20190809153207.49288-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3a00c722-b075-a098-101b-50d1669bb6af@redhat.com>
+Date: Fri, 9 Aug 2019 18:54:05 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Aug 2019 16:35:46 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: glaubitz pmaydell
-X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
-References: <156518306048.32528.10373743991208371347.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156536854700.31102.3829708686445529573.malone@chaenomeles.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19021";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a907f2c8c261853b4370565e00f3056b171ef03a
+In-Reply-To: <20190809153207.49288-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="scp06loMc064cRTrKV2V4bXgcXp5AExjZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Fri, 09 Aug 2019 16:54:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1839325] Re: Go programs crash on qemu-sh4 due to
- issues with atomics
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/io: handle alignment and
+ max_transfer for copy_range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,117 +98,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1839325 <1839325@bugs.launchpad.net>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The non-8-aligned pointer is the runtime.work.empty field. The
-compilation that I have of this binary has put the 'runtime.work' struct
-at 0x6bfadc, which is only 4-aligned, and this won't work as the lfstack
-fields it starts with are supposed to be 8-aligned. So it looks to me
-like the compiler has miscompiled the binary somehow, and QEMU's actual
-execution of it is OK.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--scp06loMc064cRTrKV2V4bXgcXp5AExjZ
+Content-Type: multipart/mixed; boundary="Fd6X4SkvWBETbivxk2ywU61yqgHACrRpD";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+Message-ID: <3a00c722-b075-a098-101b-50d1669bb6af@redhat.com>
+Subject: Re: [PATCH v2 3/7] block/io: handle alignment and max_transfer for
+ copy_range
+References: <20190809153207.49288-1-vsementsov@virtuozzo.com>
+ <20190809153207.49288-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190809153207.49288-4-vsementsov@virtuozzo.com>
 
-I don't know if this is a general bug in the sh4 gccgo support (in which
-case we must be succeeding on the real hardware by accident, probably by
-finishing fast enough that the gc never kicks in), or if QEMU is mis-
-executing the compiler somehow and a build done on the real hardware
-puts the work struct at an 8-aligned address.
+--Fd6X4SkvWBETbivxk2ywU61yqgHACrRpD
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On 09.08.19 17:32, Vladimir Sementsov-Ogievskiy wrote:
+> copy_range ignores these limitations, let's improve it.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/io.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 40 insertions(+), 8 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1839325
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Title:
-  Go programs crash on qemu-sh4 due to issues with atomics
 
-Status in QEMU:
-  New
+--Fd6X4SkvWBETbivxk2ywU61yqgHACrRpD--
 
-Bug description:
-  After #1738545 [1] was fixed, Go applications work fine on qemu-arm
-  but still crash on qemu-sh4. From the backtrace, it looks like an
-  issue with the atomics in qemu-sh4:
+--scp06loMc064cRTrKV2V4bXgcXp5AExjZ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  (sid-sh4-sbuild)root@epyc:/# cat hello.go
-  package main
+-----BEGIN PGP SIGNATURE-----
 
-  import "fmt"
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1NpS0ACgkQ9AfbAGHV
+z0DEGggAwWuiaCgppk/vSnHybIrmgiX9U4RG67QixVS3YBHdlR15F392UwJpMxqW
+JQr7jg2HF47s85lXiA4elLK24IbDXEFukmd5TyUUPIbyPtYue83Ah7zu1M8Ljz4y
+N4JWy8ByP4Uj+J6ydtJX29qGtFKU9zYCQyl5soxmyaEb8VSVHx7gdvUgZ3T3iq0p
+pX19PhWIacDP4vau7KAVyBVtJ1Da8Vz6E3p4zgvoNXy/MOdEAHnQmJHueH7tucyI
+xRxp1xLqWHUv1yLcPM5ody1nV6FQXVhWVorHOAGJ38zIGD84Fl7c+skVsogvGb6o
+sHd6Ctx14JbDMUw86wJ+7AQ+BbHijw==
+=rtjm
+-----END PGP SIGNATURE-----
 
-  func main() {
-        fmt.Println("hello world")
-  }
-
-  (sid-sh4-sbuild)root@epyc:/# gccgo-9 hello.go -o hello
-  (sid-sh4-sbuild)root@epyc:/# ./hello =
-
-  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
-  fatal error: panic on system stack
-  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
-  fatal error: panic on system stack
-
-  runtime stack:
-  runtime..z2finternal..z2fatomic.Load64
-          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
-  runtime_mstart
-          ../../../src/libgo/runtime/proc.c:596
-
-  goroutine 1 [running]:
-          goroutine running on other thread; stack unavailable
-
-  runtime stack:
-  runtime..z2finternal..z2fatomic.Load64
-          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
-  runtime_mstart
-          ../../../src/libgo/runtime/proc.c:596
-  (sid-sh4-sbuild)root@epyc:/#
-
-  The same sample Go program runs fine on my SH7785LCR SH4 evaluation
-  board:
-
-  root@tirpitz:~> uname -a
-  Linux tirpitz 3.16.7-ckt7 #8 PREEMPT Fri Oct 21 18:47:41 CEST 2016 sh4a G=
-NU/Linux
-  root@tirpitz:~> cat hello.go
-  package main
-
-  import "fmt"
-
-  func main() {
-        fmt.Println("hello world")
-  }
-
-  root@tirpitz:~> gccgo-9 hello.go -o hello
-  root@tirpitz:~> ./hello =
-
-  hello world
-  root@tirpitz:~>
-
-  Please note: In order to be able to reproduce this, one also needs to
-  revert commit 61dedf2af7 [2], otherwise the Go application crashes
-  differently:
-
-  (sid-sh4-sbuild)root@epyc:/# ./hello        =
-
-  Unhandled trap: 0x180
-  pc=3D0x7e5f7f9e sr=3D0x00000000 pr=3D0x7ee3d582 fpscr=3D0x00080004
-  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0x7e590480 vbr=3D0x00000000
-  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x7e5f7f60 fpul=3D0x00034f=
-3b
-  r0=3D0x008007d4 r1=3D0x00000000 r2=3D0xfffe0b2a r3=3D0x00000002
-  r4=3D0x008006e4 r5=3D0x00872000 r6=3D0x00200000 r7=3D0x00000000
-  r8=3D0x7f7bca7c r9=3D0x7fffebd4 r10=3D0x00800480 r11=3D0x7f7bc0f0
-  r12=3D0x7f7a3fa4 r13=3D0x008004c0 r14=3D0x7f7b2238 r15=3D0x7fffebd0
-  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
-  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
-  (sid-sh4-sbuild)root@epyc:/#
-
-  > [1] https://bugs.launchpad.net/bugs/1738545
-  > [2] https://bugs.launchpad.net/bugs/1796520
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1839325/+subscriptions
+--scp06loMc064cRTrKV2V4bXgcXp5AExjZ--
 
