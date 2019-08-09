@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4E0C31E40
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4E8C433FF
 	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 07:09:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 566CF2171F
+	by mail.kernel.org (Postfix) with ESMTPS id 12B922171F
 	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 07:09:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566CF2171F
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12B922171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvz1I-0006pL-L9
+	id 1hvz1I-0006no-BL
 	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 03:09:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50944)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50863)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hvyqh-000491-53
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:58:04 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hvyqU-0003Vs-75
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hvyqg-0008Bk-0O
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:58:03 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hvyqS-00081e-Lt
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:50 -0400
 Received: from mga05.intel.com ([192.55.52.43]:16871)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hvyqf-0007xE-Oh
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:58:01 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hvyqS-0007xE-Bi
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:48 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 08 Aug 2019 23:58:01 -0700
+ 08 Aug 2019 23:57:47 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,364,1559545200"; d="scan'208";a="326549066"
+X-IronPort-AV: E=Sophos;i="5.64,364,1559545200"; d="scan'208";a="326549029"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by orsmga004.jf.intel.com with ESMTP; 08 Aug 2019 23:57:59 -0700
+ by orsmga004.jf.intel.com with ESMTP; 08 Aug 2019 23:57:45 -0700
 From: Tao <tao3.xu@intel.com>
 To: imammedo@redhat.com,
 	eblake@redhat.com,
 	ehabkost@redhat.com
-Date: Fri,  9 Aug 2019 14:57:31 +0800
-Message-Id: <20190809065731.9097-12-tao3.xu@intel.com>
+Date: Fri,  9 Aug 2019 14:57:25 +0800
+Message-Id: <20190809065731.9097-6-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190809065731.9097-1-tao3.xu@intel.com>
 References: <20190809065731.9097-1-tao3.xu@intel.com>
@@ -55,8 +55,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 192.55.52.43
-Subject: [Qemu-devel] [PATCH v9 11/11] tests/bios-tables-test: add test
- cases for ACPI HMAT
+Subject: [Qemu-devel] [PATCH v9 05/11] numa: Extend CLI to provide initiator
+ information for numa nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,89 +77,198 @@ Sender: "Qemu-devel"
 
 From: Tao Xu <tao3.xu@intel.com>
 
-ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
-Heterogeneous Memory with boot option '-numa node'.
+In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),
+The initiator represents processor which access to memory. And in 5.2.27.3
+Memory Proximity Domain Attributes Structure, the attached initiator is
+defined as where the memory controller responsible for a memory proximity
+domain. With attached initiator information, the topology of heterogeneous
+memory can be described.
 
-Add test cases on PC and Q35 machines with 2 numa nodes.
-Because HMAT is generated when system enable numa, the
-following tables need to be added for this test:
-  tests/acpi-test-data/pc/*.acpihmat
-  tests/acpi-test-data/pc/HMAT.*
-  tests/acpi-test-data/q35/*.acpihmat
-  tests/acpi-test-data/q35/HMAT.*
+Extend CLI of "-numa node" option to indicate the initiator numa node-id.
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables.
 
 Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Dan Williams <dan.j.williams@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
-Changes in v9:
-    - update the test case
+No changes in v9
 ---
- tests/bios-tables-test.c | 43 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ hw/core/machine.c     | 24 ++++++++++++++++++++++++
+ hw/core/numa.c        | 13 +++++++++++++
+ include/sysemu/numa.h |  3 +++
+ qapi/machine.json     |  6 +++++-
+ qemu-options.hx       | 27 +++++++++++++++++++++++----
+ 5 files changed, 68 insertions(+), 5 deletions(-)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index a356ac3489..294f097e52 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -871,6 +871,47 @@ static void test_acpi_piix4_tcg_dimm_pxm(void)
-     test_acpi_tcg_dimm_pxm(MACHINE_PC);
- }
- 
-+static void test_acpi_tcg_acpi_hmat(const char *machine)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = machine;
-+    data.variant = ".acpihmat";
-+    test_acpi_one(" -smp 2,sockets=2"
-+                  " -m 128M,slots=2,maxmem=1G"
-+                  " -object memory-backend-ram,size=64M,id=m0"
-+                  " -object memory-backend-ram,size=64M,id=m1"
-+                  " -numa node,nodeid=0,memdev=m0"
-+                  " -numa node,nodeid=1,memdev=m1,initiator=0"
-+                  " -numa cpu,node-id=0,socket-id=0"
-+                  " -numa cpu,node-id=0,socket-id=1"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-latency,latency=5ns"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-bandwidth,bandwidth=500M"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-latency,latency=10ns"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-bandwidth,bandwidth=100M"
-+                  " -numa hmat-cache,node-id=0,size=0x20000,total=1,level=1"
-+                  ",assoc=direct,policy=write-back,line=8"
-+                  " -numa hmat-cache,node-id=1,size=0x20000,total=1,level=1"
-+                  ",assoc=direct,policy=write-back,line=8",
-+                  &data);
-+    free_test_data(&data);
-+}
-+
-+static void test_acpi_q35_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
-+}
-+
-+static void test_acpi_piix4_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_PC);
-+}
-+
- static void test_acpi_virt_tcg(void)
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 3c55470103..113184a9df 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -640,6 +640,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+                                const CpuInstanceProperties *props, Error **errp)
  {
-     test_data data = {
-@@ -915,6 +956,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
-         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
-         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-+        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
-+        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
-     } else if (strcmp(arch, "aarch64") == 0) {
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
++    NodeInfo *numa_info = machine->numa_state->nodes;
+     bool match = false;
+     int i;
+ 
+@@ -709,6 +710,16 @@ void machine_set_cpu_numa_node(MachineState *machine,
+         match = true;
+         slot->props.node_id = props->node_id;
+         slot->props.has_node_id = props->has_node_id;
++
++        if (numa_info[props->node_id].initiator_valid &&
++            (props->node_id != numa_info[props->node_id].initiator)) {
++            error_setg(errp, "The initiator of CPU NUMA node %" PRId64
++                       " should be itself.", props->node_id);
++            return;
++        }
++        numa_info[props->node_id].initiator_valid = true;
++        numa_info[props->node_id].has_cpu = true;
++        numa_info[props->node_id].initiator = props->node_id;
      }
+ 
+     if (!match) {
+@@ -1050,6 +1061,7 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
+     GString *s = g_string_new(NULL);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
++    NodeInfo *numa_info = machine->numa_state->nodes;
+ 
+     assert(machine->numa_state->num_nodes);
+     for (i = 0; i < possible_cpus->len; i++) {
+@@ -1083,6 +1095,18 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
+             machine_set_cpu_numa_node(machine, &props, &error_fatal);
+         }
+     }
++
++    for (i = 0; i < machine->numa_state->num_nodes; i++) {
++        if (numa_info[i].initiator_valid &&
++            !numa_info[numa_info[i].initiator].has_cpu) {
++            error_report("The initiator-id %"PRIu16 " of NUMA node %d"
++                         " does not exist.", numa_info[i].initiator, i);
++            error_printf("\n");
++
++            exit(1);
++        }
++    }
++
+     if (s->len && !qtest_enabled()) {
+         warn_report("CPU(s) not present in any NUMA nodes: %s",
+                     s->str);
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 8fcbba05d6..cfb6339810 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -128,6 +128,19 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+         numa_info[nodenr].node_mem = object_property_get_uint(o, "size", NULL);
+         numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
+     }
++
++    if (node->has_initiator) {
++        if (numa_info[nodenr].initiator_valid &&
++            (node->initiator != numa_info[nodenr].initiator)) {
++            error_setg(errp, "The initiator of NUMA node %" PRIu16 " has been "
++                       "set to node %" PRIu16, nodenr,
++                       numa_info[nodenr].initiator);
++            return;
++        }
++
++        numa_info[nodenr].initiator_valid = true;
++        numa_info[nodenr].initiator = node->initiator;
++    }
+     numa_info[nodenr].present = true;
+     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+     ms->numa_state->num_nodes++;
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 76da3016db..46ad06e000 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -10,6 +10,9 @@ struct NodeInfo {
+     uint64_t node_mem;
+     struct HostMemoryBackend *node_memdev;
+     bool present;
++    bool has_cpu;
++    bool initiator_valid;
++    uint16_t initiator;
+     uint8_t distance[MAX_NODES];
+ };
+ 
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 6db8a7e2ec..05e367d26a 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -414,6 +414,9 @@
+ # @memdev: memory backend object.  If specified for one node,
+ #          it must be specified for all nodes.
+ #
++# @initiator: the initiator numa nodeid that is closest (as in directly
++#             attached) to this numa node (since 4.2)
++#
+ # Since: 2.1
+ ##
+ { 'struct': 'NumaNodeOptions',
+@@ -421,7 +424,8 @@
+    '*nodeid': 'uint16',
+    '*cpus':   ['uint16'],
+    '*mem':    'size',
+-   '*memdev': 'str' }}
++   '*memdev': 'str',
++   '*initiator': 'uint16' }}
+ 
+ ##
+ # @NumaDistOptions:
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9621e934c0..c480781992 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -161,14 +161,14 @@ If any on the three values is given, the total number of CPUs @var{n} can be omi
+ ETEXI
+ 
+ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+-    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
+-    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
++    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
++    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
+     "-numa dist,src=source,dst=destination,val=distance\n"
+     "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+-@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
+-@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
++@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
++@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+ @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+ @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
+ @findex -numa
+@@ -215,6 +215,25 @@ split equally between them.
+ @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
+ if one node uses @samp{memdev}, all of them have to use it.
+ 
++@samp{initiator} indicate the initiator NUMA @var{initiator} that is
++closest (as in directly attached) to this NUMA @var{node}.
++
++For example, the following option assigns 2 NUMA nodes, node 0 has CPU.
++node 1 has only memory, and its' initiator is node 0. Note that because
++node 0 has CPU, by default the initiator of node 0 is itself and must be
++itself.
++@example
++-M pc \
++-m 2G,slots=2,maxmem=4G \
++-object memory-backend-ram,size=1G,id=m0 \
++-object memory-backend-ram,size=1G,id=m1 \
++-numa node,nodeid=0,memdev=m0 \
++-numa node,nodeid=1,memdev=m1,initiator=0 \
++-smp 2,sockets=2,maxcpus=2  \
++-numa cpu,node-id=0,socket-id=0 \
++-numa cpu,node-id=0,socket-id=1 \
++@end example
++
+ @var{source} and @var{destination} are NUMA node IDs.
+ @var{distance} is the NUMA distance from @var{source} to @var{destination}.
+ The distance from a node to itself is always 10. If any pair of nodes is
 -- 
 2.20.1
 
