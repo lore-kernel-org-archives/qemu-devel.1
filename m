@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78AA3C31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E04C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:57:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CA92208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:56:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CA92208C3
+	by mail.kernel.org (Postfix) with ESMTPS id 16679208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:57:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16679208C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvypb-0001PE-I7
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 02:56:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48387)
+	id 1hvyqN-0002qB-DO
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 02:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48285)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hvygC-0000vI-RW
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:15 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hvyg8-0001p1-9x
+ (envelope-from <armbru@redhat.com>) id 1hvyg8-0000sH-A6
  for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36318)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1hvyg4-0001ly-4w
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53700)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvyg4-0001l1-3J
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:05 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvyg3-0001iP-8c
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6844E30BA080
- for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 06:47:03 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 704D73082B1F
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 06:46:59 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6C0875D6A0;
- Fri,  9 Aug 2019 06:47:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F9EC60600;
+ Fri,  9 Aug 2019 06:46:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9E78E1136425; Fri,  9 Aug 2019 08:46:45 +0200 (CEST)
+ id 7AEE3113860E; Fri,  9 Aug 2019 08:46:45 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  9 Aug 2019 08:46:29 +0200
-Message-Id: <20190809064645.22656-14-armbru@redhat.com>
+Date: Fri,  9 Aug 2019 08:46:19 +0200
+Message-Id: <20190809064645.22656-4-armbru@redhat.com>
 In-Reply-To: <20190809064645.22656-1-armbru@redhat.com>
 References: <20190809064645.22656-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 09 Aug 2019 06:47:03 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Fri, 09 Aug 2019 06:46:59 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 13/29] Clean up inclusion of
- exec/cpu-common.h
+Subject: [Qemu-devel] [PATCH v3 03/29] qapi: Split error.json off common.json
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,227 +75,162 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-migration/qemu-file.h neglects to include it even though it needs
-ram_addr_t.  Fix that.  Drop a few superfluous inclusions elsewhere.
+In my "build everything" tree, changing a type in qapi/common.json
+triggers a recompile of some 3600 out of 6600 objects (not counting
+tests and objects that don't depend on qemu/osdep.h).
 
+One common dependency is QapiErrorClass: it's used only in in
+qapi/error.h, which uses nothing else, and is widely included.
+
+Move QapiErrorClass from common.json to new error.json.  Touching
+common.json now recompiles only some 2900 objects.
+
+Cc: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- accel/stubs/tcg-stub.c          | 1 -
- balloon.c                       | 1 -
- hw/smbios/smbios.c              | 1 -
- include/hw/hw.h                 | 1 -
- include/hw/ppc/ppc4xx.h         | 1 -
- include/migration/misc.h        | 1 -
- include/sysemu/kvm_int.h        | 1 -
- include/sysemu/memory_mapping.h | 1 -
- migration/migration.h           | 1 -
- migration/qemu-file-channel.c   | 1 -
- migration/qemu-file.h           | 1 +
- migration/vmstate-types.c       | 1 -
- qom/cpu.c                       | 1 -
- tcg/optimize.c                  | 1 -
- tcg/tcg-common.c                | 1 -
- tcg/tcg.c                       | 1 -
- 16 files changed, 1 insertion(+), 15 deletions(-)
+ MAINTAINERS           |  2 ++
+ include/qapi/error.h  |  2 +-
+ qapi/Makefile.objs    |  2 +-
+ qapi/common.json      | 24 ------------------------
+ qapi/error.json       | 29 +++++++++++++++++++++++++++++
+ qapi/qapi-schema.json |  1 +
+ 6 files changed, 34 insertions(+), 26 deletions(-)
+ create mode 100644 qapi/error.json
 
-diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
-index 76ae461749..e2d23edafe 100644
---- a/accel/stubs/tcg-stub.c
-+++ b/accel/stubs/tcg-stub.c
-@@ -14,7 +14,6 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "tcg/tcg.h"
--#include "exec/cpu-common.h"
- #include "exec/exec-all.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d6de200453..adc64cfe33 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1874,6 +1874,7 @@ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+ F: include/qapi/error.h
+ F: include/qemu/error-report.h
++F: qapi/error.json
+ F: util/error.c
+ F: util/qemu-error.c
 =20
- void tb_flush(CPUState *cpu)
-diff --git a/balloon.c b/balloon.c
-index 914b3662db..f104b42961 100644
---- a/balloon.c
-+++ b/balloon.c
-@@ -26,7 +26,6 @@
+@@ -2062,6 +2063,7 @@ F: monitor/monitor-internal.h
+ F: monitor/qmp*
+ F: monitor/misc.c
+ F: monitor/monitor.c
++F: qapi/error.json
+ F: docs/devel/*qmp-*
+ F: docs/interop/*qmp-*
+ F: scripts/qmp/
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 51b63dd4b5..3f95141a01 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -119,7 +119,7 @@
+ #ifndef ERROR_H
+ #define ERROR_H
 =20
- #include "qemu/osdep.h"
- #include "qemu/atomic.h"
--#include "exec/cpu-common.h"
- #include "sysemu/kvm.h"
- #include "sysemu/balloon.h"
- #include "trace-root.h"
-diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
-index 7bcd67b098..11d476c4a2 100644
---- a/hw/smbios/smbios.c
-+++ b/hw/smbios/smbios.c
-@@ -28,7 +28,6 @@
- #include "hw/firmware/smbios.h"
- #include "hw/loader.h"
- #include "hw/boards.h"
--#include "exec/cpu-common.h"
- #include "smbios_build.h"
+-#include "qapi/qapi-types-common.h"
++#include "qapi/qapi-types-error.h"
 =20
- /* legacy structures and constants for <=3D 2.0 machines */
-diff --git a/include/hw/hw.h b/include/hw/hw.h
-index 38d2fb1f40..86ff26b712 100644
---- a/include/hw/hw.h
-+++ b/include/hw/hw.h
-@@ -6,7 +6,6 @@
- #error Cannot include hw/hw.h from user emulation
- #endif
+ /*
+  * Overall category of an error.
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index c5a29e86e2..dd3f5e6f94 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -6,7 +6,7 @@ util-obj-y +=3D qmp-event.o
+ util-obj-y +=3D qapi-util.o
 =20
--#include "exec/cpu-common.h"
- #include "qom/object.h"
- #include "exec/memory.h"
- #include "migration/vmstate.h"
-diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-index 90f8866138..7d82259051 100644
---- a/include/hw/ppc/ppc4xx.h
-+++ b/include/hw/ppc/ppc4xx.h
-@@ -26,7 +26,6 @@
- #define PPC4XX_H
+ QAPI_COMMON_MODULES =3D audio authz block-core block char common crypto
+-QAPI_COMMON_MODULES +=3D dump introspect job machine migration misc net
++QAPI_COMMON_MODULES +=3D dump error introspect job machine migration mis=
+c net
+ QAPI_COMMON_MODULES +=3D qdev qom rdma rocker run-state sockets tpm
+ QAPI_COMMON_MODULES +=3D trace transaction ui
+ QAPI_TARGET_MODULES =3D machine-target misc-target
+diff --git a/qapi/common.json b/qapi/common.json
+index 99d313ef3b..3d4e8de1e0 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -4,30 +4,6 @@
+ # =3D Common data types
+ ##
 =20
- #include "hw/ppc/ppc.h"
--#include "exec/cpu-common.h"
- #include "exec/memory.h"
+-##
+-# @QapiErrorClass:
+-#
+-# QEMU error classes
+-#
+-# @GenericError: this is used for errors that don't require a specific e=
+rror
+-#                class. This should be the default case for most errors
+-#
+-# @CommandNotFound: the requested command has not been found
+-#
+-# @DeviceNotActive: a device has failed to be become active
+-#
+-# @DeviceNotFound: the requested device has not been found
+-#
+-# @KVMMissingCap: the requested operation can't be fulfilled because a
+-#                 required KVM capability is missing
+-#
+-# Since: 1.2
+-##
+-{ 'enum': 'QapiErrorClass',
+-  # Keep this in sync with ErrorClass in error.h
+-  'data': [ 'GenericError', 'CommandNotFound',
+-            'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
+-
+ ##
+ # @IoOperationType:
+ #
+diff --git a/qapi/error.json b/qapi/error.json
+new file mode 100644
+index 0000000000..3fad08f506
+--- /dev/null
++++ b/qapi/error.json
+@@ -0,0 +1,29 @@
++# -*- Mode: Python -*-
++
++##
++# =3D QMP errors
++##
++
++##
++# @QapiErrorClass:
++#
++# QEMU error classes
++#
++# @GenericError: this is used for errors that don't require a specific e=
+rror
++#                class. This should be the default case for most errors
++#
++# @CommandNotFound: the requested command has not been found
++#
++# @DeviceNotActive: a device has failed to be become active
++#
++# @DeviceNotFound: the requested device has not been found
++#
++# @KVMMissingCap: the requested operation can't be fulfilled because a
++#                 required KVM capability is missing
++#
++# Since: 1.2
++##
++{ 'enum': 'QapiErrorClass',
++  # Keep this in sync with ErrorClass in error.h
++  'data': [ 'GenericError', 'CommandNotFound',
++            'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 38af54d6b3..920b03b0aa 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -80,6 +80,7 @@
+ # stable order, it's best to include each sub-schema just once, or
+ # include it first right here.
 =20
- /* PowerPC 4xx core initialization */
-diff --git a/include/migration/misc.h b/include/migration/misc.h
-index 5cdbabd094..b9d8e787af 100644
---- a/include/migration/misc.h
-+++ b/include/migration/misc.h
-@@ -14,7 +14,6 @@
- #ifndef MIGRATION_MISC_H
- #define MIGRATION_MISC_H
-=20
--#include "exec/cpu-common.h"
- #include "qemu/notify.h"
- #include "qapi/qapi-types-net.h"
-=20
-diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
-index 787dbc7770..5d341cc29b 100644
---- a/include/sysemu/kvm_int.h
-+++ b/include/sysemu/kvm_int.h
-@@ -9,7 +9,6 @@
- #ifndef QEMU_KVM_INT_H
- #define QEMU_KVM_INT_H
-=20
--#include "exec/cpu-common.h"
- #include "exec/memory.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/accel.h"
-diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapp=
-ing.h
-index 1b440df486..4b20f1a639 100644
---- a/include/sysemu/memory_mapping.h
-+++ b/include/sysemu/memory_mapping.h
-@@ -15,7 +15,6 @@
- #define MEMORY_MAPPING_H
-=20
- #include "qemu/queue.h"
--#include "exec/cpu-common.h"
- #include "exec/cpu-defs.h"
- #include "exec/memory.h"
-=20
-diff --git a/migration/migration.h b/migration/migration.h
-index 1fdd7b21fd..26f01d00f6 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -16,7 +16,6 @@
-=20
- #include "qapi/qapi-types-migration.h"
- #include "qemu/thread.h"
--#include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
- #include "hw/qdev.h"
- #include "io/channel.h"
-diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.=
-c
-index 8e639eb496..78ef248820 100644
---- a/migration/qemu-file-channel.c
-+++ b/migration/qemu-file-channel.c
-@@ -24,7 +24,6 @@
-=20
- #include "qemu/osdep.h"
- #include "qemu-file-channel.h"
--#include "exec/cpu-common.h"
- #include "qemu-file.h"
- #include "io/channel-socket.h"
- #include "qemu/iov.h"
-diff --git a/migration/qemu-file.h b/migration/qemu-file.h
-index 13baf896bd..21f3ae4be2 100644
---- a/migration/qemu-file.h
-+++ b/migration/qemu-file.h
-@@ -26,6 +26,7 @@
- #define MIGRATION_QEMU_FILE_H
-=20
- #include <zlib.h>
-+#include "exec/cpu-common.h"
-=20
- /* Read a chunk of data from a file at the given position.  The pos argu=
-ment
-  * can be ignored if the file is only be used for streaming.  The number=
- of
-diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-index 845f4649ee..bee658a1b2 100644
---- a/migration/vmstate-types.c
-+++ b/migration/vmstate-types.c
-@@ -11,7 +11,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "exec/cpu-common.h"
- #include "qemu-file.h"
- #include "migration.h"
- #include "migration/vmstate.h"
-diff --git a/qom/cpu.c b/qom/cpu.c
-index f376f782d8..fdc1af8f40 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -25,7 +25,6 @@
- #include "qemu/notify.h"
- #include "qemu/log.h"
- #include "exec/log.h"
--#include "exec/cpu-common.h"
- #include "qemu/error-report.h"
- #include "qemu/qemu-print.h"
- #include "sysemu/sysemu.h"
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index d2424de4af..cee2a36a60 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -24,7 +24,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "exec/cpu-common.h"
- #include "tcg-op.h"
-=20
- #define CASE_OP_32_64(x)                        \
-diff --git a/tcg/tcg-common.c b/tcg/tcg-common.c
-index 907d58d0f0..97305a3efc 100644
---- a/tcg/tcg-common.c
-+++ b/tcg/tcg-common.c
-@@ -23,7 +23,6 @@
-  */
-=20
- #include "qemu/osdep.h"
--#include "exec/cpu-common.h"
- #include "tcg/tcg.h"
-=20
- #if defined(CONFIG_TCG_INTERPRETER)
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index be2c33c400..2db83ce2e8 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -42,7 +42,6 @@
- #define NO_CPU_IO_DEFS
- #include "cpu.h"
-=20
--#include "exec/cpu-common.h"
- #include "exec/exec-all.h"
-=20
- #if !defined(CONFIG_USER_ONLY)
++{ 'include': 'error.json' }
+ { 'include': 'common.json' }
+ { 'include': 'sockets.json' }
+ { 'include': 'run-state.json' }
 --=20
 2.21.0
 
