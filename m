@@ -2,60 +2,62 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C90C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:29:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3357CC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:34:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED7620C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:29:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED7620C01
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bsdio.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA66A2166E
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 04:34:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Anz+Mu5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA66A2166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvwX8-0001lt-Hg
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 00:29:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55913)
+	id 1hvwc4-0003kY-2L
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 00:34:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56567)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <rebecca@bsdio.com>) id 1hvwWj-0001M0-DV
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:29:18 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hvwbg-0003Ks-1x
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rebecca@bsdio.com>) id 1hvwWi-0004Zt-Dg
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:29:17 -0400
-Received: from muon.bsdio.com ([65.103.231.193]:4151)
+ (envelope-from <dgibson@ozlabs.org>) id 1hvwbe-0002D5-Ts
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:34:23 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:59205)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rebecca@bsdio.com>)
- id 1hvwWi-0004ZD-8P; Fri, 09 Aug 2019 00:29:16 -0400
-Received: from muon.bsdio.com (localhost [127.0.0.1])
- by muon.bsdio.com (Postfix) with ESMTP id 5062081CC9;
- Thu,  8 Aug 2019 22:29:15 -0600 (MDT)
-Received: from muon.bsdio.com ([127.0.0.1])
- by muon.bsdio.com (muon.bsdio.com [127.0.0.1]) (amavisd-new, port 10026)
- with ESMTP id zWOmAVpNbpPU; Thu,  8 Aug 2019 22:29:14 -0600 (MDT)
-Received: from photon.int.bluestop.org (unknown [10.0.10.120])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by muon.bsdio.com (Postfix) with ESMTPSA;
- Thu,  8 Aug 2019 22:29:14 -0600 (MDT)
-From: Rebecca Cran <rebecca@bsdio.com>
-To: qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, qemu-trivial@nongnu.org
-Date: Thu,  8 Aug 2019 22:29:09 -0600
-Message-Id: <20190809042909.74988-1-rebecca@bsdio.com>
-X-Mailer: git-send-email 2.22.0
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1hvwbd-000267-Mo
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 00:34:22 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 464XSm0C9Zz9sN4; Fri,  9 Aug 2019 14:34:15 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1565325256;
+ bh=pnffnth02fHDLb+kjDfO9OIFpdAisu9HTECgN03roN4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Anz+Mu5eQGP34Ym+GGUwWZjtkHaFy4l2foMs7ky6oaz3k5MiXTv65HTlge3wscrAW
+ wmslxp3e6iL9iboNxMl6EdnV4bdvXpoXnleNZJlEjaeARG9/TdoWLpDnBrKqaURZyr
+ mSXp2YMXoHEekZautrgyG+KDvQCjm75YKvTGC6wM=
+Date: Fri, 9 Aug 2019 13:06:47 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190809030647.GI5465@umbus.fritz.box>
+References: <877e7nelf3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 65.103.231.193
-Subject: [Qemu-devel] [PATCH v2] Update the avx2 configure test to be
- compatible with clang
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="J+eNKFoVC4T1DV3f"
+Content-Disposition: inline
+In-Reply-To: <877e7nelf3.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
+Subject: Re: [Qemu-devel] configure and submodules capstone, slirp, dtc
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,45 +69,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Rebecca Cran <rebecca@bsdio.com>
+Cc: Samuel@pond.sub.org,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ David Gibson <dgibson@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-clang doesn't support the GCC pragma to enable AVX2, but instead
-requires the command line option -mavx2. Since GCC also supports that,
-remove the pragma lines and add the -mavx2 option when building the
-test. If AVX2 is supported, update QEMU_CFLAGS to include -mavx2 .
 
-Signed-off-by: Rebecca Cran <rebecca@bsdio.com>
----
- configure | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+--J+eNKFoVC4T1DV3f
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/configure b/configure
-index 714e7fb6a1..227fce6561 100755
---- a/configure
-+++ b/configure
-@@ -5392,8 +5392,6 @@ fi
-=20
- if test "$cpuid_h" =3D "yes" && test "$avx2_opt" !=3D "no"; then
-   cat > $TMPC << EOF
--#pragma GCC push_options
--#pragma GCC target("avx2")
- #include <cpuid.h>
- #include <immintrin.h>
- static int bar(void *a) {
-@@ -5402,7 +5400,8 @@ static int bar(void *a) {
- }
- int main(int argc, char *argv[]) { return bar(argv[0]); }
- EOF
--  if compile_object "" ; then
-+  if compile_object "-mavx2" ; then
-+    QEMU_CFLAGS=3D"-mavx2 $QEMU_CFLAGS"
-     avx2_opt=3D"yes"
-   else
-     avx2_opt=3D"no"
+On Thu, Aug 08, 2019 at 05:17:36PM +0200, Markus Armbruster wrote:
+> configure --help documents capstone like any other generic optional
+> feature.  This leaves --enable-capstone=3Dgit and =3Dsystem undocumented
+> there.  Anyone care to improve this?
+>=20
+> It documents slirp unlike other generic optional features, and shows
+> only --disable-slirp.  Anyone care to improve this?
+>=20
+> There's also --enable-dtc, which appears to select the system's dtc if
+> it deems it usable, else the git submodule.  Should it support explicit
+> --enable=3Ddtc=3Dgit and =3Dsystem, too?
+
+I have no strong opinion on the matter, so I'm happy for it to be
+consistent with whatever else we have.
+
 --=20
-2.22.0
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--J+eNKFoVC4T1DV3f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1M40cACgkQbDjKyiDZ
+s5KrqhAAqEtcD7zXZrWFbDk8GSVR9iUxJejBKtDDrwANix2jwTN/7huc6Eirf8lj
+xdozMpP1IBUnQMST7/fFIqsOmo97gg1+C6hF/TedNQz5VvBEQbA/9AR18UNuV7pd
+YzhQZSxsreVZG5JTqxP3M04RPnPYZCK3xhlCum3QYugXWJIhYBRq9QGA+LnVgH6T
+NU7tVVxHbrDkD0YUPEWn+3SASJfxLHXMJ1cdk91BCIbK5sCEMMsza0FmRnsipqud
+70wI6Kfq5IgKlWkkJOXoWiAlNrF3OXazLekMyCZ2iWpoGqisFqkOEoR1W1XXcL7M
+iuDgk8k2aJfqTX2C5z5jMkSEhxSJPZARWifqQdwg8qBsM5imcIH8/eVzUXo/Rh/c
++w6vXpUt+J6lESFTvy4vzLVlqxfHrSVr2xSUEdd+2hN0AGqIz9OVcbiH2P4yfPCp
+dKuS4uaPPQgqhC2/QSK13B21vq9cIXP9AmIktHa+phfJYlrnNfzWA7irEgeTjcGp
+xaPkOIy/8oRz4/RlOtZuXfatftkmZ8twPDeM84GAhsOCi/z0GuW/tV0NdLAbDxZH
+Bt1kdoPRE1GdDYQhNPzjLCE75ygIkX/KyInkugb0LrJWFZFmTzbgTX6e4l2t9aqw
+A7imsfOBAwMMWVfu9K0XZHqykp8KDBGQvdVCHHUXWFDbK9OvhX8=
+=xeIh
+-----END PGP SIGNATURE-----
+
+--J+eNKFoVC4T1DV3f--
 
