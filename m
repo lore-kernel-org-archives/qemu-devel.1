@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9136C31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D817C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:32:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72BDD20C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:31:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BDD20C01
+	by mail.kernel.org (Postfix) with ESMTPS id B8F3B20C01
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:32:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8F3B20C01
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw7no-00064M-Pw
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:31:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57750)
+	id 1hw7oQ-0007TQ-20
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:32:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57834)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hw7YR-00044L-Qw
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:49 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hw7YX-0004MA-3G
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hw7YP-0004jN-Q2
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50204)
+ (envelope-from <mreitz@redhat.com>) id 1hw7YV-0004mu-Ma
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:15:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51832)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hw7YG-0004fm-Q2; Fri, 09 Aug 2019 12:15:37 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hw7YS-0004kx-Kw; Fri, 09 Aug 2019 12:15:48 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1EDC230BD1DA;
- Fri,  9 Aug 2019 16:15:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EF13D316EFEC;
+ Fri,  9 Aug 2019 16:15:47 +0000 (UTC)
 Received: from localhost (unknown [10.40.205.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ABB935DC1E;
- Fri,  9 Aug 2019 16:15:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F3CD60BF7;
+ Fri,  9 Aug 2019 16:15:47 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Fri,  9 Aug 2019 18:14:01 +0200
-Message-Id: <20190809161407.11920-37-mreitz@redhat.com>
+Date: Fri,  9 Aug 2019 18:14:05 +0200
+Message-Id: <20190809161407.11920-41-mreitz@redhat.com>
 In-Reply-To: <20190809161407.11920-1-mreitz@redhat.com>
 References: <20190809161407.11920-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 09 Aug 2019 16:15:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Fri, 09 Aug 2019 16:15:48 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v6 36/42] iotests: Add tests for mirror
- @replaces loops
+Subject: [Qemu-devel] [PATCH v6 40/42] iotests: Add filter mirror test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,165 +73,201 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds two tests for cases where our old check_to_replace_node()
-function failed to detect that executing this job with these parameters
-would result in a cyclic graph.
+This patch adds some test cases how mirroring relates to filters.  One
+of them tests what happens when you mirror off a filtered COW node, two
+others use the mirror filter node as basically our only example of an
+implicitly created filter node so far (besides the commit filter).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/041     | 124 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/041     | 146 ++++++++++++++++++++++++++++++++++++-
  tests/qemu-iotests/041.out |   4 +-
- 2 files changed, 126 insertions(+), 2 deletions(-)
+ 2 files changed, 147 insertions(+), 3 deletions(-)
 
 diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 26bf1701eb..0c1432f189 100755
+index 0c1432f189..c2b5299f62 100755
 --- a/tests/qemu-iotests/041
 +++ b/tests/qemu-iotests/041
-@@ -1067,5 +1067,129 @@ class TestOrphanedSource(iotests.QMPTestCase):
-                              target=3D'dest-ro')
-         self.assert_qmp(result, 'error/class', 'GenericError')
+@@ -20,8 +20,9 @@
 =20
-+# Various tests for the @replaces option (independent of quorum)
-+class TestReplaces(iotests.QMPTestCase):
+ import time
+ import os
++import json
+ import iotests
+-from iotests import qemu_img, qemu_io
++from iotests import qemu_img, qemu_img_pipe, qemu_io
+=20
+ backing_img =3D os.path.join(iotests.test_dir, 'backing.img')
+ target_backing_img =3D os.path.join(iotests.test_dir, 'target-backing.im=
+g')
+@@ -1191,5 +1192,148 @@ class TestReplaces(iotests.QMPTestCase):
+         os.remove(test_img)
+         os.remove(target_img)
+=20
++# Tests for mirror with filters (and how the mirror filter behaves, as
++# an example for an implicit filter)
++class TestFilters(iotests.QMPTestCase):
 +    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, backing_img, '1M')
++        qemu_img('create', '-f', iotests.imgfmt, '-b', backing_img, test=
+_img)
++        qemu_img('create', '-f', iotests.imgfmt, '-b', backing_img, targ=
+et_img)
++
++        qemu_io('-c', 'write -P 1 0 512k', backing_img)
++        qemu_io('-c', 'write -P 2 512k 512k', test_img)
++
 +        self.vm =3D iotests.VM()
 +        self.vm.launch()
++
++        result =3D self.vm.qmp('blockdev-add', **{
++                                'node-name': 'target',
++                                'driver': iotests.imgfmt,
++                                'file': {
++                                    'driver': 'file',
++                                    'filename': target_img
++                                },
++                                'backing': None
++                            })
++        self.assert_qmp(result, 'return', {})
++
++        self.filterless_chain =3D {
++                'node-name': 'source',
++                'driver': iotests.imgfmt,
++                'file': {
++                    'driver': 'file',
++                    'filename': test_img
++                },
++                'backing': {
++                    'node-name': 'backing',
++                    'driver': iotests.imgfmt,
++                    'file': {
++                        'driver': 'file',
++                        'filename': backing_img
++                    }
++                }
++            }
 +
 +    def tearDown(self):
 +        self.vm.shutdown()
 +
-+    def test_drive_mirror_loop(self):
-+        qemu_img('create', '-f', iotests.imgfmt, test_img, '1M')
-+
-+        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group'=
-, id=3D'tg')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                    'node-name': 'source',
-+                    'driver': 'throttle',
-+                    'throttle-group': 'tg',
-+                    'file': {
-+                        'node-name': 'filtered',
-+                        'driver': iotests.imgfmt,
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': test_img
-+                        }
-+                    }
-+                })
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Mirror from @source to @target in sync=3Dnone, so that @source
-+        # will be @target's backing file; but replace @filtered.
-+        # Then, @target's backing file will be @source, whose backing
-+        # file is now @target instead of @filtered.  That is a loop.
-+        # (But apart from the loop, replacing @filtered instead of
-+        # @source is fine, because both are just filtered versions of
-+        # each other.)
-+        result =3D self.vm.qmp('drive-mirror',
-+                             job_id=3D'mirror',
-+                             device=3D'source',
-+                             target=3Dtarget_img,
-+                             format=3Diotests.imgfmt,
-+                             node_name=3D'target',
-+                             sync=3D'none',
-+                             replaces=3D'filtered')
-+        if 'error' in result:
-+            # This is the correct result
-+            self.assert_qmp(result, 'error/class', 'GenericError')
-+        else:
-+            # This is wrong, but let's run it to the bitter conclusion
-+            self.complete_and_wait(drive=3D'mirror')
-+            # Fail for good measure, although qemu should have crashed
-+            # anyway
-+            self.fail('Loop creation was successful')
-+
 +        os.remove(test_img)
-+        try:
-+            os.remove(target_img)
-+        except OSError:
-+            pass
++        os.remove(target_img)
++        os.remove(backing_img)
 +
-+    def test_blockdev_mirror_loop(self):
-+        qemu_img('create', '-f', iotests.imgfmt, test_img, '1M')
-+        qemu_img('create', '-f', iotests.imgfmt, target_img, '1M')
-+
-+        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group'=
-, id=3D'tg')
++    def test_cor(self):
++        result =3D self.vm.qmp('blockdev-add', **{
++                                'node-name': 'filter',
++                                'driver': 'copy-on-read',
++                                'file': self.filterless_chain
++                            })
 +        self.assert_qmp(result, 'return', {})
 +
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                    'node-name': 'source',
-+                    'driver': 'throttle',
-+                    'throttle-group': 'tg',
-+                    'file': {
-+                        'node-name': 'middle',
-+                        'driver': 'throttle',
-+                        'throttle-group': 'tg',
-+                        'file': {
-+                            'node-name': 'bottom',
-+                            'driver': iotests.imgfmt,
-+                            'file': {
-+                                'driver': 'file',
-+                                'filename': test_img
-+                            }
-+                        }
-+                    }
-+                })
++        result =3D self.vm.qmp('blockdev-mirror',
++                             job_id=3D'mirror',
++                             device=3D'filter',
++                             target=3D'target',
++                             sync=3D'top')
 +        self.assert_qmp(result, 'return', {})
 +
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                    'node-name': 'target',
-+                    'driver': iotests.imgfmt,
-+                    'file': {
-+                        'driver': 'file',
-+                        'filename': target_img
-+                    },
-+                    'backing': 'middle'
-+                })
++        self.complete_and_wait('mirror')
 +
-+        # Mirror from @source to @target.  With blockdev-mirror, the
-+        # current (old) backing file is retained (which is @middle).
-+        # By replacing @bottom, @middle's file will be @target, whose
-+        # backing file is @middle again.  That is a loop.
-+        # (But apart from the loop, replacing @bottom instead of
-+        # @source is fine, because both are just filtered versions of
-+        # each other.)
++        self.vm.qmp('blockdev-del', node_name=3D'target')
++
++        target_map =3D qemu_img_pipe('map', '--output=3Djson', target_im=
+g)
++        target_map =3D json.loads(target_map)
++
++        assert target_map[0]['start'] =3D=3D 0
++        assert target_map[0]['length'] =3D=3D 512 * 1024
++        assert target_map[0]['depth'] =3D=3D 1
++
++        assert target_map[1]['start'] =3D=3D 512 * 1024
++        assert target_map[1]['length'] =3D=3D 512 * 1024
++        assert target_map[1]['depth'] =3D=3D 0
++
++    def test_implicit_mirror_filter(self):
++        result =3D self.vm.qmp('blockdev-add', **self.filterless_chain)
++        self.assert_qmp(result, 'return', {})
++
++        # We need this so we can query from above the mirror node
++        result =3D self.vm.qmp('device_add',
++                             driver=3D'virtio-blk',
++                             id=3D'virtio',
++                             bus=3D'pci.0',
++                             drive=3D'source')
++        self.assert_qmp(result, 'return', {})
++
 +        result =3D self.vm.qmp('blockdev-mirror',
 +                             job_id=3D'mirror',
 +                             device=3D'source',
 +                             target=3D'target',
-+                             sync=3D'full',
-+                             replaces=3D'bottom')
-+        if 'error' in result:
-+            # This is the correct result
-+            self.assert_qmp(result, 'error/class', 'GenericError')
-+        else:
-+            # This is wrong, but let's run it to the bitter conclusion
-+            self.complete_and_wait(drive=3D'mirror')
-+            # Fail for good measure, although qemu should have crashed
-+            # anyway
-+            self.fail('Loop creation was successful')
++                             sync=3D'top')
++        self.assert_qmp(result, 'return', {})
 +
-+        os.remove(test_img)
-+        os.remove(target_img)
++        # The mirror filter is now an implicit node, so it should be
++        # invisible when querying the backing chain
++        device_info =3D self.vm.qmp('query-block')['return'][0]
++        assert device_info['qdev'] =3D=3D '/machine/peripheral/virtio/vi=
+rtio-backend'
++
++        assert device_info['inserted']['node-name'] =3D=3D 'source'
++
++        image_info =3D device_info['inserted']['image']
++        assert image_info['filename'] =3D=3D test_img
++        assert image_info['backing-image']['filename'] =3D=3D backing_im=
+g
++
++        self.complete_and_wait('mirror')
++
++    def test_explicit_mirror_filter(self):
++        # Same test as above, but this time we give the mirror filter
++        # a node-name so it will not be invisible
++        result =3D self.vm.qmp('blockdev-add', **self.filterless_chain)
++        self.assert_qmp(result, 'return', {})
++
++        # We need this so we can query from above the mirror node
++        result =3D self.vm.qmp('device_add',
++                             driver=3D'virtio-blk',
++                             id=3D'virtio',
++                             bus=3D'pci.0',
++                             drive=3D'source')
++        self.assert_qmp(result, 'return', {})
++
++        result =3D self.vm.qmp('blockdev-mirror',
++                             job_id=3D'mirror',
++                             device=3D'source',
++                             target=3D'target',
++                             sync=3D'top',
++                             filter_node_name=3D'mirror-filter')
++        self.assert_qmp(result, 'return', {})
++
++        # With a node-name given to it, the mirror filter should now
++        # be visible
++        device_info =3D self.vm.qmp('query-block')['return'][0]
++        assert device_info['qdev'] =3D=3D '/machine/peripheral/virtio/vi=
+rtio-backend'
++
++        assert device_info['inserted']['node-name'] =3D=3D 'mirror-filte=
+r'
++
++        self.complete_and_wait('mirror')
++
 +
  if __name__ =3D=3D '__main__':
      iotests.main(supported_fmts=3D['qcow2', 'qed'])
 diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index e071d0b261..2c448b4239 100644
+index 2c448b4239..ffc779b4d1 100644
 --- a/tests/qemu-iotests/041.out
 +++ b/tests/qemu-iotests/041.out
 @@ -1,5 +1,5 @@
 -........................................................................=
-................
-+........................................................................=
 ..................
++........................................................................=
+.....................
  ----------------------------------------------------------------------
--Ran 88 tests
-+Ran 90 tests
+-Ran 90 tests
++Ran 93 tests
 =20
  OK
 --=20
