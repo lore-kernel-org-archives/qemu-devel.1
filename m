@@ -2,76 +2,72 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F289EC31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 171A3C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:46:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B221F2089E
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:35:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B221F2089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E26F920B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 16:46:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26F920B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw7rt-0004cC-To
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:35:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33051)
+	id 1hw82M-00011O-3M
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 12:46:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34607)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mst@redhat.com>) id 1hw7rV-00047p-CH
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:35:30 -0400
+ (envelope-from <bounces@canonical.com>) id 1hw81o-0000bz-9R
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:46:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1hw7rU-0005U8-8D
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:35:29 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:34707)
+ (envelope-from <bounces@canonical.com>) id 1hw81n-0004yP-3H
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:46:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54332)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1hw7rU-0005TQ-3n
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:35:28 -0400
-Received: by mail-qk1-f193.google.com with SMTP id z16so2285211qka.1
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 09:35:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=F5uHMDxjjgBE10i2i5vQFV4kfYVwViF+4v8/iXiU+DQ=;
- b=HCaSsGzvJ6FyIhhRn2L97HzgIiGOaxjZUG7/Yi3y5vC3Tt+EgfwXEcLJfkyQ0bEvj7
- ag1Xvfx0cxoKiWes2/5q//mzaQIOuo6H8ljeoiFFacTTpxHwMsWrPIZ+0krZAe/8EncT
- 74XmurWVgsAxYLvUVWj9cJ8+KILizfyRcz9ChXleFZoA1ORF2eGDTdh99uOr2+EiAZli
- QUARKMELcT3wdBUstdPbf7BrTNN81jydJCo/ZXsA7cMeE5PrpO7LVCWuYXzAxn47alnd
- dxsG7krExTtClTPYcGguWrqCLKs6hhOyw8i0jW7Zeg0/g8u8yvv33efYdJIQdlVyrQa7
- POsA==
-X-Gm-Message-State: APjAAAWVuLINqX/NrYZaT5iiYKf/0NAriEh7fTjjp45lkGbraPg7HD8x
- yujCroDmOPPdUmx37Svvlo6SnA==
-X-Google-Smtp-Source: APXvYqwtV6v/QzH2EXkh+BYRDb+5Ux7hKmrIxN/zzVeCwxmu9aCEKGxnCmkqGDzaYZqGLW9Z7Oe1/Q==
-X-Received: by 2002:a37:a742:: with SMTP id q63mr18313538qke.421.1565368526971; 
- Fri, 09 Aug 2019 09:35:26 -0700 (PDT)
-Received: from redhat.com (bzq-79-181-91-42.red.bezeqint.net. [79.181.91.42])
- by smtp.gmail.com with ESMTPSA id
- d123sm44741955qkb.94.2019.08.09.09.35.24
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 09:35:26 -0700 (PDT)
-Date: Fri, 9 Aug 2019 12:35:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Julia Suvorova <jusual@redhat.com>
-Message-ID: <20190809123341-mutt-send-email-mst@kernel.org>
-References: <20190807082241.23984-1-jusual@redhat.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hw81m-0004uc-N1
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 12:46:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hw81j-0000gz-NV
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 16:46:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 852C02E81A0
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 16:46:01 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190807082241.23984-1-jusual@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Aug 2019 16:35:46 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: glaubitz pmaydell
+X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156518306048.32528.10373743991208371347.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156536854700.31102.3829708686445529573.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19021";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: a907f2c8c261853b4370565e00f3056b171ef03a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.222.193
-Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Add Function Level Reset
- support
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1839325] Re: Go programs crash on qemu-sh4 due to
+ issues with atomics
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,79 +76,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1839325 <1839325@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 07, 2019 at 10:22:41AM +0200, Julia Suvorova wrote:
-> Using FLR becomes convenient in cases where resetting the bus is
-> impractical, for example, when debugging the behavior of individual
-> functions.
-> 
-> Signed-off-by: Julia Suvorova <jusual@redhat.com>
-> ---
->  hw/virtio/virtio-pci.c | 10 ++++++++++
->  hw/virtio/virtio-pci.h |  1 +
->  2 files changed, 11 insertions(+)
-> 
-> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> index f6d2223e78..37c5d6efbc 100644
-> --- a/hw/virtio/virtio-pci.c
-> +++ b/hw/virtio/virtio-pci.c
-> @@ -599,6 +599,10 @@ static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
->  
->      pci_default_write_config(pci_dev, address, val, len);
->  
-> +    if (proxy->has_flr) {
-> +        pcie_cap_flr_write_config(pci_dev, address, val, len);
-> +    }
-> +
->      if (range_covers_byte(address, len, PCI_COMMAND) &&
->          !(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
->          virtio_pci_stop_ioeventfd(proxy);
-> @@ -1718,6 +1722,8 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->      proxy->notify_pio.size = 0x4;
->      proxy->notify_pio.type = VIRTIO_PCI_CAP_NOTIFY_CFG;
->  
-> +    proxy->has_flr = false;
-> +
->      /* subclasses can enforce modern, so do this unconditionally */
->      memory_region_init(&proxy->modern_bar, OBJECT(proxy), "virtio-pci",
->                         /* PCI BAR regions must be powers of 2 */
-> @@ -1749,6 +1755,10 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
->  
->          pci_dev->exp.pm_cap = pos;
->  
-> +        /* Set Function Level Reset capability bit */
-> +        pcie_cap_flr_init(pci_dev);
-> +        proxy->has_flr = true;
-> +
->          /*
->           * Indicates that this function complies with revision 1.2 of the
->           * PCI Power Management Interface Specification.
+The non-8-aligned pointer is the runtime.work.empty field. The
+compilation that I have of this binary has put the 'runtime.work' struct
+at 0x6bfadc, which is only 4-aligned, and this won't work as the lfstack
+fields it starts with are supposed to be 8-aligned. So it looks to me
+like the compiler has miscompiled the binary somehow, and QEMU's actual
+execution of it is OK.
 
+I don't know if this is a general bug in the sh4 gccgo support (in which
+case we must be succeeding on the real hardware by accident, probably by
+finishing fast enough that the gc never kicks in), or if QEMU is mis-
+executing the compiler somehow and a build done on the real hardware
+puts the work struct at an 8-aligned address.
 
-I don't think we can set this for everyone: this will break
-things like cross version migration.
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1839325
 
+Title:
+  Go programs crash on qemu-sh4 due to issues with atomics
 
-> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
-> index 292275acb1..16d293a6bf 100644
-> --- a/hw/virtio/virtio-pci.h
-> +++ b/hw/virtio/virtio-pci.h
-> @@ -152,6 +152,7 @@ struct VirtIOPCIProxy {
->      VirtIOIRQFD *vector_irqfd;
->      int nvqs_with_notifiers;
->      VirtioBusState bus;
-> +    bool has_flr;
->  };
->  
->  static inline bool virtio_pci_modern(VirtIOPCIProxy *proxy)
+Status in QEMU:
+  New
 
+Bug description:
+  After #1738545 [1] was fixed, Go applications work fine on qemu-arm
+  but still crash on qemu-sh4. From the backtrace, it looks like an
+  issue with the atomics in qemu-sh4:
 
+  (sid-sh4-sbuild)root@epyc:/# cat hello.go
+  package main
 
-> -- 
-> 2.21.0
+  import "fmt"
+
+  func main() {
+        fmt.Println("hello world")
+  }
+
+  (sid-sh4-sbuild)root@epyc:/# gccgo-9 hello.go -o hello
+  (sid-sh4-sbuild)root@epyc:/# ./hello =
+
+  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
+  fatal error: panic on system stack
+  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
+  fatal error: panic on system stack
+
+  runtime stack:
+  runtime..z2finternal..z2fatomic.Load64
+          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
+  runtime_mstart
+          ../../../src/libgo/runtime/proc.c:596
+
+  goroutine 1 [running]:
+          goroutine running on other thread; stack unavailable
+
+  runtime stack:
+  runtime..z2finternal..z2fatomic.Load64
+          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
+  runtime_mstart
+          ../../../src/libgo/runtime/proc.c:596
+  (sid-sh4-sbuild)root@epyc:/#
+
+  The same sample Go program runs fine on my SH7785LCR SH4 evaluation
+  board:
+
+  root@tirpitz:~> uname -a
+  Linux tirpitz 3.16.7-ckt7 #8 PREEMPT Fri Oct 21 18:47:41 CEST 2016 sh4a G=
+NU/Linux
+  root@tirpitz:~> cat hello.go
+  package main
+
+  import "fmt"
+
+  func main() {
+        fmt.Println("hello world")
+  }
+
+  root@tirpitz:~> gccgo-9 hello.go -o hello
+  root@tirpitz:~> ./hello =
+
+  hello world
+  root@tirpitz:~>
+
+  Please note: In order to be able to reproduce this, one also needs to
+  revert commit 61dedf2af7 [2], otherwise the Go application crashes
+  differently:
+
+  (sid-sh4-sbuild)root@epyc:/# ./hello        =
+
+  Unhandled trap: 0x180
+  pc=3D0x7e5f7f9e sr=3D0x00000000 pr=3D0x7ee3d582 fpscr=3D0x00080004
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0x7e590480 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x7e5f7f60 fpul=3D0x00034f=
+3b
+  r0=3D0x008007d4 r1=3D0x00000000 r2=3D0xfffe0b2a r3=3D0x00000002
+  r4=3D0x008006e4 r5=3D0x00872000 r6=3D0x00200000 r7=3D0x00000000
+  r8=3D0x7f7bca7c r9=3D0x7fffebd4 r10=3D0x00800480 r11=3D0x7f7bc0f0
+  r12=3D0x7f7a3fa4 r13=3D0x008004c0 r14=3D0x7f7b2238 r15=3D0x7fffebd0
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@epyc:/#
+
+  > [1] https://bugs.launchpad.net/bugs/1738545
+  > [2] https://bugs.launchpad.net/bugs/1796520
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1839325/+subscriptions
 
