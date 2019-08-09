@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 750D8C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DBBFC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:56:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D25020B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:56:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D25020B7C
+	by mail.kernel.org (Postfix) with ESMTPS id D398420B7C
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 12:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D398420B7C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw4RI-00014F-5Y
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 08:56:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53094)
+	id 1hw4RM-00019C-9I
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 08:56:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53015)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4KJ-0002Ts-T9
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:49:02 -0400
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4K3-0002Gd-9M
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4KH-0001Nb-Mg
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:59 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:46057 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1hw4Jz-0001Fa-UH
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:52591 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1hw4KH-0000v0-CA
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:57 -0400
+ id 1hw4Jz-00019X-9x
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 08:48:39 -0400
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id CB0F11A2142;
- Fri,  9 Aug 2019 14:47:52 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTP id BFC461A21C4;
+ Fri,  9 Aug 2019 14:48:25 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.13.43])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A9B321A2128;
- Fri,  9 Aug 2019 14:47:52 +0200 (CEST)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 9F06D1A216D;
+ Fri,  9 Aug 2019 14:48:25 +0200 (CEST)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Date: Fri,  9 Aug 2019 14:46:34 +0200
-Message-Id: <1565354819-1495-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Fri,  9 Aug 2019 14:46:51 +0200
+Message-Id: <1565354819-1495-19-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1565354819-1495-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1565354819-1495-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 89.216.37.149
-Subject: [Qemu-devel] [PATCH for 4.2 v7 01/26] target/mips: Add support for
- DSPRAM
+Subject: [Qemu-devel] [PATCH for 4.2 v7 18/26] target/mips: Clean up
+ handling of CP0 register 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,472 +63,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arikalo@wavecomp.com, Yongbok Kim <yongbok.kim@mips.com>, philmd@redhat.com,
- amarkovic@wavecomp.com
+Cc: arikalo@wavecomp.com, philmd@redhat.com, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-The optional Data Scratch Pad RAM (DSPRAM) block provides a general scratch pad RAM
-used for temporary storage of data. The DSPRAM provides a connection to on-chip
-memory or memory-mapped registers, which are accessed in parallel with the L1 data
-cache to minimize access latency
+Clean up handling of CP0 register 2.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- hw/mips/cps.c                    |  29 +++++++-
- hw/misc/Makefile.objs            |   1 +
- hw/misc/mips_dspram.c            | 153 +++++++++++++++++++++++++++++++++++++++
- include/hw/mips/cps.h            |   2 +
- include/hw/misc/mips_dspram.h    |  46 ++++++++++++
- target/mips/cpu.h                |   9 ++-
- target/mips/internal.h           |   3 +-
- target/mips/op_helper.c          |  18 +++++
- target/mips/translate.c          |   8 ++
- target/mips/translate_init.inc.c |   2 +
- 10 files changed, 266 insertions(+), 5 deletions(-)
- create mode 100644 hw/misc/mips_dspram.c
- create mode 100644 include/hw/misc/mips_dspram.h
+ target/mips/cpu.h       |  7 ++++++
+ target/mips/translate.c | 64 ++++++++++++++++++++++++-------------------------
+ 2 files changed, 39 insertions(+), 32 deletions(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 0d459c4..c84bc64 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -18,6 +18,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
- #include "hw/mips/cps.h"
-@@ -91,7 +92,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
- 
-     cpu = MIPS_CPU(first_cpu);
-     env = &cpu->env;
--    saar_present = (bool)env->saarp;
-+    saar_present = env->saarp;
-+    bool dspram_present = env->dspramp;
- 
-     /* Inter-Thread Communication Unit */
-     if (itu_present) {
-@@ -102,7 +104,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-         object_property_set_bool(OBJECT(&s->itu), saar_present, "saar-present",
-                                  &err);
-         if (saar_present) {
--            qdev_prop_set_ptr(DEVICE(&s->itu), "saar", (void *)&env->CP0_SAAR);
-+            qdev_prop_set_ptr(DEVICE(&s->itu), "saar",
-+                              (void *) &env->CP0_SAAR[0]);
-         }
-         object_property_set_bool(OBJECT(&s->itu), true, "realized", &err);
-         if (err != NULL) {
-@@ -113,6 +116,28 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-         memory_region_add_subregion(&s->container, 0,
-                            sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->itu), 0));
-     }
-+    env->dspram = g_new0(MIPSDSPRAMState, 1);
-+
-+    /* Data Scratch Pad RAM */
-+    if (dspram_present) {
-+        if (!saar_present) {
-+            error_report("%s: DSPRAM requires SAAR registers", __func__);
-+            return;
-+        }
-+        object_initialize(&s->dspram, sizeof(MIPSDSPRAMState),
-+                          TYPE_MIPS_DSPRAM);
-+        qdev_set_parent_bus(DEVICE(&s->dspram), sysbus_get_default());
-+        qdev_prop_set_ptr(DEVICE(&s->dspram), "saar",
-+                          &env->CP0_SAAR[1]);
-+        object_property_set_bool(OBJECT(&s->dspram), true, "realized", &err);
-+        if (err != NULL) {
-+            error_report("%s: DSPRAM initialisation failed", __func__);
-+            error_propagate(errp, err);
-+            return;
-+        }
-+        memory_region_add_subregion(&s->container, 0,
-+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->dspram), 0));
-+    }
- 
-     /* Cluster Power Controller */
-     sysbus_init_child_obj(OBJECT(dev), "cpc", &s->cpc, sizeof(s->cpc),
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index e9aab51..5fcb4db 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -60,6 +60,7 @@ obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-+obj-$(CONFIG_MIPS_DSPRAM) += mips_dspram.o
- obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
- obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
- 
-diff --git a/hw/misc/mips_dspram.c b/hw/misc/mips_dspram.c
-new file mode 100644
-index 0000000..9bc155b
---- /dev/null
-+++ b/hw/misc/mips_dspram.c
-@@ -0,0 +1,153 @@
-+/*
-+ * Data Scratch Pad RAM
-+ *
-+ * Copyright (c) 2017 Imagination Technologies
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "cpu.h"
-+#include "qemu/log.h"
-+#include "exec/exec-all.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/sysemu.h"
-+#include "hw/misc/mips_dspram.h"
-+
-+static void raise_exception(int excp)
-+{
-+    current_cpu->exception_index = excp;
-+    cpu_loop_exit(current_cpu);
-+}
-+
-+static uint64_t dspram_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    MIPSDSPRAMState *s = (MIPSDSPRAMState *)opaque;
-+
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        raise_exception(EXCP_AdEL);
-+        return 0;
-+    case 4:
-+        return *(uint32_t *) &s->ramblock[addr % (1 << s->size)];
-+    case 8:
-+        return *(uint64_t *) &s->ramblock[addr % (1 << s->size)];
-+    }
-+    return 0;
-+}
-+
-+static void dspram_write(void *opaque, hwaddr addr, uint64_t data,
-+                         unsigned size)
-+{
-+    MIPSDSPRAMState *s = (MIPSDSPRAMState *)opaque;
-+
-+    switch (size) {
-+    case 1:
-+    case 2:
-+        raise_exception(EXCP_AdES);
-+        return;
-+    case 4:
-+        *(uint32_t *) &s->ramblock[addr % (1 << s->size)] = (uint32_t) data;
-+        break;
-+    case 8:
-+        *(uint64_t *) &s->ramblock[addr % (1 << s->size)] = data;
-+        break;
-+    }
-+}
-+
-+void dspram_reconfigure(struct MIPSDSPRAMState *dspram)
-+{
-+    MemoryRegion *mr = &dspram->mr;
-+    hwaddr address;
-+    bool is_enabled;
-+
-+    address = ((*(uint64_t *) dspram->saar) & 0xFFFFFFFE000ULL) << 4;
-+    is_enabled = *(uint64_t *) dspram->saar & 1;
-+
-+    memory_region_transaction_begin();
-+    memory_region_set_size(mr, (1 << dspram->size));
-+    memory_region_set_address(mr, address);
-+    memory_region_set_enabled(mr, is_enabled);
-+    memory_region_transaction_commit();
-+}
-+
-+static const MemoryRegionOps dspram_ops = {
-+    .read = dspram_read,
-+    .write = dspram_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .unaligned = false,
-+    }
-+};
-+
-+static void mips_dspram_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    MIPSDSPRAMState *s = MIPS_DSPRAM(obj);
-+
-+    memory_region_init_io(&s->mr, OBJECT(s), &dspram_ops, s,
-+                          "mips-dspram", (1 << s->size));
-+    sysbus_init_mmio(sbd, &s->mr);
-+}
-+
-+static void mips_dspram_realize(DeviceState *dev, Error **errp)
-+{
-+    MIPSDSPRAMState *s = MIPS_DSPRAM(dev);
-+
-+    /* some error handling here */
-+
-+    s->ramblock = g_malloc0(1 << s->size);
-+}
-+
-+static void mips_dspram_reset(DeviceState *dev)
-+{
-+    MIPSDSPRAMState *s = MIPS_DSPRAM(dev);
-+
-+    *(uint64_t *) s->saar = s->size << 1;
-+    memset(s->ramblock, 0, (1 << s->size));
-+}
-+
-+static Property mips_dspram_properties[] = {
-+    DEFINE_PROP_PTR("saar", MIPSDSPRAMState, saar),
-+    /* default DSPRAM size is 64 KB */
-+    DEFINE_PROP_SIZE("size", MIPSDSPRAMState, size, 0x10),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void mips_dspram_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = mips_dspram_properties;
-+    dc->realize = mips_dspram_realize;
-+    dc->reset = mips_dspram_reset;
-+}
-+
-+static const TypeInfo mips_dspram_info = {
-+    .name          = TYPE_MIPS_DSPRAM,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MIPSDSPRAMState),
-+    .instance_init = mips_dspram_init,
-+    .class_init    = mips_dspram_class_init,
-+};
-+
-+static void mips_dspram_register_types(void)
-+{
-+    type_register_static(&mips_dspram_info);
-+}
-+
-+type_init(mips_dspram_register_types);
-diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
-index aab1af9..a637036 100644
---- a/include/hw/mips/cps.h
-+++ b/include/hw/mips/cps.h
-@@ -25,6 +25,7 @@
- #include "hw/intc/mips_gic.h"
- #include "hw/misc/mips_cpc.h"
- #include "hw/misc/mips_itu.h"
-+#include "hw/misc/mips_dspram.h"
- 
- #define TYPE_MIPS_CPS "mips-cps"
- #define MIPS_CPS(obj) OBJECT_CHECK(MIPSCPSState, (obj), TYPE_MIPS_CPS)
-@@ -41,6 +42,7 @@ typedef struct MIPSCPSState {
-     MIPSGICState gic;
-     MIPSCPCState cpc;
-     MIPSITUState itu;
-+    MIPSDSPRAMState dspram;
- } MIPSCPSState;
- 
- qemu_irq get_cps_irq(MIPSCPSState *cps, int pin_number);
-diff --git a/include/hw/misc/mips_dspram.h b/include/hw/misc/mips_dspram.h
-new file mode 100644
-index 0000000..ee99e17
---- /dev/null
-+++ b/include/hw/misc/mips_dspram.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Data Scratch Pad RAM
-+ *
-+ * Copyright (c) 2017 Imagination Technologies
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef MIPS_DSPRAM_H
-+#define MIPS_DSPRAM_H
-+
-+#include "hw/sysbus.h"
-+
-+#define TYPE_MIPS_DSPRAM "mips-dspram"
-+#define MIPS_DSPRAM(obj) OBJECT_CHECK(MIPSDSPRAMState, (obj), TYPE_MIPS_DSPRAM)
-+
-+typedef struct MIPSDSPRAMState {
-+    /*< private >*/
-+    SysBusDevice parent_obj;
-+    /*< public >*/
-+
-+    /* 2 ^ SIZE */
-+    uint64_t size;
-+
-+    MemoryRegion mr;
-+
-+    /* SAAR */
-+    bool saar_present;
-+    void *saar;
-+
-+    /* ramblock */
-+    uint8_t *ramblock;
-+} MIPSDSPRAMState;
-+
-+#endif /* MIPS_DSPRAM_H */
 diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 21c0615..90a2ed8 100644
+index 597afa8..eebdc9f 100644
 --- a/target/mips/cpu.h
 +++ b/target/mips/cpu.h
-@@ -453,6 +453,7 @@ struct TCState {
- 
- };
- 
-+struct MIPSDSPRAMState;
- struct MIPSITUState;
- typedef struct CPUMIPSState CPUMIPSState;
- struct CPUMIPSState {
-@@ -1035,8 +1036,8 @@ struct CPUMIPSState {
-     uint32_t CP0_Status_rw_bitmask; /* Read/write bits in CP0_Status */
-     uint32_t CP0_TCStatus_rw_bitmask; /* Read/write bits in CP0_TCStatus */
-     uint64_t insn_flags; /* Supported instruction set */
--    int saarp;
--
-+    bool saarp;
-+    bool dspramp;
-     /* Fields up to this point are cleared by a CPU reset */
-     struct {} end_reset_fields;
- 
-@@ -1051,6 +1052,7 @@ struct CPUMIPSState {
-     QEMUTimer *timer; /* Internal timer */
-     struct MIPSITUState *itu;
-     MemoryRegion *itc_tag; /* ITC Configuration Tags */
-+    struct MIPSDSPRAMState *dspram;
-     target_ulong exception_base; /* ExceptionBase input to the core */
- };
- 
-@@ -1192,6 +1194,9 @@ void cpu_mips_soft_irq(CPUMIPSState *env, int irq, int level);
- /* mips_itu.c */
- void itc_reconfigure(struct MIPSITUState *tag);
- 
-+/* mips_dspram.c */
-+void dspram_reconfigure(struct MIPSDSPRAMState *dspram);
-+
- /* helper.c */
- target_ulong exception_resume_pc(CPUMIPSState *env);
- 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index b2b41a5..f6d0d7a 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -61,7 +61,8 @@ struct mips_def_t {
-     target_ulong CP0_EBaseWG_rw_bitmask;
-     uint64_t insn_flags;
-     enum mips_mmu_types mmu_type;
--    int32_t SAARP;
-+    bool SAARP;
-+    bool DSPRAMP;
- };
- 
- extern const struct mips_def_t mips_defs[];
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 9e2e02f..628da45 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -1614,7 +1614,16 @@ void helper_mtc0_saar(CPUMIPSState *env, target_ulong arg1)
-                 itc_reconfigure(env->itu);
-             }
-             break;
-+#if defined(CONFIG_MIPS_DSPRAM)
-+        case 1:
-+            if (env->dspram) {
-+                dspram_reconfigure(env->dspram);
-+            }
-+            break;
-+#endif
-         }
-+    } else {
-+        helper_raise_exception(env, EXCP_RI);
-     }
- }
- 
-@@ -1631,7 +1640,16 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
-                 itc_reconfigure(env->itu);
-             }
-             break;
-+#if defined(CONFIG_MIPS_DSPRAM)
-+        case 1:
-+            if (env->dspram) {
-+                dspram_reconfigure(env->dspram);
-+            }
-+            break;
-+#endif
-         }
-+    } else {
-+        helper_raise_exception(env, EXCP_RI);
-     }
- }
- 
+@@ -294,6 +294,13 @@ typedef struct mips_def_t mips_def_t;
+ #define CP0_REG01__VPEOPT          7
+ /* CP0 Register 02 */
+ #define CP0_REG02__ENTRYLO0        0
++#define CP0_REG02__TCSTATUS        1
++#define CP0_REG02__TCBIND          2
++#define CP0_REG02__TCRESTART       3
++#define CP0_REG02__TCHALT          4
++#define CP0_REG02__TCCONTEXT       5
++#define CP0_REG02__TCSCHEDULE      6
++#define CP0_REG02__TCSCHEFBACK     7
+ /* CP0 Register 03 */
+ #define CP0_REG03__ENTRYLO1        0
+ #define CP0_REG03__GLOBALNUM       1
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index ca62800..4ebeabe 100644
+index dad32e9..3fb3757 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -30368,6 +30368,8 @@ void cpu_state_reset(CPUMIPSState *env)
-     env->active_fpu.fcr31 = env->cpu_model->CP1_fcr31;
-     env->msair = env->cpu_model->MSAIR;
-     env->insn_flags = env->cpu_model->insn_flags;
-+    env->saarp = env->cpu_model->SAARP;
-+    env->dspramp = env->cpu_model->DSPRAMP;
- 
- #if defined(CONFIG_USER_ONLY)
-     env->CP0_Status = (MIPS_HFLAG_UM << CP0St_KSU);
-@@ -30528,6 +30530,12 @@ void cpu_state_reset(CPUMIPSState *env)
-         msa_reset(env);
-     }
- 
-+    /* DSPRAM */
-+    if (env->dspramp) {
-+        /* Fixed DSPRAM size with Default Value */
-+        env->CP0_SAAR[1] = 0x10 << 1;
-+    }
-+
-     compute_hflags(env);
-     restore_fp_status(env);
-     restore_pamask(env);
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index 6d145a9..1df0901 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -760,6 +760,8 @@ const mips_def_t mips_defs[] =
-         .PABITS = 48,
-         .insn_flags = CPU_MIPS64R6 | ASE_MSA,
-         .mmu_type = MMU_TYPE_R4000,
-+        .SAARP = 1,
-+        .DSPRAMP = 1,
-     },
-     {
-         .name = "Loongson-2E",
+@@ -6929,7 +6929,7 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_02:
+         switch (sel) {
+-        case 0:
++        case CP0_REG02__ENTRYLO0:
+             {
+                 TCGv_i64 tmp = tcg_temp_new_i64();
+                 tcg_gen_ld_i64(tmp, cpu_env,
+@@ -6946,37 +6946,37 @@ static void gen_mfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+             }
+             register_name = "EntryLo0";
+             break;
+-        case 1:
++        case CP0_REG02__TCSTATUS:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcstatus(arg, cpu_env);
+             register_name = "TCStatus";
+             break;
+-        case 2:
++        case CP0_REG02__TCBIND:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcbind(arg, cpu_env);
+             register_name = "TCBind";
+             break;
+-        case 3:
++        case CP0_REG02__TCRESTART:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcrestart(arg, cpu_env);
+             register_name = "TCRestart";
+             break;
+-        case 4:
++        case CP0_REG02__TCHALT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tchalt(arg, cpu_env);
+             register_name = "TCHalt";
+             break;
+-        case 5:
++        case CP0_REG02__TCCONTEXT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tccontext(arg, cpu_env);
+             register_name = "TCContext";
+             break;
+-        case 6:
++        case CP0_REG02__TCSCHEDULE:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcschedule(arg, cpu_env);
+             register_name = "TCSchedule";
+             break;
+-        case 7:
++        case CP0_REG02__TCSCHEFBACK:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcschefback(arg, cpu_env);
+             register_name = "TCScheFBack";
+@@ -7698,41 +7698,41 @@ static void gen_mtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_02:
+         switch (sel) {
+-        case 0:
++        case CP0_REG02__ENTRYLO0:
+             gen_helper_mtc0_entrylo0(cpu_env, arg);
+             register_name = "EntryLo0";
+             break;
+-        case 1:
++        case CP0_REG02__TCSTATUS:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcstatus(cpu_env, arg);
+             register_name = "TCStatus";
+             break;
+-        case 2:
++        case CP0_REG02__TCBIND:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcbind(cpu_env, arg);
+             register_name = "TCBind";
+             break;
+-        case 3:
++        case CP0_REG02__TCRESTART:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcrestart(cpu_env, arg);
+             register_name = "TCRestart";
+             break;
+-        case 4:
++        case CP0_REG02__TCHALT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tchalt(cpu_env, arg);
+             register_name = "TCHalt";
+             break;
+-        case 5:
++        case CP0_REG02__TCCONTEXT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tccontext(cpu_env, arg);
+             register_name = "TCContext";
+             break;
+-        case 6:
++        case CP0_REG02__TCSCHEDULE:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcschedule(cpu_env, arg);
+             register_name = "TCSchedule";
+             break;
+-        case 7:
++        case CP0_REG02__TCSCHEFBACK:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcschefback(cpu_env, arg);
+             register_name = "TCScheFBack";
+@@ -8449,41 +8449,41 @@ static void gen_dmfc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_02:
+         switch (sel) {
+-        case 0:
++        case CP0_REG02__ENTRYLO0:
+             tcg_gen_ld_tl(arg, cpu_env, offsetof(CPUMIPSState, CP0_EntryLo0));
+             register_name = "EntryLo0";
+             break;
+-        case 1:
++        case CP0_REG02__TCSTATUS:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcstatus(arg, cpu_env);
+             register_name = "TCStatus";
+             break;
+-        case 2:
++        case CP0_REG02__TCBIND:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mfc0_tcbind(arg, cpu_env);
+             register_name = "TCBind";
+             break;
+-        case 3:
++        case CP0_REG02__TCRESTART:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_dmfc0_tcrestart(arg, cpu_env);
+             register_name = "TCRestart";
+             break;
+-        case 4:
++        case CP0_REG02__TCHALT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_dmfc0_tchalt(arg, cpu_env);
+             register_name = "TCHalt";
+             break;
+-        case 5:
++        case CP0_REG02__TCCONTEXT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_dmfc0_tccontext(arg, cpu_env);
+             register_name = "TCContext";
+             break;
+-        case 6:
++        case CP0_REG02__TCSCHEDULE:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_dmfc0_tcschedule(arg, cpu_env);
+             register_name = "TCSchedule";
+             break;
+-        case 7:
++        case CP0_REG02__TCSCHEFBACK:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_dmfc0_tcschefback(arg, cpu_env);
+             register_name = "TCScheFBack";
+@@ -9170,41 +9170,41 @@ static void gen_dmtc0(DisasContext *ctx, TCGv arg, int reg, int sel)
+         break;
+     case CP0_REGISTER_02:
+         switch (sel) {
+-        case 0:
++        case CP0_REG02__ENTRYLO0:
+             gen_helper_dmtc0_entrylo0(cpu_env, arg);
+             register_name = "EntryLo0";
+             break;
+-        case 1:
++        case CP0_REG02__TCSTATUS:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcstatus(cpu_env, arg);
+             register_name = "TCStatus";
+             break;
+-        case 2:
++        case CP0_REG02__TCBIND:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcbind(cpu_env, arg);
+             register_name = "TCBind";
+             break;
+-        case 3:
++        case CP0_REG02__TCRESTART:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcrestart(cpu_env, arg);
+             register_name = "TCRestart";
+             break;
+-        case 4:
++        case CP0_REG02__TCHALT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tchalt(cpu_env, arg);
+             register_name = "TCHalt";
+             break;
+-        case 5:
++        case CP0_REG02__TCCONTEXT:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tccontext(cpu_env, arg);
+             register_name = "TCContext";
+             break;
+-        case 6:
++        case CP0_REG02__TCSCHEDULE:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcschedule(cpu_env, arg);
+             register_name = "TCSchedule";
+             break;
+-        case 7:
++        case CP0_REG02__TCSCHEFBACK:
+             CP0_CHECK(ctx->insn_flags & ASE_MT);
+             gen_helper_mtc0_tcschefback(cpu_env, arg);
+             register_name = "TCScheFBack";
 -- 
 2.7.4
 
