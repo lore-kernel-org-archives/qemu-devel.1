@@ -2,61 +2,63 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D8AC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8507C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C224208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:58:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C224208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AECCB208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 06:59:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AECCB208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvyrO-0004ub-ST
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 02:58:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50826)
+	id 1hvyrw-0005m1-0n
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 02:59:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48388)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <tao3.xu@intel.com>) id 1hvyqP-0003I0-9M
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:46 -0400
+ (envelope-from <armbru@redhat.com>) id 1hvygC-0000vJ-Rk
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1hvyqN-0007zE-Ur
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:45 -0400
-Received: from mga05.intel.com ([192.55.52.43]:16871)
+ (envelope-from <armbru@redhat.com>) id 1hvyg8-0001pw-GI
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48460)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hvyqN-0007xE-JE
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:43 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 08 Aug 2019 23:57:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,364,1559545200"; d="scan'208";a="326549017"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
- by orsmga004.jf.intel.com with ESMTP; 08 Aug 2019 23:57:41 -0700
-From: Tao <tao3.xu@intel.com>
-To: imammedo@redhat.com,
-	eblake@redhat.com,
-	ehabkost@redhat.com
-Date: Fri,  9 Aug 2019 14:57:23 +0800
-Message-Id: <20190809065731.9097-4-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190809065731.9097-1-tao3.xu@intel.com>
-References: <20190809065731.9097-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvyg8-0001mS-9E
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 26F2A30832E1;
+ Fri,  9 Aug 2019 06:47:04 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E7273600D1;
+ Fri,  9 Aug 2019 06:47:03 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C6BD5113642F; Fri,  9 Aug 2019 08:46:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Fri,  9 Aug 2019 08:46:39 +0200
+Message-Id: <20190809064645.22656-24-armbru@redhat.com>
+In-Reply-To: <20190809064645.22656-1-armbru@redhat.com>
+References: <20190809064645.22656-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
-Subject: [Qemu-devel] [PATCH v9 03/11] numa: move numa global variable
- have_numa_distance into MachineState
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 09 Aug 2019 06:47:04 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PATCH v3 23/29] numa: Don't include hw/boards.h into
+ sysemu/numa.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,139 +70,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, daniel@linux.ibm.com, jonathan.cameron@huawei.com,
- dan.j.williams@intel.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tao Xu <tao3.xu@intel.com>
+sysemu/numa.h includes hw/boards.h just for the CPUArchId typedef, at
+the cost of pulling in more than two dozen extra headers indirectly.
 
-Move existing numa global have_numa_distance into NumaState.
+I could move the typedef from hw/boards.h to qemu/typedefs.h.  But
+it's used in just two headers: boards.h and numa.h.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+I could move it to another header both its users include.
+exec/cpu-common.h seems to be the least bad fit.
+
+But I'm keeping this simple & stupid: declare the struct tag in
+numa.h.
+
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
+ hw/mem/pc-dimm.c      | 1 +
+ include/hw/boards.h   | 2 +-
+ include/sysemu/numa.h | 9 +++++++--
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-No changes in v9
----
- hw/arm/sbsa-ref.c        | 2 +-
- hw/arm/virt-acpi-build.c | 2 +-
- hw/arm/virt.c            | 2 +-
- hw/core/numa.c           | 5 ++---
- hw/i386/acpi-build.c     | 2 +-
- include/sysemu/numa.h    | 4 ++--
- 6 files changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index 22847909bf..7e4c471717 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -158,7 +158,7 @@ static void create_fdt(SBSAMachineState *sms)
-     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
-     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
- 
--    if (have_numa_distance) {
-+    if (ms->numa_state->have_numa_distance) {
-         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
-         uint32_t *matrix = g_malloc0(size);
-         int idx, i, j;
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index a2cc4b84fe..461a44b5b0 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -797,7 +797,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
-     if (ms->numa_state->num_nodes > 0) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, vms);
--        if (have_numa_distance) {
-+        if (ms->numa_state->have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, ms);
-         }
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c72b8fd3a7..6f0170cf1d 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -232,7 +232,7 @@ static void create_fdt(VirtMachineState *vms)
-                                 "clk24mhz");
-     qemu_fdt_setprop_cell(fdt, "/apb-pclk", "phandle", vms->clock_phandle);
- 
--    if (have_numa_distance) {
-+    if (nb_numa_nodes > 0 && ms->numa_state->have_numa_distance) {
-         int size = nb_numa_nodes * nb_numa_nodes * 3 * sizeof(uint32_t);
-         uint32_t *matrix = g_malloc0(size);
-         int idx, i, j;
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 4d5e308bf1..2142ec29e8 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -50,7 +50,6 @@ static int have_mem;
- static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
-                              * For all nodes, nodeid < max_numa_nodeid
-                              */
--bool have_numa_distance;
- NodeInfo numa_info[MAX_NODES];
- 
- 
-@@ -168,7 +167,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
-     }
- 
-     numa_info[src].distance[dst] = val;
--    have_numa_distance = true;
-+    ms->numa_state->have_numa_distance = true;
- }
- 
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-@@ -441,7 +440,7 @@ void numa_complete_configuration(MachineState *ms)
-          * asymmetric. In this case, the distances for both directions
-          * of all node pairs are required.
-          */
--        if (have_numa_distance) {
-+        if (ms->numa_state->have_numa_distance) {
-             /* Validate enough NUMA distance information was provided. */
-             validate_numa_distance(ms);
- 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index d4c092358d..081a8fc116 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2692,7 +2692,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-     if (pcms->numa_nodes) {
-         acpi_add_table(table_offsets, tables_blob);
-         build_srat(tables_blob, tables->linker, machine);
--        if (have_numa_distance) {
-+        if (machine->numa_state->have_numa_distance) {
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, machine);
-         }
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 1f3e676066..dea48f9163 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -19,6 +19,7 @@
+  */
+=20
+ #include "qemu/osdep.h"
++#include "hw/boards.h"
+ #include "hw/mem/pc-dimm.h"
+ #include "hw/qdev-properties.h"
+ #include "migration/vmstate.h"
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 67e551636a..739d109fe1 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -86,7 +86,7 @@ void machine_class_allow_dynamic_sysbus_dev(MachineClas=
+s *mc, const char *type);
+  * @props - CPU object properties, initialized by board
+  * #vcpus_count - number of threads provided by @cpu object
+  */
+-typedef struct {
++typedef struct CPUArchId {
+     uint64_t arch_id;
+     int64_t vcpus_count;
+     CpuInstanceProperties props;
 diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 3e8dbf20c1..2e5e998adb 100644
+index 01a263eba2..4c4c1dee9b 100644
 --- a/include/sysemu/numa.h
 +++ b/include/sysemu/numa.h
-@@ -6,8 +6,6 @@
+@@ -4,7 +4,10 @@
+ #include "qemu/bitmap.h"
+ #include "sysemu/sysemu.h"
  #include "sysemu/hostmem.h"
- #include "hw/boards.h"
- 
--extern bool have_numa_distance;
--
- struct NodeInfo {
-     uint64_t node_mem;
-     struct HostMemoryBackend *node_memdev;
-@@ -26,6 +24,8 @@ struct NumaState {
-     /* Number of NUMA nodes */
-     int num_nodes;
- 
-+    /* Allow setting NUMA distance for different NUMA nodes */
-+    bool have_numa_distance;
- };
- typedef struct NumaState NumaState;
- 
--- 
-2.20.1
+-#include "hw/boards.h"
++#include "qapi/qapi-types-machine.h"
++#include "exec/cpu-common.h"
++
++struct CPUArchId;
+=20
+ extern int nb_numa_nodes;   /* Number of NUMA nodes */
+ extern bool have_numa_distance;
+@@ -32,5 +35,7 @@ void numa_legacy_auto_assign_ram(MachineClass *mc, Node=
+Info *nodes,
+                                  int nb_nodes, ram_addr_t size);
+ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                   int nb_nodes, ram_addr_t size);
+-void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **=
+errp);
++void numa_cpu_pre_plug(const struct CPUArchId *slot, DeviceState *dev,
++                       Error **errp);
++
+ #endif
+--=20
+2.21.0
 
 
