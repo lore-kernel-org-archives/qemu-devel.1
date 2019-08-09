@@ -8,83 +8,83 @@ X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F06C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4780C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9886D20B7C
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:05:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FCB52173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 09:07:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+znzyqw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9886D20B7C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oW1Rpm5k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FCB52173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw0pr-0006Uf-VX
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 05:05:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44329)
+	id 1hw0sG-0007aD-LO
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 05:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44763)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <stefanha@gmail.com>) id 1hw0pF-00064s-6s
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:04:42 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hw0rs-00079M-Mv
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hw0pE-0006XT-7n
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:04:41 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44931)
+ (envelope-from <stefanha@gmail.com>) id 1hw0rr-0000uT-SG
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:07:24 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45921)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hw0pE-0006WD-0i
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:04:40 -0400
-Received: by mail-wr1-x443.google.com with SMTP id p17so97507787wrf.11
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 02:04:39 -0700 (PDT)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hw0rr-0000tV-KD
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 05:07:23 -0400
+Received: by mail-wr1-x442.google.com with SMTP id q12so7274526wrj.12
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 02:07:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=WgQ2B39Wnr7SVMpckGQ/VtnmwBDdI/Q5p+4YfbiKwWM=;
- b=D+znzyqwr+wHUOtyJpcWrnvXZcQRJsyhILY/HoSvj9EoYzHOvQJ3w5CfDWTjkbebhD
- 7+wAiRbEBrOGVvsMTChKFTOwLN/BEYopKNxCrIaOJ7xXbXGhHOmjgRaqrKDpRfNh3Uqy
- +xKP9d1U3YaIZ6kvujJ3mOm16mIAAq96FKRSNzd5mRXjLtY0Yv58lWbmzf90v2+nrryE
- +P2FLxSck+o/ooduGRmp5S5rwbzQaWukXRnzzSDaTxy8PwgFvsoj1i5EHHGsOW4lqMfy
- ddp+VWN78SLlDmfREm30/jRANUrB2qI/EG8PUStvZQp66Bn7mJh8AAi+29MZ/wEfmJwz
- 6bKw==
+ bh=myhIy+9F/f7dkasTn952IAcaiHsFZ+flJcN0JpViv54=;
+ b=oW1Rpm5kp+iXjoN1zBtTEpR8RMIaZEHqm56gj0W2jdsTF08WvJbV7nzLjfF8jxw8zP
+ vBqU50NoNIngEwOdInwGnZzozLPoADWxEvBBWu+NjqRbIp+Rg+BFKyCdQ0ZYzVKoVzi/
+ fNhdugeZ8N0rQBenHFg2m/LYYGvP3PYdQcUA0o4a2AXXwDGCjxfVgfr6oeuT01cm9xMW
+ 86RULScGslnIFfky36f8gm0k6H4qdIqhVlbYozCyBpgaEp+KoJw8WP8d+UpwYB+Gw3Ot
+ eW1caN1wxEKGcjO7rvDcTcsCboaspi3PsxNpTo0soVLHwGBoACII6KTs8uiAMLn0YIfD
+ wc/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=WgQ2B39Wnr7SVMpckGQ/VtnmwBDdI/Q5p+4YfbiKwWM=;
- b=RwRK3uxVpd9vXzjOzJanHtdkkohM9tiMgn56rXB62YcVgcp4pEMUSwFEMq7GfLcdXc
- H23ss3dVkFocIBgSMf3qvUdRDNUPZtF6jixQ+Eakae/vkh4s081anvPsQxjsKIle1Gde
- M10b/zcXSfFT7KvaQeC/TNKubIfc4rm3y0TMhU9bvDIR8/UOx+VA8jkHFxNPg8L8uqac
- S/4ECa9tsrj84m8MU8/09TD+39PdC/0erfnfZqYULr9znPqwK8AWlUXkY5cYj+lGWOV2
- A4DKa8Ocvt86648NWshl/Js9CTU1pfeWTIa+4SfDFmBJVliJNSKzHMKtf0maNOD3wJvR
- sY5A==
-X-Gm-Message-State: APjAAAUK6/MRwFGFKu67uTCwoX2EK+dhU/wOOeBvTaoDjtSDhwfg3wr1
- 7hZGBt4/hpsE7qj4FacSqL8=
-X-Google-Smtp-Source: APXvYqzxSi2AZMl9ULhUtAuRaaYUPP1zkOyZYcCjBem/XrMYrDlAK8fNZmjXGMVS7x2T6njQdH71xg==
-X-Received: by 2002:adf:eacf:: with SMTP id o15mr23651586wrn.171.1565341478853; 
- Fri, 09 Aug 2019 02:04:38 -0700 (PDT)
+ bh=myhIy+9F/f7dkasTn952IAcaiHsFZ+flJcN0JpViv54=;
+ b=HUsdkTr6o9i1YWdBSysUUJMMzOWixWLrr2PGXIMIvYzcgHYKQZVQSNmAsWis/WDt1J
+ PuCZ/LBBM6gzzVHuhvwZ8G1GwXcpUY4PxXJUkgjKyfkVg2VayTpWkElwuDZk9/SJ69rj
+ yGa60Eeq58AqH0h1XaCIU0/1o4pdlAI4wBFzAz3wTLvfRNrp+jWGIlNK9jhSPf8Uu958
+ 1rOk9yXOWz6zwqkmee2n4kdgKB6FCGqK5GQb3XtERPnFVbF5XlcBRT3JB1AW55MBTDrB
+ 5aC0ioOII048PPKTaXkDP27FXlZY2g2yDZdvkG0FhilI7XXOcmVwQNy3nACGiksmG3zz
+ upFw==
+X-Gm-Message-State: APjAAAWoXwuulZ4IoPmYChro+yaWI5jCepq0A/q7uvOgNADn0OnUfNiQ
+ 3SQjpqvoJPznTxtwrYiCImI=
+X-Google-Smtp-Source: APXvYqzQq+zN0qdeXEfTW/u25N9e8eKU/5Fk1wSAuJRDrkUHgf+GBwdjy06/ybpw72V615eoruperw==
+X-Received: by 2002:adf:e94e:: with SMTP id m14mr20237496wrn.230.1565341642535; 
+ Fri, 09 Aug 2019 02:07:22 -0700 (PDT)
 Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id o4sm3808020wmh.35.2019.08.09.02.04.37
+ by smtp.gmail.com with ESMTPSA id i66sm7160883wmg.2.2019.08.09.02.07.21
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 02:04:38 -0700 (PDT)
-Date: Fri, 9 Aug 2019 10:04:36 +0100
+ Fri, 09 Aug 2019 02:07:21 -0700 (PDT)
+Date: Fri, 9 Aug 2019 10:07:20 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
 To: "Oleinik, Alexander" <alxndr@bu.edu>
-Message-ID: <20190809090436.GG25286@stefanha-x1.localdomain>
+Message-ID: <20190809090720.GH25286@stefanha-x1.localdomain>
 References: <20190805071038.32146-1-alxndr@bu.edu>
- <20190805071038.32146-5-alxndr@bu.edu>
+ <20190805071038.32146-7-alxndr@bu.edu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="GUPx2O/K0ibUojHx"
+ protocol="application/pgp-signature"; boundary="ISKrrfpKsPiF35CV"
 Content-Disposition: inline
-In-Reply-To: <20190805071038.32146-5-alxndr@bu.edu>
+In-Reply-To: <20190805071038.32146-7-alxndr@bu.edu>
 User-Agent: Mutt/1.12.0 (2019-05-25)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [RFC PATCH v2 04/17] fuzz: Skip modules that were
- already initialized
+X-Received-From: 2a00:1450:4864:20::442
+Subject: Re: [Qemu-devel] [RFC PATCH v2 06/17] fuzz: Add FUZZ_TARGET module
+ type
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,37 +105,32 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---GUPx2O/K0ibUojHx
+--ISKrrfpKsPiF35CV
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Mon, Aug 05, 2019 at 07:11:05AM +0000, Oleinik, Alexander wrote:
+On Mon, Aug 05, 2019 at 07:11:07AM +0000, Oleinik, Alexander wrote:
 > Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 > ---
->  util/module.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  include/qemu/module.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Why is this necessary?  Existing callers only invoke this function once
-for each type.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Please include justification in the commit description.
-
-Stefan
-
---GUPx2O/K0ibUojHx
+--ISKrrfpKsPiF35CV
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1NNyQACgkQnKSrs4Gr
-c8hHBQf+MXABid6zLTvOBLVIHUIn5MVWmv0s6wJKeJtlDWzlTjArI1EpVn5CvNht
-cfOGsXCUnDg6mzyQnZdsEUucy6l/4rESE9cCn8gHFsS8MVBDcywQslhkU7kEzV3u
-jqkhQG+kPbzWwXEBMN2QXCtviornYP5+U1y7sNtg3Nd0cD/zR4T6/VoFYLxQz3hh
-0nP02iU3rOixwnfTiTHrTla4W9xq8gfh3c7Q2AyxsdzEyMZ2XL7e5rNogOId7FiT
-ahZ4y5R/2AXdEFXDlnh7DTWzmQXA4VsWMpMiA+ovvmBv7sCyAIHpcgC5E3xOY+S8
-Mm/neMPZ1qE0d8zunwolZnyiYbI3OA==
-=YfUJ
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1NN8gACgkQnKSrs4Gr
+c8igNwf/SHJwu9PPVmwTYNQl4jfM7G1SQAwCTQFqJwNykwM/j472+cjwDbASKzWx
+G5x3Yqo42oo4rSu4Z6aNNvHXgb2cNq991SmglLvvrmgEWt2PU+pb3pS400l26ZKe
+InJ8qz/ARzBZsGPNNV4orJdXGDWMrQWcbz8VLyYJC5acrQlgj0kE2mgu+aHYRPmy
+OopuQwWCjAp10kRw4+EOUIUl6uQ5qfTw6mrCNNK88GEnTGnaeDtdrbbQ35RuOGsN
+FrsjKcCVhh7VjhwoC+BsLAZcEKr8KF2lNm1zvgoqVc/rkMkmvPxerptFCLHh8cC4
+HHEmirdEpL/+pB/hBGVUdT7HqbsLVQ==
+=nJey
 -----END PGP SIGNATURE-----
 
---GUPx2O/K0ibUojHx--
+--ISKrrfpKsPiF35CV--
 
