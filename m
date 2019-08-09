@@ -2,65 +2,91 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 735DEC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D1BC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:22:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FAFD2166E
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:15:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FAFD2166E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1B1E72171F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 05:22:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lxMyPPaN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B1E72171F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvxFN-0003oJ-As
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 01:15:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33458)
+	id 1hvxMU-0006Xw-6g
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 01:22:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34190)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <no-reply@patchew.org>) id 1hvxEH-0003J7-B8
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:14:18 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hvxLt-0005zV-Hq
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1hvxEG-0003MU-9W
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:14:17 -0400
-Resent-Date: Fri, 09 Aug 2019 01:14:17 -0400
-Resent-Message-Id: <E1hvxEG-0003MU-9W@eggs.gnu.org>
-Received: from sender-of-o53.zoho.com ([135.84.80.218]:21827)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1hvxEG-0003J1-1k; Fri, 09 Aug 2019 01:14:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1565327646; cv=none; d=zoho.com; s=zohoarc; 
- b=ffOvaKg1g4VOnWr2xCtKQee2TiS9fge3V/nUpxa1X8zM0A2/qax2+Ma+0lmgzzKASt0tSZ5TNsVjoIxKGZgN33Ibz68F3mIIjjbaVhG+qfQnbSF1tk2TibWRW0mOmHjft2scRZe2PU6/bFWZcLb8KfotTCtSfiK2t+/Px5XEKs0=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
- s=zohoarc; t=1565327646;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
- bh=SLH2Zf2+ApKlpaCtdSLJN6M7y+5Xhk/o4Ijng6kaguY=; 
- b=Sqbrbwg+9EF3YSvf67aqQLyHNxgMN3lJFzvLIiCS1rAoAPuGIXA9JK7SQkSvy8aXyVTdy/lIZ0PggYY/SmqKoyD/6G/i6IkgpcyoUUPqOwFagGx9ZZiI/BNZyRc63/IYnjhEPyAS1RE14oxB274JzHzSuAJdb5BFq7HbpRKe1aw=
-ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1565327645137271.8518030906167;
- Thu, 8 Aug 2019 22:14:05 -0700 (PDT)
-In-Reply-To: <20190809042909.74988-1-rebecca@bsdio.com>
-Message-ID: <156532764399.12874.720972209018325901@b08f24806b7e>
+ (envelope-from <richard.henderson@linaro.org>) id 1hvxLs-0000Lk-LF
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:22:09 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35278)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hvxLs-0000Ky-BH
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 01:22:08 -0400
+Received: by mail-pg1-x542.google.com with SMTP id n4so3530504pgv.2
+ for <qemu-devel@nongnu.org>; Thu, 08 Aug 2019 22:22:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=GFQf6fdXY7+fyX4kjByQA9BGer8bsmegQl2PDNmFEa8=;
+ b=lxMyPPaNvSlC517wHZLEpXfkYJI3oYZE3vOUN726nsCOcScQrjRm16lXlm8lZvKg6A
+ Jebz1pID2sLsnqDQKsUH0Zb5lTihPNZUZTqdAp2X4bTiiHQ2ogMDYAJmjr+EbZzQMvlq
+ /vDPSQF03RTFxAVhJBRlAuXMRIkHgTjJv/vhvCZzUq4A3Zm9o1fa5aiHWoBHe//iV5FG
+ +H3rccc8gYc2yl0lMnPuyjS5wU9+WxgqD6L6njoKt6gSUnTyDpk4nMHh7VDniKinAyGp
+ GGo05TCy6SxDDL+bVQOtNNJ2qm3SpI5Rc/Khnm84Fxc33dQj/URdq46j9Eg43Sj7KT5P
+ vdvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=GFQf6fdXY7+fyX4kjByQA9BGer8bsmegQl2PDNmFEa8=;
+ b=YcodNtU/+amPeo0uoPeN23woMRLLzBW1K5kTY1lnqM+M7irKukSNiUynPJScWPLYoz
+ yXNDpXbkhH2gUjHhWlMC+EV1vsy7MR4DSNhUrifRcHfALujJ8e0nPdPPUQWx3YR8HL4U
+ ya+xzRRcoHpVyqOdHunyrjzUqt6P/mm9apeePb6fGE8Srtwey7tL1kV6EuXsq9Is/+Wa
+ VMWzySeLcXMV2P1AM4msc3d6Ew5qyRlEqk3YByVBALeFcSUWbLYJDS6xrAdWURn4G6+T
+ O4vCDIzThQdsw8jDf7QXQkfyoHflM4x4OOBwufPRRV4jUYPIp7hcAYGtp4bKp3nKJ7g6
+ fJxQ==
+X-Gm-Message-State: APjAAAUloTFS1UG2GOSRNJKMz42Z2OVeWPpxJGrGXLyikTuOBcPzTAu3
+ E98/oz5LTk4m+4R6o1Z2IWIrwA==
+X-Google-Smtp-Source: APXvYqx7B1/MLRUjD3/SpODUmBII9i2WrCON3ThKkuoOTgbPGI7oW5VDSLBIdf3lQVxjD9B/+M7+vQ==
+X-Received: by 2002:a65:690e:: with SMTP id s14mr16216648pgq.47.1565328126625; 
+ Thu, 08 Aug 2019 22:22:06 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id a16sm105168363pfd.68.2019.08.08.22.22.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 08 Aug 2019 22:22:05 -0700 (PDT)
+To: Rebecca Cran <rebecca@bsdio.com>, qemu-devel@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-trivial@nongnu.org
+References: <20190809041952.57302-1-rebecca@bsdio.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <57083e0b-2853-7f5b-16ec-83bc22f237fa@linaro.org>
+Date: Thu, 8 Aug 2019 22:22:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: rebecca@bsdio.com
-Date: Thu, 8 Aug 2019 22:14:05 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 135.84.80.218
-Subject: Re: [Qemu-devel] [PATCH v2] Update the avx2 configure test to be
+In-Reply-To: <20190809041952.57302-1-rebecca@bsdio.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
+Subject: Re: [Qemu-devel] [PATCH] Update the avx2 configure test to be
  compatible with clang
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,49 +99,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, rebecca@bsdio.com, mjt@tls.msk.ru,
- qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgwOTA0MjkwOS43NDk4
-OC0xLXJlYmVjY2FAYnNkaW8uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
-biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
-b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
-Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2Ug
-ZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQg
-TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgdXRpbC9vc2xpYi1w
-b3NpeC5vCiAgQ0MgICAgICB1dGlsL3FlbXUtb3BlbnB0eS5vCiAgQ0MgICAgICB1dGlsL3FlbXUt
-dGhyZWFkLXBvc2l4Lm8KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6ZXJvLmM6NzE6
-MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93bi1wcmFn
-bWFzXQojcHJhZ21hIEdDQyBwdXNoX29wdGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVz
-dC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzo3MjoxMzogZXJyb3I6IHVua25vd24gcHJhZ21hIGln
-bm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEgR0NDIHRhcmdldCgic3Nl
-MiIpCiAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6ZXJvLmM6
-MTA4OjEzOiBlcnJvcjogdW5rbm93biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vua25vd24t
-cHJhZ21hc10KI3ByYWdtYSBHQ0MgcG9wX29wdGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUt
-dGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8uYzoxMTY6MTM6IGVycm9yOiB1bmtub3duIHByYWdt
-YSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93bi1wcmFnbWFzXQojcHJhZ21hIEdDQyBwdXNoX29w
-dGlvbnMKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9idWZmZXJpc3plcm8u
-YzoxMTc6MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9yLC1XdW5rbm93
-bi1wcmFnbWFzXQojcHJhZ21hIEdDQyB0YXJnZXQoInNzZTQiKQogICAgICAgICAgICBeCi90bXAv
-cWVtdS10ZXN0L3NyYy91dGlsL2J1ZmZlcmlzemVyby5jOjE0ODoxMzogZXJyb3I6IHVua25vd24g
-cHJhZ21hIGlnbm9yZWQgWy1XZXJyb3IsLVd1bmtub3duLXByYWdtYXNdCiNwcmFnbWEgR0NDIHBv
-cF9vcHRpb25zCiAgICAgICAgICAgIF4KL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6
-ZXJvLmM6MTQ5OjEzOiBlcnJvcjogdW5rbm93biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vu
-a25vd24tcHJhZ21hc10KI3ByYWdtYSBHQ0MgcHVzaF9vcHRpb25zCiAgICAgICAgICAgIF4KL3Rt
-cC9xZW11LXRlc3Qvc3JjL3V0aWwvYnVmZmVyaXN6ZXJvLmM6MTUwOjEzOiBlcnJvcjogdW5rbm93
-biBwcmFnbWEgaWdub3JlZCBbLVdlcnJvciwtV3Vua25vd24tcHJhZ21hc10KI3ByYWdtYSBHQ0Mg
-dGFyZ2V0KCJhdngyIikKICAgICAgICAgICAgXgovdG1wL3FlbXUtdGVzdC9zcmMvdXRpbC9idWZm
-ZXJpc3plcm8uYzoxODc6MTM6IGVycm9yOiB1bmtub3duIHByYWdtYSBpZ25vcmVkIFstV2Vycm9y
-LC1XdW5rbm93bi1wcmFnbWFzXQojcHJhZ21hIEdDQyBwb3Bfb3B0aW9ucwogICAgICAgICAgICBe
-CjkgZXJyb3JzIGdlbmVyYXRlZC4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6
-Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkwODA5MDQyOTA5Ljc0OTg4LTEtcmViZWNjYUBic2Rpby5j
-b20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 8/8/19 9:19 PM, Rebecca Cran wrote:
+> clang doesn't support the GCC pragma to enable AVX2, but instead
+> requires the command line option -mavx2. Since GCC also supports that,
+> remove the pragma lines and add the -mavx2 option when building the
+> test.
 
+No, this means we're not testing what we need:
+
+We need to compile exactly one function using avx2.
+
+The other functions should be compiled with sse4 and sse2, respectively, and we
+choose between them by testing cpuid bits at startup.  If you supply -mavx2 to
+the entire compilation, then the routine that is supposed to use only sse2 will
+in fact use avx2, and then the runtime selection is moot.
+
+
+r~
 
