@@ -2,83 +2,74 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A722C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E399AC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:11:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 261D72171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:10:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k1rL3WvV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 261D72171F
+	by mail.kernel.org (Postfix) with ESMTPS id B80A12171F
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:11:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80A12171F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw5bd-0002NC-FR
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 10:10:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37512)
+	id 1hw5cF-0003Ew-UI
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 10:11:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37571)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hw5bG-0001yi-Px
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:10:35 -0400
+ (envelope-from <bounces@canonical.com>) id 1hw5bl-0002ix-2W
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:11:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hw5bF-0006PE-SV
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:10:34 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44580)
+ (envelope-from <bounces@canonical.com>) id 1hw5bj-0006aS-Sm
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:11:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48844)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hw5bF-0006Os-N8
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:10:33 -0400
-Received: by mail-ot1-x341.google.com with SMTP id b7so82806964otl.11
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 07:10:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HWEjUnf0BBmT8RQ1A6LFXtofsCQr7i/VNcYjR50FUdw=;
- b=k1rL3WvVDzYse272wuVCOcefDIsmcVYCNnhQOykLn7V+Oc9xJyyKgQYZnkJoY8FeSn
- xalvqy07qNHhetHZm1BVEULzQiLudij7JBk854k1odO0+6wEybSMef5U6uFamlRC5ZNa
- 1HKEzdKgvklS0RdPfR5s68NwKXINIipDL9Mhk2oRJ2zgXD2iiXY64yRa8cPsL8vPDwsP
- wMd/xlg6W984NmB6My/JjYcWsE34ODBDiX5A4Y9QjFkRdVpg5Dv70CgX+QOf9vXg0GMU
- 05ffb52OBc89VjVkE3YmmLL8bbMm3uAkyHhZ8/5R1cr6pzOOe/jk5W7nIjuU0Uk5a9kr
- Vjag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HWEjUnf0BBmT8RQ1A6LFXtofsCQr7i/VNcYjR50FUdw=;
- b=B+ukVcN5nIE6TqyLS8j8JkmLGCl3CWewqFooir53Rn1ft38AaVH0cgSMI3LXh7ab/R
- iToPirdX+8Nm6y+ICWe89z5c3En5pW7Q5ZLNBIDrY+YRV423gzK1UfvdRwX7MwaUjmEp
- 5u//rlXH7OBgZQDJG9JQKBsx2hpbZ4k3IdjyBwamf/25wPdPe9c0pVmnxmZZe0JenKLL
- 5dvcYZ8Gkt9NniXTpFcnPCtrS/8qbpFke/6pptFu7RXh7gT56Gvgy3OzBsSLHGj07KKE
- fmzPAqdlhd6LC/z3lfukfTdeInnSe4Oyy2Aybm+mwb8SG/vNaAl+rj/ed0awYuePaUsa
- Fcug==
-X-Gm-Message-State: APjAAAV6sonAd55LWidejrbgxtJGNvzdXXHrr3ZJsgCwt9b7Wa/IiO6v
- JJFpU+UlOGtF89oNUDaO0TJG6G29rbgP0/fMRYzV9w==
-X-Google-Smtp-Source: APXvYqy74Xd5crY/LRMhwU5vqbjUY2jZ5PXNz2dM1nShNRGZqtF1oChT9tMhULzW3SGP7Gx5tBtglEX5KglHPwZKEQ8=
-X-Received: by 2002:aca:4bcc:: with SMTP id y195mr5841699oia.146.1565359832581; 
- Fri, 09 Aug 2019 07:10:32 -0700 (PDT)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hw5bj-0006Zz-NB
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:11:03 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hw5bh-0005dh-Vt
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 14:11:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id CF6BC2E80CC
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 14:11:01 +0000 (UTC)
 MIME-Version: 1.0
-References: <87r25vd5y1.fsf@dusky.pond.sub.org>
- <CAFEAcA-3X0s-mxaD27HWQa7ysiEb6Uo-BD+Yxo0QhBV_yb9WLA@mail.gmail.com>
- <CAFEAcA-e2aW33GeuganVSnu9epuqt57rnZ_KgEHwDNqrWrTHuA@mail.gmail.com>
-In-Reply-To: <CAFEAcA-e2aW33GeuganVSnu9epuqt57rnZ_KgEHwDNqrWrTHuA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Aug 2019 14:00:14 -0000
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 9 Aug 2019 15:10:21 +0100
-Message-ID: <CAFEAcA-jhnMWwE6GCNarioSzr6PuJg_BVCanpppAteb=fLB3nA@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] Does i386-linux-user build on an i686 host?
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: linux-user sh4
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: glaubitz pmaydell
+X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <153886120838.22456.12836438866392888832.malonedeb@gac.canonical.com>
+Message-Id: <156535921480.17466.15071595569494931155.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19021";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 2d4ef01b543f3f3c3cca83d713fb4e554028e3f8
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1796520] Re: autogen crashes on qemu-sh4-user
+ after 61dedf2af7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,34 +78,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Michael Tokarev <mjt@tls.msk.ru>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <Laurent@vivier.eu>
+Reply-To: Bug 1796520 <1796520@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 9 Aug 2019 at 13:49, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Easy fix: uninstall oss4-dev.
->
-> Better fix: patch QEMU to provide its own versions of these constants
-> if the system headers don't.
->
-> Utopian fix: I've wondered occasionally whether for cases like this
-> where the constant is known to be the same for the host and the guest
-> we should have some sort of approach which lets us use the QEMU
-> copies of the linux kernel headers rather than having to rely on
-> the host system, which might have an older version that restricts
-> us unnecessarily on what we could support...
+I can reproduce this bug, but I'm not sure what QEMU is doing wrong.
+Looking at the "SH4 Software Manual", it definitely says that if the
+FPSCR.PR bit is 0 then the 'frchg' and 'fschg' instructions should both
+trap.
 
-I missed out this other option:
+The 'frchg' that autogen is hitting is the one in glibc's "getcontext" impl=
+ementation:
+https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/li=
+nux/sh/sh4/getcontext.S;hb=3Db6d2c4475d5abc05dd009575b90556bdd3c78ad0#l70
 
-Make The World A Better Place fix:
+QEMU linux-user mode runs with FPSCR=3D0x000800000, which is "FPSCR.PR =3D=
+=3D
+1", ie "double precision". This seems to match what the kernel has for
+its FPSCR_INIT value.
 
-Report bug and/or provide patch to the oss4-dev headers to
-augment them to provide all the ioctl numbers and other
-constants that the kernel's version does, so they really
-are interoperable with the header they're diverting.
+Are you in a position to test what the actual hardware/real Linux kernel
+using for its FPSCR value when running sh4 userspace binaries ?
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1796520
+
+Title:
+  autogen crashes on qemu-sh4-user after 61dedf2af7
+
+Status in QEMU:
+  Confirmed
+
+Bug description:
+  Running "autogen --help" crashes on qemu-sh4-user with:
+
+  (sid-sh4-sbuild)root@nofan:/# autogen --help
+  Unhandled trap: 0x180
+  pc=3D0xf64dd2de sr=3D0x00000000 pr=3D0xf63b9c74 fpscr=3D0x00080000
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0xf61102a8 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0xf64dd2a0 fpul=3D0x000000=
+03
+  r0=3D0xf6fc1320 r1=3D0x00000000 r2=3D0xffff5dc4 r3=3D0xf67bfb50
+  r4=3D0xf6fc1230 r5=3D0xf6fc141c r6=3D0x000003ff r7=3D0x00000000
+  r8=3D0x00000004 r9=3D0xf63e20bc r10=3D0xf6fc141c r11=3D0xf63e28f0
+  r12=3D0xf63e2258 r13=3D0xf63eae1c r14=3D0x00000804 r15=3D0xf6fc1220
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@nofan:/#
+
+  Bi-secting found this commit to be the culprit:
+
+  61dedf2af79fb5866dc7a0f972093682f2185e17 is the first bad commit
+  commit 61dedf2af79fb5866dc7a0f972093682f2185e17
+  Author: Richard Henderson <rth@twiddle.net>
+  Date:   Tue Jul 18 10:02:50 2017 -1000
+
+      target/sh4: Add missing FPSCR.PR =3D=3D 0 checks
+      =
+
+      Both frchg and fschg require PR =3D=3D 0, otherwise undefined_operati=
+on.
+      =
+
+      Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+      Signed-off-by: Richard Henderson <rth@twiddle.net>
+      Message-Id: <20170718200255.31647-26-rth@twiddle.net>
+      Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+
+  :040000 040000 980d79b69ae712f23a1e4c56983e97a843153b4a
+  1024c109f506c7ad57367c63bc8bbbc8a7a36cd7 M      target
+
+  Reverting 61dedf2af79fb5866dc7a0f972093682f2185e17 fixes the problem
+  for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1796520/+subscriptions
 
