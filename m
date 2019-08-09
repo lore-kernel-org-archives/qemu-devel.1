@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E399AC31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A92EC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B80A12171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:11:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80A12171F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6E5E8208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 14:26:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5E8208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=physik.fu-berlin.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw5cF-0003Ew-UI
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 10:11:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37571)
+	id 1hw5qM-0008KY-Kb
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 10:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39599)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hw5bl-0002ix-2W
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:11:06 -0400
+ (envelope-from <bounces@canonical.com>) id 1hw5py-0007uz-Ps
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:25:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hw5bj-0006aS-Sm
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:11:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48844)
+ (envelope-from <bounces@canonical.com>) id 1hw5pw-0005TD-Ob
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:25:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51746)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hw5bj-0006Zz-NB
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:11:03 -0400
+ id 1hw5pw-0005Su-Iy
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 10:25:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hw5bh-0005dh-Vt
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 14:11:02 +0000
+ id 1hw5pt-0007Qy-1E
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 14:25:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CF6BC2E80CC
- for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 14:11:01 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id E7A872E80CC
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 14:25:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 09 Aug 2019 14:00:14 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 09 Aug 2019 14:18:03 -0000
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
@@ -55,15 +55,15 @@ X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: glaubitz pmaydell
 X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
-X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+X-Launchpad-Bug-Modifier: John Paul Adrian Glaubitz (glaubitz)
 References: <153886120838.22456.12836438866392888832.malonedeb@gac.canonical.com>
-Message-Id: <156535921480.17466.15071595569494931155.malone@gac.canonical.com>
+Message-Id: <156536028318.18686.12177052892448057549.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19021";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2d4ef01b543f3f3c3cca83d713fb4e554028e3f8
+X-Launchpad-Hash: f6e6fbb9bad04a2bfbf9a097df9edce5217f0de1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
 Subject: [Qemu-devel] [Bug 1796520] Re: autogen crashes on qemu-sh4-user
@@ -83,23 +83,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I can reproduce this bug, but I'm not sure what QEMU is doing wrong.
-Looking at the "SH4 Software Manual", it definitely says that if the
-FPSCR.PR bit is 0 then the 'frchg' and 'fschg' instructions should both
-trap.
-
-The 'frchg' that autogen is hitting is the one in glibc's "getcontext" impl=
-ementation:
-https://sourceware.org/git/?p=3Dglibc.git;a=3Dblob;f=3Dsysdeps/unix/sysv/li=
-nux/sh/sh4/getcontext.S;hb=3Db6d2c4475d5abc05dd009575b90556bdd3c78ad0#l70
-
-QEMU linux-user mode runs with FPSCR=3D0x000800000, which is "FPSCR.PR =3D=
-=3D
-1", ie "double precision". This seems to match what the kernel has for
-its FPSCR_INIT value.
-
-Are you in a position to test what the actual hardware/real Linux kernel
-using for its FPSCR value when running sh4 userspace binaries ?
+I can provide access to a machine connected to the internet so you can
+test it yourself. I'll send you an email.
 
 -- =
 
