@@ -2,82 +2,72 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6E7C32757
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 20:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BF9C433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 22:41:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA5C02171F
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 20:22:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA5C02171F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D1F92070D
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 22:41:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1F92070D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwBPC-0006QU-BC
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 16:22:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39249)
+	id 1hwDZT-0004bR-C5
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 18:41:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56199)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hwBOo-0005uz-4M
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:22:07 -0400
+ (envelope-from <bounces@canonical.com>) id 1hwDZ5-00044S-6k
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 18:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hwBOn-0001VM-3v
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:22:06 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54431)
+ (envelope-from <bounces@canonical.com>) id 1hwDZ4-0004Tb-2s
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 18:40:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41464)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hwBOm-0001Uw-Tb
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 16:22:05 -0400
-Received: by mail-wm1-f68.google.com with SMTP id p74so6842863wme.4
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 13:22:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=wfFUisYao/CObVSSiozPR0j1fe4VzwBjemIAiGRc/3I=;
- b=rhiVcwAdwIo9p5Qx9DoQG863iEInVawPk8ooILS0cA7WlVgJYd8rd8U1uYc1rdB3Yb
- 0+JDEyN+RWVE1sz2uybESoGflIN4P/CgV4eYGhdGg6XzfsPgIPl+WMI2LufsVeXRU8dD
- Lj/jzeHjkMaHxyLkMNNSPWS/K1EVL3nvGLmBomG7/J2WL6o0ZHqrnG4MqyCud/3PzPJ5
- VqtUlQosQhYDSs+PkVQbBzlQ2GypGQKxWNZwIkrQP8i54n/Fimf06hvNlyUaT+yDggzy
- 0sN25v4LElZG8Ivkokx3N5IFQt5dvjySjC98dz+o4pOxhwiGRqK1qt3+mrSOtVh9xo3n
- aRyg==
-X-Gm-Message-State: APjAAAWMm/GUKSgBAGc2u/iIDIsroXGlwSmA5Zo73KYEOKWTSpm1kzmX
- /pIVZoZh8oxMRVItenNJzVUjpw==
-X-Google-Smtp-Source: APXvYqwaWOyDjiD1e3P7VI2ZmVGax+mPdqfK2xNPEp0Ydmc8ANaeAnkP69uvjNyAmvCXKGcGA3NQ6g==
-X-Received: by 2002:a1c:1d08:: with SMTP id d8mr12368266wmd.22.1565382123803; 
- Fri, 09 Aug 2019 13:22:03 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id 15sm4585995wmk.34.2019.08.09.13.22.02
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 09 Aug 2019 13:22:03 -0700 (PDT)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190701194942.10092-1-philmd@redhat.com>
- <CAFEAcA_bWHAe_aoaN1+1RFm3zEvAxmzQtVm1zbatJHG_+CgqmA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <07662a67-b4cf-e681-fffa-98a03a26e0fb@redhat.com>
-Date: Fri, 9 Aug 2019 22:22:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hwDZ3-0004T1-Ta
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 18:40:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hwDZ2-0000Mm-AL
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 22:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4C32D2E80CD
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 22:40:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_bWHAe_aoaN1+1RFm3zEvAxmzQtVm1zbatJHG_+CgqmA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Aug 2019 22:32:52 -0000
+From: John Snow <1776920@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eblake jaywang0tw jnsnow mmoole paelzer wkozaczuk
+X-Launchpad-Bug-Reporter: Waldemar Kozaczuk (wkozaczuk)
+X-Launchpad-Bug-Modifier: John Snow (jnsnow)
+References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
+Message-Id: <156538997288.18724.3637857237641530302.malone@wampee.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19021";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 12ecb6a5d7c1cb523d9f1cbc241e2cc82bbb7e5d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.68
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] Support disabling TCG on ARM
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
+ corrupt images
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,50 +76,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yang Zhong <yang.zhong@intel.com>, Andrew Jones <drjones@redhat.com>,
- Samuel Ortiz <sameo@linux.intel.com>, Rob Bradford <robert.bradford@intel.com>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter, Paolo, Alex, Thomas :)
+Hi, there isn't really a development branch; if '-S 0' didn't help
+alleviate the problem there may be other problems at hand, or the APFS
+implementation of SEEK_DATA is causing us even more problems in new
+versions.
 
-On 7/2/19 4:08 PM, Peter Maydell wrote:
-> On Mon, 1 Jul 2019 at 20:49, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
-[...]
->> $ git backport-diff -u v3 -r target-arm.next..v4
->> Key:
->> [----] : patches are identical
->> [####] : number of functional differences between upstream/downstream patch
->> [down] : patch is downstream-only
->> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
->>
-[skipping patches already applied...]
+You could try Yan-Jie Wang's patch that was posted in #20, but until
+it's posted to the mailing list with a Signed-off-by tag, we can't
+include it ourselves.
 
->> 004/8:[----] [--] 'RFC target/arm: Restrict pre-ARMv7 cpus to TCG'
->> 005/8:[----] [--] 'RFC target/arm: Do not build pre-ARMv7 cpus when using KVM'
->> 006/8:[----] [--] 'RFC target/arm: Restrict R and M profiles to TCG'
->> 007/8:[----] [--] 'RFC target/arm: Do not build A/M-profile cpus when using KVM'
->> 008/8:[----] [--] 'target/arm: Do not build TCG objects when TCG is off'
-> 
-> I'm going to apply patches 1 and 2 to target-arm.next for rc0 (since
-> 2 is helpful to redhat downstream and taking 1 now reduces the
-> amount of code-movement patches you'll need to rebase). Patch 3
-> doesn't compile and 4-8 are rfc.
+However, it would still be nice to know if it fixes your problem.
 
-The remaining patches can be applied without conflict, so no need to
-respin (yet) IMO.
+-- =
 
-Paolo/Thomas, do you mind reviewing patches 5 and 7? They are kconfig
-related.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776920
 
-Peter/Alex, do you mind reviewing patches 4 and 6 first, then 5 and 7 (5
-and 7 can wait for Paolo/Thomas' review first).
+Title:
+  qemu-img convert on Mac OSX creates corrupt images
 
-Thanks!
+Status in QEMU:
+  New
 
-Phil.
+Bug description:
+  An image created by qemu-img create, then modified by another program
+  is converted to bad/corrupt image when using convert sub command on
+  Mac OSX. The same convert works on Linux. The version of qemu-img is
+  2.12.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
 
