@@ -2,62 +2,61 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47C97C433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 07:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B1BC433FF
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 07:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B1A3208C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 07:00:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1A3208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2470208C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 07:00:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2470208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56849 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hvysY-0007Ne-R9
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 02:59:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48489)
+	id 1hvyst-0008E1-2h
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 03:00:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50849)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hvygI-0000yR-2f
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:20 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1hvyqS-0003PQ-8L
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hvygE-0001us-Rg
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53648)
+ (envelope-from <tao3.xu@intel.com>) id 1hvyqQ-00080a-Cb
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:48 -0400
+Received: from mga05.intel.com ([192.55.52.43]:16871)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hvygC-0001r8-R7
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:47:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 34F9C30BD1C8;
- Fri,  9 Aug 2019 06:47:09 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98D5A60600;
- Fri,  9 Aug 2019 06:47:05 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D62841136433; Fri,  9 Aug 2019 08:46:45 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Fri,  9 Aug 2019 08:46:43 +0200
-Message-Id: <20190809064645.22656-28-armbru@redhat.com>
-In-Reply-To: <20190809064645.22656-1-armbru@redhat.com>
-References: <20190809064645.22656-1-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1hvyqP-0007xE-Tp
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 02:57:46 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 08 Aug 2019 23:57:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,364,1559545200"; d="scan'208";a="326549023"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.37])
+ by orsmga004.jf.intel.com with ESMTP; 08 Aug 2019 23:57:43 -0700
+From: Tao <tao3.xu@intel.com>
+To: imammedo@redhat.com,
+	eblake@redhat.com,
+	ehabkost@redhat.com
+Date: Fri,  9 Aug 2019 14:57:24 +0800
+Message-Id: <20190809065731.9097-5-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190809065731.9097-1-tao3.xu@intel.com>
+References: <20190809065731.9097-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 09 Aug 2019 06:47:09 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 27/29] Include sysemu/sysemu.h a lot less
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.43
+Subject: [Qemu-devel] [PATCH v9 04/11] numa: move numa global variable
+ numa_info into MachineState
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,458 +68,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, daniel@linux.ibm.com, jonathan.cameron@huawei.com,
+ dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In my "build everything" tree, changing sysemu/sysemu.h triggers a
-recompile of some 5400 out of 6600 objects (not counting tests and
-objects that don't depend on qemu/osdep.h).
+From: Tao Xu <tao3.xu@intel.com>
 
-hw/qdev-core.h includes sysemu/sysemu.h since recent commit e965ffa70a
-"qdev: add qdev_add_vm_change_state_handler()".  This is a bad idea:
-hw/qdev-core.h is widely included.
+Move existing numa global numa_info (renamed as "nodes") into NumaState.
 
-Move the declaration of qdev_add_vm_change_state_handler() to
-sysemu/sysemu.h, and drop the problematic include from hw/qdev-core.h.
-
-Touching sysemu/sysemu.h now recompiles some 1800 objects.
-qemu/uuid.h also drops from 5400 to 1800.  A few more headers show
-smaller improvement: qemu/notify.h drops from 5600 to 5200,
-qemu/timer.h from 5600 to 4500, and qapi/qapi-types-run-state.h from
-5500 to 5000.
-
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- accel/kvm/kvm-all.c               | 1 +
- backends/hostmem.c                | 1 +
- cpus.c                            | 1 +
- hw/arm/allwinner-a10.c            | 1 +
- hw/arm/aspeed_soc.c               | 1 +
- hw/arm/kzm.c                      | 1 +
- hw/arm/msf2-soc.c                 | 1 +
- hw/arm/stm32f205_soc.c            | 1 +
- hw/char/serial-isa.c              | 1 +
- hw/char/xen_console.c             | 1 +
- hw/core/numa.c                    | 1 +
- hw/core/vm-change-state-handler.c | 1 +
- hw/display/qxl-render.c           | 1 +
- hw/i386/xen/xen-hvm.c             | 1 +
- hw/i386/xen/xen-mapcache.c        | 1 +
- hw/intc/ioapic.c                  | 1 +
- hw/pci/pci.c                      | 1 +
- hw/riscv/sifive_e.c               | 1 +
- hw/riscv/sifive_u.c               | 1 +
- hw/riscv/spike.c                  | 1 +
- hw/riscv/virt.c                   | 1 +
- hw/sparc64/niagara.c              | 2 +-
- hw/usb/hcd-ehci.h                 | 1 +
- hw/xen/xen-common.c               | 1 +
- hw/xen/xen_devconfig.c            | 1 +
- hw/xenpv/xen_machine_pv.c         | 1 +
- include/hw/qdev-core.h            | 5 -----
- include/sysemu/sysemu.h           | 3 +++
- migration/global_state.c          | 1 +
- migration/migration.c             | 1 +
- migration/savevm.c                | 1 +
- 31 files changed, 32 insertions(+), 6 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e1a44eccf5..fc38d0b9e3 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -29,6 +29,7 @@
- #include "exec/gdbstub.h"
- #include "sysemu/kvm_int.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/sysemu.h"
- #include "qemu/bswap.h"
- #include "exec/memory.h"
- #include "exec/ram_addr.h"
-diff --git a/backends/hostmem.c b/backends/hostmem.c
-index 463102aa15..6d333dc23c 100644
---- a/backends/hostmem.c
-+++ b/backends/hostmem.c
-@@ -12,6 +12,7 @@
-=20
- #include "qemu/osdep.h"
- #include "sysemu/hostmem.h"
-+#include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "qapi/error.h"
- #include "qapi/qapi-builtin-visit.h"
-diff --git a/cpus.c b/cpus.c
-index e70cc58e31..a20a9a29c1 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -41,6 +41,7 @@
- #include "sysemu/kvm.h"
- #include "sysemu/hax.h"
- #include "sysemu/hvf.h"
-+#include "sysemu/sysemu.h"
- #include "sysemu/whpx.h"
- #include "exec/exec-all.h"
-=20
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 3b0d3eccdd..73810a4440 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -23,6 +23,7 @@
- #include "hw/sysbus.h"
- #include "hw/arm/allwinner-a10.h"
- #include "hw/misc/unimp.h"
-+#include "sysemu/sysemu.h"
-=20
- static void aw_a10_init(Object *obj)
- {
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index c6fb3700f2..9ee8104832 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -22,6 +22,7 @@
- #include "qemu/error-report.h"
- #include "hw/i2c/aspeed_i2c.h"
- #include "net/net.h"
-+#include "sysemu/sysemu.h"
-=20
- #define ASPEED_SOC_IOMEM_SIZE       0x00200000
-=20
-diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
-index 59d2102dc5..2f052e1f8c 100644
---- a/hw/arm/kzm.c
-+++ b/hw/arm/kzm.c
-@@ -24,6 +24,7 @@
- #include "hw/net/lan9118.h"
- #include "hw/char/serial.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/sysemu.h"
-=20
- /* Memory map for Kzm Emulation Baseboard:
-  * 0x00000000-0x7fffffff See i.MX31 SOC for support
-diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
-index 8ae763f99f..76cc3e09b0 100644
---- a/hw/arm/msf2-soc.c
-+++ b/hw/arm/msf2-soc.c
-@@ -30,6 +30,7 @@
- #include "hw/irq.h"
- #include "hw/arm/msf2-soc.h"
- #include "hw/misc/unimp.h"
-+#include "sysemu/sysemu.h"
-=20
- #define MSF2_TIMER_BASE       0x40004000
- #define MSF2_SYSREG_BASE      0x40038000
-diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-index be8b7df679..f5a5c2d80c 100644
---- a/hw/arm/stm32f205_soc.c
-+++ b/hw/arm/stm32f205_soc.c
-@@ -29,6 +29,7 @@
- #include "exec/address-spaces.h"
- #include "hw/arm/stm32f205_soc.h"
- #include "hw/qdev-properties.h"
-+#include "sysemu/sysemu.h"
-=20
- /* At the moment only Timer 2 to 5 are modelled */
- static const uint32_t timer_addr[STM_NUM_TIMERS] =3D { 0x40000000, 0x400=
-00400,
-diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
-index 5a0ae02ee7..9e31c51bb6 100644
---- a/hw/char/serial-isa.c
-+++ b/hw/char/serial-isa.c
-@@ -26,6 +26,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "sysemu/sysemu.h"
- #include "hw/char/serial.h"
- #include "hw/isa/isa.h"
- #include "hw/qdev-properties.h"
-diff --git a/hw/char/xen_console.c b/hw/char/xen_console.c
-index 8cc9328b3f..63153dfde4 100644
---- a/hw/char/xen_console.c
-+++ b/hw/char/xen_console.c
-@@ -24,6 +24,7 @@
- #include <termios.h>
-=20
- #include "qapi/error.h"
-+#include "sysemu/sysemu.h"
- #include "chardev/char-fe.h"
- #include "hw/xen/xen-legacy-backend.h"
-=20
+No changes in v9
+---
+ exec.c                   |  2 +-
+ hw/acpi/aml-build.c      |  6 ++++--
+ hw/arm/boot.c            |  2 +-
+ hw/arm/sbsa-ref.c        |  3 ++-
+ hw/arm/virt-acpi-build.c |  7 ++++---
+ hw/arm/virt.c            |  3 ++-
+ hw/core/numa.c           | 15 +++++++++------
+ hw/i386/pc.c             |  4 ++--
+ hw/ppc/spapr.c           | 10 +++++-----
+ hw/ppc/spapr_pci.c       |  4 +++-
+ include/sysemu/numa.h    |  5 +++--
+ 11 files changed, 36 insertions(+), 25 deletions(-)
+
+diff --git a/exec.c b/exec.c
+index 4fd6ec2bd0..de87d3548b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1779,7 +1779,7 @@ long qemu_minrampagesize(void)
+     if (hpsize > mainrampagesize &&
+         (ms->numa_state == NULL ||
+          ms->numa_state->num_nodes == 0 ||
+-         numa_info[0].node_memdev == NULL)) {
++         ms->numa_state->nodes[0].node_memdev == NULL)) {
+         static bool warned;
+         if (!warned) {
+             error_report("Huge page support disabled (n/a for main memory).");
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 63c1cae8c9..26ccc1a3e2 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1737,8 +1737,10 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms)
+     build_append_int_noprefix(table_data, nb_numa_nodes, 8);
+     for (i = 0; i < nb_numa_nodes; i++) {
+         for (j = 0; j < nb_numa_nodes; j++) {
+-            assert(numa_info[i].distance[j]);
+-            build_append_int_noprefix(table_data, numa_info[i].distance[j], 1);
++            assert(ms->numa_state->nodes[i].distance[j]);
++            build_append_int_noprefix(table_data,
++                                      ms->numa_state->nodes[i].distance[j],
++                                      1);
+         }
+     }
+ 
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index d02d2dae85..6472aa441e 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -601,7 +601,7 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+     if (ms->numa_state != NULL && ms->numa_state->num_nodes > 0) {
+         mem_base = binfo->loader_start;
+         for (i = 0; i < ms->numa_state->num_nodes; i++) {
+-            mem_len = numa_info[i].node_mem;
++            mem_len = ms->numa_state->nodes[i].node_mem;
+             rc = fdt_add_memory_node(fdt, acells, mem_base,
+                                      scells, mem_len, i);
+             if (rc < 0) {
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 7e4c471717..3a243e6a53 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -168,7 +168,8 @@ static void create_fdt(SBSAMachineState *sms)
+                 idx = (i * nb_numa_nodes + j) * 3;
+                 matrix[idx + 0] = cpu_to_be32(i);
+                 matrix[idx + 1] = cpu_to_be32(j);
+-                matrix[idx + 2] = cpu_to_be32(numa_info[i].distance[j]);
++                matrix[idx + 2] =
++                    cpu_to_be32(ms->numa_state->nodes[i].distance[j]);
+             }
+         }
+ 
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 461a44b5b0..89899ec4c1 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -534,11 +534,12 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ 
+     mem_base = vms->memmap[VIRT_MEM].base;
+     for (i = 0; i < ms->numa_state->num_nodes; ++i) {
+-        if (numa_info[i].node_mem > 0) {
++        if (ms->numa_state->nodes[i].node_mem > 0) {
+             numamem = acpi_data_push(table_data, sizeof(*numamem));
+-            build_srat_memory(numamem, mem_base, numa_info[i].node_mem, i,
++            build_srat_memory(numamem, mem_base,
++                              ms->numa_state->nodes[i].node_mem, i,
+                               MEM_AFFINITY_ENABLED);
+-            mem_base += numa_info[i].node_mem;
++            mem_base += ms->numa_state->nodes[i].node_mem;
+         }
+     }
+ 
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 6f0170cf1d..46f39e20bc 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -242,7 +242,8 @@ static void create_fdt(VirtMachineState *vms)
+                 idx = (i * nb_numa_nodes + j) * 3;
+                 matrix[idx + 0] = cpu_to_be32(i);
+                 matrix[idx + 1] = cpu_to_be32(j);
+-                matrix[idx + 2] = cpu_to_be32(numa_info[i].distance[j]);
++                matrix[idx + 2] =
++                    cpu_to_be32(ms->numa_state->nodes[i].distance[j]);
+             }
+         }
+ 
 diff --git a/hw/core/numa.c b/hw/core/numa.c
-index 450c522dd8..7a63ddc4c6 100644
+index 2142ec29e8..8fcbba05d6 100644
 --- a/hw/core/numa.c
 +++ b/hw/core/numa.c
-@@ -25,6 +25,7 @@
- #include "qemu/osdep.h"
- #include "sysemu/hostmem.h"
- #include "sysemu/numa.h"
-+#include "sysemu/sysemu.h"
- #include "exec/cpu-common.h"
- #include "exec/ramlist.h"
- #include "qemu/bitmap.h"
-diff --git a/hw/core/vm-change-state-handler.c b/hw/core/vm-change-state-=
-handler.c
-index e27ea45977..9068d51c9a 100644
---- a/hw/core/vm-change-state-handler.c
-+++ b/hw/core/vm-change-state-handler.c
-@@ -17,6 +17,7 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/qdev-core.h"
-+#include "sysemu/sysemu.h"
-=20
- static int qdev_get_dev_tree_depth(DeviceState *dev)
- {
-diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
-index 14ad2b352d..473e333475 100644
---- a/hw/display/qxl-render.c
-+++ b/hw/display/qxl-render.c
-@@ -21,6 +21,7 @@
-=20
- #include "qemu/osdep.h"
- #include "qxl.h"
-+#include "sysemu/sysemu.h"
- #include "trace.h"
-=20
- static void qxl_blit(PCIQXLDevice *qxl, QXLRect *rect)
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 3e15ffc828..ca4659b20f 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -25,6 +25,7 @@
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
- #include "qemu/range.h"
-+#include "sysemu/sysemu.h"
- #include "sysemu/xen-mapcache.h"
- #include "trace.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-index dc73c86c61..09656f9f11 100644
---- a/hw/i386/xen/xen-mapcache.c
-+++ b/hw/i386/xen/xen-mapcache.c
-@@ -17,6 +17,7 @@
- #include "hw/xen/xen-legacy-backend.h"
- #include "qemu/bitmap.h"
-=20
-+#include "sysemu/sysemu.h"
- #include "sysemu/xen-mapcache.h"
- #include "trace.h"
-=20
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index dddd231337..1ede055387 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -30,6 +30,7 @@
- #include "hw/pci/msi.h"
- #include "hw/qdev-properties.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/sysemu.h"
- #include "hw/i386/apic-msidef.h"
- #include "hw/i386/x86-iommu.h"
- #include "trace.h"
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 4b6ffab13d..aa05c2b9b2 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -35,6 +35,7 @@
- #include "monitor/monitor.h"
- #include "net/net.h"
- #include "sysemu/numa.h"
-+#include "sysemu/sysemu.h"
- #include "hw/loader.h"
- #include "qemu/error-report.h"
- #include "qemu/range.h"
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 862903d6b5..792d75a1a3 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -46,6 +46,7 @@
- #include "hw/riscv/boot.h"
- #include "chardev/char.h"
- #include "sysemu/arch_init.h"
-+#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
-=20
- static const struct MemmapEntry {
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 0b3c5dff97..9910fa6708 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -44,6 +44,7 @@
- #include "chardev/char.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/device_tree.h"
-+#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
-=20
- #include <libfdt.h>
-diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-index 9cc786b6b6..7c04bd554f 100644
---- a/hw/riscv/spike.c
-+++ b/hw/riscv/spike.c
-@@ -40,6 +40,7 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
-=20
- #include <libfdt.h>
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index c72198b720..9bced28486 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -37,6 +37,7 @@
- #include "chardev/char.h"
- #include "sysemu/arch_init.h"
- #include "sysemu/device_tree.h"
-+#include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
- #include "hw/pci/pci.h"
- #include "hw/pci-host/gpex.h"
-diff --git a/hw/sparc64/niagara.c b/hw/sparc64/niagara.c
-index 1efcff628a..167143bffe 100644
---- a/hw/sparc64/niagara.c
-+++ b/hw/sparc64/niagara.c
-@@ -35,7 +35,7 @@
- #include "sysemu/block-backend.h"
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
+@@ -50,8 +50,6 @@ static int have_mem;
+ static int max_numa_nodeid; /* Highest specified NUMA node ID, plus one.
+                              * For all nodes, nodeid < max_numa_nodeid
+                              */
+-NodeInfo numa_info[MAX_NODES];
 -
-+#include "sysemu/sysemu.h"
-=20
- typedef struct NiagaraBoardState {
-     MemoryRegion hv_ram;
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-index 0298238f0b..fdbcfdcbeb 100644
---- a/hw/usb/hcd-ehci.h
-+++ b/hw/usb/hcd-ehci.h
-@@ -21,6 +21,7 @@
- #include "qemu/timer.h"
- #include "hw/usb.h"
- #include "sysemu/dma.h"
-+#include "sysemu/sysemu.h"
- #include "hw/pci/pci.h"
- #include "hw/sysbus.h"
-=20
-diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
-index 32503cfc1c..76621da2f5 100644
---- a/hw/xen/xen-common.c
-+++ b/hw/xen/xen-common.c
-@@ -14,6 +14,7 @@
- #include "hw/xen/xen-legacy-backend.h"
- #include "chardev/char.h"
- #include "sysemu/accel.h"
-+#include "sysemu/sysemu.h"
- #include "migration/misc.h"
- #include "migration/global_state.h"
-=20
-diff --git a/hw/xen/xen_devconfig.c b/hw/xen/xen_devconfig.c
-index 315dbc9c51..46ee4a7f02 100644
---- a/hw/xen/xen_devconfig.c
-+++ b/hw/xen/xen_devconfig.c
-@@ -2,6 +2,7 @@
- #include "hw/xen/xen-legacy-backend.h"
- #include "qemu/option.h"
- #include "sysemu/blockdev.h"
-+#include "sysemu/sysemu.h"
-=20
- /* ------------------------------------------------------------- */
-=20
-diff --git a/hw/xenpv/xen_machine_pv.c b/hw/xenpv/xen_machine_pv.c
-index 524d608eab..3a8af1a1e0 100644
---- a/hw/xenpv/xen_machine_pv.c
-+++ b/hw/xenpv/xen_machine_pv.c
-@@ -28,6 +28,7 @@
- #include "hw/xen/xen-legacy-backend.h"
- #include "hw/xen/xen-bus.h"
- #include "sysemu/block-backend.h"
-+#include "sysemu/sysemu.h"
-=20
- static void xen_init_pv(MachineState *machine)
+ 
+ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+                             Error **errp)
+@@ -61,6 +59,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
+     uint16List *cpus = NULL;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+     unsigned int max_cpus = ms->smp.max_cpus;
++    NodeInfo *numa_info = ms->numa_state->nodes;
+ 
+     if (node->has_nodeid) {
+         nodenr = node->nodeid;
+@@ -140,6 +139,7 @@ void parse_numa_distance(MachineState *ms, NumaDistOptions *dist, Error **errp)
+     uint16_t src = dist->src;
+     uint16_t dst = dist->dst;
+     uint8_t val = dist->val;
++    NodeInfo *numa_info = ms->numa_state->nodes;
+ 
+     if (src >= MAX_NODES || dst >= MAX_NODES) {
+         error_setg(errp, "Parameter '%s' expects an integer between 0 and %d",
+@@ -198,7 +198,7 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+             error_setg(&err, "Missing mandatory node-id property");
+             goto end;
+         }
+-        if (!numa_info[object->u.cpu.node_id].present) {
++        if (!ms->numa_state->nodes[object->u.cpu.node_id].present) {
+             error_setg(&err, "Invalid node-id=%" PRId64 ", NUMA node must be "
+                 "defined with -numa node,nodeid=ID before it's used with "
+                 "-numa cpu,node-id=ID", object->u.cpu.node_id);
+@@ -258,6 +258,7 @@ static void validate_numa_distance(MachineState *ms)
+     int src, dst;
+     bool is_asymmetrical = false;
+     int nb_numa_nodes = ms->numa_state->num_nodes;
++    NodeInfo *numa_info = ms->numa_state->nodes;
+ 
+     for (src = 0; src < nb_numa_nodes; src++) {
+         for (dst = src; dst < nb_numa_nodes; dst++) {
+@@ -298,6 +299,7 @@ static void validate_numa_distance(MachineState *ms)
+ static void complete_init_numa_distance(MachineState *ms)
  {
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index e5b62dd2fc..de70b7a19a 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -5,7 +5,6 @@
- #include "qemu/bitmap.h"
- #include "qom/object.h"
- #include "hw/hotplug.h"
--#include "sysemu/sysemu.h"
-=20
- enum {
-     DEV_NVECTORS_UNSPECIFIED =3D -1,
-@@ -451,8 +450,4 @@ static inline bool qbus_is_hotpluggable(BusState *bus=
-)
- void device_listener_register(DeviceListener *listener);
- void device_listener_unregister(DeviceListener *listener);
-=20
--VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
--                                                     VMChangeStateHandle=
-r *cb,
--                                                     void *opaque);
+     int src, dst;
++    NodeInfo *numa_info = ms->numa_state->nodes;
+ 
+     /* Fixup NUMA distance by symmetric policy because if it is an
+      * asymmetric distance table, it should be a complete table and
+@@ -357,6 +359,7 @@ void numa_complete_configuration(MachineState *ms)
+ {
+     int i;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
++    NodeInfo *numa_info = ms->numa_state->nodes;
+ 
+     /*
+      * If memory hotplug is enabled (slots > 0) but without '-numa'
+@@ -522,8 +525,8 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+ 
+     memory_region_init(mr, owner, name, ram_size);
+     for (i = 0; i < ms->numa_state->num_nodes; i++) {
+-        uint64_t size = numa_info[i].node_mem;
+-        HostMemoryBackend *backend = numa_info[i].node_memdev;
++        uint64_t size = ms->numa_state->nodes[i].node_mem;
++        HostMemoryBackend *backend = ms->numa_state->nodes[i].node_memdev;
+         if (!backend) {
+             continue;
+         }
+@@ -589,7 +592,7 @@ void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms)
+ 
+     numa_stat_memory_devices(node_mem);
+     for (i = 0; i < ms->numa_state->num_nodes; i++) {
+-        node_mem[i].node_mem += numa_info[i].node_mem;
++        node_mem[i].node_mem += ms->numa_state->nodes[i].node_mem;
+     }
+ }
+ 
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b2cc618fbf..c3f5a70a56 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1040,7 +1040,7 @@ static FWCfgState *bochs_bios_init(AddressSpace *as, PCMachineState *pcms)
+     }
+     for (i = 0; i < nb_numa_nodes; i++) {
+         numa_fw_cfg[pcms->apic_id_limit + 1 + i] =
+-            cpu_to_le64(numa_info[i].node_mem);
++            cpu_to_le64(ms->numa_state->nodes[i].node_mem);
+     }
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_NUMA, numa_fw_cfg,
+                      (1 + pcms->apic_id_limit + nb_numa_nodes) *
+@@ -1768,7 +1768,7 @@ void pc_guest_info_init(PCMachineState *pcms)
+     pcms->node_mem = g_malloc0(pcms->numa_nodes *
+                                     sizeof *pcms->node_mem);
+     for (i = 0; i < ms->numa_state->num_nodes; i++) {
+-        pcms->node_mem[i] = numa_info[i].node_mem;
++        pcms->node_mem[i] = ms->numa_state->nodes[i].node_mem;
+     }
+ 
+     pcms->machine_done.notify = pc_machine_done;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 358d670485..f607ca567b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -354,8 +354,8 @@ static hwaddr spapr_node0_size(MachineState *machine)
+     if (machine->numa_state->num_nodes) {
+         int i;
+         for (i = 0; i < machine->numa_state->num_nodes; ++i) {
+-            if (numa_info[i].node_mem) {
+-                return MIN(pow2floor(numa_info[i].node_mem),
++            if (machine->numa_state->nodes[i].node_mem) {
++                return MIN(pow2floor(machine->numa_state->nodes[i].node_mem),
+                            machine->ram_size);
+             }
+         }
+@@ -399,7 +399,7 @@ static int spapr_populate_memory(SpaprMachineState *spapr, void *fdt)
+     MachineState *machine = MACHINE(spapr);
+     hwaddr mem_start, node_size;
+     int i, nb_nodes = machine->numa_state->num_nodes;
+-    NodeInfo *nodes = numa_info;
++    NodeInfo *nodes = machine->numa_state->nodes;
+     NodeInfo ramnode;
+ 
+     /* No NUMA nodes, assume there is just one node with whole RAM */
+@@ -2539,11 +2539,11 @@ static void spapr_validate_node_memory(MachineState *machine, Error **errp)
+     }
+ 
+     for (i = 0; i < machine->numa_state->num_nodes; i++) {
+-        if (numa_info[i].node_mem % SPAPR_MEMORY_BLOCK_SIZE) {
++        if (machine->numa_state->nodes[i].node_mem % SPAPR_MEMORY_BLOCK_SIZE) {
+             error_setg(errp,
+                        "Node %d memory size 0x%" PRIx64
+                        " is not aligned to %" PRIu64 " MiB",
+-                       i, numa_info[i].node_mem,
++                       i, machine->numa_state->nodes[i].node_mem,
+                        SPAPR_MEMORY_BLOCK_SIZE / MiB);
+             return;
+         }
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 9003fe9010..f05d82eee7 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1818,6 +1818,7 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     SysBusDevice *s = SYS_BUS_DEVICE(dev);
+     SpaprPhbState *sphb = SPAPR_PCI_HOST_BRIDGE(s);
+     PCIHostState *phb = PCI_HOST_BRIDGE(s);
++    MachineState *ms = MACHINE(spapr);
+     char *namebuf;
+     int i;
+     PCIBus *bus;
+@@ -1870,7 +1871,8 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     if (sphb->numa_node != -1 &&
+-        (sphb->numa_node >= MAX_NODES || !numa_info[sphb->numa_node].present)) {
++        (sphb->numa_node >= MAX_NODES ||
++         !ms->numa_state->nodes[sphb->numa_node].present)) {
+         error_setg(errp, "Invalid NUMA node ID for PCI host bridge");
+         return;
+     }
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 2e5e998adb..76da3016db 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -18,14 +18,15 @@ struct NumaNodeMem {
+     uint64_t node_plugged_mem;
+ };
+ 
+-extern NodeInfo numa_info[MAX_NODES];
 -
- #endif
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 227202999d..908f158677 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -29,6 +29,9 @@ VMChangeStateEntry *qemu_add_vm_change_state_handler(VM=
-ChangeStateHandler *cb,
-                                                      void *opaque);
- VMChangeStateEntry *qemu_add_vm_change_state_handler_prio(
-         VMChangeStateHandler *cb, void *opaque, int priority);
-+VMChangeStateEntry *qdev_add_vm_change_state_handler(DeviceState *dev,
-+                                                     VMChangeStateHandle=
-r *cb,
-+                                                     void *opaque);
- void qemu_del_vm_change_state_handler(VMChangeStateEntry *e);
- void vm_state_notify(int running, RunState state);
-=20
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 2c8c447239..7cba868979 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "qemu/cutils.h"
- #include "qemu/error-report.h"
-+#include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "migration.h"
- #include "migration/global_state.h"
-diff --git a/migration/migration.c b/migration/migration.c
-index 3a6340f602..2986b8b164 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -21,6 +21,7 @@
- #include "exec.h"
- #include "fd.h"
- #include "socket.h"
-+#include "sysemu/sysemu.h"
- #include "rdma.h"
- #include "ram.h"
- #include "migration/global_state.h"
-diff --git a/migration/savevm.c b/migration/savevm.c
-index b8f734537a..33da39f0ea 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -57,6 +57,7 @@
- #include "io/channel-buffer.h"
- #include "io/channel-file.h"
- #include "sysemu/replay.h"
-+#include "sysemu/sysemu.h"
- #include "qjson.h"
- #include "migration/colo.h"
- #include "qemu/bitmap.h"
---=20
-2.21.0
+ struct NumaState {
+     /* Number of NUMA nodes */
+     int num_nodes;
+ 
+     /* Allow setting NUMA distance for different NUMA nodes */
+     bool have_numa_distance;
++
++    /* NUMA nodes information */
++    NodeInfo nodes[MAX_NODES];
+ };
+ typedef struct NumaState NumaState;
+ 
+-- 
+2.20.1
 
 
