@@ -2,84 +2,72 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B26A8C31E40
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B666C31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:31:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC8F20820
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:12:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OAh8az9D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC8F20820
+	by mail.kernel.org (Postfix) with ESMTPS id E98ED214C6
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 17:31:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E98ED214C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw8RD-0004OY-Nu
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 13:12:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37943)
+	id 1hw8jP-0002Kx-7j
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 13:31:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40718)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hw8Qr-0003pc-3U
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:12:02 -0400
+ (envelope-from <bounces@canonical.com>) id 1hw8iz-0001v1-MQ
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hw8Qq-0006cy-0j
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:12:01 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43669)
+ (envelope-from <bounces@canonical.com>) id 1hw8iy-0006hy-Ch
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:30:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39032)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hw8Qp-0006cV-O6
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:11:59 -0400
-Received: by mail-pg1-x541.google.com with SMTP id r26so10209992pgl.10
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 10:11:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=ytkVX0l93V8o0cYS4Oq6t62B9ZsJBOcYFtRg7HNNvw8=;
- b=OAh8az9D3ZF272uDEsz4bf6PbWDxKUa72Iouu7bUj/0XwOG8R+ydJ66Qp1idhNsXWk
- VSkNV7s+SVOGcxCDS6IaWeqPk0pvrP95MqKBGM2TkY/x3nfbgIds97F5yNTuhgdqvFf/
- iFpChpPIBb29wnBb27DeAe7XnBTuijCLhKScout51dRJnNNT5uSbHHlO6B5dt+W6Cq+/
- wUln9RomXdU52Edlrc7MzgllELLd7LprsH/Eps/gjn7oPwA1iwku1dGgGO2O4Re+K2CO
- PnZ0NfdbGMM9t94dS5dz0deW6v0S6O4Zhbiaojy4E2WkGcW4c2cYRTkO/4DQT7j1sAZL
- oQaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=ytkVX0l93V8o0cYS4Oq6t62B9ZsJBOcYFtRg7HNNvw8=;
- b=dSWTj1pgSwXcH+hTj6PItGuv613aKIpbKLIiCh8jwQOYPL81G2HCTSzzOue26YJ0rI
- 5BaSqKpvKRb/aQWWZVcWcnMcU/akwNiQwPAbtUNchKeP9Nw/2ANrMNq10jHzvO7T8/u9
- umf9Uf88pLITrVMvQX+bTe9vKNA17K0d8hAkD33MOymbTe+eFq2dr1NAg49hetCopg/p
- wzgR0Hn3023JLzX57mxaPxt1c3mwMfEG+JmDydeeuNXS1w/qyr3SzPbycj3Mof3CMtc5
- oH7V7KcCXTqIQ060cMU3mK6bb2sGQ/lhxNeLggB2he+Z+11bfAXSuMt6y+plcb4MCcQ/
- qp2w==
-X-Gm-Message-State: APjAAAX9XxxDn/TRqvVUmpjFKiPpBmD8MBI7EBC3SFZYlMkcsiaWtQBy
- 9g2kbN+erAByxRd3cFGNUtwOfxNGQNM=
-X-Google-Smtp-Source: APXvYqySxdZhIkOeZjsh+xEfUzMrOT9e9uqx6jgRH9jodXLonQ9Ds0TYzh8cPkIhj/P+RcDQ+1szew==
-X-Received: by 2002:a62:874d:: with SMTP id i74mr22155960pfe.94.1565370718261; 
- Fri, 09 Aug 2019 10:11:58 -0700 (PDT)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id l189sm119049433pfl.7.2019.08.09.10.11.56
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 10:11:57 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hw8iy-0006hJ-7Q
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 13:30:44 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hw8iw-0000Eb-VL
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 17:30:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E90BD2E80C9
+ for <qemu-devel@nongnu.org>; Fri,  9 Aug 2019 17:30:42 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 09 Aug 2019 17:22:50 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri,  9 Aug 2019 10:11:56 -0700
-Message-Id: <20190809171156.3476-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: [Qemu-devel] [PATCH] linux-user: Add AT_HWCAP2 for
- aarch64-linux-user
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: glaubitz pmaydell
+X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <156518306048.32528.10373743991208371347.malonedeb@chaenomeles.canonical.com>
+Message-Id: <156537137023.17671.1927095889622186018.malone@gac.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19021";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: f2dff662c834962d901004f3ed39ac23bbd0b840
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1839325] Re: Go programs crash on qemu-sh4 due to
+ issues with atomics
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,92 +76,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, laurent@vivier.eu
+Reply-To: Bug 1839325 <1839325@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the HWCAP2_* bits from kernel version v5.3-rc3.
-Enable the bits corresponding to ARMv8.5-CondM and ARMv8.5-FRINT.
+I just did an objdump -x of the /usr/lib/sh4-linux-gnu/libgo.so.14,
+which will be the shipped version from the Debian package, and in the
+section header it has:
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/elfload.c | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
----
+ 24 .bss          000191f8  00fe74ec  00fe74ec  00fd74ec  2**2
+                  ALLOC
 
-The HWCAP2_FLAGM2 and HWCAP2_FRINT bits came in during the 
-last merge window and will be in the upcoming v5.3 release.
-We don't yet implement any of the other extensions that make
-up the rest of the HWCAP2 bits.
+and in the symbol table it has:
 
+00ff98f4 l     O .bss   00000104              runtime.work
 
-r~
+So the compiler has put the 'runtime.work' struct at a non-multiple-of-8
+offset into the bss, and it's given the BSS alignment requirements that
+are only 4-aligned, not 8-aligned. That means it's random luck whether
+the struct gets 8-aligned or not.
 
+This looks to me like it's a bug in the sh4 gccgo --
+https://go101.org/article/memory-layout.html says that the first word in
+a struct or variable is supposed to be guaranteed to be 8-aligned, so
+the compiler needs to align things more strictly than it is currently
+doing.
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index bd43c4817d..4fd2f46f18 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -606,9 +606,23 @@ enum {
-     ARM_HWCAP_A64_SB            = 1 << 29,
-     ARM_HWCAP_A64_PACA          = 1 << 30,
-     ARM_HWCAP_A64_PACG          = 1UL << 31,
-+
-+    ARM_HWCAP2_A64_DCPODP       = 1 << 0,
-+    ARM_HWCAP2_A64_SVE2         = 1 << 1,
-+    ARM_HWCAP2_A64_SVEAES       = 1 << 2,
-+    ARM_HWCAP2_A64_SVEPMULL     = 1 << 3,
-+    ARM_HWCAP2_A64_SVEBITPERM   = 1 << 4,
-+    ARM_HWCAP2_A64_SVESHA3      = 1 << 5,
-+    ARM_HWCAP2_A64_SVESM4       = 1 << 6,
-+    ARM_HWCAP2_A64_FLAGM2       = 1 << 7,
-+    ARM_HWCAP2_A64_FRINT        = 1 << 8,
- };
- 
--#define ELF_HWCAP get_elf_hwcap()
-+#define ELF_HWCAP   get_elf_hwcap()
-+#define ELF_HWCAP2  get_elf_hwcap2()
-+
-+#define GET_FEATURE_ID(feat, hwcap) \
-+    do { if (cpu_isar_feature(feat, cpu)) { hwcaps |= hwcap; } } while (0)
- 
- static uint32_t get_elf_hwcap(void)
- {
-@@ -620,8 +634,6 @@ static uint32_t get_elf_hwcap(void)
-     hwcaps |= ARM_HWCAP_A64_CPUID;
- 
-     /* probe for the extra features */
--#define GET_FEATURE_ID(feat, hwcap) \
--    do { if (cpu_isar_feature(feat, cpu)) { hwcaps |= hwcap; } } while (0)
- 
-     GET_FEATURE_ID(aa64_aes, ARM_HWCAP_A64_AES);
-     GET_FEATURE_ID(aa64_pmull, ARM_HWCAP_A64_PMULL);
-@@ -644,11 +656,22 @@ static uint32_t get_elf_hwcap(void)
-     GET_FEATURE_ID(aa64_sb, ARM_HWCAP_A64_SB);
-     GET_FEATURE_ID(aa64_condm_4, ARM_HWCAP_A64_FLAGM);
- 
--#undef GET_FEATURE_ID
-+    return hwcaps;
-+}
-+
-+static uint32_t get_elf_hwcap2(void)
-+{
-+    ARMCPU *cpu = ARM_CPU(thread_cpu);
-+    uint32_t hwcaps = 0;
-+
-+    GET_FEATURE_ID(aa64_condm_5, ARM_HWCAP2_A64_FLAGM2);
-+    GET_FEATURE_ID(aa64_frint, ARM_HWCAP2_A64_FRINT);
- 
-     return hwcaps;
- }
- 
-+#undef GET_FEATURE_ID
-+
- #endif /* not TARGET_AARCH64 */
- #endif /* TARGET_ARM */
- 
--- 
-2.17.1
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1839325
+
+Title:
+  Go programs crash on qemu-sh4 due to issues with atomics
+
+Status in QEMU:
+  New
+
+Bug description:
+  After #1738545 [1] was fixed, Go applications work fine on qemu-arm
+  but still crash on qemu-sh4. From the backtrace, it looks like an
+  issue with the atomics in qemu-sh4:
+
+  (sid-sh4-sbuild)root@epyc:/# cat hello.go
+  package main
+
+  import "fmt"
+
+  func main() {
+        fmt.Println("hello world")
+  }
+
+  (sid-sh4-sbuild)root@epyc:/# gccgo-9 hello.go -o hello
+  (sid-sh4-sbuild)root@epyc:/# ./hello =
+
+  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
+  fatal error: panic on system stack
+  panic: (        runtime runtime.errorString) (0x7f74527c,0x80a038)
+  fatal error: panic on system stack
+
+  runtime stack:
+  runtime..z2finternal..z2fatomic.Load64
+          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
+  runtime_mstart
+          ../../../src/libgo/runtime/proc.c:596
+
+  goroutine 1 [running]:
+          goroutine running on other thread; stack unavailable
+
+  runtime stack:
+  runtime..z2finternal..z2fatomic.Load64
+          ../../../src/libgo/go/runtime/internal/atomic/atomic.c:37
+  runtime_mstart
+          ../../../src/libgo/runtime/proc.c:596
+  (sid-sh4-sbuild)root@epyc:/#
+
+  The same sample Go program runs fine on my SH7785LCR SH4 evaluation
+  board:
+
+  root@tirpitz:~> uname -a
+  Linux tirpitz 3.16.7-ckt7 #8 PREEMPT Fri Oct 21 18:47:41 CEST 2016 sh4a G=
+NU/Linux
+  root@tirpitz:~> cat hello.go
+  package main
+
+  import "fmt"
+
+  func main() {
+        fmt.Println("hello world")
+  }
+
+  root@tirpitz:~> gccgo-9 hello.go -o hello
+  root@tirpitz:~> ./hello =
+
+  hello world
+  root@tirpitz:~>
+
+  Please note: In order to be able to reproduce this, one also needs to
+  revert commit 61dedf2af7 [2], otherwise the Go application crashes
+  differently:
+
+  (sid-sh4-sbuild)root@epyc:/# ./hello        =
+
+  Unhandled trap: 0x180
+  pc=3D0x7e5f7f9e sr=3D0x00000000 pr=3D0x7ee3d582 fpscr=3D0x00080004
+  spc=3D0x00000000 ssr=3D0x00000000 gbr=3D0x7e590480 vbr=3D0x00000000
+  sgr=3D0x00000000 dbr=3D0x00000000 delayed_pc=3D0x7e5f7f60 fpul=3D0x00034f=
+3b
+  r0=3D0x008007d4 r1=3D0x00000000 r2=3D0xfffe0b2a r3=3D0x00000002
+  r4=3D0x008006e4 r5=3D0x00872000 r6=3D0x00200000 r7=3D0x00000000
+  r8=3D0x7f7bca7c r9=3D0x7fffebd4 r10=3D0x00800480 r11=3D0x7f7bc0f0
+  r12=3D0x7f7a3fa4 r13=3D0x008004c0 r14=3D0x7f7b2238 r15=3D0x7fffebd0
+  r16=3D0x00000000 r17=3D0x00000000 r18=3D0x00000000 r19=3D0x00000000
+  r20=3D0x00000000 r21=3D0x00000000 r22=3D0x00000000 r23=3D0x00000000
+  (sid-sh4-sbuild)root@epyc:/#
+
+  > [1] https://bugs.launchpad.net/bugs/1738545
+  > [2] https://bugs.launchpad.net/bugs/1796520
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1839325/+subscriptions
 
