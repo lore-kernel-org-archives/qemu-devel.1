@@ -2,80 +2,86 @@ Return-Path: <SRS0=8dir=WF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66CFC433FF
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728DEC31E40
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9216420C01
-	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:49:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9216420C01
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 305382089E
+	for <qemu-devel@archiver.kernel.org>; Fri,  9 Aug 2019 15:51:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Wz5CxMsI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 305382089E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hw78w-0008Nc-UX
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:49:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52289)
+	id 1hw7Av-000216-CS
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 11:51:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52498)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <philmd@redhat.com>) id 1hw78R-0007WN-Hf
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:48:56 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hw7AJ-0000pN-UO
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:50:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hw78Q-00051q-IL
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:48:55 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42151)
+ (envelope-from <alex.bennee@linaro.org>) id 1hw7AI-00067J-U5
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:50:51 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43795)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hw78Q-00050r-BZ
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:48:54 -0400
-Received: by mail-wr1-f68.google.com with SMTP id b16so1976294wrq.9
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 08:48:54 -0700 (PDT)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hw7AI-00066D-Kg
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 11:50:50 -0400
+Received: by mail-wr1-x442.google.com with SMTP id p13so24103843wru.10
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 08:50:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ygRfiXcw8nu+FWMinQnK0wJ2K/Utz7SUuc0zdF1It3I=;
+ b=Wz5CxMsI8TrMEOPWWkDVb3eeLuiBSvlSp6dkQOpIRA4zUlKrxTxtpYwyCB9qaTLKme
+ C4RgWq+OuBlWoJkaDZpVijY4gTXbd4C3KgNM8JPgZ69ZZ0h4PRSXw0Njw19Ga+VX3Px3
+ 2lrhS0glUlkmln2mbDgKAZeoR4MpkEwjf39LTcBml833mMC7UD5DAg94Rxf66hHPJrTw
+ S8lsn33IFwOdLWWmqyZ69C5aKLtR9IdfFfNzPtt0t6i9yBOP8GTf1367nwmhKKCl3Yq1
+ y0H334VaQ0lcUMON6/WyK42SkDZv5UFYwrgRiSWTGzi0ptP7ej1AptMY5Ob/96ZESyQ/
+ zz8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=5Oi13/rZPM+SHevM7m+/KQw8/CzWh3xVBc3OgoZVhB0=;
- b=i6+A9ByaOF60JYblmJfIXIrI9KgL1iyYA77wJ7FhP/KHpkna85NMHTV7FmURyGLV6p
- Yim/zDPDVkJNDiSaQjVX+ZECoUaMVvim/x1rl7luE1qFaIiNU3ibVoTgeUNY8wWmZVeF
- klZghzZn+9o3TYMdY+wxRrDN7am32f+FTUQNSVBFABFD528qQHG8sXuuhw50KiTgMbDz
- 9pBBgTYy0b0M8EcoegLzL1YEsseCnpVs4XlfzcJ16oGDJRTwcS0XUyEz9nop+Z0aqpMv
- jgO07hLuWeapH6pzDaQLuvbu5WeDEWGB+iFNfDizgoNyvdHpj30l0A4O480zyiAcZvdr
- g8OQ==
-X-Gm-Message-State: APjAAAVDylaDBtbCJP7rfSw1V8hM9Zs532vDLsN0g6SnsGpNX5SA9wwJ
- eBIqGq7pmIcPRABngf5/PXh8ww==
-X-Google-Smtp-Source: APXvYqwCcDTTAl7KKKTZ2SQ4Kmsj6ojDyUOHUQZIqhLfXF30x/5dD2G+BDbItWZr5sM9D/yV5m12hw==
-X-Received: by 2002:a5d:668e:: with SMTP id l14mr24111168wru.156.1565365733268; 
- Fri, 09 Aug 2019 08:48:53 -0700 (PDT)
-Received: from [192.168.1.39] (214.red-83-51-160.dynamicip.rima-tde.net.
- [83.51.160.214])
- by smtp.gmail.com with ESMTPSA id p3sm5238896wmg.15.2019.08.09.08.48.52
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Fri, 09 Aug 2019 08:48:52 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190809154153.31763-1-richard.henderson@linaro.org>
- <20190809154153.31763-4-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <2ca2d3fc-36cf-b3ef-8220-4bce3898b633@redhat.com>
-Date: Fri, 9 Aug 2019 17:48:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ bh=ygRfiXcw8nu+FWMinQnK0wJ2K/Utz7SUuc0zdF1It3I=;
+ b=M+hHLrLLe6QS6u2/dEdFmGYlcsqS/wieRMMTXWNVGE8xIJuMz8I7S0OAr/BtM+5Rb5
+ +vne3Kl88fqb7hIC0HcRWNVry4jAxSbZRjN1DaYNqDAzG5leIKw/XVHgDKlZziL26O9t
+ tfDVtpU6iOjGMISUQnhyR8x+YwT6qQhPVTpT6WpqaSJ3sLqS9Cv9ttZyvFmeP1muxTgN
+ jIvxsOUZXxk12Jw7GcRZbWsy8o/PMeMT+rkkb762M+WuJPbxazVCN4GM9R4GOLpo8pCT
+ sIC28JxxKLqMacq+/UfYftxV+4D3/tB0mnSojbXH/OIC1jW5+UyJQGIUCA1D/wsRuoGM
+ lGCQ==
+X-Gm-Message-State: APjAAAXOVl0FNWGJkTcnHfdDsxr0DKrfzFiwKg3k+oXKN0rFnuYhHIYK
+ 8j5XFiQLCHfrAGSpcFlvLwND+Q==
+X-Google-Smtp-Source: APXvYqyZ5WF0UY7iG0G/OBTjYouIdjlwwdl5r5eO+XoVPpgQ18ZDi6wCA8L3MRZw2D1pWy5h4s9RWQ==
+X-Received: by 2002:adf:c594:: with SMTP id m20mr26409506wrg.126.1565365848819; 
+ Fri, 09 Aug 2019 08:50:48 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id g25sm6725874wmk.18.2019.08.09.08.50.47
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Fri, 09 Aug 2019 08:50:47 -0700 (PDT)
+Received: from zen.linaroharston. (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 839AF1FF87;
+ Fri,  9 Aug 2019 16:50:47 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri,  9 Aug 2019 16:50:45 +0100
+Message-Id: <20190809155047.24526-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190809154153.31763-4-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/riscv: Remove redundant
- declaration pragmas
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
+Subject: [Qemu-devel] [PATCH  v1 0/2] docker DEF_TARGET_LIST cleanup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,55 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Alistair.Francis@wdc.com, qemu-arm@nongnu.org,
- qemu-riscv@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, armbru@redhat.com,
+ f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/9/19 5:41 PM, Richard Henderson wrote:
-> These are now generated by decodetree itself.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Hi,
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+While reviewing Markus' header cleanups I realised my advice to use:
 
-> ---
->  target/riscv/translate.c | 19 +------------------
->  1 file changed, 1 insertion(+), 18 deletions(-)
-> 
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 8d6ab73258..adeddb85f6 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -708,26 +708,9 @@ static bool gen_shift(DisasContext *ctx, arg_r *a,
->  #include "insn_trans/trans_rvd.inc.c"
->  #include "insn_trans/trans_privileged.inc.c"
->  
-> -/*
-> - * Auto-generated decoder.
-> - * Note that the 16-bit decoder reuses some of the trans_* functions
-> - * initially declared by the 32-bit decoder, which results in duplicate
-> - * declaration warnings.  Suppress them.
-> - */
-> -#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-> -# pragma GCC diagnostic push
-> -# pragma GCC diagnostic ignored "-Wredundant-decls"
-> -# ifdef __clang__
-> -#  pragma GCC diagnostic ignored "-Wtypedef-redefinition"
-> -# endif
-> -#endif
-> -
-> +/* Include the auto-generated decoder for 16 bit insn */
->  #include "decode_insn16.inc.c"
->  
-> -#ifdef CONFIG_PRAGMA_DIAGNOSTIC_AVAILABLE
-> -# pragma GCC diagnostic pop
-> -#endif
-> -
->  static void decode_opc(DisasContext *ctx)
->  {
->      /* check for compressed insn */
-> 
+  make docker-test-build
+
+to run through all the various builds would miss some of the cases
+that shippable catches. This is because the default target list is
+hard-coded into the tests. This series allows it to be over-ridden by
+each docker image by setting the DEF_TARGET_LIST env variable. The user
+still has full control of the target list by calling:
+
+  make docker-test-build TARGET_LIST=foo
+
+
+Alex Bennée (2):
+  tests/docker: move DEF_TARGET_LIST setting to common.rc
+  tests/docker: set DEF_TARGET_LIST for some containers
+
+ tests/docker/common.rc                                | 4 ++++
+ tests/docker/dockerfiles/debian-arm64-cross.docker    | 1 +
+ tests/docker/dockerfiles/debian-armel-cross.docker    | 1 +
+ tests/docker/dockerfiles/debian-armhf-cross.docker    | 1 +
+ tests/docker/dockerfiles/debian-mips-cross.docker     | 1 +
+ tests/docker/dockerfiles/debian-mips64el-cross.docker | 1 +
+ tests/docker/dockerfiles/debian-ppc64el-cross.docker  | 1 +
+ tests/docker/dockerfiles/debian-s390x-cross.docker    | 1 +
+ tests/docker/test-build                               | 1 -
+ tests/docker/test-mingw                               | 1 -
+ tests/docker/test-quick                               | 1 -
+ 11 files changed, 11 insertions(+), 3 deletions(-)
+
+-- 
+2.20.1
+
 
