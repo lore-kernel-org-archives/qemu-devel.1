@@ -2,61 +2,90 @@ Return-Path: <SRS0=VlUQ=WG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F82AC433FF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 21:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB26C32751
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 23:36:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDDF8208C3
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 21:36:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDDF8208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.alibaba.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2928820880
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 23:36:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZK7xT5nC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2928820880
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwZ2Y-0007qI-7h
-	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 17:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57980)
+	id 1hwaup-0000Ca-E1
+	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 19:36:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42939)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bo.liu@linux.alibaba.com>) id 1hwZ1x-0007Pg-A0
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 17:36:06 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hwau5-0007r5-Cn
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 19:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bo.liu@linux.alibaba.com>) id 1hwZ1v-0004Rr-Dk
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 17:36:05 -0400
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:56410)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bo.liu@linux.alibaba.com>)
- id 1hwZ1v-0004P8-3H
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 17:36:03 -0400
-X-Alimail-AntiSpam: AC=PASS; BC=-1|-1; BR=01201311R101e4; CH=green; DM=||false|;
- FP=0|-1|-1|-1|0|-1|-1|-1; HT=e01e07486; MF=bo.liu@linux.alibaba.com; NM=1;
- PH=DS; RN=4; SR=0; TI=SMTPD_---0TZ7877c_1565472956; 
-Received: from US-160370MP2.local(mailfrom:bo.liu@linux.alibaba.com
- fp:SMTPD_---0TZ7877c_1565472956) by smtp.aliyun-inc.com(127.0.0.1);
- Sun, 11 Aug 2019 05:35:58 +0800
-Date: Sat, 10 Aug 2019 14:35:55 -0700
-From: Liu Bo <bo.liu@linux.alibaba.com>
-To: Vivek Goyal <vgoyal@redhat.com>
-Message-ID: <20190810213555.hqdkm4yio4asnh5t@US-160370MP2.local>
-References: <20190801165409.20121-1-stefanha@redhat.com>
- <20190807180355.GA22758@stefanha-x1.localdomain>
- <20190807205715.GE18557@redhat.com>
- <20190808090213.GD31476@stefanha-x1.localdomain>
- <20190808095316.GC2852@work-vm> <20190808125320.GB3147@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hwau3-0001MC-QG
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 19:36:05 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45056)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hwau3-0001K3-6b
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 19:36:03 -0400
+Received: by mail-pf1-x441.google.com with SMTP id w26so2654605pfq.12
+ for <qemu-devel@nongnu.org>; Sat, 10 Aug 2019 16:36:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=JqU3IVJi5OC1DT4qD2Hk5+RbETbHYR7Jv0J4+bWcbvk=;
+ b=ZK7xT5nCRa6yFx/YAsyPiZHEKzgsi3F+A04djCAu/3YhPGUYyduyhJANZxHM9myBd+
+ CcKdvqagIAs1yuwHqXFWXLXvtQ1LgAWG0S4Ef70wHBs0es9+sg7XSlu3Jh+SnSaXsyOD
+ sUo1pMsteZlGbSH+pNkfaSsCtleRZoD9hfNIAdsQW3Mv623T/jd55fDNsrM/JsLJ/po6
+ erWdtDYrotE90C6KOgCQc0TCXZCvYAwkUgbDVGCxXwvCW3T3zgTZ25zlNiSpHWm89Mgn
+ uHYUhmUZi79tu6jS16p4FWae1nXSDsV/vF/sWC6kirqgGUIaiGS2BEZiHOTeYFT7oXyK
+ E+2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JqU3IVJi5OC1DT4qD2Hk5+RbETbHYR7Jv0J4+bWcbvk=;
+ b=YtR9RKuhz3ZAMVq1Tq+945oshUNxf6444yHR2tpGkmNs5feju5ut4yDTnGhFXijICt
+ /NXmHCq5a3/mWj9yyW/azZwJS8xs5Zq1T+qHyOlZVuPJXOR5QnkiMbdcgqJi2n6zuOm9
+ 9OHALYakD0gxNa8Ze1a2m9de0E3aFHXwo+aIr2KaQ5WYAoEozGzN/JRpSsE0NZvhpv42
+ wI9+un7Ga8vnxhQBVgwRHY+INre5OSwiJMi1iX9NPb1/XU2N5NV6NV3M8d69rU21w/Jl
+ 5RdCHaT12G8qbMfRDPM+YtOj3POywA5Tk8z1QN3mWw5snh3WH9cq0AT8LIsaHfkYODZV
+ 6q9A==
+X-Gm-Message-State: APjAAAWaySAzIVo7T9ABhBykR5KdpP3aqLTbNd+LR+afPVsvb+OUcoj3
+ BkkxAItF/+Dc9ntvdhAjBk8GdA==
+X-Google-Smtp-Source: APXvYqy8trmn3XcKtzVMMs8ISmI9VBS26/cnW4VuP26wYbho90+7hThk1oKWt4ThZpT4LOP06icwsQ==
+X-Received: by 2002:a63:b64:: with SMTP id a36mr24382102pgl.215.1565480161169; 
+ Sat, 10 Aug 2019 16:36:01 -0700 (PDT)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id h70sm97232877pgc.36.2019.08.10.16.35.59
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 10 Aug 2019 16:36:00 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190810041255.6820-1-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <7d6ac8e9-00a0-fda2-74ba-327b39460cce@linaro.org>
+Date: Sat, 10 Aug 2019 16:35:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190808125320.GB3147@redhat.com>
-User-Agent: NeoMutt/20180323
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 47.88.44.36
-Subject: Re: [Qemu-devel] [Virtio-fs] [PATCH 0/4] virtiofsd: multithreading
- preparation part 3
+In-Reply-To: <20190810041255.6820-1-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/39] rewrite MMX/SSE instruction
+ translation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,82 +97,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: bo.liu@linux.alibaba.com
-Cc: virtio-fs@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 08, 2019 at 08:53:20AM -0400, Vivek Goyal wrote:
-> On Thu, Aug 08, 2019 at 10:53:16AM +0100, Dr. David Alan Gilbert wrote:
-> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > On Wed, Aug 07, 2019 at 04:57:15PM -0400, Vivek Goyal wrote:
-> > > > Kernel also serializes MAP/UNMAP on one inode. So you will need to run
-> > > > multiple jobs operating on different inodes to see parallel MAP/UNMAP
-> > > > (atleast from kernel's point of view).
-> > > 
-> > > Okay, there is still room to experiment with how MAP and UNMAP are
-> > > handled by virtiofsd and QEMU even if the host kernel ultimately becomes
-> > > the bottleneck.
-> > > 
-> > > One possible optimization is to eliminate REMOVEMAPPING requests when
-> > > the guest driver knows a SETUPMAPPING will follow immediately.  I see
-> > > the following request pattern in a fio randread iodepth=64 job:
-> > > 
-> > >   unique: 995348, opcode: SETUPMAPPING (48), nodeid: 135, insize: 80, pid: 1351
-> > >   lo_setupmapping(ino=135, fi=0x(nil), foffset=3860856832, len=2097152, moffset=859832320, flags=0)
-> > >      unique: 995348, success, outsize: 16
-> > >   unique: 995350, opcode: REMOVEMAPPING (49), nodeid: 135, insize: 60, pid: 12
-> > >      unique: 995350, success, outsize: 16
-> > >   unique: 995352, opcode: SETUPMAPPING (48), nodeid: 135, insize: 80, pid: 1351
-> > >   lo_setupmapping(ino=135, fi=0x(nil), foffset=16777216, len=2097152, moffset=861929472, flags=0)
-> > >      unique: 995352, success, outsize: 16
-> > >   unique: 995354, opcode: REMOVEMAPPING (49), nodeid: 135, insize: 60, pid: 12
-> > >      unique: 995354, success, outsize: 16
-> > >   virtio_send_msg: elem 9: with 1 in desc of length 16
-> > >   unique: 995356, opcode: SETUPMAPPING (48), nodeid: 135, insize: 80, pid: 1351
-> > >   lo_setupmapping(ino=135, fi=0x(nil), foffset=383778816, len=2097152, moffset=864026624, flags=0)
-> > >      unique: 995356, success, outsize: 16
-> > >   unique: 995358, opcode: REMOVEMAPPING (49), nodeid: 135, insize: 60, pid: 12
-> > > 
-> > > The REMOVEMAPPING requests are unnecessary since we can map over the top
-> > > of the old mapping instead of taking the extra step of removing it
-> > > first.
-> > 
-> > Yep, those should go - I think Vivek likes to keep them for testing
-> > since they make things fail more completely if there's a screwup.
-> 
-> I like to keep them because otherwise they keep the resources busy
-> on host. If DAX range is being used immediately, then this optimization
-> makes more sense. I will keep this in mind.
->
+On 8/9/19 9:12 PM, Jan Bobek wrote:
+> This is a v2 of the patch series posted in [1]. Patches 1-9 are just
+> cleanups; patches 10-39 are something actually interesting. Compared
+> to v1, I started using preprocessor more extensively to generate
+> repetitive boilerplate code; opinions/alternatives are welcome and
+> appreciated.
 
-Other than the resource not being released, do you think there'll be
-any stale data problem if we don't do removemapping at all, neither
-background reclaim nor inline reclaim?
-(truncate/punch_hole/evict_inode still needs to remove mapping though)
+This is tricky.  I'm not keen on code entirely expanded via macros because it
+becomes extremely difficult to debug.  All statements get recorded at the same
+line of the location of the expansion, which makes the gdb "step" command
+finish the entire function because there is no next line.
 
-thanks,
--liubo
+Once upon a time I wrote some code that's extremely macro crazy:
 
-> > 
-> > > Some more questions to consider for DAX performance optimization:
-> > > 
-> > > 1. Is FUSE_READ/FUSE_WRITE more efficient than DAX for some I/O patterns?
-> > 
-> > Probably for cases where the data is only accessed once, and you can't
-> > preemptively map.
-> > Another variant on (1) is whether we could do read/writes while the mmap
-> > is happening to absorb the latency.
-> 
-> For small random I/O, dax might not be very effective. Overhead of
-> setting up mapping and tearing it down is significant.
-> 
-> Vivek
-> 
-> _______________________________________________
-> Virtio-fs mailing list
-> Virtio-fs@redhat.com
-> https://www.redhat.com/mailman/listinfo/virtio-fs
+https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=soft-fp/op-common.h;hb=HEAD
+
+It has been extremely difficult to maintain over the years.
+
+We have just recently gotten rid of some of the macros in the softmmu code
+
+https://patchwork.ozlabs.org/project/qemu-devel/list/?series=105441
+
+replacing most of them with inline functions.
+
+A lot of what you have needs very little adjustment to address the debugging
+problem.  E.g.
+
+> +#define INSNOP_INIT(opT, init_stmt)                                \
+> +    static int insnop_init(opT)(CPUX86State *env, DisasContext *s, \
+> +                                int modrm, insnop_t(opT) *op)      \
+> +    {                                                              \
+> +        init_stmt;                                                 \
+> +    }
+....
+> +INSNOP(
+> +    M, TCGv,
+> +    do {
+> +        if (decode_modrm_mod(env, s, modrm) == 3) {
+> +            INSNOP_INIT_FAIL;
+> +        } else {
+> +            INSNOP_INIT_OK(s->A0);
+> +        }
+> +    } while (0),
+> +    do {
+> +        assert(*op == s->A0);
+> +        gen_lea_modrm(env, s, modrm);
+> +    } while (0),
+> +    INSNOP_FINALIZE_NOOP)
+
+Rearrange this as
+
+#define INSNOP_INIT(OPT) \
+    static bool insnop_##OPT##_init(CPUX86State *env, DisasContext *s, \
+                                    int modrm, insnop_##OPT##_t *op)
+
+#define INSNOP_PREPARE(OPT) \
+    static void insnop_##OPT##_prepare(CPUX86State *env, DisasContext *s, \
+                                       int modrm, insnop_##OPT##_t *op)
+
+INSNOP_INIT(M)
+{
+    if (decode_modrm_mod(env, s, modrm) == 3) {
+        INSNOP_INIT_FAIL;
+    } else {
+        INSNOP_INIT_OK(s->A0);
+    }
+}
+
+INSNOP_PREPARE(M)
+{
+    assert(*op == s->A0);
+    gen_lea_modrm(env, s, modrm);
+}
+
+etc and suddenly the entire expansion does not occur on a single line.
+
+Further specific commentary to follow.
+
+
+r~
 
