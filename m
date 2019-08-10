@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7866C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 01:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6A9C31E40
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 01:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FCC82166E
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 01:55:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 140802085A
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 01:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FKsQ9zDK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCC82166E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fTtdXK2C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 140802085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwGbs-0001ar-Sm
-	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 21:55:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48877)
+	id 1hwGcX-00035R-CQ
+	for qemu-devel@archiver.kernel.org; Fri, 09 Aug 2019 21:56:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48954)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hwGbU-000190-9R
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 21:55:33 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hwGc8-0002bn-Ia
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 21:56:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hwGbT-0002Vd-7g
- for qemu-devel@nongnu.org; Fri, 09 Aug 2019 21:55:32 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:37440)
+ (envelope-from <alistair23@gmail.com>) id 1hwGc7-0002lB-Bz
+ for qemu-devel@nongnu.org; Fri, 09 Aug 2019 21:56:12 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:34292)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hwGbT-0002VH-0K; Fri, 09 Aug 2019 21:55:31 -0400
-Received: by mail-lj1-x243.google.com with SMTP id z28so39464471ljn.4;
- Fri, 09 Aug 2019 18:55:30 -0700 (PDT)
+ id 1hwGc7-0002kJ-55; Fri, 09 Aug 2019 21:56:11 -0400
+Received: by mail-lf1-x141.google.com with SMTP id b29so63558176lfq.1;
+ Fri, 09 Aug 2019 18:56:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=dTTSTn93r8pdh3TbJRxXc/6d1wGwv9Pp87/9fjZQd+o=;
- b=FKsQ9zDKMzJMVmaSeMdeOoD90a0jmUGO5GKObsv0o1tD+PVSe1nvr9YIxMX2J9kXIS
- tjb0iQ9mM1r9cGYdUkEuijYZJnLZWaIRZgBiV1Q5bfSZ8H/ZkhYB+t4vcTJW8BLUtV0w
- qgAz08QFonMpYUXn90f4Pst9k9x402k2yidEX71gVP14NW+K0yazITZaLoYuxMWo9LIv
- YW+I5PAoCv/zDtFdV+dfTKHlf0aCu8RwouV0z2feqKpdeBaOqZ3xIrCEfm4XoXGKvVWj
- 52NccA4AXN2otGqv1LdgkZLypNZ1rE+ZzDwrQrqMeDOFQik3f8CtyPh8UZmWJLeQ1Tb5
- +DHA==
+ bh=KhestzNF3jl4BE+FK0L15HSsCgusxLq1SQq8c966BzI=;
+ b=fTtdXK2CLQn8/o426mTdx1agdncusTwEBCGpnavQQfDDV4wRfU1RJt8zBfDh43zsq6
+ 7UT+ZTdUwmHWxY/d4oNV/ioKH04acZle6Xn7ADy3kdTGcwCGANQS4byC5ZXrZ6iilZmK
+ wsvlKaOPliWhbHqWUj8zxKD9FK5H/Aa4P3J5I8JSYphWkEq15CVRVKw0pJyIp0W9P27a
+ NWCm1sKKtP5P3pVwv76UsNfUKwvKDosOpO8ZJExb1HPHCMnC4uMXVtb+Oa8qMjahLVWq
+ KMq7uQ946Fbuf+6mLxJMkdMUoyGsCVuqhfR9cmeoX61b7KOyCD8my/7PJ1BliO3vKN1p
+ wu/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=dTTSTn93r8pdh3TbJRxXc/6d1wGwv9Pp87/9fjZQd+o=;
- b=gXeZId6S9H4m2w7NkkBsNhO9k1s38tfAEK4vTB/OQrEXXhYIQxLPpHgG4ksCq+2WkO
- eO6olMyrhFOskd/neBjsfMdvEvChOuDjdI1ZvPDPGclOIB5H1leVXQjeOK/D9Dbtt0Y1
- pWupIOLobTgRdTeNYAA8je17e2kW8ZtRD7P8H2PuwSQRI8YIt7ZNzE3zoC55HiJU9fl6
- ZOoR6JAmVLZMw9oqvDeHWHKpqC8/Ml1BbG24x27eNRebew7U77dij0i276J8gAkm6WkV
- aX5SNpYBd2AjUbT6M4DM+9DsDvYToSK68O5PF+P87wXRDw1a/5NTFTztNRnHuxEmhKKg
- +T3g==
-X-Gm-Message-State: APjAAAX4UN85WlYbWWCYV3JPAtD37XO+8hogBMbCtJHujL9tuNtNICRT
- AyBEl73BhnudDh8bsMUr1IWQSYguInUnqntAfCc=
-X-Google-Smtp-Source: APXvYqwVTzm6vmrMarIWPyY+QjW2s9JwvazROSRl6LMBlaoekJwY/jKy0bhniyGuAiZDkZPP7sP+6K/ChA6fuBmBwEA=
-X-Received: by 2002:a2e:3604:: with SMTP id d4mr12899275lja.85.1565402129903; 
- Fri, 09 Aug 2019 18:55:29 -0700 (PDT)
+ bh=KhestzNF3jl4BE+FK0L15HSsCgusxLq1SQq8c966BzI=;
+ b=Ygu962dl0NT9Q1YD7SuH0NWGgPK5XAjjbUpqFZLykx6j1o1Y6tKwXPAqr3uTAc/DvO
+ MxsVtAG+bokAygmAXGrDmuZs3CCukwcc4zmsEnBGXyiNeMR4XRvVv7D9ZXDviZU4PclM
+ QE8/PAv9w9NosArYFklmLBVk7wyY/OkfETqroqg+ru096C5KQ3FGBpjztLaQdU8u1kCU
+ Wu38j/6xx5XKNVPH/06vPxefD5f9ZSpJ3P+uoeC8oWpT08O7AlMjeoRmworz4IMHVVse
+ lOnga38Uxm8pxBoGeKesvSPPskWaMk0OlxBKjXpsBlqO3irhC2kQVoqEH7ET9m3LFW5y
+ kkaw==
+X-Gm-Message-State: APjAAAUyoai+BsP54TOp4feuplCk7bL+zEaeo3L5I68UvjYbLT44TiYG
+ TnQh0Li8DOFz+JQGa0vwxjL2nw1N8LRBKecS7mA=
+X-Google-Smtp-Source: APXvYqwl/WKsRXczy15NeYJ2d2IA6WNoQyMza0uMg/Fj4dFFAEVahh4VJ4kNirIqSnI+/TdlWgASmTrB6HbvX5j5hyc=
+X-Received: by 2002:a19:6904:: with SMTP id e4mr14603305lfc.156.1565402168608; 
+ Fri, 09 Aug 2019 18:56:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190808164117.23348-1-alex.bennee@linaro.org>
- <20190808164117.23348-7-alex.bennee@linaro.org>
-In-Reply-To: <20190808164117.23348-7-alex.bennee@linaro.org>
+References: <20190809091940.1223-1-alex.bennee@linaro.org>
+ <20190809091940.1223-7-alex.bennee@linaro.org>
+In-Reply-To: <20190809091940.1223-7-alex.bennee@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 9 Aug 2019 18:55:03 -0700
-Message-ID: <CAKmqyKNfhp1PWuxof1wCeVt6PAhqOgABQwYBtMQL8i_pDua4oA@mail.gmail.com>
+Date: Fri, 9 Aug 2019 18:55:42 -0700
+Message-ID: <CAKmqyKNPW=Jtp3PUdwuSzjNE7g58WdureNxAWUnK_KZ-Z17HnQ@mail.gmail.com>
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH v1 6/7] target/riscv: rationalise softfloat
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] target/riscv: rationalise softfloat
  includes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,6 +94,7 @@ Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
  Palmer Dabbelt <palmer@sifive.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
  "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
  Markus Armbruster <armbru@redhat.com>,
  Alistair Francis <Alistair.Francis@wdc.com>
@@ -101,7 +102,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 8, 2019 at 9:43 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+On Fri, Aug 9, 2019 at 2:22 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
 ote:
 >
 > We should avoid including the whole of softfloat headers in cpu.h and
@@ -110,6 +111,9 @@ ote:
 > bits that are global.
 >
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+I just reviewed v1, but this also applies to v2:
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
