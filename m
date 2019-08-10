@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A8BC32751
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14EC0C32751
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:29:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71934217F4
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:27:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1B58217F4
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:29:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i0GOzEG/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71934217F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fGpsfdaT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1B58217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwIyY-0003Gf-Ph
-	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 00:27:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34864)
+	id 1hwJ0C-00069s-5K
+	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 00:29:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35047)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hwIl2-0006AA-Mk
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:34 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hwIlI-00070M-FK
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hwIl0-0004Qw-Uo
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:32 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34824)
+ (envelope-from <jan.bobek@gmail.com>) id 1hwIlH-0004mq-Cy
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:48 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42337)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hwIl0-0004Qd-Ox
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:30 -0400
-Received: by mail-ot1-x342.google.com with SMTP id j19so63824774otq.2
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 21:13:30 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hwIlH-0004mR-8k
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:47 -0400
+Received: by mail-ot1-x342.google.com with SMTP id l15so140516469otn.9
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 21:13:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=49k4L6Ed4GjJbtEpz/mWICDG8bIJSDwKyFJ7IpyHgb4=;
- b=i0GOzEG/TuAuakcReWv4mmDO83sFXHIkf7FXrJfohVzOUo827HzJH6fXFC5WdLEAJB
- E9iWo1A5/4+gPrWKYKg2xm3q5TS/yoXuunFpmtrrnJ6sLZMufmlE1zFGtFmyb6sKQYdr
- dHkLrIcINT6vdAuw2xmpbe2chbW3IramaDlkO8+9l82v3sIuvsD3aIleQNqj1TS0APFC
- Rij9bN5MVnm+UR7PGw2dnV9zuIPTOdXkxSSL1rlcJhQeSKBM1M/DiVo/FuRJXzLaoUaE
- CZBzonHkKZ3BPi8m36ZoITGjhRYzSlIU3nKl1lVurngOwE2xLWZ75qII+pt5Ysc/y51b
- nmuQ==
+ bh=ORYsNUP5X43haVcteZ8oI+Qz8mSDMdaq3Ei5edtuVYc=;
+ b=fGpsfdaT1g3KyZeMeRpQetLL0l6QOz7CIyvX2laGsVcrebhBfVo3uzfqgTnt8t89Sp
+ rpI9YRqOY9daKcm5qsZDA/11+ZuxRNsrjb/Uxxyxv5L6Bw5/nrpk3SgjCnn2/c0izLny
+ nsx4Fm9TEHPvzrLH2O8JuTeYXuXcDd3ZnSn9L1zibemPZR8l7dIHhfgEE/y+kacmz338
+ nFUYOv48u+luG+GGA/LWj5Qmy+cX655LBXgDpH1+OuqkFcIYKSZt9IA4eJr08MthlJzP
+ sJaIV63sl1vN0CXDdVFb486xIMBGwEZtDEauiu1se4hEETM+XxMynWVTTWC0rKuDZdLM
+ 4C2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=49k4L6Ed4GjJbtEpz/mWICDG8bIJSDwKyFJ7IpyHgb4=;
- b=eavyiKsFOZZrr60ki5JL1UBK0pknWF2tmjL1JZRF4sNPpceg9Gwdlb6P06K7BpEDAp
- 6Ff4R+98DilEh4Rz5ULT0wdOw4xfKE9nnMsslI+znJTcQ2gFFhQZKlfTGo/2+wD+SmAH
- vVHcJboDM3sm8YHO82MSgRervMgRjdOt2bkO3Gg+W9Ay087LiymuwYucE0pDkerxQeV9
- U3WQClhmX2P/JYHRV02mROoieUaTqC7DPMqtAbyskU9Hs9fpmKaxsbs7K1vThBIi6NwO
- XolPCzC6boWhPDPCUhdxnxcsnLz1R8QnQ559nvnLyvX+6OKkDvp+cKznJ/3GDW0PuibB
- F7Qw==
-X-Gm-Message-State: APjAAAU4X1WwM82LYmw97xxTmj9DufPpmVW8iST7SFGiLICiPLp3hf5j
- 2hA8Fk5NK8ewuq9wyF26Az3dTWLp
-X-Google-Smtp-Source: APXvYqxPFF4tz9Zij61f3Y5LXqQPZFPSsJIxpv8BdMmAKHa0sB7RYzTRS8LqbO7aPwsIA8g//GL9oQ==
-X-Received: by 2002:a9d:76ce:: with SMTP id p14mr5690952otl.342.1565410409998; 
- Fri, 09 Aug 2019 21:13:29 -0700 (PDT)
+ bh=ORYsNUP5X43haVcteZ8oI+Qz8mSDMdaq3Ei5edtuVYc=;
+ b=dSlAvPesS3aulBF0eGkAFkdVxIKkGybtFxlBlbtB2YxBHkCCQNMDRQvoGYppQRTas4
+ hWtcGUmZqOQnc3eI9X1Zh2LLKabPQmcaNM3AfN4yxZthSQwA51z32Xz//A8ydlCdEeyT
+ KmYxQx6hXb6YMeRjjbZfpnGDp7VgVO4sFv/8XdXrNB/oNefVG8ECbqD9OV0PItenQuLK
+ mkhMHrimw26VD6Z1gMS5M7U1kukBalFlHusKLvpwJxKSRtFYA1kCI3GSlg6J+pbq79Vl
+ Anvwuvf6He6LB1wZRYM9YOfgtBfiz+ogvHxZ/Y5g2IAtbbbLgulXpeeOoqja7ixeoEmE
+ eo/Q==
+X-Gm-Message-State: APjAAAV3l3NwBwfnC8tbrHzsEYYS4PmNDUSjIS+YtCnYOL3cYSEzX3iC
+ x1GK1RY9aaKIO+y8LmSGGFXI8x7O
+X-Google-Smtp-Source: APXvYqwFERvERI/w9s8gv5shlP8dL9u5BRd7WsJO0yTVozHqvubZtGAu2P++XRHR/0KP2sOmFYm4UA==
+X-Received: by 2002:a9d:7741:: with SMTP id t1mr10594402otl.178.1565410426557; 
+ Fri, 09 Aug 2019 21:13:46 -0700 (PDT)
 Received: from dionysus.attlocal.net
  (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
- by smtp.gmail.com with ESMTPSA id f84sm33383540oig.43.2019.08.09.21.13.29
+ by smtp.gmail.com with ESMTPSA id f84sm33383540oig.43.2019.08.09.21.13.46
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 21:13:29 -0700 (PDT)
+ Fri, 09 Aug 2019 21:13:46 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 10 Aug 2019 00:12:39 -0400
-Message-Id: <20190810041255.6820-24-jan.bobek@gmail.com>
+Date: Sat, 10 Aug 2019 00:12:55 -0400
+Message-Id: <20190810041255.6820-40-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190810041255.6820-1-jan.bobek@gmail.com>
 References: <20190810041255.6820-1-jan.bobek@gmail.com>
@@ -81,8 +81,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::342
-Subject: [Qemu-devel] [RFC PATCH v2 23/39] target/i386: introduce
- instruction translator macros
+Subject: [Qemu-devel] [RFC PATCH v2 39/39] target/i386: introduce
+ memory-pointer operand read/write workarounds
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,331 +101,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instruction "translators" are responsible for decoding and loading
-instruction operands, calling the passed-in code generator, and
-storing the operands back (if applicable). Once a translator returns,
-the instruction has been translated to TCG ops, hence the name.
+The memory-pointer operand has a known limitation (see the commit
+introducing M* operands for details); the workaround involves
+declaring write-memory operands as read-memory instead.
+
+Note: This changeset is intended for development only and shall not be
+included in the final patch series.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- target/i386/translate.c | 288 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 288 insertions(+)
+ target/i386/insn.h | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 30180d1c25..0da064d5fd 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -4715,6 +4715,222 @@ static int ck_cpuid(CPUX86State *env, DisasContext *s, int ck_cpuid_feat)
- #define gen_insn_wrrr(mnem, opW1, opR1, opR2, opR3)     \
-     gen_ ## mnem ## _ ## opW1 ## opR1 ## opR2 ## opR3
+diff --git a/target/i386/insn.h b/target/i386/insn.h
+index 6e0c75b9f7..b61a4182f6 100644
+--- a/target/i386/insn.h
++++ b/target/i386/insn.h
+@@ -94,12 +94,14 @@ INSN_WR(movss, LEG(F3, 0F, 0), 0x11, SSE, Wd, Vd)
+ /* NP 0F 12 /r: MOVLPS xmm1, m64 */
+ INSN_WR(movhlps, LEG(NP, 0F, 0), 0x12, SSE, Vq, UdqMq)
+ /* 0F 13 /r: MOVLPS m64, xmm1 */
+-INSN_WR(movlps, LEG(NP, 0F, 0), 0x13, SSE, Mq, Vq)
++/* FIXME this is hacked, should be INSN_WR */
++INSN_RR(movlps, LEG(NP, 0F, 0), 0x13, SSE, Mq, Vq)
+ /* NP 0F 16 /r: MOVLHPS xmm1, xmm2 */
+ /* NP 0F 16 /r: MOVHPS xmm1, m64 */
+ INSN_WRR(movlhps, LEG(NP, 0F, 0), 0x16, SSE, Vdq, Vq, UqMq)
+ /* NP 0F 17 /r: MOVHPS m64, xmm1 */
+-INSN_WR(movhps, LEG(NP, 0F, 0), 0x17, SSE, Mq, Vdq)
++/* FIXME this is hacked, should be INSN_WR */
++INSN_RR(movhps, LEG(NP, 0F, 0), 0x17, SSE, Mq, Vdq)
+ /* NP 0F D7 /r: PMOVMSKB r32, mm */
+ INSN_WR(pmovmskb, LEG(NP, 0F, 0), 0xd7, SSE, Gd, Nq)
+ /* NP REX.W 0F D7 /r: PMOVMSKB r64, mm */
+@@ -299,9 +301,11 @@ INSN_WR(cvttss2si, LEG(F3, 0F, 1), 0x2c, SSE, Gq, Wd)
+ /* NP 0F F7 /r: MASKMOVQ mm1, mm2 */
+ INSN_RR(maskmovq, LEG(NP, 0F, 0), 0xf7, SSE, Pq, Nq)
+ /* NP 0F 2B /r: MOVNTPS m128, xmm1 */
+-INSN_WR(movntps, LEG(NP, 0F, 0), 0x2b, SSE, Mdq, Vdq)
++/* FIXME this is hacked, should be INSN_WR */
++INSN_RR(movntps, LEG(NP, 0F, 0), 0x2b, SSE, Mdq, Vdq)
+ /* NP 0F E7 /r: MOVNTQ m64, mm */
+-INSN_WR(movntq, LEG(NP, 0F, 0), 0xe7, SSE, Mq, Pq)
++/* FIXME this is hacked, should be INSN_WR */
++INSN_RR(movntq, LEG(NP, 0F, 0), 0xe7, SSE, Mq, Pq)
+ /* NP 0F 77: EMMS */
+ INSN(emms, LEG(NP, 0F, 0), 0x77, MMX)
  
-+/*
-+ * Instruction translators
-+ */
-+#define translate_insn_r(opR1)                  \
-+    translate_insn_r_ ## opR1
-+#define translate_insn_rr(opR1, opR2)           \
-+    translate_insn_rr_ ## opR1 ## opR2
-+#define translate_insn_w(opW1)                  \
-+    translate_insn_w_ ## opW1
-+#define translate_insn_wr(opW1, opR1)           \
-+    translate_insn_wr_ ## opW1 ## opR1
-+#define translate_insn_wrr(opW1, opR1, opR2)    \
-+    translate_insn_wrr_ ## opW1 ## opR1 ## opR2
-+#define translate_insn_wrrr(opW1, opR1, opR2, opR3)             \
-+    translate_insn_wrrr_ ## opW1 ## opR1 ## opR2 ## opR3
-+#define translate_group(grpname)                \
-+    translate_group_ ## grpname
-+
-+static void translate_insn(
-+    CPUX86State *env, DisasContext *s, int ck_cpuid_feat,
-+    void (*gen_insn_fp)(CPUX86State *, DisasContext *))
-+{
-+    if (ck_cpuid(env, s, ck_cpuid_feat)) {
-+        gen_illegal_opcode(s);
-+        return;
-+    }
-+
-+    (*gen_insn_fp)(env, s);
-+}
-+
-+#define TRANSLATE_INSN_R(opR1)                                          \
-+    static void translate_insn_r(opR1)(                                 \
-+        CPUX86State *env, DisasContext *s, int modrm, int ck_cpuid_feat, \
-+        void (*gen_insn_fp)(CPUX86State *, DisasContext *, insnop_t(opR1))) \
-+    {                                                                   \
-+        insnop_t(opR1) arg1;                                            \
-+                                                                        \
-+        if (ck_cpuid(env, s, ck_cpuid_feat)                             \
-+            || insnop_init(opR1)(env, s, modrm, &arg1)) {               \
-+            gen_illegal_opcode(s);                                      \
-+            return;                                                     \
-+        }                                                               \
-+                                                                        \
-+        insnop_prepare(opR1)(env, s, modrm, &arg1);                     \
-+        (*gen_insn_fp)(env, s, arg1);                                   \
-+    }
-+
-+#define TRANSLATE_INSN_RR(opR1, opR2)                                   \
-+    static void translate_insn_rr(opR1, opR2)(                          \
-+        CPUX86State *env, DisasContext *s, int modrm, int ck_cpuid_feat, \
-+        void (*gen_insn_fp)(CPUX86State *, DisasContext *, insnop_t(opR1), \
-+                            insnop_t(opR2)))                            \
-+    {                                                                   \
-+        insnop_t(opR1) arg1;                                            \
-+        insnop_t(opR2) arg2;                                            \
-+                                                                        \
-+        if (ck_cpuid(env, s, ck_cpuid_feat)                             \
-+            || insnop_init(opR1)(env, s, modrm, &arg1)                  \
-+            || insnop_init(opR2)(env, s, modrm, &arg2)) {               \
-+            gen_illegal_opcode(s);                                      \
-+            return;                                                     \
-+        }                                                               \
-+                                                                        \
-+        insnop_prepare(opR1)(env, s, modrm, &arg1);                     \
-+        insnop_prepare(opR2)(env, s, modrm, &arg2);                     \
-+        (*gen_insn_fp)(env, s, arg1, arg2);                             \
-+    }
-+
-+#define TRANSLATE_INSN_W(opW1)                                          \
-+    static void translate_insn_w(opW1)(                                 \
-+        CPUX86State *env, DisasContext *s, int modrm, int ck_cpuid_feat, \
-+        void (*gen_insn_fp)(CPUX86State *, DisasContext *, insnop_t(opW1))) \
-+    {                                                                   \
-+        insnop_t(opW1) ret;                                             \
-+                                                                        \
-+        if (ck_cpuid(env, s, ck_cpuid_feat)                             \
-+            || insnop_init(opW1)(env, s, modrm, &ret)) {                \
-+            gen_illegal_opcode(s);                                      \
-+            return;                                                     \
-+        }                                                               \
-+                                                                        \
-+        (*gen_insn_fp)(env, s, ret);                                    \
-+        insnop_finalize(opW1)(env, s, modrm, &ret);                     \
-+    }
-+
-+#define TRANSLATE_INSN_WR(opW1, opR1)                                   \
-+    static void translate_insn_wr(opW1, opR1)(                          \
-+        CPUX86State *env, DisasContext *s, int modrm, int ck_cpuid_feat, \
-+        void (*gen_insn_fp)(CPUX86State *, DisasContext *, insnop_t(opW1), \
-+                            insnop_t(opR1)))                            \
-+    {                                                                   \
-+        insnop_t(opW1) ret;                                             \
-+        insnop_t(opR1) arg1;                                            \
-+                                                                        \
-+        if (ck_cpuid(env, s, ck_cpuid_feat)                             \
-+            || insnop_init(opW1)(env, s, modrm, &ret)                   \
-+            || insnop_init(opR1)(env, s, modrm, &arg1)) {               \
-+            gen_illegal_opcode(s);                                      \
-+            return;                                                     \
-+        }                                                               \
-+                                                                        \
-+        insnop_prepare(opR1)(env, s, modrm, &arg1);                     \
-+        (*gen_insn_fp)(env, s, ret, arg1);                              \
-+        insnop_finalize(opW1)(env, s, modrm, &ret);                     \
-+    }
-+
-+#define TRANSLATE_INSN_WRR(opW1, opR1, opR2)                            \
-+    static void translate_insn_wrr(opW1, opR1, opR2)(                   \
-+        CPUX86State *env, DisasContext *s, int modrm, int ck_cpuid_feat, \
-+        void (*gen_insn_fp)(CPUX86State *, DisasContext *, insnop_t(opW1), \
-+                            insnop_t(opR1), insnop_t(opR2)))            \
-+    {                                                                   \
-+        insnop_t(opW1) ret;                                             \
-+        insnop_t(opR1) arg1;                                            \
-+        insnop_t(opR2) arg2;                                            \
-+                                                                        \
-+        if (ck_cpuid(env, s, ck_cpuid_feat)                             \
-+            || insnop_init(opW1)(env, s, modrm, &ret)                   \
-+            || insnop_init(opR1)(env, s, modrm, &arg1)                  \
-+            || insnop_init(opR2)(env, s, modrm, &arg2)) {               \
-+            gen_illegal_opcode(s);                                      \
-+            return;                                                     \
-+        }                                                               \
-+                                                                        \
-+        insnop_prepare(opR1)(env, s, modrm, &arg1);                     \
-+        insnop_prepare(opR2)(env, s, modrm, &arg2);                     \
-+        (*gen_insn_fp)(env, s, ret, arg1, arg2);                        \
-+        insnop_finalize(opW1)(env, s, modrm, &ret);                     \
-+    }
-+
-+#define TRANSLATE_INSN_WRRR(opW1, opR1, opR2, opR3)                     \
-+    static void translate_insn_wrrr(opW1, opR1, opR2, opR3)(            \
-+        CPUX86State *env, DisasContext *s, int modrm, int ck_cpuid_feat, \
-+        void (*gen_insn_fp)(CPUX86State *, DisasContext *, insnop_t(opW1), \
-+                            insnop_t(opR1), insnop_t(opR2), insnop_t(opR3))) \
-+    {                                                                   \
-+        insnop_t(opW1) ret;                                             \
-+        insnop_t(opR1) arg1;                                            \
-+        insnop_t(opR2) arg2;                                            \
-+        insnop_t(opR3) arg3;                                            \
-+                                                                        \
-+        if (ck_cpuid(env, s, ck_cpuid_feat)                             \
-+            || insnop_init(opW1)(env, s, modrm, &ret)                   \
-+            || insnop_init(opR1)(env, s, modrm, &arg1)                  \
-+            || insnop_init(opR2)(env, s, modrm, &arg2)                  \
-+            || insnop_init(opR3)(env, s, modrm, &arg3)) {               \
-+            gen_illegal_opcode(s);                                      \
-+            return;                                                     \
-+        }                                                               \
-+                                                                        \
-+        insnop_prepare(opR1)(env, s, modrm, &arg1);                     \
-+        insnop_prepare(opR2)(env, s, modrm, &arg2);                     \
-+        insnop_prepare(opR3)(env, s, modrm, &arg3);                     \
-+        (*gen_insn_fp)(env, s, ret, arg1, arg2, arg3);                  \
-+        insnop_finalize(opW1)(env, s, modrm, &ret);                     \
-+    }
-+
-+#define INSN_GRP_BEGIN(grpname)                                 \
-+    static void translate_group(grpname)(                       \
-+        CPUX86State *env, DisasContext *s, int modrm)           \
-+    {                                                           \
-+        const int reg = decode_modrm_reg_norexr(env, s, modrm); \
-+                                                                \
-+        switch (reg) {
-+#define INSN_GRPMEMB(grpname, mnem, opcode, feat) \
-+        case opcode:                              \
-+            translate_insn(                       \
-+                env, s, CK_CPUID_ ## feat,        \
-+                gen_insn(mnem));                  \
-+            return;
-+#define INSN_GRPMEMB_R(grpname, mnem, opcode, feat, opR1) \
-+        case opcode:                                      \
-+            translate_insn_r(opR1)(                       \
-+                env, s, modrm, CK_CPUID_ ## feat,         \
-+                gen_insn_r(mnem, opR1));                  \
-+            return;
-+#define INSN_GRPMEMB_RR(grpname, mnem, opcode, feat, opR1, opR2) \
-+        case opcode:                                             \
-+            translate_insn_rr(opR1, opR2)(                       \
-+                env, s, modrm, CK_CPUID_ ## feat,                \
-+                gen_insn_rr(mnem, opR1, opR2));                  \
-+            return;
-+#define INSN_GRPMEMB_W(grpname, mnem, opcode, feat, opW1) \
-+        case opcode:                                      \
-+            translate_insn_w(opW1)(                       \
-+                env, s, modrm, CK_CPUID_ ## feat,         \
-+                gen_insn_w(mnem, opW1));                  \
-+            return;
-+#define INSN_GRPMEMB_WR(grpname, mnem, opcode, feat, opW1, opR1) \
-+        case opcode:                                             \
-+            translate_insn_wr(opW1, opR1)(                       \
-+                env, s, modrm, CK_CPUID_ ## feat,                \
-+                gen_insn_wr(mnem, opW1, opR1));                  \
-+            return;
-+#define INSN_GRPMEMB_WRR(grpname, mnem, opcode, feat, opW1, opR1, opR2) \
-+        case opcode:                                                    \
-+            translate_insn_wrr(opW1, opR1, opR2)(                       \
-+                env, s, modrm, CK_CPUID_ ## feat,                       \
-+                gen_insn_wrr(mnem, opW1, opR1, opR2));                  \
-+            return;
-+#define INSN_GRPMEMB_WRRR(grpname, mnem, opcode, feat, opW1, opR1, opR2, opR3) \
-+        case opcode:                                                    \
-+            translate_insn_wrrr(opW1, opR1, opR2, opR3)(                \
-+                env, s, modrm, CK_CPUID_ ## feat,                       \
-+                gen_insn_wrrr(mnem, opW1, opR1, opR2, opR3));           \
-+            return;
-+#define INSN_GRP_END(grpname)                   \
-+        default:                                \
-+            gen_illegal_opcode(s);              \
-+            return;                             \
-+        }                                       \
-+                                                \
-+        g_assert_not_reached();                 \
-+    }
-+#include "insn.h"
-+
- static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
- {
-     enum {
-@@ -4726,15 +4942,87 @@ static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
-         M_0F = 1 << (4 + 8),
-     };
+@@ -340,7 +344,8 @@ INSN_GRP_BEGIN(grp15_LEG_NP)
+     /* NP 0F AE /2: LDMXCSR m32 */
+     INSN_GRPMEMB_R(grp15_LEG_NP, ldmxcsr, 2, SSE, Md)
+     /* NP 0F AE /3: STMXCSR m32 */
+-    INSN_GRPMEMB_W(grp15_LEG_NP, stmxcsr, 3, SSE, Md)
++    /* FIXME this is hacked, should be INSN_GRPMEMB_W */
++    INSN_GRPMEMB_R(grp15_LEG_NP, stmxcsr, 3, SSE, Md)
+ INSN_GRP_END(grp15_LEG_NP)
  
-+    int modrm;
-+
-     switch (b | M_0F
-             | (s->prefix & PREFIX_DATA ? P_66 : 0)
-             | (s->prefix & PREFIX_REPZ ? P_F3 : 0)
-             | (s->prefix & PREFIX_REPNZ ? P_F2 : 0)
-             | (REX_W(s) > 0 ? W_1 : W_0)) {
- 
-+#define CASES_LEG_NP_0F_W0(opcode)              \
-+    case opcode | M_0F | W_0:
-+#define CASES_LEG_NP_0F_W1(opcode)              \
-+    case opcode | M_0F | W_1:
-+#define CASES_LEG_F3_0F_W0(opcode)              \
-+    case opcode | M_0F | P_F3 | W_0:
-+#define CASES_LEG_F3_0F_W1(opcode)              \
-+    case opcode | M_0F | P_F3 | W_1:
-+
-+#define LEG(p, m, w)                            \
-+    CASES_LEG_ ## p ## _ ## m ## _W ## w
-+#define INSN(mnem, cases, opcode, feat)         \
-+    cases(opcode)                               \
-+        translate_insn(                         \
-+            env, s, CK_CPUID_ ## feat,          \
-+            gen_insn(mnem));                    \
-+        return;
-+#define INSN_R(mnem, cases, opcode, feat, opR1)      \
-+    cases(opcode)                                    \
-+        modrm = x86_ldub_code(env, s);               \
-+        translate_insn_r(opR1)(                      \
-+            env, s, modrm, CK_CPUID_ ## feat,        \
-+            gen_insn_r(mnem, opR1));                 \
-+        return;
-+#define INSN_RR(mnem, cases, opcode, feat, opR1, opR2)       \
-+    cases(opcode)                                            \
-+        modrm = x86_ldub_code(env, s);                       \
-+        translate_insn_rr(opR1, opR2)(                       \
-+            env, s, modrm, CK_CPUID_ ## feat,                \
-+            gen_insn_rr(mnem, opR1, opR2));                  \
-+        return;
-+#define INSN_W(mnem, cases, opcode, feat, opW1)       \
-+    cases(opcode)                                     \
-+        modrm = x86_ldub_code(env, s);                \
-+        translate_insn_wr(opW1)(                      \
-+            env, s, modrm, CK_CPUID_ ## feat,         \
-+            gen_insn_wr(mnem, opW1));                 \
-+        return;
-+#define INSN_WR(mnem, cases, opcode, feat, opW1, opR1)      \
-+    cases(opcode)                                           \
-+        modrm = x86_ldub_code(env, s);                      \
-+        translate_insn_wr(opW1, opR1)(                      \
-+            env, s, modrm, CK_CPUID_ ## feat,               \
-+            gen_insn_wr(mnem, opW1, opR1));                 \
-+        return;
-+#define INSN_WRR(mnem, cases, opcode, feat, opW1, opR1, opR2)       \
-+    cases(opcode)                                                   \
-+        modrm = x86_ldub_code(env, s);                              \
-+        translate_insn_wrr(opW1, opR1, opR2)(                       \
-+            env, s, modrm, CK_CPUID_ ## feat,                       \
-+            gen_insn_wrr(mnem, opW1, opR1, opR2));                  \
-+        return;
-+#define INSN_WRRR(mnem, cases, opcode, feat, opW1, opR1, opR2, opR3)    \
-+    cases(opcode)                                                   \
-+        modrm = x86_ldub_code(env, s);                              \
-+        translate_insn_wrrr(opW1, opR1, opR2, opR3)(                \
-+            env, s, modrm, CK_CPUID_ ## feat,                       \
-+            gen_insn_wrrr(mnem, opW1, opR1, opR2, opR3));           \
-+        return;
-+#define INSN_GRP(grpname, cases, opcode)                \
-+    cases(opcode)                                       \
-+        modrm = x86_ldub_code(env, s);                  \
-+        translate_group(grpname)(env, s, modrm);        \
-+        return;
-+#include "insn.h"
-     default:
-         gen_sse(env, s, b);
-         return;
-+
-+#undef CASES_LEG_NP_0F_W0
-+#undef CASES_LEG_NP_0F_W1
-+#undef CASES_LEG_F3_0F_W0
-+#undef CASES_LEG_F3_0F_W1
-     }
- 
-     g_assert_not_reached();
+ INSN_GRP(grp16_LEG_NP, LEG(NP, 0F, 0), 0x18)
 -- 
 2.20.1
 
