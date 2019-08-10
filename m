@@ -5,74 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDDFC32756
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB8BEC32751
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:19:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B0D82085A
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9154F2085A
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:19:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4YCuurm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0D82085A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJL0rxJn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9154F2085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwIq9-00017y-Aw
-	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 00:18:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34705)
+	id 1hwIqR-0001qP-PY
+	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 00:19:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34746)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hwIkp-0005RP-Ft
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:20 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hwIkr-0005Yr-Rc
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hwIko-0004GV-GB
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:19 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34820)
+ (envelope-from <jan.bobek@gmail.com>) id 1hwIkq-0004Jk-Ss
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:21 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34822)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hwIko-0004GF-Bs
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:18 -0400
-Received: by mail-ot1-x344.google.com with SMTP id j19so63823631otq.2
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 21:13:18 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hwIkq-0004JY-N1
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:20 -0400
+Received: by mail-ot1-x344.google.com with SMTP id j19so63823816otq.2
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 21:13:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=UnCpLXb0Tm7zqYonWzBKX7Cm2ohAULA3NbEvcZesBtY=;
- b=Y4YCuurmcsRd1lDniXb8fsVDwtM3OIO2st5C+qJdDllcoceRr4+PKh4a5jT1X1F7nV
- jvCh3iris+hldYmfd31xMNnTeo82+bH+uHqMyIBX+bkAln6D2c50CVxJN7UrAi/D0gzU
- HiSodpmf5ZdtM2lDALc1k+5w9PPaNZK4hsUy4h42DhUJy5ttAl5oVLmDmxEm62/aGj4+
- L/zkV694NLLtTTEKjJX5GECNY1K7MxeSb6A7bfcLm/owM3enJJujssFFo9JQRFu850St
- W4g0lp2tdTkO4s/F21ursy7ALzaYltYVCz29MkWmT01FNEu/EA/RAyRhrMskrn+EbiTb
- C7AQ==
+ bh=cdQ2zHbW0n5vJl74dX5gSkq4IDwwB5HUv7xrl7+M5h4=;
+ b=OJL0rxJnhpB3/XnARFLu3HaekUeDLS2G5va7KZGRvM/Ub80os6wAYCMv1jV7+6/A+7
+ Ox5s3MRvTlVxEdq8tMNOJUHdohzuZGYMcztZYO1TaW4pUHFsaxyaCtfDXmb8cy9geYuP
+ +0cu6kdm+fQztdjJQrLNKBuZ1YCJ/FluC0MrOL8S5i5r+8mJ1rSZNVO5jDJTTwGws7G8
+ WnrwrYBdLyerEEbIKsHPSovZFzrcZH95jLM4MZsIkFfMBDeEC5t4LIM/SAFxLXUkRlQ/
+ Qzbh2r5ErMIW2OUj92VaqOLcyFBbVRtpVtoLTp+vKFtXjSdjwp4ERI2aBBg188as2gnL
+ Gjlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=UnCpLXb0Tm7zqYonWzBKX7Cm2ohAULA3NbEvcZesBtY=;
- b=pGaU4WV7aYAv3Cj4OnucDo9gki54++9/gfxs+vaK2xgZ0eup0F4x/62ugKooDx274j
- rdzB2PvMSTULFFYeS20ATut8GVQRE+jiGSu4HfqtZxs77dam8W1wsX5WCsuwPFJQ7RSM
- t05R03MoiAfYtgDBZ0lHPF8Lmt8gofAtv6wmg5U8mGVgJsrOg6GZcni58AvDMj5iOZtO
- Cu8NlDFZl5Z3bG74AblqRK8CzO0jXW3voU6e61/Q3cuiaV10286KB9luQpzh5GMM8enG
- bFYuOr3b8M8KQ+X8WV9W3Rp+1uGi1WrkCaIPEzKPeyixjms1NwlvFCGju+mn9nO6Cfqs
- DCog==
-X-Gm-Message-State: APjAAAUyxo+/GT3IUuyiEz0HKokfKQ3PNeAvQGzG7Y6vVEgtcl/d8StE
- X96fDvU+W47giPFgC7MMCgPKhnQ8
-X-Google-Smtp-Source: APXvYqwRT8CfMHKtC+/kor1tPsDPt7uP5cQI1/DLILmArdYMAakdY6Peh/3zXLI/Q+dE7z2z0CQDNw==
-X-Received: by 2002:a54:4191:: with SMTP id 17mr4018392oiy.125.1565410397558; 
- Fri, 09 Aug 2019 21:13:17 -0700 (PDT)
+ bh=cdQ2zHbW0n5vJl74dX5gSkq4IDwwB5HUv7xrl7+M5h4=;
+ b=t3xy9vELtUN4ijWB2Fzzj3nWVEWf/Vw6gQok3+8Ht8hsWP/Z4Icv0fozBBTjZJUQUw
+ om2ouuHUKgNCtIcK7KtKHDTIwXm63DD8lb8woSx0bS1XNWBUM3R7BtcN2MY6Kxw/q6zg
+ G+8iv5CGRxzGejUsnUKDCq/0DzDo2OWyZD7wv5KCJ7qW/Z32aqTITg3PFPNM8M5qopba
+ vpRmU1qGowEoo2edq95BaDgFh/8Eq1zCIB6pFSOSpK1m3mxhwzNRtCXOcpjgruh6rTdj
+ Ce60Puk4CW3q10bUhkbanqFoCG7k6h/OCnTYcIgDVSS7eoFq5Uih/5ypTo25q1BhLnbp
+ 6QcQ==
+X-Gm-Message-State: APjAAAVwQaDGTOZHW2B7Ha0lzSrMoPWF8JTPY//tP+C//Xg+jOMkHDoQ
+ cQTRSBvKTsAc7G8vkO94R+Dn/u1M
+X-Google-Smtp-Source: APXvYqyPsA/TllPJq4B6jXcPfgj6zf5PRf07URZU1HoSdzx5xxHtEprx+ckWSioKbcbcdbW6YBuZYA==
+X-Received: by 2002:a9d:4902:: with SMTP id e2mr20076436otf.184.1565410400035; 
+ Fri, 09 Aug 2019 21:13:20 -0700 (PDT)
 Received: from dionysus.attlocal.net
  (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
- by smtp.gmail.com with ESMTPSA id f84sm33383540oig.43.2019.08.09.21.13.16
+ by smtp.gmail.com with ESMTPSA id f84sm33383540oig.43.2019.08.09.21.13.19
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 21:13:17 -0700 (PDT)
+ Fri, 09 Aug 2019 21:13:19 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 10 Aug 2019 00:12:26 -0400
-Message-Id: <20190810041255.6820-11-jan.bobek@gmail.com>
+Date: Sat, 10 Aug 2019 00:12:29 -0400
+Message-Id: <20190810041255.6820-14-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190810041255.6820-1-jan.bobek@gmail.com>
 References: <20190810041255.6820-1-jan.bobek@gmail.com>
@@ -81,8 +81,8 @@ Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::344
-Subject: [Qemu-devel] [RFC PATCH v2 10/39] target/i386: add vector register
- file alignment constraints
+Subject: [Qemu-devel] [RFC PATCH v2 13/39] target/i386: disable unused
+ function warning temporarily
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,33 +101,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-gvec operations require that all vectors be aligned on 16-byte
-boundary; make sure the MM/XMM/YMM/ZMM register file is aligned as
-neccessary.
+Some functions added later are generated by preprocessor macros and
+end up being unused (e.g. not all operands can serve as a destination
+operand). Disable unused function warnings for the new code until I
+figure out how I want to solve this particular issue.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Note: This changeset is intended for development only and shall not be
+included in the final patch series.
+
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- target/i386/cpu.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/i386/translate.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8b3dc5533e..cb407b86ba 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1199,9 +1199,9 @@ typedef struct CPUX86State {
-     float_status mmx_status; /* for 3DNow! float ops */
-     float_status sse_status;
-     uint32_t mxcsr;
--    ZMMReg xmm_regs[CPU_NB_REGS == 8 ? 8 : 32];
--    ZMMReg xmm_t0;
--    MMXReg mmx_t0;
-+    ZMMReg xmm_regs[CPU_NB_REGS == 8 ? 8 : 32] QEMU_ALIGNED(16);
-+    ZMMReg xmm_t0 QEMU_ALIGNED(16);
-+    MMXReg mmx_t0 QEMU_ALIGNED(8);
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index fbf10b57a2..23550a21d3 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -4489,6 +4489,10 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b)
+     }
+ }
  
-     XMMReg ymmh_regs[CPU_NB_REGS];
++/* XXX TODO get rid of this eventually */
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wunused-function"
++
+ static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
+ {
+     enum {
+@@ -4513,6 +4517,7 @@ static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
  
+     g_assert_not_reached();
+ }
++#pragma GCC diagnostic pop
+ 
+ /* convert one instruction. s->base.is_jmp is set if the translation must
+    be stopped. Return the next pc value */
 -- 
 2.20.1
 
