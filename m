@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC58C433FF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E33AC32751
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:16:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25CFA2084C
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 670B02054F
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 04:16:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/GdNl8u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25CFA2084C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DVplSbDC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670B02054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwImX-0002dH-E6
-	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 00:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34692)
+	id 1hwIno-0005at-K2
+	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 00:16:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34788)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.bobek@gmail.com>) id 1hwIko-0005PC-Of
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:19 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hwIkv-0005kQ-87
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hwIkn-0004Fx-K9
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:18 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44992)
+ (envelope-from <jan.bobek@gmail.com>) id 1hwIku-0004MR-BO
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:25 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:42323)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hwIkn-0004Fp-Fn
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:17 -0400
-Received: by mail-ot1-x343.google.com with SMTP id b7so90233340otl.11
- for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 21:13:17 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hwIku-0004MI-7G
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 00:13:24 -0400
+Received: by mail-ot1-x342.google.com with SMTP id l15so140514396otn.9
+ for <qemu-devel@nongnu.org>; Fri, 09 Aug 2019 21:13:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GAcvgP4Isw7Hfqe0q/GzuOtPct/EkGIUWGKaxvtkJzo=;
- b=B/GdNl8uEz9ez4yNhPbXeRK5D81FqoTCXLBmLU3HVzydkDw7fTkRE9jgVQd1o5Fwbk
- RJzvWE7Dx6VZPRKwhkgfN/uof3CtBsbm03DGZL10fb1g7o2wfIBwmA7rjs8AsDzUjZYS
- Sc+6fFh9vNJF4cl6fAgREUYreTQaihHOmvynIcBedC0eGy0Fo5d9mZMshvsG1LpiIYDV
- vE1YJPbjzYffJx2yqjNDm2pvsr/pXxWxs9//ikzinRFqc6uGsdxawZLTiTtPEKOHg7uP
- 1dSfn+ZvLJNmZcnqKt0sC/1y7owhmiSOe/R94/q7c0RqUWtT49HmA97fAwAnKgRIhbQG
- bYDw==
+ bh=n4ayeLooNp0fm7Wh5HpoXhexlt7VndsDJ81PF2rUFA0=;
+ b=DVplSbDCgX7onjD5puxpTGLnxluQ0jX+43UGtWkzo3STsfRWvDI4tvUMJ0yKtpHrED
+ PRapDVmeoH98/k2wifF+7Fh3KxYm62PrCfWFJet0RG+xXU/fBip7ZStBBBvZl9S8VKvm
+ cKtHqDbKW0fPvFjIVYLzy0zB+WRpkggKcldD1mMZz/YHfFHrwYkofEH8bkxIUbVbtk9P
+ KIKo+wMAX3fqZbSk3cAh3lNrlV774oZuKVOFbq9QjgP9do9bjTcoWHMnyOxtvqGjMDA1
+ RYooEPchLLy4mmtdpff9fR3qhjO5AtATL4wu31QXfIIy8yzpXR1PtgK+C12DD0s97zfv
+ aJpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GAcvgP4Isw7Hfqe0q/GzuOtPct/EkGIUWGKaxvtkJzo=;
- b=M9ygHuQ81MyOggcAkEmJxs9W+xURe8xvnzCQXAi4kHG4s/I5AbPwis9T7J3+V5mOil
- W4dYIe93ieXfd3Ood/ubuwyCXe/jM8EpMRhQbGX2qRRbpoAD9dYP8tt1faBwbhmvFmvY
- KJPVykLfiSOsb3FKLpp5LjELWxEu6fzxiAsG9XgbC1tcaUL7iGmgstl58L9PepYq7gYb
- g6eR3Y2OpQzRsrtG44IB2GEhzQo9ma2ZopTbRsoTEYBObS8kxNmkR21Hk6O7Tl1g4eU8
- A4zs0mj3icZQjOlLGeMb1hjB+D9X/gcGPDsgNzH0WKx1dm/7/aajyFh0kB1yWXMDxsem
- RLXw==
-X-Gm-Message-State: APjAAAVaAo+BohngiUTwOBbJznn5QW9EMijjYb3UVsyfvY+J6jhTBARO
- WmgiI0Eg4D3rwnS9I/PDtoVYuStO
-X-Google-Smtp-Source: APXvYqxrM0Z+eQC7q8yxKZwAvTIyPpiPsjj/4SCdGy18kRwCM7RdT3jliMYPqXzeXfm+wtPokbUo9w==
-X-Received: by 2002:a9d:7988:: with SMTP id h8mr20925964otm.301.1565410396806; 
- Fri, 09 Aug 2019 21:13:16 -0700 (PDT)
+ bh=n4ayeLooNp0fm7Wh5HpoXhexlt7VndsDJ81PF2rUFA0=;
+ b=QNz2AEOlkVno57vQU47RRtOiDI9iUSFUc6s/jbk1/XtaUYPldiHwbxPGYKuxpOqYRJ
+ C7//R2YeEjnAHvIQwQ9cuk+azffRKxH50/xx4qdkbucHHmDilJ3YIiRZyOQhBUz42MI3
+ F3SRmm34SowG6V7hGXrvLAgnuZlHwbF5x18iGknSvmMw7nhXtJRoF+GKVnRMT+DgWLUS
+ ZpJCTyFZBflk8d3/hdVF9bTtb3K3wQLu81MjdSWT0AdE+4mzD8VZcg3lJ78RUXy9eaPG
+ edTdlcpfI5vieCj47J12M/gqRPXdxGyIb9z21FjII8i+e/3gQOg61xxamrFZG/52gAxY
+ +jrw==
+X-Gm-Message-State: APjAAAUyZOV0ky5FVMoEQqaDgKTGGdYtTUE0LRgHPMSaPJqemetGwkee
+ suukHPjd+NEEqsxYyG7u/LixRgAT
+X-Google-Smtp-Source: APXvYqzMJ7XmCqdQnhh6kKPYbuRkepa1HG9DtTu/UEZb315ATUEtYxpMK5ufmGoTtGcmhw1TgiD90w==
+X-Received: by 2002:a9d:6a95:: with SMTP id l21mr3725154otq.192.1565410403539; 
+ Fri, 09 Aug 2019 21:13:23 -0700 (PDT)
 Received: from dionysus.attlocal.net
  (69-222-133-165.lightspeed.tukrga.sbcglobal.net. [69.222.133.165])
- by smtp.gmail.com with ESMTPSA id f84sm33383540oig.43.2019.08.09.21.13.16
+ by smtp.gmail.com with ESMTPSA id f84sm33383540oig.43.2019.08.09.21.13.22
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Fri, 09 Aug 2019 21:13:16 -0700 (PDT)
+ Fri, 09 Aug 2019 21:13:23 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Sat, 10 Aug 2019 00:12:25 -0400
-Message-Id: <20190810041255.6820-10-jan.bobek@gmail.com>
+Date: Sat, 10 Aug 2019 00:12:33 -0400
+Message-Id: <20190810041255.6820-18-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190810041255.6820-1-jan.bobek@gmail.com>
 References: <20190810041255.6820-1-jan.bobek@gmail.com>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: [Qemu-devel] [RFC PATCH v2 09/39] target/i386: make variable is_xmm
- const
+X-Received-From: 2607:f8b0:4864:20::342
+Subject: [Qemu-devel] [RFC PATCH v2 17/39] target/i386: introduce helpers
+ for decoding modrm fields
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,53 +101,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The variable is_xmm does not change value after assignment, so make
-this fact explicit by marking it const.
+The old code uses bitshifts and bitwise-and all over the place for
+decoding ModR/M fields. Avoid doing that by introducing proper
+decoding macros.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- target/i386/translate.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+ target/i386/translate.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 8bf39b73c4..c5ec309fe2 100644
+index 109e4922eb..4a2dae6238 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -3042,7 +3042,7 @@ static const struct SSEOpHelper_eppi sse_op_table7[256] = {
+@@ -4500,6 +4500,21 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b)
+ #define tcg_gen_gvec_cmpgt(vece, dofs, aofs, bofs, oprsz, maxsz)        \
+     tcg_gen_gvec_cmp(TCG_COND_GT, vece, dofs, aofs, bofs, oprsz, maxsz)
  
- static void gen_sse(CPUX86State *env, DisasContext *s, int b)
- {
--    int op1_offset, op2_offset, is_xmm, val;
-+    int op1_offset, op2_offset, val;
-     int modrm, mod, rm, reg;
-     SSEFunc_0_epp sse_fn_epp;
-     SSEFunc_0_eppi sse_fn_eppi;
-@@ -3056,20 +3056,15 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b)
-         : s->prefix & PREFIX_REPZ ? 2
-         : s->prefix & PREFIX_REPNZ ? 3
-         : 0;
-+    const int is_xmm =
-+        (0x10 <= b && b <= 0x5f)
-+        || b == 0xc6
-+        || b == 0xc2
-+        || !!b1;
-     sse_fn_epp = sse_op_table1[b][b1];
-     if (!sse_fn_epp) {
-         goto unknown_op;
-     }
--    if ((b <= 0x5f && b >= 0x10) || b == 0xc6 || b == 0xc2) {
--        is_xmm = 1;
--    } else {
--        if (b1 == 0) {
--            /* MMX case */
--            is_xmm = 0;
--        } else {
--            is_xmm = 1;
--        }
--    }
-     /* simple MMX/SSE operation */
-     if (s->flags & HF_TS_MASK) {
-         gen_exception(s, EXCP07_PREX);
++#define decode_modrm_mod(env, s, modrm)         \
++    (((modrm) >> 6) & 3)
++
++#define decode_modrm_reg_norexr(env, s, modrm)  \
++    (((modrm) >> 3) & 7)
++#define decode_modrm_reg_rexr(env, s, modrm)    \
++    (decode_modrm_reg_norexr(env, s, modrm)     \
++     | REX_R(s))
++
++#define decode_modrm_rm_norexb(env, s, modrm)   \
++    ((modrm) & 7)
++#define decode_modrm_rm_rexb(env, s, modrm)     \
++    (decode_modrm_rm_norexb(env, s, modrm)      \
++     | REX_B(s))
++
+ enum {
+     CK_CPUID_MMX = 1,
+     CK_CPUID_3DNOW,
 -- 
 2.20.1
 
