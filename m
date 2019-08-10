@@ -2,121 +2,62 @@ Return-Path: <SRS0=VlUQ=WG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A0BC433FF
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 13:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A45C32751
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 13:36:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 347E62089E
-	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 13:32:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FNx7kC/S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 347E62089E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 603C72089E
+	for <qemu-devel@archiver.kernel.org>; Sat, 10 Aug 2019 13:36:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 603C72089E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwRUD-00040w-Jl
-	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 09:32:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60359)
+	id 1hwRXt-0006Ya-NU
+	for qemu-devel@archiver.kernel.org; Sat, 10 Aug 2019 09:36:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60933)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hwRTj-0003Xx-Lc
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 09:32:17 -0400
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1hwRXU-0005uA-Jt
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 09:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hwRTi-0001sp-Cg
- for qemu-devel@nongnu.org; Sat, 10 Aug 2019 09:32:15 -0400
-Received: from mail-eopbgr130127.outbound.protection.outlook.com
- ([40.107.13.127]:16772 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hwRTg-0001qD-Po; Sat, 10 Aug 2019 09:32:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GAh4Ma/jw8usvo+V60zsFKJflKUlPcctRUYIa5CWQQxxkcE+8GBlehT5INzyytLOjuhmCBS4VTD9R8219Cxp6mCE7VIvuO4niYxLelgf3O2cpUecoj8QLwSQJ9ZaF4Cq0i1n+oRnaGXQE9uGcGQvV3v9VeuRrtobX6hwmeSGHAT8zwLI0ZPUmhG1tDKOALqn9f0x50c91ZBzs0UQmZdn4Eck9f2rI21bms0CXMobwoQ1XQdnMlQeUtUwJY4grOVtLlt7+TP3WBVR0GQDqWYYzOPkPSbuuuRD+ag7shI6fr2Jok0WvBofgd9kCKKfBBO137QYzHhvvg6MrJEmVEAFhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5KM85tTjLGwaUaHV7lqFgZ8MHiXseKw18MnZxMdpnUw=;
- b=aEGGhCbkHYsr9E0udln8nE0cScDJYpJNHFzM/opJ2rhMc7H+7X9IxRl5w86TWHvw2cHbWh0BS1EOGaj4rqax2EklMrqMv/v30IAZh60qn26N7EFKCmB6ZJAA55Sm/zOM8i8VERxAXAY2eVtaIQPV0P6ASfrjJKmQUdkYM2F9Z71+VuleLSR53Fv6bX6w7Hu4/f06ASp2oFrKz7Xo/kNxgO/fQ1R+OBsQ/SbsVmv0NMBLbcbwyx6Z4Q0l3gYZsUteFswbZMDW6L5/o2DgC6qZODKvYkHkjhkit3kQcZTCIqIUGWw7qQ0MJYSNiDSnT0cQkoUBGixV+/d0qDUmn04tnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5KM85tTjLGwaUaHV7lqFgZ8MHiXseKw18MnZxMdpnUw=;
- b=FNx7kC/So8JO629+TeqE4GpxxwKnQHx4Rp9u27Onnmyj1SVEpe1TVoj22zqNrdwNwpB1vE0CFLP/XJ3TYZcaicbgXRPfJR7BeNah29D9v/QXUi1nTtN70TnAlMbqjEp8DQoJl6SkRKMRUIVrV0VE6yXZmo1QXQYhBsVnbW9C/BU=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5257.eurprd08.prod.outlook.com (10.255.18.14) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.16; Sat, 10 Aug 2019 13:32:08 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.021; Sat, 10 Aug 2019
- 13:32:08 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Thread-Topic: [PATCH v6 09/42] block: Include filters when freezing backing
- chain
-Thread-Index: AQHVTs2HIkGycjdnZUuS/P1RVk38qKb0YmUA
-Date: Sat, 10 Aug 2019 13:32:08 +0000
-Message-ID: <0020733a-cf68-7df0-b92f-68fd498735cd@virtuozzo.com>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-10-mreitz@redhat.com>
-In-Reply-To: <20190809161407.11920-10-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0251.eurprd05.prod.outlook.com
- (2603:10a6:3:fb::27) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190810163206091
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bee016af-14ed-4f69-e0f2-08d71d972430
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5257; 
-x-ms-traffictypediagnostic: DB8PR08MB5257:
-x-microsoft-antispam-prvs: <DB8PR08MB5257C641A1AC1D84A8DC59D1C1D10@DB8PR08MB5257.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:569;
-x-forefront-prvs: 012570D5A0
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(396003)(346002)(39850400004)(376002)(189003)(199004)(186003)(478600001)(110136005)(66446008)(81156014)(36756003)(102836004)(7736002)(26005)(8676002)(305945005)(229853002)(64756008)(5660300002)(4326008)(86362001)(6486002)(31696002)(6506007)(6436002)(6512007)(54906003)(386003)(8936002)(81166006)(14454004)(25786009)(476003)(3846002)(11346002)(446003)(2616005)(6116002)(31686004)(99286004)(76176011)(2906002)(486006)(53936002)(66066001)(2501003)(6246003)(14444005)(256004)(66946007)(66476007)(66556008)(52116002)(316002)(71190400001)(71200400001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5257;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: VOKd1iOoIsHpnix8G308h3XXaC/ROpaQP01uLB4fG+ycp23eIHIFxsAp56EcpPR3YHFUoUL/DDNtxjFlu/gqPn3bbVZg0tsLMuSCGSbJUkqmPSowJ/EAsPaduD9CHkdv+1IoPAXCbEQ+mEYUId1kkhD2BmDpqrRtZmJKWNOHYBMWBIRvNniSAN7Z4XJ8RKQgqRpKrrxhdMzB7TwxY2uHQncYfF4cnl3q/A8qPhkpx4Ou8dx0DFZ3+96M1lyARIzSfYT0S1EYRa55h+xXiUd+BZ3CGR48Z7h5by1nkzEZIAjLp8MX1QjSpULlrMtWRjPP6ydXEPgZ18Fxn892X0xnH4rYno/6cZWR2I13lroMQzzjzgyvvYga+tzeqGNKRwfhI5UR0wsk+ynGVs35NY6AUvSenkqpDv18I5glj1P3ayY=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0D8287E93A3AB040B6454231DCA551D1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <zhiwei_liu@c-sky.com>) id 1hwRXS-0004Xa-PE
+ for qemu-devel@nongnu.org; Sat, 10 Aug 2019 09:36:08 -0400
+Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:42235)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhiwei_liu@c-sky.com>)
+ id 1hwRXR-0004QB-Vb; Sat, 10 Aug 2019 09:36:06 -0400
+X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06184501|-1; CH=green;
+ DM=CONTINUE|CONTINUE|true|0.362003-0.0192363-0.61876; FP=0|0|0|0|0|-1|-1|-1;
+ HT=e01l10434; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS; RN=8; RT=8; SR=0;
+ TI=SMTPD_---.F9is1lq_1565444133; 
+Received: from 192.168.79.129(mailfrom:zhiwei_liu@c-sky.com
+ fp:SMTPD_---.F9is1lq_1565444133)
+ by smtp.aliyun-inc.com(10.147.43.230);
+ Sat, 10 Aug 2019 21:35:55 +0800
+To: Chih-Min Chao <chihmin.chao@sifive.com>
+References: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
+ <CAL1e-=jceerbvam57mmXoKWHzepB-qUFL08gBEnSws_ohewLzw@mail.gmail.com>
+ <CAEiOBXVDg-oaqWDpzFrsPjzt8jdmLt7DskG4=zXwYVUb+5=tfg@mail.gmail.com>
+From: LIU ZhiWei <zhiwei_liu@c-sky.com>
+Message-ID: <29508a4a-ac24-c8d2-d703-cb971c33166b@c-sky.com>
+Date: Sat, 10 Aug 2019 06:35:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bee016af-14ed-4f69-e0f2-08d71d972430
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Aug 2019 13:32:08.2586 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xk4Ok3MfOSEAVlpOEgI84j8aRyGAyCHdpUJJ+j3ZTzscCTVoR5y1taXxCbky3jyIq2BQyLSMizqkPQkyCvqUZ0OuQRGPMBnOhgZuk65uVcg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5257
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.13.127
-Subject: Re: [Qemu-devel] [PATCH v6 09/42] block: Include filters when
- freezing backing chain
+In-Reply-To: <CAEiOBXVDg-oaqWDpzFrsPjzt8jdmLt7DskG4=zXwYVUb+5=tfg@mail.gmail.com>
+Content-Language: en-US
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 121.197.200.217
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,75 +69,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Palmer Dabbelt <palmer@sifive.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDkuMDguMjAxOSAxOToxMywgTWF4IFJlaXR6IHdyb3RlOg0KPiBJbiBvcmRlciB0byBtYWtlIGZp
-bHRlcnMgd29yayBpbiBiYWNraW5nIGNoYWlucywgdGhlIGFzc29jaWF0ZWQNCj4gZnVuY3Rpb25z
-IG11c3QgYmUgYWJsZSB0byBkZWFsIHdpdGggdGhlbSBhbmQgZnJlZXplIGFsbCBmaWx0ZXIgbGlu
-a3MsIGJlDQo+IHRoZXkgQ09XIG9yIFIvVyBmaWx0ZXIgbGlua3MuDQo+IA0KPiBJbiB0aGUgcHJv
-Y2VzcywgcmVuYW1lIHRoZXNlIGZ1bmN0aW9ucyB0byByZWZsZWN0IHRoYXQgdGhleSBub3cgYWN0
-IG9uDQo+IGdlbmVyYWxpemVkIGNoYWlucyBvZiBmaWx0ZXIgbm9kZXMgaW5zdGVhZCBvZiBiYWNr
-aW5nIGNoYWlucyBhbG9uZS4NCj4gDQo+IFdoaWxlIGF0IGl0LCBhZGQgc29tZSBjb21tZW50cyB0
-aGF0IG5vdGUgd2hpY2ggZnVuY3Rpb25zIHJlcXVpcmUgdGhlaXINCj4gY2FsbGVyIHRvIGVuc3Vy
-ZSB0aGF0IGEgZ2l2ZW4gY2hpbGQgbGluayBpcyBub3QgZnJvemVuLCBhbmQgaG93IHRoZQ0KPiBj
-YWxsZXJzIGRvIHNvLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogTWF4IFJlaXR6IDxtcmVpdHpAcmVk
-aGF0LmNvbT4NCj4gLS0tDQo+ICAgaW5jbHVkZS9ibG9jay9ibG9jay5oIHwgMTAgKysrLS0tDQo+
-ICAgYmxvY2suYyAgICAgICAgICAgICAgIHwgODEgKysrKysrKysrKysrKysrKysrKysrKysrKy0t
-LS0tLS0tLS0tLS0tLS0tLQ0KPiAgIGJsb2NrL2NvbW1pdC5jICAgICAgICB8ICA4ICsrLS0tDQo+
-ICAgYmxvY2svbWlycm9yLmMgICAgICAgIHwgIDQgKy0tDQo+ICAgYmxvY2svc3RyZWFtLmMgICAg
-ICAgIHwgIDggKystLS0NCj4gICA1IGZpbGVzIGNoYW5nZWQsIDYyIGluc2VydGlvbnMoKyksIDQ5
-IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvYmxvY2svYmxvY2suaCBi
-L2luY2x1ZGUvYmxvY2svYmxvY2suaA0KPiBpbmRleCA1MGEwN2MxYzMzLi5mNmYwOWI5NWNkIDEw
-MDY0NA0KPiAtLS0gYS9pbmNsdWRlL2Jsb2NrL2Jsb2NrLmgNCj4gKysrIGIvaW5jbHVkZS9ibG9j
-ay9ibG9jay5oDQo+IEBAIC0zNjQsMTEgKzM2NCwxMSBAQCBpbnQgYmRydl9kcm9wX2ludGVybWVk
-aWF0ZShCbG9ja0RyaXZlclN0YXRlICp0b3AsIEJsb2NrRHJpdmVyU3RhdGUgKmJhc2UsDQo+ICAg
-QmxvY2tEcml2ZXJTdGF0ZSAqYmRydl9maW5kX292ZXJsYXkoQmxvY2tEcml2ZXJTdGF0ZSAqYWN0
-aXZlLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIEJsb2NrRHJpdmVy
-U3RhdGUgKmJzKTsNCj4gICBCbG9ja0RyaXZlclN0YXRlICpiZHJ2X2ZpbmRfYmFzZShCbG9ja0Ry
-aXZlclN0YXRlICpicyk7DQo+IC1ib29sIGJkcnZfaXNfYmFja2luZ19jaGFpbl9mcm96ZW4oQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsIEJsb2NrRHJpdmVyU3RhdGUgKmJhc2UsDQo+IC0gICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4gLWludCBiZHJ2X2ZyZWV6
-ZV9iYWNraW5nX2NoYWluKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBCbG9ja0RyaXZlclN0YXRlICpi
-YXNlLA0KPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4g
-LXZvaWQgYmRydl91bmZyZWV6ZV9iYWNraW5nX2NoYWluKEJsb2NrRHJpdmVyU3RhdGUgKmJzLCBC
-bG9ja0RyaXZlclN0YXRlICpiYXNlKTsNCj4gK2Jvb2wgYmRydl9pc19jaGFpbl9mcm96ZW4oQmxv
-Y2tEcml2ZXJTdGF0ZSAqYnMsIEJsb2NrRHJpdmVyU3RhdGUgKmJhc2UsDQo+ICsgICAgICAgICAg
-ICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCk7DQo+ICtpbnQgYmRydl9mcmVlemVfY2hhaW4o
-QmxvY2tEcml2ZXJTdGF0ZSAqYnMsIEJsb2NrRHJpdmVyU3RhdGUgKmJhc2UsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKTsNCj4gK3ZvaWQgYmRydl91bmZyZWV6ZV9jaGFp
-bihCbG9ja0RyaXZlclN0YXRlICpicywgQmxvY2tEcml2ZXJTdGF0ZSAqYmFzZSk7DQo+ICAgDQo+
-ICAgDQo+ICAgdHlwZWRlZiBzdHJ1Y3QgQmRydkNoZWNrUmVzdWx0IHsNCj4gZGlmZiAtLWdpdCBh
-L2Jsb2NrLmMgYi9ibG9jay5jDQo+IGluZGV4IGFkZjgyZWZiMGUuLjY1MGMwMGQxODIgMTAwNjQ0
-DQo+IC0tLSBhL2Jsb2NrLmMNCj4gKysrIGIvYmxvY2suYw0KPiBAQCAtMjMwMywxMiArMjMwMywx
-NSBAQCBzdGF0aWMgdm9pZCBiZHJ2X3JlcGxhY2VfY2hpbGRfbm9wZXJtKEJkcnZDaGlsZCAqY2hp
-bGQsDQo+ICAgICogSWYgQG5ld19icyBpcyBub3QgTlVMTCwgYmRydl9jaGVja19wZXJtKCkgbXVz
-dCBiZSBjYWxsZWQgYmVmb3JlaGFuZCwgYXMgdGhpcw0KPiAgICAqIGZ1bmN0aW9uIHVzZXMgYmRy
-dl9zZXRfcGVybSgpIHRvIHVwZGF0ZSB0aGUgcGVybWlzc2lvbnMgYWNjb3JkaW5nIHRvIHRoZSBu
-ZXcNCj4gICAgKiByZWZlcmVuY2UgdGhhdCBAbmV3X2JzIGdldHMuDQo+ICsgKg0KPiArICogQ2Fs
-bGVycyBtdXN0IGVuc3VyZSB0aGF0IGNoaWxkLT5mcm96ZW4gaXMgZmFsc2UuDQo+ICAgICovDQo+
-ICAgc3RhdGljIHZvaWQgYmRydl9yZXBsYWNlX2NoaWxkKEJkcnZDaGlsZCAqY2hpbGQsIEJsb2Nr
-RHJpdmVyU3RhdGUgKm5ld19icykNCj4gICB7DQo+ICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKm9s
-ZF9icyA9IGNoaWxkLT5iczsNCj4gICAgICAgdWludDY0X3QgcGVybSwgc2hhcmVkX3Blcm07DQo+
-ICAgDQo+ICsgICAgLyogQXNzZXJ0cyB0aGF0IGNoaWxkLT5mcm96ZW4gPT0gZmFsc2UgKi8NCj4g
-ICAgICAgYmRydl9yZXBsYWNlX2NoaWxkX25vcGVybShjaGlsZCwgbmV3X2JzKTsNCj4gICANCj4g
-ICAgICAgLyoNCj4gQEAgLTI0NjgsNiArMjQ3MSw3IEBAIHN0YXRpYyB2b2lkIGJkcnZfZGV0YWNo
-X2NoaWxkKEJkcnZDaGlsZCAqY2hpbGQpDQo+ICAgICAgIGdfZnJlZShjaGlsZCk7DQo+ICAgfQ0K
-PiAgIA0KPiArLyogQ2FsbGVycyBtdXN0IGVuc3VyZSB0aGF0IGNoaWxkLT5mcm96ZW4gaXMgZmFs
-c2UuICovDQo+ICAgdm9pZCBiZHJ2X3Jvb3RfdW5yZWZfY2hpbGQoQmRydkNoaWxkICpjaGlsZCkN
-Cj4gICB7DQo+ICAgICAgIEJsb2NrRHJpdmVyU3RhdGUgKmNoaWxkX2JzOw0KPiBAQCAtMjQ3Nywx
-MCArMjQ4MSw2IEBAIHZvaWQgYmRydl9yb290X3VucmVmX2NoaWxkKEJkcnZDaGlsZCAqY2hpbGQp
-DQo+ICAgICAgIGJkcnZfdW5yZWYoY2hpbGRfYnMpOw0KPiAgIH0NCj4gICANCj4gLS8qKg0KPiAt
-ICogQ2xlYXIgYWxsIGluaGVyaXRzX2Zyb20gcG9pbnRlcnMgZnJvbSBjaGlsZHJlbiBhbmQgZ3Jh
-bmRjaGlsZHJlbiBvZg0KPiAtICogQHJvb3QgdGhhdCBwb2ludCB0byBAcm9vdCwgd2hlcmUgbmVj
-ZXNzYXJ5Lg0KPiAtICovDQoNCkhtbSwgdW5yZWxhdGVkIGNodW5rPyBXaXRob3V0IGl0Og0KUmV2
-aWV3ZWQtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVv
-enpvLmNvbT4NCg0KPiAgIHN0YXRpYyB2b2lkIGJkcnZfdW5zZXRfaW5oZXJpdHNfZnJvbShCbG9j
-a0RyaXZlclN0YXRlICpyb290LCBCZHJ2Q2hpbGQgKmNoaWxkKQ0KPiAgIHsNCj4gICAgICAgQmRy
-dkNoaWxkICpjOw0KPiBAQCAtMjUwNSw2ICsyNTA1LDcgQEAgc3RhdGljIHZvaWQgYmRydl91bnNl
-dF9pbmhlcml0c19mcm9tKEJsb2NrRHJpdmVyU3RhdGUgKnJvb3QsIEJkcnZDaGlsZCAqY2hpbGQp
-DQoNClsuLl0NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
+On 8/8/19 6:48 AM, Chih-Min Chao wrote:
+>
+>
+> On Thu, Aug 8, 2019 at 7:29 PM Aleksandar Markovic 
+> <aleksandar.m.mail@gmail.com <mailto:aleksandar.m.mail@gmail.com>> wrote:
+>
+>     On Thu, Aug 8, 2019 at 11:52 AM liuzhiwei <zhiwei_liu@c-sky.com
+>     <mailto:zhiwei_liu@c-sky.com>> wrote:
+>
+>     > Hi all,
+>     >
+>     >     My workmate  and I have been working on Vector & Dsp
+>     extension, and
+>     > I'd like to share develop status  with folks.
+>     >
+>     >     The spec references for  Vector extension is
+>     riscv-v-spec-0.7.1, and
+>     > riscv-p-spec-0.5 for DSP extension.
+>
+>
+>     Hello, Liu.
+>
+>     I will not answer your questions directly, however I want to bring
+>     to you
+>     and others another perspective on this situation.
+>
+>     First, please provide the link to the specifications. Via Google,
+>     I found
+>     that "riscv-v-spec-0.7.1" is titled "Working draft of the proposed
+>     RISC-V V
+>     vector extension". I could not find "riscv-p-spec-0.5".
+>
+>     I am not sure what the QEMU policy towards "working draft
+>     proposal" type of
+>     specification is. Peter, can you perhaps clarify that or any other
+>     related
+>     issue?
+>
+>
+> Hi Aleksandar,
+>
+> As for riscv-v-spec 0.7.1, it is first stable spec for target software 
+> development
+> though the name is working draft.  The architecture skeleton is fix 
+> and most of
+> work are focusing the issues related to micro-architecture 
+> implementation complexity.
+> Sifive has released an open source implementation on spike simulation 
+> and Imperas also
+> provides another implementation with its binary simulator.  I think it 
+> is worth to include the extension
+> in Qemu at this moment.
+>
+> As for riscv-p-spec-0.5, I think Andes has fully supported this 
+> extension and should release more
+> detailed spec in the near future (described Riscv Technical Update 
+> 2019/06).
+> They have implement lots of DSP kernel based on this extension and 
+> also provided impressed
+> performance result.  It is also worth to be reviewed (at least [RFC]) 
+> if the detailed  spec is public.
+>
+>
+> ref:
+>      1. 
+> https://content.riscv.org/wp-content/uploads/2019/06/17.40-Vector_RISCV-20190611-Vectors.pdf
+>      2. 
+> https://content.riscv.org/wp-content/uploads/2019/06/17.20-P-ext-RVW-Zurich-20190611.pdf
+>      3. 
+> https://content.riscv.org/wp-content/uploads/2019/06/10.05-TechCommitteeUpdate-June-2019-Copy.pdf
+>
+>
+> chihmin
+>
+Hi chihmin,
+
+Thank you for the detailed and informative response. You have a very 
+good understanding of the specifications.
+
+I will modify the code according to the latest spec(currently 
+riscv-v-spec 0.7.2) from the ISA spec git repo as Alistair advised.
+
+Yours,
+
+Zhiwei
+
+>
+>     I would advice some caution in these cases. The major issue is
+>     backward
+>     compatibility, but there are other issues too. Let's say,
+>     fairness. If we
+>     let emulation of a component based on a "working draft proposal" be
+>     integrated into QEMU, this will set a precedent, and many other
+>     developer
+>     would rightfully ask for their contributions based on drafts to be
+>     integrated into QEMU. Our policy should be as equal as possible to all
+>     contribution, large or small, riscv or alpha, cpu or device, tcg
+>     or kvm -
+>     in my honest opinion. QEMU upstream should not be a collecting
+>     place for
+>     all imaginable experimentations, certain criteria on what is
+>     appropriate
+>     for upstreaming exist and must continue to exist.
+>
+>     Yours,
+>     Aleksandar
+>
+>
+>
+>
+>     > The code of vector extension is
+>     > ready and under testing,  the first patch will be sent about two
+>     weeks
+>     > later. After that we will forward working on DSP extension, and
+>     send the
+>     > first patch in middle  October.
+>     >
+>     >      Could the maintainers  tell me whether the specs referenced are
+>     > appropriate? Is anyone working on these extensions? I'd like to get
+>     > your status, and maybe discuss questions and work togather.
+>     >
+>     > Best Regards
+>     >
+>     > LIU Zhiwei
+>     >
+>     >
+>     >
+>     >
+>
