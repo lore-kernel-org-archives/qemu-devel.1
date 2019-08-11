@@ -2,80 +2,81 @@ Return-Path: <SRS0=60Ee=WH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD20C0650F
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 16:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189EFC0650F
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:01:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4549B208C2
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 16:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCE232087B
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:01:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnygUUUj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4549B208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KV9DN1gu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCE232087B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwr4C-0005p9-Hk
-	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 12:51:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56479)
+	id 1hwrDv-0001U0-5J
+	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 13:01:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57508)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hwr3e-0005N7-4K
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 12:51:03 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hwrD1-0000yC-H8
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:00:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hwr3c-0003dm-RZ
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 12:51:02 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40128)
+ (envelope-from <alistair23@gmail.com>) id 1hwrD0-00041b-FM
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:00:43 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40407)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hwr3c-0003d4-Mv; Sun, 11 Aug 2019 12:51:00 -0400
-Received: by mail-ot1-x341.google.com with SMTP id c34so10895651otb.7;
- Sun, 11 Aug 2019 09:51:00 -0700 (PDT)
+ id 1hwrD0-00040S-8U; Sun, 11 Aug 2019 13:00:42 -0400
+Received: by mail-ot1-x344.google.com with SMTP id c34so10941452otb.7;
+ Sun, 11 Aug 2019 10:00:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2bNd7kS07e8DmxE9VISRIf3yUieomvDkgZDU7pz9CAQ=;
- b=MnygUUUjCUzf+B78U23UVPJca9vfU1tfNKret7TB71RNVvI0JhH3hUByqgt36dnULL
- 6+iSqaoXV4ih1IzpvSLTF5N45phstlH+T1AsuHsWaVXvS5YZ3QRCj8rp3fHs3aI6aRFV
- JubNQSDdC06Esu2UvlGDOyK4MUIym06esVXQ7sNbcmLVSiqlrjL/YsPEUnyDfWIG4e2e
- 4zxFmU9i3fRVG1oFWgVtWHB34HSWLZ0WUhooLugLZV7dl3JAEPtLZsFURr9KW0zPEcOm
- jS5ik3Zc8aul+Q7YeL4d7u9lwxzGlOpQ/k5v11B1LN+13/HgIh8KJ7E+6dDNastJw1Jo
- 3Ueg==
+ :cc; bh=fbB2d0ZXqx/HgSBqFZsbfsL+6307BAZlOHb+z8rL79k=;
+ b=KV9DN1guiU17XS5XECguVBJpdtTA4PZ1zmj+Br0+DPMZ6n4VoATbp1wbRqCKJy73Xi
+ AS6MtgTKx5wuOBhCY9mt3zkXl7A7ogn9Sah1UJio3wH5MzNVm95dHujQcXy9Q+jfMtQ8
+ DIWAeyN/72DuqsPLK0SvqCR8tezwHHy+t0gOZAgNmNjEFAyCsOrm/4fOMKT3QCW8vSLF
+ c6QwyRqOk7Cqt9+yIUJk7EKIAB/UwmG9p4Ohy5lZr7Tk+U3vWICGA0AmVdAdJmJCwAHB
+ MVE6FwGJrYb9QslK4EvhWEknJMt4gGYE+IMYCXf4S8R5/RHNhiG4P4fXuCtT7rW3XUHh
+ XFGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2bNd7kS07e8DmxE9VISRIf3yUieomvDkgZDU7pz9CAQ=;
- b=TRm0QVTFigPzYNkftwZlYUjgkY8EvBKubSkKTLwJd0bdhAdyOXYvR79ZK3PxjoaOul
- bpuMrYaOmZBp9D/LugV0i61P+np4MpmVI9xki5y+bYcmSP/62YBNaDJNmKLI39EBD/Ac
- m/n31QFbkS3ZVx2LDZG808zufdEql7hDGxIEHObefYiONzVWkikWCTmPUIDpC/FtfYd0
- kCtpBEG/U+MLHiD7ekkvvQDeYMRb7lGcPbeon6XvU7Tdt3ZGTFtM10akEVYoVNXe/pVg
- tWjEx69SLsJ1s1GZzFXAMUjUYhQVSLkRLv2DqSFrdjiYAmTgWgSd3rlqAR6wxNnEyLQQ
- 3C3A==
-X-Gm-Message-State: APjAAAV9GO8nnd6js8LmHs0e6EpYcTnqnMLi9aHYAgnaP3wSL5ZPRYMV
- D9vD4suzpmontKOz48uhVICmIFBs9gbKz7J1FKw=
-X-Google-Smtp-Source: APXvYqwJ3GlW46Z5hXwCAWkQ3FkfcfRQh7UYu1lGslG+KpyVSf4z7G5PitkHRbauBzDPUZL6P4V0wBa6dGLEdkM1pBs=
-X-Received: by 2002:a5e:9b05:: with SMTP id j5mr12115520iok.75.1565542259591; 
- Sun, 11 Aug 2019 09:50:59 -0700 (PDT)
+ bh=fbB2d0ZXqx/HgSBqFZsbfsL+6307BAZlOHb+z8rL79k=;
+ b=PL1Uu7bMyLaaHszUVI2Xckpa/ZJgYn3VSs012a3gTzQ88whY4q/XyCQZ4HV7EiKWZ+
+ I1lN4j9WZN1cOyBMupoT2BPvxSq70NjQglIhrdU6Kp6Lhe3mbUrd+6jG90UPAwvREx6D
+ ehM4JFYW2emudCQnnW1TOrKEIbLXxUSNBaf6sxCCiWsPJlMyUrpdSIkcHNCha0npWEZL
+ 2VkjB8yKd66vg9VulyO1KRXPpu2IyacsnGqJVqP8liia553CG8ncWJw3jY7IfY98Dz2b
+ +jKi/cW4XLUn+WtZmrOlrY0RXSR0M9F2AE45CO4baMeQYCTse6JyQOw6vEI1CMsRNS6E
+ NJWg==
+X-Gm-Message-State: APjAAAWfTLxnLQxloJTrxJbcHAq8v9bJqYTjd18/8oYniG9G5DgKsdPy
+ m9lv9OTVznq2dXg5/xDsq+Ovy2LpHowtzQ5AYLE=
+X-Google-Smtp-Source: APXvYqx+mQvAKHt1lPgZyLsKvw9UUgcm/xgoHwuGp+ri973Bjl2EB0Z0TUWupAbjCS0c1TFXcneYQcoeslQ3YxnLmHs=
+X-Received: by 2002:a02:37c6:: with SMTP id
+ r189mr22355534jar.118.1565542841106; 
+ Sun, 11 Aug 2019 10:00:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
- <CAKmqyKMqCKS_-rxZ2WYEn+m2gDom27rd2f2FCe0LmVs9brPcAQ@mail.gmail.com>
- <c502163b-ed8a-89d1-6437-9b0f49e88a84@c-sky.com>
-In-Reply-To: <c502163b-ed8a-89d1-6437-9b0f49e88a84@c-sky.com>
+References: <1565510821-3927-1-git-send-email-bmeng.cn@gmail.com>
+ <1565510821-3927-5-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565510821-3927-5-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Sun, 11 Aug 2019 09:50:31 -0700
-Message-ID: <CAKmqyKM5zneojhPe57h1+h3pav5kQxFaMnhNiwWRUa=nbzS3Ag@mail.gmail.com>
-To: LIU ZhiWei <zhiwei_liu@c-sky.com>
+Date: Sun, 11 Aug 2019 10:00:13 -0700
+Message-ID: <CAKmqyKOG9EV8L7KQ3KvGG5EmXB_WPdAdfPfZoHMp2w0ynKB5Yw@mail.gmail.com>
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
+X-Received-From: 2607:f8b0:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v3 04/28] riscv: hart: Extract hart realize
+ to a separate routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,69 +89,87 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, bastian@mail.uni-paderborn.de,
  Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 10, 2019 at 6:55 AM LIU ZhiWei <zhiwei_liu@c-sky.com> wrote:
+On Sun, Aug 11, 2019 at 1:07 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
+> Currently riscv_harts_realize() creates all harts based on the
+> same cpu type given in the hart array property. With current
+> implementation it can only create symmetric harts. Exact the
+> hart realize to a separate routine in preparation for supporting
+> heterogeneous hart arrays.
 >
-> On 8/9/19 6:54 PM, Alistair Francis wrote:
->
-> On Thu, Aug 8, 2019 at 2:52 AM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Hi all,
->
->     My workmate  and I have been working on Vector & Dsp extension, and
-> I'd like to share develop status  with folks.
->
-> Cool!
->
->     The spec references for  Vector extension is riscv-v-spec-0.7.1, and
-> riscv-p-spec-0.5 for DSP extension. The code of vector extension is
-> ready and under testing,  the first patch will be sent about two weeks
-> later. After that we will forward working on DSP extension, and send the
-> first patch in middle  October.
->
-> What code are you talking about? Is this QEMU code?
->
-> Hi Alistair,
->
-> It's the QEMU code I have been working on these days, which implements Vector extension. It is under testing,
-> and will be sent later.
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
-Great! Please send it when you have it ready. We can accept draft
-extensions in QEMU as long as they are disabled by default.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+> ---
 >
->      Could the maintainers  tell me whether the specs referenced are
-> appropriate? Is anyone working on these extensions?  I'd like to get
-> your status, and maybe discuss questions and work togather.
+> Changes in v3: None
+> Changes in v2: None
 >
-> Just use the latest (master) from the ISA spec git repo.
+>  hw/riscv/riscv_hart.c | 31 +++++++++++++++++++------------
+>  1 file changed, 19 insertions(+), 12 deletions(-)
 >
-> I will follow your advice.Thanks for your attention to this matter.
+> diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+> index ca69a1b..3dd1c6a 100644
+> --- a/hw/riscv/riscv_hart.c
+> +++ b/hw/riscv/riscv_hart.c
+> @@ -37,26 +37,33 @@ static void riscv_harts_cpu_reset(void *opaque)
+>      cpu_reset(CPU(cpu));
+>  }
 >
-> Best Regards,
+> +static void riscv_hart_realize(RISCVHartArrayState *s, int hart,
+> +                               char *cpu_type, Error **errp)
+> +{
+> +    Error *err = NULL;
+> +
+> +    object_initialize_child(OBJECT(s), "harts[*]", &s->harts[hart],
+> +                            sizeof(RISCVCPU), cpu_type,
+> +                            &error_abort, NULL);
+> +    s->harts[hart].env.mhartid = hart;
+> +    qemu_register_reset(riscv_harts_cpu_reset, &s->harts[hart]);
+> +    object_property_set_bool(OBJECT(&s->harts[hart]), true,
+> +                             "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +}
+> +
+>  static void riscv_harts_realize(DeviceState *dev, Error **errp)
+>  {
+>      RISCVHartArrayState *s = RISCV_HART_ARRAY(dev);
+> -    Error *err = NULL;
+>      int n;
 >
-> Zhiwei
+>      s->harts = g_new0(RISCVCPU, s->num_harts);
 >
-> I don't know anyone doing vector work for QEMU. It would be very
-> useful, but everyone is busy with something at the moment
-> unfortunately.
+>      for (n = 0; n < s->num_harts; n++) {
+> -        object_initialize_child(OBJECT(s), "harts[*]", &s->harts[n],
+> -                                sizeof(RISCVCPU), s->cpu_type,
+> -                                &error_abort, NULL);
+> -        s->harts[n].env.mhartid = n;
+> -        qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
+> -        object_property_set_bool(OBJECT(&s->harts[n]), true,
+> -                                 "realized", &err);
+> -        if (err) {
+> -            error_propagate(errp, err);
+> -            return;
+> -        }
+> +        riscv_hart_realize(s, n, s->cpu_type, errp);
+>      }
+>  }
 >
-> Alistair
->
-> Best Regards
->
-> LIU Zhiwei
->
+> --
+> 2.7.4
 >
 >
 
