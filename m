@@ -2,51 +2,54 @@ Return-Path: <SRS0=60Ee=WH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 437F3C433FF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9841FC0650F
 	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 21:34:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16E9220844
+	by mail.kernel.org (Postfix) with ESMTPS id 6FDBD20844
 	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 21:34:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16E9220844
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FDBD20844
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwvTm-0003YS-8K
+	id 1hwvTm-0003bJ-PK
 	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 17:34:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58155)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58189)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <balaton@eik.bme.hu>) id 1hwvSy-000207-1z
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 17:33:29 -0400
+ (envelope-from <balaton@eik.bme.hu>) id 1hwvSy-00020E-VY
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 17:33:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1hwvSw-00045v-V4
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 17:33:27 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:55462)
+ (envelope-from <balaton@eik.bme.hu>) id 1hwvSx-00046f-UK
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 17:33:28 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:55463)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hwvSw-0003yR-NU
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 17:33:26 -0400
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hwvSx-0003yP-OC
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 17:33:27 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 679AA74C707;
+ by localhost (Postfix) with SMTP id 6B6A974C89D;
  Sun, 11 Aug 2019 23:33:12 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id CBA497456CB; Sun, 11 Aug 2019 23:33:11 +0200 (CEST)
-Message-Id: <cover.1565558093.git.balaton@eik.bme.hu>
+ id DEFC9749FDB; Sun, 11 Aug 2019 23:33:11 +0200 (CEST)
+Message-Id: <292e70a92b7fbfd9a4120d433dbdcfda4e5f6c3c.1565558093.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1565558093.git.balaton@eik.bme.hu>
+References: <cover.1565558093.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Sun, 11 Aug 2019 23:14:53 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 To: qemu-devel@nongnu.org
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
-Subject: [Qemu-devel] [PATCH 0/7] Resend of all outstanding ati-vga patches
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:738:2001:2001::2001
+Subject: [Qemu-devel] [PATCH 3/7] ati-vga: Fix GPIO_MONID register write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,40 +66,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+Also update bitbang_i2c state when output bits are changed while
+enable bits are set. This fixes EDID access by the ATI FCode ROM.
 
-This is the latest version of all outstanding ati-vga patches
-collected in one series. Some of these or previous versions of them
-were sent individually before but these are now superceding all
-previous patches that are not yet in master and this series is all
-that should be needed.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+ hw/display/ati.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-This should fix color problems due to endianness with most drivers (if
-such problems remain with some Linux drivers those should be cross
-checked with real hardware), fixes running FCode ROM with appropriate
-OpenBIOS patches for mac99 and includes fixes that will be needed to
-get picture with MacOS 9 but that may also need VBlank interrupts
-emulated so it won't boot yet.
-
-Regards,
-BALATON Zoltan
-
-BALATON Zoltan (7):
-  ati-vga: Add registers for getting apertures
-  ati-vga: Add some register definitions for debugging
-  ati-vga: Fix GPIO_MONID register write
-  ati-vga: Fix cursor color with guest_hwcursor=3Dtrue
-  ati-vga: Fix hardware cursor image offset
-  ati-vga: Attempt to handle CRTC offset not exact multiple of stride
-  ati-vga: Add limited support for big endian frame buffer aperture
-
- hw/display/ati.c      | 68 +++++++++++++++++++++++++++++++++++++--------=
-------
- hw/display/ati_dbg.c  |  9 +++++++
- hw/display/ati_int.h  |  1 +
- hw/display/ati_regs.h | 11 +++++++++
- 4 files changed, 71 insertions(+), 18 deletions(-)
-
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index c8fc62505b..699f38223b 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -564,12 +564,15 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+                                addr - GPIO_MONID, data, size);
+             /*
+              * Rage128p accesses DDC used to get EDID via these bits.
+-             * Only touch i2c when write overlaps 3rd byte because some
+-             * drivers access this reg via multiple partial writes and
+-             * without this spurious bits would be sent.
++             * Because some drivers access this via multiple byte writes
++             * we have to be careful when we send bits to avoid spurious
++             * changes in bitbang_i2c state. So only do it when mask is =
+set
++             * and either the enable bits are changed or output bits cha=
+nged
++             * while enabled.
+              */
+             if ((s->regs.gpio_monid & BIT(25)) &&
+-                addr <=3D GPIO_MONID + 2 && addr + size > GPIO_MONID + 2=
+) {
++                ((addr <=3D GPIO_MONID + 2 && addr + size > GPIO_MONID +=
+ 2) ||
++                 (addr =3D=3D GPIO_MONID && (s->regs.gpio_monid & 0x6000=
+0)))) {
+                 s->regs.gpio_monid =3D ati_i2c(&s->bbi2c, s->regs.gpio_m=
+onid, 1);
+             }
+         }
 --=20
 2.13.7
 
