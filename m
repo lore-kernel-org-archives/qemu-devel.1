@@ -8,75 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E264FC0650F
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8CBFC0650F
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:19:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A3EE2085B
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63E012085B
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:19:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTA+23Ps"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A3EE2085B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTB4hR4k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63E012085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwrUD-0002So-Pp
-	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 13:18:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59737)
+	id 1hwrUl-0003K5-CS
+	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 13:19:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59825)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hwrTW-0001pZ-KM
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:17:48 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hwrU5-0002SC-15
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:18:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hwrTU-0008PR-Kr
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:17:46 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:32883)
+ (envelope-from <alistair23@gmail.com>) id 1hwrU3-0000VG-22
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:18:20 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:39615)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hwrTU-0008Nk-2P; Sun, 11 Aug 2019 13:17:44 -0400
-Received: by mail-lf1-x144.google.com with SMTP id x3so72883543lfc.0;
- Sun, 11 Aug 2019 10:17:43 -0700 (PDT)
+ id 1hwrU1-0000S6-Cn; Sun, 11 Aug 2019 13:18:18 -0400
+Received: by mail-lf1-x143.google.com with SMTP id x3so19009004lfn.6;
+ Sun, 11 Aug 2019 10:18:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WKLnY++cMwTMNN2jhkRqbHxy6lmT1CHCtl7LRSVdKg4=;
- b=dTA+23PsFzVdkFG7J0iiryGnAJtk+5SFMU/pv+/mGt54bYwEhl7xO65AN1yzBADPqf
- O57znu9LsGeWQgfRkfCYlaO9fy5Q0lRXYJSlluf3C7ySLc0GIH4yvlmq6zt+0lm8rEwF
- cQUDqx1nlHX81mZavbj+hAKOhwxJz+BKGHgB9x2TnjisWpXAQ3Z0+rLev4t5ALS9Gqqv
- XVQTwfiSUUnH7/2TMswqHcbTSgLjMXRSs2nCqsIn2XAQl1bXtwMEkE1NCFR8fd6T1Mpv
- DLNHO5hUSJ71CUCTfp2uhjNngX/QGxYSBNebRZuo1BJ++mZPa3YIn2KuGqEvNIsJnzUI
- Pg2g==
+ :cc:content-transfer-encoding;
+ bh=qlGk1t1JX6kb8l3MG/lAxzFXFUA/DSSAXsqUp/eSLiE=;
+ b=FTB4hR4kAo+9gv1FxusaPgXKiEywj9neb4Yef57QzfOv42OWniHhMMpalttkgdvp5H
+ EBJO1i6g8RcCwlCn/OxhLHIFCZROJusM37yfSvuW6/0ILn0JF51GbPJ8wKfCEUpO2vhh
+ mg6TNry0A5ZDv3iCxJnhsKrGw+i1DzXgCKnHF+Y5QTdZWhJSYmepPppbkhQGxIUxDncM
+ X91bqp6GF8WUYv6JrZNZbDf0I5CkD3tE6uLIczbIL9gKz5tw8ZoFh57zJJgfGoYcU8Kp
+ xg7XhikuYiAAK7BJ9N4KWlb9A25mcROYnNoBMkcIdNVhcXoGZYAfHNgmwpWZGKns7kpX
+ iPIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WKLnY++cMwTMNN2jhkRqbHxy6lmT1CHCtl7LRSVdKg4=;
- b=GUyePwoSPaymrPjStcvipaqiceA6izpgJKOOPgmCaT3awEJDGvwXFhr/dQPuhoEyxs
- o2nTRkd5WJMogRE06eFQkWXjJKftFfs37T6f4TH0N8mCWs1Meqk4jAGLalLiuEYdUPH3
- rRPrW5+0BnFFG2gEljA3I7nDu9yu1nakLqPuMiuu4VjJJBOtJx4eRpy3Oz8Ef2YM1TJU
- FQyvNNA+IRL/ywhV8L39FflaN798jgPb/jbSIy+gI1WXcOWOhURZJTeZnAOd2k6Lj59c
- hWBUoU6nUP0j/gkT7/287tyG8egfO5f3JL8mjlXLbQVGwkQsaDGGwyESk+/v+o+Z76Hx
- VXZw==
-X-Gm-Message-State: APjAAAVEO/vv8UlgY+sG9xAI98ARIyfCLzVax/C+Xs+QGuDWWkFNl9nZ
- 8uGyVKwEyC36uedxMq7CBN+SbVArkY6DlV1BBVY=
-X-Google-Smtp-Source: APXvYqxWEM2TF6O8gmW3G2rVelbdwU5831Q+hJfp+x1NGcW7pTKl/Ko+xPu0wMkCniwabMFsHxzUlBXWbeIRAEOUBvU=
-X-Received: by 2002:ac2:563c:: with SMTP id b28mr17504191lff.93.1565543862689; 
- Sun, 11 Aug 2019 10:17:42 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=qlGk1t1JX6kb8l3MG/lAxzFXFUA/DSSAXsqUp/eSLiE=;
+ b=KlfDu2CyqqppCQz6rdoTVpuFl4BlI8F0fDPigovVHn3hV+NUtJj/Pio6O6nB1Y21JH
+ FbLo8wd4obMZt46uDF6WMfBV+kNWKcWBAjW2mBu6DxXg1UZhia2F/R46QsjCguMbEPzl
+ esrkJ4HULJ1Ze1Hs75lhPPFD6mqcFfnEErYtOW5eyDdfSrVNQZvWP7bW1/HSBHwLAAbZ
+ 1sUOAyIQsNz6SbRRcYnpMDxYbY12PqvLoXGuyzxindhOD3kBDfMhg7onmiAHKQcwG5Xe
+ Cwz9gLlvKqhwdvX8Dz2PiQnImyyN/lHTD4Rn5wgcZUJgRQHMM1k8CawnKB1vmCLjx4Ee
+ 2zsg==
+X-Gm-Message-State: APjAAAVtw/1dfrV+XttLSEwH4k/BGHr83Y9m5ZJZzWbh3USxOPurnXnB
+ b45Lz6m3XfhS++1jEuc6RXXOUYd4zDlzPcDKZEk=
+X-Google-Smtp-Source: APXvYqz8dcXpixz6f+aBsN5AVY94G6TJKan0yNELtw2lAzSpbVR4zj2v5b7MdwVbndQAaqCr0r7mdk1sSd21kor3XnY=
+X-Received: by 2002:a19:ed11:: with SMTP id y17mr17851156lfy.141.1565543894974; 
+ Sun, 11 Aug 2019 10:18:14 -0700 (PDT)
 MIME-Version: 1.0
 References: <1565510821-3927-1-git-send-email-bmeng.cn@gmail.com>
- <1565510821-3927-25-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1565510821-3927-25-git-send-email-bmeng.cn@gmail.com>
+ <1565510821-3927-28-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565510821-3927-28-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Sun, 11 Aug 2019 10:17:14 -0700
-Message-ID: <CAKmqyKMaPcnrOihbr7wppEZKGGN8_OCMfn0b0o3az7JTftuSYA@mail.gmail.com>
+Date: Sun, 11 Aug 2019 10:17:47 -0700
+Message-ID: <CAKmqyKN79+jZt_giWs8XqO3dcsuk+6f2nXXt42SOG+ar_CiQgg@mail.gmail.com>
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::144
-Subject: Re: [Qemu-devel] [PATCH v3 24/28] riscv: sifive_u: Support loading
- initramfs
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH v3 27/28] riscv: virt: Change create_fdt()
+ to return void
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,13 +98,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Aug 11, 2019 at 1:17 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Sun, Aug 11, 2019 at 1:14 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> The loading of initramfs is currently not supported on 'sifive_u'.
-> Add the support to make '-initrd' command line parameter useful.
+> There is no need to return fdt at the end of create_fdt() because
+> it's already saved in s->fdt. Other machines (sifive_u, spike)
+> don't do it neither.
 >
 > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 > Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
@@ -113,33 +117,70 @@ Alistair
 > Changes in v3: None
 > Changes in v2: None
 >
->  hw/riscv/sifive_u.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
+>  hw/riscv/virt.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index e8bef44..b0026aa 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -328,7 +328,18 @@ static void riscv_sifive_u_init(MachineState *machine)
->                                   memmap[SIFIVE_U_DRAM].base);
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 2f75195..6bfa721 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -112,7 +112,7 @@ static void create_pcie_irq_map(void *fdt, char *node=
+name,
+>                             0x1800, 0, 0, 0x7);
+>  }
 >
->      if (machine->kernel_filename) {
-> -        riscv_load_kernel(machine->kernel_filename);
-> +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
-> +
-> +        if (machine->initrd_filename) {
-> +            hwaddr start;
-> +            hwaddr end = riscv_load_initrd(machine->initrd_filename,
-> +                                           machine->ram_size, kernel_entry,
-> +                                           &start);
-> +            qemu_fdt_setprop_cell(s->fdt, "/chosen",
-> +                                  "linux,initrd-start", start);
-> +            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
-> +                                  end);
-> +        }
+> -static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *mem=
+map,
+> +static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memm=
+ap,
+>      uint64_t mem_size, const char *cmdline)
+>  {
+>      void *fdt;
+> @@ -316,8 +316,6 @@ static void *create_fdt(RISCVVirtState *s, const stru=
+ct MemmapEntry *memmap,
+>          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
 >      }
+>      g_free(nodename);
+> -
+> -    return fdt;
+>  }
 >
->      /* reset vector */
+>
+> @@ -373,7 +371,6 @@ static void riscv_virt_board_init(MachineState *machi=
+ne)
+>      size_t plic_hart_config_len;
+>      int i;
+>      unsigned int smp_cpus =3D machine->smp.cpus;
+> -    void *fdt;
+>
+>      /* Initialize SOC */
+>      object_initialize_child(OBJECT(machine), "soc", &s->soc, sizeof(s->s=
+oc),
+> @@ -392,7 +389,7 @@ static void riscv_virt_board_init(MachineState *machi=
+ne)
+>          main_mem);
+>
+>      /* create device tree */
+> -    fdt =3D create_fdt(s, memmap, machine->ram_size, machine->kernel_cmd=
+line);
+> +    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>
+>      /* boot rom */
+>      memory_region_init_rom(mask_rom, NULL, "riscv_virt_board.mrom",
+> @@ -411,9 +408,9 @@ static void riscv_virt_board_init(MachineState *machi=
+ne)
+>              hwaddr end =3D riscv_load_initrd(machine->initrd_filename,
+>                                             machine->ram_size, kernel_ent=
+ry,
+>                                             &start);
+> -            qemu_fdt_setprop_cell(fdt, "/chosen",
+> +            qemu_fdt_setprop_cell(s->fdt, "/chosen",
+>                                    "linux,initrd-start", start);
+> -            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
+> +            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
+>                                    end);
+>          }
+>      }
 > --
 > 2.7.4
 >
