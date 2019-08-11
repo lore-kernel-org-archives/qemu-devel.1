@@ -8,80 +8,80 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 695B5C0650F
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 08:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1271FC0650F
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 08:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3755D208C2
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 08:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1A52208C2
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 08:08:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sRl4ghrl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3755D208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vdNrHhBn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A52208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwitP-0007An-DQ
-	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 04:07:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59989)
+	id 1hwitU-0007RE-3e
+	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 04:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60040)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bmeng.cn@gmail.com>) id 1hwisg-0005Qg-AJ
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 04:07:11 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hwisj-0005T2-FO
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 04:07:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hwisf-0003oq-8R
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 04:07:10 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:39345)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hwisi-0003qg-Ib
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 04:07:13 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38674)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hwisf-0003oL-3F; Sun, 11 Aug 2019 04:07:09 -0400
-Received: by mail-pf1-x443.google.com with SMTP id f17so44250429pfn.6;
- Sun, 11 Aug 2019 01:07:09 -0700 (PDT)
+ id 1hwisi-0003qK-D6; Sun, 11 Aug 2019 04:07:12 -0400
+Received: by mail-pf1-x444.google.com with SMTP id o70so2898755pfg.5;
+ Sun, 11 Aug 2019 01:07:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:subject:date:message-id:in-reply-to:references;
- bh=3LT92N7XM1qCNmYC5QZ4lu+LlxUUbvlnPQDuotQ/kSI=;
- b=sRl4ghrlTihW1jVsm6xdOD2Eb5Mxt4gjG7ooJoq2YhfZMVFWjvkGOg5Oa8cPdTw+gt
- TDHjRVS1CH8b8kB86d1aGp490Iotw6JkD+zWinS2eGrga265g1TBz7f1qQqb8hQxZ9XN
- ZSE+ddlfxNF+wzCIGLKzMdrW3a66Xr521ceHmjECydxVp0CSM4gV/GVWIoUmys02Vx5g
- cJ9vTy263JV9FfTpg5R/zQNBVKt9ThfSY/qomIptv6UOL2sZiN97hzwBhCAYDQ8C5jEb
- QODtXccProWKdIBVoDh4Uj5f5LfYMX0Cw8i4bwCRv45Q/4uPkYUBttoeuQHXRGrs+Pyc
- R2yQ==
+ bh=b+BteCNl7LaQtomU9G8Fo8wvkmlvmSM+Wq5AwSdX96s=;
+ b=vdNrHhBnrd1qvwt94HxxgSJxSELoGlCmiZ///BdI+TQQVjMZoogXgB+eKRjY+J2Z7r
+ DPQ4bw0DXoT+HiTiF+QEQyvkPOIqvAzs8gsiX+SQ3CnUptbgk44gRAt05RKyw6sODpI3
+ 9wlMKJ8wnj9g/UEgYHDZqNz0Nnu8nCciIq01tsOvR76VBG+xS3uWm9Yjhut1hUGDF5CD
+ 4DiSrO5pU+++B4maozVzSibLumDuGtgXEZVHcEj/cdZuFWBsTxVu+ucPjSH/vOplFgsQ
+ Xoqo2K4cjMlf2td37YvV4WNIQ9Mks1tnCE4mrIfT+FkS96/aiHqn6+TBph6pZaqtBV6k
+ zAyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references;
- bh=3LT92N7XM1qCNmYC5QZ4lu+LlxUUbvlnPQDuotQ/kSI=;
- b=UStTWGVsVY5cKLWUaHoLBBRp9vua9aYg8tIergyEHXV1FMEUSipV4nXlMXBYT0BOae
- lfCD1hzGudnZnpAYw4mbVj4rA3yB5qSiewKKx3ky8LvQoTPkAGQF5COkf4lsSK+UZz33
- AVooqTQzAD/d82ZKftUFEebACu5JuyMMmh87d3oA6unc1E2Pe1O44Nn1cFDV9S9v0UMj
- 9yubbnTJG64gPLxuDF1YJMm825hlxdaaUB9f+e8oLE/4XRSafLkwtH6Ro1sQl67wneD7
- 6ONec0veBhY3hWjaEkXE2O/0yzxPXxpk+0PLmzEQ+j9wT+kqwiDb3rocR5ekp60HNGgz
- tnJA==
-X-Gm-Message-State: APjAAAWZti66HGnaGA1gAJikI5C0ffZFDAcZtwcUYAt/sVQyEXIbbP4t
- LW56s+Z+yIDarPF4/wx2JAWySfXt
-X-Google-Smtp-Source: APXvYqyW/GPAZkkk/dG7HJ0DKEehBJzEiXUqZP5YbiG+4Hh1TDYeSSJo/97qXPdpNi4CTf3YRiwEBg==
-X-Received: by 2002:a62:144b:: with SMTP id 72mr2137603pfu.42.1565510828211;
- Sun, 11 Aug 2019 01:07:08 -0700 (PDT)
+ bh=b+BteCNl7LaQtomU9G8Fo8wvkmlvmSM+Wq5AwSdX96s=;
+ b=eqy3iA6lBr5E2LLZMeBOLwTEWgIm54442lD6czdRr5FeMkgXQBWCbLSBgWdhPHfHKU
+ XW3my/SUj7dLVAKva/XxPfw4/z1VFxSmyNkvFnl/NMcUvVsWs1qhvAXmp/2vJPBengjk
+ xCl/EysR4+axe3w8XQx+kjp/qIUwt2V3NrKffW8UEsr/B0WO+I1Xbqnsz1f6JnPPZHz9
+ 8kpX//PgqmSFEQBHAqIKCUvErp6yU+uVU2BlQ70Jum84yw49haiVrvXgrzKYO1qc3wfE
+ 7SpRonwok3rpTIDv7nLsIGZQS8GftZuCJuxMM8Hc5mTg/9GYZQVd/ZZzJRG0dQ3DKnC4
+ mhHw==
+X-Gm-Message-State: APjAAAUzpTSdd3Jdtf4lgNTvpJbHsRwTJ2/eOfZW/GXEf0ZLfln4wurB
+ p9cy7jaj4VA0kM8SgdC0vc4=
+X-Google-Smtp-Source: APXvYqwddlyWa5wfumuB9aigKCiZRNxC10XXuo/E292jMJ2fc6WrCmLGm+dx9e8uXbwDnM8APgPwhQ==
+X-Received: by 2002:a63:5765:: with SMTP id h37mr24592764pgm.183.1565510831510; 
+ Sun, 11 Aug 2019 01:07:11 -0700 (PDT)
 Received: from localhost.localdomain (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id v8sm87339107pgs.82.2019.08.11.01.07.07
+ by smtp.gmail.com with ESMTPSA id v8sm87339107pgs.82.2019.08.11.01.07.10
  (version=TLS1 cipher=AES128-SHA bits=128/128);
- Sun, 11 Aug 2019 01:07:07 -0700 (PDT)
+ Sun, 11 Aug 2019 01:07:10 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  Palmer Dabbelt <palmer@sifive.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Date: Sun, 11 Aug 2019 01:06:34 -0700
-Message-Id: <1565510821-3927-2-git-send-email-bmeng.cn@gmail.com>
+Date: Sun, 11 Aug 2019 01:06:37 -0700
+Message-Id: <1565510821-3927-5-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 1.7.1
 In-Reply-To: <1565510821-3927-1-git-send-email-bmeng.cn@gmail.com>
 References: <1565510821-3927-1-git-send-email-bmeng.cn@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
-Subject: [Qemu-devel] [PATCH v3 01/28] riscv: hw: Remove superfluous "linux,
- phandle" property
+X-Received-From: 2607:f8b0:4864:20::444
+Subject: [Qemu-devel] [PATCH v3 04/28] riscv: hart: Extract hart realize to
+ a separate routine
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,72 +97,71 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"linux,phandle" property is optional. Remove all instances in the
-sifive_u and virt machine device tree.
+Currently riscv_harts_realize() creates all harts based on the
+same cpu type given in the hart array property. With current
+implementation it can only create symmetric harts. Exact the
+hart realize to a separate routine in preparation for supporting
+heterogeneous hart arrays.
 
 Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
 
 Changes in v3: None
 Changes in v2: None
 
- hw/riscv/sifive_u.c | 3 ---
- hw/riscv/virt.c     | 3 ---
- 2 files changed, 6 deletions(-)
+ hw/riscv/riscv_hart.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 71b8083..ef36948 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -125,7 +125,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-         qemu_fdt_add_subnode(fdt, intc);
-         qemu_fdt_setprop_cell(fdt, intc, "phandle", cpu_phandle);
--        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", cpu_phandle);
-         qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-         qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-         qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-@@ -184,7 +183,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 0x35);
-     qemu_fdt_setprop_cells(fdt, nodename, "phandle", plic_phandle);
--    qemu_fdt_setprop_cells(fdt, nodename, "linux,phandle", plic_phandle);
-     plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-     g_free(cells);
-     g_free(nodename);
-@@ -197,7 +195,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
-         SIFIVE_U_GEM_CLOCK_FREQ);
-     qemu_fdt_setprop_cell(fdt, nodename, "phandle", ethclk_phandle);
--    qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", ethclk_phandle);
-     ethclk_phandle = qemu_fdt_get_phandle(fdt, nodename);
-     g_free(nodename);
+diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+index ca69a1b..3dd1c6a 100644
+--- a/hw/riscv/riscv_hart.c
++++ b/hw/riscv/riscv_hart.c
+@@ -37,26 +37,33 @@ static void riscv_harts_cpu_reset(void *opaque)
+     cpu_reset(CPU(cpu));
+ }
  
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index 25faf3b..00be05a 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -170,11 +170,9 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-         qemu_fdt_setprop_cell(fdt, nodename, "reg", cpu);
-         qemu_fdt_setprop_string(fdt, nodename, "device_type", "cpu");
-         qemu_fdt_setprop_cell(fdt, nodename, "phandle", cpu_phandle);
--        qemu_fdt_setprop_cell(fdt, nodename, "linux,phandle", cpu_phandle);
-         intc_phandle = phandle++;
-         qemu_fdt_add_subnode(fdt, intc);
-         qemu_fdt_setprop_cell(fdt, intc, "phandle", intc_phandle);
--        qemu_fdt_setprop_cell(fdt, intc, "linux,phandle", intc_phandle);
-         qemu_fdt_setprop_string(fdt, intc, "compatible", "riscv,cpu-intc");
-         qemu_fdt_setprop(fdt, intc, "interrupt-controller", NULL, 0);
-         qemu_fdt_setprop_cell(fdt, intc, "#interrupt-cells", 1);
-@@ -250,7 +248,6 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
-     qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
-     qemu_fdt_setprop_cells(fdt, nodename, "phandle", plic_phandle);
--    qemu_fdt_setprop_cells(fdt, nodename, "linux,phandle", plic_phandle);
-     plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-     g_free(cells);
-     g_free(nodename);
++static void riscv_hart_realize(RISCVHartArrayState *s, int hart,
++                               char *cpu_type, Error **errp)
++{
++    Error *err = NULL;
++
++    object_initialize_child(OBJECT(s), "harts[*]", &s->harts[hart],
++                            sizeof(RISCVCPU), cpu_type,
++                            &error_abort, NULL);
++    s->harts[hart].env.mhartid = hart;
++    qemu_register_reset(riscv_harts_cpu_reset, &s->harts[hart]);
++    object_property_set_bool(OBJECT(&s->harts[hart]), true,
++                             "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++}
++
+ static void riscv_harts_realize(DeviceState *dev, Error **errp)
+ {
+     RISCVHartArrayState *s = RISCV_HART_ARRAY(dev);
+-    Error *err = NULL;
+     int n;
+ 
+     s->harts = g_new0(RISCVCPU, s->num_harts);
+ 
+     for (n = 0; n < s->num_harts; n++) {
+-        object_initialize_child(OBJECT(s), "harts[*]", &s->harts[n],
+-                                sizeof(RISCVCPU), s->cpu_type,
+-                                &error_abort, NULL);
+-        s->harts[n].env.mhartid = n;
+-        qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
+-        object_property_set_bool(OBJECT(&s->harts[n]), true,
+-                                 "realized", &err);
+-        if (err) {
+-            error_propagate(errp, err);
+-            return;
+-        }
++        riscv_hart_realize(s, n, s->cpu_type, errp);
+     }
+ }
+ 
 -- 
 2.7.4
 
