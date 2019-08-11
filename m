@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A26C433FF
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1EEC0650F
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:20:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ECB02085B
-	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DE802147A
+	for <qemu-devel@archiver.kernel.org>; Sun, 11 Aug 2019 17:20:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aozxrl4i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ECB02085B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FcoIkSpP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DE802147A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41158 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hwrVH-0004Ed-Nd
-	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 13:19:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59917)
+	id 1hwrVl-0005AJ-N5
+	for qemu-devel@archiver.kernel.org; Sun, 11 Aug 2019 13:20:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60010)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alistair23@gmail.com>) id 1hwrUj-0003Sn-Hu
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:19:02 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hwrVL-0004RX-5s
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:19:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hwrUg-000179-Lj
- for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:19:01 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:38795)
+ (envelope-from <alistair23@gmail.com>) id 1hwrVK-0001uW-9R
+ for qemu-devel@nongnu.org; Sun, 11 Aug 2019 13:19:39 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42238)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hwrUc-00012L-Qd; Sun, 11 Aug 2019 13:18:56 -0400
-Received: by mail-lj1-x241.google.com with SMTP id r9so96342762ljg.5;
- Sun, 11 Aug 2019 10:18:52 -0700 (PDT)
+ id 1hwrVK-0001sP-2x; Sun, 11 Aug 2019 13:19:38 -0400
+Received: by mail-lj1-x243.google.com with SMTP id 15so4573091ljr.9;
+ Sun, 11 Aug 2019 10:19:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qlfsIV+m0GJS7PQYBM1mHKaxsiMIzfF2GLRdvNas8l4=;
- b=aozxrl4itttN13bV+Bzv57GWeMiPv6Mbo1waBQdY5hdLSbmLmCXvmznQuYwVXxX2k6
- ENVaT/kS4apCe6k3nSdOX7rbgkgnMCIbpi9AeF4EniVFC7aXnynDrBZRAo132ZP3QgPX
- 2Y25JC/i+B1+kBJBkFZaV4v/dLn0fJPdPpvvbB2tSG0mfp/5TGr+9kEE0S3aJcDy9/1I
- SkNBgfcFLQKkxkK/gkkMP+WUuy1qFUYlz7vreF18I0lDSoQuESnevQheDA43n+GvFb8K
- 0CCNBcXAZ+7pSNHRQLSs+lNtmfjtRA6YzpWi9fz17EqVeU8zBcg4GYWp6tybeEKR4jKf
- 9hIw==
+ :cc; bh=G+N2YL8BwAixur1dtOz/BBrKukS7VJWTaSyTlWenmcs=;
+ b=FcoIkSpPKics0MPSc3T4hNdO5xSQK1j9pST5Zlt81GdXTdl4l9Pt5JDhTLVfjEXYQ6
+ Zd14kjhM/bOhylCq4XGGbh1htdLgyGrJ3XBQycoYZs3xjJiih4lHSg4j9ZwJcQQ+DxpO
+ fzzwDGX4AYSb8Zw0B2jrqaEb97+5WFNAMqU2hvV2AzJQUGpPIgAbjb8yZnYjqKgeGTqG
+ sFieiIh3H/BEb36DkpuBs4JNVQS17CJ4FfzQ9woOAtnJWH2rbipMDH9MLmCmPkCeW01F
+ GU1J7jo7kwUhUWt06mo2fNqluXLa2plLX1ZSFzMmwJ8YcORPCWQP2wjz8OHlb3//W10m
+ szvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=qlfsIV+m0GJS7PQYBM1mHKaxsiMIzfF2GLRdvNas8l4=;
- b=QiwnLjgzqxyrHixRt4TZeWu/R3uKBJexzyHVlM5eAHbTJ9T/vhC5YgneUQ6+DydrR8
- tkzXZ+e8dWUTfbWtMHy5c6wdFQZx51qbNvLgHFybVLKzpAbqyfWjRHCG1dtGtk1dbIGV
- Ne9bzgU03SHmID1HO4S64SnM8pdis4SwTjgpMvz3Bh9j2542qrt6BFy11A9u57fm696o
- sVqpvJ7GwPLnYj12rSo5cUNcU1Zbd4cgQ9+suEv6ubOlmiA3UKGAGT11CsC6E/JrfcK8
- bdbiG9rolep9B36vAxd5T3tEeG+Ud8LGn4foMx1mQaErDy+nDYWJubUbK1r5tbx9XWM6
- 1syw==
-X-Gm-Message-State: APjAAAVRCI+FzON/fWG1je0c20L/1O7SMdrh4HkpJqanUM6rfLxgXt5J
- Dr/0Ln5can0GVOV/kYhMqoqTKOXIbi95Jr5iaHQ=
-X-Google-Smtp-Source: APXvYqwCdFYSg4wLke74nP82m5A5UNMbkBZ8NlqUXiyJ+bQYgBCmODruZWB298QldvfJ2AG5/e/bNtIND4PN68YvISE=
-X-Received: by 2002:a2e:9158:: with SMTP id q24mr17056535ljg.119.1565543931147; 
- Sun, 11 Aug 2019 10:18:51 -0700 (PDT)
+ bh=G+N2YL8BwAixur1dtOz/BBrKukS7VJWTaSyTlWenmcs=;
+ b=K/unQ9bIzOOfUdvuvMmuJOIT+MDaoixCuS1z/o2ug28EPT13uaiEAlL9HV895KHZPQ
+ b5YXmtZlyjF1wV3NgOHetXgghVoC4lvBgOmxJjl+PHmVDxw4RrHjnwgF+PV4vNBTCJ4y
+ fgu/hPTQCbHwzPYiGotC9AVcPU47VKC0TWe1mKdfjpuQ4bZ9zYY2EbhUCBU0PyxNhfql
+ DtraR13mID266Kwa+qV/FXQmn6Uj/5djQNEL6rkxzG5d83XyjxCcsw0ZDnyVZJLXgFxR
+ e7DVSrv+TVWWtdmGPtx7MBTVWTGyDRkxQtDz0w2Z9RTOp0OGHmmDHfjh+9UAMyvC1vij
+ JwXQ==
+X-Gm-Message-State: APjAAAUS6kND65OCTszuvrQ//fr9zwXjpMXb5up3ke+b24TNSO4bvuiI
+ kEJZrquO6cSJD1GQAeoS1DCwTtDPm7QIdcNFD6I=
+X-Google-Smtp-Source: APXvYqyJOvuZXiVmfMyhdal/sMhdm0hFr4XS1a0X7kEZ/HWoD4tsTtfrE5AnncrtyXa758ad79mJTo5kZsEH17DdCg8=
+X-Received: by 2002:a2e:86cc:: with SMTP id n12mr16660252ljj.146.1565543976825; 
+ Sun, 11 Aug 2019 10:19:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <1565510821-3927-1-git-send-email-bmeng.cn@gmail.com>
- <1565510821-3927-26-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1565510821-3927-26-git-send-email-bmeng.cn@gmail.com>
+ <1565510821-3927-23-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1565510821-3927-23-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Sun, 11 Aug 2019 10:18:23 -0700
-Message-ID: <CAKmqyKN7-h7ggJpwKXGQb9nmgLuFtfh07QvZ83bXto5QOoP4BA@mail.gmail.com>
+Date: Sun, 11 Aug 2019 10:19:09 -0700
+Message-ID: <CAKmqyKOGFWPbx=adfp2A2nNPUSMc0oOW0ohcAryo1DG7gLCbRQ@mail.gmail.com>
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::241
-Subject: Re: [Qemu-devel] [PATCH v3 25/28] riscv: hw: Remove not needed PLIC
- properties in device tree
+X-Received-From: 2a00:1450:4864:20::243
+Subject: Re: [Qemu-devel] [PATCH v3 22/28] riscv: sifive_u: Generate an
+ aliases node in the device tree
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,13 +95,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Aug 11, 2019 at 1:18 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Sun, Aug 11, 2019 at 1:13 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> This removes "reg-names" and "riscv,max-priority" properties of the
-> PLIC node from device tree.
+> The Linux kernel SiFive UART driver expects an aliases node to be
+> present in the device tree, from which the driver extracts the port
+> number from "serial#" in the aliases node.
 >
 > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-> Reviewed-by: Jonathan Behrens <fintelia@gmail.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
@@ -110,40 +110,24 @@ Alistair
 > ---
 >
 > Changes in v3: None
-> Changes in v2:
-> - keep the PLIC compatible string unchanged as OpenSBI uses that
->   for DT fix up
+> Changes in v2: None
 >
->  hw/riscv/sifive_u.c | 2 --
->  hw/riscv/virt.c     | 2 --
->  2 files changed, 4 deletions(-)
+>  hw/riscv/sifive_u.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
 > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index b0026aa..8801ee2 100644
+> index 7eb2b7e..0c1a89f 100644
 > --- a/hw/riscv/sifive_u.c
 > +++ b/hw/riscv/sifive_u.c
-> @@ -238,8 +238,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->      qemu_fdt_setprop_cells(fdt, nodename, "reg",
->          0x0, memmap[SIFIVE_U_PLIC].base,
->          0x0, memmap[SIFIVE_U_PLIC].size);
-> -    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-> -    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
->      qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", 0x35);
->      qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
->      plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 127f005..2f75195 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -244,8 +244,6 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      qemu_fdt_setprop_cells(fdt, nodename, "reg",
->          0x0, memmap[VIRT_PLIC].base,
->          0x0, memmap[VIRT_PLIC].size);
-> -    qemu_fdt_setprop_string(fdt, nodename, "reg-names", "control");
-> -    qemu_fdt_setprop_cell(fdt, nodename, "riscv,max-priority", 7);
->      qemu_fdt_setprop_cell(fdt, nodename, "riscv,ndev", VIRTIO_NDEV);
->      qemu_fdt_setprop_cell(fdt, nodename, "phandle", plic_phandle);
->      plic_phandle = qemu_fdt_get_phandle(fdt, nodename);
+> @@ -284,6 +284,8 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>      if (cmdline) {
+>          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+>      }
+> +    qemu_fdt_add_subnode(fdt, "/aliases");
+> +    qemu_fdt_setprop_string(fdt, "/aliases", "serial0", nodename);
+>      g_free(nodename);
+>  }
+>
 > --
 > 2.7.4
 >
