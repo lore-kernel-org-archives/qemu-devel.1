@@ -6,49 +6,45 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE92C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAC3C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:12:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F9B62075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:07:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F9B62075B
+	by mail.kernel.org (Postfix) with ESMTPS id 9C2242070C
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:12:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C2242070C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFfY-0008NQ-UE
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:07:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49217)
+	id 1hxFjn-0002lz-O1
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:12:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49852)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxFfA-0007ub-2C
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:07:25 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxFiz-0001be-Cj
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:11:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxFf9-0001rW-2G
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:07:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56160)
+ (envelope-from <mreitz@redhat.com>) id 1hxFiy-0003VR-Au
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:11:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43762)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxFf6-0001qY-Tf; Mon, 12 Aug 2019 15:07:21 -0400
+ id 1hxFiv-0003Tz-TM; Mon, 12 Aug 2019 15:11:18 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 432C281DE7;
- Mon, 12 Aug 2019 19:07:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DFFBA85542;
+ Mon, 12 Aug 2019 19:11:16 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
  [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 180EB19C4F;
- Mon, 12 Aug 2019 19:07:18 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0065E19C4F;
+ Mon, 12 Aug 2019 19:11:12 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 References: <20190725155512.9827-1-mreitz@redhat.com>
- <20190725155512.9827-4-mreitz@redhat.com>
- <627fbb64-5ffe-aca7-6198-9d991d4219e3@virtuozzo.com>
- <f50d585c-ac91-5dfa-365b-efda321aeffa@redhat.com>
- <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
+ <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -75,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <fa7313b1-2f21-39dd-b1fd-8372c6100cef@redhat.com>
-Date: Mon, 12 Aug 2019 21:07:17 +0200
+Message-ID: <e6bc8a2d-4541-60a3-64a7-294c4dee0c32@redhat.com>
+Date: Mon, 12 Aug 2019 21:11:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
+In-Reply-To: <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9"
+ boundary="SenCr0Wjz9yu6Yy2VSsbfBmVEDB2eqA0e"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 19:07:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Mon, 12 Aug 2019 19:11:16 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] vpc: Do not return RAW from
- block_status
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/3] block: Make various
+ formats' block_status recurse again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,101 +99,126 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9
-Content-Type: multipart/mixed; boundary="liNzYjQmliiZ6oztyIQnPlZ0W1Ex1B02S";
+--SenCr0Wjz9yu6Yy2VSsbfBmVEDB2eqA0e
+Content-Type: multipart/mixed; boundary="8BR4u9brWrtHzjbSOfBkOvzkFuDPJ310b";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <fa7313b1-2f21-39dd-b1fd-8372c6100cef@redhat.com>
-Subject: Re: [PATCH 3/3] vpc: Do not return RAW from block_status
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+Message-ID: <e6bc8a2d-4541-60a3-64a7-294c4dee0c32@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 0/3] block: Make various formats'
+ block_status recurse again
 References: <20190725155512.9827-1-mreitz@redhat.com>
- <20190725155512.9827-4-mreitz@redhat.com>
- <627fbb64-5ffe-aca7-6198-9d991d4219e3@virtuozzo.com>
- <f50d585c-ac91-5dfa-365b-efda321aeffa@redhat.com>
- <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
-In-Reply-To: <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
+ <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
+In-Reply-To: <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
 
---liNzYjQmliiZ6oztyIQnPlZ0W1Ex1B02S
+--8BR4u9brWrtHzjbSOfBkOvzkFuDPJ310b
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 12.08.19 18:50, Vladimir Sementsov-Ogievskiy wrote:
-> 12.08.2019 18:56, Max Reitz wrote:
->> On 12.08.19 17:33, Vladimir Sementsov-Ogievskiy wrote:
->>> 25.07.2019 18:55, Max Reitz wrote:
->>>> vpc is not really a passthrough driver, even when using the fixed
->>>> subformat (where host and guest offsets are equal).  It should handl=
-e
->>>> preallocation like all other drivers do, namely by returning
->>>> DATA | RECURSE instead of RAW.
->>>>
->>>> There is no tangible difference but the fact that bdrv_is_allocated(=
-) no
->>>> longer falls through to the protocol layer.
->>>
->>> Hmm. Isn't a real bug (fixed by this patch) ?
->>>
->>> Assume vpc->file is qcow2 with backing, which have "unallocated" regi=
-on, which is
->>> backed by actual data in backing file.
+On 12.08.19 20:39, John Snow wrote:
+>=20
+>=20
+> On 7/25/19 11:55 AM, Max Reitz wrote:
+>> Hi,
 >>
->> Come on now.
+>> 69f47505ee66afaa513305de0c1895a224e52c45 changed block_status so that =
+it
+>> would only go down to the protocol layer if the format layer returned
+>> BDRV_BLOCK_RECURSE, thus indicating that it has no sufficient
+>> information whether a given range in the image is zero or not.
+>> Generally, this is because the image is preallocated and thus all rang=
+es
+>> appear as zeroes.
 >>
->>> So, this region will be reported as not allocated and will be skipped=
- by any copying
->>> loop using block-status? Is it a bug of BDRV_BLOCK_RAW itself? Or I d=
-on't understand
->>> something..
+>> However, it only implemented this preallocation detection for qcow2.
+>> There are more formats that support preallocation, though: vdi, vhdx,
+>> vmdk, vpc.  (Funny how they all start with =E2=80=9Cv=E2=80=9D.)
 >>
->> I think what you don=E2=80=99t understand is that if you have a vpc fi=
-le inside
->> of a qcow2 file, you=E2=80=99re doing basically everything wrong. ;-)
+>> For vdi, vmdk, and vpc, the fix is rather simple, because they really
+>> have different subformats depending on whether an image is preallocate=
+d
+>> or not.  This makes the check very simple.
 >>
->> But maybe we should drop BDRV_BLOCK_RAW...  Does it do anything good f=
-or
->> us in the raw driver?  Shouldn=E2=80=99t it too just return DATA | REC=
-URSE?
+>> vhdx is more like qcow2, where after the image has been created, it
+>> isn=E2=80=99t clear whether it=E2=80=99s been preallocated or everythi=
+ng is allocated
+>> because everything was already written to.  69f47505ee added a heurist=
+ic
+>> to qcow2 to get around this, but I think that=E2=80=99s too much for v=
+hdx.  I
+>> just left it unfixed, because I don=E2=80=99t care that much, honestly=
+ (and I
+>> don=E2=80=99t think anyone else does).
 >>
 >=20
-> And if I have raw driver above qcow2, it will not work, like I've descr=
-ibed above..
+> What's the practical outcome of that, and is the limitation documented
+> somewhere?
 
-Yep.  That=E2=80=99s why I was wondering.  (This is a more likely case, b=
-ecause
-maybe you really want to use raw=E2=80=99s offset capability on top of qc=
-ow2.)
+The outcome is that it if you preallocate a vhdx image
+(subformat=3Dfixed), you=E2=80=99ll see that all sectors contain data, ev=
+en if
+they may be zero sectors on the filesystem level.
+
+I don=E2=80=99t think it=E2=80=99s user-visible whatsoever.
+
+> (I'm fine with not fixing it, I just want it documented somehow.)
+
+I am really not inclined to start any documentation on the
+particularities with which qemu handles vhdx images.
+
+(Especially so considering we don=E2=80=99t even have any documentation o=
+n the
+qcow2 case.  The stress in my paragraph was =E2=80=9Cheuristic=E2=80=9D. =
+ If you
+preallocate a qcow2 image, but then discard enough sectors that the
+heuristic thinks you didn=E2=80=99t, you=E2=80=99ll have the same effect.=
+  Or if you
+grow a preallocated image without preallocating the new area.)
 
 Max
 
+>>
+>> Max Reitz (3):
+>>   vdi: Make block_status recurse for fixed images
+>>   vmdk: Make block_status recurse for flat extents
+>>   vpc: Do not return RAW from block_status
+>>
+>>  block/vdi.c  | 3 ++-
+>>  block/vmdk.c | 3 +++
+>>  block/vpc.c  | 2 +-
+>>  3 files changed, 6 insertions(+), 2 deletions(-)
+>>
 
---liNzYjQmliiZ6oztyIQnPlZ0W1Ex1B02S--
 
---N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9
+
+--8BR4u9brWrtHzjbSOfBkOvzkFuDPJ310b--
+
+--SenCr0Wjz9yu6Yy2VSsbfBmVEDB2eqA0e
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RuOUACgkQ9AfbAGHV
-z0ANHAgAkmkPKd0A8vhtEJ1Xeit7caluFajsIb25oaZ2NMWW03S0KZ/XW2sReSUw
-ue1Rwv9Zk2Q/zqjekckO4Qb8d32VD2kWCNs3+9vb6mtp/kVLhcl3zv/3fUKCgbZe
-ixgFYujgcMFx/Pm7Yt91+GG8fiH/aZX+Q5EsSk+CPnSiVi72fbIsaNfYIgn2R2Pk
-Cn4zeXLUW25zGMKBXniZWn7LRmlzSHEoCT1MxzJAcCmH8wnIdPjqd/xoaJmiyrVn
-y7l2J1CLMOs579VeuXAIRpCrl0Fr2IxOo7nfdEaqVllv8rlG2wnpyZvgYMm9bmib
-8l97i1O0iuN0bD2SPr82VMd2GyX1OQ==
-=5RCB
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1Ruc8ACgkQ9AfbAGHV
+z0BOowf/U0/l0e5La4gTyv8lVMe8iOwNJmBgmGRoe1hDxpdPW4VCawEbIGP41TL6
+meejTwuhyTSyjZr+8ai2uszDQNNdRD52QH0Qj7SLNAKEX/IYXRzg5iE2KpfEIqvv
+WJRGBMptVe10sYugDZEjil29xyP1leXZZya8KxhgV3Bj1zXDKp1cc5H42SANRCtl
+6JF5cGV7Vh2dw0N+//bO0XCDJA2S3rQTWhpqH940oH41bO526kZYUUlO4peGjC4w
+YC5bJsHh7VxNj2fG9Wmcpd3HI9j6QlWjfBbGyhrda1tOP4+P5mPyyHzj9NG7yKkj
+twkUHp9ouQ3w1x745D/GiG2WzHwVxA==
+=7rGW
 -----END PGP SIGNATURE-----
 
---N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9--
+--SenCr0Wjz9yu6Yy2VSsbfBmVEDB2eqA0e--
 
