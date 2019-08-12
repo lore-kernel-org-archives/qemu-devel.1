@@ -2,47 +2,47 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1320CC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5572CC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:48:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB98220684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:46:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB98220684
+	by mail.kernel.org (Postfix) with ESMTPS id 27A2420684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:48:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27A2420684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFL7-0000Ys-48
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 14:46:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45603)
+	id 1hxFN0-0001iI-Gw
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 14:48:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45848)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxFKB-0008Sc-NV
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:45:44 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxFMN-0001A1-0E
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:48:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxFKA-0000bH-T5
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:45:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52090)
+ (envelope-from <jsnow@redhat.com>) id 1hxFML-0001DY-Pw
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:47:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45112)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxFK8-0000aZ-RD; Mon, 12 Aug 2019 14:45:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hxFMJ-0001Cg-Ef; Mon, 12 Aug 2019 14:47:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DCBF183F3B;
- Mon, 12 Aug 2019 18:45:39 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B753C300676E;
+ Mon, 12 Aug 2019 18:47:54 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2970F802C9;
- Mon, 12 Aug 2019 18:45:38 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190809185253.17535-1-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2FC001001B1A;
+ Mon, 12 Aug 2019 18:47:54 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190809091107.11161-1-kwolf@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,22 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <70dd181b-42f6-6da3-023a-baab380edde2@redhat.com>
-Date: Mon, 12 Aug 2019 14:45:38 -0400
+Message-ID: <cab11261-5b94-0455-fd25-fa79f6562f23@redhat.com>
+Date: Mon, 12 Aug 2019 14:47:53 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190809185253.17535-1-mreitz@redhat.com>
+In-Reply-To: <20190809091107.11161-1-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 12 Aug 2019 18:45:39 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Mon, 12 Aug 2019 18:47:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Fix 141 when run
- with qed
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qemu-img convert: Deprecate
+ using -n and -o together
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,25 +146,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/9/19 2:52 PM, Max Reitz wrote:
-> 69f47505ee has changed qcow2 in such a way that the commit job run in
-> test 141 (and 144[1]) returns before it emits the READY event.  However,
-> 141 also runs with qed, where the order is still the other way around.
-> Just filter out the {"return": {}} so the test passes for qed again.
+On 8/9/19 5:11 AM, Kevin Wolf wrote:
+> bdrv_create options specified with -o have no effect when skipping image
+> creation with -n, so this doesn't make sense. Warn against the misuse
+> and deprecate the combination so we can make it a hard error later.
 > 
-> [1] 144 only runs with qcow2, so it is fine as it is.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qemu-img.c           | 5 +++++
+>  qemu-deprecated.texi | 7 +++++++
+>  2 files changed, 12 insertions(+)
 > 
-> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Fixes: 69f47505ee66afaa513305de0c1895a224e52c45
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 79983772de..d9321f6418 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -2231,6 +2231,11 @@ static int img_convert(int argc, char **argv)
+>          goto fail_getopt;
+>      }
+>  
+> +    if (skip_create && options) {
+> +        warn_report("-o has no effect when skipping image creation");
+> +        warn_report("This will become an error in future QEMU versions.");
+> +    }
+> +
+>      s.src_num = argc - optind - 1;
+>      out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
+>  
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index fff07bb2a3..7673d079c5 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -305,6 +305,13 @@ to just export the entire image and then mount only /dev/nbd0p1 than
+>  it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
+>  subset of the image.
+>  
+> +@subsection qemu-img convert -n -o (since 4.2.0)
+> +
+> +All options specified in @option{-o} are image creation options, so they
+> +have no effect when used with @option{-n} to skip image creation. This
+> +combination never made sense and shows that the user misunderstood the
+> +effect of the options, so this will be made an error in future versions.
+> +
+
+I would avoid too much finger-wagging here. We can just say that the
+combination never had a well-defined behavior, so it will now be treated
+as an error.
+
+Otherwise:
 
 Reviewed-by: John Snow <jsnow@redhat.com>
 
