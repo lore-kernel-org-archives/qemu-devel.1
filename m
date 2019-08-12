@@ -2,49 +2,49 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A55AEC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 11:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CC2C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 11:51:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7224B20684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 11:48:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7224B20684
+	by mail.kernel.org (Postfix) with ESMTPS id 6C0DD20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 11:51:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C0DD20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx8oG-0007ET-Mc
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 07:48:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37083)
+	id 1hx8rg-0008V7-QG
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 07:51:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37505)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hx8ni-0006XN-0P
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 07:47:46 -0400
+ (envelope-from <thuth@redhat.com>) id 1hx8rB-00080Q-W1
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 07:51:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hx8nh-0004kk-3a
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 07:47:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58372)
+ (envelope-from <thuth@redhat.com>) id 1hx8rB-0006M9-6y
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 07:51:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54260)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hx8ng-0004kK-T0; Mon, 12 Aug 2019 07:47:45 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hx8rA-0006LY-WB; Mon, 12 Aug 2019 07:51:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 17869300676E;
- Mon, 12 Aug 2019 11:47:44 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E898A3CA0A;
+ Mon, 12 Aug 2019 11:51:19 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-117-26.ams2.redhat.com [10.36.117.26])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AB79C600C4;
- Mon, 12 Aug 2019 11:47:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 028291001947;
+ Mon, 12 Aug 2019 11:51:13 +0000 (UTC)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20190812113739.16587-1-philmd@redhat.com>
- <20190812113739.16587-2-philmd@redhat.com>
+ <20190812113739.16587-3-philmd@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,21 +90,22 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <67d69f94-1606-dec9-cefa-349952407888@redhat.com>
-Date: Mon, 12 Aug 2019 13:47:36 +0200
+Message-ID: <61761ee5-af96-f4cb-aaa2-2544b90b18e7@redhat.com>
+Date: Mon, 12 Aug 2019 13:51:12 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190812113739.16587-2-philmd@redhat.com>
+In-Reply-To: <20190812113739.16587-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 12 Aug 2019 11:47:44 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Mon, 12 Aug 2019 11:51:19 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/display/sm501: Remove unused include
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/display: Compile various display
+ devices as common object
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,36 +117,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-ppc@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-ppc@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/12/19 1:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> The "cpu.h" include makes devices target-specific. Since it
-> is not used, remove it, so the device become generic (we can
-> now compile it once for all targets).
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  hw/display/sm501.c | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index 5918f59b2b..b15fb1ab00 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -28,7 +28,6 @@
->  #include "qapi/error.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
-> -#include "cpu.h"
->  #include "hw/hw.h"
->  #include "hw/char/serial.h"
->  #include "ui/console.h"
->=20
-
+> Various display devices are not target-specific and can
+> be compiled once for all the targets.
+> After this commit, the 'make world' target is reduced by
+> 54 objectts
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
 
