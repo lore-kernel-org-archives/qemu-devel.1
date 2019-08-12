@@ -2,48 +2,48 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA368C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F8FC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:01:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8895020684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:00:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8895020684
+	by mail.kernel.org (Postfix) with ESMTPS id 8809020684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:01:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8809020684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFYB-00040l-Q3
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:00:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47706)
+	id 1hxFZU-0005W0-Tj
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:01:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47888)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxFXb-0003Uc-6P
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:59:35 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxFYK-0004VL-8E
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:00:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxFXa-0005uW-D6
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:59:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47966)
+ (envelope-from <jsnow@redhat.com>) id 1hxFYI-0006BF-Qw
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:00:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51244)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxFXY-0005sz-F3; Mon, 12 Aug 2019 14:59:32 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hxFYG-00069V-4n; Mon, 12 Aug 2019 15:00:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0A0A830B1B7E;
- Mon, 12 Aug 2019 18:59:30 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 332A9300676E;
+ Mon, 12 Aug 2019 19:00:15 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A25617CCB;
- Mon, 12 Aug 2019 18:59:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5BCDA80342;
+ Mon, 12 Aug 2019 19:00:09 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190625211955.15664-1-mreitz@redhat.com>
- <20190625211955.15664-3-mreitz@redhat.com>
+ <20190625211955.15664-4-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <6162d697-2adc-ebe6-23b3-0209949f3fe8@redhat.com>
-Date: Mon, 12 Aug 2019 14:59:26 -0400
+Message-ID: <4ed1bd3f-9b47-cbe7-ddc2-dca2e2d349b9@redhat.com>
+Date: Mon, 12 Aug 2019 15:00:09 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190625211955.15664-3-mreitz@redhat.com>
+In-Reply-To: <20190625211955.15664-4-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Mon, 12 Aug 2019 18:59:30 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Mon, 12 Aug 2019 19:00:15 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/5] iotests: Prefer
- null-co over null-aio
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/5] iotests: Allow
+ skipping test cases
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,7 +147,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -155,12 +156,77 @@ Sender: "Qemu-devel"
 
 
 On 6/25/19 5:19 PM, Max Reitz wrote:
-> We use null-co basically everywhere in the iotests.  Unless we want to
-> test null-aio specifically, we should use it instead (for consistency).
-> 
+> case_notrun() does not actually skip the current test case.  It just
+> adds a "notrun" note and then returns to the caller, who manually has t=
+o
+> skip the test.  Generally, skipping a test case is as simple as
+> returning from the current function, but not always: For example, this
+> model does not allow skipping tests already in the setUp() function.
+>=20
+> Thus, add a QMPTestCase.case_skip() function that invokes case_notrun()
+> and then self.skipTest().  To make this work, we need to filter the
+> information on how many test cases were skipped from the unittest
+> output.
+>=20
+
+I feel like skipping sub-tests has been a point of contention before,
+but I don't recall the outcome.
+
+Cleber, can you help jog my memory?
+
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qemu-iotests/iotests.py | 20 ++++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
+.py
+> index 3ecef5bc90..1b0ac50153 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -741,6 +741,11 @@ class QMPTestCase(unittest.TestCase):
+>              return self.pause_wait(job_id)
+>          return result
+> =20
+> +    def case_skip(self, reason):
+> +        '''Skip this test case'''
+> +        case_notrun(reason)
+> +        self.skipTest(reason)
+> +
+> =20
+>  def notrun(reason):
+>      '''Skip this test suite'''
+> @@ -752,7 +757,10 @@ def notrun(reason):
+>      sys.exit(0)
+> =20
+>  def case_notrun(reason):
+> -    '''Skip this test case'''
+> +    '''Mark this test case as not having been run, but do not actually
+> +    skip it; that is left to the caller.  See QMPTestCase.case_skip()
+> +    for a variant that actually skips the current test case.'''
+> +
+>      # Each test in qemu-iotests has a number ("seq")
+>      seq =3D os.path.basename(sys.argv[0])
+> =20
+> @@ -879,4 +887,12 @@ def main(supported_fmts=3D[], supported_oses=3D['l=
+inux'], supported_cache_modes=3D[],
+>          unittest.main(testRunner=3DMyTestRunner)
+>      finally:
+>          if not debug:
+> -            sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s', r'=
+Ran \1 tests', output.getvalue()))
+> +            out =3D output.getvalue()
+> +            out =3D re.sub(r'Ran (\d+) tests? in [\d.]+s', r'Ran \1 te=
+sts', out)
+> +
+> +            # Hide skipped tests from the reference output
+> +            out =3D re.sub(r'OK \(skipped=3D\d+\)', 'OK', out)
+> +            out_first_line, out_rest =3D out.split('\n', 1)
+> +            out =3D out_first_line.replace('s', '.') + '\n' + out_rest
+> +
+> +            sys.stderr.write(out)
+>=20
 
-Probably fine.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+--=20
+=E2=80=94js
 
