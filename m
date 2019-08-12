@@ -2,120 +2,92 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A2CC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 14:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CCE2C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 14:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD24F2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 14:48:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Rd3/nNyC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD24F2085A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DEC31206A2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 14:49:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEC31206A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxBd2-00081P-VC
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 10:48:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37006)
+	id 1hxBdo-0000Di-7d
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 10:49:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37187)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxBbt-000705-7x
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 10:47:46 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxBce-0007eB-JY
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 10:48:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxBbq-0005o1-OD
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 10:47:44 -0400
-Received: from mail-eopbgr50123.outbound.protection.outlook.com
- ([40.107.5.123]:9377 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxBbq-0005nS-50; Mon, 12 Aug 2019 10:47:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l7vN6UBiar/d5QHCkjgxUnt3jX6OStjbGQgGfmA7jRGZom30BxF1pApQKwvzBlSgJPSf2dnloiBQZk+9Wgi236fIFn8i250Z6YktvrCFL0R9KSIhEEAaGfY2T0Z/EwX4sNQBwrDWrnEqSldDHif+sildQCCUvqsakmZDKylyfpCjH4QiQMoDFR26D4hM9Otd1fyx3P7vy7uFAk7tetrUgzDOcAqftnhCIH6Wc2lbV9JB7VL8HZtkcb1u3byK3x+hNPbGMghW9teQ83ooTEClblMs+4R4gDHAowoTZpbeVyubzg+FH2j0tJhilO3PEGWJcFk9hiWkdSR4Lzz0rOea+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yBX8N8uxkrE6Uq9rtIpcaRHWl28GypIKvk/fTv77vYc=;
- b=HFZux8IQZT0CECWGP3i6iaD2dD312XzRiAp7AJlZ2evvi9IQVPUtSArAw+209NVLkbetzcpZ7xrGAL9w2iCbY8pinXiOGnT/UPf9zX5g4mlRwTzIN6LQPb7m97+VcsBGJgqQCPS8HVw3HvBur2C1F5FZR2I+UqlnQlcx5JAh0T0AqaBcRfzZ3FyMbc6OfF0+yKnc+OxREbI7HntyqvB5XT/FzNVLN1fjAv9/t2nsFi/sVfhh5GQD2OxVmR61UKxF1oTR89KR8VZXwdGAWl7LhO5GY6I+IyCxat23hhJ/vEl0u9OFze0qZRdEKhxsjIaCJAmDpCo/KvSLm9itKLkTbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yBX8N8uxkrE6Uq9rtIpcaRHWl28GypIKvk/fTv77vYc=;
- b=Rd3/nNyCTcrUZ0AT2/VkcQd74UzA4hSIoneBRoGw5Vxr28ivUiGT3Q/LqZau2OOdHZ3hbxFpWpDVshXcX4cvbHvSQjEUS6h75kL+n5ho79AmctpA6c1PqQtdTaajP4EepM9Z++rnY3NSKdfBPF6zzTb1bCMXhGCplam0zM16Eq0=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB4187.eurprd08.prod.outlook.com (20.179.9.82) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.22; Mon, 12 Aug 2019 14:47:40 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.022; Mon, 12 Aug 2019
- 14:47:40 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Thread-Topic: [PATCH 1/3] vdi: Make block_status recurse for fixed images
-Thread-Index: AQHVQwFdJNt2TM9ks0SHntbJ24gB1ab3s8GA
-Date: Mon, 12 Aug 2019 14:47:40 +0000
-Message-ID: <fc17bae2-a916-3c0e-b944-f2fd60d4ecca@virtuozzo.com>
-References: <20190725155512.9827-1-mreitz@redhat.com>
- <20190725155512.9827-2-mreitz@redhat.com>
-In-Reply-To: <20190725155512.9827-2-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR07CA0012.eurprd07.prod.outlook.com
- (2603:10a6:7:67::22) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190812174737479
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5dbcc906-969f-4c94-cd48-08d71f340632
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB4187; 
-x-ms-traffictypediagnostic: DB8PR08MB4187:
-x-microsoft-antispam-prvs: <DB8PR08MB41878C4B42D573DCEA21E87DC1D30@DB8PR08MB4187.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:489;
-x-forefront-prvs: 012792EC17
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(396003)(39840400004)(366004)(136003)(376002)(189003)(199004)(81156014)(81166006)(6512007)(8676002)(31686004)(99286004)(14454004)(7736002)(11346002)(486006)(2616005)(2906002)(476003)(25786009)(446003)(478600001)(8936002)(54906003)(36756003)(110136005)(86362001)(229853002)(6436002)(66066001)(6486002)(31696002)(102836004)(52116002)(2501003)(26005)(316002)(76176011)(71190400001)(71200400001)(66946007)(66446008)(64756008)(66556008)(6506007)(386003)(186003)(66476007)(6246003)(256004)(14444005)(5660300002)(6116002)(3846002)(53936002)(4326008)(305945005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4187;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: GD0zQfWRx+wOTxePnKNfHFCHzhVrEV5Dw8DWFaLKJOdWLrwvgymjGdSk+9HgNIXPe6JbXn4kra6IO1IkT/3bRx2O5WCWFvtYEwPH3HydHUUWF/CWcjATsu65+QqafaLpXWhQbeqlbO5ggbGR2DKdU7NlPrUO3nWFyOMudEI7Waazb+A2da3KwxYMjA5shc+ASEj1WhuQuuOXEo5+kP3DPhjV7I/Vuh0CSHG2y+cceTu8XKxdL0YjrZ2KkHDWn6yMaW9cxNONvD8DpVcrLZPx975+Mqq/j+vubuM+jA8/tiG0uuoBooFH4fSzFbpyiVy9sNhwEr1uF5BFAgkkeR1LF+boqTsExk1hJG7gAgbvrjJORt5P79NNrD1ZqmrDkSYmh399NEfmu7fOr2E2kSHJD+RFPSMUbGslAWZP7exEmqU=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <1E2EB95FFF13DA4BAFA48C6758EC47E1@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <mreitz@redhat.com>) id 1hxBcd-00063x-O3
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 10:48:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58574)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hxBca-000638-PH; Mon, 12 Aug 2019 10:48:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E69F3003194;
+ Mon, 12 Aug 2019 14:48:27 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
+ [10.40.204.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 77A6A60BEE;
+ Mon, 12 Aug 2019 14:48:20 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
+ <20190810193155.58637-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <519a80e3-3cec-d37c-9131-52cac0e0e4b6@redhat.com>
+Date: Mon, 12 Aug 2019 16:48:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5dbcc906-969f-4c94-cd48-08d71f340632
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2019 14:47:40.0809 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Q2fONfbFI/3xGJtEHBUWRz9rb07doYyMBPLAEuLlKLqmYLCjM5jc5EXK1mjnwcPdE8uT5u7h7Vk/asmj98BnJhXXvRsMPQmWVEDbb7YSNxw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4187
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.123
-Subject: Re: [Qemu-devel] [PATCH 1/3] vdi: Make block_status recurse for
- fixed images
+In-Reply-To: <20190810193155.58637-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="2upsmnOAJAk4BivmRaNUjPU3zWErctGkV"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 12 Aug 2019 14:48:28 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] block/io: handle alignment and
+ max_transfer for copy_range
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,31 +99,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjUuMDcuMjAxOSAxODo1NSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBTdWdnZXN0ZWQtYnk6IFZsYWRp
-bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4gRml4
-ZXM6IDY5ZjQ3NTA1ZWU2NmFmYWE1MTMzMDVkZTBjMTg5NWEyMjRlNTJjNDUNCj4gU2lnbmVkLW9m
-Zi1ieTogTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT4NCg0KU29ycnkgZm9yIGEgZGVsYXks
-IEkgdGhvdWdodCB0aGF0IG1haW50YWluZXJzIG9mIHRoZSBmb3JtYXRzIHdpbGwgYXBwcm92ZSB0
-aGVzZSBwYXRjaGVzIDspDQoNCkRvbid0IGtub3cgdmRpIGNvZGUsIGJ1dCBpdCBpcyB3aGF0IEkg
-c3VnZ2VzdGVkIGFuZCBzZWVtcyB0byBiZSB0aGUgcmlnaHQgdGhpbmcgdG8gZG86DQoNClJldmll
-d2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
-by5jb20+DQoNCj4gLS0tDQo+ICAgYmxvY2svdmRpLmMgfCAzICsrLQ0KPiAgIDEgZmlsZSBjaGFu
-Z2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9i
-bG9jay92ZGkuYyBiL2Jsb2NrL3ZkaS5jDQo+IGluZGV4IGI5ODQ1YTRjYmQuLjQwZDQwYzM0ZDUg
-MTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL3ZkaS5jDQo+ICsrKyBiL2Jsb2NrL3ZkaS5jDQo+IEBAIC01
-NDIsNyArNTQyLDggQEAgc3RhdGljIGludCBjb3JvdXRpbmVfZm4gdmRpX2NvX2Jsb2NrX3N0YXR1
-cyhCbG9ja0RyaXZlclN0YXRlICpicywNCj4gICAgICAgKm1hcCA9IHMtPmhlYWRlci5vZmZzZXRf
-ZGF0YSArICh1aW50NjRfdClibWFwX2VudHJ5ICogcy0+YmxvY2tfc2l6ZSArDQo+ICAgICAgICAg
-ICBpbmRleF9pbl9ibG9jazsNCj4gICAgICAgKmZpbGUgPSBicy0+ZmlsZS0+YnM7DQo+IC0gICAg
-cmV0dXJuIEJEUlZfQkxPQ0tfREFUQSB8IEJEUlZfQkxPQ0tfT0ZGU0VUX1ZBTElEOw0KPiArICAg
-IHJldHVybiBCRFJWX0JMT0NLX0RBVEEgfCBCRFJWX0JMT0NLX09GRlNFVF9WQUxJRCB8DQo+ICsg
-ICAgICAgIChzLT5oZWFkZXIuaW1hZ2VfdHlwZSA9PSBWRElfVFlQRV9TVEFUSUMgPyBCRFJWX0JM
-T0NLX1JFQ1VSU0UgOiAwKTsNCj4gICB9DQo+ICAgDQo+ICAgc3RhdGljIGludCBjb3JvdXRpbmVf
-Zm4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2upsmnOAJAk4BivmRaNUjPU3zWErctGkV
+Content-Type: multipart/mixed; boundary="rnlJ7UJikvhb9u6EwleycsQ8D5R2sWRYJ";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+Message-ID: <519a80e3-3cec-d37c-9131-52cac0e0e4b6@redhat.com>
+Subject: Re: [PATCH v3 3/7] block/io: handle alignment and max_transfer for
+ copy_range
+References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
+ <20190810193155.58637-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190810193155.58637-4-vsementsov@virtuozzo.com>
+
+--rnlJ7UJikvhb9u6EwleycsQ8D5R2sWRYJ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 10.08.19 21:31, Vladimir Sementsov-Ogievskiy wrote:
+> copy_range ignores these limitations, let's improve it.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/io.c | 44 ++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 36 insertions(+), 8 deletions(-)
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--rnlJ7UJikvhb9u6EwleycsQ8D5R2sWRYJ--
+
+--2upsmnOAJAk4BivmRaNUjPU3zWErctGkV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RfDIACgkQ9AfbAGHV
+z0A+Bwf/dgBPXfAt6OrkCZnbxA4YAtNtOtDd2GheqfA1J/W8O7RMpa4nNKVRsAuX
+yxKHR9+zC5DGk63EQzBiOxhhCA0ODaZkkuL9SanMCkectoZelRjfY9xdNbsLrzcV
+K9FVRjWEj+Au9Df/hrIm51dVRIIPG8tS1giixVmKdnBtX3f3vg7k4p1FqI4I3Qxz
+XAxIEqabtaNzf3KxqP82AXfJg0MAgcMPLe5Ihsc5mJg+jrsyFjpPEFQckScONuHF
+//VEJ4Bk+1ZOU9wEap/lE/pZtIYom7fMxE8/pAADVS6JLSVbH9XXGa/Mwpv2LXdD
+F8xyh3rq70cT/6gGc8yJq7mB1v5jTA==
+=DFYi
+-----END PGP SIGNATURE-----
+
+--2upsmnOAJAk4BivmRaNUjPU3zWErctGkV--
 
