@@ -2,94 +2,78 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F747C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5545C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:46:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC4B520663
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:39:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sMzY0DIF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC4B520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 78336208C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:46:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78336208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx9bz-0008C4-2V
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 08:39:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43919)
+	id 1hx9iH-0003fO-QY
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 08:46:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44951)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <randrianasulu@gmail.com>) id 1hx9bN-0007m7-AC
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:39:06 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hx9hq-0003FN-9T
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:45:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <randrianasulu@gmail.com>) id 1hx9bM-0004rY-2D
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:39:05 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:43618)
+ (envelope-from <pbonzini@redhat.com>) id 1hx9hp-0000Pv-6M
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:45:46 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36796)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
- id 1hx9bL-0004qj-MX
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:39:04 -0400
-Received: by mail-lf1-x143.google.com with SMTP id c19so74120168lfm.10
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:subject:date:user-agent:cc:references:in-reply-to
- :mime-version:content-transfer-encoding:content-disposition
- :message-id; bh=T3UFkfZVOYvpMwdINYQTXRqex/OJ9MIESAtVURuyhJg=;
- b=sMzY0DIF94W+0EAIuKWQy0L/6izfFMKiSQKkci9pEeIDnNKKXDqVMdnKzmbJ9+K/AE
- TwUf5mKCG2KbzYJJGFtbBO2kvJ7tnQqQLGac1OOvT90LQq57UQgKrVXsgrcsbUhWbG2W
- kIB8ff6eVQLLtN48V5vYaFl/QgzibUFRM73JZN5lm4pFNjUY18QgXGnAD4WM1r/d2GVC
- xkPtYYRZRW0f4ltAUPnpMWqhB/DFiJhRt1+ilR7q5uCFlWAmD0vruUK4RWQ+q9QoEHoG
- oOx0KLsn+NeXWGabc31HC/PXvoqCWfIi1B/kWF2FVGY4fq5uwRLA5EM7mRggBAlVLaVd
- WftA==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hx9hp-0000PW-07
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:45:45 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r3so10703041wrt.3
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:45:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:user-agent:cc:references
- :in-reply-to:mime-version:content-transfer-encoding
- :content-disposition:message-id;
- bh=T3UFkfZVOYvpMwdINYQTXRqex/OJ9MIESAtVURuyhJg=;
- b=h0dsM2fmOihnWceklJg5sNih1SR3u7IxVy4mIoRZJNSI6fP+8s8/d7jMab84okRFOG
- OvBg8NizEgq2/Ibiks8v3RDqQE98RnIWnZGbZDGC2Pxj3NJmINttlI7fylAmOM5MNfWy
- s0KtFxOV4D8irGde523bMdI6uMTRn0QjY2FyUjpCuJP11CrbqwP7XHIi3ux0m7oO6/4G
- atUu7CL9rS326k785EERSoInNHNgQVt66U7+FVdiTq5bs/E5elo4WIj5mW/7x5pT5qDo
- 940YEJro9c/gU6CEJO4I/nEJh6K60Xa706typVtbMa5y+F+Ld+BeQKX6IKZA5HMarFgZ
- ifQg==
-X-Gm-Message-State: APjAAAUkweGMSl0F/nXqucKKIsCalS7dhowENHPsbjmPRTRFwj5/F1gw
- cumozwtvLK+lsSW52m23DJ4=
-X-Google-Smtp-Source: APXvYqwDLuy0F7O8fmGL6M3gXnyCwito+vwyKBxHjW+Ycq8t/kXSTXivfK25yc+2PVBYrkCHR7T8XQ==
-X-Received: by 2002:a05:6512:244:: with SMTP id
- b4mr20843505lfo.114.1565613541229; 
- Mon, 12 Aug 2019 05:39:01 -0700 (PDT)
-Received: from [192.168.1.100] ([176.116.252.109])
- by smtp.gmail.com with ESMTPSA id x13sm582273ljm.7.2019.08.12.05.38.59
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 12 Aug 2019 05:38:59 -0700 (PDT)
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Mon, 12 Aug 2019 15:27:55 +0300
-User-Agent: KMail/1.9.10
-References: <cover.1565558093.git.balaton@eik.bme.hu>
- <8942e49f-493f-70c4-b2a1-10b97f2a7c6d@redhat.com>
- <alpine.BSF.2.21.9999.1908121239520.68551@zero.eik.bme.hu>
-In-Reply-To: <alpine.BSF.2.21.9999.1908121239520.68551@zero.eik.bme.hu>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Iai2XMHreZtPQzNCJ5E1hj7XpzUJV3iDebTMKyw/FWU=;
+ b=sDk1JTYLSw1xgMRtKKE1lV41EUFtSQcakanoLXlzD8+9IDpflu1pobOYi97kiWVLRH
+ DYmm/lr/yG5F+Iz4akPyySzh/WAkZC7GSAbRZQDaim+rct2VJAapuWcWnsewVbC4fqDA
+ MRpvgBBtyVTStVWiWYNhYDyn8GGh66wuThCCkC+pwSZ4djeY3LhefLtHsI2tUgCG+PNU
+ URgAhVFCccLOADIPUzxBRAR8rfNqg/o1AuF5k37MVabum0HkZ8oPVgHrhx5XNajVTD3j
+ mw2Ofj6O/eWvLMOYUUujvHjVoDeE0056D4cYDi+ZGi2vX6A+i/U39nVx2J/dH+Asc37y
+ XcpQ==
+X-Gm-Message-State: APjAAAX7WWR6WlCVoQZJvX0+L2j+Bb3qCwCtJcH0oU05v1hVfSUX0P8H
+ dJq4IuovQHnHuyIhYIubJPnO60Wo1vg=
+X-Google-Smtp-Source: APXvYqyNRI9JCyPGBmrAgrbJ5w7oidY854Ppgawt+n7NIAXrJs0tq3yRk+T5B8/vK6hSz/Q0DHZGrw==
+X-Received: by 2002:adf:f088:: with SMTP id n8mr40563924wro.58.1565613942710; 
+ Mon, 12 Aug 2019 05:45:42 -0700 (PDT)
+Received: from [10.201.49.73] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id x24sm15896931wmh.5.2019.08.12.05.45.41
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Mon, 12 Aug 2019 05:45:41 -0700 (PDT)
+To: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+ Peter Maydell <peter.maydell@linaro.org>,
+ Prasad J Pandit <ppandit@redhat.com>
+References: <20190812065221.20907-1-kraxel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <aec51679-b766-5773-86cb-9ebd06a8cb49@redhat.com>
+Date: Mon, 12 Aug 2019 14:45:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Message-Id: <201908121527.55871.randrianasulu@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] [PATCH 4/7] ati-vga: Fix cursor color with
- guest_hwcursor=true
+In-Reply-To: <20190812065221.20907-1-kraxel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.68
+Subject: Re: [Qemu-devel] [PATCH 0/1] display/bochs: fix pcie support (qemu
+ security issue)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,100 +85,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-=D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=82 =
-Monday 12 August 2019 13:55:45 BALATON Zoltan =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BB(=D0=B0):
-> On Mon, 12 Aug 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 8/12/19 12:28 PM, BALATON Zoltan wrote:
-> >> On Mon, 12 Aug 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>> On 8/11/19 11:14 PM, BALATON Zoltan wrote:
-> >>>> Fixes: a38127414bd007c5b6ae64c664d9e8839393277e
-> >>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >>>> ---
-> >>>> ?hw/display/ati.c | 2 +-
-> >>>> ?1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/hw/display/ati.c b/hw/display/ati.c
-> >>>> index 699f38223b..b849f5d510 100644
-> >>>> --- a/hw/display/ati.c
-> >>>> +++ b/hw/display/ati.c
-> >>>> @@ -207,7 +207,7 @@ static void ati_cursor_draw_line(VGACommonState
-> >>>> *vga, uint8_t *d, int scr_y)
-> >>>> ???????????????? }
-> >>>> ???????????? } else {
-> >>>> ???????????????? color =3D (xbits & BIT(7) ? s->regs.cur_color1 :
-> >>>> -????????????????????????????????????????? s->regs.cur_color0) << 8 |
-> >>>> 0xff;
-> >>>> +????????????????????????????????????????? s->regs.cur_color0) |
-> >>>> 0xff000000;
-> >>>> ???????????? }
-> >>>> ???????????? if (vga->hw_cursor_x + i * 8 + j >=3D h) {
-> >>>> ???????????????? return; /* end of screen, don't span to next line */
-> >>>>
-> >>>
-> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>
-> >> Thanks. I've noticed that cursor color may still be wrong with MacOS
-> >> that uses big endian frame buffer so maybe this will also need to take
-> >> frame buffer endianness into account somehow but this patch corrects a
-> >> difference between guest_hwcursor true and false values, reproducible
-> >> with some Linux versions (as far as I remember). While the wrong cursor
-> >> color with MacOS is now consistent after this patch with both
-> >> guest_hwcursor true or false so that likely needs a different fix that
-> >> should be applied both to this place and to ati_cursor_define. (MacOS
-> >> does not yet boot fully, it needs patches to OpenBIOS to be able to run
-> >> an FCode ROM and will probably need the VBlank interrupt implemented in
-> >> ati-vga without which it displays a desktop but freezes there).
-> >
-> > If you remember which Linux version had this problem, or you can link to
-> > roms that behave incorrectly, please share, so we can add display
-> > regression tests.
->=20
-> Unfortunately I don't. I think it was Andrew who found this so maybe he=20
-> can remember.
+On 12/08/19 08:52, Gerd Hoffmann wrote:
+> Just found while investigating
+>   https://bugzilla.redhat.com/show_bug.cgi?id=1707118
+> 
+> Found PCIe extended config space filled with random crap due to
+> allocation being too small (conventional pci config space only).
+> 
+> PCI(e) config space is guest writable.  Writes are limited by
+> write mask (which probably is also filled with random stuff),
 
-Blue cursor was seen on specific dvd (x86) image I did for myself,=20
-because it was  using plain X cursor (arrow or X-shaped), not colored=20
-versions used by default in many distributions.
+Yes, it is also allocated with 256 bytes only.
 
-may be 'startx -- -retro" will show it briefly too?
+> so the guest can only flip enabled bits.  But I suspect it
+> still might be exploitable, so rather serious because it might
+> be a host escape for the guest.  On the other hand the device
+> is probably not yet in widespread use.
+> 
+> Migitation: use "-device bochs-display" as conventional pci
+> device only.
+> 
+> Note: qemu 4.1 release is planned for tomorrow.
+> 
+> Gerd Hoffmann (1):
+>   display/bochs: fix pcie support
+> 
+>  hw/display/bochs-display.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
 
-from man Xserver (1.19.7):
+Looks good to me, and no other device seems to have the same issue.  We
+could add an assertion that pci_config_size has not increased after
+calling pc->realize.
 
-=2Dretro  starts  the  server  with  the  classic stipple and cursor visibl=
-e.  The default is to start with a black root window, and to suppress displ=
-ay of the cursor until the
-               first time an application calls XDefineCursor().=20
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-
-https://yadi.sk/d/F8cbINWzWJ-DkA
-
-users: root and guest
-passwords: toor and guest
-
-You need to boot it to syslinux and type 'slax' there, because default will=
- boot x86-64 kernel without aty128fb .... (my fault)
-Unfortunately, i don't have fresh qemu compiled (previous tests were done f=
-rom tmpfs copy of qemu source tree),
- will recompile from git and re-test. from memory, loading aty128fb and
-setting config fragment in /etc/X11/xorg.conf.d for EXA AccelMethod and "Op=
-tion "UseFBDev" "1" ' allowed device (ati-vga) to work.
-
-
-
->=20
-> (You may also need latest vgabios-ati.bin from Gerd's repo to get Linux=20
-> drivers load and for rage128p that has to be in pc-bios dir because PCI=20
-> IDs are only patched in that way.)
->=20
-> Regards,
-> BALATON Zoltan
-
-
+Paolo
 
