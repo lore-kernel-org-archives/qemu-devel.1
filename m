@@ -2,142 +2,91 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C6EC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A891C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:20:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAB2B206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:17:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAB2B206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 2B54D206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:20:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B54D206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFov-00076h-5r
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:17:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50893)
+	id 1hxFsH-00009R-Hm
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:20:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51560)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxFoK-0006N1-Ku
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:16:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxFrq-00085i-Od
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:20:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxFoI-0005of-PA
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:16:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53104)
+ (envelope-from <mreitz@redhat.com>) id 1hxFrp-0007Mw-PG
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:20:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54272)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxFoF-0005mn-8U; Mon, 12 Aug 2019 15:16:47 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hxFrk-0007Hc-Ga; Mon, 12 Aug 2019 15:20:25 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 588B7300BCE9;
- Mon, 12 Aug 2019 19:16:46 +0000 (UTC)
-Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B55B9D1FE;
- Mon, 12 Aug 2019 19:16:42 +0000 (UTC)
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-References: <f95cecc3-9ba2-0aed-9b17-fb76c6558929@redhat.com>
- <e5cc1268-428f-b3c0-3eb1-9291a9fe5688@redhat.com>
- <5e5822d2-41eb-a4e9-1d47-e29409b14b1e@redhat.com>
-From: John Snow <jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 0DCD83CA1D;
+ Mon, 12 Aug 2019 19:20:21 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
+ [10.40.204.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C92560872;
+ Mon, 12 Aug 2019 19:20:16 +0000 (UTC)
+To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>
+References: <c293e99d-331a-f3aa-eecb-d562554350f9@redhat.com>
+ <ac5a6d46-99ee-ef1f-9fa0-8ebeab0f4485@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
- IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
- vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
- rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
- 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
- ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
- 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
- h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
- T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
- LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
- KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
- BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
- qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
- LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
- ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
- J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
- vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
- il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
- 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
- tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
- 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
- 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
- d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
- 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
- MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
- NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
- TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
- L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
- JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
- /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
- nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
- 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
- Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
- e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
- ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
- vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
- C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
- fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
- rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
- TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
- PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
- Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
- E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
- Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
- rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
- cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
- wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
- jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
- vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
- eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
- RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
- CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
- AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
- VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
- XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
- Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
- y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
- sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
- HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
- 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
- 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
- y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
- uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
- YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
- 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
- Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
- TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
- TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
- GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
- rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
- i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
- RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
- glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <a2f5b94f-ce87-a8d2-b751-a38e44ad3b76@redhat.com>
-Date: Mon, 12 Aug 2019 15:16:42 -0400
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fdb15508-4cb8-4295-af34-63d402e58ccd@redhat.com>
+Date: Mon, 12 Aug 2019 21:20:15 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <5e5822d2-41eb-a4e9-1d47-e29409b14b1e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <ac5a6d46-99ee-ef1f-9fa0-8ebeab0f4485@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="rN4M0qnFYLv2zsOJfZ47Ju3tTomVU1hNS"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 12 Aug 2019 19:16:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.39]); Mon, 12 Aug 2019 19:20:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] qemu-iotests 069 and 111 are failing
- on NetBSD
+Subject: Re: [Qemu-devel] [Qemu-block] qemu-iotest 059 fails with vmdk
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,74 +98,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--rN4M0qnFYLv2zsOJfZ47Ju3tTomVU1hNS
+Content-Type: multipart/mixed; boundary="qy2B316llwOjffRXP0xBsqFa6glIhytEs";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Sam Eiderman <shmuel.eiderman@oracle.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
+Message-ID: <fdb15508-4cb8-4295-af34-63d402e58ccd@redhat.com>
+Subject: Re: [Qemu-block] qemu-iotest 059 fails with vmdk
+References: <c293e99d-331a-f3aa-eecb-d562554350f9@redhat.com>
+ <ac5a6d46-99ee-ef1f-9fa0-8ebeab0f4485@redhat.com>
+In-Reply-To: <ac5a6d46-99ee-ef1f-9fa0-8ebeab0f4485@redhat.com>
 
+--qy2B316llwOjffRXP0xBsqFa6glIhytEs
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 7/25/19 4:34 AM, Thomas Huth wrote:
-> On 24/07/2019 18.29, Paolo Bonzini wrote:
->> On 24/07/19 11:34, Thomas Huth wrote:
->>> In case somebody is interested, two of the "auto" iotests are failing
->>> on NetBSD due to non-matching output:
->>>
->>>   TEST    iotest-qcow2: 069 [fail]
->>> --- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out        2019-07-24 09:19:22.000000000 +0000
->>> +++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out.bad    2019-07-24 09:21:34.000000000 +0000
->>> @@ -4,5 +4,5 @@
->>>  
->>>  Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=131072
->>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base
->>> -qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing file: Could not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
->>> +qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing file: TEST_DIR/t.IMGFMT.base: stat failed: No such file or directory
->>>  *** done
->>>
->>> and:
->>>
->>>   TEST    iotest-qcow2: 111 [fail]
->>> --- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out        2019-07-24 09:19:22.000000000 +0000
->>> +++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out.bad    2019-07-24 09:21:40.000000000 +0000
->>> @@ -1,4 +1,4 @@
->>>  QA output created by 111
->>> -qemu-img: TEST_DIR/t.IMGFMT: Could not open 'TEST_DIR/t.IMGFMT.inexistent': No such file or directory
->>> +qemu-img: TEST_DIR/t.IMGFMT: TEST_DIR/t.IMGFMT.inexistent: stat failed: No such file or directory
->>>  Could not open backing image to determine size.
->>>  *** done
->>>
->>> It's currently not a problem yet since we're not running the
->>> iotests on NetBSD yet (since our netbsd VM image does not have
->>> bash and gsed installed yet), but if somebody has some spare
->>> minutes, it would be great if this could be fixed so that we
->>> can enable the iotests on NetBSD, too, one day...
+On 12.08.19 21:14, John Snow wrote:
+>=20
+>=20
+> On 7/22/19 8:58 AM, Thomas Huth wrote:
+>> Not sure if it has been reported before, but test 059 currently fails:=
+
 >>
->> Is this (slightly ridiculous but effective) patch enough?
+>> 059      fail       [14:55:21] [14:55:26]                    output
+>> mismatch (see 059.out.bad)
+>> --- /home/thuth/devel/qemu/tests/qemu-iotests/059.out	2019-07-19
+>> 10:19:18.000000000 +0200
+>> +++ /home/thuth/tmp/qemu-build/tests/qemu-iotests/059.out.bad	2019-07-=
+22
+>> 14:55:26.000000000 +0200
+>> @@ -27,7 +27,7 @@
+>>  image: TEST_DIR/t.vmdk
+>>  file format: vmdk
+>>  virtual size: 0.977 TiB (1073741824000 bytes)
+>> -disk size: 16 KiB
+>> +disk size: 517 KiB
+>>  Format specific information:
+>>      cid: XXXXXXXX
+>>      parent cid: XXXXXXXX
+>> Failures: 059
+>> Failed 1 of 1 tests
 >>
->> diff --git a/block/file-posix.c b/block/file-posix.c
->> index 73a001ceb7..ce847f4d62 100644
->> --- a/block/file-posix.c
->> +++ b/block/file-posix.c
->> @@ -217,7 +217,7 @@ static int raw_normalize_devicepath(const char **filename, Error **errp)
->>      fname = *filename;
->>      dp = strrchr(fname, '/');
->>      if (lstat(fname, &sb) < 0) {
->> -        error_setg_errno(errp, errno, "%s: stat failed", fname);
->> +        error_setg_errno(errp, errno, "Could not open: '%s'", fname);
->>          return -errno;
->>      }
-> 
-> Yes, good idea! It works after removing the colon after "open"! :-)
-> 
-> With the colon removed:
-> 
-> Tested-by: Thomas Huth <thuth@redhat.com>
-> 
->  Thomas
-> 
+>> ... I think this was working fine for me a couple of weeks ago, so I
+>> assume this is a rather new bug?
+>>
+>>  Thomas
+>>
+>=20
+> I know this is a pretty late response, but "worksforme" -- did someone
+> address this in the meantime? I don't see any commits to 059 in some
+> time. (Not since March.)
 
-Does someone intend to submit this patch formally?
+I didn=E2=80=99t because I could never reproduce this failure.  (XFS/tmpf=
+s here.)
 
---js
+I have =E2=80=9Cvmdk: Misc fixes=E2=80=9D on list which came from running=
+ the iotests
+with all possible subformats (which broke many things, but not 059 in
+this way).
+
+Max
+
+
+--qy2B316llwOjffRXP0xBsqFa6glIhytEs--
+
+--rN4M0qnFYLv2zsOJfZ47Ju3tTomVU1hNS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1Ru+8ACgkQ9AfbAGHV
+z0AGtAgAqh9FBmKVt9vxrPlSG7H9YvkQGmBzMfSuLaKB9o+Swfl/JouM8EYkYKUe
+zLDZuZuPSFY2LItJ7W558iKsJufdIBmm5Lo/4vCq+Rp/wJgiue14OV/ky3ev6fRz
+BeWegkq16b3KKwpdp0HdY7/bo0/meyZOOFF446O3E6Zakclceq44hNysGCxlRHnG
+2oLVUhNnr/y8Mm0dxyr/xMeoC6wVftYnFtJ/Sc4Wm+egF+yrKwagPgnHcmvHRBtM
+o1xnNP3zrUP3Glg61wo9PyQOLk+gM2p9Z0gghMO/6GV5D+Psi8NqLWfkIFD2w1Zg
+9GI3rUn/QqYi3Z4xDLOobun51ZXC3g==
+=2Nx+
+-----END PGP SIGNATURE-----
+
+--rN4M0qnFYLv2zsOJfZ47Ju3tTomVU1hNS--
 
