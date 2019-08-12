@@ -2,72 +2,111 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF303C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 07:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D7EC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 07:53:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C226D2085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 07:47:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C226D2085A
+	by mail.kernel.org (Postfix) with ESMTPS id 353F720820
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 07:53:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353F720820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx535-0007rJ-3C
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 03:47:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51249)
+	id 1hx591-0001oy-HJ
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 03:53:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52187)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peterx@redhat.com>) id 1hx51R-00043e-3Y
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 03:45:42 -0400
+ (envelope-from <david@redhat.com>) id 1hx58X-00016a-SV
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 03:53:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hx51P-0007dl-Nz
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 03:45:41 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45040)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hx51P-0007cx-Es
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 03:45:39 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p17so103686393wrf.11
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 00:45:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=lTmpuaaCdK+p1SsvLRVZxUAT9brrOBbHnhL4uMZgKJs=;
- b=TNXcNOPwC6V64YDLj+Gi8N2nhqX5a2W68O8EI3Ckk9ujg16mX/CHqttGfLoJpKGUAK
- ZwwmkVa/wsGSPcfZSffi7M2JVdNZ8QSQAI85GPynjnGw5E9ECnrZXfIrz8QRpfDlzhBQ
- 1YbNZ44TMZhWvTDDaz+XnaGj6jkc8JatgKLCKos4GtghDc03MCC7nvh/bJ1mv4H92wZX
- XuBNgB1MtTgA3pIY8Cqa3LMLjNISSelIkOC55N6ICI+VVrC5CQK+HKJ9Rgfp5FjZQSMu
- +GCmWBSQqm5qfc1P/gWDWN9rz4utQoyNk7bm7BaV/CiebBZXSVngLAbBPT4lbLyh07q8
- 8H/Q==
-X-Gm-Message-State: APjAAAUFk0bby0vA7lYrH/GCOMm4oQemKL3sz3PkhPJqv8cltxq0xQjp
- dcvfLT7+b9rvxkDH5tqCmIZ4X2vKEBk38A==
-X-Google-Smtp-Source: APXvYqwYyrYt3CyKED8drAxVo2rPv72ZkhD4VNuZOp69dfJgrsJ9LAOLsSSfzFeTG+OWMJmo/DsdJQ==
-X-Received: by 2002:a5d:5348:: with SMTP id t8mr37981882wrv.159.1565595937867; 
- Mon, 12 Aug 2019 00:45:37 -0700 (PDT)
-Received: from xz-x1.redhat.com (net77-43-52-122.mclink.it. [77.43.52.122])
- by smtp.gmail.com with ESMTPSA id a84sm15909450wmf.29.2019.08.12.00.45.36
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 12 Aug 2019 00:45:37 -0700 (PDT)
-From: Peter Xu <peterx@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 12 Aug 2019 09:45:29 +0200
-Message-Id: <20190812074531.28970-3-peterx@redhat.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190812074531.28970-1-peterx@redhat.com>
-References: <20190812074531.28970-1-peterx@redhat.com>
+ (envelope-from <david@redhat.com>) id 1hx58W-0001Sr-PC
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 03:53:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57546)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>)
+ id 1hx58W-0001Sg-Ho; Mon, 12 Aug 2019 03:53:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6F42189C33;
+ Mon, 12 Aug 2019 07:52:59 +0000 (UTC)
+Received: from [10.36.117.110] (ovpn-117-110.ams2.redhat.com [10.36.117.110])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4E42C19C4F;
+ Mon, 12 Aug 2019 07:52:57 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190805152947.28536-1-david@redhat.com>
+ <20190805152947.28536-2-david@redhat.com>
+ <e68f8298-8946-37f1-2e65-afa73a45604e@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <bbf905b3-6f32-c478-4e6e-81c341f5601a@redhat.com>
+Date: Mon, 12 Aug 2019 09:52:56 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <e68f8298-8946-37f1-2e65-afa73a45604e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Mon, 12 Aug 2019 07:52:59 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.68
-Subject: [Qemu-devel] [PATCH RFC 2/4] qdev/machine: Introduce
- hotplug_allowed hook
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v1 1/9] s390x/mmu: Better ASC
+ selection in s390_cpu_get_phys_page_debug()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,116 +118,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>,
- peterx@redhat.com, Bandan Das <bsd@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce this new per-machine hook to give any machine class a chance
-to do a sanity check on the to-be-hotplugged device as a sanity test.
-This will be used for x86 to try to detect some illegal configuration
-of devices, e.g., possible conflictions between vfio-pci and x86
-vIOMMU.
+On 12.08.19 09:12, Thomas Huth wrote:
+> On 8/5/19 5:29 PM, David Hildenbrand wrote:
+>> Let's select the ASC before calling the function and use MMU_DATA_LOAD=
+.
+>> This is a preparation to:
+>> - Remove the ASC magic depending on the access mode from mmu_translate
+>> - Implement IEP support, where we could run into access exceptions
+>>   trying to fetch instructions
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/helper.c | 10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+>> index 13ae9909ad..08166558a0 100644
+>> --- a/target/s390x/helper.c
+>> +++ b/target/s390x/helper.c
+>> @@ -58,7 +58,15 @@ hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, v=
+addr vaddr)
+>>          vaddr &=3D 0x7fffffff;
+>>      }
+>> =20
+>> -    if (mmu_translate(env, vaddr, MMU_INST_FETCH, asc, &raddr, &prot,=
+ false)) {
+>> +    /*
+>> +     * We want to read the code, however, not run into access excepti=
+ons
+>=20
+> Is this really a safe assumption here that we always use this to
+> translate code addresses and not data addresses? ... I don't think so.
+> For example with the "gva2gpa" HMP command, I'd rather expect that it
+> also works with the secondary space mode...?
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- hw/core/qdev.c         | 17 +++++++++++++++++
- include/hw/boards.h    |  9 +++++++++
- include/hw/qdev-core.h |  1 +
- qdev-monitor.c         |  7 +++++++
- 4 files changed, 34 insertions(+)
+Well, it's what current code does. I am not changing that behavior.
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 94ebc0a4a1..d792b43c37 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -236,6 +236,23 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
-     return NULL;
- }
- 
-+bool qdev_hotplug_allowed(DeviceState *dev, Error **errp)
-+{
-+    MachineState *machine;
-+    MachineClass *mc;
-+    Object *m_obj = qdev_get_machine();
-+
-+    if (object_dynamic_cast(m_obj, TYPE_MACHINE)) {
-+        machine = MACHINE(m_obj);
-+        mc = MACHINE_GET_CLASS(machine);
-+        if (mc->hotplug_allowed) {
-+            return mc->hotplug_allowed(machine, dev, errp);
-+        }
-+    }
-+
-+    return true;
-+}
-+
- HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev)
- {
-     if (dev->parent_bus) {
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index a71d1a53a5..1cf63be45d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -166,6 +166,13 @@ typedef struct {
-  *    The function pointer to hook different machine specific functions for
-  *    parsing "smp-opts" from QemuOpts to MachineState::CpuTopology and more
-  *    machine specific topology fields, such as smp_dies for PCMachine.
-+ * @hotplug_allowed:
-+ *    If the hook is provided, then it'll be called for each device
-+ *    hotplug to check whether the device hotplug is allowed.  Return
-+ *    true to grant allowance or false to reject the hotplug.  When
-+ *    false is returned, an error must be set to show the reason of
-+ *    the rejection.  If the hook is not provided, all hotplug will be
-+ *    allowed.
-  */
- struct MachineClass {
-     /*< private >*/
-@@ -223,6 +230,8 @@ struct MachineClass {
- 
-     HotplugHandler *(*get_hotplug_handler)(MachineState *machine,
-                                            DeviceState *dev);
-+    bool (*hotplug_allowed)(MachineState *state, DeviceState *dev,
-+                            Error **errp);
-     CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
-                                                          unsigned cpu_index);
-     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 136df7774c..88e7ec4b60 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -284,6 +284,7 @@ void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version);
- HotplugHandler *qdev_get_bus_hotplug_handler(DeviceState *dev);
- HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
-+bool qdev_hotplug_allowed(DeviceState *dev, Error **errp);
- /**
-  * qdev_get_hotplug_handler: Get handler responsible for device wiring
-  *
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 58222c2211..6c80602771 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -614,6 +614,13 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
-     /* create device */
-     dev = DEVICE(object_new(driver));
- 
-+    /* Check whether the hotplug is allowed by the machine */
-+    if (qdev_hotplug && !qdev_hotplug_allowed(dev, &err)) {
-+        /* Error must be set in the machine hook */
-+        assert(err);
-+        goto err_del_dev;
-+    }
-+
-     if (bus) {
-         qdev_set_parent_bus(dev, bus);
-     } else if (qdev_hotplug && !qdev_get_machine_hotplug_handler(dev)) {
--- 
-2.21.0
+While it is in general broken to have a single interface to debug
+code+data (which is only a problem on s390x), it makes a lot of sense if
+you think about single-stepping through disassembled code using the
+gdbstub. Or dumping code where you crashed.
 
+In Linux, code+data will luckily usually have the same virtual->physical
+tables, so it's not a real issue.
+
+>=20
+> So maybe we need a proper MemTxAttrs bit or something similar for
+> distinguishing instruction accesses from data accesses here?
+
+There would first have to be a way to ask "get_phys_page_debug" to get
+code or data for this to make sense. Right now we used it to get code.
+
+Thanks.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
