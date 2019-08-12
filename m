@@ -6,59 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E91BFC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A1EC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC4A520989
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:32:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4A520989
+	by mail.kernel.org (Postfix) with ESMTPS id 625D120989
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:34:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 625D120989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43100 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx2wd-0003AW-Tf
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 01:32:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57203)
+	id 1hx2yM-0005Ir-Cc
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 01:34:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57281)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hx2oX-0000Hf-IC
+ (envelope-from <armbru@redhat.com>) id 1hx2ob-0000Vi-IX
  for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hx2oS-000665-6f
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54300)
+ (envelope-from <armbru@redhat.com>) id 1hx2oW-0006D4-NN
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54118)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hx2oR-000652-Rd
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:08 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hx2oW-0006Bp-F7
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2C17430FB8F8;
- Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A51D93099F76
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:24:11 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 464AF28DE2;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 411DE1E5;
  Mon, 12 Aug 2019 05:24:06 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D8BC61136420; Mon, 12 Aug 2019 07:23:59 +0200 (CEST)
+ id D4F3211384DA; Mon, 12 Aug 2019 07:23:59 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 12 Aug 2019 07:23:38 +0200
-Message-Id: <20190812052359.30071-9-armbru@redhat.com>
+Date: Mon, 12 Aug 2019 07:23:37 +0200
+Message-Id: <20190812052359.30071-8-armbru@redhat.com>
 In-Reply-To: <20190812052359.30071-1-armbru@redhat.com>
 References: <20190812052359.30071-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.41]); Mon, 12 Aug 2019 05:24:11 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 08/29] Include sysemu/reset.h a lot less
+Subject: [Qemu-devel] [PATCH v4 07/29] trace: Do not include qom/cpu.h into
+ generated trace.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,1364 +71,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In my "build everything" tree, changing sysemu/reset.h triggers a
-recompile of some 2600 out of 6600 objects (not counting tests and
-objects that don't depend on qemu/osdep.h).
+docs/devel/tracing.txt explains "since many source files include
+trace.h, [the generated trace.h use] a minimum of types and other
+header files included to keep the namespace clean and compile times
+and dependencies down."
 
-The main culprit is hw/hw.h, which supposedly includes it for
-convenience.
+Commit 4815185902 "trace: Add per-vCPU tracing states for events with
+the 'vcpu' property" made them all include qom/cpu.h via
+control-internal.h.  qom/cpu.h in turn includes about thirty headers.
+Ouch.
 
-Include sysemu/reset.h only where it's needed.  Touching it now
-recompiles less than 200 objects.
+Per-vCPU tracing is currently not supported in sub-directories'
+trace-events.  In other words, qom/cpu.h can only be used in
+trace-root.h, not in any trace.h.
 
+Split trace/control-vcpu.h off trace/control.h and
+trace/control-internal.h.  Have the generated trace.h include
+trace/control.h (which no longer includes qom/cpu.h), and trace-root.h
+include trace/control-vcpu.h (which includes it).
+
+The resulting improvement is a bit disappointing: in my "build
+everything" tree, some 1100 out of 6600 objects (not counting tests
+and objects that don't depend on qemu/osdep.h) depend on a trace.h,
+and about 600 of them no longer depend on qom/cpu.h.  But more than
+1300 others depend on trace-root.h.  More work is clearly needed.
+Left for another day.
+
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/hw.h            | 1 -
- hw/acpi/ich9.c             | 2 ++
- hw/acpi/piix4.c            | 2 ++
- hw/acpi/vmgenid.c          | 1 +
- hw/arm/armv7m.c            | 1 +
- hw/arm/boot.c              | 1 +
- hw/arm/nseries.c           | 1 +
- hw/arm/omap1.c             | 1 +
- hw/arm/omap2.c             | 1 +
- hw/arm/virt-acpi-build.c   | 1 +
- hw/char/parallel.c         | 1 +
- hw/char/serial.c           | 1 +
- hw/core/generic-loader.c   | 1 +
- hw/core/loader.c           | 1 +
- hw/cris/boot.c             | 1 +
- hw/display/cirrus_vga.c    | 1 +
- hw/display/ramfb.c         | 2 ++
- hw/display/vga.c           | 2 ++
- hw/hppa/machine.c          | 1 +
- hw/i386/acpi-build.c       | 1 +
- hw/i386/pc.c               | 1 +
- hw/ide/cmd646.c            | 1 +
- hw/ide/piix.c              | 1 +
- hw/ide/sii3112.c           | 1 +
- hw/ide/via.c               | 1 +
- hw/input/lm832x.c          | 1 +
- hw/input/pckbd.c           | 2 ++
- hw/input/ps2.c             | 2 ++
- hw/input/tsc2005.c         | 1 +
- hw/input/tsc210x.c         | 1 +
- hw/intc/mips_gic.c         | 1 +
- hw/intc/pnv_xive.c         | 1 +
- hw/intc/spapr_xive.c       | 1 +
- hw/intc/xics.c             | 1 +
- hw/intc/xive.c             | 1 +
- hw/isa/piix4.c             | 1 +
- hw/isa/vt82c686.c          | 1 +
- hw/lm32/lm32_boards.c      | 1 +
- hw/lm32/milkymist.c        | 1 +
- hw/microblaze/boot.c       | 1 +
- hw/mips/cps.c              | 1 +
- hw/mips/mips_fulong2e.c    | 1 +
- hw/mips/mips_jazz.c        | 1 +
- hw/mips/mips_malta.c       | 1 +
- hw/mips/mips_mipssim.c     | 2 ++
- hw/mips/mips_r4k.c         | 2 ++
- hw/misc/vmcoreinfo.c       | 1 +
- hw/moxie/moxiesim.c        | 2 ++
- hw/net/eepro100.c          | 1 +
- hw/nios2/boot.c            | 1 +
- hw/nvram/fw_cfg.c          | 1 +
- hw/openrisc/openrisc_sim.c | 1 +
- hw/pci-host/bonito.c       | 1 +
- hw/pci-host/piix.c         | 1 +
- hw/ppc/e500.c              | 1 +
- hw/ppc/mac_newworld.c      | 1 +
- hw/ppc/mac_oldworld.c      | 1 +
- hw/ppc/pnv.c               | 1 +
- hw/ppc/pnv_core.c          | 1 +
- hw/ppc/pnv_psi.c           | 1 +
- hw/ppc/ppc405_boards.c     | 2 ++
- hw/ppc/ppc405_uc.c         | 2 ++
- hw/ppc/ppc440_bamboo.c     | 1 +
- hw/ppc/ppc440_uc.c         | 1 +
- hw/ppc/ppc4xx_devs.c       | 2 ++
- hw/ppc/ppc4xx_pci.c        | 1 +
- hw/ppc/ppc_booke.c         | 2 ++
- hw/ppc/prep.c              | 2 ++
- hw/ppc/sam460ex.c          | 1 +
- hw/ppc/spapr.c             | 1 +
- hw/ppc/spapr_cpu_core.c    | 2 ++
- hw/ppc/spapr_drc.c         | 1 +
- hw/ppc/virtex_ml507.c      | 1 +
- hw/riscv/riscv_hart.c      | 1 +
- hw/s390x/ipl.c             | 1 +
- hw/s390x/s390-virtio-ccw.c | 1 +
- hw/sh4/r2d.c               | 1 +
- hw/sparc/leon3.c           | 2 ++
- hw/sparc/sun4m.c           | 2 ++
- hw/sparc64/sparc64.c       | 1 +
- hw/timer/etraxfs_timer.c   | 1 +
- hw/timer/mc146818rtc.c     | 1 +
- hw/tpm/tpm_ppi.c           | 1 -
- hw/vfio/common.c           | 1 +
- hw/watchdog/wdt_diag288.c  | 1 +
- hw/xtensa/sim.c            | 1 +
- hw/xtensa/xtfpga.c         | 1 +
- target/i386/cpu.c          | 1 +
- target/i386/hax-all.c      | 1 +
- target/i386/kvm.c          | 1 +
- target/s390x/cpu.c         | 1 +
- vl.c                       | 1 +
- 92 files changed, 107 insertions(+), 2 deletions(-)
+ trace/control-internal.h      | 25 --------------
+ trace/control-vcpu.h          | 63 +++++++++++++++++++++++++++++++++++
+ trace/control.h               | 24 -------------
+ block/block-backend.c         |  1 +
+ qom/object.c                  |  1 +
+ trace/qmp.c                   |  2 +-
+ ui/vnc.c                      |  1 +
+ scripts/tracetool/format/c.py |  1 +
+ scripts/tracetool/format/h.py |  7 +++-
+ 9 files changed, 74 insertions(+), 51 deletions(-)
+ create mode 100644 trace/control-vcpu.h
 
-diff --git a/include/hw/hw.h b/include/hw/hw.h
-index b1b79964b5..a4fb2390e8 100644
---- a/include/hw/hw.h
-+++ b/include/hw/hw.h
-@@ -12,7 +12,6 @@
- #include "hw/irq.h"
- #include "migration/vmstate.h"
- #include "migration/qemu-file-types.h"
--#include "sysemu/reset.h"
+diff --git a/trace/control-internal.h b/trace/control-internal.h
+index c7fbe2d3bf..8b2b50a7cf 100644
+--- a/trace/control-internal.h
++++ b/trace/control-internal.h
+@@ -10,9 +10,6 @@
+ #ifndef TRACE__CONTROL_INTERNAL_H
+ #define TRACE__CONTROL_INTERNAL_H
 =20
- void QEMU_NORETURN hw_error(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+-#include "qom/cpu.h"
+-
+-
+ extern int trace_events_enabled_count;
 =20
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index e53dfe1ee3..b4d987c811 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -23,6 +23,7 @@
-  * Contributions after 2012-01-13 are licensed under the terms of the
-  * GNU GPL, version 2 or (at your option) any later version.
-  */
-+
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "qapi/error.h"
-@@ -30,6 +31,7 @@
- #include "hw/i386/pc.h"
- #include "hw/pci/pci.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/acpi/acpi.h"
- #include "hw/acpi/tco.h"
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index ec4e186cec..a59e58d937 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -18,6 +18,7 @@
-  * Contributions after 2012-01-13 are licensed under the terms of the
-  * GNU GPL, version 2 or (at your option) any later version.
-  */
-+
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/i386/pc.h"
-@@ -25,6 +26,7 @@
- #include "hw/i2c/pm_smbus.h"
- #include "hw/pci/pci.h"
- #include "hw/acpi/acpi.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qemu/range.h"
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index b891df375f..ed92ccc4b8 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -18,6 +18,7 @@
- #include "hw/acpi/aml-build.h"
- #include "hw/acpi/vmgenid.h"
- #include "hw/nvram/fw_cfg.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
 =20
- void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *g=
-uid,
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index b9efad6bac..4b2d8b6574 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -16,6 +16,7 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-index c2b89b3bb9..d082daf6f2 100644
---- a/hw/arm/boot.c
-+++ b/hw/arm/boot.c
-@@ -18,6 +18,7 @@
- #include "sysemu/kvm.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/numa.h"
-+#include "sysemu/reset.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "elf.h"
-diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index 4a79f5c88b..3f3eca52e2 100644
---- a/hw/arm/nseries.c
-+++ b/hw/arm/nseries.c
-@@ -23,6 +23,7 @@
- #include "cpu.h"
- #include "qemu/cutils.h"
- #include "qemu/bswap.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/arm/omap.h"
- #include "hw/arm/boot.h"
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 28fbe275a8..beaddaf11f 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -29,6 +29,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/arm/soc_dma.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "qemu/range.h"
- #include "hw/sysbus.h"
- #include "qemu/cutils.h"
-diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index 87ced7f3a2..7d4cac1f46 100644
---- a/hw/arm/omap2.c
-+++ b/hw/arm/omap2.c
-@@ -23,6 +23,7 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/boards.h"
- #include "hw/hw.h"
- #include "hw/arm/boot.h"
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 0afb372769..ad54d65ea0 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -44,6 +44,7 @@
- #include "hw/pci/pci.h"
- #include "hw/arm/virt.h"
- #include "sysemu/numa.h"
-+#include "sysemu/reset.h"
- #include "kvm_arm.h"
+@@ -59,28 +56,6 @@ static inline bool trace_event_get_state_dynamic(Trace=
+Event *ev)
+     return unlikely(trace_events_enabled_count) && *ev->dstate;
+ }
 =20
- #define ARM_SPI_BASE 32
-diff --git a/hw/char/parallel.c b/hw/char/parallel.c
-index 1cd4c54a02..fed15dc548 100644
---- a/hw/char/parallel.c
-+++ b/hw/char/parallel.c
-@@ -31,6 +31,7 @@
- #include "chardev/char-fe.h"
- #include "hw/isa/isa.h"
- #include "hw/char/parallel.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "trace.h"
+-static inline bool
+-trace_event_get_vcpu_state_dynamic_by_vcpu_id(CPUState *vcpu,
+-                                              uint32_t vcpu_id)
+-{
+-    /* it's on fast path, avoid consistency checks (asserts) */
+-    if (unlikely(trace_events_enabled_count)) {
+-        return test_bit(vcpu_id, vcpu->trace_dstate);
+-    } else {
+-        return false;
+-    }
+-}
+-
+-static inline bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu,
+-                                                      TraceEvent *ev)
+-{
+-    uint32_t vcpu_id;
+-    assert(trace_event_is_vcpu(ev));
+-    vcpu_id =3D trace_event_get_vcpu_id(ev);
+-    return trace_event_get_vcpu_state_dynamic_by_vcpu_id(vcpu, vcpu_id);
+-}
+-
+-
+ void trace_event_register_group(TraceEvent **events);
 =20
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 7c42a2abfc..a9e42f7d97 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -28,6 +28,7 @@
- #include "chardev/char-serial.h"
- #include "qapi/error.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "qemu/error-report.h"
- #include "trace.h"
-=20
-diff --git a/hw/core/generic-loader.c b/hw/core/generic-loader.c
-index 79a493e577..579fe5ed32 100644
---- a/hw/core/generic-loader.c
-+++ b/hw/core/generic-loader.c
-@@ -34,6 +34,7 @@
- #include "qom/cpu.h"
- #include "hw/sysbus.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
- #include "hw/loader.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 425bf69a99..830845dd73 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -48,6 +48,7 @@
- #include "hw/hw.h"
- #include "disas/disas.h"
- #include "monitor/monitor.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "uboot_image.h"
- #include "hw/loader.h"
-diff --git a/hw/cris/boot.c b/hw/cris/boot.c
-index 602f538ef6..d44fdec43f 100644
---- a/hw/cris/boot.c
-+++ b/hw/cris/boot.c
-@@ -29,6 +29,7 @@
- #include "elf.h"
- #include "boot.h"
- #include "qemu/cutils.h"
-+#include "sysemu/reset.h"
-=20
- static void main_cpu_reset(void *opaque)
- {
-diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
-index 2e4911a1e3..4ccf5b4f18 100644
---- a/hw/display/cirrus_vga.c
-+++ b/hw/display/cirrus_vga.c
-@@ -35,6 +35,7 @@
- #include "qemu/osdep.h"
- #include "qemu/module.h"
- #include "qemu/units.h"
-+#include "sysemu/reset.h"
- #include "qapi/error.h"
- #include "trace.h"
- #include "hw/hw.h"
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-index b4eb283ef8..6026a35b11 100644
---- a/hw/display/ramfb.c
-+++ b/hw/display/ramfb.c
-@@ -10,12 +10,14 @@
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ #endif /* TRACE__CONTROL_INTERNAL_H */
+diff --git a/trace/control-vcpu.h b/trace/control-vcpu.h
+new file mode 100644
+index 0000000000..a8f1035c2e
+--- /dev/null
++++ b/trace/control-vcpu.h
+@@ -0,0 +1,63 @@
++/*
++ * Interface for configuring and controlling the state of tracing events=
+.
++ *
++ * Copyright (C) 2011-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
 ter.
-  * See the COPYING file in the top-level directory.
-  */
++ * See the COPYING file in the top-level directory.
++ */
 +
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/option.h"
- #include "hw/loader.h"
- #include "hw/display/ramfb.h"
- #include "ui/console.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
-=20
- struct QEMU_PACKED RAMFBCfg {
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index 910a23c12e..4d3572891a 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -21,8 +21,10 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
++#ifndef TRACE__CONTROL_VCPU_H
++#define TRACE__CONTROL_VCPU_H
 +
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "sysemu/reset.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
- #include "hw/display/vga.h"
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index 662838d83b..bc74438496 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -11,6 +11,7 @@
- #include "hw/loader.h"
- #include "hw/boards.h"
- #include "qemu/error-report.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/ide.h"
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index f3fdfefcd5..74667a53be 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -48,6 +48,7 @@
- #include "hw/timer/mc146818rtc_regs.h"
- #include "hw/mem/memory-device.h"
- #include "sysemu/numa.h"
-+#include "sysemu/reset.h"
++#include "control.h"
++#include "event-internal.h"
++#include "qom/cpu.h"
++
++/**
++ * trace_event_get_vcpu_state:
++ * @vcpu: Target vCPU.
++ * @id: Event identifier name.
++ *
++ * Get the tracing state of an event (both static and dynamic) for the g=
+iven
++ * vCPU.
++ *
++ * If the event has the disabled property, the check will have no perfor=
+mance
++ * impact.
++ */
++#define trace_event_get_vcpu_state(vcpu, id)                            =
+\
++    ((id ##_ENABLED) &&                                                 =
+\
++     trace_event_get_vcpu_state_dynamic_by_vcpu_id(                     =
+\
++         vcpu, _ ## id ## _EVENT.vcpu_id))
++
++/**
++ * trace_event_get_vcpu_state_dynamic:
++ *
++ * Get the dynamic tracing state of an event for the given vCPU.
++ */
++static bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu, TraceEven=
+t *ev);
++
++#include "control-internal.h"
++
++static inline bool
++trace_event_get_vcpu_state_dynamic_by_vcpu_id(CPUState *vcpu,
++                                              uint32_t vcpu_id)
++{
++    /* it's on fast path, avoid consistency checks (asserts) */
++    if (unlikely(trace_events_enabled_count)) {
++        return test_bit(vcpu_id, vcpu->trace_dstate);
++    } else {
++        return false;
++    }
++}
++
++static inline bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu,
++                                                      TraceEvent *ev)
++{
++    uint32_t vcpu_id;
++    assert(trace_event_is_vcpu(ev));
++    vcpu_id =3D trace_event_get_vcpu_id(ev);
++    return trace_event_get_vcpu_state_dynamic_by_vcpu_id(vcpu, vcpu_id);
++}
++
++#endif
+diff --git a/trace/control.h b/trace/control.h
+index 570492d6e8..1f81c491b6 100644
+--- a/trace/control.h
++++ b/trace/control.h
+@@ -119,22 +119,6 @@ static const char * trace_event_get_name(TraceEvent =
+*ev);
+ #define trace_event_get_state_backends(id)              \
+     ((id ##_ENABLED) && id ##_BACKEND_DSTATE())
 =20
- /* Supported chipsets: */
- #include "hw/acpi/piix4.h"
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 549c437050..73b55500b0 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -54,6 +54,7 @@
- #include "sysemu/numa.h"
- #include "sysemu/kvm.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "kvm_i386.h"
- #include "hw/xen/xen.h"
- #include "hw/xen/start_info.h"
-diff --git a/hw/ide/cmd646.c b/hw/ide/cmd646.c
-index ed23aabf21..e5542c9811 100644
---- a/hw/ide/cmd646.c
-+++ b/hw/ide/cmd646.c
-@@ -30,6 +30,7 @@
- #include "hw/isa/isa.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
+-/**
+- * trace_event_get_vcpu_state:
+- * @vcpu: Target vCPU.
+- * @id: Event identifier name.
+- *
+- * Get the tracing state of an event (both static and dynamic) for the g=
+iven
+- * vCPU.
+- *
+- * If the event has the disabled property, the check will have no perfor=
+mance
+- * impact.
+- */
+-#define trace_event_get_vcpu_state(vcpu, id)                            =
+\
+-    ((id ##_ENABLED) &&                                                 =
+\
+-     trace_event_get_vcpu_state_dynamic_by_vcpu_id(                     =
+\
+-         vcpu, _ ## id ## _EVENT.vcpu_id))
+-
+ /**
+  * trace_event_get_state_static:
+  * @id: Event identifier.
+@@ -155,14 +139,6 @@ static bool trace_event_get_state_static(TraceEvent =
+*ev);
+  */
+ static bool trace_event_get_state_dynamic(TraceEvent *ev);
 =20
- #include "hw/ide/pci.h"
- #include "trace.h"
-diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-index b97e555072..c4c6d4b760 100644
---- a/hw/ide/piix.c
-+++ b/hw/ide/piix.c
-@@ -31,6 +31,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
-=20
- #include "hw/ide/pci.h"
- #include "trace.h"
-diff --git a/hw/ide/sii3112.c b/hw/ide/sii3112.c
-index d7590d4ba4..2181260531 100644
---- a/hw/ide/sii3112.c
-+++ b/hw/ide/sii3112.c
+-/**
+- * trace_event_get_vcpu_state_dynamic:
+- *
+- * Get the dynamic tracing state of an event for the given vCPU.
+- */
+-static bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu, TraceEven=
+t *ev);
+-
+-
+ /**
+  * trace_event_set_state_dynamic:
+  *
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 0056b526b8..6aed80bf0b 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
 @@ -15,6 +15,7 @@
- #include "qemu/osdep.h"
- #include "hw/ide/pci.h"
- #include "qemu/module.h"
-+#include "sysemu/reset.h"
- #include "trace.h"
-=20
- #define TYPE_SII3112_PCI "sii3112"
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index c3bda909f9..6d54ac55f0 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -30,6 +30,7 @@
- #include "qemu/module.h"
+ #include "block/block_int.h"
+ #include "block/blockjob.h"
+ #include "block/throttle-groups.h"
++#include "hw/qdev-core.h"
+ #include "sysemu/blockdev.h"
  #include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
-=20
- #include "hw/ide/pci.h"
- #include "trace.h"
-diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
-index 5203da2bcf..ebb72c6590 100644
---- a/hw/input/lm832x.c
-+++ b/hw/input/lm832x.c
-@@ -23,6 +23,7 @@
- #include "hw/i2c/i2c.h"
- #include "qemu/module.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "ui/console.h"
-=20
- #define TYPE_LM8323 "lm8323"
-diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-index 47a606f5e3..5d06a53362 100644
---- a/hw/input/pckbd.c
-+++ b/hw/input/pckbd.c
-@@ -21,6 +21,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
+ #include "qapi/error.h"
+diff --git a/qom/object.c b/qom/object.c
+index 1555547727..6fa9c619fa 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -11,6 +11,7 @@
   */
-+
+=20
  #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "hw/hw.h"
-@@ -28,6 +29,7 @@
- #include "hw/i386/pc.h"
- #include "hw/input/ps2.h"
- #include "hw/input/i8042.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
-=20
- #include "trace.h"
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index d3161f1e7c..8d922b05c9 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -21,12 +21,14 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
++#include "hw/qdev-core.h"
+ #include "qapi/error.h"
+ #include "qom/object.h"
+ #include "qom/object_interfaces.h"
+diff --git a/trace/qmp.c b/trace/qmp.c
+index ea99b00956..38246e1aa6 100644
+--- a/trace/qmp.c
++++ b/trace/qmp.c
+@@ -10,7 +10,7 @@
  #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "hw/hw.h"
- #include "hw/input/ps2.h"
- #include "ui/console.h"
- #include "ui/input.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-commands-trace.h"
+-#include "control.h"
++#include "control-vcpu.h"
 =20
- #include "trace.h"
-diff --git a/hw/input/tsc2005.c b/hw/input/tsc2005.c
-index f82771e7a7..0a0431744c 100644
---- a/hw/input/tsc2005.c
-+++ b/hw/input/tsc2005.c
-@@ -22,6 +22,7 @@
- #include "qemu/log.h"
- #include "hw/hw.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "ui/console.h"
- #include "hw/input/tsc2xxx.h"
- #include "trace.h"
-diff --git a/hw/input/tsc210x.c b/hw/input/tsc210x.c
-index f94cb4683b..d2486f4b4e 100644
---- a/hw/input/tsc210x.c
-+++ b/hw/input/tsc210x.c
-@@ -23,6 +23,7 @@
- #include "hw/hw.h"
- #include "audio/audio.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "ui/console.h"
- #include "hw/arm/omap.h"            /* For I2SCodec */
- #include "hw/input/tsc2xxx.h"
-diff --git a/hw/intc/mips_gic.c b/hw/intc/mips_gic.c
-index 33ab51c5b8..e27e333766 100644
---- a/hw/intc/mips_gic.c
-+++ b/hw/intc/mips_gic.c
-@@ -18,6 +18,7 @@
- #include "exec/memory.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "kvm_mips.h"
- #include "hw/intc/mips_gic.h"
 =20
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 4dc92ef1e3..63b0f461ec 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -14,6 +14,7 @@
- #include "target/ppc/cpu.h"
- #include "sysemu/cpus.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
- #include "monitor/monitor.h"
- #include "hw/ppc/fdt.h"
- #include "hw/ppc/pnv.h"
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 3ae311d9ff..2e39cc1e47 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -14,6 +14,7 @@
- #include "qemu/error-report.h"
- #include "target/ppc/cpu.h"
- #include "sysemu/cpus.h"
-+#include "sysemu/reset.h"
- #include "monitor/monitor.h"
- #include "hw/ppc/fdt.h"
- #include "hw/ppc/spapr.h"
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index faa976e2f8..9ed224ce5f 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -38,6 +38,7 @@
- #include "monitor/monitor.h"
- #include "hw/intc/intc.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
-=20
- void icp_pic_print_info(ICPState *icp, Monitor *mon)
- {
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index cf77bdb7d3..b27d6b8646 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -14,6 +14,7 @@
- #include "target/ppc/cpu.h"
- #include "sysemu/cpus.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
- #include "hw/qdev-properties.h"
- #include "monitor/monitor.h"
- #include "hw/ppc/xive.h"
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 6b8bc3faf0..3677976ef7 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
+ static CPUState *get_cpu(bool has_vcpu, int vcpu, Error **errp)
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 38f92bfca3..f47f726681 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
 @@ -28,6 +28,7 @@
- #include "hw/pci/pci.h"
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
-+#include "sysemu/reset.h"
-=20
- PCIDevice *piix4_dev;
-=20
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 12c460590f..81bffb1fb9 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -22,6 +22,7 @@
- #include "hw/isa/apm.h"
- #include "hw/acpi/acpi.h"
- #include "hw/i2c/pm_smbus.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qemu/module.h"
- #include "qemu/timer.h"
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index fb9d52d54f..e075ebc8a6 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -30,6 +30,7 @@
- #include "lm32_hwsetup.h"
- #include "lm32.h"
- #include "exec/address-spaces.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
-=20
- typedef struct {
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index 689e633199..33669ee19b 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -27,6 +27,7 @@
- #include "hw/block/flash.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "elf.h"
-diff --git a/hw/microblaze/boot.c b/hw/microblaze/boot.c
-index a7af4c0704..bade4d22c0 100644
---- a/hw/microblaze/boot.c
-+++ b/hw/microblaze/boot.c
-@@ -31,6 +31,7 @@
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "sysemu/device_tree.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/loader.h"
- #include "elf.h"
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 0d459c4141..aea6bcd7fe 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -24,6 +24,7 @@
- #include "hw/mips/mips.h"
- #include "hw/mips/cpudevs.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
-=20
- qemu_irq get_cps_irq(MIPSCPSState *s, int pin_number)
- {
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 5dbaa3bfcc..0a1bf5ef5c 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -44,6 +44,7 @@
- #include "hw/timer/i8254.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "qemu/error-report.h"
-=20
- #define DEBUG_FULONG2E_INIT
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index fa8775d428..6ea25cd5f4 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -48,6 +48,7 @@
- #include "hw/sysbus.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 20e019bf66..29bc8de5cf 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -51,6 +51,7 @@
- #include "hw/sysbus.h"             /* SysBusDevice */
- #include "qemu/host-utils.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
- #include "hw/empty_slot.h"
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 824abda657..280e76a482 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -24,6 +24,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu-common.h"
-@@ -43,6 +44,7 @@
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
-=20
- static struct _loaderparams {
-     int ram_size;
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 93dbf76bb4..191047826d 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -7,6 +7,7 @@
-  * All peripherial devices are attached to this "bus" with
-  * the standard PC ISA addresses.
- */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-@@ -33,6 +34,7 @@
- #include "hw/timer/i8254.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "qemu/error-report.h"
-=20
- #define MAX_IDE_BUS 2
-diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
-index 987d6f52af..49e87d462b 100644
---- a/hw/misc/vmcoreinfo.c
-+++ b/hw/misc/vmcoreinfo.c
-@@ -13,6 +13,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "sysemu/reset.h"
- #include "hw/nvram/fw_cfg.h"
- #include "hw/misc/vmcoreinfo.h"
-=20
-diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index d771d393c2..16a7d58274 100644
---- a/hw/moxie/moxiesim.c
-+++ b/hw/moxie/moxiesim.c
-@@ -24,6 +24,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -31,6 +32,7 @@
- #include "hw/sysbus.h"
- #include "hw/hw.h"
- #include "net/net.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
-diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
-index 6607c9142d..e0cf0c46d7 100644
---- a/hw/net/eepro100.c
-+++ b/hw/net/eepro100.c
-@@ -49,6 +49,7 @@
- #include "hw/nvram/eeprom93xx.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
- #include "qemu/bitops.h"
- #include "qemu/module.h"
- #include "qapi/error.h"
-diff --git a/hw/nios2/boot.c b/hw/nios2/boot.c
-index 276068c842..d78bc9ed0e 100644
---- a/hw/nios2/boot.c
-+++ b/hw/nios2/boot.c
-@@ -36,6 +36,7 @@
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "sysemu/device_tree.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/loader.h"
- #include "elf.h"
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index dcfd6d2ed3..3032f1c65f 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -27,6 +27,7 @@
- #include "hw/hw.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
-+#include "sysemu/reset.h"
- #include "hw/boards.h"
- #include "hw/nvram/fw_cfg.h"
- #include "hw/sysbus.h"
-diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-index b85f0df323..cb2fc5ba78 100644
---- a/hw/openrisc/openrisc_sim.c
-+++ b/hw/openrisc/openrisc_sim.c
-@@ -32,6 +32,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/sysbus.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
-=20
- #define KERNEL_LOAD_ADDR 0x100
-=20
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index dde4437595..36c7ca45ad 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -44,6 +44,7 @@
- #include "hw/i386/pc.h"
- #include "hw/mips/mips.h"
- #include "hw/pci/pci_host.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "exec/address-spaces.h"
-=20
-diff --git a/hw/pci-host/piix.c b/hw/pci-host/piix.c
-index d9c70f7ce6..f3671d28b7 100644
---- a/hw/pci-host/piix.c
-+++ b/hw/pci-host/piix.c
-@@ -33,6 +33,7 @@
- #include "qemu/range.h"
- #include "hw/xen/xen.h"
- #include "hw/pci-host/pam.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/i386/ioapic.h"
- #include "qapi/visitor.h"
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index a3eac7f057..566f179bb1 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -28,6 +28,7 @@
- #include "hw/boards.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "kvm_ppc.h"
- #include "sysemu/device_tree.h"
- #include "hw/ppc/openpic.h"
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 09bc6068f3..0f9f351eb1 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -68,6 +68,7 @@
- #include "elf.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "kvm_ppc.h"
- #include "hw/usb.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 9ffde5b6f7..6640057473 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -47,6 +47,7 @@
- #include "elf.h"
- #include "qemu/error-report.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "kvm_ppc.h"
- #include "exec/address-spaces.h"
-=20
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index bd4531c822..96608883aa 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -23,6 +23,7 @@
- #include "qapi/error.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/numa.h"
-+#include "sysemu/reset.h"
- #include "sysemu/cpus.h"
- #include "sysemu/device_tree.h"
- #include "hw/hw.h"
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index c6411ecc1d..ff477ba6c9 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
- #include "qemu/log.h"
-diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-index d7b6f5d75b..6b26d0f6bc 100644
---- a/hw/ppc/pnv_psi.c
-+++ b/hw/ppc/pnv_psi.c
-@@ -22,6 +22,7 @@
- #include "target/ppc/cpu.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "sysemu/reset.h"
- #include "qapi/error.h"
- #include "monitor/monitor.h"
-=20
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 13318a9faf..5b278e7791 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -21,6 +21,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-@@ -33,6 +34,7 @@
- #include "hw/block/flash.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "sysemu/block-backend.h"
- #include "hw/boards.h"
- #include "qemu/log.h"
-diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-index edb6b2d190..f9d98fe71e 100644
---- a/hw/ppc/ppc405_uc.c
-+++ b/hw/ppc/ppc405_uc.c
-@@ -21,6 +21,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-@@ -32,6 +33,7 @@
- #include "ppc405.h"
- #include "hw/char/serial.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index b4da099e3e..1bd92aa749 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -31,6 +31,7 @@
- #include "ppc405.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/sysbus.h"
-=20
- #define BINARY_DEVICE_TREE_FILE "bamboo.dtb"
-diff --git a/hw/ppc/ppc440_uc.c b/hw/ppc/ppc440_uc.c
-index 5c1a53d6e7..7329cfe651 100644
---- a/hw/ppc/ppc440_uc.c
-+++ b/hw/ppc/ppc440_uc.c
-@@ -21,6 +21,7 @@
- #include "hw/ppc/ppc.h"
- #include "hw/pci/pci.h"
- #include "sysemu/block-backend.h"
-+#include "sysemu/reset.h"
- #include "ppc440.h"
-=20
- /***********************************************************************=
-******/
-diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-index fdfeb67e65..e62bef3b8d 100644
---- a/hw/ppc/ppc4xx_devs.c
-+++ b/hw/ppc/ppc4xx_devs.c
-@@ -21,8 +21,10 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "sysemu/reset.h"
- #include "cpu.h"
- #include "hw/hw.h"
- #include "hw/ppc/ppc.h"
-diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-index e7cf8d50a5..b013319c60 100644
---- a/hw/ppc/ppc4xx_pci.c
-+++ b/hw/ppc/ppc4xx_pci.c
-@@ -24,6 +24,7 @@
- #include "hw/ppc/ppc.h"
- #include "hw/ppc/ppc4xx.h"
- #include "qemu/module.h"
-+#include "sysemu/reset.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/ppc/ppc_booke.c b/hw/ppc/ppc_booke.c
-index 18d1457581..ba5f513ca5 100644
---- a/hw/ppc/ppc_booke.c
-+++ b/hw/ppc/ppc_booke.c
-@@ -21,11 +21,13 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "hw/hw.h"
- #include "hw/ppc/ppc.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qemu/log.h"
- #include "hw/loader.h"
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index ab3c1df1fc..84e968e28c 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -22,6 +22,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "hw/hw.h"
-@@ -45,6 +46,7 @@
- #include "sysemu/arch_init.h"
- #include "sysemu/kvm.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "exec/address-spaces.h"
+ #include "vnc.h"
+ #include "vnc-jobs.h"
  #include "trace.h"
- #include "elf.h"
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index fbcddc5b00..c1d6f74d5b 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -31,6 +31,7 @@
- #include "hw/block/flash.h"
++#include "hw/qdev-core.h"
  #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/sysbus.h"
- #include "hw/char/serial.h"
- #include "hw/i2c/ppc4xx_i2c.h"
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 821f0d4a49..5cade1a374 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -31,6 +31,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/numa.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/hw.h"
- #include "qemu/log.h"
- #include "hw/fw-path-provider.h"
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index 5621fb9a3d..ccc8970c7c 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -6,6 +6,7 @@
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  * See the COPYING file in the top-level directory.
-  */
-+
- #include "qemu/osdep.h"
- #include "hw/cpu/core.h"
- #include "hw/ppc/spapr_cpu_core.h"
-@@ -19,6 +20,7 @@
- #include "hw/ppc/ppc.h"
- #include "target/ppc/mmu-hash64.h"
- #include "sysemu/numa.h"
-+#include "sysemu/reset.h"
- #include "sysemu/hw_accel.h"
- #include "qemu/error-report.h"
-=20
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index bacadfcac5..678493a9c5 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -23,6 +23,7 @@
- #include "hw/ppc/spapr.h" /* for RTAS return codes */
- #include "hw/pci-host/spapr.h" /* spapr_phb_remove_pci_device_cb callbac=
-k */
- #include "sysemu/device_tree.h"
-+#include "sysemu/reset.h"
- #include "trace.h"
-=20
- #define DRC_CONTAINER_PATH "/dr-connector"
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index 834053a7d2..06f5a28601 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -32,6 +32,7 @@
- #include "hw/block/flash.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/boards.h"
- #include "sysemu/device_tree.h"
- #include "hw/loader.h"
-diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
-index ca69a1bcd8..61bd4d5170 100644
---- a/hw/riscv/riscv_hart.c
-+++ b/hw/riscv/riscv_hart.c
-@@ -21,6 +21,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
-+#include "sysemu/reset.h"
- #include "hw/sysbus.h"
- #include "target/riscv/cpu.h"
- #include "hw/riscv/riscv_hart.h"
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 60bd081d3e..2e5ce11a6b 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -14,6 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qapi/error.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
- #include "cpu.h"
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 5b6a9a4e55..4ffdd53a85 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -27,6 +27,7 @@
- #include "qemu/error-report.h"
- #include "qemu/option.h"
- #include "s390-pci-bus.h"
-+#include "sysemu/reset.h"
- #include "hw/s390x/storage-keys.h"
- #include "hw/s390x/storage-attributes.h"
- #include "hw/s390x/event-facility.h"
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index f22c79c867..da79bf0337 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -30,6 +30,7 @@
- #include "hw/sysbus.h"
- #include "hw/hw.h"
- #include "hw/sh4/sh.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "hw/pci/pci.h"
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 19cedebd16..c7ddfa2cfe 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -21,6 +21,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qemu/error-report.h"
-@@ -32,6 +33,7 @@
- #include "hw/ptimer.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/qtest.h"
-+#include "sysemu/reset.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "elf.h"
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index b2342f2a89..93a69c12fb 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -21,6 +21,7 @@
-  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-  * THE SOFTWARE.
-  */
-+
- #include "qemu/osdep.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-@@ -33,6 +34,7 @@
- #include "hw/timer/m48t59.h"
- #include "hw/sparc/sparc32_dma.h"
- #include "hw/block/fdc.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "net/net.h"
- #include "hw/boards.h"
-diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-index 689801f37d..100b2fab17 100644
---- a/hw/sparc64/sparc64.c
-+++ b/hw/sparc64/sparc64.c
-@@ -28,6 +28,7 @@
- #include "hw/char/serial.h"
- #include "hw/sparc/sparc64.h"
- #include "qemu/timer.h"
-+#include "sysemu/reset.h"
- #include "trace.h"
-=20
-=20
-diff --git a/hw/timer/etraxfs_timer.c b/hw/timer/etraxfs_timer.c
-index 53834e197f..18887b2be2 100644
---- a/hw/timer/etraxfs_timer.c
-+++ b/hw/timer/etraxfs_timer.c
-@@ -24,6 +24,7 @@
-=20
- #include "qemu/osdep.h"
- #include "hw/sysbus.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qemu/module.h"
- #include "qemu/timer.h"
-diff --git a/hw/timer/mc146818rtc.c b/hw/timer/mc146818rtc.c
-index ce4550b6f2..21fcba5e3a 100644
---- a/hw/timer/mc146818rtc.c
-+++ b/hw/timer/mc146818rtc.c
-@@ -31,6 +31,7 @@
- #include "qemu/timer.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/replay.h"
-+#include "sysemu/reset.h"
- #include "hw/timer/mc146818rtc.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc-target.h"
-diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-index cd8205f212..ff314592b4 100644
---- a/hw/tpm/tpm_ppi.c
-+++ b/hw/tpm/tpm_ppi.c
-@@ -16,7 +16,6 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "sysemu/memory_mapping.h"
--#include "sysemu/reset.h"
- #include "migration/vmstate.h"
- #include "tpm_ppi.h"
- #include "trace.h"
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index a859298fda..a363b4495f 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -34,6 +34,7 @@
- #include "qemu/range.h"
- #include "sysemu/balloon.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "trace.h"
- #include "qapi/error.h"
-=20
-diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
-index 29e5b5dcf6..fec046ef09 100644
---- a/hw/watchdog/wdt_diag288.c
-+++ b/hw/watchdog/wdt_diag288.c
-@@ -12,6 +12,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "sysemu/reset.h"
- #include "sysemu/watchdog.h"
- #include "hw/sysbus.h"
- #include "qemu/timer.h"
-diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-index 09165b6f4d..981dbb7bbe 100644
---- a/hw/xtensa/sim.c
-+++ b/hw/xtensa/sim.c
-@@ -28,6 +28,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "cpu.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index f7f3e11e93..0a2cce3c64 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -41,6 +41,7 @@
- #include "hw/block/flash.h"
- #include "chardev/char.h"
- #include "sysemu/device_tree.h"
-+#include "sysemu/reset.h"
- #include "qemu/error-report.h"
- #include "qemu/option.h"
- #include "bootparam.h"
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 19751e37a7..80f1443110 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -26,6 +26,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "sysemu/hvf.h"
- #include "sysemu/cpus.h"
- #include "kvm_i386.h"
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index 9e7b77965d..bcacdd1d8f 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -30,6 +30,7 @@
- #include "qemu-common.h"
- #include "hax-i386.h"
- #include "sysemu/accel.h"
-+#include "sysemu/reset.h"
- #include "sysemu/sysemu.h"
- #include "qemu/main-loop.h"
- #include "hw/boards.h"
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index dbbb13772a..30ed209e6b 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -24,6 +24,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/hw_accel.h"
- #include "sysemu/kvm_int.h"
-+#include "sysemu/reset.h"
- #include "kvm_i386.h"
- #include "hyperv.h"
- #include "hyperv-proto.h"
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 736a7903e2..3caba8d5e1 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -26,6 +26,7 @@
- #include "internal.h"
- #include "kvm_s390x.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/reset.h"
- #include "qemu/timer.h"
  #include "qemu/error-report.h"
  #include "qemu/module.h"
-diff --git a/vl.c b/vl.c
-index b426b32134..1abfd306e3 100644
---- a/vl.c
-+++ b/vl.c
-@@ -30,6 +30,7 @@
- #include "qemu/cutils.h"
- #include "qemu/help_option.h"
- #include "qemu/uuid.h"
-+#include "sysemu/reset.h"
- #include "sysemu/seccomp.h"
- #include "sysemu/tcg.h"
+diff --git a/scripts/tracetool/format/c.py b/scripts/tracetool/format/c.p=
+y
+index 833c05a022..31207961b0 100644
+--- a/scripts/tracetool/format/c.py
++++ b/scripts/tracetool/format/c.py
+@@ -28,6 +28,7 @@ def generate(events, backend, group):
+     out('/* This file is autogenerated by tracetool, do not edit. */',
+         '',
+         '#include "qemu/osdep.h"',
++        '#include "qemu/module.h"',
+         '#include "%s"' % header,
+         '')
 =20
+diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.p=
+y
+index 338a2365ee..5596b304e6 100644
+--- a/scripts/tracetool/format/h.py
++++ b/scripts/tracetool/format/h.py
+@@ -17,12 +17,17 @@ from tracetool import out
+=20
+=20
+ def generate(events, backend, group):
++    if group =3D=3D "root":
++        header =3D "trace/control-vcpu.h"
++    else:
++        header =3D "trace/control.h"
++
+     out('/* This file is autogenerated by tracetool, do not edit. */',
+         '',
+         '#ifndef TRACE_%s_GENERATED_TRACERS_H' % group.upper(),
+         '#define TRACE_%s_GENERATED_TRACERS_H' % group.upper(),
+         '',
+-        '#include "trace/control.h"',
++        '#include "%s"' % header,
+         '')
+=20
+     for e in events:
 --=20
 2.21.0
 
