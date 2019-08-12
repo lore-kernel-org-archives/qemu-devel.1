@@ -2,119 +2,91 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C510C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 15:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7F9C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 15:01:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E95CA208C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 15:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 399A8206C1
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 15:01:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ND3QQyCU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E95CA208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IUDhCM0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 399A8206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxBoU-0005js-9B
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 11:00:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39212)
+	id 1hxBpR-00075H-IP
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 11:01:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39349)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxBnk-0004hj-GS
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 11:00:01 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hxBoQ-0005y7-TS
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 11:00:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxBnj-0001Vj-It
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 11:00:00 -0400
-Received: from mail-eopbgr00111.outbound.protection.outlook.com
- ([40.107.0.111]:12208 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxBnj-0001VF-BI; Mon, 12 Aug 2019 10:59:59 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JaOO1iXNhRZJ5t59vWEnleUMgzFCve//dFTxL1rOPdsRNbmSewXr8q08SXgjTHgMOoL8rdu4+RD2+bUxQB13C+DgI+Llyr+6ZDYdQ94PNdOu+/kpxpYXNBgVXvdVC+7aTF5D/mtUnyFOmmpZhhD6A4ii1fMovOB1q102jL+tcgmBGVtZ8/i4wGpQQZmNsg/TCQZik/L+uqyKTW9qiXszD+Ma60IW8k0rXkPGWnXAM23MMvBjkBYhxzsrrTN7RNvQ+7gsHH2x4w7IsWLv/BSEGN4deWSHYNcnV66YmFOG//3O/TbvOw5BH7KkfASuGpsiupcve4xw4VitsdK5GBcgdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C4CQl0c0QcDHzhQv9s+aKy55Q3o8xsseEBV/aJ/LVbw=;
- b=A+XJcQ4QZ1x1EpoXkcLupm7l7DC2oux2YGiiKB7PxtOEVMEv3Sz9hFJT4FhwojVk5+QWDG9Q52QGVJS8hFGIJBwfH1iP70mh9ehiUc2GlW0fiZMllWTyd/JIDUX0Zsv2FUJiGwrJPQeUgvxlTiKnzQU82APcxASOUselM8ObYvaBSV1hgC0IWrezK2Ua2OVVnk55ItnI3Y58Ri7lst1MQ1xHwSuqgrxmSPL3auZlvbHMFFOzkSuH489HDu+9qtiwleucdMeKAmjv4aJPqdW5pjlkh5bB4IGOpACNhuolpieQWDdud+56bcLdgkQrk77bApG5+soGYQyiIBpU5m88gg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C4CQl0c0QcDHzhQv9s+aKy55Q3o8xsseEBV/aJ/LVbw=;
- b=ND3QQyCUGaok9pWFOBoacdQP6afpROSS84GSMT8vjCpBZL3PmBCAcGkxrp7NNnJMQgYr8L12FI2BDaBnM63NaAloS6yARypR0R65Icrsr5SapYFRkKfxLV8lO8ExMtVBkZZ+XCohViSZ8yVNPjj72jWcb0anE4Gxokc/kdMSu2I=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5067.eurprd08.prod.outlook.com (10.255.19.83) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.18; Mon, 12 Aug 2019 14:59:56 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.022; Mon, 12 Aug 2019
- 14:59:56 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Thread-Topic: [PATCH 2/3] vmdk: Make block_status recurse for flat extents
-Thread-Index: AQHVQwFfQc9enZtMpEa///lccFWY3qb3ty6A
-Date: Mon, 12 Aug 2019 14:59:56 +0000
-Message-ID: <f8b4cd1c-5fb0-6ab1-e4db-43affdf1ff66@virtuozzo.com>
-References: <20190725155512.9827-1-mreitz@redhat.com>
- <20190725155512.9827-3-mreitz@redhat.com>
-In-Reply-To: <20190725155512.9827-3-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0701CA0047.eurprd07.prod.outlook.com
- (2603:10a6:3:9e::15) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190812175953925
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3b66b1f8-1790-42d1-c214-08d71f35bd0b
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5067; 
-x-ms-traffictypediagnostic: DB8PR08MB5067:
-x-microsoft-antispam-prvs: <DB8PR08MB506738008B695C0E505190CEC1D30@DB8PR08MB5067.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3276;
-x-forefront-prvs: 012792EC17
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(39840400004)(346002)(396003)(136003)(189003)(199004)(66476007)(66556008)(81166006)(53936002)(64756008)(6246003)(478600001)(7736002)(31696002)(81156014)(14454004)(36756003)(66946007)(86362001)(305945005)(66446008)(8676002)(256004)(6116002)(3846002)(2906002)(71190400001)(71200400001)(4326008)(31686004)(66066001)(99286004)(25786009)(476003)(76176011)(2616005)(316002)(229853002)(486006)(6486002)(26005)(5660300002)(11346002)(52116002)(2501003)(6436002)(446003)(110136005)(6506007)(386003)(186003)(102836004)(54906003)(8936002)(6512007);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5067;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: uvokjShSy2Jy9FMC2BAvvDhTyaY4CWCK1V1HHIiviR6Fg7QGV63obS4PWOmX2PWafSDJaZhbRa90ljwLjMg9IRe3BBg5/yw3n6Q9MYNkYY4BKOfYek3UMgXkEcnA/UNqqcLEWY/sQ7GJkAsmkTz4/kSDwPYowhopFd2B4ZnX9OhOvJnA2CjXzHpbPfBIFWJYcI3ilaJPDAelXHR562dVNCP3jxG2M9e8ksVZFVXCRUx9gLfuffRjeP1UgZXwC9eDjLEk9QXvc0vmBdIF8BRWu8sJwoWmuCAADG/ReAonG5ucLpJFmT77wjA9r/1CoOXZLvJo7xTMrRT7fbcn8phZVRFcB+ekapN9OcAbA0mDghoU+dTp5hDOTFC6lCLgHqAKQeqjTQltLBfhMOG2UH3soCV4UG9o1Hg63+Hzxgotr9I=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <61141BB902EEFF47B3E4A780CFF1AB9C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <alex.bennee@linaro.org>) id 1hxBoQ-0001xv-0e
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 11:00:42 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51925)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hxBoO-0001w5-3J
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 11:00:41 -0400
+Received: by mail-wm1-x341.google.com with SMTP id 207so12488525wma.1
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 08:00:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=pgbcHeuDIrR0tqfydCTdm0SqQI83SF4IyYREZOx8bdM=;
+ b=IUDhCM0r+pqag+PV98uFJ7tjPhi/hCsxtVITGX07h+2mFECWUvDB+UmlqJ6YsUNUG1
+ FPMEiDc9UqJy4wnuqWyf6MxB3DWM5n87q21JD4Uv2gJQNHdWTBujh5ka77skWEmr2G3V
+ etFsk8V96Kzu5/fgr0LoeymFGZIZCBzfo4M2JjSkEgGmlOGAb015Si+kK50MyTRcnRH3
+ CObHRlcg+lXysuG1qTqfTZqKPp7Fxs+gSvruPKaBWNXuWiXurb8eW6dF4ZdJ1NWoHpdP
+ kCLFeh+Pxs1eVebfgXvxArr7azYPs7GsIVsvM5gMfSrzXL0H2w3g42NJsLvH6nvNiAY/
+ RDbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=pgbcHeuDIrR0tqfydCTdm0SqQI83SF4IyYREZOx8bdM=;
+ b=NXDo9ZRicqG3ytowOw+9OVdl0QgR/9Vxkr0pSdINu9p7ruZVrpgnFp1Jqi0BpJWC/m
+ Gj1DZ3EjBHNWY6sxi/cF34xQu7AsjHfbNtaSlgiQv585JXYHZ8ZMHNbHptJv274dyHuq
+ EWLsdg25AcxBLK1nRVwKSFecRYrHzMKeS9mc5GmXZWr3K2Cdk/PiUt2Ne3GaAal/8Ugp
+ kFlGNx5lvBKnvTxLru2sIwOCkRlD5KRR89ghsMg+bx5ceAPAmC1QK1/hJHT+cMKjYu++
+ zoiyPJQrzloqaJUEARISfV2E9dsoMBb7laNDquq8eJxrSQPhfa/2xG88IskH7K3gZcFw
+ b55A==
+X-Gm-Message-State: APjAAAVJyrPs+kEN/AOBiG92hBp4FPOji71gW2sHLKjJCEdLHVmC583L
+ OMIbIovGsPWaYvTPOgNQYehV+/Lniz0=
+X-Google-Smtp-Source: APXvYqzGH4+BeZDN35xbghaJZmbVFbly3IuW/frQXfLB8a516KeCDSvA/0r+aFRmHlhVkq9pSKB8iA==
+X-Received: by 2002:a1c:b342:: with SMTP id c63mr4005896wmf.84.1565622037554; 
+ Mon, 12 Aug 2019 08:00:37 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id p9sm6111665wru.61.2019.08.12.08.00.36
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Mon, 12 Aug 2019 08:00:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A45E91FF87;
+ Mon, 12 Aug 2019 16:00:36 +0100 (BST)
+References: <20190812052359.30071-1-armbru@redhat.com>
+ <20190812052359.30071-29-armbru@redhat.com> <87h86mofw3.fsf@linaro.org>
+ <87o90utro1.fsf@dusky.pond.sub.org>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+In-reply-to: <87o90utro1.fsf@dusky.pond.sub.org>
+Date: Mon, 12 Aug 2019 16:00:36 +0100
+Message-ID: <878sryo2cr.fsf@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b66b1f8-1790-42d1-c214-08d71f35bd0b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2019 14:59:56.2827 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: S6+DWjRQ3vMDrhDJ6fefTNbdFVVgd0Clh1wJA+gYK2IhePV1CCZt5KDm+k+8ZgIQ+Nm1JTObpckJGUZE2yyJa6qpBflE48ThQ1tkj43KGvw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5067
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.0.111
-Subject: Re: [Qemu-devel] [PATCH 2/3] vmdk: Make block_status recurse for
- flat extents
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH v4 28/29] sysemu: Move the
+ VMChangeStateEntry typedef to qemu/typedefs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -126,32 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjUuMDcuMjAxOSAxODo1NSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBGaXhlczogNjlmNDc1MDVlZTY2
-YWZhYTUxMzMwNWRlMGMxODk1YTIyNGU1MmM0NQ0KPiBTaWduZWQtb2ZmLWJ5OiBNYXggUmVpdHog
-PG1yZWl0ekByZWRoYXQuY29tPg0KDQpBZ2FpbiwgZG9uJ3Qga25vdyB2bWRrIGNvZGUsIGJ1dCBi
-cmllZmx5IGxvb2tpbmcgYXQgaXQgKGFuZCBhdCB2bWRrIHNwZWMpIEkNCnNlZSB0aGF0ICJleHRl
-bnRzIiBhcmUgZmlsZXMsIGFuZCBmbGF0IGV4dGVudCBpcyBhIHJhdyBmaWxlIHdpdGhvdXQgYW55
-IHNwZWNpYWwNCmZvcm1hdC4gQW5kIGl0IGlzIGFsbG9jYXRlZCBieSBibGtfdHJ1bmNhdGUoLi4g
-UFJFQUxMT0NfTU9ERV9PRkYgLi4pLCBzbyByZWFsbHkNCmxvb2tzIGxpa2UgbWV0YWRhdGEgcHJl
-YWxsb2NhdGlvbi4NCg0KQW5kLCBhbnkgd2F5LCB0aGVyZSBzaG91bGQgbm90IGJlIHJlYWwgZGFt
-YWdlLCBhcyBwYXRjaCBzaW1wbHkgYnJpbmdzIGJhY2sgb2xkIGJlaGF2aW9yDQpmb3Igb25lIGNh
-c2UuDQoNClJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
-c292QHZpcnR1b3p6by5jb20+DQoNCj4gLS0tDQo+ICAgYmxvY2svdm1kay5jIHwgMyArKysNCj4g
-ICAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYmxv
-Y2svdm1kay5jIGIvYmxvY2svdm1kay5jDQo+IGluZGV4IGJkMzZlY2UxMjUuLmZkNzhmZDBjY2Yg
-MTAwNjQ0DQo+IC0tLSBhL2Jsb2NrL3ZtZGsuYw0KPiArKysgYi9ibG9jay92bWRrLmMNCj4gQEAg
-LTE2OTIsNiArMTY5Miw5IEBAIHN0YXRpYyBpbnQgY29yb3V0aW5lX2ZuIHZtZGtfY29fYmxvY2tf
-c3RhdHVzKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiAgICAgICAgICAgaWYgKCFleHRlbnQtPmNv
-bXByZXNzZWQpIHsNCj4gICAgICAgICAgICAgICByZXQgfD0gQkRSVl9CTE9DS19PRkZTRVRfVkFM
-SUQ7DQo+ICAgICAgICAgICAgICAgKm1hcCA9IGNsdXN0ZXJfb2Zmc2V0ICsgaW5kZXhfaW5fY2x1
-c3RlcjsNCj4gKyAgICAgICAgICAgIGlmIChleHRlbnQtPmZsYXQpIHsNCj4gKyAgICAgICAgICAg
-ICAgICByZXQgfD0gQkRSVl9CTE9DS19SRUNVUlNFOw0KPiArICAgICAgICAgICAgfQ0KPiAgICAg
-ICAgICAgfQ0KPiAgICAgICAgICAgKmZpbGUgPSBleHRlbnQtPmZpbGUtPmJzOw0KPiAgICAgICAg
-ICAgYnJlYWs7DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+>
+>> Markus Armbruster <armbru@redhat.com> writes:
+>>
+>>> In my "build everything" tree, changing sysemu/sysemu.h triggers a
+>>> recompile of some 1800 out of 6600 objects (not counting tests and
+>>> objects that don't depend on qemu/osdep.h, down from 5400 due to the
+>>> previous commit).
+>>>
+>>> Several headers include sysemu/sysemu.h just to get typedef
+>>> VMChangeStateEntry.  Move it from sysemu/sysemu.h to qemu/typedefs.h.
+>>> Spell its structure tag the same while there.  Drop the now
+>>> superfluous includes of sysemu/sysemu.h from headers.
+>>
+>> You should probably mention you also fix the struct definition to meet
+>> our coding style. Otherwise:
+>
+> I did: "Spell its structure tag the same while there."  Would you like
+> to suggest a better wording?
+
+Apologies - my eyes obviously glazed over that part...
+
+>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> Thanks!
+
+
+--
+Alex Benn=C3=A9e
 
