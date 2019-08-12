@@ -2,80 +2,64 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F6EC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 16:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3172CC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 16:50:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7963320679
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 16:40:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="urDcK7gv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7963320679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 01EEF2067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 16:50:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01EEF2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxDMu-0004K7-K5
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 12:40:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55520)
+	id 1hxDWb-000679-A6
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 12:50:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56850)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hxDMO-0003nt-Vw
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 12:39:53 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hxDWC-0005Yy-CQ
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 12:50:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hxDMO-0006ap-4L
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 12:39:52 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36514)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hxDMN-0006aS-VJ
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 12:39:52 -0400
-Received: by mail-ot1-x343.google.com with SMTP id k18so29076216otr.3
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 09:39:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=22ACQm0I/TMpU8Y4cYRjIH02JqCCteh4p73DvdIam8U=;
- b=urDcK7gvcUQbH076Qln8AY6ZJHFmXi0mhVeTaunX41LhgBPIIBKLN1x/5xgxXzwbs4
- G9GJQWuPqq2KwrS38knRksNt11Hclp/J6zAhWne5iaZIlPNGuGU04FBkXbY6rMAhmnQc
- 28dSH5QgTDARaeNIY/4TTfTACEbZiqlatmpjYt0j1I5PlB4q5L9mQNH7+ZrHZIxYYcX+
- 7CwKM3Rft6r0HFpwNh4yo89j031uJSj3Hasm1yFBD0LXUOyO7GQN5HfmboBweNe2CPH7
- j5yLkgg3d4gNhiNCAnXQsOKQXrOvzkUMVjO00lM3Uui6A29k4KVnjN/naDlLKkGdTbR8
- cQfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=22ACQm0I/TMpU8Y4cYRjIH02JqCCteh4p73DvdIam8U=;
- b=fPOkNfMw6T5Cs5F0HrU8vX5TdWn/I/JjNcqC9l9sjhOtzeo7Yc8F6CAJVsWYA3VBEO
- DVW6NlgILxKT9JiR40UxOJoP3ac1fUDDkRwyyW2kIBb7EwBUx7i1to6/JzKCFDgSwX15
- mRyoyGstUeCFmKUkAc2cFaSL2qtJ3zBG7esqkNU01QsA01SmfPJXhxXpT0yRuFUvhTd0
- lCnmYiySuV1akg+JtIDUTYrbCzf5a3o42CFr0CzGApT6vTmAPv+XZBAOWfrMTo+ZXjGt
- zEjfrCj0awY+V7AMa6sLlkBnDGHzkF2A8g+n9sK9RvvFioGOJ9pdsOyLWp83ndfACBdN
- nisg==
-X-Gm-Message-State: APjAAAXsW+xRAIbP/HBmKBYImiip2+Cf87xaEaRzoY3PuVyg4qsZ6eiI
- QHvHNTvBek5FqhzCW2D/8IvtNDmiuaW/Sh2fLvNTdA==
-X-Google-Smtp-Source: APXvYqw+4qdH1h1rtRx38Jq5OlvBoaAzFVoZlfNcKR/1a3FJlo+eGKXu1PZtWG5d2LSHi88E7exeSSCqC5ylOrVocJo=
-X-Received: by 2002:a05:6830:1653:: with SMTP id
- h19mr31318759otr.232.1565627990914; 
- Mon, 12 Aug 2019 09:39:50 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1hxDWB-0003Fp-9H
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 12:50:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54136)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hxDW8-0003EY-B8; Mon, 12 Aug 2019 12:49:56 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0C2AB3E806;
+ Mon, 12 Aug 2019 16:49:54 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-66.ams2.redhat.com
+ [10.36.116.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C5D4C5C54A;
+ Mon, 12 Aug 2019 16:49:29 +0000 (UTC)
+Date: Mon, 12 Aug 2019 18:49:28 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <20190812164928.GC6400@localhost.localdomain>
+References: <6826e3c2-bc6e-b2a2-1bf1-3ed31079f0ee@virtuozzo.com>
+ <20190812132352.GA6400@localhost.localdomain>
+ <1b4f5b7c-ca3c-365d-f4ec-d3009b0bde59@virtuozzo.com>
 MIME-Version: 1.0
-References: <20190809171156.3476-1-richard.henderson@linaro.org>
-In-Reply-To: <20190809171156.3476-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Aug 2019 17:39:39 +0100
-Message-ID: <CAFEAcA_PJho=wwMiDHRuND1itJctctv9GUDFKp6VT4+QnbV4CQ@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
-Subject: Re: [Qemu-devel] [PATCH] linux-user: Add AT_HWCAP2 for
- aarch64-linux-user
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1b4f5b7c-ca3c-365d-f4ec-d3009b0bde59@virtuozzo.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 16:49:54 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] backup bug or question
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,30 +71,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 9 Aug 2019 at 18:11, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> Add the HWCAP2_* bits from kernel version v5.3-rc3.
-> Enable the bits corresponding to ARMv8.5-CondM and ARMv8.5-FRINT.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/elfload.c | 31 +++++++++++++++++++++++++++----
->  1 file changed, 27 insertions(+), 4 deletions(-)
-> ---
->
-> The HWCAP2_FLAGM2 and HWCAP2_FRINT bits came in during the
-> last merge window and will be in the upcoming v5.3 release.
-> We don't yet implement any of the other extensions that make
-> up the rest of the HWCAP2 bits.
+Am 12.08.2019 um 18:09 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 12.08.2019 16:23, Kevin Wolf wrote:
+> > Am 09.08.2019 um 15:18 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> >> Hi!
+> >>
+> >> Hmm, hacking around backup I have a question:
+> >>
+> >> What prevents guest write request after job_start but before setting
+> >> write notifier?
+> >>
+> >> code path:
+> >>
+> >> qmp_drive_backup or transaction with backup
+> >>
+> >>      job_start
+> >>         aio_co_enter(job_co_entry) /* may only schedule execution, isn't it ? */
+> >>
+> >> ....
+> >>
+> >> job_co_entry
+> >>      job_pause_point() /* it definitely yields, isn't it bad? */
+> >>      job->driver->run() /* backup_run */
+> >>
+> >> ----
+> >>
+> >> backup_run()
+> >>      bdrv_add_before_write_notifier()
+> >>
+> >> ...
+> >>
+> >> And what guarantees we give to the user? Is it guaranteed that write notifier is
+> >> set when qmp command returns?
+> >>
+> >> And I guess, if we start several backups in a transaction it should be guaranteed
+> >> that the set of backups is consistent and correspond to one point in time...
+> > 
+> > Do the patches to switch backup to a filter node solve this
+> > automatically because that node would be inserted in
+> > backup_job_create()?
+> > 
+> 
+> Hmm, great, looks like they should. At least it moves scope of the
+> problem to do_drive_backup and do_blockdev_backup functions..
+> 
+> Am I right that aio_context_acquire/aio_context_release guarantees no
+> new request created during the section? Or should we add
+> drained_begin/drained_end pair, or at least drain() at start of
+> qmp_blockdev_backup and qmp_drive_backup?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Holding the AioContext lock should be enough for this.
 
-thanks
--- PMM
+But note that it doesn't make a difference if new requests are actually
+incoming. The timing of the QMP command to start a backup job versus the
+timing of guest requests is essentially random. QEMU doesn't know what
+guest requests you mean to be included in the backup and which you don't
+unless you stop sending new requests well ahead of time.
+
+If you send a QMP request to start a backup, the backup will be
+consistent for some arbitrary point in time between the time that you
+sent the QMP request and the time that you received the reply to it.
+
+Draining in the QMP command handler wouldn't change any of this, because
+even the drain section starts at some arbitrary point in time.
+
+> Assume scenario like the this,
+> 
+> 1. fsfreeze
+> 2. qmp backup
+> 3. fsthaw
+> 
+> to make sure that backup starting point is consistent. So in our qmp command we should:
+> 1. complete all current requests to make drives corresponding to fsfreeze point
+> 2. initialize write-notifiers or filter before any new guest request, i.e. before fsthaw,
+> i.e. before qmp command return.
+
+If I understand correctly, fsfreeze only returns success after it has
+made sure that the guest has quiesced the device. So at any point
+between receiving the successful return of the fsfreeze and calling
+fsthaw, the state should be consistent.
+
+> Transactions should be OK, as they use drained_begin/drained_end
+> pairs, and additional aio_context_acquire/aio_context_release pairs.
+
+Here, draining is actually important because you don't synchronise
+against something external that you don't control anyway, but you just
+make sure that you start the backup of all disks at the same point in
+time (which is still an arbitrary point between the time that you send
+the transaction QMP command and the time that you receive success), even
+if no fsfreeze/fsthaw was used.
+
+Kevin
 
