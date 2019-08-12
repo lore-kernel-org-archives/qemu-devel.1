@@ -2,48 +2,51 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 004EBC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EDCC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:41:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C51E8206C1
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:33:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51E8206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 2426F20820
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:41:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2426F20820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxG4E-000451-22
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:33:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53150)
+	id 1hxGC0-00064P-Ct
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:41:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54036)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxG3p-0003ZA-F1
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:32:54 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxGBb-0005au-Qr
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:40:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxG3o-000374-Ic
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:32:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49466)
+ (envelope-from <jsnow@redhat.com>) id 1hxGBa-0004yF-Cj
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:40:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40360)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxG3m-00036V-DB; Mon, 12 Aug 2019 15:32:50 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hxGBX-0004wk-ER; Mon, 12 Aug 2019 15:40:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EFA997E436;
- Mon, 12 Aug 2019 19:32:48 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A303E30253A4;
+ Mon, 12 Aug 2019 19:40:50 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 451856FDC0;
- Mon, 12 Aug 2019 19:32:48 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-2-mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E01B5C3FA;
+ Mon, 12 Aug 2019 19:40:49 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190805164652.42409-1-vsementsov@virtuozzo.com>
+ <f7d9be28-73d8-af63-55af-4ed33e17d0cb@redhat.com>
+ <f4d13748-7b72-92b1-03c6-c3b44d31795e@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +123,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <f550d312-8b14-491b-3a98-d092730a528e@redhat.com>
-Date: Mon, 12 Aug 2019 15:32:47 -0400
+Message-ID: <18f80908-cb0f-89db-bb1f-f7437d513981@redhat.com>
+Date: Mon, 12 Aug 2019 15:40:49 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190725155735.11872-2-mreitz@redhat.com>
+In-Reply-To: <f4d13748-7b72-92b1-03c6-c3b44d31795e@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Mon, 12 Aug 2019 19:32:49 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Mon, 12 Aug 2019 19:40:50 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/7] iotests: Fix
- _filter_img_create()
+Subject: Re: [Qemu-devel] [PATCH] tests/test-hbitmap: test next_zero and
+ _next_dirty_area after truncate
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,29 +150,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 7/25/19 11:57 AM, Max Reitz wrote:
-> fe646693acc changed qemu-img create's output so that it no longer prints
-> single quotes around parameter values.  The subformat and adapter_type
-> filters in _filter_img_create() have never been adapted to that change.
+On 8/9/19 4:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 08.08.2019 3:04, John Snow wrote:
+>>
+>>
+>> On 8/5/19 12:46 PM, Vladimir Sementsov-Ogievskiy wrote:
+>>> Test that hbitmap_next_zero and hbitmap_next_dirty_area can find things
+>>> after old bitmap end.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>
+>>> It's a follow-up for
+>>>
+>>>      [PATCH for-4.1] util/hbitmap: update orig_size on truncate
+>>>
+>>>   tests/test-hbitmap.c | 22 ++++++++++++++++++++++
+>>>   1 file changed, 22 insertions(+)
+>>>
+>>> diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+>>> index 592d8219db..eed5d288cb 100644
+>>> --- a/tests/test-hbitmap.c
+>>> +++ b/tests/test-hbitmap.c
+>>> @@ -1004,6 +1004,15 @@ static void test_hbitmap_next_zero_4(TestHBitmapData *data, const void *unused)
+>>>       test_hbitmap_next_zero_do(data, 4);
+>>>   }
+>>>   
+>>> +static void test_hbitmap_next_zero_after_truncate(TestHBitmapData *data,
+>>> +                                                  const void *unused)
+>>> +{
+>>> +    hbitmap_test_init(data, L1, 0);
+>>> +    hbitmap_test_truncate_impl(data, L1 * 2);
+>>> +    hbitmap_set(data->hb, 0, L1);
+>>> +    test_hbitmap_next_zero_check(data, 0);
+>>> +}
+>>> +
+>>>   static void test_hbitmap_next_dirty_area_check(TestHBitmapData *data,
+>>>                                                  uint64_t offset,
+>>>                                                  uint64_t count)
+>>> @@ -1104,6 +1113,15 @@ static void test_hbitmap_next_dirty_area_4(TestHBitmapData *data,
+>>>       test_hbitmap_next_dirty_area_do(data, 4);
+>>>   }
+>>>   
+>>> +static void test_hbitmap_next_dirty_area_after_truncate(TestHBitmapData *data,
+>>> +                                                        const void *unused)
+>>> +{
+>>> +    hbitmap_test_init(data, L1, 0);
+>>> +    hbitmap_test_truncate_impl(data, L1 * 2);
+>>> +    hbitmap_set(data->hb, L1 + 1, 1);
+>>> +    test_hbitmap_next_dirty_area_check(data, 0, UINT64_MAX);
+>>> +}
+>>> +
+>>>   int main(int argc, char **argv)
+>>>   {
+>>>       g_test_init(&argc, &argv, NULL);
+>>> @@ -1169,6 +1187,8 @@ int main(int argc, char **argv)
+>>>                        test_hbitmap_next_zero_0);
+>>>       hbitmap_test_add("/hbitmap/next_zero/next_zero_4",
+>>>                        test_hbitmap_next_zero_4);
+>>> +    hbitmap_test_add("/hbitmap/next_zero/next_zero_after_truncate",
+>>> +                     test_hbitmap_next_zero_after_truncate);
+>>>   
+>>>       hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_0",
+>>>                        test_hbitmap_next_dirty_area_0);
+>>> @@ -1176,6 +1196,8 @@ int main(int argc, char **argv)
+>>>                        test_hbitmap_next_dirty_area_1);
+>>>       hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_4",
+>>>                        test_hbitmap_next_dirty_area_4);
+>>> +    hbitmap_test_add("/hbitmap/next_dirty_area/next_dirty_area_after_truncate",
+>>> +                     test_hbitmap_next_dirty_area_after_truncate);
+>>>   
+>>>       g_test_run();
+>>>   
+>>>
+>>
+>> Tested-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>
+>> And staged:
+>>
+>> Thanks, applied to my bitmaps tree:
+>>
+>> https://github.com/jnsnow/qemu/commits/bitmaps
 > 
-> Fixes: fe646693acc13ac48b98435d14149ab04dc597bc
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/059.out       | 16 ++++++++--------
->  tests/qemu-iotests/common.filter |  4 ++--
->  2 files changed, 10 insertions(+), 10 deletions(-)
+> Thanks! Hmm but I don't see the patch at this link, neither 01 and 03 from
+> "[Qemu-devel] [PATCH 0/3] backup fixes for 4.1?"...
 > 
 
-either way, the test passes. and it was apparently our intent to filter
-out the subformat, so I suppose this is correct.
+Made a mistake with my git-push syntax, because the local branch was
+named `bitmaps-next`. Should be properly synchronized now.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+(Also, as Max noted, I need to fix my rebase attempt for the sync=top
+routine.)
+
+--js
+
 
 
