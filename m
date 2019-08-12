@@ -2,84 +2,65 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 947EEC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA1F3C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:41:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E157206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:40:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ScX/iIel"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E157206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C1C4206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:41:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C1C4206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxAZ0-0001oX-Iw
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 09:40:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55921)
+	id 1hxAZe-0002jd-QW
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 09:41:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56025)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hxAYQ-000133-MG
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:40:07 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hxAZC-0002Gm-E0
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:40:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hxAYP-0000I3-KS
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:40:06 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41898)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hxAYP-0000Hi-Ey
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:40:05 -0400
-Received: by mail-ot1-x341.google.com with SMTP id o101so5865531ota.8
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 06:40:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Mnz8GgR2odvpj1t0ngPY0WAp+NVmgtDMzQAMO5KnUVw=;
- b=ScX/iIelJ9KgMT7h0ofiF7E4k+HCyLjJEmyMQ2BzbLOq9Zz/JjJLg8+HGce7MZmuqR
- HwOKsGodZU1jV13CSn3Nu1OzG1FpozOp5xQAV56bGnPj/QKoNupEilNmtSWOw68gM73M
- oqORuFh7xUow2FD+h5+H4WH3qJhm16Ylcvlx3jmYsbrUNdgFpNWx1iQoafuirpxey9NW
- 3D49dHW3ox/5RkNU89qceGp0oGQ9BLOqK3aViAr/6T/1Fj8brct8NvupjzhcHmJi/LA/
- 8oWhNBI5ic3cRG1S199HLH90YoOkRzfzor8x4Xpvxk1mjRCUGhsJps1OFOJ5MF9hRr0f
- em9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Mnz8GgR2odvpj1t0ngPY0WAp+NVmgtDMzQAMO5KnUVw=;
- b=ozRtFyDySReXYskZ9wEgQODMx9yWr4S6N5dPE2l1oyOaOgRbIapPdpqfLlxy1pjzgt
- JLZ06ih9WAfem+npngtUB4yw1l0b2/KB/FbWsfEJWVq7FNIMqKaWd3dVyNGpoiygl15O
- Ik/zdZll+vI/bN+kvq0lfDci0HRzq2uT6p0CA8NSUNAATLUuDKEcxoSmLDwKE0tQvsrO
- NSbvmBYrEg2PfckHcyFyA76XfFluZPfFib+yg+tmTBnzK6t6oOfiGDlghIasYUyJNSgF
- hIuauhWZwBb8U1nLU1Vkpilsz7c3Wtw0XxGUPKaunP6p7YoeUy3AzxpUEHhfJlb2J5Qu
- +CeQ==
-X-Gm-Message-State: APjAAAXi7MqjbospvmOam1FldEfdi4wDRwISqUIhBkFwtZGFKRkvSP70
- 6sltZQJJ2AWAliaZLbcEgk99JZum4B6w1tzUjguRiQ==
-X-Google-Smtp-Source: APXvYqymCk3NKtP7VXyBn4Qk5LjejbRX2avvXC2XQ8HwrBFZZZuUFppMy3Z3SAxHGUIi8bdxtdK5/7kRrQdGgBzOWCw=
-X-Received: by 2002:aca:4814:: with SMTP id v20mr1496819oia.98.1565617204452; 
- Mon, 12 Aug 2019 06:40:04 -0700 (PDT)
+ (envelope-from <cohuck@redhat.com>) id 1hxAZB-0000mM-7w
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:40:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37618)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hxAZB-0000lx-1p; Mon, 12 Aug 2019 09:40:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3A31E30084AD;
+ Mon, 12 Aug 2019 13:40:52 +0000 (UTC)
+Received: from gondolin (dhcp-192-181.str.redhat.com [10.33.192.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A54E62FC68;
+ Mon, 12 Aug 2019 13:40:47 +0000 (UTC)
+Date: Mon, 12 Aug 2019 15:40:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190812154045.10393873.cohuck@redhat.com>
+In-Reply-To: <bbf905b3-6f32-c478-4e6e-81c341f5601a@redhat.com>
+References: <20190805152947.28536-1-david@redhat.com>
+ <20190805152947.28536-2-david@redhat.com>
+ <e68f8298-8946-37f1-2e65-afa73a45604e@redhat.com>
+ <bbf905b3-6f32-c478-4e6e-81c341f5601a@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20190812065221.20907-1-kraxel@redhat.com>
- <aec51679-b766-5773-86cb-9ebd06a8cb49@redhat.com>
- <c4b30dfe-83d7-f1e0-d868-82791d56d6b6@redhat.com>
-In-Reply-To: <c4b30dfe-83d7-f1e0-d868-82791d56d6b6@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 12 Aug 2019 14:39:53 +0100
-Message-ID: <CAFEAcA-3bFuy2DDG8=-_Y3JO4HWpCW80EcsGWWN8toxiMpafBA@mail.gmail.com>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH 0/1] display/bochs: fix pcie support (qemu
- security issue)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Mon, 12 Aug 2019 13:40:52 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v1 1/9] s390x/mmu: Better ASC
+ selection in s390_cpu_get_phys_page_debug()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,51 +72,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Prasad J Pandit <ppandit@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Ilya Leoshkevich <iii@linux.ibm.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 12 Aug 2019 at 13:51, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> On 8/12/19 2:45 PM, Paolo Bonzini wrote:
-> > On 12/08/19 08:52, Gerd Hoffmann wrote:
-> >> Just found while investigating
-> >>   https://bugzilla.redhat.com/show_bug.cgi?id=3D1707118
+On Mon, 12 Aug 2019 09:52:56 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 12.08.19 09:12, Thomas Huth wrote:
+> > On 8/5/19 5:29 PM, David Hildenbrand wrote:  
+> >> Let's select the ASC before calling the function and use MMU_DATA_LOAD.
+> >> This is a preparation to:
+> >> - Remove the ASC magic depending on the access mode from mmu_translate
+> >> - Implement IEP support, where we could run into access exceptions
+> >>   trying to fetch instructions
 > >>
-> >> Found PCIe extended config space filled with random crap due to
-> >> allocation being too small (conventional pci config space only).
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  target/s390x/helper.c | 10 +++++++++-
+> >>  1 file changed, 9 insertions(+), 1 deletion(-)
 > >>
->
-> Can you amend this information to the commit description?
->
-> <...
->
-> >> PCI(e) config space is guest writable.  Writes are limited by
-> >> write mask (which probably is also filled with random stuff),
-> >
-> > Yes, it is also allocated with 256 bytes only.
-> >
-> >> so the guest can only flip enabled bits.  But I suspect it
-> >> still might be exploitable, so rather serious because it might
-> >> be a host escape for the guest.  On the other hand the device
-> >> is probably not yet in widespread use.
->
-> ...>
+> >> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+> >> index 13ae9909ad..08166558a0 100644
+> >> --- a/target/s390x/helper.c
+> >> +++ b/target/s390x/helper.c
+> >> @@ -58,7 +58,15 @@ hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vaddr vaddr)
+> >>          vaddr &= 0x7fffffff;
+> >>      }
+> >>  
+> >> -    if (mmu_translate(env, vaddr, MMU_INST_FETCH, asc, &raddr, &prot, false)) {
+> >> +    /*
+> >> +     * We want to read the code, however, not run into access exceptions  
+> > 
+> > Is this really a safe assumption here that we always use this to
+> > translate code addresses and not data addresses? ... I don't think so.
+> > For example with the "gva2gpa" HMP command, I'd rather expect that it
+> > also works with the secondary space mode...?  
+> 
+> Well, it's what current code does. I am not changing that behavior.
 
-I can add to the commit this paragraph of the cover letter,
-and I think also the 'mitigation' note might as well go in.
+Agreed, that is not actively breaking something.
 
-I've also put the cc:stable into the commit message.
+> 
+> While it is in general broken to have a single interface to debug
+> code+data (which is only a problem on s390x), it makes a lot of sense if
+> you think about single-stepping through disassembled code using the
+> gdbstub. Or dumping code where you crashed.
 
-Updated commit, ready to apply to master if we're OK with it:
+What about the memsave interface?
 
-https://git.linaro.org/people/peter.maydell/qemu-arm.git/commit/?h=3Dstagin=
-g&id=3Dc075b5f318a8be628ab8edf93be33f5a93a4aacd
+> 
+> In Linux, code+data will luckily usually have the same virtual->physical
+> tables, so it's not a real issue.
+> 
+> > 
+> > So maybe we need a proper MemTxAttrs bit or something similar for
+> > distinguishing instruction accesses from data accesses here?  
+> 
+> There would first have to be a way to ask "get_phys_page_debug" to get
+> code or data for this to make sense. Right now we used it to get code.
 
-thanks
--- PMM
+I'm wondering if we're able to do better; but if the code/data
+distinction is not considered in architecture independent code,
+probably not easily.
 
