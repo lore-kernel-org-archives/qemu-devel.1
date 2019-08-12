@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 971F0C32757
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CADC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DCF42085A
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:26:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DCF42085A
+	by mail.kernel.org (Postfix) with ESMTPS id 1A5612085A
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:26:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A5612085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx2qG-0005D0-O9
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 01:26:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57181)
+	id 1hx2qK-0005Rr-CR
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 01:26:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57134)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hx2oW-0000CL-1G
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:14 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hx2oU-000697-76
+ (envelope-from <armbru@redhat.com>) id 1hx2oT-0008WS-Qd
  for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48958)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <armbru@redhat.com>) id 1hx2oS-00066N-Bq
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48946)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hx2oT-00067j-W1
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hx2oS-00065K-46
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:08 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4EF5C30622EA
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:24:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 721853086E23
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 85CA36F938;
- Mon, 12 Aug 2019 05:24:05 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 16EF363B89;
+ Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E12381136422; Mon, 12 Aug 2019 07:23:59 +0200 (CEST)
+ id EB2331136425; Mon, 12 Aug 2019 07:23:59 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 12 Aug 2019 07:23:40 +0200
-Message-Id: <20190812052359.30071-11-armbru@redhat.com>
+Date: Mon, 12 Aug 2019 07:23:43 +0200
+Message-Id: <20190812052359.30071-14-armbru@redhat.com>
 In-Reply-To: <20190812052359.30071-1-armbru@redhat.com>
 References: <20190812052359.30071-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Mon, 12 Aug 2019 05:24:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 10/29] ide: Include hw/ide/internal a bit
- less outside hw/ide/
+Subject: [Qemu-devel] [PATCH v4 13/29] Clean up inclusion of
+ exec/cpu-common.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,133 +71,232 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to hw/ide/internal's file comment, only files in hw/ide/ are
-supposed to include it.  Drag reality slightly closer to supposition.
+migration/qemu-file.h neglects to include it even though it needs
+ram_addr_t.  Fix that.  Drop a few superfluous inclusions elsewhere.
 
-Three includes outside hw/ide remain: hw/arm/sbsa-ref.c,
-include/hw/ide/pci.h, and include/hw/misc/macio/macio.h.  Turns out
-board code needs ide-internal.h to wire up IDE stuff.  More cleanup is
-needed.  Left for another day.
-
-Cc: John Snow <jsnow@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/ide/ahci_internal.h         | 1 +
- hw/ppc/mac.h                   | 1 -
- include/hw/arm/allwinner-a10.h | 1 -
- include/hw/arm/xlnx-zynqmp.h   | 1 -
- include/hw/misc/mos6522.h      | 1 -
- hw/arm/allwinner-a10.c         | 1 +
- hw/arm/cubieboard.c            | 1 +
- hw/arm/xlnx-zynqmp.c           | 1 +
- 8 files changed, 4 insertions(+), 4 deletions(-)
+ include/hw/hw.h                 | 1 -
+ include/hw/ppc/ppc4xx.h         | 1 -
+ include/migration/misc.h        | 1 -
+ include/sysemu/kvm_int.h        | 1 -
+ include/sysemu/memory_mapping.h | 1 -
+ migration/migration.h           | 1 -
+ migration/qemu-file.h           | 1 +
+ accel/stubs/tcg-stub.c          | 1 -
+ balloon.c                       | 1 -
+ hw/smbios/smbios.c              | 1 -
+ migration/qemu-file-channel.c   | 1 -
+ migration/vmstate-types.c       | 1 -
+ qom/cpu.c                       | 1 -
+ tcg/optimize.c                  | 1 -
+ tcg/tcg-common.c                | 1 -
+ tcg/tcg.c                       | 1 -
+ 16 files changed, 1 insertion(+), 15 deletions(-)
 
-diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
-index 95ecddcd3c..73424516da 100644
---- a/hw/ide/ahci_internal.h
-+++ b/hw/ide/ahci_internal.h
-@@ -25,6 +25,7 @@
- #define HW_IDE_AHCI_INTERNAL_H
+diff --git a/include/hw/hw.h b/include/hw/hw.h
+index 38d2fb1f40..86ff26b712 100644
+--- a/include/hw/hw.h
++++ b/include/hw/hw.h
+@@ -6,7 +6,6 @@
+ #error Cannot include hw/hw.h from user emulation
+ #endif
 =20
- #include "hw/ide/ahci.h"
-+#include "hw/ide/internal.h"
- #include "hw/sysbus.h"
-=20
- #define AHCI_MEM_BAR_SIZE         0x1000
-diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-index a741300ac9..6af87d1fa0 100644
---- a/hw/ppc/mac.h
-+++ b/hw/ppc/mac.h
-@@ -30,7 +30,6 @@
+-#include "exec/cpu-common.h"
+ #include "qom/object.h"
  #include "exec/memory.h"
- #include "hw/boards.h"
- #include "hw/sysbus.h"
--#include "hw/ide/internal.h"
- #include "hw/input/adb.h"
- #include "hw/misc/mos6522.h"
- #include "hw/pci/pci_host.h"
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a1=
-0.h
-index 7182ce5c4b..101b72a71d 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -7,7 +7,6 @@
- #include "hw/timer/allwinner-a10-pit.h"
- #include "hw/intc/allwinner-a10-pic.h"
- #include "hw/net/allwinner_emac.h"
--#include "hw/ide/pci.h"
- #include "hw/ide/ahci.h"
+ #include "migration/vmstate.h"
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index 90f8866138..7d82259051 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -26,7 +26,6 @@
+ #define PPC4XX_H
 =20
+ #include "hw/ppc/ppc.h"
+-#include "exec/cpu-common.h"
+ #include "exec/memory.h"
+=20
+ /* PowerPC 4xx core initialization */
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 5cdbabd094..b9d8e787af 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -14,7 +14,6 @@
+ #ifndef MIGRATION_MISC_H
+ #define MIGRATION_MISC_H
+=20
+-#include "exec/cpu-common.h"
+ #include "qemu/notify.h"
+ #include "qapi/qapi-types-net.h"
+=20
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 787dbc7770..5d341cc29b 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -9,7 +9,6 @@
+ #ifndef QEMU_KVM_INT_H
+ #define QEMU_KVM_INT_H
+=20
+-#include "exec/cpu-common.h"
+ #include "exec/memory.h"
  #include "sysemu/sysemu.h"
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 6cb65e7537..d7483c3b42 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -22,7 +22,6 @@
- #include "hw/intc/arm_gic.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/char/cadence_uart.h"
--#include "hw/ide/pci.h"
- #include "hw/ide/ahci.h"
- #include "hw/sd/sdhci.h"
- #include "hw/ssi/xilinx_spips.h"
-diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
-index 03d9f0c059..493c907537 100644
---- a/include/hw/misc/mos6522.h
-+++ b/include/hw/misc/mos6522.h
-@@ -29,7 +29,6 @@
+ #include "sysemu/accel.h"
+diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapp=
+ing.h
+index 1b440df486..4b20f1a639 100644
+--- a/include/sysemu/memory_mapping.h
++++ b/include/sysemu/memory_mapping.h
+@@ -15,7 +15,6 @@
+ #define MEMORY_MAPPING_H
 =20
+ #include "qemu/queue.h"
+-#include "exec/cpu-common.h"
+ #include "exec/cpu-defs.h"
  #include "exec/memory.h"
- #include "hw/sysbus.h"
--#include "hw/ide/internal.h"
- #include "hw/input/adb.h"
 =20
- /* Bits in ACR */
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index 35e906ca54..3b0d3eccdd 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -16,6 +16,7 @@
-  */
+diff --git a/migration/migration.h b/migration/migration.h
+index 1fdd7b21fd..26f01d00f6 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -16,7 +16,6 @@
+=20
+ #include "qapi/qapi-types-migration.h"
+ #include "qemu/thread.h"
+-#include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+ #include "hw/qdev.h"
+ #include "io/channel.h"
+diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+index 13baf896bd..21f3ae4be2 100644
+--- a/migration/qemu-file.h
++++ b/migration/qemu-file.h
+@@ -26,6 +26,7 @@
+ #define MIGRATION_QEMU_FILE_H
+=20
+ #include <zlib.h>
++#include "exec/cpu-common.h"
+=20
+ /* Read a chunk of data from a file at the given position.  The pos argu=
+ment
+  * can be ignored if the file is only be used for streaming.  The number=
+ of
+diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
+index 76ae461749..e2d23edafe 100644
+--- a/accel/stubs/tcg-stub.c
++++ b/accel/stubs/tcg-stub.c
+@@ -14,7 +14,6 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "tcg/tcg.h"
+-#include "exec/cpu-common.h"
+ #include "exec/exec-all.h"
+=20
+ void tb_flush(CPUState *cpu)
+diff --git a/balloon.c b/balloon.c
+index 914b3662db..f104b42961 100644
+--- a/balloon.c
++++ b/balloon.c
+@@ -26,7 +26,6 @@
 =20
  #include "qemu/osdep.h"
-+#include "exec/address-spaces.h"
- #include "qapi/error.h"
- #include "qemu/module.h"
- #include "cpu.h"
-diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
-index f7c8a5985a..38e0ca0f53 100644
---- a/hw/arm/cubieboard.c
-+++ b/hw/arm/cubieboard.c
-@@ -16,6 +16,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "exec/address-spaces.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "hw/sysbus.h"
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index a60830d37a..0f587e63d3 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -24,6 +24,7 @@
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
+ #include "qemu/atomic.h"
+-#include "exec/cpu-common.h"
  #include "sysemu/kvm.h"
-+#include "sysemu/sysemu.h"
- #include "kvm_arm.h"
+ #include "sysemu/balloon.h"
+ #include "trace-root.h"
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 7bcd67b098..11d476c4a2 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -28,7 +28,6 @@
+ #include "hw/firmware/smbios.h"
+ #include "hw/loader.h"
+ #include "hw/boards.h"
+-#include "exec/cpu-common.h"
+ #include "smbios_build.h"
 =20
- #define GIC_NUM_SPI_INTR 160
+ /* legacy structures and constants for <=3D 2.0 machines */
+diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.=
+c
+index 8e639eb496..78ef248820 100644
+--- a/migration/qemu-file-channel.c
++++ b/migration/qemu-file-channel.c
+@@ -24,7 +24,6 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu-file-channel.h"
+-#include "exec/cpu-common.h"
+ #include "qemu-file.h"
+ #include "io/channel-socket.h"
+ #include "qemu/iov.h"
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index 845f4649ee..bee658a1b2 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -11,7 +11,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "exec/cpu-common.h"
+ #include "qemu-file.h"
+ #include "migration.h"
+ #include "migration/vmstate.h"
+diff --git a/qom/cpu.c b/qom/cpu.c
+index f376f782d8..fdc1af8f40 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -25,7 +25,6 @@
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+ #include "exec/log.h"
+-#include "exec/cpu-common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/qemu-print.h"
+ #include "sysemu/sysemu.h"
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index d2424de4af..cee2a36a60 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -24,7 +24,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "exec/cpu-common.h"
+ #include "tcg-op.h"
+=20
+ #define CASE_OP_32_64(x)                        \
+diff --git a/tcg/tcg-common.c b/tcg/tcg-common.c
+index 907d58d0f0..97305a3efc 100644
+--- a/tcg/tcg-common.c
++++ b/tcg/tcg-common.c
+@@ -23,7 +23,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "exec/cpu-common.h"
+ #include "tcg/tcg.h"
+=20
+ #if defined(CONFIG_TCG_INTERPRETER)
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index be2c33c400..2db83ce2e8 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -42,7 +42,6 @@
+ #define NO_CPU_IO_DEFS
+ #include "cpu.h"
+=20
+-#include "exec/cpu-common.h"
+ #include "exec/exec-all.h"
+=20
+ #if !defined(CONFIG_USER_ONLY)
 --=20
 2.21.0
 
