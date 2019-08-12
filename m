@@ -2,47 +2,47 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 950ECC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1320CC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:46:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 657C420684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:39:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657C420684
+	by mail.kernel.org (Postfix) with ESMTPS id DB98220684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:46:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB98220684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFEL-0007Kf-GJ
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 14:39:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44626)
+	id 1hxFL7-0000Ys-48
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 14:46:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45603)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxFDw-0006rj-K4
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:39:17 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxFKB-0008Sc-NV
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxFDv-0006iz-Km
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:39:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56600)
+ (envelope-from <jsnow@redhat.com>) id 1hxFKA-0000bH-T5
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:45:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52090)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxFDt-0006hj-Eo; Mon, 12 Aug 2019 14:39:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hxFK8-0000aZ-RD; Mon, 12 Aug 2019 14:45:41 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 037FE3145739;
- Mon, 12 Aug 2019 18:39:12 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id DCBF183F3B;
+ Mon, 12 Aug 2019 18:45:39 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 476C17EB73;
- Mon, 12 Aug 2019 18:39:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2970F802C9;
+ Mon, 12 Aug 2019 18:45:38 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190725155512.9827-1-mreitz@redhat.com>
+References: <20190809185253.17535-1-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -119,22 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
-Date: Mon, 12 Aug 2019 14:39:10 -0400
+Message-ID: <70dd181b-42f6-6da3-023a-baab380edde2@redhat.com>
+Date: Mon, 12 Aug 2019 14:45:38 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190725155512.9827-1-mreitz@redhat.com>
+In-Reply-To: <20190809185253.17535-1-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Mon, 12 Aug 2019 18:39:12 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.27]); Mon, 12 Aug 2019 18:45:39 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/3] block: Make various
- formats' block_status recurse again
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] iotests: Fix 141 when run
+ with qed
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,52 +154,17 @@ Sender: "Qemu-devel"
 
 
 
-On 7/25/19 11:55 AM, Max Reitz wrote:
-> Hi,
->=20
-> 69f47505ee66afaa513305de0c1895a224e52c45 changed block_status so that i=
-t
-> would only go down to the protocol layer if the format layer returned
-> BDRV_BLOCK_RECURSE, thus indicating that it has no sufficient
-> information whether a given range in the image is zero or not.
-> Generally, this is because the image is preallocated and thus all range=
-s
-> appear as zeroes.
->=20
-> However, it only implemented this preallocation detection for qcow2.
-> There are more formats that support preallocation, though: vdi, vhdx,
-> vmdk, vpc.  (Funny how they all start with =E2=80=9Cv=E2=80=9D.)
->=20
-> For vdi, vmdk, and vpc, the fix is rather simple, because they really
-> have different subformats depending on whether an image is preallocated
-> or not.  This makes the check very simple.
->=20
-> vhdx is more like qcow2, where after the image has been created, it
-> isn=E2=80=99t clear whether it=E2=80=99s been preallocated or everythin=
-g is allocated
-> because everything was already written to.  69f47505ee added a heuristi=
-c
-> to qcow2 to get around this, but I think that=E2=80=99s too much for vh=
-dx.  I
-> just left it unfixed, because I don=E2=80=99t care that much, honestly =
-(and I
-> don=E2=80=99t think anyone else does).
->=20
+On 8/9/19 2:52 PM, Max Reitz wrote:
+> 69f47505ee has changed qcow2 in such a way that the commit job run in
+> test 141 (and 144[1]) returns before it emits the READY event.  However,
+> 141 also runs with qed, where the order is still the other way around.
+> Just filter out the {"return": {}} so the test passes for qed again.
+> 
+> [1] 144 only runs with qcow2, so it is fine as it is.
+> 
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Fixes: 69f47505ee66afaa513305de0c1895a224e52c45
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-What's the practical outcome of that, and is the limitation documented
-somewhere?
-
-(I'm fine with not fixing it, I just want it documented somehow.)
-
->=20
-> Max Reitz (3):
->   vdi: Make block_status recurse for fixed images
->   vmdk: Make block_status recurse for flat extents
->   vpc: Do not return RAW from block_status
->=20
->  block/vdi.c  | 3 ++-
->  block/vmdk.c | 3 +++
->  block/vpc.c  | 2 +-
->  3 files changed, 6 insertions(+), 2 deletions(-)
->=20
+Reviewed-by: John Snow <jsnow@redhat.com>
 
