@@ -2,50 +2,51 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 349D2C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB23AC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:09:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04B5A20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:04:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04B5A20679
+	by mail.kernel.org (Postfix) with ESMTPS id 88C83206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:09:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C83206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxHUx-00035f-2Y
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 17:04:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39730)
+	id 1hxHZb-0004qf-Qt
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 17:09:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40503)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxHTr-0002VA-W4
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:03:53 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxHYw-00046r-Nj
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:09:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxHTq-0000XI-Mj
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:03:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43200)
+ (envelope-from <mreitz@redhat.com>) id 1hxHYv-0003hN-KT
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:09:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44822)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxHTn-0000Uh-Nr; Mon, 12 Aug 2019 17:03:48 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hxHYt-0003e2-2L; Mon, 12 Aug 2019 17:09:03 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 007E93001834;
- Mon, 12 Aug 2019 21:03:47 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3D2733082124;
+ Mon, 12 Aug 2019 21:09:02 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
  [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 81F37D1FE;
- Mon, 12 Aug 2019 21:03:43 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-5-mreitz@redhat.com>
- <04db2aa5-f850-c6fa-0101-3e9cb8d34a6a@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 30AFD1001281;
+ Mon, 12 Aug 2019 21:09:00 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+References: <20190726140954.31921-1-ptoscano@redhat.com>
+ <20190726140954.31921-3-ptoscano@redhat.com>
+ <549f94df-5d31-3dfe-0693-72a2861ddd7f@redhat.com>
+ <20190729110830.GA5757@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +73,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9be593c8-332e-5f5b-899c-53737f05f878@redhat.com>
-Date: Mon, 12 Aug 2019 23:03:41 +0200
+Message-ID: <3cea1759-3c6d-c78f-dd93-37fde0acd076@redhat.com>
+Date: Mon, 12 Aug 2019 23:08:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <04db2aa5-f850-c6fa-0101-3e9cb8d34a6a@redhat.com>
+In-Reply-To: <20190729110830.GA5757@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="A0DkRO5IV5DlIK9soEpjLwAOTwzizorpZ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+ boundary="kowUoJzTmxHJZrswvpAa8Y4SUfbfahtCq"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 12 Aug 2019 21:03:47 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Mon, 12 Aug 2019 21:09:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/7] vmdk: Reject invalid
- compressed writes
+Subject: Re: [Qemu-devel] [PATCH 2/2] ssh: implement private key
+ authentication
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,166 +100,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: pkrempa@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, rjones@redhat.com,
+ Pino Toscano <ptoscano@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---A0DkRO5IV5DlIK9soEpjLwAOTwzizorpZ
-Content-Type: multipart/mixed; boundary="pEYXEQ8rb1ZBhcH5G3L2O1Rld60125eM9";
+--kowUoJzTmxHJZrswvpAa8Y4SUfbfahtCq
+Content-Type: multipart/mixed; boundary="NK109kDGKK6Y5BUzJsjrsLZK9VbK5Up5r";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <9be593c8-332e-5f5b-899c-53737f05f878@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 4/7] vmdk: Reject invalid compressed writes
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-5-mreitz@redhat.com>
- <04db2aa5-f850-c6fa-0101-3e9cb8d34a6a@redhat.com>
-In-Reply-To: <04db2aa5-f850-c6fa-0101-3e9cb8d34a6a@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+Cc: Pino Toscano <ptoscano@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, pkrempa@redhat.com, rjones@redhat.com,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <3cea1759-3c6d-c78f-dd93-37fde0acd076@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] ssh: implement private key
+ authentication
+References: <20190726140954.31921-1-ptoscano@redhat.com>
+ <20190726140954.31921-3-ptoscano@redhat.com>
+ <549f94df-5d31-3dfe-0693-72a2861ddd7f@redhat.com>
+ <20190729110830.GA5757@localhost.localdomain>
+In-Reply-To: <20190729110830.GA5757@localhost.localdomain>
 
---pEYXEQ8rb1ZBhcH5G3L2O1Rld60125eM9
-Content-Type: text/plain; charset=utf-8
+--NK109kDGKK6Y5BUzJsjrsLZK9VbK5Up5r
+Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 12.08.19 22:26, John Snow wrote:
->=20
->=20
-> On 7/25/19 11:57 AM, Max Reitz wrote:
->> Compressed writes generally have to write full clusters, not just in
->> theory but also in practice when it comes to vmdk's streamOptimized
->> subformat.  It currently is just silently broken for writes with
->> non-zero in-cluster offsets:
+On 29.07.19 13:08, Kevin Wolf wrote:
+> Am 26.07.2019 um 16:24 hat Eric Blake geschrieben:
+>> On 7/26/19 9:09 AM, Pino Toscano wrote:
+>>> Add a 'private-key' option which represents the path of a private key=
+
+>>> to use for authentication, and 'private-key-secret' as the name of an=
+
+>>> object with its passphrase.
+>>>
+>>> Signed-off-by: Pino Toscano <ptoscano@redhat.com>
 >>
->> $ qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 1M
->> $ qemu-io -c 'write 4k 4k' -c 'read 4k 4k' foo.vmdk
->> wrote 4096/4096 bytes at offset 4096
->> 4 KiB, 1 ops; 00.01 sec (443.724 KiB/sec and 110.9309 ops/sec)
->> read failed: Invalid argument
+>>> +++ b/qapi/block-core.json
+>>> @@ -3226,6 +3226,11 @@
+>>>  # @password-secret:     ID of a QCryptoSecret object providing a pas=
+sword
+>>>  #                       for authentication (since 4.2)
+>>>  #
+>>> +# @private-key:         path to the private key (since 4.2)
+>>> +#
+>>> +# @private-key-secret:  ID of a QCryptoSecret object providing the p=
+assphrase
+>>> +#                       for 'private-key' (since 4.2)
 >>
->> (The technical reason is that vmdk_write_extent() just writes the
->> incomplete compressed data actually to offset 4k.  When reading the
->> data, vmdk_read_extent() looks at offset 0 and finds the compressed da=
-ta
->> size to be 0, because that is what it reads from there.  This yields a=
+>> Is password-secret intended to be mutually-exclusive with
+>> private-key/private-key-secret?  If so, this should probably utilize a=
 n
->> error.)
+>> enum for a discriminator
+>> { 'enum': 'SshAuth', 'data': ['ssh-agent', 'password', 'private'key'] =
+}
 >>
->> For incomplete writes with zero in-cluster offsets, the error path whe=
-n
->> reading the rest of the cluster is a bit different, but the result is
->> the same:
->>
->> $ qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 1M
->> $ qemu-io -c 'write 0k 4k' -c 'read 4k 4k' foo.vmdk
->> wrote 4096/4096 bytes at offset 0
->> 4 KiB, 1 ops; 00.01 sec (362.641 KiB/sec and 90.6603 ops/sec)
->> read failed: Invalid argument
->>
->> (Here, vmdk_read_extent() finds the data and then sees that the
->> uncompressed data is short.)
->>
->> It is better to reject invalid writes than to make the user believe th=
-ey
->> might have succeeded and then fail when trying to read it back.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  block/vmdk.c | 10 ++++++++++
->>  1 file changed, 10 insertions(+)
->>
->> diff --git a/block/vmdk.c b/block/vmdk.c
->> index db6acfc31e..641acacfe0 100644
->> --- a/block/vmdk.c
->> +++ b/block/vmdk.c
->> @@ -1731,6 +1731,16 @@ static int vmdk_write_extent(VmdkExtent *extent=
-, int64_t cluster_offset,
->>      if (extent->compressed) {
->>          void *compressed_data;
->> =20
->> +        /* Only whole clusters */
->> +        if (offset_in_cluster ||
->> +            n_bytes > (extent->cluster_sectors * SECTOR_SIZE) ||
->> +            (n_bytes < (extent->cluster_sectors * SECTOR_SIZE) &&
->> +             offset + n_bytes !=3D extent->end_sector * SECTOR_SIZE))=
+>> then update BlockdevOptionsSsh to be a union type with an optional
+>> discriminator (defaulting to ssh-agent) for back-compat, where
+>> 'auth':'ssh-agent' needs no further fields, 'auth':'password' adds in =
+a
+>> 'secret' field for use as password, or where 'auth':'private-key' adds=
 
->> +        {
->> +            ret =3D -EINVAL;
->> +            goto out;
->> +        }
->> +
->>          if (!extent->has_marker) {
->>              ret =3D -EINVAL;
->>              goto out;
->>
+>> in both 'key-file' and 'secret' for use as the two pieces needed for
+>> private key use.
 >=20
-> What does this look like from a guest's perspective? Is there something=
+> Can we actually support optional discriminators when we don't have
+> defaults in the QAPI schema yet?
 
-> that enforces the alignment in the graph for us?
+Just chiming in here, because I wanted to throw in that v4 of my =E2=80=9C=
+block:
+Try to create well-typed json:{} filenames=E2=80=8B=E2=80=9D series adds =
+that.
+
+>> On a different topic, how much of this work overlaps with the nbdkit s=
+sh
+>> plugin? Should we be duplicating efforts with both projects supporting=
+
+>> ssh natively, or is it worth considering getting qemu out of the ssh
+>> business and instead connecting to an nbd device provided by nbdkit
+>> connecting to ssh?
 >=20
-> Or is it the case that indeed guests (or users via qemu-io) can request=
+> ssh behaves essentially like a filesystem whereas NBD behaves like a
+> block device. This is especially relevant for everything related to the=
 
-> invalid writes and we will halt the VM in those cases (in preference to=
+> file size. As far as I know, using an image format like qcow2 that want=
+s
+> to grow the image file isn't possible over NBD, whereas I expect it to
+> work with the ssh block driver.
 
-> corrupting the disk)?
-
-Have you ever tried using a streamOptimized VMDK disk with a guest?
-
-I haven=E2=80=99t, but I know that it won=E2=80=99t work. O:-)  If you tr=
-y to write to
-an already allocated cluster, you=E2=80=99ll get an EIO and an error mess=
-age via
-error_report() (=E2=80=9CCould not write to allocated cluster for
-streamOptimized=E2=80=9D).  So really, the only use of streamOptimized is=
- as a
-qemu-img convert source/target, or as a backup/mirror target.  (Just
-like compressed clusters in qcow2 images.)
-
-I suppose if I introduced streamOptimized support today, I wouldn=E2=80=99=
-t just
-forward vmdk_co_pwritev_compressed() to vmdk_co_pwritev(), but instead
-make vmdk_co_pwritev_compressed() only work on streamOptimized images,
-and vmdk_co_pwritev() only on everything else.  Then it would be more cle=
-ar.
-
-Hm.  In fact, that=E2=80=99s a bug, isn=E2=80=99t it?  vmdk will accept c=
-ompressed
-writes for any subformat, even if it doesn=E2=80=99t support compression.=
-  So if
-you use -c and convert to vmdk, it will succeed, but the result won=E2=80=
-=99t be
-compressed,
-
-It=E2=80=99s also a bit weird to accept normal writes for streamOptimized=
-, but
-I=E2=80=99m not sure whether that=E2=80=99s really a bug?  In any case, c=
-hanging this
-behavior would not be backwards-compatible...  Should we deprecate
-normal writes to streamOptimized?
+Just using sshfs and file-posix would seem simpler to me, by the way.
 
 Max
 
 
---pEYXEQ8rb1ZBhcH5G3L2O1Rld60125eM9--
+--NK109kDGKK6Y5BUzJsjrsLZK9VbK5Up5r--
 
---A0DkRO5IV5DlIK9soEpjLwAOTwzizorpZ
+--kowUoJzTmxHJZrswvpAa8Y4SUfbfahtCq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1R1C0ACgkQ9AfbAGHV
-z0CzoggAjJO0tsPlvgRrbbwLFk0j9l4KoTPXiHaURrswh+9KUdld+neVv7/o0vcj
-KOwJtx4ZBdjAzQbyAqQCzNDFaAkXCl5uGrfoJ+NCoPrP0bATtv/jap86h0XDFVOl
-kxtCZWu9abL+FC3AiFVU7j1sVv7gMkKvgjBfjyKu2Zz5rkg0tJZSvxA/5jilX6EP
-19zBdtT7H/qMzzSdY1WjbohcT7Trt4n3desOs+HR2clGtKm596LAqX3k0JYxkF1/
-S5gVZyI99n1XhXbE98vHkiLDsckFfIdChSAcbuAu/25eyvm8SvA2AoGTyXScvpRt
-NDsy9oaLSL8L5esJO+K5mDh3xmrhug==
-=3Kdy
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1R1WoACgkQ9AfbAGHV
+z0A4IAf/b2FJeoGXQeL1a5hcXtUOxRX4EEgK91B3YZILRV07GNDLfHoYduVZxOCJ
+NM1P71Yf23wF2vxSImyo9bM4KU5ub/23HXgJHcS7nH2BIRwMFLNvrjrwFYXyzANl
+JEI1GAe1gds8nFQ7QN4DgeXYUbba4Rw3hchlSza7mXe2/vHS3rgxmtA4uY6/qLpO
+WgmoMI7n+YqqtgGEUone2rQY96vsYsnbY45eUcmX+47H+F4DrkxlsyuvaLS5KUb8
+yY38c75FzqBOdpfyYpQvKajSBSrkYZ8kVYdPLC1XcgeDsY4EqxZZdP+aL80TkLDw
+NhaUNfT7W3Bd0zh3k/fi/GQ0euQaIw==
+=tXio
 -----END PGP SIGNATURE-----
 
---A0DkRO5IV5DlIK9soEpjLwAOTwzizorpZ--
+--kowUoJzTmxHJZrswvpAa8Y4SUfbfahtCq--
 
