@@ -2,51 +2,47 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D408C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 17:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFFCC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 17:58:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F4194206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 17:47:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F4194206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 322CF206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 17:58:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 322CF206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxEPX-0001bc-3k
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 13:47:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36701)
+	id 1hxEak-000400-FE
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 13:58:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38566)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxEP5-00015O-H8
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 13:46:44 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxEa9-0003SG-P6
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 13:58:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxEP4-0001Pn-Cw
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 13:46:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59398)
+ (envelope-from <jsnow@redhat.com>) id 1hxEa8-0006bF-HQ
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 13:58:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53974)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxEP0-0001N6-9Y; Mon, 12 Aug 2019 13:46:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hxEa8-0006aW-3x
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 13:58:08 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 025414E83E;
- Mon, 12 Aug 2019 17:46:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E1BAC30A56B0
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 17:58:06 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 15F5D5D6B2;
- Mon, 12 Aug 2019 17:46:34 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-References: <6826e3c2-bc6e-b2a2-1bf1-3ed31079f0ee@virtuozzo.com>
- <b032aeef-07f4-2922-6ee8-3047a8c622b8@redhat.com>
- <0c95727d-6572-710f-6a78-e54c4f655de3@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8052B1001B20;
+ Mon, 12 Aug 2019 17:58:06 +0000 (UTC)
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20190812071212.24551-1-kraxel@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -123,21 +119,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <d52ae020-0b35-936a-b321-02593739be85@redhat.com>
-Date: Mon, 12 Aug 2019 13:46:34 -0400
+Message-ID: <20a99cc9-de01-8182-1c75-07dd07b5b35c@redhat.com>
+Date: Mon, 12 Aug 2019 13:58:05 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <0c95727d-6572-710f-6a78-e54c4f655de3@virtuozzo.com>
+In-Reply-To: <20190812071212.24551-1-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Mon, 12 Aug 2019 17:46:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Mon, 12 Aug 2019 17:58:07 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] backup bug or question
+Subject: Re: [Qemu-devel] [PATCH] Add git-publish profile for security bugs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,107 +151,52 @@ Sender: "Qemu-devel"
 
 
 
-On 8/10/19 7:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 09.08.2019 23:13, John Snow wrote:
->>
->>
->> On 8/9/19 9:18 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Hi!
->>>
->>> Hmm, hacking around backup I have a question:
->>>
->>> What prevents guest write request after job_start but before setting
->>> write notifier?
->>>
->>> code path:
->>>
->>> qmp_drive_backup or transaction with backup
->>>
->>>      job_start
->>>         aio_co_enter(job_co_entry) /* may only schedule execution, isn't it ? */
->>>
->>> ....
->>>
->>> job_co_entry
->>>      job_pause_point() /* it definitely yields, isn't it bad? */
->>>      job->driver->run() /* backup_run */
->>>
->>> ----
->>>
->>> backup_run()
->>>      bdrv_add_before_write_notifier()
->>>
->>> ...
->>>
->>
->> I think you're right... :(
->>
->>
->> We create jobs like this:
->>
->> job->paused        = true;
->> job->pause_count   = 1;
->>
->>
->> And then job_start does this:
->>
->> job->co = qemu_coroutine_create(job_co_entry, job);
->> job->pause_count--;
->> job->busy = true;
->> job->paused = false;
->>
->>
->> Which means that job_co_entry is being called before we lift the pause:
->>
->> assert(job && job->driver && job->driver->run);
->> job_pause_point(job);
->> job->ret = job->driver->run(job, &job->err);
->>
->> ...Which means that we are definitely yielding in job_pause_point.
->>
->> Yeah, that's a race condition waiting to happen.
->>
->>> And what guarantees we give to the user? Is it guaranteed that write notifier is
->>> set when qmp command returns?
->>>
->>> And I guess, if we start several backups in a transaction it should be guaranteed
->>> that the set of backups is consistent and correspond to one point in time...
->>>
->>
->> I would have hoped that maybe the drain_all coupled with the individual
->> jobs taking drain_start and drain_end would save us, but I guess we
->> simply don't have a guarantee that all backup jobs WILL have installed
->> their handler by the time the transaction ends.
->>
->> Or, if there is that guarantee, I don't know what provides it, so I
->> think we shouldn't count on it accidentally working anymore.
->>
->>
->>
->> I think we should do two things:
->>
->> 1. Move the handler installation to creation time.
->> 2. Modify backup_before_write_notify to return without invoking
->> backup_do_cow if the job isn't started yet.
->>
+On 8/12/19 3:12 AM, Gerd Hoffmann wrote:
+> Simplifies sending security patches to all people listed in
+> https://wiki.qemu.org/SecurityProcess.  Should also make it
+> harder to send a copy to the mailing list by accident.
 > 
-> Hmm, I don't see, how it helps.. No-op write-notifier will not save as from
-> guest write, is it?
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  .gitpublish | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
+> diff --git a/.gitpublish b/.gitpublish
+> index a13f8c7c0ecd..55750c45ed89 100644
+> --- a/.gitpublish
+> +++ b/.gitpublish
+> @@ -49,3 +49,14 @@ base = master
+>  to = qemu-devel@nongnu.org
+>  cc = qemu-ppc@nongnu.org
+>  cccmd = scripts/get_maintainer.pl --noroles --norolestats --nogit --nogit-fallback 2>/dev/null
+> +
+> +# https://wiki.qemu.org/SecurityProcess
+> +[gitpublishprofile "security"]
+> +base = master
+> +to = mst@redhat.com
+> +to = pmatouse@redhat.com
+> +to = sstabellini@kernel.org
+> +to = secalert@redhat.com
+> +to = mdroth@linux.vnet.ibm.com
+> +to = pjp@redhat.com
+> +suppresscc = all
 > 
 
-The idea is that by installing the write notifier during creation, the
-write notifier can be switched on the instant job_start is created,
-regardless of if we yield in the co_entry shim or not.
+Should we force inspect-emails = true here due to the nature of the
+security list? That way if we accidentally add extra CCs/etc there's a
+chance to review 'em.
 
-That way, no matter when we yield or when the backup_run coroutine
-actually gets scheduled and executed, the write notifier is active already.
+Also, should we update MAINTAINERS to match this script?
 
-Or put another way: calling job_start() guarantees that the write
-notifier is active.
+Responsible Disclosure, Reporting Security Issues
+-------------------------------------------------
+W: https://wiki.qemu.org/SecurityProcess
+M: Michael S. Tsirkin <mst@redhat.com>
+L: secalert@redhat.com
 
-I think using filters will save us too, but I don't know how ready those
-are. Do we still want a patch that guarantees this behavior in the meantime?
+
+With perhaps a footnote encouraging anyone changing this section to also
+update the git-publish script and vice-versa?
 
 --js
 
