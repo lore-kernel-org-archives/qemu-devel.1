@@ -6,136 +6,87 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F8FC31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:01:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D5DC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8809020684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:01:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8809020684
+	by mail.kernel.org (Postfix) with ESMTPS id 4F48B20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:05:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F48B20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFZU-0005W0-Tj
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:01:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47888)
+	id 1hxFdM-00071p-CH
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:05:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48721)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxFYK-0004VL-8E
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:00:21 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxFcf-0006WB-Ug
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxFYI-0006BF-Qw
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:00:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51244)
+ (envelope-from <mreitz@redhat.com>) id 1hxFce-0008GC-9j
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:04:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxFYG-00069V-4n; Mon, 12 Aug 2019 15:00:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hxFcZ-0008DN-Ew; Mon, 12 Aug 2019 15:04:43 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 332A9300676E;
- Mon, 12 Aug 2019 19:00:15 +0000 (UTC)
-Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5BCDA80342;
- Mon, 12 Aug 2019 19:00:09 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190625211955.15664-1-mreitz@redhat.com>
- <20190625211955.15664-4-mreitz@redhat.com>
-From: John Snow <jsnow@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 02CB661B22;
+ Mon, 12 Aug 2019 19:04:42 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
+ [10.40.204.161])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D57C1001B20;
+ Mon, 12 Aug 2019 19:04:36 +0000 (UTC)
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+References: <20190516143314.81302-1-anton.nefedov@virtuozzo.com>
+ <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4ed1bd3f-9b47-cbe7-ddc2-dca2e2d349b9@redhat.com>
-Date: Mon, 12 Aug 2019 15:00:09 -0400
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9280c26d-13c4-7fad-dc15-ff799c5284e3@redhat.com>
+Date: Mon, 12 Aug 2019 21:04:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190625211955.15664-4-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Mon, 12 Aug 2019 19:00:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 19:04:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/5] iotests: Allow
- skipping test cases
+Subject: Re: [Qemu-devel] [PATCH v8 9/9] qapi: query-blockstat: add driver
+ specific file-posix stats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,86 +98,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- Cleber Rosa <crosa@redhat.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
+ den@virtuozzo.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN
+Content-Type: multipart/mixed; boundary="yLagptrLR6M7iImuFmKTWPwsZuWW6s1uN";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com,
+ pbonzini@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com,
+ vsementsov@virtuozzo.com
+Message-ID: <9280c26d-13c4-7fad-dc15-ff799c5284e3@redhat.com>
+Subject: Re: [PATCH v8 9/9] qapi: query-blockstat: add driver specific
+ file-posix stats
+References: <20190516143314.81302-1-anton.nefedov@virtuozzo.com>
+ <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
+In-Reply-To: <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
 
+--yLagptrLR6M7iImuFmKTWPwsZuWW6s1uN
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 6/25/19 5:19 PM, Max Reitz wrote:
-> case_notrun() does not actually skip the current test case.  It just
-> adds a "notrun" note and then returns to the caller, who manually has t=
-o
-> skip the test.  Generally, skipping a test case is as simple as
-> returning from the current function, but not always: For example, this
-> model does not allow skipping tests already in the setUp() function.
+On 16.05.19 16:33, Anton Nefedov wrote:
+> A block driver can provide a callback to report driver-specific
+> statistics.
 >=20
-> Thus, add a QMPTestCase.case_skip() function that invokes case_notrun()
-> and then self.skipTest().  To make this work, we need to filter the
-> information on how many test cases were skipped from the unittest
-> output.
+> file-posix driver now reports discard statistics
 >=20
-
-I feel like skipping sub-tests has been a point of contention before,
-but I don't recall the outcome.
-
-Cleber, can you help jog my memory?
-
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Acked-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  tests/qemu-iotests/iotests.py | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-.py
-> index 3ecef5bc90..1b0ac50153 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -741,6 +741,11 @@ class QMPTestCase(unittest.TestCase):
->              return self.pause_wait(job_id)
->          return result
-> =20
-> +    def case_skip(self, reason):
-> +        '''Skip this test case'''
-> +        case_notrun(reason)
-> +        self.skipTest(reason)
-> +
-> =20
->  def notrun(reason):
->      '''Skip this test suite'''
-> @@ -752,7 +757,10 @@ def notrun(reason):
->      sys.exit(0)
-> =20
->  def case_notrun(reason):
-> -    '''Skip this test case'''
-> +    '''Mark this test case as not having been run, but do not actually
-> +    skip it; that is left to the caller.  See QMPTestCase.case_skip()
-> +    for a variant that actually skips the current test case.'''
-> +
->      # Each test in qemu-iotests has a number ("seq")
->      seq =3D os.path.basename(sys.argv[0])
-> =20
-> @@ -879,4 +887,12 @@ def main(supported_fmts=3D[], supported_oses=3D['l=
-inux'], supported_cache_modes=3D[],
->          unittest.main(testRunner=3DMyTestRunner)
->      finally:
->          if not debug:
-> -            sys.stderr.write(re.sub(r'Ran (\d+) tests? in [\d.]+s', r'=
-Ran \1 tests', output.getvalue()))
-> +            out =3D output.getvalue()
-> +            out =3D re.sub(r'Ran (\d+) tests? in [\d.]+s', r'Ran \1 te=
-sts', out)
-> +
-> +            # Hide skipped tests from the reference output
-> +            out =3D re.sub(r'OK \(skipped=3D\d+\)', 'OK', out)
-> +            out_first_line, out_rest =3D out.split('\n', 1)
-> +            out =3D out_first_line.replace('s', '.') + '\n' + out_rest
-> +
-> +            sys.stderr.write(out)
->=20
+>  qapi/block-core.json      | 38 ++++++++++++++++++++++++++++++++++++++
+>  include/block/block.h     |  1 +
+>  include/block/block_int.h |  1 +
+>  block.c                   |  9 +++++++++
+>  block/file-posix.c        | 38 +++++++++++++++++++++++++++++++++++---
+>  block/qapi.c              |  5 +++++
+>  6 files changed, 89 insertions(+), 3 deletions(-)
 
---=20
-=E2=80=94js
+
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 55194f84ce..368e09ae37 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -956,6 +956,41 @@
+>             '*wr_latency_histogram': 'BlockLatencyHistogramInfo',
+>             '*flush_latency_histogram': 'BlockLatencyHistogramInfo' } }=
+
+> =20
+> +##
+> +# @BlockStatsSpecificFile:
+> +#
+> +# File driver statistics
+> +#
+> +# @discard-nb-ok: The number of successful discard operations performe=
+d by
+> +#                 the driver.
+> +#
+> +# @discard-nb-failed: The number of failed discard operations performe=
+d by
+> +#                     the driver.
+> +#
+> +# @discard-bytes-ok: The number of bytes discarded by the driver.
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'struct': 'BlockStatsSpecificFile',
+> +  'data': {
+> +      'discard-nb-ok': 'uint64',
+> +      'discard-nb-failed': 'uint64',
+> +      'discard-bytes-ok': 'uint64' } }
+> +
+> +##
+> +# @BlockStatsSpecific:
+> +#
+> +# Block driver specific statistics
+> +#
+> +# Since: 4.1
+> +##
+> +{ 'union': 'BlockStatsSpecific',
+> +  'base': { 'driver': 'BlockdevDriver' },
+> +  'discriminator': 'driver',
+> +  'data': {
+> +      'file': 'BlockStatsSpecificFile',
+> +      'host_device': 'BlockStatsSpecificFile' } }
+
+I would like to use these chance to complain that I find this awkward.
+My problem is that I don=E2=80=99t know how any management application is=
+
+supposed to reasonably consume this.  It feels weird to potentially have
+to recognize the result for every block driver.
+
+I would now like to note that I=E2=80=99m clearly not in a position to bl=
+ock
+this at this point, because I=E2=80=99ve had a year to do so, I didn=E2=80=
+=99t, so it
+would be unfair to do it now.
+
+(Still, I feel like if I have a concern, I should raise it, even if it=E2=
+=80=99s
+too late.)
+
+I know Markus has proposed this, but I don=E2=80=99t understand why.  He =
+set
+ImageInfoSpecific as a precedence, but that has a different reasoning
+behind it.  The point for that is that it simply doesn=E2=80=99t work any=
+ other
+way, because it is clearly format-specific information that cannot be
+shared between drivers.  Anything that can be shared is put into
+ImageInfo (like the cluster size).
+
+We have the same constellation here, BlockStats contains common stuff,
+and BlockStatsSpecific would contain driver-specific stuff.  But to me,
+BlockStatsSpecificFile doesn=E2=80=99t look very special.  It looks like =
+it just
+duplicates fields that already exist in BlockDeviceStats.
+
+
+(Furthermore, most of ImageInfoSpecific is actually not useful to
+management software, but only as an information for humans (and having
+such a structure for that is perfectly fine).  But these stats don=E2=80=99=
+t
+really look like something for immediate human consumption.)
+
+
+So I wonder why you don=E2=80=99t just put this information into
+BlockDeviceStats.  From what I can tell looking at
+bdrv_query_bds_stats() and qmp_query_blockstats(), the @stats field is
+currently completely 0 if @query-nodes is true.
+
+(Furthermore, I wonder whether it would make sense to re-add
+BlockAcctStats to each BDS and then let the generic block code do the
+accounting on it.  I moved it to the BB in 7f0e9da6f13 because we didn=E2=
+=80=99t
+care about node-level information at the time, but maybe it=E2=80=99s tim=
+e to
+reconsider.)
+
+
+Anyway, as I=E2=80=99ve said, I fully understand that complaining about a=
+ design
+decision is just unfair at this point, so this is not a veto.
+
+> +
+>  ##
+>  # @BlockStats:
+>  #
+> @@ -971,6 +1006,8 @@
+>  #
+>  # @stats:  A @BlockDeviceStats for the device.
+>  #
+> +# @driver-specific: Optional driver-specific stats. (Since 4.1)
+> +#
+>  # @parent: This describes the file block device if it has one.
+>  #          Contains recursively the statistics of the underlying
+>  #          protocol (e.g. the host file for a qcow2 image). If there i=
+s
+> @@ -984,6 +1021,7 @@
+>  { 'struct': 'BlockStats',
+>    'data': {'*device': 'str', '*qdev': 'str', '*node-name': 'str',
+>             'stats': 'BlockDeviceStats',
+> +           '*driver-specific': 'BlockStatsSpecific',
+>             '*parent': 'BlockStats',
+>             '*backing': 'BlockStats'} }
+> =20
+
+[...]
+
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 76d54b3a85..a2f01cfe10 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -160,9 +160,9 @@ typedef struct BDRVRawState {
+>      bool drop_cache;
+>      bool check_cache_dropped;
+>      struct {
+> -        int64_t discard_nb_ok;
+> -        int64_t discard_nb_failed;
+> -        int64_t discard_bytes_ok;
+> +        uint64_t discard_nb_ok;
+> +        uint64_t discard_nb_failed;
+> +        uint64_t discard_bytes_ok;
+
+(I don=E2=80=99t know why you didn=E2=80=99t introduce these fields with =
+these types in
+the previous patch then.)
+
+Max
+
+>      } stats;
+> =20
+>      PRManager *pr_mgr;
+
+
+--yLagptrLR6M7iImuFmKTWPwsZuWW6s1uN--
+
+--fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RuEMACgkQ9AfbAGHV
+z0Cr+wgAiRwYiZaxuJUOqs40vgl08cuMyMzv7aUMtfBPkAXWbBHrIFc0KvIM0aG4
+Z82ADm1CJGE/tK4/byGvv+f7GmQU63n3yr36G3o4WEkr/ADHajMjUijuiEwNjgj6
+ZDOIRV5ZpCmafs3lob2YplhtoCfl02PjTJ+/ntem3N6S4FRW3rZEznB5jdnnLFFE
++VvpIuGjRmRxMBvd4x2ZjvCtXJlrOh5TQGzZ5r2QXpE0iEaHx/b1Ndww7t62WL8V
+TLM9ettYlOkKkfJp5MraPTYsCedwPkLJSjKVtWfBHiwC7btpdKN+/wYqqckt1CBY
+NH9btDy7uA3Qmt8g28KHWZoTIsqMpg==
+=PAIE
+-----END PGP SIGNATURE-----
+
+--fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN--
 
