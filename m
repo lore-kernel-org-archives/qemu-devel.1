@@ -2,51 +2,51 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68768C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F2ACC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:58:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AF7520679
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:57:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AF7520679
+	by mail.kernel.org (Postfix) with ESMTPS id 5DA2B20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:58:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DA2B20679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx9tS-00019g-EM
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 08:57:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46787)
+	id 1hx9uY-0002IG-Ig
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 08:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47003)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hx9si-0000fa-8t
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:57:01 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hx9u3-0001ir-Mu
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:58:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hx9sh-000724-74
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:57:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54848)
+ (envelope-from <mreitz@redhat.com>) id 1hx9u2-0007qR-GS
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:58:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33406)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hx9se-0006zF-Tp; Mon, 12 Aug 2019 08:56:57 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hx9tz-0007oX-RM; Mon, 12 Aug 2019 08:58:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 39A863066EDC;
- Mon, 12 Aug 2019 12:56:55 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1654A7BDA2;
+ Mon, 12 Aug 2019 12:58:19 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
  [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DBE7171C86;
- Mon, 12 Aug 2019 12:56:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D65A618E31;
+ Mon, 12 Aug 2019 12:58:17 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-10-mreitz@redhat.com>
- <0020733a-cf68-7df0-b92f-68fd498735cd@virtuozzo.com>
+ <20190809161407.11920-17-mreitz@redhat.com>
+ <b2f43475-224e-5003-2c51-3949e9fb2d42@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,22 +73,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <36be9f5d-b081-152b-6e11-0d787270005a@redhat.com>
-Date: Mon, 12 Aug 2019 14:56:51 +0200
+Message-ID: <e18b1eed-6d7a-603b-f8ad-4c56795309c2@redhat.com>
+Date: Mon, 12 Aug 2019 14:58:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <0020733a-cf68-7df0-b92f-68fd498735cd@virtuozzo.com>
+In-Reply-To: <b2f43475-224e-5003-2c51-3949e9fb2d42@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="6IfWqsS1FI5ULZogmYFEZDd6Y7bOEYdrG"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="Skek6HntgcrTx8xDc6edYdB3VUplu5Djf"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Mon, 12 Aug 2019 12:56:55 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 12 Aug 2019 12:58:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 09/42] block: Include filters when
- freezing backing chain
+Subject: Re: [Qemu-devel] [PATCH v6 16/42] block: Flush all children in
+ generic code
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,93 +107,150 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6IfWqsS1FI5ULZogmYFEZDd6Y7bOEYdrG
-Content-Type: multipart/mixed; boundary="VN0WRjBOAvhegKQ91QH7BQ2tzklI4pEZI";
+--Skek6HntgcrTx8xDc6edYdB3VUplu5Djf
+Content-Type: multipart/mixed; boundary="AxGbxhld7NLAPANVTdAVhAkcTy7TmF21W";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Kevin Wolf <kwolf@redhat.com>
-Message-ID: <36be9f5d-b081-152b-6e11-0d787270005a@redhat.com>
-Subject: Re: [PATCH v6 09/42] block: Include filters when freezing backing
- chain
+Message-ID: <e18b1eed-6d7a-603b-f8ad-4c56795309c2@redhat.com>
+Subject: Re: [PATCH v6 16/42] block: Flush all children in generic code
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-10-mreitz@redhat.com>
- <0020733a-cf68-7df0-b92f-68fd498735cd@virtuozzo.com>
-In-Reply-To: <0020733a-cf68-7df0-b92f-68fd498735cd@virtuozzo.com>
+ <20190809161407.11920-17-mreitz@redhat.com>
+ <b2f43475-224e-5003-2c51-3949e9fb2d42@virtuozzo.com>
+In-Reply-To: <b2f43475-224e-5003-2c51-3949e9fb2d42@virtuozzo.com>
 
---VN0WRjBOAvhegKQ91QH7BQ2tzklI4pEZI
+--AxGbxhld7NLAPANVTdAVhAkcTy7TmF21W
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.08.19 15:32, Vladimir Sementsov-Ogievskiy wrote:
+On 10.08.19 17:36, Vladimir Sementsov-Ogievskiy wrote:
 > 09.08.2019 19:13, Max Reitz wrote:
->> In order to make filters work in backing chains, the associated
->> functions must be able to deal with them and freeze all filter links, =
-be
->> they COW or R/W filter links.
+>> If the driver does not support .bdrv_co_flush() so bdrv_co_flush()
+>> itself has to flush the children of the given node, it should not flus=
+h
+>> just bs->file->bs, but in fact all children.
 >>
->> In the process, rename these functions to reflect that they now act on=
-
->> generalized chains of filter nodes instead of backing chains alone.
+>> In any case, the BLKDBG_EVENT() should be emitted on the primary child=
+,
+>> because that is where a blkdebug node would be if there is any.
 >>
->> While at it, add some comments that note which functions require their=
-
->> caller to ensure that a given child link is not frozen, and how the
->> callers do so.
->>
+>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>   include/block/block.h | 10 +++---
->>   block.c               | 81 +++++++++++++++++++++++++----------------=
---
->>   block/commit.c        |  8 ++---
->>   block/mirror.c        |  4 +--
->>   block/stream.c        |  8 ++---
->>   5 files changed, 62 insertions(+), 49 deletions(-)
-
-[...]
-
->> @@ -2477,10 +2481,6 @@ void bdrv_root_unref_child(BdrvChild *child)
->>       bdrv_unref(child_bs);
->>   }
+>>   block/io.c | 23 +++++++++++++++++------
+>>   1 file changed, 17 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index c5a8e3e6a3..bcc770d336 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -2572,6 +2572,8 @@ static void coroutine_fn bdrv_flush_co_entry(voi=
+d *opaque)
 >>  =20
->> -/**
->> - * Clear all inherits_from pointers from children and grandchildren o=
-f
->> - * @root that point to @root, where necessary.
->> - */
+>>   int coroutine_fn bdrv_co_flush(BlockDriverState *bs)
+>>   {
+>> +    BdrvChild *primary_child =3D bdrv_primary_child(bs);
+>> +    BdrvChild *child;
+>>       int current_gen;
+>>       int ret =3D 0;
+>>  =20
+>> @@ -2601,7 +2603,7 @@ int coroutine_fn bdrv_co_flush(BlockDriverState =
+*bs)
+>>       }
+>>  =20
+>>       /* Write back cached data to the OS even with cache=3Dunsafe */
+>> -    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_OS);
+>> +    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_OS);
+>>       if (bs->drv->bdrv_co_flush_to_os) {
+>>           ret =3D bs->drv->bdrv_co_flush_to_os(bs);
+>>           if (ret < 0) {
+>> @@ -2611,15 +2613,15 @@ int coroutine_fn bdrv_co_flush(BlockDriverStat=
+e *bs)
+>>  =20
+>>       /* But don't actually force it to the disk with cache=3Dunsafe *=
+/
+>>       if (bs->open_flags & BDRV_O_NO_FLUSH) {
+>> -        goto flush_parent;
+>> +        goto flush_children;
+>>       }
+>>  =20
+>>       /* Check if we really need to flush anything */
+>>       if (bs->flushed_gen =3D=3D current_gen) {
+>> -        goto flush_parent;
+>> +        goto flush_children;
+>>       }
+>>  =20
+>> -    BLKDBG_EVENT(bs->file, BLKDBG_FLUSH_TO_DISK);
+>> +    BLKDBG_EVENT(primary_child, BLKDBG_FLUSH_TO_DISK);
+>>       if (!bs->drv) {
+>>           /* bs->drv->bdrv_co_flush() might have ejected the BDS
+>>            * (even in case of apparent success) */
+>> @@ -2663,8 +2665,17 @@ int coroutine_fn bdrv_co_flush(BlockDriverState=
+ *bs)
+>>       /* Now flush the underlying protocol.  It will also have BDRV_O_=
+NO_FLUSH
+>>        * in the case of cache=3Dunsafe, so there are no useless flushe=
+s.
+>>        */
+>> -flush_parent:
+>> -    ret =3D bs->file ? bdrv_co_flush(bs->file->bs) : 0;
+>> +flush_children:
+>> +    ret =3D 0; > +    QLIST_FOREACH(child, &bs->children, next) {
+>> +        int this_child_ret;
+>> +
+>> +        this_child_ret =3D bdrv_co_flush(child->bs);
+>> +        if (!ret) {
+>> +            ret =3D this_child_ret;
+>> +        }
+>> +    }
 >=20
-> Hmm, unrelated chunk? Without it:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Hmm, you said that we want to flush only children with write-access fro=
+m parent..
 
-I don=E2=80=99t know how that slipped in, sorry...
+Good that you remember it, I must have overlooked it (when reading the
+replies to the previous version). :-)
 
-Once again, thanks for reviewing!
+> Shouldn't we check it? Or we assume that it's always safe to call bdrv_=
+co_flush on
+> a node?
+
+I think it=E2=80=99s always safe.  But checking it seems like a nice touc=
+h, yes.
 
 Max
 
+>> +
+>>   out:
+>>       /* Notify any pending flushes that we have completed */
+>>       if (ret =3D=3D 0) {
+>>
+>=20
+>=20
 
---VN0WRjBOAvhegKQ91QH7BQ2tzklI4pEZI--
 
---6IfWqsS1FI5ULZogmYFEZDd6Y7bOEYdrG
+
+--AxGbxhld7NLAPANVTdAVhAkcTy7TmF21W--
+
+--Skek6HntgcrTx8xDc6edYdB3VUplu5Djf
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RYhMACgkQ9AfbAGHV
-z0BWiAf/d+Kf3XtmveoqdqAR52V019h/VYs7N6jFidgO3OEfyzJRa4GRqkycOmRa
-+chkW3LrAlmYzFyuEiZmhxv83F7cNYuK3uyqCCW2sxRbj3fnxcCzLsULJhvFnwSw
-fXemYOxY+4dyK8I7zFiFglGmyBTgST0F44RvGYiyvQQNokTfRKG6POMuWx9kWFi7
-wyrkY6fr90Yo7/pQp/H5UHLv4z9OWiXOevOC97tmI+gQoGui0I4Xf9geBvD1m0zy
-7qxFXWE0w1qzauk28j93cHSDPPQLD1xoFisQKnASix8jTWe/TZDS19Mgh52c8Vr9
-pU1/qwaA+Mwu26ADy2jEf8R/EkK2pw==
-=tMUK
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RYmgACgkQ9AfbAGHV
+z0AwBggAhesFsPB2+qEPzFR+8jLfasJUQV2ScQQHYVqPIa3GVz1P4cv35azBrg81
+RcwJUnPwKWBHRr8W9OFXN+Btk3jceCq34z0/wmW65nt4jA04RSTKeTdi9hNZApwC
+983J67vucz+cQLOoT6nYEAnWnzJdx5HqtijAodPDs+bx7llollcKKR38LmM4K58p
+Lv6KFsmgKcI83SlSXyLYKHrPkgL+Off5BYIi2u0N9ZSjNMikFG6HievMfI+lP2zf
+9k7JUqr8zWz7TH7EAAMIXQLEf3CGDu6cfR+xxG3wiTW4Q7jJNbl4IkrEhyBNO0So
+58cacYcGGYbRiwXA14RSWHtzYKJvDg==
+=HsU9
 -----END PGP SIGNATURE-----
 
---6IfWqsS1FI5ULZogmYFEZDd6Y7bOEYdrG--
+--Skek6HntgcrTx8xDc6edYdB3VUplu5Djf--
 
