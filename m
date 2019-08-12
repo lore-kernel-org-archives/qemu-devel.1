@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B441C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 159D3C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:33:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A6752075B
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:26:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6752075B
+	by mail.kernel.org (Postfix) with ESMTPS id D957620820
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:33:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D957620820
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxHpt-0003it-P4
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 17:26:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43094)
+	id 1hxHww-0005Jy-18
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 17:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44555)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxHpV-0003Fs-Bh
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:26:14 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxHwT-0004qa-NL
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:33:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxHpU-0005NU-1v
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:26:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50008)
+ (envelope-from <jsnow@redhat.com>) id 1hxHwS-0002dB-OR
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:33:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxHpR-0005LY-IE; Mon, 12 Aug 2019 17:26:09 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hxHwQ-0002aB-7r; Mon, 12 Aug 2019 17:33:22 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D244330EA19E;
- Mon, 12 Aug 2019 21:26:08 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2B1EC3086258;
+ Mon, 12 Aug 2019 21:33:21 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52BF61000329;
- Mon, 12 Aug 2019 21:26:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9BF5C5C296;
+ Mon, 12 Aug 2019 21:33:20 +0000 (UTC)
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-7-mreitz@redhat.com>
+ <20190725155735.11872-8-mreitz@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <ae0b7c2c-cd2f-8fce-35a4-c2615a80ceed@redhat.com>
-Date: Mon, 12 Aug 2019 17:26:07 -0400
+Message-ID: <42b23025-5270-8b53-1fa0-724883d9a746@redhat.com>
+Date: Mon, 12 Aug 2019 17:33:20 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190725155735.11872-7-mreitz@redhat.com>
+In-Reply-To: <20190725155735.11872-8-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Mon, 12 Aug 2019 21:26:08 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.49]); Mon, 12 Aug 2019 21:33:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 6/7] iotests: Disable 110 for
- vmdk.twoGbMaxExtentSparse
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 7/7] iotests: Disable 126 for
+ some vmdk subformats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -155,40 +155,49 @@ Sender: "Qemu-devel"
 
 
 On 7/25/19 11:57 AM, Max Reitz wrote:
-> The error message for the test case where we have a quorum node for
-> which no directory name can be generated is different: For
-> twoGbMaxExtentSparse, it complains that it cannot open the extent file.
-> For other (sub)formats, it just notes that it cannot determine the
-> backing file path.  Both are fine, but just disable twoGbMaxExtentSparse
-> for simplicity's sake.
+> Several vmdk subformats do not work with iotest 126, so disable them.
+> 
+> (twoGbMaxExtentSparse actually should work, but fixing that is a bit
+> difficult.  The problem is that the vmdk descriptor file will contain a
+> referenc to "image:base.vmdk", which the block layer cannot open because
+
+reference
+
+> it does not know the protocol "image".  This is not trivial to solve,
+> because I suppose real protocols like "http://" should be supported.
+> Making vmdk treat all paths with a potential protocol prefix that the
+> block layer does not recognize as plain files seems a bit weird,
+> though.  Ignoring this problem does not seem too bad.)
 > 
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  tests/qemu-iotests/110 | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  tests/qemu-iotests/126 | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-> index 2cdc7c8a72..2ef516baf1 100755
-> --- a/tests/qemu-iotests/110
-> +++ b/tests/qemu-iotests/110
-> @@ -40,7 +40,8 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
->  # Any format supporting backing files
->  _supported_fmt qed qcow qcow2 vmdk
->  _supported_proto file
-> -_unsupported_imgopts "subformat=monolithicFlat" "subformat=twoGbMaxExtentFlat"
-> +_unsupported_imgopts "subformat=monolithicFlat" "subformat=twoGbMaxExtentFlat" \
+> diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
+> index 9b0dcf9255..8e55d7c843 100755
+> --- a/tests/qemu-iotests/126
+> +++ b/tests/qemu-iotests/126
+> @@ -33,6 +33,12 @@ status=1	# failure is the default!
+>  
+>  # Needs backing file support
+>  _supported_fmt qcow qcow2 qed vmdk
+> +# (1) Flat vmdk images do not support backing files
+> +# (2) Split vmdk images simply fail this test right now.  Fixing that
+> +#     is left for another day.
+
+Which one? :)
+
+> +_unsupported_imgopts "subformat=monolithicFlat" \
+> +                     "subformat=twoGbMaxExtentFlat" \
 > +                     "subformat=twoGbMaxExtentSparse"
->  
->  TEST_IMG_REL=$(basename "$TEST_IMG")
->  
+>  # This is the default protocol (and we want to test the difference between
+>  # colons which separate a protocol prefix from the rest and colons which are
+>  # just part of the filename, so we cannot test protocols which require a prefix)
 > 
 
-Hm, fine. This is the second patch I've seen today that tries to work
-around error messages changing because of configuration options, though.
+What exactly fails? Does the VMDK driver see `image:` and think it's a
+special filename it needs to handle and fails to do so?
 
-Wonder if we need a more general purpose solution to this kind of thing.
 
-Ah, well, regardless... good enough for now, I think, probably.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
 
