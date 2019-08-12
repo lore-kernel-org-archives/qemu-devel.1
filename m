@@ -6,46 +6,47 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90F0C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FF2C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88E4C20673
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:47:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88E4C20673
+	by mail.kernel.org (Postfix) with ESMTPS id 20FE520673
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:51:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20FE520673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxGHd-0000LM-Sg
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:47:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55133)
+	id 1hxGLQ-0002mF-BN
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:51:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55609)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxGHD-0008IP-OJ
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:46:45 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxGKy-0001zK-Ne
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:50:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxGHB-0007Rn-Jn
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:46:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54930)
+ (envelope-from <mreitz@redhat.com>) id 1hxGKx-0000ri-Ms
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:50:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54280)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxGH4-0007OL-A9; Mon, 12 Aug 2019 15:46:36 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hxGKv-0000r3-4v; Mon, 12 Aug 2019 15:50:33 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DC2753082E61;
- Mon, 12 Aug 2019 19:46:32 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2A81430872DD;
+ Mon, 12 Aug 2019 19:50:32 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
  [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83BD362675;
- Mon, 12 Aug 2019 19:46:31 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 908CE7D4FB;
+ Mon, 12 Aug 2019 19:50:30 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
+ <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -71,18 +72,18 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
-Date: Mon, 12 Aug 2019 21:46:29 +0200
+Message-ID: <e53a0399-f051-52bd-49e8-4ac4dbf2596f@redhat.com>
+Date: Mon, 12 Aug 2019 21:50:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190812181146.26121-1-vsementsov@virtuozzo.com>
+In-Reply-To: <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="LTY0Pw6GQw1upVhioBnMB1DczlNIYOuoy"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="9oN0Fg0d5vouudxWSIffeQCS9ma2N43A9"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 12 Aug 2019 19:46:32 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.47]); Mon, 12 Aug 2019 19:50:32 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
 Subject: Re: [Qemu-devel] [PATCH 0/2] deal with BDRV_BLOCK_RAW
@@ -103,74 +104,79 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---LTY0Pw6GQw1upVhioBnMB1DczlNIYOuoy
-Content-Type: multipart/mixed; boundary="JlA5z186qP29Vfgcd3caOVd5StHU62e6s";
+--9oN0Fg0d5vouudxWSIffeQCS9ma2N43A9
+Content-Type: multipart/mixed; boundary="x6JEUTRFTw2IvKllcZZpXmn2flX1F9ANK";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, kwolf@redhat.com, den@openvz.org
-Message-ID: <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
+Message-ID: <e53a0399-f051-52bd-49e8-4ac4dbf2596f@redhat.com>
 Subject: Re: [PATCH 0/2] deal with BDRV_BLOCK_RAW
 References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20190812181146.26121-1-vsementsov@virtuozzo.com>
+ <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
+In-Reply-To: <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
 
---JlA5z186qP29Vfgcd3caOVd5StHU62e6s
+--x6JEUTRFTw2IvKllcZZpXmn2flX1F9ANK
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 12.08.19 20:11, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
+On 12.08.19 21:46, Max Reitz wrote:
+> On 12.08.19 20:11, Vladimir Sementsov-Ogievskiy wrote:
+>> Hi all!
+>>
+>> I'm not sure, is it a bug or a feature, but using qcow2 under raw is
+>> broken. It should be either fixed like I propose (by Max's suggestion)=
+
+>> or somehow forbidden (just forbid backing-file supporting node to be
+>> file child of raw-format node).
 >=20
-> I'm not sure, is it a bug or a feature, but using qcow2 under raw is
-> broken. It should be either fixed like I propose (by Max's suggestion)
-> or somehow forbidden (just forbid backing-file supporting node to be
-> file child of raw-format node).
-
-I agree, I think only filters should return BDRV_BLOCK_RAW.
-
-(And not even them, they should just be handled transparently by
-bdrv_co_block_status().  But that=E2=80=99s something for later.)
-
-> Vladimir Sementsov-Ogievskiy (2):
->   block/raw-format: switch to BDRV_BLOCK_DATA with BDRV_BLOCK_RECURSE
->   iotests: test mirroring qcow2 under raw format
+> I agree, I think only filters should return BDRV_BLOCK_RAW.
 >=20
->  block/raw-format.c         |  2 +-
->  tests/qemu-iotests/263     | 46 ++++++++++++++++++++++++++++++++++++++=
+> (And not even them, they should just be handled transparently by
+> bdrv_co_block_status().  But that=E2=80=99s something for later.)
+>=20
+>> Vladimir Sementsov-Ogievskiy (2):
+>>   block/raw-format: switch to BDRV_BLOCK_DATA with BDRV_BLOCK_RECURSE
+>>   iotests: test mirroring qcow2 under raw format
+>>
+>>  block/raw-format.c         |  2 +-
+>>  tests/qemu-iotests/263     | 46 +++++++++++++++++++++++++++++++++++++=
++
+>>  tests/qemu-iotests/263.out | 12 ++++++++++
+>>  tests/qemu-iotests/group   |  1 +
+>>  4 files changed, 60 insertions(+), 1 deletion(-)
+>>  create mode 100755 tests/qemu-iotests/263
+>>  create mode 100644 tests/qemu-iotests/263.out
+>=20
+> Thanks, applied to my block-next branch:
+>=20
+> https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
 
->  tests/qemu-iotests/263.out | 12 ++++++++++
->  tests/qemu-iotests/group   |  1 +
->  4 files changed, 60 insertions(+), 1 deletion(-)
->  create mode 100755 tests/qemu-iotests/263
->  create mode 100644 tests/qemu-iotests/263.out
-
-Thanks, applied to my block-next branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
+Oops, maybe not.  221 needs to be adjusted.
 
 Max
 
 
---JlA5z186qP29Vfgcd3caOVd5StHU62e6s--
+--x6JEUTRFTw2IvKllcZZpXmn2flX1F9ANK--
 
---LTY0Pw6GQw1upVhioBnMB1DczlNIYOuoy
+--9oN0Fg0d5vouudxWSIffeQCS9ma2N43A9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RwhUACgkQ9AfbAGHV
-z0CBzQf+N6w29T1N1NuIiYu86Ljjl8tuD7OLluW2cRtxFkHL3pgeUkcZZBS2UI1/
-tp7FBaBteXaguI7pQr3S9m1UetMB6HNCTSahdKvfinThYeCGuT6qrCXf5984Ytgu
-zYII1iRjGNZ9MFCsmejJSY3Tjx9ti9qtdsb2o+uy/Apny+I8uLPKNCCyAhYQcdgk
-h7j3TezEHZGt4zHEH6tvM3xKqvCHXgO/MFjG4ytj7EMzGtYm3qo1gddaBnJDT5Hh
-uCdWdx0fyvOTYNRt2JSG12uZPnPdz/pm43H0xBF6slFmNj6IPn915y2vpaLlWt4k
-OB3kaiE7Hu+DTwSgjVnkiiK4sdb0gw==
-=FuYY
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RwwQACgkQ9AfbAGHV
+z0AD+ggAoD2TwNVOKKaL9fgZAjmiaS2f6Wc+qgQM8XjlvM+azswbvb2jbexW+lsz
+wjGTgVaMTvhwUxrAR42osG2BVvehR2kp/j24U874331KYcVLIgQ9vQojWYDG/z+/
+wtGLQm55J8ruJY/uJms1KelrNzKVyJFJpgm18ivuUN6SSbGixdFsM7IIL9C0kR7B
+LL8IY10qn33YMXrceOQ+E1GyQnbRdv5rxFgzi5Tfptr5NjalsJY00pL+Uws2kAbf
+LSTYcWMq9ofDzbeLwevLpzrXYb2QlxxhTM2iWwSmRNEZ8isfLSdhHxPMltcW3HVT
+u1gaKEOm5kf6SrLlDnuMRuAzhVm3SA==
+=l19T
 -----END PGP SIGNATURE-----
 
---LTY0Pw6GQw1upVhioBnMB1DczlNIYOuoy--
+--9oN0Fg0d5vouudxWSIffeQCS9ma2N43A9--
 
