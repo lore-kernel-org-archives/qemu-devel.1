@@ -2,77 +2,94 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BC8C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F747C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CE9D214C6
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:35:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CE9D214C6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC4B520663
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 12:39:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sMzY0DIF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC4B520663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx9Xm-0006ON-JT
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 08:35:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43302)
+	id 1hx9bz-0008C4-2V
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 08:39:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43919)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pmathieu@redhat.com>) id 1hx9XK-0005tp-LG
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:34:55 -0400
+ (envelope-from <randrianasulu@gmail.com>) id 1hx9bN-0007m7-AC
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:39:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmathieu@redhat.com>) id 1hx9XJ-0001gP-HD
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:34:54 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39362)
+ (envelope-from <randrianasulu@gmail.com>) id 1hx9bM-0004rY-2D
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:39:05 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:43618)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1hx9XJ-0001fk-BQ
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:34:53 -0400
-Received: by mail-wm1-f67.google.com with SMTP id u25so11601130wmc.4
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:34:52 -0700 (PDT)
+ (Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
+ id 1hx9bL-0004qj-MX
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 08:39:04 -0400
+Received: by mail-lf1-x143.google.com with SMTP id c19so74120168lfm.10
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:39:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:subject:date:user-agent:cc:references:in-reply-to
+ :mime-version:content-transfer-encoding:content-disposition
+ :message-id; bh=T3UFkfZVOYvpMwdINYQTXRqex/OJ9MIESAtVURuyhJg=;
+ b=sMzY0DIF94W+0EAIuKWQy0L/6izfFMKiSQKkci9pEeIDnNKKXDqVMdnKzmbJ9+K/AE
+ TwUf5mKCG2KbzYJJGFtbBO2kvJ7tnQqQLGac1OOvT90LQq57UQgKrVXsgrcsbUhWbG2W
+ kIB8ff6eVQLLtN48V5vYaFl/QgzibUFRM73JZN5lm4pFNjUY18QgXGnAD4WM1r/d2GVC
+ xkPtYYRZRW0f4ltAUPnpMWqhB/DFiJhRt1+ilR7q5uCFlWAmD0vruUK4RWQ+q9QoEHoG
+ oOx0KLsn+NeXWGabc31HC/PXvoqCWfIi1B/kWF2FVGY4fq5uwRLA5EM7mRggBAlVLaVd
+ WftA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=peHclrgjz+AXqkSU7jes+3NdA2R3fGF0/AbZV6lY9Jw=;
- b=hPlRYpcQiIg2D9be162xXlEiqqTm8P8ysN/wBUesPQAmQUToY9yYzLkUXCn2pNdzpC
- 7jOb5tymmtiT6FlG6Nc912km7hjvLuhXdFxjZDXDaBajCgg7sSg2OHMgYidooh2Z7Cq1
- TzUqpBDLZU/fi2ccteXx6KREmnpft1OplFhGq/aIJattk1ZmjAH3Z2Km0WwrfQJTCIcL
- c7wFG5Z9iBkQKG8Cs5A2BM2B3cu8qA6fPawKCeFZ/zqQvmBhtK0rzhU+t3a68aHzCEWh
- 1QSOd+xJ6XLirZWBeWIdAwqZ8L2uSVY5Pf9K+Ul96YXzSxEh1X55aSdEzqKrnWJJGGZG
- Scow==
-X-Gm-Message-State: APjAAAV88a7Zldscx1lzg5V+HPYo3P7JH9jJrXQnP0QTrh97oRQs4h5R
- 4lck9dhnhqs8+LyuUUetgbF9mxyG3P8z1M70fqaNqA==
-X-Google-Smtp-Source: APXvYqxp2f7ysNhLzxeekQ8Xqb8MtN4XrLi6M8WfyrPtWRcB1CqpXzbudjQ7PHvM1e95o5eiEqRfJERVN9KKzLX8+Jk=
-X-Received: by 2002:a1c:407:: with SMTP id 7mr29151367wme.113.1565613291674;
- Mon, 12 Aug 2019 05:34:51 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:user-agent:cc:references
+ :in-reply-to:mime-version:content-transfer-encoding
+ :content-disposition:message-id;
+ bh=T3UFkfZVOYvpMwdINYQTXRqex/OJ9MIESAtVURuyhJg=;
+ b=h0dsM2fmOihnWceklJg5sNih1SR3u7IxVy4mIoRZJNSI6fP+8s8/d7jMab84okRFOG
+ OvBg8NizEgq2/Ibiks8v3RDqQE98RnIWnZGbZDGC2Pxj3NJmINttlI7fylAmOM5MNfWy
+ s0KtFxOV4D8irGde523bMdI6uMTRn0QjY2FyUjpCuJP11CrbqwP7XHIi3ux0m7oO6/4G
+ atUu7CL9rS326k785EERSoInNHNgQVt66U7+FVdiTq5bs/E5elo4WIj5mW/7x5pT5qDo
+ 940YEJro9c/gU6CEJO4I/nEJh6K60Xa706typVtbMa5y+F+Ld+BeQKX6IKZA5HMarFgZ
+ ifQg==
+X-Gm-Message-State: APjAAAUkweGMSl0F/nXqucKKIsCalS7dhowENHPsbjmPRTRFwj5/F1gw
+ cumozwtvLK+lsSW52m23DJ4=
+X-Google-Smtp-Source: APXvYqwDLuy0F7O8fmGL6M3gXnyCwito+vwyKBxHjW+Ycq8t/kXSTXivfK25yc+2PVBYrkCHR7T8XQ==
+X-Received: by 2002:a05:6512:244:: with SMTP id
+ b4mr20843505lfo.114.1565613541229; 
+ Mon, 12 Aug 2019 05:39:01 -0700 (PDT)
+Received: from [192.168.1.100] ([176.116.252.109])
+ by smtp.gmail.com with ESMTPSA id x13sm582273ljm.7.2019.08.12.05.38.59
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 12 Aug 2019 05:38:59 -0700 (PDT)
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Mon, 12 Aug 2019 15:27:55 +0300
+User-Agent: KMail/1.9.10
+References: <cover.1565558093.git.balaton@eik.bme.hu>
+ <8942e49f-493f-70c4-b2a1-10b97f2a7c6d@redhat.com>
+ <alpine.BSF.2.21.9999.1908121239520.68551@zero.eik.bme.hu>
+In-Reply-To: <alpine.BSF.2.21.9999.1908121239520.68551@zero.eik.bme.hu>
 MIME-Version: 1.0
-References: <20190806151435.10740-1-armbru@redhat.com>
- <20190806151435.10740-28-armbru@redhat.com>
- <8c2a6fad-6ac1-21b1-c17c-e1bd5ac41c9f@redhat.com>
- <87a7ckrat7.fsf@dusky.pond.sub.org>
- <ee3709c9-f351-081a-3aeb-53b7b6036b0a@redhat.com>
- <87imr8l0ti.fsf_-_@dusky.pond.sub.org>
- <695325d7-a0c3-73c1-97ab-f62fb345c622@unipi.it>
- <87blwzho1y.fsf@dusky.pond.sub.org>
- <2fb98b77-efab-6092-dd5a-fa50c3c4b3f9@redhat.com>
-In-Reply-To: <2fb98b77-efab-6092-dd5a-fa50c3c4b3f9@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Mon, 12 Aug 2019 14:34:40 +0200
-Message-ID: <CAP+75-UHvn+1EjHRn1PThuZg1YJ+=EpWj6LnSfk8Ww33JpqVuw@mail.gmail.com>
-To: Markus Armbruster <armbru@redhat.com>,
- Giuseppe Lettieri <giuseppe.lettieri@unipi.it>, 
- Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+  charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.67
-Subject: Re: [Qemu-devel] Is network backend netmap worth keeping?
+Content-Disposition: inline
+Message-Id: <201908121527.55871.randrianasulu@gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::143
+Subject: Re: [Qemu-devel] [PATCH 4/7] ati-vga: Fix cursor color with
+ guest_hwcursor=true
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,64 +101,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. Berrange" <berrange@redhat.com>, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I forgot to Cc Thomas, who did a lot of directory refactoring in the past.
+=D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=82 =
+Monday 12 August 2019 13:55:45 BALATON Zoltan =D0=BD=D0=B0=D0=BF=D0=B8=D1=
+=81=D0=B0=D0=BB(=D0=B0):
+> On Mon, 12 Aug 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 8/12/19 12:28 PM, BALATON Zoltan wrote:
+> >> On Mon, 12 Aug 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+> >>> On 8/11/19 11:14 PM, BALATON Zoltan wrote:
+> >>>> Fixes: a38127414bd007c5b6ae64c664d9e8839393277e
+> >>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >>>> ---
+> >>>> ?hw/display/ati.c | 2 +-
+> >>>> ?1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/hw/display/ati.c b/hw/display/ati.c
+> >>>> index 699f38223b..b849f5d510 100644
+> >>>> --- a/hw/display/ati.c
+> >>>> +++ b/hw/display/ati.c
+> >>>> @@ -207,7 +207,7 @@ static void ati_cursor_draw_line(VGACommonState
+> >>>> *vga, uint8_t *d, int scr_y)
+> >>>> ???????????????? }
+> >>>> ???????????? } else {
+> >>>> ???????????????? color =3D (xbits & BIT(7) ? s->regs.cur_color1 :
+> >>>> -????????????????????????????????????????? s->regs.cur_color0) << 8 |
+> >>>> 0xff;
+> >>>> +????????????????????????????????????????? s->regs.cur_color0) |
+> >>>> 0xff000000;
+> >>>> ???????????? }
+> >>>> ???????????? if (vga->hw_cursor_x + i * 8 + j >=3D h) {
+> >>>> ???????????????? return; /* end of screen, don't span to next line */
+> >>>>
+> >>>
+> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >>
+> >> Thanks. I've noticed that cursor color may still be wrong with MacOS
+> >> that uses big endian frame buffer so maybe this will also need to take
+> >> frame buffer endianness into account somehow but this patch corrects a
+> >> difference between guest_hwcursor true and false values, reproducible
+> >> with some Linux versions (as far as I remember). While the wrong cursor
+> >> color with MacOS is now consistent after this patch with both
+> >> guest_hwcursor true or false so that likely needs a different fix that
+> >> should be applied both to this place and to ati_cursor_define. (MacOS
+> >> does not yet boot fully, it needs patches to OpenBIOS to be able to run
+> >> an FCode ROM and will probably need the VBlank interrupt implemented in
+> >> ati-vga without which it displays a desktop but freezes there).
+> >
+> > If you remember which Linux version had this problem, or you can link to
+> > roms that behave incorrectly, please share, so we can add display
+> > regression tests.
+>=20
+> Unfortunately I don't. I think it was Andrew who found this so maybe he=20
+> can remember.
 
-On Mon, Aug 12, 2019 at 2:32 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
-> On 8/8/19 1:52 PM, Markus Armbruster wrote:
-> > Giuseppe Lettieri <giuseppe.lettieri@unipi.it> writes:
-> >
-> >> Dear Markus,
-> >>
-> >> the netmap project is alive and well, if a bit understuffed. We have
-> >> moved to github:
-> >>
-> >> https://github.com/luigirizzo/netmap
-> >>
-> >> We have users from FreeBSD, where it is part of the official kernel,
-> >> and Linux, both from Academia and industry.
-> >>
-> >> But you asked about the netmap backend in QEMU, in particular. When it
-> >> was merged, the decision was made to disable it by default because it
-> >> was not supported upstream in Linux. As Jason Wang says, this support
-> >> is even more unlikely now than it was then.
-> >>
-> >> The fact the the backend has to be explicitly enabled and built from
-> >> the sources has obviously cut down the number of potential
-> >> users. However, we still think it is useful and we have pending
-> >> updates for it. If it's causing problems in the workflow, I am willing
-> >> to help as much as I can.
-> >
-> > Could we make it a submodule, simililar to slirp and capstone?
->
-> Good idea, this would extend the coverage. Netmap users/developers are
-> probably best suited to do this.
->
-> >
-> >     --enable-netmap=3Dsystem      use the system's netmap
-> >     --enable-netmap=3Dgit         use the git submodule
-> >     --enable-netmap             use system's, else git, else fail
-> >     --disable-netmap            disable netmap
-> >     default                     use system's, else git, else disable
-> >
-> > A fresh clone of https://github.com/luigirizzo/netmap clocks in at
-> > 14MiB, which is between libslirp's 1.5MiB and capstone's 72MiB.
->
-> In which directory should we clone it? As /netmap directly?
->
-> Should we start using a 3rd-party/ subdirectory?
->
-> Similarly, what about the virglrenderer component?
->
-> Its repository is: https://anongit.freedesktop.org/git/virglrenderer.git
+Blue cursor was seen on specific dvd (x86) image I did for myself,=20
+because it was  using plain X cursor (arrow or X-shaped), not colored=20
+versions used by default in many distributions.
+
+may be 'startx -- -retro" will show it briefly too?
+
+from man Xserver (1.19.7):
+
+=2Dretro  starts  the  server  with  the  classic stipple and cursor visibl=
+e.  The default is to start with a black root window, and to suppress displ=
+ay of the cursor until the
+               first time an application calls XDefineCursor().=20
+
+
+https://yadi.sk/d/F8cbINWzWJ-DkA
+
+users: root and guest
+passwords: toor and guest
+
+You need to boot it to syslinux and type 'slax' there, because default will=
+ boot x86-64 kernel without aty128fb .... (my fault)
+Unfortunately, i don't have fresh qemu compiled (previous tests were done f=
+rom tmpfs copy of qemu source tree),
+ will recompile from git and re-test. from memory, loading aty128fb and
+setting config fragment in /etc/X11/xorg.conf.d for EXA AccelMethod and "Op=
+tion "UseFBDev" "1" ' allowed device (ati-vga) to work.
+
+
+
+>=20
+> (You may also need latest vgabios-ati.bin from Gerd's repo to get Linux=20
+> drivers load and for rage128p that has to be in pc-bios dir because PCI=20
+> IDs are only patched in that way.)
+>=20
+> Regards,
+> BALATON Zoltan
+
+
 
