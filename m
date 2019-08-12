@@ -2,90 +2,139 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D75C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 950ECC433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:39:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8534F2070C
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:27:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLHRRMow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8534F2070C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 657C420684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 18:39:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657C420684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxF2C-0005CC-Oq
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 14:27:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43266)
+	id 1hxFEL-0007Kf-GJ
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 14:39:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44626)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <randrianasulu@gmail.com>) id 1hxF1p-0004lv-1Y
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:26:46 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxFDw-0006rj-K4
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <randrianasulu@gmail.com>) id 1hxF1n-0002Db-LU
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:26:44 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:39366)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
- id 1hxF1n-0002Bc-CS
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:26:43 -0400
-Received: by mail-lf1-x141.google.com with SMTP id x3so21131891lfn.6
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 11:26:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=content-disposition:from:to:subject:date:user-agent:mime-version
- :content-transfer-encoding:message-id;
- bh=QcKMK13CyehigHIGy94d4e5RQfyKfGhXATXu5vDSGO8=;
- b=NLHRRMowpcK4Ny485JBZI3gWtVxYaz4c3gL1U6D2cBdc/fWtDWGGHz42LWlvIS3JJw
- qSP58lttvnn80bKChfzmP89WUUet04sGwBYZnSXy5geGmk6VgsoBoBeJt7JPYfgVx+e2
- mBx6vw4r5U4Wiiz0LEIjAAUaO3K1UxDqwPTghKL9MREfu3qRjLHGeveMjmVx8InCieW7
- 89DdKoFkj8EYUm1grOTpdZzd6YceiBrJRcQYlHk74AE6lT/TPTS1Ux5nGy2hCKiVqiFm
- w/9sxob+tNCsR966BWPhLHSr7NOCmqp/Po6JLol1umGkCT65BojTQg0TXafWHnQzv0Tj
- osrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:content-disposition:from:to:subject:date
- :user-agent:mime-version:content-transfer-encoding:message-id;
- bh=QcKMK13CyehigHIGy94d4e5RQfyKfGhXATXu5vDSGO8=;
- b=W+hfz6ye1uTFFULmXqf0/zlxhvnmAWiVrwP/jm/Ia5xs3bQRma9KfEt2skFKSA/Q3Y
- EjuhhsumWapB7JTT6Xd+YUjbndSF4BuTg1V3urtCMHb4287TXT/jAg5qzq1QcgLe0uqu
- JB33+lnIV7KKOJ7Ns/GJ0zHAmnv2W2UoFF+sp/ypcKENVTGzPDvewECW9vTeQRbPTVHU
- APQTe6R/8bnPepf/L/buZYGUfdCRMaMDa71eOfAoG3hoTwUGI1DaK/zoqNxEPf+uWf2u
- 5K1IIseDjLzwRQ9ekc8do/n89EiT+DdinvZQ1depKkLlPk78vG5e6MqNNGDlMZCYz2xP
- PQ3A==
-X-Gm-Message-State: APjAAAWu/XQx9fodkyy9dUqUJwqZ0z0AQnwI3bMD7STsKSUAxH79ZIhg
- 2sd+5HFwwnEV/EOC4U0Sxj8=
-X-Google-Smtp-Source: APXvYqxGIZA0XSUlLeKaR0CM773re4EXeUZd4AQP+HZCYsxHmyT1MKSgdsqfQpfQa1DrAnS8FkIjcw==
-X-Received: by 2002:a19:674d:: with SMTP id e13mr16218374lfj.176.1565634401744; 
- Mon, 12 Aug 2019 11:26:41 -0700 (PDT)
-Received: from [192.168.1.100] ([176.116.252.109])
- by smtp.gmail.com with ESMTPSA id f12sm2509137lfm.14.2019.08.12.11.26.39
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 12 Aug 2019 11:26:40 -0700 (PDT)
-Content-Disposition: inline
-From: Andrew Randrianasulu <randrianasulu@gmail.com>
-To: BALATON Zoltan <balaton@eik.bme.hu>,
- "Philippe =?utf-8?q?Mathieu-Daud=C3=A9?=" <philmd@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 12 Aug 2019 21:15:37 +0300
-User-Agent: KMail/1.9.10
+ (envelope-from <jsnow@redhat.com>) id 1hxFDv-0006iz-Km
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 14:39:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56600)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hxFDt-0006hj-Eo; Mon, 12 Aug 2019 14:39:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 037FE3145739;
+ Mon, 12 Aug 2019 18:39:12 +0000 (UTC)
+Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 476C17EB73;
+ Mon, 12 Aug 2019 18:39:11 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190725155512.9827-1-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
+Date: Mon, 12 Aug 2019 14:39:10 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
+In-Reply-To: <20190725155512.9827-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Mon, 12 Aug 2019 18:39:12 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <201908122115.38211.randrianasulu@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::141
-Subject: [Qemu-devel] Fwd: Re: [PATCH 4/7] ati-vga: Fix cursor color with
- guest_hwcursor=true
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/3] block: Make various
+ formats' block_status recurse again
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,135 +146,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-=2D---------  =D0=9F=D0=B5=D1=80=D0=B5=D1=81=D0=BB=D0=B0=D0=BD=D0=BD=D0=BE=
-=D0=B5 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B5  ----------
 
-=D0=A2=D0=B5=D0=BC=D0=B0: Re: [Qemu-devel] [PATCH 4/7] ati-vga: Fix cursor =
-color with guest_hwcursor=3Dtrue
-=D0=94=D0=B0=D1=82=D0=B0: =D0=9F=D0=BE=D0=BD=D0=B5=D0=B4=D0=B5=D0=BB=D1=8C=
-=D0=BD=D0=B8=D0=BA 12 =D0=B0=D0=B2=D0=B3=D1=83=D1=81=D1=82=D0=B0 2019
-=D0=9E=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D0=B8=D1=82=D0=B5=D0=BB=D1=8C: Andrew =
-Randrianasulu <randrianasulu@gmail.com>
-=D0=9F=D0=BE=D0=BB=D1=83=D1=87=D0=B0=D1=82=D0=B5=D0=BB=D1=8C:  BALATON Zolt=
-an <balaton@eik.bme.hu>
-
-=D0=92 =D1=81=D0=BE=D0=BE=D0=B1=D1=89=D0=B5=D0=BD=D0=B8=D0=B8 =D0=BE=D1=82 =
-Monday 12 August 2019 13:55:45 BALATON Zoltan =D0=BD=D0=B0=D0=BF=D0=B8=D1=
-=81=D0=B0=D0=BB(=D0=B0):
-> On Mon, 12 Aug 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> > On 8/12/19 12:28 PM, BALATON Zoltan wrote:
-> >> On Mon, 12 Aug 2019, Philippe Mathieu-Daud=C3=A9 wrote:
-> >>> On 8/11/19 11:14 PM, BALATON Zoltan wrote:
-> >>>> Fixes: a38127414bd007c5b6ae64c664d9e8839393277e
-> >>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >>>> ---
-> >>>> ?hw/display/ati.c | 2 +-
-> >>>> ?1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/hw/display/ati.c b/hw/display/ati.c
-> >>>> index 699f38223b..b849f5d510 100644
-> >>>> --- a/hw/display/ati.c
-> >>>> +++ b/hw/display/ati.c
-> >>>> @@ -207,7 +207,7 @@ static void ati_cursor_draw_line(VGACommonState
-> >>>> *vga, uint8_t *d, int scr_y)
-> >>>> ???????????????? }
-> >>>> ???????????? } else {
-> >>>> ???????????????? color =3D (xbits & BIT(7) ? s->regs.cur_color1 :
-> >>>> -????????????????????????????????????????? s->regs.cur_color0) << 8 |
-> >>>> 0xff;
-> >>>> +????????????????????????????????????????? s->regs.cur_color0) |
-> >>>> 0xff000000;
-> >>>> ???????????? }
-> >>>> ???????????? if (vga->hw_cursor_x + i * 8 + j >=3D h) {
-> >>>> ???????????????? return; /* end of screen, don't span to next line */
-> >>>>
-> >>>
-> >>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >>
-> >> Thanks. I've noticed that cursor color may still be wrong with MacOS
-> >> that uses big endian frame buffer so maybe this will also need to take
-> >> frame buffer endianness into account somehow but this patch corrects a
-> >> difference between guest_hwcursor true and false values, reproducible
-> >> with some Linux versions (as far as I remember). While the wrong cursor
-> >> color with MacOS is now consistent after this patch with both
-> >> guest_hwcursor true or false so that likely needs a different fix that
-> >> should be applied both to this place and to ati_cursor_define. (MacOS
-> >> does not yet boot fully, it needs patches to OpenBIOS to be able to run
-> >> an FCode ROM and will probably need the VBlank interrupt implemented in
-> >> ati-vga without which it displays a desktop but freezes there).
-> >
-> > If you remember which Linux version had this problem, or you can link to
-> > roms that behave incorrectly, please share, so we can add display
-> > regression tests.
+On 7/25/19 11:55 AM, Max Reitz wrote:
+> Hi,
 >=20
-> Unfortunately I don't. I think it was Andrew who found this so maybe he=20
-> can remember.
+> 69f47505ee66afaa513305de0c1895a224e52c45 changed block_status so that i=
+t
+> would only go down to the protocol layer if the format layer returned
+> BDRV_BLOCK_RECURSE, thus indicating that it has no sufficient
+> information whether a given range in the image is zero or not.
+> Generally, this is because the image is preallocated and thus all range=
+s
+> appear as zeroes.
+>=20
+> However, it only implemented this preallocation detection for qcow2.
+> There are more formats that support preallocation, though: vdi, vhdx,
+> vmdk, vpc.  (Funny how they all start with =E2=80=9Cv=E2=80=9D.)
+>=20
+> For vdi, vmdk, and vpc, the fix is rather simple, because they really
+> have different subformats depending on whether an image is preallocated
+> or not.  This makes the check very simple.
+>=20
+> vhdx is more like qcow2, where after the image has been created, it
+> isn=E2=80=99t clear whether it=E2=80=99s been preallocated or everythin=
+g is allocated
+> because everything was already written to.  69f47505ee added a heuristi=
+c
+> to qcow2 to get around this, but I think that=E2=80=99s too much for vh=
+dx.  I
+> just left it unfixed, because I don=E2=80=99t care that much, honestly =
+(and I
+> don=E2=80=99t think anyone else does).
+>=20
 
-Blue cursor was seen on specific dvd (x86) image I did for myself,=20
-because it was  using plain X cursor (arrow or X-shaped), not colored=20
-versions used by default in many distributions.
+What's the practical outcome of that, and is the limitation documented
+somewhere?
 
-may be 'startx -- -retro" will show it briefly too?
-
-from man Xserver (1.19.7):
-
-=2Dretro  starts  the  server  with  the  classic stipple and cursor visibl=
-e.  The default is to start with a black root window, and to suppress displ=
-ay of the cursor until the
-               first time an application calls XDefineCursor().=20
-
-
-https://yadi.sk/d/F8cbINWzWJ-DkA
-
-users: root and guest
-passwords: toor and guest
-
-You need to boot it to syslinux and type 'slax' there, because default will=
- boot x86-64 kernel without aty128fb .... (my fault)
-Unfortunately, i don't have fresh qemu compiled (previous tests were done f=
-rom tmpfs copy of qemu source tree),
- will recompile from git and re-test. from memory, loading aty128fb and
-setting config fragment in /etc/X11/xorg.conf.d for EXA AccelMethod and "Op=
-tion "UseFBDev" "1" ' allowed device (ati-vga) to work.
-
-=2D-----------------------------
-
-Update: qemu commit 864ab314f1d924129d06ac7b571f105a2b76a4b2 (tag: v4.1.0-r=
-c4)
-plus patch series by Zoltan (https://patchew.org/QEMU/cover.1565558093.git.=
-balaton%40eik.bme.hu/)
-actually boots my x86 dvd image with this command:
-
-x86_64-softmmu/qemu-system-x86_64 -m 512 -enable-kvm -device ati-vga,guest_=
-hwcursor=3Dtrue -cdrom /mnt/sdb1/slax-14_06_2019-private0.iso
-
-or
-x86_64-softmmu/qemu-system-x86_64 -m 512 -enable-kvm -device ati-vga,guest_=
-hwcursor=3Dtrue -cdrom /mnt/sdb1/slax-14_06_2019-private0.iso -display sdl,=
-gl=3Don
-
-Cursor is normally-colored, but you need something like "xrandr -s 23" beca=
-use default resolution a bit too big.=20
-(after modprobe aty128fb + usual xorg.conf dance about UseFBDev)
-
-=2D---end of update--------
-
-
+(I'm fine with not fixing it, I just want it documented somehow.)
 
 >=20
-> (You may also need latest vgabios-ati.bin from Gerd's repo to get Linux=20
-> drivers load and for rage128p that has to be in pc-bios dir because PCI=20
-> IDs are only patched in that way.)
+> Max Reitz (3):
+>   vdi: Make block_status recurse for fixed images
+>   vmdk: Make block_status recurse for flat extents
+>   vpc: Do not return RAW from block_status
 >=20
-> Regards,
-> BALATON Zoltan
-
-
-
-=2D------------------------------------------------------
+>  block/vdi.c  | 3 ++-
+>  block/vmdk.c | 3 +++
+>  block/vpc.c  | 2 +-
+>  3 files changed, 6 insertions(+), 2 deletions(-)
+>=20
 
