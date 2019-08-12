@@ -2,74 +2,142 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F79C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:17:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4338C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:17:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD0CA206C2
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:17:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD0CA206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 95A7F206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 21:17:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A7F206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxHgk-0006rC-6M
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 17:17:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41693)
+	id 1hxHh7-0007G8-Tu
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 17:17:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41721)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peterx@redhat.com>) id 1hxHg9-0006Dk-5V
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:16:34 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxHgI-0006La-Jh
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:16:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hxHg7-000893-Us
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:16:33 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40552)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hxHg7-00088S-Oj
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:16:31 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r1so6743736wrl.7
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 14:16:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=H1NCDqFtaNw5+6bAZgV4zzDgD8o02gBItnoR55euYAI=;
- b=Me03qzEnDxhyQFkxxzrgUmSd/4gJVPUzl1kc8Fij8pAOzi1luCC2qhUziHxbNbdnWS
- B83GOlb8+MBL6MK2aCTYMoVIq8Y4zzBwUymslr9pSucVnKMbBz6ZZZv6XH/Y6yF5XVle
- YfD84jmIiPTi0rNK1oRfgPKB0VrQdRfHL46ZT8AvJl4C5uL26rjzUmonesUP6zQHUdFD
- DkB8d4cAowyiT3SrMEufp4Hal9ZQZy/bhLJXqPngcqpXl6H0UIXLv/GUa2SmWwtv5Iz1
- 3xuXukJ8F9bsva/WhFbz5lbPc5oTGqhWD3MQfwer8eqR9dcvBel/X5h261AejQQW9s1Y
- mUXA==
-X-Gm-Message-State: APjAAAVKkP3FTEHgDDiNtXphxaMwniuvdTOjwRcNilbJ1kY1z80E+CfB
- M793PPCwoZ6cwAkgYqvIUg5V3A==
-X-Google-Smtp-Source: APXvYqxr/RRoG8S9rTuft4qTEEol3OBHH17ebnAS6en5pOul5jtWCVMHqBcWArTlKs4n/23Jiit/lA==
-X-Received: by 2002:a5d:4b05:: with SMTP id v5mr17428349wrq.208.1565644590492; 
- Mon, 12 Aug 2019 14:16:30 -0700 (PDT)
-Received: from xz-x1 (net77-43-52-122.mclink.it. [77.43.52.122])
- by smtp.gmail.com with ESMTPSA id v124sm482741wmf.23.2019.08.12.14.16.28
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Mon, 12 Aug 2019 14:16:29 -0700 (PDT)
-Date: Mon, 12 Aug 2019 23:16:26 +0200
-From: Peter Xu <peterx@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190812211626.GA9073@xz-x1>
-References: <20190812074531.28970-1-peterx@redhat.com>
- <20190812102453.3c05ab43@x1.home>
+ (envelope-from <jsnow@redhat.com>) id 1hxHgH-0008FH-76
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 17:16:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49772)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hxHgE-0008Ci-D9; Mon, 12 Aug 2019 17:16:38 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id BB602315C037;
+ Mon, 12 Aug 2019 21:16:36 +0000 (UTC)
+Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1E393100195F;
+ Mon, 12 Aug 2019 21:16:35 +0000 (UTC)
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+References: <20190725155735.11872-1-mreitz@redhat.com>
+ <20190725155735.11872-5-mreitz@redhat.com>
+ <04db2aa5-f850-c6fa-0101-3e9cb8d34a6a@redhat.com>
+ <9be593c8-332e-5f5b-899c-53737f05f878@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b4a780dc-4fc7-3f29-c634-627ab51e45b4@redhat.com>
+Date: Mon, 12 Aug 2019 17:16:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <9be593c8-332e-5f5b-899c-53737f05f878@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190812102453.3c05ab43@x1.home>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.41]); Mon, 12 Aug 2019 21:16:36 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH RFC 0/4] intel_iommu: Do sanity check of
- vfio-pci earlier
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/7] vmdk: Reject invalid
+ compressed writes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,89 +149,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
- Bandan Das <bsd@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 12, 2019 at 10:24:53AM -0600, Alex Williamson wrote:
-> On Mon, 12 Aug 2019 09:45:27 +0200
-> Peter Xu <peterx@redhat.com> wrote:
-> 
-> > This is a RFC series.
-> > 
-> > The VT-d code has some defects, one of them is that we cannot detect
-> > the misuse of vIOMMU and vfio-pci early enough.
-> > 
-> > For example, logically this is not allowed:
-> > 
-> >   -device intel-iommu,caching-mode=off \
-> >   -device vfio-pci,host=05:00.0
-> 
-> Do we require intel-iommu with intremap=on in order to get x2apic for
-> large vCPU count guests?  If so, wouldn't it be a valid configuration
-> for the user to specify:
-> 
->    -device intel-iommu,caching-mode=off,intremap=on \
->    -device vfio-pci,host=05:00.0
-> 
-> so long as they never have any intention of the guest enabling DMA
-> translation?  Would there be any advantage to this config versus
-> caching-mode=on?  I suspect the overhead of CM=1 when only using
-> interrupt remapping is small to non-existent, but are there other
-> reasons for running with CM=0, perhaps guest drivers not supporting it?
 
-AFAIU the major users of the vIOMMU should be guest DPDK apps and
-nested device assignments.  For these users I would just make bold to
-guess they are mostly using Linux so the majority should be safe.
 
-For the minority, I do agree that above question is valid.  IMHO the
-hard point is to find out those users and let them join the
-discussion, then we can know how many will be affected and how.  I
-think one way to achieve it could be that we merge the patchset like
-this, then people will start to complain if there is any. :) I'm not
-sure whether that's the best way to go.  I think that could still be a
-serious option considering that it could potentially fix a more severe
-issue (unexpected QEMU quits), and also reverting the patchset like
-this one could be easy as well when really necessary (e.g., the
-patchset will not bring machine state changes which might cause
-migration issues, or so on).
+On 8/12/19 5:03 PM, Max Reitz wrote:
+> On 12.08.19 22:26, John Snow wrote:
+>>
+>>
+>> On 7/25/19 11:57 AM, Max Reitz wrote:
+>>> Compressed writes generally have to write full clusters, not just in
+>>> theory but also in practice when it comes to vmdk's streamOptimized
+>>> subformat.  It currently is just silently broken for writes with
+>>> non-zero in-cluster offsets:
+>>>
+>>> $ qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 1M
+>>> $ qemu-io -c 'write 4k 4k' -c 'read 4k 4k' foo.vmdk
+>>> wrote 4096/4096 bytes at offset 4096
+>>> 4 KiB, 1 ops; 00.01 sec (443.724 KiB/sec and 110.9309 ops/sec)
+>>> read failed: Invalid argument
+>>>
+>>> (The technical reason is that vmdk_write_extent() just writes the
+>>> incomplete compressed data actually to offset 4k.  When reading the
+>>> data, vmdk_read_extent() looks at offset 0 and finds the compressed d=
+ata
+>>> size to be 0, because that is what it reads from there.  This yields =
+an
+>>> error.)
+>>>
+>>> For incomplete writes with zero in-cluster offsets, the error path wh=
+en
+>>> reading the rest of the cluster is a bit different, but the result is
+>>> the same:
+>>>
+>>> $ qemu-img create -f vmdk -o subformat=3DstreamOptimized foo.vmdk 1M
+>>> $ qemu-io -c 'write 0k 4k' -c 'read 4k 4k' foo.vmdk
+>>> wrote 4096/4096 bytes at offset 0
+>>> 4 KiB, 1 ops; 00.01 sec (362.641 KiB/sec and 90.6603 ops/sec)
+>>> read failed: Invalid argument
+>>>
+>>> (Here, vmdk_read_extent() finds the data and then sees that the
+>>> uncompressed data is short.)
+>>>
+>>> It is better to reject invalid writes than to make the user believe t=
+hey
+>>> might have succeeded and then fail when trying to read it back.
+>>>
+>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>> ---
+>>>  block/vmdk.c | 10 ++++++++++
+>>>  1 file changed, 10 insertions(+)
+>>>
+>>> diff --git a/block/vmdk.c b/block/vmdk.c
+>>> index db6acfc31e..641acacfe0 100644
+>>> --- a/block/vmdk.c
+>>> +++ b/block/vmdk.c
+>>> @@ -1731,6 +1731,16 @@ static int vmdk_write_extent(VmdkExtent *exten=
+t, int64_t cluster_offset,
+>>>      if (extent->compressed) {
+>>>          void *compressed_data;
+>>> =20
+>>> +        /* Only whole clusters */
+>>> +        if (offset_in_cluster ||
+>>> +            n_bytes > (extent->cluster_sectors * SECTOR_SIZE) ||
+>>> +            (n_bytes < (extent->cluster_sectors * SECTOR_SIZE) &&
+>>> +             offset + n_bytes !=3D extent->end_sector * SECTOR_SIZE)=
+)
+>>> +        {
+>>> +            ret =3D -EINVAL;
+>>> +            goto out;
+>>> +        }
+>>> +
+>>>          if (!extent->has_marker) {
+>>>              ret =3D -EINVAL;
+>>>              goto out;
+>>>
+>>
+>> What does this look like from a guest's perspective? Is there somethin=
+g
+>> that enforces the alignment in the graph for us?
+>>
+>> Or is it the case that indeed guests (or users via qemu-io) can reques=
+t
+>> invalid writes and we will halt the VM in those cases (in preference t=
+o
+>> corrupting the disk)?
+>=20
+> Have you ever tried using a streamOptimized VMDK disk with a guest?
+>=20
 
-> 
-> I like the idea of being able to nak an incompatible hot-add rather
-> than kill the VM, we could narrow that even further to look at not only
-> whether caching-mode support is enabled, but also whether translation
-> is enabled on the vIOMMU.  Ideally we might disallow the guest from
-> enabling translation in such a configuration, but the Linux code is not
-> written with the expectation that the hardware can refuse to enable
-> translation and there are no capability bits to remove the DMA
-> translation capability of the IOMMU.
+Nope! It's why I'm asking. I have no idea what the whole picture before
+and after is.
 
-This is an interesting view at least to me, while... I'm not sure we
-should allow that even for emulation.  I'm just imaging such a patch
-for the Linux kernel to allow failures on enabling DMAR - it'll be
-only for QEMU emulation and I'm not sure whether upstream would like
-such a patch.  After all, we are emulating the hardwares, and the
-hardware will always succeed in enabling DMAR, AFAICT.  For Windows
-and other OSs it could be even harder.  If without the support of all
-these, we could simply have other risks of having hanging guests when
-the driver is busy waiting for the DMAR status bit to be set.
+> I haven=E2=80=99t, but I know that it won=E2=80=99t work. O:-)  If you =
+try to write to
+> an already allocated cluster, you=E2=80=99ll get an EIO and an error me=
+ssage via
+> error_report() (=E2=80=9CCould not write to allocated cluster for
+> streamOptimized=E2=80=9D).  So really, the only use of streamOptimized =
+is as a
+> qemu-img convert source/target, or as a backup/mirror target.  (Just
+> like compressed clusters in qcow2 images.)
+>=20
 
-> Still, we might want to think
-> about which is the better user experience, to have the guest panic when
-> DMA_GSTS_TES never becomes set (as it seems Linux would do) or to have
-> QEMU exit, or as proposed here, prevent all configurations where this
-> might occur.  Thanks,
+OK, makes sense. Someone's going to try to use it in cases where it
+doesn't make sense though, for sure.
 
-Agreed.  So far, a stricter rule could be a bit better than a hanging
-guest to me.  Though that could be very subjective.
+> I suppose if I introduced streamOptimized support today, I wouldn=E2=80=
+=99t just
+> forward vmdk_co_pwritev_compressed() to vmdk_co_pwritev(), but instead
+> make vmdk_co_pwritev_compressed() only work on streamOptimized images,
+> and vmdk_co_pwritev() only on everything else.  Then it would be more c=
+lear.
+>=20
+> Hm.  In fact, that=E2=80=99s a bug, isn=E2=80=99t it?  vmdk will accept=
+ compressed
+> writes for any subformat, even if it doesn=E2=80=99t support compressio=
+n.  So if
+> you use -c and convert to vmdk, it will succeed, but the result won=E2=80=
+=99t be
+> compressed,
+>=20
+> It=E2=80=99s also a bit weird to accept normal writes for streamOptimiz=
+ed, but
+> I=E2=80=99m not sure whether that=E2=80=99s really a bug?  In any case,=
+ changing this
+> behavior would not be backwards-compatible...  Should we deprecate
+> normal writes to streamOptimized?
+>=20
 
-Thanks!
+If it's supposed to be the case that streamOptimized *only* gets
+compressed, aligned writes -- it probably is a bug to do normal,
+uncompressed writes, isn't it? Does that produce a usable image?
 
--- 
-Peter Xu
+> Max
+>=20
+
+Anyway, I'm fine with this patch because things aren't any worse, and
+our support for non-native formats has always been kind of best-attempt.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+
 
