@@ -3,63 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D181C433FF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0E8C32756
 	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6200D2085A
+	by mail.kernel.org (Postfix) with ESMTPS id A19532085A
 	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 05:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6200D2085A
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19532085A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hx2sX-0003ju-Nv
+	id 1hx2sX-0003kq-UR
 	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 01:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57153)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57259)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hx2oU-00005l-CX
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:13 -0400
+ (envelope-from <armbru@redhat.com>) id 1hx2oa-0000Qo-7V
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hx2oS-00066Y-E4
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50574)
+ (envelope-from <armbru@redhat.com>) id 1hx2oV-0006B5-GE
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5933)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hx2oS-00065M-5w
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:08 -0400
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hx2oV-00069d-4B
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 01:24:11 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 79D9F793E5;
- Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 551023002077
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:24:10 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B53710002B9;
- Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE6A4100034E
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 05:24:09 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EEAEB1136426; Mon, 12 Aug 2019 07:23:59 +0200 (CEST)
+ id 309EB1136437; Mon, 12 Aug 2019 07:24:00 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 12 Aug 2019 07:23:44 +0200
-Message-Id: <20190812052359.30071-15-armbru@redhat.com>
+Date: Mon, 12 Aug 2019 07:23:58 +0200
+Message-Id: <20190812052359.30071-29-armbru@redhat.com>
 In-Reply-To: <20190812052359.30071-1-armbru@redhat.com>
 References: <20190812052359.30071-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 05:24:07 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Mon, 12 Aug 2019 05:24:10 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v4 14/29] migration: Move the
- VMStateDescription typedef to typedefs.h
+Subject: [Qemu-devel] [PATCH v4 28/29] sysemu: Move the VMChangeStateEntry
+ typedef to qemu/typedefs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,285 +70,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We declare incomplete struct VMStateDescription in a couple of places
-so we don't have to include migration/vmstate.h for the typedef.
-That's fine with me.  However, the next commit will drop
-migration/vmstate.h from a massive number of compiles.  Move the
-typedef to qemu/typedefs.h now, so I don't have to insert struct in
-front of VMStateDescription all over the place then.
+In my "build everything" tree, changing sysemu/sysemu.h triggers a
+recompile of some 1800 out of 6600 objects (not counting tests and
+objects that don't depend on qemu/osdep.h, down from 5400 due to the
+previous commit).
+
+Several headers include sysemu/sysemu.h just to get typedef
+VMChangeStateEntry.  Move it from sysemu/sysemu.h to qemu/typedefs.h.
+Spell its structure tag the same while there.  Drop the now
+superfluous includes of sysemu/sysemu.h from headers.
+
+Touching sysemu/sysemu.h now recompiles some 1100 objects.
+qemu/uuid.h also drops from 1800 to 1100, and
+qapi/qapi-types-run-state.h from 5000 to 4400.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- include/hw/qdev-core.h      | 6 ++----
- include/migration/vmstate.h | 1 -
+ hw/usb/hcd-ehci.h           | 1 -
+ include/hw/ide/internal.h   | 3 ++-
+ include/hw/ppc/spapr_xive.h | 1 -
+ include/hw/scsi/scsi.h      | 1 -
+ include/hw/virtio/virtio.h  | 1 -
  include/qemu/typedefs.h     | 1 +
- include/qom/cpu.h           | 4 ++--
- target/alpha/cpu.h          | 2 +-
- target/arm/cpu.h            | 2 +-
- target/cris/cpu.h           | 2 +-
- target/hppa/cpu.h           | 2 +-
- target/i386/cpu.h           | 2 +-
- target/lm32/cpu.h           | 2 +-
- target/mips/internal.h      | 2 +-
- target/openrisc/cpu.h       | 2 +-
- target/ppc/cpu-qom.h        | 2 +-
- target/ppc/cpu.h            | 2 +-
- target/s390x/cpu.h          | 2 +-
- target/sparc/cpu.h          | 2 +-
- 16 files changed, 17 insertions(+), 19 deletions(-)
+ include/sysemu/sysemu.h     | 1 -
+ hw/block/vhost-user-blk.c   | 1 +
+ hw/block/virtio-blk.c       | 1 +
+ hw/display/virtio-gpu.c     | 1 +
+ hw/misc/macio/macio.c       | 1 +
+ hw/net/virtio-net.c         | 1 +
+ hw/s390x/s390-ccw.c         | 1 +
+ hw/s390x/s390-virtio-ccw.c  | 1 +
+ hw/scsi/scsi-bus.c          | 1 +
+ hw/scsi/vhost-scsi.c        | 1 +
+ hw/scsi/vhost-user-scsi.c   | 1 +
+ hw/usb/hcd-ehci.c           | 1 +
+ hw/virtio/virtio-rng.c      | 1 +
+ hw/virtio/virtio.c          | 1 +
+ vl.c                        | 6 +++---
+ 21 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index b870c8ceeb..e5b62dd2fc 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -35,8 +35,6 @@ typedef void (*DeviceReset)(DeviceState *dev);
- typedef void (*BusRealize)(BusState *bus, Error **errp);
- typedef void (*BusUnrealize)(BusState *bus, Error **errp);
+diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+index fdbcfdcbeb..0298238f0b 100644
+--- a/hw/usb/hcd-ehci.h
++++ b/hw/usb/hcd-ehci.h
+@@ -21,7 +21,6 @@
+ #include "qemu/timer.h"
+ #include "hw/usb.h"
+ #include "sysemu/dma.h"
+-#include "sysemu/sysemu.h"
+ #include "hw/pci/pci.h"
+ #include "hw/sysbus.h"
 =20
--struct VMStateDescription;
--
- /**
-  * DeviceClass:
-  * @props: Properties accessing state fields.
-@@ -112,7 +110,7 @@ typedef struct DeviceClass {
-     DeviceUnrealize unrealize;
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index c6954c1d56..52ec197da0 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -6,11 +6,12 @@
+  * only files in hw/ide/ are supposed to include this file.
+  * non-internal declarations are in hw/ide.h
+  */
++
++#include "qapi/qapi-types-run-state.h"
+ #include "hw/ide.h"
+ #include "hw/irq.h"
+ #include "hw/isa/isa.h"
+ #include "sysemu/dma.h"
+-#include "sysemu/sysemu.h"
+ #include "hw/block/block.h"
+ #include "scsi/constants.h"
 =20
-     /* device state */
--    const struct VMStateDescription *vmsd;
-+    const VMStateDescription *vmsd;
+diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+index a39e672f27..bfd40f01d8 100644
+--- a/include/hw/ppc/spapr_xive.h
++++ b/include/hw/ppc/spapr_xive.h
+@@ -12,7 +12,6 @@
 =20
-     /* Private to qdev / bus.  */
-     const char *bus_type;
-@@ -425,7 +423,7 @@ void device_class_set_parent_unrealize(DeviceClass *d=
-c,
-                                        DeviceUnrealize dev_unrealize,
-                                        DeviceUnrealize *parent_unrealize=
-);
+ #include "hw/ppc/spapr_irq.h"
+ #include "hw/ppc/xive.h"
+-#include "sysemu/sysemu.h"
 =20
--const struct VMStateDescription *qdev_get_vmsd(DeviceState *dev);
-+const VMStateDescription *qdev_get_vmsd(DeviceState *dev);
+ #define TYPE_SPAPR_XIVE "spapr-xive"
+ #define SPAPR_XIVE(obj) OBJECT_CHECK(SpaprXive, (obj), TYPE_SPAPR_XIVE)
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index 2bfaad0fe9..d77a92361b 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -4,7 +4,6 @@
+ #include "block/aio.h"
+ #include "hw/block/block.h"
+ #include "hw/qdev-core.h"
+-#include "sysemu/sysemu.h"
+ #include "scsi/utils.h"
+ #include "qemu/notify.h"
 =20
- const char *qdev_fw_name(DeviceState *dev);
-=20
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index c2bfa7a7f0..1fbfd099dd 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -28,7 +28,6 @@
- #define QEMU_VMSTATE_H
-=20
- typedef struct VMStateInfo VMStateInfo;
--typedef struct VMStateDescription VMStateDescription;
- typedef struct VMStateField VMStateField;
-=20
- /* VMStateInfo allows customized migration of objects that don't fit in
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index df40a46d60..48e8d04ff6 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -17,7 +17,6 @@
+ #include "exec/memory.h"
+ #include "hw/qdev-core.h"
+ #include "net/net.h"
+-#include "sysemu/sysemu.h"
+ #include "migration/vmstate.h"
+ #include "qemu/event_notifier.h"
+ #include "standard-headers/linux/virtio_config.h"
 diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index c32efb5b18..9e1283aacf 100644
+index f569f5f270..3fcdde8bfc 100644
 --- a/include/qemu/typedefs.h
 +++ b/include/qemu/typedefs.h
-@@ -101,6 +101,7 @@ typedef struct SHPCDevice SHPCDevice;
+@@ -102,6 +102,7 @@ typedef struct SHPCDevice SHPCDevice;
  typedef struct SSIBus SSIBus;
  typedef struct VirtIODevice VirtIODevice;
  typedef struct Visitor Visitor;
-+typedef struct VMStateDescription VMStateDescription;
++typedef struct VMChangeStateEntry VMChangeStateEntry;
+ typedef struct VMStateDescription VMStateDescription;
 =20
  /*
-  * Pointer types
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 5ee0046b62..ddb91bbaff 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -215,7 +215,7 @@ typedef struct CPUClass {
-     int (*write_elf32_qemunote)(WriteCoreDumpFunction f, CPUState *cpu,
-                                 void *opaque);
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index 908f158677..7606eaaf2a 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -22,7 +22,6 @@ void runstate_set(RunState new_state);
+ int runstate_is_running(void);
+ bool runstate_needs_reset(void);
+ bool runstate_store(char *str, size_t size);
+-typedef struct vm_change_state_entry VMChangeStateEntry;
+ typedef void VMChangeStateHandler(void *opaque, int running, RunState st=
+ate);
 =20
--    const struct VMStateDescription *vmsd;
-+    const VMStateDescription *vmsd;
-     const char *gdb_core_xml_file;
-     gchar * (*gdb_arch_name)(CPUState *cpu);
-     const char * (*gdb_get_dynamic_xml)(CPUState *cpu, const char *xmlna=
-me);
-@@ -1108,7 +1108,7 @@ bool target_words_bigendian(void);
- #ifdef NEED_CPU_H
+ VMChangeStateEntry *qemu_add_vm_change_state_handler(VMChangeStateHandle=
+r *cb,
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index 7b44cca6d9..6b6cd07362 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -28,6 +28,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-bus.h"
+ #include "hw/virtio/virtio-access.h"
++#include "sysemu/sysemu.h"
 =20
- #ifdef CONFIG_SOFTMMU
--extern const struct VMStateDescription vmstate_cpu_common;
-+extern const VMStateDescription vmstate_cpu_common;
- #else
- #define vmstate_cpu_common vmstate_dummy
- #endif
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index b3e8a823e1..4619530660 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -277,7 +277,7 @@ struct AlphaCPU {
+ static const int user_feature_bits[] =3D {
+     VIRTIO_BLK_F_SIZE_MAX,
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 8cc2a232e0..78ac371eba 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -20,6 +20,7 @@
+ #include "hw/block/block.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/sysemu.h"
+ #include "hw/virtio/virtio-blk.h"
+ #include "dataplane/virtio-blk.h"
+ #include "scsi/constants.h"
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 6de9689a30..28e868c021 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -17,6 +17,7 @@
+ #include "ui/console.h"
+ #include "trace.h"
+ #include "sysemu/dma.h"
++#include "sysemu/sysemu.h"
+ #include "hw/virtio/virtio.h"
+ #include "migration/qemu-file-types.h"
+ #include "hw/virtio/virtio-gpu.h"
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index b59df4e3b8..50f20d8206 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -35,6 +35,7 @@
+ #include "hw/char/escc.h"
+ #include "hw/misc/macio/macio.h"
+ #include "hw/intc/heathrow_pic.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
 =20
+ /* Note: this code is strongly inspirated from the corresponding code
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 4113729fcf..9f11422337 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -31,6 +31,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "migration/misc.h"
+ #include "standard-headers/linux/ethtool.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
 =20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_alpha_cpu;
-+extern const VMStateDescription vmstate_alpha_cpu;
- #endif
+ #define VIRTIO_NET_VM_VERSION    11
+diff --git a/hw/s390x/s390-ccw.c b/hw/s390x/s390-ccw.c
+index 22c6878b84..0c5a5b60bd 100644
+--- a/hw/s390x/s390-ccw.c
++++ b/hw/s390x/s390-ccw.c
+@@ -19,6 +19,7 @@
+ #include "hw/s390x/css.h"
+ #include "hw/s390x/css-bridge.h"
+ #include "hw/s390x/s390-ccw.h"
++#include "sysemu/sysemu.h"
 =20
- void alpha_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 94c990cddb..2cdde6c4bc 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -922,7 +922,7 @@ void arm_cpu_post_init(Object *obj);
- uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz);
+ IOInstEnding s390_ccw_cmd_request(SubchDev *sch)
+ {
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index a543b64e56..434d933ec9 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -40,6 +40,7 @@
+ #include "hw/nmi.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/s390x/tod.h"
++#include "sysemu/sysemu.h"
 =20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_arm_cpu;
-+extern const VMStateDescription vmstate_arm_cpu;
- #endif
+ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+ {
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index db785e6001..cb8e8d1f36 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -10,6 +10,7 @@
+ #include "scsi/constants.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
++#include "sysemu/sysemu.h"
+ #include "trace.h"
+ #include "sysemu/dma.h"
+ #include "qemu/cutils.h"
+diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
+index cd5cf1679d..c693fc748a 100644
+--- a/hw/scsi/vhost-scsi.c
++++ b/hw/scsi/vhost-scsi.c
+@@ -30,6 +30,7 @@
+ #include "hw/fw-path-provider.h"
+ #include "hw/qdev-properties.h"
+ #include "qemu/cutils.h"
++#include "sysemu/sysemu.h"
 =20
- void arm_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/cris/cpu.h b/target/cris/cpu.h
-index fb14ad51f1..aba0a66474 100644
---- a/target/cris/cpu.h
-+++ b/target/cris/cpu.h
-@@ -183,7 +183,7 @@ struct CRISCPU {
+ /* Features supported by host kernel. */
+ static const int kernel_feature_bits[] =3D {
+diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
+index a5be128b54..31c9d34637 100644
+--- a/hw/scsi/vhost-user-scsi.c
++++ b/hw/scsi/vhost-user-scsi.c
+@@ -28,6 +28,7 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "chardev/char-fe.h"
++#include "sysemu/sysemu.h"
 =20
+ /* Features supported by the host application */
+ static const int user_feature_bits[] =3D {
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index d7d1ecd45d..e76c939751 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -35,6 +35,7 @@
+ #include "trace.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
++#include "sysemu/sysemu.h"
 =20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_cris_cpu;
-+extern const VMStateDescription vmstate_cris_cpu;
- #endif
+ #define FRAME_TIMER_FREQ 1000
+ #define FRAME_TIMER_NS   (NANOSECONDS_PER_SECOND / FRAME_TIMER_FREQ)
+diff --git a/hw/virtio/virtio-rng.c b/hw/virtio/virtio-rng.c
+index 34b4619fd3..c9c2414b7b 100644
+--- a/hw/virtio/virtio-rng.c
++++ b/hw/virtio/virtio-rng.c
+@@ -17,6 +17,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/virtio/virtio-rng.h"
+ #include "sysemu/rng.h"
++#include "sysemu/sysemu.h"
+ #include "qom/object_interfaces.h"
+ #include "trace.h"
 =20
- void cris_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index e9fba96be9..4b816cc13a 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -334,7 +334,7 @@ bool hppa_cpu_tlb_fill(CPUState *cs, vaddr address, i=
-nt size,
- int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx=
-,
-                               int type, hwaddr *pphys, int *pprot);
- extern const MemoryRegionOps hppa_io_eir_ops;
--extern const struct VMStateDescription vmstate_hppa_cpu;
-+extern const VMStateDescription vmstate_hppa_cpu;
- void hppa_cpu_alarm_timer(void *);
- int hppa_artype_for_page(CPUHPPAState *env, target_ulong vaddr);
- #endif
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8b3dc5533e..ecd0ec0899 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1516,7 +1516,7 @@ struct X86CPU {
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 721dcccc96..0ce142bc04 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -26,6 +26,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/virtio/virtio-access.h"
+ #include "sysemu/dma.h"
++#include "sysemu/sysemu.h"
 =20
+ /*
+  * The alignment to use between consumer and producer parts of vring.
+diff --git a/vl.c b/vl.c
+index 08ef28f100..9dbbce4ce3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1362,14 +1362,14 @@ static int machine_help_func(QemuOpts *opts, Mach=
+ineState *machine)
+     return 1;
+ }
 =20
- #ifndef CONFIG_USER_ONLY
--extern struct VMStateDescription vmstate_x86_cpu;
-+extern VMStateDescription vmstate_x86_cpu;
- #endif
+-struct vm_change_state_entry {
++struct VMChangeStateEntry {
+     VMChangeStateHandler *cb;
+     void *opaque;
+-    QTAILQ_ENTRY(vm_change_state_entry) entries;
++    QTAILQ_ENTRY(VMChangeStateEntry) entries;
+     int priority;
+ };
+=20
+-static QTAILQ_HEAD(, vm_change_state_entry) vm_change_state_head;
++static QTAILQ_HEAD(, VMChangeStateEntry) vm_change_state_head;
 =20
  /**
-diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
-index c2bbfa2780..064c6b1267 100644
---- a/target/lm32/cpu.h
-+++ b/target/lm32/cpu.h
-@@ -195,7 +195,7 @@ struct LM32CPU {
-=20
-=20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_lm32_cpu;
-+extern const VMStateDescription vmstate_lm32_cpu;
- #endif
-=20
- void lm32_cpu_do_interrupt(CPUState *cpu);
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index b2b41a51ab..d5aa5490d3 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -148,7 +148,7 @@ hwaddr cpu_mips_translate_address(CPUMIPSState *env, =
-target_ulong address,
- #define cpu_signal_handler cpu_mips_signal_handler
-=20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_mips_cpu;
-+extern const VMStateDescription vmstate_mips_cpu;
- #endif
-=20
- static inline bool cpu_mips_hw_interrupts_enabled(CPUMIPSState *env)
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index f23b25262d..61ade1d4f0 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -333,7 +333,7 @@ int print_insn_or1k(bfd_vma addr, disassemble_info *i=
-nfo);
- #define cpu_signal_handler cpu_openrisc_signal_handler
-=20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_openrisc_cpu;
-+extern const VMStateDescription vmstate_openrisc_cpu;
-=20
- /* hw/openrisc_pic.c */
- void cpu_openrisc_pic_init(OpenRISCCPU *cpu);
-diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-index be9b4c30c3..a2f202f021 100644
---- a/target/ppc/cpu-qom.h
-+++ b/target/ppc/cpu-qom.h
-@@ -203,7 +203,7 @@ typedef struct PPCTimebase {
-     int64_t time_of_the_day_ns;
- } PPCTimebase;
-=20
--extern const struct VMStateDescription vmstate_ppc_timebase;
-+extern const VMStateDescription vmstate_ppc_timebase;
-=20
- #define VMSTATE_PPC_TIMEBASE_V(_field, _state, _version) {            \
-     .name       =3D (stringify(_field)),                                =
-\
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c9beba2a5c..4ea33cf696 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1255,7 +1255,7 @@ int ppc32_cpu_write_elf32_note(WriteCoreDumpFunctio=
-n f, CPUState *cs,
-                                int cpuid, void *opaque);
- #ifndef CONFIG_USER_ONLY
- void ppc_cpu_do_system_reset(CPUState *cs);
--extern const struct VMStateDescription vmstate_ppc_cpu;
-+extern const VMStateDescription vmstate_ppc_cpu;
- #endif
-=20
- /***********************************************************************=
-******/
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index a606547b4d..3d9de25f7c 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -163,7 +163,7 @@ struct S390CPU {
-=20
-=20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_s390_cpu;
-+extern const VMStateDescription vmstate_s390_cpu;
- #endif
-=20
- /* distinguish between 24 bit and 31 bit addressing */
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 8ed2250cd0..0d5b01efe5 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -532,7 +532,7 @@ struct SPARCCPU {
-=20
-=20
- #ifndef CONFIG_USER_ONLY
--extern const struct VMStateDescription vmstate_sparc_cpu;
-+extern const VMStateDescription vmstate_sparc_cpu;
- #endif
-=20
- void sparc_cpu_do_interrupt(CPUState *cpu);
+  * qemu_add_vm_change_state_handler_prio:
 --=20
 2.21.0
 
