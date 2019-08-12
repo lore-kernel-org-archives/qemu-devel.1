@@ -2,95 +2,142 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F28C31E40
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C6EC31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:17:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D97B2054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:16:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D97B2054F
+	by mail.kernel.org (Postfix) with ESMTPS id CAB2B206C2
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:17:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAB2B206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFoE-0006A4-Dj
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:16:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50735)
+	id 1hxFov-00076h-5r
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:17:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50893)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxFnG-0005Ud-Lb
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:15:48 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxFoK-0006N1-Ku
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:16:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxFnF-0005Sh-Gp
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:15:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42596)
+ (envelope-from <jsnow@redhat.com>) id 1hxFoI-0005of-PA
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:16:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53104)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxFnB-0005RT-Q0; Mon, 12 Aug 2019 15:15:42 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hxFoF-0005mn-8U; Mon, 12 Aug 2019 15:16:47 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 20DE0300CB2B;
- Mon, 12 Aug 2019 19:15:41 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
- [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E93B65C548;
- Mon, 12 Aug 2019 19:15:39 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-23-mreitz@redhat.com>
- <c5571509-98ed-b99d-37fe-39a1067105cd@virtuozzo.com>
- <4a2b0a48-5ee0-85b7-7519-a3633cefd803@redhat.com>
- <994ec2e4-23fe-58d2-bc4e-120ec1e89d25@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 588B7300BCE9;
+ Mon, 12 Aug 2019 19:16:46 +0000 (UTC)
+Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B55B9D1FE;
+ Mon, 12 Aug 2019 19:16:42 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+References: <f95cecc3-9ba2-0aed-9b17-fb76c6558929@redhat.com>
+ <e5cc1268-428f-b3c0-3eb1-9291a9fe5688@redhat.com>
+ <5e5822d2-41eb-a4e9-1d47-e29409b14b1e@redhat.com>
+From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <42ba1ef7-0073-42f6-76f1-b3537f56f96b@redhat.com>
-Date: Mon, 12 Aug 2019 21:15:38 +0200
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <a2f5b94f-ce87-a8d2-b751-a38e44ad3b76@redhat.com>
+Date: Mon, 12 Aug 2019 15:16:42 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <994ec2e4-23fe-58d2-bc4e-120ec1e89d25@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="CKHfB6n1nD2Gla4h4W2jXNyq70y7wtfZv"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <5e5822d2-41eb-a4e9-1d47-e29409b14b1e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 12 Aug 2019 19:15:41 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Mon, 12 Aug 2019 19:16:46 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 22/42] block: Fix
- bdrv_get_allocated_file_size's fallback
+Subject: Re: [Qemu-devel] [Qemu-block] qemu-iotests 069 and 111 are failing
+ on NetBSD
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,162 +149,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CKHfB6n1nD2Gla4h4W2jXNyq70y7wtfZv
-Content-Type: multipart/mixed; boundary="ZTODKkm6ryCmxaomHX9jH8rf8o48mB8HC";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <42ba1ef7-0073-42f6-76f1-b3537f56f96b@redhat.com>
-Subject: Re: [PATCH v6 22/42] block: Fix bdrv_get_allocated_file_size's
- fallback
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-23-mreitz@redhat.com>
- <c5571509-98ed-b99d-37fe-39a1067105cd@virtuozzo.com>
- <4a2b0a48-5ee0-85b7-7519-a3633cefd803@redhat.com>
- <994ec2e4-23fe-58d2-bc4e-120ec1e89d25@virtuozzo.com>
-In-Reply-To: <994ec2e4-23fe-58d2-bc4e-120ec1e89d25@virtuozzo.com>
 
---ZTODKkm6ryCmxaomHX9jH8rf8o48mB8HC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 12.08.19 19:14, Vladimir Sementsov-Ogievskiy wrote:
-> 12.08.2019 16:09, Max Reitz wrote:
->> On 10.08.19 18:41, Vladimir Sementsov-Ogievskiy wrote:
->>> 09.08.2019 19:13, Max Reitz wrote:
->>>> If the driver does not implement bdrv_get_allocated_file_size(), we
->>>> should fall back to cumulating the allocated size of all non-COW
->>>> children instead of just bs->file.
->>>>
->>>> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>    block.c | 22 ++++++++++++++++++++--
->>>>    1 file changed, 20 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/block.c b/block.c
->>>> index 1070aa1ba9..6e1ddab056 100644
->>>> --- a/block.c
->>>> +++ b/block.c
->>>> @@ -4650,9 +4650,27 @@ int64_t bdrv_get_allocated_file_size(BlockDri=
-verState *bs)
->>>>        if (drv->bdrv_get_allocated_file_size) {
->>>>            return drv->bdrv_get_allocated_file_size(bs);
->>>>        }
->>>> -    if (bs->file) {
->>>> -        return bdrv_get_allocated_file_size(bs->file->bs);
->>>> +
->>>> +    if (!QLIST_EMPTY(&bs->children)) {
->>>> +        BdrvChild *child;
->>>> +        int64_t child_size, total_size =3D 0;
->>>> +
->>>> +        QLIST_FOREACH(child, &bs->children, next) {
->>>> +            if (child =3D=3D bdrv_filtered_cow_child(bs)) {
->>>> +                /* Ignore COW backing files */
->>>> +                continue;
->>>> +            }
->>>> +
->>>> +            child_size =3D bdrv_get_allocated_file_size(child->bs);=
-
->>>> +            if (child_size < 0) {
->>>> +                return child_size;
->>>> +            }
->>>> +            total_size +=3D child_size;
->>>> +        }
->>>> +
->>>> +        return total_size;
->>>>        }
->>>> +
->>>>        return -ENOTSUP;
->>>>    }
->>>>   =20
->>>>
+On 7/25/19 4:34 AM, Thomas Huth wrote:
+> On 24/07/2019 18.29, Paolo Bonzini wrote:
+>> On 24/07/19 11:34, Thomas Huth wrote:
+>>> In case somebody is interested, two of the "auto" iotests are failing
+>>> on NetBSD due to non-matching output:
 >>>
->>> Hmm..
+>>>   TEST    iotest-qcow2: 069 [fail]
+>>> --- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out        2019-07-24 09:19:22.000000000 +0000
+>>> +++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/069.out.bad    2019-07-24 09:21:34.000000000 +0000
+>>> @@ -4,5 +4,5 @@
+>>>  
+>>>  Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=131072
+>>>  Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=131072 backing_file=TEST_DIR/t.IMGFMT.base
+>>> -qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing file: Could not open 'TEST_DIR/t.IMGFMT.base': No such file or directory
+>>> +qemu-io: can't open device TEST_DIR/t.IMGFMT: Could not open backing file: TEST_DIR/t.IMGFMT.base: stat failed: No such file or directory
+>>>  *** done
 >>>
->>> 1. No children -> -ENOTSUP
->>> 2. Only cow child -> 0
->>> 3. Some non-cow children -> SUM
+>>> and:
 >>>
->>> It's all arguable (the strictest way is -ENOTSUP in either case),
->>> but if we want to fallback to SUM of non-cow children, 1. and 2. shou=
-ld return
->>> the same.
+>>>   TEST    iotest-qcow2: 111 [fail]
+>>> --- /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out        2019-07-24 09:19:22.000000000 +0000
+>>> +++ /var/tmp/qemu-test.1BMupF/tests/qemu-iotests/111.out.bad    2019-07-24 09:21:40.000000000 +0000
+>>> @@ -1,4 +1,4 @@
+>>>  QA output created by 111
+>>> -qemu-img: TEST_DIR/t.IMGFMT: Could not open 'TEST_DIR/t.IMGFMT.inexistent': No such file or directory
+>>> +qemu-img: TEST_DIR/t.IMGFMT: TEST_DIR/t.IMGFMT.inexistent: stat failed: No such file or directory
+>>>  Could not open backing image to determine size.
+>>>  *** done
+>>>
+>>> It's currently not a problem yet since we're not running the
+>>> iotests on NetBSD yet (since our netbsd VM image does not have
+>>> bash and gsed installed yet), but if somebody has some spare
+>>> minutes, it would be great if this could be fixed so that we
+>>> can enable the iotests on NetBSD, too, one day...
 >>
->> I don=E2=80=99t think 2 is possible at all.  If you have a COW child, =
-you need
->> some other child to COW to.
+>> Is this (slightly ridiculous but effective) patch enough?
 >>
->> And in the weird (and probably impossible) case where a node really on=
-ly
->> has a COW child, I=E2=80=99d say it=E2=80=99s correct that it has a di=
-sk size of 0 =E2=80=93
->> because it hasn=E2=80=99t COWed anything yet.  (Just like a new qcow2 =
-image with
->> a backing file only has its metadata as its disk size.)
->>
->=20
-> Agreed. Then, why not return 0 on [1] ?
+>> diff --git a/block/file-posix.c b/block/file-posix.c
+>> index 73a001ceb7..ce847f4d62 100644
+>> --- a/block/file-posix.c
+>> +++ b/block/file-posix.c
+>> @@ -217,7 +217,7 @@ static int raw_normalize_devicepath(const char **filename, Error **errp)
+>>      fname = *filename;
+>>      dp = strrchr(fname, '/');
+>>      if (lstat(fname, &sb) < 0) {
+>> -        error_setg_errno(errp, errno, "%s: stat failed", fname);
+>> +        error_setg_errno(errp, errno, "Could not open: '%s'", fname);
+>>          return -errno;
+>>      }
+> 
+> Yes, good idea! It works after removing the colon after "open"! :-)
+> 
+> With the colon removed:
+> 
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> 
+>  Thomas
+> 
 
-(1) Because that=E2=80=99s the current behavior. :-)
+Does someone intend to submit this patch formally?
 
-(2) Nodes that have no children are protocol nodes.  Protocol nodes
-(apart from null) still have to store their data somewhere.  Therefore,
-they must implement .bdrv_get_allocated_file_size() to report that.  If
-they don=E2=80=99t, that doesn=E2=80=99t mean they don=E2=80=99t store an=
-y data, but only that
-we don=E2=80=99t know how much data they store.
-
-> Also, another idea: shouldn't we return 0 for filters, i.e. skip filter=
-ed_rw_child too?
-> [as filtered-child is more like backing child than file one, it's "less=
- owned" by its parent]
-
-Why would we do that?  If I have a block device with a throttle node
-attached to it and request how much space it uses, of course I will want
-to know how much space the whole tree below it uses.
-
-(Otherwise, bdrv_get_allocated_file_size() should only report anything
-for protocol nodes, and 0 for everything else.)
-
-Max
-
-> with or without any of these suggestions:
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-
-
-
---ZTODKkm6ryCmxaomHX9jH8rf8o48mB8HC--
-
---CKHfB6n1nD2Gla4h4W2jXNyq70y7wtfZv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RutoACgkQ9AfbAGHV
-z0D6WwgAhPQXJJpuknuRDiAF6GI5pQksvvNy7AVbl+Dsi5L4Xi10bWYFf8p1Q4mW
-e529Ha0IjQiPrDwQW2gI6MRmpRV8p8JHqOlpHlY+tCfVxYDveYz7pbHjNOfG1g+J
-z6d4ryi4mEjRIvev1bRusqzg2sDkkrC+OSSLCCxa7/Rhpo64ncyUv2Q8pTOy6rgh
-PPAyiwdWx384W22Yexvk0IrFzQyepGzmHzE0LEYP6DNQwpfmivB5OuweGKT+PUxR
-pmG6279zcWs+9e0WdOkC2RYeGN4NpoY/16m3NSVxiw+7zBzgjBimWp0gNQY4EOpR
-elim0Zzy6nDMWPnREXHO8BrAjorTFw==
-=3IAy
------END PGP SIGNATURE-----
-
---CKHfB6n1nD2Gla4h4W2jXNyq70y7wtfZv--
+--js
 
