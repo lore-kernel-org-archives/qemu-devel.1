@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BD9C433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26931C31E40
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49D6620684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:07:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49D6620684
+	by mail.kernel.org (Postfix) with ESMTPS id F180820684
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 13:10:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F180820684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxA36-0006tf-7D
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 09:07:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48628)
+	id 1hxA5u-0008AM-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 09:10:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49165)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxA2W-0006PM-JT
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:07:09 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxA5V-0007i5-7v
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:10:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxA2V-0005qs-7U
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:07:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50526)
+ (envelope-from <mreitz@redhat.com>) id 1hxA5U-0008GB-0A
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 09:10:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43946)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxA2R-0005mi-39; Mon, 12 Aug 2019 09:07:04 -0400
+ id 1hxA5M-00080U-L5; Mon, 12 Aug 2019 09:10:06 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 09328306039A;
- Mon, 12 Aug 2019 13:07:02 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 93016772C7;
+ Mon, 12 Aug 2019 13:10:02 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
  [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CBA9F646B9;
- Mon, 12 Aug 2019 13:07:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55B0B67669;
+ Mon, 12 Aug 2019 13:10:01 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <ff792d97-02aa-56f6-dc2c-39c25ebad96c@virtuozzo.com>
+ <20190809161407.11920-23-mreitz@redhat.com>
+ <c5571509-98ed-b99d-37fe-39a1067105cd@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -73,21 +73,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9266d305-7290-a622-cbdc-04bc5c7bb820@redhat.com>
-Date: Mon, 12 Aug 2019 15:06:59 +0200
+Message-ID: <4a2b0a48-5ee0-85b7-7519-a3633cefd803@redhat.com>
+Date: Mon, 12 Aug 2019 15:09:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <ff792d97-02aa-56f6-dc2c-39c25ebad96c@virtuozzo.com>
+In-Reply-To: <c5571509-98ed-b99d-37fe-39a1067105cd@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="osiR8o7nmg2RRhlnyv96ojh8oXwc5ZBtj"
+ boundary="F9TRqeLt0Sxab4yyBDxzufpDHpHoWQXt6"
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Mon, 12 Aug 2019 13:07:02 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Mon, 12 Aug 2019 13:10:02 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 20/42] block/snapshot: Fix fallback
+Subject: Re: [Qemu-devel] [PATCH v6 22/42] block: Fix
+ bdrv_get_allocated_file_size's fallback
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,209 +107,119 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---osiR8o7nmg2RRhlnyv96ojh8oXwc5ZBtj
-Content-Type: multipart/mixed; boundary="Z2QWtKsAWCIrUZiPxhtSvZU4HdIdJltGg";
+--F9TRqeLt0Sxab4yyBDxzufpDHpHoWQXt6
+Content-Type: multipart/mixed; boundary="tcYBhgnFtw4Chghf0D6yY3rAu8Yhs0aok";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Kevin Wolf <kwolf@redhat.com>
-Message-ID: <9266d305-7290-a622-cbdc-04bc5c7bb820@redhat.com>
-Subject: Re: [PATCH v6 20/42] block/snapshot: Fix fallback
+Message-ID: <4a2b0a48-5ee0-85b7-7519-a3633cefd803@redhat.com>
+Subject: Re: [PATCH v6 22/42] block: Fix bdrv_get_allocated_file_size's
+ fallback
 References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-21-mreitz@redhat.com>
- <ff792d97-02aa-56f6-dc2c-39c25ebad96c@virtuozzo.com>
-In-Reply-To: <ff792d97-02aa-56f6-dc2c-39c25ebad96c@virtuozzo.com>
+ <20190809161407.11920-23-mreitz@redhat.com>
+ <c5571509-98ed-b99d-37fe-39a1067105cd@virtuozzo.com>
+In-Reply-To: <c5571509-98ed-b99d-37fe-39a1067105cd@virtuozzo.com>
 
---Z2QWtKsAWCIrUZiPxhtSvZU4HdIdJltGg
+--tcYBhgnFtw4Chghf0D6yY3rAu8Yhs0aok
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 10.08.19 18:34, Vladimir Sementsov-Ogievskiy wrote:
+On 10.08.19 18:41, Vladimir Sementsov-Ogievskiy wrote:
 > 09.08.2019 19:13, Max Reitz wrote:
->> If the top node's driver does not provide snapshot functionality and w=
-e
->> want to fall back to a node down the chain, we need to snapshot all
->> non-COW children.  For simplicity's sake, just do not fall back if the=
-re
->> is more than one such child.
->>
->> bdrv_snapshot_goto() becomes a bit weird because we may have to redire=
-ct
->> the actual child pointer, so it only works if the fallback child is
->> bs->file or bs->backing (and then we have to find out which it is).
+>> If the driver does not implement bdrv_get_allocated_file_size(), we
+>> should fall back to cumulating the allocated size of all non-COW
+>> children instead of just bs->file.
 >>
 >> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> Signed-off-by: Max Reitz <mreitz@redhat.com>
 >> ---
->>   block/snapshot.c | 100 +++++++++++++++++++++++++++++++++++++--------=
---
->>   1 file changed, 79 insertions(+), 21 deletions(-)
+>>   block.c | 22 ++++++++++++++++++++--
+>>   1 file changed, 20 insertions(+), 2 deletions(-)
 >>
->> diff --git a/block/snapshot.c b/block/snapshot.c
->> index f2f48f926a..35403c167f 100644
->> --- a/block/snapshot.c
->> +++ b/block/snapshot.c
->> @@ -146,6 +146,32 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDrive=
-rState *bs,
->>       return ret;
->>   }
->>  =20
->> +/**
->> + * Return the child BDS to which we can fall back if the given BDS
->> + * does not support snapshots.
->> + * Return NULL if there is no BDS to (safely) fall back to.
->> + */
->> +static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *bs)=
-
->> +{
->> +    BlockDriverState *child_bs =3D NULL;
->> +    BdrvChild *child;
->> +
->> +    QLIST_FOREACH(child, &bs->children, next) {
->> +        if (child =3D=3D bdrv_filtered_cow_child(bs)) {
->> +            /* Ignore: COW children need not be included in snapshots=
- */
->> +            continue;
->> +        }
->> +
->> +        if (child_bs) {
->> +            /* Cannot fall back to a single child if there are multip=
-le */
->> +            return NULL;
->> +        }
->> +        child_bs =3D child->bs;
->> +    }
->> +
->> +    return child_bs;
->> +}
->> +
->>   int bdrv_can_snapshot(BlockDriverState *bs)
->>   {
->>       BlockDriver *drv =3D bs->drv;
->> @@ -154,8 +180,9 @@ int bdrv_can_snapshot(BlockDriverState *bs)
->>       }
->>  =20
->>       if (!drv->bdrv_snapshot_create) {
->> -        if (bs->file !=3D NULL) {
->> -            return bdrv_can_snapshot(bs->file->bs);
->> +        BlockDriverState *fallback_bs =3D bdrv_snapshot_fallback(bs);=
-
->> +        if (fallback_bs) {
->> +            return bdrv_can_snapshot(fallback_bs);
->>           }
->>           return 0;
->>       }
->> @@ -167,14 +194,15 @@ int bdrv_snapshot_create(BlockDriverState *bs,
->>                            QEMUSnapshotInfo *sn_info)
->>   {
->>       BlockDriver *drv =3D bs->drv;
->> +    BlockDriverState *fallback_bs =3D bdrv_snapshot_fallback(bs);
->>       if (!drv) {
->>           return -ENOMEDIUM;
->>       }
->>       if (drv->bdrv_snapshot_create) {
->>           return drv->bdrv_snapshot_create(bs, sn_info);
+>> diff --git a/block.c b/block.c
+>> index 1070aa1ba9..6e1ddab056 100644
+>> --- a/block.c
+>> +++ b/block.c
+>> @@ -4650,9 +4650,27 @@ int64_t bdrv_get_allocated_file_size(BlockDrive=
+rState *bs)
+>>       if (drv->bdrv_get_allocated_file_size) {
+>>           return drv->bdrv_get_allocated_file_size(bs);
 >>       }
 >> -    if (bs->file) {
->> -        return bdrv_snapshot_create(bs->file->bs, sn_info);
->> +    if (fallback_bs) {
->> +        return bdrv_snapshot_create(fallback_bs, sn_info);
+>> -        return bdrv_get_allocated_file_size(bs->file->bs);
+>> +
+>> +    if (!QLIST_EMPTY(&bs->children)) {
+>> +        BdrvChild *child;
+>> +        int64_t child_size, total_size =3D 0;
+>> +
+>> +        QLIST_FOREACH(child, &bs->children, next) {
+>> +            if (child =3D=3D bdrv_filtered_cow_child(bs)) {
+>> +                /* Ignore COW backing files */
+>> +                continue;
+>> +            }
+>> +
+>> +            child_size =3D bdrv_get_allocated_file_size(child->bs);
+>> +            if (child_size < 0) {
+>> +                return child_size;
+>> +            }
+>> +            total_size +=3D child_size;
+>> +        }
+>> +
+>> +        return total_size;
 >>       }
+>> +
 >>       return -ENOTSUP;
 >>   }
->> @@ -184,6 +212,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
->>                          Error **errp)
->>   {
->>       BlockDriver *drv =3D bs->drv;
->> +    BlockDriverState *fallback_bs;
->>       int ret, open_ret;
 >>  =20
->>       if (!drv) {
->> @@ -204,39 +233,66 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
->>           return ret;
->>       }
->>  =20
->> -    if (bs->file) {
->> -        BlockDriverState *file;
->> -        QDict *options =3D qdict_clone_shallow(bs->options);
->> +    fallback_bs =3D bdrv_snapshot_fallback(bs);
->> +    if (fallback_bs) {
->> +        QDict *options;
->>           QDict *file_options;
->>           Error *local_err =3D NULL;
->> +        bool is_backing_child;
->> +        BdrvChild **child_pointer;
->> +
->> +        /*
->> +         * We need a pointer to the fallback child pointer, so let us=
-
->> +         * see whether the child is referenced by a field in the BDS
->> +         * object.
->> +         */
->> +        if (fallback_bs =3D=3D bs->file->bs) {
->> +            is_backing_child =3D false;
->> +            child_pointer =3D &bs->file;
->> +        } else if (fallback_bs =3D=3D bs->backing->bs) {
->> +            is_backing_child =3D true;
->> +            child_pointer =3D &bs->backing;
->> +        } else {
->> +            /*
->> +             * The fallback child is not referenced by a field in the=
-
->> +             * BDS object.  We cannot go on then.
->> +             */
->> +            error_setg(errp, "Block driver does not support snapshots=
-");
->> +            return -ENOTSUP;
->> +        }
->> +
+>>
 >=20
-> Hmm.. Should not this check be included into bdrv_snapshot_fallback(), =
-to
-> work only with file and backing?
+> Hmm..
+>=20
+> 1. No children -> -ENOTSUP
+> 2. Only cow child -> 0
+> 3. Some non-cow children -> SUM
+>=20
+> It's all arguable (the strictest way is -ENOTSUP in either case),
+> but if we want to fallback to SUM of non-cow children, 1. and 2. should=
+ return
+> the same.
 
-I was under the impression that this was just special code for what
-turned out to be bdrv_snapshot_load_tmp() now, because it seems so
-weird.  (So I thought just making the restriction here wouldn=E2=80=99t r=
-eally
-be a limit.)
+I don=E2=80=99t think 2 is possible at all.  If you have a COW child, you=
+ need
+some other child to COW to.
 
-I was wrong.  This is used when applying snapshots, so it is important.
- If we make a restriction here, we should have it in all fallback code, y=
-es.
-
-> And could we allow fallback only for filters? Is there real usecase exc=
-ept filters?
-> Or may be, drop fallback at all?
-
-raw isn=E2=80=99t a filter driver.  And rbd as a protocol supports snapsh=
-otting.
- Hence the fallback code, I presume.
+And in the weird (and probably impossible) case where a node really only
+has a COW child, I=E2=80=99d say it=E2=80=99s correct that it has a disk =
+size of 0 =E2=80=93
+because it hasn=E2=80=99t COWed anything yet.  (Just like a new qcow2 ima=
+ge with
+a backing file only has its metadata as its disk size.)
 
 Max
 
 
---Z2QWtKsAWCIrUZiPxhtSvZU4HdIdJltGg--
+--tcYBhgnFtw4Chghf0D6yY3rAu8Yhs0aok--
 
---osiR8o7nmg2RRhlnyv96ojh8oXwc5ZBtj
+--F9TRqeLt0Sxab4yyBDxzufpDHpHoWQXt6
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RZHMACgkQ9AfbAGHV
-z0BFNggAiwczDBsUjPfOZT2pNQatkU8g8NSKE6+eTuoX0RzocKew3URUvxWXeIFT
-9UM6sXgDkleCLLzOBjX99qLSAl2RaRaVXpxrpXLooHtEG953rp/8Ulbyt+VC4UQQ
-kVefJzV7Qb+5BJgukCPU6zZN6/KWHcD5VfZ3vwcQkOvX9ID2a270fvnYGxllAwHB
-RJ5oWmgrxbeD3FoUp5motONxLGFSfscDxxLTMbNYu1wuWq6rWKLOJqHFIdkFMrOV
-cGSSaA7gt+vM2jCBFloJv0oGz2H57mCAGchP7kk8ltM4hMvSHy1shPLMu7uVjmjb
-u1uIYztyPkFBFKole8IDTpGj+EHAOA==
-=YhT/
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RZScACgkQ9AfbAGHV
+z0B7swgAscuoEJ0KXf9OAS7oWmfEXQbX6gLeiwxk2jrLWhXT5q7RQZsSDayDhkuE
+qqFqo1MZi0dhmnrXDSHCkBaWolZVuvLRzl13AVpL0pKrlQQsHCBNvXIRlyGyljOt
+t6gckHI2g5MWMD0GX6nPgIUDfignQeHtXeVVCQv6/DCKvI2wlkwHtRoTI4NoC6T8
+bYsnNGgLNrHktNX4Kpy/0EqofcCqIbqgRWS14j6SZfYENpdEukctwdOUZ7JYuBcu
+9S7h6kxS8+Nz/TTfV9aOlnOlL8uWuuYMpnA+gqlGRnumB071xNrVd0e/6x3FtUho
+6vokIIl/TnXUsgOpB8m3uUsR/aFYaA==
+=wsyT
 -----END PGP SIGNATURE-----
 
---osiR8o7nmg2RRhlnyv96ojh8oXwc5ZBtj--
+--F9TRqeLt0Sxab4yyBDxzufpDHpHoWQXt6--
 
