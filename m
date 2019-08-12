@@ -2,49 +2,53 @@ Return-Path: <SRS0=mi2X=WI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D5DC433FF
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE92C433FF
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:07:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F48B20684
-	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:05:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F48B20684
+	by mail.kernel.org (Postfix) with ESMTPS id 8F9B62075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 12 Aug 2019 19:07:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F9B62075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxFdM-00071p-CH
-	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:05:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48721)
+	id 1hxFfY-0008NQ-UE
+	for qemu-devel@archiver.kernel.org; Mon, 12 Aug 2019 15:07:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49217)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxFcf-0006WB-Ug
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:04:51 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxFfA-0007ub-2C
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxFce-0008GC-9j
- for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:04:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54996)
+ (envelope-from <mreitz@redhat.com>) id 1hxFf9-0001rW-2G
+ for qemu-devel@nongnu.org; Mon, 12 Aug 2019 15:07:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56160)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxFcZ-0008DN-Ew; Mon, 12 Aug 2019 15:04:43 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hxFf6-0001qY-Tf; Mon, 12 Aug 2019 15:07:21 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 02CB661B22;
- Mon, 12 Aug 2019 19:04:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 432C281DE7;
+ Mon, 12 Aug 2019 19:07:20 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-204-161.brq.redhat.com
  [10.40.204.161])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D57C1001B20;
- Mon, 12 Aug 2019 19:04:36 +0000 (UTC)
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
-References: <20190516143314.81302-1-anton.nefedov@virtuozzo.com>
- <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 180EB19C4F;
+ Mon, 12 Aug 2019 19:07:18 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190725155512.9827-1-mreitz@redhat.com>
+ <20190725155512.9827-4-mreitz@redhat.com>
+ <627fbb64-5ffe-aca7-6198-9d991d4219e3@virtuozzo.com>
+ <f50d585c-ac91-5dfa-365b-efda321aeffa@redhat.com>
+ <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +75,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9280c26d-13c4-7fad-dc15-ff799c5284e3@redhat.com>
-Date: Mon, 12 Aug 2019 21:04:35 +0200
+Message-ID: <fa7313b1-2f21-39dd-b1fd-8372c6100cef@redhat.com>
+Date: Mon, 12 Aug 2019 21:07:17 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
+In-Reply-To: <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 19:04:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.25]); Mon, 12 Aug 2019 19:07:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v8 9/9] qapi: query-blockstat: add driver
- specific file-posix stats
+Subject: Re: [Qemu-devel] [PATCH 3/3] vpc: Do not return RAW from
+ block_status
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,225 +102,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berto@igalia.com,
- den@virtuozzo.com, qemu-devel@nongnu.org, pbonzini@redhat.com,
- jsnow@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN
-Content-Type: multipart/mixed; boundary="yLagptrLR6M7iImuFmKTWPwsZuWW6s1uN";
+--N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9
+Content-Type: multipart/mixed; boundary="liNzYjQmliiZ6oztyIQnPlZ0W1Ex1B02S";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com,
- pbonzini@redhat.com, eblake@redhat.com, den@virtuozzo.com, berto@igalia.com,
- vsementsov@virtuozzo.com
-Message-ID: <9280c26d-13c4-7fad-dc15-ff799c5284e3@redhat.com>
-Subject: Re: [PATCH v8 9/9] qapi: query-blockstat: add driver specific
- file-posix stats
-References: <20190516143314.81302-1-anton.nefedov@virtuozzo.com>
- <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
-In-Reply-To: <20190516143314.81302-10-anton.nefedov@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <fa7313b1-2f21-39dd-b1fd-8372c6100cef@redhat.com>
+Subject: Re: [PATCH 3/3] vpc: Do not return RAW from block_status
+References: <20190725155512.9827-1-mreitz@redhat.com>
+ <20190725155512.9827-4-mreitz@redhat.com>
+ <627fbb64-5ffe-aca7-6198-9d991d4219e3@virtuozzo.com>
+ <f50d585c-ac91-5dfa-365b-efda321aeffa@redhat.com>
+ <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
+In-Reply-To: <eaf85ded-c537-ceb3-9277-6765bb672daa@virtuozzo.com>
 
---yLagptrLR6M7iImuFmKTWPwsZuWW6s1uN
+--liNzYjQmliiZ6oztyIQnPlZ0W1Ex1B02S
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 16.05.19 16:33, Anton Nefedov wrote:
-> A block driver can provide a callback to report driver-specific
-> statistics.
+On 12.08.19 18:50, Vladimir Sementsov-Ogievskiy wrote:
+> 12.08.2019 18:56, Max Reitz wrote:
+>> On 12.08.19 17:33, Vladimir Sementsov-Ogievskiy wrote:
+>>> 25.07.2019 18:55, Max Reitz wrote:
+>>>> vpc is not really a passthrough driver, even when using the fixed
+>>>> subformat (where host and guest offsets are equal).  It should handl=
+e
+>>>> preallocation like all other drivers do, namely by returning
+>>>> DATA | RECURSE instead of RAW.
+>>>>
+>>>> There is no tangible difference but the fact that bdrv_is_allocated(=
+) no
+>>>> longer falls through to the protocol layer.
+>>>
+>>> Hmm. Isn't a real bug (fixed by this patch) ?
+>>>
+>>> Assume vpc->file is qcow2 with backing, which have "unallocated" regi=
+on, which is
+>>> backed by actual data in backing file.
+>>
+>> Come on now.
+>>
+>>> So, this region will be reported as not allocated and will be skipped=
+ by any copying
+>>> loop using block-status? Is it a bug of BDRV_BLOCK_RAW itself? Or I d=
+on't understand
+>>> something..
+>>
+>> I think what you don=E2=80=99t understand is that if you have a vpc fi=
+le inside
+>> of a qcow2 file, you=E2=80=99re doing basically everything wrong. ;-)
+>>
+>> But maybe we should drop BDRV_BLOCK_RAW...  Does it do anything good f=
+or
+>> us in the raw driver?  Shouldn=E2=80=99t it too just return DATA | REC=
+URSE?
+>>
 >=20
-> file-posix driver now reports discard statistics
->=20
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Acked-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  qapi/block-core.json      | 38 ++++++++++++++++++++++++++++++++++++++
->  include/block/block.h     |  1 +
->  include/block/block_int.h |  1 +
->  block.c                   |  9 +++++++++
->  block/file-posix.c        | 38 +++++++++++++++++++++++++++++++++++---
->  block/qapi.c              |  5 +++++
->  6 files changed, 89 insertions(+), 3 deletions(-)
+> And if I have raw driver above qcow2, it will not work, like I've descr=
+ibed above..
 
-
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 55194f84ce..368e09ae37 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -956,6 +956,41 @@
->             '*wr_latency_histogram': 'BlockLatencyHistogramInfo',
->             '*flush_latency_histogram': 'BlockLatencyHistogramInfo' } }=
-
-> =20
-> +##
-> +# @BlockStatsSpecificFile:
-> +#
-> +# File driver statistics
-> +#
-> +# @discard-nb-ok: The number of successful discard operations performe=
-d by
-> +#                 the driver.
-> +#
-> +# @discard-nb-failed: The number of failed discard operations performe=
-d by
-> +#                     the driver.
-> +#
-> +# @discard-bytes-ok: The number of bytes discarded by the driver.
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'struct': 'BlockStatsSpecificFile',
-> +  'data': {
-> +      'discard-nb-ok': 'uint64',
-> +      'discard-nb-failed': 'uint64',
-> +      'discard-bytes-ok': 'uint64' } }
-> +
-> +##
-> +# @BlockStatsSpecific:
-> +#
-> +# Block driver specific statistics
-> +#
-> +# Since: 4.1
-> +##
-> +{ 'union': 'BlockStatsSpecific',
-> +  'base': { 'driver': 'BlockdevDriver' },
-> +  'discriminator': 'driver',
-> +  'data': {
-> +      'file': 'BlockStatsSpecificFile',
-> +      'host_device': 'BlockStatsSpecificFile' } }
-
-I would like to use these chance to complain that I find this awkward.
-My problem is that I don=E2=80=99t know how any management application is=
-
-supposed to reasonably consume this.  It feels weird to potentially have
-to recognize the result for every block driver.
-
-I would now like to note that I=E2=80=99m clearly not in a position to bl=
-ock
-this at this point, because I=E2=80=99ve had a year to do so, I didn=E2=80=
-=99t, so it
-would be unfair to do it now.
-
-(Still, I feel like if I have a concern, I should raise it, even if it=E2=
-=80=99s
-too late.)
-
-I know Markus has proposed this, but I don=E2=80=99t understand why.  He =
-set
-ImageInfoSpecific as a precedence, but that has a different reasoning
-behind it.  The point for that is that it simply doesn=E2=80=99t work any=
- other
-way, because it is clearly format-specific information that cannot be
-shared between drivers.  Anything that can be shared is put into
-ImageInfo (like the cluster size).
-
-We have the same constellation here, BlockStats contains common stuff,
-and BlockStatsSpecific would contain driver-specific stuff.  But to me,
-BlockStatsSpecificFile doesn=E2=80=99t look very special.  It looks like =
-it just
-duplicates fields that already exist in BlockDeviceStats.
-
-
-(Furthermore, most of ImageInfoSpecific is actually not useful to
-management software, but only as an information for humans (and having
-such a structure for that is perfectly fine).  But these stats don=E2=80=99=
-t
-really look like something for immediate human consumption.)
-
-
-So I wonder why you don=E2=80=99t just put this information into
-BlockDeviceStats.  From what I can tell looking at
-bdrv_query_bds_stats() and qmp_query_blockstats(), the @stats field is
-currently completely 0 if @query-nodes is true.
-
-(Furthermore, I wonder whether it would make sense to re-add
-BlockAcctStats to each BDS and then let the generic block code do the
-accounting on it.  I moved it to the BB in 7f0e9da6f13 because we didn=E2=
-=80=99t
-care about node-level information at the time, but maybe it=E2=80=99s tim=
-e to
-reconsider.)
-
-
-Anyway, as I=E2=80=99ve said, I fully understand that complaining about a=
- design
-decision is just unfair at this point, so this is not a veto.
-
-> +
->  ##
->  # @BlockStats:
->  #
-> @@ -971,6 +1006,8 @@
->  #
->  # @stats:  A @BlockDeviceStats for the device.
->  #
-> +# @driver-specific: Optional driver-specific stats. (Since 4.1)
-> +#
->  # @parent: This describes the file block device if it has one.
->  #          Contains recursively the statistics of the underlying
->  #          protocol (e.g. the host file for a qcow2 image). If there i=
-s
-> @@ -984,6 +1021,7 @@
->  { 'struct': 'BlockStats',
->    'data': {'*device': 'str', '*qdev': 'str', '*node-name': 'str',
->             'stats': 'BlockDeviceStats',
-> +           '*driver-specific': 'BlockStatsSpecific',
->             '*parent': 'BlockStats',
->             '*backing': 'BlockStats'} }
-> =20
-
-[...]
-
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 76d54b3a85..a2f01cfe10 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -160,9 +160,9 @@ typedef struct BDRVRawState {
->      bool drop_cache;
->      bool check_cache_dropped;
->      struct {
-> -        int64_t discard_nb_ok;
-> -        int64_t discard_nb_failed;
-> -        int64_t discard_bytes_ok;
-> +        uint64_t discard_nb_ok;
-> +        uint64_t discard_nb_failed;
-> +        uint64_t discard_bytes_ok;
-
-(I don=E2=80=99t know why you didn=E2=80=99t introduce these fields with =
-these types in
-the previous patch then.)
+Yep.  That=E2=80=99s why I was wondering.  (This is a more likely case, b=
+ecause
+maybe you really want to use raw=E2=80=99s offset capability on top of qc=
+ow2.)
 
 Max
 
->      } stats;
-> =20
->      PRManager *pr_mgr;
 
+--liNzYjQmliiZ6oztyIQnPlZ0W1Ex1B02S--
 
---yLagptrLR6M7iImuFmKTWPwsZuWW6s1uN--
-
---fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN
+--N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RuEMACgkQ9AfbAGHV
-z0Cr+wgAiRwYiZaxuJUOqs40vgl08cuMyMzv7aUMtfBPkAXWbBHrIFc0KvIM0aG4
-Z82ADm1CJGE/tK4/byGvv+f7GmQU63n3yr36G3o4WEkr/ADHajMjUijuiEwNjgj6
-ZDOIRV5ZpCmafs3lob2YplhtoCfl02PjTJ+/ntem3N6S4FRW3rZEznB5jdnnLFFE
-+VvpIuGjRmRxMBvd4x2ZjvCtXJlrOh5TQGzZ5r2QXpE0iEaHx/b1Ndww7t62WL8V
-TLM9ettYlOkKkfJp5MraPTYsCedwPkLJSjKVtWfBHiwC7btpdKN+/wYqqckt1CBY
-NH9btDy7uA3Qmt8g28KHWZoTIsqMpg==
-=PAIE
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1RuOUACgkQ9AfbAGHV
+z0ANHAgAkmkPKd0A8vhtEJ1Xeit7caluFajsIb25oaZ2NMWW03S0KZ/XW2sReSUw
+ue1Rwv9Zk2Q/zqjekckO4Qb8d32VD2kWCNs3+9vb6mtp/kVLhcl3zv/3fUKCgbZe
+ixgFYujgcMFx/Pm7Yt91+GG8fiH/aZX+Q5EsSk+CPnSiVi72fbIsaNfYIgn2R2Pk
+Cn4zeXLUW25zGMKBXniZWn7LRmlzSHEoCT1MxzJAcCmH8wnIdPjqd/xoaJmiyrVn
+y7l2J1CLMOs579VeuXAIRpCrl0Fr2IxOo7nfdEaqVllv8rlG2wnpyZvgYMm9bmib
+8l97i1O0iuN0bD2SPr82VMd2GyX1OQ==
+=5RCB
 -----END PGP SIGNATURE-----
 
---fWGR9RUu7qW3P59MWRSFz9V0qRaR3pYaN--
+--N4UvEtEy1niSNF0yWAKVEC2p65o8ZsnA9--
 
