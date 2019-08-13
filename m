@@ -6,81 +6,90 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C568C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36769C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:43:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF25520663
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:42:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF25520663
+	by mail.kernel.org (Postfix) with ESMTPS id 0BB9420663
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:43:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BB9420663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=us.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxZsW-0004tP-5A
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 12:42:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50073)
+	id 1hxZtH-0005lw-BZ
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 12:43:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56551)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <pc@us.ibm.com>) id 1hxYmi-0006zD-B3
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:32:31 -0400
+ (envelope-from <pc@us.ibm.com>) id 1hxZSS-0003vx-G9
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:15:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pc@us.ibm.com>) id 1hxYmg-0008Pd-FZ
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:32:28 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:28586
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <pc@us.ibm.com>) id 1hxZSQ-0003Q1-8z
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:15:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19504)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pc@us.ibm.com>)
- id 1hxYmQ-00089e-Ch; Tue, 13 Aug 2019 11:32:11 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x7DFDDso109435; Tue, 13 Aug 2019 11:32:01 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2uby40aju2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 13 Aug 2019 11:32:01 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7DFUJKo009769;
- Tue, 13 Aug 2019 15:32:01 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com
- [9.57.198.28]) by ppma01wdc.us.ibm.com with ESMTP id 2u9nj6nw4u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 13 Aug 2019 15:32:01 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x7DFW0rV51380708
+ (Exim 4.71) (envelope-from <pc@us.ibm.com>) id 1hxZSQ-0003Oq-13
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:15:34 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7DG7mqH072970
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 12:15:32 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2uby39ck36-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 12:15:31 -0400
+Received: from localhost
+ by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pc@us.ibm.com>;
+ Tue, 13 Aug 2019 17:15:30 +0100
+Received: from b01cxnp22035.gho.pok.ibm.com (9.57.198.25)
+ by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 13 Aug 2019 17:15:28 +0100
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
+ [9.57.199.107])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x7DGFRsg47579594
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 13 Aug 2019 15:32:00 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7AB5EAE062;
- Tue, 13 Aug 2019 15:32:00 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4D661AE06B;
- Tue, 13 Aug 2019 15:32:00 +0000 (GMT)
+ Tue, 13 Aug 2019 16:15:27 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4D73812405B;
+ Tue, 13 Aug 2019 16:15:27 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 22F6D124058;
+ Tue, 13 Aug 2019 16:15:27 +0000 (GMT)
 Received: from localhost (unknown [9.85.151.40])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue, 13 Aug 2019 15:32:00 +0000 (GMT)
+ by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 13 Aug 2019 16:15:27 +0000 (GMT)
 From: "Paul A. Clarke" <pc@us.ibm.com>
 To: david@gibson.dropbear.id.au
-Date: Tue, 13 Aug 2019 10:31:59 -0500
-Message-Id: <1565710319-1026-1-git-send-email-pc@us.ibm.com>
+Date: Tue, 13 Aug 2019 11:15:26 -0500
 X-Mailer: git-send-email 1.8.3.1
 X-TM-AS-GCONF: 00
+x-cbid: 19081316-0052-0000-0000-000003EA6E14
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011588; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01246282; UDB=6.00657665; IPR=6.01027788; 
+ MB=3.00028161; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-13 16:15:29
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19081316-0053-0000-0000-000062147092
+Message-Id: <1565712926-21194-1-git-send-email-pc@us.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-08-13_05:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=881 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1908130158
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=841 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908130161
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.158.5
-X-Mailman-Approved-At: Tue, 13 Aug 2019 12:42:08 -0400
-Subject: [Qemu-devel] [PATCH] ppc: Add support for 'mffsl' instruction
+X-Received-From: 148.163.156.1
+X-Mailman-Approved-At: Tue, 13 Aug 2019 12:42:09 -0400
+Subject: [Qemu-devel] [PATCH v2] ppc: Add support for 'mffsl' instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,6 +124,13 @@ is both bits of the FPSCR rounding mode, as defined in the ISA.
 I also fixed a typo in the definition of FPSCR_FR.
 
 Signed-off-by: Paul A. Clarke <pc@us.ibm.com>
+
+v2: (Sorry for the quick v2!)
+- I found that I copied too much of the 'mffs' implementation.
+  The 'Rc' condition code bits are not needed for 'mffsl'.  Removed.
+- I now free the (renamed) 'tmask' temporary.
+- I now bail early for older ISA to the original 'mffs' implementation.
+
 ---
  disas/ppc.c                        |  5 +++++
  target/ppc/cpu.h                   | 15 ++++++++++-----
@@ -223,7 +239,7 @@ index f437c88..5611cf0 100644
              break;
          default:
 diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
-index 9dcff94..d1845d6 100644
+index 9dcff94..3b395b4 100644
 --- a/target/ppc/translate/fp-impl.inc.c
 +++ b/target/ppc/translate/fp-impl.inc.c
 @@ -617,6 +617,29 @@ static void gen_mffs(DisasContext *ctx)
@@ -233,7 +249,11 @@ index 9dcff94..d1845d6 100644
 +/* mffsl */
 +static void gen_mffsl(DisasContext *ctx)
 +{
-+    TCGv_i64 t0;
++    TCGv_i64 t0, tmask;
++
++    if (unlikely(!(ctx->insns_flags2 & PPC2_ISA300)))
++        return gen_mffs(ctx);
++
 +    if (unlikely(!ctx->fpu_enabled)) {
 +        gen_exception(ctx, POWERPC_EXCP_FPU);
 +        return;
@@ -241,15 +261,11 @@ index 9dcff94..d1845d6 100644
 +    t0 = tcg_temp_new_i64();
 +    gen_reset_fpstatus();
 +    tcg_gen_extu_tl_i64(t0, cpu_fpscr);
-+    if (likely(ctx->insns_flags2 & PPC2_ISA300)) {
-+        /* Mask everything except mode, status, and enables.  */
-+        TCGv_i64 mask = tcg_const_i64(FP_MODE | FP_STATUS | FP_ENABLES);
-+        tcg_gen_and_i64(t0, t0, mask);
-+    }
++    /* Mask everything except mode, status, and enables.  */
++    tmask = tcg_const_i64(FP_MODE | FP_STATUS | FP_ENABLES);
++    tcg_gen_and_i64(t0, t0, tmask);
 +    set_fpr(rD(ctx->opcode), t0);
-+    if (unlikely(Rc(ctx->opcode))) {
-+        gen_set_cr1_from_fpscr(ctx);
-+    }
++    tcg_temp_free_i64(tmask);
 +    tcg_temp_free_i64(t0);
 +}
 +
