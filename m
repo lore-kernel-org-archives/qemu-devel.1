@@ -7,77 +7,75 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EFD9C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 10:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390EFC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 10:17:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08F99206C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 10:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03D602067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 10:17:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k8t2K+QM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F99206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jxgn8f7P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D602067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxTrH-00039I-0O
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 06:16:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60388)
+	id 1hxTsE-0004BO-CM
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 06:17:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60530)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <peter.maydell@linaro.org>) id 1hxTqZ-0002bi-Rh
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 06:16:08 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hxTrN-0003Nq-Ow
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 06:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hxTqY-0007s2-P1
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 06:16:07 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39719)
+ (envelope-from <peter.maydell@linaro.org>) id 1hxTrL-0000B6-V5
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 06:16:57 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:35920)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hxTqY-0007rJ-J2
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 06:16:06 -0400
-Received: by mail-ot1-x344.google.com with SMTP id b1so2246577otp.6
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 03:16:06 -0700 (PDT)
+ id 1hxTrL-0000AK-Q1
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 06:16:55 -0400
+Received: by mail-ot1-x343.google.com with SMTP id k18so38263232otr.3
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 03:16:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xWnOlc+rdYPEcW6/QFopxSziVcxOEotK2Z++W7oOqtk=;
- b=k8t2K+QM3Cs+1NE6tvrQpSPUMtcdJndKwfKYXtOrDr5aG/tIJ0ar484iYbzSDGO+zO
- X53EpJ7B9LXehYVH/pKb0Iss8nf2TnxjD1+8cXerDcb2CxIyX8yPvkUwihN/+zj7eFf5
- DKZV8rEbohkWAptPRBGlSz5/bnoAFV3Lu4ZlQ6QmUTfSLdugKFmdI8f7B7xn0ifYWuMY
- SaZJAkZ6VCCRuCkrBa3xDXC/XF0U/MxeC4M0+N8u3Po90LI8eV4+Cg22i/nr4lT393nf
- daeGoWgyf4DSv5EIQxsD9e8ABAcyqqePf4W4D8SEikb+NgYf+oBmsPOOWMQwO+g4o1mM
- Wlzw==
+ :cc; bh=oNwStrN+/EsnU4MA8wxhsySv/IFe0kuMTJLQOEkXquY=;
+ b=jxgn8f7Prkf+EIID06Cmy8fc/MYgbfJjlgR9ywFY8GsA3LFVapPiy/qECm5TvvsTTD
+ /HB//Cj5ah0mrYn2rx93CDxV8QoDT1oOkOpWY9VB57ueF9LPWhgaBd9Iw7w284+aUE0t
+ UOUzbaZi+MAjg/ZfzekHQhe3mbvmIHLoaoDTcdpOKFvB5QniOolYIgQAlIfsrYBa4XK6
+ hqoNSi/RgcEQSMa7YjUDO9Q2A1Vs/Waxz2SqeH9jRBFyO9oxS1USghmI3M43Lg8kUXTc
+ hmQ3KHkcgV0jk9grk3jxlTmgdVHRUo1EcJdY5NuwuG8cmpN5q65/fhyNI8nPzBh7rQav
+ tqqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=xWnOlc+rdYPEcW6/QFopxSziVcxOEotK2Z++W7oOqtk=;
- b=WISfl4u2UKvoiVAcyUB/rwrrYM3tSS9p1XZPaCcb/sB6GI2O0HeowfoOxS8bp3xjpl
- NpO74rLacFLeMr12n4QfFhsJlk17WLs2ERlvGIsUejEYm7nrIx2hSpkQRjP31Knf3mqA
- y+F+MnRrkrFct8Pl8NoqqlwINmXRcB11lM5nWDuoY2IPTJ9t85hWVDbKtrTcgWf8Z46b
- doz9CtfEyUXSkLkm8nhPPqFLhrVSEDWtxsR5BbweYo2DP2tjCeCd25q9mKYmzWqDcxmf
- 7o7IMVg26uDbz0FPrP1kfmUD37HKoBgRaF7GZuADr++a1NET7/Uh9sDRYHPySVkkQXSX
- lO2A==
-X-Gm-Message-State: APjAAAVQ2mLtdJFFdiC0TW5qvI2g4mamtv5BHdZIs9syWLGqwVlzlUYR
- cO/AmBv95KusipGtTJW+KzUUT3vlrmizV4MpuxtDrw==
-X-Google-Smtp-Source: APXvYqzLdbHcjSxSzc55lWLhA18AOKVhR5AiWQN55gQiyYc4A4Ta62GPi4XV0ltLIH3tn0RCN9C3+CApriK83e4O1MU=
-X-Received: by 2002:a05:6830:2103:: with SMTP id
- i3mr4395974otc.135.1565691365380; 
- Tue, 13 Aug 2019 03:16:05 -0700 (PDT)
+ bh=oNwStrN+/EsnU4MA8wxhsySv/IFe0kuMTJLQOEkXquY=;
+ b=nxc5zpHSR4y/Hvnn6G2dtXM+6KTZGeo4+gjKlrQV34ua1ceXxfS54xe9aK6YYPDoTX
+ sgW1VE95+IM/9Fe6QF+1YXuNF7O/rY7RP7UjRK531HQbCl53xvmkEoSGvnxbqhxVlUxN
+ 9aQFbSPwDK4zANpgA1Q4kPsen23MTSgjRt27VyJC2qt+y4hRuiwiclCPlXYA6OtM1sVx
+ uSqbdUhSZHiqRERzIa86GhbDD2HumR97yIps9qW62HcD3Sae7HegMaWflZSAO8+LSaY5
+ TePROqybApE6h6a8uAVpkG9EDyCnpEWNHQ9qwqtkre4OWEAU48HutYuSNQFuDN58q0QA
+ xFrw==
+X-Gm-Message-State: APjAAAX0L5YxyOsMlu1EO4sdV4XgCywXSXgJVWz0GUHG5VzKyvrbnW4L
+ 0XruDMahTSIkA08swf4Nrvtw1j3OZtGhWKFF6nfAPw==
+X-Google-Smtp-Source: APXvYqwOtTi5RlMLMNztk6dEMFrAXykgCiNvkFRBUsle6C/bt7kSESzaeu3QI787ysrVCKIESLnuEoNKA2zoSTzIt0U=
+X-Received: by 2002:aca:6185:: with SMTP id v127mr991337oib.163.1565691414741; 
+ Tue, 13 Aug 2019 03:16:54 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190709073222.26370-1-huth@tuxfamily.org>
- <20190709073222.26370-2-huth@tuxfamily.org>
-In-Reply-To: <20190709073222.26370-2-huth@tuxfamily.org>
+ <20190709073222.26370-3-huth@tuxfamily.org>
+In-Reply-To: <20190709073222.26370-3-huth@tuxfamily.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Aug 2019 11:15:54 +0100
-Message-ID: <CAFEAcA8s=JnNRJX0SdK2_pMbb6hyZWiOY0PN-vzr3ntKu556jQ@mail.gmail.com>
+Date: Tue, 13 Aug 2019 11:16:44 +0100
+Message-ID: <CAFEAcA9uech2_Uc1XnxSm8Dk2rEAuyvxtnH74e_oCgw7ovVCaw@mail.gmail.com>
 To: Thomas Huth <huth@tuxfamily.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v4 1/6] m68k: Add NeXTcube framebuffer
- device emulation
+X-Received-From: 2607:f8b0:4864:20::343
+Subject: Re: [Qemu-devel] [PATCH v4 2/6] m68k: Add NeXTcube keyboard device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,42 +97,27 @@ Sender: "Qemu-devel"
 
 On Tue, 9 Jul 2019 at 08:35, Thomas Huth <huth@tuxfamily.org> wrote:
 >
-> The NeXTcube uses a linear framebuffer with 4 greyscale colors and
-> a fixed resolution of 1120 * 832.
+> It is likely still quite incomplete (e.g. mouse and interrupts are not
+> implemented yet), but it is good enough for keyboard input at the firmware
+> monitor.
 > This code has been taken from Bryce Lanham's GSoC 2011 NeXT branch at
 >
->  https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-fb.c
+>  https://github.com/blanham/qemu-NeXT/blob/next-cube/hw/next-kbd.c
 >
-> and altered to fit the latest interface of the current QEMU (e.g.
-> the device has been "qdev"-ified etc.).
+> and altered to fit the latest interface of the current QEMU (e.g. to use
+> memory_region_init_io() instead of cpu_register_physical_memory()).
 >
 > Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-> ---
->  default-configs/m68k-softmmu.mak |   1 +
->  hw/display/Makefile.objs         |   1 +
->  hw/display/next-fb.c             | 145 +++++++++++++++++++++++++++++++
->  hw/m68k/Kconfig                  |   4 +
->  include/hw/m68k/next-cube.h      |   7 ++
->  5 files changed, 158 insertions(+)
->  create mode 100644 hw/display/next-fb.c
->  create mode 100644 include/hw/m68k/next-cube.h
-> +static void nextfb_class_init(ObjectClass *oc, void *data)
+> +static void nextkbd_class_init(ObjectClass *oc, void *data)
 > +{
 > +    DeviceClass *dc = DEVICE_CLASS(oc);
 > +
-> +    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-> +    dc->realize = nextfb_realize;
+> +    set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+> +    dc->realize = nextkbd_realize;
+> +    dc->reset = nextkbd_reset;
 > +}
-> +
 
-Hi; this device seems to be missing a reset function and
-also a vmsd pointer for the migration state. (If there
-is in fact no migratable state, then a comment in the
-class init function stating that helps to confirm that
-it was not an accidental omission. Some day we might
-provide some in-code way to say "has no migration state"
-and then we could assert that vmsd wasn't accidentally
-omitted; but we can't do that today.)
+This one definitely needs migration state...
 
 thanks
 -- PMM
