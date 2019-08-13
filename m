@@ -2,52 +2,57 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5A9C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B8FC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:05:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 011B4205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:04:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011B4205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 256C1205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:05:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256C1205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYLq-00081O-1M
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45425)
+	id 1hxYMN-0000E4-Ej
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:05:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45489)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxYLM-0007NR-6e
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:04:13 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxYLZ-0007l9-Fo
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxYLL-0006Ls-4L
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:04:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38718)
+ (envelope-from <mreitz@redhat.com>) id 1hxYLY-0006Tp-Fy
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:04:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39396)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxYLA-0006Df-UM; Tue, 13 Aug 2019 11:04:01 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hxYLW-0006Rw-52; Tue, 13 Aug 2019 11:04:22 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 33E1D3001834;
- Tue, 13 Aug 2019 15:04:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6A7C4300A242;
+ Tue, 13 Aug 2019 15:04:21 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C9831805D6;
- Tue, 13 Aug 2019 15:03:58 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
- <20190812181146.26121-2-vsementsov@virtuozzo.com>
- <20190813110428.GE4663@localhost.localdomain>
- <fef7f4d1-b40e-6c84-3952-120a641a8061@redhat.com>
- <6af67f42-b5ee-1ca9-6fb1-500fd993616a@virtuozzo.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 091708D641;
+ Tue, 13 Aug 2019 15:04:19 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
+ <e53a0399-f051-52bd-49e8-4ac4dbf2596f@redhat.com>
+ <3d5fcc5b-cdb0-f028-1ea2-af85850db20e@virtuozzo.com>
+ <15cf7372-826a-0684-d6ad-90deea36959e@virtuozzo.com>
+ <43fb7754-6f94-00f6-6172-70cbb53e787c@virtuozzo.com>
+ <94ccf129-cc7e-2778-7688-fd718f8df249@virtuozzo.com>
+ <20190813115115.GG4663@localhost.localdomain>
+ <b0c32bfc-f4cf-0d46-beb8-ba4cf79b76c5@redhat.com>
+ <48fa03d6-259d-9ded-dacb-a4975f8d24e4@virtuozzo.com>
+ <fcad59bc-0190-004f-3aee-20dfb3fc3a89@redhat.com>
+ <20190813150303.GK4663@localhost.localdomain>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -74,22 +79,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d0b0fc4e-eb2f-796d-3413-366a6bb5aeca@redhat.com>
-Date: Tue, 13 Aug 2019 17:03:57 +0200
+Message-ID: <cb79d424-09c9-0add-71d0-075f46a00da3@redhat.com>
+Date: Tue, 13 Aug 2019 17:04:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <6af67f42-b5ee-1ca9-6fb1-500fd993616a@virtuozzo.com>
+In-Reply-To: <20190813150303.GK4663@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="RKg1czQDNAEXwIsOOwsGnV4CacKEbkO1L"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="X6YRewNllq3g3hDyuJl6T9ou5StReP0HE"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 13 Aug 2019 15:04:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 13 Aug 2019 15:04:21 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/raw-format: switch to
- BDRV_BLOCK_DATA with BDRV_BLOCK_RECURSE
+Subject: Re: [Qemu-devel] [PATCH 0/2] deal with BDRV_BLOCK_RAW
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,7 +105,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
  Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -109,114 +114,122 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---RKg1czQDNAEXwIsOOwsGnV4CacKEbkO1L
-Content-Type: multipart/mixed; boundary="PSuoERA0bApUk6Uj4kSJ3yBZJpTHZ3Xts";
+--X6YRewNllq3g3hDyuJl6T9ou5StReP0HE
+Content-Type: multipart/mixed; boundary="88SGst3zyB0DYtRgIzx92wxFrVopd0KvC";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>
-Cc: "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Denis Lunev <den@virtuozzo.com>
-Message-ID: <d0b0fc4e-eb2f-796d-3413-366a6bb5aeca@redhat.com>
-Subject: Re: [PATCH 1/2] block/raw-format: switch to BDRV_BLOCK_DATA with
- BDRV_BLOCK_RECURSE
-References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
- <20190812181146.26121-2-vsementsov@virtuozzo.com>
- <20190813110428.GE4663@localhost.localdomain>
- <fef7f4d1-b40e-6c84-3952-120a641a8061@redhat.com>
- <6af67f42-b5ee-1ca9-6fb1-500fd993616a@virtuozzo.com>
-In-Reply-To: <6af67f42-b5ee-1ca9-6fb1-500fd993616a@virtuozzo.com>
+Message-ID: <cb79d424-09c9-0add-71d0-075f46a00da3@redhat.com>
+Subject: Re: [PATCH 0/2] deal with BDRV_BLOCK_RAW
+References: <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
+ <e53a0399-f051-52bd-49e8-4ac4dbf2596f@redhat.com>
+ <3d5fcc5b-cdb0-f028-1ea2-af85850db20e@virtuozzo.com>
+ <15cf7372-826a-0684-d6ad-90deea36959e@virtuozzo.com>
+ <43fb7754-6f94-00f6-6172-70cbb53e787c@virtuozzo.com>
+ <94ccf129-cc7e-2778-7688-fd718f8df249@virtuozzo.com>
+ <20190813115115.GG4663@localhost.localdomain>
+ <b0c32bfc-f4cf-0d46-beb8-ba4cf79b76c5@redhat.com>
+ <48fa03d6-259d-9ded-dacb-a4975f8d24e4@virtuozzo.com>
+ <fcad59bc-0190-004f-3aee-20dfb3fc3a89@redhat.com>
+ <20190813150303.GK4663@localhost.localdomain>
+In-Reply-To: <20190813150303.GK4663@localhost.localdomain>
 
---PSuoERA0bApUk6Uj4kSJ3yBZJpTHZ3Xts
+--88SGst3zyB0DYtRgIzx92wxFrVopd0KvC
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 13.08.19 16:56, Vladimir Sementsov-Ogievskiy wrote:
-> 13.08.2019 17:43, Max Reitz wrote:
->> On 13.08.19 13:04, Kevin Wolf wrote:
->>> Am 12.08.2019 um 20:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> BDRV_BLOCK_RAW makes generic bdrv_co_block_status to fallthrough to
->>>> returned file. But is it correct behavior at all? If returned file
->>>> itself has a backing file, we may report as totally unallocated and
->>>> area which actually has data in bottom backing file.
+On 13.08.19 17:03, Kevin Wolf wrote:
+> Am 13.08.2019 um 16:53 hat Max Reitz geschrieben:
+>> On 13.08.19 16:46, Vladimir Sementsov-Ogievskiy wrote:
+>>> 13.08.2019 17:31, Max Reitz wrote:
+>>>> On 13.08.19 13:51, Kevin Wolf wrote:
 >>>>
->>>> So, mirroring of qcow2 under raw-format is broken. Which is illustra=
-ted
->>>> by following commit with a test. Let's make raw-format behave more
->>>> correctly returning BDRV_BLOCK_DATA.
+>>>> [...]
 >>>>
->>>> Suggested-by: Max Reitz <mreitz@redhat.com>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
+>>>>> Hm... This is a mess. :-)
+>>>>
+>>>> Just out of curiosity: Why?
+>>>>
+>>>> Aren=E2=80=99t there only two things we really need from the block_s=
+tatus
+>>>> infrastructure?
+>>>>
+>>>> (1) Whether something is allocated in the given layer of the backing=
+ chain,
+>>>>
+>>>> (2) Whether we know that a given range reads as zeroes.
+>>>>
+>>>> Do we really need anything else?
+>>>>
 >>>
->>> After some reading, I think I came to the conclusion that RAW is the
->>> correct thing to do. There is indeed a problem, but this patch is try=
-ing
->>> to fix it in the wrong place.
->>>
->>> In the case where the backing file contains some data, and we have a
->>> 'raw' node above the qcow2 overlay node, the content of the respectiv=
-e
->>> block is not defined by the queried backing file layer, so it is
->>> completely correct that bdrv_is_allocated() returns false,like it wou=
-ld
->>> if you queried the qcow2 layer directly.
+>>> qemu-img map?
 >>
->> I disagree.  The queried backing file layer is the raw node.  As I sai=
-d,
->> in my opinion raw nodes are not filter nodes, neither in behavior (the=
-y
->> have an offset option), nor in how they are generally used (as a forma=
-t).
+>> Which is a debugging tool.  So it doesn=E2=80=99t fall under =E2=80=9C=
+really=E2=80=9D in my
+>> book.  If removing everything but allocation+zero information would ma=
+ke
+>> the code a lot simpler, I think that would be worth it.
 >>
->> The raw format does not support backing files.  Therefore, everything =
-on
->> a raw node is allocated.
+>>> 1. We need to fix the bug somehow
+>>> 2. We need to fix comment about different block-status flags, as it r=
+eally
+>>> lacks information of what actually "DATA" means (together with *file)=
+=2E
+>>> And what finally means "allocated", can you define it precisely?
 >>
->=20
-> Could you tell me at least, what means "allocated" ?
->=20
-> It's a term that describing a region somehow.. But how? Allocated where=
-?
-> In raw node, in its child or both? Am I right that if region allocated =
-in
-> one of non-cow children it is assumed to be allocated in parent too? Or=
- what?
->=20
-> And it's unrelated to real disk allocation which (IMHO) directly shows =
-that
-> this a bad term.
-
-It=E2=80=99s a term for COW backing chains.  If something is allocated on=
+>> As I wrote in my other mails, I think the problem is that it=E2=80=99s=
+ just
+>> unexpected that block_status automatically skips through for filters.
+>> It shouldn=E2=80=99t, that=E2=80=99s just black magic that the caller =
+should not rely on.
+>>
+>> (We see precisely here that it=E2=80=99s wrong, because the callers ar=
+e not
+>> prepared for the allocation information returned to be associated with=
  a
-given node in a COW backing chain, it means it is either present in
-exactly that node or in one of its storage children (in case the node is
-a format node).  If it is not allocated, it is not, and read accesses
-will be forwarded to the COW backing child.
+>> different node than what they passed.)
+>>
+>> So my definition is just =E2=80=9CIf the node has a COW backing file a=
+nd
+>> block_status returns =E2=80=98not allocated=E2=80=99, the data will be=
+ there.
+>> Otherwise, the data is in the current node.=E2=80=9D  Yes, that means =
+that
+>> filters should appear as fully allocated.
+>=20
+> You can do that, but then the callers need to learn to do the recursion=
+
+> instead. After all, just copying everything if a filter is in the
+> subtree isn't the desired behaviour.
+
+Yes, hence the =E2=80=9Cdeal with filters=E2=80=9D series.
 
 Max
 
 
---PSuoERA0bApUk6Uj4kSJ3yBZJpTHZ3Xts--
+--88SGst3zyB0DYtRgIzx92wxFrVopd0KvC--
 
---RKg1czQDNAEXwIsOOwsGnV4CacKEbkO1L
+--X6YRewNllq3g3hDyuJl6T9ou5StReP0HE
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1S0V0ACgkQ9AfbAGHV
-z0AtzAf7BfSi4G+UQ93acHuHg6MmZuijZiQr4IOHI6ok4Ww2sXb0t4BuUIcAbvi9
-P/UutkediTSiLmXexXwMEZ3imtGYKxsWTsbFBaSpDIH3nyGitTZ5zd6bMoYJwbGR
-EAfb+kASfxMfqktMrnebK6cY/xRg7zqSibou7cNSXAK7PLoBxHeLiPFtdYjbyvcC
-jA6TzjSVaXWqgub6KmdMoJd98+rRE2Q8coNcGAcadMsJZ9pCr4KIvGZwlniT9CF5
-rWJB2pML3Z+FK2653xJDzJGzE3YiRpK8IlJ5Vs3OHOk936RXrxUNKtkOj1bsM0Pe
-iVIYQd5jTi4Wp1AJMnRLZDnoGwqZ9g==
-=yIP+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1S0XIACgkQ9AfbAGHV
+z0BdFggAxLh8edib3SUF5/bJfgxioUYqyos5HrOx8z38tVuRrpXRc+drSEiLD92/
+Ys0ppBT1TiVyYZ3jIKtkRIE1Mb3fhzC+fNDvPZuPZCLrSejqxNnDLH5e2TKWm7Xw
+Fvy+SUMCQHMjhcGAH3ViCLn10FSMOby7uM38UpSkfRG1EGLcVftkb4Rx+AolI+Gi
+f0L1YY7GJAV49gyuftoapvdT8n4KSNfTLZKgrjzOOjSo6OvPoo141P0cX2cH/Xjm
+BxdOGfv89mNRZ8AhD3t1m8oT7+h9LZl31repR+hvR7cxncDFe9wQ1ZMzsKd+B2gK
+udvJw7MOkGn2jtjIIJKGNt9aEpXMcg==
+=SM0j
 -----END PGP SIGNATURE-----
 
---RKg1czQDNAEXwIsOOwsGnV4CacKEbkO1L--
+--X6YRewNllq3g3hDyuJl6T9ou5StReP0HE--
 
