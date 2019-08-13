@@ -7,75 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D6C6C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC25BC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DED8B206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 748E0206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AtkGgsui"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DED8B206C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e0xDx/S+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748E0206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxWI0-0007FN-6N
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 08:52:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53641)
+	id 1hxWIG-00080F-Oy
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 08:52:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53573)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hxWFR-0002Ts-1C
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:57 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hxWFM-0002Gt-Vb
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hxWFQ-0000l1-1m
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:56 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34626)
+ (envelope-from <alex.bennee@linaro.org>) id 1hxWFL-0000fe-Ni
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:52 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51772)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hxWFP-0000k9-S8
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:56 -0400
-Received: by mail-wm1-x341.google.com with SMTP id e8so1009716wme.1
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 05:49:55 -0700 (PDT)
+ id 1hxWFL-0000eT-H7
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:51 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 207so1397940wma.1
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 05:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7gMIeXb33bJiJJ2wC99NJRgf91T+h2agcGiVoSf4NFI=;
- b=AtkGgsui1bxAw0W/eI+q06kI2PErsc2z8s4oTsD9Kl5APeF2G1TOwavC/uSEoRy3rv
- ALXF2RG6BmCPJ4AGv2VbsluYkQ/SRzZpz/brustAm6AeabRHnJQIX7fJzzqiG6vZzKEo
- Zb/ZWfxYr28V483fDYpFUxj7u2qOBcmVBlcsc76YWMoAnDN9PtDa6TQA70cinwxwhBqT
- Bj7Yc2xuqBWrYX8VdVRI427qx8ulF3C29O/xak/SNwfai5Vb//eSdrEkFptOO3sbVIf5
- fhCTyWrnYZPjZhcT73dLmeM6+UuCAQgukWwGESKVUBZRVbpzMf4AtVNHjRGDN+F1D1Ph
- RCaQ==
+ bh=PJTLOGYfOYJRlE+NNvZ7x6ubINqPg6f5ZRf9gomrPy8=;
+ b=e0xDx/S+M8brLECdnB1pGQzGyowZzrKXfBiHHQMR/euElwOc3rAXwocxnoOf2MtGIl
+ P/IXiYqyB7ou1CcgYtIVPfLof/BwfxnTWZBdIW/PpHiPe4o5VclQtpaPwqSval3dIDX7
+ 7VW7AzIX7pU+H9hgFVKOwHX6MGegdk7nxHW2CNImzwfCs7MZ5SbQv7UlTR3VL+qQqcJZ
+ qp2+g+tVcyywKYnHYCd5zym6T1sjA+uPwuN0Z9YGmA/r5Iy9QKJNEIaLvbmo/yQbcGY/
+ DwetfURFOs0Cw74owqWVRb3SgJvvh0dolNwYiwjBBmHU16+XihbApxxrNf/QTJ7A5EIE
+ XXdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7gMIeXb33bJiJJ2wC99NJRgf91T+h2agcGiVoSf4NFI=;
- b=o8HnHA/TAxRhOHXw1bAOwFuu9HaOzjiREFayOQFD+XtvV4CK5A51OxgnGOtpvQZ/am
- 1IAgjnnjc0dek9o9BMl4hhMpO9XHV8tKjRLhslLF+SIvgqCsUQ7xtFT17H5yag4Pwrk8
- ra6eWCdXOy8HH4kbtyzT6hzgvGrfnq8oUJOVxAtFWJ5Nu1/b2VVWBkSjk1V7O4iCQSL2
- IAP9mok67/zIVpdW4k8ocmz1jTOfrgt7u+0HWtrWgPPg04GhmHyryf6XQV4PvftuX8Na
- HFLt0RiQIIaP0dJRRTzL9If5zmf6YmjQifkxgXvVK7rucqXvFvcCsuHAykA/2sqRpQta
- xXoQ==
-X-Gm-Message-State: APjAAAVlICwpXx4+R9Xu23ASL+bB2kXrnBezWtq5UB0qGEyD0N809ZDA
- f4shUfCSAxPvjL8s11xpUgynEQ==
-X-Google-Smtp-Source: APXvYqxauFES2XK//lwC+e4NWh67klPh/C9QLwOhfixvolGWspvpspHuVPBcAmatwpC6t8iT+SmMAQ==
-X-Received: by 2002:a05:600c:23cd:: with SMTP id
- p13mr2791724wmb.86.1565700594824; 
- Tue, 13 Aug 2019 05:49:54 -0700 (PDT)
+ bh=PJTLOGYfOYJRlE+NNvZ7x6ubINqPg6f5ZRf9gomrPy8=;
+ b=URV47GowgMJfAml0QI1n5CmhJ+k03W8BumsyxaCLXwIqGUT/gZumdj1RV/HlZS0qxS
+ PLjfyTWqTaqUrYMIFB21ZM0AxfCPlGfWGRMVytATxAsHvDXFQe2d2KQ2XFWy8T1JG5DN
+ 4WHVkmk2huurD2LQ+FHVtytJzmITGl04WaheO1cTQe2J3PmtJFx1gLSQISDIxAnERMZq
+ oyynQJvJYYvaP0B/SXAkc0Xo9Ouj1/A+066R0W1631xfAC3qkv4YLO3qWWO6r1UzDS2Y
+ lfGdzC+yajBl4aW52IZTOeW0Z+9G6nczgH4nYHw5IYobdN+gar0iu44XAcAKddoG659R
+ mEpQ==
+X-Gm-Message-State: APjAAAVsGD84sLtRsBHsB1+NydVmFVX1VJueZttUI0kK7dTJGBsl5w8/
+ DtnEaymZ5R8qCaoC4GrMxAk5yw==
+X-Google-Smtp-Source: APXvYqw6t3Ci5VubDx2993pPUOgES3uKBlsnW5r44hT64j2wxxD8dWth5ADtGPzS2nMRPvY4Mt1XRw==
+X-Received: by 2002:a7b:c775:: with SMTP id x21mr2969690wmk.97.1565700590465; 
+ Tue, 13 Aug 2019 05:49:50 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id x20sm236796612wrg.10.2019.08.13.05.49.49
+ by smtp.gmail.com with ESMTPSA id i66sm1256285wmg.2.2019.08.13.05.49.47
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 13 Aug 2019 05:49:51 -0700 (PDT)
+ Tue, 13 Aug 2019 05:49:48 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id C6A4A1FF9A;
+ by zen.linaroharston (Postfix) with ESMTP id 427931FF91;
  Tue, 13 Aug 2019 13:49:47 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 13:49:43 +0100
-Message-Id: <20190813124946.25322-11-alex.bennee@linaro.org>
+Date: Tue, 13 Aug 2019 13:49:37 +0100
+Message-Id: <20190813124946.25322-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190813124946.25322-1-alex.bennee@linaro.org>
 References: <20190813124946.25322-1-alex.bennee@linaro.org>
@@ -84,9 +83,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: [Qemu-devel] [PATCH v3 10/13] fpu: rename softfloat-specialize.h ->
- .inc.c
+X-Received-From: 2a00:1450:4864:20::344
+Subject: [Qemu-devel] [PATCH v3 04/13] fpu: use min/max values from stdint.h
+ for integral overflow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,45 +98,127 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, armbru@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, armbru@redhat.com,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not a normal header and should only be included in the main
-softfloat.c file to bring in the various target specific
-specialisations. Indeed as it contains non-inlined C functions it is
-not even a legal header. Rename it to match our included C convention.
+Remove some more use of LIT64 while making the meaning more clear. We
+also avoid the need of casts as the results by definition fit into the
+return type.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- fpu/{softfloat-specialize.h => softfloat-specialize.inc.c} | 0
- fpu/softfloat.c                                            | 2 +-
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename fpu/{softfloat-specialize.h => softfloat-specialize.inc.c} (100%)
+ fpu/softfloat.c | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.inc.c
-similarity index 100%
-rename from fpu/softfloat-specialize.h
-rename to fpu/softfloat-specialize.inc.c
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 6bf6241710f..6e98fee48a3 100644
+index 9e57b7b5933..a1e1e9a8559 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -634,7 +634,7 @@ static inline float64 float64_pack_raw(FloatParts p)
- | are propagated from function inputs to output.  These details are target-
- | specific.
- *----------------------------------------------------------------------------*/
--#include "softfloat-specialize.h"
-+#include "softfloat-specialize.inc.c"
- 
- /* Canonicalize EXP and FRAC, setting CLS.  */
- static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
+@@ -3444,9 +3444,7 @@ static int64_t roundAndPackInt64(flag zSign, uint64_t absZ0, uint64_t absZ1,
+     if ( z && ( ( z < 0 ) ^ zSign ) ) {
+  overflow:
+         float_raise(float_flag_invalid, status);
+-        return
+-              zSign ? (int64_t) LIT64( 0x8000000000000000 )
+-            : LIT64( 0x7FFFFFFFFFFFFFFF );
++        return zSign ? INT64_MIN : INT64_MAX;
+     }
+     if (absZ1) {
+         status->float_exception_flags |= float_flag_inexact;
+@@ -3497,7 +3495,7 @@ static int64_t roundAndPackUint64(flag zSign, uint64_t absZ0,
+         ++absZ0;
+         if (absZ0 == 0) {
+             float_raise(float_flag_invalid, status);
+-            return LIT64(0xFFFFFFFFFFFFFFFF);
++            return UINT64_MAX;
+         }
+         absZ0 &= ~(((uint64_t)(absZ1<<1) == 0) & roundNearestEven);
+     }
+@@ -5518,9 +5516,9 @@ int64_t floatx80_to_int64(floatx80 a, float_status *status)
+         if ( shiftCount ) {
+             float_raise(float_flag_invalid, status);
+             if (!aSign || floatx80_is_any_nan(a)) {
+-                return LIT64( 0x7FFFFFFFFFFFFFFF );
++                return INT64_MAX;
+             }
+-            return (int64_t) LIT64( 0x8000000000000000 );
++            return INT64_MIN;
+         }
+         aSigExtra = 0;
+     }
+@@ -5561,10 +5559,10 @@ int64_t floatx80_to_int64_round_to_zero(floatx80 a, float_status *status)
+         if ( ( a.high != 0xC03E ) || aSig ) {
+             float_raise(float_flag_invalid, status);
+             if ( ! aSign || ( ( aExp == 0x7FFF ) && aSig ) ) {
+-                return LIT64( 0x7FFFFFFFFFFFFFFF );
++                return INT64_MAX;
+             }
+         }
+-        return (int64_t) LIT64( 0x8000000000000000 );
++        return INT64_MIN;
+     }
+     else if ( aExp < 0x3FFF ) {
+         if (aExp | aSig) {
+@@ -6623,7 +6621,7 @@ int32_t float128_to_int32_round_to_zero(float128 a, float_status *status)
+     if ( ( z < 0 ) ^ aSign ) {
+  invalid:
+         float_raise(float_flag_invalid, status);
+-        return aSign ? (int32_t) 0x80000000 : 0x7FFFFFFF;
++        return aSign ? INT32_MIN : INT32_MAX;
+     }
+     if ( ( aSig0<<shiftCount ) != savedASig ) {
+         status->float_exception_flags |= float_flag_inexact;
+@@ -6662,9 +6660,9 @@ int64_t float128_to_int64(float128 a, float_status *status)
+                       && ( aSig1 || ( aSig0 != LIT64( 0x0001000000000000 ) ) )
+                     )
+                ) {
+-                return LIT64( 0x7FFFFFFFFFFFFFFF );
++                return INT64_MAX;
+             }
+-            return (int64_t) LIT64( 0x8000000000000000 );
++            return INT64_MIN;
+         }
+         shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
+     }
+@@ -6710,10 +6708,10 @@ int64_t float128_to_int64_round_to_zero(float128 a, float_status *status)
+             else {
+                 float_raise(float_flag_invalid, status);
+                 if ( ! aSign || ( ( aExp == 0x7FFF ) && ( aSig0 | aSig1 ) ) ) {
+-                    return LIT64( 0x7FFFFFFFFFFFFFFF );
++                    return INT64_MAX;
+                 }
+             }
+-            return (int64_t) LIT64( 0x8000000000000000 );
++            return INT64_MIN;
+         }
+         z = ( aSig0<<shiftCount ) | ( aSig1>>( ( - shiftCount ) & 63 ) );
+         if ( (uint64_t) ( aSig1<<shiftCount ) ) {
+@@ -6764,19 +6762,19 @@ uint64_t float128_to_uint64(float128 a, float_status *status)
+     if (aSign && (aExp > 0x3FFE)) {
+         float_raise(float_flag_invalid, status);
+         if (float128_is_any_nan(a)) {
+-            return LIT64(0xFFFFFFFFFFFFFFFF);
++            return UINT64_MAX;
+         } else {
+             return 0;
+         }
+     }
+     if (aExp) {
+-        aSig0 |= LIT64(0x0001000000000000);
++        aSig0 |= UINT64_C(0x0001000000000000);
+     }
+     shiftCount = 0x402F - aExp;
+     if (shiftCount <= 0) {
+         if (0x403E < aExp) {
+             float_raise(float_flag_invalid, status);
+-            return LIT64(0xFFFFFFFFFFFFFFFF);
++            return UINT64_MAX;
+         }
+         shortShift128Left(aSig0, aSig1, -shiftCount, &aSig0, &aSig1);
+     } else {
 -- 
 2.20.1
 
