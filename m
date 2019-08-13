@@ -2,74 +2,69 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 302D3C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 07:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E765BC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 07:02:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED29B205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 07:02:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED29B205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A943F205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 07:02:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A943F205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxQom-00008w-RW
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 03:02:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58311)
+	id 1hxQpP-0001Hi-0M
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 03:02:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58441)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <bounces@canonical.com>) id 1hxQng-00076I-TN
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 03:00:58 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hxQoc-00009h-GS
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 03:01:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hxQnf-0004Bp-Iw
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 03:00:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39908)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hxQnf-0004At-DX
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 03:00:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hxQnd-0006Df-OM
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 07:00:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A8ABF2E80CB
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 07:00:53 +0000 (UTC)
+ (envelope-from <no-reply@patchew.org>) id 1hxQoa-0004tA-OY
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 03:01:54 -0400
+Resent-Date: Tue, 13 Aug 2019 03:01:54 -0400
+Resent-Message-Id: <E1hxQoa-0004tA-OY@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21524)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hxQoW-0004oU-Ho; Tue, 13 Aug 2019 03:01:48 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565679688; cv=none; d=zoho.com; s=zohoarc; 
+ b=i2w7YX3voJO1FfPOIpTYLQOgwjwIYtbacMXMQTC7gwZzprmXe9W5+Ve7SVaXP75JpocqAl9JMGyZy/qTRt5eDj2NldXwhN9ABU/Y6v5yLYumlo7aRRABJgCykYChpZyO/uM0gZJXLV9uEyZLogyROLRDxAqyT2nH/6w27n2WauU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565679688;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=KmuUb29QKpsCrRwnFA83gu+rFnuB5+hvJyYqTVzAqYo=; 
+ b=nwZVJedIVPiOp24QpSO9EcpQRBG5y1KEH2VA+XjQrJub6Nz78o8BdPA8m3dM/FO4U4rTprEriYRELyhBguRaKVHW6i++px0A48j+4fZuoWXba5A7+t6G3VP3K6aOoL6/8xaftE8yK0Ir3OR2DJkHNp1wTPD++WW9upf512UAy5I=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565679685579835.6976502356379;
+ Tue, 13 Aug 2019 00:01:25 -0700 (PDT)
+In-Reply-To: <20190813064853.29310-1-clg@kaod.org>
+Message-ID: <156567968422.1483.14886752616666164211@5dec9699b7de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 13 Aug 2019 06:55:31 -0000
-From: Al Sn <1839807@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm snapshots
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alsn pmaydell
-X-Launchpad-Bug-Reporter: Al Sn (alsn)
-X-Launchpad-Bug-Modifier: Al Sn (alsn)
-References: <156559266426.18172.16579923111498222299.malonedeb@wampee.canonical.com>
-Message-Id: <156567933201.17428.11092825856618786498.malone@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19021";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: b9fd66c0dfbee6ae5ad9de61b071133ef4a6ccfb
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: clg@kaod.org
+Date: Tue, 13 Aug 2019 00:01:25 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1839807] Re: Snapshots freeze guest Sabrelite
- IMX.6 board
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH] spapr/xive: Fix migration of hot-plugged
+ CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,106 +73,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1839807 <1839807@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello again,
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgxMzA2NDg1My4yOTMx
+MC0xLWNsZ0BrYW9kLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUg
+Y29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0
+aW9uOgoKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gc3BhcHIveGl2ZTogRml4IG1pZ3Jh
+dGlvbiBvZiBob3QtcGx1Z2dlZCBDUFVzCk1lc3NhZ2UtaWQ6IDIwMTkwODEzMDY0ODUzLjI5MzEw
+LTEtY2xnQGthb2Qub3JnClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
+IS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBU
+IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
+ODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1
+cGRhdGVdICAgICAgcGF0Y2hldy8yMDE5MDgxMjIzNDYzMC4yMjgxNC0xLWVoYWJrb3N0QHJlZGhh
+dC5jb20gLT4gcGF0Y2hldy8yMDE5MDgxMjIzNDYzMC4yMjgxNC0xLWVoYWJrb3N0QHJlZGhhdC5j
+b20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDE5MDgxMzA2NDg1My4yOTMxMC0xLWNs
+Z0BrYW9kLm9yZyAtPiBwYXRjaGV3LzIwMTkwODEzMDY0ODUzLjI5MzEwLTEtY2xnQGthb2Qub3Jn
+ClN1Ym1vZHVsZSAnY2Fwc3RvbmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvY2Fwc3RvbmUu
+Z2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdjYXBzdG9uZScKU3VibW9kdWxlICdkdGMnIChodHRw
+czovL2dpdC5xZW11Lm9yZy9naXQvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpT
+dWJtb2R1bGUgJ3JvbXMvUWVtdU1hY0RyaXZlcnMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
+UWVtdU1hY0RyaXZlcnMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL1FlbXVNYWNEcml2
+ZXJzJwpTdWJtb2R1bGUgJ3JvbXMvU0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9TTE9G
+LmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1bGUgJ3JvbXMvZWRr
+MicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9lZGsyLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0
+aCAncm9tcy9lZGsyJwpTdWJtb2R1bGUgJ3JvbXMvaXB4ZScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9pcHhlJwpTdWJtb2R1bGUg
+J3JvbXMvb3BlbmJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3BlbmJpb3MuZ2l0KSBy
+ZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5iaW9zJwpTdWJtb2R1bGUgJ3JvbXMvb3Blbmhh
+Y2t3YXJlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5oYWNrd2FyZS5naXQpIHJlZ2lz
+dGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJwpTdWJtb2R1bGUgJ3JvbXMvb3BlbnNi
+aScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuc2JpLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAncm9tcy9vcGVuc2JpJwpTdWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxjb2RlJyAoaHR0cHM6
+Ly9naXQucWVtdS5vcmcvZ2l0L3FlbXUtcGFsY29kZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGgg
+J3JvbXMvcWVtdS1wYWxjb2RlJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycgKGh0dHBzOi8vZ2l0
+LnFlbXUub3JnL2dpdC9zZWFiaW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2Vh
+YmlvcycKU3VibW9kdWxlICdyb21zL3NlYWJpb3MtaHBwYScgKGh0dHBzOi8vZ2l0LnFlbXUub3Jn
+L2dpdC9zZWFiaW9zLWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL3NlYWJpb3Mt
+aHBwYScKU3VibW9kdWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
+c2dhYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlvcycKU3VibW9kdWxl
+ICdyb21zL3NraWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tpYm9vdC5naXQpIHJl
+Z2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdCcg
+KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdyb21zL3UtYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBleCcgKGh0dHBzOi8v
+Z2l0LnFlbXUub3JnL2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRo
+ICdyb21zL3UtYm9vdC1zYW00NjBleCcKU3VibW9kdWxlICdzbGlycCcgKGh0dHBzOi8vZ2l0LnFl
+bXUub3JnL2dpdC9saWJzbGlycC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3NsaXJwJwpTdWJt
+b2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJyAoaHR0cHM6Ly9naXQucWVtdS5v
+cmcvZ2l0L2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndGVz
+dHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMvZnAvYmVya2VsZXkt
+dGVzdGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvYmVya2VsZXktdGVzdGZsb2F0
+LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQt
+MycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQv
+a2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5Y29kZW1hcGRiJwpD
+bG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fwc3RvbmUnOiBjaGVj
+a2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2IwNjZiZicKQ2xvbmlu
+ZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2VkIG91dCAnODhmMTg5
+MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBpbnRvICdyb21zL1Fl
+bXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFjRHJpdmVycyc6IGNo
+ZWNrZWQgb3V0ICc5MGM0ODhkNWY0YTQwNzM0MjI0N2I5ZWE4NjlkZjFjMmQ5YzhlMjY2JwpDbG9u
+aW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvU0xPRic6IGNoZWNr
+ZWQgb3V0ICdiYTFhYjM2MGVlYmU2MzM4YmI4ZDdkODNhOTIyMGNjZjdlMjEzYWYzJwpDbG9uaW5n
+IGludG8gJ3JvbXMvZWRrMicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRrMic6IGNoZWNrZWQg
+b3V0ICcyMGQyZTVhMTI1ZTM0ZmM4NTAxMDI2NjEzYTcxNTQ5YjJhMWEzZTU0JwpTdWJtb2R1bGUg
+J1NvZnRGbG9hdCcgKGh0dHBzOi8vZ2l0aHViLmNvbS91Y2ItYmFyL2JlcmtlbGV5LXNvZnRmbG9h
+dC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQXJtUGtnL0xpYnJhcnkvQXJtU29mdEZsb2F0
+TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ0NyeXB0b1BrZy9MaWJyYXJ5L09w
+ZW5zc2xMaWIvb3BlbnNzbCcgKGh0dHBzOi8vZ2l0aHViLmNvbS9vcGVuc3NsL29wZW5zc2wpIHJl
+Z2lzdGVyZWQgZm9yIHBhdGggJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcK
+Q2xvbmluZyBpbnRvICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIvYmVya2VsZXktc29m
+dGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQXJtUGtnL0xpYnJhcnkvQXJt
+U29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hlY2tlZCBvdXQgJ2I2NGFmNDFj
+MzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25pbmcgaW50byAnQ3J5cHRvUGtn
+L0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsy
+L0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCc6IGNoZWNrZWQgb3V0ICc1MGVh
+YWM5ZjMzMzc2NjcyNTlkZTcyNTQ1MWYyMDFlNzg0NTk5Njg3JwpTdWJtb2R1bGUgJ2JvcmluZ3Nz
+bCcgKGh0dHBzOi8vYm9yaW5nc3NsLmdvb2dsZXNvdXJjZS5jb20vYm9yaW5nc3NsKSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdib3Jpbmdzc2wnClN1Ym1vZHVsZSAna3JiNScgKGh0dHBzOi8vZ2l0aHVi
+LmNvbS9rcmI1L2tyYjUpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2tyYjUnClN1Ym1vZHVsZSAncHlj
+YS5jcnlwdG9ncmFwaHknIChodHRwczovL2dpdGh1Yi5jb20vcHljYS9jcnlwdG9ncmFwaHkuZ2l0
+KSByZWdpc3RlcmVkIGZvciBwYXRoICdweWNhLWNyeXB0b2dyYXBoeScKQ2xvbmluZyBpbnRvICdi
+b3Jpbmdzc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkv
+T3BlbnNzbExpYi9vcGVuc3NsL2JvcmluZ3NzbCc6IGNoZWNrZWQgb3V0ICcyMDcwZjhhZDkxNTFk
+YzhmM2E3M2JmZmFhMTQ2YjVlNjkzN2E1ODNmJwpDbG9uaW5nIGludG8gJ2tyYjUnLi4uCmZhdGFs
+OiB1bmFibGUgdG8gYWNjZXNzICdodHRwczovL2dpdGh1Yi5jb20va3JiNS9rcmI1Lyc6IFRoZSBy
+ZXF1ZXN0ZWQgVVJMIHJldHVybmVkIGVycm9yOiA1MDMKQ2xvbmUgb2YgJ2h0dHBzOi8vZ2l0aHVi
+LmNvbS9rcmI1L2tyYjUnIGludG8gc3VibW9kdWxlIHBhdGggJ2tyYjUnIGZhaWxlZApGYWlsZWQg
+dG8gcmVjdXJzZSBpbnRvIHN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJh
+cnkvT3BlbnNzbExpYi9vcGVuc3NsJwpDbG9uaW5nIGludG8gJ3JvbXMvaXB4ZScuLi4KU3VibW9k
+dWxlIHBhdGggJ3JvbXMvaXB4ZSc6IGNoZWNrZWQgb3V0ICdkZTQ1NjVjYmU3NmVhOWY3OTEzYTAx
+ZjMzMWJlM2VlOTAxYmI2ZTE3JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmJpb3MnLi4uClN1Ym1v
+ZHVsZSBwYXRoICdyb21zL29wZW5iaW9zJzogY2hlY2tlZCBvdXQgJ2M3OWUwZWNiODRmNGYxZWUz
+ZjczZjUyMTYyMmUyNjRlZGQxYmYxNzQnCkNsb25pbmcgaW50byAncm9tcy9vcGVuaGFja3dhcmUn
+Li4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5oYWNrd2FyZSc6IGNoZWNrZWQgb3V0ICdjNTU5
+ZGE3YzhlZWM1ZTQ1ZWYxZjY3OTc4ODI3YWY2ZjBiOTU0NmY1JwpDbG9uaW5nIGludG8gJ3JvbXMv
+b3BlbnNiaScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvb3BlbnNiaSc6IGNoZWNrZWQgb3V0ICdj
+ZTIyOGVlMDkxOWRlYjk5NTcxOTJkNzIzZWVjYzhhYWFlMjY5N2M2JwpDbG9uaW5nIGludG8gJ3Jv
+bXMvcWVtdS1wYWxjb2RlJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9xZW11LXBhbGNvZGUnOiBj
+aGVja2VkIG91dCAnYmYwZTEzNjk4ODcyNDUwMTY0ZmE3MDQwZGEzNmE5NWQyZDRiMzI2ZicKQ2xv
+bmluZyBpbnRvICdyb21zL3NlYWJpb3MnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3NlYWJpb3Mn
+OiBjaGVja2VkIG91dCAnYTVjYWI1OGU5YTNmYjZlMTY4YWJhOTE5YzU2NjliZWE0MDY1NzNiNCcK
+Q2xvbmluZyBpbnRvICdyb21zL3NlYWJpb3MtaHBwYScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
+c2VhYmlvcy1ocHBhJzogY2hlY2tlZCBvdXQgJzBmNGZlODQ2NTgxNjVlOTZjZTM1ODcwZmQxOWZj
+NjM0ZTE4MmU3N2InCkNsb25pbmcgaW50byAncm9tcy9zZ2FiaW9zJy4uLgpTdWJtb2R1bGUgcGF0
+aCAncm9tcy9zZ2FiaW9zJzogY2hlY2tlZCBvdXQgJ2NiYWVlNTIyODdlNWYzMjM3MzE4MWNmZjUw
+YTAwYjZjNGFjOTAxNWEnCkNsb25pbmcgaW50byAncm9tcy9za2lib290Jy4uLgpTdWJtb2R1bGUg
+cGF0aCAncm9tcy9za2lib290JzogY2hlY2tlZCBvdXQgJzI2MWNhOGU3NzllNTEzODg2OWE0NWYx
+NzRjYWE0OWJlNmEyNzQ1MDEnCkNsb25pbmcgaW50byAncm9tcy91LWJvb3QnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL3UtYm9vdCc6IGNoZWNrZWQgb3V0ICdkMzY4OTI2N2Y5MmM1OTU2ZTA5Y2M3
+ZDFiYWE0NzAwMTQxNjYyYmZmJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290LXNhbTQ2MGV4Jy4u
+LgpTdWJtb2R1bGUgcGF0aCAncm9tcy91LWJvb3Qtc2FtNDYwZXgnOiBjaGVja2VkIG91dCAnNjBi
+MzkxNmYzM2U2MTdhODE1OTczYzVhNmRmNzcwNTViMmUzYTU4OCcKQ2xvbmluZyBpbnRvICdzbGly
+cCcuLi4KU3VibW9kdWxlIHBhdGggJ3NsaXJwJzogY2hlY2tlZCBvdXQgJzEyNmMwNGFjYmFiZDdh
+ZDMyYzJiMDE4ZmUxMGRmYWMyYTNiYzEyMTAnCkNsb25pbmcgaW50byAndGVzdHMvZnAvYmVya2Vs
+ZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICd0ZXN0cy9mcC9iZXJrZWxleS1zb2Z0
+ZmxvYXQtMyc6IGNoZWNrZWQgb3V0ICdiNjRhZjQxYzMyNzZmOTdmMGUxODE5MjA0MDBlZTA1NmI5
+Yzg4MDM3JwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJy4uLgpT
+dWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnOiBjaGVja2VkIG91
+dCAnNWE1OWRjZWMxOTMyNzM5NmEwMTFhMTdmZDkyNGFlZDRmZWM0MTZiMycKQ2xvbmluZyBpbnRv
+ICd1aS9rZXljb2RlbWFwZGInLi4uClN1Ym1vZHVsZSBwYXRoICd1aS9rZXljb2RlbWFwZGInOiBj
+aGVja2VkIG91dCAnNmIzZDcxNmUyYjY0NzJlYjcxODlkMzIyMDU1MjI4MGVmM2Q4MzJjZScKRmFp
+bGVkIHRvIHJlY3Vyc2UgaW50byBzdWJtb2R1bGUgcGF0aCAncm9tcy9lZGsyJwpUcmFjZWJhY2sg
+KG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi9wYXRjaGV3LWNsaSIsIGxpbmUgNTA0
+LCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8iXSwgclsiaGVh
+ZCJdLCBsb2dmKQogIEZpbGUgIi4vcGF0Y2hldy1jbGkiLCBsaW5lIDUwLCBpbiBnaXRfY2xvbmVf
+cmVwbwogICAgc3RkZXJyPWxvZ2YsIHN0ZG91dD1sb2dmKQogIEZpbGUgIi91c3IvbGliNjQvcHl0
+aG9uMy40L3N1YnByb2Nlc3MucHkiLCBsaW5lIDU1OCwgaW4gY2hlY2tfY2FsbAogICAgcmFpc2Ug
+Q2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNz
+RXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ2Nsb25lJywgJy1xJywgJy0tcmVjdXJzaXZlJywgJy9o
+b21lL3BhdGNoZXcvLmNhY2hlL3BhdGNoZXctZ2l0LWNhY2hlL2h0dHBzZ2l0aHViY29tcGF0Y2hl
+d3Byb2plY3RxZW11LTNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQnLCAn
+L3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLW4zNDdpb3NzL3NyYyddJyByZXR1cm5lZCBub24t
+emVybyBleGl0IHN0YXR1cyAxCgoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA4MTMwNjQ4NTMuMjkzMTAtMS1jbGdAa2FvZC5vcmcvdGVz
+dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-I have tried to disable TrustZone using argument mentioned in comment #5
-by changing -M sabrelite to -M sabrelite,secure=3Doff, but I get error
-"qemu-system-arm: Property '.secure' not found". It works with virt
-though. Is there any other way to disable it?
-
-Thank you,
-...
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1839807
-
-Title:
-  Snapshots freeze guest Sabrelite IMX.6 board
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hello,
-
-  I'm trying to take and restore  a snapshot with the whole system state of=
- the Sabrelite IMX.6 board running on QEMU with commands savevm/loadvm.
-  It seems that I am able to take a snapshot but loading the snapshot fails.
-
-  For comparison I checked out snapshots on 32bit ARM Virt with Debian as w=
-ell as on the Versatilepb board with a bare metal application and it works =
-fine.
-  The problem occurs only with that one particular board.
-
-  My environment is:
-  Ubuntu 18.04
-  QEMU 3.0.1 (I see the same issue in QEMU 4.0.0 as well)
-  The kernel and device tree used for the board was 5.1.14 version from ker=
-nel.org
-
-  The file system was build from imx_v6_v7_defconfig config in buildroot
-  as and sd card image.
-
-  Problem:
-
-  Loading snapshot stops the whole machine and it's impossible to resume
-  it.
-
-  Steps to reproduce problem:
-
-  1.      I converted the sdcard.img built from the buildroot to qcow2
-  using command qemu-img convert -f raw -O qcow2 sdcard.img
-  sdcard.qcow2, since the raw doesn't support snapshots.
-
-  2.      I start QEMU with a command
-  ./arm-softmmu/qemu-system-arm -m 512 -M sabrelite -kernel zImage -append =
-"rootfstype=3Dext4 root=3D/dev/mmcblk2p2 rw rootwait" -rtc base=3Dlocaltime=
-,clock=3Dvm -dtb imx6dl-sabresd.dtb -drive file=3Dsdcard.qcow2,index=3D2,fo=
-rmat=3Dqcow2,id=3Dmycard -device sd-card,drive=3Dmycard -nographic -net nic=
- -net user
-
-  3.      I run a simple program which print characters to the console
-  in the background and add some files in user directory, to differ from
-  original image.
-
-  4.      I switch to QEMU monitor, and type =E2=80=9Csavevm <name>=E2=80=
-=9D.
-  When I type =E2=80=9Cinfo snapshots=E2=80=9D, the snapshot is listed.
-  So I assume it was saved correctly.
-
-  5.      Then I switch back to Linux console from monitor, remove the
-  added files and stop the background printing process.
-
-  6.      I switch back to monitor and I'm trying now to load the
-  snapshot by =E2=80=9Cloadvm <name>=E2=80=9D command.
-
-  That=E2=80=99s where the problem occurs. QEMU stops and I can't switch ba=
-ck from monitor to Linux.
-  Typing =E2=80=9Ccont=E2=80=9D doesn=E2=80=99t help.
-  It seems like the simulation has freezed. CPU usage on my Laptop machine =
-equals 100% until I exit QEMU.
-
-  =
-
-  What=E2=80=99s interesting when I exit the QEMU and then start it again t=
-he Linux boots and after it reaches the command prompt I can see the files =
-which were removed after saving the snapshot.
-
-  It looks like loading the snapshots works for restoring disk space but
-  it fails for restoring the running processes.
-
-  Due to the answer on QEMU mailing list
-  (https://lists.nongnu.org/archive/html/qemu-
-  discuss/2019-08/msg00016.html) it is QEMUs bug.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1839807/+subscriptions
 
