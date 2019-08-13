@@ -2,72 +2,59 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FE4C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E80C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:45:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA1B620644
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:44:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA1B620644
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id D5FA520644
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:45:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5FA520644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxfX6-0000b1-5S
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55386)
+	id 1hxfXi-0001sC-U5
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:45:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55445)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hxfWi-0000AC-LV
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:44:25 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxfXD-0000wO-6s
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:44:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hxfWh-0003Ee-EE
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:44:24 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:33849)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hxfWh-0003EJ-9W
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:44:23 -0400
-Received: by mail-pg1-f193.google.com with SMTP id n9so45788102pgc.1
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 15:44:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=sJIocxls5v7/F9lnrVCDJBoHU+q1YnklqThtqdk9Kz4=;
- b=eigVnqTJfCSMbr4YLbf4TpVxPCx4tVtldU07yNbMPENKtlRei9W6Wi5QBMGCwId6U7
- QA00gp6SsYRbjbw832H/8xkUQKgAs+9pDC+EKx5uucjR3OpzlrhGD/EXhB1OvWYjeZQa
- wDR8ElcI3B8zBBZ3rL11hMDtLmBVg+K3a2cZS0iYfy5CsrunQ3HYiqytioI/tZy/VWnv
- ENkBtA9Zz5NT1riCiw2cdOyrM66g4vW9Jj8Qxg5Krl8vuqbKJhVDbxXB7MzhuUYm9OEn
- fTr2/+nrZiSIDx1qhWyO1PKw46OZsC3VJ2g3QhLlQv7kWCerl6ujNApN+ZwGqkIRqFXI
- oZ9w==
-X-Gm-Message-State: APjAAAXuy5e00hZEros8PZGZMYPTCv7eJgXDyIqkO/y9HWUROtY2VV1h
- TSM18JvunglpPRtX0D3RNbUIuMHaopE=
-X-Google-Smtp-Source: APXvYqwbvxlulGm8svsBkzFA7P0HPvrJDdmkuIdJTPi+TOwWwrnvSUdLJhVlQcAG/3cWMcLVHnspdQ==
-X-Received: by 2002:a63:2b8e:: with SMTP id r136mr6818998pgr.216.1565736261420; 
- Tue, 13 Aug 2019 15:44:21 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id u7sm99025672pgr.94.2019.08.13.15.44.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 13 Aug 2019 15:44:20 -0700 (PDT)
-Date: Tue, 13 Aug 2019 15:44:20 -0700 (PDT)
-X-Google-Original-Date: Tue, 13 Aug 2019 15:43:48 PDT (-0700)
-In-Reply-To: <CAFEAcA-A5P+2XE49dg582CRtDPH0CXevyYfkGkaDH3HN=NFYcg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <mhng-19b0dd58-7f8d-45a6-ac6b-049be291d2a7@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <jsnow@redhat.com>) id 1hxfXB-0003OS-UR
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:44:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44506)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hxfX9-0003Na-Bq; Tue, 13 Aug 2019 18:44:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9703883F3C;
+ Tue, 13 Aug 2019 22:44:50 +0000 (UTC)
+Received: from probe.bos.redhat.com (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FAD94C5;
+ Tue, 13 Aug 2019 22:44:47 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Date: Tue, 13 Aug 2019 18:44:46 -0400
+Message-Id: <20190813224446.14145-1-jsnow@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Tue, 13 Aug 2019 22:44:50 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.215.193
-Subject: Re: [Qemu-devel] [PULL 04/32] target/riscv: Implement
- riscv_cpu_unassigned_access
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [RFC] dirty-bitmaps: add block-dirty-bitmap-persist
+ command
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,50 +66,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 01 Aug 2019 08:39:17 PDT (-0700), Peter Maydell wrote:
-> On Wed, 3 Jul 2019 at 09:41, Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> From: Michael Clark <mjc@sifive.com>
->>
->> This patch adds support for the riscv_cpu_unassigned_access call
->> and will raise a load or store access fault.
->>
->> Signed-off-by: Michael Clark <mjc@sifive.com>
->> [Changes by AF:
->>  - Squash two patches and rewrite commit message
->>  - Set baddr to the access address
->> ]
->> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
->> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
->
-> Oops, I missed seeing this go by. The do_unassigned_access
-> hook is deprecated and you should drop this and use
-> the do_transaction_failed hook instead.
->
-> The distinction between the two is that do_unassigned_access
-> will end up being called for any failing access, including
-> not just "normal" guest accesses but also for bad accesses
-> that happen during page table walks (which often want to
-> be reported to the guest differently) and also accesses
-> by random devices like DMA controllers (where throwing a
-> cpu exception is always a bug).
->
-> Changing the hook implementation itself should be straightforward;
-> commit 6ad4d7eed05a1e23537f is an example of doing that on Alpha.
-> You also want to check all the places in your target code that
-> do physical memory accesses, determine what the right behaviour
-> if they get a bus fault is, and implement that (or at least put
-> in TODO comments).
+This is for the purpose of toggling on/off persistence on a bitmap.
+This enables you to save a bitmap that was not persistent, but may
+have already accumulated valuable data.
 
-Sorry, updating that has been on my TODO list for a while now.  I figured it 
-was better to have the deprecated version in there than nothing at all.  I've 
-written some patches to fix this, but I want to give them another look before 
-sending them out.
+This is simply a QOL enhancement:
+- Allows user to "upgrade" an existing bitmap to persistent
+- Allows user to "downgrade" an existing bitmap to transient,
+  removing it from storage without deleting the bitmap.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+
+This is just an RFC because I'm not sure if I really want to pursue
+adding this, but it was raised in a discussion I had recently that it
+was a little annoying as an API design that persistence couldn't be
+changed after addition, so I wanted to see how much code it would take
+to address that.
+
+(So this patch isn't really tested; just: "Hey, look!")
+
+I don't like this patch because it exacerbates my perceived problems
+with the "check if I can make it persistent, then toggle the flag"
+model, where I prefer the "Just try to set it persistent and let it fail
+if it cannot" model, but there were some issues with that patchset that
+I want to revisit.
+
+---
+
+ blockdev.c           | 49 ++++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json | 34 ++++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+)
+
+diff --git a/blockdev.c b/blockdev.c
+index 2d7e7be538..230442e921 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3095,6 +3095,55 @@ void qmp_block_dirty_bitmap_merge(const char *node=
+, const char *target,
+     do_block_dirty_bitmap_merge(node, target, bitmaps, NULL, errp);
+ }
+=20
++void qmp_block_dirty_bitmap_persist(const char *node, const char *name,
++                                    bool persist, Error **errp)
++{
++    BdrvDirtyBitmap *bitmap;
++    BlockDriverState *bs;
++    AioContext *aio_context =3D NULL;
++    Error *local_err =3D NULL;
++    bool persistent;
++
++    bitmap =3D block_dirty_bitmap_lookup(node, name, &bs, errp);
++    if (!bitmap || !bs) {
++        return;
++    }
++
++    if (bdrv_dirty_bitmap_check(bitmap, BDRV_BITMAP_DEFAULT, errp)) {
++        return;
++    }
++
++    persistent =3D bdrv_dirty_bitmap_get_persistence(bitmap);
++
++    if (persist !=3D persistent) {
++        aio_context =3D bdrv_get_aio_context(bs);
++        aio_context_acquire(aio_context);
++    }
++
++    if (!persist && persistent) {
++        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
++        if (local_err !=3D NULL) {
++            error_propagate(errp, local_err);
++            goto out;
++        }
++    }
++
++    if (persist && !persistent) {
++        uint32_t granularity =3D bdrv_dirty_bitmap_granularity(bitmap);
++        if (!bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp=
+)) {
++            goto out;
++        }
++    }
++
++    bdrv_dirty_bitmap_set_persistence(bitmap, persistent);
++
++ out:
++    if (aio_context) {
++        aio_context_release(aio_context);
++    }
++    return;
++}
++
+ BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char=
+ *node,
+                                                               const char=
+ *name,
+                                                               Error **er=
+rp)
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 3dbf23d874..9c0957f528 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2001,6 +2001,19 @@
+   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+             '*persistent': 'bool', '*autoload': 'bool', '*disabled': 'bo=
+ol' } }
+=20
++##
++# @BlockDirtyBitmapPersist:
++#
++# @persist: True sets the specified bitmap as persistent.
++#           False will remove it from storage and mark it transient.
++#
++# Since: 4.2
++##
++{ 'struct': 'BlockDirtyBitmapPersist',
++  'base': 'BlockDirtyBitmap',
++  'data': { 'persist': 'bool' }
++}
++
+ ##
+ # @BlockDirtyBitmapMergeSource:
+ #
+@@ -2173,6 +2186,27 @@
+       { 'command': 'block-dirty-bitmap-merge',
+         'data': 'BlockDirtyBitmapMerge' }
+=20
++##
++# @block-dirty-bitmap-persist:
++#
++# Mark a dirty bitmap as either persistent or transient.
++#
++# Returns: nothing on success; including for no-op.
++#          GenericError with explanation if the operation did not succee=
+d.
++#
++# Example:
++#
++# -> { "execute": "block-dirty-bitmap-persist",
++#      "arguments": { "node": "drive0",
++#                     "bitmap": "bitmap0",
++#                     "persist": true } }
++# <- { "return": {} }
++#
++# Since: 4.2
++##
++{ 'command': 'block-dirty-bitmap-persist',
++  'data': 'BlockDirtyBitmapPersist' }
++
+ ##
+ # @BlockDirtyBitmapSha256:
+ #
+--=20
+2.21.0
+
 
