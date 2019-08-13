@@ -2,104 +2,65 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0D4C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:52:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C36C3C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:56:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 137062067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:52:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 137062067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7CE7A2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 16:56:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CE7A2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxa1s-00041o-EH
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 12:52:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60849)
+	id 1hxa5h-0005Tq-RL
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 12:56:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32992)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxa1R-0003Xc-Dv
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:51:46 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hxa4y-0004ul-8m
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxa1P-0001rq-9O
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:51:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59886)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxa1M-0001pz-K0; Tue, 13 Aug 2019 12:51:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4C03430D17F4;
- Tue, 13 Aug 2019 16:51:38 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BB7AE8220F;
- Tue, 13 Aug 2019 16:51:31 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
- <20190810193155.58637-7-vsementsov@virtuozzo.com>
- <5102eac9-125b-0719-910f-4adb240732f1@redhat.com>
- <89c87c83-276a-7663-a239-57dbd9f91a30@virtuozzo.com>
- <ecff86a8-57d1-4c8a-d4b4-95524471d249@redhat.com>
- <e3fc5e07-33c6-1fe3-2042-35bdac0a03c3@virtuozzo.com>
- <4093762b-a1bc-d6b1-8358-4f9d1ab52557@virtuozzo.com>
- <e05af208-c7cb-31e6-bfab-62a44f5281e7@redhat.com>
- <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
- <9b7a3060-4880-9ef4-89f2-e8327ce655b8@redhat.com>
- <9479f6b6-3cfe-8594-d8fc-9a66c8f799c1@virtuozzo.com>
- <f331ace9-de9f-e5d9-a569-5f50059a522c@redhat.com>
- <cab80946-e12b-b47b-c825-12aef7cee615@virtuozzo.com>
- <e9e8070a-8c76-c8ef-ccd4-a3761f07f0f9@redhat.com>
- <699db7d9-f692-cf2c-259f-238a1dd53f51@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <439fe503-5d2e-6b2f-5c53-d2efca4ac434@redhat.com>
-Date: Tue, 13 Aug 2019 18:51:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <no-reply@patchew.org>) id 1hxa4w-00044C-HF
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 12:55:24 -0400
+Resent-Date: Tue, 13 Aug 2019 12:55:24 -0400
+Resent-Message-Id: <E1hxa4w-00044C-HF@eggs.gnu.org>
+Received: from sender4-of-o55.zoho.com ([136.143.188.55]:21561)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hxa4s-0003yp-PY; Tue, 13 Aug 2019 12:55:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565715298; cv=none; d=zoho.com; s=zohoarc; 
+ b=KCdKMNFZIYbskyDWCB4lG2VM27X+IuoHLPPdV5lxCcywjkiAczcDO3ceL15yxIu7AeW8S10n+7o7Ziv0p1UxFN1IoWrS71aTjxvHiLfEZpCi/XmtUC/h3WvRTsye/oVzOa8ekA3yOoZfjYqZI8Du36ks04vFa17yEiEUxBTNOLU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565715298;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=a/85859kNhZWjBWEhsqZ4iI0Pys8g12sT0hoLEHVLgA=; 
+ b=gCF+pqIXECpv4C8F22fJ24xxK38fwkjK7eo8c/x8nECVHOS9c8uglQiwMUIneIuRrwCLGsPVKXKgK81wOTF3bR3KquNuL954npmT6bpukXpF4C/TyUtAGNNxOhJZBOZhypKOYyY0N/p9IMyr5df0J2NxQNaBSTlcrIqFeSGig3w=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565715296272683.5810148722284;
+ Tue, 13 Aug 2019 09:54:56 -0700 (PDT)
+In-Reply-To: <1565710319-1026-1-git-send-email-pc@us.ibm.com>
+Message-ID: <156571529524.3056.1562013436368934542@5dec9699b7de>
 MIME-Version: 1.0
-In-Reply-To: <699db7d9-f692-cf2c-259f-238a1dd53f51@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="PPdRBcHkymWGhy4TcWPl6zQjwz5u4YD4t"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.47]); Tue, 13 Aug 2019 16:51:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pc@us.ibm.com
+Date: Tue, 13 Aug 2019 09:54:56 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/backup: teach
- backup_cow_with_bounce_buffer to copy more at once
+X-Received-From: 136.143.188.55
+Subject: Re: [Qemu-devel] [PATCH] ppc: Add support for 'mffsl' instruction
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,178 +72,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PPdRBcHkymWGhy4TcWPl6zQjwz5u4YD4t
-Content-Type: multipart/mixed; boundary="VtOjIvqknPEM5Tyz8SeSCtM60dcQhn9Vm";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com"
- <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
-Message-ID: <439fe503-5d2e-6b2f-5c53-d2efca4ac434@redhat.com>
-Subject: Re: [PATCH v3 6/7] block/backup: teach backup_cow_with_bounce_buffer
- to copy more at once
-References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
- <20190810193155.58637-7-vsementsov@virtuozzo.com>
- <5102eac9-125b-0719-910f-4adb240732f1@redhat.com>
- <89c87c83-276a-7663-a239-57dbd9f91a30@virtuozzo.com>
- <ecff86a8-57d1-4c8a-d4b4-95524471d249@redhat.com>
- <e3fc5e07-33c6-1fe3-2042-35bdac0a03c3@virtuozzo.com>
- <4093762b-a1bc-d6b1-8358-4f9d1ab52557@virtuozzo.com>
- <e05af208-c7cb-31e6-bfab-62a44f5281e7@redhat.com>
- <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
- <9b7a3060-4880-9ef4-89f2-e8327ce655b8@redhat.com>
- <9479f6b6-3cfe-8594-d8fc-9a66c8f799c1@virtuozzo.com>
- <f331ace9-de9f-e5d9-a569-5f50059a522c@redhat.com>
- <cab80946-e12b-b47b-c825-12aef7cee615@virtuozzo.com>
- <e9e8070a-8c76-c8ef-ccd4-a3761f07f0f9@redhat.com>
- <699db7d9-f692-cf2c-259f-238a1dd53f51@virtuozzo.com>
-In-Reply-To: <699db7d9-f692-cf2c-259f-238a1dd53f51@virtuozzo.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTY1NzEwMzE5LTEwMjYtMS1n
+aXQtc2VuZC1lbWFpbC1wY0B1cy5pYm0uY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRv
+IGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1v
+cmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBwcGM6IEFkZCBz
+dXBwb3J0IGZvciAnbWZmc2wnIGluc3RydWN0aW9uCk1lc3NhZ2UtaWQ6IDE1NjU3MTAzMTktMTAy
+Ni0xLWdpdC1zZW5kLWVtYWlsLXBjQHVzLmlibS5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBT
+Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
+bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
+b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
+Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
+MWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2pl
+Y3QvcWVtdQogICAwMmRiMWJlLi5mMjhlZDc0ICBtYXN0ZXIgICAgIC0+IG1hc3RlcgogKiBbbmV3
+IHRhZ10gICAgICAgICBwYXRjaGV3LzE1NjU3MTAzMTktMTAyNi0xLWdpdC1zZW5kLWVtYWlsLXBj
+QHVzLmlibS5jb20gLT4gcGF0Y2hldy8xNTY1NzEwMzE5LTEwMjYtMS1naXQtc2VuZC1lbWFpbC1w
+Y0B1cy5pYm0uY29tClN1Ym1vZHVsZSAnY2Fwc3RvbmUnIChodHRwczovL2dpdC5xZW11Lm9yZy9n
+aXQvY2Fwc3RvbmUuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdjYXBzdG9uZScKU3VibW9kdWxl
+ICdkdGMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3Ig
+cGF0aCAnZHRjJwpTdWJtb2R1bGUgJ3JvbXMvUWVtdU1hY0RyaXZlcnMnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvUWVtdU1hY0RyaXZlcnMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21z
+L1FlbXVNYWNEcml2ZXJzJwpTdWJtb2R1bGUgJ3JvbXMvU0xPRicgKGh0dHBzOi8vZ2l0LnFlbXUu
+b3JnL2dpdC9TTE9GLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9TTE9GJwpTdWJtb2R1
+bGUgJ3JvbXMvZWRrMicgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9lZGsyLmdpdCkgcmVnaXN0
+ZXJlZCBmb3IgcGF0aCAncm9tcy9lZGsyJwpTdWJtb2R1bGUgJ3JvbXMvaXB4ZScgKGh0dHBzOi8v
+Z2l0LnFlbXUub3JnL2dpdC9pcHhlLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9pcHhl
+JwpTdWJtb2R1bGUgJ3JvbXMvb3BlbmJpb3MnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvb3Bl
+bmJpb3MuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdyb21zL29wZW5iaW9zJwpTdWJtb2R1bGUg
+J3JvbXMvb3BlbmhhY2t3YXJlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L29wZW5oYWNrd2Fy
+ZS5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvb3BlbmhhY2t3YXJlJwpTdWJtb2R1bGUg
+J3JvbXMvb3BlbnNiaScgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9vcGVuc2JpLmdpdCkgcmVn
+aXN0ZXJlZCBmb3IgcGF0aCAncm9tcy9vcGVuc2JpJwpTdWJtb2R1bGUgJ3JvbXMvcWVtdS1wYWxj
+b2RlJyAoaHR0cHM6Ly9naXQucWVtdS5vcmcvZ2l0L3FlbXUtcGFsY29kZS5naXQpIHJlZ2lzdGVy
+ZWQgZm9yIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJwpTdWJtb2R1bGUgJ3JvbXMvc2VhYmlvcycg
+KGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLmdpdC8pIHJlZ2lzdGVyZWQgZm9yIHBh
+dGggJ3JvbXMvc2VhYmlvcycKU3VibW9kdWxlICdyb21zL3NlYWJpb3MtaHBwYScgKGh0dHBzOi8v
+Z2l0LnFlbXUub3JnL2dpdC9zZWFiaW9zLWhwcGEuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdy
+b21zL3NlYWJpb3MtaHBwYScKU3VibW9kdWxlICdyb21zL3NnYWJpb3MnIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQvc2dhYmlvcy5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2dhYmlv
+cycKU3VibW9kdWxlICdyb21zL3NraWJvb3QnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvc2tp
+Ym9vdC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ3JvbXMvc2tpYm9vdCcKU3VibW9kdWxlICdy
+b21zL3UtYm9vdCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3QuZ2l0KSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdyb21zL3UtYm9vdCcKU3VibW9kdWxlICdyb21zL3UtYm9vdC1zYW00NjBl
+eCcgKGh0dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC91LWJvb3Qtc2FtNDYwZXguZ2l0KSByZWdpc3Rl
+cmVkIGZvciBwYXRoICdyb21zL3UtYm9vdC1zYW00NjBleCcKU3VibW9kdWxlICdzbGlycCcgKGh0
+dHBzOi8vZ2l0LnFlbXUub3JnL2dpdC9saWJzbGlycC5naXQpIHJlZ2lzdGVyZWQgZm9yIHBhdGgg
+J3NsaXJwJwpTdWJtb2R1bGUgJ3Rlc3RzL2ZwL2JlcmtlbGV5LXNvZnRmbG9hdC0zJyAoaHR0cHM6
+Ly9naXQucWVtdS5vcmcvZ2l0L2JlcmtlbGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBm
+b3IgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZsb2F0LTMnClN1Ym1vZHVsZSAndGVzdHMv
+ZnAvYmVya2VsZXktdGVzdGZsb2F0LTMnIChodHRwczovL2dpdC5xZW11Lm9yZy9naXQvYmVya2Vs
+ZXktdGVzdGZsb2F0LTMuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICd0ZXN0cy9mcC9iZXJrZWxl
+eS10ZXN0ZmxvYXQtMycKU3VibW9kdWxlICd1aS9rZXljb2RlbWFwZGInIChodHRwczovL2dpdC5x
+ZW11Lm9yZy9naXQva2V5Y29kZW1hcGRiLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAndWkva2V5
+Y29kZW1hcGRiJwpDbG9uaW5nIGludG8gJ2NhcHN0b25lJy4uLgpTdWJtb2R1bGUgcGF0aCAnY2Fw
+c3RvbmUnOiBjaGVja2VkIG91dCAnMjJlYWQzZTBiZmRiODc1MTY2NTY0NTMzMzYxNjBlMGEzN2Iw
+NjZiZicKQ2xvbmluZyBpbnRvICdkdGMnLi4uClN1Ym1vZHVsZSBwYXRoICdkdGMnOiBjaGVja2Vk
+IG91dCAnODhmMTg5MDlkYjczMWE2Mjc0NTZmMjZkNzc5NDQ1Zjg0ZTQ0OTUzNicKQ2xvbmluZyBp
+bnRvICdyb21zL1FlbXVNYWNEcml2ZXJzJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9RZW11TWFj
+RHJpdmVycyc6IGNoZWNrZWQgb3V0ICc5MGM0ODhkNWY0YTQwNzM0MjI0N2I5ZWE4NjlkZjFjMmQ5
+YzhlMjY2JwpDbG9uaW5nIGludG8gJ3JvbXMvU0xPRicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMv
+U0xPRic6IGNoZWNrZWQgb3V0ICdiYTFhYjM2MGVlYmU2MzM4YmI4ZDdkODNhOTIyMGNjZjdlMjEz
+YWYzJwpDbG9uaW5nIGludG8gJ3JvbXMvZWRrMicuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvZWRr
+Mic6IGNoZWNrZWQgb3V0ICcyMGQyZTVhMTI1ZTM0ZmM4NTAxMDI2NjEzYTcxNTQ5YjJhMWEzZTU0
+JwpTdWJtb2R1bGUgJ1NvZnRGbG9hdCcgKGh0dHBzOi8vZ2l0aHViLmNvbS91Y2ItYmFyL2Jlcmtl
+bGV5LXNvZnRmbG9hdC0zLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnQXJtUGtnL0xpYnJhcnkv
+QXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0zJwpTdWJtb2R1bGUgJ0NyeXB0b1Br
+Zy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCcgKGh0dHBzOi8vZ2l0aHViLmNvbS9vcGVuc3Ns
+L29wZW5zc2wpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xM
+aWIvb3BlbnNzbCcKQ2xvbmluZyBpbnRvICdBcm1Qa2cvTGlicmFyeS9Bcm1Tb2Z0RmxvYXRMaWIv
+YmVya2VsZXktc29mdGZsb2F0LTMnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQXJtUGtn
+L0xpYnJhcnkvQXJtU29mdEZsb2F0TGliL2JlcmtlbGV5LXNvZnRmbG9hdC0zJzogY2hlY2tlZCBv
+dXQgJ2I2NGFmNDFjMzI3NmY5N2YwZTE4MTkyMDQwMGVlMDU2YjljODgwMzcnCkNsb25pbmcgaW50
+byAnQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsJy4uLgpTdWJtb2R1bGUgcGF0
+aCAncm9tcy9lZGsyL0NyeXB0b1BrZy9MaWJyYXJ5L09wZW5zc2xMaWIvb3BlbnNzbCc6IGNoZWNr
+ZWQgb3V0ICc1MGVhYWM5ZjMzMzc2NjcyNTlkZTcyNTQ1MWYyMDFlNzg0NTk5Njg3JwpTdWJtb2R1
+bGUgJ2JvcmluZ3NzbCcgKGh0dHBzOi8vYm9yaW5nc3NsLmdvb2dsZXNvdXJjZS5jb20vYm9yaW5n
+c3NsKSByZWdpc3RlcmVkIGZvciBwYXRoICdib3Jpbmdzc2wnClN1Ym1vZHVsZSAna3JiNScgKGh0
+dHBzOi8vZ2l0aHViLmNvbS9rcmI1L2tyYjUpIHJlZ2lzdGVyZWQgZm9yIHBhdGggJ2tyYjUnClN1
+Ym1vZHVsZSAncHljYS5jcnlwdG9ncmFwaHknIChodHRwczovL2dpdGh1Yi5jb20vcHljYS9jcnlw
+dG9ncmFwaHkuZ2l0KSByZWdpc3RlcmVkIGZvciBwYXRoICdweWNhLWNyeXB0b2dyYXBoeScKQ2xv
+bmluZyBpbnRvICdib3Jpbmdzc2wnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRv
+UGtnL0xpYnJhcnkvT3BlbnNzbExpYi9vcGVuc3NsL2JvcmluZ3NzbCc6IGNoZWNrZWQgb3V0ICcy
+MDcwZjhhZDkxNTFkYzhmM2E3M2JmZmFhMTQ2YjVlNjkzN2E1ODNmJwpDbG9uaW5nIGludG8gJ2ty
+YjUnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL2VkazIvQ3J5cHRvUGtnL0xpYnJhcnkvT3BlbnNz
+bExpYi9vcGVuc3NsL2tyYjUnOiBjaGVja2VkIG91dCAnYjlhZDZjNDk1MDVjOTZhMDg4MzI2YjYy
+YTUyNTY4ZTM0ODRmMjE2OCcKQ2xvbmluZyBpbnRvICdweWNhLWNyeXB0b2dyYXBoeScuLi4KU3Vi
+bW9kdWxlIHBhdGggJ3JvbXMvZWRrMi9DcnlwdG9Qa2cvTGlicmFyeS9PcGVuc3NsTGliL29wZW5z
+c2wvcHljYS1jcnlwdG9ncmFwaHknOiBjaGVja2VkIG91dCAnMDk0MDMxMDBkZTJmNmYxY2RkMGQ0
+ODRkY2I4ZTYyMGYxYzMzNWM4ZicKQ2xvbmluZyBpbnRvICdyb21zL2lweGUnLi4uClN1Ym1vZHVs
+ZSBwYXRoICdyb21zL2lweGUnOiBjaGVja2VkIG91dCAnZGU0NTY1Y2JlNzZlYTlmNzkxM2EwMWYz
+MzFiZTNlZTkwMWJiNmUxNycKQ2xvbmluZyBpbnRvICdyb21zL29wZW5iaW9zJy4uLgpTdWJtb2R1
+bGUgcGF0aCAncm9tcy9vcGVuYmlvcyc6IGNoZWNrZWQgb3V0ICdjNzllMGVjYjg0ZjRmMWVlM2Y3
+M2Y1MjE2MjJlMjY0ZWRkMWJmMTc0JwpDbG9uaW5nIGludG8gJ3JvbXMvb3BlbmhhY2t3YXJlJy4u
+LgpTdWJtb2R1bGUgcGF0aCAncm9tcy9vcGVuaGFja3dhcmUnOiBjaGVja2VkIG91dCAnYzU1OWRh
+N2M4ZWVjNWU0NWVmMWY2Nzk3ODgyN2FmNmYwYjk1NDZmNScKQ2xvbmluZyBpbnRvICdyb21zL29w
+ZW5zYmknLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL29wZW5zYmknOiBjaGVja2VkIG91dCAnY2Uy
+MjhlZTA5MTlkZWI5OTU3MTkyZDcyM2VlY2M4YWFhZTI2OTdjNicKQ2xvbmluZyBpbnRvICdyb21z
+L3FlbXUtcGFsY29kZScuLi4KU3VibW9kdWxlIHBhdGggJ3JvbXMvcWVtdS1wYWxjb2RlJzogY2hl
+Y2tlZCBvdXQgJ2JmMGUxMzY5ODg3MjQ1MDE2NGZhNzA0MGRhMzZhOTVkMmQ0YjMyNmYnCkNsb25p
+bmcgaW50byAncm9tcy9zZWFiaW9zJy4uLgpTdWJtb2R1bGUgcGF0aCAncm9tcy9zZWFiaW9zJzog
+Y2hlY2tlZCBvdXQgJ2E1Y2FiNThlOWEzZmI2ZTE2OGFiYTkxOWM1NjY5YmVhNDA2NTczYjQnCkNs
+b25pbmcgaW50byAncm9tcy9zZWFiaW9zLWhwcGEnLi4uClN1Ym1vZHVsZSBwYXRoICdyb21zL3Nl
+YWJpb3MtaHBwYSc6IGNoZWNrZWQgb3V0ICcwZjRmZTg0NjU4MTY1ZTk2Y2UzNTg3MGZkMTlmYzYz
+NGUxODJlNzdiJwpDbG9uaW5nIGludG8gJ3JvbXMvc2dhYmlvcycuLi4KU3VibW9kdWxlIHBhdGgg
+J3JvbXMvc2dhYmlvcyc6IGNoZWNrZWQgb3V0ICdjYmFlZTUyMjg3ZTVmMzIzNzMxODFjZmY1MGEw
+MGI2YzRhYzkwMTVhJwpDbG9uaW5nIGludG8gJ3JvbXMvc2tpYm9vdCcuLi4KU3VibW9kdWxlIHBh
+dGggJ3JvbXMvc2tpYm9vdCc6IGNoZWNrZWQgb3V0ICcyNjFjYThlNzc5ZTUxMzg4NjlhNDVmMTc0
+Y2FhNDliZTZhMjc0NTAxJwpDbG9uaW5nIGludG8gJ3JvbXMvdS1ib290Jy4uLgpTdWJtb2R1bGUg
+cGF0aCAncm9tcy91LWJvb3QnOiBjaGVja2VkIG91dCAnZDM2ODkyNjdmOTJjNTk1NmUwOWNjN2Qx
+YmFhNDcwMDE0MTY2MmJmZicKQ2xvbmluZyBpbnRvICdyb21zL3UtYm9vdC1zYW00NjBleCcuLi4K
+U3VibW9kdWxlIHBhdGggJ3JvbXMvdS1ib290LXNhbTQ2MGV4JzogY2hlY2tlZCBvdXQgJzYwYjM5
+MTZmMzNlNjE3YTgxNTk3M2M1YTZkZjc3MDU1YjJlM2E1ODgnCkNsb25pbmcgaW50byAnc2xpcnAn
+Li4uClN1Ym1vZHVsZSBwYXRoICdzbGlycCc6IGNoZWNrZWQgb3V0ICcxMjZjMDRhY2JhYmQ3YWQz
+MmMyYjAxOGZlMTBkZmFjMmEzYmMxMjEwJwpDbG9uaW5nIGludG8gJ3Rlc3RzL2ZwL2JlcmtlbGV5
+LXNvZnRmbG9hdC0zJy4uLgpTdWJtb2R1bGUgcGF0aCAndGVzdHMvZnAvYmVya2VsZXktc29mdGZs
+b2F0LTMnOiBjaGVja2VkIG91dCAnYjY0YWY0MWMzMjc2Zjk3ZjBlMTgxOTIwNDAwZWUwNTZiOWM4
+ODAzNycKQ2xvbmluZyBpbnRvICd0ZXN0cy9mcC9iZXJrZWxleS10ZXN0ZmxvYXQtMycuLi4KU3Vi
+bW9kdWxlIHBhdGggJ3Rlc3RzL2ZwL2JlcmtlbGV5LXRlc3RmbG9hdC0zJzogY2hlY2tlZCBvdXQg
+JzVhNTlkY2VjMTkzMjczOTZhMDExYTE3ZmQ5MjRhZWQ0ZmVjNDE2YjMnCkNsb25pbmcgaW50byAn
+dWkva2V5Y29kZW1hcGRiJy4uLgpTdWJtb2R1bGUgcGF0aCAndWkva2V5Y29kZW1hcGRiJzogY2hl
+Y2tlZCBvdXQgJzZiM2Q3MTZlMmI2NDcyZWI3MTg5ZDMyMjA1NTIyODBlZjNkODMyY2UnClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjgxMTExMyBwcGM6IEFkZCBzdXBwb3J0IGZvciAn
+bWZmc2wnIGluc3RydWN0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZXR3ZWVuIGZ1bmN0aW9uIG5hbWUgYW5kIG9wZW4gcGFyZW50aGVzaXMgJygnCiMz
+NDogRklMRTogZGlzYXMvcHBjLmM6MTc2OToKKyNkZWZpbmUgWFJBKG9wLCB4b3AsIHJhKSAoWCAo
+KG9wKSwgKHhvcCkpIHwgKCgocmEpIDw8IDE2KSAmIFhSQV9NQVNLKSkKCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQzOiBGSUxFOiBkaXNhcy9wcGMuYzo1MDA0Ogor
+eyAibWZmc2wiLCAgIFhSQSg2Myw1ODMsMTIpLCBYUkFSQl9NQVNLLF5JUE9XRVI5LF5JeyBGUlQg
+fSB9LCQKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzQz
+OiBGSUxFOiBkaXNhcy9wcGMuYzo1MDA0OgoreyAibWZmc2wiLCAgIFhSQSg2Myw1ODMsMTIpLCBY
+UkFSQl9NQVNLLCAgICAgICBQT1dFUjksIHsgRlJUIH0gfSwKICAgICAgICAgICAgICAgICAgICBe
+CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0MzogRklM
+RTogZGlzYXMvcHBjLmM6NTAwNDoKK3sgIm1mZnNsIiwgICBYUkEoNjMsNTgzLDEyKSwgWFJBUkJf
+TUFTSywgICAgICAgUE9XRVI5LCB7IEZSVCB9IH0sCiAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjg6IEZJTEU6IHRhcmdldC9wcGMv
+dHJhbnNsYXRlL2ZwLW9wcy5pbmMuYzoxMDg6CitHRU5fSEFORExFUl9FXzIobWZmc2wsIDB4M0Ys
+IDB4MDcsIDB4MTIsIDB4MTgsIDB4MDAwMDAwMDAsIFBQQ19GTE9BVCwgUFBDMl9JU0EzMDApLAoK
+dG90YWw6IDQgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMTYgbGluZXMgY2hlY2tlZAoKQ29tbWl0IGI4
+MTExMTM2YTkwYyAocHBjOiBBZGQgc3VwcG9ydCBmb3IgJ21mZnNsJyBpbnN0cnVjdGlvbikgaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
+ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
+L3BhdGNoZXcub3JnL2xvZ3MvMTU2NTcxMDMxOS0xMDI2LTEtZ2l0LXNlbmQtZW1haWwtcGNAdXMu
+aWJtLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
---VtOjIvqknPEM5Tyz8SeSCtM60dcQhn9Vm
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 13.08.19 18:45, Vladimir Sementsov-Ogievskiy wrote:
-> 13.08.2019 19:30, Max Reitz wrote:
->> On 13.08.19 17:32, Vladimir Sementsov-Ogievskiy wrote:
->>> 13.08.2019 18:02, Max Reitz wrote:
->>>> On 13.08.19 17:00, Vladimir Sementsov-Ogievskiy wrote:
->>>>> 13.08.2019 17:57, Max Reitz wrote:
->>>>>> On 13.08.19 16:39, Vladimir Sementsov-Ogievskiy wrote:
->>>>>>> 13.08.2019 17:23, Max Reitz wrote:
->>>>>>>> On 13.08.19 16:14, Vladimir Sementsov-Ogievskiy wrote:
->>
->> [...]
->>
->>>>>>>>> But still..
->>>>>>>>>
->>>>>>>>> Synchronous mirror allocates full-request buffers on guest writ=
-e. Is it correct?
->>>>>>>>>
->>>>>>>>> If we assume that it is correct to double memory usage of guest=
- operations, than for backup
->>>>>>>>> the problem is only in write_zero and discard where guest-assum=
-ed memory usage should be zero.
->>>>>>>>
->>>>>>>> Well, but that is the problem.  I didn=E2=80=99t say anything in=
- v2, because I
->>>>>>>> only thought of normal writes and I found it fine to double the =
-memory
->>>>>>>> usage there (a guest won=E2=80=99t issue huge write requests in =
-parallel).  But
->>>>>>>> discard/write-zeroes are a different matter.
->>>>>>>>
->>>>>>>>> And if we should distinguish writes from write_zeroes and disca=
-rd, it's better to postpone this
->>>>>>>>> improvement to be after backup-top filter merged.
->>>>>>>>
->>>>>>>> But do you need to distinguish it?  Why not just keep track of m=
-emory
->>>>>>>> usage and put the current I/O coroutine to sleep in a CoQueue or=
-
->>>>>>>> something, and wake that up at the end of backup_do_cow()?
->>>>>>>>
->>>>>>>
->>>>>>> 1. Because if we _can_ allow doubling of memory, it's more effect=
-ive to not restrict allocations on
->>>>>>> guest writes. It's just seems to be more effective technique.
->>>>>>
->>>>>> But the problem with backup and zero writes/discards is that the m=
-emory
->>>>>> is not doubled.  The request doesn=E2=80=99t need any memory, but =
-the CBW
->>>>>> operation does, and maybe lots of it.
->>>>>>
->>>>>> So the guest may issue many zero writes/discards in parallel and t=
-hus
->>>>>> exhaust memory on the host.
->>>>>
->>>>> So this is the reason to separate writes from write-zeros/discrads.=
- So at least write will be happy. And I
->>>>> think that write is more often request than write-zero/discard
->>>>
->>>> But that makes it complicated for no practical gain whatsoever.
->>>>
->>>>>>
->>>>>>> 2. Anyway, I'd allow some always-available size to allocate - let=
- it be one cluster, which will correspond
->>>>>>> to current behavior and prevent guest io hang in worst case.
->>>>>>
->>>>>> The guest would only hang if it we have to copy more than e.g. 64 =
-MB at
->>>>>> a time.  At which point I think it=E2=80=99s not unreasonable to s=
-equentialize
->>>>>> requests.
->>>>
->>>> Because of this.  How is it bad to start sequentializing writes when=
- the
->>>> data exceeds 64 MB?
->>>>
->>>
->>> So you want total memory limit of 64 MB? (with possible parameter lik=
-e in mirror)
->>>
->>> And allocation algorithm to copy count bytes:
->>>
->>> if free_mem >=3D count: allocate count bytes
->>> else if free_mem >=3D cluster: allocate cluster and copy in a loop
->>> else wait in co-queue until some memory available and retry
->>>
->>> Is it OK for you?
->>
->> Sounds good to me, although I don=E2=80=99t know whether the second br=
-anch is
->> necessary.  As I=E2=80=99ve said, the total limit is just an insurance=
- against a
->> guest that does some crazy stuff.
->>
->=20
-> I'm afraid that if there would be one big request it may wait forever w=
-hile smaller
-> requests will eat most of available memory. So it would be unfair queue=
-: smaller
-> requests will have higher priority in low memory case. With [2] it beco=
-mes more fair.
-
-OK.  Sounds reasonable.
-
-Max
-
-
---VtOjIvqknPEM5Tyz8SeSCtM60dcQhn9Vm--
-
---PPdRBcHkymWGhy4TcWPl6zQjwz5u4YD4t
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1S6pIACgkQ9AfbAGHV
-z0C74wgAtmVdNQbJCVrLqlOoZzECu4Xxc/fWS/Ph3t1l+4cFc0cN/fWxPF2m7qkF
-4KC/SbPGydMHkYPYDYrE5a+6hWmah5XxpHizmg6i2Ca8S2qyCEL+3FpA3uAJHdni
-0rmNwqxCr6HLAb79kt6FqqHVM7T8FDY2uBshnfvXVBAgNbvOTMgHOFjajJSFBlhD
-GzHrF8Lz2ufSFBLaCCo2q1icKJc4+vuLa6K5xqO5oNFEOM8AUb0k0jZGT3Io4RPW
-epPxP8WLriImxxmzKinjj/ta6aEWcsszpYGLu+JhN8k2aEOxwQDHKVctj6tKCnWM
-DFUWUbHQV3uY9QjOOXRgUkZxFpTqwQ==
-=SX0A
------END PGP SIGNATURE-----
-
---PPdRBcHkymWGhy4TcWPl6zQjwz5u4YD4t--
 
