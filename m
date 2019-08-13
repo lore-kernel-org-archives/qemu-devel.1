@@ -2,121 +2,98 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EC3C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD11C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:58:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E0D0205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:56:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AMZTpdT7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E0D0205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 60934205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:58:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60934205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYEK-0007qJ-Hn
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 10:56:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43953)
+	id 1hxYFz-0000RN-Na
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 10:58:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44240)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxYDe-0007Me-OU
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:56:15 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxYFT-0008Ol-FM
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxYDd-0001XC-NN
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:56:14 -0400
-Received: from mail-eopbgr150115.outbound.protection.outlook.com
- ([40.107.15.115]:23800 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxYDd-0001Wd-0u; Tue, 13 Aug 2019 10:56:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OUdOl90xVUvOgdLf4ERJoyK5662fAkhNU14ds3AaYYyTZF3foY50SPeph0tMEmwk0ReXzHhwp7DRbbAmiTtJyqkVh3tSjMFUQu9iowj/Wr+tCpV8852j9szRYRpuqWyHRsQ5FqqV6LrS+aHSakjDuhes9DjQOeZS5LAH5xuCv5votEZxgrsevEnw0AMVOEjok8w3h0tr4lFRtlfRT/1dAVVNGq4ZTWL8J1p88fwssHpJSLRFqrb6c5xci8GSfZ7831hOvKfzpqz3Ur6dCRFMZ3h0N2SfQD8y5CDHxuYsTz2dM6szufx9xcyV3Y4S3EgL/T5tMi6e2icad2n6makDuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PeI3l6cteEK1zHD8hSmiV4pxFG4OInfd9n6ckvk0Tjo=;
- b=U3EeD+SYuiA6PqvXiX0e1WbPrMbQq3/vOHZc/jdwyeNrnoTg5RNgpNxeONDZxaWzvBf5UZam7xkGHmIpKE4ydRU47arz6d15qJLNTOo8+fbqA7R+s4rkNAeIqEBE7esoXjVzZ+2+jSDwuftLOWBluWMBjUkpT27uQDoCdVWHw3oN/U+lu2o8GuD8AWZaRacjhBWqg11KxLgIGiN+wiNQHMl+ivu3OcCUPVGs71yCyV2RWdU6A3Qa71hIuUksHPZemq++27IEPu2Od9lBhqek52GDJzSOtkkTU/xz/p2tOEE2idNRe+fZCqxbwTd0Noaj2S96vMHidigtcWhau0H4KA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PeI3l6cteEK1zHD8hSmiV4pxFG4OInfd9n6ckvk0Tjo=;
- b=AMZTpdT7Dz7yWIpg8DP1vzN3mCKrn0iwkDDCrq/Kxw0GHvSCVjWY5GGUk/hZckzmivCJA8koW2USdmEJYeHQ2Dzct7K9JBc2RCxddgdnGE8G/cW/GvPxp0xFC44h4bUcMKj4HWsO0XBB3iwIaKIM6o0gH9F5W3P4on9KjQMYBnA=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5083.eurprd08.prod.outlook.com (10.255.18.95) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.18; Tue, 13 Aug 2019 14:56:11 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.022; Tue, 13 Aug 2019
- 14:56:11 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Thread-Topic: [PATCH 1/2] block/raw-format: switch to BDRV_BLOCK_DATA with
- BDRV_BLOCK_RECURSE
-Thread-Index: AQHVUTlsaPHpCWSa5ku4nJrwFG1t86b4600AgAA9SACAAANyAA==
-Date: Tue, 13 Aug 2019 14:56:11 +0000
-Message-ID: <6af67f42-b5ee-1ca9-6fb1-500fd993616a@virtuozzo.com>
-References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
- <20190812181146.26121-2-vsementsov@virtuozzo.com>
- <20190813110428.GE4663@localhost.localdomain>
- <fef7f4d1-b40e-6c84-3952-120a641a8061@redhat.com>
-In-Reply-To: <fef7f4d1-b40e-6c84-3952-120a641a8061@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0326.eurprd05.prod.outlook.com
- (2603:10a6:7:92::21) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190813175608922
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0a67a6b2-257e-493d-a94d-08d71ffe613b
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5083; 
-x-ms-traffictypediagnostic: DB8PR08MB5083:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8PR08MB5083A0EDB7803732E51D0EEDC1D20@DB8PR08MB5083.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01283822F8
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(396003)(39840400004)(366004)(346002)(376002)(199004)(189003)(6436002)(31686004)(66476007)(64756008)(53546011)(66946007)(81166006)(386003)(99286004)(8676002)(66446008)(66556008)(186003)(71200400001)(81156014)(6506007)(478600001)(71190400001)(486006)(305945005)(102836004)(4326008)(6486002)(76176011)(52116002)(6116002)(3846002)(7736002)(2616005)(229853002)(6512007)(316002)(14454004)(476003)(86362001)(54906003)(446003)(110136005)(8936002)(11346002)(25786009)(5660300002)(2906002)(6246003)(256004)(107886003)(36756003)(31696002)(26005)(66066001)(53936002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5083;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 16zeVakB+e2jLSoSEz7ttZc2/bs7m9ycYdujUs6WyVp4ZKuTM8AQz1S0qDFRbri8Jq9zGzxZR9FGstMXbVtAH+Bw+9Pg9YVgkKHymBi+fKxvkfvePhtDlbZuvirFC/Ohr7pgQLMkNKETBJT5N8ao1x/cXiysGWxKQeSdcAmXLknG7yV6D1q70DJD3z1k5rEcLqJuYOnsiL4rqnOXtf309syQ66EqL2PH0FQXXZ0UfJ6IjA2XRgNJBAWNgI7CNugyDtTh4tTdFslmipvQrFHlPuobWT9/KyLMmoV+C39FiHZGTe5FxtYk0K1yF05hPY567xFPaLHeqIBnP5NF75Ju+4XMVCuwAZCgwiSVHhZM3Cw9si9jjfCQPXl+mdSaz6G9yuDHw5JB9FQOJHYrmHOrZD4bIJJJ0pbybfZdNJX9Umk=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DC1E4B6F562B7047AB0F459BF71DBFD0@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <mreitz@redhat.com>) id 1hxYFR-0002JM-OB
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:58:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40750)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hxYFN-0002HT-VQ; Tue, 13 Aug 2019 10:58:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 336603090FE1;
+ Tue, 13 Aug 2019 14:58:01 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C70F860BE2;
+ Tue, 13 Aug 2019 14:57:51 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
+ <20190810193155.58637-7-vsementsov@virtuozzo.com>
+ <5102eac9-125b-0719-910f-4adb240732f1@redhat.com>
+ <89c87c83-276a-7663-a239-57dbd9f91a30@virtuozzo.com>
+ <ecff86a8-57d1-4c8a-d4b4-95524471d249@redhat.com>
+ <e3fc5e07-33c6-1fe3-2042-35bdac0a03c3@virtuozzo.com>
+ <4093762b-a1bc-d6b1-8358-4f9d1ab52557@virtuozzo.com>
+ <e05af208-c7cb-31e6-bfab-62a44f5281e7@redhat.com>
+ <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9b7a3060-4880-9ef4-89f2-e8327ce655b8@redhat.com>
+Date: Tue, 13 Aug 2019 16:57:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a67a6b2-257e-493d-a94d-08d71ffe613b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2019 14:56:11.0469 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YOyH+40GHX1NaFYhzp+y095ZLaBZSDKjr198NaPKWSzCsIRXJxFd4iT+iFyOm+FOKREklVdIuHkP9LXdWWHh+1aDbhKGTnk4aRNgjnPpf2o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5083
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.115
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/raw-format: switch to
- BDRV_BLOCK_DATA with BDRV_BLOCK_RECURSE
+In-Reply-To: <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="1dT8vhnjVYMCA0KIo4NtzppwW00ibhVQS"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Tue, 13 Aug 2019 14:58:01 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/backup: teach
+ backup_cow_with_bounce_buffer to copy more at once
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,47 +105,361 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDguMjAxOSAxNzo0MywgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxMy4wOC4xOSAxMzowNCwg
-S2V2aW4gV29sZiB3cm90ZToNCj4+IEFtIDEyLjA4LjIwMTkgdW0gMjA6MTEgaGF0IFZsYWRpbWly
-IFNlbWVudHNvdi1PZ2lldnNraXkgZ2VzY2hyaWViZW46DQo+Pj4gQkRSVl9CTE9DS19SQVcgbWFr
-ZXMgZ2VuZXJpYyBiZHJ2X2NvX2Jsb2NrX3N0YXR1cyB0byBmYWxsdGhyb3VnaCB0bw0KPj4+IHJl
-dHVybmVkIGZpbGUuIEJ1dCBpcyBpdCBjb3JyZWN0IGJlaGF2aW9yIGF0IGFsbD8gSWYgcmV0dXJu
-ZWQgZmlsZQ0KPj4+IGl0c2VsZiBoYXMgYSBiYWNraW5nIGZpbGUsIHdlIG1heSByZXBvcnQgYXMg
-dG90YWxseSB1bmFsbG9jYXRlZCBhbmQNCj4+PiBhcmVhIHdoaWNoIGFjdHVhbGx5IGhhcyBkYXRh
-IGluIGJvdHRvbSBiYWNraW5nIGZpbGUuDQo+Pj4NCj4+PiBTbywgbWlycm9yaW5nIG9mIHFjb3cy
-IHVuZGVyIHJhdy1mb3JtYXQgaXMgYnJva2VuLiBXaGljaCBpcyBpbGx1c3RyYXRlZA0KPj4+IGJ5
-IGZvbGxvd2luZyBjb21taXQgd2l0aCBhIHRlc3QuIExldCdzIG1ha2UgcmF3LWZvcm1hdCBiZWhh
-dmUgbW9yZQ0KPj4+IGNvcnJlY3RseSByZXR1cm5pbmcgQkRSVl9CTE9DS19EQVRBLg0KPj4+DQo+
-Pj4gU3VnZ2VzdGVkLWJ5OiBNYXggUmVpdHogPG1yZWl0ekByZWRoYXQuY29tPg0KPj4+IFNpZ25l
-ZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVv
-enpvLmNvbT4NCj4+DQo+PiBBZnRlciBzb21lIHJlYWRpbmcsIEkgdGhpbmsgSSBjYW1lIHRvIHRo
-ZSBjb25jbHVzaW9uIHRoYXQgUkFXIGlzIHRoZQ0KPj4gY29ycmVjdCB0aGluZyB0byBkby4gVGhl
-cmUgaXMgaW5kZWVkIGEgcHJvYmxlbSwgYnV0IHRoaXMgcGF0Y2ggaXMgdHJ5aW5nDQo+PiB0byBm
-aXggaXQgaW4gdGhlIHdyb25nIHBsYWNlLg0KPj4NCj4+IEluIHRoZSBjYXNlIHdoZXJlIHRoZSBi
-YWNraW5nIGZpbGUgY29udGFpbnMgc29tZSBkYXRhLCBhbmQgd2UgaGF2ZSBhDQo+PiAncmF3JyBu
-b2RlIGFib3ZlIHRoZSBxY293MiBvdmVybGF5IG5vZGUsIHRoZSBjb250ZW50IG9mIHRoZSByZXNw
-ZWN0aXZlDQo+PiBibG9jayBpcyBub3QgZGVmaW5lZCBieSB0aGUgcXVlcmllZCBiYWNraW5nIGZp
-bGUgbGF5ZXIsIHNvIGl0IGlzDQo+PiBjb21wbGV0ZWx5IGNvcnJlY3QgdGhhdCBiZHJ2X2lzX2Fs
-bG9jYXRlZCgpIHJldHVybnMgZmFsc2UsbGlrZSBpdCB3b3VsZA0KPj4gaWYgeW91IHF1ZXJpZWQg
-dGhlIHFjb3cyIGxheWVyIGRpcmVjdGx5Lg0KPiANCj4gSSBkaXNhZ3JlZS4gIFRoZSBxdWVyaWVk
-IGJhY2tpbmcgZmlsZSBsYXllciBpcyB0aGUgcmF3IG5vZGUuICBBcyBJIHNhaWQsDQo+IGluIG15
-IG9waW5pb24gcmF3IG5vZGVzIGFyZSBub3QgZmlsdGVyIG5vZGVzLCBuZWl0aGVyIGluIGJlaGF2
-aW9yICh0aGV5DQo+IGhhdmUgYW4gb2Zmc2V0IG9wdGlvbiksIG5vciBpbiBob3cgdGhleSBhcmUg
-Z2VuZXJhbGx5IHVzZWQgKGFzIGEgZm9ybWF0KS4NCj4gDQo+IFRoZSByYXcgZm9ybWF0IGRvZXMg
-bm90IHN1cHBvcnQgYmFja2luZyBmaWxlcy4gIFRoZXJlZm9yZSwgZXZlcnl0aGluZyBvbg0KPiBh
-IHJhdyBub2RlIGlzIGFsbG9jYXRlZC4NCj4gDQoNCkNvdWxkIHlvdSB0ZWxsIG1lIGF0IGxlYXN0
-LCB3aGF0IG1lYW5zICJhbGxvY2F0ZWQiID8NCg0KSXQncyBhIHRlcm0gdGhhdCBkZXNjcmliaW5n
-IGEgcmVnaW9uIHNvbWVob3cuLiBCdXQgaG93PyBBbGxvY2F0ZWQgd2hlcmU/DQpJbiByYXcgbm9k
-ZSwgaW4gaXRzIGNoaWxkIG9yIGJvdGg/IEFtIEkgcmlnaHQgdGhhdCBpZiByZWdpb24gYWxsb2Nh
-dGVkIGluDQpvbmUgb2Ygbm9uLWNvdyBjaGlsZHJlbiBpdCBpcyBhc3N1bWVkIHRvIGJlIGFsbG9j
-YXRlZCBpbiBwYXJlbnQgdG9vPyBPciB3aGF0Pw0KDQpBbmQgaXQncyB1bnJlbGF0ZWQgdG8gcmVh
-bCBkaXNrIGFsbG9jYXRpb24gd2hpY2ggKElNSE8pIGRpcmVjdGx5IHNob3dzIHRoYXQNCnRoaXMg
-YSBiYWQgdGVybS4NCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1dT8vhnjVYMCA0KIo4NtzppwW00ibhVQS
+Content-Type: multipart/mixed; boundary="XxiJGivbTKuyDNiDDmZdXVRckIJ75w6ut";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Message-ID: <9b7a3060-4880-9ef4-89f2-e8327ce655b8@redhat.com>
+Subject: Re: [PATCH v3 6/7] block/backup: teach backup_cow_with_bounce_buffer
+ to copy more at once
+References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
+ <20190810193155.58637-7-vsementsov@virtuozzo.com>
+ <5102eac9-125b-0719-910f-4adb240732f1@redhat.com>
+ <89c87c83-276a-7663-a239-57dbd9f91a30@virtuozzo.com>
+ <ecff86a8-57d1-4c8a-d4b4-95524471d249@redhat.com>
+ <e3fc5e07-33c6-1fe3-2042-35bdac0a03c3@virtuozzo.com>
+ <4093762b-a1bc-d6b1-8358-4f9d1ab52557@virtuozzo.com>
+ <e05af208-c7cb-31e6-bfab-62a44f5281e7@redhat.com>
+ <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
+In-Reply-To: <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
+
+--XxiJGivbTKuyDNiDDmZdXVRckIJ75w6ut
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 13.08.19 16:39, Vladimir Sementsov-Ogievskiy wrote:
+> 13.08.2019 17:23, Max Reitz wrote:
+>> On 13.08.19 16:14, Vladimir Sementsov-Ogievskiy wrote:
+>>> 12.08.2019 19:37, Vladimir Sementsov-Ogievskiy wrote:
+>>>> 12.08.2019 19:11, Max Reitz wrote:
+>>>>> On 12.08.19 17:47, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> 12.08.2019 18:10, Max Reitz wrote:
+>>>>>>> On 10.08.19 21:31, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>> backup_cow_with_offload can transfer more than one cluster. Let
+>>>>>>>> backup_cow_with_bounce_buffer behave similarly. It reduces the n=
+umber
+>>>>>>>> of IO requests, since there is no need to copy cluster by cluste=
+r.
+>>>>>>>>
+>>>>>>>> Logic around bounce_buffer allocation changed: we can't just all=
+ocate
+>>>>>>>> one-cluster-sized buffer to share for all iterations. We can't a=
+lso
+>>>>>>>> allocate buffer of full-request length it may be too large, so
+>>>>>>>> BACKUP_MAX_BOUNCE_BUFFER is introduced. And finally, allocation =
+logic
+>>>>>>>> is to allocate a buffer sufficient to handle all remaining itera=
+tions
+>>>>>>>> at the point where we need the buffer for the first time.
+>>>>>>>>
+>>>>>>>> Bonus: get rid of pointer-to-pointer.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozz=
+o.com>
+>>>>>>>> ---
+>>>>>>>>  =C2=A0=C2=A0 block/backup.c | 65 ++++++++++++++++++++++++++++++=
++-------------------
+>>>>>>>>  =C2=A0=C2=A0 1 file changed, 41 insertions(+), 24 deletions(-)
+>>>>>>>>
+>>>>>>>> diff --git a/block/backup.c b/block/backup.c
+>>>>>>>> index d482d93458..65f7212c85 100644
+>>>>>>>> --- a/block/backup.c
+>>>>>>>> +++ b/block/backup.c
+>>>>>>>> @@ -27,6 +27,7 @@
+>>>>>>>>  =C2=A0=C2=A0 #include "qemu/error-report.h"
+>>>>>>>>  =C2=A0=C2=A0 #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+>>>>>>>> +#define BACKUP_MAX_BOUNCE_BUFFER (64 * 1024 * 1024)
+>>>>>>>>  =C2=A0=C2=A0 typedef struct CowRequest {
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t start_byte;
+>>>>>>>> @@ -98,44 +99,55 @@ static void cow_request_end(CowRequest *req)=
+
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_co_queue_restart_all(=
+&req->wait_queue);
+>>>>>>>>  =C2=A0=C2=A0 }
+>>>>>>>> -/* Copy range to target with a bounce buffer and return the byt=
+es copied. If
+>>>>>>>> - * error occurred, return a negative error number */
+>>>>>>>> +/*
+>>>>>>>> + * Copy range to target with a bounce buffer and return the byt=
+es copied. If
+>>>>>>>> + * error occurred, return a negative error number
+>>>>>>>> + *
+>>>>>>>> + * @bounce_buffer is assumed to enough to store
+>>>>>>>
+>>>>>>> s/to/to be/
+>>>>>>>
+>>>>>>>> + * MIN(BACKUP_MAX_BOUNCE_BUFFER, @end - @start) bytes
+>>>>>>>> + */
+>>>>>>>>  =C2=A0=C2=A0 static int coroutine_fn backup_cow_with_bounce_buf=
+fer(BackupBlockJob *job,
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t start,
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t end,
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool is_write_notifier,
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool *error_is_read,
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void **bounce_buffer)
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *bounce_buffer)
+>>>>>>>>  =C2=A0=C2=A0 {
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockBackend *blk =3D job-=
+>common.blk;
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 int nbytes;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 int nbytes, remaining_bytes;
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int read_flags =3D is_writ=
+e_notifier ? BDRV_REQ_NO_SERIALISING : 0;
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(QEMU_IS_ALIGNED(sta=
+rt, job->cluster_size));
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 bdrv_reset_dirty_bitmap(job->copy_bitmap, st=
+art, job->cluster_size);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 nbytes =3D MIN(job->cluster_size, job->len -=
+ start);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 if (!*bounce_buffer) {
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *bounce_buffer =3D b=
+lk_blockalign(blk, job->cluster_size);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 }
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 bdrv_reset_dirty_bitmap(job->copy_bitmap, st=
+art, end - start);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 nbytes =3D MIN(end - start, job->len - start=
+);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pread(blk, start, nbytes, *bo=
+unce_buffer, read_flags);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_backup_do_cow_=
+read_fail(job, start, ret);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (error_is_read) {=
+
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 *error_is_read =3D true;
+>>>>>>>> +
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 remaining_bytes =3D nbytes;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0 while (remaining_bytes) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int chunk =3D MIN(BA=
+CKUP_MAX_BOUNCE_BUFFER, remaining_bytes);
+>>>>>>>> +
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pread=
+(blk, start, chunk, bounce_buffer, read_flags);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 trace_backup_do_cow_read_fail(job, start, ret);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (error_is_read) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *error_is_read =3D true;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 goto fail;
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 }
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pwrite(job->target, start, nb=
+ytes, *bounce_buffer,
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ job->write_flags);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_backup_do_cow_=
+write_fail(job, start, ret);
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (error_is_read) {=
+
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 *error_is_read =3D false;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pwrit=
+e(job->target, start, chunk, bounce_buffer,
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 job->write_flags);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 trace_backup_do_cow_write_fail(job, start, ret);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (error_is_read) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *error_is_read =3D false;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 goto fail;
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>>>>>>> +
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 start +=3D chunk;
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 remaining_bytes -=3D=
+ chunk;
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbytes;
+>>>>>>>> @@ -301,9 +313,14 @@ static int coroutine_fn backup_do_cow(Backu=
+pBlockJob *job,
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
+ (!job->use_copy_range) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (!bounce_buffer) {
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t len =3D MIN(BACKUP_MAX_BOUNCE_BUFFER,
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MAX(dirty_end - st=
+art, end - dirty_end));
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 bounce_buffer =3D blk_try_blockalign(job->com=
+mon.blk, len);
+>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }
+>>>>>>>
+>>>>>>> If you use _try_, you should probably also check whether it succe=
+eded.
+>>>>>>
+>>>>>> Oops, you are right, of course.
+>>>>>>
+>>>>>>>
+>>>>>>> Anyway, I wonder whether it=E2=80=99d be better to just allocate =
+this buffer
+>>>>>>> once per job (the first time we get here, probably) to be of size=
+
+>>>>>>> BACKUP_MAX_BOUNCE_BUFFER and put it into BackupBlockJob.=C2=A0 (A=
+nd maybe add
+>>>>>>> a buf-size parameter similar to what the mirror jobs have.)
+>>>>>>>
+>>>>>>
+>>>>>> Once per job will not work, as we may have several guest writes in=
+ parallel and therefore
+>>>>>> several parallel copy-before-write operations.
+>>>>>
+>>>>> Hm.=C2=A0 I=E2=80=99m not quite happy with that because if the gues=
+t just issues many
+>>>>> large discards in parallel, this means that qemu will allocate a la=
+rge
+>>>>> amount of memory.
+>>>>>
+>>>>> It would be nice if there was a simple way to keep track of the tot=
+al
+>>>>> memory usage and let requests yield if they would exceed it.
+>>>>
+>>>> Agree, it should be fixed anyway.
+>>>>
+>>>
+>>>
+>>> But still..
+>>>
+>>> Synchronous mirror allocates full-request buffers on guest write. Is =
+it correct?
+>>>
+>>> If we assume that it is correct to double memory usage of guest opera=
+tions, than for backup
+>>> the problem is only in write_zero and discard where guest-assumed mem=
+ory usage should be zero.
+>>
+>> Well, but that is the problem.  I didn=E2=80=99t say anything in v2, b=
+ecause I
+>> only thought of normal writes and I found it fine to double the memory=
+
+>> usage there (a guest won=E2=80=99t issue huge write requests in parall=
+el).  But
+>> discard/write-zeroes are a different matter.
+>>
+>>> And if we should distinguish writes from write_zeroes and discard, it=
+'s better to postpone this
+>>> improvement to be after backup-top filter merged.
+>>
+>> But do you need to distinguish it?  Why not just keep track of memory
+>> usage and put the current I/O coroutine to sleep in a CoQueue or
+>> something, and wake that up at the end of backup_do_cow()?
+>>
+>=20
+> 1. Because if we _can_ allow doubling of memory, it's more effective to=
+ not restrict allocations on
+> guest writes. It's just seems to be more effective technique.
+
+But the problem with backup and zero writes/discards is that the memory
+is not doubled.  The request doesn=E2=80=99t need any memory, but the CBW=
+
+operation does, and maybe lots of it.
+
+So the guest may issue many zero writes/discards in parallel and thus
+exhaust memory on the host.
+
+> 2. Anyway, I'd allow some always-available size to allocate - let it be=
+ one cluster, which will correspond
+> to current behavior and prevent guest io hang in worst case.
+
+The guest would only hang if it we have to copy more than e.g. 64 MB at
+a time.  At which point I think it=E2=80=99s not unreasonable to sequenti=
+alize
+requests.
+
+Max
+
+> So I mean, if we have enough memory allow
+> individual CBW operation to allocate the whole buffer, and if we have n=
+o extra memory allow to allocate one
+> cluster.
+>=20
+
+
+
+--XxiJGivbTKuyDNiDDmZdXVRckIJ75w6ut--
+
+--1dT8vhnjVYMCA0KIo4NtzppwW00ibhVQS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1Sz+4ACgkQ9AfbAGHV
+z0CNTQf/YIYSlxICCtL4ufHKswfAZs78weQf7cE8nYNUE19mt6SLgJ6Bk5i80eRY
+GKn4Y68q/96/GNe0sWdpP5YMI0oPMUnjPqDONbnxIcpocnqyyQckQ19YWxYLJ2TF
+KfKGJHfanUAaAM+nZQX2uPmBjPdC2KIUuF6Q0c4fgt5VI8NZZZgEnifMNQvQRQYJ
+iR3tyX5SEyy9LYT7dCNOkrVnLelAqN0L01bXaffByX6UfWDhG3hT0HBrY56nEUBq
+au4tg9fTd32y82uIL61ctWV3146+ijhkanoao9IbuMG+f2SNJ8mE06+nzL5n17lA
+2Dc7o6EKzQjnBCTIgDusBdaEIMtS5w==
+=37/o
+-----END PGP SIGNATURE-----
+
+--1dT8vhnjVYMCA0KIo4NtzppwW00ibhVQS--
 
