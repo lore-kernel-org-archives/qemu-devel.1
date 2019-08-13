@@ -2,62 +2,100 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE1E3C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011BCC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:03:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2CBC205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:02:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2CBC205F4
+	by mail.kernel.org (Postfix) with ESMTPS id B840B205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:03:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B840B205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYJs-0004Zq-7O
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:02:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44622)
+	id 1hxYKS-0005bE-Vb
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:03:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45095)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <imammedo@redhat.com>) id 1hxYHr-0001KV-99
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:00:36 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxYJs-0004kb-GX
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:02:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1hxYHp-0003jl-Er
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:00:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49915)
+ (envelope-from <mreitz@redhat.com>) id 1hxYJq-00051K-Km
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:02:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47042)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1hxYHp-0003jQ-5D
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:00:33 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hxYJi-0004rl-U5; Tue, 13 Aug 2019 11:02:31 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 65FAB308FC22;
- Tue, 13 Aug 2019 15:00:31 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.182])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4A0C7271AA;
- Tue, 13 Aug 2019 15:00:29 +0000 (UTC)
-Date: Tue, 13 Aug 2019 17:00:27 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao <tao3.xu@intel.com>
-Message-ID: <20190813170027.0617b129@redhat.com>
-In-Reply-To: <20190809065731.9097-6-tao3.xu@intel.com>
-References: <20190809065731.9097-1-tao3.xu@intel.com>
- <20190809065731.9097-6-tao3.xu@intel.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id E90A730A00C8;
+ Tue, 13 Aug 2019 15:02:29 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.136])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9444D28D06;
+ Tue, 13 Aug 2019 15:02:21 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
+ <20190810193155.58637-7-vsementsov@virtuozzo.com>
+ <5102eac9-125b-0719-910f-4adb240732f1@redhat.com>
+ <89c87c83-276a-7663-a239-57dbd9f91a30@virtuozzo.com>
+ <ecff86a8-57d1-4c8a-d4b4-95524471d249@redhat.com>
+ <e3fc5e07-33c6-1fe3-2042-35bdac0a03c3@virtuozzo.com>
+ <4093762b-a1bc-d6b1-8358-4f9d1ab52557@virtuozzo.com>
+ <e05af208-c7cb-31e6-bfab-62a44f5281e7@redhat.com>
+ <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
+ <9b7a3060-4880-9ef4-89f2-e8327ce655b8@redhat.com>
+ <9479f6b6-3cfe-8594-d8fc-9a66c8f799c1@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <f331ace9-de9f-e5d9-a569-5f50059a522c@redhat.com>
+Date: Tue, 13 Aug 2019 17:02:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <9479f6b6-3cfe-8594-d8fc-9a66c8f799c1@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="vgWd08rtLlfTwhhV9JcbNv54DNelUwpN3"
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 13 Aug 2019 15:00:31 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Tue, 13 Aug 2019 15:02:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 05/11] numa: Extend CLI to provide
- initiator information for numa nodes
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block/backup: teach
+ backup_cow_with_bounce_buffer to copy more at once
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,235 +107,378 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, jingqi.liu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, daniel@linux.ibm.com, jonathan.cameron@huawei.com,
- dan.j.williams@intel.com
+Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  9 Aug 2019 14:57:25 +0800
-Tao <tao3.xu@intel.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vgWd08rtLlfTwhhV9JcbNv54DNelUwpN3
+Content-Type: multipart/mixed; boundary="OS8gh9nTflnuschu1kQBhUeuo583FsOoa";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, "jsnow@redhat.com"
+ <jsnow@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Message-ID: <f331ace9-de9f-e5d9-a569-5f50059a522c@redhat.com>
+Subject: Re: [PATCH v3 6/7] block/backup: teach backup_cow_with_bounce_buffer
+ to copy more at once
+References: <20190810193155.58637-1-vsementsov@virtuozzo.com>
+ <20190810193155.58637-7-vsementsov@virtuozzo.com>
+ <5102eac9-125b-0719-910f-4adb240732f1@redhat.com>
+ <89c87c83-276a-7663-a239-57dbd9f91a30@virtuozzo.com>
+ <ecff86a8-57d1-4c8a-d4b4-95524471d249@redhat.com>
+ <e3fc5e07-33c6-1fe3-2042-35bdac0a03c3@virtuozzo.com>
+ <4093762b-a1bc-d6b1-8358-4f9d1ab52557@virtuozzo.com>
+ <e05af208-c7cb-31e6-bfab-62a44f5281e7@redhat.com>
+ <cf9718b9-f36d-27f3-ad49-4f6fb1e1d7b3@virtuozzo.com>
+ <9b7a3060-4880-9ef4-89f2-e8327ce655b8@redhat.com>
+ <9479f6b6-3cfe-8594-d8fc-9a66c8f799c1@virtuozzo.com>
+In-Reply-To: <9479f6b6-3cfe-8594-d8fc-9a66c8f799c1@virtuozzo.com>
 
-> From: Tao Xu <tao3.xu@intel.com>
-> 
-> In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),
-> The initiator represents processor which access to memory. And in 5.2.27.3
-> Memory Proximity Domain Attributes Structure, the attached initiator is
-> defined as where the memory controller responsible for a memory proximity
-> domain. With attached initiator information, the topology of heterogeneous
-> memory can be described.
-> 
-> Extend CLI of "-numa node" option to indicate the initiator numa node-id.
-> In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-> the platform's HMAT tables.
-> 
-> Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
-> Suggested-by: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
-> 
-> No changes in v9
-> ---
->  hw/core/machine.c     | 24 ++++++++++++++++++++++++
->  hw/core/numa.c        | 13 +++++++++++++
->  include/sysemu/numa.h |  3 +++
->  qapi/machine.json     |  6 +++++-
->  qemu-options.hx       | 27 +++++++++++++++++++++++----
->  5 files changed, 68 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 3c55470103..113184a9df 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -640,6 +640,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
->                                 const CpuInstanceProperties *props, Error **errp)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
-> +    NodeInfo *numa_info = machine->numa_state->nodes;
->      bool match = false;
->      int i;
->  
-> @@ -709,6 +710,16 @@ void machine_set_cpu_numa_node(MachineState *machine,
->          match = true;
->          slot->props.node_id = props->node_id;
->          slot->props.has_node_id = props->has_node_id;
-> +
-> +        if (numa_info[props->node_id].initiator_valid &&
-> +            (props->node_id != numa_info[props->node_id].initiator)) {
-> +            error_setg(errp, "The initiator of CPU NUMA node %" PRId64
-> +                       " should be itself.", props->node_id);
-> +            return;
-> +        }
-> +        numa_info[props->node_id].initiator_valid = true;
-> +        numa_info[props->node_id].has_cpu = true;
-> +        numa_info[props->node_id].initiator = props->node_id;
->      }
->  
->      if (!match) {
-> @@ -1050,6 +1061,7 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
->      GString *s = g_string_new(NULL);
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
->      const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
-> +    NodeInfo *numa_info = machine->numa_state->nodes;
->  
->      assert(machine->numa_state->num_nodes);
->      for (i = 0; i < possible_cpus->len; i++) {
-> @@ -1083,6 +1095,18 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
->              machine_set_cpu_numa_node(machine, &props, &error_fatal);
->          }
->      }
-> +
-> +    for (i = 0; i < machine->numa_state->num_nodes; i++) {
-> +        if (numa_info[i].initiator_valid &&
-> +            !numa_info[numa_info[i].initiator].has_cpu) {
-                          ^^^^^^^^^^^^^^^^^^^^^^ possible out of bounds read, see bellow
+--OS8gh9nTflnuschu1kQBhUeuo583FsOoa
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> +            error_report("The initiator-id %"PRIu16 " of NUMA node %d"
-> +                         " does not exist.", numa_info[i].initiator, i);
-> +            error_printf("\n");
-> +
-> +            exit(1);
-> +        }
-it takes care only about nodes that have cpus or memory-only ones that have
-initiator explicitly provided on CLI. And leaves possibility to have
-memory-only nodes without initiator mixed with nodes that have initiator.
-Is it valid to have mixed configuration?
-Should we forbid it?
+On 13.08.19 17:00, Vladimir Sementsov-Ogievskiy wrote:
+> 13.08.2019 17:57, Max Reitz wrote:
+>> On 13.08.19 16:39, Vladimir Sementsov-Ogievskiy wrote:
+>>> 13.08.2019 17:23, Max Reitz wrote:
+>>>> On 13.08.19 16:14, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 12.08.2019 19:37, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> 12.08.2019 19:11, Max Reitz wrote:
+>>>>>>> On 12.08.19 17:47, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>> 12.08.2019 18:10, Max Reitz wrote:
+>>>>>>>>> On 10.08.19 21:31, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>>>>> backup_cow_with_offload can transfer more than one cluster. Le=
+t
+>>>>>>>>>> backup_cow_with_bounce_buffer behave similarly. It reduces the=
+ number
+>>>>>>>>>> of IO requests, since there is no need to copy cluster by clus=
+ter.
+>>>>>>>>>>
+>>>>>>>>>> Logic around bounce_buffer allocation changed: we can't just a=
+llocate
+>>>>>>>>>> one-cluster-sized buffer to share for all iterations. We can't=
+ also
+>>>>>>>>>> allocate buffer of full-request length it may be too large, so=
 
-> +    }
-> +
->      if (s->len && !qtest_enabled()) {
->          warn_report("CPU(s) not present in any NUMA nodes: %s",
->                      s->str);
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index 8fcbba05d6..cfb6339810 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -128,6 +128,19 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
->          numa_info[nodenr].node_mem = object_property_get_uint(o, "size", NULL);
->          numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
->      }
-> +
-> +    if (node->has_initiator) {
-> +        if (numa_info[nodenr].initiator_valid &&
-> +            (node->initiator != numa_info[nodenr].initiator)) {
-> +            error_setg(errp, "The initiator of NUMA node %" PRIu16 " has been "
-> +                       "set to node %" PRIu16, nodenr,
-> +                       numa_info[nodenr].initiator);
-> +            return;
-> +        }
-> +
-> +        numa_info[nodenr].initiator_valid = true;
-> +        numa_info[nodenr].initiator = node->initiator;
-                                             ^^^
-not validated  user input? (which could lead to read beyond numa_info[] boundaries
-in previous hunk).
+>>>>>>>>>> BACKUP_MAX_BOUNCE_BUFFER is introduced. And finally, allocatio=
+n logic
+>>>>>>>>>> is to allocate a buffer sufficient to handle all remaining ite=
+rations
+>>>>>>>>>> at the point where we need the buffer for the first time.
+>>>>>>>>>>
+>>>>>>>>>> Bonus: get rid of pointer-to-pointer.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuo=
+zzo.com>
+>>>>>>>>>> ---
+>>>>>>>>>>   =C2=A0=C2=A0 block/backup.c | 65 +++++++++++++++++++++++++++=
+++++-------------------
+>>>>>>>>>>   =C2=A0=C2=A0 1 file changed, 41 insertions(+), 24 deletions(=
+-)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/block/backup.c b/block/backup.c
+>>>>>>>>>> index d482d93458..65f7212c85 100644
+>>>>>>>>>> --- a/block/backup.c
+>>>>>>>>>> +++ b/block/backup.c
+>>>>>>>>>> @@ -27,6 +27,7 @@
+>>>>>>>>>>   =C2=A0=C2=A0 #include "qemu/error-report.h"
+>>>>>>>>>>   =C2=A0=C2=A0 #define BACKUP_CLUSTER_SIZE_DEFAULT (1 << 16)
+>>>>>>>>>> +#define BACKUP_MAX_BOUNCE_BUFFER (64 * 1024 * 1024)
+>>>>>>>>>>   =C2=A0=C2=A0 typedef struct CowRequest {
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t start_byte;
+>>>>>>>>>> @@ -98,44 +99,55 @@ static void cow_request_end(CowRequest *re=
+q)
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_co_queue_restart_a=
+ll(&req->wait_queue);
+>>>>>>>>>>   =C2=A0=C2=A0 }
+>>>>>>>>>> -/* Copy range to target with a bounce buffer and return the b=
+ytes copied. If
+>>>>>>>>>> - * error occurred, return a negative error number */
+>>>>>>>>>> +/*
+>>>>>>>>>> + * Copy range to target with a bounce buffer and return the b=
+ytes copied. If
+>>>>>>>>>> + * error occurred, return a negative error number
+>>>>>>>>>> + *
+>>>>>>>>>> + * @bounce_buffer is assumed to enough to store
+>>>>>>>>>
+>>>>>>>>> s/to/to be/
+>>>>>>>>>
+>>>>>>>>>> + * MIN(BACKUP_MAX_BOUNCE_BUFFER, @end - @start) bytes
+>>>>>>>>>> + */
+>>>>>>>>>>   =C2=A0=C2=A0 static int coroutine_fn backup_cow_with_bounce_=
+buffer(BackupBlockJob *job,
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t start,
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t end,
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool is_write_notifie=
+r,
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool *error_is_read,
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void **bounce_buffer)
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *bounce_buffer)
+>>>>>>>>>>   =C2=A0=C2=A0 {
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockBackend *blk =3D j=
+ob->common.blk;
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 int nbytes;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 int nbytes, remaining_bytes;
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int read_flags =3D is_w=
+rite_notifier ? BDRV_REQ_NO_SERIALISING : 0;
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert(QEMU_IS_ALIGNED(=
+start, job->cluster_size));
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 bdrv_reset_dirty_bitmap(job->copy_bitmap, =
+start, job->cluster_size);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 nbytes =3D MIN(job->cluster_size, job->len=
+ - start);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 if (!*bounce_buffer) {
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *bounce_buffer =3D=
+ blk_blockalign(blk, job->cluster_size);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 bdrv_reset_dirty_bitmap(job->copy_bitmap, =
+start, end - start);
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 nbytes =3D MIN(end - start, job->len - sta=
+rt);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pread(blk, start, nbytes, *=
+bounce_buffer, read_flags);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_backup_do_co=
+w_read_fail(job, start, ret);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (error_is_read)=
+ {
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 *error_is_read =3D true;
+>>>>>>>>>> +
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 remaining_bytes =3D nbytes;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0 while (remaining_bytes) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int chunk =3D MIN(=
+BACKUP_MAX_BOUNCE_BUFFER, remaining_bytes);
+>>>>>>>>>> +
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pre=
+ad(blk, start, chunk, bounce_buffer, read_flags);
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 trace_backup_do_cow_read_fail(job, start, ret);
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (error_is_read) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *error_is_read =3D true;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 goto fail;
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ }
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pwrite(job->target, start, =
+nbytes, *bounce_buffer,
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ job->write_flags);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_backup_do_co=
+w_write_fail(job, start, ret);
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (error_is_read)=
+ {
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 *error_is_read =3D false;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_co_pwr=
+ite(job->target, start, chunk, bounce_buffer,
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 job->write_flags);
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 trace_backup_do_cow_write_fail(job, start, ret);
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (error_is_read) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 *error_is_read =3D false;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 goto fail;
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ }
+>>>>>>>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
+>>>>>>>>>> +
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 start +=3D chunk;
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 remaining_bytes -=3D=
+ chunk;
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbytes;
+>>>>>>>>>> @@ -301,9 +313,14 @@ static int coroutine_fn backup_do_cow(Bac=
+kupBlockJob *job,
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ }
+>>>>>>>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ if (!job->use_copy_range) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (!bounce_buffer) {
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t len =3D MIN(BACKUP_MAX_BOUNCE_BUFFER,
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MAX(dirty_end - st=
+art, end - dirty_end));
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 bounce_buffer =3D blk_try_blockalign(job->com=
+mon.blk, len);
+>>>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }
+>>>>>>>>>
+>>>>>>>>> If you use _try_, you should probably also check whether it suc=
+ceeded.
+>>>>>>>>
+>>>>>>>> Oops, you are right, of course.
+>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> Anyway, I wonder whether it=E2=80=99d be better to just allocat=
+e this buffer
+>>>>>>>>> once per job (the first time we get here, probably) to be of si=
+ze
+>>>>>>>>> BACKUP_MAX_BOUNCE_BUFFER and put it into BackupBlockJob.=C2=A0 =
+(And maybe add
+>>>>>>>>> a buf-size parameter similar to what the mirror jobs have.)
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> Once per job will not work, as we may have several guest writes =
+in parallel and therefore
+>>>>>>>> several parallel copy-before-write operations.
+>>>>>>>
+>>>>>>> Hm.=C2=A0 I=E2=80=99m not quite happy with that because if the gu=
+est just issues many
+>>>>>>> large discards in parallel, this means that qemu will allocate a =
+large
+>>>>>>> amount of memory.
+>>>>>>>
+>>>>>>> It would be nice if there was a simple way to keep track of the t=
+otal
+>>>>>>> memory usage and let requests yield if they would exceed it.
+>>>>>>
+>>>>>> Agree, it should be fixed anyway.
+>>>>>>
+>>>>>
+>>>>>
+>>>>> But still..
+>>>>>
+>>>>> Synchronous mirror allocates full-request buffers on guest write. I=
+s it correct?
+>>>>>
+>>>>> If we assume that it is correct to double memory usage of guest ope=
+rations, than for backup
+>>>>> the problem is only in write_zero and discard where guest-assumed m=
+emory usage should be zero.
+>>>>
+>>>> Well, but that is the problem.  I didn=E2=80=99t say anything in v2,=
+ because I
+>>>> only thought of normal writes and I found it fine to double the memo=
+ry
+>>>> usage there (a guest won=E2=80=99t issue huge write requests in para=
+llel).  But
+>>>> discard/write-zeroes are a different matter.
+>>>>
+>>>>> And if we should distinguish writes from write_zeroes and discard, =
+it's better to postpone this
+>>>>> improvement to be after backup-top filter merged.
+>>>>
+>>>> But do you need to distinguish it?  Why not just keep track of memor=
+y
+>>>> usage and put the current I/O coroutine to sleep in a CoQueue or
+>>>> something, and wake that up at the end of backup_do_cow()?
+>>>>
+>>>
+>>> 1. Because if we _can_ allow doubling of memory, it's more effective =
+to not restrict allocations on
+>>> guest writes. It's just seems to be more effective technique.
+>>
+>> But the problem with backup and zero writes/discards is that the memor=
+y
+>> is not doubled.  The request doesn=E2=80=99t need any memory, but the =
+CBW
+>> operation does, and maybe lots of it.
+>>
+>> So the guest may issue many zero writes/discards in parallel and thus
+>> exhaust memory on the host.
+>=20
+> So this is the reason to separate writes from write-zeros/discrads. So =
+at least write will be happy. And I
+> think that write is more often request than write-zero/discard
 
-> +    }
->      numa_info[nodenr].present = true;
->      max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
->      ms->numa_state->num_nodes++;
-> diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-> index 76da3016db..46ad06e000 100644
-> --- a/include/sysemu/numa.h
-> +++ b/include/sysemu/numa.h
-> @@ -10,6 +10,9 @@ struct NodeInfo {
->      uint64_t node_mem;
->      struct HostMemoryBackend *node_memdev;
->      bool present;
-> +    bool has_cpu;
-> +    bool initiator_valid;
-> +    uint16_t initiator;
->      uint8_t distance[MAX_NODES];
->  };
->  
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index 6db8a7e2ec..05e367d26a 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -414,6 +414,9 @@
->  # @memdev: memory backend object.  If specified for one node,
->  #          it must be specified for all nodes.
->  #
-> +# @initiator: the initiator numa nodeid that is closest (as in directly
-> +#             attached) to this numa node (since 4.2)
-well, it's pretty unclear what doc comment means (unless reader knows well
-specific part of ACPI spec)
+But that makes it complicated for no practical gain whatsoever.
 
-suggest to rephrase to something more understandable for unaware
-readers (+ possible reference to spec for those who is interested
-in spec definition since this doc is meant for developers).
+>>
+>>> 2. Anyway, I'd allow some always-available size to allocate - let it =
+be one cluster, which will correspond
+>>> to current behavior and prevent guest io hang in worst case.
+>>
+>> The guest would only hang if it we have to copy more than e.g. 64 MB a=
+t
+>> a time.  At which point I think it=E2=80=99s not unreasonable to seque=
+ntialize
+>> requests.
 
-> +#
->  # Since: 2.1
->  ##
->  { 'struct': 'NumaNodeOptions',
-> @@ -421,7 +424,8 @@
->     '*nodeid': 'uint16',
->     '*cpus':   ['uint16'],
->     '*mem':    'size',
-> -   '*memdev': 'str' }}
-> +   '*memdev': 'str',
-> +   '*initiator': 'uint16' }}
->  
->  ##
->  # @NumaDistOptions:
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9621e934c0..c480781992 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -161,14 +161,14 @@ If any on the three values is given, the total number of CPUs @var{n} can be omi
->  ETEXI
->  
->  DEF("numa", HAS_ARG, QEMU_OPTION_numa,
-> -    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-> -    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node]\n"
-> +    "-numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
-> +    "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
->      "-numa dist,src=source,dst=destination,val=distance\n"
->      "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n",
->      QEMU_ARCH_ALL)
->  STEXI
-> -@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
-> -@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}]
-> +@item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
-> +@itemx -numa node[,memdev=@var{id}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
->  @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
->  @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
->  @findex -numa
-> @@ -215,6 +215,25 @@ split equally between them.
->  @samp{mem} and @samp{memdev} are mutually exclusive. Furthermore,
->  if one node uses @samp{memdev}, all of them have to use it.
->  
-> +@samp{initiator} indicate the initiator NUMA @var{initiator} that is
-                                  ^^^^^^^       ^^^^^^^^^^^^^^
-above will result in "initiator NUMA initiator", was it your intention?
+Because of this.  How is it bad to start sequentializing writes when the
+data exceeds 64 MB?
 
-> +closest (as in directly attached) to this NUMA @var{node}.
-Again suggest replace spec language with something more user friendly
-(this time without spec reference as it's geared for end user) 
+Max
 
-> +For example, the following option assigns 2 NUMA nodes, node 0 has CPU.
-Following example creates a machine with 2 NUMA ...
 
-> +node 1 has only memory, and its' initiator is node 0. Note that because
-> +node 0 has CPU, by default the initiator of node 0 is itself and must be
-> +itself.
-> +@example
-> +-M pc \
-> +-m 2G,slots=2,maxmem=4G \
-> +-object memory-backend-ram,size=1G,id=m0 \
-> +-object memory-backend-ram,size=1G,id=m1 \
-> +-numa node,nodeid=0,memdev=m0 \
-> +-numa node,nodeid=1,memdev=m1,initiator=0 \
-> +-smp 2,sockets=2,maxcpus=2  \
-> +-numa cpu,node-id=0,socket-id=0 \
-> +-numa cpu,node-id=0,socket-id=1 \
-> +@end example
-> +
->  @var{source} and @var{destination} are NUMA node IDs.
->  @var{distance} is the NUMA distance from @var{source} to @var{destination}.
->  The distance from a node to itself is always 10. If any pair of nodes is
+--OS8gh9nTflnuschu1kQBhUeuo583FsOoa--
 
+--vgWd08rtLlfTwhhV9JcbNv54DNelUwpN3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1S0PwACgkQ9AfbAGHV
+z0BV4Qf+KWfQ76xX38txNo8+9hfVkGkDQt/z+fzTDaykxIg3+uPUzVCf5hmzdpZS
+EKAE1COC7c++dijF7MUSBAMvengyDvDv00JjMfeXXItAU+oxHWPwLglKmSRzPtPw
+326/AOHGJIX3n43eS++y5udS8NHKOwJKv5T14K1oRHnLsdj3VtS/JedO+qsRhxgp
+AVJlfUlDhBzx/gF+BT1xvBVcuwHKDtFtBf3k4H1tXtmRk5AfCfQYU+hKaNSej3Il
+RrDeHOdRwh5LTjPZESppHJV5BRykFW6nt9ANxEsR3pcMBkE0Sx0SDqFH6a4tn2qD
+ltRVo2x/ygU5BVaag1qGWvPa43p/EA==
+=Vxq2
+-----END PGP SIGNATURE-----
+
+--vgWd08rtLlfTwhhV9JcbNv54DNelUwpN3--
 
