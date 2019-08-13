@@ -2,108 +2,85 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DEEC32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9F3AC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 18:21:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A833120679
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:55:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A833120679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7734620578
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 18:21:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DD1QjVJ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7734620578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxb0d-0008Fj-UT
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 13:54:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
+	id 1hxbQd-00068e-Gh
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 14:21:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43240)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hxb05-0007r2-Ic
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:54:26 -0400
+ (envelope-from <nirsof@gmail.com>) id 1hxbQD-0005gD-S5
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:21:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hxb04-0004J7-LG
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:54:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52650)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hxb04-0004IY-DR
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:54:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 14C283002B30
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 17:54:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-63.ams2.redhat.com [10.36.116.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7398A60A9D;
- Tue, 13 Aug 2019 17:54:16 +0000 (UTC)
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20190813133042.11683-1-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <39b21ab6-bf1b-69c1-bbea-fb6f1b637132@redhat.com>
-Date: Tue, 13 Aug 2019 19:54:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <nirsof@gmail.com>) id 1hxbQC-0006Ns-Aa
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:21:25 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52835)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nirsof@gmail.com>)
+ id 1hxbQ9-0006MD-4M; Tue, 13 Aug 2019 14:21:21 -0400
+Received: by mail-wm1-x342.google.com with SMTP id o4so2239628wmh.2;
+ Tue, 13 Aug 2019 11:21:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Z2xq2ahvziVly4LRC1W3wVvI1JHARH0E1kCVkG9ipp0=;
+ b=DD1QjVJ1vrfIpYO2Vrq1pPa7w5EnLHjMX6FJEyBadDgbW/A4k6w/RYr7zb33fqlXFx
+ 3NHhvAwfo2gROVgG7AOnJnqhtqLj30A4Lyp5Aa/yNiBzNemDt17iBjDdaWvgeBC+D0te
+ ozZg772tZeqUEVdmUHxi1OS5bKQlAuksBWaqOHOjm8W2+CU5/V4KX3LZuBZ0I7vL9iuQ
+ GLUsTAys74Eq1Mypp+oIzk5GfbIVO2zfn8l7SaXmABMft16W+VhkJRWC9zcn4jrUHJqF
+ CH9522vwJh1qUUg17kQGaQOuhKkHflgLVSCfCh+KsGWzW8SNANfhjKmPcixnKnNnAj8V
+ bt8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Z2xq2ahvziVly4LRC1W3wVvI1JHARH0E1kCVkG9ipp0=;
+ b=GL8fTwlqBZeyrP7h3o+nzH/5La4ZDHwh7CH5J+iNm5JoN5naSeEqrJNT1MYLcXiaMi
+ cxscKMOGHugj7gLbdtMafPvOtGDM3mYQjSlUeuC4hUbhfUE2DVbF+0kZqTSk3J6L99Ab
+ C5iDTPmsY4UuHRWLTGLdw7EGTXI4VumL/0ONG4bRBjgNnC6P7VK4k7SPL6luxLSWa1XM
+ 8veHuMbzYzpiqWMlq+BVg+GX2U6kJ/uBHzzFnLAPetWjFULgIh8DrhBmHIhFbthl8aRs
+ gm8GDm6OJO+K1I5pRLzOenTr7fzyQz+tg4ZbcVfRKfddwetX+SNHw4nhf6WY9NbggDIZ
+ Qorg==
+X-Gm-Message-State: APjAAAWBUzfYI2HyfkDB9W6MNw+B/xIllAdloU93RDLCAbc4Mx8HsJ9X
+ oIsJNX8CVBq95px8KRJcflrgfm6bAnw=
+X-Google-Smtp-Source: APXvYqy6vJ7rS7SNuSfoweyhRbSVBr46er8Gk19Ryuid1j9Mhtd59OYm7Gea4LcsBliSpnIdc1QWCw==
+X-Received: by 2002:a1c:f101:: with SMTP id p1mr4445446wmh.151.1565720478570; 
+ Tue, 13 Aug 2019 11:21:18 -0700 (PDT)
+Received: from sparse-local.tlv.redhat.com (bzq-82-81-161-50.red.bezeqint.net.
+ [82.81.161.50])
+ by smtp.gmail.com with ESMTPSA id a18sm6526072wrt.18.2019.08.13.11.21.15
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Tue, 13 Aug 2019 11:21:17 -0700 (PDT)
+From: Nir Soffer <nirsof@gmail.com>
+X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
+To: qemu-block@nongnu.org
+Date: Tue, 13 Aug 2019 21:21:03 +0300
+Message-Id: <20190813182103.8816-1-nsoffer@redhat.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190813133042.11683-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Tue, 13 Aug 2019 17:54:23 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] usb: reword -usb command-line option and
- mention xHCI
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: [Qemu-devel] [PATCH v3] block: posix: Handle undetectable alignment
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,44 +92,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kraxel@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/13/19 3:30 PM, Stefan Hajnoczi wrote:
-> The -usb section of the man page is not very clear on what exactly -usb
-> does and fails to mention xHCI as a modern alternative (-device
-> nec-usb-xhci).
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  qemu-options.hx | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9621e934c0..7d11c016d1 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1436,12 +1436,15 @@ STEXI
->  ETEXI
->  
->  DEF("usb", 0, QEMU_OPTION_usb,
-> -    "-usb            enable the USB driver (if it is not used by default yet)\n",
-> +    "-usb            enable on-board USB host controller (if not enabled by default)\n",
->      QEMU_ARCH_ALL)
->  STEXI
->  @item -usb
->  @findex -usb
-> -Enable the USB driver (if it is not used by default yet).
-> +Enable USB emulation on machine types with an on-board USB host controller (if
-> +not enabled by default).  Note that on-board USB host controllers may not
-> +support USB 3.0.  In this case -device nec-usb-xhci can be used instead on
+In some cases buf_align or request_alignment cannot be detected:
 
-Should we maybe rather recommend qemu-xhci instead?
-And please put the @option{} around the "-device *-xhci" here.
+1. With Gluster, buf_align cannot be detected since the actual I/O is
+   done on Gluster server, and qemu buffer alignment does not matter.
+   Since we don't have alignment requirement, buf_align=1 is the best
+   value.
 
-With @option:
+2. With local XFS filesystem, buf_align cannot be detected if reading
+   from unallocated area. In this we must align the buffer, but we don't
+   know what is the correct size. Using the wrong alignment results in
+   I/O error.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+3. With Gluster backed by XFS, request_alignment cannot be detected if
+   reading from unallocated area. In this case we need to use the
+   correct alignment, and failing to do so results in I/O errors.
+
+4. With NFS, the server does not use direct I/O, so both buf_align cannot
+   be detected. In this case we don't need any alignment so we can use
+   buf_align=1 and request_alignment=1.
+
+These cases seems to work when storage sector size is 512 bytes, because
+the current code starts checking align=512. If the check succeeds
+because alignment cannot be detected we use 512. But this does not work
+for storage with 4k sector size.
+
+To determine if we can detect the alignment, we probe first with
+align=1. If probing succeeds, maybe there are no alignment requirement
+(cases 1, 4) or we are probing unallocated area (cases 2, 3). Since we
+don't have any way to tell, we treat this as undetectable alignment. If
+probing with align=1 fails with EINVAL, but probing with one of the
+expected alignments succeeds, we know that we found a working alignment.
+
+Practically the alignment requirements are the same for buffer
+alignment, buffer length, and offset in file. So in case we cannot
+detect buf_align, we can use request alignment. If we cannot detect
+request alignment, we can fallback to a safe value. To use this logic,
+we probe first request alignment instead of buf_align.
+
+Here is a table showing the behaviour with current code (the value in
+parenthesis is the optimal value).
+
+Case    Sector    buf_align (opt)   request_alignment (opt)     result
+======================================================================
+1       512       512   (1)          512   (512)                 OK
+1       4096      512   (1)          4096  (4096)                FAIL
+----------------------------------------------------------------------
+2       512       512   (512)        512   (512)                 OK
+2       4096      512   (4096)       4096  (4096)                FAIL
+----------------------------------------------------------------------
+3       512       512   (1)          512   (512)                 OK
+3       4096      512   (1)          512   (4096)                FAIL
+----------------------------------------------------------------------
+4       512       512   (1)          512   (1)                   OK
+4       4096      512   (1)          512   (1)                   OK
+
+Same cases with this change:
+
+Case    Sector    buf_align (opt)   request_alignment (opt)     result
+======================================================================
+1       512       512   (1)          512   (512)                 OK
+1       4096      4096  (1)          4096  (4096)                OK
+----------------------------------------------------------------------
+2       512       512   (512)        512   (512)                 OK
+2       4096      4096  (4096)       4096  (4096)                OK
+----------------------------------------------------------------------
+3       512       4096  (1)          4096  (512)                 OK
+3       4096      4096  (1)          4096  (4096)                OK
+----------------------------------------------------------------------
+4       512       4096  (1)          4096  (1)                   OK
+4       4096      4096  (1)          4096  (1)                   OK
+
+I tested that provisioning VMs and copying disks on local XFS and
+Gluster with 4k bytes sector size work now, resolving bugs [1],[2].
+I tested also on XFS, NFS, Gluster with 512 bytes sector size.
+
+[1] https://bugzilla.redhat.com/1737256
+[2] https://bugzilla.redhat.com/1738657
+
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+---
+
+Changes since v2
+- Improve the commit message (Kevin)
+- Remove unneeded 2-level ternary (Kevin)
+
+v2 was here:
+https://lists.nongnu.org/archive/html/qemu-block/2019-08/msg00426.html
+
+ block/file-posix.c | 36 +++++++++++++++++++++++++-----------
+ 1 file changed, 25 insertions(+), 11 deletions(-)
+
+diff --git a/block/file-posix.c b/block/file-posix.c
+index f33b542b33..9baade65f4 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -323,6 +323,7 @@ static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
+     BDRVRawState *s = bs->opaque;
+     char *buf;
+     size_t max_align = MAX(MAX_BLOCKSIZE, getpagesize());
++    size_t alignments[] = {1, 512, 1024, 2048, 4096};
+ 
+     /* For SCSI generic devices the alignment is not really used.
+        With buffered I/O, we don't have any restrictions. */
+@@ -349,25 +350,38 @@ static void raw_probe_alignment(BlockDriverState *bs, int fd, Error **errp)
+     }
+ #endif
+ 
+-    /* If we could not get the sizes so far, we can only guess them */
+-    if (!s->buf_align) {
++    /*
++     * If we could not get the sizes so far, we can only guess them. First try
++     * to detect request alignment, since it is more likely to succeed. Then
++     * try to detect buf_align, which cannot be detected in some cases (e.g.
++     * Gluster). If buf_align cannot be detected, we fallback to the value of
++     * request_alignment.
++     */
++
++    if (!bs->bl.request_alignment) {
++        int i;
+         size_t align;
+-        buf = qemu_memalign(max_align, 2 * max_align);
+-        for (align = 512; align <= max_align; align <<= 1) {
+-            if (raw_is_io_aligned(fd, buf + align, max_align)) {
+-                s->buf_align = align;
++        buf = qemu_memalign(max_align, max_align);
++        for (i = 0; i < ARRAY_SIZE(alignments); i++) {
++            align = alignments[i];
++            if (raw_is_io_aligned(fd, buf, align)) {
++                /* Fallback to safe value. */
++                bs->bl.request_alignment = (align != 1) ? align : max_align;
+                 break;
+             }
+         }
+         qemu_vfree(buf);
+     }
+ 
+-    if (!bs->bl.request_alignment) {
++    if (!s->buf_align) {
++        int i;
+         size_t align;
+-        buf = qemu_memalign(s->buf_align, max_align);
+-        for (align = 512; align <= max_align; align <<= 1) {
+-            if (raw_is_io_aligned(fd, buf, align)) {
+-                bs->bl.request_alignment = align;
++        buf = qemu_memalign(max_align, 2 * max_align);
++        for (i = 0; i < ARRAY_SIZE(alignments); i++) {
++            align = alignments[i];
++            if (raw_is_io_aligned(fd, buf + align, max_align)) {
++                /* Fallback to request_aligment. */
++                s->buf_align = (align != 1) ? align : bs->bl.request_alignment;
+                 break;
+             }
+         }
+-- 
+2.20.1
+
 
