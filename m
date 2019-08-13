@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A55CAC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE418C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:25:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A12520663
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:23:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A12520663
+	by mail.kernel.org (Postfix) with ESMTPS id C158820663
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C158820663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYeL-0002Jq-BE
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:23:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48471)
+	id 1hxYgJ-0004v1-1W
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:25:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48718)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hxYdw-0001pu-Mm
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:23:25 -0400
+ (envelope-from <eblake@redhat.com>) id 1hxYf2-0003X1-JV
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hxYdv-00022q-PA
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:23:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36196)
+ (envelope-from <eblake@redhat.com>) id 1hxYf1-0002l5-Ja
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:24:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hxYdt-00021f-Jd; Tue, 13 Aug 2019 11:23:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hxYez-0002ik-F7; Tue, 13 Aug 2019 11:24:29 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B79A46412F;
- Tue, 13 Aug 2019 15:23:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id C6E173082124;
+ Tue, 13 Aug 2019 15:24:28 +0000 (UTC)
 Received: from [10.3.117.22] (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3315D82211;
- Tue, 13 Aug 2019 15:22:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 00C3D60BE2;
+ Tue, 13 Aug 2019 15:24:18 +0000 (UTC)
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-6-thuth@redhat.com>
+ <20190813093047.27948-7-thuth@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <37039656-89e7-d8a9-eb5e-2d0b70ac02b4@redhat.com>
-Date: Tue, 13 Aug 2019 10:22:50 -0500
+Message-ID: <e9122776-fa1b-7c15-ba37-7a60ad9fc82b@redhat.com>
+Date: Tue, 13 Aug 2019 10:24:18 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190813093047.27948-6-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-7-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="9TN9oI0jhRKTUtDf4kQul6asVbed3RFdl"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="32vNRb46TPxswzgCpSOQ6UfgYVGf4YQel"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 13 Aug 2019 15:23:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.42]); Tue, 13 Aug 2019 15:24:28 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 5/6] tests/libqtest: Make
- qtest_qmp_device_add/del independent from global_qtest
+Subject: Re: [Qemu-devel] [PATCH 6/6] tests/libqtest: Make
+ qmp_assert_success() independent from global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,8 +109,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9TN9oI0jhRKTUtDf4kQul6asVbed3RFdl
-Content-Type: multipart/mixed; boundary="TDRYDSw51vJhDGELOPzvobpgcDJcE8sur";
+--32vNRb46TPxswzgCpSOQ6UfgYVGf4YQel
+Content-Type: multipart/mixed; boundary="m1g8zUhtyp8tpkdwKjizTAqKicNqKn0xB";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
@@ -120,25 +120,51 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
  John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
-Message-ID: <37039656-89e7-d8a9-eb5e-2d0b70ac02b4@redhat.com>
-Subject: Re: [PATCH 5/6] tests/libqtest: Make qtest_qmp_device_add/del
- independent from global_qtest
+Message-ID: <e9122776-fa1b-7c15-ba37-7a60ad9fc82b@redhat.com>
+Subject: Re: [PATCH 6/6] tests/libqtest: Make qmp_assert_success() independent
+ from global_qtest
 References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-6-thuth@redhat.com>
-In-Reply-To: <20190813093047.27948-6-thuth@redhat.com>
+ <20190813093047.27948-7-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-7-thuth@redhat.com>
 
---TDRYDSw51vJhDGELOPzvobpgcDJcE8sur
+--m1g8zUhtyp8tpkdwKjizTAqKicNqKn0xB
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 8/13/19 4:30 AM, Thomas Huth wrote:
-> Generic library functions like qtest_qmp_device_add() and _del()
-> should not depend on the global_qtest variable. Pass the test
-> state via parameter instead.
+> The normal libqtest library functions should never depend on global_qte=
+st.
+> Pass in the test state via parameter instead. And while we're at it,
+> also rename this function to qtest_qmp_assert_success() to make it clea=
+r
+> that it is part of libqtest.
 >=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
+>  tests/libqtest.c         | 4 ++--
+>  tests/libqtest.h         | 6 ++++--
+>  tests/virtio-scsi-test.c | 3 ++-
+>  3 files changed, 8 insertions(+), 5 deletions(-)
+>=20
+
+> +++ b/tests/virtio-scsi-test.c
+> @@ -225,7 +225,8 @@ static void test_iothread_attach_node(void *obj, vo=
+id *data,
+>      mkqcow2(tmp_path, 64);
+> =20
+>      /* Attach the overlay to the null0 node */
+> -    qmp_assert_success("{'execute': 'blockdev-add', 'arguments': {"
+> +    qtest_qmp_assert_success(scsi_pci->pci_vdev.pdev->bus->qts,
+> +                       "{'execute': 'blockdev-add', 'arguments': {"
+>                         "   'driver': 'qcow2', 'node-name': 'overlay',"=
+
+>                         "   'backing': 'null0', 'file': {"
+>                         "     'driver': 'file', 'filename': %s}}}", tmp=
+_path);
+>=20
+
+Indentation is now off.  Minor, so:
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -148,24 +174,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---TDRYDSw51vJhDGELOPzvobpgcDJcE8sur--
+--m1g8zUhtyp8tpkdwKjizTAqKicNqKn0xB--
 
---9TN9oI0jhRKTUtDf4kQul6asVbed3RFdl
+--32vNRb46TPxswzgCpSOQ6UfgYVGf4YQel
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1coACgkQp6FrSiUn
-Q2olwgf9Ety0HSadGbjsgHctxLDP+acQahNbWDFLhU+Puah5/vXhwBitX7hoQ7x/
-6GktqLWsfDiiR4sBqDWRkH2+h1OX1XXepQbC9xprgfQh663UuLRnudxC0wOrfmkt
-V5Zo/9dovvSUZXLLUNa19xxdZCYXQ4e/Ef2/ADXiqUlgSeHodd2bMQiRlteN6CYq
-8Xuv+egd9KPPxH9Ag706XZdVfGQl/QWRXjmqZervrGAxR+BG9QPtT/pJZ8fboR9M
-rGlDiKa6OeDpUHRu477J9F6JiHBE/5yFe10MlGjyxSlg65gWCFeyZFvTF9+zx0Z1
-XPVvIEzfd7nPkPOeLwNdeubgzGqXdQ==
-=NztO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1iIACgkQp6FrSiUn
+Q2pCzwf+Oy9x5EvBIyS36ml9PQ/EOFv4oE6UOc/9rkOOTK6DOEOHH+PVkr1dd+0r
+bVLP+u2QVPTFCxm2jB4Fjo/fm7cyVsRLfFx9WMRfHSTczcJDsjSpMq+JNJg/uucq
+zffDniWmZIDR+My6S28ry2cDKQ5wG7tUYg2wfb00Vj4pOb2OlfVX1WcMyyMaPegU
+aPRVEaNx0tv4qYYsoTClt8THt+Ys3wXb8sHg9I8OwjI3/mQbi0KENyx7EQg6p3Cx
+m/Elppk8vpRy0BgSMAtyV4Wb2AiBOG1NFmXqC05GzRD1XRR09KOlvQGtzmXSuOIj
+mi9FmM5ini+xqhBoGdoLiW6FpjcB/A==
+=otrr
 -----END PGP SIGNATURE-----
 
---9TN9oI0jhRKTUtDf4kQul6asVbed3RFdl--
+--32vNRb46TPxswzgCpSOQ6UfgYVGf4YQel--
 
