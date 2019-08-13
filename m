@@ -2,124 +2,66 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 222E4C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64887C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD4C920844
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:47:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F7AB20651
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 14:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qnmX/ocR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD4C920844
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="e3KTaBXU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F7AB20651
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxY5D-0007LG-7n
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 10:47:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42389)
+	id 1hxY66-0000b2-GO
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 10:48:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42585)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxY4d-0006dl-4a
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:46:56 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1hxY5X-0007v0-Ua
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxY4c-0006dX-2m
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:46:55 -0400
-Received: from mail-eopbgr50118.outbound.protection.outlook.com
- ([40.107.5.118]:21862 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxY4b-0006cy-Ra; Tue, 13 Aug 2019 10:46:54 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FfjCZWM8Rg/sv8pCoryrUfI+YE5nv2x/pk7nRvpKM40qzmhsSs0hOXyEicT91RwKsg7RW4uAEyJmzofvS8sKZauGmZIKQXzjwqSIj92RerMVd8TVrj3hvhhwcio9RYZQ3ZNGou29dEVxV1OJUILP/n3JLlUcQAsTNhqOtgV7W+f6sSSp4jP4f4aHqw+LX9epjyZ+eu5ktbZWAwoDNwmIhv94SuPOpZI+OQcF4MJw9/cYdX0s7XUVOupBvoBwyAMslhWV1V+u7+uuk2ZP7WF/Nou/83XJCr0Dkogqpom7XmHlYk7VQXREczqG7BVAYA/0MuMEj02+fiIO2psYkEsFRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rFiI85EbPzvGZZd6AfCF9VkJLEEfJuzx7+N9VcgNTbU=;
- b=adpYN1e9VLTRVx3dp49sKIP7pfbS/7+kTccDj6ETs1dt0nmMsoKmsfDLki/6p5UEumbF2rHAOix1SX201m8s19HfmEUYdwvX0/GFjATts/pmMKL5PGzsH77XO3bUehtSETeZuxwUOwmh+x5iB8tye9XwhU0HeOdgQGN/CsYdBVrF21r7LFWsQqMmggI/sy/9gugbyWCWgWYDoMzT9ermHtyBBE4IcQ30DoPlssspRD3+kV9uivzGp8yodaVYBjvxCMzb4EU9oJCIG1+kGNEI8M8K32fCVSs9R6duh1N4VUTwwjE6+4vslPR5lS6VZer2l7yf2YwdX9fA1on1LfEIpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rFiI85EbPzvGZZd6AfCF9VkJLEEfJuzx7+N9VcgNTbU=;
- b=qnmX/ocRyK0keUKvhvZOPHycby/eLzA9C5VFqolh4Cu10XV+NtRFrZY86HAuZ1lZG99kWkRwZf12uYP6DzYL1t9BbJ0f47z+1MN0DVOHZPCI+2tit0VzkRwu//V6vLGBrikDU4wZOk3xeLteiR5Ww9EBGzc4u+NIfxLxGvtCYq8=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB4938.eurprd08.prod.outlook.com (10.255.16.24) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.16; Tue, 13 Aug 2019 14:46:50 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.022; Tue, 13 Aug 2019
- 14:46:50 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Thread-Topic: [PATCH 0/2] deal with BDRV_BLOCK_RAW
-Thread-Index: AQHVUTlscGMEUismPEagfLbq4nW+tab36tGAgAABHQCAANb8gIAABheAgAAIyICAAE6FgP//2BGAgAAsr4CAAARdAA==
-Date: Tue, 13 Aug 2019 14:46:50 +0000
-Message-ID: <48fa03d6-259d-9ded-dacb-a4975f8d24e4@virtuozzo.com>
-References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
- <35b23140-25d5-627e-7a86-4b50fbc5be52@redhat.com>
- <e53a0399-f051-52bd-49e8-4ac4dbf2596f@redhat.com>
- <3d5fcc5b-cdb0-f028-1ea2-af85850db20e@virtuozzo.com>
- <15cf7372-826a-0684-d6ad-90deea36959e@virtuozzo.com>
- <43fb7754-6f94-00f6-6172-70cbb53e787c@virtuozzo.com>
- <94ccf129-cc7e-2778-7688-fd718f8df249@virtuozzo.com>
- <20190813115115.GG4663@localhost.localdomain>
- <b0c32bfc-f4cf-0d46-beb8-ba4cf79b76c5@redhat.com>
-In-Reply-To: <b0c32bfc-f4cf-0d46-beb8-ba4cf79b76c5@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0156.eurprd05.prod.outlook.com
- (2603:10a6:7:28::43) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20190813174648643
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ab8d41d4-3bdb-44be-4486-08d71ffd1343
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);
- SRVR:DB8PR08MB4938; 
-x-ms-traffictypediagnostic: DB8PR08MB4938:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8PR08MB49382192DA431D1C5497D64AC1D20@DB8PR08MB4938.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 01283822F8
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(136003)(376002)(366004)(39840400004)(396003)(189003)(199004)(486006)(446003)(305945005)(76176011)(26005)(53546011)(6506007)(102836004)(7736002)(99286004)(66066001)(81166006)(81156014)(6486002)(229853002)(2616005)(8936002)(386003)(52116002)(36756003)(6436002)(107886003)(2906002)(6512007)(11346002)(476003)(71200400001)(4326008)(71190400001)(25786009)(53936002)(86362001)(6246003)(256004)(64756008)(66556008)(66946007)(66476007)(66446008)(31686004)(4744005)(5660300002)(14454004)(478600001)(6116002)(3846002)(8676002)(186003)(110136005)(54906003)(316002)(31696002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4938;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: QSYOZnN+BU5PGfGrj1D8olpyTWUvXnx0pYK8hqbsr0H7dK12DYpQ6BD9BMj/ANNJuIlWiZ2x6S96YGnciWVLSzSxlNIADiKWGDk8n6HWwJbLedxB63vXzpSTwVnT2Hv2lPLb0IQXBbKspsx93N0QRM44lmWb9PlZo0s/BCOw25lLoiddy16t+dk45FSxssLdcDH5shiecF+vL9jFLqRKvROY6Obs2Ehfa+XYFF1Ge+fEKxX7C3JNIEeg7GX+Xm0c9tLeqpOQ85Va5W5DocMHDzqo22P7LcXRPK9WyVuTIiprpCPfMzc3xUW5lioRU+DYRLsvS1MHF7thB3p1E21J1s50q4j8Y2WL9RenbeiQoDWB4l8doC5cEKX087hCmuQU7P4wnFV2hKTt608TKcLsNR0IyznlNOx2l+Sc0Q4LFLo=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C6C44B3D67DD0948A413A2CB07140DD9@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <dgibson@ozlabs.org>) id 1hxY5W-00071k-Q8
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 10:47:51 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41581 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1hxY5V-0006zP-Km; Tue, 13 Aug 2019 10:47:50 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 467Ftl62Y1z9sNf; Wed, 14 Aug 2019 00:47:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1565707663;
+ bh=qj9v8BqTYNBavk3ErJeF1QoUPZhuxCr+XREnLWJLOCY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=e3KTaBXU6FbREHNfDsYAvy34M2YrySW9pg3+e7k5T0UtDtSm+QeFoX9dOj3uO1qcW
+ j9XYx7erKeRVvgepVmljjFuzOEw51/Rwb2IDT6+CY3bjXRbWJPrjLsc9/BBiKLQ3Pm
+ 4wu517GV4tTiVgDvaULm7LN050nqgt0ZiFoxk1Qg=
+Date: Wed, 14 Aug 2019 00:17:55 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
+Message-ID: <20190813141755.GN3947@umbus.fritz.box>
+References: <20190719024555.18845-1-aik@ozlabs.ru>
+ <ae3e5bd1-c7dd-d893-5c0e-803f4e4f2325@linux.vnet.ibm.com>
+ <20190812100849.GF3947@umbus.fritz.box>
+ <3722a768-c8bb-ed04-e450-b18cba8e6296@linux.vnet.ibm.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab8d41d4-3bdb-44be-4486-08d71ffd1343
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2019 14:46:50.7637 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +qHiz6vTV/mkya/iZVGXoMqJA81bGFYqVShz19B7xATk0ylRtoQqUeLsEod81p29nTF+pJ1hrrEBBxls/UwcFLVbSikS25ta8Ey523MwsSc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4938
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.118
-Subject: Re: [Qemu-devel] [PATCH 0/2] deal with BDRV_BLOCK_RAW
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="prC3/KjdfqNV7evK"
+Content-Disposition: inline
+In-Reply-To: <3722a768-c8bb-ed04-e450-b18cba8e6296@linux.vnet.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 203.11.71.1
+Subject: Re: [Qemu-devel] [Qemu-ppc] [GIT PULL for qemu-pseries REPOST]
+ pseries: Update SLOF firmware image
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,27 +73,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MTMuMDguMjAxOSAxNzozMSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxMy4wOC4xOSAxMzo1MSwg
-S2V2aW4gV29sZiB3cm90ZToNCj4gDQo+IFsuLi5dDQo+IA0KPj4gSG0uLi4gVGhpcyBpcyBhIG1l
-c3MuIDotKQ0KPiANCj4gSnVzdCBvdXQgb2YgY3VyaW9zaXR5OiBXaHk/DQo+IA0KPiBBcmVu4oCZ
-dCB0aGVyZSBvbmx5IHR3byB0aGluZ3Mgd2UgcmVhbGx5IG5lZWQgZnJvbSB0aGUgYmxvY2tfc3Rh
-dHVzDQo+IGluZnJhc3RydWN0dXJlPw0KPiANCj4gKDEpIFdoZXRoZXIgc29tZXRoaW5nIGlzIGFs
-bG9jYXRlZCBpbiB0aGUgZ2l2ZW4gbGF5ZXIgb2YgdGhlIGJhY2tpbmcgY2hhaW4sDQo+IA0KPiAo
-MikgV2hldGhlciB3ZSBrbm93IHRoYXQgYSBnaXZlbiByYW5nZSByZWFkcyBhcyB6ZXJvZXMuDQo+
-IA0KPiBEbyB3ZSByZWFsbHkgbmVlZCBhbnl0aGluZyBlbHNlPw0KPiANCg0KcWVtdS1pbWcgbWFw
-Pw0KDQoNCjEuIFdlIG5lZWQgdG8gZml4IHRoZSBidWcgc29tZWhvdw0KMi4gV2UgbmVlZCB0byBm
-aXggY29tbWVudCBhYm91dCBkaWZmZXJlbnQgYmxvY2stc3RhdHVzIGZsYWdzLCBhcyBpdCByZWFs
-bHkNCmxhY2tzIGluZm9ybWF0aW9uIG9mIHdoYXQgYWN0dWFsbHkgIkRBVEEiIG1lYW5zICh0b2dl
-dGhlciB3aXRoICpmaWxlKS4NCkFuZCB3aGF0IGZpbmFsbHkgbWVhbnMgImFsbG9jYXRlZCIsIGNh
-biB5b3UgZGVmaW5lIGl0IHByZWNpc2VseT8NCjMuIEZpeCBuYmQtc2VydmVyIHRvIGJlIGNsb3Nl
-ciB0byBOQkQgc3BlYyBhYm91dCBibG9jay1zdGF0dXMNCg0KSSBtYWRlIHNldmVyYWwgdHJpZXMg
-dG8gaW1hZ2luZSBbMV0gYW5kIFsyXSBidXQgbmV2ZXIgc3VjY2VlZGVkLi4NCg0KDQotLSANCkJl
-c3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+--prC3/KjdfqNV7evK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Aug 13, 2019 at 01:00:24PM +0530, Aravinda Prasad wrote:
+>=20
+>=20
+> On Monday 12 August 2019 03:38 PM, David Gibson wrote:
+> > On Mon, Aug 05, 2019 at 02:14:39PM +0530, Aravinda Prasad wrote:
+> >> Alexey/David,
+> >>
+> >> With the SLOF changes, QEMU cannot resize the RTAS blob. Resizing is
+> >> required for FWNMI support which extends the RTAS blob to include an
+> >> error log upon a machine check.
+> >>
+> >> The check to valid RTAS buffer fails in the guest because the rtas-size
+> >> updated in QEMU is not reflecting in the guest.
+> >>
+> >> Any workaround for this?
+> >=20
+> > Well, we should still be able to do it, it just means fwnmi would need
+> > a SLOF change.  It's an inconvenience, but not really a big deal.
+>=20
+> Yes. Alexey and I were discussing about the following changes to SLOf:
+>=20
+> diff --git a/lib/libhvcall/hvcall.S b/lib/libhvcall/hvcall.S
+> index b19f6dbeff2c..880d29a29122 100644
+> --- a/lib/libhvcall/hvcall.S
+> +++ b/lib/libhvcall/hvcall.S
+> @@ -134,6 +134,7 @@ ENTRY(hv_rtas)
+>         ori     r3,r3,KVMPPC_H_RTAS@l
+>         HVCALL
+>         blr
+> +    .space 2048
+>         .globl hv_rtas_size
+>  hv_rtas_size:
+>         .long . - hv_rtas;
+>=20
+>=20
+> But this will statically reserve space for RTAS even when
+> SPAPR_CAP_FWNMI_MCE is OFF.
+
+Sure.  We could flag that in the DT somehow, and have SLOF reserve the
+space conditionally.
+
+Or we could just ignore it. 2 kiB is miniscule compared to our minimum
+guest size, and our current RTAS is microscopic compared to PowerVM.
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--prC3/KjdfqNV7evK
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl1SxpMACgkQbDjKyiDZ
+s5KZQRAAjpKlTdgqpn6EAewEIG4mdnQ7ggBYnIlb4JsMVKq58sto0ziHTLfqCxpi
+oOKKBo4IrVkZi4EYJ+3cnE0nr7Q1sGIcJIqaEUFSfaytMFVzY2oDCArHb0o/R+RB
+slOQQoQtwdZTcf122J07Te5tMzHJaPvfWfG/Vk1YiTzkwi/FD2ZpH/jAvG3Li2k2
+ijOb+PKPOTU37vpeC7QxNOlcQ+ORl5PgalZpxk8cnx8sxhMh5gteOuG6xETXml52
+StWoLcMKh1HVk+MKTPgT4CJSgfjL0s9zbexjt7ppLXsStdeYuIUIho5PIwVfMcNv
+fIycK5s9eLNy923r1h26xqWKSp75hgMG1+OnmAOcJsbw/E0EJ3bW+AUyNeZWBjYD
+xKDY7LMwTo+jnwv6nzaBhj1Lp1krbiy+jjjDKmZGUZL7Cih7Qypoa16HBp/0HU3X
+44vtaTzo8GQosOsZ8D7TZ9Ywv3es/kOUKRn9WB7yFekzjxm2UyxxrehWK1jdTgr8
+T9aZyeIk9WqwzFEFu3DRGKORX58YndIatim19EL3MkahKZ1+K+8KngMsiOn4bL7Z
+Gp/cH36IxjEbgnNk0r0+f33CDv8evRTK/0pGi8X26SfeuxEyLI1qRvFlmJa+LRhj
+hwSaZ9urxvBUX8HprAJgilLPNrkRBrQ6yTsAteF4qDkptrQ54Zk=
+=qdPN
+-----END PGP SIGNATURE-----
+
+--prC3/KjdfqNV7evK--
 
