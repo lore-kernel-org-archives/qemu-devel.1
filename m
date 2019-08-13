@@ -2,90 +2,72 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373C0C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A89C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F09172067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:12:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F09172067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19CCC2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CCC2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYSy-0002qh-Ab
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:12:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46781)
+	id 1hxYZx-0004ue-AW
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:19:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47520)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hxYSZ-0002Ow-02
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:11:40 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1hxYZ7-00046W-TU
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hxYSX-00034L-Hz
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:11:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48477)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hxYSX-00033u-9Q
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:11:37 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 74A6630EBE7B;
- Tue, 13 Aug 2019 15:11:36 +0000 (UTC)
-Received: from [10.3.117.22] (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 24B2E10013A1;
- Tue, 13 Aug 2019 15:11:35 +0000 (UTC)
-To: Tao <tao3.xu@intel.com>, imammedo@redhat.com, ehabkost@redhat.com
-References: <20190809065731.9097-1-tao3.xu@intel.com>
- <20190809065731.9097-10-tao3.xu@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <be305a8a-f1f4-7084-4bb7-4174d530483d@redhat.com>
-Date: Tue, 13 Aug 2019 10:11:32 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
-MIME-Version: 1.0
-In-Reply-To: <20190809065731.9097-10-tao3.xu@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Qg8aNq8QcDZ1H9if7a8Whcr9WOrgJHI5R"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 13 Aug 2019 15:11:36 +0000 (UTC)
+ (envelope-from <palmer@dabbelt.com>) id 1hxYZ5-0007YI-Vl
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:25 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:37901)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hxYZ4-0007Wq-2K
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:23 -0400
+Received: by mail-pf1-f193.google.com with SMTP id o70so6450890pfg.5
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 08:18:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=7Bf8BN0PQWXLYxjsZANwcPreBR2wqTJQWjafZYvdYcE=;
+ b=EQMK7CQJsKd1ycjhoH37MtrwKmQmInSyZ0JXkadlrirBOhV4JKHz9wIxQHOEAuW+QQ
+ Bz6CZ7neuw6tVgLduwiHtpM3q+afmC2SgHw2Xgj9u6yzTBP4JFVgkbJkvKbf4IZcCJ3R
+ mHu95Xhi5Of5p5B12+fuRMRj6SWFTw1L44F0eCbvCGovH8Uy8YNhcUVMd2qIEf1cj4Gi
+ NL7C3oMMZYAa9nQQ6QFJj1Y27A88noVwpVKPd9nWuEZ3E9VSyLGLo/EdilYRU+FLMNzf
+ xkzxqQ+1uIQq7OMZKdDxtEtNbTrzigDz7GNOat9C1LAsOaLtLj2BVRg49meu5f5jpM66
+ HisQ==
+X-Gm-Message-State: APjAAAUu9qEzyKVjjj2wo6g8b3uEQWdl96lAPt6prCFfDNFtlHkkFC9b
+ rOE5EdYcLKc5S8MuQxzR3mPoag==
+X-Google-Smtp-Source: APXvYqw5ZdxJ1CzvjoyaNJ/92XUtZqoCXwooUw3zN4SVVWpJKP6jVJKn7eUi3rnKXEX1Z15mi6gJEg==
+X-Received: by 2002:a63:d741:: with SMTP id w1mr33931302pgi.155.1565709500152; 
+ Tue, 13 Aug 2019 08:18:20 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id l4sm111688345pff.50.2019.08.13.08.18.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Aug 2019 08:18:18 -0700 (PDT)
+Date: Tue, 13 Aug 2019 08:18:18 -0700 (PDT)
+X-Google-Original-Date: Tue, 13 Aug 2019 08:18:03 PDT (-0700)
+In-Reply-To: <1564577355-29273-1-git-send-email-bmeng.cn@gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-b5a2e14d-7a56-46ab-aaa2-96123b44c56b@palmer-si-x1e>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v9 09/11] numa: Extend the CLI to provide
- memory latency and bandwidth information
+ [fuzzy]
+X-Received-From: 209.85.210.193
+Subject: Re: [Qemu-devel] [PATCH] riscv: hmp: Add a command to show virtual
+ memory mappings
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,276 +79,293 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, fan.du@intel.com, qemu-devel@nongnu.org,
- daniel@linux.ibm.com, Markus Armbruster <armbru@redhat.com>,
- jonathan.cameron@huawei.com, dan.j.williams@intel.com
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, dgilbert@redhat.com,
+ qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Qg8aNq8QcDZ1H9if7a8Whcr9WOrgJHI5R
-Content-Type: multipart/mixed; boundary="U048lAAeGXzlrI5vdCoJ7DClS1dpiyx0S";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Tao <tao3.xu@intel.com>, imammedo@redhat.com, ehabkost@redhat.com
-Cc: jingqi.liu@intel.com, dan.j.williams@intel.com,
- jonathan.cameron@huawei.com, daniel@linux.ibm.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-Message-ID: <be305a8a-f1f4-7084-4bb7-4174d530483d@redhat.com>
-Subject: Re: [PATCH v9 09/11] numa: Extend the CLI to provide memory latency
- and bandwidth information
-References: <20190809065731.9097-1-tao3.xu@intel.com>
- <20190809065731.9097-10-tao3.xu@intel.com>
-In-Reply-To: <20190809065731.9097-10-tao3.xu@intel.com>
-
---U048lAAeGXzlrI5vdCoJ7DClS1dpiyx0S
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/9/19 1:57 AM, Tao wrote:
-> From: Liu Jingqi <jingqi.liu@intel.com>
->=20
-> Add -numa hmat-lb option to provide System Locality Latency and
-> Bandwidth Information. These memory attributes help to build
-> System Locality Latency and Bandwidth Information Structure(s)
-> in ACPI Heterogeneous Memory Attribute Table (HMAT).
->=20
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+On Wed, 31 Jul 2019 05:49:15 PDT (-0700), bmeng.cn@gmail.com wrote:
+> This adds 'info mem' command for RISC-V, to show virtual memory
+> mappings that aids debugging.
+>
+> Rather than showing every valid PTE, the command compacts the
+> output by merging all contiguous physical address mappings into
+> one block and only shows the merged block mapping details.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 > ---
->=20
-> Changes in v9:
->     - change the CLI input way, make it more user firendly (Daniel Blac=
-k)
->     use latency=3DNUM[p|n|u]s and bandwidth=3DNUM[M|G|P](B/s) as input =
-and drop
->     the base-lat and base-bw input.
-
-Why are you hand-rolling yet another scaling parser instead of reusing
-one that's already in-tree?
-
-> +++ b/hw/core/numa.c
-
-> +void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
-> +                        Error **errp)
+>
+>  hmp-commands-info.hx       |   2 +-
+>  target/riscv/Makefile.objs |   4 +
+>  target/riscv/monitor.c     | 227 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 232 insertions(+), 1 deletion(-)
+>  create mode 100644 target/riscv/monitor.c
+>
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index c59444c..257ee7d 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -249,7 +249,7 @@ STEXI
+>  Show virtual to physical memory mappings.
+>  ETEXI
+>
+> -#if defined(TARGET_I386)
+> +#if defined(TARGET_I386) || defined(TARGET_RISCV)
+>      {
+>          .name       = "mem",
+>          .args_type  = "",
+> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+> index b1c79bc..a8ceccd 100644
+> --- a/target/riscv/Makefile.objs
+> +++ b/target/riscv/Makefile.objs
+> @@ -1,5 +1,9 @@
+>  obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o pmp.o
+>
+> +ifeq ($(CONFIG_SOFTMMU),y)
+> +obj-y += monitor.o
+> +endif
+> +
+>  DECODETREE = $(SRC_PATH)/scripts/decodetree.py
+>
+>  decode32-y = $(SRC_PATH)/target/riscv/insn32.decode
+> diff --git a/target/riscv/monitor.c b/target/riscv/monitor.c
+> new file mode 100644
+> index 0000000..30560ff
+> --- /dev/null
+> +++ b/target/riscv/monitor.c
+> @@ -0,0 +1,227 @@
+> +/*
+> + * QEMU monitor for RISC-V
+> + *
+> + * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
+> + *
+> + * RISC-V specific monitor commands implementation
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "cpu_bits.h"
+> +#include "monitor/monitor.h"
+> +#include "monitor/hmp-target.h"
+> +
+> +#ifdef TARGET_RISCV64
+> +#define PTE_HEADER_FIELDS       "vaddr            paddr            "\
+> +                                "size             attr\n"
+> +#define PTE_HEADER_DELIMITER    "---------------- ---------------- "\
+> +                                "---------------- -------\n"
+> +#else
+> +#define PTE_HEADER_FIELDS       "vaddr    paddr            size     attr\n"
+> +#define PTE_HEADER_DELIMITER    "-------- ---------------- -------- -------\n"
+> +#endif
+> +
+> +/* Perform linear address sign extension */
+> +static target_ulong addr_canonical(int va_bits, target_ulong addr)
 > +{
-
-> +    if (node->has_latency) {
-> +        hmat_lb =3D ms->numa_state->hmat_lb[node->hierarchy][node->dat=
-a_type];
+> +#ifdef TARGET_RISCV64
+> +    if (addr & (1UL << (va_bits - 1))) {
+> +        addr |= (hwaddr)-(1L << va_bits);
+> +    }
+> +#endif
 > +
-> +        if (!hmat_lb) {
-> +            hmat_lb =3D g_malloc0(sizeof(*hmat_lb));
-> +            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] =
-=3D hmat_lb;
-> +        } else if (hmat_lb->latency[node->initiator][node->target]) {
-> +            error_setg(errp, "Duplicate configuration of the latency f=
-or "
-> +                       "initiator=3D%" PRIu16 " and target=3D%" PRIu16=
- ".",
-> +                       node->initiator, node->target);
-> +            return;
+> +    return addr;
+> +}
+> +
+> +static void print_pte_header(Monitor *mon)
+> +{
+> +    monitor_printf(mon, PTE_HEADER_FIELDS);
+> +    monitor_printf(mon, PTE_HEADER_DELIMITER);
+> +}
+> +
+> +static void print_pte(Monitor *mon, int va_bits, target_ulong vaddr,
+> +                      hwaddr paddr, target_ulong size, int attr)
+> +{
+> +    /* santity check on vaddr */
+> +    if (vaddr >= (1UL << va_bits)) {
+> +        return;
+> +    }
+> +
+> +    if (!size) {
+> +        return;
+> +    }
+> +
+> +    monitor_printf(mon, TARGET_FMT_lx " " TARGET_FMT_plx " " TARGET_FMT_lx
+> +                   " %c%c%c%c%c%c%c\n",
+> +                   addr_canonical(va_bits, vaddr),
+> +                   paddr, size,
+> +                   attr & PTE_R ? 'r' : '-',
+> +                   attr & PTE_W ? 'w' : '-',
+> +                   attr & PTE_X ? 'x' : '-',
+> +                   attr & PTE_U ? 'u' : '-',
+> +                   attr & PTE_G ? 'g' : '-',
+> +                   attr & PTE_A ? 'a' : '-',
+> +                   attr & PTE_D ? 'd' : '-');
+> +}
+> +
+> +static void walk_pte(Monitor *mon, hwaddr base, target_ulong start,
+> +                     int level, int ptidxbits, int ptesize, int va_bits,
+> +                     hwaddr *vbase, hwaddr *pbase, hwaddr *last_paddr,
+> +                     target_ulong *last_size, int *last_attr)
+> +{
+> +    hwaddr pte_addr;
+> +    hwaddr paddr;
+> +    target_ulong pgsize;
+> +    target_ulong pte;
+> +    int ptshift;
+> +    int attr;
+> +    int idx;
+> +
+> +    if (level < 0) {
+> +        return;
+> +    }
+> +
+> +    ptshift = level * ptidxbits;
+> +    pgsize = 1UL << (PGSHIFT + ptshift);
+> +
+> +    for (idx = 0; idx < (1UL << ptidxbits); idx++) {
+> +        pte_addr = base + idx * ptesize;
+> +        cpu_physical_memory_read(pte_addr, &pte, ptesize);
+> +
+> +        paddr = (pte >> PTE_PPN_SHIFT) << PGSHIFT;
+> +        attr = pte & 0xff;
+> +
+> +        /* PTE has to be valid */
+> +        if (attr & PTE_V) {
+> +            if (attr & (PTE_R | PTE_W | PTE_X)) {
+> +                /*
+> +                 * A leaf PTE has been found
+> +                 *
+> +                 * If current PTE's permission bits differ from the last one,
+> +                 * or current PTE's ppn does not make a contiguous physical
+> +                 * address block together with the last one, print out the last
+> +                 * contiguous mapped block details.
+> +                 */
+> +                if ((*last_attr != attr) ||
+> +                    (*last_paddr + *last_size != paddr)) {
+> +                    print_pte(mon, va_bits, *vbase, *pbase,
+> +                              *last_paddr + *last_size - *pbase, *last_attr);
+> +
+> +                    *vbase = start;
+> +                    *pbase = paddr;
+> +                    *last_attr = attr;
+> +                }
+> +
+> +                *last_paddr = paddr;
+> +                *last_size = pgsize;
+> +            } else {
+> +                /* pointer to the next level of the page table */
+> +                walk_pte(mon, paddr, start, level - 1, ptidxbits, ptesize,
+> +                         va_bits, vbase, pbase, last_paddr,
+> +                         last_size, last_attr);
+> +            }
 > +        }
 > +
-> +        ret =3D qemu_strtoui(node->latency, &endptr, 10, &latency);
-> +        if (ret < 0) {
-> +            error_setg(errp, "Invalid latency %s", node->latency);
-> +            return;
-> +        }
+> +        start += pgsize;
+> +    }
 > +
-> +        if (*endptr =3D=3D '\0') {
-> +            base_lat =3D 1;
-> +        } else if (*(endptr + 1) =3D=3D 's') {
-> +            switch (*endptr) {
-> +            case 'p':
-> +                base_lat =3D 1;
-> +                break;
-> +            case 'n':
-> +                base_lat =3D PICO_PER_NSEC;
-> +                break;
-> +            case 'u':
-> +                base_lat =3D PICO_PER_USEC;
-> +                break;
-
-Hmm - this is a different scaling than any of our existing parsers
-(which assume multiples k/M/G..., not subdivisions u/n/s)
-
-
-> +    if (node->has_bandwidth) {
-> +        hmat_lb =3D ms->numa_state->hmat_lb[node->hierarchy][node->dat=
-a_type];
+> +}
 > +
-> +        if (!hmat_lb) {
-> +            hmat_lb =3D g_malloc0(sizeof(*hmat_lb));
-> +            ms->numa_state->hmat_lb[node->hierarchy][node->data_type] =
-=3D hmat_lb;
-> +        } else if (hmat_lb->bandwidth[node->initiator][node->target]) =
-{
-> +            error_setg(errp, "Duplicate configuration of the bandwidth=
- for "
-> +                       "initiator=3D%" PRIu16 " and target=3D%" PRIu16=
- ".",
-> +                       node->initiator, node->target);
-> +            return;
-> +        }
+> +static void mem_info_svxx(Monitor *mon, CPUArchState *env)
+> +{
+> +    hwaddr base;
+> +    int levels, ptidxbits, ptesize, vm, va_bits;
+> +    hwaddr vbase, pbase, last_paddr;
+> +    target_ulong last_size;
+> +    int last_attr;
 > +
-> +        ret =3D qemu_strtoui(node->bandwidth, &endptr, 10, &bandwidth)=
-;
-> +        if (ret < 0) {
-> +            error_setg(errp, "Invalid bandwidth %s", node->bandwidth);=
-
-> +            return;
-> +        }
+> +    base = get_field(env->satp, SATP_PPN) << PGSHIFT;
 > +
-> +        switch (toupper(*endptr)) {
-> +        case '\0':
-> +        case 'M':
-> +            base_bw =3D 1;
-> +            break;
-> +        case 'G':
-> +            base_bw =3D UINT64_C(1) << 10;
-> +            break;
-> +        case 'P':
-> +            base_bw =3D UINT64_C(1) << 20;
-> +            break;
-
-But this one, in addition to being wrong (P is 1<<30, not 1<<20), should
-definitely be reusing qemu_strtosz_metric() or similar (look in
-util/cutils.c).
-
-
-> +++ b/qapi/machine.json
-> @@ -377,10 +377,12 @@
->  #
->  # @cpu: property based CPU(s) to node mapping (Since: 2.10)
->  #
-> +# @hmat-lb: memory latency and bandwidth information (Since: 4.2)
-> +#
->  # Since: 2.1
->  ##
->  { 'enum': 'NumaOptionsType',
-> -  'data': [ 'node', 'dist', 'cpu' ] }
-> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-> =20
-
-> +##
-> +# @HmatLBDataType:
-> +#
-> +# Data type in the System Locality Latency
-> +# and Bandwidth Information Structure of HMAT (Heterogeneous
-> +# Memory Attribute Table)
-> +#
-> +# For more information of @HmatLBDataType see
-> +# the chapter 5.2.27.4: Table 5-142:  Field "Data Type" of ACPI 6.3 sp=
-ec.
-> +#
-> +# @access-latency: access latency (picoseconds)
-> +#
-> +# @read-latency: read latency (picoseconds)
-> +#
-> +# @write-latency: write latency (picoseconds)
-> +#
-> +# @access-bandwidth: access bandwidth (MB/s)
-> +#
-> +# @read-bandwidth: read bandwidth (MB/s)
-> +#
-> +# @write-bandwidth: write bandwidth (MB/s)
-
-Are these really the best scales?
-
-
+> +    vm = get_field(env->satp, SATP_MODE);
+> +    switch (vm) {
+> +    case VM_1_10_SV32:
+> +        levels = 2;
+> +        ptidxbits = 10;
+> +        ptesize = 4;
+> +        break;
+> +    case VM_1_10_SV39:
+> +        levels = 3;
+> +        ptidxbits = 9;
+> +        ptesize = 8;
+> +        break;
+> +    case VM_1_10_SV48:
+> +        levels = 4;
+> +        ptidxbits = 9;
+> +        ptesize = 8;
+> +        break;
+> +    case VM_1_10_SV57:
+> +        levels = 5;
+> +        ptidxbits = 9;
+> +        ptesize = 8;
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +        break;
+> +    }
 > +
-> +##
-> +# @NumaHmatLBOptions:
-> +#
-> +# Set the system locality latency and bandwidth information
-> +# between Initiator and Target proximity Domains.
-> +#
-> +# For more information of @NumaHmatLBOptions see
-> +# the chapter 5.2.27.4: Table 5-142 of ACPI 6.3 spec.
-> +#
-> +# @initiator: the Initiator Proximity Domain.
-> +#
-> +# @target: the Target Proximity Domain.
-> +#
-> +# @hierarchy: the Memory Hierarchy. Indicates the performance
-> +#             of memory or side cache.
-> +#
-> +# @data-type: presents the type of data, access/read/write
-> +#             latency or hit latency.
-> +#
-> +# @latency: the value of latency from @initiator to @target proximity =
-domain,
-> +#           the latency units are "ps(picosecond)", "ns(nanosecond)" o=
-r
-> +#           "us(microsecond)".
-> +#
-> +# @bandwidth: the value of bandwidth between @initiator and @target pr=
-oximity
-> +#             domain, the bandwidth units are "MB(/s)","GB(/s)" or "PB=
-(/s)".
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'struct': 'NumaHmatLBOptions',
-> +    'data': {
-> +    'initiator': 'uint16',
-> +    'target': 'uint16',
-> +    'hierarchy': 'HmatLBMemoryHierarchy',
-> +    'data-type': 'HmatLBDataType',
-> +    '*latency': 'str',
-> +    '*bandwidth': 'str' }}
+> +    /* calculate virtual address bits */
+> +    va_bits = PGSHIFT + levels * ptidxbits;
+> +
+> +    /* print header */
+> +    print_pte_header(mon);
+> +
+> +    vbase = -1;
+> +    pbase = -1;
+> +    last_paddr = -1;
+> +    last_size = 0;
+> +    last_attr = 0;
+> +
+> +    /* walk page tables, starting from address 0 */
+> +    walk_pte(mon, base, 0, levels - 1, ptidxbits, ptesize, va_bits,
+> +             &vbase, &pbase, &last_paddr, &last_size, &last_attr);
+> +
+> +    /* don't forget the last one */
+> +    print_pte(mon, va_bits, vbase, pbase,
+> +              last_paddr + last_size - pbase, last_attr);
+> +}
+> +
+> +void hmp_info_mem(Monitor *mon, const QDict *qdict)
+> +{
+> +    CPUArchState *env;
+> +
+> +    env = mon_get_cpu_env();
+> +    if (!env) {
+> +        monitor_printf(mon, "No CPU available\n");
+> +        return;
+> +    }
+> +
+> +    if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
+> +        monitor_printf(mon, "S-mode MMU unavailable\n");
+> +        return;
+> +    }
+> +
+> +    if (env->priv_ver < PRIV_VERSION_1_10_0) {
+> +        monitor_printf(mon, "Privileged mode < 1.10 unsupported\n");
+> +        return;
+> +    }
+> +
+> +    if (!(env->satp & SATP_MODE)) {
+> +        monitor_printf(mon, "No translation or protection\n");
+> +        return;
+> +    }
+> +
+> +    mem_info_svxx(mon, env);
+> +}
 
-=2E..and then parsing strings instead of taking raw integers?  Parsing
-strings is okay for HMP, but for QMP, our goal should be a single
-representation with no additional sugar on top.  Latency and bandwidth
-should be int in a single scale.
+Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
 
-
-> +++ b/qemu-options.hx
-> @@ -164,16 +164,19 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
->      "-numa node[,mem=3Dsize][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dnod=
-e][,initiator=3Dnode]\n"
->      "-numa node[,memdev=3Did][,cpus=3Dfirstcpu[-lastcpu]][,nodeid=3Dno=
-de][,initiator=3Dnode]\n"
->      "-numa dist,src=3Dsource,dst=3Ddestination,val=3Ddistance\n"
-> -    "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=
-=3Dz]\n",
-> +    "-numa cpu,node-id=3Dnode[,socket-id=3Dx][,core-id=3Dy][,thread-id=
-=3Dz]\n"
-> +    "-numa hmat-lb,initiator=3Dnode,target=3Dnode,hierarchy=3Dmemory|f=
-irst-level|second-level|third-level,data-type=3Daccess-latency|read-laten=
-cy|write-latency[,latency=3Dlat][,bandwidth=3Dbw]\n",
-
-Command-line parsing can then take human-written scaled numbers, and
-pre-convert them into the single scale accepted by the QMP interface.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---U048lAAeGXzlrI5vdCoJ7DClS1dpiyx0S--
-
---Qg8aNq8QcDZ1H9if7a8Whcr9WOrgJHI5R
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S0yQACgkQp6FrSiUn
-Q2riXQf+KBwZj0aAoYAvX1Cz6r2s8cVmUtkHYI4zmnlFxcZ6tJKCR52PN1ujAMM+
-5PdeMw1si7TnglNbiE3qpBcUHJ4g+FN7urETwPOascCRHSZjHJC5TaHXvn1+GfqU
-LYhfKDaL9JXPUJz+lqo+ZBYrrnhL4ps0iqZVDjxPhh5oV7OuSnnM5YJ/WtSxTFJ1
-eM2vtv/ZG2AMZwGYRaGQCpnSqk5tbFsN57D8I/OnL7SXbk6Iv3EzrGfZt6CgSmqd
-7+VS0Z0dhJ0vhZtxzFSS+8sJOBHEDrxulkrHnZcQsIdTJCqgF9kBJIX+uL5q/J/d
-xU5QfPepgjcF0P4aSaIBpDcPl1D4gQ==
-=jsol
------END PGP SIGNATURE-----
-
---Qg8aNq8QcDZ1H9if7a8Whcr9WOrgJHI5R--
+I'm putting this in the RISC-V tree with David's Acked-by, LMK if you want me 
+to do something else.
 
