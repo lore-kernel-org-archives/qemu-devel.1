@@ -2,49 +2,49 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A87C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 08:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DD06C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 08:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC883206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 08:48:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC883206C2
+	by mail.kernel.org (Postfix) with ESMTPS id E7677206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 08:49:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7677206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxSTW-0000V3-8M
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 04:48:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46486)
+	id 1hxSV0-0001Pp-9o
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 04:49:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46638)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hxST1-0008PV-HB
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 04:47:45 -0400
+ (envelope-from <thuth@redhat.com>) id 1hxSUQ-0000zs-7p
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 04:49:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hxSSz-0007rb-Ga
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 04:47:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36920)
+ (envelope-from <thuth@redhat.com>) id 1hxSUP-0008Ti-B2
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 04:49:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33708)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hxSSx-0007q6-ET
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 04:47:39 -0400
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hxSUP-0008TU-3L
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 04:49:09 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E8BEA3082B5A;
- Tue, 13 Aug 2019 08:47:37 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 712E4C058CA4;
+ Tue, 13 Aug 2019 08:49:08 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-154.ams2.redhat.com [10.36.116.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C31706E6E5;
- Tue, 13 Aug 2019 08:47:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4421153E09;
+ Tue, 13 Aug 2019 08:48:59 +0000 (UTC)
 To: "Oleinik, Alexander" <alxndr@bu.edu>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190805032400.8054-1-alxndr@bu.edu>
+References: <20190805031240.6024-1-alxndr@bu.edu>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,22 +90,21 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <c6429356-2266-f0ff-4e4d-5597e949eb20@redhat.com>
-Date: Tue, 13 Aug 2019 10:47:28 +0200
+Message-ID: <17142a94-250f-ca19-9881-a6c019576f23@redhat.com>
+Date: Tue, 13 Aug 2019 10:48:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190805032400.8054-1-alxndr@bu.edu>
+In-Reply-To: <20190805031240.6024-1-alxndr@bu.edu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Tue, 13 Aug 2019 08:47:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Tue, 13 Aug 2019 08:49:08 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] libqos: Account for the ctrl queue in
- virtio-net
+Subject: Re: [Qemu-devel] [PATCH] qtest: Rename qtest.c:qtest_init()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,54 +118,22 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Laurent Vivier <lvivier@redhat.com>,
  "pbonzini@redhat.com" <pbonzini@redhat.com>, "bsd@redhat.com" <bsd@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
  "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/5/19 5:24 AM, Oleinik, Alexander wrote:
-> The number of queues is 2n+1, where n == 1 when multiqueue is disabled
+On 8/5/19 5:13 AM, Oleinik, Alexander wrote:
+> Both the qtest client, libqtest.c, and server, qtest.c, used the same
+> name for initialization functions which can cause confusion.
 > 
 > Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 > ---
-> 
-> I split this commit out of the fuzz patch-series.
-> 
->  tests/libqos/virtio-net.c | 1 +
->  tests/libqos/virtio-net.h | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/libqos/virtio-net.c b/tests/libqos/virtio-net.c
-> index 66405b646e..b8b5bc5dfc 100644
-> --- a/tests/libqos/virtio-net.c
-> +++ b/tests/libqos/virtio-net.c
-> @@ -53,6 +53,7 @@ static void virtio_net_setup(QVirtioNet *interface)
->      } else {
->          interface->n_queues = 2;
->      }
-> +    inteface->n_queues++; /* Account for the ctrl queue */
->  
->      interface->queues = g_new(QVirtQueue *, interface->n_queues);
->      for (i = 0; i < interface->n_queues; i++) {
-> diff --git a/tests/libqos/virtio-net.h b/tests/libqos/virtio-net.h
-> index a5697d7326..855c67d00f 100644
-> --- a/tests/libqos/virtio-net.h
-> +++ b/tests/libqos/virtio-net.h
-> @@ -29,7 +29,7 @@ typedef struct QVirtioNetDevice QVirtioNetDevice;
->  
->  struct QVirtioNet {
->      QVirtioDevice *vdev;
-> -    int n_queues;
-> +    int n_queues; /* total number of virtqueues (rx, tx, ctrl) */
->      QVirtQueue **queues;
->  };
+> Thank you, Thomas Huth for the suggestion.
 
-FYI, I've queued this patch now in the qtest branch:
+Thanks you for the patch, it's now queued in my qtest tree:
 
  https://gitlab.com/huth/qemu/commits/qtest-next
-
-(with the typo fixed, obviously)
 
  Thomas
 
