@@ -2,90 +2,64 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF3D9C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BCDC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:58:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8593206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:58:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bguDt9Lf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8593206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 15234206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:58:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15234206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxWNX-0007mZ-0z
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 08:58:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53680)
+	id 1hxWO0-0000Gb-Oq
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 08:58:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54053)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hxWFS-0002Yt-Ql
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:59 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hxWI9-000888-Iv
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hxWFR-0000nH-M9
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:58 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56267)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hxWFR-0000mF-ES
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:57 -0400
-Received: by mail-wm1-x342.google.com with SMTP id f72so1386165wmf.5
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 05:49:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NoY4fxuwSw4w5d0A97p1qZBRlAujfMxBHOYoRwMXm8I=;
- b=bguDt9Lfy7i3w+MyuHH+hr1JoO5u/iyHxOohMr9ooAd1ybUxCvfi7GcmA8YaOjA2r1
- UOP4aE95WI2ziWF26t/hYw+eNvdz+KESuZsRfzvtW8hiq33nFkqTFScby8pxV3X1rHfc
- oGX+q91tNsXhlEkWZ5t5ykHdw93jEZActMRh/gfntKMqVZSbc1oTyY10RYHKTJu/0VGh
- g+4pC1DgLV1R2BvDMsqhL53yVmXEHELMCs6mGBsp1dptFj37wpZIHp3gS87G/mv5zrcc
- BwuY4Cn2ZPFApZZIijpPFvGsDsMKjes5nDEAfb7jwJ75rRCGwM/3DJN064VEtIzH1b/4
- keLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NoY4fxuwSw4w5d0A97p1qZBRlAujfMxBHOYoRwMXm8I=;
- b=I9BTV6VqTaHw/21Hn62iJxnEX4iszEsoFOop220o/vp+VJ5o+hT0l2wIj4P/CJ2mMS
- Tw3XKOrVkKLsFwU++b+qpkFIkmwV7RDvUpqHbFpK91FPuI5svCwjNSRllvzQ17iGFVPi
- qgc1IaB686d2wo3Z89HCJw31FqphygL1AHmSwxl8Q7TPzvIItAadnTMQnAYz4EOeJlpu
- /AmwlPEeFka1ghDljwcQmTDMJAP9Gg2yvDItSmCRg1/7zPcCqpWz2IRbzd8Og1KQdA63
- h04N7dxXs0l0XvbTE+avHaj2kSrsehRQvRqw7PI45aXsCGmQpfEeufeILosxwJ/+TteY
- vsvw==
-X-Gm-Message-State: APjAAAVGXJXusoxhD0AxgtzOhzP3rY7SJAtqMm7KY6wvDhjCK5rs7NZT
- 3GCfNhYUySUD9U2aFG6HQnHYaw==
-X-Google-Smtp-Source: APXvYqzk1SaYamAhANQ7ZOGx/4l/FUNMITCJzDxRQ2pzjZ127lXSjZGWCKhifeIJio+wqQyfZ+nnxg==
-X-Received: by 2002:a1c:4d0c:: with SMTP id o12mr3106796wmh.62.1565700596345; 
- Tue, 13 Aug 2019 05:49:56 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id w5sm1705603wmm.43.2019.08.13.05.49.50
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 13 Aug 2019 05:49:53 -0700 (PDT)
-Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 240B51FF9C;
- Tue, 13 Aug 2019 13:49:48 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 13:49:46 +0100
-Message-Id: <20190813124946.25322-14-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190813124946.25322-1-alex.bennee@linaro.org>
-References: <20190813124946.25322-1-alex.bennee@linaro.org>
+ (envelope-from <cohuck@redhat.com>) id 1hxWI8-00037r-JD
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:52:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36292)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hxWI8-00037R-DW; Tue, 13 Aug 2019 08:52:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9B51830EA18D;
+ Tue, 13 Aug 2019 12:52:43 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 44E8B80FF3;
+ Tue, 13 Aug 2019 12:52:39 +0000 (UTC)
+Date: Tue, 13 Aug 2019 14:52:37 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Message-ID: <20190813145237.58e83eeb.cohuck@redhat.com>
+In-Reply-To: <10b59926-4834-7cc6-a01e-7d6c43749057@redhat.com>
+References: <20190812112737.6652-1-david@redhat.com>
+ <20190812112737.6652-3-david@redhat.com>
+ <10b59926-4834-7cc6-a01e-7d6c43749057@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: [Qemu-devel] [PATCH v3 13/13] targets (various): use
- softfloat-helpers.h where we can
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Tue, 13 Aug 2019 12:52:43 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v1 2/6] s390x/tcg: Rework MMU
+ selection for instruction fetches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,114 +71,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, armbru@redhat.com,
- "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Generally the cpu and non-FP helper files just want to manipulate the
-softfloat flags. For this they can just use the -helpers.h include
-which brings in a minimal number of inline helpers.
+On Mon, 12 Aug 2019 15:37:39 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: David Hildenbrand <david@redhat.com>
----
- target/alpha/helper.c   | 2 +-
- target/microblaze/cpu.c | 2 +-
- target/s390x/cpu.c      | 2 +-
- target/sh4/cpu.c        | 3 +--
- target/tricore/helper.c | 2 +-
- target/unicore32/cpu.c  | 1 -
- 6 files changed, 5 insertions(+), 7 deletions(-)
+> On 12.08.19 13:27, David Hildenbrand wrote:
+> > Instructions are always fetched from primary address space, except when
+> > in home address mode. Perform the selection directly in cpu_mmu_index().
+> > 
+> > get_mem_index() is only used to perform data access, instructions are
+> > fetched via cpu_lduw_code(), which translates to cpu_mmu_index(env, true).
+> > 
+> > We don't care about restricting the access permissions of the TLB
+> > entries anymore, as we no longer enter PRIMARY entries into the
+> > SECONDARY MMU. Cleanup related code a bit.
+> > 
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  target/s390x/cpu.h        |  7 +++++++
+> >  target/s390x/mmu_helper.c | 35 ++++++++++++++---------------------
+> >  2 files changed, 21 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> > index a606547b4d..c34992bb2e 100644
+> > --- a/target/s390x/cpu.h
+> > +++ b/target/s390x/cpu.h
+> > @@ -332,6 +332,13 @@ static inline int cpu_mmu_index(CPUS390XState *env, bool ifetch)
+> >          return MMU_REAL_IDX;
+> >      }
+> >  
+> > +    if (ifetch) {
+> > +        if ((env->psw.mask & PSW_MASK_ASC) == PSW_ASC_HOME) {
+> > +            return MMU_HOME_IDX;
+> > +        }
+> > +        return MMU_PRIMARY_IDX;
+> > +    }
+> > +
+> >      switch (env->psw.mask & PSW_MASK_ASC) {
+> >      case PSW_ASC_PRIMARY:
+> >          return MMU_PRIMARY_IDX;
+> > diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
+> > index 6e9c4d6151..2c9bb3acc0 100644
+> > --- a/target/s390x/mmu_helper.c
+> > +++ b/target/s390x/mmu_helper.c
+> > @@ -349,6 +349,7 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+> >  {
+> >      static S390SKeysState *ss;
+> >      static S390SKeysClass *skeyclass;
+> > +    uint64_t asce;
+> >      int r = -1;  
+> 
+> I can now stop initializing r.
+> 
+> >      uint8_t key;
+> >  
+> > @@ -381,35 +382,21 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
+> >      if (!(env->psw.mask & PSW_MASK_DAT)) {
+> >          *raddr = vaddr;
+> >          r = 0;  
+> 
+> and this can go as well.
+> 
+> > -        goto out;
+> > +        goto nodat;
+> >      }
+> >    
+> 
+> 
 
-diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index 93b8e788b18..c6998348df4 100644
---- a/target/alpha/helper.c
-+++ b/target/alpha/helper.c
-@@ -21,7 +21,7 @@
- 
- #include "cpu.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-types.h"
- #include "exec/helper-proto.h"
- #include "qemu/qemu-print.h"
- 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 0bec54b2f8a..9cfd7445e7d 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -28,7 +28,7 @@
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-helpers.h"
- 
- static const struct {
-     const char *name;
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 736a7903e22..5db016672bb 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -42,7 +42,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/tcg.h"
- #endif
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-helpers.h"
- 
- #define CR0_RESET       0xE0UL
- #define CR14_RESET      0xC2000000UL;
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 816d6d7f311..d0a7707991f 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -25,8 +25,7 @@
- #include "cpu.h"
- #include "migration/vmstate.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
--
-+#include "fpu/softfloat-helpers.h"
- 
- static void superh_cpu_set_pc(CPUState *cs, vaddr value)
- {
-diff --git a/target/tricore/helper.c b/target/tricore/helper.c
-index a6803368506..d5db7b2c03f 100644
---- a/target/tricore/helper.c
-+++ b/target/tricore/helper.c
-@@ -19,7 +19,7 @@
- 
- #include "cpu.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
-+#include "fpu/softfloat-helpers.h"
- #include "qemu/qemu-print.h"
- 
- enum {
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index 802e2f1eba5..b27fb9689ff 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -17,7 +17,6 @@
- #include "cpu.h"
- #include "migration/vmstate.h"
- #include "exec/exec-all.h"
--#include "fpu/softfloat.h"
- 
- static void uc32_cpu_set_pc(CPUState *cs, vaddr value)
- {
--- 
-2.20.1
-
+So, there will be a v2?
 
