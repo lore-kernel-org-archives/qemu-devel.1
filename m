@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D28C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9BBC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:07:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A1AC20651
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:06:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A1AC20651
+	by mail.kernel.org (Postfix) with ESMTPS id 167C020842
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:07:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167C020842
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxc8C-0004HC-Kp
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 15:06:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49136)
+	id 1hxc98-00059b-Eu
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 15:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49189)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxc7S-0003he-Ma
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:06:08 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxc7r-00040x-FK
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxc7Q-0005jB-5g
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:06:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35898)
+ (envelope-from <mreitz@redhat.com>) id 1hxc7q-0005ws-9p
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:06:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59298)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxc7N-0005hY-KC; Tue, 13 Aug 2019 15:06:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ id 1hxc7m-0005sq-Bn; Tue, 13 Aug 2019 15:06:26 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C6A7E308FC22;
- Tue, 13 Aug 2019 19:06:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CD26836899;
+ Tue, 13 Aug 2019 19:06:24 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E3F44B6;
- Tue, 13 Aug 2019 19:05:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 58F6737DE;
+ Tue, 13 Aug 2019 19:06:20 +0000 (UTC)
 To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
  qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
  kraxel@redhat.com, kevin@koconnor.net
 References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
- <20190626123948.10199-6-shmuel.eiderman@oracle.com>
+ <20190626123948.10199-5-shmuel.eiderman@oracle.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +72,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8e54c29d-119b-e02b-8966-56fa7ea91f9e@redhat.com>
-Date: Tue, 13 Aug 2019 21:05:54 +0200
+Message-ID: <49d3db3b-5a66-c87d-8d78-157bd0201731@redhat.com>
+Date: Tue, 13 Aug 2019 21:06:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190626123948.10199-6-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190626123948.10199-5-shmuel.eiderman@oracle.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="eIeAeCUgaM6eFfHY0XUQAZNswKPfXTTv4"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+ boundary="TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Tue, 13 Aug 2019 19:06:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Tue, 13 Aug 2019 19:06:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 5/8] bootdevice: Gather LCHS from
- all relevant devices
+Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 4/8] scsi: Propagate unrealize()
+ callback to scsi-hd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,137 +105,91 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eIeAeCUgaM6eFfHY0XUQAZNswKPfXTTv4
-Content-Type: multipart/mixed; boundary="Xo9hQ7pS0ah2uMVaKc0VLHqlZiuE6Jmsx";
+--TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5
+Content-Type: multipart/mixed; boundary="kLucQT5g4pN9xz331Famfw3jVVHzsLaBf";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
  qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
  kraxel@redhat.com, kevin@koconnor.net
 Cc: karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
-Message-ID: <8e54c29d-119b-e02b-8966-56fa7ea91f9e@redhat.com>
-Subject: Re: [QEMU] [PATCH v5 5/8] bootdevice: Gather LCHS from all relevant
- devices
+Message-ID: <49d3db3b-5a66-c87d-8d78-157bd0201731@redhat.com>
+Subject: Re: [QEMU] [PATCH v5 4/8] scsi: Propagate unrealize() callback to
+ scsi-hd
 References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
- <20190626123948.10199-6-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190626123948.10199-6-shmuel.eiderman@oracle.com>
+ <20190626123948.10199-5-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190626123948.10199-5-shmuel.eiderman@oracle.com>
 
---Xo9hQ7pS0ah2uMVaKc0VLHqlZiuE6Jmsx
+--kLucQT5g4pN9xz331Famfw3jVVHzsLaBf
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 26.06.19 14:39, Sam Eiderman wrote:
-> Relevant devices are:
->     * ide-hd (and ide-cd, ide-drive)
->     * scsi-hd (and scsi-cd, scsi-disk, scsi-block)
->     * virtio-blk-pci
->=20
-> We do not call del_boot_device_lchs() for ide-* since we don't need to =
--
-> IDE block devices do not support unplugging.
+> We will need to add LCHS removal logic to scsi-hd's unrealize() in the
+> next commit.
 >=20
 > Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 > Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
 > Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
 > ---
->  hw/block/virtio-blk.c |  6 ++++++
->  hw/ide/qdev.c         |  5 +++++
->  hw/scsi/scsi-disk.c   | 14 ++++++++++++++
->  3 files changed, 25 insertions(+)
+>  hw/scsi/scsi-bus.c     | 15 +++++++++++++++
+>  include/hw/scsi/scsi.h |  1 +
+>  2 files changed, 16 insertions(+)
 >=20
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 06e57a4d39..787bbd768a 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -1182,6 +1182,11 @@ static void virtio_blk_device_realize(DeviceStat=
-e *dev, Error **errp)
->      blk_set_guest_block_size(s->blk, s->conf.conf.logical_block_size);=
+> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+> index c480553083..f6fe497a1a 100644
+> --- a/hw/scsi/scsi-bus.c
+> +++ b/hw/scsi/scsi-bus.c
 
+[...]
+
+> @@ -213,11 +221,18 @@ static void scsi_qdev_realize(DeviceState *qdev, =
+Error **errp)
+>  static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+>  {
+>      SCSIDevice *dev =3D SCSI_DEVICE(qdev);
+> +    Error *local_err =3D NULL;
 > =20
->      blk_iostatus_enable(s->blk);
+>      if (dev->vmsentry) {
+>          qemu_del_vm_change_state_handler(dev->vmsentry);
+>      }
+> =20
+> +    scsi_device_unrealize(dev, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
 > +
-> +    add_boot_device_lchs(dev, "/disk@0,0",
-> +                         (&conf->conf)->lcyls,
-> +                         (&conf->conf)->lheads,
-> +                         (&conf->conf)->lsecs);
+>      scsi_device_purge_requests(dev, SENSE_CODE(NO_SENSE));
 
-=2E..why not simply =E2=80=9Cconf->conf.lcyls=E2=80=9D and so on?
-
-[...]
-
-> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-> index 7b89ac798b..3451aefdea 100644
-> --- a/hw/scsi/scsi-disk.c
-> +++ b/hw/scsi/scsi-disk.c
-
-[...]
-
-> @@ -2988,6 +2998,7 @@ static void scsi_hd_class_initfn(ObjectClass *kla=
-ss, void *data)
->      SCSIDeviceClass *sc =3D SCSI_DEVICE_CLASS(klass);
-> =20
->      sc->realize      =3D scsi_hd_realize;
-> +    sc->unrealize    =3D scsi_unrealize;
->      sc->alloc_req    =3D scsi_new_request;
->      sc->unit_attention_reported =3D scsi_disk_unit_attention_reported;=
-
->      dc->desc =3D "virtual SCSI disk";
-> @@ -3019,6 +3030,7 @@ static void scsi_cd_class_initfn(ObjectClass *kla=
-ss, void *data)
->      SCSIDeviceClass *sc =3D SCSI_DEVICE_CLASS(klass);
-> =20
->      sc->realize      =3D scsi_cd_realize;
-> +    sc->unrealize    =3D scsi_unrealize;
->      sc->alloc_req    =3D scsi_new_request;
->      sc->unit_attention_reported =3D scsi_disk_unit_attention_reported;=
-
->      dc->desc =3D "virtual SCSI CD-ROM";
-> @@ -3054,6 +3066,7 @@ static void scsi_block_class_initfn(ObjectClass *=
-klass, void *data)
->      SCSIDiskClass *sdc =3D SCSI_DISK_BASE_CLASS(klass);
-> =20
->      sc->realize      =3D scsi_block_realize;
-> +    sc->unrealize    =3D scsi_unrealize;
->      sc->alloc_req    =3D scsi_block_new_request;
->      sc->parse_cdb    =3D scsi_block_parse_cdb;
->      sdc->dma_readv   =3D scsi_block_dma_readv;
-> @@ -3095,6 +3108,7 @@ static void scsi_disk_class_initfn(ObjectClass *k=
-lass, void *data)
->      SCSIDeviceClass *sc =3D SCSI_DEVICE_CLASS(klass);
-> =20
->      sc->realize      =3D scsi_disk_realize;
-> +    sc->unrealize    =3D scsi_unrealize;
->      sc->alloc_req    =3D scsi_new_request;
->      sc->unit_attention_reported =3D scsi_disk_unit_attention_reported;=
-
->      dc->fw_name =3D "disk";
-
-Only scsi-hd has the lchs properties, though, so what=E2=80=99s the purpo=
-se of
-defining the unrealize function for all other classes?
+(I see this code for the first time, but) I suppose I=E2=80=99d put the
+scsi_device_unrealize() after scsi_device_purge_requests().
 
 Max
 
+>      blockdev_mark_auto_del(dev->conf.blk);
+>  }
 
---Xo9hQ7pS0ah2uMVaKc0VLHqlZiuE6Jmsx--
 
---eIeAeCUgaM6eFfHY0XUQAZNswKPfXTTv4
+--kLucQT5g4pN9xz331Famfw3jVVHzsLaBf--
+
+--TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TChIACgkQ9AfbAGHV
-z0AYmggAhfJ8XYh7MBvUnWa+TVTyReLON77W6zTXUp3Wo0hxocP+nfSNdfu2Qt0I
-Gp1uEWXATj7/7bLc9h1kIzEBd6RaTjP/jnW0Ck71Rkwr4xBmcKiWLoHYGxJ1sBNM
-kukSQnOf3vpT5cWR+uNTTlo4S5wKm3xTINOCVwbgEYUxEfgj1cXnkG9MGBO7CcYU
-Pn0jV8/BO8eiMaP/kHgjC/uwl/qDyOrhnZAqO7ov8obnzu0I6hecUs8N43rrD+7b
-28YOxc2dLoiCrm/AFaPz8NuUHPWHF44g+B+dgdZ9wezbJLCtCYuAka5fg4Map8jW
-pOKTMbUpcrY/zeB74MO729xAqPhi2A==
-=3yty
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TCioACgkQ9AfbAGHV
+z0DbhAgAn8G++81sexDg57oFo0TjlARLcHBjs/wJLw2LpkW9f4g7EQAwxxPxudLx
+hU01wgCHds4if/LD9FTZCkzlTy7X+qWnTXC6KUmCJGBz1v/gjr9luv3PfR3xRoFO
+Wcd0Ao0j5EDyTV2o5yd7o10qx+dCMCTEde9HlrGCpCFKxdPOkKrmclfkXlDfLnM2
+rR5Udcgn1GIx5UpJG2FHGZu6M6luLQh0xGQJuKN9XRYY4qU8ja3oL78Fez/D1I1R
+ZLe2outARTafFnPGb74792suLIN4VdPhwbFrtgRbrFiQil4GqgYNcGOg/Pd5bLrF
+eBsF+3Q9myi2BGega388Z0hm53llxw==
+=5lpq
 -----END PGP SIGNATURE-----
 
---eIeAeCUgaM6eFfHY0XUQAZNswKPfXTTv4--
+--TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5--
 
