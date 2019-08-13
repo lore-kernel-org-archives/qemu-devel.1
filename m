@@ -2,92 +2,115 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE80C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 18:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E1C4C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 18:54:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C4AC20578
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 18:52:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C4AC20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4BA9D20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 18:54:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="IHLPLbZT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BA9D20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxbuG-0006OR-BQ
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 14:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47553)
+	id 1hxbw4-0007dp-I4
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 14:54:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47810)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxbtj-0005fU-Uw
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:51:56 -0400
+ (envelope-from <alxndr@bu.edu>) id 1hxbve-0007Dt-TY
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxbti-0000uk-Ve
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:51:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60324)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxbtg-0000tG-GI; Tue, 13 Aug 2019 14:51:52 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2603E81F18;
- Tue, 13 Aug 2019 18:51:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C755891D9;
- Tue, 13 Aug 2019 18:51:45 +0000 (UTC)
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
- kraxel@redhat.com, kevin@koconnor.net
-References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
- <20190626123948.10199-4-shmuel.eiderman@oracle.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a4e72a67-4107-4cbb-10e6-6a77011f34ce@redhat.com>
-Date: Tue, 13 Aug 2019 20:51:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <alxndr@bu.edu>) id 1hxbve-0001dG-1o
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:53:54 -0400
+Received: from mail-eopbgr780123.outbound.protection.outlook.com
+ ([40.107.78.123]:6328 helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1hxbvd-0001cn-N6
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 14:53:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IlDZ8vfIUFz/gjetVlPJQUCmDH/xQ1M4gRCRk5yI6EJKYfaxaRDytFYSzcYJXGFfPj2TyTmwCPkL4gRE8I+gUN3P/V9lGnnvD2F7VYi7WkCu4IYBXZoTvXxSEjCqR/RLshStu/MSfYYH7OkzE2HffLPeaA33Dc8aKaEardHSq9WilbVzfBoxbXkEjlIgLnLaEVKrOFxJmrAlmhQZXtKnThodgU/wnHjuMFT8IrQGnO22KM/XrrVsncGkNIaw4AZ9rf7HsVFzdARkI4vZilKUhewf24+49MUE4PoyiWjmh6KM81HYjUY7y0r0Yg3j49TpvGDsneV9JxcSZi+SmFELew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MnyriQZH9ZiU2SuCmrRZlCZETGbsX/Guqb12lQ5NGJs=;
+ b=ZqAXIUCmP6QNH/tyeS+p0O1nNNhwX4iTo2UozJJOtZWxfhsmd+8Yu80JzZNNPg5ZHOtZg/lIa40Sx0hWPFszJqz0Fnj9bi9aSrW7CSAz4chYh/NrT4dtIqmhL2eMT1EaVNXZNA6PqcNRCnk6lN3sW7kO3Z2HJ1tKCexHT7Te47+WMODRz+HgBulngFC+ivuhBk8CSOPO8snltRdc45c87Xfv/bTRXJTfV+ENYxgrcFBFaJCd4E5be8i34az0Tr1sRXuTBPdvyoIIl0RBYFmV5KUqipbs4RdeeKeB035byJojSyIbvt0mm1t4R9F5lq6siSQx45GogWR5lIWAd/DGYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MnyriQZH9ZiU2SuCmrRZlCZETGbsX/Guqb12lQ5NGJs=;
+ b=IHLPLbZT7tncra85+tRtExrUot/7rQDtwTQs/hjFSXvp05UPEvufU6ZBYCkooQ2Vrec6PQ8nqMIVCNIkiV0kJK2vBDk+W6BumTLpzrZ1nrLbHjPN4D1/AxbdwG+a+89Q5SP8FqSuuru7odtGrQWiYZmnqe5Db1VvwRAc+MQczvo=
+Received: from CY4PR03MB2872.namprd03.prod.outlook.com (10.175.118.17) by
+ CY4PR03MB2582.namprd03.prod.outlook.com (10.173.41.19) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.18; Tue, 13 Aug 2019 18:53:51 +0000
+Received: from CY4PR03MB2872.namprd03.prod.outlook.com
+ ([fe80::6cce:cc85:9e3:d33a]) by CY4PR03MB2872.namprd03.prod.outlook.com
+ ([fe80::6cce:cc85:9e3:d33a%4]) with mapi id 15.20.2157.022; Tue, 13 Aug 2019
+ 18:53:51 +0000
+From: "Oleinik, Alexander" <alxndr@bu.edu>
+To: "stefanha@gmail.com" <stefanha@gmail.com>
+Thread-Topic: [Qemu-devel] [RFC PATCH v2 04/17] fuzz: Skip modules that were
+ already initialized
+Thread-Index: AQHVS1zyeePe8eajFEyVAJES1NtnGqbyjDUAgAbt8YA=
+Date: Tue, 13 Aug 2019 18:53:51 +0000
+Message-ID: <6dd76b32f07c5eb620e2a09216d4d329fd609bab.camel@bu.edu>
+References: <20190805071038.32146-1-alxndr@bu.edu>
+ <20190805071038.32146-5-alxndr@bu.edu>
+ <20190809090436.GG25286@stefanha-x1.localdomain>
+In-Reply-To: <20190809090436.GG25286@stefanha-x1.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
+x-originating-ip: [128.197.127.33]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 43bf3225-170d-427a-33a7-08d7201f9517
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:CY4PR03MB2582; 
+x-ms-traffictypediagnostic: CY4PR03MB2582:
+x-microsoft-antispam-prvs: <CY4PR03MB2582D5375F68E78246979F69BAD20@CY4PR03MB2582.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:551;
+x-forefront-prvs: 01283822F8
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(396003)(366004)(136003)(376002)(39860400002)(346002)(189003)(199004)(76116006)(54906003)(66556008)(256004)(478600001)(66476007)(8936002)(3846002)(66446008)(1730700003)(8676002)(64756008)(6116002)(91956017)(53936002)(81166006)(66946007)(4326008)(81156014)(25786009)(1411001)(1361003)(75432002)(99286004)(118296001)(36756003)(6246003)(66066001)(786003)(316002)(486006)(476003)(2616005)(5660300002)(2501003)(14454004)(186003)(5640700003)(11346002)(102836004)(26005)(76176011)(2906002)(305945005)(6506007)(86362001)(7736002)(2351001)(229853002)(88552002)(6486002)(6512007)(4744005)(6916009)(6436002)(71200400001)(446003)(71190400001)(42522002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:CY4PR03MB2582;
+ H:CY4PR03MB2872.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: bu.edu does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: p04gT9xjIyo0KzI2VX7RSs2i3bYoMNt8Lve1ZYCs4uOzMo2WFVtNr0ehzdtU//FkIO8vF+Y+fhxR8C7F4Ks18tHJl2TEtV24GEEQO1J8V5SwJ7OSL/+MC8odwtk/Bx6UNS1JW/tzWsYlxJCH/Wl5ZSuPBEYbryg2r6FQer/gIWqZTSSA+ZTqGLpORUQsdiWNQ8YVFp/RQ9KaGbfWk0ww70dAJ6exGoljHJOS1vONHD2/O7P3HUn0G0Omq5pClAtmdt1D6AcmLDNv8ox3RGTj0V96Fit00z67DQlBa1u+OWoFjmyDLFHlsz+eX/ARZ5Ax5OSYb27hhXpmDLV1I+n7IiSRwJakOLHTMic9ugewTmwaTVrTPVsA3NX7AaSbZSRHAZ61kgPBxjHtf/swvbiDfxmefuCYnjVBnnEqG87JU0g=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C8079376CA75434DA0CF10BB8419BC1C@namprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20190626123948.10199-4-shmuel.eiderman@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="UdjxFkOug62WtINyd4tKv7t4mu1XqYIxi"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Tue, 13 Aug 2019 18:51:51 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 3/8] bootdevice: Add interface to
- gather LCHS
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43bf3225-170d-427a-33a7-08d7201f9517
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2019 18:53:51.2765 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1vPjYBX/S+TFuYXpxuUIT4oEngMStBHhYmbM8dgA0+OKoCMYcunS+RKsgNkuFEjy
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR03MB2582
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.78.123
+Subject: Re: [Qemu-devel] [RFC PATCH v2 04/17] fuzz: Skip modules that were
+ already initialized
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,145 +122,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, karl.heubaum@oracle.com, arbel.moshe@oracle.com
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UdjxFkOug62WtINyd4tKv7t4mu1XqYIxi
-Content-Type: multipart/mixed; boundary="SJpyh4iUPO1hLQw6OMhvJgLckp4kbGSfw";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
- kraxel@redhat.com, kevin@koconnor.net
-Cc: karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
-Message-ID: <a4e72a67-4107-4cbb-10e6-6a77011f34ce@redhat.com>
-Subject: Re: [QEMU] [PATCH v5 3/8] bootdevice: Add interface to gather LCHS
-References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
- <20190626123948.10199-4-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190626123948.10199-4-shmuel.eiderman@oracle.com>
-
---SJpyh4iUPO1hLQw6OMhvJgLckp4kbGSfw
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 26.06.19 14:39, Sam Eiderman wrote:
-> Add an interface to provide direct logical CHS values for boot devices.=
-
-> We will use this interface in the next commits.
->=20
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-> ---
->  bootdevice.c            | 55 +++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  include/sysemu/sysemu.h |  3 +++
->  2 files changed, 58 insertions(+)
-
-I=E2=80=99ve got a couple of =E2=80=9Cundelivered mail returned to sender=
-=E2=80=9D mails for Sam
-recently, but anyway...
-
-> diff --git a/bootdevice.c b/bootdevice.c
-> index 1d225202f9..bc5e1c2de4 100644
-> --- a/bootdevice.c
-> +++ b/bootdevice.c
-> @@ -343,3 +343,58 @@ void device_add_bootindex_property(Object *obj, in=
-t32_t *bootindex,
->      /* initialize devices' bootindex property to -1 */
->      object_property_set_int(obj, -1, name, NULL);
->  }
-> +
-> +typedef struct FWLCHSEntry FWLCHSEntry;
-> +
-> +struct FWLCHSEntry {
-> +    QTAILQ_ENTRY(FWLCHSEntry) link;
-> +    DeviceState *dev;
-> +    char *suffix;
-> +    uint32_t lcyls;
-> +    uint32_t lheads;
-> +    uint32_t lsecs;
-> +};
-> +
-> +static QTAILQ_HEAD(, FWLCHSEntry) fw_lchs =3D
-> +    QTAILQ_HEAD_INITIALIZER(fw_lchs);
-> +
-> +void add_boot_device_lchs(DeviceState *dev, const char *suffix,
-> +                          uint32_t lcyls, uint32_t lheads, uint32_t ls=
-ecs)
-> +{
-> +    FWLCHSEntry *node;
-> +
-> +    if (!lcyls && !lheads && !lsecs) {
-> +        return;
-> +    }
-> +
-> +    assert(dev !=3D NULL || suffix !=3D NULL);
-
-It doesn=E2=80=99t look like any caller actually passes a NULL @dev, so w=
-hy not
-drop the @suffix part?
-
-> +    node =3D g_malloc0(sizeof(FWLCHSEntry));
-> +    node->suffix =3D g_strdup(suffix);
-> +    node->dev =3D dev;
-> +    node->lcyls =3D lcyls;
-> +    node->lheads =3D lheads;
-> +    node->lsecs =3D lsecs;
-> +
-> +    QTAILQ_INSERT_TAIL(&fw_lchs, node, link);
-> +}
-> +
-> +void del_boot_device_lchs(DeviceState *dev, const char *suffix)
-> +{
-> +    FWLCHSEntry *i;
-> +
-> +    if (dev =3D=3D NULL) {
-> +        return;
-> +    }
-> +
-> +    QTAILQ_FOREACH(i, &fw_lchs, link) {
-> +        if ((!suffix || !g_strcmp0(i->suffix, suffix)) &&
-> +             i->dev =3D=3D dev) {
-
-(Furthermore, it=E2=80=99d be impossible to remove an FWLCHSEntry with .d=
-ev =3D=3D
-NULL.)
-
-Max
-
-> +            QTAILQ_REMOVE(&fw_lchs, i, link);
-> +            g_free(i->suffix);
-> +            g_free(i);
-> +
-> +            break;
-> +        }
-> +    }
-> +}
-
-
---SJpyh4iUPO1hLQw6OMhvJgLckp4kbGSfw--
-
---UdjxFkOug62WtINyd4tKv7t4mu1XqYIxi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TBsAACgkQ9AfbAGHV
-z0DiTAf/VvNUfK7o/glkJLX6dyd/nz+OgW1Au48Q5dwL0f9S7Xk+sGJN5wA9Mrwp
-L2wRWKkm9JgGVuZgYwjbYgZ0y5doBllu8pU9BVGWA6r6QkZ6oLotCOGMwY+yO1xg
-MLfmwLN79TIgmoTHxLvoJAxRzRpaIWNri8wWo62df8lZDb0cdj0kFUWGd90rAgpA
-BfOEjfUDH8zLmcsa48Edg0dNZdg4OdoI/uS0mQuCvrK1SPEH5x+NH2MBuW6hmNDt
-z9IPbLGiFRLbqgqypWf3eWoWJtf/Lrc75VfRqxaqWh8Qrhs15PIIFY46pLx0A618
-ewM9osTJpmsS9IRweW2y4GqeCmC8Lg==
-=8L9O
------END PGP SIGNATURE-----
-
---UdjxFkOug62WtINyd4tKv7t4mu1XqYIxi--
+T24gRnJpLCAyMDE5LTA4LTA5IGF0IDEwOjA0ICswMTAwLCBTdGVmYW4gSGFqbm9jemkgd3JvdGU6
+DQo+IE9uIE1vbiwgQXVnIDA1LCAyMDE5IGF0IDA3OjExOjA1QU0gKzAwMDAsIE9sZWluaWssIEFs
+ZXhhbmRlciB3cm90ZToNCj4gPiBTaWduZWQtb2ZmLWJ5OiBBbGV4YW5kZXIgT2xlaW5payA8YWx4
+bmRyQGJ1LmVkdT4NCj4gPiAtLS0NCj4gPiAgdXRpbC9tb2R1bGUuYyB8IDcgKysrKysrKw0KPiA+
+ICAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25zKCspDQo+IA0KPiBXaHkgaXMgdGhpcyBuZWNl
+c3Nhcnk/ICBFeGlzdGluZyBjYWxsZXJzIG9ubHkgaW52b2tlIHRoaXMgZnVuY3Rpb24NCj4gb25j
+ZQ0KPiBmb3IgZWFjaCB0eXBlLg0KVGhpcyB3YXMgc3VnZ2VzdGVkIGJ5IFBhb2xvIGluIE1lc3Nh
+Z2UtSUQ6DQpmYWQ5ZDEyYS0zOWRmLWUyZmEtMDY0Yi01MTMyYWRkOWRhZmZAcmVkaGF0LmNvbQ0K
+DQpJIG5lZWQgdG8gaW5pdGlhbGl6ZSB0aGUgUU9TIG1vZHVsZSBpbiB0aGUgZnV6emVyIG1haW4g
+dG8gaWRlbnRpZnkgdGhlDQpxZW11IGFyZ3VtZW50cywgcHJpb3IgdG8gcnVubmluZyB2bC5jOm1h
+aW4uDQo+IFBsZWFzZSBpbmNsdWRlIGp1c3RpZmljYXRpb24gaW4gdGhlIGNvbW1pdCBkZXNjcmlw
+dGlvbi4NCldpbGwgZG8NCj4gU3RlZmFuDQoNCg==
 
