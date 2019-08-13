@@ -2,63 +2,110 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45168C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D34FC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:40:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11D912067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:39:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11D912067D
+	by mail.kernel.org (Postfix) with ESMTPS id 045E720840
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:40:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 045E720840
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxale-0004UV-5l
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 13:39:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37956)
+	id 1hxamU-0005Uv-C1
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 13:40:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37979)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <dgilbert@redhat.com>) id 1hxalD-000404-RM
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:05 -0400
+ (envelope-from <thuth@redhat.com>) id 1hxalK-000459-0m
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hxalC-000693-Cc
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51178)
+ (envelope-from <thuth@redhat.com>) id 1hxalJ-0006Cf-5H
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hxalC-000688-3M
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>)
+ id 1hxalH-0006B7-0C; Tue, 13 Aug 2019 13:39:07 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E39CDC05AA57;
- Tue, 13 Aug 2019 17:38:59 +0000 (UTC)
-Received: from work-vm (ovpn-117-72.ams2.redhat.com [10.36.117.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 37A2183060;
- Tue, 13 Aug 2019 17:38:57 +0000 (UTC)
-Date: Tue, 13 Aug 2019 18:38:55 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Message-ID: <20190813173855.GI2763@work-vm>
-References: <20190806165429.19327-1-brijesh.singh@amd.com>
- <20190806165429.19327-11-brijesh.singh@amd.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 407043002F44;
+ Tue, 13 Aug 2019 17:39:06 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-63.ams2.redhat.com [10.36.116.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EEC95277A8;
+ Tue, 13 Aug 2019 17:38:55 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20190813093047.27948-1-thuth@redhat.com>
+ <20190813093047.27948-4-thuth@redhat.com>
+ <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <ed667b30-7787-e51d-1ef2-4e1b05c6f963@redhat.com>
+Date: Tue, 13 Aug 2019 19:38:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190806165429.19327-11-brijesh.singh@amd.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Tue, 13 Aug 2019 17:38:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Tue, 13 Aug 2019 17:39:06 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 10/14] target/i386: sev: add support to
- load incoming encrypted page
+Subject: Re: [Qemu-devel] [PATCH 3/6] tests/libqtest: Remove unused function
+ hmp()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,258 +117,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
- Thomas" <Thomas.Lendacky@amd.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Singh, Brijesh (brijesh.singh@amd.com) wrote:
-> The sev_load_incoming_page() provide the implementation to read the
-> incoming guest private pages from the socket and load it into the guest
-> memory. The routines uses the RECEIVE_START command to create the
-> incoming encryption context on the first call then uses the
-> RECEIEVE_UPDATE_DATA command to load the encrypted pages into the guest
-> memory. After migration is completed, we issue the RECEIVE_FINISH command
-> to transition the SEV guest to the runnable state so that it can be
-> executed.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7
+Content-Type: multipart/mixed; boundary="IqRSwRncyodGHEnb4JwpWYiZ21bYnj7lb";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Message-ID: <ed667b30-7787-e51d-1ef2-4e1b05c6f963@redhat.com>
+Subject: Re: [PATCH 3/6] tests/libqtest: Remove unused function hmp()
+References: <20190813093047.27948-1-thuth@redhat.com>
+ <20190813093047.27948-4-thuth@redhat.com>
+ <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+In-Reply-To: <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
 
-OK, some comments about the return values of the functions would help,
-but other than that.
+--IqRSwRncyodGHEnb4JwpWYiZ21bYnj7lb
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 8/13/19 5:20 PM, Eric Blake wrote:
+> On 8/13/19 4:30 AM, Thomas Huth wrote:
+>> No test is using hmp() anymore, and since this function uses the disli=
+ked
+>> global_qtest variable, we should also make sure that nobody adds new c=
+ode
+>> with this function again. qtest_hmp() should be used instead.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  tests/libqtest.c | 11 -----------
+>>  tests/libqtest.h | 10 ----------
+>>  2 files changed, 21 deletions(-)
+>=20
+> Yay.
+>=20
+> We could, at a later time, introduce a patch to do s/qtest_hmp/hmp/ if
+> it was deemed worthwhile, but I'm not sure it's worth the churn.
+
+Actually, I like the qtest_* prefix for the libqtest functions - so it
+is clear at the first sight that a function is part of libqtest or
+rather the test itself.
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks a lot!
+
+ Thomas
 
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-> ---
->  accel/kvm/kvm-all.c      |   6 ++
->  accel/kvm/sev-stub.c     |   5 ++
->  include/sysemu/sev.h     |   1 +
->  target/i386/sev.c        | 137 ++++++++++++++++++++++++++++++++++++++-
->  target/i386/trace-events |   3 +
->  5 files changed, 151 insertions(+), 1 deletion(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index a5b0ae9363..ba0e7fa2be 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -180,9 +180,15 @@ static int kvm_memcrypt_save_outgoing_page(QEMUFile *f, uint8_t *ptr,
->                                    bytes_sent);
->  }
->  
-> +static int kvm_memcrypt_load_incoming_page(QEMUFile *f, uint8_t *ptr)
-> +{
-> +    return sev_load_incoming_page(kvm_state->memcrypt_handle, f, ptr);
-> +}
-> +
->  static struct MachineMemoryEncryptionOps sev_memory_encryption_ops = {
->      .save_setup = kvm_memcrypt_save_setup,
->      .save_outgoing_page = kvm_memcrypt_save_outgoing_page,
-> +    .load_incoming_page = kvm_memcrypt_load_incoming_page,
->  };
->  
->  int kvm_memcrypt_encrypt_data(uint8_t *ptr, uint64_t len)
-> diff --git a/accel/kvm/sev-stub.c b/accel/kvm/sev-stub.c
-> index 51b17b8141..1b6773ef72 100644
-> --- a/accel/kvm/sev-stub.c
-> +++ b/accel/kvm/sev-stub.c
-> @@ -36,3 +36,8 @@ int sev_save_outgoing_page(void *handle, QEMUFile *f, uint8_t *ptr,
->  {
->      return 1;
->  }
-> +
-> +int sev_load_incoming_page(void *handle, QEMUFile *f, uint8_t *ptr)
-> +{
-> +    return 1;
-> +}
-> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
-> index f06fd203cd..e9371bd2dd 100644
-> --- a/include/sysemu/sev.h
-> +++ b/include/sysemu/sev.h
-> @@ -22,4 +22,5 @@ int sev_save_setup(void *handle, const char *pdh, const char *plat_cert,
->                     const char *amd_cert);
->  int sev_save_outgoing_page(void *handle, QEMUFile *f, uint8_t *ptr,
->                             uint32_t size, uint64_t *bytes_sent);
-> +int sev_load_incoming_page(void *handle, QEMUFile *f, uint8_t *ptr);
->  #endif
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 1820c62a71..a689011991 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -721,13 +721,34 @@ sev_launch_finish(SEVState *s)
->      }
->  }
->  
-> +static int
-> +sev_receive_finish(SEVState *s)
-> +{
-> +    int error, ret = 1;
-> +
-> +    trace_kvm_sev_receive_finish();
-> +    ret = sev_ioctl(s->sev_fd, KVM_SEV_RECEIVE_FINISH, 0, &error);
-> +    if (ret) {
-> +        error_report("%s: RECEIVE_FINISH ret=%d fw_error=%d '%s'",
-> +                __func__, ret, error, fw_error_to_str(error));
-> +        goto err;
-> +    }
-> +
-> +    sev_set_guest_state(SEV_STATE_RUNNING);
-> +err:
-> +    return ret;
-> +}
-> +
-> +
->  static void
->  sev_vm_state_change(void *opaque, int running, RunState state)
->  {
->      SEVState *s = opaque;
->  
->      if (running) {
-> -        if (!sev_check_state(SEV_STATE_RUNNING)) {
-> +        if (sev_check_state(SEV_STATE_RECEIVE_UPDATE)) {
-> +            sev_receive_finish(s);
-> +        } else if (!sev_check_state(SEV_STATE_RUNNING)) {
->              sev_launch_finish(s);
->          }
->      }
-> @@ -1097,6 +1118,120 @@ int sev_save_outgoing_page(void *handle, QEMUFile *f, uint8_t *ptr,
->      return sev_send_update_data(s, f, ptr, sz, bytes_sent);
->  }
->  
-> +static int
-> +sev_receive_start(QSevGuestInfo *sev, QEMUFile *f)
-> +{
-> +    int ret = 1;
-> +    int fw_error;
-> +    struct kvm_sev_receive_start start = { };
-> +    gchar *session = NULL, *pdh_cert = NULL;
-> +
-> +    /* get SEV guest handle */
-> +    start.handle = object_property_get_int(OBJECT(sev), "handle",
-> +                                           &error_abort);
-> +
-> +    /* get the source policy */
-> +    start.policy = qemu_get_be32(f);
-> +
-> +    /* get source PDH key */
-> +    start.pdh_len = qemu_get_be32(f);
-> +    if (!check_blob_length(start.pdh_len)) {
-> +        return 1;
-> +    }
-> +
-> +    pdh_cert = g_new(gchar, start.pdh_len);
-> +    qemu_get_buffer(f, (uint8_t *)pdh_cert, start.pdh_len);
-> +    start.pdh_uaddr = (uintptr_t)pdh_cert;
-> +
-> +    /* get source session data */
-> +    start.session_len = qemu_get_be32(f);
-> +    if (!check_blob_length(start.session_len)) {
-> +        return 1;
-> +    }
-> +    session = g_new(gchar, start.session_len);
-> +    qemu_get_buffer(f, (uint8_t *)session, start.session_len);
-> +    start.session_uaddr = (uintptr_t)session;
-> +
-> +    trace_kvm_sev_receive_start(start.policy, session, pdh_cert);
-> +
-> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_RECEIVE_START,
-> +                    &start, &fw_error);
-> +    if (ret < 0) {
-> +        error_report("Error RECEIVE_START ret=%d fw_error=%d '%s'",
-> +                ret, fw_error, fw_error_to_str(fw_error));
-> +        goto err;
-> +    }
-> +
-> +    object_property_set_int(OBJECT(sev), start.handle, "handle", &error_abort);
-> +    sev_set_guest_state(SEV_STATE_RECEIVE_UPDATE);
-> +err:
-> +    g_free(session);
-> +    g_free(pdh_cert);
-> +
-> +    return ret;
-> +}
-> +
-> +static int sev_receive_update_data(QEMUFile *f, uint8_t *ptr)
-> +{
-> +    int ret = 1, fw_error = 0;
-> +    gchar *hdr = NULL, *trans = NULL;
-> +    struct kvm_sev_receive_update_data update = {};
-> +
-> +    /* get packet header */
-> +    update.hdr_len = qemu_get_be32(f);
-> +    if (!check_blob_length(update.hdr_len)) {
-> +        return 1;
-> +    }
-> +
-> +    hdr = g_new(gchar, update.hdr_len);
-> +    qemu_get_buffer(f, (uint8_t *)hdr, update.hdr_len);
-> +    update.hdr_uaddr = (uintptr_t)hdr;
-> +
-> +    /* get transport buffer */
-> +    update.trans_len = qemu_get_be32(f);
-> +    if (!check_blob_length(update.trans_len)) {
-> +        goto err;
-> +    }
-> +
-> +    trans = g_new(gchar, update.trans_len);
-> +    update.trans_uaddr = (uintptr_t)trans;
-> +    qemu_get_buffer(f, (uint8_t *)update.trans_uaddr, update.trans_len);
-> +
-> +    update.guest_uaddr = (uintptr_t) ptr;
-> +    update.guest_len = update.trans_len;
-> +
-> +    trace_kvm_sev_receive_update_data(trans, ptr, update.guest_len,
-> +            hdr, update.hdr_len);
-> +
-> +    ret = sev_ioctl(sev_state->sev_fd, KVM_SEV_RECEIVE_UPDATE_DATA,
-> +                    &update, &fw_error);
-> +    if (ret) {
-> +        error_report("Error RECEIVE_UPDATE_DATA ret=%d fw_error=%d '%s'",
-> +                ret, fw_error, fw_error_to_str(fw_error));
-> +        goto err;
-> +    }
-> +err:
-> +    g_free(trans);
-> +    g_free(hdr);
-> +    return ret;
-> +}
-> +
-> +int sev_load_incoming_page(void *handle, QEMUFile *f, uint8_t *ptr)
-> +{
-> +    SEVState *s = (SEVState *)handle;
-> +
-> +    /*
-> +     * If this is first buffer and SEV is not in recieiving state then
-> +     * use RECEIVE_START command to create a encryption context.
-> +     */
-> +    if (!sev_check_state(SEV_STATE_RECEIVE_UPDATE) &&
-> +        sev_receive_start(s->sev_info, f)) {
-> +        return 1;
-> +    }
-> +
-> +    return sev_receive_update_data(f, ptr);
-> +}
-> +
->  static void
->  sev_register_types(void)
->  {
-> diff --git a/target/i386/trace-events b/target/i386/trace-events
-> index b41516cf9f..609752cca7 100644
-> --- a/target/i386/trace-events
-> +++ b/target/i386/trace-events
-> @@ -18,3 +18,6 @@ kvm_sev_launch_finish(void) ""
->  kvm_sev_send_start(uint64_t pdh, int l1, uint64_t plat, int l2, uint64_t amd, int l3) "pdh 0x%" PRIx64 " len %d plat 0x%" PRIx64 " len %d amd 0x%" PRIx64 " len %d"
->  kvm_sev_send_update_data(void *src, void *dst, int len) "guest %p trans %p len %d"
->  kvm_sev_send_finish(void) ""
-> +kvm_sev_receive_start(int policy, void *session, void *pdh) "policy 0x%x session %p pdh %p"
-> +kvm_sev_receive_update_data(void *src, void *dst, int len, void *hdr, int hdr_len) "guest %p trans %p len %d hdr %p hdr_len %d"
-> +kvm_sev_receive_finish(void) ""
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--IqRSwRncyodGHEnb4JwpWYiZ21bYnj7lb--
+
+--ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl1S9a4ACgkQLtnXdP5w
+LbXPfhAAkN497KyzGylnE2eveqGea5Y5arI424qfPtCiMUFPik5Isig12ZwxODwV
+HCMSHKoth0IIKcnPUmm+nxjciy9V//ZTD7DiaxnT2jXJ2dB1eBOn5aK/LsqEw7tW
+yiAJyLd3l/xHU6SvjqEltK/E/N6j0dkTHxtOSsbBg5N5/2VN9BAad+wmMRfK8edZ
+yf/ibhVK+VlNbGtPIBwgVRQ9AEoB6MlCuIt/4AAlptQjx8uLOuko9FdOlh9kZ00r
+cUrztDEgpV6FEukeo27LpjZ1ChKpKhg+l0oh34efQ8gr1h/iO+h+/fbfZgnPYnr/
+3zdael6nHQVHEbaZkvEunfoF3pRFlp6s6U2eNwoLMJtUPe681lVNnGLvv/3ZRIqP
+bei8Uh6KWTUxTwsUGiODDvRvRxoSzZ1jFEeYTn6TjpQX/owLGof2Nl0CaBN3PNyH
+IU9ICOvUxQruEjvb/rb9UW9YzdWEjMsNzVtmPHBFZI/VsZTM6U2+EAxKgDVfh22a
+GeSl+NgafHuZIl0HDLPQ8Th6LlpRTqmLwZTmL1aLGp7laumwMvpEMTVG2RTwST7c
+jsLsVXu7Y2Gn3Mi2baN4zQ/hS1FuYSu2Rs/7zO5SPrIp6JnIPaMRaIhgGgKkFJ7H
+Up4SVe4lxGnyxFrD4xXFLf8hhfYnzczyEOSIKDTMjyBj3RZmHf0=
+=Z6dr
+-----END PGP SIGNATURE-----
+
+--ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7--
 
