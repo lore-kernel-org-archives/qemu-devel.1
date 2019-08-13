@@ -2,49 +2,47 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D34FC32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:40:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1DEEC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:55:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 045E720840
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:40:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 045E720840
+	by mail.kernel.org (Postfix) with ESMTPS id A833120679
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 17:55:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A833120679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxamU-0005Uv-C1
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 13:40:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37979)
+	id 1hxb0d-0008Fj-UT
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 13:54:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39486)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <thuth@redhat.com>) id 1hxalK-000459-0m
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:10 -0400
+ (envelope-from <thuth@redhat.com>) id 1hxb05-0007r2-Ic
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hxalJ-0006Cf-5H
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:39:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55134)
+ (envelope-from <thuth@redhat.com>) id 1hxb04-0004J7-LG
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:54:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52650)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hxalH-0006B7-0C; Tue, 13 Aug 2019 13:39:07 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hxb04-0004IY-DR
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 13:54:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 407043002F44;
- Tue, 13 Aug 2019 17:39:06 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 14C283002B30
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 17:54:23 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-63.ams2.redhat.com [10.36.116.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EEC95277A8;
- Tue, 13 Aug 2019 17:38:55 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-4-thuth@redhat.com>
- <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7398A60A9D;
+ Tue, 13 Aug 2019 17:54:16 +0000 (UTC)
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20190813133042.11683-1-stefanha@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
@@ -90,22 +88,22 @@ Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
 Organization: Red Hat
-Message-ID: <ed667b30-7787-e51d-1ef2-4e1b05c6f963@redhat.com>
-Date: Tue, 13 Aug 2019 19:38:24 +0200
+Message-ID: <39b21ab6-bf1b-69c1-bbea-fb6f1b637132@redhat.com>
+Date: Tue, 13 Aug 2019 19:54:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20190813133042.11683-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Tue, 13 Aug 2019 17:39:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Tue, 13 Aug 2019 17:54:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/6] tests/libqtest: Remove unused function
- hmp()
+Subject: Re: [Qemu-devel] [PATCH] usb: reword -usb command-line option and
+ mention xHCI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,97 +115,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
- Jason Wang <jasowang@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7
-Content-Type: multipart/mixed; boundary="IqRSwRncyodGHEnb4JwpWYiZ21bYnj7lb";
- protected-headers="v1"
-From: Thomas Huth <thuth@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
- qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
- Jason Wang <jasowang@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
-Message-ID: <ed667b30-7787-e51d-1ef2-4e1b05c6f963@redhat.com>
-Subject: Re: [PATCH 3/6] tests/libqtest: Remove unused function hmp()
-References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-4-thuth@redhat.com>
- <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
-In-Reply-To: <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+On 8/13/19 3:30 PM, Stefan Hajnoczi wrote:
+> The -usb section of the man page is not very clear on what exactly -usb
+> does and fails to mention xHCI as a modern alternative (-device
+> nec-usb-xhci).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  qemu-options.hx | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9621e934c0..7d11c016d1 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1436,12 +1436,15 @@ STEXI
+>  ETEXI
+>  
+>  DEF("usb", 0, QEMU_OPTION_usb,
+> -    "-usb            enable the USB driver (if it is not used by default yet)\n",
+> +    "-usb            enable on-board USB host controller (if not enabled by default)\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -usb
+>  @findex -usb
+> -Enable the USB driver (if it is not used by default yet).
+> +Enable USB emulation on machine types with an on-board USB host controller (if
+> +not enabled by default).  Note that on-board USB host controllers may not
+> +support USB 3.0.  In this case -device nec-usb-xhci can be used instead on
 
---IqRSwRncyodGHEnb4JwpWYiZ21bYnj7lb
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Should we maybe rather recommend qemu-xhci instead?
+And please put the @option{} around the "-device *-xhci" here.
 
-On 8/13/19 5:20 PM, Eric Blake wrote:
-> On 8/13/19 4:30 AM, Thomas Huth wrote:
->> No test is using hmp() anymore, and since this function uses the disli=
-ked
->> global_qtest variable, we should also make sure that nobody adds new c=
-ode
->> with this function again. qtest_hmp() should be used instead.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  tests/libqtest.c | 11 -----------
->>  tests/libqtest.h | 10 ----------
->>  2 files changed, 21 deletions(-)
->=20
-> Yay.
->=20
-> We could, at a later time, introduce a patch to do s/qtest_hmp/hmp/ if
-> it was deemed worthwhile, but I'm not sure it's worth the churn.
+With @option:
 
-Actually, I like the qtest_* prefix for the libqtest functions - so it
-is clear at the first sight that a function is part of libqtest or
-rather the test itself.
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks a lot!
-
- Thomas
-
-
-
-
---IqRSwRncyodGHEnb4JwpWYiZ21bYnj7lb--
-
---ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl1S9a4ACgkQLtnXdP5w
-LbXPfhAAkN497KyzGylnE2eveqGea5Y5arI424qfPtCiMUFPik5Isig12ZwxODwV
-HCMSHKoth0IIKcnPUmm+nxjciy9V//ZTD7DiaxnT2jXJ2dB1eBOn5aK/LsqEw7tW
-yiAJyLd3l/xHU6SvjqEltK/E/N6j0dkTHxtOSsbBg5N5/2VN9BAad+wmMRfK8edZ
-yf/ibhVK+VlNbGtPIBwgVRQ9AEoB6MlCuIt/4AAlptQjx8uLOuko9FdOlh9kZ00r
-cUrztDEgpV6FEukeo27LpjZ1ChKpKhg+l0oh34efQ8gr1h/iO+h+/fbfZgnPYnr/
-3zdael6nHQVHEbaZkvEunfoF3pRFlp6s6U2eNwoLMJtUPe681lVNnGLvv/3ZRIqP
-bei8Uh6KWTUxTwsUGiODDvRvRxoSzZ1jFEeYTn6TjpQX/owLGof2Nl0CaBN3PNyH
-IU9ICOvUxQruEjvb/rb9UW9YzdWEjMsNzVtmPHBFZI/VsZTM6U2+EAxKgDVfh22a
-GeSl+NgafHuZIl0HDLPQ8Th6LlpRTqmLwZTmL1aLGp7laumwMvpEMTVG2RTwST7c
-jsLsVXu7Y2Gn3Mi2baN4zQ/hS1FuYSu2Rs/7zO5SPrIp6JnIPaMRaIhgGgKkFJ7H
-Up4SVe4lxGnyxFrD4xXFLf8hhfYnzczyEOSIKDTMjyBj3RZmHf0=
-=Z6dr
------END PGP SIGNATURE-----
-
---ZiWmcuq7UeuYCx8tZOKHCgeNzii0OJQc7--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
