@@ -2,67 +2,63 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A35C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA36C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 451EA205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:42:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 451EA205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 329C2205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:48:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 329C2205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYw9-00031X-Jp
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:42:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51472)
+	id 1hxZ2L-0005cR-Bi
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52238)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kwolf@redhat.com>) id 1hxYvf-0002X2-MA
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:41:44 -0400
+ (envelope-from <armbru@redhat.com>) id 1hxZ0n-00043z-Hf
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1hxYve-0006cK-CL
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:41:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36704)
+ (envelope-from <armbru@redhat.com>) id 1hxZ0m-000292-96
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59866)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>)
- id 1hxYvb-0006Yw-Q4; Tue, 13 Aug 2019 11:41:39 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hxZ0m-00028p-1y
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9851314AFBE;
- Tue, 13 Aug 2019 15:41:38 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-18.ams2.redhat.com
- [10.36.117.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4BC928D66F;
- Tue, 13 Aug 2019 15:41:23 +0000 (UTC)
-Date: Tue, 13 Aug 2019 17:41:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Message-ID: <20190813154122.GL4663@localhost.localdomain>
-References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
- <20190812181146.26121-2-vsementsov@virtuozzo.com>
- <20190813110428.GE4663@localhost.localdomain>
- <fef7f4d1-b40e-6c84-3952-120a641a8061@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4B4892CD81A
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 15:46:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
+ [10.36.117.142])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C416347FB;
+ Tue, 13 Aug 2019 15:46:56 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9A8FB113644A; Tue, 13 Aug 2019 17:46:53 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 13 Aug 2019 17:46:27 +0200
+Message-Id: <20190813154653.20568-4-armbru@redhat.com>
+In-Reply-To: <20190813154653.20568-1-armbru@redhat.com>
+References: <20190813154653.20568-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="kvUQC+jR9YzypDnK"
-Content-Disposition: inline
-In-Reply-To: <fef7f4d1-b40e-6c84-3952-120a641a8061@redhat.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 13 Aug 2019 15:41:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 13 Aug 2019 15:46:59 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] block/raw-format: switch to
- BDRV_BLOCK_DATA with BDRV_BLOCK_RECURSE
+Subject: [Qemu-devel] [PULL 03/29] qapi: Split error.json off common.json
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,114 +70,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: den@openvz.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+In my "build everything" tree, changing a type in qapi/common.json
+triggers a recompile of some 3600 out of 6600 objects (not counting
+tests and objects that don't depend on qemu/osdep.h).
 
---kvUQC+jR9YzypDnK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+One common dependency is QapiErrorClass: it's used only in in
+qapi/error.h, which uses nothing else, and is widely included.
 
-Am 13.08.2019 um 16:43 hat Max Reitz geschrieben:
-> On 13.08.19 13:04, Kevin Wolf wrote:
-> > Am 12.08.2019 um 20:11 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> >> BDRV_BLOCK_RAW makes generic bdrv_co_block_status to fallthrough to
-> >> returned file. But is it correct behavior at all? If returned file
-> >> itself has a backing file, we may report as totally unallocated and
-> >> area which actually has data in bottom backing file.
-> >>
-> >> So, mirroring of qcow2 under raw-format is broken. Which is illustrated
-> >> by following commit with a test. Let's make raw-format behave more
-> >> correctly returning BDRV_BLOCK_DATA.
-> >>
-> >> Suggested-by: Max Reitz <mreitz@redhat.com>
-> >> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >=20
-> > After some reading, I think I came to the conclusion that RAW is the
-> > correct thing to do. There is indeed a problem, but this patch is trying
-> > to fix it in the wrong place.
-> >=20
-> > In the case where the backing file contains some data, and we have a
-> > 'raw' node above the qcow2 overlay node, the content of the respective
-> > block is not defined by the queried backing file layer, so it is
-> > completely correct that bdrv_is_allocated() returns false,like it would
-> > if you queried the qcow2 layer directly.
->=20
-> I disagree.  The queried backing file layer is the raw node.  As I said,
-> in my opinion raw nodes are not filter nodes, neither in behavior (they
-> have an offset option), nor in how they are generally used (as a format).
->=20
-> The raw format does not support backing files.  Therefore, everything on
-> a raw node is allocated.
->=20
-> (That is, like, my opinion.)
->=20
-> >                                          If it returned true, we would
-> > copy everything, which isn't right either (the test cases should may add
-> > the qemu-img map output of the target so this becomes visible).
->=20
-> It is right.
+Move QapiErrorClass from common.json to new error.json.  Touching
+common.json now recompiles only some 2900 objects.
 
-So we don't even agree what mirroring the raw node should even mean.
+Cc: Eric Blake <eblake@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20190812052359.30071-4-armbru@redhat.com>
+---
+ qapi/common.json      | 24 ------------------------
+ qapi/error.json       | 29 +++++++++++++++++++++++++++++
+ qapi/qapi-schema.json |  1 +
+ include/qapi/error.h  |  2 +-
+ MAINTAINERS           |  2 ++
+ qapi/Makefile.objs    |  2 +-
+ 6 files changed, 34 insertions(+), 26 deletions(-)
+ create mode 100644 qapi/error.json
 
-I can the see your point when you say that the raw node has no backing
-file, so everything should be copied. But I can also see the point that
-the raw node can really just be used as a filter that limits the data
-exposed from the qcow2 layer, and you want to keep the copy a COW
-overlay over the same backing file.
+diff --git a/qapi/common.json b/qapi/common.json
+index 99d313ef3b..3d4e8de1e0 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -4,30 +4,6 @@
+ # =3D Common data types
+ ##
+=20
+-##
+-# @QapiErrorClass:
+-#
+-# QEMU error classes
+-#
+-# @GenericError: this is used for errors that don't require a specific e=
+rror
+-#                class. This should be the default case for most errors
+-#
+-# @CommandNotFound: the requested command has not been found
+-#
+-# @DeviceNotActive: a device has failed to be become active
+-#
+-# @DeviceNotFound: the requested device has not been found
+-#
+-# @KVMMissingCap: the requested operation can't be fulfilled because a
+-#                 required KVM capability is missing
+-#
+-# Since: 1.2
+-##
+-{ 'enum': 'QapiErrorClass',
+-  # Keep this in sync with ErrorClass in error.h
+-  'data': [ 'GenericError', 'CommandNotFound',
+-            'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
+-
+ ##
+ # @IoOperationType:
+ #
+diff --git a/qapi/error.json b/qapi/error.json
+new file mode 100644
+index 0000000000..3fad08f506
+--- /dev/null
++++ b/qapi/error.json
+@@ -0,0 +1,29 @@
++# -*- Mode: Python -*-
++
++##
++# =3D QMP errors
++##
++
++##
++# @QapiErrorClass:
++#
++# QEMU error classes
++#
++# @GenericError: this is used for errors that don't require a specific e=
+rror
++#                class. This should be the default case for most errors
++#
++# @CommandNotFound: the requested command has not been found
++#
++# @DeviceNotActive: a device has failed to be become active
++#
++# @DeviceNotFound: the requested device has not been found
++#
++# @KVMMissingCap: the requested operation can't be fulfilled because a
++#                 required KVM capability is missing
++#
++# Since: 1.2
++##
++{ 'enum': 'QapiErrorClass',
++  # Keep this in sync with ErrorClass in error.h
++  'data': [ 'GenericError', 'CommandNotFound',
++            'DeviceNotActive', 'DeviceNotFound', 'KVMMissingCap' ] }
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 38af54d6b3..920b03b0aa 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -80,6 +80,7 @@
+ # stable order, it's best to include each sub-schema just once, or
+ # include it first right here.
+=20
++{ 'include': 'error.json' }
+ { 'include': 'common.json' }
+ { 'include': 'sockets.json' }
+ { 'include': 'run-state.json' }
+diff --git a/include/qapi/error.h b/include/qapi/error.h
+index 51b63dd4b5..3f95141a01 100644
+--- a/include/qapi/error.h
++++ b/include/qapi/error.h
+@@ -119,7 +119,7 @@
+ #ifndef ERROR_H
+ #define ERROR_H
+=20
+-#include "qapi/qapi-types-common.h"
++#include "qapi/qapi-types-error.h"
+=20
+ /*
+  * Overall category of an error.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d6de200453..adc64cfe33 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1874,6 +1874,7 @@ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+ F: include/qapi/error.h
+ F: include/qemu/error-report.h
++F: qapi/error.json
+ F: util/error.c
+ F: util/qemu-error.c
+=20
+@@ -2062,6 +2063,7 @@ F: monitor/monitor-internal.h
+ F: monitor/qmp*
+ F: monitor/misc.c
+ F: monitor/monitor.c
++F: qapi/error.json
+ F: docs/devel/*qmp-*
+ F: docs/interop/*qmp-*
+ F: scripts/qmp/
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+index c5a29e86e2..dd3f5e6f94 100644
+--- a/qapi/Makefile.objs
++++ b/qapi/Makefile.objs
+@@ -6,7 +6,7 @@ util-obj-y +=3D qmp-event.o
+ util-obj-y +=3D qapi-util.o
+=20
+ QAPI_COMMON_MODULES =3D audio authz block-core block char common crypto
+-QAPI_COMMON_MODULES +=3D dump introspect job machine migration misc net
++QAPI_COMMON_MODULES +=3D dump error introspect job machine migration mis=
+c net
+ QAPI_COMMON_MODULES +=3D qdev qom rdma rocker run-state sockets tpm
+ QAPI_COMMON_MODULES +=3D trace transaction ui
+ QAPI_TARGET_MODULES =3D machine-target misc-target
+--=20
+2.21.0
 
-Both are valid use cases in principle and there is no single right or
-wrong.
-
-We don't currently support the latter use case because we have only
-sync=3Dfull or sync=3Dtop, but if you could specify a base node instead, we
-could probably suport the case without all of the special-casing filter
-nodes and backing file childs.
-
-You would call bdrv_co_block_status_above() with the right base node and
-it would just recurse whereever the data is stored, be it bs->backing,
-bs->file or even driver-specific children. This would allow you to find
-out whether some block in the top node came from the base node that
-we're going to keep. If yes, skip it; if no, copy it.
-
-This way we wouldn't have to decide whether raw is a filter or not,
-because it wouldn't make a difference. The behaviour would only depend
-on the base node given by the user. If you specified the top-level qcow2
-file as the base, you get your full copy; if you specified the backing
-qcow2, you get the partial copy where the target still uses the same
-backing file.
-
-(Hm... It would only actually work if the offsets stay the same in the
-chain, which is true for backing file children, but not necessarily for
-other children. Anyway, even if we don't gain much functionality, I
-really want a more generic model that avoids different types of nodes
-and edges as much as possible.)
-
-Kevin
-
---kvUQC+jR9YzypDnK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdUtoiAAoJEH8JsnLIjy/Wsn4QAJt06Q3wP9SiFBhGiy3gVk4N
-aY0YCviVAm6wxkXMEq+0J4p/UOUzOv3wMvGvZfBK056dV9jMMTmW7/SxQoy62QEq
-2LHa8Bve0CJijMoSnXwtlhiEzwFtzzLkwUy78paAl5ejpxXC0z1YWjMkT5KgWF57
-p56ldRZJ/QsBfFk5WbmPlo/q0vlOlopLseuz+eE+Lzrhw9HTqEOxaTLrAnxZKleR
-B7yZzScN3cabJk3SlRqn85QIiURurR6EBW8D7uQP68TZMV1bjo1rnKe/DVRWwdip
-9GtQoYm8Af6HoUbz50no7HFP4FxsQP063D/jysuwwGQp7iZQ+XR40fWzGOzDaDk0
-zDmzJ92mqzYFrA5COxrTHPpEZ9dzY+Xy4n3h3VAVo3BFKCH4KXJNPQLA0d0/1rJY
-LSd4bxWjle1MvRBxFRZf+pD/3iBVWUXD2gs8+SLPXDKApQKaUGFWgYh3HjpeBwZh
-7MjJ9cru5neIg/mpmtG20lwj3tV5I7UgZ3gywTwx74rq1hKmtiL0MVgjQoQUNDNT
-or2DvH2F1gZjdc6k5u0mq2XclmlkkAP2SeI7EYB9gCqcn3LLYlH1h52gL7HdQHiz
-Bh4FPOz1Gp3IsjUBoxxI+aXCFJChl/f7n86JBsVyz5wCK/2h9EdU7gSeH3V9I6fm
-xSpR6hEpLPuwnmknuyNr
-=VYsH
------END PGP SIGNATURE-----
-
---kvUQC+jR9YzypDnK--
 
