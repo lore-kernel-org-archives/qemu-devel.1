@@ -2,65 +2,92 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3473C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 05:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF23CC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 05:08:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A10F1206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 05:05:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A10F1206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 861BE206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 05:08:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uu7E14Sg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 861BE206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxOzy-0006Sl-Nj
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 01:05:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42821)
+	id 1hxP2o-0007YU-TX
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 01:08:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43132)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hxOzX-0005xe-LM
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 01:05:04 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hxP2P-00074x-DM
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 01:08:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hxOzW-00010T-IK
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 01:05:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34922)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hxOzW-0000zv-DG
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 01:05:02 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2F1BD30A699C
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 05:05:01 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-144.ams2.redhat.com
- [10.36.116.144])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B72F1B466;
- Tue, 13 Aug 2019 05:04:56 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 3030316E08; Tue, 13 Aug 2019 07:04:55 +0200 (CEST)
-Date: Tue, 13 Aug 2019 07:04:55 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Message-ID: <20190813050455.jt7um37eo7a46mrz@sirius.home.kraxel.org>
-References: <20190812071212.24551-1-kraxel@redhat.com>
- <20a99cc9-de01-8182-1c75-07dd07b5b35c@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1hxP2O-0002NT-Gt
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 01:08:01 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:33512)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hxP2O-0002Mg-9v
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 01:08:00 -0400
+Received: by mail-wm1-x342.google.com with SMTP id p77so223348wme.0
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 22:08:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=MY0jFkCW4QtK76+Yab9cbKYXYClX22vI/naRAXUS0pA=;
+ b=uu7E14SgX6QOfpuMSUeXLBMqBddqd67Xi0eTYbXsuhX0gYJyuY8NQ3pDF6B0vTl0MI
+ bJ7lq3MG8FFQt/qAdRXs24vLbilhAsIpNgkXaKFxpnocIq05sv4lJpTBzUojgs/bcXJ5
+ 2E4JnQxxpaVeXF/Q2GuE4j9mmk8PsiOvOjTDTkDabodQoU+NXQXFvxrZNNCRBH0K7ctm
+ YyESFv9lIrbvo7J8VLma+CIbqKvzUrONz5Yu+KKKYLXqRDl9u++KnNuMu/hKIVHdA7LR
+ I0/UXwIPzNzywHC4e0UL7Pg9i9SDk1utz4nFVtT+Up+iG7T1RRluCJACr4iKM4O682I3
+ eVCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=MY0jFkCW4QtK76+Yab9cbKYXYClX22vI/naRAXUS0pA=;
+ b=Ndr6xFiyrIuGoT0rcCs/zT6ZdEJodd9lBTS4i29hqiZFLiVSzs3bmEsEHwzzieA0dP
+ DnjysANs32fjfbNDVTdgMNfcTtb+jkCYH5lqGPeSOvEZglQO75FgTjP0iJ0BsCQDmt0I
+ 0+NH+Z40cVelvkcCLwNXXQR84w0BlCPB2s/y4M19iMkiGlCVGEw3i8xxYQ35agzu56bP
+ kqhqYSHhwPRmFvUehGpcQbREP9rzFBP/iF9vLz0nnLELUT93Aw8Tu+OsDeSkMEr9k+wb
+ 1TIeIbx4W384k6N+QWHxZjKT0jcn5SwiagaTVk+kwTP+Ps/BrKoRZClmRDr8W7QwZANF
+ dscA==
+X-Gm-Message-State: APjAAAVNA4A3bBgAFcvEYr7LHTEScAUKXuwUguJmuU0XcqG8Q4Kz3otH
+ vWm63T/ow2hqCLEeO3r0L6cmyg==
+X-Google-Smtp-Source: APXvYqyPM2f9t1ySDWZSxly082wkJ3Xz83jF4gQN2ZaXx5+p9N0VNkGh2QZXL+6zls+B0a9yLG2pQA==
+X-Received: by 2002:a1c:a446:: with SMTP id n67mr735502wme.56.1565672879009;
+ Mon, 12 Aug 2019 22:07:59 -0700 (PDT)
+Received: from ?IPv6:2a02:c7f:a69:1700:8897:9507:94c2:b98d?
+ ([2a02:c7f:a69:1700:8897:9507:94c2:b98d])
+ by smtp.gmail.com with ESMTPSA id p10sm440958wma.8.2019.08.12.22.07.58
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 12 Aug 2019 22:07:58 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190810041255.6820-1-jan.bobek@gmail.com>
+ <20190810041255.6820-16-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <2d2e027e-8689-45fc-b3cd-9618c552e0d5@linaro.org>
+Date: Tue, 13 Aug 2019 06:07:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20a99cc9-de01-8182-1c75-07dd07b5b35c@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 13 Aug 2019 05:05:01 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] Add git-publish profile for security bugs
+In-Reply-To: <20190810041255.6820-16-jan.bobek@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [RFC PATCH v2 15/39] target/i386: introduce
+ function ck_cpuid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,44 +99,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > +# https://wiki.qemu.org/SecurityProcess
-> > +[gitpublishprofile "security"]
-> > +base = master
-> > +to = mst@redhat.com
-> > +to = pmatouse@redhat.com
-> > +to = sstabellini@kernel.org
-> > +to = secalert@redhat.com
-> > +to = mdroth@linux.vnet.ibm.com
-> > +to = pjp@redhat.com
-> > +suppresscc = all
-> > 
-> 
-> Should we force inspect-emails = true here due to the nature of the
-> security list? That way if we accidentally add extra CCs/etc there's a
-> chance to review 'em.
+On 8/10/19 5:12 AM, Jan Bobek wrote:
+> +enum {
+> +    CK_CPUID_MMX = 1,
+> +    CK_CPUID_3DNOW,
+> +    CK_CPUID_SSE,
+> +    CK_CPUID_SSE2,
+> +    CK_CPUID_SSE3,
+> +    CK_CPUID_SSSE3,
+> +    CK_CPUID_SSE4_1,
+> +    CK_CPUID_SSE4_2,
+> +    CK_CPUID_SSE4A,
+> +    CK_CPUID_AVX,
+> +    CK_CPUID_AVX2,
+> +};
 
-That makes sense indeed.
+Name the enumeration,
 
-> Also, should we update MAINTAINERS to match this script?
-> 
-> Responsible Disclosure, Reporting Security Issues
-> -------------------------------------------------
-> W: https://wiki.qemu.org/SecurityProcess
-> M: Michael S. Tsirkin <mst@redhat.com>
-> L: secalert@redhat.com
+> +static int ck_cpuid(CPUX86State *env, DisasContext *s, int ck_cpuid_feat)
 
-Hmm, good question.  I took the list of addresses from the
-SecurityProcess page.  Not sure why MAINTAINERS is not in sync even
-though it links the page.  Is that intentional or just an oversight?
+and use it in the parameter.  Return bool and true on success.
 
-[ Cc'ing mst ]
+Otherwise,
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-cheers,
-  Gerd
+
+r~
 
 
