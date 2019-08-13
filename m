@@ -2,72 +2,90 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A89C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBBCC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19CCC2067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CCC2067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDE962067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE962067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYZx-0004ue-AW
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:19:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47520)
+	id 1hxYa2-00056D-S7
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47550)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <palmer@dabbelt.com>) id 1hxYZ7-00046W-TU
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:27 -0400
+ (envelope-from <eblake@redhat.com>) id 1hxYZF-00047t-M9
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1hxYZ5-0007YI-Vl
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:25 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:37901)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1hxYZ4-0007Wq-2K
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:23 -0400
-Received: by mail-pf1-f193.google.com with SMTP id o70so6450890pfg.5
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 08:18:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=7Bf8BN0PQWXLYxjsZANwcPreBR2wqTJQWjafZYvdYcE=;
- b=EQMK7CQJsKd1ycjhoH37MtrwKmQmInSyZ0JXkadlrirBOhV4JKHz9wIxQHOEAuW+QQ
- Bz6CZ7neuw6tVgLduwiHtpM3q+afmC2SgHw2Xgj9u6yzTBP4JFVgkbJkvKbf4IZcCJ3R
- mHu95Xhi5Of5p5B12+fuRMRj6SWFTw1L44F0eCbvCGovH8Uy8YNhcUVMd2qIEf1cj4Gi
- NL7C3oMMZYAa9nQQ6QFJj1Y27A88noVwpVKPd9nWuEZ3E9VSyLGLo/EdilYRU+FLMNzf
- xkzxqQ+1uIQq7OMZKdDxtEtNbTrzigDz7GNOat9C1LAsOaLtLj2BVRg49meu5f5jpM66
- HisQ==
-X-Gm-Message-State: APjAAAUu9qEzyKVjjj2wo6g8b3uEQWdl96lAPt6prCFfDNFtlHkkFC9b
- rOE5EdYcLKc5S8MuQxzR3mPoag==
-X-Google-Smtp-Source: APXvYqw5ZdxJ1CzvjoyaNJ/92XUtZqoCXwooUw3zN4SVVWpJKP6jVJKn7eUi3rnKXEX1Z15mi6gJEg==
-X-Received: by 2002:a63:d741:: with SMTP id w1mr33931302pgi.155.1565709500152; 
- Tue, 13 Aug 2019 08:18:20 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id l4sm111688345pff.50.2019.08.13.08.18.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 13 Aug 2019 08:18:18 -0700 (PDT)
-Date: Tue, 13 Aug 2019 08:18:18 -0700 (PDT)
-X-Google-Original-Date: Tue, 13 Aug 2019 08:18:03 PDT (-0700)
-In-Reply-To: <1564577355-29273-1-git-send-email-bmeng.cn@gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: bmeng.cn@gmail.com
-Message-ID: <mhng-b5a2e14d-7a56-46ab-aaa2-96123b44c56b@palmer-si-x1e>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (envelope-from <eblake@redhat.com>) id 1hxYZD-0007eY-OM
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49880)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>)
+ id 1hxYZ9-0007Zx-Pc; Tue, 13 Aug 2019 11:18:27 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id F0060C034E71;
+ Tue, 13 Aug 2019 15:18:25 +0000 (UTC)
+Received: from [10.3.117.22] (ovpn-117-22.phx2.redhat.com [10.3.117.22])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 59B2110013A1;
+ Tue, 13 Aug 2019 15:18:17 +0000 (UTC)
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20190813093047.27948-1-thuth@redhat.com>
+ <20190813093047.27948-2-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=eblake@redhat.com; keydata=
+ xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
+ xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
+ TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
+ GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
+ sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
+ AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
+ CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
+ RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
+ wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
+ Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
+ gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
+ pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
+ zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
+ pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
+ 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
+ NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
+ cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
+ SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
+ I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
+ mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
+ Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
+ 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
+Organization: Red Hat, Inc.
+Message-ID: <04a21d67-7a8b-20bf-2d8c-56d714ebb07d@redhat.com>
+Date: Tue, 13 Aug 2019 10:18:16 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190813093047.27948-2-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.31]); Tue, 13 Aug 2019 15:18:26 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.193
-Subject: Re: [Qemu-devel] [PATCH] riscv: hmp: Add a command to show virtual
- memory mappings
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 1/6] tests/libqos: Make generic virtio code
+ independent from global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,293 +97,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, dgilbert@redhat.com,
- qemu-devel@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Fam Zheng <fam@euphon.net>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Greg Kurz <groug@kaod.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 31 Jul 2019 05:49:15 PDT (-0700), bmeng.cn@gmail.com wrote:
-> This adds 'info mem' command for RISC-V, to show virtual memory
-> mappings that aids debugging.
->
-> Rather than showing every valid PTE, the command compacts the
-> output by merging all contiguous physical address mappings into
-> one block and only shows the merged block mapping details.
->
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb
+Content-Type: multipart/mixed; boundary="7MnpAFX2nFGj8AZzltoL8zo5O24YuFyIu";
+ protected-headers="v1"
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
+Message-ID: <04a21d67-7a8b-20bf-2d8c-56d714ebb07d@redhat.com>
+Subject: Re: [PATCH 1/6] tests/libqos: Make generic virtio code independent
+ from global_qtest
+References: <20190813093047.27948-1-thuth@redhat.com>
+ <20190813093047.27948-2-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-2-thuth@redhat.com>
+
+--7MnpAFX2nFGj8AZzltoL8zo5O24YuFyIu
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 8/13/19 4:30 AM, Thomas Huth wrote:
+> The libqos library functions should never depend on global_qtest,
+> since these functions might be used in tests that track multiple
+> test states. Pass around a pointer to the QTestState instead.
+
+Thanks for picking up on my initial RFC along these lines a couple years
+ago now; it's taking us a while, but these cleanups are worthwhile.
+
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->
->  hmp-commands-info.hx       |   2 +-
->  target/riscv/Makefile.objs |   4 +
->  target/riscv/monitor.c     | 227 +++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 232 insertions(+), 1 deletion(-)
->  create mode 100644 target/riscv/monitor.c
->
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index c59444c..257ee7d 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -249,7 +249,7 @@ STEXI
->  Show virtual to physical memory mappings.
->  ETEXI
->
-> -#if defined(TARGET_I386)
-> +#if defined(TARGET_I386) || defined(TARGET_RISCV)
->      {
->          .name       = "mem",
->          .args_type  = "",
-> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-> index b1c79bc..a8ceccd 100644
-> --- a/target/riscv/Makefile.objs
-> +++ b/target/riscv/Makefile.objs
-> @@ -1,5 +1,9 @@
->  obj-y += translate.o op_helper.o cpu_helper.o cpu.o csr.o fpu_helper.o gdbstub.o pmp.o
->
-> +ifeq ($(CONFIG_SOFTMMU),y)
-> +obj-y += monitor.o
-> +endif
-> +
->  DECODETREE = $(SRC_PATH)/scripts/decodetree.py
->
->  decode32-y = $(SRC_PATH)/target/riscv/insn32.decode
-> diff --git a/target/riscv/monitor.c b/target/riscv/monitor.c
-> new file mode 100644
-> index 0000000..30560ff
-> --- /dev/null
-> +++ b/target/riscv/monitor.c
-> @@ -0,0 +1,227 @@
-> +/*
-> + * QEMU monitor for RISC-V
-> + *
-> + * Copyright (c) 2019 Bin Meng <bmeng.cn@gmail.com>
-> + *
-> + * RISC-V specific monitor commands implementation
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "cpu.h"
-> +#include "cpu_bits.h"
-> +#include "monitor/monitor.h"
-> +#include "monitor/hmp-target.h"
-> +
-> +#ifdef TARGET_RISCV64
-> +#define PTE_HEADER_FIELDS       "vaddr            paddr            "\
-> +                                "size             attr\n"
-> +#define PTE_HEADER_DELIMITER    "---------------- ---------------- "\
-> +                                "---------------- -------\n"
-> +#else
-> +#define PTE_HEADER_FIELDS       "vaddr    paddr            size     attr\n"
-> +#define PTE_HEADER_DELIMITER    "-------- ---------------- -------- -------\n"
-> +#endif
-> +
-> +/* Perform linear address sign extension */
-> +static target_ulong addr_canonical(int va_bits, target_ulong addr)
-> +{
-> +#ifdef TARGET_RISCV64
-> +    if (addr & (1UL << (va_bits - 1))) {
-> +        addr |= (hwaddr)-(1L << va_bits);
-> +    }
-> +#endif
-> +
-> +    return addr;
-> +}
-> +
-> +static void print_pte_header(Monitor *mon)
-> +{
-> +    monitor_printf(mon, PTE_HEADER_FIELDS);
-> +    monitor_printf(mon, PTE_HEADER_DELIMITER);
-> +}
-> +
-> +static void print_pte(Monitor *mon, int va_bits, target_ulong vaddr,
-> +                      hwaddr paddr, target_ulong size, int attr)
-> +{
-> +    /* santity check on vaddr */
-> +    if (vaddr >= (1UL << va_bits)) {
-> +        return;
-> +    }
-> +
-> +    if (!size) {
-> +        return;
-> +    }
-> +
-> +    monitor_printf(mon, TARGET_FMT_lx " " TARGET_FMT_plx " " TARGET_FMT_lx
-> +                   " %c%c%c%c%c%c%c\n",
-> +                   addr_canonical(va_bits, vaddr),
-> +                   paddr, size,
-> +                   attr & PTE_R ? 'r' : '-',
-> +                   attr & PTE_W ? 'w' : '-',
-> +                   attr & PTE_X ? 'x' : '-',
-> +                   attr & PTE_U ? 'u' : '-',
-> +                   attr & PTE_G ? 'g' : '-',
-> +                   attr & PTE_A ? 'a' : '-',
-> +                   attr & PTE_D ? 'd' : '-');
-> +}
-> +
-> +static void walk_pte(Monitor *mon, hwaddr base, target_ulong start,
-> +                     int level, int ptidxbits, int ptesize, int va_bits,
-> +                     hwaddr *vbase, hwaddr *pbase, hwaddr *last_paddr,
-> +                     target_ulong *last_size, int *last_attr)
-> +{
-> +    hwaddr pte_addr;
-> +    hwaddr paddr;
-> +    target_ulong pgsize;
-> +    target_ulong pte;
-> +    int ptshift;
-> +    int attr;
-> +    int idx;
-> +
-> +    if (level < 0) {
-> +        return;
-> +    }
-> +
-> +    ptshift = level * ptidxbits;
-> +    pgsize = 1UL << (PGSHIFT + ptshift);
-> +
-> +    for (idx = 0; idx < (1UL << ptidxbits); idx++) {
-> +        pte_addr = base + idx * ptesize;
-> +        cpu_physical_memory_read(pte_addr, &pte, ptesize);
-> +
-> +        paddr = (pte >> PTE_PPN_SHIFT) << PGSHIFT;
-> +        attr = pte & 0xff;
-> +
-> +        /* PTE has to be valid */
-> +        if (attr & PTE_V) {
-> +            if (attr & (PTE_R | PTE_W | PTE_X)) {
-> +                /*
-> +                 * A leaf PTE has been found
-> +                 *
-> +                 * If current PTE's permission bits differ from the last one,
-> +                 * or current PTE's ppn does not make a contiguous physical
-> +                 * address block together with the last one, print out the last
-> +                 * contiguous mapped block details.
-> +                 */
-> +                if ((*last_attr != attr) ||
-> +                    (*last_paddr + *last_size != paddr)) {
-> +                    print_pte(mon, va_bits, *vbase, *pbase,
-> +                              *last_paddr + *last_size - *pbase, *last_attr);
-> +
-> +                    *vbase = start;
-> +                    *pbase = paddr;
-> +                    *last_attr = attr;
-> +                }
-> +
-> +                *last_paddr = paddr;
-> +                *last_size = pgsize;
-> +            } else {
-> +                /* pointer to the next level of the page table */
-> +                walk_pte(mon, paddr, start, level - 1, ptidxbits, ptesize,
-> +                         va_bits, vbase, pbase, last_paddr,
-> +                         last_size, last_attr);
-> +            }
-> +        }
-> +
-> +        start += pgsize;
-> +    }
-> +
-> +}
-> +
-> +static void mem_info_svxx(Monitor *mon, CPUArchState *env)
-> +{
-> +    hwaddr base;
-> +    int levels, ptidxbits, ptesize, vm, va_bits;
-> +    hwaddr vbase, pbase, last_paddr;
-> +    target_ulong last_size;
-> +    int last_attr;
-> +
-> +    base = get_field(env->satp, SATP_PPN) << PGSHIFT;
-> +
-> +    vm = get_field(env->satp, SATP_MODE);
-> +    switch (vm) {
-> +    case VM_1_10_SV32:
-> +        levels = 2;
-> +        ptidxbits = 10;
-> +        ptesize = 4;
-> +        break;
-> +    case VM_1_10_SV39:
-> +        levels = 3;
-> +        ptidxbits = 9;
-> +        ptesize = 8;
-> +        break;
-> +    case VM_1_10_SV48:
-> +        levels = 4;
-> +        ptidxbits = 9;
-> +        ptesize = 8;
-> +        break;
-> +    case VM_1_10_SV57:
-> +        levels = 5;
-> +        ptidxbits = 9;
-> +        ptesize = 8;
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +        break;
-> +    }
-> +
-> +    /* calculate virtual address bits */
-> +    va_bits = PGSHIFT + levels * ptidxbits;
-> +
-> +    /* print header */
-> +    print_pte_header(mon);
-> +
-> +    vbase = -1;
-> +    pbase = -1;
-> +    last_paddr = -1;
-> +    last_size = 0;
-> +    last_attr = 0;
-> +
-> +    /* walk page tables, starting from address 0 */
-> +    walk_pte(mon, base, 0, levels - 1, ptidxbits, ptesize, va_bits,
-> +             &vbase, &pbase, &last_paddr, &last_size, &last_attr);
-> +
-> +    /* don't forget the last one */
-> +    print_pte(mon, va_bits, vbase, pbase,
-> +              last_paddr + last_size - pbase, last_attr);
-> +}
-> +
-> +void hmp_info_mem(Monitor *mon, const QDict *qdict)
-> +{
-> +    CPUArchState *env;
-> +
-> +    env = mon_get_cpu_env();
-> +    if (!env) {
-> +        monitor_printf(mon, "No CPU available\n");
-> +        return;
-> +    }
-> +
-> +    if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
-> +        monitor_printf(mon, "S-mode MMU unavailable\n");
-> +        return;
-> +    }
-> +
-> +    if (env->priv_ver < PRIV_VERSION_1_10_0) {
-> +        monitor_printf(mon, "Privileged mode < 1.10 unsupported\n");
-> +        return;
-> +    }
-> +
-> +    if (!(env->satp & SATP_MODE)) {
-> +        monitor_printf(mon, "No translation or protection\n");
-> +        return;
-> +    }
-> +
-> +    mem_info_svxx(mon, env);
-> +}
 
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+> @@ -193,7 +193,7 @@ void qvring_init(QTestState *qts, const QGuestAlloc=
+ator *alloc, QVirtQueue *vq,
+>                   0);
+>  }
+> =20
+> -QVRingIndirectDesc *qvring_indirect_desc_setup(QVirtioDevice *d,
+> +QVRingIndirectDesc *qvring_indirect_desc_setup(QTestState *qs, QVirtio=
+Device *d,
+>                                          QGuestAllocator *alloc, uint16=
+_t elem)
+>  {
 
-I'm putting this in the RISC-V tree with David's Acked-by, LMK if you want me 
-to do something else.
+Pre-existing, but indentation is off; maybe you want to fix that while he=
+re.
+
+
+> -void qvirtqueue_kick(QVirtioDevice *d, QVirtQueue *vq, uint32_t free_h=
+ead)
+> +void qvirtqueue_kick(QTestState *qts, QVirtioDevice *d, QVirtQueue *vq=
+,
+> +                     uint32_t free_head)
+>  {
+>      /* vq->avail->idx */
+> -    uint16_t idx =3D readw(vq->avail + 2);
+> +    uint16_t idx =3D qtest_readw(qts, vq->avail + 2);
+>      /* vq->used->flags */
+>      uint16_t flags;
+>      /* vq->used->avail_event */
+>      uint16_t avail_event;
+> =20
+>      /* vq->avail->ring[idx % vq->size] */
+> -    writew(vq->avail + 4 + (2 * (idx % vq->size)), free_head);
+> +    qtest_writew(qts, vq->avail + 4 + (2 * (idx % vq->size)), free_hea=
+d);
+>      /* vq->avail->idx */
+> -    writew(vq->avail + 2, idx + 1);
+> +    qtest_writew(qts, vq->avail + 2, idx + 1);
+> =20
+>      /* Must read after idx is updated */
+> -    flags =3D readw(vq->avail);
+> -    avail_event =3D readw(vq->used + 4 +
+> +    flags =3D qtest_readw(qts, vq->avail);
+> +    avail_event =3D qtest_readw(qts, vq->used + 4 +
+>                                  sizeof(struct vring_used_elem) * vq->s=
+ize);
+
+Here as well.
+
+> @@ -333,23 +337,25 @@ bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t =
+*desc_idx, uint32_t *len)
+>          sizeof(struct vring_used_elem);
+> =20
+>      if (desc_idx) {
+> -        *desc_idx =3D readl(elem_addr + offsetof(struct vring_used_ele=
+m, id));
+> +        *desc_idx =3D qtest_readl(qts, elem_addr +
+> +                                     offsetof(struct vring_used_elem, =
+id));
+
+This one works as-is, although it gives me a double-take when the
+indentation is not right after a ( in the line above.  I probably would
+have written either:
+
+        *desc_idx =3D qtest_readl(qts,
+                                elem_addr + offsetof(struct
+vring_used_elem, id));
+
+or
+
+        *desc_idx =3D qtest_readl(qts, (elem_addr +
+                                      offsetof(struct vring_used_elem,
+id)));
+
+or even introduce a temp variable to bring down the line length.
+
+
+> @@ -131,17 +131,20 @@ void qvirtqueue_cleanup(const QVirtioBus *bus, QV=
+irtQueue *vq,
+> =20
+>  void qvring_init(QTestState *qts, const QGuestAllocator *alloc, QVirtQ=
+ueue *vq,
+>                   uint64_t addr);
+> -QVRingIndirectDesc *qvring_indirect_desc_setup(QVirtioDevice *d,
+> +QVRingIndirectDesc *qvring_indirect_desc_setup(QTestState *qs, QVirtio=
+Device *d,
+>                                          QGuestAllocator *alloc, uint16=
+_t elem);
+
+Another pre-existing odd indentation (here, it looks like line length
+was the reason).
+
+Indentation is minor, so:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
+
+--7MnpAFX2nFGj8AZzltoL8zo5O24YuFyIu--
+
+--cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1LgACgkQp6FrSiUn
+Q2pIiwf9G1QH1USeXKAiL+2sbSdY5dyWcFnE6ng++4MzFg+M4shKaeegqb4okOTj
+BnSYm7cdjJfidfraaMKb7e3Mv317VQIVYfzH2qS3BrN3K4ukSzpaOUtzEKfWWAYo
+lSH7TEZjLTApOnNkrH7beLzEArZYF7B50VoP/PQieePIKh/Lqz0YcBjPu2kSmhG6
++k9l6CcrlBXHfMY64/hOshqFj26VrfQcw3u9qWjMGiHYFXU1VS5MO02xoYS+NWxX
+zheFGvg6xUw/0VPkmPqsCASmrkWqP8knhoWL/w02urEfQADOgjwTk23mGcduln39
+C+XU8khjyy81disVndw5COM5xB6ADQ==
+=AySs
+-----END PGP SIGNATURE-----
+
+--cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb--
 
