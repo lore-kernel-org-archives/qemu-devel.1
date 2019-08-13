@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C4E1C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91787C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:50:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D972620679
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:50:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D972620679
+	by mail.kernel.org (Postfix) with ESMTPS id 671D5205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:50:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 671D5205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxZ3g-00010O-6c
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:50:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52358)
+	id 1hxZ4S-0002cu-NT
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:50:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52379)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hxZ10-00049U-QC
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:16 -0400
+ (envelope-from <armbru@redhat.com>) id 1hxZ12-0004Cl-2L
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hxZ0y-0002Tv-2T
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50962)
+ (envelope-from <armbru@redhat.com>) id 1hxZ10-0002Vg-6s
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38958)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hxZ0w-0002S2-7q
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:12 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hxZ0x-0002TI-W1
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:14 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5A5CB301662E
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 15:47:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 37DB7883BA;
+ Tue, 13 Aug 2019 15:47:11 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E42582489;
- Tue, 13 Aug 2019 15:47:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7645B3480B;
+ Tue, 13 Aug 2019 15:47:07 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A7FA1113644E; Tue, 13 Aug 2019 17:46:53 +0200 (CEST)
+ id C1A031136455; Tue, 13 Aug 2019 17:46:53 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 17:46:31 +0200
-Message-Id: <20190813154653.20568-8-armbru@redhat.com>
+Date: Tue, 13 Aug 2019 17:46:38 +0200
+Message-Id: <20190813154653.20568-15-armbru@redhat.com>
 In-Reply-To: <20190813154653.20568-1-armbru@redhat.com>
 References: <20190813154653.20568-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 13 Aug 2019 15:47:09 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Tue, 13 Aug 2019 15:47:11 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/29] trace: Do not include qom/cpu.h into
- generated trace.h
+Subject: [Qemu-devel] [PULL 14/29] migration: Move the VMStateDescription
+ typedef to typedefs.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,313 +72,285 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-docs/devel/tracing.txt explains "since many source files include
-trace.h, [the generated trace.h use] a minimum of types and other
-header files included to keep the namespace clean and compile times
-and dependencies down."
+We declare incomplete struct VMStateDescription in a couple of places
+so we don't have to include migration/vmstate.h for the typedef.
+That's fine with me.  However, the next commit will drop
+migration/vmstate.h from a massive number of compiles.  Move the
+typedef to qemu/typedefs.h now, so I don't have to insert struct in
+front of VMStateDescription all over the place then.
 
-Commit 4815185902 "trace: Add per-vCPU tracing states for events with
-the 'vcpu' property" made them all include qom/cpu.h via
-control-internal.h.  qom/cpu.h in turn includes about thirty headers.
-Ouch.
-
-Per-vCPU tracing is currently not supported in sub-directories'
-trace-events.  In other words, qom/cpu.h can only be used in
-trace-root.h, not in any trace.h.
-
-Split trace/control-vcpu.h off trace/control.h and
-trace/control-internal.h.  Have the generated trace.h include
-trace/control.h (which no longer includes qom/cpu.h), and trace-root.h
-include trace/control-vcpu.h (which includes it).
-
-The resulting improvement is a bit disappointing: in my "build
-everything" tree, some 1100 out of 6600 objects (not counting tests
-and objects that don't depend on qemu/osdep.h) depend on a trace.h,
-and about 600 of them no longer depend on qom/cpu.h.  But more than
-1300 others depend on trace-root.h.  More work is clearly needed.
-Left for another day.
-
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20190812052359.30071-8-armbru@redhat.com>
+Message-Id: <20190812052359.30071-15-armbru@redhat.com>
 ---
- trace/control-internal.h      | 25 --------------
- trace/control-vcpu.h          | 63 +++++++++++++++++++++++++++++++++++
- trace/control.h               | 24 -------------
- block/block-backend.c         |  1 +
- qom/object.c                  |  1 +
- trace/qmp.c                   |  2 +-
- ui/vnc.c                      |  1 +
- scripts/tracetool/format/c.py |  1 +
- scripts/tracetool/format/h.py |  7 +++-
- 9 files changed, 74 insertions(+), 51 deletions(-)
- create mode 100644 trace/control-vcpu.h
+ include/hw/qdev-core.h      | 6 ++----
+ include/migration/vmstate.h | 1 -
+ include/qemu/typedefs.h     | 1 +
+ include/qom/cpu.h           | 4 ++--
+ target/alpha/cpu.h          | 2 +-
+ target/arm/cpu.h            | 2 +-
+ target/cris/cpu.h           | 2 +-
+ target/hppa/cpu.h           | 2 +-
+ target/i386/cpu.h           | 2 +-
+ target/lm32/cpu.h           | 2 +-
+ target/mips/internal.h      | 2 +-
+ target/openrisc/cpu.h       | 2 +-
+ target/ppc/cpu-qom.h        | 2 +-
+ target/ppc/cpu.h            | 2 +-
+ target/s390x/cpu.h          | 2 +-
+ target/sparc/cpu.h          | 2 +-
+ 16 files changed, 17 insertions(+), 19 deletions(-)
 
-diff --git a/trace/control-internal.h b/trace/control-internal.h
-index c7fbe2d3bf..8b2b50a7cf 100644
---- a/trace/control-internal.h
-+++ b/trace/control-internal.h
-@@ -10,9 +10,6 @@
- #ifndef TRACE__CONTROL_INTERNAL_H
- #define TRACE__CONTROL_INTERNAL_H
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index b870c8ceeb..e5b62dd2fc 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -35,8 +35,6 @@ typedef void (*DeviceReset)(DeviceState *dev);
+ typedef void (*BusRealize)(BusState *bus, Error **errp);
+ typedef void (*BusUnrealize)(BusState *bus, Error **errp);
 =20
--#include "qom/cpu.h"
--
--
- extern int trace_events_enabled_count;
-=20
-=20
-@@ -59,28 +56,6 @@ static inline bool trace_event_get_state_dynamic(Trace=
-Event *ev)
-     return unlikely(trace_events_enabled_count) && *ev->dstate;
- }
-=20
--static inline bool
--trace_event_get_vcpu_state_dynamic_by_vcpu_id(CPUState *vcpu,
--                                              uint32_t vcpu_id)
--{
--    /* it's on fast path, avoid consistency checks (asserts) */
--    if (unlikely(trace_events_enabled_count)) {
--        return test_bit(vcpu_id, vcpu->trace_dstate);
--    } else {
--        return false;
--    }
--}
--
--static inline bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu,
--                                                      TraceEvent *ev)
--{
--    uint32_t vcpu_id;
--    assert(trace_event_is_vcpu(ev));
--    vcpu_id =3D trace_event_get_vcpu_id(ev);
--    return trace_event_get_vcpu_state_dynamic_by_vcpu_id(vcpu, vcpu_id);
--}
--
--
- void trace_event_register_group(TraceEvent **events);
-=20
- #endif /* TRACE__CONTROL_INTERNAL_H */
-diff --git a/trace/control-vcpu.h b/trace/control-vcpu.h
-new file mode 100644
-index 0000000000..a8f1035c2e
---- /dev/null
-+++ b/trace/control-vcpu.h
-@@ -0,0 +1,63 @@
-+/*
-+ * Interface for configuring and controlling the state of tracing events=
-.
-+ *
-+ * Copyright (C) 2011-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef TRACE__CONTROL_VCPU_H
-+#define TRACE__CONTROL_VCPU_H
-+
-+#include "control.h"
-+#include "event-internal.h"
-+#include "qom/cpu.h"
-+
-+/**
-+ * trace_event_get_vcpu_state:
-+ * @vcpu: Target vCPU.
-+ * @id: Event identifier name.
-+ *
-+ * Get the tracing state of an event (both static and dynamic) for the g=
-iven
-+ * vCPU.
-+ *
-+ * If the event has the disabled property, the check will have no perfor=
-mance
-+ * impact.
-+ */
-+#define trace_event_get_vcpu_state(vcpu, id)                            =
-\
-+    ((id ##_ENABLED) &&                                                 =
-\
-+     trace_event_get_vcpu_state_dynamic_by_vcpu_id(                     =
-\
-+         vcpu, _ ## id ## _EVENT.vcpu_id))
-+
-+/**
-+ * trace_event_get_vcpu_state_dynamic:
-+ *
-+ * Get the dynamic tracing state of an event for the given vCPU.
-+ */
-+static bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu, TraceEven=
-t *ev);
-+
-+#include "control-internal.h"
-+
-+static inline bool
-+trace_event_get_vcpu_state_dynamic_by_vcpu_id(CPUState *vcpu,
-+                                              uint32_t vcpu_id)
-+{
-+    /* it's on fast path, avoid consistency checks (asserts) */
-+    if (unlikely(trace_events_enabled_count)) {
-+        return test_bit(vcpu_id, vcpu->trace_dstate);
-+    } else {
-+        return false;
-+    }
-+}
-+
-+static inline bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu,
-+                                                      TraceEvent *ev)
-+{
-+    uint32_t vcpu_id;
-+    assert(trace_event_is_vcpu(ev));
-+    vcpu_id =3D trace_event_get_vcpu_id(ev);
-+    return trace_event_get_vcpu_state_dynamic_by_vcpu_id(vcpu, vcpu_id);
-+}
-+
-+#endif
-diff --git a/trace/control.h b/trace/control.h
-index 570492d6e8..1f81c491b6 100644
---- a/trace/control.h
-+++ b/trace/control.h
-@@ -119,22 +119,6 @@ static const char * trace_event_get_name(TraceEvent =
-*ev);
- #define trace_event_get_state_backends(id)              \
-     ((id ##_ENABLED) && id ##_BACKEND_DSTATE())
-=20
--/**
-- * trace_event_get_vcpu_state:
-- * @vcpu: Target vCPU.
-- * @id: Event identifier name.
-- *
-- * Get the tracing state of an event (both static and dynamic) for the g=
-iven
-- * vCPU.
-- *
-- * If the event has the disabled property, the check will have no perfor=
-mance
-- * impact.
-- */
--#define trace_event_get_vcpu_state(vcpu, id)                            =
-\
--    ((id ##_ENABLED) &&                                                 =
-\
--     trace_event_get_vcpu_state_dynamic_by_vcpu_id(                     =
-\
--         vcpu, _ ## id ## _EVENT.vcpu_id))
+-struct VMStateDescription;
 -
  /**
-  * trace_event_get_state_static:
-  * @id: Event identifier.
-@@ -155,14 +139,6 @@ static bool trace_event_get_state_static(TraceEvent =
-*ev);
-  */
- static bool trace_event_get_state_dynamic(TraceEvent *ev);
+  * DeviceClass:
+  * @props: Properties accessing state fields.
+@@ -112,7 +110,7 @@ typedef struct DeviceClass {
+     DeviceUnrealize unrealize;
 =20
--/**
-- * trace_event_get_vcpu_state_dynamic:
-- *
-- * Get the dynamic tracing state of an event for the given vCPU.
-- */
--static bool trace_event_get_vcpu_state_dynamic(CPUState *vcpu, TraceEven=
-t *ev);
--
--
+     /* device state */
+-    const struct VMStateDescription *vmsd;
++    const VMStateDescription *vmsd;
+=20
+     /* Private to qdev / bus.  */
+     const char *bus_type;
+@@ -425,7 +423,7 @@ void device_class_set_parent_unrealize(DeviceClass *d=
+c,
+                                        DeviceUnrealize dev_unrealize,
+                                        DeviceUnrealize *parent_unrealize=
+);
+=20
+-const struct VMStateDescription *qdev_get_vmsd(DeviceState *dev);
++const VMStateDescription *qdev_get_vmsd(DeviceState *dev);
+=20
+ const char *qdev_fw_name(DeviceState *dev);
+=20
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index c2bfa7a7f0..1fbfd099dd 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -28,7 +28,6 @@
+ #define QEMU_VMSTATE_H
+=20
+ typedef struct VMStateInfo VMStateInfo;
+-typedef struct VMStateDescription VMStateDescription;
+ typedef struct VMStateField VMStateField;
+=20
+ /* VMStateInfo allows customized migration of objects that don't fit in
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index c32efb5b18..9e1283aacf 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -101,6 +101,7 @@ typedef struct SHPCDevice SHPCDevice;
+ typedef struct SSIBus SSIBus;
+ typedef struct VirtIODevice VirtIODevice;
+ typedef struct Visitor Visitor;
++typedef struct VMStateDescription VMStateDescription;
+=20
+ /*
+  * Pointer types
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 5ee0046b62..ddb91bbaff 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -215,7 +215,7 @@ typedef struct CPUClass {
+     int (*write_elf32_qemunote)(WriteCoreDumpFunction f, CPUState *cpu,
+                                 void *opaque);
+=20
+-    const struct VMStateDescription *vmsd;
++    const VMStateDescription *vmsd;
+     const char *gdb_core_xml_file;
+     gchar * (*gdb_arch_name)(CPUState *cpu);
+     const char * (*gdb_get_dynamic_xml)(CPUState *cpu, const char *xmlna=
+me);
+@@ -1108,7 +1108,7 @@ bool target_words_bigendian(void);
+ #ifdef NEED_CPU_H
+=20
+ #ifdef CONFIG_SOFTMMU
+-extern const struct VMStateDescription vmstate_cpu_common;
++extern const VMStateDescription vmstate_cpu_common;
+ #else
+ #define vmstate_cpu_common vmstate_dummy
+ #endif
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index b3e8a823e1..4619530660 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -277,7 +277,7 @@ struct AlphaCPU {
+=20
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_alpha_cpu;
++extern const VMStateDescription vmstate_alpha_cpu;
+ #endif
+=20
+ void alpha_cpu_do_interrupt(CPUState *cpu);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 94c990cddb..2cdde6c4bc 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -922,7 +922,7 @@ void arm_cpu_post_init(Object *obj);
+ uint64_t arm_cpu_mp_affinity(int idx, uint8_t clustersz);
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_arm_cpu;
++extern const VMStateDescription vmstate_arm_cpu;
+ #endif
+=20
+ void arm_cpu_do_interrupt(CPUState *cpu);
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index fb14ad51f1..aba0a66474 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -183,7 +183,7 @@ struct CRISCPU {
+=20
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_cris_cpu;
++extern const VMStateDescription vmstate_cris_cpu;
+ #endif
+=20
+ void cris_cpu_do_interrupt(CPUState *cpu);
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index e9fba96be9..4b816cc13a 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -334,7 +334,7 @@ bool hppa_cpu_tlb_fill(CPUState *cs, vaddr address, i=
+nt size,
+ int hppa_get_physical_address(CPUHPPAState *env, vaddr addr, int mmu_idx=
+,
+                               int type, hwaddr *pphys, int *pprot);
+ extern const MemoryRegionOps hppa_io_eir_ops;
+-extern const struct VMStateDescription vmstate_hppa_cpu;
++extern const VMStateDescription vmstate_hppa_cpu;
+ void hppa_cpu_alarm_timer(void *);
+ int hppa_artype_for_page(CPUHPPAState *env, target_ulong vaddr);
+ #endif
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 8b3dc5533e..ecd0ec0899 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1516,7 +1516,7 @@ struct X86CPU {
+=20
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern struct VMStateDescription vmstate_x86_cpu;
++extern VMStateDescription vmstate_x86_cpu;
+ #endif
+=20
  /**
-  * trace_event_set_state_dynamic:
-  *
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 0056b526b8..6aed80bf0b 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -15,6 +15,7 @@
- #include "block/block_int.h"
- #include "block/blockjob.h"
- #include "block/throttle-groups.h"
-+#include "hw/qdev-core.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
- #include "qapi/error.h"
-diff --git a/qom/object.c b/qom/object.c
-index 1555547727..6fa9c619fa 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -11,6 +11,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "hw/qdev-core.h"
- #include "qapi/error.h"
- #include "qom/object.h"
- #include "qom/object_interfaces.h"
-diff --git a/trace/qmp.c b/trace/qmp.c
-index ea99b00956..38246e1aa6 100644
---- a/trace/qmp.c
-+++ b/trace/qmp.c
-@@ -10,7 +10,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-trace.h"
--#include "control.h"
-+#include "control-vcpu.h"
+diff --git a/target/lm32/cpu.h b/target/lm32/cpu.h
+index c2bbfa2780..064c6b1267 100644
+--- a/target/lm32/cpu.h
++++ b/target/lm32/cpu.h
+@@ -195,7 +195,7 @@ struct LM32CPU {
 =20
 =20
- static CPUState *get_cpu(bool has_vcpu, int vcpu, Error **errp)
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 38f92bfca3..f47f726681 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -28,6 +28,7 @@
- #include "vnc.h"
- #include "vnc-jobs.h"
- #include "trace.h"
-+#include "hw/qdev-core.h"
- #include "sysemu/sysemu.h"
- #include "qemu/error-report.h"
- #include "qemu/module.h"
-diff --git a/scripts/tracetool/format/c.py b/scripts/tracetool/format/c.p=
-y
-index 833c05a022..31207961b0 100644
---- a/scripts/tracetool/format/c.py
-+++ b/scripts/tracetool/format/c.py
-@@ -28,6 +28,7 @@ def generate(events, backend, group):
-     out('/* This file is autogenerated by tracetool, do not edit. */',
-         '',
-         '#include "qemu/osdep.h"',
-+        '#include "qemu/module.h"',
-         '#include "%s"' % header,
-         '')
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_lm32_cpu;
++extern const VMStateDescription vmstate_lm32_cpu;
+ #endif
 =20
-diff --git a/scripts/tracetool/format/h.py b/scripts/tracetool/format/h.p=
-y
-index 338a2365ee..5596b304e6 100644
---- a/scripts/tracetool/format/h.py
-+++ b/scripts/tracetool/format/h.py
-@@ -17,12 +17,17 @@ from tracetool import out
+ void lm32_cpu_do_interrupt(CPUState *cpu);
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index b2b41a51ab..d5aa5490d3 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -148,7 +148,7 @@ hwaddr cpu_mips_translate_address(CPUMIPSState *env, =
+target_ulong address,
+ #define cpu_signal_handler cpu_mips_signal_handler
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_mips_cpu;
++extern const VMStateDescription vmstate_mips_cpu;
+ #endif
+=20
+ static inline bool cpu_mips_hw_interrupts_enabled(CPUMIPSState *env)
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index f23b25262d..61ade1d4f0 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -333,7 +333,7 @@ int print_insn_or1k(bfd_vma addr, disassemble_info *i=
+nfo);
+ #define cpu_signal_handler cpu_openrisc_signal_handler
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_openrisc_cpu;
++extern const VMStateDescription vmstate_openrisc_cpu;
+=20
+ /* hw/openrisc_pic.c */
+ void cpu_openrisc_pic_init(OpenRISCCPU *cpu);
+diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
+index be9b4c30c3..a2f202f021 100644
+--- a/target/ppc/cpu-qom.h
++++ b/target/ppc/cpu-qom.h
+@@ -203,7 +203,7 @@ typedef struct PPCTimebase {
+     int64_t time_of_the_day_ns;
+ } PPCTimebase;
+=20
+-extern const struct VMStateDescription vmstate_ppc_timebase;
++extern const VMStateDescription vmstate_ppc_timebase;
+=20
+ #define VMSTATE_PPC_TIMEBASE_V(_field, _state, _version) {            \
+     .name       =3D (stringify(_field)),                                =
+\
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c9beba2a5c..4ea33cf696 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1255,7 +1255,7 @@ int ppc32_cpu_write_elf32_note(WriteCoreDumpFunctio=
+n f, CPUState *cs,
+                                int cpuid, void *opaque);
+ #ifndef CONFIG_USER_ONLY
+ void ppc_cpu_do_system_reset(CPUState *cs);
+-extern const struct VMStateDescription vmstate_ppc_cpu;
++extern const VMStateDescription vmstate_ppc_cpu;
+ #endif
+=20
+ /***********************************************************************=
+******/
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index a606547b4d..3d9de25f7c 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -163,7 +163,7 @@ struct S390CPU {
 =20
 =20
- def generate(events, backend, group):
-+    if group =3D=3D "root":
-+        header =3D "trace/control-vcpu.h"
-+    else:
-+        header =3D "trace/control.h"
-+
-     out('/* This file is autogenerated by tracetool, do not edit. */',
-         '',
-         '#ifndef TRACE_%s_GENERATED_TRACERS_H' % group.upper(),
-         '#define TRACE_%s_GENERATED_TRACERS_H' % group.upper(),
-         '',
--        '#include "trace/control.h"',
-+        '#include "%s"' % header,
-         '')
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_s390_cpu;
++extern const VMStateDescription vmstate_s390_cpu;
+ #endif
 =20
-     for e in events:
+ /* distinguish between 24 bit and 31 bit addressing */
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index 8ed2250cd0..0d5b01efe5 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -532,7 +532,7 @@ struct SPARCCPU {
+=20
+=20
+ #ifndef CONFIG_USER_ONLY
+-extern const struct VMStateDescription vmstate_sparc_cpu;
++extern const VMStateDescription vmstate_sparc_cpu;
+ #endif
+=20
+ void sparc_cpu_do_interrupt(CPUState *cpu);
 --=20
 2.21.0
 
