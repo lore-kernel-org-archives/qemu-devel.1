@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8ECC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 21:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA06EC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 21:10:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6050A206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 21:09:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6050A206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 7F039206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 21:10:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F039206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxe3K-0006nA-I2
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 17:09:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41678)
+	id 1hxe3N-0006zr-Pk
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 17:10:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41602)
  by lists.gnu.org with esmtp (Exim 4.86_2)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hxe0z-0004t4-63
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:07:35 -0400
+ id 1hxe0o-0004Zd-P8
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:07:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hxe0x-0001Bn-On
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:07:32 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2186 helo=huawei.com)
+ id 1hxe0n-00010e-TY
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:07:22 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2252 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1hxe0u-00016N-Nf; Tue, 13 Aug 2019 17:07:29 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id D6296777F7D2255294D1;
- Wed, 14 Aug 2019 05:07:26 +0800 (CST)
+ id 1hxe0l-0000tZ-Fm; Tue, 13 Aug 2019 17:07:19 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id D986516219B64C76B000;
+ Wed, 14 Aug 2019 05:07:16 +0800 (CST)
 Received: from S00345302A-PC.china.huawei.com (10.47.94.0) by
  DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 14 Aug 2019 05:07:17 +0800
+ 14.3.439.0; Wed, 14 Aug 2019 05:07:10 +0800
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-arm@nongnu.org>, <eric.auger@redhat.com>,
  <imammedo@redhat.com>
-Date: Tue, 13 Aug 2019 22:05:31 +0100
-Message-ID: <20190813210539.31164-5-shameerali.kolothum.thodi@huawei.com>
+Date: Tue, 13 Aug 2019 22:05:29 +0100
+Message-ID: <20190813210539.31164-3-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20190813210539.31164-1-shameerali.kolothum.thodi@huawei.com>
 References: <20190813210539.31164-1-shameerali.kolothum.thodi@huawei.com>
@@ -53,9 +53,9 @@ Content-Type: text/plain
 X-Originating-IP: [10.47.94.0]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 45.249.212.190
-Subject: [Qemu-devel] [PATCH-for-4.2 v9 04/12] hw/arm/virt: Add memory
- hotplug framework
+X-Received-From: 45.249.212.191
+Subject: [Qemu-devel] [PATCH-for-4.2 v9 02/12] hw/acpi: Do not create memory
+ hotplug method when handler is not defined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,130 +74,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Samuel Ortiz <sameo@linux.intel.com>
 
-This patch adds the memory hot-plug/hot-unplug infrastructure
-in machvirt. The device memory is not yet exposed to the Guest
-either through DT or ACPI and hence both cold/hot plug of memory
-is explicitly disabled for now.
+With Hardware-reduced ACPI, the GED device will manage ACPI
+hotplug entirely. As a consequence, make the memory specific
+events AML generation optional. The code will only be added
+when the method name is not NULL.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 ---
-v8 --> v9
- -Added error propagation.
----
- hw/arm/Kconfig |  2 ++
- hw/arm/virt.c  | 53 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 54 insertions(+), 1 deletion(-)
+ hw/acpi/memory_hotplug.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index ab65ecd216..84961c17ab 100644
---- a/hw/arm/Kconfig
-+++ b/hw/arm/Kconfig
-@@ -20,6 +20,8 @@ config ARM_VIRT
-     select SMBIOS
-     select VIRTIO_MMIO
-     select ACPI_PCI
-+    select MEM_DEVICE
-+    select DIMM
- 
- config CHEETAH
-     bool
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index d9496c9363..72cde9deba 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -64,6 +64,8 @@
- #include "hw/arm/smmuv3.h"
- #include "hw/acpi/acpi.h"
- #include "target/arm/internals.h"
-+#include "hw/mem/pc-dimm.h"
-+#include "hw/mem/nvdimm.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1871,6 +1873,42 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
- 
-+static void virt_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                                 Error **errp)
-+{
-+
-+    /*
-+     * The device memory is not yet exposed to the Guest either through
-+     * DT or ACPI and hence both cold/hot plug of memory is explicitly
-+     * disabled for now.
-+     */
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        error_setg(errp, "memory cold/hot plug is not yet supported");
-+        return;
-+    }
-+
-+    pc_dimm_pre_plug(PC_DIMM(dev), MACHINE(hotplug_dev), NULL, errp);
-+}
-+
-+static void virt_memory_plug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
-+    Error *local_err = NULL;
-+
-+    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-+
-+    error_propagate(errp, local_err);
-+}
-+
-+static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-+                                            DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_pre_plug(hotplug_dev, dev, errp);
-+    }
-+}
-+
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-@@ -1882,12 +1920,23 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
-         }
+diff --git a/hw/acpi/memory_hotplug.c b/hw/acpi/memory_hotplug.c
+index 1734d4b44f..552f60a716 100644
+--- a/hw/acpi/memory_hotplug.c
++++ b/hw/acpi/memory_hotplug.c
+@@ -715,10 +715,12 @@ void build_memory_hotplug_aml(Aml *table, uint32_t nr_mem,
      }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_memory_plug(hotplug_dev, dev, errp);
+     aml_append(table, dev_container);
+ 
+-    method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
+-    aml_append(method,
+-        aml_call0(MEMORY_DEVICES_CONTAINER "." MEMORY_SLOT_SCAN_METHOD));
+-    aml_append(table, method);
++    if (event_handler_method) {
++        method = aml_method(event_handler_method, 0, AML_NOTSERIALIZED);
++        aml_append(method, aml_call0(MEMORY_DEVICES_CONTAINER "."
++                                     MEMORY_SLOT_SCAN_METHOD));
++        aml_append(table, method);
 +    }
-+}
-+
-+static void virt_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp)
-+{
-+    error_setg(errp, "device unplug request for unsupported device"
-+               " type: %s", object_get_typename(OBJECT(dev)));
+ 
+     g_free(mhp_res_path);
  }
- 
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-                                                         DeviceState *dev)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
-     }
- 
-@@ -1951,7 +2000,9 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->kvm_type = virt_kvm_type;
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-+    hc->pre_plug = virt_machine_device_pre_plug_cb;
-     hc->plug = virt_machine_device_plug_cb;
-+    hc->unplug_request = virt_machine_device_unplug_request_cb;
-     mc->numa_mem_supported = true;
- }
- 
 -- 
 2.17.1
 
