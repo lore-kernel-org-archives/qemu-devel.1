@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0995C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D6C6C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B98B9206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DED8B206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 12:52:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="baRLPYTP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B98B9206C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AtkGgsui"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DED8B206C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxWHx-000791-U4
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 08:52:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53593)
+	id 1hxWI0-0007FN-6N
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 08:52:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53641)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <alex.bennee@linaro.org>) id 1hxWFO-0002MJ-Oj
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:55 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hxWFR-0002Ts-1C
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hxWFN-0000iE-TH
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:54 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45326)
+ (envelope-from <alex.bennee@linaro.org>) id 1hxWFQ-0000l1-1m
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:56 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34626)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hxWFN-0000hQ-NP
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:53 -0400
-Received: by mail-wr1-x444.google.com with SMTP id q12so17367345wrj.12
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 05:49:53 -0700 (PDT)
+ id 1hxWFP-0000k9-S8
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 08:49:56 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e8so1009716wme.1
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 05:49:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=cEKv00Em9U5YApD5FMoRIKqjxBDA/UgVlGfBKWggZY4=;
- b=baRLPYTP/xvzEBB8qghJskeYWBvRPOTZsoSTjbiXlmMDci22FZLIFlYGBCiY8n76ou
- 7XTwFd1BPzcfzTpjqDHng82VJB7Dt9jriJbtib0UOllKpL597z63WP0HcNYOsAMBTac4
- kJ+6bzLjJ5AQL5SaQiI79Xo4vydh1lSV1NbGCaayjOU0Qhbhcby8y8bpCEl2em7JITS1
- vTucUUQmESnr7OvxboB8ESIVsc+c2oBRhg9oi202tyg2cZvxfkHGDh8YcK9vg5xEYI+z
- PWaP6LjZli///fyGuA2BNgIEP+yC8XU7MwStFeEOi5utfL6zsMGZ/BkeYW3AwGcEi4Ly
- 7ldQ==
+ bh=7gMIeXb33bJiJJ2wC99NJRgf91T+h2agcGiVoSf4NFI=;
+ b=AtkGgsui1bxAw0W/eI+q06kI2PErsc2z8s4oTsD9Kl5APeF2G1TOwavC/uSEoRy3rv
+ ALXF2RG6BmCPJ4AGv2VbsluYkQ/SRzZpz/brustAm6AeabRHnJQIX7fJzzqiG6vZzKEo
+ Zb/ZWfxYr28V483fDYpFUxj7u2qOBcmVBlcsc76YWMoAnDN9PtDa6TQA70cinwxwhBqT
+ Bj7Yc2xuqBWrYX8VdVRI427qx8ulF3C29O/xak/SNwfai5Vb//eSdrEkFptOO3sbVIf5
+ fhCTyWrnYZPjZhcT73dLmeM6+UuCAQgukWwGESKVUBZRVbpzMf4AtVNHjRGDN+F1D1Ph
+ RCaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cEKv00Em9U5YApD5FMoRIKqjxBDA/UgVlGfBKWggZY4=;
- b=Hi10SGZ8yKnT0lt+f3JvtOdOSIcy4xtCwWqxfreIQHLZYvOXF0c6pTzoUbhHyNIvrJ
- ysL4Su4h3dIFPO2mXE+Emnq0nQzSaGs2adIttZN5zjtAJmytSNw9/I2SgdFhc+1SWiRz
- vpCajZa1k7oT0uQexKTaCCtWrct7r8JSmRqFhgubl17zxj/Piv30L3j2UB1ZWdOcUN4W
- ZAx1Zs7m1bWDZIoqo6yxUU36sOc/TMQPE6vcnoHFloeluIcZYPVqhsznzINVsD1NYUZk
- U64jxmsGk0h4+wRkjXlUwv5pn71AL4110Nt+UXOCetW0AOydq6NqBvwscs2lxFtAeizY
- tbOg==
-X-Gm-Message-State: APjAAAXb1ExZhHj2+jLeYCe7Ej5ge3smD6koldGYxSlg7ykDS1RI4HfC
- 5HUBcauYK1KQZXWEX/rSpCTNhw==
-X-Google-Smtp-Source: APXvYqyuOeZsvRxpa9osma+u4fYvGCeGa6ED9QEDeYmxlAiiGH95LkcFJi9zeFI49tTRssWh7mI9mg==
-X-Received: by 2002:adf:cd81:: with SMTP id q1mr48012266wrj.16.1565700592616; 
- Tue, 13 Aug 2019 05:49:52 -0700 (PDT)
+ bh=7gMIeXb33bJiJJ2wC99NJRgf91T+h2agcGiVoSf4NFI=;
+ b=o8HnHA/TAxRhOHXw1bAOwFuu9HaOzjiREFayOQFD+XtvV4CK5A51OxgnGOtpvQZ/am
+ 1IAgjnnjc0dek9o9BMl4hhMpO9XHV8tKjRLhslLF+SIvgqCsUQ7xtFT17H5yag4Pwrk8
+ ra6eWCdXOy8HH4kbtyzT6hzgvGrfnq8oUJOVxAtFWJ5Nu1/b2VVWBkSjk1V7O4iCQSL2
+ IAP9mok67/zIVpdW4k8ocmz1jTOfrgt7u+0HWtrWgPPg04GhmHyryf6XQV4PvftuX8Na
+ HFLt0RiQIIaP0dJRRTzL9If5zmf6YmjQifkxgXvVK7rucqXvFvcCsuHAykA/2sqRpQta
+ xXoQ==
+X-Gm-Message-State: APjAAAVlICwpXx4+R9Xu23ASL+bB2kXrnBezWtq5UB0qGEyD0N809ZDA
+ f4shUfCSAxPvjL8s11xpUgynEQ==
+X-Google-Smtp-Source: APXvYqxauFES2XK//lwC+e4NWh67klPh/C9QLwOhfixvolGWspvpspHuVPBcAmatwpC6t8iT+SmMAQ==
+X-Received: by 2002:a05:600c:23cd:: with SMTP id
+ p13mr2791724wmb.86.1565700594824; 
+ Tue, 13 Aug 2019 05:49:54 -0700 (PDT)
 Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id f17sm1588521wmj.27.2019.08.13.05.49.48
+ by smtp.gmail.com with ESMTPSA id x20sm236796612wrg.10.2019.08.13.05.49.49
  (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Tue, 13 Aug 2019 05:49:50 -0700 (PDT)
+ Tue, 13 Aug 2019 05:49:51 -0700 (PDT)
 Received: from zen.linaroharston. (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 85FAA1FF96;
+ by zen.linaroharston (Postfix) with ESMTP id C6A4A1FF9A;
  Tue, 13 Aug 2019 13:49:47 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 13:49:40 +0100
-Message-Id: <20190813124946.25322-8-alex.bennee@linaro.org>
+Date: Tue, 13 Aug 2019 13:49:43 +0100
+Message-Id: <20190813124946.25322-11-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190813124946.25322-1-alex.bennee@linaro.org>
 References: <20190813124946.25322-1-alex.bennee@linaro.org>
@@ -83,8 +84,9 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: [Qemu-devel] [PATCH  v3 07/13] fpu: remove the LIT64 macro
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PATCH v3 10/13] fpu: rename softfloat-specialize.h ->
+ .inc.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,32 +99,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, armbru@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, armbru@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now the rest of the code has been cleaned up we can remove this.
+This is not a normal header and should only be included in the main
+softfloat.c file to bring in the various target specific
+specialisations. Indeed as it contains non-inlined C functions it is
+not even a legal header. Rename it to match our included C convention.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/fpu/softfloat.h | 2 --
- 1 file changed, 2 deletions(-)
+ fpu/{softfloat-specialize.h => softfloat-specialize.inc.c} | 0
+ fpu/softfloat.c                                            | 2 +-
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename fpu/{softfloat-specialize.h => softfloat-specialize.inc.c} (100%)
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 3ff3fa52245..d9333eb65b8 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -82,8 +82,6 @@ this code that are retained.
- #ifndef SOFTFLOAT_H
- #define SOFTFLOAT_H
- 
--#define LIT64( a ) a##LL
--
- /*----------------------------------------------------------------------------
- | Software IEC/IEEE floating-point ordering relations
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.inc.c
+similarity index 100%
+rename from fpu/softfloat-specialize.h
+rename to fpu/softfloat-specialize.inc.c
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 6bf6241710f..6e98fee48a3 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -634,7 +634,7 @@ static inline float64 float64_pack_raw(FloatParts p)
+ | are propagated from function inputs to output.  These details are target-
+ | specific.
  *----------------------------------------------------------------------------*/
+-#include "softfloat-specialize.h"
++#include "softfloat-specialize.inc.c"
+ 
+ /* Canonicalize EXP and FRAC, setting CLS.  */
+ static FloatParts sf_canonicalize(FloatParts part, const FloatFmt *parm,
 -- 
 2.20.1
 
