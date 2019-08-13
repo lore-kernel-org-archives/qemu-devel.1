@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 890D4C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:48:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 662B2C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:48:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BEBF205F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:48:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEBF205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 3E8F8205F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:48:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E8F8205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxZ2T-0005tv-Jx
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:48:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52274)
+	id 1hxZ2V-0005zL-F3
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:48:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52300)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <armbru@redhat.com>) id 1hxZ0w-000461-8l
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:11 -0400
+ (envelope-from <armbru@redhat.com>) id 1hxZ0y-00046J-2Q
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hxZ0u-0002RV-7K
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35652)
+ (envelope-from <armbru@redhat.com>) id 1hxZ0w-0002SQ-3D
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35684)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hxZ0r-0002JF-Po
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:08 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1hxZ0u-0002QV-5Z
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:47:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B846019D335
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 15:47:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id CCA3113A82
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 15:47:06 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
  [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C7A080487;
- Tue, 13 Aug 2019 15:47:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E1EF7A22D;
+ Tue, 13 Aug 2019 15:47:06 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9DEE7113644B; Tue, 13 Aug 2019 17:46:53 +0200 (CEST)
+ id BE37D1136454; Tue, 13 Aug 2019 17:46:53 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 17:46:28 +0200
-Message-Id: <20190813154653.20568-5-armbru@redhat.com>
+Date: Tue, 13 Aug 2019 17:46:37 +0200
+Message-Id: <20190813154653.20568-14-armbru@redhat.com>
 In-Reply-To: <20190813154653.20568-1-armbru@redhat.com>
 References: <20190813154653.20568-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 13 Aug 2019 15:47:04 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 13 Aug 2019 15:47:06 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 04/29] memory: Fix type of
- IOMMUMemoryRegionClass member @parent_class
+Subject: [Qemu-devel] [PULL 13/29] Clean up inclusion of exec/cpu-common.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,123 +70,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TYPE_IOMMU_MEMORY_REGION is a direct subtype of TYPE_MEMORY_REGION.
-Its instance struct is IOMMUMemoryRegion, and its first member is a
-MemoryRegion.  Correct.  Its class struct is IOMMUMemoryRegionClass,
-and its first member is a DeviceClass.  Wrong.  Messed up when commit
-1221a474676 introduced the QOM type.  It even included hw/qdev-core.h
-just for that.
+migration/qemu-file.h neglects to include it even though it needs
+ram_addr_t.  Fix that.  Drop a few superfluous inclusions elsewhere.
 
-TYPE_MEMORY_REGION doesn't bother to define a class struct.  This is
-fine, it simply defaults to its super-type TYPE_OBJECT's class struct
-ObjectClass.  Changing IOMMUMemoryRegionClass's first member's type to
-ObjectClass would be a minimal fix, if a bit brittle: if
-TYPE_MEMORY_REGION ever acquired own class struct, we'd have to update
-IOMMUMemoryRegionClass to use it.
-
-Fix it the clean and robust way instead: give TYPE_MEMORY_REGION its
-own class struct MemoryRegionClass now, and use it for
-IOMMUMemoryRegionClass's first member.
-
-Revert the include of hw/qdev-core.h, and fix the few files that have
-come to rely on it.
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20190812052359.30071-5-armbru@redhat.com>
+Message-Id: <20190812052359.30071-14-armbru@redhat.com>
 ---
- hw/net/pcnet.h          |  1 +
- include/exec/memory.h   | 10 ++++++++--
- hw/display/vga-isa-mm.c |  1 +
- memory.c                |  1 +
- 4 files changed, 11 insertions(+), 2 deletions(-)
+ include/hw/hw.h                 | 1 -
+ include/hw/ppc/ppc4xx.h         | 1 -
+ include/migration/misc.h        | 1 -
+ include/sysemu/kvm_int.h        | 1 -
+ include/sysemu/memory_mapping.h | 1 -
+ migration/migration.h           | 1 -
+ migration/qemu-file.h           | 1 +
+ accel/stubs/tcg-stub.c          | 1 -
+ balloon.c                       | 1 -
+ hw/smbios/smbios.c              | 1 -
+ migration/qemu-file-channel.c   | 1 -
+ migration/vmstate-types.c       | 1 -
+ qom/cpu.c                       | 1 -
+ tcg/optimize.c                  | 1 -
+ tcg/tcg-common.c                | 1 -
+ tcg/tcg.c                       | 1 -
+ 16 files changed, 1 insertion(+), 15 deletions(-)
 
-diff --git a/hw/net/pcnet.h b/hw/net/pcnet.h
-index 40831a7845..28d19a5c6f 100644
---- a/hw/net/pcnet.h
-+++ b/hw/net/pcnet.h
-@@ -8,6 +8,7 @@
- #define PCNET_LOOPTEST_NOCRC	2
+diff --git a/include/hw/hw.h b/include/hw/hw.h
+index 38d2fb1f40..86ff26b712 100644
+--- a/include/hw/hw.h
++++ b/include/hw/hw.h
+@@ -6,7 +6,6 @@
+ #error Cannot include hw/hw.h from user emulation
+ #endif
 =20
- #include "exec/memory.h"
-+#include "hw/irq.h"
-=20
- /* BUS CONFIGURATION REGISTERS */
- #define BCR_MSRDA    0
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index bb0961ddb9..d99eb25d2e 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -20,12 +20,12 @@
- #include "exec/hwaddr.h"
- #include "exec/memattrs.h"
- #include "exec/ramlist.h"
-+#include "qemu/bswap.h"
- #include "qemu/queue.h"
- #include "qemu/int128.h"
- #include "qemu/notify.h"
+-#include "exec/cpu-common.h"
  #include "qom/object.h"
- #include "qemu/rcu.h"
--#include "hw/qdev-core.h"
+ #include "exec/memory.h"
+ #include "migration/vmstate.h"
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index 90f8866138..7d82259051 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -26,7 +26,6 @@
+ #define PPC4XX_H
 =20
- #define RAM_ADDR_INVALID (~(ram_addr_t)0)
+ #include "hw/ppc/ppc.h"
+-#include "exec/cpu-common.h"
+ #include "exec/memory.h"
 =20
-@@ -205,6 +205,12 @@ struct MemoryRegionOps {
-     } impl;
- };
+ /* PowerPC 4xx core initialization */
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 5cdbabd094..b9d8e787af 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -14,7 +14,6 @@
+ #ifndef MIGRATION_MISC_H
+ #define MIGRATION_MISC_H
 =20
-+typedef struct MemoryRegionClass {
-+    /* private */
-+    ObjectClass parent_class;
-+} MemoryRegionClass;
-+
-+
- enum IOMMUMemoryRegionAttr {
-     IOMMU_ATTR_SPAPR_TCE_FD
- };
-@@ -237,7 +243,7 @@ enum IOMMUMemoryRegionAttr {
-  */
- typedef struct IOMMUMemoryRegionClass {
-     /* private */
--    struct DeviceClass parent_class;
-+    MemoryRegionClass parent_class;
+-#include "exec/cpu-common.h"
+ #include "qemu/notify.h"
+ #include "qapi/qapi-types-net.h"
 =20
-     /*
-      * Return a TLB entry that contains a given address.
-diff --git a/hw/display/vga-isa-mm.c b/hw/display/vga-isa-mm.c
-index 215e649719..a790f69b6d 100644
---- a/hw/display/vga-isa-mm.c
-+++ b/hw/display/vga-isa-mm.c
-@@ -22,6 +22,7 @@
-  * THE SOFTWARE.
-  */
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index 787dbc7770..5d341cc29b 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -9,7 +9,6 @@
+ #ifndef QEMU_KVM_INT_H
+ #define QEMU_KVM_INT_H
+=20
+-#include "exec/cpu-common.h"
+ #include "exec/memory.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/accel.h"
+diff --git a/include/sysemu/memory_mapping.h b/include/sysemu/memory_mapp=
+ing.h
+index 1b440df486..4b20f1a639 100644
+--- a/include/sysemu/memory_mapping.h
++++ b/include/sysemu/memory_mapping.h
+@@ -15,7 +15,6 @@
+ #define MEMORY_MAPPING_H
+=20
+ #include "qemu/queue.h"
+-#include "exec/cpu-common.h"
+ #include "exec/cpu-defs.h"
+ #include "exec/memory.h"
+=20
+diff --git a/migration/migration.h b/migration/migration.h
+index 1fdd7b21fd..26f01d00f6 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -16,7 +16,6 @@
+=20
+ #include "qapi/qapi-types-migration.h"
+ #include "qemu/thread.h"
+-#include "exec/cpu-common.h"
+ #include "qemu/coroutine_int.h"
+ #include "hw/qdev.h"
+ #include "io/channel.h"
+diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+index 13baf896bd..21f3ae4be2 100644
+--- a/migration/qemu-file.h
++++ b/migration/qemu-file.h
+@@ -26,6 +26,7 @@
+ #define MIGRATION_QEMU_FILE_H
+=20
+ #include <zlib.h>
++#include "exec/cpu-common.h"
+=20
+ /* Read a chunk of data from a file at the given position.  The pos argu=
+ment
+  * can be ignored if the file is only be used for streaming.  The number=
+ of
+diff --git a/accel/stubs/tcg-stub.c b/accel/stubs/tcg-stub.c
+index 76ae461749..e2d23edafe 100644
+--- a/accel/stubs/tcg-stub.c
++++ b/accel/stubs/tcg-stub.c
+@@ -14,7 +14,6 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "tcg/tcg.h"
+-#include "exec/cpu-common.h"
+ #include "exec/exec-all.h"
+=20
+ void tb_flush(CPUState *cpu)
+diff --git a/balloon.c b/balloon.c
+index 914b3662db..f104b42961 100644
+--- a/balloon.c
++++ b/balloon.c
+@@ -26,7 +26,6 @@
+=20
  #include "qemu/osdep.h"
-+#include "qemu/bitops.h"
- #include "qemu/units.h"
- #include "hw/hw.h"
- #include "hw/display/vga.h"
-diff --git a/memory.c b/memory.c
-index 5d8c9a9234..09d9b254fd 100644
---- a/memory.c
-+++ b/memory.c
-@@ -3245,6 +3245,7 @@ void memory_region_init_rom_device(MemoryRegion *mr=
-,
- static const TypeInfo memory_region_info =3D {
-     .parent             =3D TYPE_OBJECT,
-     .name               =3D TYPE_MEMORY_REGION,
-+    .class_size         =3D sizeof(MemoryRegionClass),
-     .instance_size      =3D sizeof(MemoryRegion),
-     .instance_init      =3D memory_region_initfn,
-     .instance_finalize  =3D memory_region_finalize,
+ #include "qemu/atomic.h"
+-#include "exec/cpu-common.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/balloon.h"
+ #include "trace-root.h"
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index 7bcd67b098..11d476c4a2 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -28,7 +28,6 @@
+ #include "hw/firmware/smbios.h"
+ #include "hw/loader.h"
+ #include "hw/boards.h"
+-#include "exec/cpu-common.h"
+ #include "smbios_build.h"
+=20
+ /* legacy structures and constants for <=3D 2.0 machines */
+diff --git a/migration/qemu-file-channel.c b/migration/qemu-file-channel.=
+c
+index 8e639eb496..78ef248820 100644
+--- a/migration/qemu-file-channel.c
++++ b/migration/qemu-file-channel.c
+@@ -24,7 +24,6 @@
+=20
+ #include "qemu/osdep.h"
+ #include "qemu-file-channel.h"
+-#include "exec/cpu-common.h"
+ #include "qemu-file.h"
+ #include "io/channel-socket.h"
+ #include "qemu/iov.h"
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index 845f4649ee..bee658a1b2 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -11,7 +11,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "exec/cpu-common.h"
+ #include "qemu-file.h"
+ #include "migration.h"
+ #include "migration/vmstate.h"
+diff --git a/qom/cpu.c b/qom/cpu.c
+index f376f782d8..fdc1af8f40 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -25,7 +25,6 @@
+ #include "qemu/notify.h"
+ #include "qemu/log.h"
+ #include "exec/log.h"
+-#include "exec/cpu-common.h"
+ #include "qemu/error-report.h"
+ #include "qemu/qemu-print.h"
+ #include "sysemu/sysemu.h"
+diff --git a/tcg/optimize.c b/tcg/optimize.c
+index d2424de4af..cee2a36a60 100644
+--- a/tcg/optimize.c
++++ b/tcg/optimize.c
+@@ -24,7 +24,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "exec/cpu-common.h"
+ #include "tcg-op.h"
+=20
+ #define CASE_OP_32_64(x)                        \
+diff --git a/tcg/tcg-common.c b/tcg/tcg-common.c
+index 907d58d0f0..97305a3efc 100644
+--- a/tcg/tcg-common.c
++++ b/tcg/tcg-common.c
+@@ -23,7 +23,6 @@
+  */
+=20
+ #include "qemu/osdep.h"
+-#include "exec/cpu-common.h"
+ #include "tcg/tcg.h"
+=20
+ #if defined(CONFIG_TCG_INTERPRETER)
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index be2c33c400..2db83ce2e8 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -42,7 +42,6 @@
+ #define NO_CPU_IO_DEFS
+ #include "cpu.h"
+=20
+-#include "exec/cpu-common.h"
+ #include "exec/exec-all.h"
+=20
+ #if !defined(CONFIG_USER_ONLY)
 --=20
 2.21.0
 
