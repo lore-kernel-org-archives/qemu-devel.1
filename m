@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7ED5C32753
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 788F9C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:25:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAB9E20673
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:24:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAB9E20673
+	by mail.kernel.org (Postfix) with ESMTPS id 49AE320673
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:25:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49AE320673
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxUuU-0005c4-2r
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 07:24:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41735)
+	id 1hxUvE-0006c7-Jb
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 07:25:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41736)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hxUoz-0001DV-PL
+ (envelope-from <kraxel@redhat.com>) id 1hxUoz-0001DW-PM
  for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hxUoy-00058l-CS
+ (envelope-from <kraxel@redhat.com>) id 1hxUoy-00059B-J2
  for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35232)
+Received: from mx1.redhat.com ([209.132.183.28]:35242)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hxUou-00056E-CX
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:30 -0400
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hxUoy-00056G-C2
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:32 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id ABEA62CE953;
+ by mx1.redhat.com (Postfix) with ESMTPS id CC2F92D6A0D;
  Tue, 13 Aug 2019 11:18:27 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-116-144.ams2.redhat.com
  [10.36.116.144])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B660679C6B;
- Tue, 13 Aug 2019 11:18:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6E15979C5D;
+ Tue, 13 Aug 2019 11:18:27 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 03F5E9CAB; Tue, 13 Aug 2019 13:18:10 +0200 (CEST)
+ id B82859D3C; Tue, 13 Aug 2019 13:18:09 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 13:18:08 +0200
-Message-Id: <20190813111809.3141-15-kraxel@redhat.com>
+Date: Tue, 13 Aug 2019 13:18:05 +0200
+Message-Id: <20190813111809.3141-12-kraxel@redhat.com>
 In-Reply-To: <20190813111809.3141-1-kraxel@redhat.com>
 References: <20190813111809.3141-1-kraxel@redhat.com>
 MIME-Version: 1.0
@@ -58,7 +58,7 @@ X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 14/15] audio: fix memory leak reported by ASAN
+Subject: [Qemu-devel] [PULL 11/15] paaudio: fix playback glitches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,32 +77,40 @@ Sender: "Qemu-devel"
 
 From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
 
+Pulseaudio normally assumes that when the server wants it, the client
+can generate the audio samples and send it right away.  Unfortunately
+this is not the case with QEMU -- it's up to the emulated system when
+does it generate the samples.  Buffering the samples and sending them
+from a background thread is just a workaround, that doesn't work too
+well.  Instead enable pa's compatibility support and let pa worry about
+the details.
+
 Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
 >
-Message-id: 752d0beb8a35abc89cbe0618a21e496c072a317e.1564925487.git.DirtY=
+Message-id: c32779a94edfb7a61a41028f154ecc7cf2f69ef1.1564925486.git.DirtY=
 .iCE.hu@gmail.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- audio/audio.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ audio/paaudio.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/audio/audio.c b/audio/audio.c
-index d3c639211d43..ebe49f3ca10a 100644
---- a/audio/audio.c
-+++ b/audio/audio.c
-@@ -1343,6 +1343,12 @@ static void free_audio_state(AudioState *s)
-         qapi_free_Audiodev(s->dev);
-         s->dev =3D NULL;
-     }
-+
-+    if (s->ts) {
-+        timer_free(s->ts);
-+        s->ts =3D NULL;
-+    }
-+
-     g_free(s);
- }
+diff --git a/audio/paaudio.c b/audio/paaudio.c
+index f3864e1d5038..c8ae1a6eca01 100644
+--- a/audio/paaudio.c
++++ b/audio/paaudio.c
+@@ -512,10 +512,8 @@ static pa_stream *qpa_simple_new (
 =20
+     flags =3D
+         PA_STREAM_INTERPOLATE_TIMING
+-#ifdef PA_STREAM_ADJUST_LATENCY
+-        | PA_STREAM_ADJUST_LATENCY
+-#endif
+-        | PA_STREAM_AUTO_TIMING_UPDATE;
++        | PA_STREAM_AUTO_TIMING_UPDATE
++        | PA_STREAM_EARLY_REQUESTS;
+=20
+     if (dev) {
+         /* don't move the stream if the user specified a sink/source */
 --=20
 2.18.1
 
