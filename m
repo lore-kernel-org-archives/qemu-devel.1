@@ -2,51 +2,47 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B51C5C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EFDC32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:40:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86CCA20578
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:36:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86CCA20578
+	by mail.kernel.org (Postfix) with ESMTPS id D1C9E2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:40:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1C9E2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxfOw-0006LQ-Sd
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:36:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54443)
+	id 1hxfTD-0007aD-17
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:40:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54962)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxfOX-0005jN-QV
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:35:58 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxfSn-00076z-Ro
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:40:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxfOW-0000Ug-Ku
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:35:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56432)
+ (envelope-from <jsnow@redhat.com>) id 1hxfSm-0002Ds-Vc
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:40:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59156)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxfOU-0000Tc-0P; Tue, 13 Aug 2019 18:35:54 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hxfSm-0002Dk-O0
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:40:20 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 27FF7308213F;
- Tue, 13 Aug 2019 22:35:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D65AE3086211
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 22:40:19 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 88D2B10016EB;
- Tue, 13 Aug 2019 22:35:47 +0000 (UTC)
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20190725155512.9827-1-mreitz@redhat.com>
- <125926bf-4c5a-939a-2cc7-01e11a1a2511@redhat.com>
- <e6bc8a2d-4541-60a3-64a7-294c4dee0c32@redhat.com>
- <62114b6e-803d-5eec-df7e-e77708f065c6@redhat.com>
- <cb8a761c-48bb-52b8-8079-b8220a32bc63@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7D7084536;
+ Tue, 13 Aug 2019 22:40:19 +0000 (UTC)
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20190729213416.1972-1-pbonzini@redhat.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -123,22 +119,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <7fdd5c4c-748a-d0c6-c374-43e8e6a9495c@redhat.com>
-Date: Tue, 13 Aug 2019 18:35:46 -0400
+Message-ID: <b1135640-3e01-6e25-ecd0-375d57acb901@redhat.com>
+Date: Tue, 13 Aug 2019 18:40:19 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <cb8a761c-48bb-52b8-8079-b8220a32bc63@redhat.com>
+In-Reply-To: <20190729213416.1972-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Tue, 13 Aug 2019 22:35:53 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.42]); Tue, 13 Aug 2019 22:40:19 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 0/3] block: Make various
- formats' block_status recurse again
+Subject: Re: [Qemu-devel] [PATCH] dma-helpers: ensure AIO callback is
+ invoked after cancellation
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,123 +146,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/13/19 10:48 AM, Max Reitz wrote:
-> On 12.08.19 23:45, John Snow wrote:
->>
->>
->> On 8/12/19 3:11 PM, Max Reitz wrote:
->>> On 12.08.19 20:39, John Snow wrote:
->>>>
->>>>
->>>> On 7/25/19 11:55 AM, Max Reitz wrote:
->>>>> Hi,
->>>>>
->>>>> 69f47505ee66afaa513305de0c1895a224e52c45 changed block_status so th=
-at it
->>>>> would only go down to the protocol layer if the format layer return=
-ed
->>>>> BDRV_BLOCK_RECURSE, thus indicating that it has no sufficient
->>>>> information whether a given range in the image is zero or not.
->>>>> Generally, this is because the image is preallocated and thus all r=
-anges
->>>>> appear as zeroes.
->>>>>
->>>>> However, it only implemented this preallocation detection for qcow2=
-.
->>>>> There are more formats that support preallocation, though: vdi, vhd=
-x,
->>>>> vmdk, vpc.  (Funny how they all start with =E2=80=9Cv=E2=80=9D.)
->>>>>
->>>>> For vdi, vmdk, and vpc, the fix is rather simple, because they real=
-ly
->>>>> have different subformats depending on whether an image is prealloc=
-ated
->>>>> or not.  This makes the check very simple.
->>>>>
->>>>> vhdx is more like qcow2, where after the image has been created, it
->>>>> isn=E2=80=99t clear whether it=E2=80=99s been preallocated or every=
-thing is allocated
->>>>> because everything was already written to.  69f47505ee added a heur=
-istic
->>>>> to qcow2 to get around this, but I think that=E2=80=99s too much fo=
-r vhdx.  I
->>>>> just left it unfixed, because I don=E2=80=99t care that much, hones=
-tly (and I
->>>>> don=E2=80=99t think anyone else does).
->>>>>
->>>>
->>>> What's the practical outcome of that, and is the limitation document=
-ed
->>>> somewhere?
->>>
->>> The outcome is that it if you preallocate a vhdx image
->>> (subformat=3Dfixed), you=E2=80=99ll see that all sectors contain data=
-, even if
->>> they may be zero sectors on the filesystem level.
->>>
->>> I don=E2=80=99t think it=E2=80=99s user-visible whatsoever.
->>>
->>
->> But it might mean that doing things with sync=3Dtop might over-allocat=
-e
->> data depending on the destination, wouldn't it?
->>
->> That's not crucial, but it's possibly visible, no?
->=20
-> I don=E2=80=99t think it has anything to do with sync=3Dtop because whe=
-ther a
-> block is zero on the protocol level has nothing to do with whether it i=
-s
-> allocated on the format level.
->=20
-> It may make a difference for convert which uses block_status to inquire
-> the zero status.  However, it also does zero-detection, so...
->=20
+On 7/29/19 5:34 PM, Paolo Bonzini wrote:
+> dma_aio_cancel unschedules the BH if there is one, which corresponds
+> to the reschedule_dma case of dma_blk_cb.  This can stall the DMA
+> permanently, because dma_complete will never get invoked and therefore
+> nobody will ever invoke the original AIO callback in dbs->common.cb.
+> 
+> Fix this by invoking the callback (which is ensured to happen after
+> a bdrv_aio_cancel_async, or done manually in the dbs->bh case), and
+> add assertions to check that the DMA state machine is indeed waiting
+> for dma_complete or reschedule_dma, but never both.
+> 
+> Reported-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Oh, okay then. Probably... fine, but I have a nagging doubt relating to
-some of the fallbacks in e.g. qcow2 that tend to inflate zeroes in some
-cases (or used to. Maybe it's been fixed since.)
-
-...but I can't point to anything, so it's fine, and I'm just drawing
-things out for no reason.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
->>>> (I'm fine with not fixing it, I just want it documented somehow.)
->>>
->>> I am really not inclined to start any documentation on the
->>> particularities with which qemu handles vhdx images.
->>>
->>> (Especially so considering we don=E2=80=99t even have any documentati=
-on on the
->>> qcow2 case.  The stress in my paragraph was =E2=80=9Cheuristic=E2=80=9D=
-.  If you
->>> preallocate a qcow2 image, but then discard enough sectors that the
->>> heuristic thinks you didn=E2=80=99t, you=E2=80=99ll have the same eff=
-ect.  Or if you
->>> grow a preallocated image without preallocating the new area.)
->>>
->>> Max
->>>
->>
->> "But our qcow2 docs are also bad" is the kind of argument I can't
->> *really* disagree with, but...
->=20
-> My main argument is that nobody would read the vhdx docs anyway.
->=20
-> Max
->=20
-
-That's the sort of thing I'd like to change, but I guess I haven't
-really made good on that desire in any way, so what good is that?
+No maintainer here, I guess; Paolo will you be pulling this or should I
+do it as part of the other IDE fixes I need to make?
 
 --js
 
