@@ -2,57 +2,92 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6233C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5963C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:30:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7908520673
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:30:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7908520673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6BD3820673
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:30:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nZOLbu5f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BD3820673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxQJp-0004qA-Nb
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 02:30:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54244)
+	id 1hxQKS-0005n0-OT
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 02:30:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54282)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jan.kiszka@siemens.com>) id 1hxQJQ-0004QN-5G
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:29:41 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hxQJx-00059W-D6
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:30:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@siemens.com>) id 1hxQJP-0006z6-41
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:29:40 -0400
-Received: from thoth.sbs.de ([192.35.17.2]:48446)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
- id 1hxQJO-0006wY-QH
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:29:39 -0400
-Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
- by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id x7D6TYrF021230
- (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 13 Aug 2019 08:29:34 +0200
-Received: from [167.87.5.105] ([167.87.5.105])
- by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id x7D6TXxS009720;
- Tue, 13 Aug 2019 08:29:33 +0200
-From: Jan Kiszka <jan.kiszka@siemens.com>
-To: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <776d4705-f554-0c57-b231-ac66056d99f6@siemens.com>
-Date: Tue, 13 Aug 2019 08:29:33 +0200
+ (envelope-from <richard.henderson@linaro.org>) id 1hxQJw-0007JK-Fa
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:30:13 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39811)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hxQJv-0007IV-EC
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:30:11 -0400
+Received: by mail-wm1-x342.google.com with SMTP id i63so394221wmg.4
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 23:30:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ur7nk9rA4m/5Ft7HuFSK0taFXGeexv2FYCfZkOI3uV8=;
+ b=nZOLbu5fqorV+HW4tPQP2Unm+9nDao6OawcGRCXt4KMSc588PY3se0O8IiQQ4sE4+l
+ 9pELB3ioZQifR6hBLnzXuXP69NZMFJuSvvWqc45vo7DgeClGvm7IBzq5Yu+0Q8WZp1rD
+ HFZh68LD1Wr7nkfJnViiQGOOO7y+KeUDugDoQVrMrD311rKdxx8NI+WPiLt8mvXYOsq4
+ RwgKTHMm6OCV4mgG1xQqKJALr0CH//CgHKwhWNPn3fzC/HSEHcnhToru76RFDUwYpEzD
+ jQlIun7ZLcXbGFEenJc1KL87rpzTWdh1/EqrlhXfJfuT/cUFGk8BtdtoQGCXjKPNv9J1
+ RSkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ur7nk9rA4m/5Ft7HuFSK0taFXGeexv2FYCfZkOI3uV8=;
+ b=CZkxorulS1aqVmzHuUWjQ4U/37aLEirQ7Zp82UFcQKZ023DNbdttmxI702wOJA7WmQ
+ pQRMkMSx0ZLqoe+Y/8OQOLQXjQ/ijayljAM+uYi/hdDAyB0gR3Du8fJnARC00NA7mXSl
+ 3hJ5RKrsBc6ukQ4luqXboVQLvMuS3C1oF/4ZtqHWYroYP906nsVoiAm4lQen5uhPMXH4
+ NRk/uki7tieRuZ1hZEI65pFuJNcwIMTuaVoq8ZSvGgK9QeJL0Zvi9Zd5gocZ43cPN/IF
+ G2TRf6Jr83CEpvsvEC2stpAplnpACRAp9d70nvu9s8pffE9vh/JnFrSYXmZXvjAC8Jwf
+ Xz5A==
+X-Gm-Message-State: APjAAAUorjiCSkyDeWG5C0eqzu/WQ8M+9dFTo35UmejSXGnr960yoUT8
+ y7iEHgOUuID1bYS2MZrb/tz6YA==
+X-Google-Smtp-Source: APXvYqyIz66SK0EiXKPEISnQKIpN3FoGPM/mrUAha28gZlFVR+HVq51ydXxcec10mPSipBspI8FD/g==
+X-Received: by 2002:a1c:f415:: with SMTP id z21mr1212120wma.34.1565677809874; 
+ Mon, 12 Aug 2019 23:30:09 -0700 (PDT)
+Received: from ?IPv6:2a02:c7f:a69:1700:8897:9507:94c2:b98d?
+ ([2a02:c7f:a69:1700:8897:9507:94c2:b98d])
+ by smtp.gmail.com with ESMTPSA id m6sm16580245wrq.95.2019.08.12.23.30.09
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 12 Aug 2019 23:30:09 -0700 (PDT)
+To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
+References: <20190810041255.6820-1-jan.bobek@gmail.com>
+ <20190810041255.6820-24-jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <3b2287fd-df92-ecc2-4eaf-e4f01be57be0@linaro.org>
+Date: Tue, 13 Aug 2019 07:30:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190810041255.6820-24-jan.bobek@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 192.35.17.2
-Subject: [Qemu-devel] [PATCH] kvm: vmxcap: Enhance with latest features
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+Subject: Re: [Qemu-devel] [RFC PATCH v2 23/39] target/i386: introduce
+ instruction translator macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,65 +99,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based on SDM from May 2019.
+On 8/10/19 5:12 AM, Jan Bobek wrote:
+> +#define CASES_LEG_NP_0F_W0(opcode)              \
+> +    case opcode | M_0F | W_0:
+> +#define CASES_LEG_NP_0F_W1(opcode)              \
+> +    case opcode | M_0F | W_1:
+> +#define CASES_LEG_F3_0F_W0(opcode)              \
+> +    case opcode | M_0F | P_F3 | W_0:
+> +#define CASES_LEG_F3_0F_W1(opcode)              \
+> +    case opcode | M_0F | P_F3 | W_1:
+> +
+> +#define LEG(p, m, w)                            \
+> +    CASES_LEG_ ## p ## _ ## m ## _W ## w
+> +#define INSN(mnem, cases, opcode, feat)         \
+> +    cases(opcode)                               \
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
----
- scripts/kvm/vmxcap | 8 ++++++++
- 1 file changed, 8 insertions(+)
+It appears as if you don't need the CASES_* macros here.
 
-diff --git a/scripts/kvm/vmxcap b/scripts/kvm/vmxcap
-index 99a8146aaa..d8c7d6dfb8 100755
---- a/scripts/kvm/vmxcap
-+++ b/scripts/kvm/vmxcap
-@@ -178,7 +178,11 @@ controls = [
-             19: 'Conceal non-root operation from PT',
-             20: 'Enable XSAVES/XRSTORS',
-             22: 'Mode-based execute control (XS/XU)',
-+            23: 'Sub-page write permissions',
-+            24: 'GPA translation for PT',
-             25: 'TSC scaling',
-+            26: 'User wait and pause',
-+            28: 'ENCLV exiting',
-             },
-         cap_msr = MSR_IA32_VMX_PROCBASED_CTLS2,
-         ),
-@@ -197,6 +201,7 @@ controls = [
-             22: 'Save VMX-preemption timer value',
-             23: 'Clear IA32_BNDCFGS',
-             24: 'Conceal VM exits from PT',
-+            25: 'Clear IA32_RTIT_CTL',
-             },
-         cap_msr = MSR_IA32_VMX_EXIT_CTLS,
-         true_cap_msr = MSR_IA32_VMX_TRUE_EXIT_CTLS,
-@@ -214,6 +219,7 @@ controls = [
-             15: 'Load IA32_EFER',
-             16: 'Load IA32_BNDCFGS',
-             17: 'Conceal VM entries from PT',
-+            18: 'Load IA32_RTIT_CTL',
-             },
-         cap_msr = MSR_IA32_VMX_ENTRY_CTLS,
-         true_cap_msr = MSR_IA32_VMX_TRUE_ENTRY_CTLS,
-@@ -227,6 +233,7 @@ controls = [
-             6: 'HLT activity state',
-             7: 'Shutdown activity state',
-             8: 'Wait-for-SIPI activity state',
-+            14: 'PT in VMX operation',
-             15: 'IA32_SMBASE support',
-             (16,24): 'Number of CR3-target values',
-             (25,27): 'MSR-load/store count recommendation',
-@@ -249,6 +256,7 @@ controls = [
-             17: '1GB EPT pages',
-             20: 'INVEPT supported',
-             21: 'EPT accessed and dirty flags',
-+            22: 'Advanced VM-exit information for EPT violations',
-             25: 'Single-context INVEPT',
-             26: 'All-context INVEPT',
-             32: 'INVVPID supported',
--- 
-2.16.4
+#define LEG(p, m, w, op) \
+   case P_##p | M_##m | W_##2 | op
+
+#define INSN(mnem, leg, feat) \
+   leg: translate_insn(env, s, CK_CPUID_##feat, gen_insn(mnem));
+
+so long as P_NP is in the enumeration above with value 0.
+
+Unless there's some other reason that opcode needs to stay separate?
+
+
+r~
 
