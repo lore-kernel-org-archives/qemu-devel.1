@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBBCC433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D20C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDE962067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:19:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE962067D
+	by mail.kernel.org (Postfix) with ESMTPS id 7866020844
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:20:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7866020844
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYa2-00056D-S7
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:19:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47550)
+	id 1hxYaf-0006P6-Pz
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:20:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47641)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hxYZF-00047t-M9
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:34 -0400
+ (envelope-from <eblake@redhat.com>) id 1hxYZw-0005Bt-Dw
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hxYZD-0007eY-OM
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:18:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49880)
+ (envelope-from <eblake@redhat.com>) id 1hxYZv-00082Q-Fc
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:19:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57074)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hxYZ9-0007Zx-Pc; Tue, 13 Aug 2019 11:18:27 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hxYZt-000803-BH; Tue, 13 Aug 2019 11:19:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F0060C034E71;
- Tue, 13 Aug 2019 15:18:25 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9D75058;
+ Tue, 13 Aug 2019 15:19:11 +0000 (UTC)
 Received: from [10.3.117.22] (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 59B2110013A1;
- Tue, 13 Aug 2019 15:18:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EE36980FD6;
+ Tue, 13 Aug 2019 15:19:02 +0000 (UTC)
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-2-thuth@redhat.com>
+ <20190813093047.27948-3-thuth@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,21 +70,21 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <04a21d67-7a8b-20bf-2d8c-56d714ebb07d@redhat.com>
-Date: Tue, 13 Aug 2019 10:18:16 -0500
+Message-ID: <fda986ed-af0d-beb8-3721-b7b13155efb5@redhat.com>
+Date: Tue, 13 Aug 2019 10:19:02 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190813093047.27948-2-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-3-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Tue, 13 Aug 2019 15:18:26 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Tue, 13 Aug 2019 15:19:11 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/6] tests/libqos: Make generic virtio code
+Subject: Re: [Qemu-devel] [PATCH 2/6] tests/libqos: Make virtio-pci code
  independent from global_qtest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,8 +109,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb
-Content-Type: multipart/mixed; boundary="7MnpAFX2nFGj8AZzltoL8zo5O24YuFyIu";
+--DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V
+Content-Type: multipart/mixed; boundary="Ovk5PxvTkSG7J0SspjHaR0VCV4jvT8LZz";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
@@ -120,14 +120,14 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
  John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
-Message-ID: <04a21d67-7a8b-20bf-2d8c-56d714ebb07d@redhat.com>
-Subject: Re: [PATCH 1/6] tests/libqos: Make generic virtio code independent
- from global_qtest
+Message-ID: <fda986ed-af0d-beb8-3721-b7b13155efb5@redhat.com>
+Subject: Re: [PATCH 2/6] tests/libqos: Make virtio-pci code independent from
+ global_qtest
 References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-2-thuth@redhat.com>
-In-Reply-To: <20190813093047.27948-2-thuth@redhat.com>
+ <20190813093047.27948-3-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-3-thuth@redhat.com>
 
---7MnpAFX2nFGj8AZzltoL8zo5O24YuFyIu
+--Ovk5PxvTkSG7J0SspjHaR0VCV4jvT8LZz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -135,107 +135,12 @@ Content-Transfer-Encoding: quoted-printable
 On 8/13/19 4:30 AM, Thomas Huth wrote:
 > The libqos library functions should never depend on global_qtest,
 > since these functions might be used in tests that track multiple
-> test states. Pass around a pointer to the QTestState instead.
-
-Thanks for picking up on my initial RFC along these lines a couple years
-ago now; it's taking us a while, but these cleanups are worthwhile.
-
+> test states. So let's use the test state of the QPCIDevice instead.
 >=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
-
-> @@ -193,7 +193,7 @@ void qvring_init(QTestState *qts, const QGuestAlloc=
-ator *alloc, QVirtQueue *vq,
->                   0);
->  }
-> =20
-> -QVRingIndirectDesc *qvring_indirect_desc_setup(QVirtioDevice *d,
-> +QVRingIndirectDesc *qvring_indirect_desc_setup(QTestState *qs, QVirtio=
-Device *d,
->                                          QGuestAllocator *alloc, uint16=
-_t elem)
->  {
-
-Pre-existing, but indentation is off; maybe you want to fix that while he=
-re.
-
-
-> -void qvirtqueue_kick(QVirtioDevice *d, QVirtQueue *vq, uint32_t free_h=
-ead)
-> +void qvirtqueue_kick(QTestState *qts, QVirtioDevice *d, QVirtQueue *vq=
-,
-> +                     uint32_t free_head)
->  {
->      /* vq->avail->idx */
-> -    uint16_t idx =3D readw(vq->avail + 2);
-> +    uint16_t idx =3D qtest_readw(qts, vq->avail + 2);
->      /* vq->used->flags */
->      uint16_t flags;
->      /* vq->used->avail_event */
->      uint16_t avail_event;
-> =20
->      /* vq->avail->ring[idx % vq->size] */
-> -    writew(vq->avail + 4 + (2 * (idx % vq->size)), free_head);
-> +    qtest_writew(qts, vq->avail + 4 + (2 * (idx % vq->size)), free_hea=
-d);
->      /* vq->avail->idx */
-> -    writew(vq->avail + 2, idx + 1);
-> +    qtest_writew(qts, vq->avail + 2, idx + 1);
-> =20
->      /* Must read after idx is updated */
-> -    flags =3D readw(vq->avail);
-> -    avail_event =3D readw(vq->used + 4 +
-> +    flags =3D qtest_readw(qts, vq->avail);
-> +    avail_event =3D qtest_readw(qts, vq->used + 4 +
->                                  sizeof(struct vring_used_elem) * vq->s=
-ize);
-
-Here as well.
-
-> @@ -333,23 +337,25 @@ bool qvirtqueue_get_buf(QVirtQueue *vq, uint32_t =
-*desc_idx, uint32_t *len)
->          sizeof(struct vring_used_elem);
-> =20
->      if (desc_idx) {
-> -        *desc_idx =3D readl(elem_addr + offsetof(struct vring_used_ele=
-m, id));
-> +        *desc_idx =3D qtest_readl(qts, elem_addr +
-> +                                     offsetof(struct vring_used_elem, =
-id));
-
-This one works as-is, although it gives me a double-take when the
-indentation is not right after a ( in the line above.  I probably would
-have written either:
-
-        *desc_idx =3D qtest_readl(qts,
-                                elem_addr + offsetof(struct
-vring_used_elem, id));
-
-or
-
-        *desc_idx =3D qtest_readl(qts, (elem_addr +
-                                      offsetof(struct vring_used_elem,
-id)));
-
-or even introduce a temp variable to bring down the line length.
-
-
-> @@ -131,17 +131,20 @@ void qvirtqueue_cleanup(const QVirtioBus *bus, QV=
-irtQueue *vq,
-> =20
->  void qvring_init(QTestState *qts, const QGuestAllocator *alloc, QVirtQ=
-ueue *vq,
->                   uint64_t addr);
-> -QVRingIndirectDesc *qvring_indirect_desc_setup(QVirtioDevice *d,
-> +QVRingIndirectDesc *qvring_indirect_desc_setup(QTestState *qs, QVirtio=
-Device *d,
->                                          QGuestAllocator *alloc, uint16=
-_t elem);
-
-Another pre-existing odd indentation (here, it looks like line length
-was the reason).
-
-Indentation is minor, so:
+>  tests/libqos/virtio-pci.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -245,24 +150,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---7MnpAFX2nFGj8AZzltoL8zo5O24YuFyIu--
+--Ovk5PxvTkSG7J0SspjHaR0VCV4jvT8LZz--
 
---cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb
+--DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1LgACgkQp6FrSiUn
-Q2pIiwf9G1QH1USeXKAiL+2sbSdY5dyWcFnE6ng++4MzFg+M4shKaeegqb4okOTj
-BnSYm7cdjJfidfraaMKb7e3Mv317VQIVYfzH2qS3BrN3K4ukSzpaOUtzEKfWWAYo
-lSH7TEZjLTApOnNkrH7beLzEArZYF7B50VoP/PQieePIKh/Lqz0YcBjPu2kSmhG6
-+k9l6CcrlBXHfMY64/hOshqFj26VrfQcw3u9qWjMGiHYFXU1VS5MO02xoYS+NWxX
-zheFGvg6xUw/0VPkmPqsCASmrkWqP8knhoWL/w02urEfQADOgjwTk23mGcduln39
-C+XU8khjyy81disVndw5COM5xB6ADQ==
-=AySs
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1OYACgkQp6FrSiUn
+Q2pEswf+NcXyGslKU9kAdNJmpN/Yp+0rYRmGKSiK2ZGlV6izH7GRH0VBiYU83g9U
++XrnS5rVkKmcQuGwXQKS01zMJpHAPNF/G1OmQ07/wUkOuEXmOg7RnIkXUcRb2edh
+f8pJK2YzX96Gs8VRxPH73PlTKpYp2SGo1WtJVd99jlHipJdTmrmhN8GE8UKrj34c
+78Uq2E7cWr93o5J1lpgvYC/InI5LVX8hvu3YcWRje2zFoZDu5ctPZEn9d07F/jP2
+dznR61OEJ8+3X1Un/+05/GtwGb49Rl2wPcFN0upyL1Veumbc6W7yq70V+/ZzcjX/
+9zzXwLL2g8Vrs3l96M0qqEJ3wz1toQ==
+=1Wo9
 -----END PGP SIGNATURE-----
 
---cQqwl0UnpkIGQ1udLXRHD2KQ6Z2x3l7yb--
+--DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V--
 
