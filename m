@@ -2,66 +2,58 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 249D4C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:46:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB23C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:49:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E89B8206C2
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:46:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E89B8206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4FFE4206C2
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 06:49:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FFE4206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxQZv-0000ok-90
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 02:46:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56156)
+	id 1hxQd4-0001zv-6C
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 02:49:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56616)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jfreimann@redhat.com>) id 1hxQZF-0000Oi-9L
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:46:02 -0400
+ (envelope-from <clg@kaod.org>) id 1hxQcN-0001UT-Fk
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1hxQZE-0006No-0X
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:46:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35672)
+ (envelope-from <clg@kaod.org>) id 1hxQcM-0007LH-Ae
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:49:15 -0400
+Received: from 4.mo69.mail-out.ovh.net ([46.105.42.102]:34948)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1hxQZD-0006NJ-Or
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:45:59 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5D97CCCFE8
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 06:45:58 +0000 (UTC)
-Received: from localhost (dhcp-192-230.str.redhat.com [10.33.192.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DDE6A2C2A9;
- Tue, 13 Aug 2019 06:45:50 +0000 (UTC)
-Date: Tue, 13 Aug 2019 08:45:49 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20190813064549.hpcdpwjg57obdsyr@jenstp.localdomain>
-References: <20190802150605.5880-1-jfreimann@redhat.com>
- <20190802150605.5880-4-jfreimann@redhat.com>
- <20190812171854.1c47ddfa.cohuck@redhat.com>
- <20190812152252.2578e60c@x1.home>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hxQcM-0007HL-5F
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 02:49:14 -0400
+Received: from player795.ha.ovh.net (unknown [10.108.57.50])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 186D965B9B
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 08:49:04 +0200 (CEST)
+Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
+ (Authenticated sender: clg@kaod.org)
+ by player795.ha.ovh.net (Postfix) with ESMTPSA id 63BB48BF03E0;
+ Tue, 13 Aug 2019 06:48:57 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Tue, 13 Aug 2019 08:48:53 +0200
+Message-Id: <20190813064853.29310-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20190812152252.2578e60c@x1.home>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Tue, 13 Aug 2019 06:45:58 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 6728377844263062502
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddvhedgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/9] vfio: unplug failover primary device
- before migration
+X-Received-From: 46.105.42.102
+Subject: [Qemu-devel] [PATCH] spapr/xive: Fix migration of hot-plugged CPUs
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,133 +65,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, laine@redhat.com, ailan@redhat.com
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 12, 2019 at 03:22:52PM -0600, Alex Williamson wrote:
->On Mon, 12 Aug 2019 17:18:54 +0200
->Cornelia Huck <cohuck@redhat.com> wrote:
->
->> On Fri,  2 Aug 2019 17:05:59 +0200
->> Jens Freimann <jfreimann@redhat.com> wrote:
->>
->> > As usual block all vfio-pci devices from being migrated, but make an
->> > exception for failover primary devices. This is achieved by setting
->> > unmigratable to 0 but also add a migration blocker for all vfio-pci
->> > devices except failover primary devices. These will be unplugged before
->> > migration happens by the migration handler of the corresponding
->> > virtio-net standby device.
->> >
->> > Signed-off-by: Jens Freimann <jfreimann@redhat.com>
->> > ---
->> >  hw/vfio/pci.c | 24 +++++++++++++++++++++++-
->> >  hw/vfio/pci.h |  1 +
->> >  2 files changed, 24 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
->> > index d6ae9bd4ac..398d26669b 100644
->> > --- a/hw/vfio/pci.c
->> > +++ b/hw/vfio/pci.c
->> > @@ -35,6 +35,9 @@
->> >  #include "pci.h"
->> >  #include "trace.h"
->> >  #include "qapi/error.h"
->> > +#include "migration/blocker.h"
->> > +#include "qemu/option.h"
->> > +#include "qemu/option_int.h"
->> >
->> >  #define TYPE_VFIO_PCI "vfio-pci"
->> >  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
->> > @@ -2693,6 +2696,12 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
->> >      vdev->req_enabled = false;
->> >  }
->> >
->> > +static int has_standby_arg(void *opaque, const char *name,
->> > +                           const char *value, Error **errp)
->> > +{
->> > +    return strcmp(name, "standby") == 0;
->> > +}
->> > +
->> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
->> >  {
->> >      VFIOPCIDevice *vdev = PCI_VFIO(pdev);
->> > @@ -2706,6 +2715,19 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
->> >      int i, ret;
->> >      bool is_mdev;
->> >
->> > +    if (qemu_opt_foreach(pdev->qdev.opts, has_standby_arg,
->> > +                         (void *) pdev->qdev.opts, &err) == 0) {
->> > +        error_setg(&vdev->migration_blocker,
->> > +                "VFIO device doesn't support migration");
->> > +        ret = migrate_add_blocker(vdev->migration_blocker, &err);
->> > +        if (err) {
->> > +            error_propagate(errp, err);
->> > +            error_free(vdev->migration_blocker);
->> > +        }
->> > +    } else {
->> > +        pdev->qdev.allow_unplug_during_migration = true;
->>
->> I think you add this only in the next patch?
->>
->> > +    }
->> > +
->> >      if (!vdev->vbasedev.sysfsdev) {
->> >          if (!(~vdev->host.domain || ~vdev->host.bus ||
->> >                ~vdev->host.slot || ~vdev->host.function)) {
->> > @@ -3148,7 +3170,7 @@ static Property vfio_pci_dev_properties[] = {
->> >
->> >  static const VMStateDescription vfio_pci_vmstate = {
->> >      .name = "vfio-pci",
->> > -    .unmigratable = 1,
->> > +    .unmigratable = 0,
->> >  };
->> >
->> >  static void vfio_pci_dev_class_init(ObjectClass *klass, void *data)
->> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
->> > index 27d58fc55b..0f6f8cb395 100644
->> > --- a/hw/vfio/pci.h
->> > +++ b/hw/vfio/pci.h
->> > @@ -169,6 +169,7 @@ typedef struct VFIOPCIDevice {
->> >      bool no_vfio_ioeventfd;
->> >      bool enable_ramfb;
->> >      VFIODisplay *dpy;
->> > +    Error *migration_blocker;
->> >  } VFIOPCIDevice;
->> >
->> >  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
->>
->> This patch interacts with support for vfio migration (last posted in
->> <1562665760-26158-1-git-send-email-kwankhede@nvidia.com>, I've not seen
->> a later version yet.)
->>
->> With that, we'd have three cases to consider:
->> 1) device is a failover primary
->> 2) device has a migration region
->> 3) none of the above
->>
->> Can 1) and 2) happen simultaneously? If yes, what should take
->> precedence?
->
->Great questions.  I would assume that a user specifying this option
->intends the behavior here regardless of the device's support for
->migration, which could be made more clear and easier to test by adding
->this option to other, otherwise migratable, QEMU NICs.
+The migration sequence of a guest using the XIVE exploitation mode
+relies on the fact that the states of all devices are restored before
+the machine is. This is not true for hot-plug devices such as CPUs
+which state come after the machine. This breaks migration because the
+thread interrupt context registers are not correctly set.
 
-I agree and think it makes sense that if a user intentionally marks a
-device as a primary device of a failover pair then it should override
-the use of an existing migration region of the device.
->
->Also, I thought we agreed that "standby" was not a sufficiently
->descriptive name for this device option and that this option would be
->rejected with an error on non-Ethernet class devices[1].  Thanks,
+Fix migration of hotplugged CPUs by restoring their context in the
+'post_load' handler of the XiveTCTX model.
 
-We did agree on that, sorry. Will fix in next version.
+Fixes: 277dd3d7712a ("spapr/xive: add migration support for KVM")
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/xive.h    |  1 +
+ hw/intc/spapr_xive_kvm.c | 19 +++++++++++++++++--
+ hw/intc/xive.c           | 21 ++++++++++++++++++++-
+ 3 files changed, 38 insertions(+), 3 deletions(-)
 
-regards,
-Jens 
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 4851ff87e795..3ab8439a32f8 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -431,5 +431,6 @@ void kvmppc_xive_source_set_irq(void *opaque, int src=
+no, int val);
+ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp);
+ void kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp);
+ void kvmppc_xive_cpu_get_state(XiveTCTX *tctx, Error **errp);
++void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp);
+=20
+ #endif /* PPC_XIVE_H */
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 3bf8e7a20e14..8898615c69f5 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -72,11 +72,17 @@ static void kvm_cpu_disable_all(void)
+  * XIVE Thread Interrupt Management context (KVM)
+  */
+=20
+-static void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
++void kvmppc_xive_cpu_set_state(XiveTCTX *tctx, Error **errp)
+ {
++    SpaprXive *xive =3D SPAPR_MACHINE(qdev_get_machine())->xive;
+     uint64_t state[2];
+     int ret;
+=20
++    /* The KVM XIVE device is not in use yet */
++    if (xive->fd =3D=3D -1) {
++        return;
++    }
++
+     /* word0 and word1 of the OS ring. */
+     state[0] =3D *((uint64_t *) &tctx->regs[TM_QW1_OS]);
+=20
+@@ -655,7 +661,16 @@ int kvmppc_xive_post_load(SpaprXive *xive, int versi=
+on_id)
+         }
+     }
+=20
+-    /* Restore the thread interrupt contexts */
++    /*
++     * Restore the thread interrupt contexts of initial CPUs.
++     *
++     * The context of hotplugged CPUs is restored later, by the
++     * 'post_load' handler of the XiveTCTX model because they are not
++     * available at the time the SpaprXive 'post_load' method is
++     * called. We can not restore the context of all CPUs in the
++     * 'post_load' handler of XiveTCTX because the machine is not
++     * necessarily connected to the KVM device at that time.
++     */
+     CPU_FOREACH(cs) {
+         PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+=20
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 88f2e560db0f..33d8df3504db 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -628,12 +628,31 @@ static int vmstate_xive_tctx_pre_save(void *opaque)
+     return 0;
+ }
+=20
++static int vmstate_xive_tctx_post_load(void *opaque, int version_id)
++{
++    Error *local_err =3D NULL;
++
++    if (kvm_irqchip_in_kernel()) {
++        /*
++         * Required for hotplugged CPU, for which the state comes
++         * after all states of the machine.
++         */
++        kvmppc_xive_cpu_set_state(XIVE_TCTX(opaque), &local_err);
++        if (local_err) {
++            error_report_err(local_err);
++            return -1;
++        }
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_xive_tctx =3D {
+     .name =3D TYPE_XIVE_TCTX,
+     .version_id =3D 1,
+     .minimum_version_id =3D 1,
+     .pre_save =3D vmstate_xive_tctx_pre_save,
+-    .post_load =3D NULL, /* handled by the sPAPRxive model */
++    .post_load =3D vmstate_xive_tctx_post_load,
+     .fields =3D (VMStateField[]) {
+         VMSTATE_BUFFER(regs, XiveTCTX),
+         VMSTATE_END_OF_LIST()
+--=20
+2.21.0
 
 
