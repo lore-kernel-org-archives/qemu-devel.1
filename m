@@ -2,60 +2,80 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 896F8C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 21:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D77C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:00:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C0332067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 21:56:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C0332067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B368E2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:00:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YS2POwhs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B368E2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxemd-0003Pq-G1
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 17:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48793)
+	id 1hxepu-0004SV-WD
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:00:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49233)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <ehabkost@redhat.com>) id 1hxem7-0002wq-7g
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:56:18 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hxepE-00041H-TZ
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1hxem3-0008LJ-Na
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:56:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48306)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>)
- id 1hxelw-0008K7-7t; Tue, 13 Aug 2019 17:56:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 229B23082E20;
- Tue, 13 Aug 2019 21:56:02 +0000 (UTC)
-Received: from localhost (ovpn-116-32.gru2.redhat.com [10.97.116.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1371B18E35;
- Tue, 13 Aug 2019 21:55:59 +0000 (UTC)
-Date: Tue, 13 Aug 2019 18:55:58 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Tao <tao3.xu@intel.com>
-Message-ID: <20190813215558.GG3908@habkost.net>
+ (envelope-from <alistair23@gmail.com>) id 1hxepB-00011c-8R
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:59:28 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:46862)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hxepA-00011J-MG
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 17:59:25 -0400
+Received: by mail-lf1-x143.google.com with SMTP id n19so9446912lfe.13
+ for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 14:59:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Y+pEK+570qjqe3CggLwzOzVvkyoasw2T8v1oF5R8Vl4=;
+ b=YS2POwhsoSRUKuVJs4xjBft/yW3YO3wG1knuPu+UyFbnzDh7Hzeu92ijXZazHxqd/c
+ ptM7UNpzTR0z3i7IS0a9On4/krbENjeMWlt5dwI9awM8Ntkb3mpW0J1aG5aRkE1Hdo2M
+ xEtL4IfHb42LXBhiIJphofUKjS1B2mMejF2eKf1LfZa0h5AIYObTet14K7I+V0kHhYiW
+ dP9+epRJhZ0cVd/WR4PPYaGN15Z/LDDtFEVHKsyekasOwFmR+fNQF9EvXfQYfND2HnW+
+ DLc2TP5VtQsa476b/uoQgfhXxnmUXMda0yl/NMrKlBm1OIZw+XFyvgJEPStvxltORVyG
+ ldzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Y+pEK+570qjqe3CggLwzOzVvkyoasw2T8v1oF5R8Vl4=;
+ b=qHqL74IMMQwyxrK9WhrSGSwTugMVa2GWzfqoqg4Cb+u16CCMunXjTKWrKhhLayHG/S
+ UJRJAAnl7Rf4h4V6Thqr/eNxXtl7KFGNeLiSXp8zAgquc5/ir+A35agq8vVvd4ohzPOU
+ wVqARHIEuMnbL+V7+4B91MVmnfnzZmpbC5wXtdGkvlxrvmB4El6/KOHwHBuFrTL8o+XU
+ P9Hs5UKuGoJNYRTkhU1roWzoGZ9QdD/zPk/4q4Iy/jy2f7D24hGWt/3wTXe21CjUhl4t
+ NQFp1waQ3kbcIpTIyvA3FAIhImkiQimP27L6V5Pjtu4dyVhnAtufTKf9w/DJGyRJ0KKu
+ 7KaA==
+X-Gm-Message-State: APjAAAV+Bf8S0SJzX2k50JdEolTOxMQ1sOOj8+qjuT4a7Yd/Xdv87XKF
+ Ldg/wo4ehgZh7SagoNpyx1AY6pX14ZdKIKZHUEs=
+X-Google-Smtp-Source: APXvYqxZnCWC+22lR5wLpGMaKWq6Y9d33XsPoRbMhICilS3RND70nahGLsLK0mpfeQocPFIuv0OKcbO48EN+xodvOpM=
+X-Received: by 2002:ac2:563c:: with SMTP id b28mr438664lff.93.1565733563035;
+ Tue, 13 Aug 2019 14:59:23 -0700 (PDT)
+MIME-Version: 1.0
 References: <20190809065731.9097-1-tao3.xu@intel.com>
  <20190809065731.9097-2-tao3.xu@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20190809065731.9097-2-tao3.xu@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Tue, 13 Aug 2019 21:56:02 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 13 Aug 2019 14:55:31 -0700
+Message-ID: <CAKmqyKNBPaGCRW-dFRtitfW97YPy8OsJYxHhVLkKa9qu8ySdrQ@mail.gmail.com>
+To: Tao <tao3.xu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::143
 Subject: Re: [Qemu-devel] [PATCH v9 01/11] hw/arm: simplify arm_load_dtb
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,46 +88,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, imammedo@redhat.com,
- qemu-devel@nongnu.org, daniel@linux.ibm.com,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>,
- Alistair Francis <alistair@alistair23.me>, jingqi.liu@intel.com,
- fan.du@intel.com, Leif Lindholm <leif.lindholm@linaro.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Jan Kiszka <jan.kiszka@web.de>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- jonathan.cameron@huawei.com, dan.j.williams@intel.com,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Andrew Jeffery <andrew@aj.id.au>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, jingqi.liu@intel.com,
+ fan.du@intel.com, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ daniel@linux.ibm.com, Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>, dan.j.williams@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-CCing ARM maintainers.  I'd like to at least get one Acked-by from
-them before queueing this on machine-next.
-
-
-On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
+On Fri, Aug 9, 2019 at 12:01 AM Tao <tao3.xu@intel.com> wrote:
+>
 > From: Tao Xu <tao3.xu@intel.com>
-> 
+>
 > In struct arm_boot_info, kernel_filename, initrd_filename and
 > kernel_cmdline are copied from from MachineState. This patch add
 > MachineState as a parameter into arm_load_dtb() and move the copy chunk
 > of kernel_filename, initrd_filename and kernel_cmdline into
 > arm_load_kernel().
-> 
+>
 > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
 > Suggested-by: Igor Mammedov <imammedo@redhat.com>
 > Signed-off-by: Tao Xu <tao3.xu@intel.com>
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+
+Alistair
+
 > ---
-> 
+>
 > No changes in v9
 > ---
 >  hw/arm/aspeed.c           |  5 +----
@@ -141,7 +150,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >  hw/arm/z2.c               |  8 +-------
 >  include/hw/arm/boot.h     |  4 ++--
 >  30 files changed, 43 insertions(+), 147 deletions(-)
-> 
+>
 > diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
 > index 843b708247..f8733b86b9 100644
 > --- a/hw/arm/aspeed.c
@@ -149,7 +158,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -241,9 +241,6 @@ static void aspeed_board_init(MachineState *machine,
 >          write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort);
 >      }
->  
+>
 > -    aspeed_board_binfo.kernel_filename = machine->kernel_filename;
 > -    aspeed_board_binfo.initrd_filename = machine->initrd_filename;
 > -    aspeed_board_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -159,11 +168,11 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -252,7 +249,7 @@ static void aspeed_board_init(MachineState *machine,
 >          cfg->i2c_init(bmc);
 >      }
->  
+>
 > -    arm_load_kernel(ARM_CPU(first_cpu), &aspeed_board_binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &aspeed_board_binfo);
 >  }
->  
+>
 >  static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
 > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
 > index c2b89b3bb9..ba604f8277 100644
@@ -171,7 +180,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/boot.c
 > @@ -524,7 +524,7 @@ static void fdt_add_psci_node(void *fdt)
 >  }
->  
+>
 >  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
 > -                 hwaddr addr_limit, AddressSpace *as)
 > +                 hwaddr addr_limit, AddressSpace *as, MachineState *ms)
@@ -181,7 +190,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -627,9 +627,9 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
 >          qemu_fdt_add_subnode(fdt, "/chosen");
 >      }
->  
+>
 > -    if (binfo->kernel_cmdline && *binfo->kernel_cmdline) {
 > +    if (ms->kernel_cmdline && *ms->kernel_cmdline) {
 >          rc = qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
@@ -193,7 +202,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -1261,7 +1261,7 @@ static void arm_setup_firmware_boot(ARMCPU *cpu, struct arm_boot_info *info)
 >       */
 >  }
->  
+>
 > -void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
 > +void arm_load_kernel(ARMCPU *cpu, MachineState *ms, struct arm_boot_info *info)
 >  {
@@ -209,10 +218,10 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +    info->initrd_filename = ms->initrd_filename;
 >      info->dtb_filename = qemu_opt_get(qemu_get_machine_opts(), "dtb");
 >      info->dtb_limit = 0;
->  
+>
 > @@ -1294,7 +1296,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
 >      }
->  
+>
 >      if (!info->skip_dtb_autoload && have_dtb(info)) {
 > -        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
 > +        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as, ms) < 0) {
@@ -224,7 +233,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > --- a/hw/arm/collie.c
 > +++ b/hw/arm/collie.c
 > @@ -26,9 +26,6 @@ static struct arm_boot_info collie_binfo = {
->  
+>
 >  static void collie_init(MachineState *machine)
 >  {
 > -    const char *kernel_filename = machine->kernel_filename;
@@ -234,9 +243,9 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      DriveInfo *dinfo;
 >      MemoryRegion *sysmem = get_system_memory();
 > @@ -47,11 +44,8 @@ static void collie_init(MachineState *machine)
->  
+>
 >      sysbus_create_simple("scoop", 0x40800000, NULL);
->  
+>
 > -    collie_binfo.kernel_filename = kernel_filename;
 > -    collie_binfo.kernel_cmdline = kernel_cmdline;
 > -    collie_binfo.initrd_filename = initrd_filename;
@@ -244,7 +253,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(s->cpu, &collie_binfo);
 > +    arm_load_kernel(s->cpu, machine, &collie_binfo);
 >  }
->  
+>
 >  static void collie_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
 > index f7c8a5985a..d992fa087a 100644
@@ -252,7 +261,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/cubieboard.c
 > @@ -72,10 +72,7 @@ static void cubieboard_init(MachineState *machine)
 >      /* TODO create and connect IDE devices for ide_drive_get() */
->  
+>
 >      cubieboard_binfo.ram_size = machine->ram_size;
 > -    cubieboard_binfo.kernel_filename = machine->kernel_filename;
 > -    cubieboard_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -260,7 +269,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(&s->a10->cpu, &cubieboard_binfo);
 > +    arm_load_kernel(&s->a10->cpu, machine, &cubieboard_binfo);
 >  }
->  
+>
 >  static void cubieboard_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
 > index ac0b0dc2a9..da402d5216 100644
@@ -275,24 +284,24 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    exynos4_board_binfo.kernel_cmdline = machine->kernel_cmdline;
 >      exynos4_board_binfo.gic_cpu_if_addr =
 >              EXYNOS4210_SMP_PRIVATE_BASE_ADDR + 0x100;
->  
+>
 > @@ -141,7 +138,7 @@ static void nuri_init(MachineState *machine)
 >  {
 >      exynos4_boards_init_common(machine, EXYNOS4_BOARD_NURI);
->  
+>
 > -    arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &exynos4_board_binfo);
 >  }
->  
+>
 >  static void smdkc210_init(MachineState *machine)
 > @@ -151,7 +148,7 @@ static void smdkc210_init(MachineState *machine)
->  
+>
 >      lan9215_init(SMDK_LAN9118_BASE_ADDR,
 >              qemu_irq_invert(s->soc.irq_table[exynos4210_get_irq(37, 1)]));
 > -    arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &exynos4_board_binfo);
 >  }
->  
+>
 >  static void nuri_class_init(ObjectClass *oc, void *data)
 > diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
 > index def0f1ce6a..1a35b6d82f 100644
@@ -310,7 +319,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      qemu_irq pic[128];
 > @@ -388,9 +385,6 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
 >      /* TODO create and connect IDE devices for ide_drive_get() */
->  
+>
 >      highbank_binfo.ram_size = ram_size;
 > -    highbank_binfo.kernel_filename = kernel_filename;
 > -    highbank_binfo.kernel_cmdline = kernel_cmdline;
@@ -321,11 +330,11 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -410,7 +404,7 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
 >                      "may not boot.");
 >      }
->  
+>
 > -    arm_load_kernel(ARM_CPU(first_cpu), &highbank_binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &highbank_binfo);
 >  }
->  
+>
 >  static void highbank_init(MachineState *machine)
 > diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
 > index 5d673e47bc..c76fc2bd94 100644
@@ -333,7 +342,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/imx25_pdk.c
 > @@ -116,9 +116,6 @@ static void imx25_pdk_init(MachineState *machine)
 >      }
->  
+>
 >      imx25_pdk_binfo.ram_size = machine->ram_size;
 > -    imx25_pdk_binfo.kernel_filename = machine->kernel_filename;
 > -    imx25_pdk_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -349,7 +358,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +        arm_load_kernel(&s->soc.cpu, machine, &imx25_pdk_binfo);
 >      }
 >  }
->  
+>
 > diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
 > index 200c0107f0..4d9e9c9e49 100644
 > --- a/hw/arm/integratorcp.c
@@ -366,7 +375,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      MemoryRegion *address_space_mem = get_system_memory();
 > @@ -650,10 +647,7 @@ static void integratorcp_init(MachineState *machine)
 >      sysbus_create_simple("pl110", 0xc0000000, pic[22]);
->  
+>
 >      integrator_binfo.ram_size = ram_size;
 > -    integrator_binfo.kernel_filename = kernel_filename;
 > -    integrator_binfo.kernel_cmdline = kernel_cmdline;
@@ -374,7 +383,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(cpu, &integrator_binfo);
 > +    arm_load_kernel(cpu, machine, &integrator_binfo);
 >  }
->  
+>
 >  static void integratorcp_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
 > index 59d2102dc5..5ff419a555 100644
@@ -382,19 +391,19 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/kzm.c
 > @@ -126,13 +126,10 @@ static void kzm_init(MachineState *machine)
 >      }
->  
+>
 >      kzm_binfo.ram_size = machine->ram_size;
 > -    kzm_binfo.kernel_filename = machine->kernel_filename;
 > -    kzm_binfo.kernel_cmdline = machine->kernel_cmdline;
 > -    kzm_binfo.initrd_filename = machine->initrd_filename;
 >      kzm_binfo.nb_cpus = 1;
->  
+>
 >      if (!qtest_enabled()) {
 > -        arm_load_kernel(&s->soc.cpu, &kzm_binfo);
 > +        arm_load_kernel(&s->soc.cpu, machine, &kzm_binfo);
 >      }
 >  }
->  
+>
 > diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
 > index cd1f904c6c..c76cfb5dd1 100644
 > --- a/hw/arm/mainstone.c
@@ -402,7 +411,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -177,11 +177,8 @@ static void mainstone_common_init(MemoryRegion *address_space_mem,
 >      smc91c111_init(&nd_table[0], MST_ETH_PHYS,
 >                      qdev_get_gpio_in(mst_irq, ETHERNET_IRQ));
->  
+>
 > -    mainstone_binfo.kernel_filename = machine->kernel_filename;
 > -    mainstone_binfo.kernel_cmdline = machine->kernel_cmdline;
 > -    mainstone_binfo.initrd_filename = machine->initrd_filename;
@@ -410,7 +419,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(mpu->cpu, &mainstone_binfo);
 > +    arm_load_kernel(mpu->cpu, machine, &mainstone_binfo);
 >  }
->  
+>
 >  static void mainstone_init(MachineState *machine)
 > diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
 > index 1f6f4aed97..e8a9b03069 100644
@@ -425,16 +434,16 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -        .initrd_filename = machine->initrd_filename,
 >          .nb_cpus = machine->smp.cpus,
 >      };
->  
+>
 > @@ -71,7 +68,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
 >      }
->  
+>
 >      if (!qtest_enabled()) {
 > -        arm_load_kernel(&s->soc.cpu, &boot_info);
 > +        arm_load_kernel(&s->soc.cpu, machine, &boot_info);
 >      }
 >  }
->  
+>
 > diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
 > index 72eab03a0c..3123d8767f 100644
 > --- a/hw/arm/mcimx7d-sabre.c
@@ -448,22 +457,22 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -        .initrd_filename = machine->initrd_filename,
 >          .nb_cpus = machine->smp.cpus,
 >      };
->  
+>
 > @@ -74,7 +71,7 @@ static void mcimx7d_sabre_init(MachineState *machine)
 >      }
->  
+>
 >      if (!qtest_enabled()) {
 > -        arm_load_kernel(&s->soc.cpu[0], &boot_info);
 > +        arm_load_kernel(&s->soc.cpu[0], machine, &boot_info);
 >      }
 >  }
->  
+>
 > diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
 > index 95d56f3208..a53ee12737 100644
 > --- a/hw/arm/musicpal.c
 > +++ b/hw/arm/musicpal.c
 > @@ -1568,9 +1568,6 @@ static struct arm_boot_info musicpal_binfo = {
->  
+>
 >  static void musicpal_init(MachineState *machine)
 >  {
 > -    const char *kernel_filename = machine->kernel_filename;
@@ -474,7 +483,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      DeviceState *dev;
 > @@ -1699,10 +1696,7 @@ static void musicpal_init(MachineState *machine)
 >      sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
->  
+>
 >      musicpal_binfo.ram_size = MP_RAM_DEFAULT_SIZE;
 > -    musicpal_binfo.kernel_filename = kernel_filename;
 > -    musicpal_binfo.kernel_cmdline = kernel_cmdline;
@@ -482,14 +491,14 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(cpu, &musicpal_binfo);
 > +    arm_load_kernel(cpu, machine, &musicpal_binfo);
 >  }
->  
+>
 >  static void musicpal_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
 > index 4a79f5c88b..31dd2f1b51 100644
 > --- a/hw/arm/nseries.c
 > +++ b/hw/arm/nseries.c
 > @@ -1358,10 +1358,7 @@ static void n8x0_init(MachineState *machine,
->  
+>
 >      if (machine->kernel_filename) {
 >          /* Or at the linux loader.  */
 > -        binfo->kernel_filename = machine->kernel_filename;
@@ -497,7 +506,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -        binfo->initrd_filename = machine->initrd_filename;
 > -        arm_load_kernel(s->mpu->cpu, binfo);
 > +        arm_load_kernel(s->mpu->cpu, machine, binfo);
->  
+>
 >          qemu_register_reset(n8x0_boot_init, s);
 >      }
 > diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
@@ -506,14 +515,14 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/omap_sx1.c
 > @@ -196,10 +196,7 @@ static void sx1_init(MachineState *machine, const int version)
 >      }
->  
+>
 >      /* Load the kernel.  */
 > -    sx1_binfo.kernel_filename = machine->kernel_filename;
 > -    sx1_binfo.kernel_cmdline = machine->kernel_cmdline;
 > -    sx1_binfo.initrd_filename = machine->initrd_filename;
 > -    arm_load_kernel(mpu->cpu, &sx1_binfo);
 > +    arm_load_kernel(mpu->cpu, machine, &sx1_binfo);
->  
+>
 >      /* TODO: fix next line */
 >      //~ qemu_console_resize(ds, 640, 480);
 > diff --git a/hw/arm/palm.c b/hw/arm/palm.c
@@ -521,7 +530,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > --- a/hw/arm/palm.c
 > +++ b/hw/arm/palm.c
 > @@ -186,9 +186,6 @@ static struct arm_boot_info palmte_binfo = {
->  
+>
 >  static void palmte_init(MachineState *machine)
 >  {
 > -    const char *kernel_filename = machine->kernel_filename;
@@ -533,13 +542,13 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -248,16 +245,13 @@ static void palmte_init(MachineState *machine)
 >          }
 >      }
->  
+>
 > -    if (!rom_loaded && !kernel_filename && !qtest_enabled()) {
 > +    if (!rom_loaded && !machine->kernel_filename && !qtest_enabled()) {
 >          fprintf(stderr, "Kernel or ROM image must be specified\n");
 >          exit(1);
 >      }
->  
+>
 >      /* Load the kernel.  */
 > -    palmte_binfo.kernel_filename = kernel_filename;
 > -    palmte_binfo.kernel_cmdline = kernel_cmdline;
@@ -547,14 +556,14 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(mpu->cpu, &palmte_binfo);
 > +    arm_load_kernel(mpu->cpu, machine, &palmte_binfo);
 >  }
->  
+>
 >  static void palmte_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
 > index 5b2620acb4..74c062d05e 100644
 > --- a/hw/arm/raspi.c
 > +++ b/hw/arm/raspi.c
 > @@ -157,13 +157,9 @@ static void setup_boot(MachineState *machine, int version, size_t ram_size)
->  
+>
 >          binfo.entry = firmware_addr;
 >          binfo.firmware_loaded = true;
 > -    } else {
@@ -562,11 +571,11 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -        binfo.kernel_cmdline = machine->kernel_cmdline;
 > -        binfo.initrd_filename = machine->initrd_filename;
 >      }
->  
+>
 > -    arm_load_kernel(ARM_CPU(first_cpu), &binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
 >  }
->  
+>
 >  static void raspi_init(MachineState *machine, int version)
 > diff --git a/hw/arm/realview.c b/hw/arm/realview.c
 > index 7c56c8d2ed..5a3e65ddd6 100644
@@ -574,7 +583,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/realview.c
 > @@ -350,13 +350,10 @@ static void realview_init(MachineState *machine,
 >      memory_region_add_subregion(sysmem, SMP_BOOT_ADDR, ram_hack);
->  
+>
 >      realview_binfo.ram_size = ram_size;
 > -    realview_binfo.kernel_filename = machine->kernel_filename;
 > -    realview_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -585,7 +594,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(ARM_CPU(first_cpu), &realview_binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &realview_binfo);
 >  }
->  
+>
 >  static void realview_eb_init(MachineState *machine)
 > diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
 > index 934f4c9261..8f4b68e14c 100644
@@ -593,7 +602,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/sabrelite.c
 > @@ -102,16 +102,13 @@ static void sabrelite_init(MachineState *machine)
 >      }
->  
+>
 >      sabrelite_binfo.ram_size = machine->ram_size;
 > -    sabrelite_binfo.kernel_filename = machine->kernel_filename;
 > -    sabrelite_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -602,20 +611,20 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      sabrelite_binfo.secure_boot = true;
 >      sabrelite_binfo.write_secondary_boot = sabrelite_write_secondary;
 >      sabrelite_binfo.secondary_cpu_reset_hook = sabrelite_reset_secondary;
->  
+>
 >      if (!qtest_enabled()) {
 > -        arm_load_kernel(&s->soc.cpu[0], &sabrelite_binfo);
 > +        arm_load_kernel(&s->soc.cpu[0], machine, &sabrelite_binfo);
 >      }
 >  }
->  
+>
 > diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
 > index 9c67d5c6f9..2aba3c58c5 100644
 > --- a/hw/arm/sbsa-ref.c
 > +++ b/hw/arm/sbsa-ref.c
 > @@ -709,13 +709,12 @@ static void sbsa_ref_init(MachineState *machine)
 >      create_pcie(sms, pic);
->  
+>
 >      sms->bootinfo.ram_size = machine->ram_size;
 > -    sms->bootinfo.kernel_filename = machine->kernel_filename;
 >      sms->bootinfo.nb_cpus = smp_cpus;
@@ -626,7 +635,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(ARM_CPU(first_cpu), &sms->bootinfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &sms->bootinfo);
 >  }
->  
+>
 >  static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
 > diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
 > index 723cf5d592..42338696b3 100644
@@ -635,7 +644,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -951,11 +951,8 @@ static void spitz_common_init(MachineState *machine,
 >          /* A 4.0 GB microdrive is permanently sitting in CF slot 0.  */
 >          spitz_microdrive_attach(mpu, 0);
->  
+>
 > -    spitz_binfo.kernel_filename = machine->kernel_filename;
 > -    spitz_binfo.kernel_cmdline = machine->kernel_cmdline;
 > -    spitz_binfo.initrd_filename = machine->initrd_filename;
@@ -644,13 +653,13 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +    arm_load_kernel(mpu->cpu, machine, &spitz_binfo);
 >      sl_bootparam_write(SL_PXA_PARAM_BASE);
 >  }
->  
+>
 > diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
 > index 7843d68d46..3a1de81278 100644
 > --- a/hw/arm/tosa.c
 > +++ b/hw/arm/tosa.c
 > @@ -218,9 +218,6 @@ static struct arm_boot_info tosa_binfo = {
->  
+>
 >  static void tosa_init(MachineState *machine)
 >  {
 > -    const char *kernel_filename = machine->kernel_filename;
@@ -660,9 +669,9 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      MemoryRegion *rom = g_new(MemoryRegion, 1);
 >      PXA2xxState *mpu;
 > @@ -245,11 +242,8 @@ static void tosa_init(MachineState *machine)
->  
+>
 >      tosa_tg_init(mpu);
->  
+>
 > -    tosa_binfo.kernel_filename = kernel_filename;
 > -    tosa_binfo.kernel_cmdline = kernel_cmdline;
 > -    tosa_binfo.initrd_filename = initrd_filename;
@@ -671,14 +680,14 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +    arm_load_kernel(mpu->cpu, machine, &tosa_binfo);
 >      sl_bootparam_write(SL_PXA_PARAM_BASE);
 >  }
->  
+>
 > diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
 > index e5857117ac..d3c3c00f55 100644
 > --- a/hw/arm/versatilepb.c
 > +++ b/hw/arm/versatilepb.c
 > @@ -373,11 +373,8 @@ static void versatile_init(MachineState *machine, int board_id)
 >      }
->  
+>
 >      versatile_binfo.ram_size = machine->ram_size;
 > -    versatile_binfo.kernel_filename = machine->kernel_filename;
 > -    versatile_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -687,7 +696,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(cpu, &versatile_binfo);
 > +    arm_load_kernel(cpu, machine, &versatile_binfo);
 >  }
->  
+>
 >  static void vpb_init(MachineState *machine)
 > diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
 > index 5d932c27c0..4673a88a8d 100644
@@ -695,7 +704,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/vexpress.c
 > @@ -707,9 +707,6 @@ static void vexpress_common_init(MachineState *machine)
 >      }
->  
+>
 >      daughterboard->bootinfo.ram_size = machine->ram_size;
 > -    daughterboard->bootinfo.kernel_filename = machine->kernel_filename;
 > -    daughterboard->bootinfo.kernel_cmdline = machine->kernel_cmdline;
@@ -710,7 +719,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(ARM_CPU(first_cpu), &daughterboard->bootinfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &daughterboard->bootinfo);
 >  }
->  
+>
 >  static bool vexpress_get_secure(Object *obj, Error **errp)
 > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
 > index d9496c9363..6ffb80bf5b 100644
@@ -732,10 +741,10 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as, ms) < 0) {
 >          exit(1);
 >      }
->  
+>
 > @@ -1707,16 +1708,13 @@ static void machvirt_init(MachineState *machine)
 >      create_platform_bus(vms, pic);
->  
+>
 >      vms->bootinfo.ram_size = machine->ram_size;
 > -    vms->bootinfo.kernel_filename = machine->kernel_filename;
 > -    vms->bootinfo.kernel_cmdline = machine->kernel_cmdline;
@@ -748,7 +757,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      vms->bootinfo.firmware_loaded = firmware_loaded;
 > -    arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &vms->bootinfo);
->  
+>
 >      vms->machine_done.notify = virt_machine_done;
 >      qemu_add_machine_init_done_notifier(&vms->machine_done);
 > diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
@@ -767,7 +776,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
 > @@ -303,16 +300,13 @@ static void zynq_init(MachineState *machine)
 >      sysbus_mmio_map(busdev, 0, 0xF8007000);
->  
+>
 >      zynq_binfo.ram_size = ram_size;
 > -    zynq_binfo.kernel_filename = kernel_filename;
 > -    zynq_binfo.kernel_cmdline = kernel_cmdline;
@@ -777,11 +786,11 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >      zynq_binfo.loader_start = 0;
 >      zynq_binfo.board_setup_addr = BOARD_SETUP_ADDR;
 >      zynq_binfo.write_board_setup = zynq_write_board_setup;
->  
+>
 > -    arm_load_kernel(ARM_CPU(first_cpu), &zynq_binfo);
 > +    arm_load_kernel(ARM_CPU(first_cpu), machine, &zynq_binfo);
 >  }
->  
+>
 >  static void zynq_machine_init(MachineClass *mc)
 > diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
 > index f95fde2309..462493c467 100644
@@ -789,7 +798,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/xlnx-versal-virt.c
 > @@ -441,14 +441,11 @@ static void versal_virt_init(MachineState *machine)
 >                                          0, &s->soc.fpd.apu.mr, 0);
->  
+>
 >      s->binfo.ram_size = machine->ram_size;
 > -    s->binfo.kernel_filename = machine->kernel_filename;
 > -    s->binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -818,7 +827,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > +++ b/hw/arm/xlnx-zcu102.c
 > @@ -171,11 +171,8 @@ static void xlnx_zcu102_init(MachineState *machine)
 >      /* TODO create and connect IDE devices for ide_drive_get() */
->  
+>
 >      xlnx_zcu102_binfo.ram_size = ram_size;
 > -    xlnx_zcu102_binfo.kernel_filename = machine->kernel_filename;
 > -    xlnx_zcu102_binfo.kernel_cmdline = machine->kernel_cmdline;
@@ -827,14 +836,14 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(s->soc.boot_cpu_ptr, &xlnx_zcu102_binfo);
 > +    arm_load_kernel(s->soc.boot_cpu_ptr, machine, &xlnx_zcu102_binfo);
 >  }
->  
+>
 >  static void xlnx_zcu102_machine_instance_init(Object *obj)
 > diff --git a/hw/arm/z2.c b/hw/arm/z2.c
 > index 44aa748d39..2f21421683 100644
 > --- a/hw/arm/z2.c
 > +++ b/hw/arm/z2.c
 > @@ -296,9 +296,6 @@ static const TypeInfo aer915_info = {
->  
+>
 >  static void z2_init(MachineState *machine)
 >  {
 > -    const char *kernel_filename = machine->kernel_filename;
@@ -846,7 +855,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > @@ -352,11 +349,8 @@ static void z2_init(MachineState *machine)
 >      qdev_connect_gpio_out(mpu->gpio, Z2_GPIO_LCD_CS,
 >                            qemu_allocate_irq(z2_lcd_cs, z2_lcd, 0));
->  
+>
 > -    z2_binfo.kernel_filename = kernel_filename;
 > -    z2_binfo.kernel_cmdline = kernel_cmdline;
 > -    z2_binfo.initrd_filename = initrd_filename;
@@ -854,7 +863,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 > -    arm_load_kernel(mpu->cpu, &z2_binfo);
 > +    arm_load_kernel(mpu->cpu, machine, &z2_binfo);
 >  }
->  
+>
 >  static void z2_machine_init(MachineClass *mc)
 > diff --git a/include/hw/arm/boot.h b/include/hw/arm/boot.h
 > index c48cc4c2bc..2673abe81f 100644
@@ -866,7 +875,7 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >   */
 > -void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info);
 > +void arm_load_kernel(ARMCPU *cpu, MachineState *ms, struct arm_boot_info *info);
->  
+>
 >  AddressSpace *arm_boot_address_space(ARMCPU *cpu,
 >                                       const struct arm_boot_info *info);
 > @@ -160,7 +160,7 @@ AddressSpace *arm_boot_address_space(ARMCPU *cpu,
@@ -875,14 +884,11 @@ On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
 >  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
 > -                 hwaddr addr_limit, AddressSpace *as);
 > +                 hwaddr addr_limit, AddressSpace *as, MachineState *ms);
->  
+>
 >  /* Write a secure board setup routine with a dummy handler for SMCs */
 >  void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
-> -- 
+> --
 > 2.20.1
-> 
-> 
-
--- 
-Eduardo
+>
+>
 
