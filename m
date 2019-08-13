@@ -2,49 +2,49 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A551C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2675C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:52:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DA302063F
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:50:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DA302063F
+	by mail.kernel.org (Postfix) with ESMTPS id 864DE20644
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 22:52:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 864DE20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55997 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxfcd-0004BI-Fp
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:50:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56078)
+	id 1hxfe7-0005B8-O5
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 18:52:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56322)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <jsnow@redhat.com>) id 1hxfc9-0003bo-8c
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:50:02 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxfdY-0004i1-GP
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxfc8-0004rt-Cn
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:50:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36614)
+ (envelope-from <jsnow@redhat.com>) id 1hxfdX-0005T5-Er
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:51:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37332)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1hxfc8-0004rh-50
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 18:50:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hxfdU-0005SF-V9; Tue, 13 Aug 2019 18:51:25 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6E31285360
- for <qemu-devel@nongnu.org>; Tue, 13 Aug 2019 22:49:59 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 25CC430860CA;
+ Tue, 13 Aug 2019 22:51:24 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DD60C3605;
- Tue, 13 Aug 2019 22:49:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A88D910016E9;
+ Tue, 13 Aug 2019 22:51:23 +0000 (UTC)
+To: shaju.abraham@nutanix.com, qemu-devel@nongnu.org
+References: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
 From: John Snow <jsnow@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20190729213416.1972-1-pbonzini@redhat.com>
- <b1135640-3e01-6e25-ecd0-375d57acb901@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -120,22 +120,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <fe1102a8-b36e-c123-6372-ebad4b9c4394@redhat.com>
-Date: Tue, 13 Aug 2019 18:49:58 -0400
+Message-ID: <9d75160a-1355-81ce-c9ec-2994c1781643@redhat.com>
+Date: Tue, 13 Aug 2019 18:51:23 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <b1135640-3e01-6e25-ecd0-375d57acb901@redhat.com>
+In-Reply-To: <1562554503-177179-1-git-send-email-shaju.abraham@nutanix.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Tue, 13 Aug 2019 22:49:59 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Tue, 13 Aug 2019 22:51:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] dma-helpers: ensure AIO callback is
- invoked after cancellation
+Subject: Re: [Qemu-devel] [PATCH] Fix Guest VM crash due to iSCSI Sense Key
+ error
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,34 +147,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/13/19 6:40 PM, John Snow wrote:
+On 7/7/19 10:55 PM, shaju.abraham@nutanix.com wrote:
+> From: Shaju Abraham <shaju.abraham@nutanix.com>
 > 
+> During the  IDE DMA transfer for a ISCSI target,when libiscsi encounters
+> a SENSE KEY error, it sets the task->sense to  the value "COMMAND ABORTED".
+> The function iscsi_translate_sense() later translaters this error to -ECANCELED
+> and this value is passed to the callback function. In the case of  IDE DMA read
+> or write, the callback function returns immediately if the value of the ret
+> argument is -ECANCELED.
+> Later when ide_cancel_dma_sync() function is invoked  the assertion
+> "s->bus->dma->aiocb == ((void *)0)" fails and the qemu process gets terminated.
+> Fix the issue by making the value of s->bus->dma->aiocb = NULL when
+> -ECANCELED is passed to the callback.
 > 
-> On 7/29/19 5:34 PM, Paolo Bonzini wrote:
->> dma_aio_cancel unschedules the BH if there is one, which corresponds
->> to the reschedule_dma case of dma_blk_cb.  This can stall the DMA
->> permanently, because dma_complete will never get invoked and therefore
->> nobody will ever invoke the original AIO callback in dbs->common.cb.
->>
->> Fix this by invoking the callback (which is ensured to happen after
->> a bdrv_aio_cancel_async, or done manually in the dbs->bh case), and
->> add assertions to check that the DMA state machine is indeed waiting
->> for dma_complete or reschedule_dma, but never both.
->>
->> Reported-by: John Snow <jsnow@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
+> ---
+>  hw/ide/core.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> No maintainer here, I guess; Paolo will you be pulling this or should I
-> do it as part of the other IDE fixes I need to make?
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 6afadf8..78ea357 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -841,6 +841,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>      bool stay_active = false;
+>  
+>      if (ret == -ECANCELED) {
+> +        s->bus->dma->aiocb = NULL;
+>          return;
+>      }
+>  
 > 
 
-Nevermind, I made a decision.
+Hopefully just as adequately addressed by the patches in
+
+https://github.com/jnsnow/qemu/commits/ide
+
+but if you wanted to give it a test and confirm for me, I wouldn't be
+upset by that.
 
 --js
 
