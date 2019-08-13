@@ -2,49 +2,49 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C64C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C4A9C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 20:48:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 024D22067D
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:35:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 024D22067D
+	by mail.kernel.org (Postfix) with ESMTPS id ECA5020665
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 20:48:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECA5020665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxcaL-0002vs-UZ
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 15:35:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52463)
+	id 1hxdif-0008Ka-1c
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 16:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60919)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxcZl-0002Sd-MJ
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:35:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxdhn-00073M-TQ
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 16:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxcZk-0005L1-Ow
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:35:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32898)
+ (envelope-from <mreitz@redhat.com>) id 1hxdhm-0002S9-U6
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 16:47:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61019)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxcZf-0005IC-Cb; Tue, 13 Aug 2019 15:35:16 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hxdhi-0002PR-Pc; Tue, 13 Aug 2019 16:47:39 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1BC198E597;
- Tue, 13 Aug 2019 19:35:14 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4EDE085546;
+ Tue, 13 Aug 2019 20:47:36 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E74810016E9;
- Tue, 13 Aug 2019 19:35:08 +0000 (UTC)
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
- kraxel@redhat.com, kevin@koconnor.net
-References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 25AAB4510;
+ Tue, 13 Aug 2019 20:47:31 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
+ <20190730141826.709849-2-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,21 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3f9009fc-b478-60e1-dbcd-7782336c26e7@redhat.com>
-Date: Tue, 13 Aug 2019 21:35:06 +0200
+Message-ID: <565ee3a9-d606-cc64-3748-21f9c54cffb7@redhat.com>
+Date: Tue, 13 Aug 2019 22:47:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190730141826.709849-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DWer4nmGtEkLkR3j0GQdckceGUPm6geVF"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ boundary="MDT5Acitqyevr4eLcODZAcALXm5LDj5TC"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Tue, 13 Aug 2019 19:35:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Tue, 13 Aug 2019 20:47:36 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 0/8] Add Qemu to SeaBIOS LCHS
- interface
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] block: introduce aio task pool
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,81 +97,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liran.alon@oracle.com, karl.heubaum@oracle.com, arbel.moshe@oracle.com
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DWer4nmGtEkLkR3j0GQdckceGUPm6geVF
-Content-Type: multipart/mixed; boundary="WEOWzJqS9ZRtmag05GohvfXNlQq8eNIx4";
+--MDT5Acitqyevr4eLcODZAcALXm5LDj5TC
+Content-Type: multipart/mixed; boundary="i6CpnHsO9waPxWizlDlVYwqisw0NCIbUK";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
- kraxel@redhat.com, kevin@koconnor.net
-Cc: karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
-Message-ID: <3f9009fc-b478-60e1-dbcd-7782336c26e7@redhat.com>
-Subject: Re: [QEMU] [PATCH v5 0/8] Add Qemu to SeaBIOS LCHS interface
-References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com, kwolf@redhat.com, den@openvz.org,
+ stefanha@redhat.com
+Message-ID: <565ee3a9-d606-cc64-3748-21f9c54cffb7@redhat.com>
+Subject: Re: [PATCH v2 1/4] block: introduce aio task pool
+References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
+ <20190730141826.709849-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190730141826.709849-2-vsementsov@virtuozzo.com>
 
---WEOWzJqS9ZRtmag05GohvfXNlQq8eNIx4
+--i6CpnHsO9waPxWizlDlVYwqisw0NCIbUK
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 26.06.19 14:39, Sam Eiderman wrote:
-> v1:
+On 30.07.19 16:18, Vladimir Sementsov-Ogievskiy wrote:
+> Common interface for aio task loops. To be used for improving
+> performance of synchronous io loops in qcow2, block-stream,
+> copy-on-read, and may be other places.
 >=20
-> Non-standard logical geometries break under QEMU.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+
+Looks good to me overall.
+
+>  block/aio_task.h    |  52 +++++++++++++++++++
+
+I=E2=80=99ve move this to include/block/.
+
+>  block/aio_task.c    | 119 ++++++++++++++++++++++++++++++++++++++++++++=
+
+>  block/Makefile.objs |   2 +
+>  3 files changed, 173 insertions(+)
+>  create mode 100644 block/aio_task.h
+>  create mode 100644 block/aio_task.c
 >=20
-> A virtual disk which contains an operating system which depends on
-> logical geometries (consistent values being reported from BIOS INT13
-> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standa=
-rd
-> logical geometries - for example 56 SPT (sectors per track).
-> No matter what QEMU will guess - SeaBIOS, for large enough disks - will=
+> diff --git a/block/aio_task.h b/block/aio_task.h
+> new file mode 100644
+> index 0000000000..933af1d8e7
+> --- /dev/null
+> +++ b/block/aio_task.h
 
-> use LBA translation, which will report 63 SPT instead.
->=20
-> In addition we can not enforce SeaBIOS to rely on phyiscal geometries a=
-t
-> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
-> report more than 16 physical heads when moved to an IDE controller, the=
+[...]
 
-> ATA spec allows a maximum of 16 heads - this is an artifact of
-> virtualization.
->=20
-> By supplying the logical geometies directly we are able to support such=
+> +typedef struct AioTaskPool AioTaskPool;
+> +typedef struct AioTask AioTask;
+> +typedef int (*AioTaskFunc)(AioTask *task);
 
-> "exotic" disks.
->=20
-> We will use fw_cfg to do just that.
++coroutine_fn
 
-(From a block perspective,) I didn=E2=80=99t find anything too bad, so:
+> +struct AioTask {
+> +    AioTaskPool *pool;
+> +    AioTaskFunc func;
+> +    int ret;
+> +};
+> +
+> +/*
+> + * aio_task_pool_new
+> + *
+> + * The caller is responsible to g_free AioTaskPool pointer after use.
 
-Acked-by: Max Reitz <mreitz@redhat.com>
+s/to g_free/for g_freeing/ or something similar.
+
+Or you=E2=80=99d just add aio_task_pool_free().
+
+> + */
+> +AioTaskPool *aio_task_pool_new(int max_busy_tasks);
+> +int aio_task_pool_status(AioTaskPool *pool);
+
+A comment wouldn=E2=80=99t hurt.  It wasn=E2=80=99t immediately clear to =
+me that status
+refers to the error code of a failing task (or 0), although it wasn=E2=80=
+=99t
+too much of a surprise either.
+
+> +bool aio_task_pool_empty(AioTaskPool *pool);
+> +void aio_task_pool_start_task(AioTaskPool *pool, AioTask *task);
+
+Maybe make a note that task->pool will be set automatically?
+
+> +void aio_task_pool_wait_slot(AioTaskPool *pool);
+> +void aio_task_pool_wait_one(AioTaskPool *pool);
+> +void aio_task_pool_wait_all(AioTaskPool *pool);
+
+Shouldn=E2=80=99t all of these but aio_task_pool_empty() and
+aio_task_pool_status() be coroutine_fns?
+
+> +#endif /* BLOCK_AIO_TASK_H */
+> diff --git a/block/aio_task.c b/block/aio_task.c
+> new file mode 100644
+> index 0000000000..807be8deb5
+> --- /dev/null
+> +++ b/block/aio_task.c
+
+[...]
+
+> +static void aio_task_co(void *opaque)
+
++coroutine_fn
+
+[...]
+
+> +void aio_task_pool_wait_one(AioTaskPool *pool)
+> +{
+> +    assert(pool->busy_tasks > 0);
+> +    assert(qemu_coroutine_self() =3D=3D pool->main_co);
+> +
+> +    pool->wait_done =3D true;
+
+Hmmm, but the wait actually isn=E2=80=99t done yet. :-)
+
+Maybe s/wait_done/waiting/?
+
+Max
+
+> +    qemu_coroutine_yield();
+> +
+> +    assert(!pool->wait_done);
+> +    assert(pool->busy_tasks < pool->max_busy_tasks);
+> +}
 
 
---WEOWzJqS9ZRtmag05GohvfXNlQq8eNIx4--
+--i6CpnHsO9waPxWizlDlVYwqisw0NCIbUK--
 
---DWer4nmGtEkLkR3j0GQdckceGUPm6geVF
+--MDT5Acitqyevr4eLcODZAcALXm5LDj5TC
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TEOoACgkQ9AfbAGHV
-z0De0wgAlf8VnM17uoVg8wA/DUSLOLjTEw/blK7v1+rQbmu9PmeG/smqmGwxJkCU
-b/fqeDUb6EBgj19O3CGaq6AjPo276PvjXE8itOuK5dR6WeJDHU/rQLcX6LVlSdJx
-Ax7dy/BHJUaG0iqZ+LuHQ3vWMcGR/7EPBlCTF40l9Pq5yoWROZcmDMY+MnCpE71t
-PSwm1BYDWwQBRyTwSyrB9FInpGBxG85lsFCHjj25eu/8O5wUJAXKyHNLSFwRUPyr
-HWPwAbu1iejWKCjM5llWJaMD3JJQEJ/lu9ED9H/f29I5mqzikdhPMKn/errBXGFe
-6dJdg7kP4+a8N6STCrLbQkDIo2LJBQ==
-=IgXi
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TIeEACgkQ9AfbAGHV
+z0DM5wf/YsfLlPDhf8my90Qpzz0U9KuFJgrdVmxn1+6+jWfJiGK1cZZ86zHDFnB0
+neXMls/t8bJQ7FvWCAu8l3sWt8hWiNr6eMRk/Ki0To3RjlO0SrHOMhs2M26Aoecx
+jZ7l5xm3gDhaiH281FegKVjJR950Gh+XgEeMjZQqGRPm5JlpL/zohKcNHC+lKdcs
+by9m5+DIBpm1pCQPUtPMTuk8hYO3I42Y+YXRNiV8JO0TRrMruFwbFebR+BFrVHX5
+YMXIjI1taghZhK1DH9UlQhaPXvEw7t1Iz0tkoYAoKFJ3jUkpheQGCmW6fzUxKmk7
+ChIPZUgJWzNvI7FBSSWPQXknCSh9bg==
+=z9R+
 -----END PGP SIGNATURE-----
 
---DWer4nmGtEkLkR3j0GQdckceGUPm6geVF--
+--MDT5Acitqyevr4eLcODZAcALXm5LDj5TC--
 
