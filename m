@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D20C32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 192F2C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7866020844
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:20:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7866020844
+	by mail.kernel.org (Postfix) with ESMTPS id DEA6A2067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 15:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEA6A2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxYaf-0006P6-Pz
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:20:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47641)
+	id 1hxYbV-0007an-8d
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 11:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47817)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <eblake@redhat.com>) id 1hxYZw-0005Bt-Dw
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:19:17 -0400
+ (envelope-from <eblake@redhat.com>) id 1hxYb5-00077a-Li
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:20:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hxYZv-00082Q-Fc
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:19:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57074)
+ (envelope-from <eblake@redhat.com>) id 1hxYb4-0000Ll-ND
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 11:20:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13689)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hxYZt-000803-BH; Tue, 13 Aug 2019 11:19:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ id 1hxYb2-0000JS-NR; Tue, 13 Aug 2019 11:20:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9D75058;
- Tue, 13 Aug 2019 15:19:11 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id EDCA03003AFE;
+ Tue, 13 Aug 2019 15:20:23 +0000 (UTC)
 Received: from [10.3.117.22] (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EE36980FD6;
- Tue, 13 Aug 2019 15:19:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 395477EB96;
+ Tue, 13 Aug 2019 15:20:15 +0000 (UTC)
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-3-thuth@redhat.com>
+ <20190813093047.27948-4-thuth@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=eblake@redhat.com; keydata=
@@ -70,22 +70,22 @@ Autocrypt: addr=eblake@redhat.com; keydata=
  Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
  2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
 Organization: Red Hat, Inc.
-Message-ID: <fda986ed-af0d-beb8-3721-b7b13155efb5@redhat.com>
-Date: Tue, 13 Aug 2019 10:19:02 -0500
+Message-ID: <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+Date: Tue, 13 Aug 2019 10:20:14 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.0
 MIME-Version: 1.0
-In-Reply-To: <20190813093047.27948-3-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-4-thuth@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+ boundary="8kyHuZ3oyT1By7fWZzW83ySIRgsgTtpJX"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Tue, 13 Aug 2019 15:19:11 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.45]); Tue, 13 Aug 2019 15:20:24 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/6] tests/libqos: Make virtio-pci code
- independent from global_qtest
+Subject: Re: [Qemu-devel] [PATCH 3/6] tests/libqtest: Remove unused function
+ hmp()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,8 +109,8 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V
-Content-Type: multipart/mixed; boundary="Ovk5PxvTkSG7J0SspjHaR0VCV4jvT8LZz";
+--8kyHuZ3oyT1By7fWZzW83ySIRgsgTtpJX
+Content-Type: multipart/mixed; boundary="bSplOWEJ1jOf5RzdbkK0rdha7wNx4sv5O";
  protected-headers="v1"
 From: Eric Blake <eblake@redhat.com>
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
@@ -120,27 +120,34 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <fam@euphon.net>,
  John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
  Amit Shah <amit@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
-Message-ID: <fda986ed-af0d-beb8-3721-b7b13155efb5@redhat.com>
-Subject: Re: [PATCH 2/6] tests/libqos: Make virtio-pci code independent from
- global_qtest
+Message-ID: <5b373fbe-6dbc-7a2a-a981-091fa8648ac2@redhat.com>
+Subject: Re: [PATCH 3/6] tests/libqtest: Remove unused function hmp()
 References: <20190813093047.27948-1-thuth@redhat.com>
- <20190813093047.27948-3-thuth@redhat.com>
-In-Reply-To: <20190813093047.27948-3-thuth@redhat.com>
+ <20190813093047.27948-4-thuth@redhat.com>
+In-Reply-To: <20190813093047.27948-4-thuth@redhat.com>
 
---Ovk5PxvTkSG7J0SspjHaR0VCV4jvT8LZz
+--bSplOWEJ1jOf5RzdbkK0rdha7wNx4sv5O
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 8/13/19 4:30 AM, Thomas Huth wrote:
-> The libqos library functions should never depend on global_qtest,
-> since these functions might be used in tests that track multiple
-> test states. So let's use the test state of the QPCIDevice instead.
+> No test is using hmp() anymore, and since this function uses the dislik=
+ed
+> global_qtest variable, we should also make sure that nobody adds new co=
+de
+> with this function again. qtest_hmp() should be used instead.
 >=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  tests/libqos/virtio-pci.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  tests/libqtest.c | 11 -----------
+>  tests/libqtest.h | 10 ----------
+>  2 files changed, 21 deletions(-)
+
+Yay.
+
+We could, at a later time, introduce a patch to do s/qtest_hmp/hmp/ if
+it was deemed worthwhile, but I'm not sure it's worth the churn.
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -150,24 +157,24 @@ Red Hat, Inc.           +1-919-301-3226
 Virtualization:  qemu.org | libvirt.org
 
 
---Ovk5PxvTkSG7J0SspjHaR0VCV4jvT8LZz--
+--bSplOWEJ1jOf5RzdbkK0rdha7wNx4sv5O--
 
---DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V
+--8kyHuZ3oyT1By7fWZzW83ySIRgsgTtpJX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1OYACgkQp6FrSiUn
-Q2pEswf+NcXyGslKU9kAdNJmpN/Yp+0rYRmGKSiK2ZGlV6izH7GRH0VBiYU83g9U
-+XrnS5rVkKmcQuGwXQKS01zMJpHAPNF/G1OmQ07/wUkOuEXmOg7RnIkXUcRb2edh
-f8pJK2YzX96Gs8VRxPH73PlTKpYp2SGo1WtJVd99jlHipJdTmrmhN8GE8UKrj34c
-78Uq2E7cWr93o5J1lpgvYC/InI5LVX8hvu3YcWRje2zFoZDu5ctPZEn9d07F/jP2
-dznR61OEJ8+3X1Un/+05/GtwGb49Rl2wPcFN0upyL1Veumbc6W7yq70V+/ZzcjX/
-9zzXwLL2g8Vrs3l96M0qqEJ3wz1toQ==
-=1Wo9
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1S1S4ACgkQp6FrSiUn
+Q2oiYwgAjNK52SVzZmsJUwMQrkD1opBiIV2wGzlzlmCI9BwMirkzUI+TPi8x+gJH
+fw8EEImZqo6+fKMuB97tMpex9uQjz4aywm6p7ZBxy9Th1U5SDbuLevLUDuciiuKF
+eYvUJQs5qx4cJyubYKsF0NTpsubMZN1Jt2zhBgT64MfGX9YcrOkU11u9nB5SLLL7
+3qko0AUukR2m2S2vahDpGiJ6rzZTNmRmX9VVTUPUDwdAIQyDQfKo7iSbJAWbedIP
+HWvYMPMHHN3kbsGQPB+ZvlzN2Pm+6K0XtWMaO6UwkDUghU+KZO1VgSS/82cvVE/W
+HhiZv6JWriFU3HO/aeIlWMbnkj2f1w==
+=iOiN
 -----END PGP SIGNATURE-----
 
---DaaPSrOsoWgCiRyipUvXj7IbopkV3WQ6V--
+--8kyHuZ3oyT1By7fWZzW83ySIRgsgTtpJX--
 
