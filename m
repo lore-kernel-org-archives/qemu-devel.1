@@ -2,50 +2,49 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9BBC32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C64C433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:35:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 167C020842
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:07:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 167C020842
+	by mail.kernel.org (Postfix) with ESMTPS id 024D22067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 19:35:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 024D22067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxc98-00059b-Eu
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 15:07:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49189)
+	id 1hxcaL-0002vs-UZ
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 15:35:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52463)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <mreitz@redhat.com>) id 1hxc7r-00040x-FK
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:06:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxcZl-0002Sd-MJ
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxc7q-0005ws-9p
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:06:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59298)
+ (envelope-from <mreitz@redhat.com>) id 1hxcZk-0005L1-Ow
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 15:35:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32898)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxc7m-0005sq-Bn; Tue, 13 Aug 2019 15:06:26 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ id 1hxcZf-0005IC-Cb; Tue, 13 Aug 2019 15:35:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id CD26836899;
- Tue, 13 Aug 2019 19:06:24 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1BC198E597;
+ Tue, 13 Aug 2019 19:35:14 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.136])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 58F6737DE;
- Tue, 13 Aug 2019 19:06:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E74810016E9;
+ Tue, 13 Aug 2019 19:35:08 +0000 (UTC)
 To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
  qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
  kraxel@redhat.com, kevin@koconnor.net
 References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
- <20190626123948.10199-5-shmuel.eiderman@oracle.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -72,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <49d3db3b-5a66-c87d-8d78-157bd0201731@redhat.com>
-Date: Tue, 13 Aug 2019 21:06:18 +0200
+Message-ID: <3f9009fc-b478-60e1-dbcd-7782336c26e7@redhat.com>
+Date: Tue, 13 Aug 2019 21:35:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190626123948.10199-5-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ boundary="DWer4nmGtEkLkR3j0GQdckceGUPm6geVF"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.30]); Tue, 13 Aug 2019 19:06:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Tue, 13 Aug 2019 19:35:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 4/8] scsi: Propagate unrealize()
- callback to scsi-hd
+Subject: Re: [Qemu-devel] [QEMU] [PATCH v5 0/8] Add Qemu to SeaBIOS LCHS
+ interface
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,91 +104,75 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5
-Content-Type: multipart/mixed; boundary="kLucQT5g4pN9xz331Famfw3jVVHzsLaBf";
+--DWer4nmGtEkLkR3j0GQdckceGUPm6geVF
+Content-Type: multipart/mixed; boundary="WEOWzJqS9ZRtmag05GohvfXNlQq8eNIx4";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Sam Eiderman <shmuel.eiderman@oracle.com>, kwolf@redhat.com,
  qemu-block@nongnu.org, qemu-devel@nongnu.org, seabios@seabios.org,
  kraxel@redhat.com, kevin@koconnor.net
 Cc: karl.heubaum@oracle.com, liran.alon@oracle.com, arbel.moshe@oracle.com
-Message-ID: <49d3db3b-5a66-c87d-8d78-157bd0201731@redhat.com>
-Subject: Re: [QEMU] [PATCH v5 4/8] scsi: Propagate unrealize() callback to
- scsi-hd
+Message-ID: <3f9009fc-b478-60e1-dbcd-7782336c26e7@redhat.com>
+Subject: Re: [QEMU] [PATCH v5 0/8] Add Qemu to SeaBIOS LCHS interface
 References: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
- <20190626123948.10199-5-shmuel.eiderman@oracle.com>
-In-Reply-To: <20190626123948.10199-5-shmuel.eiderman@oracle.com>
+In-Reply-To: <20190626123948.10199-1-shmuel.eiderman@oracle.com>
 
---kLucQT5g4pN9xz331Famfw3jVVHzsLaBf
+--WEOWzJqS9ZRtmag05GohvfXNlQq8eNIx4
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 26.06.19 14:39, Sam Eiderman wrote:
-> We will need to add LCHS removal logic to scsi-hd's unrealize() in the
-> next commit.
+> v1:
 >=20
-> Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-> Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-> Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-> ---
->  hw/scsi/scsi-bus.c     | 15 +++++++++++++++
->  include/hw/scsi/scsi.h |  1 +
->  2 files changed, 16 insertions(+)
+> Non-standard logical geometries break under QEMU.
 >=20
-> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-> index c480553083..f6fe497a1a 100644
-> --- a/hw/scsi/scsi-bus.c
-> +++ b/hw/scsi/scsi-bus.c
+> A virtual disk which contains an operating system which depends on
+> logical geometries (consistent values being reported from BIOS INT13
+> AH=3D08) will most likely break under QEMU/SeaBIOS if it has non-standa=
+rd
+> logical geometries - for example 56 SPT (sectors per track).
+> No matter what QEMU will guess - SeaBIOS, for large enough disks - will=
 
-[...]
+> use LBA translation, which will report 63 SPT instead.
+>=20
+> In addition we can not enforce SeaBIOS to rely on phyiscal geometries a=
+t
+> all. A virtio-blk-pci virtual disk with 255 phyiscal heads can not
+> report more than 16 physical heads when moved to an IDE controller, the=
 
-> @@ -213,11 +221,18 @@ static void scsi_qdev_realize(DeviceState *qdev, =
-Error **errp)
->  static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
->  {
->      SCSIDevice *dev =3D SCSI_DEVICE(qdev);
-> +    Error *local_err =3D NULL;
-> =20
->      if (dev->vmsentry) {
->          qemu_del_vm_change_state_handler(dev->vmsentry);
->      }
-> =20
-> +    scsi_device_unrealize(dev, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
->      scsi_device_purge_requests(dev, SENSE_CODE(NO_SENSE));
+> ATA spec allows a maximum of 16 heads - this is an artifact of
+> virtualization.
+>=20
+> By supplying the logical geometies directly we are able to support such=
 
-(I see this code for the first time, but) I suppose I=E2=80=99d put the
-scsi_device_unrealize() after scsi_device_purge_requests().
+> "exotic" disks.
+>=20
+> We will use fw_cfg to do just that.
 
-Max
+(From a block perspective,) I didn=E2=80=99t find anything too bad, so:
 
->      blockdev_mark_auto_del(dev->conf.blk);
->  }
+Acked-by: Max Reitz <mreitz@redhat.com>
 
 
---kLucQT5g4pN9xz331Famfw3jVVHzsLaBf--
+--WEOWzJqS9ZRtmag05GohvfXNlQq8eNIx4--
 
---TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5
+--DWer4nmGtEkLkR3j0GQdckceGUPm6geVF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TCioACgkQ9AfbAGHV
-z0DbhAgAn8G++81sexDg57oFo0TjlARLcHBjs/wJLw2LpkW9f4g7EQAwxxPxudLx
-hU01wgCHds4if/LD9FTZCkzlTy7X+qWnTXC6KUmCJGBz1v/gjr9luv3PfR3xRoFO
-Wcd0Ao0j5EDyTV2o5yd7o10qx+dCMCTEde9HlrGCpCFKxdPOkKrmclfkXlDfLnM2
-rR5Udcgn1GIx5UpJG2FHGZu6M6luLQh0xGQJuKN9XRYY4qU8ja3oL78Fez/D1I1R
-ZLe2outARTafFnPGb74792suLIN4VdPhwbFrtgRbrFiQil4GqgYNcGOg/Pd5bLrF
-eBsF+3Q9myi2BGega388Z0hm53llxw==
-=5lpq
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1TEOoACgkQ9AfbAGHV
+z0De0wgAlf8VnM17uoVg8wA/DUSLOLjTEw/blK7v1+rQbmu9PmeG/smqmGwxJkCU
+b/fqeDUb6EBgj19O3CGaq6AjPo276PvjXE8itOuK5dR6WeJDHU/rQLcX6LVlSdJx
+Ax7dy/BHJUaG0iqZ+LuHQ3vWMcGR/7EPBlCTF40l9Pq5yoWROZcmDMY+MnCpE71t
+PSwm1BYDWwQBRyTwSyrB9FInpGBxG85lsFCHjj25eu/8O5wUJAXKyHNLSFwRUPyr
+HWPwAbu1iejWKCjM5llWJaMD3JJQEJ/lu9ED9H/f29I5mqzikdhPMKn/errBXGFe
+6dJdg7kP4+a8N6STCrLbQkDIo2LJBQ==
+=IgXi
 -----END PGP SIGNATURE-----
 
---TbT4fuIm9LFAPXCRFLYTOv7SEg52i1AT5--
+--DWer4nmGtEkLkR3j0GQdckceGUPm6geVF--
 
