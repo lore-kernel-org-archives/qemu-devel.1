@@ -7,88 +7,88 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F545C433FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 04:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C23CC433FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 04:48:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 365602063F
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 04:47:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 159DC2063F
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 04:48:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bE3MZMcw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 365602063F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sZ6FFqKE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 159DC2063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxOio-0002FX-8U
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 00:47:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41082)
+	id 1hxOjF-0003Bc-ET
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 00:48:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41167)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <richard.henderson@linaro.org>) id 1hxOiB-0001Xg-3c
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 00:47:07 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hxOii-0002H8-HR
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 00:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hxOiA-0001iL-8A
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 00:47:07 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51622)
+ (envelope-from <richard.henderson@linaro.org>) id 1hxOih-0001yv-KX
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 00:47:40 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:47065)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hxOiA-0001hP-1F
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 00:47:06 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 207so225749wma.1
- for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 21:47:04 -0700 (PDT)
+ id 1hxOih-0001yf-Ed
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 00:47:39 -0400
+Received: by mail-wr1-x441.google.com with SMTP id z1so106477941wru.13
+ for <qemu-devel@nongnu.org>; Mon, 12 Aug 2019 21:47:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=4+G6JiIYr8r2dtoxsbssZMd1u8xHy/3PjAPQ7Rm+328=;
- b=bE3MZMcwJ4qkqnKbffuN9Zf9EB9lhFEAsX4ZFWCWHAcRAJVZX+sauLY9sYVIznb2Xt
- 2gScDaQG8JLDDWJhCSDAcDY0/a3OX5T5q9hTKyRx26+KxqhqPW3nV2mM16mEVbC1ZeQp
- l8l8gV1+H95tGdxzRqkOczdzr0sSU4t+5U3gQ7Ik+zWZDNmHtq3dor9Kt5aKyg18D7LB
- 6dNVHwPsY/l2iBHQO451/PR8Kz2xnZHHIE+OYrM9mej3d9OeWo3wZCny/4kPGr1Sn5Pm
- gVIg4Uvxq+h0mnYvshtsG2rBvje3v5Up64zPEEB9ljeTg+iRmQCclxOxphLYWJ01Q5G0
- dMPQ==
+ bh=riOf9SI8199DfHP2OSX3uGmJduKR0yErw8/NnNTvgKw=;
+ b=sZ6FFqKEDNgFxWdeztiIuhbDnYyBv4wkqj8fBnBMcBS0ANgeOVm7xnxbiEzT2kqhng
+ Gf+uyMXJy7lchUuY/2mUG1m5mdrh6Z+JsxivsASA1WDT+MuOsT/gAdbKzGmGeS8zH+v3
+ UXsrEGmbPVhmJClCxfmt0CjyjKMMR7+gTNsnJ3DogUDlf0d51t4XlRlI42YdGMUMk4Jy
+ dzlOF5Hr2HSFwmOuH4ctIllkL4p2OGp+/7Z1Yur8cdJ1gy044A8J+fbP5LxaLqI7gy3Z
+ xBsuxjCMzRDVzNOJwTlWan7I1L8u9Y5Kcx2AvTyDXvZGUjPYV8XhICpca4fKA/N+0U3C
+ TOVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=4+G6JiIYr8r2dtoxsbssZMd1u8xHy/3PjAPQ7Rm+328=;
- b=EgvVAv5eRQP3XYt6iieyov+PrMNXPYC9Ux/IEu3RARZVGyH8qMrPhhMfTTf1Itdoly
- PGRRno8EI7kAmJXnZnlLkQl5F1N1IHQOaG6GYrXoyqv4h1D1qBljPQMOelFY4D//1gQe
- GA2bBxZdAEvqq1Gp3kdLlfyLV8VhlIER2Vyr8cD2d/6D0VBS+DAqKFb+2L3lMWyTuz3k
- xi1b6dFMvarxp6ZUSr9n6HoUmrDUzXaHtMjrtXQXvO2J1IQWLkESLsSnVjG3INtN4hTQ
- BYNdAhOsWy/uPouXzxwno9LgsaGL9MySQR1ZLXG9GNpOyfcG/ctpBEAneKJ38H4Vj+tk
- nJkw==
-X-Gm-Message-State: APjAAAVH094lXratIl8GN1ymV7/hdbKgnqrLCT0B7ul5AoEpp0j9C4wG
- WvEJDifJnQCRTWea/52QVfpcLg==
-X-Google-Smtp-Source: APXvYqzRKyglwS9N7uK8PFJrUyYer3hnBxs75jZNjWWfPPPGHouJ/iejHAV99FbYvEb7Imi/laihgA==
-X-Received: by 2002:a7b:c8c5:: with SMTP id f5mr635570wml.25.1565671622997;
- Mon, 12 Aug 2019 21:47:02 -0700 (PDT)
+ bh=riOf9SI8199DfHP2OSX3uGmJduKR0yErw8/NnNTvgKw=;
+ b=ckwQeNQIK4wuNcPumEMP0WD1qHi5m/+7TDWMbE6lCnPyYCb+vZVrqHuXlvZ57ReCc+
+ gwwv4cg58nTXHZD0i6niMTgn5p0K2VyeLuRZ2+i+gKiOjBFEn98gLU0TH3yn1krJWU17
+ KLoUA0cp32ybUjhVRmvRzyBov4WxZRqgdda08xXhJhJN0fQWI7C3CauWqsC8syplC1PI
+ Nnwshm38K1y0ABE2P7yOKLq27RAmrnWR3YVp3Xjbnlwo9gtjc36HyV5CISmGCh6TC6To
+ JOGdVqPS7yt3yLZHqo0Z2M37b9AOvfztVJR6Alf9HTwaw/8ji3jjFWvqEqDQg+OVU8xl
+ ItTA==
+X-Gm-Message-State: APjAAAV+WiRRp3F4x6FtlGQTNcAlyn97ZguGu64RKhmUWYEpVAf9E90r
+ xki9Vp48KNK1FC69d2s/OxeSPA==
+X-Google-Smtp-Source: APXvYqxm6mPwnnOYqly7KuC0Ov65DmVhd1KBiOz4HvqZHILc9WYJ608/3knclInVyZnGzm0saW+VnQ==
+X-Received: by 2002:adf:e2c1:: with SMTP id d1mr46038878wrj.283.1565671658196; 
+ Mon, 12 Aug 2019 21:47:38 -0700 (PDT)
 Received: from ?IPv6:2a02:c7f:a69:1700:8897:9507:94c2:b98d?
  ([2a02:c7f:a69:1700:8897:9507:94c2:b98d])
- by smtp.gmail.com with ESMTPSA id o11sm254164wmh.46.2019.08.12.21.47.01
+ by smtp.gmail.com with ESMTPSA id m23sm369863wml.41.2019.08.12.21.47.37
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 12 Aug 2019 21:47:01 -0700 (PDT)
+ Mon, 12 Aug 2019 21:47:37 -0700 (PDT)
 To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
 References: <20190810041255.6820-1-jan.bobek@gmail.com>
- <20190810041255.6820-8-jan.bobek@gmail.com>
+ <20190810041255.6820-4-jan.bobek@gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
 Openpgp: preference=signencrypt
-Message-ID: <32739af1-d162-45da-43c8-b5263bffe67e@linaro.org>
-Date: Tue, 13 Aug 2019 05:47:00 +0100
+Message-ID: <dd35fb5f-4ab7-aea8-7453-5f16e40de1b0@linaro.org>
+Date: Tue, 13 Aug 2019 05:47:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190810041255.6820-8-jan.bobek@gmail.com>
+In-Reply-To: <20190810041255.6820-4-jan.bobek@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [RFC PATCH v2 07/39] target/i386: use pc_start
- from DisasContext
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [RFC PATCH v2 03/39] target/i386: reduce scope of
+ variable aflag
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,22 +100,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/10/19 5:12 AM, Jan Bobek wrote:
-> The variable pc_start is already a member of DisasContext. Remove the
-> superfluous local variable.
+> The variable aflag is not used in most of disas_insn; make this clear
+> by explicitly reducing its scope to the block where it is used.
 > 
+> Suggested-by: Richard Henderson <rth@twiddle.net>
 > Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 > ---
->  target/i386/translate.c | 131 ++++++++++++++++++++--------------------
->  1 file changed, 65 insertions(+), 66 deletions(-)
+>  target/i386/translate.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
+
+
 
