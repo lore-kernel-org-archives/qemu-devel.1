@@ -2,63 +2,120 @@ Return-Path: <SRS0=ZEKs=WJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 727ADC32750
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F37C32750
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:28:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37A9420673
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:26:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37A9420673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8FC8D20673
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Aug 2019 11:28:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YSGSAroP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FC8D20673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.86_2)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxUx6-00005X-IJ
-	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 07:26:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41796)
+	id 1hxUyl-0001IW-TX
+	for qemu-devel@archiver.kernel.org; Tue, 13 Aug 2019 07:28:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42919)
  by lists.gnu.org with esmtp (Exim 4.86_2)
- (envelope-from <kraxel@redhat.com>) id 1hxUp2-0001Et-77
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:38 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxUyJ-0000ie-Ug
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1hxUp0-0005Au-1t
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40934)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1hxUoz-00059F-Nk
- for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:18:33 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 688D53CA2E;
- Tue, 13 Aug 2019 11:18:32 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-144.ams2.redhat.com
- [10.36.116.144])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8594E5D717;
- Tue, 13 Aug 2019 11:18:21 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 66B7C9D20; Tue, 13 Aug 2019 13:18:09 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Tue, 13 Aug 2019 13:17:59 +0200
-Message-Id: <20190813111809.3141-6-kraxel@redhat.com>
-In-Reply-To: <20190813111809.3141-1-kraxel@redhat.com>
-References: <20190813111809.3141-1-kraxel@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxUyI-0001pG-No
+ for qemu-devel@nongnu.org; Tue, 13 Aug 2019 07:28:11 -0400
+Received: from mail-eopbgr00139.outbound.protection.outlook.com
+ ([40.107.0.139]:65507 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hxUyI-0001oa-HY; Tue, 13 Aug 2019 07:28:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c/9s7nMVXyCFsNDbvTm2Qal6lRGSJNz/YrEzRPzBZG0QIdJW14a4DqI7czx9sYv0719bdv8O6h6yJLNUKsG23oW6X5yHwWr36UTq2AGQXJKHzfsCpjXn9qZlxTh0k9KeQVN1bnJERl3vXXmXB9Ug9CquPUrR15Ph+27yNPsylzBaHHpAfmz9YD0LrqjUmRrdULtMGeGHHNhDaAroR1KMFbaItVTmFGsZmdWPF21x/ci+UvUIDVUWy93PBMksI+7CByzVk/YuylDMuTfvBBtVUUaLi/gAoKOLYp5VUOsNU0EqW/udCgMlSAmRcPaK4zqdMAX/YWSMd9mJFUmIFht8Eg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=28hbuT5hKOaq340AtE/fazJO4/WWsdqyrlbPLL1DrDs=;
+ b=XZe+utapWwMurrHgYkyP3V8KitaQY6YLUjFyYSK1DB/Lf5uAbvRbT2XX/y9Tm4dA0/403pAXa/rFyve7nPBcfvoeY3Wqm9fbbLNYo8glXHXohpB0NkGrddjghXCrUsB/mrE6vPgpEi7EMtJhBQ39CyngiHgLK1yp6n/njeWzqIurvG7NSKxLWRfKX4yJF6QdSJr3wIy8HFQAJ/lrj//kGm/kxl7mpTIHIgVrXepVjvs6MbIX9euCluHRmitq0uQMAlR7/FtdDtMxVCPskGgsIfh6Qm19eaauHJavZp/w9LezrVygDJ+cu1+FRuxWUB+/qzOJJdv9P+Jc0XZkKUpuAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=28hbuT5hKOaq340AtE/fazJO4/WWsdqyrlbPLL1DrDs=;
+ b=YSGSAroPnBtl3KTQLYpCei5zm1TnSByYU61G/PQO905IXwcDfbq6BSxFt59kRra+edOGzqdp/eL2eQdGnxoDiUhBKN5SLx8Dor3FJSnqLyyz+QgbiIwSyNYj9ulD+9pzhxSgAA68YlojnzDspyBOAOzNVipIgEUTI6Xq6FUXQ/s=
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
+ DB8PR08MB4138.eurprd08.prod.outlook.com (20.179.9.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.15; Tue, 13 Aug 2019 11:28:07 +0000
+Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
+ ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.022; Tue, 13 Aug 2019
+ 11:28:06 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Thread-Topic: [PATCH 1/2] block/raw-format: switch to BDRV_BLOCK_DATA with
+ BDRV_BLOCK_RECURSE
+Thread-Index: AQHVUTlsaPHpCWSa5ku4nJrwFG1t86b4600AgAAGmAA=
+Date: Tue, 13 Aug 2019 11:28:06 +0000
+Message-ID: <7fcab62a-ad7b-4105-7a23-76c46d8cee0f@virtuozzo.com>
+References: <20190812181146.26121-1-vsementsov@virtuozzo.com>
+ <20190812181146.26121-2-vsementsov@virtuozzo.com>
+ <20190813110428.GE4663@localhost.localdomain>
+In-Reply-To: <20190813110428.GE4663@localhost.localdomain>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0701CA0067.eurprd07.prod.outlook.com
+ (2603:10a6:3:64::11) To DB8PR08MB5498.eurprd08.prod.outlook.com
+ (2603:10a6:10:11c::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20190813142804751
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7e2a9fc4-7a57-46f0-0eef-08d71fe15015
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:DB8PR08MB4138; 
+x-ms-traffictypediagnostic: DB8PR08MB4138:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB8PR08MB4138DF59C2DFE4D003CBADD9C1D20@DB8PR08MB4138.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 01283822F8
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(39840400004)(396003)(346002)(366004)(376002)(136003)(189003)(199004)(386003)(486006)(4326008)(52116002)(36756003)(446003)(2616005)(6246003)(14454004)(6506007)(478600001)(107886003)(66946007)(81156014)(86362001)(6512007)(66446008)(102836004)(6436002)(53936002)(476003)(256004)(11346002)(76176011)(81166006)(31696002)(25786009)(6916009)(64756008)(8936002)(66476007)(66556008)(99286004)(6486002)(229853002)(66066001)(6116002)(5660300002)(316002)(3846002)(31686004)(54906003)(8676002)(26005)(305945005)(2906002)(71200400001)(71190400001)(7736002)(186003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB4138;
+ H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: hNgzxLIF1fb6uNnj3MP78uYDxddVfqZ2GRmqNrij7z7llEl5ZKt/gwOcxzyiFOZKbg3rMyB5bRexYqNllpI7aRfsYS6Ob9sQqbGFAPTYZms/ydixQkujwK9mWKD2ZkYKsPSgYBa9fU9ndA6tbjCq9pnos9oOC6vb33pJEYU/vCdzpQRY44Bo8iq1qrQl+VOLBzLxPi2ucOjoSGigFBPwua6twzSznmX0o/fFJIXGYqsAKA19D4/ETO3cvuc08Y9OXJPmfFLm1D8GRrbIEh/enz3SFcbij/i8KBFak4JNY3pXKPRxHGQgiziQtwMd6B0USZF19DSQ1Gh6LiISOwLVDj90bs2z0lgB/AYNnwIFrS9lxEJ6zF6W5578axaB0PRYC/VwkN9dCQ4QFGg29iGNJmAdKPjAOFpen+zQZTKw6ho=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8EFDA9D809817346B8D61FD1A42DE7E0@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.39]); Tue, 13 Aug 2019 11:18:32 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 05/15] paaudio: prepare for multiple audiodev
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e2a9fc4-7a57-46f0-0eef-08d71fe15015
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Aug 2019 11:28:06.9335 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8w+BSxwt5kfJ4LjDfZdiQJLXZGCDNDd0JhEfxevFfHUvt1cjTPT0EPs80pZ3n4lUIggwvmvoKy8Iac31EJXKLFSSvPpgu+nrfuRQnVcQa0o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4138
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.139
+Subject: Re: [Qemu-devel] [PATCH 1/2] block/raw-format: switch to
+ BDRV_BLOCK_DATA with BDRV_BLOCK_RECURSE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,651 +127,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kővágó@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Walle <michael@walle.cc>, Gerd Hoffmann <kraxel@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, =?UTF-8?q?Zolt=C3=A1n?= <DirtY.iCE.hu@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <dirty.ice.hu@gmail.com>
-
-Have a pool of refcounted connections per server, so if the user creates
-multiple audiodevs to the same pa server, it will use a single connection=
-.  (It
-will still create different streams, so the user can manage those streams
-separately in pulseaudio.)
-
-Signed-off-by: K=C5=91v=C3=A1g=C3=B3, Zolt=C3=A1n <DirtY.iCE.hu@gmail.com=
->
-Message-id: 45d00e97d64544d645291454a7b09ce33dbca85c.1564925486.git.DirtY=
-.iCE.hu@gmail.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- audio/paaudio.c | 329 +++++++++++++++++++++++++++---------------------
- 1 file changed, 188 insertions(+), 141 deletions(-)
-
-diff --git a/audio/paaudio.c b/audio/paaudio.c
-index 5fc886bb33cd..cc3a34c2eaeb 100644
---- a/audio/paaudio.c
-+++ b/audio/paaudio.c
-@@ -11,10 +11,21 @@
- #include "audio_int.h"
- #include "audio_pt_int.h"
-=20
--typedef struct {
--    Audiodev *dev;
-+typedef struct PAConnection {
-+    char *server;
-+    int refcount;
-+    QTAILQ_ENTRY(PAConnection) list;
-+
-     pa_threaded_mainloop *mainloop;
-     pa_context *context;
-+} PAConnection;
-+
-+static QTAILQ_HEAD(PAConnectionHead, PAConnection) pa_conns =3D
-+    QTAILQ_HEAD_INITIALIZER(pa_conns);
-+
-+typedef struct {
-+    Audiodev *dev;
-+    PAConnection *conn;
- } paaudio;
-=20
- typedef struct {
-@@ -45,7 +56,7 @@ typedef struct {
-     int samples;
- } PAVoiceIn;
-=20
--static void qpa_audio_fini(void *opaque);
-+static void qpa_conn_fini(PAConnection *c);
-=20
- static void GCC_FMT_ATTR (2, 3) qpa_logerr (int err, const char *fmt, ..=
-.)
- {
-@@ -108,11 +119,11 @@ static inline int PA_STREAM_IS_GOOD(pa_stream_state=
-_t x)
-=20
- static int qpa_simple_read (PAVoiceIn *p, void *data, size_t length, int=
- *rerror)
- {
--    paaudio *g =3D p->g;
-+    PAConnection *c =3D p->g->conn;
-=20
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
-=20
--    CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-=20
-     while (length > 0) {
-         size_t l;
-@@ -121,11 +132,11 @@ static int qpa_simple_read (PAVoiceIn *p, void *dat=
-a, size_t length, int *rerror
-             int r;
-=20
-             r =3D pa_stream_peek (p->stream, &p->read_data, &p->read_len=
-gth);
--            CHECK_SUCCESS_GOTO (g, rerror, r =3D=3D 0, unlock_and_fail);
-+            CHECK_SUCCESS_GOTO(c, rerror, r =3D=3D 0, unlock_and_fail);
-=20
-             if (!p->read_data) {
--                pa_threaded_mainloop_wait (g->mainloop);
--                CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+                pa_threaded_mainloop_wait(c->mainloop);
-+                CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-             } else {
-                 p->read_index =3D 0;
-             }
-@@ -148,53 +159,53 @@ static int qpa_simple_read (PAVoiceIn *p, void *dat=
-a, size_t length, int *rerror
-             p->read_length =3D 0;
-             p->read_index =3D 0;
-=20
--            CHECK_SUCCESS_GOTO (g, rerror, r =3D=3D 0, unlock_and_fail);
-+            CHECK_SUCCESS_GOTO(c, rerror, r =3D=3D 0, unlock_and_fail);
-         }
-     }
-=20
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return 0;
-=20
- unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return -1;
- }
-=20
- static int qpa_simple_write (PAVoiceOut *p, const void *data, size_t len=
-gth, int *rerror)
- {
--    paaudio *g =3D p->g;
-+    PAConnection *c =3D p->g->conn;
-=20
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
-=20
--    CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+    CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-=20
-     while (length > 0) {
-         size_t l;
-         int r;
-=20
-         while (!(l =3D pa_stream_writable_size (p->stream))) {
--            pa_threaded_mainloop_wait (g->mainloop);
--            CHECK_DEAD_GOTO (g, p->stream, rerror, unlock_and_fail);
-+            pa_threaded_mainloop_wait(c->mainloop);
-+            CHECK_DEAD_GOTO(c, p->stream, rerror, unlock_and_fail);
-         }
-=20
--        CHECK_SUCCESS_GOTO (g, rerror, l !=3D (size_t) -1, unlock_and_fa=
-il);
-+        CHECK_SUCCESS_GOTO(c, rerror, l !=3D (size_t) -1, unlock_and_fai=
-l);
-=20
-         if (l > length) {
-             l =3D length;
-         }
-=20
-         r =3D pa_stream_write (p->stream, data, l, NULL, 0LL, PA_SEEK_RE=
-LATIVE);
--        CHECK_SUCCESS_GOTO (g, rerror, r >=3D 0, unlock_and_fail);
-+        CHECK_SUCCESS_GOTO(c, rerror, r >=3D 0, unlock_and_fail);
-=20
-         data =3D (const uint8_t *) data + l;
-         length -=3D l;
-     }
-=20
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return 0;
-=20
- unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-     return -1;
- }
-=20
-@@ -432,13 +443,13 @@ static AudioFormat pa_to_audfmt (pa_sample_format_t=
- fmt, int *endianness)
-=20
- static void context_state_cb (pa_context *c, void *userdata)
- {
--    paaudio *g =3D userdata;
-+    PAConnection *conn =3D userdata;
-=20
-     switch (pa_context_get_state(c)) {
-     case PA_CONTEXT_READY:
-     case PA_CONTEXT_TERMINATED:
-     case PA_CONTEXT_FAILED:
--        pa_threaded_mainloop_signal (g->mainloop, 0);
-+        pa_threaded_mainloop_signal(conn->mainloop, 0);
-         break;
-=20
-     case PA_CONTEXT_UNCONNECTED:
-@@ -451,14 +462,14 @@ static void context_state_cb (pa_context *c, void *=
-userdata)
-=20
- static void stream_state_cb (pa_stream *s, void * userdata)
- {
--    paaudio *g =3D userdata;
-+    PAConnection *c =3D userdata;
-=20
-     switch (pa_stream_get_state (s)) {
-=20
-     case PA_STREAM_READY:
-     case PA_STREAM_FAILED:
-     case PA_STREAM_TERMINATED:
--        pa_threaded_mainloop_signal (g->mainloop, 0);
-+        pa_threaded_mainloop_signal(c->mainloop, 0);
-         break;
-=20
-     case PA_STREAM_UNCONNECTED:
-@@ -469,13 +480,13 @@ static void stream_state_cb (pa_stream *s, void * u=
-serdata)
-=20
- static void stream_request_cb (pa_stream *s, size_t length, void *userda=
-ta)
- {
--    paaudio *g =3D userdata;
-+    PAConnection *c =3D userdata;
-=20
--    pa_threaded_mainloop_signal (g->mainloop, 0);
-+    pa_threaded_mainloop_signal(c->mainloop, 0);
- }
-=20
- static pa_stream *qpa_simple_new (
--        paaudio *g,
-+        PAConnection *c,
-         const char *name,
-         pa_stream_direction_t dir,
-         const char *dev,
-@@ -486,50 +497,48 @@ static pa_stream *qpa_simple_new (
- {
-     int r;
-     pa_stream *stream;
-+    pa_stream_flags_t flags;
-=20
--    pa_threaded_mainloop_lock (g->mainloop);
-+    pa_threaded_mainloop_lock(c->mainloop);
-=20
--    stream =3D pa_stream_new (g->context, name, ss, map);
-+    stream =3D pa_stream_new(c->context, name, ss, map);
-     if (!stream) {
-         goto fail;
-     }
-=20
--    pa_stream_set_state_callback (stream, stream_state_cb, g);
--    pa_stream_set_read_callback (stream, stream_request_cb, g);
--    pa_stream_set_write_callback (stream, stream_request_cb, g);
-+    pa_stream_set_state_callback(stream, stream_state_cb, c);
-+    pa_stream_set_read_callback(stream, stream_request_cb, c);
-+    pa_stream_set_write_callback(stream, stream_request_cb, c);
-+
-+    flags =3D
-+        PA_STREAM_INTERPOLATE_TIMING
-+#ifdef PA_STREAM_ADJUST_LATENCY
-+        | PA_STREAM_ADJUST_LATENCY
-+#endif
-+        | PA_STREAM_AUTO_TIMING_UPDATE;
-=20
-     if (dir =3D=3D PA_STREAM_PLAYBACK) {
--        r =3D pa_stream_connect_playback (stream, dev, attr,
--                                        PA_STREAM_INTERPOLATE_TIMING
--#ifdef PA_STREAM_ADJUST_LATENCY
--                                        |PA_STREAM_ADJUST_LATENCY
--#endif
--                                        |PA_STREAM_AUTO_TIMING_UPDATE, N=
-ULL, NULL);
-+        r =3D pa_stream_connect_playback(stream, dev, attr, flags, NULL,=
- NULL);
-     } else {
--        r =3D pa_stream_connect_record (stream, dev, attr,
--                                      PA_STREAM_INTERPOLATE_TIMING
--#ifdef PA_STREAM_ADJUST_LATENCY
--                                      |PA_STREAM_ADJUST_LATENCY
--#endif
--                                      |PA_STREAM_AUTO_TIMING_UPDATE);
-+        r =3D pa_stream_connect_record(stream, dev, attr, flags);
-     }
-=20
-     if (r < 0) {
-       goto fail;
-     }
-=20
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-=20
-     return stream;
-=20
- fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
-+    pa_threaded_mainloop_unlock(c->mainloop);
-=20
-     if (stream) {
-         pa_stream_unref (stream);
-     }
-=20
--    *rerror =3D pa_context_errno (g->context);
-+    *rerror =3D pa_context_errno(c->context);
-=20
-     return NULL;
- }
-@@ -545,6 +554,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audset=
-tings *as,
-     paaudio *g =3D pa->g =3D drv_opaque;
-     AudiodevPaOptions *popts =3D &g->dev->u.pa;
-     AudiodevPaPerDirectionOptions *ppdo =3D popts->out;
-+    PAConnection *c =3D g->conn;
-=20
-     ss.format =3D audfmt_to_pa (as->fmt, as->endianness);
-     ss.channels =3D as->nchannels;
-@@ -558,7 +568,7 @@ static int qpa_init_out(HWVoiceOut *hw, struct audset=
-tings *as,
-     obt_as.fmt =3D pa_to_audfmt (ss.format, &obt_as.endianness);
-=20
-     pa->stream =3D qpa_simple_new (
--        g,
-+        c,
-         "qemu",
-         PA_STREAM_PLAYBACK,
-         ppdo->has_name ? ppdo->name : NULL,
-@@ -612,6 +622,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsetti=
-ngs *as, void *drv_opaque)
-     paaudio *g =3D pa->g =3D drv_opaque;
-     AudiodevPaOptions *popts =3D &g->dev->u.pa;
-     AudiodevPaPerDirectionOptions *ppdo =3D popts->in;
-+    PAConnection *c =3D g->conn;
-=20
-     ss.format =3D audfmt_to_pa (as->fmt, as->endianness);
-     ss.channels =3D as->nchannels;
-@@ -625,7 +636,7 @@ static int qpa_init_in(HWVoiceIn *hw, struct audsetti=
-ngs *as, void *drv_opaque)
-     obt_as.fmt =3D pa_to_audfmt (ss.format, &obt_as.endianness);
-=20
-     pa->stream =3D qpa_simple_new (
--        g,
-+        c,
-         "qemu",
-         PA_STREAM_RECORD,
-         ppdo->has_name ? ppdo->name : NULL,
-@@ -714,7 +725,7 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ...)
-     PAVoiceOut *pa =3D (PAVoiceOut *) hw;
-     pa_operation *op;
-     pa_cvolume v;
--    paaudio *g =3D pa->g;
-+    PAConnection *c =3D pa->g->conn;
-=20
- #ifdef PA_CHECK_VERSION    /* macro is present in 0.9.16+ */
-     pa_cvolume_init (&v);  /* function is present in 0.9.13+ */
-@@ -734,28 +745,29 @@ static int qpa_ctl_out (HWVoiceOut *hw, int cmd, ..=
-.)
-             v.values[0] =3D ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vo=
-l.l) / UINT32_MAX;
-             v.values[1] =3D ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vo=
-l.r) / UINT32_MAX;
-=20
--            pa_threaded_mainloop_lock (g->mainloop);
-+            pa_threaded_mainloop_lock(c->mainloop);
-=20
--            op =3D pa_context_set_sink_input_volume (g->context,
-+            op =3D pa_context_set_sink_input_volume(c->context,
-                 pa_stream_get_index (pa->stream),
-                 &v, NULL, NULL);
--            if (!op)
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_sink_input_volume() failed\n");
--            else
--                pa_operation_unref (op);
-+            if (!op) {
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_sink_input_volume() failed\n");
-+            } else {
-+                pa_operation_unref(op);
-+            }
-=20
--            op =3D pa_context_set_sink_input_mute (g->context,
-+            op =3D pa_context_set_sink_input_mute(c->context,
-                 pa_stream_get_index (pa->stream),
-                sw->vol.mute, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_sink_input_mute() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_sink_input_mute() failed\n");
-             } else {
--                pa_operation_unref (op);
-+                pa_operation_unref(op);
-             }
-=20
--            pa_threaded_mainloop_unlock (g->mainloop);
-+            pa_threaded_mainloop_unlock(c->mainloop);
-         }
-     }
-     return 0;
-@@ -766,7 +778,7 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-     PAVoiceIn *pa =3D (PAVoiceIn *) hw;
-     pa_operation *op;
-     pa_cvolume v;
--    paaudio *g =3D pa->g;
-+    PAConnection *c =3D pa->g->conn;
-=20
- #ifdef PA_CHECK_VERSION
-     pa_cvolume_init (&v);
-@@ -786,29 +798,29 @@ static int qpa_ctl_in (HWVoiceIn *hw, int cmd, ...)
-             v.values[0] =3D ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vo=
-l.l) / UINT32_MAX;
-             v.values[1] =3D ((PA_VOLUME_NORM - PA_VOLUME_MUTED) * sw->vo=
-l.r) / UINT32_MAX;
-=20
--            pa_threaded_mainloop_lock (g->mainloop);
-+            pa_threaded_mainloop_lock(c->mainloop);
-=20
--            op =3D pa_context_set_source_output_volume (g->context,
--                pa_stream_get_index (pa->stream),
-+            op =3D pa_context_set_source_output_volume(c->context,
-+                pa_stream_get_index(pa->stream),
-                 &v, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_source_output_volume() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_source_output_volume() failed\n");
-             } else {
-                 pa_operation_unref(op);
-             }
-=20
--            op =3D pa_context_set_source_output_mute (g->context,
-+            op =3D pa_context_set_source_output_mute(c->context,
-                 pa_stream_get_index (pa->stream),
-                 sw->vol.mute, NULL, NULL);
-             if (!op) {
--                qpa_logerr (pa_context_errno (g->context),
--                            "set_source_output_mute() failed\n");
-+                qpa_logerr(pa_context_errno(c->context),
-+                           "set_source_output_mute() failed\n");
-             } else {
-                 pa_operation_unref (op);
-             }
-=20
--            pa_threaded_mainloop_unlock (g->mainloop);
-+            pa_threaded_mainloop_unlock(c->mainloop);
-         }
-     }
-     return 0;
-@@ -828,11 +840,75 @@ static int qpa_validate_per_direction_opts(Audiodev=
- *dev,
-     return 1;
- }
-=20
-+/* common */
-+static void *qpa_conn_init(const char *server)
-+{
-+    PAConnection *c =3D g_malloc0(sizeof(PAConnection));
-+    QTAILQ_INSERT_TAIL(&pa_conns, c, list);
-+
-+    c->mainloop =3D pa_threaded_mainloop_new();
-+    if (!c->mainloop) {
-+        goto fail;
-+    }
-+
-+    c->context =3D pa_context_new(pa_threaded_mainloop_get_api(c->mainlo=
-op),
-+                                server);
-+    if (!c->context) {
-+        goto fail;
-+    }
-+
-+    pa_context_set_state_callback(c->context, context_state_cb, c);
-+
-+    if (pa_context_connect(c->context, server, 0, NULL) < 0) {
-+        qpa_logerr(pa_context_errno(c->context),
-+                   "pa_context_connect() failed\n");
-+        goto fail;
-+    }
-+
-+    pa_threaded_mainloop_lock(c->mainloop);
-+
-+    if (pa_threaded_mainloop_start(c->mainloop) < 0) {
-+        goto unlock_and_fail;
-+    }
-+
-+    for (;;) {
-+        pa_context_state_t state;
-+
-+        state =3D pa_context_get_state(c->context);
-+
-+        if (state =3D=3D PA_CONTEXT_READY) {
-+            break;
-+        }
-+
-+        if (!PA_CONTEXT_IS_GOOD(state)) {
-+            qpa_logerr(pa_context_errno(c->context),
-+                       "Wrong context state\n");
-+            goto unlock_and_fail;
-+        }
-+
-+        /* Wait until the context is ready */
-+        pa_threaded_mainloop_wait(c->mainloop);
-+    }
-+
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+    return c;
-+
-+unlock_and_fail:
-+    pa_threaded_mainloop_unlock(c->mainloop);
-+fail:
-+    AUD_log (AUDIO_CAP, "Failed to initialize PA context");
-+    qpa_conn_fini(c);
-+    return NULL;
-+}
-+
- static void *qpa_audio_init(Audiodev *dev)
- {
-     paaudio *g;
-     AudiodevPaOptions *popts =3D &dev->u.pa;
-     const char *server;
-+    PAConnection *c;
-+
-+    assert(dev->driver =3D=3D AUDIODEV_DRIVER_PA);
-=20
-     if (!popts->has_server) {
-         char pidfile[64];
-@@ -849,93 +925,64 @@ static void *qpa_audio_init(Audiodev *dev)
-         }
-     }
-=20
--    assert(dev->driver =3D=3D AUDIODEV_DRIVER_PA);
--
--    g =3D g_malloc(sizeof(paaudio));
--    server =3D popts->has_server ? popts->server : NULL;
--
-     if (!qpa_validate_per_direction_opts(dev, popts->in)) {
--        goto fail;
-+        return NULL;
-     }
-     if (!qpa_validate_per_direction_opts(dev, popts->out)) {
--        goto fail;
-+        return NULL;
-     }
-=20
-+    g =3D g_malloc0(sizeof(paaudio));
-+    server =3D popts->has_server ? popts->server : NULL;
-+
-     g->dev =3D dev;
--    g->mainloop =3D NULL;
--    g->context =3D NULL;
-=20
--    g->mainloop =3D pa_threaded_mainloop_new ();
--    if (!g->mainloop) {
--        goto fail;
--    }
--
--    g->context =3D pa_context_new (pa_threaded_mainloop_get_api (g->main=
-loop),
--                                 server);
--    if (!g->context) {
--        goto fail;
--    }
--
--    pa_context_set_state_callback (g->context, context_state_cb, g);
--
--    if (pa_context_connect(g->context, server, 0, NULL) < 0) {
--        qpa_logerr (pa_context_errno (g->context),
--                    "pa_context_connect() failed\n");
--        goto fail;
--    }
--
--    pa_threaded_mainloop_lock (g->mainloop);
--
--    if (pa_threaded_mainloop_start (g->mainloop) < 0) {
--        goto unlock_and_fail;
--    }
--
--    for (;;) {
--        pa_context_state_t state;
--
--        state =3D pa_context_get_state (g->context);
--
--        if (state =3D=3D PA_CONTEXT_READY) {
-+    QTAILQ_FOREACH(c, &pa_conns, list) {
-+        if (server =3D=3D NULL || c->server =3D=3D NULL ?
-+            server =3D=3D c->server :
-+            strcmp(server, c->server) =3D=3D 0) {
-+            g->conn =3D c;
-             break;
-         }
--
--        if (!PA_CONTEXT_IS_GOOD (state)) {
--            qpa_logerr (pa_context_errno (g->context),
--                        "Wrong context state\n");
--            goto unlock_and_fail;
--        }
--
--        /* Wait until the context is ready */
--        pa_threaded_mainloop_wait (g->mainloop);
-+    }
-+    if (!g->conn) {
-+        g->conn =3D qpa_conn_init(server);
-+    }
-+    if (!g->conn) {
-+        g_free(g);
-+        return NULL;
-     }
-=20
--    pa_threaded_mainloop_unlock (g->mainloop);
--
-+    ++g->conn->refcount;
-     return g;
-+}
-=20
--unlock_and_fail:
--    pa_threaded_mainloop_unlock (g->mainloop);
--fail:
--    AUD_log (AUDIO_CAP, "Failed to initialize PA context");
--    qpa_audio_fini(g);
--    return NULL;
-+static void qpa_conn_fini(PAConnection *c)
-+{
-+    if (c->mainloop) {
-+        pa_threaded_mainloop_stop(c->mainloop);
-+    }
-+
-+    if (c->context) {
-+        pa_context_disconnect(c->context);
-+        pa_context_unref(c->context);
-+    }
-+
-+    if (c->mainloop) {
-+        pa_threaded_mainloop_free(c->mainloop);
-+    }
-+
-+    QTAILQ_REMOVE(&pa_conns, c, list);
-+    g_free(c);
- }
-=20
- static void qpa_audio_fini (void *opaque)
- {
-     paaudio *g =3D opaque;
-+    PAConnection *c =3D g->conn;
-=20
--    if (g->mainloop) {
--        pa_threaded_mainloop_stop (g->mainloop);
--    }
--
--    if (g->context) {
--        pa_context_disconnect (g->context);
--        pa_context_unref (g->context);
--    }
--
--    if (g->mainloop) {
--        pa_threaded_mainloop_free (g->mainloop);
-+    if (--c->refcount =3D=3D 0) {
-+        qpa_conn_fini(c);
-     }
-=20
-     g_free(g);
---=20
-2.18.1
-
+MTMuMDguMjAxOSAxNDowNCwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMTIuMDguMjAxOSB1bSAy
+MDoxMSBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IEJE
+UlZfQkxPQ0tfUkFXIG1ha2VzIGdlbmVyaWMgYmRydl9jb19ibG9ja19zdGF0dXMgdG8gZmFsbHRo
+cm91Z2ggdG8NCj4+IHJldHVybmVkIGZpbGUuIEJ1dCBpcyBpdCBjb3JyZWN0IGJlaGF2aW9yIGF0
+IGFsbD8gSWYgcmV0dXJuZWQgZmlsZQ0KPj4gaXRzZWxmIGhhcyBhIGJhY2tpbmcgZmlsZSwgd2Ug
+bWF5IHJlcG9ydCBhcyB0b3RhbGx5IHVuYWxsb2NhdGVkIGFuZA0KPj4gYXJlYSB3aGljaCBhY3R1
+YWxseSBoYXMgZGF0YSBpbiBib3R0b20gYmFja2luZyBmaWxlLg0KPj4NCj4+IFNvLCBtaXJyb3Jp
+bmcgb2YgcWNvdzIgdW5kZXIgcmF3LWZvcm1hdCBpcyBicm9rZW4uIFdoaWNoIGlzIGlsbHVzdHJh
+dGVkDQo+PiBieSBmb2xsb3dpbmcgY29tbWl0IHdpdGggYSB0ZXN0LiBMZXQncyBtYWtlIHJhdy1m
+b3JtYXQgYmVoYXZlIG1vcmUNCj4+IGNvcnJlY3RseSByZXR1cm5pbmcgQkRSVl9CTE9DS19EQVRB
+Lg0KPj4NCj4+IFN1Z2dlc3RlZC1ieTogTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT4NCj4+
+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZA
+dmlydHVvenpvLmNvbT4NCj4gDQo+IEFmdGVyIHNvbWUgcmVhZGluZywgSSB0aGluayBJIGNhbWUg
+dG8gdGhlIGNvbmNsdXNpb24gdGhhdCBSQVcgaXMgdGhlDQo+IGNvcnJlY3QgdGhpbmcgdG8gZG8u
+IFRoZXJlIGlzIGluZGVlZCBhIHByb2JsZW0sIGJ1dCB0aGlzIHBhdGNoIGlzIHRyeWluZw0KPiB0
+byBmaXggaXQgaW4gdGhlIHdyb25nIHBsYWNlLg0KPiANCj4gSW4gdGhlIGNhc2Ugd2hlcmUgdGhl
+IGJhY2tpbmcgZmlsZSBjb250YWlucyBzb21lIGRhdGEsIGFuZCB3ZSBoYXZlIGENCj4gJ3Jhdycg
+bm9kZSBhYm92ZSB0aGUgcWNvdzIgb3ZlcmxheSBub2RlLCB0aGUgY29udGVudCBvZiB0aGUgcmVz
+cGVjdGl2ZQ0KPiBibG9jayBpcyBub3QgZGVmaW5lZCBieSB0aGUgcXVlcmllZCBiYWNraW5nIGZp
+bGUgbGF5ZXIsIHNvIGl0IGlzDQo+IGNvbXBsZXRlbHkgY29ycmVjdCB0aGF0IGJkcnZfaXNfYWxs
+b2NhdGVkKCkgcmV0dXJucyBmYWxzZSwgbGlrZSBpdCB3b3VsZA0KPiBpZiB5b3UgcXVlcmllZCB0
+aGUgcWNvdzIgbGF5ZXIgZGlyZWN0bHkuIElmIGl0IHJldHVybmVkIHRydWUsIHdlIHdvdWxkDQo+
+IGNvcHkgZXZlcnl0aGluZywgd2hpY2ggaXNuJ3QgcmlnaHQgZWl0aGVyICh0aGUgdGVzdCBjYXNl
+cyBzaG91bGQgbWF5IGFkZA0KPiB0aGUgcWVtdS1pbWcgbWFwIG91dHB1dCBvZiB0aGUgdGFyZ2V0
+IHNvIHRoaXMgYmVjb21lcyB2aXNpYmxlKS4NCj4gDQo+IFRoZSBwcm9ibGVtIGlzIHRoYXQgd2Ug
+dHJ5IHRvIHJlY3Vyc2UgYWxvbmcgdGhlIGJhY2tpbmcgY2hhaW4sIGJ1dCB3ZQ0KPiBmYWlsIHRv
+IG1ha2UgdGhlIHN0ZXAgZnJvbSB0aGUgcmF3IG5vZGUgdG8gdGhlIGJhY2tpbmcgZmlsZS4NCg0K
+SSdkIHNheSwgdGhlIHByb2JsZW0gaXMgdGhhdCB3ZSBpZ25vcmUgYmFja2luZyBjaGFpbiBvZiBu
+b24tYmFja2luZyBjaGlsZA0KDQo+IA0KPiBOb3RlIHRoYXQganVzdCBleHRlbmRpbmcgTWF4J3Mg
+ImRlYWwgd2l0aCBmaWx0ZXJzIiBpcyBub3QgZW5vdWdoIHRvIGZpeA0KPiB0aGlzIGJlY2F1c2Ug
+cmF3IGRvZXNuJ3QgYWN0dWFsbHkgbWVldCBhbGwgb2YgdGhlIGNyaXRlcmlhIGZvciBiZWluZyBh
+DQo+IGZpbHRlciBpbiB0aGlzIHNlbnNlIChhdCBsZWFzdCBiZWNhdXNlIHRoZSAnb2Zmc2V0JyBv
+cHRpb24gY2FuIGNoYW5nZQ0KPiBvZmZzZXRzIGJldHdlZW4gcmF3IGFuZCBpdHMgY2hpbGQpLg0K
+PiANCj4gSSB0aGluayB0aGlzIGlzIGVzc2VudGlhbGx5IGEgcmVzdWx0IG9mIHNwZWNpYWwtY2Fz
+aW5nIGJhY2tpbmcgZmlsZXMNCj4gZXZlcnl3aGVyZSBpbnN0ZWFkIG9mIHRyZWF0aW5nIHRoZW0g
+bGlrZSBjaGlsZHJlbiBsaWtlIGFueSBvdGhlci4NCg0KQnV0IHdlIG5lZWQgdG8gc3BlY2lhbC1j
+YXNlIHRoZW0sIGFzIHdlIGhhdmUgaW50ZXJmYWNlcyBvcGVyYXRpbmcgb24gYmFja2luZyBjaGFp
+biwNCg0KPiBiZHJ2X2NvX2Jsb2NrX3N0YXR1c19hYm92ZSgpIHByb2JhYmx5IHNob3VsZG4ndCBy
+ZWN1cnNlIGFsb25nIHRoZQ0KPiBiYWNraW5nIGNoYWluLCBidXQgYWxvbmcgdGhlIHJldHVybmVk
+ICpmaWxlIHBvaW50ZXJzLCBhbmQgY29uc2lkZXIgdGhlDQo+IHJldHVybmVkIG9mZnNldCBpbiAq
+bWFwLg0KPiANCg0KU28sIHlvdSBtZWFuIHRoYXQgaW4gY2FzZSBvZiB1bmFsbG9jYXRlZCwgZm9y
+bWF0IGxheWVyIHNob3VsZCByZXR1cm4gaXQncyBiYWNraW5nIGZpbGUgYXMgZmlsZT8NClRoZW4s
+IG1heWJlIGJkcnZfY29fYmxvY2tfc3RhdHVzIHNob3VsZCBub3QgcmVjdXJzZSBhdCBhbGw/DQoN
+Cg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
