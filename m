@@ -2,51 +2,48 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753F3C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AF2C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:48:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9222084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:47:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9222084F
+	by mail.kernel.org (Postfix) with ESMTPS id 3BDB02084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:48:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BDB02084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxuYu-0006rb-DJ
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 10:47:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34154)
+	id 1hxuaA-00087I-9i
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 10:48:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34161)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxuUo-00043U-Iy
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:43:27 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxuUo-00043o-SR
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxuUn-0002DA-Ce
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxuUn-0002DV-LA
  for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:43:26 -0400
-Received: from relay.sw.ru ([185.231.240.75]:49608)
+Received: from relay.sw.ru ([185.231.240.75]:49618)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxuUi-0002AH-Qn; Wed, 14 Aug 2019 10:43:22 -0400
+ id 1hxuUi-0002AI-Qm; Wed, 14 Aug 2019 10:43:22 -0400
 Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxuUf-0007hk-JB; Wed, 14 Aug 2019 17:43:17 +0300
+ id 1hxuUd-0007hk-RL; Wed, 14 Aug 2019 17:43:16 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Date: Wed, 14 Aug 2019 17:43:15 +0300
-Message-Id: <20190814144315.89729-5-vsementsov@virtuozzo.com>
+Date: Wed, 14 Aug 2019 17:43:11 +0300
+Message-Id: <20190814144315.89729-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190814144315.89729-1-vsementsov@virtuozzo.com>
-References: <20190814144315.89729-1-vsementsov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
 X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH 4/4] block/backup: fix and improve skipping
- unallocated in backup_do_cow
+Subject: [Qemu-devel] [PATCH 0/4] backup: fix skipping unallocated clusters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,73 +61,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-1. There is a bug: after detection an allocated area of skip_bytes
-length we ignore skip_bytes variable and my finish up by copying more
-than skip_bytes.
+Hi all!
 
-2. If request area is allocated we call block_status for each cluster
-on each loop iteration, even if after the first call we know that the
-whole request area is allocated.
+There is a bug in not yet merged patch
+"block/backup: teach TOP to never copy unallocated regions"
+in https://github.com/jnsnow/qemu bitmaps. 04 fixes it. So, I propose
+to put 01-03 somewhere before
+"block/backup: teach TOP to never copy unallocated regions"
+and squash 04 into "block/backup: teach TOP to never copy unallocated regions"
 
-Solve all of this by handling resetting all unallocated bytes from
-requested area before copying loop.
+Based-on: https://github.com/jnsnow/qemu bitmaps
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/backup.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+Vladimir Sementsov-Ogievskiy (4):
+  block/dirty-bitmap: switch _next_dirty_area and _next_zero to int64_t
+  block/dirty-bitmap: add _next_dirty API
+  block/backup: use bdrv_dirty_bitmap_next_dirty
+  block/backup: fix and improve skipping unallocated in backup_do_cow
 
-diff --git a/block/backup.c b/block/backup.c
-index 9bddea1b59..d0815b21c8 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -257,7 +257,6 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     int ret = 0;
-     int64_t start, end; /* bytes */
-     void *bounce_buffer = NULL;
--    int64_t skip_bytes;
- 
-     qemu_co_rwlock_rdlock(&job->flush_rwlock);
- 
-@@ -269,6 +268,22 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     wait_for_overlapping_requests(job, start, end);
-     cow_request_begin(&cow_request, job, start, end);
- 
-+    if (job->initializing_bitmap) {
-+        int64_t off = start;
-+        int64_t count;
-+
-+        while (off < end) {
-+            off = bdrv_dirty_bitmap_next_dirty(job->copy_bitmap,
-+                                               off, end - off);
-+            if (off < 0) {
-+                break;
-+            }
-+
-+            backup_bitmap_reset_unallocated(job, off, &count);
-+            off += count;
-+        }
-+    }
-+
-     while (start < end) {
-         int64_t dirty_end;
- 
-@@ -277,15 +292,6 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-             break;
-         }
- 
--        if (job->initializing_bitmap) {
--            ret = backup_bitmap_reset_unallocated(job, start, &skip_bytes);
--            if (ret == 0) {
--                trace_backup_do_cow_skip_range(job, start, skip_bytes);
--                start += skip_bytes;
--                continue;
--            }
--        }
--
-         dirty_end = bdrv_dirty_bitmap_next_zero(job->copy_bitmap, start,
-                                                 (end - start));
-         if (dirty_end < 0) {
+ include/block/dirty-bitmap.h |  8 ++--
+ include/qemu/hbitmap.h       | 18 +++++++--
+ block/backup.c               | 33 ++++++++++-------
+ block/dirty-bitmap.c         | 12 ++++--
+ block/mirror.c               |  4 +-
+ tests/test-hbitmap.c         | 32 ++++++++--------
+ util/hbitmap.c               | 72 ++++++++++++++++++++----------------
+ block/trace-events           |  1 -
+ 8 files changed, 107 insertions(+), 73 deletions(-)
+
 -- 
 2.18.0
 
