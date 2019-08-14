@@ -2,101 +2,90 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ABF5C0650F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 06:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F616C0650F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 06:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04506208C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 06:13:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04506208C2
+	by mail.kernel.org (Postfix) with ESMTPS id 161D321721
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 06:13:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161D321721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxmWp-0003zo-NC
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 02:12:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52407)
+	id 1hxmX1-0004HG-Pd
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 02:13:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52404)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hxmV3-0002QX-7Y
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hxmV3-0002QR-5m
  for qemu-devel@nongnu.org; Wed, 14 Aug 2019 02:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hxmV2-0006LT-16
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 02:11:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53364)
+ (envelope-from <aravinda@linux.vnet.ibm.com>) id 1hxmV1-0006Kh-QX
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 02:11:08 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57942
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aravinda@linux.vnet.ibm.com>)
- id 1hxmV1-0006JP-Mg
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 02:11:07 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- x7E66r6D050432
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 02:11:06 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2uc9s0ed0x-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 02:11:05 -0400
-Received: from localhost
- by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <aravinda@linux.vnet.ibm.com>;
- Wed, 14 Aug 2019 07:11:05 +0100
-Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
- by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized
- Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 14 Aug 2019 07:11:03 +0100
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- x7E6B2Kq47120668
+ id 1hxmUz-0006F7-Ca; Wed, 14 Aug 2019 02:11:05 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7E673q5007849; Wed, 14 Aug 2019 02:10:55 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2uccda8sbs-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 14 Aug 2019 02:10:55 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x7E6AFtw029578;
+ Wed, 14 Aug 2019 06:10:54 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma05wdc.us.ibm.com with ESMTP id 2u9nj63sxu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 14 Aug 2019 06:10:54 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x7E6ArBl61014378
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 14 Aug 2019 06:11:02 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7EA206A04D;
- Wed, 14 Aug 2019 06:11:02 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 358AF6A047;
- Wed, 14 Aug 2019 06:11:00 +0000 (GMT)
+ Wed, 14 Aug 2019 06:10:53 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8F54B6E050;
+ Wed, 14 Aug 2019 06:10:53 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4424F6E04E;
+ Wed, 14 Aug 2019 06:10:51 +0000 (GMT)
 Received: from [127.0.1.1] (unknown [9.124.31.79])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 14 Aug 2019 06:10:59 +0000 (GMT)
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 14 Aug 2019 06:10:50 +0000 (GMT)
 From: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
 To: aik@au1.ibm.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
  david@gibson.dropbear.id.au
-Date: Wed, 14 Aug 2019 11:40:58 +0530
-In-Reply-To: <156576293464.29984.1631520917528142744.stgit@aravinda>
-References: <156576293464.29984.1631520917528142744.stgit@aravinda>
+Date: Wed, 14 Aug 2019 11:40:50 +0530
+Message-ID: <156576293464.29984.1631520917528142744.stgit@aravinda>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-x-cbid: 19081406-0016-0000-0000-000009DC0450
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011590; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000287; SDB=6.01246559; UDB=6.00657833; IPR=6.01028066; 
- MB=3.00028170; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-14 06:11:04
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19081406-0017-0000-0000-0000446B2F4D
-Message-Id: <156576305894.29984.16040662309121781174.stgit@aravinda>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-08-14_02:, , signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=899 adultscore=0 classifier=spam adjust=0 reason=mlx
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=573 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1906280000 definitions=main-1908140060
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 148.163.156.1
-Subject: [Qemu-devel] [patch-for-4.2 PATCH v11 1/6] Wrapper function to wait
- on condition for the main loop mutex
+X-Received-From: 148.163.158.5
+Subject: [Qemu-devel] [patch-for-4.2 PATCH v11 0/6] target-ppc/spapr: Add
+ FWNMI support in QEMU for PowerKVM guests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,54 +102,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce a wrapper function to wait on condition for
-the main loop mutex. This function atomically releases
-the main loop mutex and causes the calling thread to
-block on the condition. This wrapper is required because
-qemu_global_mutex is a static variable.
+This patch set adds support for FWNMI in PowerKVM guests.
 
-Signed-off-by: Aravinda Prasad <aravinda@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+System errors such as SLB multihit and memory errors
+that cannot be corrected by hardware is passed on to
+the kernel for handling by raising machine check
+exception (an NMI). Upon such machine check exceptions,
+if the address in error belongs to guest then KVM
+invokes guests' 0x200 interrupt vector if the guest
+is not FWNMI capable. For FWNMI capable guest
+KVM passes the control to QEMU by exiting the guest.
+
+This patch series adds functionality to QEMU to pass
+on such machine check exceptions to the FWNMI capable
+guest kernel by building an error log and invoking
+the guest registered machine check handling routine.
+
+The KVM changes are now part of the upstream kernel
+(commit e20bbd3d). This series contain QEMU changes.
+
+Change Log v11:
+  - Moved FWNMI SPAPR cap defaults to 4.2 class option
+  - Fixed issues with handling fwnmi KVM capability
+
+Change Log v10:
+  - Reshuffled the patch sequence + minor fixes
+
+Change Log v9:
+  - Fixed kvm cap and spapr cap issues
+
+Change Log v8:
+  - Added functionality to check FWNMI capability during
+    VM migration
 ---
- cpus.c                   |    5 +++++
- include/qemu/main-loop.h |    8 ++++++++
- 2 files changed, 13 insertions(+)
 
-diff --git a/cpus.c b/cpus.c
-index 927a00a..7dca2b7 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1867,6 +1867,11 @@ void qemu_mutex_unlock_iothread(void)
-     qemu_mutex_unlock(&qemu_global_mutex);
- }
- 
-+void qemu_cond_wait_iothread(QemuCond *cond)
-+{
-+    qemu_cond_wait(cond, &qemu_global_mutex);
-+}
-+
- static bool all_vcpus_paused(void)
- {
-     CPUState *cpu;
-diff --git a/include/qemu/main-loop.h b/include/qemu/main-loop.h
-index f6ba78e..a6d20b0 100644
---- a/include/qemu/main-loop.h
-+++ b/include/qemu/main-loop.h
-@@ -295,6 +295,14 @@ void qemu_mutex_lock_iothread_impl(const char *file, int line);
-  */
- void qemu_mutex_unlock_iothread(void);
- 
-+/*
-+ * qemu_cond_wait_iothread: Wait on condition for the main loop mutex
-+ *
-+ * This function atomically releases the main loop mutex and causes
-+ * the calling thread to block on the condition.
-+ */
-+void qemu_cond_wait_iothread(QemuCond *cond);
-+
- /* internal interfaces */
- 
- void qemu_fd_register(int fd);
+Aravinda Prasad (6):
+      Wrapper function to wait on condition for the main loop mutex
+      ppc: spapr: Introduce FWNMI capability
+      target/ppc: Handle NMI guest exit
+      target/ppc: Build rtas error log upon an MCE
+      ppc: spapr: Handle "ibm,nmi-register" and "ibm,nmi-interlock" RTAS calls
+      migration: Include migration support for machine check handling
 
+
+ cpus.c                   |    5 +
+ hw/ppc/spapr.c           |   78 +++++++++++++
+ hw/ppc/spapr_caps.c      |   29 +++++
+ hw/ppc/spapr_events.c    |  268 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_rtas.c      |   78 +++++++++++++
+ include/hw/ppc/spapr.h   |   25 ++++
+ include/qemu/main-loop.h |    8 +
+ target/ppc/cpu.h         |    1 
+ target/ppc/kvm.c         |   38 +++++++
+ target/ppc/kvm_ppc.h     |   13 ++
+ target/ppc/trace-events  |    1 
+ 11 files changed, 542 insertions(+), 2 deletions(-)
+
+--
+Signature
 
