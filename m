@@ -2,63 +2,65 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D529C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E30E0C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:47:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 739752084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:38:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 739752084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A808320665
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:47:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A808320665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxwHu-0007JI-Lt
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 12:38:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53330)
+	id 1hxwQV-0001Lo-DV
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 12:47:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1hxwHF-0006sM-SM
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:37:35 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hxwPQ-0000pm-EJ
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hxwHD-0007ir-Pe
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:37:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60832)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hxwHD-0007iU-HW
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:37:31 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id DA614203ED;
- Wed, 14 Aug 2019 16:37:30 +0000 (UTC)
-Received: from work-vm (ovpn-117-212.ams2.redhat.com [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 599FD81E3B;
- Wed, 14 Aug 2019 16:37:28 +0000 (UTC)
-Date: Wed, 14 Aug 2019 17:37:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Singh, Brijesh" <brijesh.singh@amd.com>
-Message-ID: <20190814163726.GO2920@work-vm>
-References: <20190806165429.19327-1-brijesh.singh@amd.com>
- <20190806165429.19327-14-brijesh.singh@amd.com>
+ (envelope-from <no-reply@patchew.org>) id 1hxwPO-00046O-7v
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:46:00 -0400
+Resent-Date: Wed, 14 Aug 2019 12:45:59 -0400
+Resent-Message-Id: <E1hxwPO-00046O-7v@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21475)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hxwPN-00044q-WF; Wed, 14 Aug 2019 12:45:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565801141; cv=none; d=zoho.com; s=zohoarc; 
+ b=VVXN6DyOTtLY4eErbuiAWB7zCJgxItFGlQjRcH8nahZVAUp0bxtYdk/0DO02KrhsMx+k7mS0ofOb6URR4chuVtbs4jpsy44Y/vLDeGS1DAdjMWTGDO0c9dztM9bZIfU6n1av8d4RIWR40ho2FWRgc6UEhVNHtXcjv4VeRhXJIAE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565801141;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=SKLC5zMvolwvgTT8O3fxUiObbiNSNBwpgCOPZJldWu8=; 
+ b=BP+zB5XMXxha0qE+Fq6yS4nip7wmHi37rOS1awu8XXvnYNgWu1tOoYnLyrQz3A8V7yOvMW1bblitdbg4azC3Ep9dj32OgMnwnNBhGsOuC6Z87qwzJz8lLlJCZ/I5sTu70kpWBMkHarecADp754NHFU007ieG1SD2ItYqb8MiVMA=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565801139639764.4800449502418;
+ Wed, 14 Aug 2019 09:45:39 -0700 (PDT)
+In-Reply-To: <20190814121527.17876-1-philmd@redhat.com>
+Message-ID: <156580113789.3056.11607826485848839827@5dec9699b7de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190806165429.19327-14-brijesh.singh@amd.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Wed, 14 Aug 2019 16:37:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Wed, 14 Aug 2019 09:45:39 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 13/14] migration/ram: add support to
- send encrypted pages
+X-Received-From: 135.84.80.217
+Subject: Re: [Qemu-devel] [PATCH 0/4] configure: Fix libssh on Ubuntu 18.04
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,246 +72,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "Lendacky,
- Thomas" <Thomas.Lendacky@amd.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ philmd@redhat.com, rjones@redhat.com, ptoscano@redhat.com, 1151451036@qq.com,
+ mreitz@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Singh, Brijesh (brijesh.singh@amd.com) wrote:
-> When memory encryption is enabled, the guest memory will be encrypted with
-> the guest specific key. The patch introduces RAM_SAVE_FLAG_ENCRYPTED_PAGE
-> flag to distinguish the encrypted data from plaintext. Encrypted pages
-> may need special handling. The kvm_memcrypt_save_outgoing_page() is used
-> by the sender to write the encrypted pages onto the socket, similarly the
-> kvm_memcrypt_load_incoming_page() is used by the target to read the
-> encrypted pages from the socket and load into the guest memory.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgxNDEyMTUyNy4xNzg3
+Ni0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgYXNh
+biBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIg
+b3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2Jh
+Ymx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
+aW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2Ug
+ZG9ja2VyLXRlc3QtZGVidWdAZmVkb3JhIFRBUkdFVF9MSVNUPXg4Nl82NC1zb2Z0bW11IEo9MTQg
+TkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpDb25maWd1cmUgb3B0aW9uczoKLS1l
+bmFibGUtd2Vycm9yIC0tdGFyZ2V0LWxpc3Q9eDg2XzY0LXNvZnRtbXUgLS1wcmVmaXg9L3RtcC9x
+ZW11LXRlc3QvaW5zdGFsbCAtLXB5dGhvbj0vdXNyL2Jpbi9weXRob24zIC0tZW5hYmxlLWRlYnVn
+IC0tZW5hYmxlLXNhbml0aXplcnMgLS1jeHg9Y2xhbmcrKyAtLWNjPWNsYW5nIC0taG9zdC1jYz1j
+bGFuZwoKRVJST1I6IGNvbmZpZ3VyZSB0ZXN0IHBhc3NlZCB3aXRob3V0IC1XZXJyb3IgYnV0IGZh
+aWxlZCB3aXRoIC1XZXJyb3IuCiAgICAgICBUaGlzIGlzIHByb2JhYmx5IGEgYnVnIGluIHRoZSBj
+b25maWd1cmUgc2NyaXB0LiBUaGUgZmFpbGluZyBjb21tYW5kCiAgICAgICB3aWxsIGJlIGF0IHRo
+ZSBib3R0b20gb2YgY29uZmlnLmxvZy4KICAgICAgIFlvdSBjYW4gcnVuIGNvbmZpZ3VyZSB3aXRo
+IC0tZGlzYWJsZS13ZXJyb3IgdG8gYnlwYXNzIHRoaXMgY2hlY2suCi0tLQpmdW5jczogZG9fY29t
+cGlsZXIgZG9fY2MgY29tcGlsZV9vYmplY3QgY2hlY2tfZGVmaW5lIG1haW4KbGluZXM6IDkyIDEy
+MiA2MjcgNjk2IDAKY2xhbmcgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1E
+X0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAt
+V2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0
+cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLWMgLW8gY29uZmln
+LXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmMKY29uZmlnLXRlbXAvcWVt
+dS1jb25mLmM6MjoyOiBlcnJvcjogX19pMzg2X18gbm90IGRlZmluZWQKI2Vycm9yIF9faTM4Nl9f
+IG5vdCBkZWZpbmVkCiBeCjEgZXJyb3IgZ2VuZXJhdGVkLgotLS0KZnVuY3M6IGRvX2NvbXBpbGVy
+IGRvX2NjIGNvbXBpbGVfb2JqZWN0IGNoZWNrX2RlZmluZSBtYWluCmxpbmVzOiA5MiAxMjIgNjI3
+IDY5OSAwCmNsYW5nIC1EX0dOVV9TT1VSQ0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJH
+RUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwg
+LVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3Qt
+YWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFwdiAtc3RkPWdudTk5IC1jIC1vIGNvbmZpZy10ZW1w
+L3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jCmNvbmZpZy10ZW1wL3FlbXUtY29u
+Zi5jOjI6MjogZXJyb3I6IF9fSUxQMzJfXyBub3QgZGVmaW5lZAojZXJyb3IgX19JTFAzMl9fIG5v
+dCBkZWZpbmVkCiBeCjEgZXJyb3IgZ2VuZXJhdGVkLgotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRv
+X2NjIGNvbXBpbGVfcHJvZyBjY19oYXNfd2FybmluZ19mbGFnIG1haW4KbGluZXM6IDkyIDEyOCAx
+OTU4IDE5NjIgMApjbGFuZyAtbTY0IC1tY3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VU
+X0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5k
+YW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5
+cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAt
+V25vLXN0cmluZy1wbHVzLWludCAtV25vLXR5cGVkZWYtcmVkZWZpbml0aW9uIC1Xbm8taW5pdGlh
+bGl6ZXItb3ZlcnJpZGVzIC1XZXhwYW5zaW9uLXRvLWRlZmluZWQgLVdlbmRpZi1sYWJlbHMgLVdu
+by1zaGlmdC1uZWdhdGl2ZS12YWx1ZSAtV25vLW1pc3NpbmctaW5jbHVkZS1kaXJzIC1XZW1wdHkt
+Ym9keSAtV25lc3RlZC1leHRlcm5zIC1XZm9ybWF0LXNlY3VyaXR5IC1XZm9ybWF0LXkyayAtV2lu
+aXQtc2VsZiAtV2lnbm9yZWQtcXVhbGlmaWVycyAtV2Vycm9yIC1Xb2xkLXN0eWxlLWRlY2xhcmF0
+aW9uIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5leGUgY29uZmlnLXRlbXAvcWVtdS1jb25mLmMg
+LW02NCAtZwplcnJvcjogdW5rbm93biB3YXJuaW5nIG9wdGlvbiAnLVdvbGQtc3R5bGUtZGVjbGFy
+YXRpb24nOyBkaWQgeW91IG1lYW4gJy1Xb3V0LW9mLWxpbmUtZGVjbGFyYXRpb24nPyBbLVdlcnJv
+ciwtV3Vua25vd24td2FybmluZy1vcHRpb25dCgpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29t
+cGlsZV9wcm9nIGNjX2hhc193YXJuaW5nX2ZsYWcgbWFpbgpsaW5lczogOTIgMTI4IDE5NTggMTk2
+MiAwCi0tLQpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9wcm9nIG1haW4KbGluZXM6
+IDkyIDEyOCAyNDAwIDAKY2xhbmcgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJD
+RSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJv
+dG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAt
+V21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndy
+YXB2IC1zdGQ9Z251OTkgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5p
+dGlvbiAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10by1kZWZpbmVkIC1X
+ZW5kaWYtbGFiZWxzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1taXNzaW5nLWluY2x1
+ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1zZWN1cml0eSAt
+V2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdvbGQtc3R5bGUt
+ZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtbyBjb25m
+aWctdGVtcC9xZW11LWNvbmYuZXhlIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jIC1XbCwteixyZWxy
+byAtV2wsLXosbm93IC1waWUgLW02NCAtZyAtbGx6ZnNlCmNvbmZpZy10ZW1wL3FlbXUtY29uZi5j
+OjE6MTA6IGZhdGFsIGVycm9yOiAnbHpmc2UuaCcgZmlsZSBub3QgZm91bmQKI2luY2x1ZGUgPGx6
+ZnNlLmg+CiAgICAgICAgIF5+fn5+fn5+fgoxIGVycm9yIGdlbmVyYXRlZC4KLS0tCmZ1bmNzOiBk
+b19jb21waWxlciBkb19jYyBjb21waWxlX3Byb2cgbWFpbgpsaW5lczogOTIgMTI4IDI5ODEgMApj
+bGFuZyAtZlBJRSAtRFBJRSAtbTY0IC1tY3gxNiAtRF9HTlVfU09VUkNFIC1EX0ZJTEVfT0ZGU0VU
+X0JJVFM9NjQgLURfTEFSR0VGSUxFX1NPVVJDRSAtV3N0cmljdC1wcm90b3R5cGVzIC1XcmVkdW5k
+YW50LWRlY2xzIC1XYWxsIC1XdW5kZWYgLVd3cml0ZS1zdHJpbmdzIC1XbWlzc2luZy1wcm90b3R5
+cGVzIC1mbm8tc3RyaWN0LWFsaWFzaW5nIC1mbm8tY29tbW9uIC1md3JhcHYgLXN0ZD1nbnU5OSAt
+V25vLXN0cmluZy1wbHVzLWludCAtV25vLXR5cGVkZWYtcmVkZWZpbml0aW9uIC1Xbm8taW5pdGlh
+bGl6ZXItb3ZlcnJpZGVzIC1XZXhwYW5zaW9uLXRvLWRlZmluZWQgLVdlbmRpZi1sYWJlbHMgLVdu
+by1zaGlmdC1uZWdhdGl2ZS12YWx1ZSAtV25vLW1pc3NpbmctaW5jbHVkZS1kaXJzIC1XZW1wdHkt
+Ym9keSAtV25lc3RlZC1leHRlcm5zIC1XZm9ybWF0LXNlY3VyaXR5IC1XZm9ybWF0LXkyayAtV2lu
+aXQtc2VsZiAtV2lnbm9yZWQtcXVhbGlmaWVycyAtV29sZC1zdHlsZS1kZWZpbml0aW9uIC1XdHlw
+ZS1saW1pdHMgLWZzdGFjay1wcm90ZWN0b3Itc3Ryb25nIC1JL3Vzci9pbmNsdWRlL3AxMS1raXQt
+MSAtbyBjb25maWctdGVtcC9xZW11LWNvbmYuZXhlIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jIC1X
+bCwteixyZWxybyAtV2wsLXosbm93IC1waWUgLW02NCAtZyAtbHBhbQpjb25maWctdGVtcC9xZW11
+LWNvbmYuYzoxOjEwOiBmYXRhbCBlcnJvcjogJ3NlY3VyaXR5L3BhbV9hcHBsLmgnIGZpbGUgbm90
+IGZvdW5kCiNpbmNsdWRlIDxzZWN1cml0eS9wYW1fYXBwbC5oPgogICAgICAgICBefn5+fn5+fn5+
+fn5+fn5+fn5+fn4KMSBlcnJvciBnZW5lcmF0ZWQuCi0tLQpmdW5jczogZG9fY29tcGlsZXIgZG9f
+Y2MgY29tcGlsZV9wcm9nIG1haW4KbGluZXM6IDkyIDEyOCAzMzEzIDAKY2xhbmcgLWZQSUUgLURQ
+SUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xB
+UkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2Fs
+bCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmlj
+dC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLVduby1zdHJpbmctcGx1
+cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5pdGlvbiAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRl
+cyAtV2V4cGFuc2lvbi10by1kZWZpbmVkIC1XZW5kaWYtbGFiZWxzIC1Xbm8tc2hpZnQtbmVnYXRp
+dmUtdmFsdWUgLVduby1taXNzaW5nLWluY2x1ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQt
+ZXh0ZXJucyAtV2Zvcm1hdC1zZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25v
+cmVkLXF1YWxpZmllcnMgLVdvbGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1mc3Rh
+Y2stcHJvdGVjdG9yLXN0cm9uZyAtSS91c3IvaW5jbHVkZS9wMTEta2l0LTEgLUkvdXNyL2luY2x1
+ZGUvbGlicG5nMTYgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLmV4ZSBjb25maWctdGVtcC9xZW11
+LWNvbmYuYyAtV2wsLXoscmVscm8gLVdsLC16LG5vdyAtcGllIC1tNjQgLWcKY29uZmlnLXRlbXAv
+cWVtdS1jb25mLmM6MjoxMDogZmF0YWwgZXJyb3I6ICd4ZnMveGZzLmgnIGZpbGUgbm90IGZvdW5k
+CiNpbmNsdWRlIDx4ZnMveGZzLmg+CiAgICAgICAgIF5+fn5+fn5+fn5+CjEgZXJyb3IgZ2VuZXJh
+dGVkLgotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfcHJvZyBtYWluCmxpbmVz
+OiA5MiAxMjggMzMzNyAwCmNsYW5nIC1mUElFIC1EUElFIC1tNjQgLW1jeDE2IC1EX0dOVV9TT1VS
+Q0UgLURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXBy
+b3RvdHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3Mg
+LVdtaXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3
+cmFwdiAtc3RkPWdudTk5IC1Xbm8tc3RyaW5nLXBsdXMtaW50IC1Xbm8tdHlwZWRlZi1yZWRlZmlu
+aXRpb24gLVduby1pbml0aWFsaXplci1vdmVycmlkZXMgLVdleHBhbnNpb24tdG8tZGVmaW5lZCAt
+V2VuZGlmLWxhYmVscyAtV25vLXNoaWZ0LW5lZ2F0aXZlLXZhbHVlIC1Xbm8tbWlzc2luZy1pbmNs
+dWRlLWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkg
+LVdmb3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxl
+LWRlZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgLUkvdXNy
+L2luY2x1ZGUvcDExLWtpdC0xIC1JL3Vzci9pbmNsdWRlL2xpYnBuZzE2IC1vIGNvbmZpZy10ZW1w
+L3FlbXUtY29uZi5leGUgY29uZmlnLXRlbXAvcWVtdS1jb25mLmMgLVdsLC16LHJlbHJvIC1XbCwt
+eixub3cgLXBpZSAtbTY0IC1nIC1sdmRlcGx1Zwpjb25maWctdGVtcC9xZW11LWNvbmYuYzoxOjEw
+OiBmYXRhbCBlcnJvcjogJ2xpYnZkZXBsdWcuaCcgZmlsZSBub3QgZm91bmQKI2luY2x1ZGUgPGxp
+YnZkZXBsdWcuaD4KICAgICAgICAgXn5+fn5+fn5+fn5+fn4KMSBlcnJvciBnZW5lcmF0ZWQuCi0t
+LQpmdW5jczogZG9fY29tcGlsZXIgZG9fY2MgY29tcGlsZV9wcm9nIG1haW4KbGluZXM6IDkyIDEy
+OCAzOTAwIDAKY2xhbmcgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAgLUkvdXNyL2xp
+YjY0L2dsaWItMi4wL2luY2x1ZGUgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURfR05VX1NPVVJD
+RSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdzdHJpY3QtcHJv
+dG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUtc3RyaW5ncyAt
+V21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNvbW1vbiAtZndy
+YXB2IC1zdGQ9Z251OTkgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVmLXJlZGVmaW5p
+dGlvbiAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10by1kZWZpbmVkIC1X
+ZW5kaWYtbGFiZWxzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1taXNzaW5nLWluY2x1
+ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1zZWN1cml0eSAt
+V2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdvbGQtc3R5bGUt
+ZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9uZyAtSS91c3Iv
+aW5jbHVkZS9wMTEta2l0LTEgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgLW8gY29uZmlnLXRlbXAv
+cWVtdS1jb25mLmV4ZSBjb25maWctdGVtcC9xZW11LWNvbmYuYyAtV2wsLXoscmVscm8gLVdsLC16
+LG5vdyAtcGllIC1tNjQgLWcKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6Mzo1MjogZXJyb3I6IHRv
+byBmZXcgYXJndW1lbnRzIHRvIGZ1bmN0aW9uIGNhbGwsIGV4cGVjdGVkIDIsIGhhdmUgMQpzdGF0
+aWMgdm9pZCAqZih2b2lkICpwKSB7IHB0aHJlYWRfc2V0bmFtZV9ucCgiUUVNVSIpOyB9CiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgfn5+fn5+fn5+fn5+fn5+fn5+ICAgICAgIF4KL3Vzci9pbmNs
+dWRlL3B0aHJlYWQuaDo0NTI6MTogbm90ZTogJ3B0aHJlYWRfc2V0bmFtZV9ucCcgZGVjbGFyZWQg
+aGVyZQotLS0KZnVuY3M6IGRvX2NvbXBpbGVyIGRvX2NjIGNvbXBpbGVfb2JqZWN0IG1haW4KbGlu
+ZXM6IDkyIDEyMiAzOTYyIDAKY2xhbmcgLXB0aHJlYWQgLUkvdXNyL2luY2x1ZGUvZ2xpYi0yLjAg
+LUkvdXNyL2xpYjY0L2dsaWItMi4wL2luY2x1ZGUgLWZQSUUgLURQSUUgLW02NCAtbWN4MTYgLURf
+R05VX1NPVVJDRSAtRF9GSUxFX09GRlNFVF9CSVRTPTY0IC1EX0xBUkdFRklMRV9TT1VSQ0UgLVdz
+dHJpY3QtcHJvdG90eXBlcyAtV3JlZHVuZGFudC1kZWNscyAtV2FsbCAtV3VuZGVmIC1Xd3JpdGUt
+c3RyaW5ncyAtV21pc3NpbmctcHJvdG90eXBlcyAtZm5vLXN0cmljdC1hbGlhc2luZyAtZm5vLWNv
+bW1vbiAtZndyYXB2IC1zdGQ9Z251OTkgLVduby1zdHJpbmctcGx1cy1pbnQgLVduby10eXBlZGVm
+LXJlZGVmaW5pdGlvbiAtV25vLWluaXRpYWxpemVyLW92ZXJyaWRlcyAtV2V4cGFuc2lvbi10by1k
+ZWZpbmVkIC1XZW5kaWYtbGFiZWxzIC1Xbm8tc2hpZnQtbmVnYXRpdmUtdmFsdWUgLVduby1taXNz
+aW5nLWluY2x1ZGUtZGlycyAtV2VtcHR5LWJvZHkgLVduZXN0ZWQtZXh0ZXJucyAtV2Zvcm1hdC1z
+ZWN1cml0eSAtV2Zvcm1hdC15MmsgLVdpbml0LXNlbGYgLVdpZ25vcmVkLXF1YWxpZmllcnMgLVdv
+bGQtc3R5bGUtZGVmaW5pdGlvbiAtV3R5cGUtbGltaXRzIC1mc3RhY2stcHJvdGVjdG9yLXN0cm9u
+ZyAtSS91c3IvaW5jbHVkZS9wMTEta2l0LTEgLUkvdXNyL2luY2x1ZGUvbGlicG5nMTYgLURIQVZF
+X0xJQlNTSF8wXzggLWMgLW8gY29uZmlnLXRlbXAvcWVtdS1jb25mLm8gY29uZmlnLXRlbXAvcWVt
+dS1jb25mLmMKY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6ODoyNTogd2FybmluZzogJ3NzaF9nZXRf
+cHVibGlja2V5JyBpcyBkZXByZWNhdGVkIFstV2RlcHJlY2F0ZWQtZGVjbGFyYXRpb25zXQppbnQg
+bWFpbih2b2lkKSB7IHJldHVybiBzc2hfZ2V0X3B1YmxpY2tleShOVUxMLCBOVUxMKTsgfQogICAg
+ICAgICAgICAgICAgICAgICAgICBeCi91c3IvaW5jbHVkZS9saWJzc2gvbGlic3NoLmg6NTQ1OjE6
+IG5vdGU6ICdzc2hfZ2V0X3B1YmxpY2tleScgaGFzIGJlZW4gZXhwbGljaXRseSBtYXJrZWQgZGVw
+cmVjYXRlZCBoZXJlCi0tLQovdXNyL2luY2x1ZGUvbGlic3NoL2xpYnNzaC5oOjk5OjQwOiBub3Rl
+OiBleHBhbmRlZCBmcm9tIG1hY3JvICdTU0hfREVQUkVDQVRFRCcKI2RlZmluZSBTU0hfREVQUkVD
+QVRFRCBfX2F0dHJpYnV0ZV9fICgoZGVwcmVjYXRlZCkpCiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KY29uZmlnLXRlbXAvcWVtdS1jb25mLmM6MzozNzogd2FybmluZzog
+dW51c2VkIHZhcmlhYmxlICd2YWwnIFstV3VudXNlZC1jb25zdC12YXJpYWJsZV0Kc3RhdGljIGNv
+bnN0IGVudW0gc3NoX2tub3duX2hvc3RzX2UgdmFsID0gU1NIX0tOT1dOX0hPU1RTX09LOwogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCjIgd2FybmluZ3MgZ2VuZXJhdGVkLgpj
+bGFuZyAtV2Vycm9yIC1wdGhyZWFkIC1JL3Vzci9pbmNsdWRlL2dsaWItMi4wIC1JL3Vzci9saWI2
+NC9nbGliLTIuMC9pbmNsdWRlIC1mUElFIC1EUElFIC1tNjQgLW1jeDE2IC1EX0dOVV9TT1VSQ0Ug
+LURfRklMRV9PRkZTRVRfQklUUz02NCAtRF9MQVJHRUZJTEVfU09VUkNFIC1Xc3RyaWN0LXByb3Rv
+dHlwZXMgLVdyZWR1bmRhbnQtZGVjbHMgLVdhbGwgLVd1bmRlZiAtV3dyaXRlLXN0cmluZ3MgLVdt
+aXNzaW5nLXByb3RvdHlwZXMgLWZuby1zdHJpY3QtYWxpYXNpbmcgLWZuby1jb21tb24gLWZ3cmFw
+diAtc3RkPWdudTk5IC1Xbm8tc3RyaW5nLXBsdXMtaW50IC1Xbm8tdHlwZWRlZi1yZWRlZmluaXRp
+b24gLVduby1pbml0aWFsaXplci1vdmVycmlkZXMgLVdleHBhbnNpb24tdG8tZGVmaW5lZCAtV2Vu
+ZGlmLWxhYmVscyAtV25vLXNoaWZ0LW5lZ2F0aXZlLXZhbHVlIC1Xbm8tbWlzc2luZy1pbmNsdWRl
+LWRpcnMgLVdlbXB0eS1ib2R5IC1XbmVzdGVkLWV4dGVybnMgLVdmb3JtYXQtc2VjdXJpdHkgLVdm
+b3JtYXQteTJrIC1XaW5pdC1zZWxmIC1XaWdub3JlZC1xdWFsaWZpZXJzIC1Xb2xkLXN0eWxlLWRl
+ZmluaXRpb24gLVd0eXBlLWxpbWl0cyAtZnN0YWNrLXByb3RlY3Rvci1zdHJvbmcgLUkvdXNyL2lu
+Y2x1ZGUvcDExLWtpdC0xIC1JL3Vzci9pbmNsdWRlL2xpYnBuZzE2IC1ESEFWRV9MSUJTU0hfMF84
+IC1jIC1vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5vIGNvbmZpZy10ZW1wL3FlbXUtY29uZi5jCmNv
+bmZpZy10ZW1wL3FlbXUtY29uZi5jOjg6MjU6IGVycm9yOiAnc3NoX2dldF9wdWJsaWNrZXknIGlz
+IGRlcHJlY2F0ZWQgWy1XZXJyb3IsLVdkZXByZWNhdGVkLWRlY2xhcmF0aW9uc10KaW50IG1haW4o
+dm9pZCkgeyByZXR1cm4gc3NoX2dldF9wdWJsaWNrZXkoTlVMTCwgTlVMTCk7IH0KICAgICAgICAg
+ICAgICAgICAgICAgICAgXgovdXNyL2luY2x1ZGUvbGlic3NoL2xpYnNzaC5oOjU0NToxOiBub3Rl
+OiAnc3NoX2dldF9wdWJsaWNrZXknIGhhcyBiZWVuIGV4cGxpY2l0bHkgbWFya2VkIGRlcHJlY2F0
+ZWQgaGVyZQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3Jn
+L2xvZ3MvMjAxOTA4MTQxMjE1MjcuMTc4NzYtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmFz
+YW4vP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBh
+dGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/ram.c | 131 +++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 130 insertions(+), 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 57c707525b..100a5a10cd 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -59,6 +59,9 @@
->  #include "qemu/iov.h"
->  #include "hw/boards.h"
->  
-> +/* Defines RAM_SAVE_ENCRYPTED_PAGE and  RAM_SAVE_ENCRYPTED_BITMAP */
-> +#include "sysemu/sev.h"
-> +
->  /***********************************************************/
->  /* ram save/restore */
->  
-> @@ -77,6 +80,7 @@
->  #define RAM_SAVE_FLAG_XBZRLE   0x40
->  /* 0x80 is reserved in migration.h start with 0x100 next */
->  #define RAM_SAVE_FLAG_COMPRESS_PAGE    0x100
-> +#define RAM_SAVE_FLAG_ENCRYPTED_DATA   0x200
->  
->  static inline bool is_zero_range(uint8_t *p, uint64_t size)
->  {
-> @@ -460,6 +464,9 @@ static QemuCond decomp_done_cond;
->  
->  static bool do_compress_ram_page(QEMUFile *f, z_stream *stream, RAMBlock *block,
->                                   ram_addr_t offset, uint8_t *source_buf);
-> +static int ram_save_encrypted_page(RAMState *rs, PageSearchStatus *pss,
-> +                                   bool last_stage);
-> +
->  
->  static void *do_data_compress(void *opaque)
->  {
-> @@ -2039,6 +2046,73 @@ static int save_normal_page(RAMState *rs, RAMBlock *block, ram_addr_t offset,
->      return 1;
->  }
->  
-> +/**
-> + * ram_save_encrypted_page - send the given encrypted page to the stream
-> + */
-> +static int ram_save_encrypted_page(RAMState *rs, PageSearchStatus *pss,
-> +                                   bool last_stage)
-> +{
-> +    int ret;
-> +    uint8_t *p;
-> +    RAMBlock *block = pss->block;
-> +    ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
-> +    uint64_t bytes_xmit;
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    struct MachineMemoryEncryptionOps *ops = mc->memory_encryption_ops;
-> +
-> +    p = block->host + offset;
-> +
-> +    ram_counters.transferred +=
-> +        save_page_header(rs, rs->f, block,
-> +                    offset | RAM_SAVE_FLAG_ENCRYPTED_DATA);
-> +
-> +    qemu_put_be32(rs->f, RAM_SAVE_ENCRYPTED_PAGE);
-> +    ret = ops->save_outgoing_page(rs->f, p, TARGET_PAGE_SIZE, &bytes_xmit);
-> +    if (ret) {
-> +        return -1;
-> +    }
-> +
-> +    ram_counters.transferred += bytes_xmit;
-> +    ram_counters.normal++;
-> +
-> +    return 1;
-> +}
-> +
-> +/**
-> + * ram_save_encrypted_bitmap: send the encrypted page state bitmap
-> + */
-> +static int ram_save_encrypted_bitmap(RAMState *rs, QEMUFile *f)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    struct MachineMemoryEncryptionOps *ops = mc->memory_encryption_ops;
-> +
-> +    save_page_header(rs, rs->f, rs->last_seen_block,
-> +                     RAM_SAVE_FLAG_ENCRYPTED_DATA);
-> +    qemu_put_be32(rs->f, RAM_SAVE_ENCRYPTED_BITMAP);
-> +    return ops->save_outgoing_bitmap(rs->f);
-> +}
-> +
-> +static int load_encrypted_data(QEMUFile *f, uint8_t *ptr)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    struct MachineMemoryEncryptionOps *ops = mc->memory_encryption_ops;
-> +    int flag;
-> +
-> +    flag = qemu_get_be32(f);
-> +
-> +    if (flag == RAM_SAVE_ENCRYPTED_PAGE) {
-> +        return ops->load_incoming_page(f, ptr);
-> +    } else if (flag == RAM_SAVE_ENCRYPTED_BITMAP) {
-> +        return ops->load_incoming_bitmap(f);
-> +    } else {
-> +        error_report("unknown encrypted flag %x", flag);
-> +        return 1;
-> +    }
-> +}
-> +
->  /**
->   * ram_save_page: send the given page to the stream
->   *
-> @@ -2528,6 +2602,22 @@ static bool save_compress_page(RAMState *rs, RAMBlock *block, ram_addr_t offset)
->      return false;
->  }
->  
-> +/**
-> + * encrypted_test_bitmap: check if the page is encrypted
-> + *
-> + * Returns a bool indicating whether the page is encrypted.
-> + */
-> +static bool encrypted_test_bitmap(RAMState *rs, RAMBlock *block,
-> +                                  unsigned long page)
-> +{
-> +    /* ROM devices contains the unencrypted data */
-> +    if (memory_region_is_rom(block->mr)) {
-> +        return false;
-> +    }
-> +
-> +    return test_bit(page, block->encbmap);
-> +}
-> +
->  /**
->   * ram_save_target_page: save one target page
->   *
-> @@ -2548,6 +2638,17 @@ static int ram_save_target_page(RAMState *rs, PageSearchStatus *pss,
->          return res;
->      }
->  
-> +    /*
-> +     * If memory encryption is enabled then use memory encryption APIs
-> +     * to write the outgoing buffer to the wire. The encryption APIs
-> +     * will take care of accessing the guest memory and re-encrypt it
-> +     * for the transport purposes.
-> +     */
-> +    if (memcrypt_enabled() &&
-> +        encrypted_test_bitmap(rs, pss->block, pss->page)) {
-> +        return ram_save_encrypted_page(rs, pss, last_stage);
-> +    }
-> +
->      if (save_compress_page(rs, block, offset)) {
->          return 1;
->      }
-> @@ -3445,6 +3546,16 @@ void qemu_guest_free_page_hint(void *addr, size_t len)
->      }
->  }
->  
-> +static int ram_encrypted_save_setup(void)
-> +{
-> +    MachineState *ms = MACHINE(qdev_get_machine());
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    MigrationParameters *p = &migrate_get_current()->parameters;
-> +    struct MachineMemoryEncryptionOps *ops = mc->memory_encryption_ops;
-> +
-> +    return ops->save_setup(p->sev_pdh, p->sev_plat_cert, p->sev_amd_cert);
-> +}
-> +
->  /*
->   * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
->   * long-running RCU critical section.  When rcu-reclaims in the code
-> @@ -3480,6 +3591,12 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
->  
->      rcu_read_lock();
->  
-> +    if (memcrypt_enabled()) {
-> +        if (ram_encrypted_save_setup()) {
-> +            return -1;
-> +        }
-> +    }
-> +
->      qemu_put_be64(f, ram_bytes_total_common(true) | RAM_SAVE_FLAG_MEM_SIZE);
->  
->      RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> @@ -3644,6 +3761,11 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
->      flush_compressed_data(rs);
->      ram_control_after_iterate(f, RAM_CONTROL_FINISH);
->  
-> +    /* send the page encryption state bitmap */
-> +    if (memcrypt_enabled()) {
-> +        ret = ram_save_encrypted_bitmap(rs, f);
-> +    }
-> +
->      rcu_read_unlock();
->  
->      multifd_send_sync_main();
-> @@ -4391,7 +4513,8 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->          }
->  
->          if (flags & (RAM_SAVE_FLAG_ZERO | RAM_SAVE_FLAG_PAGE |
-> -                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE)) {
-> +                     RAM_SAVE_FLAG_COMPRESS_PAGE | RAM_SAVE_FLAG_XBZRLE |
-> +                     RAM_SAVE_FLAG_ENCRYPTED_DATA)) {
->              RAMBlock *block = ram_block_from_stream(f, flags);
->  
->              /*
-> @@ -4505,6 +4628,12 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
->                  break;
->              }
->              break;
-> +        case RAM_SAVE_FLAG_ENCRYPTED_DATA:
-> +            if (load_encrypted_data(f, host)) {
-> +                    error_report("Failed to load encrypted data");
-> +                    ret = -EINVAL;
-> +            }
-> +            break;
->          case RAM_SAVE_FLAG_EOS:
->              /* normal exit */
->              multifd_recv_sync_main();
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
