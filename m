@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B75AAC32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0361BC32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:32:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F776214C6
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:32:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F776214C6
+	by mail.kernel.org (Postfix) with ESMTPS id C92FE2133F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:32:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C92FE2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxzwT-0005IW-Tn
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:32:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33200)
+	id 1hxzwa-0005RI-4L
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:32:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1hxznN-00049C-2D
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:22:58 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hxznq-0004UW-0x
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hxznL-00042S-7T
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:22:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59433)
+ (envelope-from <mlevitsk@redhat.com>) id 1hxzno-0004LA-Lt
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:23:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48019)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hxznA-0003uv-Jz; Wed, 14 Aug 2019 16:22:45 -0400
+ id 1hxznl-0004J7-JU; Wed, 14 Aug 2019 16:23:21 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 83BDA30BA1C9;
- Wed, 14 Aug 2019 20:22:42 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E234E302C076;
+ Wed, 14 Aug 2019 20:23:20 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A6F210002BA;
- Wed, 14 Aug 2019 20:22:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 571E310001B8;
+ Wed, 14 Aug 2019 20:23:11 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:22:11 +0300
-Message-Id: <20190814202219.1870-6-mlevitsk@redhat.com>
+Date: Wed, 14 Aug 2019 23:22:16 +0300
+Message-Id: <20190814202219.1870-11-mlevitsk@redhat.com>
 In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
 References: <20190814202219.1870-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 14 Aug 2019 20:22:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 14 Aug 2019 20:23:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 05/13] qcrypto-luks: clear the masterkey and
- password before freeing them always
+Subject: [Qemu-devel] [PATCH 10/13] block/crypto: implement the encryption
+ key management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,109 +74,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While there are other places where these are still stored in memory,
-this is still one less key material area that can be sniffed with
-various side channel attacks
+This implements the encryption key management
+using the generic code in qcrypto layer
 
-
+This code adds another 'write_func' because the initialization
+write_func works directly on the underlying file,
+because during the creation, there is no open instance
+of the luks driver, but during regular use, we have it,
+and should use it instead.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- crypto/block-luks.c | 52 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 44 insertions(+), 8 deletions(-)
+ block/crypto.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 93 insertions(+), 3 deletions(-)
 
-diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-index e1a4df94b7..336e633df4 100644
---- a/crypto/block-luks.c
-+++ b/crypto/block-luks.c
-@@ -1023,8 +1023,18 @@ qcrypto_block_luks_load_key(QCryptoBlock *block,
-  cleanup:
-     qcrypto_ivgen_free(ivgen);
-     qcrypto_cipher_free(cipher);
--    g_free(splitkey);
--    g_free(possiblekey);
-+
-+    if (splitkey) {
-+        memset(splitkey, 0, splitkeylen);
-+        g_free(splitkey);
-+    }
-+
-+    if (possiblekey) {
-+        memset(possiblekey, 0, masterkeylen(luks));
-+        g_free(possiblekey);
-+
-+    }
-+
+diff --git a/block/crypto.c b/block/crypto.c
+index 42a3f0898b..415b6db041 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -36,6 +36,7 @@ typedef struct BlockCrypto BlockCrypto;
+ 
+ struct BlockCrypto {
+     QCryptoBlock *block;
++    bool updating_keys;
+ };
+ 
+ 
+@@ -69,6 +70,24 @@ static ssize_t block_crypto_read_func(QCryptoBlock *block,
      return ret;
  }
  
-@@ -1161,16 +1171,34 @@ qcrypto_block_luks_open(QCryptoBlock *block,
-     block->sector_size = QCRYPTO_BLOCK_LUKS_SECTOR_SIZE;
-     block->payload_offset = luks->header.payload_offset * block->sector_size;
++static ssize_t block_crypto_write_func(QCryptoBlock *block,
++                                      size_t offset,
++                                      const uint8_t *buf,
++                                      size_t buflen,
++                                      void *opaque,
++                                      Error **errp)
++{
++    BlockDriverState *bs = opaque;
++    ssize_t ret;
++
++    ret = bdrv_pwrite(bs->file, offset, buf, buflen);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not write encryption header");
++        return ret;
++    }
++    return ret;
++}
++
  
--    g_free(masterkey);
--    g_free(password);
-+    if (masterkey) {
-+        memset(masterkey, 0, masterkeylen(luks));
-+        g_free(masterkey);
-+    }
-+
-+    if (password) {
-+        memset(password, 0, strlen(password));
-+        g_free(password);
-+    }
-+
-     return 0;
- 
-  fail:
--    g_free(masterkey);
-+
-+    if (masterkey) {
-+        memset(masterkey, 0, masterkeylen(luks));
-+        g_free(masterkey);
-+    }
-+
-+    if (password) {
-+        memset(password, 0, strlen(password));
-+        g_free(password);
-+    }
-+
-     qcrypto_block_free_cipher(block);
-     qcrypto_ivgen_free(block->ivgen);
-+
-     g_free(luks);
--    g_free(password);
-     return ret;
+ struct BlockCryptoCreateData {
+     BlockBackend *blk;
+@@ -622,6 +641,78 @@ block_crypto_get_specific_info_luks(BlockDriverState *bs, Error **errp)
+     return spec_info;
  }
  
-@@ -1459,7 +1487,10 @@ qcrypto_block_luks_create(QCryptoBlock *block,
- 
-     memset(masterkey, 0, luks->header.key_bytes);
-     g_free(masterkey);
 +
-+    memset(password, 0, strlen(password));
-     g_free(password);
++static int
++block_crypto_setup_encryption(BlockDriverState *bs,
++                              enum BlkSetupEncryptionAction action,
++                              QCryptoEncryptionSetupOptions *options,
++                              bool force,
++                              Error **errp)
++{
++    BlockCrypto *crypto = bs->opaque;
++    int ret;
 +
-     g_free(cipher_mode_spec);
- 
-     return 0;
-@@ -1467,9 +1498,14 @@ qcrypto_block_luks_create(QCryptoBlock *block,
-  error:
-     if (masterkey) {
-         memset(masterkey, 0, luks->header.key_bytes);
-+        g_free(masterkey);
-     }
--    g_free(masterkey);
--    g_free(password);
++    assert(crypto);
++    assert(crypto->block);
 +
-+    if (password) {
-+        memset(password, 0, strlen(password));
-+        g_free(password);
++    crypto->updating_keys = true;
++
++    ret = bdrv_child_refresh_perms(bs, bs->file, errp);
++
++    if (ret) {
++        crypto->updating_keys = false;
++        return ret;
 +    }
 +
-     g_free(cipher_mode_spec);
++    ret = qcrypto_block_setup_encryption(crypto->block,
++                                          block_crypto_read_func,
++                                          block_crypto_write_func,
++                                          bs,
++                                          action,
++                                          options,
++                                          force,
++                                          errp);
++
++    crypto->updating_keys = false;
++    bdrv_child_refresh_perms(bs, bs->file, errp);
++
++
++    return ret;
++
++}
++
++
++static void
++block_crypto_child_perms(BlockDriverState *bs, BdrvChild *c,
++                         const BdrvChildRole *role,
++                         BlockReopenQueue *reopen_queue,
++                         uint64_t perm, uint64_t shared,
++                         uint64_t *nperm, uint64_t *nshared)
++{
++
++    BlockCrypto *crypto = bs->opaque;
++
++    /*
++     * This driver doesn't modify LUKS metadata except
++     * when updating the encryption slots.
++     * Allow share-rw=on as a special case.
++     *
++     * Encryption update will set the crypto->updating_keys
++     * during that period and refresh permissions
++     *
++     * */
++
++    if (crypto->updating_keys) {
++        /*need exclusive write access for header update  */
++        perm |= BLK_PERM_WRITE;
++        shared &= ~BLK_PERM_WRITE;
++    }
++
++    bdrv_filter_default_perms(bs, c, role, reopen_queue,
++            perm, shared, nperm, nshared);
++}
++
++
+ static const char *const block_crypto_strong_runtime_opts[] = {
+     BLOCK_CRYPTO_OPT_LUKS_KEY_SECRET,
  
-     qcrypto_block_free_cipher(block);
+@@ -634,9 +725,7 @@ static BlockDriver bdrv_crypto_luks = {
+     .bdrv_probe         = block_crypto_probe_luks,
+     .bdrv_open          = block_crypto_open_luks,
+     .bdrv_close         = block_crypto_close,
+-    /* This driver doesn't modify LUKS metadata except when creating image.
+-     * Allow share-rw=on as a special case. */
+-    .bdrv_child_perm    = bdrv_filter_default_perms,
++    .bdrv_child_perm    = block_crypto_child_perms,
+     .bdrv_co_create     = block_crypto_co_create_luks,
+     .bdrv_co_create_opts = block_crypto_co_create_opts_luks,
+     .bdrv_co_truncate   = block_crypto_co_truncate,
+@@ -649,6 +738,7 @@ static BlockDriver bdrv_crypto_luks = {
+     .bdrv_getlength     = block_crypto_getlength,
+     .bdrv_get_info      = block_crypto_get_info_luks,
+     .bdrv_get_specific_info = block_crypto_get_specific_info_luks,
++    .bdrv_setup_encryption = block_crypto_setup_encryption,
+ 
+     .strong_runtime_opts = block_crypto_strong_runtime_opts,
+ };
 -- 
 2.17.2
 
