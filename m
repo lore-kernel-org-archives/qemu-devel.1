@@ -2,58 +2,95 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9D6EC32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47289C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:38:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3B772133F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:36:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3B772133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0A2C22083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:38:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2C22083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy00g-0001sb-Qx
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:36:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33508)
+	id 1hy02I-0003Cw-86
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:38:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1hxzoA-00052n-TG
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:23:49 -0400
+ (envelope-from <eajames@linux.ibm.com>) id 1hxzs7-0000qL-3v
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:27:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hxzo7-0004XH-Bd
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:23:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55362)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hxzo0-0004TC-LK; Wed, 14 Aug 2019 16:23:36 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 040B3C024AF4;
- Wed, 14 Aug 2019 20:23:36 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7975E10016EB;
- Wed, 14 Aug 2019 20:23:33 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
+ (envelope-from <eajames@linux.ibm.com>) id 1hxzs4-0007FX-L4
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:27:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57518)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eajames@linux.ibm.com>)
+ id 1hxzs4-0007EC-29
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:27:48 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ x7EKRC9C037566
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 16:27:45 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2ucp1hyaqy-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 16:27:44 -0400
+Received: from localhost
+ by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <eajames@linux.ibm.com>;
+ Wed, 14 Aug 2019 21:27:44 +0100
+Received: from b03cxnp07028.gho.boulder.ibm.com (9.17.130.15)
+ by e33.co.us.ibm.com (192.168.1.133) with IBM ESMTP SMTP Gateway: Authorized
+ Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 14 Aug 2019 21:27:39 +0100
+Received: from b03ledav003.gho.boulder.ibm.com
+ (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
+ by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ x7EKRd2n41287950
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 14 Aug 2019 20:27:39 GMT
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EDED76A04F;
+ Wed, 14 Aug 2019 20:27:38 +0000 (GMT)
+Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 666AA6A047;
+ Wed, 14 Aug 2019 20:27:38 +0000 (GMT)
+Received: from talon7.ibm.com (unknown [9.41.179.222])
+ by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 14 Aug 2019 20:27:38 +0000 (GMT)
+From: Eddie James <eajames@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:22:19 +0300
-Message-Id: <20190814202219.1870-14-mlevitsk@redhat.com>
-In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.32]); Wed, 14 Aug 2019 20:23:36 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 13/13] iotests : add tests for encryption key
- management
+Date: Wed, 14 Aug 2019 15:27:36 -0500
+X-Mailer: git-send-email 1.8.3.1
+X-TM-AS-GCONF: 00
+x-cbid: 19081420-0036-0000-0000-00000AE4EA4E
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011590; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01246845; UDB=6.00658004; IPR=6.01028352; 
+ MB=3.00028175; MTD=3.00000008; XFM=3.00000015; UTC=2019-08-14 20:27:42
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19081420-0037-0000-0000-00004D02F95A
+Message-Id: <1565814456-1264-1-git-send-email-eajames@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-08-14_07:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908140186
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
+X-Received-From: 148.163.156.1
+Subject: [Qemu-devel] [RFC v2] hw/sd/aspeed_sdhci: New device
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,719 +102,407 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+Cc: peter.maydell@linaro.org, andrew@aj.id.au,
+ Eddie James <eajames@linux.ibm.com>, qemu-arm@nongnu.org, joel@jms.id.au,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- tests/qemu-iotests/257           | 197 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/257.out       |  96 +++++++++++++++
- tests/qemu-iotests/258           |  95 +++++++++++++++
- tests/qemu-iotests/258.out       |  30 +++++
- tests/qemu-iotests/259           | 199 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/259.out       |   5 +
- tests/qemu-iotests/common.filter |   5 +-
- tests/qemu-iotests/group         |   3 +
- 8 files changed, 628 insertions(+), 2 deletions(-)
- create mode 100755 tests/qemu-iotests/257
- create mode 100644 tests/qemu-iotests/257.out
- create mode 100755 tests/qemu-iotests/258
- create mode 100644 tests/qemu-iotests/258.out
- create mode 100644 tests/qemu-iotests/259
- create mode 100644 tests/qemu-iotests/259.out
+The Aspeed SOCs have two SD/MMC controllers. Add a device that
+encapsulates both of these controllers and models the Aspeed-specific
+registers and behavior.
 
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-new file mode 100755
-index 0000000000..5991e4a8c7
---- /dev/null
-+++ b/tests/qemu-iotests/257
-@@ -0,0 +1,197 @@
-+#!/usr/bin/env bash
-+#
-+# Test encryption key management with luks
-+# Based on 134
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mlevitsk@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2 luks
-+_supported_proto file #TODO
-+
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
-+# you are supposed to see the password as *******, see :-)
-+SECRET0="--object secret,id=sec0,data=hunter0"
-+SECRET1="--object secret,id=sec1,data=hunter1"
-+SECRET2="--object secret,id=sec2,data=hunter2"
-+SECRET3="--object secret,id=sec3,data=hunter3"
-+SECRETS="$SECRET0 $SECRET1 $SECRET2 $SECRET3"
-+
-+
-+if [ "$IMGFMT" = "qcow2" ] ; then
-+	OPTPREFIX="encrypt."
-+	EXTRA_IMG_ARGS="-o encrypt.format=luks"
-+fi
-+
-+IMGSPEC0="driver=$IMGFMT,file.filename=$TEST_IMG,${OPTPREFIX}key-secret=sec0"
-+IMGSPEC1="driver=$IMGFMT,file.filename=$TEST_IMG,${OPTPREFIX}key-secret=sec1"
-+IMGSPEC2="driver=$IMGFMT,file.filename=$TEST_IMG,${OPTPREFIX}key-secret=sec2"
-+IMGSPEC3="driver=$IMGFMT,file.filename=$TEST_IMG,${OPTPREFIX}key-secret=sec3"
-+
-+echo "== creating a test image =="
-+_make_test_img $SECRET0 $EXTRA_IMG_ARGS -o "${OPTPREFIX}key-secret=sec0,${OPTPREFIX}iter-time=10"   32M
-+
-+echo
-+echo "== test that key 0 opens the image =="
-+$QEMU_IO $SECRET0 -c "read 0 4096" --image-opts $IMGSPEC0 | _filter_qemu_io | _filter_testdir
-+
-+
-+echo
-+echo "== adding a password to slot 1 =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC0 --keydef key-secret=sec1,iter-time=10
-+echo "== adding a password to slot 3 =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec3,iter-time=100,slot=3
-+echo "== adding a password to slot 2 =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC3 --keydef key-secret=sec2,iter-time=10
-+
-+echo
-+echo "== all secrets should work =="
-+for IMGSPEC in $IMGSPEC0 $IMGSPEC1 $IMGSPEC2 $IMGSPEC3; do
-+	$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+done
-+
-+
-+echo
-+echo "== erase slot 0 and try it =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec0| _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== erase slot 2 and try it =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef slot=2| _filter_img_create
-+$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC2 | _filter_qemu_io | _filter_testdir
-+
-+
-+# at this point slots 1 and 3 should be active
-+
-+echo
-+echo "== filling  4 slots with secret 2 =="
-+for i in $(seq 0 3) ; do
-+	$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC3 --keydef key-secret=sec2,iter-time=10
-+done
-+
-+echo
-+echo "== adding secret 0 =="
-+	$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC3 --keydef key-secret=sec0,iter-time=10
-+
-+echo
-+echo "== adding secret 3 (last slot) =="
-+	$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC3 --keydef key-secret=sec3,iter-time=10
-+
-+echo
-+echo "== trying to add another slot (should fail) =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC2 --keydef key-secret=sec3,iter-time=10
-+
-+echo
-+echo "== all secrets should work again =="
-+for IMGSPEC in $IMGSPEC0 $IMGSPEC1 $IMGSPEC2 $IMGSPEC3; do
-+	$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+done
-+
-+echo
-+echo "== erase all keys of secret 2=="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec2
-+echo "== erase all keys of secret 1=="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec1
-+echo "== erase all keys of secret 0=="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC0 --keydef key-secret=sec0
-+echo "== erase all keys of secret 3, except a remaining key =="
-+
-+
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC3 --keydef key-secret=sec3
-+
-+
-+echo
-+echo "== only secret3 should work now  =="
-+for IMGSPEC in $IMGSPEC0 $IMGSPEC1 $IMGSPEC2 $IMGSPEC3; do
-+	$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+done
-+
-+echo
-+echo "== add secret0  =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC3 --keydef key-secret=sec0,iter-time=10
-+
-+echo "== erase secret3 =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC0 --keydef key-secret=sec3
-+
-+echo
-+echo "== only secret0 should work now  == "
-+for IMGSPEC in $IMGSPEC0 $IMGSPEC1 $IMGSPEC2 $IMGSPEC3; do
-+	$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+done
-+
-+echo
-+echo "== replace secret0 with secret1 (should fail)  =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC0 --keydef key-secret=sec1,iter-time=10,slot=0
-+
-+echo
-+echo "== replace secret0 with secret1 with force (should work)  =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC0 --keydef key-secret=sec1,iter-time=10,slot=0 --force
-+
-+
-+echo
-+echo "== only secret1 should work now  =="
-+for IMGSPEC in $IMGSPEC0 $IMGSPEC1 $IMGSPEC2 $IMGSPEC3; do
-+	$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+done
-+
-+
-+
-+echo
-+echo "== erase last secret (should fail)  =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef slot=0
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec1
-+
-+
-+echo "== erase non existing secrets (should fail)  =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec5 --force
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef key-secret=sec0 --force
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef slot=1 --force
-+
-+echo
-+echo "== erase last secret with force by slot (should work)  =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef slot=0 --force
-+
-+echo
-+echo "== we have no secrets now, data is lost forever =="
-+for IMGSPEC in $IMGSPEC0 $IMGSPEC1 $IMGSPEC2 $IMGSPEC3; do
-+	$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC | _filter_qemu_io | _filter_testdir
-+done
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-+
-diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
-new file mode 100644
-index 0000000000..77f9c9136e
---- /dev/null
-+++ b/tests/qemu-iotests/257.out
-@@ -0,0 +1,96 @@
-+QA output created by 257
-+== creating a test image ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432
-+
-+== test that key 0 opens the image ==
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== adding a password to slot 1 ==
-+== adding a password to slot 3 ==
-+== adding a password to slot 2 ==
-+
-+== all secrets should work ==
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== erase slot 0 and try it ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+== erase slot 2 and try it ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+== filling  4 slots with secret 2 ==
-+
-+== adding secret 0 ==
-+
-+== adding secret 3 (last slot) ==
-+
-+== trying to add another slot (should fail) ==
-+qemu-img: Can't add a keyslot - all key slots are in use
-+
-+== all secrets should work again ==
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== erase all keys of secret 2==
-+== erase all keys of secret 1==
-+== erase all keys of secret 0==
-+== erase all keys of secret 3, except a remaining key ==
-+
-+== only secret3 should work now  ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== add secret0  ==
-+== erase secret3 ==
-+
-+== only secret0 should work now  ==
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+== replace secret0 with secret1 (should fail)  ==
-+qemu-img: Can't update an active key slot 0
-+
-+== replace secret0 with secret1 with force (should work)  ==
-+
-+== only secret1 should work now  ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+== erase last secret (should fail)  ==
-+qemu-img: Only one slot active - can't erase
-+qemu-img: Only one slot active - can't erase
-+== erase non existing secrets (should fail)  ==
-+qemu-img: No secret with id 'sec5'
-+qemu-img: Didn't erase a keyslot, because no keyslots match the given password
-+
-+== erase last secret with force by slot (should work)  ==
-+
-+== we have no secrets now, data is lost forever ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+*** done
-diff --git a/tests/qemu-iotests/258 b/tests/qemu-iotests/258
-new file mode 100755
-index 0000000000..84c8ab1907
---- /dev/null
-+++ b/tests/qemu-iotests/258
-@@ -0,0 +1,95 @@
-+#!/usr/bin/env bash
-+#
-+# Test that encryption key managment erases the key material
-+# in addition to the header
-+# Based on 134
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner=mlevitsk@redhat.com
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+	_cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt luks
-+_supported_proto file #TODO
-+
-+QEMU_IO_OPTIONS=$QEMU_IO_OPTIONS_NO_FMT
-+
-+# you are supposed to see the password as *******, see :-)
-+SECRET0="--object secret,id=sec0,data=hunter0"
-+SECRET1="--object secret,id=sec1,data=hunter1"
-+SECRETS="$SECRET0 $SECRET1"
-+
-+
-+IMGSPEC0="driver=$IMGFMT,file.filename=$TEST_IMG,key-secret=sec0"
-+IMGSPEC1="driver=$IMGFMT,file.filename=$TEST_IMG,key-secret=sec1"
-+
-+echo "== creating a test image =="
-+_make_test_img $SECRET0 -o "key-secret=sec0,iter-time=10"   32M
-+
-+echo
-+echo "== test that key 0 opens the image =="
-+$QEMU_IO $SECRET0 -c "read 0 4096" --image-opts $IMGSPEC0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== adding a password to slot 1 =="
-+$QEMU_IMG add_encryption_key $SECRETS --image-opts $IMGSPEC0 --keydef key-secret=sec1,slot=1,iter-time=10
-+
-+echo
-+echo "== 'backup' the image header =="
-+dd if=$TEST_IMG_FILE of=${TEST_IMG_FILE}.bk bs=4K skip=0 count=1
-+
-+echo
-+echo "== erase slot 0 =="
-+$QEMU_IMG erase_encryption_key $SECRETS --image-opts $IMGSPEC1 --keydef slot=0 | _filter_img_create
-+
-+echo
-+echo "== test that key 0 doesn't open the image =="
-+$QEMU_IO $SECRET0 -c "read 0 4096" --image-opts $IMGSPEC0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== 'restore' the image header =="
-+dd if=${TEST_IMG_FILE}.bk of=${TEST_IMG_FILE} bs=4K skip=0 count=1 conv=notrunc
-+
-+echo
-+echo "== test that key 0 still doesn't open the image (key material is erased) =="
-+$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC0 | _filter_qemu_io | _filter_testdir
-+
-+echo
-+echo "== test that key 1 still works =="
-+$QEMU_IO $SECRETS -c "read 0 4096" --image-opts $IMGSPEC1 | _filter_qemu_io | _filter_testdir
-+
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-+
-+
-+exit 0
-diff --git a/tests/qemu-iotests/258.out b/tests/qemu-iotests/258.out
-new file mode 100644
-index 0000000000..ea448a0ac1
---- /dev/null
-+++ b/tests/qemu-iotests/258.out
-@@ -0,0 +1,30 @@
-+QA output created by 258
-+== creating a test image ==
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=33554432
-+
-+== test that key 0 opens the image ==
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+== adding a password to slot 1 ==
-+
-+== 'backup' the image header ==
-+1+0 records in
-+1+0 records out
-+
-+== erase slot 0 ==
-+
-+== test that key 0 doesn't open the image ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+== 'restore' the image header ==
-+1+0 records in
-+1+0 records out
-+
-+== test that key 0 still doesn't open the image (key material is erased) ==
-+qemu-io: can't open: Invalid password, cannot unlock any keyslot
-+
-+== test that key 1 still works ==
-+read 4096/4096 bytes at offset 0
-+4 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+*** done
-diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
-new file mode 100644
-index 0000000000..360e723a48
---- /dev/null
-+++ b/tests/qemu-iotests/259
-@@ -0,0 +1,199 @@
-+#!/usr/bin/env python
-+#
-+# Test case QMP's encrypted key management
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import iotests
-+import os
-+import time
-+
-+test_img = os.path.join(iotests.test_dir, 'test.img')
-+
-+class Secret:
-+    def __init__(self, index):
-+        self._id = "keysec" + str(index)
-+        # you are not supposed to see the password...
-+        self._secret = "hunter" + str(index)
-+
-+    def id(self):
-+        return self._id
-+
-+    def secret(self):
-+        return self._secret
-+
-+    def to_cmdline_object(self):
-+        return  [ "secret,id=" + self._id + ",data=" + self._secret]
-+
-+    def to_qmp_object(self):
-+        return { "qom_type" : "secret", "id": self.id(),
-+                 "props": { "data": self.secret() } }
-+
-+class EncryptionSetupTestCase(iotests.QMPTestCase):
-+
-+    # test case startup
-+    def setUp(self):
-+        # start the VM
-+        self.vm = iotests.VM()
-+        self.vm.launch()
-+
-+        # create the secrets and load 'em into the VM
-+        self.secrets = [ Secret(i) for i in range(0, 4) ]
-+        for secret in self.secrets:
-+            result = self.vm.qmp("object-add", **secret.to_qmp_object())
-+            self.assert_qmp(result, 'return', {})
-+
-+    # test case shutdown
-+    def tearDown(self):
-+        # stop the VM
-+        self.vm.shutdown()
-+
-+    # create the encrypted block device
-+    def createImg(self, file, secret):
-+
-+        if iotests.imgfmt == "qcow2":
-+            prefix="encrypt."
-+            extra_options = [ '-o', "encrypt.format=luks" ]
-+        else:
-+            prefix=""
-+            extra_options = []
-+
-+        return iotests.qemu_img('create',
-+                                '--object', *secret.to_cmdline_object(),
-+                                '-f', iotests.imgfmt,
-+                                '-o', prefix+'key-secret=' + secret.id(),
-+                                '-o', prefix+'iter-time=10',
-+                                *extra_options, file, '1M')
-+
-+    # open an encrypted block device
-+    def openLUKS(self, id, file, secret):
-+        if iotests.imgfmt == "qcow2":
-+            encrypt_options = {
-+                'encrypt': {
-+                    'format':'luks',
-+                    'key-secret' : secret.id()}
-+                }
-+        else:
-+            encrypt_options = {
-+                'key-secret' : secret.id()
-+            }
-+
-+        return self.vm.qmp('blockdev-add', **
-+            {
-+                'driver': iotests.imgfmt,
-+                'node-name': id,
-+
-+                **encrypt_options,
-+
-+                'file': {
-+                    'driver': 'file',
-+                    'filename': test_img,
-+                }
-+            }
-+        )
-+
-+    # close the encrypted block device
-+    def closeLUKS(self, id):
-+        return self.vm.qmp('blockdev-del', **{ 'node-name': id })
-+
-+    # add a key to an encrypted block device
-+    def addKey(self, id, secret, old_secret = None, slot = None, force = False):
-+        args = {
-+            'node-name': id,
-+            'options' : { 'key-secret' : secret.id(), 'iter-time' : 10}
-+        }
-+
-+        if slot != None:
-+            args['options']['slot'] = slot
-+        if old_secret != None:
-+            args['options']['old-key-secret'] = old_secret.id()
-+        if force == True:
-+            args['force'] = True
-+
-+        return self.vm.qmp('x-blockdev-update-encryption', **args)
-+
-+    # erase a key from an encrypted block device
-+    def eraseKey(self, id, secret = None, slot = None, force = False):
-+        args = {
-+            'node-name': id,
-+            'options' : { }
-+        }
-+
-+        if secret != None:
-+            args['options']['key-secret'] = secret.id()
-+        if slot != None:
-+            args['options']['slot'] = slot
-+        if force == True:
-+            args['force'] = True
-+
-+        return self.vm.qmp('x-blockdev-erase-encryption', **args)
-+
-+    def check(self, result):
-+        self.assert_qmp(result, 'return', {})
-+
-+    # create image, and change its key
-+    def testChangeKey(self):
-+
-+        # create the image with secret0 and open it
-+        result = self.createImg(test_img, self.secrets[0]);
-+        self.check(self.openLUKS("testdev", test_img, self.secrets[0]))
-+
-+        # add key to slot 1
-+        self.check(self.addKey("testdev", secret=self.secrets[1]))
-+
-+
-+        # erase key from slot 0
-+        self.check(self.eraseKey("testdev", secret=self.secrets[0]))
-+
-+        #reopen the image with secret1
-+        self.check(self.closeLUKS("testdev"))
-+        self.check(self.openLUKS("testdev", test_img, self.secrets[1]))
-+
-+        # close and erase the image for good
-+        self.check(self.closeLUKS("testdev"))
-+        os.remove(test_img)
-+
-+    # test that if we erase the old password,
-+    # we can still change the encryption keys using 'old-secret'
-+    def testOldPassword(self):
-+
-+        # create the image with secret0 and open it
-+        result = self.createImg(test_img, self.secrets[0]);
-+        self.check(self.openLUKS("testdev", test_img, self.secrets[0]))
-+
-+        # add key to slot 1
-+        self.check(self.addKey("testdev", secret=self.secrets[1]))
-+
-+        # erase key from slot 0
-+        self.check(self.eraseKey("testdev", secret=self.secrets[0]))
-+
-+        # this will fail as the old password is no longer valid
-+        result = self.addKey("testdev", secret=self.secrets[2])
-+        self.assert_qmp(result, 'error/desc', "Invalid password, cannot unlock any keyslot")
-+
-+        # this will work
-+        self.check(self.addKey("testdev", secret=self.secrets[2], old_secret=self.secrets[1]))
-+
-+
-+        # close and erase the image for good
-+        self.check(self.closeLUKS("testdev"))
-+        os.remove(test_img)
-+
-+
-+if __name__ == '__main__':
-+    # Encrypted formats support
-+    iotests.main(iotests.main(supported_fmts=['qcow2','luks']))
-diff --git a/tests/qemu-iotests/259.out b/tests/qemu-iotests/259.out
-new file mode 100644
-index 0000000000..fbc63e62f8
---- /dev/null
-+++ b/tests/qemu-iotests/259.out
-@@ -0,0 +1,5 @@
-+..
-+----------------------------------------------------------------------
-+Ran 2 tests
-+
-+OK
-diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
-index 35fddc746f..c0d68e8a0c 100644
---- a/tests/qemu-iotests/common.filter
-+++ b/tests/qemu-iotests/common.filter
-@@ -138,8 +138,9 @@ _filter_img_create()
-         -e "s# block_state_zero=\\(on\\|off\\)##g" \
-         -e "s# log_size=[0-9]\\+##g" \
-         -e "s# refcount_bits=[0-9]\\+##g" \
--        -e "s# key-secret=[a-zA-Z0-9]\\+##g" \
--        -e "s# iter-time=[0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?key-secret=[a-zA-Z0-9]\\+##g" \
-+        -e "s# encrypt\\.format=[a-zA-Z0-9]\\+##g" \
-+        -e "s# \\(encrypt\\.\\)\\?iter-time=[0-9]\\+##g" \
-         -e "s# force_size=\\(on\\|off\\)##g"
+Tested by reading from mmcblk0 in Linux:
+qemu-system-arm -machine romulus-bmc -nographic -serial mon:stdio \
+ -drive file=_tmp/flash-romulus,format=raw,if=mtd \
+ -device sd-card,drive=sd0 -drive file=_tmp/kernel,format=raw,if=sd
+
+Signed-off-by: Eddie James <eajames@linux.ibm.com>
+---
+This patch applies on top of Cedric's set of recent Aspeed changes. Therefore,
+I'm sending as an RFC rather than a patch.
+
+Changes since v1:
+ - Move slot realize code into the Aspeed SDHCI realize function
+ - Fix interrupt handling by creating input irqs and connecting them to the
+   slot irqs.
+ - Removed card device creation code
+
+ hw/arm/aspeed.c              |   1 -
+ hw/arm/aspeed_soc.c          |  24 ++++++
+ hw/sd/Makefile.objs          |   1 +
+ hw/sd/aspeed_sdhci.c         | 190 +++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/aspeed_soc.h  |   3 +
+ include/hw/sd/aspeed_sdhci.h |  35 ++++++++
+ 6 files changed, 253 insertions(+), 1 deletion(-)
+ create mode 100644 hw/sd/aspeed_sdhci.c
+ create mode 100644 include/hw/sd/aspeed_sdhci.h
+
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 2574425..aeed5b6 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -480,7 +480,6 @@ static void aspeed_machine_class_init(ObjectClass *oc, void *data)
+     mc->desc = board->desc;
+     mc->init = aspeed_machine_init;
+     mc->max_cpus = ASPEED_CPUS_NUM;
+-    mc->no_sdcard = 1;
+     mc->no_floppy = 1;
+     mc->no_cdrom = 1;
+     mc->no_parallel = 1;
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 8df96f2..a12f14a 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -22,6 +22,7 @@
+ #include "qemu/error-report.h"
+ #include "hw/i2c/aspeed_i2c.h"
+ #include "net/net.h"
++#include "sysemu/blockdev.h"
+ 
+ #define ASPEED_SOC_IOMEM_SIZE       0x00200000
+ 
+@@ -62,6 +63,7 @@ static const hwaddr aspeed_soc_ast2500_memmap[] = {
+     [ASPEED_XDMA]   = 0x1E6E7000,
+     [ASPEED_ADC]    = 0x1E6E9000,
+     [ASPEED_SRAM]   = 0x1E720000,
++    [ASPEED_SDHCI]  = 0x1E740000,
+     [ASPEED_GPIO]   = 0x1E780000,
+     [ASPEED_RTC]    = 0x1E781000,
+     [ASPEED_TIMER1] = 0x1E782000,
+@@ -100,6 +102,7 @@ static const hwaddr aspeed_soc_ast2600_memmap[] = {
+     [ASPEED_XDMA]   = 0x1E6E7000,
+     [ASPEED_ADC]    = 0x1E6E9000,
+     [ASPEED_VIDEO]  = 0x1E700000,
++    [ASPEED_SDHCI]  = 0x1E740000,
+     [ASPEED_GPIO]   = 0x1E780000,
+     [ASPEED_RTC]    = 0x1E781000,
+     [ASPEED_TIMER1] = 0x1E782000,
+@@ -146,6 +149,7 @@ static const int aspeed_soc_ast2400_irqmap[] = {
+     [ASPEED_ETH1]   = 2,
+     [ASPEED_ETH2]   = 3,
+     [ASPEED_XDMA]   = 6,
++    [ASPEED_SDHCI]  = 26,
+ };
+ 
+ #define aspeed_soc_ast2500_irqmap aspeed_soc_ast2400_irqmap
+@@ -163,6 +167,7 @@ static const int aspeed_soc_ast2600_irqmap[] = {
+     [ASPEED_SDMC]   = 0,
+     [ASPEED_SCU]    = 12,
+     [ASPEED_XDMA]   = 6,
++    [ASPEED_SDHCI]  = 43,
+     [ASPEED_ADC]    = 46,
+     [ASPEED_GPIO]   = 40,
+     [ASPEED_RTC]    = 13,
+@@ -350,6 +355,15 @@ static void aspeed_soc_init(Object *obj)
+         sysbus_init_child_obj(obj, "fsi[*]", OBJECT(&s->fsi[0]),
+                               sizeof(s->fsi[0]), TYPE_ASPEED_FSI);
+     }
++
++    sysbus_init_child_obj(obj, "sdhci", OBJECT(&s->sdhci), sizeof(s->sdhci),
++                          TYPE_ASPEED_SDHCI);
++
++    /* Init sd card slot class here so that they're under the correct parent */
++    for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
++        sysbus_init_child_obj(obj, "sdhci_slot[*]", OBJECT(&s->sdhci.slots[i]),
++                              sizeof(s->sdhci.slots[i]), TYPE_SYSBUS_SDHCI);
++    }
  }
  
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index f13e5f2e23..3db7f0a863 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -271,3 +271,6 @@
- 254 rw backing quick
- 255 rw quick
- 256 rw quick
-+257 rw auto
-+258 rw auto quick
-+259 rw auto
+ /*
+@@ -680,6 +694,16 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->fsi[0]), 0,
+                            aspeed_soc_get_irq(s, ASPEED_FSI1));
+     }
++
++    /* SD/SDIO - set the reg address so slot memory mapping can be set up */
++    s->sdhci.ioaddr = sc->info->memmap[ASPEED_SDHCI];
++    object_property_set_bool(OBJECT(&s->sdhci), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
++                       aspeed_soc_get_irq(s, ASPEED_SDHCI));
+ }
+ static Property aspeed_soc_properties[] = {
+     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
+diff --git a/hw/sd/Makefile.objs b/hw/sd/Makefile.objs
+index 0665727..a884c23 100644
+--- a/hw/sd/Makefile.objs
++++ b/hw/sd/Makefile.objs
+@@ -8,3 +8,4 @@ obj-$(CONFIG_MILKYMIST) += milkymist-memcard.o
+ obj-$(CONFIG_OMAP) += omap_mmc.o
+ obj-$(CONFIG_PXA2XX) += pxa2xx_mmci.o
+ obj-$(CONFIG_RASPI) += bcm2835_sdhost.o
++obj-$(CONFIG_ASPEED_SOC) += aspeed_sdhci.o
+diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
+new file mode 100644
+index 0000000..d1a05e9
+--- /dev/null
++++ b/hw/sd/aspeed_sdhci.c
+@@ -0,0 +1,190 @@
++/*
++ * Aspeed SD Host Controller
++ * Eddie James <eajames@linux.ibm.com>
++ *
++ * Copyright (C) 2019 IBM Corp
++ * SPDX-License-Identifer: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qemu/error-report.h"
++#include "hw/sd/aspeed_sdhci.h"
++#include "qapi/error.h"
++
++#define ASPEED_SDHCI_INFO            0x00
++#define  ASPEED_SDHCI_INFO_RESET     0x00030000
++#define ASPEED_SDHCI_DEBOUNCE        0x04
++#define  ASPEED_SDHCI_DEBOUNCE_RESET 0x00000005
++#define ASPEED_SDHCI_BUS             0x08
++#define ASPEED_SDHCI_SDIO_140        0x10
++#define ASPEED_SDHCI_SDIO_148        0x18
++#define ASPEED_SDHCI_SDIO_240        0x20
++#define ASPEED_SDHCI_SDIO_248        0x28
++#define ASPEED_SDHCI_WP_POL          0xec
++#define ASPEED_SDHCI_CARD_DET        0xf0
++#define ASPEED_SDHCI_IRQ_STAT        0xfc
++
++#define TO_REG(addr) ((addr) / sizeof(uint32_t))
++
++static uint64_t aspeed_sdhci_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    uint32_t val = 0;
++    AspeedSDHCIState *sdhci = opaque;
++
++    switch (addr) {
++    case ASPEED_SDHCI_SDIO_140:
++        val = (uint32_t)sdhci->slots[0].capareg;
++        break;
++    case ASPEED_SDHCI_SDIO_148:
++        val = (uint32_t)sdhci->slots[0].maxcurr;
++        break;
++    case ASPEED_SDHCI_SDIO_240:
++        val = (uint32_t)sdhci->slots[1].capareg;
++        break;
++    case ASPEED_SDHCI_SDIO_248:
++        val = (uint32_t)sdhci->slots[1].maxcurr;
++        break;
++    default:
++        if (addr < ASPEED_SDHCI_REG_SIZE) {
++            val = sdhci->regs[TO_REG(addr)];
++        }
++    }
++
++    return (uint64_t)val;
++}
++
++static void aspeed_sdhci_write(void *opaque, hwaddr addr, uint64_t val,
++                               unsigned int size)
++{
++    AspeedSDHCIState *sdhci = opaque;
++
++    switch (addr) {
++    case ASPEED_SDHCI_SDIO_140:
++        sdhci->slots[0].capareg = (uint64_t)(uint32_t)val;
++        break;
++    case ASPEED_SDHCI_SDIO_148:
++        sdhci->slots[0].maxcurr = (uint64_t)(uint32_t)val;
++        break;
++    case ASPEED_SDHCI_SDIO_240:
++        sdhci->slots[1].capareg = (uint64_t)(uint32_t)val;
++        break;
++    case ASPEED_SDHCI_SDIO_248:
++        sdhci->slots[1].maxcurr = (uint64_t)(uint32_t)val;
++        break;
++    default:
++        if (addr < ASPEED_SDHCI_REG_SIZE) {
++            sdhci->regs[TO_REG(addr)] = (uint32_t)val;
++        }
++    }
++}
++
++static const MemoryRegionOps aspeed_sdhci_ops = {
++    .read = aspeed_sdhci_read,
++    .write = aspeed_sdhci_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid.min_access_size = 4,
++    .valid.max_access_size = 4,
++};
++
++static void aspeed_sdhci_set_irq(void *opaque, int n, int level)
++{
++    AspeedSDHCIState *sdhci = opaque;
++
++    if (level) {
++        sdhci->regs[TO_REG(ASPEED_SDHCI_IRQ_STAT)] |= BIT(n);
++
++        qemu_irq_raise(sdhci->irq);
++    } else {
++        sdhci->regs[TO_REG(ASPEED_SDHCI_IRQ_STAT)] &= ~BIT(n);
++
++        qemu_irq_lower(sdhci->irq);
++    }
++}
++
++static void aspeed_sdhci_realize(DeviceState *dev, Error **errp)
++{
++    Error *err = NULL;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    AspeedSDHCIState *sdhci = ASPEED_SDHCI(dev);
++
++    /* Create input irqs for the slots */
++    qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_irq,
++                                        sdhci, NULL, ASPEED_SDHCI_NUM_SLOTS);
++
++    for (int i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
++        hwaddr slot_addr = sdhci->ioaddr + (0x100 * (i + 1));
++        Object *sdhci_slot = OBJECT(&sdhci->slots[i]);
++        SysBusDevice *sbd_slot = SYS_BUS_DEVICE(&sdhci->slots[i]);
++
++        object_property_set_int(sdhci_slot, 2, "sd-spec-version", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        object_property_set_uint(sdhci_slot, ASPEED_SDHCI_CAPABILITIES,
++                                 "capareg", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        object_property_set_bool(sdhci_slot, true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        sysbus_mmio_map(sbd_slot, 0, slot_addr);
++
++        sysbus_connect_irq(sbd_slot, 0, qdev_get_gpio_in(DEVICE(sbd), i));
++    }
++
++    sysbus_init_irq(sbd, &sdhci->irq);
++    memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_ops,
++                          sdhci, TYPE_ASPEED_SDHCI, ASPEED_SDHCI_REG_SIZE);
++    sysbus_init_mmio(sbd, &sdhci->iomem);
++    sysbus_mmio_map(sbd, 0, sdhci->ioaddr);
++}
++
++static void aspeed_sdhci_reset(DeviceState *dev)
++{
++    AspeedSDHCIState *sdhci = ASPEED_SDHCI(dev);
++
++    memset(sdhci->regs, 0, ASPEED_SDHCI_REG_SIZE);
++    sdhci->regs[TO_REG(ASPEED_SDHCI_INFO)] = ASPEED_SDHCI_INFO_RESET;
++    sdhci->regs[TO_REG(ASPEED_SDHCI_DEBOUNCE)] = ASPEED_SDHCI_DEBOUNCE_RESET;
++}
++
++static const VMStateDescription vmstate_aspeed_sdhci = {
++    .name = TYPE_ASPEED_SDHCI,
++    .version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, AspeedSDHCIState, ASPEED_SDHCI_NUM_REGS),
++        VMSTATE_END_OF_LIST(),
++    },
++};
++
++static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(classp);
++
++    dc->realize = aspeed_sdhci_realize;
++    dc->reset = aspeed_sdhci_reset;
++    dc->vmsd = &vmstate_aspeed_sdhci;
++}
++
++static TypeInfo aspeed_sdhci_info = {
++    .name          = TYPE_ASPEED_SDHCI,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(AspeedSDHCIState),
++    .class_init    = aspeed_sdhci_class_init,
++};
++
++static void aspeed_sdhci_register_types(void)
++{
++    type_register_static(&aspeed_sdhci_info);
++}
++
++type_init(aspeed_sdhci_register_types)
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index 429d7e7..3ddba3a 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -29,6 +29,7 @@
+ #include "hw/misc/aspeed_pwm.h"
+ #include "hw/misc/aspeed_lpc.h"
+ #include "hw/misc/aspeed_fsi.h"
++#include "hw/sd/aspeed_sdhci.h"
+ 
+ #define ASPEED_SPIS_NUM  2
+ #define ASPEED_WDTS_NUM  4
+@@ -62,6 +63,7 @@ typedef struct AspeedSoCState {
+     AspeedPWMState pwm;
+     AspeedLPCState lpc;
+     AspeedFsiState fsi[2];
++    AspeedSDHCIState sdhci;
+ } AspeedSoCState;
+ 
+ #define TYPE_ASPEED_SOC "aspeed-soc"
+@@ -107,6 +109,7 @@ enum {
+     ASPEED_ADC,
+     ASPEED_VIDEO,
+     ASPEED_SRAM,
++    ASPEED_SDHCI,
+     ASPEED_GPIO,
+     ASPEED_RTC,
+     ASPEED_TIMER1,
+diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.h
+new file mode 100644
+index 0000000..ac5482f
+--- /dev/null
++++ b/include/hw/sd/aspeed_sdhci.h
+@@ -0,0 +1,35 @@
++/*
++ * Aspeed SD Host Controller
++ * Eddie James <eajames@linux.ibm.com>
++ *
++ * Copyright (C) 2019 IBM Corp
++ * SPDX-License-Identifer: GPL-2.0-or-later
++ */
++
++#ifndef ASPEED_SDHCI_H
++#define ASPEED_SDHCI_H
++
++#include "hw/sd/sdhci.h"
++
++#define TYPE_ASPEED_SDHCI "aspeed.sdhci"
++#define ASPEED_SDHCI(obj) OBJECT_CHECK(AspeedSDHCIState, (obj), \
++                                       TYPE_ASPEED_SDHCI)
++
++#define ASPEED_SDHCI_CAPABILITIES 0x01E80080
++#define ASPEED_SDHCI_NUM_SLOTS    2
++#define ASPEED_SDHCI_NUM_REGS     (ASPEED_SDHCI_REG_SIZE / sizeof(uint32_t))
++#define ASPEED_SDHCI_REG_SIZE     0x100
++
++typedef struct AspeedSDHCIState {
++    SysBusDevice parent;
++
++    SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
++
++    hwaddr ioaddr;
++    MemoryRegion iomem;
++    qemu_irq irq;
++
++    uint32_t regs[ASPEED_SDHCI_NUM_REGS];
++} AspeedSDHCIState;
++
++#endif /* ASPEED_SDHCI_H */
 -- 
-2.17.2
+1.8.3.1
 
 
