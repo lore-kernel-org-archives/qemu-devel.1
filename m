@@ -2,91 +2,87 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C62C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09131C32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:35:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 829D720843
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD89A2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:35:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u63KaraT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 829D720843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gUkhQ1/k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD89A2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxpSV-0002XE-Bx
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 05:20:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48032)
+	id 1hxpgj-0005Ox-04
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 05:35:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49721)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1hxpRn-0001uV-ND
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:20:00 -0400
+ (envelope-from <bmeng.cn@gmail.com>) id 1hxpfv-0004uh-5V
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hxpRm-0001YG-CS
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:19:59 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53572)
+ (envelope-from <bmeng.cn@gmail.com>) id 1hxpfu-0000j8-1n
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:34:35 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:33869)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hxpRm-0001Xh-5h
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:19:58 -0400
-Received: by mail-wm1-x341.google.com with SMTP id 10so3928446wmp.3
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 02:19:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=GVC3eqOMw6fknTK4q6WWr4vN9hd/YLEAouWGFY8rMTc=;
- b=u63KaraTAAI+H/LraewtxrRE+lmlfi2yNaBTrKJi0wwyTiamIwybI974620899XESm
- gS87+zlmbb8oOxLpuWX53VK9LRT/GI9jvXCB2OO9KrQKeS7x1RNEh8OjLCloECqSKHtC
- k1iWN291t+RE3iSnEJRh2yN1DZhs+p+0hmeGTei1f++gkhMLRnWJGzwnQ8fwbPWAegeo
- 1hCCaWgmsSz42EKgc6xk1QF1S7dAoIst+TN4C7RcnXX6fzX0sUqd5obLuz5CdXJKed8W
- FW5oZ9FKs7HEucF4/ARoVL/g+nupTT1b9GHyr3gyKrcnYcxFLbf/lBi4jjJOcRxnQvrI
- 5eag==
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1hxpfr-0000iJ-E6; Wed, 14 Aug 2019 05:34:31 -0400
+Received: by mail-ed1-x543.google.com with SMTP id s49so74549567edb.1;
+ Wed, 14 Aug 2019 02:34:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=ZM9ZTb4myhYtU/fLU4I/S6dUh1E6fKN3yCLi2nVjC8Q=;
+ b=gUkhQ1/kaDe2qGyhtNN9AkeV5ulGW2v0GvCjrLQSi/DsP1U+8FJKccl9AHA3l2ZAzU
+ rrpNtrVLf4WXsJMnUP9uWzzRLvQGO1rIv49pKKi1UTX/8WH5xkbwTFoj2vyMY9m6ezZt
+ jhX8A4HMqYGRqjo1kmLO4WW4HcmNYyCYyPZ93gqq4D1qtD+1GrAAGUkJae5h5JxO/Hi8
+ SfXI+W+m5xE8mbCRw6AgCGlWs65fIcObEiy93LdZpegIEPThuMKnz1Qc66+mIamZ5J0W
+ Ry9gBu27KPMM/zTGIjX1HfFjJF+DvGdI+o8Qanm5o28ysc3ILWAzwNlpxbMHPCeSM21o
+ 4FKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=GVC3eqOMw6fknTK4q6WWr4vN9hd/YLEAouWGFY8rMTc=;
- b=D7fJx98rL+cOf5kKI73jhm6cMOq7fm3E0/FMOOFGAK532rG1PxSwPT+vsL5qMIkTPB
- itDIM6lfBQbWGR/NsUsc4bDXyjzne5yoBkGzMPEKeH2LcXwjNZCEv5EUz4vOm5cXDv4I
- 29xwJty3qrMP88V5kz+L6ecgNK//LaGTmngus93m7KcuvzE/Gtuw9Bx7LlaJU4v2hmt2
- y8t/HYmyIAde0tRl4sTguEMSYtdpMYxXgIjsNhDXqMPifkyDeaQ2QwX/Y32wyN2krNWC
- DKYxx9YJbCsNpOgjcXgU+rGbp32zckfOrM1U3pHTVbzV37UcDV4pSmUGE9uKWmu/v2gq
- queA==
-X-Gm-Message-State: APjAAAW/eyj9+F6DzLOp9jHAroFx0X+t6RYp8qLkL1NwU4LyEm1LQhjL
- of6nYdVMzqagUoJJ0gbHdhgbNA==
-X-Google-Smtp-Source: APXvYqy0CZetN9PiQK0eciLbMuWeiUd66hSv4+OGiBLeaQmxtR2z7L9sQP2NidstsTVKQB1Cy2060Q==
-X-Received: by 2002:a1c:494:: with SMTP id 142mr7204869wme.12.1565774396381;
- Wed, 14 Aug 2019 02:19:56 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id p186sm763581wme.9.2019.08.14.02.19.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Aug 2019 02:19:55 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 505CA1FF87;
- Wed, 14 Aug 2019 10:19:55 +0100 (BST)
-References: <CAKmqyKNPW=Jtp3PUdwuSzjNE7g58WdureNxAWUnK_KZ-Z17HnQ@mail.gmail.com>
- <mhng-5f5b5d32-dff8-45cd-9644-dd40e502fca1@palmer-si-x1e>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Palmer Dabbelt <palmer@sifive.com>
-In-reply-to: <mhng-5f5b5d32-dff8-45cd-9644-dd40e502fca1@palmer-si-x1e>
-Date: Wed, 14 Aug 2019 10:19:55 +0100
-Message-ID: <87y2zwm7d0.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=ZM9ZTb4myhYtU/fLU4I/S6dUh1E6fKN3yCLi2nVjC8Q=;
+ b=lWeYiQf3lRO5gOqUg+9Sjk5+u+6pEr83Hv0G61mrhxt/C2PRWk/WZGN5S/nDHN6uAB
+ m13vT1gtxpfREZsBfayibEIsRBliK5MIRJwZV+5aPSn0aSAKqQQCyd+usP6maNJiIVoW
+ I9zm5c1WtcyuYDqVuguGDsttpVtDYkia1rraPuMusIjS65khtn4qJsZH2m9B/Oxs7E5e
+ aDkbiefSTpCB4/gQg/d3dxspJcBA9rjHvN/u0VFBSI62S0zN3IinrqTKDuO6Y4zucl6N
+ DZDeI+MaLTTXrTIG32k3+9c9wSNFs8Q4ANW+duI5ugueWDMziZwuNq9SiqFRehtMoM7Y
+ Sy3A==
+X-Gm-Message-State: APjAAAVH0aURZ36UZKoOpvoHwbtiU6479Kufpp+vyNWFlXw46S8rTb6X
+ XP4Tn0GNRvx21DiTWdTgNoE31uKle58jyXIg/C8=
+X-Google-Smtp-Source: APXvYqzTb2M+QKLooKHHbQyutyZpROXidpUxeYGJyAn7u8OC5nSRiD8oGyziZopyXU1A9UMaIrrXz4hM38kH2SBLDUk=
+X-Received: by 2002:a05:6402:12d1:: with SMTP id
+ k17mr26516179edx.214.1565775269984; 
+ Wed, 14 Aug 2019 02:34:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <1564792052-6469-1-git-send-email-bmeng.cn@gmail.com>
+ <CAEiOBXWQ02uRQQOpP=Rauq8WZnYtoxNqjM--Rpi5tHX2W0bGsw@mail.gmail.com>
+ <CAEUhbmU-TdVocONETkSV-+DtX_66+8J8m3yYeph3P1i_3C9LzQ@mail.gmail.com>
+ <11403b54-d41a-3083-7794-2c699a223479@redhat.com>
+ <CAEUhbmV7_75mCPE7dOzBt7xWo1Lxj43HL4+Hxz=Zs3Ota03a5w@mail.gmail.com>
+In-Reply-To: <CAEUhbmV7_75mCPE7dOzBt7xWo1Lxj43HL4+Hxz=Zs3Ota03a5w@mail.gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Wed, 14 Aug 2019 17:34:18 +0800
+Message-ID: <CAEUhbmVTUj6PPWxGnTW6Fp5ruVz_TeUXU9s2gyvGY9C=1y_NxQ@mail.gmail.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] target/riscv: rationalise softfloat
- includes
+X-Received-From: 2a00:1450:4864:20::543
+Subject: Re: [Qemu-devel] [Qemu-riscv] [PATCH] riscv: sifive_e: Correct
+ various SoC IP block sizes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,91 +94,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
- Alistair Francis <Alistair.Francis@wdc.com>, alistair23@gmail.com
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Chih-Min Chao <chihmin.chao@sifive.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi Palmer,
 
-Palmer Dabbelt <palmer@sifive.com> writes:
-
-> On Fri, 09 Aug 2019 18:55:42 PDT (-0700), alistair23@gmail.com wrote:
->> On Fri, Aug 9, 2019 at 2:22 AM Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
->>>
->>> We should avoid including the whole of softfloat headers in cpu.h and
->>> explicitly include it only where we will be calling softfloat
->>> functions. We can use the -types.h and -helpers.h in cpu.h for the few
->>> bits that are global.
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>
->> I just reviewed v1, but this also applies to v2:
->>
->> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On Wed, Aug 7, 2019 at 10:53 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> Acked-by: Palmer Dabbelt <palmer@sifive.com>
+> On Wed, Aug 7, 2019 at 5:06 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
+.com> wrote:
+> >
+> > On 8/5/19 8:43 AM, Bin Meng wrote:
+> > > On Mon, Aug 5, 2019 at 2:14 PM Chih-Min Chao <chihmin.chao@sifive.com=
+> wrote:
+> > >> On Sat, Aug 3, 2019 at 8:27 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> > >>>
+> > >>> Some of the SoC IP block sizes are wrong. Correct them according
+> > >>> to the FE310 manual.
+> > >>>
+> > >>> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> > >>> ---
+> > >>>
+> > >>>  hw/riscv/sifive_e.c | 6 +++---
+> > >>>  1 file changed, 3 insertions(+), 3 deletions(-)
+> > >>>
+> > >>> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> > >>> index 2a499d8..9655847 100644
+> > >>> --- a/hw/riscv/sifive_e.c
+> > >>> +++ b/hw/riscv/sifive_e.c
+> > >>> @@ -53,13 +53,13 @@ static const struct MemmapEntry {
+> > >>>      hwaddr base;
+> > >>>      hwaddr size;
+> > >>>  } sifive_e_memmap[] =3D {
+> > >>> -    [SIFIVE_E_DEBUG] =3D    {        0x0,      0x100 },
+> > >>> +    [SIFIVE_E_DEBUG] =3D    {        0x0,     0x1000 },
+> > >>>      [SIFIVE_E_MROM] =3D     {     0x1000,     0x2000 },
+> > >>>      [SIFIVE_E_OTP] =3D      {    0x20000,     0x2000 },
+> > >>>      [SIFIVE_E_CLINT] =3D    {  0x2000000,    0x10000 },
+> > >>>      [SIFIVE_E_PLIC] =3D     {  0xc000000,  0x4000000 },
+> > >>> -    [SIFIVE_E_AON] =3D      { 0x10000000,     0x8000 },
+> > >>> -    [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x8000 },
+> > >>> +    [SIFIVE_E_AON] =3D      { 0x10000000,     0x1000 },
+> > >>> +    [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x1000 },
+> > >>>      [SIFIVE_E_OTP_CTRL] =3D { 0x10010000,     0x1000 },
+> > >>>      [SIFIVE_E_GPIO0] =3D    { 0x10012000,     0x1000 },
+> > >>>      [SIFIVE_E_UART0] =3D    { 0x10013000,     0x1000 },
+> > >>> --
+> > >>> 2.7.4
+> > >>>
+> > >>
+> > >> It seems the modification follows  E310-G002(Hifive1 Rev B) spec and=
+ the origin is for E310-G000(Hifive1) spec.
+> > >> There should be some way to specify different board version with dif=
+ferent memory map or we have policy, always support the latest spec.
+> >
+> > I agree with Chao, it would be cleaner to have two different boards
+> > (machines).
+> > Since the SoCs are very similar, you could add a 'revision' property an=
+d
+> > use it to select the correct map.
+> >
 >
-> I'm assuming this are going in through another tree, along with the
-> rest of the patch set.
-
-It will yes..
-
+> I am not sure if adding two different machines will bring us a lot of
+> benefits, since the only difference is the SoC revision with different
+> block sizes.
 >
->>
->> Alistair
->>
->>> ---
->>>  target/riscv/cpu.c        | 1 +
->>>  target/riscv/cpu.h        | 2 +-
->>>  target/riscv/fpu_helper.c | 1 +
->>>  3 files changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->>> index f8d07bd20ad..6d52f97d7c3 100644
->>> --- a/target/riscv/cpu.c
->>> +++ b/target/riscv/cpu.c
->>> @@ -27,6 +27,7 @@
->>>  #include "qemu/error-report.h"
->>>  #include "hw/qdev-properties.h"
->>>  #include "migration/vmstate.h"
->>> +#include "fpu/softfloat-helpers.h"
->>>
->>>  /* RISC-V CPU definitions */
->>>
->>> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
->>> index 0adb307f329..240b31e2ebb 100644
->>> --- a/target/riscv/cpu.h
->>> +++ b/target/riscv/cpu.h
->>> @@ -22,7 +22,7 @@
->>>
->>>  #include "qom/cpu.h"
->>>  #include "exec/cpu-defs.h"
->>> -#include "fpu/softfloat.h"
->>> +#include "fpu/softfloat-types.h"
->>>
->>>  #define TCG_GUEST_DEFAULT_MO 0
->>>
->>> diff --git a/target/riscv/fpu_helper.c b/target/riscv/fpu_helper.c
->>> index b4f818a6465..0b79562a690 100644
->>> --- a/target/riscv/fpu_helper.c
->>> +++ b/target/riscv/fpu_helper.c
->>> @@ -21,6 +21,7 @@
->>>  #include "qemu/host-utils.h"
->>>  #include "exec/exec-all.h"
->>>  #include "exec/helper-proto.h"
->>> +#include "fpu/softfloat.h"
->>>
->>>  target_ulong riscv_cpu_get_fflags(CPURISCVState *env)
->>>  {
->>> --
->>> 2.20.1
+> > >>
+> > >
+> > > Yes, I checked both specs. The older spec says these bigger sizes,
+> > > however their register sizes fit well in the smaller range as well. S=
+o
+> > > I think the modification works well for both.
+> >
+> > This is OK for the PRCI, since sifive_prci_create() does not use
+> > memmap[SIFIVE_E_PRCI].size.
+> >
+> > However the AON case is borderline, since you shrink it from 32KiB to 4=
+KiB.
+> >
+>
+> AON is not implemented anyway currently. And I checked the FE310 old
+> spec, its register block size is still within the 4KiB range, so
+> shrinking the size should be fine for both old and new SoC.
+>
+> > BTW (not related to this patch) it is odd a function named
+> > sifive_mmio_emulate() creates a RAM region with memory_region_init_ram(=
+)
+> > and does not use the UnimplementedDevice (see make_unimp_dev() in
+> > hw/arm/musca.c).
+> >
 
+What's your suggestion regarding this patch?
 
---
-Alex Benn=C3=A9e
+Regards,
+Bin
 
