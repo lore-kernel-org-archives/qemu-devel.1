@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B63C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E1CEC32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 417E020665
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:25:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 417E020665
+	by mail.kernel.org (Postfix) with ESMTPS id 03C0C20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:25:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03C0C20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxw5C-000179-5h
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 12:25:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50900)
+	id 1hxw5v-0002RZ-5O
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 12:25:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hxw3g-0000EF-2S
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:23:32 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxw4w-0001Ff-0d
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxw3f-0000Jh-5U
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:23:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53338)
+ (envelope-from <mreitz@redhat.com>) id 1hxw4v-0001E2-49
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:24:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50346)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxw3c-0000Fv-Dz; Wed, 14 Aug 2019 12:23:28 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hxw4r-0001AJ-Lp; Wed, 14 Aug 2019 12:24:45 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8A8223175289;
- Wed, 14 Aug 2019 16:23:27 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D4C68302C075;
+ Wed, 14 Aug 2019 16:24:44 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C1AAF81E3B;
- Wed, 14 Aug 2019 16:23:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8143F87B8;
+ Wed, 14 Aug 2019 16:24:40 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
- <20190730141826.709849-4-vsementsov@virtuozzo.com>
+ <20190730141826.709849-5-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +71,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e09717b0-0fa1-885d-7454-42ba43fea2c0@redhat.com>
-Date: Wed, 14 Aug 2019 18:23:21 +0200
+Message-ID: <d435e9d2-f078-3167-ad79-e2f21a34f033@redhat.com>
+Date: Wed, 14 Aug 2019 18:24:38 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190730141826.709849-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190730141826.709849-5-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="20KaJuJD2m0DVCCHJIRgxsmTZDPMJrB60"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+ boundary="etl8aDlKGy1j2e1pheHhFqi01qgrGFGfZ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Wed, 14 Aug 2019 16:23:27 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.46]); Wed, 14 Aug 2019 16:24:44 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] block/qcow2: refactor
- qcow2_co_pwritev_part
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] block/qcow2: introduce parallel
+ subrequest handling in read and write
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,74 +104,109 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---20KaJuJD2m0DVCCHJIRgxsmTZDPMJrB60
-Content-Type: multipart/mixed; boundary="AOCATZJ4w1fyRAhSUgTKoQup8BENOGB70";
+--etl8aDlKGy1j2e1pheHhFqi01qgrGFGfZ
+Content-Type: multipart/mixed; boundary="napUPjDuaMbsyRabN273iH7y2Q1Pw1FbS";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, eblake@redhat.com, kwolf@redhat.com, den@openvz.org,
  stefanha@redhat.com
-Message-ID: <e09717b0-0fa1-885d-7454-42ba43fea2c0@redhat.com>
-Subject: Re: [PATCH v2 3/4] block/qcow2: refactor qcow2_co_pwritev_part
+Message-ID: <d435e9d2-f078-3167-ad79-e2f21a34f033@redhat.com>
+Subject: Re: [PATCH v2 4/4] block/qcow2: introduce parallel subrequest
+ handling in read and write
 References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
- <20190730141826.709849-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190730141826.709849-4-vsementsov@virtuozzo.com>
+ <20190730141826.709849-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20190730141826.709849-5-vsementsov@virtuozzo.com>
 
---AOCATZJ4w1fyRAhSUgTKoQup8BENOGB70
+--napUPjDuaMbsyRabN273iH7y2Q1Pw1FbS
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 30.07.19 16:18, Vladimir Sementsov-Ogievskiy wrote:
-> Similarly to previous commit, prepare for parallelizing write-loop
-> iterations.
+> It improves performance for fragmented qcow2 images.
 >=20
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  block/qcow2.c | 150 +++++++++++++++++++++++++++++---------------------=
+>  block/qcow2.c      | 125 +++++++++++++++++++++++++++++++++++++++++----=
 
->  1 file changed, 88 insertions(+), 62 deletions(-)
+>  block/trace-events |   1 +
+>  2 files changed, 115 insertions(+), 11 deletions(-)
 >=20
 > diff --git a/block/qcow2.c b/block/qcow2.c
-> index 7fa71968b2..37766b8b7c 100644
+> index 37766b8b7c..5f0e66ea48 100644
 > --- a/block/qcow2.c
 > +++ b/block/qcow2.c
 
 [...]
 
-> + * l2meta  - if not NULL, qcow2_co_do_pwritev() will consume it. Calle=
-r must not
-> + *           use it somehow after qcow2_co_pwritev_task() call
+> @@ -2017,6 +2018,62 @@ fail:
+>      return ret;
+>  }
+> =20
+> +typedef struct Qcow2AioTask {
+> +    AioTask task;
+> +
+> +    BlockDriverState *bs;
+> +    QCow2ClusterType cluster_type; /* only for read */
+> +    uint64_t file_cluster_offset;
+> +    uint64_t offset;
+> +    uint64_t bytes;
+> +    QEMUIOVector *qiov;
+> +    uint64_t qiov_offset;
+> +    QCowL2Meta *l2meta; /* only for write */
+> +} Qcow2AioTask;
+> +
+> +#define QCOW2_MAX_WORKERS 8
+
+Maybe move this to the top, or even qcow2.h?
 
 [...]
 
-> +        l2meta =3D NULL; /* l2meta is consumed by qcow2_co_do_pwritev(=
-) */
+> @@ -2112,7 +2182,16 @@ static coroutine_fn int qcow2_co_preadv_part(Blo=
+ckDriverState *bs,
+>          qiov_offset +=3D cur_bytes;
+>      }
+> =20
+> -    return 0;
+> +out:
+> +    if (aio) {
+> +        aio_task_pool_wait_all(aio);
+> +        if (ret =3D=3D 0) {
+> +            ret =3D aio_task_pool_status(aio);
+> +        }
+> +        g_free(aio);
+> +    }
+> +
+> +    return ret;
 
-By the way, qcow2_co_do_pwritev() does not exist. :-)
+My gcc complains here that ret may be initialized.  (Which is indeed the
+case if @bytes is 0.)
+
+The rest looks good to me.
 
 Max
 
 
---AOCATZJ4w1fyRAhSUgTKoQup8BENOGB70--
+--napUPjDuaMbsyRabN273iH7y2Q1Pw1FbS--
 
---20KaJuJD2m0DVCCHJIRgxsmTZDPMJrB60
+--etl8aDlKGy1j2e1pheHhFqi01qgrGFGfZ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1UNXkACgkQ9AfbAGHV
-z0B2JQgAkdrhM8DNA5nzo156A+fzSN+d8AjqYJEmFe6Q5GeuP0OScABFShUxlZtO
-H0RLLM9nWQmUTmCVgdQfISLS5XRNFqb75cVSVMPjatLvGyWQX1KyNazUgAgr6PcL
-6fMiR5X0SBgMF+cxlZtC/gD/jA4dzvBuJsx1Vmct8GQPJ0ZzhnolyaT7DHXtk4Vl
-TBuXIalrxsMzPfAgIeu5guoHWosXhcxrtCQCX3hNx3Y+dHFMNLSis6f0KjxLIgND
-suXb4kX8Om46dittJ7npge0PEWZXZsUpUhQYCHwp7GygcTPrICd5nPNZr9O9juHv
-7TFVvnBGyKW7U3wPmrwK/4KZOaEAww==
-=QFFJ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1UNcYACgkQ9AfbAGHV
+z0BhrwgAtcXmPWBPhOLzYk/BDuC7Ze7AvuLEpQHYJLLtOrehuTlAlxdKYJXAQz3l
+akWnEWYwRyL4SEyq1pD9Crn381xipnlIw4lnqDuYhQ7oKer3/YoKwMNr8HxjmmmE
+gzgXljLEmJROwJfo+pDfNp4mVcE3QZYcKTp3H8muxuEAVv3TnQgkpPsTenXhZCKg
+/1ZZL+fNqOvzMfbDhqEW2IVvZ/iYXpEfOKxjxqPUyLJtLph8hbhAggniRILBu0WQ
+E2y4nKCbnzX4Vpb8DIQboS+HPHfUtjfincrHp0iJaVbKnylom+09jVI45Gn/hq78
+BpIC+sBKGg781EzJVlurs2W6w12HcQ==
+=aGVq
 -----END PGP SIGNATURE-----
 
---20KaJuJD2m0DVCCHJIRgxsmTZDPMJrB60--
+--etl8aDlKGy1j2e1pheHhFqi01qgrGFGfZ--
 
