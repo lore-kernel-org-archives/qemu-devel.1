@@ -2,55 +2,57 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6711C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC359C32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:24:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A9802133F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:24:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A9802133F
+	by mail.kernel.org (Postfix) with ESMTPS id B37D72133F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:24:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B37D72133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35698 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxzpC-0005nR-78
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:24:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33067)
+	id 1hxzpE-0005sU-CJ
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:24:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33060)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1hxzn2-0003vd-72
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:22:38 -0400
+ (envelope-from <mlevitsk@redhat.com>) id 1hxzn1-0003uc-5K
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:22:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hxzn0-0003om-5K
+ (envelope-from <mlevitsk@redhat.com>) id 1hxzn0-0003or-5d
  for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:22:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60704)
+Received: from mx1.redhat.com ([209.132.183.28]:43256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hxzmw-0003kN-FU; Wed, 14 Aug 2019 16:22:30 -0400
+ id 1hxzmx-0003ld-Ic; Wed, 14 Aug 2019 16:22:31 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0EBF63067294;
- Wed, 14 Aug 2019 20:22:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D9BFC31CD7A;
+ Wed, 14 Aug 2019 20:22:30 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9750E10016EB;
- Wed, 14 Aug 2019 20:22:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 674B410016EB;
+ Wed, 14 Aug 2019 20:22:28 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:22:06 +0300
-Message-Id: <20190814202219.1870-1-mlevitsk@redhat.com>
+Date: Wed, 14 Aug 2019 23:22:07 +0300
+Message-Id: <20190814202219.1870-2-mlevitsk@redhat.com>
+In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 14 Aug 2019 20:22:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Wed, 14 Aug 2019 20:22:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key management
+Subject: [Qemu-devel] [PATCH 01/13] block-crypto: misc refactoring
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,117 +73,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
+* rename the write_func to create_write_func,
+  and init_func to create_init_func
+  this is  preparation for other write_func that will
+  be used to update the encryption keys.
 
-This patch series implements key management for luks based encryption
-It supports both raw luks images and qcow2 encrypted images.
+No functional changes
 
-Bugzilla: https://bugzilla.redhat.com/show_bug.cgi?id=1731898
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ block/crypto.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-There are still several issues that need to be figured out,
-on which the feedback is very welcome, but other than that the code mostly works.
-
-The main issues are:
-
-1. Instead of the proposed blockdev-update-encryption/blockdev-erase-encryption
-interface, it is probably better to implement 'blockdev-amend-options' in qmp,
-and use this both for offline and online key update (with some translation
-layer to convert the qemu-img 'options' to qmp structures)
-
-This interface already exists for offline qcow2 format options update/
-
-This is an issue that was raised today on IRC with Kevin Wolf. Really thanks
-for the idea!
-
-We agreed that this new qmp interface should take the same options as
-blockdev-create does, however since we want to be able to edit the encryption
-slots separately, this implies that we sort of need to allow this on creation
-time as well.
-
-Also the BlockdevCreateOptions is a union, which is specialized by the driver name
-which is great for creation, but for update, the driver name is already known,
-and thus the user should not be forced to pass it again.
-However qmp doesn't seem to support union type guessing based on actual fields
-given (this might not be desired either), which complicates this somewhat.
-
-2. 'crypto' driver (the raw luks block device/file) has special behavior for
-
-share-rw=on. write sharing usually is only allowed for raw files, files that
-qemu doesn't itself touch, but only guest does. For such files a well behaved guests can
-share the storage.
-
-On the other hand most of the format drivers need to store the metadata, and we don't
-have any format driver which implements some kind of sync vs other users of the same
-file, thus this is not allowed.
-
-However since for luks which is technically a format driver, the metadata is readonly,
-such write sharing was allowed till now, and due to backward compatibility should
-still be allowed in the future.
-
-This causes an issue with online updating of the keys, and the solution that was suggested
-by Keven that I implemented was to request the exclusive write access only during the key
-update.
-
-Testing. This was lightly tested with manual testing and with few iotests that I prepared.
-I haven't yet tested fully the write sharing behavior, nor did I run the whole iotests
-suite to see if this code causes some regressions. Since I will need probably
-to rewrite some chunks of it to change to 'amend' interface, I decided to post it now,
-to see if you have other ideas/comments to add.
-
-Best regards,
-	Maxim Levitsky
-
-Maxim Levitsky (13):
-  block-crypto: misc refactoring
-  qcrypto-luks: misc refactoring
-  qcrypto-luks: refactoring: extract load/store/check/parse header
-    functions
-  qcrypto-luks: refactoring: simplify the math used for keyslot
-    locations
-  qcrypto-luks: clear the masterkey and password before freeing them
-    always
-  qcrypto-luks: implement more rigorous header checking
-  block: add manage-encryption command (qmp and blockdev)
-  qcrypto: add the plumbing for encryption management
-  qcrypto-luks: implement the encryption key management
-  block/crypto: implement the encryption key management
-  block/qcow2: implement the encryption key managment
-  qemu-img: implement key management
-  iotests : add tests for encryption key management
-
- block/block-backend.c            |    9 +
- block/crypto.c                   |  127 ++-
- block/crypto.h                   |    3 +
- block/io.c                       |   24 +
- block/qcow2.c                    |   27 +
- blockdev.c                       |   40 +
- crypto/block-luks.c              | 1673 ++++++++++++++++++++----------
- crypto/block.c                   |   29 +
- crypto/blockpriv.h               |    9 +
- include/block/block.h            |   12 +
- include/block/block_int.h        |   11 +
- include/crypto/block.h           |   27 +
- include/sysemu/block-backend.h   |    7 +
- qapi/block-core.json             |   36 +
- qapi/crypto.json                 |   26 +
- qemu-img-cmds.hx                 |   13 +
- qemu-img.c                       |  140 +++
- tests/qemu-iotests/257           |  197 ++++
- tests/qemu-iotests/257.out       |   96 ++
- tests/qemu-iotests/258           |   95 ++
- tests/qemu-iotests/258.out       |   30 +
- tests/qemu-iotests/259           |  199 ++++
- tests/qemu-iotests/259.out       |    5 +
- tests/qemu-iotests/common.filter |    5 +-
- tests/qemu-iotests/group         |    3 +
- 25 files changed, 2286 insertions(+), 557 deletions(-)
- create mode 100755 tests/qemu-iotests/257
- create mode 100644 tests/qemu-iotests/257.out
- create mode 100755 tests/qemu-iotests/258
- create mode 100644 tests/qemu-iotests/258.out
- create mode 100644 tests/qemu-iotests/259
- create mode 100644 tests/qemu-iotests/259.out
-
+diff --git a/block/crypto.c b/block/crypto.c
+index 8237424ae6..42a3f0898b 100644
+--- a/block/crypto.c
++++ b/block/crypto.c
+@@ -51,7 +51,6 @@ static int block_crypto_probe_generic(QCryptoBlockFormat format,
+     }
+ }
+ 
+-
+ static ssize_t block_crypto_read_func(QCryptoBlock *block,
+                                       size_t offset,
+                                       uint8_t *buf,
+@@ -77,7 +76,7 @@ struct BlockCryptoCreateData {
+ };
+ 
+ 
+-static ssize_t block_crypto_write_func(QCryptoBlock *block,
++static ssize_t block_crypto_create_write_func(QCryptoBlock *block,
+                                        size_t offset,
+                                        const uint8_t *buf,
+                                        size_t buflen,
+@@ -95,8 +94,7 @@ static ssize_t block_crypto_write_func(QCryptoBlock *block,
+     return ret;
+ }
+ 
+-
+-static ssize_t block_crypto_init_func(QCryptoBlock *block,
++static ssize_t block_crypto_create_init_func(QCryptoBlock *block,
+                                       size_t headerlen,
+                                       void *opaque,
+                                       Error **errp)
+@@ -108,7 +106,8 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
+         return -EFBIG;
+     }
+ 
+-    /* User provided size should reflect amount of space made
++    /*
++     * User provided size should reflect amount of space made
+      * available to the guest, so we must take account of that
+      * which will be used by the crypto header
+      */
+@@ -117,6 +116,8 @@ static ssize_t block_crypto_init_func(QCryptoBlock *block,
+ }
+ 
+ 
++
++
+ static QemuOptsList block_crypto_runtime_opts_luks = {
+     .name = "crypto",
+     .head = QTAILQ_HEAD_INITIALIZER(block_crypto_runtime_opts_luks.head),
+@@ -272,8 +273,8 @@ static int block_crypto_co_create_generic(BlockDriverState *bs,
+     };
+ 
+     crypto = qcrypto_block_create(opts, NULL,
+-                                  block_crypto_init_func,
+-                                  block_crypto_write_func,
++                                  block_crypto_create_init_func,
++                                  block_crypto_create_write_func,
+                                   &data,
+                                   errp);
+ 
 -- 
 2.17.2
 
