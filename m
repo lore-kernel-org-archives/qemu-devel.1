@@ -2,49 +2,54 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A813C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B720C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:59:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF95C2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:56:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF95C2083B
+	by mail.kernel.org (Postfix) with ESMTPS id 3FB8A2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:59:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FB8A2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxvd3-00060y-Rd
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 11:56:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45222)
+	id 1hxvgd-0007J3-6g
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 11:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hxvcN-0005V1-2D
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:55:19 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxvfz-0006nJ-G7
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxvcM-0007Pf-4D
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:55:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53802)
+ (envelope-from <mreitz@redhat.com>) id 1hxvfy-0000OG-HO
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:59:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxvcJ-0007Oh-KA; Wed, 14 Aug 2019 11:55:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ id 1hxvfw-0000Ma-2r; Wed, 14 Aug 2019 11:59:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8903D308C21F;
- Wed, 14 Aug 2019 15:55:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 495B98E37A;
+ Wed, 14 Aug 2019 15:58:59 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 799E727BBD;
- Wed, 14 Aug 2019 15:55:06 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C6AB832A8;
+ Wed, 14 Aug 2019 15:58:54 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
- <20190730141826.709849-4-vsementsov@virtuozzo.com>
+ <20190730141826.709849-3-vsementsov@virtuozzo.com>
+ <ead713c5-ed20-096c-40cb-a4bb4b3658a6@redhat.com>
+ <85aa4552-1600-21aa-0407-128f63665aac@virtuozzo.com>
+ <c439dd02-33fd-8b94-406d-dd14d5c10cde@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
@@ -71,22 +76,22 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3968310a-6186-9d7a-cdcb-de4f2c87dd6a@redhat.com>
-Date: Wed, 14 Aug 2019 17:55:05 +0200
+Message-ID: <93b77cd4-0a26-ae51-865e-ab26e6ed4c5f@redhat.com>
+Date: Wed, 14 Aug 2019 17:58:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190730141826.709849-4-vsementsov@virtuozzo.com>
+In-Reply-To: <c439dd02-33fd-8b94-406d-dd14d5c10cde@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+ boundary="F74RmVAi5Y0hNxOG3L7QPCxtp5i6S1ojq"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Wed, 14 Aug 2019 15:55:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Wed, 14 Aug 2019 15:58:59 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] block/qcow2: refactor
- qcow2_co_pwritev_part
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] block/qcow2: refactor
+ qcow2_co_preadv_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,81 +103,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, stefanha@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>, Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU
-Content-Type: multipart/mixed; boundary="PJP6M5uGqrrnL6aUjDiYVdNLq9gdWSzru";
+--F74RmVAi5Y0hNxOG3L7QPCxtp5i6S1ojq
+Content-Type: multipart/mixed; boundary="vp0dzxDZjZlUtDhumtNXWEq8twKLAn5Q5";
  protected-headers="v1"
 From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com, kwolf@redhat.com, den@openvz.org,
- stefanha@redhat.com
-Message-ID: <3968310a-6186-9d7a-cdcb-de4f2c87dd6a@redhat.com>
-Subject: Re: [PATCH v2 3/4] block/qcow2: refactor qcow2_co_pwritev_part
+To: Eric Blake <eblake@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "armbru@redhat.com" <armbru@redhat.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
+Message-ID: <93b77cd4-0a26-ae51-865e-ab26e6ed4c5f@redhat.com>
+Subject: Re: [PATCH v2 2/4] block/qcow2: refactor qcow2_co_preadv_part
 References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
- <20190730141826.709849-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20190730141826.709849-4-vsementsov@virtuozzo.com>
+ <20190730141826.709849-3-vsementsov@virtuozzo.com>
+ <ead713c5-ed20-096c-40cb-a4bb4b3658a6@redhat.com>
+ <85aa4552-1600-21aa-0407-128f63665aac@virtuozzo.com>
+ <c439dd02-33fd-8b94-406d-dd14d5c10cde@redhat.com>
+In-Reply-To: <c439dd02-33fd-8b94-406d-dd14d5c10cde@redhat.com>
 
---PJP6M5uGqrrnL6aUjDiYVdNLq9gdWSzru
+--vp0dzxDZjZlUtDhumtNXWEq8twKLAn5Q5
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 30.07.19 16:18, Vladimir Sementsov-Ogievskiy wrote:
-> Similarly to previous commit, prepare for parallelizing write-loop
-> iterations.
+On 14.08.19 17:15, Eric Blake wrote:
+> On 8/14/19 4:11 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 14.08.2019 0:31, Max Reitz wrote:
+>>> On 30.07.19 16:18, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Further patch will run partial requests of iterations of
+>>>> qcow2_co_preadv in parallel for performance reasons. To prepare for
+>>>> this, separate part which may be parallelized into separate function=
+
+>>>> (qcow2_co_preadv_task).
+>>>>
+>>>> While being here, also separate encrypted clusters reading to own
+>>>> function, like it is done for compressed reading.
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
+m>
+>>>> ---
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->  block/qcow2.c | 150 +++++++++++++++++++++++++++++---------------------=
-
->  1 file changed, 88 insertions(+), 62 deletions(-)
+>>>> +     * but we must not do decryption in guest buffers for security
+>>>> +     * reasons.
+>>>
+>>> "for security reasons" is a bit handwave-y, no?
+>>
+>> Hmm, let's think of it a bit.
+>>
+>> WRITE
+>>
+>> 1. We can't do any operations on write buffers, as guest may use them =
+for
+>> something else and not prepared for their change. [thx to Den, pointed=
+ to this fact]
+>>
+>> READ
+>>
+>> Hmm, here otherwise, guest should not expect something meaningful in b=
+uffers until the
+>> end of read operation, so theoretically we may decrypt directly in gue=
+st buffer.. What is
+>> bad with it?
 >=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 7fa71968b2..37766b8b7c 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
+> The badness is that the guest can theoretically reverse-engineer the
+> encryption keys if they are savvy enough to grab the contents of the
+> buffer before and after.  The guest must NEVER be able to see the
+> encrypted bits, which means decryption requires a bounce buffer.
 
-[...]
-
-> @@ -2283,62 +2362,11 @@ static coroutine_fn int qcow2_co_pwritev_part(
-
-[...]
-
-> +        ret =3D qcow2_co_pwritev_task(bs, cluster_offset, offset, cur_=
-bytes,
-> +                                    qiov, bytes_done, l2meta);
-
-You=E2=80=99re passing bytes_done as qiov_offset here.  That is initializ=
-ed to
-0, so it ignores the qiov_offset given to qcow2_co_pwritev_part().
+Our encryption does not protect against a known-plaintext attack?
 
 Max
 
 
---PJP6M5uGqrrnL6aUjDiYVdNLq9gdWSzru--
+--vp0dzxDZjZlUtDhumtNXWEq8twKLAn5Q5--
 
---PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU
+--F74RmVAi5Y0hNxOG3L7QPCxtp5i6S1ojq
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1ULtkACgkQ9AfbAGHV
-z0Ae4Qf/Xzi3n04ZMnnJIXVy7LBUCnlAFN8xGUnOX4LVrsPN5FcSpdjDWZvF/n3q
-5hcEO3rBNphmr8FQS/WVGII3eXQQUZmzOGb8+0uKCUVhOGREAwyxFW6DlZVne5Nm
-qfhJn/MnOSfhnkSYXH1goyMc7S8tNsPFROx2d7ILyTl7NxFKw2uu+m9WtQK8NNOj
-tTYF0SxHbQq7arIFNY5Zpg210q397wozIJZgxKVqYVi+K7nWqWDWgwvVCVBrcXzh
-Eb0B7qGTjYTJ9sUqJcMFnNXEO6tyHpfe5H6ialZ+ZsEnK8KW426TQa35m4os3h0+
-Cp3sUyfllfKYdJ8ULLOKh+9zF7eTnA==
-=R85G
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1UL70ACgkQ9AfbAGHV
+z0BYhAgArBIAiVyAar0/bRlCPD78XEgSn/dy4pHQ0WJYX3zi92hf8bIslWCjD2Jv
+DbJoJ4dzksDJtuD4wUi2VsEGyXFngcP9Kvgel9u3x2SvMZ+PkwsOyQZadIcYuNwS
+jt2ZRQOwFDx0feEHWhFjoas1JeOQr9s62qpWwAmIfB4Kf1f5XYjLUvZmKQSpRSL7
+mTYshvf8MCoPAzvjd0CQRltta9q2btg3GbMd7NTIdpF8A3WaqYWzNy08FoPbpSRQ
+6d7oN/KaAzkfwGCjrnx2lQLWvlE9eNrD/5+cQWZ1e95q7tqEpN+MAb2unFVKEVya
+So3ov/+GOVA5K1gDyjrWsNn//egwVQ==
+=iWxX
 -----END PGP SIGNATURE-----
 
---PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU--
+--F74RmVAi5Y0hNxOG3L7QPCxtp5i6S1ojq--
 
