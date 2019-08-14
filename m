@@ -2,85 +2,91 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F89C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F1BC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:45:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 128C22084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:41:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90FE5208C2
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:45:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpSmCC7b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 128C22084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q1M3JOmH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90FE5208C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxqiT-0001Qe-7h
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 06:41:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59343)
+	id 1hxqmp-0003df-JR
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 06:45:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59939)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <catherine.hecx@gmail.com>) id 1hxqhp-0000yZ-W3
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:40:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hxqlk-0002Sl-72
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:44:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <catherine.hecx@gmail.com>) id 1hxqho-00071H-Cn
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:40:37 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:33141)
+ (envelope-from <alex.bennee@linaro.org>) id 1hxqlh-0000Kx-Py
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:44:39 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33345)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
- id 1hxqho-00070s-7k
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:40:36 -0400
-Received: by mail-ot1-x344.google.com with SMTP id q20so28299739otl.0
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 03:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EDwbWLkvkPwEK7niUFJ/Gl6bBZs8PWgUmvO0NAD3PjA=;
- b=MpSmCC7bTouLiEFVBvd59mkONeIWSwuZPCz9oh1CHyRDugTOCp2q2Ce+9Fabe5DmNa
- CvW5LgPlujpHo76luszWSXwQv5Kugr5UUZVFN2WoMmi6V4RidLSfrq2vUqWS05beDOX4
- bvzI1BRHZM/5/H2oIxRUDwm4OUHuTMle3OtQuWig9gMZu2tuEZGicdoYVk1KZMwy6lDH
- 4sQU6REIt+SjRA/Uk2gZ9t0655gew5/TShyWHEql3z2PmlifiYHGmkGuPBDi9+CwQXnH
- jbZgA8PnA3TCp+dzOAr1djNCQq/XSakhvx1cUKuDIrsZ4rnNIKYwceWNlngC+E2vfYQw
- TA0w==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hxqlh-0000K8-Cg
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:44:37 -0400
+Received: by mail-wm1-x341.google.com with SMTP id p77so3040745wme.0
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 03:44:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=2/0YLaLk0wpFVTLgfippfTC8i2Y0BB9jns3G5uGmtCg=;
+ b=Q1M3JOmH1fnFI1QHKag/jnPwzoMBBO2ETvqxIY6ZlI9s1x9UaP+k8Pdr8oOm5FEQmd
+ lNQf3UkyDadjJ6qP2L88czsVHt1Tu/IGNO4kl6xhxcMBhRZeJh7T1Xx/U2ysWaqZAD+6
+ qTt781gJzbUFfTOj6ngrFdmrjRiUvNm763KxIIP2RxwShrX7453UzWe+BRNvd/BXCA9F
+ TtAhyko9HM6IjZoUFHgR374mLwQwEsL1qaT+YXQoA+kkBjlMM3sQ66AgY2em1Mxzq9Jv
+ NzOBYgPrK2BXU66dOugK3NTB/Mj+/kMLZU0ezpvRtdygBBR4HJm2VngYquihLOWQa1BB
+ KdgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=EDwbWLkvkPwEK7niUFJ/Gl6bBZs8PWgUmvO0NAD3PjA=;
- b=h1YGn6OnYY1txZhEf+JZqNJEtC5WiO6sMUN5X06kb9y1OgQFlwuPkGaDRGgP/dSc7b
- H1kPZMl1ma79o35H10dpJvvvkevjB7Gs+GQD5jwR9a7A+tXLZy/eGy0hD+NmDLic/zuA
- uvQhlz6SoSsYiGx2OGJxAej/05HwMf1l9+XP4f6XJFDKxqkV8XfAXg67SnQzFPHh4t0T
- NuO+IUtncWgp9Q7sjubV7VB1ijbtNMlNqCC/rl8dy8FJ8rLAh4dek0pSMkmOTMFtWCMg
- pbZVJSJHdVsEw71F+7UDKXAgK6TDjzrxU+7vtYHuNC0DII91z3+U994zcdahnYP2E+is
- Cv3g==
-X-Gm-Message-State: APjAAAX0Ssk3X8e7KFlLEy+i11Yve9i40/jdKrd1oH0M2ByTqPJ8+B06
- Lu4n/pDjg0rZPsWafVrdAEIvNBCpqOQytuFCokw=
-X-Google-Smtp-Source: APXvYqxykypuyJVdDloZfr5Rx56IXqZR57WxXUVtPE5xmAzPRJJ/mvtlg/a9OI4f+0wIzynqLTXkkvKD0gigCGgBSEI=
-X-Received: by 2002:a05:6830:140b:: with SMTP id
- v11mr7177080otp.117.1565779235128; 
- Wed, 14 Aug 2019 03:40:35 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=2/0YLaLk0wpFVTLgfippfTC8i2Y0BB9jns3G5uGmtCg=;
+ b=KOa3qLYEAVKceEngVAXB38i94NcBELCKmKII/tHP8ytBzGryNcjPTCYJV7xB2nBlBA
+ Sya5qVi0bHGeaBqxW0D+IDRuCSM/nrp4gaxZPnu5jRtUaMA/aI2m2nq4JNZlNToDdNZM
+ uDpegmC+o/5+OhHtgtAyv4FWZjdCYF29aNZelY4nj9lXOIKYubiKMI+O6FkWitt4PPmQ
+ rwnqUoauUw1N2LuGnRxoTxdeZGuTI88ejWYVjQr/gRvAumEHXJ9jb3T4ro8Pm+hrfX15
+ q+ZPeDlueQ/g4qFJ8F8QOisxdwERoYt09JxgPNfcOAvVH7BPSP2iAqCg9xAdnQkPp/ls
+ XPXA==
+X-Gm-Message-State: APjAAAXaM/5qyhWbV6iN6DrtaRie1IPg/Dv4Aj8m1uOlLbXYh5/XEZWA
+ p4OVQunoZAUVVWbPkIgU0jW3tw==
+X-Google-Smtp-Source: APXvYqwNhjaaSCrtHgwAXjRhgjxrfnRlFkdYWaIRKtZL8XVAOqg8CN/lbUORL5cbvUl456kNPr3M1g==
+X-Received: by 2002:a1c:24c3:: with SMTP id k186mr7823210wmk.126.1565779475671; 
+ Wed, 14 Aug 2019 03:44:35 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id k124sm9406422wmk.47.2019.08.14.03.44.31
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 14 Aug 2019 03:44:31 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E40BA1FF87;
+ Wed, 14 Aug 2019 11:44:30 +0100 (BST)
+References: <20190814072355.15333-1-david@redhat.com>
+ <20190814072355.15333-4-david@redhat.com> <87wofgm56o.fsf@linaro.org>
+ <866fea8f-ff61-f704-d0ee-37a12e968fb5@redhat.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+In-reply-to: <866fea8f-ff61-f704-d0ee-37a12e968fb5@redhat.com>
+Date: Wed, 14 Aug 2019 11:44:30 +0100
+Message-ID: <87v9v0m3g1.fsf@linaro.org>
 MIME-Version: 1.0
-References: <1554688616-18583-1-git-send-email-catherine.hecx@gmail.com>
- <1554712933-18682-1-git-send-email-catherine.hecx@gmail.com>
- <20190605183122.GJ2669@work-vm>
-In-Reply-To: <20190605183122.GJ2669@work-vm>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Wed, 14 Aug 2019 18:40:23 +0800
-Message-ID: <CAEn6zmE2UHuioWS-s89cBA+DMzphV5gzN+85FNsPD2WRDDzJjw@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v4] migration: do not rom_reset() during
- incoming migration
+X-Received-From: 2a00:1450:4864:20::341
+Subject: Re: [Qemu-devel] [PATCH-for-4.2 v2 3/6] s390x/tcg: Flush the TLB of
+ all CPUs on SSKE and RRBE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,84 +98,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo
-Ping, is any other comment I hadn't addressed?
 
-Cheers
-Catherine
+David Hildenbrand <david@redhat.com> writes:
 
-On Thu, 6 Jun 2019 at 02:31, Dr. David Alan Gilbert <dgilbert@redhat.com>
-wrote:
-
-> Paolo, can you take this one please.
+> On 14.08.19 12:06, Alex Benn=C3=A9e wrote:
+>>
+>> David Hildenbrand <david@redhat.com> writes:
+>>
+>>> Whenever we modify a storage key, we shuld flush the TLBs of all CPUs,
+>>> so the MMU fault handling code can properly consider the changed storage
+>>> key (to e.g., properly set the reference and change bit on the next
+>>> accesses).
+>>>
+>>> These functions are barely used in modern Linux guests, so the performa=
+nce
+>>> implications are neglectable for now.
+>>>
+>>> This is a preparation for better reference and change bit handling for
+>>> TCG, which will require more MMU changes.
+>>>
+>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  target/s390x/mem_helper.c | 4 ++++
+>>>  1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+>>> index 29d9eaa5b7..ed54265e03 100644
+>>> --- a/target/s390x/mem_helper.c
+>>> +++ b/target/s390x/mem_helper.c
+>>> @@ -1815,6 +1815,8 @@ void HELPER(sske)(CPUS390XState *env, uint64_t r1=
+, uint64_t r2)
+>>>
+>>>      key =3D (uint8_t) r1;
+>>>      skeyclass->set_skeys(ss, addr / TARGET_PAGE_SIZE, 1, &key);
+>>> +    /* TODO: Flush only entries with this target address */
+>>> +    tlb_flush_all_cpus_synced(env_cpu(env));
+>>
+>> Doesn't:
+>>
+>>   tlb_flush_page_all_cpus_synced(env_cpu(env), addr & TARGET_PAGE_MASK);
+>>
+>> do what you want here?
 >
-> * Catherine Ho (catherine.hecx@gmail.com) wrote:
-> > Commit 18269069c310 ("migration: Introduce ignore-shared capability")
-> > addes ignore-shared capability to bypass the shared ramblock (e,g,
-> > membackend + numa node). It does good to live migration.
-> >
-> > As told by Yury,this commit expectes that QEMU doesn't write to guest RAM
-> > until VM starts, but it does on aarch64 qemu:
-> > Backtrace:
-> > 1  0x000055f4a296dd84 in address_space_write_rom_internal () at
-> > exec.c:3458
-> > 2  0x000055f4a296de3a in address_space_write_rom () at exec.c:3479
-> > 3  0x000055f4a2d519ff in rom_reset () at hw/core/loader.c:1101
-> > 4  0x000055f4a2d475ec in qemu_devices_reset () at hw/core/reset.c:69
-> > 5  0x000055f4a2c90a28 in qemu_system_reset () at vl.c:1675
-> > 6  0x000055f4a2c9851d in main () at vl.c:4552
-> >
-> > Actually, on arm64 virt marchine, ramblock "dtb" will be filled into ram
-> > druing rom_reset. In ignore-shared incoming case, this rom filling
-> > is not required since all the data has been stored in memory backend
-> > file.
-> >
-> > Further more, as suggested by Peter Xu, if we do rom_reset() now with
-> > these ROMs then the RAM data should be re-filled again too with the
-> > migration stream coming in.
-> >
-> > Fixes: commit 18269069c310 ("migration: Introduce ignore-shared
-> > capability")
-> > Suggested-by: Yury Kotov <yury-kotov@yandex-team.ru>
-> > Suggested-by: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
-> > ---
-> >  hw/core/loader.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >
-> > diff --git a/hw/core/loader.c b/hw/core/loader.c
-> > index fe5cb24122..040109464b 100644
-> > --- a/hw/core/loader.c
-> > +++ b/hw/core/loader.c
-> > @@ -1087,6 +1087,15 @@ static void rom_reset(void *unused)
-> >  {
-> >      Rom *rom;
-> >
-> > +    /*
-> > +     * We don't need to fill in the RAM with ROM data because we'll fill
-> > +     * the data in during the next incoming migration in all cases.
-> Note
-> > +     * that some of those RAMs can actually be modified by the guest on
-> ARM
-> > +     * so this is probably the only right thing to do here.
-> > +     */
-> > +    if (runstate_check(RUN_STATE_INMIGRATE))
-> > +        return;
-> > +
-> >      QTAILQ_FOREACH(rom, &roms, next) {
-> >          if (rom->fw_file) {
-> >              continue;
-> > --
-> > 2.17.1
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+> I would have to flush all TLB entries that target this physical page,
+> not the entry of the single virtual page. So that does, unfortunately,
+> not work.
+
+Ahh I see. Well maybe that should be the comment instead:
+
+  /*
+   * As we can only flush by virtual address and not all the entries
+   * that point to a physical address we have to flush the whole TLB
+   * here.
+   */
+   tlb_flush_all_cpus_synced(env_cpu(env));
+
+?
+
+
+--
+Alex Benn=C3=A9e
+
