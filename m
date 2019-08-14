@@ -2,63 +2,82 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 921C7C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:42:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16387C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:47:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 691BE2083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:42:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 691BE2083B
+	by mail.kernel.org (Postfix) with ESMTPS id DE9EE2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:47:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE9EE2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxsbb-0008Ca-Kz
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 08:42:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45854)
+	id 1hxsgA-0001vJ-9l
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 08:47:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46355)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ptoscano@redhat.com>) id 1hxsay-0007hu-Ib
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:41:41 -0400
+ (envelope-from <philmd@redhat.com>) id 1hxseT-0000vu-6R
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ptoscano@redhat.com>) id 1hxsax-00047s-Kb
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:41:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53850)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ptoscano@redhat.com>)
- id 1hxsav-00046t-FJ; Wed, 14 Aug 2019 08:41:37 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 70B533090FEE;
- Wed, 14 Aug 2019 12:41:36 +0000 (UTC)
-Received: from lindworm.usersys.redhat.com (unknown [10.43.2.5])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 059968175B;
- Wed, 14 Aug 2019 12:41:34 +0000 (UTC)
-From: Pino Toscano <ptoscano@redhat.com>
-To: Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>
-Date: Wed, 14 Aug 2019 14:41:34 +0200
-Message-ID: <2738213.2Lc8nMRjuf@lindworm.usersys.redhat.com>
-Organization: Red Hat
-In-Reply-To: <20190814121527.17876-5-philmd@redhat.com>
-References: <20190814121527.17876-1-philmd@redhat.com>
- <20190814121527.17876-5-philmd@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1hxseS-0005X9-7c
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:45:17 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46485)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hxseS-0005Wd-1a
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:45:16 -0400
+Received: by mail-wr1-f65.google.com with SMTP id z1so110969060wru.13
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 05:45:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3spmdXjoXaNLWcQVMlsSQgaqA5ymeCeQN+tvICLsCZE=;
+ b=qRuTPkVgXCJlFXaySKfySC7YOFbI5c0J0fDYM3xETxjzrDBPacReict/ISG2tA505H
+ aiB1sfn0dXyFLs1T8VBKOVQ4iU9S5uuWWVBC0Ny5eukU0MZD/nSZcWHCZ+GPtzSeRB9V
+ CFtV6mXFG30HxtQV9I/xlDbOTZCb8JxEq0VpCv6kuOzxyP0rOxgMlwu+/4vbz3QAW+hS
+ BHJTkEo15pTT0EBcRzqrEKomfbJ0Yd8INEnlSGfr46zWxZUCaFxp3IjLGzOrL7/SEkXs
+ +ndtUUbCs3+BL3R/lexSMtOHobhbfapY6HxZpH0T61lqsruUXt/Pvm7EcDhiQDvjqtm2
+ RmXg==
+X-Gm-Message-State: APjAAAVhJywNjVcFtmMQ7LUlC2v0hfFrRGwDE9owPy57qvLPhhHHP2zb
+ A11ry00zB8RUFUwuG9N7fipicg==
+X-Google-Smtp-Source: APXvYqwvqmvGi/W2FZdFfdVHImgftr9lXW08aRjp9r5zvW3tNskwtUcFjHNcGEfoYMVJp7tse82I2A==
+X-Received: by 2002:a5d:54ce:: with SMTP id x14mr27035053wrv.237.1565786715001; 
+ Wed, 14 Aug 2019 05:45:15 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id f10sm16539190wrm.31.2019.08.14.05.45.13
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 14 Aug 2019 05:45:14 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190712133928.21394-1-philmd@redhat.com>
+ <421f2fb2-6e8d-7579-029a-e8de726c6a5e@redhat.com>
+ <56d102b4-3f55-7070-c012-56ad65138873@redhat.com>
+ <CAFEAcA8axpVeXjWV+2cz8PL-gR_6GvU=i0BMt01pYhff_1LOwQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <4ed2e2b7-91b0-197f-7532-bf9daac075bf@redhat.com>
+Date: Wed, 14 Aug 2019 14:45:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart55926548.U4DDp3z1WI";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Wed, 14 Aug 2019 12:41:36 +0000 (UTC)
+In-Reply-To: <CAFEAcA8axpVeXjWV+2cz8PL-gR_6GvU=i0BMt01pYhff_1LOwQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 4/4] configure: Log the libssh version
- detected
+ [fuzzy]
+X-Received-From: 209.85.221.65
+Subject: Re: [Qemu-devel] [PATCH-for-4.1? 0/7] vl: Allow building with
+ CONFIG_BLUETOOTH disabled
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,78 +89,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- "Richard W . M . Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?utf-8?B?5ZGo5paH6Z2S?= <1151451036@qq.com>,
- Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Miroslav Rezanina <mrezanin@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---nextPart55926548.U4DDp3z1WI
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+On 8/13/19 4:04 PM, Peter Maydell wrote:
+> On Tue, 13 Aug 2019 at 15:01, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+>> On 7/15/19 3:13 PM, Thomas Huth wrote:
+>>> On 12/07/2019 15.39, Philippe Mathieu-Daudé wrote:
+>>>> A series of obvious patches to build without the deprecated
+>>>> bluetooth devices. Still worth for 4.1 or too late?
+>>>> It is clearly not a bugfix.
+>>>
+>>> I wonder whether this series is worth the effort right now, or whether
+>>> we should simply nuke the bluetooth code after 4.1 has been released?
+>>
+>> Well, perfect is the enemy of good :)
+>>
+>> This series is already done and is an improvement to what we have.
+>>
+>> Regarding nuking it, it depends on the Nokia N-series boards, they might
+>> become useless without BT support.
+> 
+> Er, they're not useless at all without BT support. The BT
+> hardware is a really tiny part that I doubt many users of
+> the board models ever used. As long as we retain a "simulate
+> doing nothing much" model of the BT device to show the guest
+> I don't care whether the BT backend code disappears.
 
-On Wednesday, 14 August 2019 14:15:27 CEST Philippe Mathieu-Daud=E9 wrote:
-> Log wether the version is 0.7 or 0.8 to better understand
-> user reports.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  configure | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/configure b/configure
-> index 040aa8eb6c..d06cee0ba0 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3930,6 +3930,7 @@ if test "$libssh" !=3D "no" ; then
->    if $pkg_config --exists libssh; then
->      libssh_cflags=3D$($pkg_config libssh --cflags)
->      libssh_libs=3D$($pkg_config libssh --libs)
-> +    libssh_version=3D$($pkg_config libssh --modversion)
->      libssh=3Dyes
->    else
->      if test "$libssh" =3D "yes" ; then
-> @@ -3960,6 +3961,9 @@ int main(void) { return ssh_get_publickey(NULL, NUL=
-L); }
->  EOF
->    if compile_object "$libssh_cflags -DHAVE_LIBSSH_0_8"; then
->      libssh_cflags=3D"-DHAVE_LIBSSH_0_8 $libssh_cflags"
-> +  else
-> +    # If this is not libssh 0.8, this is likely 0.7
-> +    libssh_version=3D"0.7"
->    fi
-
-Not sure why this though -- please leave it out, and just log the
-version as found.
-
-=2D-=20
-Pino Toscano
---nextPart55926548.U4DDp3z1WI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEbjdOQa52nq0tQalew9FMLZhkN80FAl1UAX4ACgkQw9FMLZhk
-N83KwxAAxg0l/paMr+GupQaFFsZM5Vbnq7LXSsslgMKmnNc7t/tWnXYJCmVRKkIp
-UYB+xwXiKmQKgXj8E0CPcvqWG+3BAm5vIZWICMLbHeUjvNhNOr/datF45osY7UUE
-cH9s2xT2j3I2LtHeVgRfOFHP3wbfTnXvWujayRBA73qNMOU8NQtLv54VCfZhnntX
-xVcwR6FnJMnnEy84XjvreTYGiALMcBEUWFVTR4qnMve7c/6KGKPNRAZ9xAD3irBo
-MCV9j0ItIZzKZbVTErINvT2EENcddhMo1pmYJjjFRWyGCHo8W6xeE4AdNBOgnhUf
-CIDyjObxYWgSx92iV4nLHqnmgMxtjkGrSVuZ+h55L11KxM4mpNr2oqJhis/8ldFw
-QJFveDbIPXGHsitvqmOcyYcHJB873E5VgLszotr8z1skLHOmDAl/oLufa7l9fwoV
-m7fi957DGo/LAW6TJia6AH3ig6K7T7d5yH32cc3q1l44P+dP8I+eVHF1VWiHaSGw
-n6l7pDksOsovBO2X3Q+jeDqZF5OXz/wiAmNaC5VpJkUIeG3xmNXnghg4cSUKq7x0
-oqpb2pvSDfXPRt+NggktriYQO7yE0oa0dP4njQeks2UwSC91GbcKSTdMaGA26edc
-81SGBTaUu9rZMlcqOWlsqQrY9iCR4Y27hcSC5oIgLcBWi4jThmQ=
-=P2wK
------END PGP SIGNATURE-----
-
---nextPart55926548.U4DDp3z1WI--
-
-
-
+OK, I won't insist then.
 
