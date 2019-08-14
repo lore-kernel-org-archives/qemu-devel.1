@@ -6,106 +6,87 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A42CBC32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A813C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:56:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76A7B2054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:44:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76A7B2054F
+	by mail.kernel.org (Postfix) with ESMTPS id CF95C2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 15:56:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF95C2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxvS2-0003mg-Mm
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 11:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43440)
+	id 1hxvd3-00060y-Rd
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 11:56:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45222)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1hxvRP-0003M9-HY
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:44:01 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hxvcN-0005V1-2D
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:55:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hxvRO-00030T-FK
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:43:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60812)
+ (envelope-from <mreitz@redhat.com>) id 1hxvcM-0007Pf-4D
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 11:55:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53802)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hxvRO-000307-7p; Wed, 14 Aug 2019 11:43:58 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hxvcJ-0007Oh-KA; Wed, 14 Aug 2019 11:55:15 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 4D1383098444;
- Wed, 14 Aug 2019 15:43:57 +0000 (UTC)
-Received: from [10.36.116.49] (ovpn-116-49.ams2.redhat.com [10.36.116.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2F5ED8B165;
- Wed, 14 Aug 2019 15:43:53 +0000 (UTC)
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20190814151242.27199-1-david@redhat.com>
- <20190814174115.2a99df3d.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 8903D308C21F;
+ Wed, 14 Aug 2019 15:55:13 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 799E727BBD;
+ Wed, 14 Aug 2019 15:55:06 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
+ <20190730141826.709849-4-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <1317f866-e3ea-7ab9-e4f8-029fc07d202b@redhat.com>
-Date: Wed, 14 Aug 2019 17:43:52 +0200
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <3968310a-6186-9d7a-cdcb-de4f2c87dd6a@redhat.com>
+Date: Wed, 14 Aug 2019 17:55:05 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190814174115.2a99df3d.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20190730141826.709849-4-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU"
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 14 Aug 2019 15:43:57 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Wed, 14 Aug 2019 15:55:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v1] s390x/tcg: Fix VERIM with 32/64 bit
- elements
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] block/qcow2: refactor
+ qcow2_co_pwritev_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,59 +98,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Stefano Brivio <sbrivio@redhat.com>,
- qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, den@openvz.org, armbru@redhat.com, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.08.19 17:41, Cornelia Huck wrote:
-> On Wed, 14 Aug 2019 17:12:42 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Wrong order of operands. The constant always comes last. Makes QEMU crash
->> reliably on specific git fetch invocations.
->>
->> Reported-by: Stefano Brivio <sbrivio@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>
->> I guess it is too late for 4.1 :(
-> 
-> Yup :(
-> 
-> But cc:stable worthy, I guess.
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU
+Content-Type: multipart/mixed; boundary="PJP6M5uGqrrnL6aUjDiYVdNLq9gdWSzru";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com, kwolf@redhat.com, den@openvz.org,
+ stefanha@redhat.com
+Message-ID: <3968310a-6186-9d7a-cdcb-de4f2c87dd6a@redhat.com>
+Subject: Re: [PATCH v2 3/4] block/qcow2: refactor qcow2_co_pwritev_part
+References: <20190730141826.709849-1-vsementsov@virtuozzo.com>
+ <20190730141826.709849-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20190730141826.709849-4-vsementsov@virtuozzo.com>
 
-Yes. Added this bug to
+--PJP6M5uGqrrnL6aUjDiYVdNLq9gdWSzru
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-https://wiki.qemu.org/Planning/4.1#Not_yet_fixed_in_any_rc
+On 30.07.19 16:18, Vladimir Sementsov-Ogievskiy wrote:
+> Similarly to previous commit, prepare for parallelizing write-loop
+> iterations.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2.c | 150 +++++++++++++++++++++++++++++---------------------=
 
->>
->> ---
->>  target/s390x/translate_vx.inc.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/s390x/translate_vx.inc.c b/target/s390x/translate_vx.inc.c
->> index 41d5cf869f..0caddb3958 100644
->> --- a/target/s390x/translate_vx.inc.c
->> +++ b/target/s390x/translate_vx.inc.c
->> @@ -213,7 +213,7 @@ static void get_vec_element_ptr_i64(TCGv_ptr ptr, uint8_t reg, TCGv_i64 enr,
->>                         vec_full_reg_offset(v3), ptr, 16, 16, data, fn)
->>  #define gen_gvec_3i(v1, v2, v3, c, gen) \
->>      tcg_gen_gvec_3i(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
->> -                    vec_full_reg_offset(v3), c, 16, 16, gen)
->> +                    vec_full_reg_offset(v3), 16, 16, c, gen)
->>  #define gen_gvec_4(v1, v2, v3, v4, gen) \
->>      tcg_gen_gvec_4(vec_full_reg_offset(v1), vec_full_reg_offset(v2), \
->>                     vec_full_reg_offset(v3), vec_full_reg_offset(v4), \
-> 
+>  1 file changed, 88 insertions(+), 62 deletions(-)
+>=20
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 7fa71968b2..37766b8b7c 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+
+[...]
+
+> @@ -2283,62 +2362,11 @@ static coroutine_fn int qcow2_co_pwritev_part(
+
+[...]
+
+> +        ret =3D qcow2_co_pwritev_task(bs, cluster_offset, offset, cur_=
+bytes,
+> +                                    qiov, bytes_done, l2meta);
+
+You=E2=80=99re passing bytes_done as qiov_offset here.  That is initializ=
+ed to
+0, so it ignores the qiov_offset given to qcow2_co_pwritev_part().
+
+Max
 
 
--- 
+--PJP6M5uGqrrnL6aUjDiYVdNLq9gdWSzru--
 
-Thanks,
+--PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-David / dhildenb
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1ULtkACgkQ9AfbAGHV
+z0Ae4Qf/Xzi3n04ZMnnJIXVy7LBUCnlAFN8xGUnOX4LVrsPN5FcSpdjDWZvF/n3q
+5hcEO3rBNphmr8FQS/WVGII3eXQQUZmzOGb8+0uKCUVhOGREAwyxFW6DlZVne5Nm
+qfhJn/MnOSfhnkSYXH1goyMc7S8tNsPFROx2d7ILyTl7NxFKw2uu+m9WtQK8NNOj
+tTYF0SxHbQq7arIFNY5Zpg210q397wozIJZgxKVqYVi+K7nWqWDWgwvVCVBrcXzh
+Eb0B7qGTjYTJ9sUqJcMFnNXEO6tyHpfe5H6ialZ+ZsEnK8KW426TQa35m4os3h0+
+Cp3sUyfllfKYdJ8ULLOKh+9zF7eTnA==
+=R85G
+-----END PGP SIGNATURE-----
+
+--PTfiZN2aQ6KbVwl19XqO2rrfoEZikGNrU--
 
