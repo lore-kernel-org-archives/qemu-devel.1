@@ -2,116 +2,86 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E2DC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE62C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:07:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 409972063F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 16:55:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAC6F2084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:07:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JCz2+Hto"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409972063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="G2RaldHS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC6F2084D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxwYg-0004Ik-BB
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 12:55:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57158)
+	id 1hxwkE-0006bv-Lq
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:07:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxwXz-0003ga-Ai
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:54:52 -0400
+ (envelope-from <palmer@sifive.com>) id 1hxwjT-000651-Hy
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hxwXy-0001l0-3z
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 12:54:51 -0400
-Received: from mail-eopbgr50113.outbound.protection.outlook.com
- ([40.107.5.113]:20708 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hxwXt-0001hn-VB; Wed, 14 Aug 2019 12:54:46 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=N/Bmy0w3OHa55E9Ea6ltwKG4/cu7NUjAG635yrPadPAP1YXE3A2NL0maY0G4q5SnXUTHvPOtu2WCBDLKf8+PjJp9OFwAloc1/tBh1UER7dQ91YcQbAjnlxl3/ASwEkpJsvhq9Zg6hapz+WufpDxvIu+/xPCHoLVkxX9x66bfonQXJm/r/UGL77XoEhkH0/rqD5hRZ5FHrFZh9B7VfKprncAEz3kN4eF8LXh/MBCGWx5FqlOpJfxhP3TdjyauUPyLiEgOJN9ms5ZE5LL/Eza7B9r15MOXsNo0Gmv8gbsIksB3PqdpKLbqW70N6pv02vEBTRdYIXS5JGsr2VCueXWYpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/3Eg2stMGmFf3dAcI5hxXTnGdBeCfuxGA+9vGemN6Yw=;
- b=ZOvtiupZZlD+pUncGNAAHvnyUyRifKTHiXvUtZ+Hp+HvzT6HRNL/PFlzA88Vt712u7ksj7XNTZUjy6emj0Xtti+iq9AQhr91lvZVjw/JRSVi6UkCP51ljyI1iq5codN9OQQQg7FjZmYnMN0+dPC5SQdH0NFFpLRcjww2sFPk/C1t56peifPOPG+ta1hTfunmA2/XYW9+3mGCt9oK8sLki3JaZdCVxONFWIG2P+x2mF7q+Q0rfqKVVtIsjwUz4ZpL1Tms4URDQFrUaAnj/qVxFYbeqHLGu8n8ozzjPd/axJahwqRBIvBm1pspYLN1k91EblIGuBKX06NvDTyn2jHMUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/3Eg2stMGmFf3dAcI5hxXTnGdBeCfuxGA+9vGemN6Yw=;
- b=JCz2+HtoBf/3bTTbJ6mkUz9GpTOdEmmQA50odia12oM4oDp8TScChaaFiNK53IlyyAlpSRI2pLIRAsiF57cZBc/Zj4KbqmcquSLl5AL6B+lZzXLP7j60YoqUd5d5Ormy6ZqH2W8lbupTJClf+doYGFoUmce/nBnjxyWn8Xra67o=
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com (52.133.242.216) by
- DB8PR08MB5260.eurprd08.prod.outlook.com (10.255.17.159) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.15; Wed, 14 Aug 2019 16:54:43 +0000
-Received: from DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604]) by DB8PR08MB5498.eurprd08.prod.outlook.com
- ([fe80::617b:d2c2:11e9:4604%3]) with mapi id 15.20.2157.022; Wed, 14 Aug 2019
- 16:54:43 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Thread-Topic: [PATCH 0/4] backup: fix skipping unallocated clusters
-Thread-Index: AQHVUq6iWmNqeubX60mrcacy86ei+6b63ImA
-Date: Wed, 14 Aug 2019 16:54:43 +0000
-Message-ID: <a018756a-fa67-49fb-a7db-622267b7d4e5@email.android.com>
-In-Reply-To: <20190814144315.89729-1-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR08CA0048.eurprd08.prod.outlook.com
- (2603:10a6:7:2a::19) To DB8PR08MB5498.eurprd08.prod.outlook.com
- (2603:10a6:10:11c::24)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-android-message-id: <a018756a-fa67-49fb-a7db-622267b7d4e5@email.android.com>
-x-originating-ip: [185.79.103.210]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1d5518cc-7681-450e-1cba-08d720d81aca
-x-microsoft-antispam: BCL:0; PCL:0;
- RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
- SRVR:DB8PR08MB5260; 
-x-ms-traffictypediagnostic: DB8PR08MB5260:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB8PR08MB526035A3CC1FA1A950B735F5C1AD0@DB8PR08MB5260.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:60;
-x-forefront-prvs: 01294F875B
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(346002)(376002)(396003)(39850400004)(189003)(199004)(53754006)(81686011)(102836004)(81156014)(6436002)(6246003)(54906003)(476003)(5640700003)(14454004)(99286004)(5660300002)(52116002)(386003)(316002)(6506007)(2351001)(2906002)(25786009)(478600001)(66946007)(6486002)(31686004)(11346002)(66446008)(66476007)(64756008)(66556008)(8676002)(71190400001)(9686003)(6512007)(66066001)(86362001)(486006)(53936002)(54896002)(81166006)(186003)(71200400001)(31696002)(256004)(3846002)(26005)(107886003)(305945005)(2501003)(6306002)(229853002)(6916009)(6116002)(7736002)(966005)(8936002)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:DB8PR08MB5260;
- H:DB8PR08MB5498.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: JeCmFZTH01xiGxvipLZ5M69f3gNrZwZq0ft8BwZreI1J01jvC6ERG6tmi+Ce5cmOBZfQoM9LJmHb5wDc1gSQ28rsuuHT819Z7Rpl24n27p2hU17h99JEEw5PFGaXDzyj7prbF7QdUbJZrmVrpubjK3Fes1QlK8H5Ie+p538YpEG/4xr4CGlv8AJ+nE1WyTiFmdna5LI7lHjRpfDgZwQxWI6G40OHinHVGSYb4b2mgVd/68cEC0iRHvoacpE1/zNyg+w3L0PVsPVy4SstloyVz19YjqJKp1fnVLOkWFcaF3C9tJheDNsm9U4G6bSsQEGejRrDksfP27VjCKZvSbdZ7ZvqXGuCqpeuQBSkUXYUhtX97fuH3klVXthDIlS0ax3wHa3Y4o4jtQNIXxN5w10HceYjNuDxfvvHIbHfxLPVQv8=
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d5518cc-7681-450e-1cba-08d720d81aca
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2019 16:54:43.2133 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /TTT1FxGg7c5zYRMvEBYCRCJ7qZnvKGBdXVodY8oKyi/ApeHfOldzuPwkkJPDCpns85+YGr7ZwgjUYXZ7/HVvzx3hk+0vBObM53chZTpkzI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5260
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.113
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH 0/4] backup: fix skipping unallocated
- clusters
+ (envelope-from <palmer@sifive.com>) id 1hxwjS-0007cs-5R
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:06:43 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38541)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hxwjR-0007bq-WD
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:06:42 -0400
+Received: by mail-pg1-x541.google.com with SMTP id e11so2826439pga.5
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 10:06:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=PEBEqNJnBX2a01paAgfoN/R9hhRL6hRf2pblNogkX80=;
+ b=G2RaldHSi07fZ6oNUvM9xz9oDne6epapEe/8e0c5+qUFO9SXuHJtchzJ/U5P2adS+G
+ U/Hwk9Rx4vHuKs/MToTuTj7KV/10938JYtbQ3RZSQQhO3gq+CNIxtIWjejzYG/6D8/xs
+ T0iXRQojwaoUhfs4KCVei53A0j+GDKsGL/34btA1aj7ZOnqB90rT+mYefNvX0HegJSNh
+ CLi7DmDrli7a7y886NfNWj3RBUgwSb9C3uV3NUtbIMfHrKpywJO9dyYWAMDpKD79Qkuc
+ 0DGx0961RM1tYqU6nzqfTtRyJNyXVaQlbySwKgk+wa2+K7ddoRih7eiUPqvlluje3sJX
+ 05IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=PEBEqNJnBX2a01paAgfoN/R9hhRL6hRf2pblNogkX80=;
+ b=FCZ3UwPcrzEzpKrHdXPzHC0IAHOpoFL7qyOUHzy2GGo2s2nvKKzAWHEVaE5X2JTGOA
+ zQV1JovmiJsMhN4kjkTplKvJNOzz883fB4GHo/cf52mvbj2JHGzxznBZTpub3iyg7IZC
+ ZcImC7miKKk81MS+Cu/IdY9U9LmuvJsRYXAr8WEU85wlSs6X+4WEXw2yB1QUpAD0IIgC
+ LVAfXgtMAREjOJ2pkSPT4O0EuAXLQ51i2UyzZnVz+7ZkIDRlLknVz7cbtPc+qbRnO3jB
+ OWzncWfUHeXWAXICNiVdfNndfa46eBJFrGSF4vwmbY4NSsjXvF0psQ599e6CLnYy5JIo
+ anaA==
+X-Gm-Message-State: APjAAAV8cHcNHRaQ5+Uw9gVHiI8Jnx0ccu/o+pdy+uX1sLSMZhVy5czG
+ +K6aIS/FJeROvVduHu99DTCWqw==
+X-Google-Smtp-Source: APXvYqwX+4db6GbAZ3+iCPsjC3ixInEzut7LemFdJVBE8vQ+AxfUh/qU0eRqfQxV6SQpUZ68lVimTw==
+X-Received: by 2002:a65:6108:: with SMTP id z8mr151734pgu.289.1565802399873;
+ Wed, 14 Aug 2019 10:06:39 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id n7sm353495pff.59.2019.08.14.10.06.38
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 14 Aug 2019 10:06:39 -0700 (PDT)
+Date: Wed, 14 Aug 2019 10:06:39 -0700 (PDT)
+X-Google-Original-Date: Wed, 14 Aug 2019 10:03:21 PDT (-0700)
+In-Reply-To: <CAEUhbmU8s5cEt4J-ae0wqfgFHEWe=YWQaDn_Au_MhtK1J7OntA@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: bmeng.cn@gmail.com
+Message-ID: <mhng-b7d8bc3c-3d03-4b2a-910f-8a9ceb18a046@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
+Subject: Re: [Qemu-devel] [PATCH 1/3] riscv: sifive_u: Add support for
+ loading initrd
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,36 +93,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>, "jsnow@redhat.com" <jsnow@redhat.com>
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ Alistair Francis <Alistair.Francis@wdc.com>, linux@roeck-us.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCjE0INCw0LLQsy4gMjAxOSDQsy4gMTc6NDMg0L/QvtC70YzQt9C+0LLQsNGC0LXQu9GMIFZs
-YWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4g0L3Q
-sNC/0LjRgdCw0Ls6DQoNCkhpIGFsbCENCg0KVGhlcmUgaXMgYSBidWcgaW4gbm90IHlldCBtZXJn
-ZWQgcGF0Y2gNCiJibG9jay9iYWNrdXA6IHRlYWNoIFRPUCB0byBuZXZlciBjb3B5IHVuYWxsb2Nh
-dGVkIHJlZ2lvbnMiDQppbiBodHRwczovL2dpdGh1Yi5jb20vam5zbm93L3FlbXUgYml0bWFwcy4g
-MDQgZml4ZXMgaXQuIFNvLCBJIHByb3Bvc2UNCnRvIHB1dCAwMS0wMyBzb21ld2hlcmUgYmVmb3Jl
-DQoiYmxvY2svYmFja3VwOiB0ZWFjaCBUT1AgdG8gbmV2ZXIgY29weSB1bmFsbG9jYXRlZCByZWdp
-b25zIg0KYW5kIHNxdWFzaCAwNCBpbnRvICJibG9jay9iYWNrdXA6IHRlYWNoIFRPUCB0byBuZXZl
-ciBjb3B5IHVuYWxsb2NhdGVkIHJlZ2lvbnMiDQoNCkhtbSwgZG9uJ3QgYm90aGVyIHdpdGggaXQu
-IFNpbXBsZXIgaXMgZml4IHRoZSBidWcgaW4geW91ciBjb21taXQgYnkganVzdCB1c2Ugc2tpcF9i
-eXRlcyB2YXJpYWJsZSB3aGVuIGluaXRpYWxpemluZyBkaXJ0eV9lbmQuDQoNCg0KQmFzZWQtb246
-IGh0dHBzOi8vZ2l0aHViLmNvbS9qbnNub3cvcWVtdSBiaXRtYXBzDQoNClZsYWRpbWlyIFNlbWVu
-dHNvdi1PZ2lldnNraXkgKDQpOg0KICBibG9jay9kaXJ0eS1iaXRtYXA6IHN3aXRjaCBfbmV4dF9k
-aXJ0eV9hcmVhIGFuZCBfbmV4dF96ZXJvIHRvIGludDY0X3QNCiAgYmxvY2svZGlydHktYml0bWFw
-OiBhZGQgX25leHRfZGlydHkgQVBJDQogIGJsb2NrL2JhY2t1cDogdXNlIGJkcnZfZGlydHlfYml0
-bWFwX25leHRfZGlydHkNCiAgYmxvY2svYmFja3VwOiBmaXggYW5kIGltcHJvdmUgc2tpcHBpbmcg
-dW5hbGxvY2F0ZWQgaW4gYmFja3VwX2RvX2Nvdw0KDQppbmNsdWRlL2Jsb2NrL2RpcnR5LWJpdG1h
-cC5oIHwgIDggKystLQ0KaW5jbHVkZS9xZW11L2hiaXRtYXAuaCAgICAgICB8IDE4ICsrKysrKyst
-LQ0KYmxvY2svYmFja3VwLmMgICAgICAgICAgICAgICB8IDMzICsrKysrKysrKystLS0tLS0tDQpi
-bG9jay9kaXJ0eS1iaXRtYXAuYyAgICAgICAgIHwgMTIgKysrKy0tDQpibG9jay9taXJyb3IuYyAg
-ICAgICAgICAgICAgIHwgIDQgKy0NCnRlc3RzL3Rlc3QtaGJpdG1hcC5jICAgICAgICAgfCAzMiAr
-KysrKysrKy0tLS0tLS0tDQp1dGlsL2hiaXRtYXAuYyAgICAgICAgICAgICAgIHwgNzIgKysrKysr
-KysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tDQpibG9jay90cmFjZS1ldmVudHMgICAgICAg
-ICAgIHwgIDEgLQ0KOCBmaWxlcyBjaGFuZ2VkLCAxMDcgaW5zZXJ0aW9ucygrKSwgNzMgZGVsZXRp
-b25zKC0pDQoNCi0tDQoyLjE4LjANCg0KDQo=
+On Mon, 12 Aug 2019 16:48:00 PDT (-0700), bmeng.cn@gmail.com wrote:
+> Hi Palmer,
+>
+> On Tue, Aug 13, 2019 at 6:45 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> On Fri, 19 Jul 2019 06:40:43 PDT (-0700), linux@roeck-us.net wrote:
+>> > Add support for loading initrd with "-initrd <filename>"
+>> > to the sifive_u machine. This lets us boot into Linux without
+>> > disk drive.
+>> >
+>> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>> > ---
+>> >  hw/riscv/sifive_u.c | 20 +++++++++++++++++---
+>> >  1 file changed, 17 insertions(+), 3 deletions(-)
+>> >
+>> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+>> > index 71b8083..0657046 100644
+>> > --- a/hw/riscv/sifive_u.c
+>> > +++ b/hw/riscv/sifive_u.c
+>> > @@ -67,7 +67,7 @@ static const struct MemmapEntry {
+>> >
+>> >  #define GEM_REVISION        0x10070109
+>> >
+>> > -static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>> > +static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>> >      uint64_t mem_size, const char *cmdline)
+>> >  {
+>> >      void *fdt;
+>> > @@ -244,11 +244,14 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>> >          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+>> >      }
+>> >      g_free(nodename);
+>> > +
+>> > +    return fdt;
+>> >  }
+>> >
+>> >  static void riscv_sifive_u_init(MachineState *machine)
+>> >  {
+>> >      const struct MemmapEntry *memmap = sifive_u_memmap;
+>> > +    void *fdt;
+>> >
+>> >      SiFiveUState *s = g_new0(SiFiveUState, 1);
+>> >      MemoryRegion *system_memory = get_system_memory();
+>> > @@ -269,13 +272,24 @@ static void riscv_sifive_u_init(MachineState *machine)
+>> >                                  main_mem);
+>> >
+>> >      /* create device tree */
+>> > -    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>> > +    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+>> >
+>> >      riscv_find_and_load_firmware(machine, BIOS_FILENAME,
+>> >                                   memmap[SIFIVE_U_DRAM].base);
+>> >
+>> >      if (machine->kernel_filename) {
+>> > -        riscv_load_kernel(machine->kernel_filename);
+>> > +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
+>> > +
+>> > +        if (machine->initrd_filename) {
+>> > +            hwaddr start;
+>> > +            hwaddr end = riscv_load_initrd(machine->initrd_filename,
+>> > +                                           machine->ram_size, kernel_entry,
+>> > +                                           &start);
+>> > +            qemu_fdt_setprop_cell(fdt, "/chosen",
+>> > +                                  "linux,initrd-start", start);
+>> > +            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
+>> > +                                  end);
+>> > +        }
+>> >      }
+>> >
+>> >      /* reset vector */
+>>
+>> Thanks.  I've queued all three of these.
+>>
+>
+> Ah, looks I did a duplicate.
+> http://patchwork.ozlabs.org/patch/1145247/
+>
+> Which git repo/branch should I rebase my series on?
+
+github.com/palmer-dabbelt/riscv-qemu -b for-master
+
