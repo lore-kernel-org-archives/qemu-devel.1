@@ -2,86 +2,68 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE62C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:07:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4D1C32757
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:24:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAC6F2084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:07:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="G2RaldHS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC6F2084D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	by mail.kernel.org (Postfix) with ESMTPS id B208920665
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:24:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B208920665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxwkE-0006bv-Lq
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:07:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59322)
+	id 1hxx0b-0005MC-TQ
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:24:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33650)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1hxwjT-000651-Hy
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:06:44 -0400
+ (envelope-from <jsuvorov@redhat.com>) id 1hxwzB-00042W-80
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1hxwjS-0007cs-5R
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:06:43 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38541)
+ (envelope-from <jsuvorov@redhat.com>) id 1hxwz9-0001w3-6j
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:22:56 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:46885)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1hxwjR-0007bq-WD
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:06:42 -0400
-Received: by mail-pg1-x541.google.com with SMTP id e11so2826439pga.5
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 10:06:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=PEBEqNJnBX2a01paAgfoN/R9hhRL6hRf2pblNogkX80=;
- b=G2RaldHSi07fZ6oNUvM9xz9oDne6epapEe/8e0c5+qUFO9SXuHJtchzJ/U5P2adS+G
- U/Hwk9Rx4vHuKs/MToTuTj7KV/10938JYtbQ3RZSQQhO3gq+CNIxtIWjejzYG/6D8/xs
- T0iXRQojwaoUhfs4KCVei53A0j+GDKsGL/34btA1aj7ZOnqB90rT+mYefNvX0HegJSNh
- CLi7DmDrli7a7y886NfNWj3RBUgwSb9C3uV3NUtbIMfHrKpywJO9dyYWAMDpKD79Qkuc
- 0DGx0961RM1tYqU6nzqfTtRyJNyXVaQlbySwKgk+wa2+K7ddoRih7eiUPqvlluje3sJX
- 05IA==
+ (Exim 4.71) (envelope-from <jsuvorov@redhat.com>) id 1hxwz8-0001u5-VT
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:22:55 -0400
+Received: by mail-lf1-f67.google.com with SMTP id n19so11497702lfe.13
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 10:22:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=PEBEqNJnBX2a01paAgfoN/R9hhRL6hRf2pblNogkX80=;
- b=FCZ3UwPcrzEzpKrHdXPzHC0IAHOpoFL7qyOUHzy2GGo2s2nvKKzAWHEVaE5X2JTGOA
- zQV1JovmiJsMhN4kjkTplKvJNOzz883fB4GHo/cf52mvbj2JHGzxznBZTpub3iyg7IZC
- ZcImC7miKKk81MS+Cu/IdY9U9LmuvJsRYXAr8WEU85wlSs6X+4WEXw2yB1QUpAD0IIgC
- LVAfXgtMAREjOJ2pkSPT4O0EuAXLQ51i2UyzZnVz+7ZkIDRlLknVz7cbtPc+qbRnO3jB
- OWzncWfUHeXWAXICNiVdfNndfa46eBJFrGSF4vwmbY4NSsjXvF0psQ599e6CLnYy5JIo
- anaA==
-X-Gm-Message-State: APjAAAV8cHcNHRaQ5+Uw9gVHiI8Jnx0ccu/o+pdy+uX1sLSMZhVy5czG
- +K6aIS/FJeROvVduHu99DTCWqw==
-X-Google-Smtp-Source: APXvYqwX+4db6GbAZ3+iCPsjC3ixInEzut7LemFdJVBE8vQ+AxfUh/qU0eRqfQxV6SQpUZ68lVimTw==
-X-Received: by 2002:a65:6108:: with SMTP id z8mr151734pgu.289.1565802399873;
- Wed, 14 Aug 2019 10:06:39 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id n7sm353495pff.59.2019.08.14.10.06.38
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 14 Aug 2019 10:06:39 -0700 (PDT)
-Date: Wed, 14 Aug 2019 10:06:39 -0700 (PDT)
-X-Google-Original-Date: Wed, 14 Aug 2019 10:03:21 PDT (-0700)
-In-Reply-To: <CAEUhbmU8s5cEt4J-ae0wqfgFHEWe=YWQaDn_Au_MhtK1J7OntA@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: bmeng.cn@gmail.com
-Message-ID: <mhng-b7d8bc3c-3d03-4b2a-910f-8a9ceb18a046@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH 1/3] riscv: sifive_u: Add support for
- loading initrd
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=a3YCWsIB+5v4k3YDEG/qqRU0o2uKGiRs93/X06JJfaE=;
+ b=Z9HTfVEwdvD8F9pdOdpdD2EQzIiYq4Qouq9P4y5J5zjvffa/fYtUCVWD2GJZoMH073
+ yHT+uOmuGi1WmUWhRmir2qhEtajwwtCDMEhVG/7UREY3e/3rj+99MAbShF22Ymctm8Qc
+ gP1osl7Rgdf9CV97zfSHKenlgxTgjWgdTAkg4knLI3eX3TWWM1nWCN31tkmiz7Dy8Qw+
+ rzxMc110LcY2LMq3XYrOI01Ipb13wGN6akNuKJ3HBI2HvFrMfxfPOvmTWzhb0Nq+yFmA
+ 6xdLXjeTF8nk3EA+c0EEJp2OZSTmMowDNwhSHGHdGLWyNm38ccvKGssC1zpLNDuAudKI
+ cz9w==
+X-Gm-Message-State: APjAAAXp5MRXrQ1Ee7hH05mYUc1r+2OuEXsZK9tV6QMF6B8oqQUci+Gv
+ ZbEaqE1m36cp4S4oR8uPQqpExWowKCo3BJyI/8U0iA==
+X-Google-Smtp-Source: APXvYqwRqNkJRKjeRdC0fHAwyrd6XRoQL5uXdtvupo9pcOTWL4M2iKGRZDaa3BCDN6bMVRiloGCJMaMPD4Ntgnk8AUo=
+X-Received: by 2002:ac2:4562:: with SMTP id k2mr274007lfm.82.1565803372363;
+ Wed, 14 Aug 2019 10:22:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190807082241.23984-1-jusual@redhat.com>
+ <20190809123341-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20190809123341-mutt-send-email-mst@kernel.org>
+From: Julia Suvorova <jusual@redhat.com>
+Date: Wed, 14 Aug 2019 19:22:41 +0200
+Message-ID: <CAMDeoFUhr9T1bSokO=jhq5=2Ra04TX6K0_w4oUP1oDYCYecF9A@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.167.67
+Subject: Re: [Qemu-devel] [PATCH] virtio-pci: Add Function Level Reset
+ support
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,91 +75,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>, linux@roeck-us.net
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 12 Aug 2019 16:48:00 PDT (-0700), bmeng.cn@gmail.com wrote:
-> Hi Palmer,
+On Fri, Aug 9, 2019 at 6:35 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> On Tue, Aug 13, 2019 at 6:45 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Fri, 19 Jul 2019 06:40:43 PDT (-0700), linux@roeck-us.net wrote:
->> > Add support for loading initrd with "-initrd <filename>"
->> > to the sifive_u machine. This lets us boot into Linux without
->> > disk drive.
->> >
->> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->> > ---
->> >  hw/riscv/sifive_u.c | 20 +++++++++++++++++---
->> >  1 file changed, 17 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
->> > index 71b8083..0657046 100644
->> > --- a/hw/riscv/sifive_u.c
->> > +++ b/hw/riscv/sifive_u.c
->> > @@ -67,7 +67,7 @@ static const struct MemmapEntry {
->> >
->> >  #define GEM_REVISION        0x10070109
->> >
->> > -static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->> > +static void *create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->> >      uint64_t mem_size, const char *cmdline)
->> >  {
->> >      void *fdt;
->> > @@ -244,11 +244,14 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
->> >          qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
->> >      }
->> >      g_free(nodename);
->> > +
->> > +    return fdt;
->> >  }
->> >
->> >  static void riscv_sifive_u_init(MachineState *machine)
->> >  {
->> >      const struct MemmapEntry *memmap = sifive_u_memmap;
->> > +    void *fdt;
->> >
->> >      SiFiveUState *s = g_new0(SiFiveUState, 1);
->> >      MemoryRegion *system_memory = get_system_memory();
->> > @@ -269,13 +272,24 @@ static void riscv_sifive_u_init(MachineState *machine)
->> >                                  main_mem);
->> >
->> >      /* create device tree */
->> > -    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
->> > +    fdt = create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
->> >
->> >      riscv_find_and_load_firmware(machine, BIOS_FILENAME,
->> >                                   memmap[SIFIVE_U_DRAM].base);
->> >
->> >      if (machine->kernel_filename) {
->> > -        riscv_load_kernel(machine->kernel_filename);
->> > +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
->> > +
->> > +        if (machine->initrd_filename) {
->> > +            hwaddr start;
->> > +            hwaddr end = riscv_load_initrd(machine->initrd_filename,
->> > +                                           machine->ram_size, kernel_entry,
->> > +                                           &start);
->> > +            qemu_fdt_setprop_cell(fdt, "/chosen",
->> > +                                  "linux,initrd-start", start);
->> > +            qemu_fdt_setprop_cell(fdt, "/chosen", "linux,initrd-end",
->> > +                                  end);
->> > +        }
->> >      }
->> >
->> >      /* reset vector */
->>
->> Thanks.  I've queued all three of these.
->>
+> On Wed, Aug 07, 2019 at 10:22:41AM +0200, Julia Suvorova wrote:
+> > Using FLR becomes convenient in cases where resetting the bus is
+> > impractical, for example, when debugging the behavior of individual
+> > functions.
+> >
+> > Signed-off-by: Julia Suvorova <jusual@redhat.com>
+> > ---
+> >  hw/virtio/virtio-pci.c | 10 ++++++++++
+> >  hw/virtio/virtio-pci.h |  1 +
+> >  2 files changed, 11 insertions(+)
+> >
+> > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> > index f6d2223e78..37c5d6efbc 100644
+> > --- a/hw/virtio/virtio-pci.c
+> > +++ b/hw/virtio/virtio-pci.c
+> > @@ -599,6 +599,10 @@ static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
+> >
+> >      pci_default_write_config(pci_dev, address, val, len);
+> >
+> > +    if (proxy->has_flr) {
+> > +        pcie_cap_flr_write_config(pci_dev, address, val, len);
+> > +    }
+> > +
+> >      if (range_covers_byte(address, len, PCI_COMMAND) &&
+> >          !(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
+> >          virtio_pci_stop_ioeventfd(proxy);
+> > @@ -1718,6 +1722,8 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+> >      proxy->notify_pio.size = 0x4;
+> >      proxy->notify_pio.type = VIRTIO_PCI_CAP_NOTIFY_CFG;
+> >
+> > +    proxy->has_flr = false;
+> > +
+> >      /* subclasses can enforce modern, so do this unconditionally */
+> >      memory_region_init(&proxy->modern_bar, OBJECT(proxy), "virtio-pci",
+> >                         /* PCI BAR regions must be powers of 2 */
+> > @@ -1749,6 +1755,10 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+> >
+> >          pci_dev->exp.pm_cap = pos;
+> >
+> > +        /* Set Function Level Reset capability bit */
+> > +        pcie_cap_flr_init(pci_dev);
+> > +        proxy->has_flr = true;
+> > +
+> >          /*
+> >           * Indicates that this function complies with revision 1.2 of the
+> >           * PCI Power Management Interface Specification.
 >
-> Ah, looks I did a duplicate.
-> http://patchwork.ozlabs.org/patch/1145247/
 >
-> Which git repo/branch should I rebase my series on?
+> I don't think we can set this for everyone: this will break
+> things like cross version migration.
 
-github.com/palmer-dabbelt/riscv-qemu -b for-master
+I see. If I add a flag and a property, which version of hw_compat should I use?
+
+Best regards, Julia Suvorova.
 
