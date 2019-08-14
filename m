@@ -2,109 +2,75 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD05C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C712C32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0657E214C6
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:51:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0657E214C6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E167620651
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:56:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsscOkVs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E167620651
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxxQv-0005ut-76
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:51:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37814)
+	id 1hxxVW-00081m-PX
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:56:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38285)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hxxQD-0005Mg-BC
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:50:55 -0400
+ (envelope-from <u9012063@gmail.com>) id 1hxxUQ-0007Nv-OZ
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:55:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hxxQB-0003Mi-5d
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:50:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45756)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hxxQA-0003MJ-Ui; Wed, 14 Aug 2019 13:50:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 123A730A922E;
- Wed, 14 Aug 2019 17:50:49 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-85.ams2.redhat.com [10.36.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 55F238208C;
- Wed, 14 Aug 2019 17:50:45 +0000 (UTC)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190814072355.15333-1-david@redhat.com>
- <20190814072355.15333-5-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <8f5a49d2-49f3-f7b4-220b-fe2542b751c2@redhat.com>
-Date: Wed, 14 Aug 2019 19:50:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <u9012063@gmail.com>) id 1hxxUO-0004qI-Jm
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:55:14 -0400
+Received: from mail-qk1-x730.google.com ([2607:f8b0:4864:20::730]:35814)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <u9012063@gmail.com>) id 1hxxUO-0004pH-9M
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:55:12 -0400
+Received: by mail-qk1-x730.google.com with SMTP id r21so83323273qke.2
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 10:55:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=ayRLVfzA9K5sR3JIzaiZYKZSYMoyMH8iYFFRoU5vOF4=;
+ b=bsscOkVsZckLkkGRkszJPAE9MziTW2wekvLkUhvhJ3zqMx+5bCOnRzboZe72f7uZqB
+ 799bI7Ra/+14MVOgMhlwuN9ksj+LsOJBOhmBmj8efEhj2dfoRa131SNT4avXXb1lHsYL
+ aYkF/O8SpxBneRv0AOm4chXhq9E92D6TMWqr/N0Hja6HCGvjeevx9VLshspfDi31HeEd
+ Zbku5F8hIevKxaOSVnjflu+e/YOlJPrPrYAi/NUCznNGqymguFlKml57SwM6sqYwPyJT
+ ckm0+2IqAaxlVzc3101AiWrKAK6zfZ4IaLOBQ0S6immRYLCrFjXlFvaphvo+1ZCRd7c+
+ 3xAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=ayRLVfzA9K5sR3JIzaiZYKZSYMoyMH8iYFFRoU5vOF4=;
+ b=ju1EIYX6YrWfJyohAbD7oRfEkak19FOZ8CUEPdefceMp0esrZzEqjQTFxwz9OK7h7h
+ HUeDjFgL2jJsym1KnBoJWlALW7BLnVY+Un0dglBpyLk+AP02AAqtVUDy9kMJHiavtVjE
+ ZpxmRx0nBDt+nNY7nH4aj+0OjNftyKmLbzhX4PAPFrnJeeatGIhTZo0nDRXey+n30skY
+ QEbi/2DDcN2HtBzraJPR7C4nepBRktSkuT1rHqDyS0eQBIIN0JwNDkHCNmq5omfGO34t
+ aMW0TkrvfnV97k4dfauoJ/aF4SQc421g4Iu05GINeo4WWHzntbGbWuXChQf7/vTncYKm
+ RQ8A==
+X-Gm-Message-State: APjAAAXLs3mgl2L9mpg2KvqpnNoHzdfKSohDujrWf/4jG3uX6Kr6dfgO
+ GHVqAB46CGENC5cks0sHxInm4L/QHMcyUvd+R0XBZtoYs6M=
+X-Google-Smtp-Source: APXvYqxRIogmqijcEtcYvrSPFvRydT7lZFdSE1sQUDWNu3QiAa6iHBBfCQk4IrroYI8H6KY8KQO70kZSOzNwIBymwzc=
+X-Received: by 2002:a37:a492:: with SMTP id n140mr583450qke.137.1565805311346; 
+ Wed, 14 Aug 2019 10:55:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190814072355.15333-5-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.44]); Wed, 14 Aug 2019 17:50:49 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v2 4/6] s390x/mmu:
- Trace the right value if setting/getting the storage key fails
+From: William Tu <u9012063@gmail.com>
+Date: Wed, 14 Aug 2019 10:54:34 -0700
+Message-ID: <CALDO+SbRvSSW3OQimwVe59HcHqv0PPLwoAW6yGg_UOnzounPtQ@mail.gmail.com>
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::730
+Subject: [Qemu-devel] Question about libvhost-user and vhost-user-bridge.c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,49 +82,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/14/19 9:23 AM, David Hildenbrand wrote:
-> We want to trace the actual return value, not "0".
-> 
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/mmu_helper.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index c34e8d2021..d22c6b9c81 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -414,7 +414,8 @@ nodat:
->      *raddr = mmu_real2abs(env, *raddr);
->  
->      if (*raddr < ram_size) {
-> -        if (skeyclass->get_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &key)) {
-> +        r = skeyclass->get_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &key);
-> +        if (r) {
->              trace_get_skeys_nonzero(r);
->              return 0;
->          }
-> @@ -427,7 +428,8 @@ nodat:
->              key |= SK_C;
->          }
->  
-> -        if (skeyclass->set_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &key)) {
-> +        r = skeyclass->set_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &key);
-> +        if (r) {
->              trace_set_skeys_nonzero(r);
->              return 0;
->          }
-> 
+Hi,
 
-Fixes: 0f5f669147b52f89928bdf180165f74c4219210e
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I'm using libvhost-user.a to write a vhost backend, in order to receive and
+send packets from/to VMs from OVS. I started by reading the vhost-user-bridge.c.
+I can now pass the initialization stage, seeing .queue_set_started get invoked.
+
+However, I am stuck at receiving the packet from VM.
+So is it correct to do:
+1) check vu_queue_empty, started, and aval_bytes, if OK, then
+2) elem = vu_queue_pop(&dev->vudev, vq, sizeof(VuVirtqElement));
+3) the packet payload should be at elem->in_sg->iov_base + hdrlen? or
+at elem->out_sg?
+
+I tried to hex dump the iov_base, but the content doesn't look like
+having a ethernet header. I saw in vubr_backend_recv_cb at vhost-user-bridge.c,
+we're creating another iovec and recvmsg(vubr->backend_udp_sock, &msg, 0);
+I don't think I have to create backend UDP sock, am I correct?
+
+Thanks
+William
 
