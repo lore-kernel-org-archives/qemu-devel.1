@@ -2,91 +2,51 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AB43C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25924C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:08:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAE4B2067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:07:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BjGA4MXX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAE4B2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF8C32067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 10:08:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF8C32067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxqCE-0006IU-KV
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 06:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54087)
+	id 1hxqDA-0007ed-1Q
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 06:08:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54260)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1hxqBH-0005WJ-Cr
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:07:00 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxqBz-0006If-GR
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hxqBG-000719-1q
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:06:59 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34319)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hxqBF-00070i-Q5
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:06:57 -0400
-Received: by mail-wr1-x444.google.com with SMTP id 31so110559569wrm.1
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 03:06:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=md3rpQXbTuAOv0p/UbpuLpcqckT8i/0EbGVxOrmwMJE=;
- b=BjGA4MXXi46Mi/Q/kv9HVvdabMh3ljoCiEtccRO71IUS+QAkkX8+IfJYEZVGzQdfOE
- AnWvQ64ahkWhkX9kOztrG9mmA1ss7onXt88vNLGxscg4xSgU0fsjkkpuL6SJuxPpfun8
- dDHpAIVeS2kqA9Ki8+INE4J1tILY7xUspaWj5C9Fr/39BFsUNwTZ1nR9EDaZI9dlqs35
- MKizj5bC4NTmcrwszYccuWpm/Jm2iTolEQ3SQfxgZjc80nmcduLaTgnpR0U/i4sZI1q+
- UdaugicJfVE4BLeYyhFB6LxFIcgKK7e74gB0VVt+L2THAA0Cqx4R8a7GRmi1iQoIGPZP
- gRbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=md3rpQXbTuAOv0p/UbpuLpcqckT8i/0EbGVxOrmwMJE=;
- b=LgCd57AOregXj/nxNowxekOX0s3GfuSNvbhYS4/53CvZaJAuiudEW0qja7zb0qwb+2
- 3tT0LSCM953lebXYiUCfxX+YveREoYtLp6C0J7Y66JP5fp0Mv9RYGscQx4RGemy0SAPI
- OwKTkv8cV2G9xvRvaLKDaSCqZwocF96CbwSNC/BeB1uiHoLmDb70RwqnNsIrOLto8erL
- iEpp6fdnhVoVYjDjROQruvzXNiBthH3xFpDKdmgtOsi9SF060TXtq0uzQgqYcu0rV0CT
- DPyCmC4PdAIiSZdYMAYAqViWEqZN9jroH6FEgHsZIPzBEN07lT3aGOYhzKkzQLLK/GBi
- SC/w==
-X-Gm-Message-State: APjAAAVc5CR9C4RV3a05QMVgwIlTh60Y4g2EuJJZ8nFd2uAc/rUE6r5C
- fFCRtQEHJjIkUHlD2Y1ny/TIZg==
-X-Google-Smtp-Source: APXvYqyZXjvRLCktd+rzbx8Kj7ox3JyaMbnDAeJdeFeIALzU1xwMKNg5zpw55bpdPlfHrqwgcMZMDg==
-X-Received: by 2002:a5d:4b05:: with SMTP id v5mr26521746wrq.208.1565777216290; 
- Wed, 14 Aug 2019 03:06:56 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id p10sm4291943wma.8.2019.08.14.03.06.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Aug 2019 03:06:55 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 272251FF87;
- Wed, 14 Aug 2019 11:06:55 +0100 (BST)
-References: <20190814072355.15333-1-david@redhat.com>
- <20190814072355.15333-4-david@redhat.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190814072355.15333-4-david@redhat.com>
-Date: Wed, 14 Aug 2019 11:06:55 +0100
-Message-ID: <87wofgm56o.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v2 3/6] s390x/tcg: Flush the TLB of
- all CPUs on SSKE and RRBE
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxqBy-0007R3-90
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 06:07:43 -0400
+Received: from relay.sw.ru ([185.231.240.75]:39976)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hxqBv-0007Ny-MB; Wed, 14 Aug 2019 06:07:39 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hxqBs-00066c-UZ; Wed, 14 Aug 2019 13:07:37 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Wed, 14 Aug 2019 13:07:34 +0300
+Message-Id: <20190814100735.24234-2-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190814100735.24234-1-vsementsov@virtuozzo.com>
+References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH 1/2] qapi: deprecate drive-mirror and
+ drive-backup
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,68 +58,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, libvir-list@redhat.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, jsnow@redhat.com,
+ den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+It's hard and not necessary to maintain outdated versions of these
+commands.
 
-David Hildenbrand <david@redhat.com> writes:
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qemu-deprecated.texi  |  4 ++++
+ qapi/block-core.json  |  4 ++++
+ qapi/transaction.json |  2 +-
+ blockdev.c            | 10 ++++++++++
+ 4 files changed, 19 insertions(+), 1 deletion(-)
 
-> Whenever we modify a storage key, we shuld flush the TLBs of all CPUs,
-> so the MMU fault handling code can properly consider the changed storage
-> key (to e.g., properly set the reference and change bit on the next
-> accesses).
->
-> These functions are barely used in modern Linux guests, so the performance
-> implications are neglectable for now.
->
-> This is a preparation for better reference and change bit handling for
-> TCG, which will require more MMU changes.
->
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/mem_helper.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index 29d9eaa5b7..ed54265e03 100644
-> --- a/target/s390x/mem_helper.c
-> +++ b/target/s390x/mem_helper.c
-> @@ -1815,6 +1815,8 @@ void HELPER(sske)(CPUS390XState *env, uint64_t r1, =
-uint64_t r2)
->
->      key =3D (uint8_t) r1;
->      skeyclass->set_skeys(ss, addr / TARGET_PAGE_SIZE, 1, &key);
-> +    /* TODO: Flush only entries with this target address */
-> +    tlb_flush_all_cpus_synced(env_cpu(env));
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index fff07bb2a3..2753fafd0b 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -179,6 +179,10 @@ and accurate ``query-qmp-schema'' command.
+ Character devices creating sockets in client mode should not specify
+ the 'wait' field, which is only applicable to sockets in server mode
+ 
++@subsection drive-mirror, drive-backup and drive-backup transaction action (since 4.2)
++
++Use blockdev-mirror and blockdev-backup instead.
++
+ @section Human Monitor Protocol (HMP) commands
+ 
+ @subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (since 3.1)
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0d43d4f37c..4e35526634 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -1635,6 +1635,8 @@
+ ##
+ # @drive-backup:
+ #
++# Command is deprecated, use blockdev-mirror instead.
++#
+ # Start a point-in-time copy of a block device to a new destination.  The
+ # status of ongoing drive-backup operations can be checked with
+ # query-block-jobs where the BlockJobInfo.type field has the value 'backup'.
+@@ -1855,6 +1857,8 @@
+ ##
+ # @drive-mirror:
+ #
++# Command is deprecated, use blockdev-mirror instead.
++#
+ # Start mirroring a block device's writes to a new destination. target
+ # specifies the target of the new image. If the file exists, or if it
+ # is a device, it will be used as the new destination for writes. If
+diff --git a/qapi/transaction.json b/qapi/transaction.json
+index 95edb78227..a16a9ff8a6 100644
+--- a/qapi/transaction.json
++++ b/qapi/transaction.json
+@@ -53,7 +53,7 @@
+ # - @blockdev-snapshot: since 2.5
+ # - @blockdev-snapshot-internal-sync: since 1.7
+ # - @blockdev-snapshot-sync: since 1.1
+-# - @drive-backup: since 1.6
++# - @drive-backup: deprecated action, since 1.6
+ #
+ # Since: 1.1
+ ##
+diff --git a/blockdev.c b/blockdev.c
+index 4d141e9a1f..36e9368e01 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1771,6 +1771,9 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+     AioContext *aio_context;
+     Error *local_err = NULL;
+ 
++    warn_report("drive-backup transaction action is deprecated and will "
++                "disappear in future. Use blockdev-backup action instead");
++
+     assert(common->action->type == TRANSACTION_ACTION_KIND_DRIVE_BACKUP);
+     backup = common->action->u.drive_backup.data;
+ 
+@@ -3591,6 +3594,10 @@ void qmp_drive_backup(DriveBackup *arg, Error **errp)
+ {
+ 
+     BlockJob *job;
++
++    warn_report("drive-backup command is deprecated and will disappear in "
++                "future. Use blockdev-backup instead");
++
+     job = do_drive_backup(arg, NULL, errp);
+     if (job) {
+         job_start(&job->job);
+@@ -3831,6 +3838,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
+     const char *format = arg->format;
+     int ret;
+ 
++    warn_report("drive-mirror command is deprecated and will disappear in "
++                "future. Use blockdev-mirror instead");
++
+     bs = qmp_get_root_bs(arg->device, errp);
+     if (!bs) {
+         return;
+-- 
+2.18.0
 
-Doesn't:
-
-  tlb_flush_page_all_cpus_synced(env_cpu(env), addr & TARGET_PAGE_MASK);
-
-do what you want here?
-
->  }
->
->  /* reset reference bit extended */
-> @@ -1843,6 +1845,8 @@ uint32_t HELPER(rrbe)(CPUS390XState *env, uint64_t =
-r2)
->      if (skeyclass->set_skeys(ss, r2 / TARGET_PAGE_SIZE, 1, &key)) {
->          return 0;
->      }
-> +    /* TODO: Flush only entries with this target address */
-> +    tlb_flush_all_cpus_synced(env_cpu(env));
->
->      /*
->       * cc
-
-
---
-Alex Benn=C3=A9e
 
