@@ -2,93 +2,79 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD69DC433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2906C32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:05:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 934C22084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:02:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 934C22084F
+	by mail.kernel.org (Postfix) with ESMTPS id 9964C2084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:05:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9964C2084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxtrZ-0002FI-MR
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 10:02:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55954)
+	id 1hxtuB-0003MN-QL
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 10:05:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hxtqG-0001SO-Gi
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:01:33 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hxttX-0002mu-1C
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hxtqF-0000fD-3Y
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:01:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38948)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hxtq5-0000YF-Cq; Wed, 14 Aug 2019 10:01:23 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 913F530A5410;
- Wed, 14 Aug 2019 14:01:18 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D59AF8328B;
- Wed, 14 Aug 2019 14:01:14 +0000 (UTC)
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-8-mreitz@redhat.com>
- <42b23025-5270-8b53-1fa0-724883d9a746@redhat.com>
- <74692040-e5c7-4ec3-8a6c-df565e6bae3f@redhat.com>
- <5496dd9a-1a78-4a5b-b84b-fb870ad409e5@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hxttV-0003Ei-Fq
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:04:54 -0400
+Received: from mail-wr1-f42.google.com ([209.85.221.42]:43417)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hxttV-0003EF-9T
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:04:53 -0400
+Received: by mail-wr1-f42.google.com with SMTP id y8so5272641wrn.10
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 07:04:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=e5B/QYpBjOvkfg+CHjR5ydDGjq2dCwH9aAtX9XHyZ+Q=;
+ b=H7HYSkNkmg7p/W9XwZApjKAO8Qin8o6+goQC30BLLlbCJaBqHHTRVT/c/UT7rKvQDl
+ /5Rvw8z9BThq2EaaG8jLCW/aUbv6011iOpZtx3XKpTuLFpkqCZ2vdSvJ2NG/S/DkbXQJ
+ oie6cgOUHJNCgXplWIGFOaLNi2r36aiDF5Kyu3Z4WlgrrgRUOkjXZlZFxzdPVKzhY0YJ
+ I5Y56Ks7zNbmCC1b3I/apDucJv4Op/UWjht87ZgtJ5LPrj1nx8x+HKoql1uFatgy3jfE
+ dk+tMIM5yjs5R/oX8KOZroWqLn2xQA1UTHUHnNRU0+CZu9lpV07dxHThx6WvCZrdyW9x
+ Ti2g==
+X-Gm-Message-State: APjAAAWpCNMzuGpFSRbx6NblOdiLa32IZtfAG4L0Y4mApl/bnkOJcFfe
+ 7fpVeIdO5s8blPHM1hcYfra7nQ==
+X-Google-Smtp-Source: APXvYqyOfjFFQKQ2/fR0mwqEnYihNDDLJQK/RLFQT6RSfWWcib9QsRw62ay7Qla1KEE1wayk6NLgRg==
+X-Received: by 2002:adf:dfc4:: with SMTP id q4mr51739845wrn.54.1565791492061; 
+ Wed, 14 Aug 2019 07:04:52 -0700 (PDT)
+Received: from [192.168.10.150] ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id g12sm154134861wrv.9.2019.08.14.07.04.50
+ (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+ Wed, 14 Aug 2019 07:04:51 -0700 (PDT)
+To: "Yao, Jiewen" <jiewen.yao@intel.com>, Laszlo Ersek <lersek@redhat.com>,
+ edk2-devel-groups-io <devel@edk2.groups.io>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8cdb2e48-5c9b-289a-0a2c-49cd0e6b623d@redhat.com>
-Date: Wed, 14 Aug 2019 16:01:13 +0200
+Message-ID: <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
+Date: Wed, 14 Aug 2019 16:04:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <5496dd9a-1a78-4a5b-b84b-fb870ad409e5@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KfoBfNDyS2qaxbDPvuvgey8ieSTpTn16w"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 14 Aug 2019 14:01:18 +0000 (UTC)
+In-Reply-To: <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 7/7] iotests: Disable 126 for
- some vmdk subformats
+ [fuzzy]
+X-Received-From: 209.85.221.42
+Subject: Re: [Qemu-devel] CPU hotplug using SMM with QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,223 +86,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ edk2-rfc-groups-io <rfc@edk2.groups.io>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KfoBfNDyS2qaxbDPvuvgey8ieSTpTn16w
-Content-Type: multipart/mixed; boundary="O14n2wBIoC0rUgzP2ZXjT1LQPoxSGaNYO";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
-Message-ID: <8cdb2e48-5c9b-289a-0a2c-49cd0e6b623d@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 7/7] iotests: Disable 126 for some vmdk
- subformats
-References: <20190725155735.11872-1-mreitz@redhat.com>
- <20190725155735.11872-8-mreitz@redhat.com>
- <42b23025-5270-8b53-1fa0-724883d9a746@redhat.com>
- <74692040-e5c7-4ec3-8a6c-df565e6bae3f@redhat.com>
- <5496dd9a-1a78-4a5b-b84b-fb870ad409e5@redhat.com>
-In-Reply-To: <5496dd9a-1a78-4a5b-b84b-fb870ad409e5@redhat.com>
+On 14/08/19 15:20, Yao, Jiewen wrote:
+>> - Does this part require a new branch somewhere in the OVMF SEC code?
+>>   How do we determine whether the CPU executing SEC is BSP or
+>>   hot-plugged AP?
+> [Jiewen] I think this is blocked from hardware perspective, since the first instruction.
+> There are some hardware specific registers can be used to determine if the CPU is new added.
+> I don’t think this must be same as the real hardware.
+> You are free to invent some registers in device model to be used in OVMF hot plug driver.
 
---O14n2wBIoC0rUgzP2ZXjT1LQPoxSGaNYO
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Yes, this would be a new operation mode for QEMU, that only applies to
+hot-plugged CPUs.  In this mode the AP doesn't reply to INIT or SMI, in
+fact it doesn't reply to anything at all.
 
-On 14.08.19 00:26, John Snow wrote:
->=20
->=20
-> On 8/13/19 10:00 AM, Max Reitz wrote:
->> On 12.08.19 23:33, John Snow wrote:
+>> - How do we tell the hot-plugged AP where to start execution? (I.e. that
+>>   it should execute code at a particular pflash location.)
+> [Jiewen] Same real mode reset vector at FFFF:FFF0.
+
+You do not need a reset vector or INIT/SIPI/SIPI sequence at all in
+QEMU.  The AP does not start execution at all when it is unplugged, so
+no cache-as-RAM etc.
+
+We only need to modify QEMU so that hot-plugged APIs do not reply to
+INIT/SIPI/SMI.
+
+> I don’t think there is problem for real hardware, who always has CAR.
+> Can QEMU provide some CPU specific space, such as MMIO region?
+
+Why is a CPU-specific region needed if every other processor is in SMM
+and thus trusted.
+
+>>   Does CPU hotplug apply only at the socket level? If the CPU is
+>>   multi-core, what is responsible for hot-plugging all cores present in
+>>   the socket?
+
+I can answer this: the SMM handler would interact with the hotplug
+controller in the same way that ACPI DSDT does normally.  This supports
+multiple hotplugs already.
+
+Writes to the hotplug controller from outside SMM would be ignored.
+
+>>> (03) New CPU: (Flash) send board message to tell host CPU (GPIO->SCI)
+>>>      -- I am waiting for hot-add message.
+>>
+>> Maybe we can simplify this in QEMU by broadcasting an SMI to existent
+>> processors immediately upon plugging the new CPU.
+
+The QEMU DSDT could be modified (when secure boot is in effect) to OUT
+to 0xB2 when hotplug happens.  It could write a well-known value to
+0xB2, to be read by an SMI handler in edk2.
+
+
+>>
+>>>                                        (NOTE: Host CPU can only
+>> send
+>>>      instruction in SMM mode. -- The register is SMM only)
+>>
+>> Sorry, I don't follow -- what register are we talking about here, and
+>> why is the BSP needed to send anything at all? What "instruction" do you
+>> have in mind?
+> [Jiewen] The new CPU does not enable SMI at reset.
+> At some point of time later, the CPU need enable SMI, right?
+> The "instruction" here means, the host CPUs need tell to CPU to enable SMI.
+
+Right, this would be a write to the CPU hotplug controller
+
+>>> (04) Host CPU: (OS) get message from board that a new CPU is added.
+>>>      (GPIO -> SCI)
 >>>
+>>> (05) Host CPU: (OS) All CPUs enter SMM (SCI->SWSMI) (NOTE: New CPU
+>>>      will not enter CPU because SMI is disabled)
+>>
+>> I don't understand the OS involvement here. But, again, perhaps QEMU can
+>> force all existent CPUs into SMM immediately upon adding the new CPU.
+> [Jiewen] OS here means the Host CPU running code in OS environment, not in SMM environment.
+
+See above.
+
+>>> (06) Host CPU: (SMM) Save 38000, Update 38000 -- fill simple SMM
+>>>      rebase code.
 >>>
->>> On 7/25/19 11:57 AM, Max Reitz wrote:
->>>> Several vmdk subformats do not work with iotest 126, so disable them=
-=2E
->>>>
->>>> (twoGbMaxExtentSparse actually should work, but fixing that is a bit=
+>>> (07) Host CPU: (SMM) Send message to New CPU to Enable SMI.
+>>
+>> Aha, so this is the SMM-only register you mention in step (03). Is the
+>> register specified in the Intel SDM?
+> [Jiewen] Right. That is the register to let host CPU tell new CPU to enable SMI.
+> It is platform specific register. Not defined in SDM.
+> You may invent one in device model.
 
->>>> difficult.  The problem is that the vmdk descriptor file will contai=
-n a
->>>> referenc to "image:base.vmdk", which the block layer cannot open bec=
-ause
->>>
->>> reference
->>>
->>>> it does not know the protocol "image".  This is not trivial to solve=
-,
->>>> because I suppose real protocols like "http://" should be supported.=
+See above.
 
->>>> Making vmdk treat all paths with a potential protocol prefix that th=
-e
->>>> block layer does not recognize as plain files seems a bit weird,
->>>> though.  Ignoring this problem does not seem too bad.)
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  tests/qemu-iotests/126 | 6 ++++++
->>>>  1 file changed, 6 insertions(+)
->>>>
->>>> diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
->>>> index 9b0dcf9255..8e55d7c843 100755
->>>> --- a/tests/qemu-iotests/126
->>>> +++ b/tests/qemu-iotests/126
->>>> @@ -33,6 +33,12 @@ status=3D1	# failure is the default!
->>>> =20
->>>>  # Needs backing file support
->>>>  _supported_fmt qcow qcow2 qed vmdk
->>>> +# (1) Flat vmdk images do not support backing files
->>>> +# (2) Split vmdk images simply fail this test right now.  Fixing th=
-at
->>>> +#     is left for another day.
->>>
->>> Which one? :)
+>>> (10) New CPU: (SMM) Response first SMI at 38000, and rebase SMBASE to
+>>>      TSEG.
 >>
->> Hmmmm?  Fixing refers to #2.  #1 is not a bug or missing feature, it=E2=
-=80=99s
->> just how it is.  (This test needs backing files, so...)
->>
->> If you mean =E2=80=9Cwhich are which=E2=80=9C, then the ones with *Fla=
-t are flat images
->> (:-)), and the ones with twoGbMaxExtent* are split.
->>
->=20
-> "Which day" ;)
->=20
->>>> +_unsupported_imgopts "subformat=3DmonolithicFlat" \
->>>> +                     "subformat=3DtwoGbMaxExtentFlat" \
->>>> +                     "subformat=3DtwoGbMaxExtentSparse"
->>>>  # This is the default protocol (and we want to test the difference =
-between
->>>>  # colons which separate a protocol prefix from the rest and colons =
-which are
->>>>  # just part of the filename, so we cannot test protocols which requ=
-ire a prefix)
->>>>
->>>
->>> What exactly fails?
->>
->> Interestingly I only now noticed that the test passes with =E2=80=9Cvm=
-dk: Use
->> bdrv_dirname() for relative extent paths=E2=80=9D (patch 2) reverted..=
-=2E
->>
->>>                     Does the VMDK driver see `image:` and think it's =
-a
->>> special filename it needs to handle and fails to do so?
->> No.  Whenever the block layer sees a parsee filename[1] with a colon
->> before a slash, it thinks everything before the colon is a protocol
->> prefix.  For example:
->>
->=20
-> Actually, I think we're on the same page here. I maybe meant to type
-> "block layer" instead of "VMDK driver", but it does look like it does
-> special processing on this sort of filename that breaks in this case.
->=20
->> $ qemu-img info foo:bar
->> qemu-img: Could not open 'foo:bar': Unknown protocol 'foo'
->>
->> This test is precisely for this.  How can you specify an image filenam=
-e
->> that has a colon in it (without using -blockdev)?  One way is to prepe=
-nd
->> it with =E2=80=9C./=E2=80=9D, the other is =E2=80=9Cfile:=E2=80=9D.
->>
->> Now with split VMDKs, we must write something in the header file to
->> reference the extents.  What vmdk does for an image like
->> =E2=80=9Cimage:foo.vmdk=E2=80=9D is it writes =E2=80=9Cimage:foo-s001.=
-vmdk=E2=80=9D there.
->>
->> When it tries to open that extent, what happens depends on whether
->> =E2=80=9Cvmdk: Use bdrv_dirname() for relative extent paths=E2=80=9D (=
-patch 2) is applied:
->>
->> --- Before that patch ---
->>
->> vmdk takes the descriptor filename, which, thanks to some magic in the=
+>> What code does the new CPU execute after it completes step (10)? Does it
+>> halt?
+>
+> [Jiewen] The new CPU exits SMM and return to original place - where it is
+> interrupted to enter SMM - running code on the flash.
 
->> block layer, is always =E2=80=9C./image:foo.vmdk=E2=80=9D, even when y=
-ou gave it as
->> =E2=80=9Cfile:image:foo.vmdk=E2=80=9D (the =E2=80=9Cfile:=E2=80=9D is =
-stripped because it does nothing,
->> generally, and the =E2=80=9C./=E2=80=9D is then prepended because of t=
-he false protocol
->> prefix =E2=80=9Cimage:=E2=80=9D).
+So in our case we'd need an INIT/SIPI/SIPI sequence between (06) and (07).
+
+>>> (11) Host CPU: (SMM) Restore 38000.
 >>
->> It then invokes path_combine() with that path and the path given in th=
-e
->> descriptor file (=E2=80=9Cimage:foo-s001.vmdk=E2=80=9D).  This yields
->> =E2=80=9C./image:foo-s001.vmdk=E2=80=9D, which actually works.
+>> These steps (i.e., (06) through (11)) don't appear RAS-specific. The
+>> only platform-specific feature seems to be SMI masking register, which
+>> could be extracted into a new SmmCpuFeaturesLib API.
 >>
->> --- After that patch ---
+>> Thus, would you please consider open sourcing firmware code for steps
+>> (06) through (11)?
 >>
->> OK, what I messed up is that I just took the extent path to be an
->> absolute path if it has a protocol prefix.  (Because that=E2=80=99s ho=
-w we
->> usually do it.)  Turns out that vmdk never did that, and path_combine(=
-)
->> actually completely ignores protocol prefixes in the relative filename=
-=2E
+>> Alternatively -- and in particular because the stack for step (01)
+>> concerns me --, we could approach this from a high-level, functional
+>> perspective. The states that really matter are the relocated SMBASE for
+>> the new CPU, and the state of the full system, right at the end of step
+>> (11).
 >>
->> I suppose I could do the same and just drop the path_has_protocol() fr=
-om
->> patch 2.  But that=E2=80=99d be a bit broken, as I wrote in the commit=
+>> When the SMM setup quiesces during normal firmware boot, OVMF could
+>> use
+>> existent (finalized) SMBASE infomation to *pre-program* some virtual
+>> QEMU hardware, with such state that would be expected, as "final" state,
+>> of any new hotplugged CPU. Afterwards, if / when the hotplug actually
+>> happens, QEMU could blanket-apply this state to the new CPU, and
+>> broadcast a hardware SMI to all CPUs except the new one.
 
->> message...  If the descriptor file refers to an extent on
->> =E2=80=9Chttp://example.com/extent.vmdk=E2=80=9D, I suppose that shoul=
-d not be
->> interpreted as a relative path, but actually work...
->>
->> But anyway, I guess if it=E2=80=99s a bit broken already, I might just=
- keep it
->> that way.
->>
->>
->> tl;dr: Turns out patch 2 broke this test, because it (accidentally)
->> tried to fix something that I consider broken.  If I just keep it brok=
-en
->> (I didn=E2=80=99t know it was), this test will continue to work and pr=
-obably
->> nobody will care because, well, it already is broken and nobody cares.=
+I'd rather avoid this and stay as close as possible to real hardware.
 
->>
->=20
-> So which kinda-broken thing are you making the case for? Are you
-> re-spinning in light of your discovery or... are we fine with the state=
-
-> of things as they land here?
->=20
-> (Sorry, it wasn't clear to me which way you were leaning.)
-
-I=E2=80=99m going to respin and drop the =E2=80=9Cpath_has_protocol(fname=
-)=E2=80=9D condition
-from patch 2.
-
-Max
-
-
---O14n2wBIoC0rUgzP2ZXjT1LQPoxSGaNYO--
-
---KfoBfNDyS2qaxbDPvuvgey8ieSTpTn16w
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1UFCkACgkQ9AfbAGHV
-z0DUvwf/YH9MjdBOzduT8TaTEyWnr/p7s0fJJMuqz5QEqH7RMzNym7A+bSeiiYWS
-Gg1cvdKTsnk0z0+a+Cf+Tyiu+1Yqxmh9DgL2NxHfB61gx9n2PDtMNVoTCcx3ffUm
-nZyENXUYQElvVtz1oXBl7ixKGdOa5K1w0X1c6MYjrjb5GWLGdO3go5sFVVqoTcEo
-PnIVdOSp2jQ5gLBWhqi/tIgxBa+DLUJzX4UhCWKb0rZxt8ThqFRjB0MztVp6Pq/w
-p/JzNNGkZi2BcACCFOzBd3Qj7LR73jA9qA1VZ9zpB8hqi2aRp44pCjB4xVi9XbPM
-23XvCsnXAkYE4sutIUl2/8le2qUCDg==
-=OiYk
------END PGP SIGNATURE-----
-
---KfoBfNDyS2qaxbDPvuvgey8ieSTpTn16w--
+Paolo
 
