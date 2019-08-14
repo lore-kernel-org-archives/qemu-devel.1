@@ -2,82 +2,62 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FD14C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1268CC32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:59:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D093B20578
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:47:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s1c8eBsi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D093B20578
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D2A7E2083B
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 09:59:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2A7E2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxpsg-0001BA-Ur
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 05:47:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51310)
+	id 1hxq3g-0003i7-Ru
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 05:59:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1hxprz-0000eb-Iy
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:47:04 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hxq2y-00038p-Iy
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:58:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1hxpry-0005S0-4m
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:47:03 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:37777)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1hxprx-0005RU-VT; Wed, 14 Aug 2019 05:47:02 -0400
-Received: by mail-ed1-x541.google.com with SMTP id f22so6529591edt.4;
- Wed, 14 Aug 2019 02:47:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QbVftAPqbdy+ZZ2a6m8s/0Vrgc+RjQJkB9Sz6aR81wM=;
- b=s1c8eBsipYAGT2dNVbbTj5TnXwv6EvZA5HIQRkou/R+yxErS+V2bYV+5DXkhktLESV
- N5T/x3zAy9OXCQlDSHZJYQmrD/sU4ZMEacWNLbzA6clZLmAvE/yu2nidsjatrF5X3jXa
- Sdrc9goYHVUMUS/RevfxZV3IPDD1SAiCD502DVZDZoRzbfLvqSLw8dWgxek2xdBbgNVO
- Mvwfa0+p87XTpPbJ+yUdoqnb+dx+jzQfU8HMZuQbvWYX7CYRwbB+wrNpW1fG3rhDjrQm
- uQgAxNnyB0j5qyjXoYjvGeUaJSVR/V3f59d1CN/UDZ1w/GDzES1JZ+iV1dfL7PlmGQBT
- 7yXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QbVftAPqbdy+ZZ2a6m8s/0Vrgc+RjQJkB9Sz6aR81wM=;
- b=gViByFu1Yydm8hl5WPP35GXMi2oEYyWOzWs3XdqvSWlFgKXGO1JJsZnLnI3Yv3efis
- E9wGAYOadbzjh3alwGoD1JLNi9KAmOz/qcFdtMZggv+98BeD8ePeI6dgGixBmWStqXvq
- tx/+RVzJ4NKX0UUs2lvVH1vG+y9+K5hrpzGiBHsOmEoSGwOhJ1kuGyu6BqJdEcthjWZC
- cHUKJBOkVn/+Z9MaIrqsYr5Wa+N84N+khytmdBRquyPhPrrSQXggnF5OlHU68Ek3hyar
- +u20L2BxpzH9uD/v/NXy49bTYXem0RYx7M6kUYqoa8Rf+iw2rQHpYuQtUy31CwxdUM0Q
- 0QEg==
-X-Gm-Message-State: APjAAAV56UKH09Tt/YvzWQHdaCDS+byOLvVNwlPit026d0FinN0Nvn2m
- jVFeJJOMxEanbrnPrTnVlc/gSw6DAnckoFyqK64=
-X-Google-Smtp-Source: APXvYqyYHMXMk+iRUUUL/2CAuU3h6ykJA4UVk6LU4LoucEZAr61QVFwALYarl28r+jPMBie7NWrVak2rYwLV69vgJq4=
-X-Received: by 2002:a05:6402:789:: with SMTP id
- d9mr28537423edy.25.1565776020667; 
- Wed, 14 Aug 2019 02:47:00 -0700 (PDT)
+ (envelope-from <dgilbert@redhat.com>) id 1hxq2x-00022i-4f
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:58:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37308)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hxq2w-00022M-Vj
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 05:58:23 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DD83983F3C
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 09:58:21 +0000 (UTC)
+Received: from work-vm (ovpn-117-212.ams2.redhat.com [10.36.117.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C035E18243;
+ Wed, 14 Aug 2019 09:58:16 +0000 (UTC)
+Date: Wed, 14 Aug 2019 10:58:13 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20190814095813.GA2921@work-vm>
+References: <20190813133042.11683-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <1564577101-29020-1-git-send-email-bmeng.cn@gmail.com>
- <1565232570-29296-1-git-send-email-bmeng.cn@gmail.com>
- <CAKmqyKPQ0z-VtiebdtBqhBocgGkgeLLbtcawhwss0YpoYZyH2A@mail.gmail.com>
-In-Reply-To: <CAKmqyKPQ0z-VtiebdtBqhBocgGkgeLLbtcawhwss0YpoYZyH2A@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 14 Aug 2019 17:46:49 +0800
-Message-ID: <CAEUhbmWpzQftgOdchxFSQEUNv1_9Zra_n=b9eigh_CRT+6sq1Q@mail.gmail.com>
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::541
-Subject: Re: [Qemu-devel] [PATCH v2] riscv: rv32: Root page table address
- can be larger than 32-bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190813133042.11683-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Wed, 14 Aug 2019 09:58:21 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH] usb: reword -usb command-line option and
+ mention xHCI
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +69,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Palmer,
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> The -usb section of the man page is not very clear on what exactly -usb
+> does and fails to mention xHCI as a modern alternative (-device
+> nec-usb-xhci).
 
-On Sat, Aug 10, 2019 at 9:49 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Wed, Aug 7, 2019 at 7:50 PM Bin Meng <bmeng.cn@gmail.com> wrote:
-> >
-> > For RV32, the root page table's PPN has 22 bits hence its address
-> > bits could be larger than the maximum bits that target_ulong is
-> > able to represent. Use hwaddr instead.
-> >
-> > Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
->
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->
+Isn't 'qemu-xhci' the current favoured device?
 
-Would you take this one too?
+Dave
 
-Regards,
-Bin
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  qemu-options.hx | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9621e934c0..7d11c016d1 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1436,12 +1436,15 @@ STEXI
+>  ETEXI
+>  
+>  DEF("usb", 0, QEMU_OPTION_usb,
+> -    "-usb            enable the USB driver (if it is not used by default yet)\n",
+> +    "-usb            enable on-board USB host controller (if not enabled by default)\n",
+>      QEMU_ARCH_ALL)
+>  STEXI
+>  @item -usb
+>  @findex -usb
+> -Enable the USB driver (if it is not used by default yet).
+> +Enable USB emulation on machine types with an on-board USB host controller (if
+> +not enabled by default).  Note that on-board USB host controllers may not
+> +support USB 3.0.  In this case -device nec-usb-xhci can be used instead on
+> +machines with PCI.
+>  ETEXI
+>  
+>  DEF("usbdevice", HAS_ARG, QEMU_OPTION_usbdevice,
+> -- 
+> 2.21.0
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
