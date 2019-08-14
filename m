@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4284C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 19:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A79E3C32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 19:28:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B4DE206C1
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 19:23:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B4DE206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 68129206C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 19:28:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68129206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxyrQ-0006Q0-Q6
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 15:23:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53006)
+	id 1hxyx3-0007mi-FE
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 15:28:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53747)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hxyqn-0005vk-7h
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 15:22:26 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxywC-0007Ia-6U
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 15:28:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxyql-0005Mh-Rj
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 15:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:9538)
+ (envelope-from <jsnow@redhat.com>) id 1hxywA-000841-MI
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 15:28:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:30248)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxyqi-0005LQ-Sl; Wed, 14 Aug 2019 15:22:21 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hxyw7-00081Z-Le; Wed, 14 Aug 2019 15:27:55 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 15799ED247;
- Wed, 14 Aug 2019 19:22:20 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id A09BA30C0615;
+ Wed, 14 Aug 2019 19:27:54 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 65C8781C18;
- Wed, 14 Aug 2019 19:22:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA68B1ED;
+ Wed, 14 Aug 2019 19:27:50 +0000 (UTC)
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, Peter Krempa <pkrempa@redhat.com>
+ qemu-block@nongnu.org
 References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
- <20190814100735.24234-2-vsementsov@virtuozzo.com>
+ <20190814100735.24234-3-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <6c40950f-c8b8-f9c7-6187-aa282e1a2d30@redhat.com>
-Date: Wed, 14 Aug 2019 15:22:15 -0400
+Message-ID: <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
+Date: Wed, 14 Aug 2019 15:27:50 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190814100735.24234-2-vsementsov@virtuozzo.com>
+In-Reply-To: <20190814100735.24234-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Wed, 14 Aug 2019 19:22:20 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Wed, 14 Aug 2019 19:27:54 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: deprecate drive-mirror and
- drive-backup
+Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: deprecate implicit filters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,8 +147,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- libvir-list@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, libvir-list@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -157,118 +156,131 @@ Sender: "Qemu-devel"
 
 
 On 8/14/19 6:07 AM, Vladimir Sementsov-Ogievskiy wrote:
-> It's hard and not necessary to maintain outdated versions of these
-> commands.
+> To get rid of implicit filters related workarounds in future let's
+> deprecate them now.
 > 
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  qemu-deprecated.texi  |  4 ++++
->  qapi/block-core.json  |  4 ++++
->  qapi/transaction.json |  2 +-
->  blockdev.c            | 10 ++++++++++
->  4 files changed, 19 insertions(+), 1 deletion(-)
+>  qemu-deprecated.texi      |  7 +++++++
+>  qapi/block-core.json      |  6 ++++--
+>  include/block/block_int.h | 10 +++++++++-
+>  blockdev.c                | 10 ++++++++++
+>  4 files changed, 30 insertions(+), 3 deletions(-)
 > 
 > diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index fff07bb2a3..2753fafd0b 100644
+> index 2753fafd0b..8222440148 100644
 > --- a/qemu-deprecated.texi
 > +++ b/qemu-deprecated.texi
-> @@ -179,6 +179,10 @@ and accurate ``query-qmp-schema'' command.
->  Character devices creating sockets in client mode should not specify
->  the 'wait' field, which is only applicable to sockets in server mode
+> @@ -183,6 +183,13 @@ the 'wait' field, which is only applicable to sockets in server mode
 >  
-> +@subsection drive-mirror, drive-backup and drive-backup transaction action (since 4.2)
+>  Use blockdev-mirror and blockdev-backup instead.
+>  
+> +@subsection implicit filters (since 4.2)
 > +
-> +Use blockdev-mirror and blockdev-backup instead.
+> +Mirror and commit jobs inserts filters, which becomes implicit if user
+> +omitted filter-node-name parameter. So omitting it is deprecated, set it
+> +always. Note, that drive-mirror don't have this parameter, so it will
+> +create implicit filter anyway, but drive-mirror is deprecated itself too.
 > +
 >  @section Human Monitor Protocol (HMP) commands
 >  
 >  @subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (since 3.1)
 > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 0d43d4f37c..4e35526634 100644
+> index 4e35526634..0505ac9d8b 100644
 > --- a/qapi/block-core.json
 > +++ b/qapi/block-core.json
-> @@ -1635,6 +1635,8 @@
->  ##
->  # @drive-backup:
+> @@ -1596,7 +1596,8 @@
+>  # @filter-node-name: the node name that should be assigned to the
+>  #                    filter driver that the commit job inserts into the graph
+>  #                    above @top. If this option is not given, a node name is
+> -#                    autogenerated. (Since: 2.9)
+> +#                    autogenerated. Omitting this option is deprecated, it will
+> +#                    be required in future. (Since: 2.9)
 >  #
-> +# Command is deprecated, use blockdev-mirror instead.
-> +#
->  # Start a point-in-time copy of a block device to a new destination.  The
->  # status of ongoing drive-backup operations can be checked with
->  # query-block-jobs where the BlockJobInfo.type field has the value 'backup'.
-> @@ -1855,6 +1857,8 @@
->  ##
->  # @drive-mirror:
+>  # @auto-finalize: When false, this job will wait in a PENDING state after it has
+>  #                 finished its work, waiting for @block-job-finalize before
+> @@ -2249,7 +2250,8 @@
+>  # @filter-node-name: the node name that should be assigned to the
+>  #                    filter driver that the mirror job inserts into the graph
+>  #                    above @device. If this option is not given, a node name is
+> -#                    autogenerated. (Since: 2.9)
+> +#                    autogenerated. Omitting this option is deprecated, it will
+> +#                    be required in future. (Since: 2.9)
 >  #
-> +# Command is deprecated, use blockdev-mirror instead.
-> +#
->  # Start mirroring a block device's writes to a new destination. target
->  # specifies the target of the new image. If the file exists, or if it
->  # is a device, it will be used as the new destination for writes. If
-> diff --git a/qapi/transaction.json b/qapi/transaction.json
-> index 95edb78227..a16a9ff8a6 100644
-> --- a/qapi/transaction.json
-> +++ b/qapi/transaction.json
-> @@ -53,7 +53,7 @@
->  # - @blockdev-snapshot: since 2.5
->  # - @blockdev-snapshot-internal-sync: since 1.7
->  # - @blockdev-snapshot-sync: since 1.1
-> -# - @drive-backup: since 1.6
-> +# - @drive-backup: deprecated action, since 1.6
->  #
->  # Since: 1.1
->  ##
+>  # @copy-mode: when to copy data to the destination; defaults to 'background'
+>  #             (Since: 3.0)
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index 3aa1e832a8..624da0b4a2 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -762,7 +762,15 @@ struct BlockDriverState {
+>      bool sg;        /* if true, the device is a /dev/sg* */
+>      bool probed;    /* if true, format was probed rather than specified */
+>      bool force_share; /* if true, always allow all shared permissions */
+> -    bool implicit;  /* if true, this filter node was automatically inserted */
+> +
+> +    /*
+> +     * @implicit field is deprecated, don't set it to true for new filters.
+> +     * If true, this filter node was automatically inserted and user don't
+> +     * know about it and unprepared for any effects of it. So, implicit
+> +     * filters are workarounded and skipped in many places of the block
+> +     * layer code.
+> +     */
+> +    bool implicit;
+>  
+>      BlockDriver *drv; /* NULL means no media */
+>      void *opaque;
 > diff --git a/blockdev.c b/blockdev.c
-> index 4d141e9a1f..36e9368e01 100644
+> index 36e9368e01..b3cfaccce1 100644
 > --- a/blockdev.c
 > +++ b/blockdev.c
-> @@ -1771,6 +1771,9 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
->      AioContext *aio_context;
+> @@ -3292,6 +3292,11 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+>      BlockdevOnError on_error = BLOCKDEV_ON_ERROR_REPORT;
+>      int job_flags = JOB_DEFAULT;
+>  
+> +    if (!has_filter_node_name) {
+> +        warn_report("Omitting filter-node-name parameter is deprecated, it "
+> +                    "will be required in future");
+> +    }
+> +
+>      if (!has_speed) {
+>          speed = 0;
+>      }
+> @@ -3990,6 +3995,11 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
 >      Error *local_err = NULL;
->  
-> +    warn_report("drive-backup transaction action is deprecated and will "
-> +                "disappear in future. Use blockdev-backup action instead");
-> +
->      assert(common->action->type == TRANSACTION_ACTION_KIND_DRIVE_BACKUP);
->      backup = common->action->u.drive_backup.data;
->  
-> @@ -3591,6 +3594,10 @@ void qmp_drive_backup(DriveBackup *arg, Error **errp)
->  {
->  
->      BlockJob *job;
-> +
-> +    warn_report("drive-backup command is deprecated and will disappear in "
-> +                "future. Use blockdev-backup instead");
-> +
->      job = do_drive_backup(arg, NULL, errp);
->      if (job) {
->          job_start(&job->job);
-> @@ -3831,6 +3838,9 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
->      const char *format = arg->format;
 >      int ret;
 >  
-> +    warn_report("drive-mirror command is deprecated and will disappear in "
-> +                "future. Use blockdev-mirror instead");
+> +    if (!has_filter_node_name) {
+> +        warn_report("Omitting filter-node-name parameter is deprecated, it "
+> +                    "will be required in future");
+> +    }
 > +
->      bs = qmp_get_root_bs(arg->device, errp);
+>      bs = qmp_get_root_bs(device, errp);
 >      if (!bs) {
 >          return;
 > 
 
-Hm!
+This might be OK to do right away, though.
 
-I wonder if this is ever-so-slightly too soon for our friends over at
-the libvirt project.
+I asked Markus this not too long ago; do we want to amend the QAPI
+schema specification to allow commands to return with "Warning" strings,
+or "Deprecated" stings to allow in-band deprecation notices for cases
+like these?
 
-I don't think they have fully moved away from the non-blockdev
-interfaces *just yet*, and I might encourage seeing the first full
-libvirt release that does support and use it before we start the
-deprecation clock.
+example:
 
-(Juuuust in case.)
+{ "return": {},
+  "deprecated": True,
+  "warning": "Omitting filter-node-name parameter is deprecated, it will
+be required in the future"
+}
 
-That's just me being very, very cautious though.
+There's no "error" key, so this should be recognized as success by
+compatible clients, but they'll definitely see the extra information.
 
-Peter Krempa, how do you feel about this?
+Part of my motivation is to facilitate a more aggressive deprecation of
+legacy features by ensuring that we are able to rigorously notify users
+through any means that they need to adjust their scripts.
 
+--js
 
