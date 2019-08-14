@@ -2,77 +2,63 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CF6C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:39:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7044EC433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:40:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787582054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:39:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787582054F
+	by mail.kernel.org (Postfix) with ESMTPS id 470EB2054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 12:40:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470EB2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxsYq-0005lP-Ck
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 08:39:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45549)
+	id 1hxsaA-00077Q-FY
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 08:40:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45629)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1hxsXs-0004sX-0l
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:38:29 -0400
+ (envelope-from <ptoscano@redhat.com>) id 1hxsYs-00065D-IL
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:39:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1hxsXr-00030I-2s
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:38:27 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43294)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hxsXq-0002zz-Sg
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:38:27 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y8so4995950wrn.10
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 05:38:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OQxTb15dBEop0iMkCR5umznP40ZPRML73cIH76GB6q0=;
- b=sfXH7Gx0c65fNzaP466eIU1EvfaYYwHAGSDCjA2jEEYyjaL3lMycNhlp6YgTvoixVa
- SUPbaxKKbb6ykWlp1DvZlONOOlaC5XMYJUfzcx5Wk7XDrCQppSyCEjkfWikMEAadJA04
- ewYEcgMkaLQ1G09VV2/MU+8h7ZNRfGKG5xyHEAkgoS9uWqmnS/lrZNvj7LqTH7DrwxnJ
- ec7vdfst89S5PVIKJRp1oHPv2bC+ecdndmATpUU75DoMFyPkFdiz1Qg53BPw9uscZAyr
- wUKBmlMzPNm2BRhrKv1TmJfFdBpk5IvNW0JeS30I1hhSqqwFCHcLKNlmP9GpvkHv2Ik6
- nihg==
-X-Gm-Message-State: APjAAAVpUkTVViowaHeQPIChnfR1SYWSHxNbbXqX5nQaI+2IXvEvkXru
- Lhs70opExDzXCX+gGnwCnTUK2w==
-X-Google-Smtp-Source: APXvYqzHXi0LTLrU+veUZEXYj8kaZqp+KV0b9firhcIoUqUVu5kp2k5HZ5tYlk4cZ7IY+Gir9fDIOA==
-X-Received: by 2002:adf:f386:: with SMTP id m6mr49490872wro.313.1565786305896; 
- Wed, 14 Aug 2019 05:38:25 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g8sm6442475wmf.17.2019.08.14.05.38.24
- (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
- Wed, 14 Aug 2019 05:38:25 -0700 (PDT)
-To: Wei Yang <richardw.yang@linux.intel.com>, qemu-devel@nongnu.org
-References: <20190814002723.5140-1-richardw.yang@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <2ff8a0a8-f665-1bb4-5073-1697bee22bfc@redhat.com>
-Date: Wed, 14 Aug 2019 14:38:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <ptoscano@redhat.com>) id 1hxsYr-0003KN-AE
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 08:39:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58226)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ptoscano@redhat.com>)
+ id 1hxsYo-0003J4-Gt; Wed, 14 Aug 2019 08:39:26 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D154DDDB21;
+ Wed, 14 Aug 2019 12:39:25 +0000 (UTC)
+Received: from lindworm.usersys.redhat.com (unknown [10.43.2.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3FF4F7A2E1;
+ Wed, 14 Aug 2019 12:39:24 +0000 (UTC)
+From: Pino Toscano <ptoscano@redhat.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu=2DDaud=E9?= <philmd@redhat.com>
+Date: Wed, 14 Aug 2019 14:39:23 +0200
+Message-ID: <7426390.htdRGj8iG7@lindworm.usersys.redhat.com>
+Organization: Red Hat
+In-Reply-To: <20190814121527.17876-4-philmd@redhat.com>
+References: <20190814121527.17876-1-philmd@redhat.com>
+ <20190814121527.17876-4-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190814002723.5140-1-richardw.yang@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="nextPart1711251.pPebD6CAJW";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.28]); Wed, 14 Aug 2019 12:39:25 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.221.67
-Subject: Re: [Qemu-devel] [PATCH] test-bitmap: test set 1 bit case for
- bitmap_set
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/4] configure: Improve checking libssh
+ version is 0.8
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,53 +70,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: corentincj@iksaif.net, pl@kamp.de, kraxel@redhat.com, peterx@redhat.com,
- quintela@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ "Richard W . M . Jones" <rjones@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?utf-8?B?5ZGo5paH6Z2S?= <1151451036@qq.com>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/08/19 02:27, Wei Yang wrote:
-> All current bitmap_set test cases set range across word, while the
-> handle of a range within one word is different from that.
-> 
-> Add case to set 1 bit as a represent for set range within one word.
-> 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> 
-> ---
-> Thanks for Paolo's finding.
-> 
-> ---
->  tests/test-bitmap.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
-> index 18aa584591..087e02a26c 100644
-> --- a/tests/test-bitmap.c
-> +++ b/tests/test-bitmap.c
-> @@ -67,6 +67,18 @@ static void bitmap_set_case(bmap_set_func set_func)
->  
->      bmap = bitmap_new(BMAP_SIZE);
->  
-> +    /* Set one bit at offset in second word */
-> +    for (offset = 0; offset <= BITS_PER_LONG; offset++) {
-> +        bitmap_clear(bmap, 0, BMAP_SIZE);
-> +        set_func(bmap, BITS_PER_LONG + offset, 1);
-> +        g_assert_cmpint(find_first_bit(bmap, 2 * BITS_PER_LONG),
-> +                        ==, BITS_PER_LONG + offset);
-> +        g_assert_cmpint(find_next_zero_bit(bmap,
-> +                                           3 * BITS_PER_LONG,
-> +                                           BITS_PER_LONG + offset),
-> +                        ==, BITS_PER_LONG + offset + 1);
-> +    }
-> +
->      /* Both Aligned, set bits [BITS_PER_LONG, 3*BITS_PER_LONG] */
->      set_func(bmap, BITS_PER_LONG, 2 * BITS_PER_LONG);
->      g_assert_cmpuint(bmap[1], ==, -1ul);
-> 
+--nextPart1711251.pPebD6CAJW
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"
 
-Queued, thanks for writing the testcase without no one asking! :)
+On Wednesday, 14 August 2019 14:15:26 CEST Philippe Mathieu-Daud=C3=A9 wrot=
+e:
+> To figure out which libssh version is installed, checking for
+> ssh_get_server_publickey() is not sufficient.
+>=20
+> ssh_get_server_publickey() has been introduced in libssh
+> commit bbd052202 (predating 0.8) but distributions also
+> backported other pre-0.8 patches, such libssh commit
+> 963c46e4f which introduce the ssh_known_hosts_e enum.
+>=20
+> Check the enum is available to assume the version is 0.8.
+>=20
+> This fixes build failure on Ubuntu 18.04:
+>=20
+>     CC      block/ssh.o
+>   block/ssh.c: In function 'check_host_key_knownhosts':
+>   block/ssh.c:281:28: error: storage size of 'state' isn't known
+>        enum ssh_known_hosts_e state;
+>                               ^~~~~
+>   rules.mak:69: recipe for target 'block/ssh.o' failed
+>   make: *** [block/ssh.o] Error 1
+>=20
+> Reported-by: =E5=91=A8=E6=96=87=E9=9D=92 <1151451036@qq.com>
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1838763
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  configure | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/configure b/configure
+> index fe3fef9309..040aa8eb6c 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3949,18 +3949,24 @@ fi
+>  if test "$libssh" =3D "yes"; then
+>    cat > $TMPC <<EOF
+>  #include <libssh/libssh.h>
+> +#ifdef HAVE_LIBSSH_0_8
+> +static const enum ssh_known_hosts_e val =3D SSH_KNOWN_HOSTS_OK;
+> +#endif
+>  #ifdef HAVE_SSH_GET_SERVER_PUBLICKEY
+>  int main(void) { return ssh_get_server_publickey(NULL, NULL); }
+>  #else
+>  int main(void) { return ssh_get_publickey(NULL, NULL); }
+>  #endif
+>  EOF
+> -  if compile_object "$libssh_cflags"; then
+> +  if compile_object "$libssh_cflags -DHAVE_LIBSSH_0_8"; then
+>      libssh_cflags=3D"-DHAVE_LIBSSH_0_8 $libssh_cflags"
+>    fi
+>    if compile_object "$libssh_cflags -DHAVE_SSH_GET_SERVER_PUBLICKEY"; th=
+en
+>      libssh_cflags=3D"-DHAVE_SSH_GET_SERVER_PUBLICKEY $libssh_cflags"
+>    fi
+> +  if ! compile_object "$libssh_cflags"; then
+> +    error_exit "cannot use with libssh (is it broken?)"
+> +  fi
 
-Paolo
+Ugh no, this is way more twisted and complex than really needed.
+
+Instead, just add another build time check for
+ssh_session_is_known_server, and change check_host_key_knownhosts to
+use it only when found.
+
+=2D-=20
+Pino Toscano
+--nextPart1711251.pPebD6CAJW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEbjdOQa52nq0tQalew9FMLZhkN80FAl1UAPsACgkQw9FMLZhk
+N81bAw/+MrjEJH+CV53OnmtruIxme4rrU1BgsEFkRQooOwSdSlXiItLJLbKDF+S/
+Q7Dnz7UN9qtTpKR31X6VOAnPzHnBlCbD1rXWzptZPZHudcpweU3PtOCb+MKcp1QY
+ccRiQdcWpWFGAR2frFPG50OTIC6ONzcbSNtHi95AQxAhqTlXywGhTYXaLyDpPiFq
+LrQrchPDZPJ5dChzdic9DsTuy90wFheRixo7yoVchp6uuw1TBRc1PsznzZB4+nN4
+4qbXMVvSUxgmIoFTEvo1vDVwvi5hFzVclfEZzcHgewnA20z6bToXwCe+qbRCf2Et
+NK+Wyq22WoPl19rEIfFrLqqXWBiaYPx0h7gpNI3/LmFRXs4kOpg/VOSprSg+S7/r
+7aYtKxs2RhRPsoHh6DgfkqtPJJIoBOMozQnJiTOwEkKly18swWzaYiqJnOmUb31f
+qLpxp2QleTVMEUcOMkCjHQ7EJB4a5kxtYV1LvMq7HekK9+e/ajW3HIvvCitUBvs7
+qr4m08xZjxqjqWNNUAKmU4EB5U06futkBDzSx1zS3KAgmCB3JpkPZBOOsOtpl7Cl
+bKnnkY8yqZ+GZVia0Lt7V8ur+ffk/5I+OecQAuc20r1QeM8YHrglyMY3JvJ8rgna
+EevENzfWdQNlmKdUuSoTQFKU6OMq5d+J46y0Ze27Bpa0XhBgd6w=
+=I1mx
+-----END PGP SIGNATURE-----
+
+--nextPart1711251.pPebD6CAJW--
+
+
+
 
