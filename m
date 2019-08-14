@@ -2,63 +2,85 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF5A4C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 13:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A9DC32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 13:21:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4D092083B
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 13:09:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4D092083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id A7D03205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 13:21:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7D03205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxt1x-0003OP-Ph
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 09:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49295)
+	id 1hxtDt-00077l-KU
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 09:21:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1hxt1D-0002n8-Ra
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 09:08:51 -0400
+ (envelope-from <jiewen.yao@intel.com>) id 1hxtDE-0006cB-Py
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 09:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1hxt19-0007Dw-TO
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 09:08:47 -0400
-Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:40402)
+ (envelope-from <jiewen.yao@intel.com>) id 1hxtDB-0002UV-Fr
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 09:21:11 -0400
+Received: from mga17.intel.com ([192.55.52.151]:22132)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1hxt19-0007DU-KG
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 09:08:43 -0400
-Received: from player789.ha.ovh.net (unknown [10.109.160.93])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id 84D55202393
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 15:08:41 +0200 (CEST)
-Received: from kaod.org (lfbn-1-2240-157.w90-76.abo.wanadoo.fr [90.76.60.157])
- (Authenticated sender: clg@kaod.org)
- by player789.ha.ovh.net (Postfix) with ESMTPSA id 147178CFA934;
- Wed, 14 Aug 2019 13:08:08 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>, Tao <tao3.xu@intel.com>
-References: <20190809065731.9097-1-tao3.xu@intel.com>
- <20190809065731.9097-2-tao3.xu@intel.com> <20190813215558.GG3908@habkost.net>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ae7403ed-1dad-4a8b-485d-413b93cdd7de@kaod.org>
-Date: Wed, 14 Aug 2019 15:08:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190813215558.GG3908@habkost.net>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.71) (envelope-from <jiewen.yao@intel.com>)
+ id 1hxtDB-0002Sk-5T
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 09:21:09 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 14 Aug 2019 06:21:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,385,1559545200"; d="scan'208";a="179048831"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by orsmga003.jf.intel.com with ESMTP; 14 Aug 2019 06:21:01 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 14 Aug 2019 06:21:00 -0700
+Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 14 Aug 2019 06:20:58 -0700
+Received: from shsmsx151.ccr.corp.intel.com (10.239.6.50) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Wed, 14 Aug 2019 06:20:58 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.19]) by
+ SHSMSX151.ccr.corp.intel.com ([169.254.3.250]) with mapi id 14.03.0439.000;
+ Wed, 14 Aug 2019 21:20:56 +0800
+From: "Yao, Jiewen" <jiewen.yao@intel.com>
+To: Laszlo Ersek <lersek@redhat.com>, edk2-devel-groups-io
+ <devel@edk2.groups.io>
+Thread-Topic: CPU hotplug using SMM with QEMU+OVMF
+Thread-Index: AQHVUfF5lMVYZhTq/0GuokGqDPas2Kb6jzUA
+Date: Wed, 14 Aug 2019 13:20:55 +0000
+Message-ID: <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+In-Reply-To: <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+Accept-Language: zh-CN, en-US
 Content-Language: en-US
-X-Ovh-Tracer-Id: 565201757359737783
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduvddruddvkedgheehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddm
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 178.33.104.253
-Subject: Re: [Qemu-devel] [PATCH v9 01/11] hw/arm: simplify arm_load_dtb
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.151
+Subject: Re: [Qemu-devel] CPU hotplug using SMM with QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,901 +92,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, imammedo@redhat.com,
- qemu-devel@nongnu.org, daniel@linux.ibm.com,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Rob Herring <robh@kernel.org>,
- Andrey Smirnov <andrew.smirnov@gmail.com>, Joel Stanley <joel@jms.id.au>,
- Alistair Francis <alistair@alistair23.me>, jingqi.liu@intel.com,
- fan.du@intel.com, Leif Lindholm <leif.lindholm@linaro.org>,
- Beniamino Galvani <b.galvani@gmail.com>, qemu-arm@nongnu.org,
- Jan Kiszka <jan.kiszka@web.de>, jonathan.cameron@huawei.com,
- dan.j.williams@intel.com, Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, Peter Chubb <peter.chubb@nicta.com.au>
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>, "Nakajima, 
+ Jun" <jun.nakajima@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ edk2-rfc-groups-io <rfc@edk2.groups.io>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/08/2019 23:55, Eduardo Habkost wrote:
->=20
-> CCing ARM maintainers.  I'd like to at least get one Acked-by from
-> them before queueing this on machine-next.
->=20
->=20
-> On Fri, Aug 09, 2019 at 02:57:21PM +0800, Tao wrote:
->> From: Tao Xu <tao3.xu@intel.com>
->>
->> In struct arm_boot_info, kernel_filename, initrd_filename and
->> kernel_cmdline are copied from from MachineState. This patch add
->> MachineState as a parameter into arm_load_dtb() and move the copy chun=
-k
->> of kernel_filename, initrd_filename and kernel_cmdline into
->> arm_load_kernel().
->>
->> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->> Reviewed-by: Liu Jingqi <jingqi.liu@intel.com>
->> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>
->> No changes in v9
->> ---
->>  hw/arm/aspeed.c           |  5 +----
->>  hw/arm/boot.c             | 14 ++++++++------
->>  hw/arm/collie.c           |  8 +-------
->>  hw/arm/cubieboard.c       |  5 +----
->>  hw/arm/exynos4_boards.c   |  7 ++-----
->>  hw/arm/highbank.c         |  8 +-------
->>  hw/arm/imx25_pdk.c        |  5 +----
->>  hw/arm/integratorcp.c     |  8 +-------
->>  hw/arm/kzm.c              |  5 +----
->>  hw/arm/mainstone.c        |  5 +----
->>  hw/arm/mcimx6ul-evk.c     |  5 +----
->>  hw/arm/mcimx7d-sabre.c    |  5 +----
->>  hw/arm/musicpal.c         |  8 +-------
->>  hw/arm/nseries.c          |  5 +----
->>  hw/arm/omap_sx1.c         |  5 +----
->>  hw/arm/palm.c             | 10 ++--------
->>  hw/arm/raspi.c            |  6 +-----
->>  hw/arm/realview.c         |  5 +----
->>  hw/arm/sabrelite.c        |  5 +----
->>  hw/arm/sbsa-ref.c         |  3 +--
->>  hw/arm/spitz.c            |  5 +----
->>  hw/arm/tosa.c             |  8 +-------
->>  hw/arm/versatilepb.c      |  5 +----
->>  hw/arm/vexpress.c         |  5 +----
->>  hw/arm/virt.c             |  8 +++-----
->>  hw/arm/xilinx_zynq.c      |  8 +-------
->>  hw/arm/xlnx-versal-virt.c |  7 ++-----
->>  hw/arm/xlnx-zcu102.c      |  5 +----
->>  hw/arm/z2.c               |  8 +-------
->>  include/hw/arm/boot.h     |  4 ++--
->>  30 files changed, 43 insertions(+), 147 deletions(-)
->>
->> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
->> index 843b708247..f8733b86b9 100644
->> --- a/hw/arm/aspeed.c
->> +++ b/hw/arm/aspeed.c
->> @@ -241,9 +241,6 @@ static void aspeed_board_init(MachineState *machin=
-e,
->>          write_boot_rom(drive0, FIRMWARE_ADDR, fl->size, &error_abort)=
-;
->>      }
->> =20
->> -    aspeed_board_binfo.kernel_filename =3D machine->kernel_filename;
->> -    aspeed_board_binfo.initrd_filename =3D machine->initrd_filename;
->> -    aspeed_board_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->>      aspeed_board_binfo.ram_size =3D ram_size;
->>      aspeed_board_binfo.loader_start =3D sc->info->memmap[ASPEED_SDRAM=
-];
->>      aspeed_board_binfo.nb_cpus =3D bmc->soc.num_cpus;
->> @@ -252,7 +249,7 @@ static void aspeed_board_init(MachineState *machin=
-e,
->>          cfg->i2c_init(bmc);
->>      }
->> =20
->> -    arm_load_kernel(ARM_CPU(first_cpu), &aspeed_board_binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &aspeed_board_binfo)=
-;
->>  }
-
-It looks OK to me.=20
-
-To be noted that the Aspeed machine use machine->kernel_filename to detec=
-t=20
-it is running without a bootloader which does some special settings, such=
-=20
-as unlocking devices. In that case, we emulate the same behaviour.
-
-Acked-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-Thanks,
-
-C.
-
->>  static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
->> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
->> index c2b89b3bb9..ba604f8277 100644
->> --- a/hw/arm/boot.c
->> +++ b/hw/arm/boot.c
->> @@ -524,7 +524,7 @@ static void fdt_add_psci_node(void *fdt)
->>  }
->> =20
->>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->> -                 hwaddr addr_limit, AddressSpace *as)
->> +                 hwaddr addr_limit, AddressSpace *as, MachineState *m=
-s)
->>  {
->>      void *fdt =3D NULL;
->>      int size, rc, n =3D 0;
->> @@ -627,9 +627,9 @@ int arm_load_dtb(hwaddr addr, const struct arm_boo=
-t_info *binfo,
->>          qemu_fdt_add_subnode(fdt, "/chosen");
->>      }
->> =20
->> -    if (binfo->kernel_cmdline && *binfo->kernel_cmdline) {
->> +    if (ms->kernel_cmdline && *ms->kernel_cmdline) {
->>          rc =3D qemu_fdt_setprop_string(fdt, "/chosen", "bootargs",
->> -                                     binfo->kernel_cmdline);
->> +                                     ms->kernel_cmdline);
->>          if (rc < 0) {
->>              fprintf(stderr, "couldn't set /chosen/bootargs\n");
->>              goto fail;
->> @@ -1261,7 +1261,7 @@ static void arm_setup_firmware_boot(ARMCPU *cpu,=
- struct arm_boot_info *info)
->>       */
->>  }
->> =20
->> -void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->> +void arm_load_kernel(ARMCPU *cpu, MachineState *ms, struct arm_boot_i=
-nfo *info)
->>  {
->>      CPUState *cs;
->>      AddressSpace *as =3D arm_boot_address_space(cpu, info);
->> @@ -1282,7 +1282,9 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boo=
-t_info *info)
->>       * doesn't support secure.
->>       */
->>      assert(!(info->secure_board_setup && kvm_enabled()));
->> -
->> +    info->kernel_filename =3D ms->kernel_filename;
->> +    info->kernel_cmdline =3D ms->kernel_cmdline;
->> +    info->initrd_filename =3D ms->initrd_filename;
->>      info->dtb_filename =3D qemu_opt_get(qemu_get_machine_opts(), "dtb=
-");
->>      info->dtb_limit =3D 0;
->> =20
->> @@ -1294,7 +1296,7 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boo=
-t_info *info)
->>      }
->> =20
->>      if (!info->skip_dtb_autoload && have_dtb(info)) {
->> -        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) =
-< 0) {
->> +        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as, =
-ms) < 0) {
->>              exit(1);
->>          }
->>      }
->> diff --git a/hw/arm/collie.c b/hw/arm/collie.c
->> index 3db3c56004..72bc8f26e5 100644
->> --- a/hw/arm/collie.c
->> +++ b/hw/arm/collie.c
->> @@ -26,9 +26,6 @@ static struct arm_boot_info collie_binfo =3D {
->> =20
->>  static void collie_init(MachineState *machine)
->>  {
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      StrongARMState *s;
->>      DriveInfo *dinfo;
->>      MemoryRegion *sysmem =3D get_system_memory();
->> @@ -47,11 +44,8 @@ static void collie_init(MachineState *machine)
->> =20
->>      sysbus_create_simple("scoop", 0x40800000, NULL);
->> =20
->> -    collie_binfo.kernel_filename =3D kernel_filename;
->> -    collie_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    collie_binfo.initrd_filename =3D initrd_filename;
->>      collie_binfo.board_id =3D 0x208;
->> -    arm_load_kernel(s->cpu, &collie_binfo);
->> +    arm_load_kernel(s->cpu, machine, &collie_binfo);
->>  }
->> =20
->>  static void collie_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/cubieboard.c b/hw/arm/cubieboard.c
->> index f7c8a5985a..d992fa087a 100644
->> --- a/hw/arm/cubieboard.c
->> +++ b/hw/arm/cubieboard.c
->> @@ -72,10 +72,7 @@ static void cubieboard_init(MachineState *machine)
->>      /* TODO create and connect IDE devices for ide_drive_get() */
->> =20
->>      cubieboard_binfo.ram_size =3D machine->ram_size;
->> -    cubieboard_binfo.kernel_filename =3D machine->kernel_filename;
->> -    cubieboard_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    cubieboard_binfo.initrd_filename =3D machine->initrd_filename;
->> -    arm_load_kernel(&s->a10->cpu, &cubieboard_binfo);
->> +    arm_load_kernel(&s->a10->cpu, machine, &cubieboard_binfo);
->>  }
->> =20
->>  static void cubieboard_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/exynos4_boards.c b/hw/arm/exynos4_boards.c
->> index ac0b0dc2a9..da402d5216 100644
->> --- a/hw/arm/exynos4_boards.c
->> +++ b/hw/arm/exynos4_boards.c
->> @@ -120,9 +120,6 @@ exynos4_boards_init_common(MachineState *machine,
->>      exynos4_board_binfo.board_id =3D exynos4_board_id[board_type];
->>      exynos4_board_binfo.smp_bootreg_addr =3D
->>              exynos4_board_smp_bootreg_addr[board_type];
->> -    exynos4_board_binfo.kernel_filename =3D machine->kernel_filename;
->> -    exynos4_board_binfo.initrd_filename =3D machine->initrd_filename;
->> -    exynos4_board_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->>      exynos4_board_binfo.gic_cpu_if_addr =3D
->>              EXYNOS4210_SMP_PRIVATE_BASE_ADDR + 0x100;
->> =20
->> @@ -141,7 +138,7 @@ static void nuri_init(MachineState *machine)
->>  {
->>      exynos4_boards_init_common(machine, EXYNOS4_BOARD_NURI);
->> =20
->> -    arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &exynos4_board_binfo=
-);
->>  }
->> =20
->>  static void smdkc210_init(MachineState *machine)
->> @@ -151,7 +148,7 @@ static void smdkc210_init(MachineState *machine)
->> =20
->>      lan9215_init(SMDK_LAN9118_BASE_ADDR,
->>              qemu_irq_invert(s->soc.irq_table[exynos4210_get_irq(37, 1=
-)]));
->> -    arm_load_kernel(ARM_CPU(first_cpu), &exynos4_board_binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &exynos4_board_binfo=
-);
->>  }
->> =20
->>  static void nuri_class_init(ObjectClass *oc, void *data)
->> diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
->> index def0f1ce6a..1a35b6d82f 100644
->> --- a/hw/arm/highbank.c
->> +++ b/hw/arm/highbank.c
->> @@ -234,9 +234,6 @@ enum cxmachines {
->>  static void calxeda_init(MachineState *machine, enum cxmachines machi=
-ne_id)
->>  {
->>      ram_addr_t ram_size =3D machine->ram_size;
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      DeviceState *dev =3D NULL;
->>      SysBusDevice *busdev;
->>      qemu_irq pic[128];
->> @@ -388,9 +385,6 @@ static void calxeda_init(MachineState *machine, en=
-um cxmachines machine_id)
->>      /* TODO create and connect IDE devices for ide_drive_get() */
->> =20
->>      highbank_binfo.ram_size =3D ram_size;
->> -    highbank_binfo.kernel_filename =3D kernel_filename;
->> -    highbank_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    highbank_binfo.initrd_filename =3D initrd_filename;
->>      /* highbank requires a dtb in order to boot, and the dtb will ove=
-rride
->>       * the board ID. The following value is ignored, so set it to -1 =
-to be
->>       * clear that the value is meaningless.
->> @@ -410,7 +404,7 @@ static void calxeda_init(MachineState *machine, en=
-um cxmachines machine_id)
->>                      "may not boot.");
->>      }
->> =20
->> -    arm_load_kernel(ARM_CPU(first_cpu), &highbank_binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &highbank_binfo);
->>  }
->> =20
->>  static void highbank_init(MachineState *machine)
->> diff --git a/hw/arm/imx25_pdk.c b/hw/arm/imx25_pdk.c
->> index 5d673e47bc..c76fc2bd94 100644
->> --- a/hw/arm/imx25_pdk.c
->> +++ b/hw/arm/imx25_pdk.c
->> @@ -116,9 +116,6 @@ static void imx25_pdk_init(MachineState *machine)
->>      }
->> =20
->>      imx25_pdk_binfo.ram_size =3D machine->ram_size;
->> -    imx25_pdk_binfo.kernel_filename =3D machine->kernel_filename;
->> -    imx25_pdk_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    imx25_pdk_binfo.initrd_filename =3D machine->initrd_filename;
->>      imx25_pdk_binfo.loader_start =3D FSL_IMX25_SDRAM0_ADDR;
->>      imx25_pdk_binfo.board_id =3D 1771,
->>      imx25_pdk_binfo.nb_cpus =3D 1;
->> @@ -129,7 +126,7 @@ static void imx25_pdk_init(MachineState *machine)
->>       * fail.
->>       */
->>      if (!qtest_enabled()) {
->> -        arm_load_kernel(&s->soc.cpu, &imx25_pdk_binfo);
->> +        arm_load_kernel(&s->soc.cpu, machine, &imx25_pdk_binfo);
->>      }
->>  }
->> =20
->> diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
->> index 200c0107f0..4d9e9c9e49 100644
->> --- a/hw/arm/integratorcp.c
->> +++ b/hw/arm/integratorcp.c
->> @@ -578,9 +578,6 @@ static struct arm_boot_info integrator_binfo =3D {
->>  static void integratorcp_init(MachineState *machine)
->>  {
->>      ram_addr_t ram_size =3D machine->ram_size;
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      Object *cpuobj;
->>      ARMCPU *cpu;
->>      MemoryRegion *address_space_mem =3D get_system_memory();
->> @@ -650,10 +647,7 @@ static void integratorcp_init(MachineState *machi=
-ne)
->>      sysbus_create_simple("pl110", 0xc0000000, pic[22]);
->> =20
->>      integrator_binfo.ram_size =3D ram_size;
->> -    integrator_binfo.kernel_filename =3D kernel_filename;
->> -    integrator_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    integrator_binfo.initrd_filename =3D initrd_filename;
->> -    arm_load_kernel(cpu, &integrator_binfo);
->> +    arm_load_kernel(cpu, machine, &integrator_binfo);
->>  }
->> =20
->>  static void integratorcp_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/kzm.c b/hw/arm/kzm.c
->> index 59d2102dc5..5ff419a555 100644
->> --- a/hw/arm/kzm.c
->> +++ b/hw/arm/kzm.c
->> @@ -126,13 +126,10 @@ static void kzm_init(MachineState *machine)
->>      }
->> =20
->>      kzm_binfo.ram_size =3D machine->ram_size;
->> -    kzm_binfo.kernel_filename =3D machine->kernel_filename;
->> -    kzm_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    kzm_binfo.initrd_filename =3D machine->initrd_filename;
->>      kzm_binfo.nb_cpus =3D 1;
->> =20
->>      if (!qtest_enabled()) {
->> -        arm_load_kernel(&s->soc.cpu, &kzm_binfo);
->> +        arm_load_kernel(&s->soc.cpu, machine, &kzm_binfo);
->>      }
->>  }
->> =20
->> diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
->> index cd1f904c6c..c76cfb5dd1 100644
->> --- a/hw/arm/mainstone.c
->> +++ b/hw/arm/mainstone.c
->> @@ -177,11 +177,8 @@ static void mainstone_common_init(MemoryRegion *a=
-ddress_space_mem,
->>      smc91c111_init(&nd_table[0], MST_ETH_PHYS,
->>                      qdev_get_gpio_in(mst_irq, ETHERNET_IRQ));
->> =20
->> -    mainstone_binfo.kernel_filename =3D machine->kernel_filename;
->> -    mainstone_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    mainstone_binfo.initrd_filename =3D machine->initrd_filename;
->>      mainstone_binfo.board_id =3D arm_id;
->> -    arm_load_kernel(mpu->cpu, &mainstone_binfo);
->> +    arm_load_kernel(mpu->cpu, machine, &mainstone_binfo);
->>  }
->> =20
->>  static void mainstone_init(MachineState *machine)
->> diff --git a/hw/arm/mcimx6ul-evk.c b/hw/arm/mcimx6ul-evk.c
->> index 1f6f4aed97..e8a9b03069 100644
->> --- a/hw/arm/mcimx6ul-evk.c
->> +++ b/hw/arm/mcimx6ul-evk.c
->> @@ -39,9 +39,6 @@ static void mcimx6ul_evk_init(MachineState *machine)
->>          .loader_start =3D FSL_IMX6UL_MMDC_ADDR,
->>          .board_id =3D -1,
->>          .ram_size =3D machine->ram_size,
->> -        .kernel_filename =3D machine->kernel_filename,
->> -        .kernel_cmdline =3D machine->kernel_cmdline,
->> -        .initrd_filename =3D machine->initrd_filename,
->>          .nb_cpus =3D machine->smp.cpus,
->>      };
->> =20
->> @@ -71,7 +68,7 @@ static void mcimx6ul_evk_init(MachineState *machine)
->>      }
->> =20
->>      if (!qtest_enabled()) {
->> -        arm_load_kernel(&s->soc.cpu, &boot_info);
->> +        arm_load_kernel(&s->soc.cpu, machine, &boot_info);
->>      }
->>  }
->> =20
->> diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
->> index 72eab03a0c..3123d8767f 100644
->> --- a/hw/arm/mcimx7d-sabre.c
->> +++ b/hw/arm/mcimx7d-sabre.c
->> @@ -42,9 +42,6 @@ static void mcimx7d_sabre_init(MachineState *machine=
-)
->>          .loader_start =3D FSL_IMX7_MMDC_ADDR,
->>          .board_id =3D -1,
->>          .ram_size =3D machine->ram_size,
->> -        .kernel_filename =3D machine->kernel_filename,
->> -        .kernel_cmdline =3D machine->kernel_cmdline,
->> -        .initrd_filename =3D machine->initrd_filename,
->>          .nb_cpus =3D machine->smp.cpus,
->>      };
->> =20
->> @@ -74,7 +71,7 @@ static void mcimx7d_sabre_init(MachineState *machine=
-)
->>      }
->> =20
->>      if (!qtest_enabled()) {
->> -        arm_load_kernel(&s->soc.cpu[0], &boot_info);
->> +        arm_load_kernel(&s->soc.cpu[0], machine, &boot_info);
->>      }
->>  }
->> =20
->> diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
->> index 95d56f3208..a53ee12737 100644
->> --- a/hw/arm/musicpal.c
->> +++ b/hw/arm/musicpal.c
->> @@ -1568,9 +1568,6 @@ static struct arm_boot_info musicpal_binfo =3D {
->> =20
->>  static void musicpal_init(MachineState *machine)
->>  {
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      ARMCPU *cpu;
->>      qemu_irq pic[32];
->>      DeviceState *dev;
->> @@ -1699,10 +1696,7 @@ static void musicpal_init(MachineState *machine=
-)
->>      sysbus_connect_irq(s, 0, pic[MP_AUDIO_IRQ]);
->> =20
->>      musicpal_binfo.ram_size =3D MP_RAM_DEFAULT_SIZE;
->> -    musicpal_binfo.kernel_filename =3D kernel_filename;
->> -    musicpal_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    musicpal_binfo.initrd_filename =3D initrd_filename;
->> -    arm_load_kernel(cpu, &musicpal_binfo);
->> +    arm_load_kernel(cpu, machine, &musicpal_binfo);
->>  }
->> =20
->>  static void musicpal_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
->> index 4a79f5c88b..31dd2f1b51 100644
->> --- a/hw/arm/nseries.c
->> +++ b/hw/arm/nseries.c
->> @@ -1358,10 +1358,7 @@ static void n8x0_init(MachineState *machine,
->> =20
->>      if (machine->kernel_filename) {
->>          /* Or at the linux loader.  */
->> -        binfo->kernel_filename =3D machine->kernel_filename;
->> -        binfo->kernel_cmdline =3D machine->kernel_cmdline;
->> -        binfo->initrd_filename =3D machine->initrd_filename;
->> -        arm_load_kernel(s->mpu->cpu, binfo);
->> +        arm_load_kernel(s->mpu->cpu, machine, binfo);
->> =20
->>          qemu_register_reset(n8x0_boot_init, s);
->>      }
->> diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
->> index cae78d0a36..3cc2817f06 100644
->> --- a/hw/arm/omap_sx1.c
->> +++ b/hw/arm/omap_sx1.c
->> @@ -196,10 +196,7 @@ static void sx1_init(MachineState *machine, const=
- int version)
->>      }
->> =20
->>      /* Load the kernel.  */
->> -    sx1_binfo.kernel_filename =3D machine->kernel_filename;
->> -    sx1_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    sx1_binfo.initrd_filename =3D machine->initrd_filename;
->> -    arm_load_kernel(mpu->cpu, &sx1_binfo);
->> +    arm_load_kernel(mpu->cpu, machine, &sx1_binfo);
->> =20
->>      /* TODO: fix next line */
->>      //~ qemu_console_resize(ds, 640, 480);
->> diff --git a/hw/arm/palm.c b/hw/arm/palm.c
->> index 9eb9612bce..67ab30b5bc 100644
->> --- a/hw/arm/palm.c
->> +++ b/hw/arm/palm.c
->> @@ -186,9 +186,6 @@ static struct arm_boot_info palmte_binfo =3D {
->> =20
->>  static void palmte_init(MachineState *machine)
->>  {
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      MemoryRegion *address_space_mem =3D get_system_memory();
->>      struct omap_mpu_state_s *mpu;
->>      int flash_size =3D 0x00800000;
->> @@ -248,16 +245,13 @@ static void palmte_init(MachineState *machine)
->>          }
->>      }
->> =20
->> -    if (!rom_loaded && !kernel_filename && !qtest_enabled()) {
->> +    if (!rom_loaded && !machine->kernel_filename && !qtest_enabled())=
- {
->>          fprintf(stderr, "Kernel or ROM image must be specified\n");
->>          exit(1);
->>      }
->> =20
->>      /* Load the kernel.  */
->> -    palmte_binfo.kernel_filename =3D kernel_filename;
->> -    palmte_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    palmte_binfo.initrd_filename =3D initrd_filename;
->> -    arm_load_kernel(mpu->cpu, &palmte_binfo);
->> +    arm_load_kernel(mpu->cpu, machine, &palmte_binfo);
->>  }
->> =20
->>  static void palmte_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
->> index 5b2620acb4..74c062d05e 100644
->> --- a/hw/arm/raspi.c
->> +++ b/hw/arm/raspi.c
->> @@ -157,13 +157,9 @@ static void setup_boot(MachineState *machine, int=
- version, size_t ram_size)
->> =20
->>          binfo.entry =3D firmware_addr;
->>          binfo.firmware_loaded =3D true;
->> -    } else {
->> -        binfo.kernel_filename =3D machine->kernel_filename;
->> -        binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -        binfo.initrd_filename =3D machine->initrd_filename;
->>      }
->> =20
->> -    arm_load_kernel(ARM_CPU(first_cpu), &binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &binfo);
->>  }
->> =20
->>  static void raspi_init(MachineState *machine, int version)
->> diff --git a/hw/arm/realview.c b/hw/arm/realview.c
->> index 7c56c8d2ed..5a3e65ddd6 100644
->> --- a/hw/arm/realview.c
->> +++ b/hw/arm/realview.c
->> @@ -350,13 +350,10 @@ static void realview_init(MachineState *machine,
->>      memory_region_add_subregion(sysmem, SMP_BOOT_ADDR, ram_hack);
->> =20
->>      realview_binfo.ram_size =3D ram_size;
->> -    realview_binfo.kernel_filename =3D machine->kernel_filename;
->> -    realview_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    realview_binfo.initrd_filename =3D machine->initrd_filename;
->>      realview_binfo.nb_cpus =3D smp_cpus;
->>      realview_binfo.board_id =3D realview_board_id[board_type];
->>      realview_binfo.loader_start =3D (board_type =3D=3D BOARD_PB_A8 ? =
-0x70000000 : 0);
->> -    arm_load_kernel(ARM_CPU(first_cpu), &realview_binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &realview_binfo);
->>  }
->> =20
->>  static void realview_eb_init(MachineState *machine)
->> diff --git a/hw/arm/sabrelite.c b/hw/arm/sabrelite.c
->> index 934f4c9261..8f4b68e14c 100644
->> --- a/hw/arm/sabrelite.c
->> +++ b/hw/arm/sabrelite.c
->> @@ -102,16 +102,13 @@ static void sabrelite_init(MachineState *machine=
-)
->>      }
->> =20
->>      sabrelite_binfo.ram_size =3D machine->ram_size;
->> -    sabrelite_binfo.kernel_filename =3D machine->kernel_filename;
->> -    sabrelite_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    sabrelite_binfo.initrd_filename =3D machine->initrd_filename;
->>      sabrelite_binfo.nb_cpus =3D machine->smp.cpus;
->>      sabrelite_binfo.secure_boot =3D true;
->>      sabrelite_binfo.write_secondary_boot =3D sabrelite_write_secondar=
-y;
->>      sabrelite_binfo.secondary_cpu_reset_hook =3D sabrelite_reset_seco=
-ndary;
->> =20
->>      if (!qtest_enabled()) {
->> -        arm_load_kernel(&s->soc.cpu[0], &sabrelite_binfo);
->> +        arm_load_kernel(&s->soc.cpu[0], machine, &sabrelite_binfo);
->>      }
->>  }
->> =20
->> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
->> index 9c67d5c6f9..2aba3c58c5 100644
->> --- a/hw/arm/sbsa-ref.c
->> +++ b/hw/arm/sbsa-ref.c
->> @@ -709,13 +709,12 @@ static void sbsa_ref_init(MachineState *machine)
->>      create_pcie(sms, pic);
->> =20
->>      sms->bootinfo.ram_size =3D machine->ram_size;
->> -    sms->bootinfo.kernel_filename =3D machine->kernel_filename;
->>      sms->bootinfo.nb_cpus =3D smp_cpus;
->>      sms->bootinfo.board_id =3D -1;
->>      sms->bootinfo.loader_start =3D sbsa_ref_memmap[SBSA_MEM].base;
->>      sms->bootinfo.get_dtb =3D sbsa_ref_dtb;
->>      sms->bootinfo.firmware_loaded =3D firmware_loaded;
->> -    arm_load_kernel(ARM_CPU(first_cpu), &sms->bootinfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &sms->bootinfo);
->>  }
->> =20
->>  static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int i=
-dx)
->> diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
->> index 723cf5d592..42338696b3 100644
->> --- a/hw/arm/spitz.c
->> +++ b/hw/arm/spitz.c
->> @@ -951,11 +951,8 @@ static void spitz_common_init(MachineState *machi=
-ne,
->>          /* A 4.0 GB microdrive is permanently sitting in CF slot 0.  =
-*/
->>          spitz_microdrive_attach(mpu, 0);
->> =20
->> -    spitz_binfo.kernel_filename =3D machine->kernel_filename;
->> -    spitz_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    spitz_binfo.initrd_filename =3D machine->initrd_filename;
->>      spitz_binfo.board_id =3D arm_id;
->> -    arm_load_kernel(mpu->cpu, &spitz_binfo);
->> +    arm_load_kernel(mpu->cpu, machine, &spitz_binfo);
->>      sl_bootparam_write(SL_PXA_PARAM_BASE);
->>  }
->> =20
->> diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
->> index 7843d68d46..3a1de81278 100644
->> --- a/hw/arm/tosa.c
->> +++ b/hw/arm/tosa.c
->> @@ -218,9 +218,6 @@ static struct arm_boot_info tosa_binfo =3D {
->> =20
->>  static void tosa_init(MachineState *machine)
->>  {
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      MemoryRegion *address_space_mem =3D get_system_memory();
->>      MemoryRegion *rom =3D g_new(MemoryRegion, 1);
->>      PXA2xxState *mpu;
->> @@ -245,11 +242,8 @@ static void tosa_init(MachineState *machine)
->> =20
->>      tosa_tg_init(mpu);
->> =20
->> -    tosa_binfo.kernel_filename =3D kernel_filename;
->> -    tosa_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    tosa_binfo.initrd_filename =3D initrd_filename;
->>      tosa_binfo.board_id =3D 0x208;
->> -    arm_load_kernel(mpu->cpu, &tosa_binfo);
->> +    arm_load_kernel(mpu->cpu, machine, &tosa_binfo);
->>      sl_bootparam_write(SL_PXA_PARAM_BASE);
->>  }
->> =20
->> diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
->> index e5857117ac..d3c3c00f55 100644
->> --- a/hw/arm/versatilepb.c
->> +++ b/hw/arm/versatilepb.c
->> @@ -373,11 +373,8 @@ static void versatile_init(MachineState *machine,=
- int board_id)
->>      }
->> =20
->>      versatile_binfo.ram_size =3D machine->ram_size;
->> -    versatile_binfo.kernel_filename =3D machine->kernel_filename;
->> -    versatile_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    versatile_binfo.initrd_filename =3D machine->initrd_filename;
->>      versatile_binfo.board_id =3D board_id;
->> -    arm_load_kernel(cpu, &versatile_binfo);
->> +    arm_load_kernel(cpu, machine, &versatile_binfo);
->>  }
->> =20
->>  static void vpb_init(MachineState *machine)
->> diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
->> index 5d932c27c0..4673a88a8d 100644
->> --- a/hw/arm/vexpress.c
->> +++ b/hw/arm/vexpress.c
->> @@ -707,9 +707,6 @@ static void vexpress_common_init(MachineState *mac=
-hine)
->>      }
->> =20
->>      daughterboard->bootinfo.ram_size =3D machine->ram_size;
->> -    daughterboard->bootinfo.kernel_filename =3D machine->kernel_filen=
-ame;
->> -    daughterboard->bootinfo.kernel_cmdline =3D machine->kernel_cmdlin=
-e;
->> -    daughterboard->bootinfo.initrd_filename =3D machine->initrd_filen=
-ame;
->>      daughterboard->bootinfo.nb_cpus =3D machine->smp.cpus;
->>      daughterboard->bootinfo.board_id =3D VEXPRESS_BOARD_ID;
->>      daughterboard->bootinfo.loader_start =3D daughterboard->loader_st=
-art;
->> @@ -719,7 +716,7 @@ static void vexpress_common_init(MachineState *mac=
-hine)
->>      daughterboard->bootinfo.modify_dtb =3D vexpress_modify_dtb;
->>      /* When booting Linux we should be in secure state if the CPU has=
- one. */
->>      daughterboard->bootinfo.secure_boot =3D vms->secure;
->> -    arm_load_kernel(ARM_CPU(first_cpu), &daughterboard->bootinfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &daughterboard->boot=
-info);
->>  }
->> =20
->>  static bool vexpress_get_secure(Object *obj, Error **errp)
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index d9496c9363..6ffb80bf5b 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -1364,6 +1364,7 @@ void virt_machine_done(Notifier *notifier, void =
-*data)
->>  {
->>      VirtMachineState *vms =3D container_of(notifier, VirtMachineState=
-,
->>                                           machine_done);
->> +    MachineState *ms =3D MACHINE(vms);
->>      ARMCPU *cpu =3D ARM_CPU(first_cpu);
->>      struct arm_boot_info *info =3D &vms->bootinfo;
->>      AddressSpace *as =3D arm_boot_address_space(cpu, info);
->> @@ -1381,7 +1382,7 @@ void virt_machine_done(Notifier *notifier, void =
-*data)
->>                                         vms->memmap[VIRT_PLATFORM_BUS]=
-.size,
->>                                         vms->irqmap[VIRT_PLATFORM_BUS]=
-);
->>      }
->> -    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0)=
- {
->> +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as, ms) =
-< 0) {
->>          exit(1);
->>      }
->> =20
->> @@ -1707,16 +1708,13 @@ static void machvirt_init(MachineState *machin=
-e)
->>      create_platform_bus(vms, pic);
->> =20
->>      vms->bootinfo.ram_size =3D machine->ram_size;
->> -    vms->bootinfo.kernel_filename =3D machine->kernel_filename;
->> -    vms->bootinfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    vms->bootinfo.initrd_filename =3D machine->initrd_filename;
->>      vms->bootinfo.nb_cpus =3D smp_cpus;
->>      vms->bootinfo.board_id =3D -1;
->>      vms->bootinfo.loader_start =3D vms->memmap[VIRT_MEM].base;
->>      vms->bootinfo.get_dtb =3D machvirt_dtb;
->>      vms->bootinfo.skip_dtb_autoload =3D true;
->>      vms->bootinfo.firmware_loaded =3D firmware_loaded;
->> -    arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &vms->bootinfo);
->> =20
->>      vms->machine_done.notify =3D virt_machine_done;
->>      qemu_add_machine_init_done_notifier(&vms->machine_done);
->> diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
->> index 89da34808b..c14774e542 100644
->> --- a/hw/arm/xilinx_zynq.c
->> +++ b/hw/arm/xilinx_zynq.c
->> @@ -158,9 +158,6 @@ static inline void zynq_init_spi_flashes(uint32_t =
-base_addr, qemu_irq irq,
->>  static void zynq_init(MachineState *machine)
->>  {
->>      ram_addr_t ram_size =3D machine->ram_size;
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      ARMCPU *cpu;
->>      MemoryRegion *address_space_mem =3D get_system_memory();
->>      MemoryRegion *ext_ram =3D g_new(MemoryRegion, 1);
->> @@ -303,16 +300,13 @@ static void zynq_init(MachineState *machine)
->>      sysbus_mmio_map(busdev, 0, 0xF8007000);
->> =20
->>      zynq_binfo.ram_size =3D ram_size;
->> -    zynq_binfo.kernel_filename =3D kernel_filename;
->> -    zynq_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    zynq_binfo.initrd_filename =3D initrd_filename;
->>      zynq_binfo.nb_cpus =3D 1;
->>      zynq_binfo.board_id =3D 0xd32;
->>      zynq_binfo.loader_start =3D 0;
->>      zynq_binfo.board_setup_addr =3D BOARD_SETUP_ADDR;
->>      zynq_binfo.write_board_setup =3D zynq_write_board_setup;
->> =20
->> -    arm_load_kernel(ARM_CPU(first_cpu), &zynq_binfo);
->> +    arm_load_kernel(ARM_CPU(first_cpu), machine, &zynq_binfo);
->>  }
->> =20
->>  static void zynq_machine_init(MachineClass *mc)
->> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
->> index f95fde2309..462493c467 100644
->> --- a/hw/arm/xlnx-versal-virt.c
->> +++ b/hw/arm/xlnx-versal-virt.c
->> @@ -441,14 +441,11 @@ static void versal_virt_init(MachineState *machi=
-ne)
->>                                          0, &s->soc.fpd.apu.mr, 0);
->> =20
->>      s->binfo.ram_size =3D machine->ram_size;
->> -    s->binfo.kernel_filename =3D machine->kernel_filename;
->> -    s->binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    s->binfo.initrd_filename =3D machine->initrd_filename;
->>      s->binfo.loader_start =3D 0x0;
->>      s->binfo.get_dtb =3D versal_virt_get_dtb;
->>      s->binfo.modify_dtb =3D versal_virt_modify_dtb;
->>      if (machine->kernel_filename) {
->> -        arm_load_kernel(s->soc.fpd.apu.cpu[0], &s->binfo);
->> +        arm_load_kernel(s->soc.fpd.apu.cpu[0], machine, &s->binfo);
->>      } else {
->>          AddressSpace *as =3D arm_boot_address_space(s->soc.fpd.apu.cp=
-u[0],
->>                                                    &s->binfo);
->> @@ -457,7 +454,7 @@ static void versal_virt_init(MachineState *machine=
-)
->>          s->binfo.loader_start =3D 0x1000;
->>          s->binfo.dtb_limit =3D 0x1000000;
->>          if (arm_load_dtb(s->binfo.loader_start,
->> -                         &s->binfo, s->binfo.dtb_limit, as) < 0) {
->> +                         &s->binfo, s->binfo.dtb_limit, as, machine) =
-< 0) {
->>              exit(EXIT_FAILURE);
->>          }
->>      }
->> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
->> index 044d3394c0..53cfe7c1f1 100644
->> --- a/hw/arm/xlnx-zcu102.c
->> +++ b/hw/arm/xlnx-zcu102.c
->> @@ -171,11 +171,8 @@ static void xlnx_zcu102_init(MachineState *machin=
-e)
->>      /* TODO create and connect IDE devices for ide_drive_get() */
->> =20
->>      xlnx_zcu102_binfo.ram_size =3D ram_size;
->> -    xlnx_zcu102_binfo.kernel_filename =3D machine->kernel_filename;
->> -    xlnx_zcu102_binfo.kernel_cmdline =3D machine->kernel_cmdline;
->> -    xlnx_zcu102_binfo.initrd_filename =3D machine->initrd_filename;
->>      xlnx_zcu102_binfo.loader_start =3D 0;
->> -    arm_load_kernel(s->soc.boot_cpu_ptr, &xlnx_zcu102_binfo);
->> +    arm_load_kernel(s->soc.boot_cpu_ptr, machine, &xlnx_zcu102_binfo)=
-;
->>  }
->> =20
->>  static void xlnx_zcu102_machine_instance_init(Object *obj)
->> diff --git a/hw/arm/z2.c b/hw/arm/z2.c
->> index 44aa748d39..2f21421683 100644
->> --- a/hw/arm/z2.c
->> +++ b/hw/arm/z2.c
->> @@ -296,9 +296,6 @@ static const TypeInfo aer915_info =3D {
->> =20
->>  static void z2_init(MachineState *machine)
->>  {
->> -    const char *kernel_filename =3D machine->kernel_filename;
->> -    const char *kernel_cmdline =3D machine->kernel_cmdline;
->> -    const char *initrd_filename =3D machine->initrd_filename;
->>      MemoryRegion *address_space_mem =3D get_system_memory();
->>      uint32_t sector_len =3D 0x10000;
->>      PXA2xxState *mpu;
->> @@ -352,11 +349,8 @@ static void z2_init(MachineState *machine)
->>      qdev_connect_gpio_out(mpu->gpio, Z2_GPIO_LCD_CS,
->>                            qemu_allocate_irq(z2_lcd_cs, z2_lcd, 0));
->> =20
->> -    z2_binfo.kernel_filename =3D kernel_filename;
->> -    z2_binfo.kernel_cmdline =3D kernel_cmdline;
->> -    z2_binfo.initrd_filename =3D initrd_filename;
->>      z2_binfo.board_id =3D 0x6dd;
->> -    arm_load_kernel(mpu->cpu, &z2_binfo);
->> +    arm_load_kernel(mpu->cpu, machine, &z2_binfo);
->>  }
->> =20
->>  static void z2_machine_init(MachineClass *mc)
->> diff --git a/include/hw/arm/boot.h b/include/hw/arm/boot.h
->> index c48cc4c2bc..2673abe81f 100644
->> --- a/include/hw/arm/boot.h
->> +++ b/include/hw/arm/boot.h
->> @@ -133,7 +133,7 @@ struct arm_boot_info {
->>   * before sysbus-fdt arm_register_platform_bus_fdt_creator. Indeed th=
-e
->>   * machine init done notifiers are called in registration reverse ord=
-er.
->>   */
->> -void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info);
->> +void arm_load_kernel(ARMCPU *cpu, MachineState *ms, struct arm_boot_i=
-nfo *info);
->> =20
->>  AddressSpace *arm_boot_address_space(ARMCPU *cpu,
->>                                       const struct arm_boot_info *info=
-);
->> @@ -160,7 +160,7 @@ AddressSpace *arm_boot_address_space(ARMCPU *cpu,
->>   * Note: Must not be called unless have_dtb(binfo) is true.
->>   */
->>  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->> -                 hwaddr addr_limit, AddressSpace *as);
->> +                 hwaddr addr_limit, AddressSpace *as, MachineState *m=
-s);
->> =20
->>  /* Write a secure board setup routine with a dummy handler for SMCs *=
-/
->>  void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
->> --=20
->> 2.20.1
->>
->>
->=20
-
+TXkgY29tbWVudHMgYmVsb3cuDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJv
+bTogTGFzemxvIEVyc2VrIFttYWlsdG86bGVyc2VrQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFdlZG5l
+c2RheSwgQXVndXN0IDE0LCAyMDE5IDEyOjA5IEFNDQo+IFRvOiBlZGsyLWRldmVsLWdyb3Vwcy1p
+byA8ZGV2ZWxAZWRrMi5ncm91cHMuaW8+DQo+IENjOiBlZGsyLXJmYy1ncm91cHMtaW8gPHJmY0Bl
+ZGsyLmdyb3Vwcy5pbz47IHFlbXUgZGV2ZWwgbGlzdA0KPiA8cWVtdS1kZXZlbEBub25nbnUub3Jn
+PjsgSWdvciBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0LmNvbT47DQo+IFBhb2xvIEJvbnppbmkg
+PHBib256aW5pQHJlZGhhdC5jb20+OyBZYW8sIEppZXdlbg0KPiA8amlld2VuLnlhb0BpbnRlbC5j
+b20+OyBDaGVuLCBZaW5nd2VuIDx5aW5nd2VuLmNoZW5AaW50ZWwuY29tPjsNCj4gTmFrYWppbWEs
+IEp1biA8anVuLm5ha2FqaW1hQGludGVsLmNvbT47IEJvcmlzIE9zdHJvdnNreQ0KPiA8Ym9yaXMu
+b3N0cm92c2t5QG9yYWNsZS5jb20+OyBKb2FvIE1hcmNhbCBMZW1vcyBNYXJ0aW5zDQo+IDxqb2Fv
+Lm0ubWFydGluc0BvcmFjbGUuY29tPjsgUGhpbGxpcCBHb2VybCA8cGhpbGxpcC5nb2VybEBvcmFj
+bGUuY29tPg0KPiBTdWJqZWN0OiBSZTogQ1BVIGhvdHBsdWcgdXNpbmcgU01NIHdpdGggUUVNVStP
+Vk1GDQo+IA0KPiBPbiAwOC8xMy8xOSAxNjoxNiwgTGFzemxvIEVyc2VrIHdyb3RlOg0KPiANCj4g
+PiBZaW5nd2VuIGFuZCBKaWV3ZW4gc3VnZ2VzdGVkIHRoZSBmb2xsb3dpbmcgcHJvY2Vzcy4NCj4g
+Pg0KPiA+IExlZ2VuZDoNCj4gPg0KPiA+IC0gIk5ldyBDUFUiOiAgQ1BVIGJlaW5nIGhvdC1hZGRl
+ZA0KPiA+IC0gIkhvc3QgQ1BVIjogZXhpc3RpbmcgQ1BVDQo+ID4gLSAoRmxhc2gpOiAgICBjb2Rl
+IHJ1bm5pbmcgZnJvbSBmbGFzaA0KPiA+IC0gKFNNTSk6ICAgICAgY29kZSBydW5uaW5nIGZyb20g
+U01SQU0NCj4gPg0KPiA+IFN0ZXBzOg0KPiA+DQo+ID4gKDAxKSBOZXcgQ1BVOiAoRmxhc2gpIGVu
+dGVyIHJlc2V0IHZlY3RvciwgR2xvYmFsIFNNSSBkaXNhYmxlZCBieQ0KPiA+ICAgICAgZGVmYXVs
+dC4NCj4gDQo+IC0gV2hhdCBkb2VzICJHbG9iYWwgU01JIGRpc2FibGVkIGJ5IGRlZmF1bHQiIG1l
+YW4/IEluIHBhcnRpY3VsYXIsIHdoYXQNCj4gICBpcyAiZ2xvYmFsIiBoZXJlPw0KW0ppZXdlbl0g
+T0suIExldCdzIGRvbuKAmXQgdXNlIHRoZSB0ZXJtICJnbG9iYWwiLg0KDQoNCj4gICBEbyB5b3Ug
+bWVhbiB0aGF0IHRoZSBDUFUgYmVpbmcgaG90LXBsdWdnZWQgc2hvdWxkIG1hc2sgKGJ5IGRlZmF1
+bHQpDQo+ICAgYnJvYWRjYXN0IFNNSXM/IFdoYXQgYWJvdXQgZGlyZWN0ZWQgU01Jcz8gKEFuIGF0
+dGFja2VyIGNvdWxkIHRyeSB0aGF0DQo+ICAgdG9vLikNCltKaWV3ZW5dIEkgbWVhbiBhbGwgU01J
+cyBhcmUgYmxvY2tlZCBmb3IgdGhpcyBzcGVjaWZpYyBob3QtYWRkZWQgQ1BVLg0KDQoNCj4gICBB
+bmQgd2hhdCBhYm91dCBvdGhlciBwcm9jZXNzb3JzPyAoSSdkIGFzc3VtZSBzdGVwICgwMSkpIGlz
+IG5vdA0KPiAgIHJlbGV2YW50IGZvciBvdGhlciBwcm9jZXNzb3JzLCBidXQgImdsb2JhbCIgaXMg
+cXVpdGUgY29uZnVzaW5nIGhlcmUuKQ0KW0ppZXdlbl0gTm8gaW1wYWN0IHRvIG90aGVyIHByb2Nl
+c3NvcnMuDQoNCg0KPiAtIERvZXMgdGhpcyBwYXJ0IHJlcXVpcmUgYSBuZXcgYnJhbmNoIHNvbWV3
+aGVyZSBpbiB0aGUgT1ZNRiBTRUMgY29kZT8NCj4gICBIb3cgZG8gd2UgZGV0ZXJtaW5lIHdoZXRo
+ZXIgdGhlIENQVSBleGVjdXRpbmcgU0VDIGlzIEJTUCBvcg0KPiAgIGhvdC1wbHVnZ2VkIEFQPw0K
+W0ppZXdlbl0gSSB0aGluayB0aGlzIGlzIGJsb2NrZWQgZnJvbSBoYXJkd2FyZSBwZXJzcGVjdGl2
+ZSwgc2luY2UgdGhlIGZpcnN0IGluc3RydWN0aW9uLg0KVGhlcmUgYXJlIHNvbWUgaGFyZHdhcmUg
+c3BlY2lmaWMgcmVnaXN0ZXJzIGNhbiBiZSB1c2VkIHRvIGRldGVybWluZSBpZiB0aGUgQ1BVIGlz
+IG5ldyBhZGRlZC4NCkkgZG9u4oCZdCB0aGluayB0aGlzIG11c3QgYmUgc2FtZSBhcyB0aGUgcmVh
+bCBoYXJkd2FyZS4NCllvdSBhcmUgZnJlZSB0byBpbnZlbnQgc29tZSByZWdpc3RlcnMgaW4gZGV2
+aWNlIG1vZGVsIHRvIGJlIHVzZWQgaW4gT1ZNRiBob3QgcGx1ZyBkcml2ZXIuDQoNCg0KPiAtIEhv
+dyBkbyB3ZSB0ZWxsIHRoZSBob3QtcGx1Z2dlZCBBUCB3aGVyZSB0byBzdGFydCBleGVjdXRpb24/
+IChJLmUuIHRoYXQNCj4gICBpdCBzaG91bGQgZXhlY3V0ZSBjb2RlIGF0IGEgcGFydGljdWxhciBw
+Zmxhc2ggbG9jYXRpb24uKQ0KW0ppZXdlbl0gU2FtZSByZWFsIG1vZGUgcmVzZXQgdmVjdG9yIGF0
+IEZGRkY6RkZGMC4NCg0KDQo+ICAgRm9yIGV4YW1wbGUsIGluIE1wSW5pdExpYiwgd2Ugc3RhcnQg
+YSBzcGVjaWZpYyBBUCB3aXRoIElOSVQtU0lQSS1TSVBJLA0KPiAgIHdoZXJlICJTSVBJIiBzdG9y
+ZXMgdGhlIHN0YXJ0dXAgYWRkcmVzcyBpbiB0aGUgIkludGVycnVwdCBDb21tYW5kDQo+ICAgUmVn
+aXN0ZXIiICh3aGljaCBpcyBtZW1vcnktbWFwcGVkIGluIHhBUElDIG1vZGUsIGFuZCBhbiBNU1Ig
+aW4geDJBUElDDQo+ICAgbW9kZSwgYXBwYXJlbnRseSkuIFRoYXQgZG9lc24ndCBhcHBseSBoZXJl
+IC0tIHNob3VsZCBRRU1VIGF1dG8tc3RhcnQNCj4gICB0aGUgbmV3IENQVT8NCltKaWV3ZW5dIFlv
+dSBjYW4gc2VuZCBJTklULVNJUEktU0lQSSB0byBuZXcgQ1BVIG9ubHkgYWZ0ZXIgaXQgY2FuIGFj
+Y2VzcyBtZW1vcnkuDQpTSVBJIG5lZWQgZ2l2ZSBBUCBhbiBiZWxvdyAxTSBtZW1vcnkgYWRkcmVz
+cyBhcyB3YWtpbmcgdmVjdG9yLg0KDQoNCj4gLSBXaGF0IG1lbW9yeSBpcyB1c2VkIGFzIHN0YWNr
+IGJ5IHRoZSBuZXcgQ1BVLCB3aGVuIGl0IHJ1bnMgY29kZSBmcm9tDQo+ICAgZmxhc2g/DQpbSmll
+d2VuXSBTYW1lIGFzIG90aGVyIENQVSBpbiBub3JtYWwgYm9vdC4gWW91IGNhbiB1c2Ugc3BlY2lh
+bCByZXNlcnZlZCBtZW1vcnkuDQoNCg0KPiAgIFFFTVUgZG9lcyBub3QgZW11bGF0ZSBDQVIgKENh
+Y2hlIEFzIFJBTSkuIFRoZSBuZXcgQ1BVIGRvZXNuJ3QgaGF2ZQ0KPiAgIGFjY2VzcyB0byBTTVJB
+TS4gQW5kIHdlIGNhbm5vdCB1c2UgQWNwaU5WUyBvciBSZXNlcnZlZCBtZW1vcnksDQo+IGJlY2F1
+c2UNCj4gICBhIG1hbGljaW91cyBPUyBjb3VsZCB1c2Ugb3RoZXIgQ1BVcyAtLSBvciBQQ0kgZGV2
+aWNlIERNQSAtLSB0byBhdHRhY2sNCj4gICB0aGUgc3RhY2sgKHVubGVzcyBRRU1VIGZvcmNpYmx5
+IHBhdXNlZCBvdGhlciBDUFVzIHVwb24gaG90cGx1ZzsgSSdtDQo+ICAgbm90IHN1cmUpLg0KW0pp
+ZXdlbl0gRXhjZWxsZW50IHBvaW50IQ0KSSBkb27igJl0IHRoaW5rIHRoZXJlIGlzIHByb2JsZW0g
+Zm9yIHJlYWwgaGFyZHdhcmUsIHdobyBhbHdheXMgaGFzIENBUi4NCkNhbiBRRU1VIHByb3ZpZGUg
+c29tZSBDUFUgc3BlY2lmaWMgc3BhY2UsIHN1Y2ggYXMgTU1JTyByZWdpb24/DQoNCg0KPiAtIElm
+IGFuIGF0dGVtcHQgaXMgbWFkZSB0byBob3RwbHVnIG11bHRpcGxlIENQVXMgaW4gcXVpY2sgc3Vj
+Y2Vzc2lvbiwNCj4gICBkb2VzIHNvbWV0aGluZyBzZXJpYWxpemUgdGhvc2UgYXR0ZW1wdHM/DQpb
+Smlld2VuXSBUaGUgQklPUyBuZWVkIGNvbnNpZGVyIHRoaXMgYXMgYXZhaWxhYmlsaXR5IHJlcXVp
+cmVtZW50Lg0KSSBkb27igJl0IGhhdmUgc3Ryb25nIG9waW5pb24uDQpZb3UgY2FuIGRlc2lnbiBh
+IHN5c3RlbSB0aGF0IHJlcXVpcmVkIGhvdHBsdWcgbXVzdCBiZSBvbmUtYnktb25lLCBvciBmYWls
+IHRoZSBob3QtYWRkLg0KT3IgeW91IGNhbiBkZXNpZ24gYSBzeXN0ZW0gdGhhdCBkaWQgbm90IGhh
+dmUgc3VjaCByZXN0cmljdGlvbi4NCkFnYWluLCBhbGwgd2UgbmVlZCB0byBkbyBpcyB0byBtYWlu
+dGFpbiB0aGUgaW50ZWdyaXR5IG9mIFNNTS4NClRoZSBhdmFpbGFiaWxpdHkgc2hvdWxkIGJlIGNv
+bnNpZGVyZWQgYXMgc2VwYXJhdGUgcmVxdWlyZW1lbnQuDQoNCg0KPiAgIEFnYWluLCBzdGFjayB1
+c2FnZSBjb3VsZCBiZSBhIGNvbmNlcm4sIGV2ZW4gd2l0aCBDYWNoZS1Bcy1SQU0gLS0NCj4gICBI
+eXBlclRocmVhZHMgKGxvZ2ljYWwgcHJvY2Vzc29ycykgb24gYSBzaW5nbGUgY29yZSBkb24ndCBo
+YXZlDQo+ICAgZGVkaWNhdGVkIGNhY2hlLg0KW0ppZXdlbl0gQWdyZWUgd2l0aCB5b3Ugb24gdGhl
+IHZpcnR1YWwgZW52aXJvbm1lbnQuDQpGb3IgcmVhbCBoYXJkd2FyZSwgd2UgZG8gc29ja2V0IGxl
+dmVsIGhvdC1hZGQgb25seS4gU28gSFQgaXMgbm90IHRoZSBjb25jZXJuLg0KQnV0IGlmIHlvdSB3
+YW50IHRvIGRvIHRoYXQgaW4gdmlydHVhbCBlbnZpcm9ubWVudCwgYSBwcm9jZXNzb3Igc3BlY2lm
+aWMgbWVtb3J5DQpzaG91bGQgYmUgY29uc2lkZXJlZC4NCg0KDQo+ICAgRG9lcyBDUFUgaG90cGx1
+ZyBhcHBseSBvbmx5IGF0IHRoZSBzb2NrZXQgbGV2ZWw/IElmIHRoZSBDUFUgaXMNCj4gICBtdWx0
+aS1jb3JlLCB3aGF0IGlzIHJlc3BvbnNpYmxlIGZvciBob3QtcGx1Z2dpbmcgYWxsIGNvcmVzIHBy
+ZXNlbnQgaW4NCj4gICB0aGUgc29ja2V0Pw0KW0ppZXdlbl0gRGl0dG8uDQoNCg0KPiA+ICgwMikg
+TmV3IENQVTogKEZsYXNoKSBjb25maWd1cmUgbWVtb3J5IGNvbnRyb2wgdG8gbGV0IGl0IGFjY2Vz
+cyBnbG9iYWwNCj4gPiAgICAgIGhvc3QgbWVtb3J5Lg0KPiANCj4gSW4gUUVNVS9LVk0gZ3Vlc3Rz
+LCB3ZSBkb24ndCBoYXZlIHRvIGVuYWJsZSBtZW1vcnkgZXhwbGljaXRseSwgaXQganVzdA0KPiBl
+eGlzdHMgYW5kIHdvcmtzLg0KPiANCj4gSW4gT1ZNRiBYNjQgU0VDLCB3ZSBjYW4ndCBhY2Nlc3Mg
+UkFNIGFib3ZlIDRHQiwgYnV0IHRoYXQgc2hvdWxkbid0IGJlIGFuDQo+IGlzc3VlIHBlciBzZS4N
+CltKaWV3ZW5dIEFncmVlLiBJIGRvIG5vdCBzZWUgdGhlIGlzc3VlLg0KDQoNCj4gPiAoMDMpIE5l
+dyBDUFU6IChGbGFzaCkgc2VuZCBib2FyZCBtZXNzYWdlIHRvIHRlbGwgaG9zdCBDUFUgKEdQSU8t
+PlNDSSkNCj4gPiAgICAgIC0tIEkgYW0gd2FpdGluZyBmb3IgaG90LWFkZCBtZXNzYWdlLg0KPiAN
+Cj4gTWF5YmUgd2UgY2FuIHNpbXBsaWZ5IHRoaXMgaW4gUUVNVSBieSBicm9hZGNhc3RpbmcgYW4g
+U01JIHRvIGV4aXN0ZW50DQo+IHByb2Nlc3NvcnMgaW1tZWRpYXRlbHkgdXBvbiBwbHVnZ2luZyB0
+aGUgbmV3IENQVS4NCj4gDQo+IA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIChOT1RFOiBIb3N0IENQVSBjYW4gb25seQ0KPiBzZW5kDQo+ID4gICAgICBpbnN0cnVj
+dGlvbiBpbiBTTU0gbW9kZS4gLS0gVGhlIHJlZ2lzdGVyIGlzIFNNTSBvbmx5KQ0KPiANCj4gU29y
+cnksIEkgZG9uJ3QgZm9sbG93IC0tIHdoYXQgcmVnaXN0ZXIgYXJlIHdlIHRhbGtpbmcgYWJvdXQg
+aGVyZSwgYW5kDQo+IHdoeSBpcyB0aGUgQlNQIG5lZWRlZCB0byBzZW5kIGFueXRoaW5nIGF0IGFs
+bD8gV2hhdCAiaW5zdHJ1Y3Rpb24iIGRvIHlvdQ0KPiBoYXZlIGluIG1pbmQ/DQpbSmlld2VuXSBU
+aGUgbmV3IENQVSBkb2VzIG5vdCBlbmFibGUgU01JIGF0IHJlc2V0Lg0KQXQgc29tZSBwb2ludCBv
+ZiB0aW1lIGxhdGVyLCB0aGUgQ1BVIG5lZWQgZW5hYmxlIFNNSSwgcmlnaHQ/DQpUaGUgImluc3Ry
+dWN0aW9uIiBoZXJlIG1lYW5zLCB0aGUgaG9zdCBDUFVzIG5lZWQgdGVsbCB0byBDUFUgdG8gZW5h
+YmxlIFNNSS4NCg0KDQo+ID4gKDA0KSBIb3N0IENQVTogKE9TKSBnZXQgbWVzc2FnZSBmcm9tIGJv
+YXJkIHRoYXQgYSBuZXcgQ1BVIGlzIGFkZGVkLg0KPiA+ICAgICAgKEdQSU8gLT4gU0NJKQ0KPiA+
+DQo+ID4gKDA1KSBIb3N0IENQVTogKE9TKSBBbGwgQ1BVcyBlbnRlciBTTU0gKFNDSS0+U1dTTUkp
+IChOT1RFOiBOZXcgQ1BVDQo+ID4gICAgICB3aWxsIG5vdCBlbnRlciBDUFUgYmVjYXVzZSBTTUkg
+aXMgZGlzYWJsZWQpDQo+IA0KPiBJIGRvbid0IHVuZGVyc3RhbmQgdGhlIE9TIGludm9sdmVtZW50
+IGhlcmUuIEJ1dCwgYWdhaW4sIHBlcmhhcHMgUUVNVSBjYW4NCj4gZm9yY2UgYWxsIGV4aXN0ZW50
+IENQVXMgaW50byBTTU0gaW1tZWRpYXRlbHkgdXBvbiBhZGRpbmcgdGhlIG5ldyBDUFUuDQpbSmll
+d2VuXSBPUyBoZXJlIG1lYW5zIHRoZSBIb3N0IENQVSBydW5uaW5nIGNvZGUgaW4gT1MgZW52aXJv
+bm1lbnQsIG5vdCBpbiBTTU0gZW52aXJvbm1lbnQuDQoNCg0KPiA+ICgwNikgSG9zdCBDUFU6IChT
+TU0pIFNhdmUgMzgwMDAsIFVwZGF0ZSAzODAwMCAtLSBmaWxsIHNpbXBsZSBTTU0NCj4gPiAgICAg
+IHJlYmFzZSBjb2RlLg0KPiA+DQo+ID4gKDA3KSBIb3N0IENQVTogKFNNTSkgU2VuZCBtZXNzYWdl
+IHRvIE5ldyBDUFUgdG8gRW5hYmxlIFNNSS4NCj4gDQo+IEFoYSwgc28gdGhpcyBpcyB0aGUgU01N
+LW9ubHkgcmVnaXN0ZXIgeW91IG1lbnRpb24gaW4gc3RlcCAoMDMpLiBJcyB0aGUNCj4gcmVnaXN0
+ZXIgc3BlY2lmaWVkIGluIHRoZSBJbnRlbCBTRE0/DQpbSmlld2VuXSBSaWdodC4gVGhhdCBpcyB0
+aGUgcmVnaXN0ZXIgdG8gbGV0IGhvc3QgQ1BVIHRlbGwgbmV3IENQVSB0byBlbmFibGUgU01JLg0K
+SXQgaXMgcGxhdGZvcm0gc3BlY2lmaWMgcmVnaXN0ZXIuIE5vdCBkZWZpbmVkIGluIFNETS4NCllv
+dSBtYXkgaW52ZW50IG9uZSBpbiBkZXZpY2UgbW9kZWwuDQoNCg0KPiA+ICgwOCkgTmV3IENQVTog
+KEZsYXNoKSBHZXQgbWVzc2FnZSAtIEVuYWJsZSBTTUkuDQo+ID4NCj4gPiAoMDkpIEhvc3QgQ1BV
+OiAoU01NKSBTZW5kIFNNSSB0byB0aGUgbmV3IENQVSBvbmx5Lg0KPiA+DQo+ID4gKDEwKSBOZXcg
+Q1BVOiAoU01NKSBSZXNwb25zZSBmaXJzdCBTTUkgYXQgMzgwMDAsIGFuZCByZWJhc2UgU01CQVNF
+IHRvDQo+ID4gICAgICBUU0VHLg0KPiANCj4gV2hhdCBjb2RlIGRvZXMgdGhlIG5ldyBDUFUgZXhl
+Y3V0ZSBhZnRlciBpdCBjb21wbGV0ZXMgc3RlcCAoMTApPyBEb2VzIGl0DQo+IGhhbHQ/DQpbSmll
+d2VuXSBUaGUgbmV3IENQVSBleGl0cyBTTU0gYW5kIHJldHVybiB0byBvcmlnaW5hbCBwbGFjZSAt
+IHdoZXJlIGl0IGlzDQppbnRlcnJ1cHRlZCB0byBlbnRlciBTTU0gLSBydW5uaW5nIGNvZGUgb24g
+dGhlIGZsYXNoLg0KDQoNCj4gPiAoMTEpIEhvc3QgQ1BVOiAoU01NKSBSZXN0b3JlIDM4MDAwLg0K
+PiANCj4gVGhlc2Ugc3RlcHMgKGkuZS4sICgwNikgdGhyb3VnaCAoMTEpKSBkb24ndCBhcHBlYXIg
+UkFTLXNwZWNpZmljLiBUaGUNCj4gb25seSBwbGF0Zm9ybS1zcGVjaWZpYyBmZWF0dXJlIHNlZW1z
+IHRvIGJlIFNNSSBtYXNraW5nIHJlZ2lzdGVyLCB3aGljaA0KPiBjb3VsZCBiZSBleHRyYWN0ZWQg
+aW50byBhIG5ldyBTbW1DcHVGZWF0dXJlc0xpYiBBUEkuDQo+IA0KPiBUaHVzLCB3b3VsZCB5b3Ug
+cGxlYXNlIGNvbnNpZGVyIG9wZW4gc291cmNpbmcgZmlybXdhcmUgY29kZSBmb3Igc3RlcHMNCj4g
+KDA2KSB0aHJvdWdoICgxMSk/DQo+IA0KPiBBbHRlcm5hdGl2ZWx5IC0tIGFuZCBpbiBwYXJ0aWN1
+bGFyIGJlY2F1c2UgdGhlIHN0YWNrIGZvciBzdGVwICgwMSkNCj4gY29uY2VybnMgbWUgLS0sIHdl
+IGNvdWxkIGFwcHJvYWNoIHRoaXMgZnJvbSBhIGhpZ2gtbGV2ZWwsIGZ1bmN0aW9uYWwNCj4gcGVy
+c3BlY3RpdmUuIFRoZSBzdGF0ZXMgdGhhdCByZWFsbHkgbWF0dGVyIGFyZSB0aGUgcmVsb2NhdGVk
+IFNNQkFTRSBmb3INCj4gdGhlIG5ldyBDUFUsIGFuZCB0aGUgc3RhdGUgb2YgdGhlIGZ1bGwgc3lz
+dGVtLCByaWdodCBhdCB0aGUgZW5kIG9mIHN0ZXANCj4gKDExKS4NCj4gDQo+IFdoZW4gdGhlIFNN
+TSBzZXR1cCBxdWllc2NlcyBkdXJpbmcgbm9ybWFsIGZpcm13YXJlIGJvb3QsIE9WTUYgY291bGQN
+Cj4gdXNlDQo+IGV4aXN0ZW50IChmaW5hbGl6ZWQpIFNNQkFTRSBpbmZvbWF0aW9uIHRvICpwcmUt
+cHJvZ3JhbSogc29tZSB2aXJ0dWFsDQo+IFFFTVUgaGFyZHdhcmUsIHdpdGggc3VjaCBzdGF0ZSB0
+aGF0IHdvdWxkIGJlIGV4cGVjdGVkLCBhcyAiZmluYWwiIHN0YXRlLA0KPiBvZiBhbnkgbmV3IGhv
+dHBsdWdnZWQgQ1BVLiBBZnRlcndhcmRzLCBpZiAvIHdoZW4gdGhlIGhvdHBsdWcgYWN0dWFsbHkN
+Cj4gaGFwcGVucywgUUVNVSBjb3VsZCBibGFua2V0LWFwcGx5IHRoaXMgc3RhdGUgdG8gdGhlIG5l
+dyBDUFUsIGFuZA0KPiBicm9hZGNhc3QgYSBoYXJkd2FyZSBTTUkgdG8gYWxsIENQVXMgZXhjZXB0
+IHRoZSBuZXcgb25lLg0KPiANCj4gVGhlIGhhcmR3YXJlIFNNSSBzaG91bGQgdGVsbCB0aGUgZmly
+bXdhcmUgdGhhdCB0aGUgcmVzdCBvZiB0aGUgcHJvY2Vzcw0KPiAtLSBzdGVwICgxMikgYmVsb3cs
+IGFuZCBvbndhcmQgLS0gaXMgYmVpbmcgcmVxdWVzdGVkLg0KPiANCj4gSWYgSSB1bmRlcnN0YW5k
+IHJpZ2h0LCB0aGlzIGFwcHJvYWNoIHdvdWxkIHByb2R1Y2UgYW4gZmlybXdhcmUgJiBzeXN0ZW0N
+Cj4gc3RhdGUgdGhhdCdzIGlkZW50aWNhbCB0byB3aGF0J3MgZXhwZWN0ZWQgcmlnaHQgYWZ0ZXIg
+c3RlcCAoMTEpOg0KPiANCj4gLSBhbGwgU01CQVNFcyByZWxvY2F0ZWQNCj4gLSBhbGwgcHJlZXhp
+c3RlbnQgQ1BVcyBpbiBTTU0NCj4gLSBuZXcgQ1BVIGhhbHRlZCAvIGJsb2NrZWQgZnJvbSBsYXVu
+Y2gNCj4gLSBEUkFNIGF0IDB4MzAwMDAgLyAweDM4MDAwIGNvbnRhaW5zIE9TLW93bmVkIGRhdGEN
+Cj4gDQo+IElzIG15IHVuZGVyc3RhbmRpbmcgY29ycmVjdCB0aGF0IHRoaXMgaXMgdGhlIGV4cGVj
+dGVkIHN0YXRlIGFmdGVyIHN0ZXANCj4gKDExKT8NCltKaWV3ZW5dIEkgdGhpbmsgeW91IGFyZSBj
+b3JyZWN0Lg0KDQoNCj4gVGhyZWUgbW9yZSBjb21tZW50cyBvbiB0aGUgIlNNQkFTRSBwcmUtY29u
+ZmlnIiBhcHByb2FjaDoNCj4gDQo+IC0gdGhlIHZpcnR1YWwgaGFyZHdhcmUgcHJvdmlkaW5nIHRo
+aXMgZmVhdHVyZSBzaG91bGQgYmVjb21lIGxvY2tlZCBhZnRlcg0KPiAgIHRoZSBjb25maWd1cmF0
+aW9uLCB1bnRpbCBuZXh0IHBsYXRmb3JtIHJlc2V0DQo+IA0KPiAtIHRoZSBwcmUtY29uZmlnIHNo
+b3VsZCBvY2N1ciB2aWEgc2ltcGxlIGhhcmR3YXJlIGFjY2Vzc2VzLCBzbyB0aGF0IGl0DQo+ICAg
+Y2FuIGJlIHJlcGxheWVkIGF0IFMzIHJlc3VtZSwgaS5lLiBhcyBwYXJ0IG9mIHRoZSBTMyBib290
+IHNjcmlwdA0KPiANCj4gLSBmcm9tIHRoZSBwcmUtY29uZmlndXJlZCBzdGF0ZSwgYW5kIHRoZSBB
+UElDIElELCBRRU1VIGl0c2VsZiBjb3VsZA0KPiAgIHBlcmhhcHMgY2FsY3VsYXRlIHRoZSBTTUkg
+c3RhY2sgbG9jYXRpb24gZm9yIHRoZSBuZXcgcHJvY2Vzc29yLg0KPiANCj4gDQo+ID4gKDEyKSBI
+b3N0IENQVTogKFNNTSkgVXBkYXRlIGxvY2F0ZWQgZGF0YSBzdHJ1Y3R1cmUgdG8gYWRkIHRoZSBu
+ZXcgQ1BVDQo+ID4gICAgICBpbmZvcm1hdGlvbi4gKFRoaXMgc3RlcCB3aWxsIGludm9sdmUgQ1BV
+X1NFUlZJQ0UgcHJvdG9jb2wpDQo+IA0KPiBJIGNvbW1lbnRlZCBvbiBFRklfU01NX0NQVV9TRVJW
+SUNFX1BST1RPQ09MIGluIHVwb24gYnVsbGV0ICg0KSBvZg0KPiA8aHR0cHM6Ly9idWd6aWxsYS50
+aWFub2NvcmUub3JnL3Nob3dfYnVnLmNnaT9pZD0xNTEyI2M0Pi4NCj4gDQo+IENhbGxpbmcgRUZJ
+X1NNTV9BRERfUFJPQ0VTU09SIGxvb2tzIGp1c3RpZmllZC4NCltKaWV3ZW5dIEkgdGhpbmsgeW91
+IGFyZSBjb3JyZWN0Lg0KQWxzbyBSRU1PVkVfUFJPQ0VTU09SIHdpbGwgYmUgdXNlZCBmb3IgaG90
+LXJlbW92ZSBhY3Rpb24uDQoNCg0KPiBXaGF0IGFyZSBzb21lIG9mIHRoZSBvdGhlciBtZW1iZXIg
+ZnVuY3Rpb25zIHVzZWQgZm9yPyBUaGUgc2Nhcnkgb25lIGlzDQo+IEVGSV9TTU1fUkVHSVNURVJf
+RVhDRVBUSU9OX0hBTkRMRVIuDQpbSmlld2VuXSBUaGlzIGlzIHRvIHJlZ2lzdGVyIGEgbmV3IGV4
+Y2VwdGlvbiBoYW5kbGVyIGluIFNNTS4NCkkgZG9u4oCZdCB0aGluayB0aGlzIEFQSSBpcyBpbnZv
+bHZlZCBpbiBob3QtYWRkLg0KDQoNCj4gPiA9PT09PT09PT09PT09PT09PT09PT0gKG5vdywgdGhl
+IG5leHQgU01JIHdpbGwgYnJpbmcgYWxsIENQVSBpbnRvIFRTRUcpDQo+IA0KPiBPSy4uLiBidXQg
+d2hhdCBjb21wb25lbnQgaW5qZWN0cyB0aGF0IFNNSSwgYW5kIHdoZW4/DQpbSmlld2VuXSBBbnkg
+U01JIGV2ZW50LiBJdCBjb3VsZCBiZSBzeW5jaHJvbml6ZWQgU01JIG9yIGFzeW5jaHJvbml6ZWQg
+U01JLg0KSXQgY291bGQgZnJvbSBzb2Z0d2FyZSBzdWNoIGFzIElPIHdyaXRlLCBvciBoYXJkd2Fy
+ZSBzdWNoIGFzIHRoZXJtYWwgZXZlbnQuDQoNCg0KPiA+ICgxMykgTmV3IENQVTogKEZsYXNoKSBy
+dW4gTVJDIGNvZGUsIHRvIGluaXQgaXRzIG93biBtZW1vcnkuDQo+IA0KPiBXaHkgaXMgdGhpcyBu
+ZWVkZWQgZXNwLiBhZnRlciBzdGVwICgxMCk/IFRoZSBuZXcgQ1BVIGhhcyBhY2Nlc3NlZCBEUkFN
+DQo+IGFscmVhZHkuIEFuZCB3aHkgYXJlIHdlIGV4ZWN1dGluZyBjb2RlIGZyb20gcGZsYXNoLCBy
+YXRoZXIgdGhhbiBmcm9tDQo+IFNNUkFNLCBnaXZlbiB0aGF0IHdlJ3JlIHBhc3QgU01CQVNFIHJl
+bG9jYXRpb24/DQpbSmlld2VuXSBPbiByZWFsIGhhcmR3YXJlLCBpdCBpcyBuZWVkZWQgYmVjYXVz
+ZSBkaWZmZXJlbnQgQ1BVIG1heSBoYXZlIGRpZmZlcmVudCBjYXBhYmlsaXR5IHRvIGFjY2VzcyBk
+aWZmZXJlbnQgRElNTS4NCkkgZG8gbm90IHRoaW5rIHlvdXIgdmlydHVhbCBwbGF0Zm9ybSBuZWVk
+IGl0Lg0KDQoNCj4gPiAoMTQpIE5ldyBDUFU6IChGbGFzaCkgRGVhZGxvb3AsIGFuZCB3YWl0IGZv
+ciBJTklULVNJUEktU0lQSS4NCj4gPg0KPiA+ICgxNSkgSG9zdCBDUFU6IChPUykgU2VuZCBJTklU
+LVNJUEktU0lQSSB0byBwdWxsIG5ldyBDUFUgaW4uDQo+IA0KPiBJJ20gY29uZnVzZWQgYnkgdGhl
+c2Ugc3RlcHMuIEkgdGhvdWdodCB0aGF0IHN0ZXAgKDEyKSB3b3VsZCBjb21wbGV0ZSB0aGUNCj4g
+aG90cGx1ZywgYnkgdXBkYXRpbmcgdGhlIGFkbWluaXN0cmF0aXZlIGRhdGEgc3RydWN0dXJlcyBp
+bnRlcm5hbGx5LiBBbmQNCj4gdGhlIG5leHQgU01JIC0tIHJhaXNlZCBmb3IgdGhlIHVzdWFsIHB1
+cnBvc2VzLCBzdWNoIGFzIGEgc29mdHdhcmUgU01JDQo+IGZvciB2YXJpYWJsZSBhY2Nlc3MgLS0g
+d291bGQgYmUgaGFuZGxlZCBsaWtlIGl0IGFsd2F5cyBpcywgZXhjZXB0IGl0DQo+IHdvdWxkIGFs
+c28gcHVsbCB0aGUgbmV3IENQVSBpbnRvIFNNTSB0b28uDQpbSmlld2VuXSBUaGUgT1MgbmVlZCB1
+c2UgdGhlIG5ldyBDUFUgYXQgc29tZSBwb2ludCBvZiB0aW1lLCByaWdodD8NCkFzIHN1Y2gsIHRo
+ZSBPUyBuZWVkIHB1bGwgdGhlIG5ldyBDUFUgaW50byBpdHMgb3duIGVudmlyb25tZW50IGJ5IElO
+SVQtU0lQSS1TSVBJLg0KDQoNCj4gVGhhbmtzIQ0KPiBMYXN6bG8NCg==
 
