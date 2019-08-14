@@ -2,111 +2,90 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CD0C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 07:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA7EC0650F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 07:21:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F7542054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 07:21:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F7542054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C1B9D2054F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 07:21:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laROo5RZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1B9D2054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxnbB-0008U3-AA
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 03:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59922)
+	id 1hxnbD-00005y-Tl
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 03:21:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1hxnZt-00071Q-89
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 03:20:14 -0400
+ (envelope-from <rashmica.g@gmail.com>) id 1hxnZs-00071M-Kg
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 03:20:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hxnZn-0002ZP-R9
+ (envelope-from <rashmica.g@gmail.com>) id 1hxnZr-0002b0-JE
  for qemu-devel@nongnu.org; Wed, 14 Aug 2019 03:20:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36620)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hxnZn-0002Z8-Jk; Wed, 14 Aug 2019 03:20:07 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D15C930083EE;
- Wed, 14 Aug 2019 07:20:06 +0000 (UTC)
-Received: from [10.36.117.4] (ovpn-117-4.ams2.redhat.com [10.36.117.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 666B4348F1;
- Wed, 14 Aug 2019 07:20:02 +0000 (UTC)
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20190812112737.6652-1-david@redhat.com>
- <20190812112737.6652-6-david@redhat.com>
- <20190813165427.14b2024c.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <91546371-d9ec-92f1-fc90-ba7d0e4f5449@redhat.com>
-Date: Wed, 14 Aug 2019 09:20:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:46141)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <rashmica.g@gmail.com>)
+ id 1hxnZo-0002Za-PY; Wed, 14 Aug 2019 03:20:08 -0400
+Received: by mail-pl1-x643.google.com with SMTP id c2so50323866plz.13;
+ Wed, 14 Aug 2019 00:20:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=message-id:subject:from:to:cc:date:in-reply-to:references
+ :user-agent:mime-version:content-transfer-encoding;
+ bh=V3JtMJEdGf+/wFSc2uNDCDMvXY6a4xpbdDwrcSsS2UU=;
+ b=laROo5RZRckeccTw26wgMqj8Nnq51sFEtEmnmuZya5DrbCeM+MWsU9Zr7SBvJZ5GZd
+ k+2OM4aLR2pRRvx+64oWXpNjqZB3Qe8Gbc3TbCGG5CjmZZXCVjINI2/9eftl57vUfiiP
+ us0c4g/dfeHHkm4kQSnKTkhheFvJtWJhTSEduEZXnob3rMwDLnmhg/0sX6gBYwtAJ8j8
+ i3jvBQW93evtER4aAeN/rt1xkxYHDampzT7A1JZ7bv0reK3puoRmaTe8y8gYcrfZKv+3
+ 9txW6uP3+qPPvNLKuSQAaApHfxaAxPvyT4HbvrZPfuKLn5lXJLLsfqnAlSglAgA1LImk
+ vNZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:user-agent:mime-version:content-transfer-encoding;
+ bh=V3JtMJEdGf+/wFSc2uNDCDMvXY6a4xpbdDwrcSsS2UU=;
+ b=PXg68mKqLz0FzS5xI42fKiTR7Ba4uZBlxmZ36aFWQuD9QcZojch53NX3P7Aev59CUj
+ +iwTzNxrQ2/ixgP2XVqmqQaxl63W62n/jRmji4rSV+lxHoBqyUsBqDpHptwIWw/gYsku
+ youKCLlmNX9xWvB8zEK3sJ9hch0+Viq2hKMqB8pMm4ffm7M+Vf7xYc51wpKt4Kpl66El
+ 0za2iVKhawLyoYuuSGBEH390z+UZrR0i2WxGsZkRYq+HWLwbcw6g6IoMTcLsWZa2W+XE
+ b1tK7VOPhTyIk8uxQU0BqSFS9m/Ov2k5LLHCqYQsvoJo+nVUY28CXZ1e+xpd0azMo6A3
+ QmPg==
+X-Gm-Message-State: APjAAAXWNzwDi4d3G3G1T6D7Qa41pgkOCDzzUe1hnkmIqjnsK2NoZgDt
+ CrNcHcA+yu7IwztF34aCIrs=
+X-Google-Smtp-Source: APXvYqzxSzm1PCg0nOTeK89Ccgiva+UU6+3GPLhIye6gkDM5mMqFeqZ9b5DE/FFFoaAr9ZjwhLvbbg==
+X-Received: by 2002:a17:902:a9c3:: with SMTP id
+ b3mr10247370plr.179.1565767207648; 
+ Wed, 14 Aug 2019 00:20:07 -0700 (PDT)
+Received: from rashmica.ozlabs.ibm.com ([122.99.82.10])
+ by smtp.googlemail.com with ESMTPSA id
+ h20sm15376501pfq.156.2019.08.14.00.20.04
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 14 Aug 2019 00:20:07 -0700 (PDT)
+Message-ID: <7af7a2ca0d5109d092922beda3b1b7bae6b4a12f.camel@gmail.com>
+From: Rashmica Gupta <rashmica.g@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 14 Aug 2019 17:20:03 +1000
+In-Reply-To: <CAFEAcA_OBg6s+qu-DG_N882Gy_FxX3_fxHLa=tzpHfRzY5fdWQ@mail.gmail.com>
+References: <20190730054501.32727-1-rashmica.g@gmail.com>
+ <20190730054501.32727-2-rashmica.g@gmail.com>
+ <CAFEAcA_OBg6s+qu-DG_N882Gy_FxX3_fxHLa=tzpHfRzY5fdWQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.5 (3.30.5-1.fc29) 
 MIME-Version: 1.0
-In-Reply-To: <20190813165427.14b2024c.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 14 Aug 2019 07:20:06 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v1 5/6] s390x/mmu:
- Better storage key reference and change bit handling
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] hw/gpio: Add basic Aspeed GPIO
+ model for AST2400 and AST2500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,34 +97,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Andrew Jeffery <andrew@aj.id.au>, qemu-arm <qemu-arm@nongnu.org>,
+ Joel Stanley <joel@jms.id.au>, QEMU Developers <qemu-devel@nongnu.org>,
+ =?ISO-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13.08.19 16:54, Cornelia Huck wrote:
-> On Mon, 12 Aug 2019 13:27:36 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On Tue, 2019-08-06 at 14:57 +0100, Peter Maydell wrote:
+> On Tue, 30 Jul 2019 at 06:45, Rashmica Gupta <rashmica.g@gmail.com>
+> wrote:
+> > GPIO pins are arranged in groups of 8 pins labeled
+> > A,B,..,Y,Z,AA,AB,AC.
+> > (Note that the ast2400 controller only goes up to group AB).
+> > A set has four groups (except set AC which only has one) and is
+> > referred to by the groups it is composed of (eg
+> > ABCD,EFGH,...,YZAAAB).
+> > Each set is accessed and controlled by a bank of 14 registers.
+> > 
+> > These registers operate on a per pin level where each bit in the
+> > register
+> > corresponds to a pin, except for the command source registers. The
+> > command
+> > source registers operate on a per group level where bits 24, 16, 8
+> > and 0
+> > correspond to each group in the set.
+> > 
+> >  eg. registers for set ABCD:
+> >  |D7...D0|C7...C0|B7...B0|A7...A0| <- GPIOs
+> >  |31...24|23...16|15....8|7.....0| <- bit position
+> > 
+> > Note that there are a couple of groups that only have 4 pins.
+> > 
+> > There are two ways that this model deviates from the behaviour of
+> > the
+> > actual controller:
+> > (1) The only control source driving the GPIO pins in the model is
+> > the ARM
+> > model (as there currently aren't models for the LPC or
+> > Coprocessor).
+> > 
+> > (2) None of the registers in the model are reset tolerant (needs
+> > integration with the watchdog).
+> > 
+> > +typedef struct AspeedGPIOReg {
+> > +    uint16_t set_idx;
+> > +    uint32_t (*read)(GPIOSets *regs);
+> > +    void (*write)(AspeedGPIOState *s, GPIOSets *regs,
+> > +                const GPIOSetProperties *props, uint32_t val);
+> > + } AspeedGPIOReg;
 > 
->> Any access sets the reference bit. In case we have a read-fault, we
->> should not allow writes to the TLB entry if the change bit was not
->> already set.
->>
->> This is a preparation for proper storage-key reference/change bit handling
->> in TCG and a fix for KVM whereby read accesses would set the change
->> bit (old KVM versions without the ioctl to carry out the translation).
+> Please don't create new abstractions for implementing
+> registers that are only used in one device model. We
+> have a couple of basic approaches that we use already:
+
+That's fair enough :)
+
 > 
-> That would be really old kvm versions, right? So no real need to e.g.
-> cc:stable?
+>  * just open coded switch statements in the read and write
+>    functions for the device's MMIO regions
 
-Yes - nothing a distribution ever supported AFAIK.
+Thoughts on the switch statement approach in v4? I think it's
+much nicer than two huge switch statements. 
 
--- 
+>  * if you'd rather have a data structure defining each
+>    register with hook functions where they need to do
+>    particular behaviour on reads and writes, have a look
+>    at the APIs in include/hw/register.h. Currently these are
+>    used just by some of the Xilinx devices, but if you
+>    want an API shaped like that you can use it.
+> 
 
-Thanks,
+I had a play with the existing register API. I couldn't quite
+get it to work. When writing to some registers in a set we
+need to look at other registers in that set, and so we need
+some kind of structure tells us how to find those registers.
 
-David / dhildenb
+
+> thanks
+> -- PMM
+
 
