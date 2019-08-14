@@ -4,83 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F68CC32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BAE5C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:57:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B6BE21721
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:52:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7CEC216F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 20:57:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="VzxttoTI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6BE21721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="TkqdvULy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7CEC216F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy0Fm-0002fC-4T
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:52:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37985)
+	id 1hy0Kd-0005H2-RK
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 16:57:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1hy0CZ-00016Y-EL
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:49:01 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1hy0Ce-00018C-26
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:49:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1hy0CX-00019q-LQ
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:48:59 -0400
-Received: from mout.web.de ([217.72.192.78]:42157)
+ (envelope-from <lukasstraub2@web.de>) id 1hy0Cb-0001Eg-S0
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:49:04 -0400
+Received: from mout.web.de ([217.72.192.78]:58691)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hy0CX-00017D-8j
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:48:57 -0400
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hy0Cb-00017L-IW
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 16:49:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1565815724;
- bh=V0jdTgZU0cNH7q4hoVZw9POPgAa3Lct0vBllFQblJL4=;
+ s=dbaedf251592; t=1565815723;
+ bh=Vj5Yz1T195ZbwoJV7LroEOscuPi8lsWZT11FMFdJAYA=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=VzxttoTI73BoPcuQiPiY/sszESy5PBST6+d4eX2RdWEY9Ly8u3B6sQGU0eCqJ7aBT
- yoGoMVM8ncpwkRCr7zWKAOttCCH+E6lyC54cfVbxaMcoFBjbNzDerYCL/hSCQEPauZ
- slmKD8f4dv41B4oSwaBN5ijALwbO/NUqcjHyeDNk=
+ b=TkqdvULyqlk+3SaUJLQ1+rTHmztOGl4WhDoR90diWhgQT6eyqa25e6tIuEKPyM8eH
+ hIVqJVukzEqjlpPMTvDaAfqGdPFxS4vP3R+qb5K6iMFWiPqj7m6OoZADB6orxKEtu1
+ 2d4m134qHEsaswM9pBSuOE7y4VVZopZgkAoysIFo=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from luklap ([87.123.206.175]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0M8R26-1iBnh80BVa-00vwjB; Wed, 14
- Aug 2019 22:48:44 +0200
-Date: Wed, 14 Aug 2019 22:47:32 +0200
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MKa6N-1hxjDQ19nD-0022ia; Wed, 14
+ Aug 2019 22:48:43 +0200
+Date: Wed, 14 Aug 2019 22:47:42 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: "Zhang, Chen" <chen.zhang@intel.com>
-Message-ID: <390c048392b2db51cde1aaca8c5acdd8f3836336.1565814686.git.lukasstraub2@web.de>
+Message-ID: <73c88a10b6bd19c14bd732126e3bf07527cd7e60.1565814686.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1565814686.git.lukasstraub2@web.de>
 References: <cover.1565814686.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:5SG06vCY+BIvDW2D/283vewMoK0ViJgDJjvH5KR3BmcEfoZil3v
- +bJTT3idKr2VeizE5jaIVmHb83UGM7bb0/RHHQdsJMgA5sc9CDcPl7RNnekBxYeceF33P/Y
- YpcpgAZ5e8EmNKbN3b8tcdeP7VqTISQ47qPChewNmdZrLE/8A4ljfF4kSeZaUa5iDwbU1Yy
- wn6wZsYHaouDmZgsdpt8g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:k2baprNzNFU=:n+s0jMv1YhitfKEQzeL6h0
- q9SLFOdsN5byyjPMVFmUHMGldIMwnC3E9TXt6IO1lQBHojPuMmtMHgVMnALRefU+P8RJT0tIL
- ujkBUfVitH3jfkrO+YPdzMtIB/KO51bAxXdTp9F6RT/oOGuckHXU5uoFWBjGXokC97utq5oz1
- Yi9ZeZScBIyb8JNWKpOrOF6ak4J/1j3D+KnmE6T6qE9XcUULAO7CnqPF2DtyaGLa+LwhF5Xue
- dJpKgZ3iDF6SFTHOBTiQXOdnqiStUO+K7twiEeUSgsCbwQT9hx92ue2Kjr39jJoFNbQLwIroz
- 7TvYmPfht94B/sWk6AZ0ag1IlIEVm2o2Tnm2xeqFTNRShq1KUzN1wPVNo/XJAHsOlz5JE4OeM
- 02IlHGMtw7NhObp/Zo9vFlrQtw2+KCbbcKwhPwNrWNA4ief136rzVolPzhKUB+IhY6EmN0/wc
- +yfpKi8FMclthkF5o8jS7xv+zzF8oRUTMdA0Rl/kabaKb30p5koqZTErSxgS0IWdMHP1covY1
- HvLlAi1VW35luzSKqjl8b8pIHdgxJlRRyk3qfKbp1CZ5mwUXI5e3Yakaa6Zu3NMRJN+AH+sbt
- zniabJfazgTKaBN68i/23R/htyNWdJMIwi9B59iA1gxd+pqbGBQvT4aJf7EGpLEH01VjP9ubD
- OHy0qm5QnccEtkCJ4wD808uR+zLBa8Qjg83K8AY+RCSflBdtsDptYOSTkDng0J8GqT0kj5hkL
- GnfZ6H+0KAUwG0SwXP1ubE/CaBH/DjmlRA40pAM+8kSIijG7sy5Ih8qMX4azqHs9VmyCLjL2h
- CCAw3KmfENhfKTMorL2KbQAcOVlCURK7PiG/+A5RIa7UKrh8YNUYL/owiAdDlWjZw63Dvc0MQ
- nl/nI8WWWjCrrQzYK3xKI9s6PzmZREAM6zftzniJVxDo2pqBEbDuQf6hLkwUZugZdPvh7GJon
- 4cKA3jAijBx5Wb50FKgPjZWhMoSN25Z5HuQVrfFsFp/d9oLZt90YhCTRBNo75N6MQOhyZAOM0
- s3PNWKjpg5lXE80SjtpN9m1AiD05XiQzSnrB22kBIL+hk4+zxzWZZNNeoJ1t4/znbqhEmA+gm
- yS47xHIUBboAFdl2cwuJDrexuxjIdqApfiEW8oNWI2LmKMbr8RpZJbDiRcxvvvDJYzRWWTlDk
- 9zDqQ=
+X-Provags-ID: V03:K1:2QOXj+nFHHGS/NWHMFYijpgOz8XBJPWvvIau42aZ154xWCT9ANS
+ ZUeDI2fYeh0hFrGdy9DHwcKqE8a+ey4PfX5/EKpbQZSLh4rC78Fotfrhs2JmlX2oErW+j47
+ MwNcjxJXQ96n1qWS6ao4u8b9DaVejKkHi4Qbm3pkPqplpD8QtDrpEgdHqlZFS6mG7rY1N2/
+ d1WykebHfSx5hGOI4q40A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:u4+dCo7JoAE=:OPedg4aQjtGiL7lSEmsV1L
+ afVZ3uvE4Uv5vQIxQc9TF8g44DMowG0vkZv8ooTpgxkIg4CnNLIblZdgbafv4K/GUrud/vZgQ
+ 0fnDmhmkP1TeTIeAkhKpXV6sgA5P5KNIzRkWTxobyX13MTX8K7QAsmxoTs4BtnaoQFvOVuwbj
+ Vb9PtM6EErUCGoKxvRhQ0ksEsBVT7vBrXQLcqpI/MDUb/+3bighZK2Rl1UVfaoNa5zH160EZS
+ 0uBDoe/sR6naRg5Cc1Nfe48/Cvuz6vW0Dwl52dvi8AUKZScvmgqhJT3rIFaxPJhBgeSe+XHgh
+ Qw28VMp+BQsOnT0PJzo7O9SJn81krTUj6PlwtHgoj3Mc2jHdVrBwMApsTcIL2AtCWul7lej1X
+ tHX++va3+HL48/uve5jgWDBFBZWvtHY6xX5FRxkj+m8qMB2bNkOmt5at+Qw6vzS0Ne3uGX1ej
+ eyFnwhrQ8o6L4YNABROTMflmEgpzstU19HqnFsG2G/63lwBn5s9NnJ8u/Lz2neeTz6w/WK86Q
+ wl4DepAu7lIT4xIoGXyojYAam4xn/tY+bcM+OpVxWVJ/adiK9aVElABjhvqTGUjQII/r1IYjD
+ PBnRW6/O0Pxpt+p/JVFZU9fPn3huvIRLyMUJg46cipxr7vIUe/XsMqlmyjBB+BagJLMTUQuPZ
+ gjzvLNc11XfoKOyKXBDXeoyZq2u3rgd44M3XBdWDHQrKqPmRag84BfQcN6DsYhG8VGO63VDsu
+ wLs9nXG9yVR406EeZv+ww0iXbqv9/mX4klHSwu44nYH1ORR9GHRII7FDK9WbA2gr+Wf8t1Ofu
+ 77TtXsUgyM+yvRnkDlVii2QRs8DRvFZSWS3wUOSZXLhzGYW1MrdWd08tcmJaoLGvt87/A3v+t
+ yz3ex3uKNWORrjCUF/2ZX40qzzqmVksoc0EnEsbm74DFV4xQ/InR7hX3YMb/w3yjMp1UuRYLV
+ YniUes+AlzweUbu44GvA44nHh0lNJd2vfTxtAssyop3bIvszEsBi5NwQPhfgt1+dUJkP5+x4j
+ NpVZmla7rXMHikSR9nUU/jdAA9DUzs1Jfo4YrHc5CCr2ifP2bmNErKeM81bcKHw3tkt9qxP6N
+ mXZ6MkShmFAuiK8gtDvI7DoHfQNrB9CNQnzrl/sSZp0tnGNK3kG0xvXV6PkvocKJBvAblzzDf
+ x67M4=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.72.192.78
-Subject: [Qemu-devel] [PATCH 2/3] net/filter.c: Add Options to insert
- filters anywhere in the filter list
+Subject: [Qemu-devel] [PATCH 3/3] Document the qmp commands for continious
+ replication
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,237 +97,318 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To switch the Secondary to Primary, we need to insert new filters before
-the filter-rewriter.
-
-Add the necessary options to insert filters anywhere in the filter list.
-
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-=2D--
- include/net/filter.h |  2 ++
- net/filter.c         | 73 ++++++++++++++++++++++++++++++++++++++++++--
- qemu-options.hx      | 10 +++---
- 3 files changed, 78 insertions(+), 7 deletions(-)
+---
+ docs/COLO-FT.txt | 185 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 138 insertions(+), 47 deletions(-)
 
-diff --git a/include/net/filter.h b/include/net/filter.h
-index 49da666ac0..355c178f75 100644
-=2D-- a/include/net/filter.h
-+++ b/include/net/filter.h
-@@ -62,6 +62,8 @@ struct NetFilterState {
-     NetClientState *netdev;
-     NetFilterDirection direction;
-     bool on;
-+    char *position;
-+    bool insert_before;
-     QTAILQ_ENTRY(NetFilterState) next;
- };
-
-diff --git a/net/filter.c b/net/filter.c
-index 28d1930db7..1058100b83 100644
-=2D-- a/net/filter.c
-+++ b/net/filter.c
-@@ -171,11 +171,47 @@ static void netfilter_set_status(Object *obj, const =
-char *str, Error **errp)
-     }
- }
-
-+static char *netfilter_get_position(Object *obj, Error **errp)
-+{
-+    NetFilterState *nf =3D NETFILTER(obj);
+diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
+index ad24680d13..c08bfbd3a8 100644
+--- a/docs/COLO-FT.txt
++++ b/docs/COLO-FT.txt
+@@ -145,35 +145,64 @@ The diagram just shows the main qmp command, you can =
+get the detail
+ in test procedure.
+=20
+ =3D=3D Test procedure =3D=3D
++Note: Here we are running both instances on the same Machine for testing,=
+=20
++change the IP Addresses if you want to run it on two Hosts
 +
-+    return g_strdup(nf->position);
-+}
+ 1. Startup qemu
+ Primary:
+-# qemu-system-x86_64 -accel kvm -m 2048 -smp 2 -qmp stdio -name primary \
+-  -device piix3-usb-uhci -vnc :7 \
+-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+-  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfif=
+o,vote-threshold=3D1,\
+-         children.0.file.filename=3D1.raw,\
+-         children.0.driver=3Draw -S
++# imagefolder=3D"/mnt/vms/colo-test"
 +
-+static void netfilter_set_position(Object *obj, const char *str, Error **=
-errp)
-+{
-+    NetFilterState *nf =3D NETFILTER(obj);
++# cp --reflink=3Dauto $imagefolder/primary.qcow2 $imagefolder/primary-copy=
+.qcow2
 +
-+    nf->position =3D g_strdup(str);
-+}
++# qemu-system-x86_64 -enable-kvm -cpu qemu64,+kvmclock -m 512 -smp 1 -qmp =
+stdio \
++   -vnc :0 -k de -device piix3-usb-uhci -device usb-tablet -name primary \
++   -netdev tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/lib/qemu/qemu-bridge-hel=
+per \
++   -device rtl8139,id=3De0,netdev=3Dhn0 \
++   -chardev socket,id=3Dmirror0,host=3D127.0.0.1,port=3D9003,server,nowait=
+ \
++   -chardev socket,id=3Dcompare1,host=3D127.0.0.1,port=3D9004,server,wait \
++   -chardev socket,id=3Dcompare0,host=3D127.0.0.1,port=3D9001,server,nowai=
+t \
++   -chardev socket,id=3Dcompare0-0,host=3D127.0.0.1,port=3D9001 \
++   -chardev socket,id=3Dcompare_out,host=3D127.0.0.1,port=3D9005,server,no=
+wait \
++   -chardev socket,id=3Dcompare_out0,host=3D127.0.0.1,port=3D9005 \
++   -object filter-mirror,id=3Dm0,netdev=3Dhn0,queue=3Dtx,outdev=3Dmirror0 \
++   -object filter-redirector,netdev=3Dhn0,id=3Dredire0,queue=3Drx,indev=3D=
+compare_out \
++   -object filter-redirector,netdev=3Dhn0,id=3Dredire1,queue=3Drx,outdev=
+=3Dcompare0 \
++   -object iothread,id=3Diothread1 \
++   -object colo-compare,id=3Dcomp0,primary_in=3Dcompare0-0,secondary_in=3D=
+compare1,\
++outdev=3Dcompare_out0,iothread=3Diothread1 \
++   -drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vot=
+e-threshold=3D1,\
++children.0.file.filename=3D$imagefolder/primary.qcow2,children.0.driver=3D=
+qcow2 -S
 +
-+static char *netfilter_get_insert(Object *obj, Error **errp)
-+{
-+    NetFilterState *nf =3D NETFILTER(obj);
+ Secondary:
+-# qemu-system-x86_64 -accel kvm -m 2048 -smp 2 -qmp stdio -name secondary \
+-  -device piix3-usb-uhci -vnc :7 \
+-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+-  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D1.raw,driver=3Draw=
+,node-name=3Dnode0 \
+-  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dseconda=
+ry,\
+-         file.driver=3Dqcow2,top-id=3Dactive-disk0,\
+-         file.file.filename=3D/mnt/ramfs/active_disk.img,\
+-         file.backing.driver=3Dqcow2,\
+-         file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
+-         file.backing.backing=3Dsecondary-disk0 \
+-  -incoming tcp:0:8888
++# imagefolder=3D"/mnt/vms/colo-test"
 +
-+    return nf->insert_before ? g_strdup("before") : g_strdup("after");
-+}
++# qemu-img create -f qcow2 $imagefolder/secondary-active.qcow2 10G
 +
-+static void netfilter_set_insert(Object *obj, const char *str, Error **er=
-rp)
-+{
-+    NetFilterState *nf =3D NETFILTER(obj);
++# qemu-img create -f qcow2 $imagefolder/secondary-hidden.qcow2 10G
 +
-+    if (strcmp(str, "before") && strcmp(str, "after")) {
-+        error_setg(errp, "Invalid value for netfilter insert, "
-+                         "should be 'head' or 'tail'");
-+        return;
-+    }
++# qemu-system-x86_64 -enable-kvm -cpu qemu64,+kvmclock -m 512 -smp 1 -qmp =
+stdio \
++   -vnc :1 -k de -device piix3-usb-uhci -device usb-tablet -name secondary=
+ \
++   -netdev tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/lib/qemu/qemu-bridge-hel=
+per \
++   -device rtl8139,id=3De0,netdev=3Dhn0 \
++   -chardev socket,id=3Dred0,host=3D127.0.0.1,port=3D9003,reconnect=3D1 \
++   -chardev socket,id=3Dred1,host=3D127.0.0.1,port=3D9004,reconnect=3D1 \
++   -object filter-redirector,id=3Df1,netdev=3Dhn0,queue=3Dtx,indev=3Dred0 \
++   -object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1=
+ \
++   -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall \
++   -drive if=3Dnone,id=3Dparent0,file.filename=3D$imagefolder/primary-copy=
+.qcow2,driver=3Dqcow2 \
++   -drive if=3Dnone,id=3Dchilds0,driver=3Dreplication,mode=3Dsecondary,fil=
+e.driver=3Dqcow2,\
++top-id=3Dchilds0,file.file.filename=3D$imagefolder/secondary-active.qcow2,\
++file.backing.driver=3Dqcow2,file.backing.file.filename=3D$imagefolder/seco=
+ndary-hidden.qcow2,\
++file.backing.backing=3Dparent0 \
++   -drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vot=
+e-threshold=3D1,\
++children.0.file=3Dchilds0,children.0.driver=3Draw \
++   -incoming tcp:0:9998
 +
-+    nf->insert_before =3D !strcmp(str, "before");
-+}
+=20
+ 2. On Secondary VM's QEMU monitor, issue command
+ {'execute':'qmp_capabilities'}
+-{ 'execute': 'nbd-server-start',
+-  'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx', '=
+port': '8889'} } }
+-}
+-{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', '=
+writable': true } }
++{'execute': 'nbd-server-start', 'arguments': {'addr': {'type': 'inet', 'da=
+ta': {'host': '127.0.0.1', 'port': '9999'} } } }
++{'execute': 'nbd-server-add', 'arguments': {'device': 'parent0', 'writable=
+': true } }
+=20
+ Note:
+   a. The qmp command nbd-server-start and nbd-server-add must be run
+@@ -184,12 +213,10 @@ Note:
+=20
+ 3. On Primary VM's QEMU monitor, issue command:
+ {'execute':'qmp_capabilities'}
+-{ 'execute': 'human-monitor-command',
+-  'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,m=
+ode=3Dprimary,file.driver=3Dnbd,file.host=3Dxx.xx.xx.xx,file.port=3D8889,fi=
+le.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
+-{ 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', '=
+node': 'nbd_client0' } }
+-{ 'execute': 'migrate-set-capabilities',
+-      'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': tr=
+ue } ] } }
+-{ 'execute': 'migrate', 'arguments': {'uri': 'tcp:xx.xx.xx.xx:8888' } }
++{'execute': 'human-monitor-command', 'arguments': {'command-line': 'drive_=
+add -n buddy driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.hos=
+t=3D127.0.0.1,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplicatio=
+n0'}}
++{'execute': 'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'nod=
+e': 'replication0' } }
++{'execute': 'migrate-set-capabilities', 'arguments': {'capabilities': [ {'=
+capability': 'x-colo', 'state': true } ] } }
++{'execute': 'migrate', 'arguments': {'uri': 'tcp:127.0.0.1:9998' } }
+=20
+   Note:
+   a. There should be only one NBD Client for each primary disk.
+@@ -199,27 +226,91 @@ Note:
+=20
+ 4. After the above steps, you will see, whenever you make changes to PVM, =
+SVM will be synced.
+ You can issue command '{ "execute": "migrate-set-parameters" , "arguments"=
+:{ "x-checkpoint-delay": 2000 } }'
+-to change the checkpoint period time
++to change the idle checkpoint period time
+=20
+ 5. Failover test
+-You can kill Primary VM and run 'x_colo_lost_heartbeat' in Secondary VM's
+-monitor at the same time, then SVM will failover and client will not detec=
+t this
+-change.
++You can kill one of the VMs and Failover on the surviving VM:=20
+=20
+-Before issuing '{ "execute": "x-colo-lost-heartbeat" }' command, we have to
+-issue block related command to stop block replication.
+-Primary:
+-  Remove the nbd child from the quorum:
+-  { 'execute': 'x-blockdev-change', 'arguments': {'parent': 'colo-disk0', =
+'child': 'children.1'}}
+-  { 'execute': 'human-monitor-command','arguments': {'command-line': 'driv=
+e_del blk-buddy0'}}
+-  Note: there is no qmp command to remove the blockdev now
++=3D=3D Primary Failover =3D=3D
++The Secondary died, resume on the Primary
+=20
+-Secondary:
+-  The primary host is down, so we should do the following thing:
+-  { 'execute': 'nbd-server-stop' }
++{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0', 'ch=
+ild': 'children.1'} }
++{'execute': 'human-monitor-command', 'arguments':{ 'command-line': 'drive_=
+del replication0' } }
++{'execute': 'object-del', 'arguments':{ 'id': 'comp0' } }
++{'execute': 'object-del', 'arguments':{ 'id': 'iothread1' } }
++{'execute': 'object-del', 'arguments':{ 'id': 'm0' } }
++{'execute': 'object-del', 'arguments':{ 'id': 'redire0' } }
++{'execute': 'object-del', 'arguments':{ 'id': 'redire1' } }
++{'execute': 'x-colo-lost-heartbeat' }
 +
- static void netfilter_init(Object *obj)
- {
-     NetFilterState *nf =3D NETFILTER(obj);
-
-     nf->on =3D true;
-+    nf->insert_before =3D false;
-+    nf->position =3D g_strdup("tail");
-
-     object_property_add_str(obj, "netdev",
-                             netfilter_get_netdev_id, netfilter_set_netdev=
-_id,
-@@ -187,16 +223,23 @@ static void netfilter_init(Object *obj)
-     object_property_add_str(obj, "status",
-                             netfilter_get_status, netfilter_set_status,
-                             NULL);
-+    object_property_add_str(obj, "position",
-+                            netfilter_get_position, netfilter_set_positio=
-n,
-+                            NULL);
-+    object_property_add_str(obj, "insert",
-+                            netfilter_get_insert, netfilter_set_insert,
-+                            NULL);
- }
-
- static void netfilter_complete(UserCreatable *uc, Error **errp)
- {
-     NetFilterState *nf =3D NETFILTER(uc);
-+    NetFilterState *position;
-     NetClientState *ncs[MAX_QUEUE_NUM];
-     NetFilterClass *nfc =3D NETFILTER_GET_CLASS(uc);
-     int queues;
-     Error *local_err =3D NULL;
--
++=3D=3D Secondary Failover =3D=3D
++The Primary died, resume on the Secondary and prepare to become the new Pr=
+imary
 +
-     if (!nf->netdev_id) {
-         error_setg(errp, "Parameter 'netdev' is required");
-         return;
-@@ -219,6 +262,20 @@ static void netfilter_complete(UserCreatable *uc, Err=
-or **errp)
-         return;
-     }
-
-+    if (strcmp(nf->position, "head") && strcmp(nf->position, "tail")) {
-+        /* Search for the position to insert before/after */
-+        Object *container;
-+        Object *obj;
++{'execute': 'nbd-server-stop'}
++{'execute': 'x-colo-lost-heartbeat'}
 +
-+        container =3D object_get_objects_root();
-+        obj =3D object_resolve_path_component(container, nf->position);
-+        if (!obj) {
-+            error_setg(errp, "filter '%s' not found", nf->position);
-+            return;
-+        }
-+        position =3D NETFILTER(obj);
-+    }
++{'execute': 'object-del', 'arguments':{ 'id': 'f2' } }
++{'execute': 'object-del', 'arguments':{ 'id': 'f1' } }
++{'execute': 'chardev-remove', 'arguments':{ 'id': 'red1' } }
++{'execute': 'chardev-remove', 'arguments':{ 'id': 'red0' } }
 +
-     nf->netdev =3D ncs[0];
-
-     if (nfc->setup) {
-@@ -228,7 +285,18 @@ static void netfilter_complete(UserCreatable *uc, Err=
-or **errp)
-             return;
-         }
-     }
--    QTAILQ_INSERT_TAIL(&nf->netdev->filters, nf, next);
++{'execute': 'chardev-add', 'arguments':{ 'id': 'mirror0', 'backend': {'typ=
+e': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.0.0=
+.1', 'port': '9003' } }, 'server': true } } } }
++{'execute': 'chardev-add', 'arguments':{ 'id': 'compare1', 'backend': {'ty=
+pe': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.0.=
+0.1', 'port': '9004' } }, 'server': true } } } }
++{'execute': 'chardev-add', 'arguments':{ 'id': 'compare0', 'backend': {'ty=
+pe': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.0.=
+0.1', 'port': '9001' } }, 'server': true } } } }
++{'execute': 'chardev-add', 'arguments':{ 'id': 'compare0-0', 'backend': {'=
+type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.=
+0.0.1', 'port': '9001' } }, 'server': false } } } }
++{'execute': 'chardev-add', 'arguments':{ 'id': 'compare_out', 'backend': {=
+'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127=
+.0.0.1', 'port': '9005' } }, 'server': true } } } }
++{'execute': 'chardev-add', 'arguments':{ 'id': 'compare_out0', 'backend': =
+{'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '12=
+7.0.0.1', 'port': '9005' } }, 'server': false } } } }
 +
-+    if (!strcmp(nf->position, "head")) {
-+        QTAILQ_INSERT_HEAD(&nf->netdev->filters, nf, next);
-+    } else if (!strcmp(nf->position, "tail")) {
-+        QTAILQ_INSERT_TAIL(&nf->netdev->filters, nf, next);
-+    } else {
-+        if (nf->insert_before) {
-+            QTAILQ_INSERT_BEFORE(position, nf, next);
-+        } else {
-+            QTAILQ_INSERT_AFTER(&nf->netdev->filters, position, nf, next)=
-;
-+        }
-+    }
- }
-
- static void netfilter_finalize(Object *obj)
-@@ -245,6 +313,7 @@ static void netfilter_finalize(Object *obj)
-         QTAILQ_REMOVE(&nf->netdev->filters, nf, next);
-     }
-     g_free(nf->netdev_id);
-+    g_free(nf->position);
- }
-
- static void default_handle_event(NetFilterState *nf, int event, Error **e=
-rrp)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 08749a3391..f0a47a0746 100644
-=2D-- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4368,7 +4368,7 @@ applications, they can do this through this paramete=
-r. Its format is
- a gnutls priority string as described at
- @url{https://gnutls.org/manual/html_node/Priority-Strings.html}.
-
--@item -object filter-buffer,id=3D@var{id},netdev=3D@var{netdevid},interva=
-l=3D@var{t}[,queue=3D@var{all|rx|tx}][,status=3D@var{on|off}]
-+@item -object filter-buffer,id=3D@var{id},netdev=3D@var{netdevid},interva=
-l=3D@var{t}[,queue=3D@var{all|rx|tx}][,status=3D@var{on|off}][,position=3D=
-@var{head|tail|id}][,insert=3D@var{after|before}]
-
- Interval @var{t} can't be 0, this filter batches the packet delivery: all
- packets arriving in a given interval on netdev @var{netdevid} are delayed
-@@ -4387,11 +4387,11 @@ queue @var{all|rx|tx} is an option that can be app=
-lied to any netfilter.
- @option{tx}: the filter is attached to the transmit queue of the netdev,
-              where it will receive packets sent by the netdev.
-
--@item -object filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=
-=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support]
-+@item -object filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=
-=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support][,position=3D=
-@var{head|tail|id}][,insert=3D@var{after|before}]
-
- filter-mirror on netdev @var{netdevid},mirror net packet to chardev@var{c=
-hardevid}, if it has the vnet_hdr_support flag, filter-mirror will mirror =
-packet with vnet_hdr_len.
-
--@item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},ind=
-ev=3D@var{chardevid},outdev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vne=
-t_hdr_support]
-+@item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},ind=
-ev=3D@var{chardevid},outdev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vne=
-t_hdr_support][,position=3D@var{head|tail|id}][,insert=3D@var{after|before=
-}]
-
- filter-redirector on netdev @var{netdevid},redirect filter's net packet t=
-o chardev
- @var{chardevid},and redirect indev's packet to filter.if it has the vnet_=
-hdr_support flag,
-@@ -4400,7 +4400,7 @@ Create a filter-redirector we need to differ outdev =
-id from indev id, id can not
- be the same. we can just use indev or outdev, but at least one of indev o=
-r outdev
- need to be specified.
-
--@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=
-=3D@var{all|rx|tx},[vnet_hdr_support]
-+@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=
-=3D@var{all|rx|tx},[vnet_hdr_support][,position=3D@var{head|tail|id}][,ins=
-ert=3D@var{after|before}]
-
- Filter-rewriter is a part of COLO project.It will rewrite tcp packet to
- secondary from primary to keep secondary tcp connection,and rewrite
-@@ -4413,7 +4413,7 @@ colo secondary:
- -object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1
- -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall
-
--@item -object filter-dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{f=
-ilename}][,maxlen=3D@var{len}]
-+@item -object filter-dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{f=
-ilename}][,maxlen=3D@var{len}][,position=3D@var{head|tail|id}][,insert=3D@=
-var{after|before}]
-
- Dump the network traffic on netdev @var{dev} to the file specified by
- @var{filename}. At most @var{len} bytes (64k by default) per packet are s=
-tored.
-=2D-
++=3D=3D Primary resume replication =3D=3D
++Resume replication after new Secondary is up.
++
++Start the new Secondary, then:
++{'execute': 'drive-mirror', 'arguments':{ 'device': 'colo-disk0', 'job-id'=
+: 'resync', 'target': 'nbd://127.0.0.1:9999/parent0', 'mode': 'existing', '=
+format': 'raw', 'sync': 'full'} }
++
++Wait until disk is synced, then:
++{'execute': 'stop'}
++{'execute': 'block-job-cancel', 'arguments':{ 'device': 'resync'} }
++
++{'execute': 'human-monitor-command', 'arguments':{ 'command-line': 'drive_=
+add -n buddy driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.hos=
+t=3D127.0.0.1,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplicatio=
+n0'}}
++{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0', 'no=
+de': 'replication0' } }
++
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-mirror', 'id':=
+ 'm0', 'props': { 'netdev': 'hn0', 'queue': 'tx', 'outdev': 'mirror0' } } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
+id': 'redire0', 'props': { 'netdev': 'hn0', 'queue': 'rx', 'indev': 'compar=
+e_out' } } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
+id': 'redire1', 'props': { 'netdev': 'hn0', 'queue': 'rx', 'outdev': 'compa=
+re0' } } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'iothread', 'id': 'iot=
+hread1' } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'colo-compare', 'id': =
+'comp0', 'props': { 'primary_in': 'compare0-0', 'secondary_in': 'compare1',=
+ 'outdev': 'compare_out0', 'iothread': 'iothread1' } } }
++
++{'execute': 'migrate-set-capabilities', 'arguments':{ 'capabilities': [ {'=
+capability': 'x-colo', 'state': true } ] } }
++{'execute': 'migrate', 'arguments':{ 'uri': 'tcp:127.0.0.1:9998' } }
++
++Note:
++If this Primary previously was a Secondary, then we need to insert the=20
++filters before the filter-rewriter by using the=20
++"'insert': 'before', 'position': 'rew0'" Options. See below.
++
++=3D=3D Secondary resume replication =3D=3D
++Become Primary and resume replication after new Secondary is up.
++
++Start the new Secondary, then:
++{'execute': 'drive-mirror', 'arguments':{ 'device': 'colo-disk0', 'job-id'=
+: 'resync', 'target': 'nbd://127.0.0.1:9999/parent0', 'mode': 'existing', '=
+format': 'raw', 'sync': 'full'} }
++
++Wait until disk is synced, then:
++{'execute': 'stop'}
++{'execute': 'block-job-cancel', 'arguments':{ 'device': 'resync' } }
++
++{'execute': 'human-monitor-command', 'arguments':{ 'command-line': 'drive_=
+add -n buddy driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.hos=
+t=3D127.0.0.1,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplicatio=
+n0'}}
++{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0', 'no=
+de': 'replication0' } }
++
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-mirror', 'id':=
+ 'm0', 'props': { 'insert': 'before', 'position': 'rew0', 'netdev': 'hn0', =
+'queue': 'tx', 'outdev': 'mirror0' } } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
+id': 'redire0', 'props': { 'insert': 'before', 'position': 'rew0', 'netdev'=
+: 'hn0', 'queue': 'rx', 'indev': 'compare_out' } } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
+id': 'redire1', 'props': { 'insert': 'before', 'position': 'rew0', 'netdev'=
+: 'hn0', 'queue': 'rx', 'outdev': 'compare0' } } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'iothread', 'id': 'iot=
+hread1' } }
++{'execute': 'object-add', 'arguments':{ 'qom-type': 'colo-compare', 'id': =
+'comp0', 'props': { 'primary_in': 'compare0-0', 'secondary_in': 'compare1',=
+ 'outdev': 'compare_out0', 'iothread': 'iothread1' } } }
++
++{'execute': 'migrate-set-capabilities', 'arguments':{ 'capabilities': [ {'=
+capability': 'x-colo', 'state': true } ] } }
++{'execute': 'migrate', 'arguments':{ 'uri': 'tcp:127.0.0.1:9998' } }
+=20
+ =3D=3D TODO =3D=3D
+-1. Support continuous VM replication.
+-2. Support shared storage.
+-3. Develop the heartbeat part.
+-4. Reduce checkpoint VM=E2=80=99s downtime while doing checkpoint.
++1. Support shared storage.
++2. Develop the heartbeat part.
++3. Reduce checkpoint VM=E2=80=99s downtime while doing checkpoint.
+--=20
 2.20.1
 
