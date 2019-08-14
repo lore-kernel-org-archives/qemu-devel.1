@@ -2,49 +2,49 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0857C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 18:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B12DEC32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 19:04:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96F3F2084F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 18:38:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96F3F2084F
+	by mail.kernel.org (Postfix) with ESMTPS id 8952A206C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 19:04:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8952A206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxyA5-0005FA-JK
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 14:38:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44498)
+	id 1hxyZN-0000ZV-GA
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 15:04:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hxy9B-0004jz-Vv
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 14:37:23 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hxyYd-0008Vl-9y
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 15:03:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hxy9A-00089j-RJ
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 14:37:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37150)
+ (envelope-from <jsnow@redhat.com>) id 1hxyYc-0003oN-2g
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 15:03:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hxy95-000836-13; Wed, 14 Aug 2019 14:37:15 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ id 1hxyYY-0003kV-SA; Wed, 14 Aug 2019 15:03:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E2EDAC08EC07;
- Wed, 14 Aug 2019 18:37:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3B8383D3C;
+ Wed, 14 Aug 2019 19:03:33 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB94310002C2;
- Wed, 14 Aug 2019 18:37:12 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
-References: <20190813224446.14145-1-jsnow@redhat.com>
- <8448b999-134c-edc0-ac29-1da08e3f4d50@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 714AB83789;
+ Wed, 14 Aug 2019 19:03:32 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Qemu-block <qemu-block@nongnu.org>
+References: <ff425747-145c-68e3-134d-432fe1198247@redhat.com>
+ <38cc9bad-5936-4fa9-81e6-bddbcc59758e@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,21 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c90319d0-d13f-fb78-f670-4b9115ad24d0@redhat.com>
-Date: Wed, 14 Aug 2019 14:37:12 -0400
+Message-ID: <44b708d0-dc40-7463-63a7-bb98702f24cd@redhat.com>
+Date: Wed, 14 Aug 2019 15:03:31 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <8448b999-134c-edc0-ac29-1da08e3f4d50@redhat.com>
+In-Reply-To: <38cc9bad-5936-4fa9-81e6-bddbcc59758e@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Wed, 14 Aug 2019 18:37:13 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Wed, 14 Aug 2019 19:03:33 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [RFC] dirty-bitmaps: add
- block-dirty-bitmap-persist command
+Subject: Re: [Qemu-devel] bitmaps branch rebase
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,91 +147,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 8/13/19 8:08 PM, Eric Blake wrote:
-> On 8/13/19 5:44 PM, John Snow wrote:
->> This is for the purpose of toggling on/off persistence on a bitmap.
->> This enables you to save a bitmap that was not persistent, but may
->> have already accumulated valuable data.
+On 8/14/19 9:26 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 08.08.2019 0:45, John Snow wrote:
+>> FYI: I rebased jsnow/bitmaps on top of kwolf/block-next, itself based on
+>> top of v4.1.0-rc4.
 >>
->> This is simply a QOL enhancement:
->> - Allows user to "upgrade" an existing bitmap to persistent
->> - Allows user to "downgrade" an existing bitmap to transient,
->>   removing it from storage without deleting the bitmap.
+>> I'll post this along with the eventual pull request, but here's the
+>> diffstat against the published patches:
+>>
+>> 011/33:[0003] [FC] 'block/backup: upgrade copy_bitmap to BdrvDirtyBitmap'
+>> 016/33:[----] [-C] 'iotests: Add virtio-scsi device helper'
+>> 017/33:[0002] [FC] 'iotests: add test 257 for bitmap-mode backups'
+>> 030/33:[0001] [FC] 'block/backup: teach TOP to never copy unallocated
+>> regions'
+>> 032/33:[0018] [FC] 'iotests/257: test traditional sync modes'
+>>
+>> 11: A new hbitmap call was added upstream, changed to
+>> bdrv_dirty_bitmap_next_zero.
+>> 16: Context-only (self.has_quit is new context in 040)
+>> 17: Removed 'auto' to follow upstream trends in iotest fashion
+>> 30: Remove ret = -ECANCELED as agreed on-list;
+>>      Context changes for dirty_end patches
+>> 32: Fix capitalization in test, as mentioned on list.
+>>
+>> I think the changes are actually fairly minimal and translate fairly
+>> directly; let's review the rebase on-list in response to the PULL mails
+>> when I send them.
 >>
 > 
-> In the meantime, a workaround is:
 > 
-> create tmp bitmap (non-persistent is fine)
-> merge existing bitmap into tmp bitmap
-> delete existing bitmap
-> recreate original bitmap with desired change in persistence
-> merge tmp bitmap into re-created original bitmap
-> delete tmp bitmap
+> There is a bug in "block/backup: teach TOP to never copy unallocated regions":
 > 
-
-Merge really lets us get away with a lot :) It's a powerful command. And
-now that merge supports cross-granularities, you can even use it to
-change the granularity of a bitmap.
-
-> (I'm not sure how much, if any of that, has to be done with a
-> transaction; ideally none, since merging two bitmaps that are both
-> enabled is not going to lose any bits.  And since one of the two ends of
-> the transaction has a non-persistent bitmap, qemu failing in the narrow
-> window where the original bitmap does not exist at all is not that much
-> different from failing while the bitmap is transient. If losing data due
-> to qemu failure was important, the bitmap should never have been
-> transient in the first place)
 > 
-
-Yup, quite a lengthy workaround, but it _IS_ possible, it's just not
-very nice.
-
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>
->> This is just an RFC because I'm not sure if I really want to pursue
->> adding this, but it was raised in a discussion I had recently that it
->> was a little annoying as an API design that persistence couldn't be
->> changed after addition, so I wanted to see how much code it would take
->> to address that.
->>
->> (So this patch isn't really tested; just: "Hey, look!")
->>
->> I don't like this patch because it exacerbates my perceived problems
->> with the "check if I can make it persistent, then toggle the flag"
->> model, where I prefer the "Just try to set it persistent and let it fail
->> if it cannot" model, but there were some issues with that patchset that
->> I want to revisit.
+>  > @@ -256,6 +287,15 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+>  >              continue; /* already copied */
+>  >          }
+>  >
+>  > +        if (job->initializing_bitmap) {
+>  > +            ret = backup_bitmap_reset_unallocated(job, start, &skip_bytes);
+>  > +            if (ret == 0) {
+>  > +                trace_backup_do_cow_skip_range(job, start, skip_bytes);
+>  > +                start += skip_bytes;
+>  > +                continue;
+>  > +            }
 > 
-> The idea itself makes sense. I don't know if libvirt would ever use it,
-> but it does seem like it could make hand-management of bitmaps easier to
-> reason about.
+> assume ret == 1, so we see skip_bytes of allocated bytes
+> 
+>  > +        }
+>  > +
+>  >          dirty_end = bdrv_dirty_bitmap_next_zero(job->copy_bitmap, start,
+>  >                                                  (end - start));
+>  >          if (dirty_end < 0) {
+>  >
+> 
+> but then, we may copy more than skip_bytes, i.e. touch following possibly unallocated area.
 > 
 
-Right, this isn't for libvirt as much as it is people doing manual
-configuration with e.g. qmp-shell (or heaven forbid, their own QMP tooling.)
+Yes, Max pointed this out to me. He fixed it in his rebase. I will
+probably send his fix as a patch, but then squash it in.
 
->> +++ b/qapi/block-core.json
->> @@ -2001,6 +2001,19 @@
->>    'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
->>              '*persistent': 'bool', '*autoload': 'bool', '*disabled': 'bool' } }
->>  
->> +##
->> +# @BlockDirtyBitmapPersist:
+> ===
 > 
-> The QAPI additions look fine to me, regardless of whether you respin the
-> code based on review there.
+> Also, if want to fix it anyway, I think it's better to make additional while loop before this one
+> and reset all unallocated from start to end, otherwise we may call block_status for every cluster
+> on each loop iteration, even if the first call returns skip_bytes >= (end - start).
 > 
 
-Thanks, just wanted this one out there on the record.
+Are you worried about the case where backup_bitmap_reset_unallocated
+returns as soon as it knows at least one cluster is unallocated, and
+thus might re-query regions in the unaligned "tails"?
 
---js
+(That is, if it finds 0 - 92K unallocated, so it confirms [0-64K] as
+unallocated, but then needs to spend time re-querying for [64-128K].)
+
+If you'd like to optimize this, I'll invite you to, as a patch.
+
+In practice I wonder if you're often going to run into the case where
+block_status wants to return to you information segmented to less than
+the cluster size such that you'd be spending a considerable portion of
+time re-querying.
+
+I suppose if the job size was e.g. 128K but the native qcow2 size was
+64K and you had very perfectly fragmented allocations that you might see
+the worst case for re-querying regions.
 
