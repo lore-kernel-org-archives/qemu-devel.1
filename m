@@ -2,109 +2,67 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24757C32753
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5961C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:46:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFB4B214DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:45:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB4B214DA
+	by mail.kernel.org (Postfix) with ESMTPS id A0977214DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 17:46:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0977214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxxL8-0003Qv-W2
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:45:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36806)
+	id 1hxxLV-0003kI-Pc
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 13:46:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36885)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hxxJz-0002Y0-PK
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:44:28 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hxxKH-0002hd-8x
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hxxJy-0008BF-Bh
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:44:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44266)
+ (envelope-from <dgilbert@redhat.com>) id 1hxxKG-000058-48
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:44:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63321)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>)
- id 1hxxJy-00087i-3i; Wed, 14 Aug 2019 13:44:26 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hxxKF-0008Uz-HV
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 13:44:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E94E269066;
- Wed, 14 Aug 2019 17:44:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-85.ams2.redhat.com [10.36.116.85])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52A0138E3D;
- Wed, 14 Aug 2019 17:44:19 +0000 (UTC)
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-References: <20190814072355.15333-1-david@redhat.com>
- <20190814072355.15333-3-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <ab85907a-0870-ab84-ec89-3df40ef7fb46@redhat.com>
-Date: Wed, 14 Aug 2019 19:44:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 353EF3E53F;
+ Wed, 14 Aug 2019 17:44:42 +0000 (UTC)
+Received: from work-vm (ovpn-117-212.ams2.redhat.com [10.36.117.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 42FA88BE3B;
+ Wed, 14 Aug 2019 17:44:32 +0000 (UTC)
+Date: Wed, 14 Aug 2019 18:44:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Message-ID: <20190814174430.GT2920@work-vm>
+References: <20190813102936.32195-1-dgilbert@redhat.com>
+ <20190813102936.32195-2-dgilbert@redhat.com>
+ <f87ef58d-a549-54cf-4a3a-8e4712c699e1@redhat.com>
+ <20190814172545.GS2920@work-vm>
+ <64416580-ee29-8d75-4ad6-c1453d70afd6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190814072355.15333-3-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <64416580-ee29-8d75-4ad6-c1453d70afd6@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Wed, 14 Aug 2019 17:44:24 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.26]); Wed, 14 Aug 2019 17:44:42 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH-for-4.2 v2 2/6] s390x/tcg:
- Rework MMU selection for instruction fetches
+Subject: Re: [Qemu-devel] [PATCH 1/2] memory: Align and add helper for
+ comparing MemoryRegionSections
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,30 +74,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, pbonzini@redhat.com, qemu-devel@nongnu.org,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/14/19 9:23 AM, David Hildenbrand wrote:
-> Instructions are always fetched from primary address space, except when
-> in home address mode. Perform the selection directly in cpu_mmu_index().
-> 
-> get_mem_index() is only used to perform data access, instructions are
-> fetched via cpu_lduw_code(), which translates to cpu_mmu_index(env, true).
-> 
-> We don't care about restricting the access permissions of the TLB
-> entries anymore, as we no longer enter PRIMARY entries into the
-> SECONDARY MMU. Cleanup related code a bit.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/cpu.h        |  7 +++++++
->  target/s390x/mmu_helper.c | 38 +++++++++++++++-----------------------
->  2 files changed, 22 insertions(+), 23 deletions(-)
+* Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> On 8/14/19 7:25 PM, Dr. David Alan Gilbert wrote:
+> > * Philippe Mathieu-Daud=E9 (philmd@redhat.com) wrote:
+> >> Hi David,
+> >>
+> >> On 8/13/19 12:29 PM, Dr. David Alan Gilbert (git) wrote:
+> >>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >>>
+> >>> MemoryRegionSection includes an Int128 'size' field;
+> >>> on some platforms the compiler causes an alignment of this to
+> >>> a 128bit boundary, leaving 8 bytes of dead space.
+> >>> This deadspace can be filled with junk.
+> >>>
+> >>> Move the size field to the top avoiding unnecsssary alignment
+> >>
+> >> "unnecessary"
+> >=20
+> > Oops thanks.
+> >=20
+> >> This is enough change to be in its own commit.
+> >>
+> >> ---
+> >>
+> >>> and provide an 'eq' routine to safely compare MRS's.
+> >>
+> >> This is another change, and should be squashed in the next patch IMO=
+.
+> >=20
+> > OK, what I'll do is I'll split this one into two ; I feel better
+> > having the extra function here separate from the next commit.
+>=20
+> Thanks, feel free to add to both:
+> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks!
+
+> >> Doesn't Clang warn about unused 'static inline' btw?
+> >=20
+> > I was using gcc; but we seem to have loads of static inline's - what
+> > would make this one different?
+>=20
+> I guess I was confused with 'static (no-inline)' :)
+>=20
+> >>>
+> >>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >>> ---
+> >>>  include/exec/memory.h | 14 +++++++++++++-
+> >>>  1 file changed, 13 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> >>> index 606250172a..ce62e847bd 100644
+> >>> --- a/include/exec/memory.h
+> >>> +++ b/include/exec/memory.h
+> >>> @@ -487,15 +487,27 @@ static inline FlatView *address_space_to_flat=
+view(AddressSpace *as)
+> >>>   * @nonvolatile: this section is non-volatile
+> >>>   */
+> >>>  struct MemoryRegionSection {
+> >>> +    Int128 size;
+> >>>      MemoryRegion *mr;
+> >>>      FlatView *fv;
+> >>>      hwaddr offset_within_region;
+> >>> -    Int128 size;
+> >>>      hwaddr offset_within_address_space;
+> >>>      bool readonly;
+> >>>      bool nonvolatile;
+> >>>  };
+> >>> =20
+> >>> +static inline bool MemoryRegionSection_eq(MemoryRegionSection *a,
+> >>> +                                          MemoryRegionSection *b)
+> >>> +{
+> >>> +    return a->mr =3D=3D b->mr &&
+> >>> +           a->fv =3D=3D b->fv &&
+> >>> +           a->offset_within_region =3D=3D b->offset_within_region =
+&&
+> >>> +           a->offset_within_address_space =3D=3D b->offset_within_=
+address_space &&
+> >>> +           int128_eq(a->size, b->size) &&
+> >>> +           a->readonly =3D=3D b->readonly &&
+> >>> +           a->nonvolatile =3D=3D b->nonvolatile;
+> >>> +}
+> >>> +
+> >>>  /**
+> >>>   * memory_region_init: Initialize a memory region
+> >>>   *
+> >>>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
