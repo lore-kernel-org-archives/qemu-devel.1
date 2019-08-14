@@ -2,92 +2,50 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEAB3C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CBFC32753
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA3EB20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:41:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kE/90/DV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA3EB20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id 795D92084F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 14:45:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 795D92084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxuTM-0003Tm-PY
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 10:41:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33525)
+	id 1hxuWP-0005JB-60
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 10:45:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1hxuSh-00033k-5Y
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:41:16 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxuUp-00043x-6r
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1hxuSf-0001Fb-QK
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:41:15 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34787)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1hxuSf-0001EX-Jn
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:41:13 -0400
-Received: by mail-pg1-x544.google.com with SMTP id n9so46972508pgc.1
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 07:41:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=N9cOcv1BVXJcJQ7QJfM1M9xy2CTQ5s9kJ2wj+tITcQY=;
- b=kE/90/DVSr4GlkuljAx2MaO6Pi/RYDAjNQ0iKr8rbw3Xg+gC7K1qbDReU5kCYDKulk
- S6b0yEag53nARBXxwMFV1b6Zb50WPCQYu/+nc2kk6flm12WSU8FhjxLjbNMj0yDke7Kz
- 58mSrG5OmAiMCYGo5BgzjePW+ZFM1IHGJrVLW5y2EBXBW6812l67yxlrLmrt+Qdv1ovR
- AoLDvyY62u22USnzGfA9KVwKw+m4UsfGfdtI5oCRw7mTD2sLZ+qgj21fnDmbztQJ3TtT
- 5SDi2BK64mJ0R0cuj89qm8I24Gu02mCEAbuNdkHghytSM4TEROpP1wcMA98lG3eG87tj
- dVzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :references:mime-version:content-disposition
- :content-transfer-encoding:in-reply-to:user-agent;
- bh=N9cOcv1BVXJcJQ7QJfM1M9xy2CTQ5s9kJ2wj+tITcQY=;
- b=O0I4CJsGD21mhQbPhGsKlcQdBnUiYo3z0aOvDxqDDzKQfQJDzMUaz5iCC8bJwmVkpJ
- z7Qw0DIJQk4u7uhvpxY99ddxCFzAS1M+ZBX5INSPr8oppC8E3F5hOkgpnnHNWKaUg3dN
- CARr563MG4ZaQDvhI6usJbRNSZJyzCbpA3dx86NHLR+ZHcbnD7SX77KHUm5DHvJbI/qn
- vZqizSi6wRfM3peHVhIAwnXo3YN1WdPodCWfgKVgWeWpreKjiUdEbQJzhNuLGA35TdrG
- QRgTojNgmbexcgLJ0WMvfnfawm8BQkGgLKHxXSryyS7ujRclq1/92zxbXj4oQyvh8l/c
- RUdA==
-X-Gm-Message-State: APjAAAW6YnNf+9rHcAlqT5IOnSr9/HrD4e05GwAix4c3BVZtclq+oL6g
- NzhNJj4ZH9opM2mw+4JaUDg=
-X-Google-Smtp-Source: APXvYqw52HXvRcV7lVxfWExg8QeH604PX2EYFypNyJLTjNdh4FrI+ouX4pWPcoLEbtJzzjQ8/JR+Fw==
-X-Received: by 2002:a63:ee08:: with SMTP id e8mr39807927pgi.70.1565793668875; 
- Wed, 14 Aug 2019 07:41:08 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id t6sm37231362pgu.23.2019.08.14.07.41.08
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 14 Aug 2019 07:41:08 -0700 (PDT)
-Date: Wed, 14 Aug 2019 07:41:07 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190814144107.GB30613@roeck-us.net>
-References: <1564508710-22909-1-git-send-email-linux@roeck-us.net>
- <160cda6c-63b3-4d52-018e-d282514be2a3@redhat.com>
- <20190802141149.dj7zv5p5wscftvnr@sirius.home.kraxel.org>
- <14dfe5ce-d74c-dccd-a62b-753b2efa924b@roeck-us.net>
- <20190813114203.z62dgyyneqcp3mru@sirius.home.kraxel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190813114203.z62dgyyneqcp3mru@sirius.home.kraxel.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
-Subject: Re: [Qemu-devel] [PATCH] ehci: Ensure that device is not NULL
- before calling usb_ep_get
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hxuUn-0002Db-ML
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 10:43:27 -0400
+Received: from relay.sw.ru ([185.231.240.75]:49612)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hxuUi-0002AE-QL; Wed, 14 Aug 2019 10:43:20 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hxuUe-0007hk-VF; Wed, 14 Aug 2019 17:43:17 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Wed, 14 Aug 2019 17:43:13 +0300
+Message-Id: <20190814144315.89729-3-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190814144315.89729-1-vsementsov@virtuozzo.com>
+References: <20190814144315.89729-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH 2/4] block/dirty-bitmap: add _next_dirty API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,103 +57,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, vsementsov@virtuozzo.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 13, 2019 at 01:42:03PM +0200, Gerd Hoffmann wrote:
-> On Tue, Aug 06, 2019 at 06:23:38AM -0700, Guenter Roeck wrote:
-> > On 8/2/19 7:11 AM, Gerd Hoffmann wrote:
-> > > On Wed, Jul 31, 2019 at 01:08:50PM +0200, Philippe Mathieu-Daudé wrote:
-> > > > On 7/30/19 7:45 PM, Guenter Roeck wrote:
-> > > > > The following assert is seen once in a while while resetting the
-> > > > > Linux kernel.
-> > > > > 
-> > > > > qemu-system-x86_64: hw/usb/core.c:734: usb_ep_get:
-> > > > > 	Assertion `dev != NULL' failed.
-> > > > > 
-> > > > > The call to usb_ep_get() originates from ehci_execute().
-> > > > > Analysis and debugging shows that p->queue->dev can indeed be NULL
-> > > > > in this function. Add check for this condition and return an error
-> > > > > if it is seen.
-> > > > 
-> > > > Your patch is not wrong as it corrects your case, but I wonder why we
-> > > > get there. This assert seems to have catched a bug.
-> > > 
-> > > https://bugzilla.redhat.com//show_bug.cgi?id=1715801 maybe.
-> > > 
-> > > > Gerd, shouldn't we call usb_packet_cleanup() in ehci_reset() rather than
-> > > > ehci_finalize()? Then we shouldn't need this patch.
-> > > 
-> > > The two ehci_queues_rip_all() calls in ehci_reset() should clean up everything
-> > > properly.
-> > > 
-> > > Can you try the patch below to see whenever a ehci_find_device failure is the
-> > > root cause?
-> > > 
-> > > thanks,
-> > >    Gerd
-> > > 
-> > > diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-> > > index 62dab0592fa2..2b0a57772ed5 100644
-> > > --- a/hw/usb/hcd-ehci.c
-> > > +++ b/hw/usb/hcd-ehci.c
-> > > @@ -1644,6 +1644,10 @@ static EHCIQueue *ehci_state_fetchqh(EHCIState *ehci, int async)
-> > >           q->dev = ehci_find_device(q->ehci,
-> > >                                     get_field(q->qh.epchar, QH_EPCHAR_DEVADDR));
-> > >       }
-> > > +    if (q->dev == NULL) {
-> > > +        fprintf(stderr, "%s: device %d not found\n", __func__,
-> > > +                get_field(q->qh.epchar, QH_EPCHAR_DEVADDR));
-> > > +    }
-> > Turns out I end up seeing that message hundreds of times early on each boot,
-> > no matter which architecture. It is quite obviously a normal operating condition.
-> 
-> Yep, as long as the queue is not active this is completely harmless.
-> So we need to check a bit later.  In execute() looks a bit too late
-> though, we don't have a good backup plan then.
-> 
-> Does the patch below solve the problem without bad side effects?
-> 
-I reverted my patch and applied the patch below to my builds of qemu, for both
-v4.0 and v4.1, and installed it in my test bed. I'll let you know how it goes.
+We have bdrv_dirty_bitmap_next_zero, let's add corresponding
+bdrv_dirty_bitmap_next_dirty, which is more comfortable to use than
+bitmap iterators in some cases. It will be used in the following
+commit.
 
-Thanks,
-Guenter
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ include/block/dirty-bitmap.h |  2 ++
+ include/qemu/hbitmap.h       | 13 ++++++++
+ block/dirty-bitmap.c         |  6 ++++
+ util/hbitmap.c               | 61 +++++++++++++++++++-----------------
+ 4 files changed, 54 insertions(+), 28 deletions(-)
 
-> thanks,
->   Gerd
-> 
-> From 5980eaad23f675a2d509d0c55e288793619761bc Mon Sep 17 00:00:00 2001
-> From: Gerd Hoffmann <kraxel@redhat.com>
-> Date: Tue, 13 Aug 2019 13:37:09 +0200
-> Subject: [PATCH] ehci: try fix queue->dev null ptr dereference
-> 
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/hcd-ehci.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
-> index 62dab0592fa2..5f089f30054b 100644
-> --- a/hw/usb/hcd-ehci.c
-> +++ b/hw/usb/hcd-ehci.c
-> @@ -1834,6 +1834,9 @@ static int ehci_state_fetchqtd(EHCIQueue *q)
->              ehci_set_state(q->ehci, q->async, EST_EXECUTING);
->              break;
->          }
-> +    } else if (q->dev == NULL) {
-> +        ehci_trace_guest_bug(q->ehci, "no device attached to queue");
-> +        ehci_set_state(q->ehci, q->async, EST_HORIZONTALQH);
->      } else {
->          p = ehci_alloc_packet(q);
->          p->qtdaddr = q->qtdaddr;
-> -- 
-> 2.18.1
-> 
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 493c4566d3..d1310ee76e 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -108,6 +108,8 @@ bool bdrv_has_changed_persistent_bitmaps(BlockDriverState *bs);
+ BdrvDirtyBitmap *bdrv_dirty_bitmap_next(BlockDriverState *bs,
+                                         BdrvDirtyBitmap *bitmap);
+ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp);
++int64_t bdrv_dirty_bitmap_next_dirty(BdrvDirtyBitmap *bitmap, int64_t offset,
++                                     int64_t bytes);
+ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
+                                     int64_t bytes);
+ bool bdrv_dirty_bitmap_next_dirty_area(BdrvDirtyBitmap *bitmap,
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 5149ac7721..80ecabe8e2 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -299,6 +299,19 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first);
+  */
+ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi);
+ 
++/*
++ * hbitmap_next_dirty:
++ *
++ * Find next dirty bit within selected range. If not found, return -1.
++ *
++ * @hb: The HBitmap to operate on
++ * @start: The bit to start from.
++ * @count: Number of bits to proceed. If @start+@count > bitmap size, the whole
++ * bitmap is looked through. You can use UINT64_MAX as @count to search up to
++ * the bitmap end.
++ */
++int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t count);
++
+ /* hbitmap_next_zero:
+  *
+  * Find next not dirty bit within selected range. If not found, return -1.
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index eeccdb48f5..efe3a39d49 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -802,6 +802,12 @@ char *bdrv_dirty_bitmap_sha256(const BdrvDirtyBitmap *bitmap, Error **errp)
+     return hbitmap_sha256(bitmap->bitmap, errp);
+ }
+ 
++int64_t bdrv_dirty_bitmap_next_dirty(BdrvDirtyBitmap *bitmap, int64_t offset,
++                                     int64_t bytes)
++{
++    return hbitmap_next_zero(bitmap->bitmap, offset, bytes);
++}
++
+ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, int64_t offset,
+                                     int64_t bytes)
+ {
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index c08751fb50..3f2d7451ce 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -193,6 +193,30 @@ void hbitmap_iter_init(HBitmapIter *hbi, const HBitmap *hb, uint64_t first)
+     }
+ }
+ 
++int64_t hbitmap_next_dirty(const HBitmap *hb, int64_t start, int64_t count)
++{
++    HBitmapIter hbi;
++    int64_t firt_dirty_off;
++    uint64_t end;
++
++    assert(start >= 0 && count >= 0);
++
++    if (start >= hb->orig_size || count == 0) {
++        return -1;
++    }
++
++    end = count > hb->orig_size - start ? hb->orig_size : start + count;
++
++    hbitmap_iter_init(&hbi, hb, start);
++    firt_dirty_off = hbitmap_iter_next(&hbi);
++
++    if (firt_dirty_off < 0 || firt_dirty_off >= end) {
++        return -1;
++    }
++
++    return MAX(start, firt_dirty_off);
++}
++
+ int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
+ {
+     size_t pos = (start >> hb->granularity) >> BITS_PER_LEVEL;
+@@ -248,40 +272,21 @@ int64_t hbitmap_next_zero(const HBitmap *hb, int64_t start, int64_t count)
+ 
+ bool hbitmap_next_dirty_area(const HBitmap *hb, int64_t *start, int64_t *count)
+ {
+-    HBitmapIter hbi;
+-    int64_t firt_dirty_off, area_end;
+-    uint32_t granularity = 1UL << hb->granularity;
+-    uint64_t end;
+-
+-    assert(*start >= 0 && *count >= 0);
+-
+-    if (*start >= hb->orig_size || *count == 0) {
+-        return false;
+-    }
+-
+-    end = *count > hb->orig_size - *start ? hb->orig_size : *start + *count;
+-
+-    hbitmap_iter_init(&hbi, hb, *start);
+-    firt_dirty_off = hbitmap_iter_next(&hbi);
++    int64_t area_start, area_end;
+ 
+-    if (firt_dirty_off < 0 || firt_dirty_off >= end) {
++    area_start = hbitmap_next_dirty(hb, *start, *count);
++    if (area_start < 0) {
+         return false;
+     }
+ 
+-    if (firt_dirty_off + granularity >= end) {
+-        area_end = end;
+-    } else {
+-        area_end = hbitmap_next_zero(hb, firt_dirty_off + granularity,
+-                                     end - firt_dirty_off - granularity);
+-        if (area_end < 0) {
+-            area_end = end;
+-        }
++    area_end = QEMU_ALIGN_UP(area_start + 1, 1UL << hb->granularity);
++    area_end = hbitmap_next_zero(hb, area_end, *start + *count - area_end);
++    if (area_end < 0) {
++        area_end = MIN(hb->orig_size, *start + *count);
+     }
+ 
+-    if (firt_dirty_off > *start) {
+-        *start = firt_dirty_off;
+-    }
+-    *count = area_end - *start;
++    *start = area_start;
++    *count = area_end - area_start;
+ 
+     return true;
+ }
+-- 
+2.18.0
+
 
