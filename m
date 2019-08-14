@@ -2,89 +2,85 @@ Return-Path: <SRS0=fB5B=WK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53BF5C433FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 21:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356D3C32757
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 21:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28F572133F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 21:10:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28F572133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 01AC7205F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 21:31:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="dWWov+CP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01AC7205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy0X5-0001fi-8p
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 17:10:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40587)
+	id 1hy0rs-0005FG-57
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 17:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hy0VQ-0000vZ-RF
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 17:08:29 -0400
+ (envelope-from <dan.j.williams@intel.com>) id 1hy0qA-0004gJ-HM
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 17:29:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hy0VP-0005xu-Qp
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 17:08:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:12616)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hy0VL-0005vg-CD; Wed, 14 Aug 2019 17:08:24 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id E5568300D21F;
- Wed, 14 Aug 2019 21:08:21 +0000 (UTC)
-Received: from [10.3.117.22] (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A6CD8378E;
- Wed, 14 Aug 2019 21:08:18 +0000 (UTC)
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=eblake@redhat.com; keydata=
- xsBNBEvHyWwBCACw7DwsQIh0kAbUXyqhfiKAKOTVu6OiMGffw2w90Ggrp4bdVKmCaEXlrVLU
- xphBM8mb+wsFkU+pq9YR621WXo9REYVIl0FxKeQo9dyQBZ/XvmUMka4NOmHtFg74nvkpJFCD
- TUNzmqfcjdKhfFV0d7P/ixKQeZr2WP1xMcjmAQY5YvQ2lUoHP43m8TtpB1LkjyYBCodd+LkV
- GmCx2Bop1LSblbvbrOm2bKpZdBPjncRNob73eTpIXEutvEaHH72LzpzksfcKM+M18cyRH+nP
- sAd98xIbVjm3Jm4k4d5oQyE2HwOur+trk2EcxTgdp17QapuWPwMfhaNq3runaX7x34zhABEB
- AAHNHkVyaWMgQmxha2UgPGVibGFrZUByZWRoYXQuY29tPsLAegQTAQgAJAIbAwULCQgHAwUV
- CgkICwUWAgMBAAIeAQIXgAUCS8fL9QIZAQAKCRCnoWtKJSdDahBHCACbl/5FGkUqJ89GAjeX
- RjpAeJtdKhujir0iS4CMSIng7fCiGZ0fNJCpL5RpViSo03Q7l37ss+No+dJI8KtAp6ID+PMz
- wTJe5Egtv/KGUKSDvOLYJ9WIIbftEObekP+GBpWP2+KbpADsc7EsNd70sYxExD3liwVJYqLc
- Rw7so1PEIFp+Ni9A1DrBR5NaJBnno2PHzHPTS9nmZVYm/4I32qkLXOcdX0XElO8VPDoVobG6
- gELf4v/vIImdmxLh/w5WctUpBhWWIfQDvSOW2VZDOihm7pzhQodr3QP/GDLfpK6wI7exeu3P
- pfPtqwa06s1pae3ad13mZGzkBdNKs1HEm8x6zsBNBEvHyWwBCADGkMFzFjmmyqAEn5D+Mt4P
- zPdO8NatsDw8Qit3Rmzu+kUygxyYbz52ZO40WUu7EgQ5kDTOeRPnTOd7awWDQcl1gGBXgrkR
- pAlQ0l0ReO57Q0eglFydLMi5bkwYhfY+TwDPMh3aOP5qBXkm4qIYSsxb8A+i00P72AqFb9Q7
- 3weG/flxSPApLYQE5qWGSXjOkXJv42NGS6o6gd4RmD6Ap5e8ACo1lSMPfTpGzXlt4aRkBfvb
- NCfNsQikLZzFYDLbQgKBA33BDeV6vNJ9Cj0SgEGOkYyed4I6AbU0kIy1hHAm1r6+sAnEdIKj
- cHi3xWH/UPrZW5flM8Kqo14OTDkI9EtlABEBAAHCwF8EGAEIAAkFAkvHyWwCGwwACgkQp6Fr
- SiUnQ2q03wgAmRFGDeXzc58NX0NrDijUu0zx3Lns/qZ9VrkSWbNZBFjpWKaeL1fdVeE4TDGm
- I5mRRIsStjQzc2R9b+2VBUhlAqY1nAiBDv0Qnt+9cLiuEICeUwlyl42YdwpmY0ELcy5+u6wz
- mK/jxrYOpzXKDwLq5k4X+hmGuSNWWAN3gHiJqmJZPkhFPUIozZUCeEc76pS/IUN72NfprZmF
- Dp6/QDjDFtfS39bHSWXKVZUbqaMPqlj/z6Ugk027/3GUjHHr8WkeL1ezWepYDY7WSoXwfoAL
- 2UXYsMAr/uUncSKlfjvArhsej0S4zbqim2ZY6S8aRWw94J3bSvJR+Nwbs34GPTD4Pg==
-Organization: Red Hat, Inc.
-Message-ID: <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
-Date: Wed, 14 Aug 2019 16:08:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ (envelope-from <dan.j.williams@intel.com>) id 1hy0q8-0006Fy-DJ
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 17:29:53 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34088)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+ id 1hy0q2-00068e-7K
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 17:29:48 -0400
+Received: by mail-oi1-x244.google.com with SMTP id l12so218272oil.1
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 14:29:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=intel-com.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dV5iSaTLF6GvE1k736/fv/IO+wacAWP05FLSNalcmJ8=;
+ b=dWWov+CPj4KHZ2zkB4yMAgJZjhzXOYsHzWu7cuyWYpM2n7cQWjcsdZxHEMBrt+Cff3
+ Zv0fU2oSRAh/pymJpfTdbVWtSL53Q4Tuvf0sseHjQa5ff80YiXrDad/DOQ6dBS3O0xnK
+ 0UnpXbEalE7sk++eozdaiBh8/orESxXg71dd/q1PaihByqqwwqs9eQ606/RYMPlutmVr
+ VJ8rqWTQrIxxJP8prkwqUj+wIK15An+poR6qHzlQ8/8eYLs7xiql4aGIvZkrIkSpcQ58
+ FFiG0PKwkhkpFbgI5T0RLMX8vjb5VVzXMsI3AjV836+x7dq+xKvErfo4ePRT9BwR01OK
+ Fs7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dV5iSaTLF6GvE1k736/fv/IO+wacAWP05FLSNalcmJ8=;
+ b=Rq0LHAC+zRB5tb8dx+v3YQMOHPmdZyBCYhbgz0vGuwJJlrPdUApCaSeerbSiOe85v4
+ +ga5PchMaalQ8RLYNsqJe7tBcDzAEIM2mD4ANFkuPQQPMGRY/NSHvn42SjMYBwHdmQWV
+ CfFd9p8XarDQG9r6AcO35iRYFpNgbUFW6/0Jep9noYN8ZdGSDzVOi9D7QKTeNvFUuNRC
+ x85f9052LcsdEuUhPp5RIGiGY6abjI6A/Wck3u7HBZKjGR15WoWVQZYzUXqBtOMIM5V4
+ 4l003l5ZUyLpKX/88TCvAhTJ3r8MKSJZJFl23q+cIDrjwU9qmyiu7jF8+qOq/1LY8Xvy
+ yIaA==
+X-Gm-Message-State: APjAAAXeYjptT/aujz9Hm+VkrBE4fuaLeWv2gLvgcRVbQi9fc7oC4K6Y
+ Td4IOPvZG/NfOOiRG+1XodpP8lJxwWuj4oh59QcIjQ==
+X-Google-Smtp-Source: APXvYqxlI4/GNJQrDZIlRpfZJ7baVdNHJY8dldUcIYGoLK4kt0EGmPKzZF7LA5r2taVGkn2tvAC5NL3KnzESyWuaxYk=
+X-Received: by 2002:a05:6808:914:: with SMTP id
+ w20mr1278133oih.73.1565818182510; 
+ Wed, 14 Aug 2019 14:29:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KKLtgl7jKERRgYxIgbaYVSi0lrqvqi31K"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Wed, 14 Aug 2019 21:08:21 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key
- management
+References: <20190809065731.9097-1-tao3.xu@intel.com>
+ <20190809065731.9097-6-tao3.xu@intel.com>
+ <20190813170027.0617b129@redhat.com>
+ <CAPcyv4j=wBtBcscJBtrMNDDz=d6+HYYDF=4QLU69d0EPMkTTqg@mail.gmail.com>
+ <a73f7c81-0363-c10f-8ae1-9344abc55449@intel.com>
+In-Reply-To: <a73f7c81-0363-c10f-8ae1-9344abc55449@intel.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 14 Aug 2019 14:29:31 -0700
+Message-ID: <CAPcyv4jCuy6zvM8NcacXhvpUBUyp_BYMcEtBuA_ck3AhkyGNsQ@mail.gmail.com>
+To: Tao Xu <tao3.xu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
+Subject: Re: [Qemu-devel] [PATCH v9 05/11] numa: Extend CLI to provide
+ initiator information for numa nodes
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,97 +92,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Jingqi Liu <jingqi.liu@intel.com>,
+ "Du, Fan" <fan.du@intel.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ daniel@linux.ibm.com, Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KKLtgl7jKERRgYxIgbaYVSi0lrqvqi31K
-Content-Type: multipart/mixed; boundary="BqulNPxXmtzhORIbmT49IlGkU45MATjTj";
- protected-headers="v1"
-From: Eric Blake <eblake@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?=
- <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Fam Zheng <fam@euphon.net>
-Message-ID: <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
-Subject: Re: [PATCH 00/13] RFC: luks/encrypted qcow2 key management
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
-In-Reply-To: <20190814202219.1870-1-mlevitsk@redhat.com>
+On Tue, Aug 13, 2019 at 10:14 PM Tao Xu <tao3.xu@intel.com> wrote:
+>
+> On 8/14/2019 10:39 AM, Dan Williams wrote:
+> > On Tue, Aug 13, 2019 at 8:00 AM Igor Mammedov <imammedo@redhat.com> wrote:
+> >>
+> >> On Fri,  9 Aug 2019 14:57:25 +0800
+> >> Tao <tao3.xu@intel.com> wrote:
+> >>
+> >>> From: Tao Xu <tao3.xu@intel.com>
+> >>>
+> >>> In ACPI 6.3 chapter 5.2.27 Heterogeneous Memory Attribute Table (HMAT),
+> >>> The initiator represents processor which access to memory. And in 5.2.27.3
+> >>> Memory Proximity Domain Attributes Structure, the attached initiator is
+> >>> defined as where the memory controller responsible for a memory proximity
+> >>> domain. With attached initiator information, the topology of heterogeneous
+> >>> memory can be described.
+> >>>
+> >>> Extend CLI of "-numa node" option to indicate the initiator numa node-id.
+> >>> In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+> >>> the platform's HMAT tables.
+> >>>
+> >>> Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
+> >>> Suggested-by: Dan Williams <dan.j.williams@intel.com>
+> >>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> >>> ---
+> >>>
+> >>> No changes in v9
+> >>> ---
+> >>>   hw/core/machine.c     | 24 ++++++++++++++++++++++++
+> >>>   hw/core/numa.c        | 13 +++++++++++++
+> >>>   include/sysemu/numa.h |  3 +++
+> >>>   qapi/machine.json     |  6 +++++-
+> >>>   qemu-options.hx       | 27 +++++++++++++++++++++++----
+> >>>   5 files changed, 68 insertions(+), 5 deletions(-)
+> >>>
+> >>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> >>> index 3c55470103..113184a9df 100644
+> >>> --- a/hw/core/machine.c
+> >>> +++ b/hw/core/machine.c
+> >>> @@ -640,6 +640,7 @@ void machine_set_cpu_numa_node(MachineState *machine,
+> >>>                                  const CpuInstanceProperties *props, Error **errp)
+> >>>   {
+> >>>       MachineClass *mc = MACHINE_GET_CLASS(machine);
+> >>> +    NodeInfo *numa_info = machine->numa_state->nodes;
+> >>>       bool match = false;
+> >>>       int i;
+> >>>
+> >>> @@ -709,6 +710,16 @@ void machine_set_cpu_numa_node(MachineState *machine,
+> >>>           match = true;
+> >>>           slot->props.node_id = props->node_id;
+> >>>           slot->props.has_node_id = props->has_node_id;
+> >>> +
+> >>> +        if (numa_info[props->node_id].initiator_valid &&
+> >>> +            (props->node_id != numa_info[props->node_id].initiator)) {
+> >>> +            error_setg(errp, "The initiator of CPU NUMA node %" PRId64
+> >>> +                       " should be itself.", props->node_id);
+> >>> +            return;
+> >>> +        }
+> >>> +        numa_info[props->node_id].initiator_valid = true;
+> >>> +        numa_info[props->node_id].has_cpu = true;
+> >>> +        numa_info[props->node_id].initiator = props->node_id;
+> >>>       }
+> >>>
+> >>>       if (!match) {
+> >>> @@ -1050,6 +1061,7 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
+> >>>       GString *s = g_string_new(NULL);
+> >>>       MachineClass *mc = MACHINE_GET_CLASS(machine);
+> >>>       const CPUArchIdList *possible_cpus = mc->possible_cpu_arch_ids(machine);
+> >>> +    NodeInfo *numa_info = machine->numa_state->nodes;
+> >>>
+> >>>       assert(machine->numa_state->num_nodes);
+> >>>       for (i = 0; i < possible_cpus->len; i++) {
+> >>> @@ -1083,6 +1095,18 @@ static void machine_numa_finish_cpu_init(MachineState *machine)
+> >>>               machine_set_cpu_numa_node(machine, &props, &error_fatal);
+> >>>           }
+> >>>       }
+> >>> +
+> >>> +    for (i = 0; i < machine->numa_state->num_nodes; i++) {
+> >>> +        if (numa_info[i].initiator_valid &&
+> >>> +            !numa_info[numa_info[i].initiator].has_cpu) {
+> >>                            ^^^^^^^^^^^^^^^^^^^^^^ possible out of bounds read, see bellow
+> >>
+> >>> +            error_report("The initiator-id %"PRIu16 " of NUMA node %d"
+> >>> +                         " does not exist.", numa_info[i].initiator, i);
+> >>> +            error_printf("\n");
+> >>> +
+> >>> +            exit(1);
+> >>> +        }
+> >> it takes care only about nodes that have cpus or memory-only ones that have
+> >> initiator explicitly provided on CLI. And leaves possibility to have
+> >> memory-only nodes without initiator mixed with nodes that have initiator.
+> >> Is it valid to have mixed configuration?
+> >> Should we forbid it?
+> >
+> > The spec talks about the "Proximity Domain for the Attached Initiator"
+> > field only being valid if the memory controller for the memory can be
+> > identified by an initiator id in the SRAT. So I expect the only way to
+> > define a memory proximity domain without this local initiator is to
+> > allow specifying a node-id that does not have an entry in the SRAT.
+> >
+> Hi Dan,
+>
+> So there may be a situation for the Attached Initiator field is not
+> valid? If true, I would allow user to input Initiator invalid.
 
---BqulNPxXmtzhORIbmT49IlGkU45MATjTj
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Yes it's something the OS needs to consider because the platform may
+not be able to meet the constraint that a single initiator is
+associated with the memory controller for a given memory target. In
+retrospect it would have been nice if the spec reserved 0xffffffff for
+this purpose, but it seems "not in SRAT" is the only way to identify
+memory that is not attached to any single initiator.
 
-On 8/14/19 3:22 PM, Maxim Levitsky wrote:
-
-> This is an issue that was raised today on IRC with Kevin Wolf. Really t=
-hanks
-> for the idea!
->=20
-> We agreed that this new qmp interface should take the same options as
-> blockdev-create does, however since we want to be able to edit the encr=
-yption
-> slots separately, this implies that we sort of need to allow this on cr=
-eation
-> time as well.
->=20
-> Also the BlockdevCreateOptions is a union, which is specialized by the =
-driver name
-> which is great for creation, but for update, the driver name is already=
- known,
-> and thus the user should not be forced to pass it again.
-> However qmp doesn't seem to support union type guessing based on actual=
- fields
-> given (this might not be desired either), which complicates this somewh=
-at.
-
-Does the idea of a union type with a default value for the discriminator
-help?  Maybe we have a discriminator which defaults to 'auto', and add a
-union branch 'auto':'any'.  During creation, if the "driver":"auto"
-branch is selected (usually implicitly by omitting "driver", but also
-possible explicitly), the creation attempt is rejected as invalid
-regardless of the contents of the remaining 'any'.  But during amend
-usage, if the 'auto' branch is selected, we then add in the proper
-"driver":"xyz" and reparse the QAPI object to determine if the remaining
-fields in 'any' still meet the specification for the required driver bran=
-ch.
-
-This idea may still require some tweaks to the QAPI generator, but it's
-the best I can come up with for a way to parse an arbitrary JSON object
-with unknown validation, then reparse it again after adding more
-information that would constrain the parse differently.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
-
---BqulNPxXmtzhORIbmT49IlGkU45MATjTj--
-
---KKLtgl7jKERRgYxIgbaYVSi0lrqvqi31K
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAl1UeEEACgkQp6FrSiUn
-Q2qVHwf/Z8b4vIcf1YvAEk0CCErpY8JCco8/gQ87k6EQTyZhI6MDLa5yub7EplGl
-61RJ7pOI9VH15vlGoWNXcH5WcT+lhjOPVk52j432ngnfuHNwIpGOTyCcvRv5hUu+
-cxFMom+3G6VnPv5Mbqt1bQFuElcZ35Hp0fHyrJlJsympNQP+v3wsKKUTar0pFBt9
-8g1Cx/29O/X36L0jwQ3mby/AF1Z3VeM1cy0ChvSFZhbTxJIXg2dGe3S1oACmebIP
-ndqVhVauFu71Zn/NgzK6zxptPFaT9D/BtKIfxK9/2q0Nq/c1dDs4afn+gc7sSRHU
-EmRZMoA5MJZSNvhlX6HyhG0tNFdHaQ==
-=ac8L
------END PGP SIGNATURE-----
-
---KKLtgl7jKERRgYxIgbaYVSi0lrqvqi31K--
+> > That would be a useful feature for testing OS HMAT parsing behavior,
+> > and may match platforms that exist in practice.
 
