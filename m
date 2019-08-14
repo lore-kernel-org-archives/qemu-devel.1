@@ -3,59 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E852C0650F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 07:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 707F8C433FF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 08:05:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26E3E206C2
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 07:29:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26E3E206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 4D0C4205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Aug 2019 08:05:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D0C4205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hxnjJ-0008DJ-BO
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 03:29:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60637)
+	id 1hxoHJ-0004MR-5z
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 04:05:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37127)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1hxndq-0002H4-CL
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 03:24:21 -0400
+ (envelope-from <cohuck@redhat.com>) id 1hxoGd-0003lv-15
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 04:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hxndo-0004jx-ON
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 03:24:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38832)
+ (envelope-from <cohuck@redhat.com>) id 1hxoGb-0006At-Ll
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 04:04:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34034)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hxndo-0004jb-Gv; Wed, 14 Aug 2019 03:24:16 -0400
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>)
+ id 1hxoGb-0006Ad-GS; Wed, 14 Aug 2019 04:04:21 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C82093086211;
- Wed, 14 Aug 2019 07:24:15 +0000 (UTC)
-Received: from t460s.redhat.com (ovpn-117-4.ams2.redhat.com [10.36.117.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04E0860852;
- Wed, 14 Aug 2019 07:24:13 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 09:23:55 +0200
-Message-Id: <20190814072355.15333-7-david@redhat.com>
-In-Reply-To: <20190814072355.15333-1-david@redhat.com>
-References: <20190814072355.15333-1-david@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 4E40FC06511B;
+ Wed, 14 Aug 2019 08:04:20 +0000 (UTC)
+Received: from gondolin (dhcp-192-232.str.redhat.com [10.33.192.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B83818243;
+ Wed, 14 Aug 2019 08:04:19 +0000 (UTC)
+Date: Wed, 14 Aug 2019 10:04:17 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+To: <luoyifan@cmss.chinamobile.com>
+Message-ID: <20190814100417.350a443b.cohuck@redhat.com>
+In-Reply-To: <02cf01d55267$86cf2850$946d78f0$@cmss.chinamobile.com>
+References: <02cf01d55267$86cf2850$946d78f0$@cmss.chinamobile.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.42]); Wed, 14 Aug 2019 07:24:15 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.31]); Wed, 14 Aug 2019 08:04:20 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH-for-4.2 v2 6/6] s390x/mmu: Factor out storage
- key handling
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw/net: fix a possible
+ memory leak in get_uuid()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,195 +69,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-s390x@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Factor it out, add a comment how it all works, and also use it in the
-REAL MMU.
+On Wed, 14 Aug 2019 14:14:26 +0800
+<luoyifan@cmss.chinamobile.com> wrote:
+
+> There is a possible memory leak in get_uuid(). Should free allocated mem
+> before 
+> return NULL.
+> 
+> Signed-off-by: Yifan Luo <luoyifan@cmss.chinamobile.com>
+> ---
+>  pc-bios/s390-ccw/netmain.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+> index f3542cb2cf1..f2dcc01e272 100644
+> --- a/pc-bios/s390-ccw/netmain.c
+> +++ b/pc-bios/s390-ccw/netmain.c
+> @@ -269,6 +269,7 @@ static const char *get_uuid(void)
+>                   : "d" (r0), "d" (r1), [addr] "a" (buf)
+>                   : "cc", "memory");
+>      if (cc) {
+> +        free(mem);
+>          return NULL;
+>      }
+>  
 
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/mmu_helper.c | 113 +++++++++++++++++++++++---------------
- 1 file changed, 69 insertions(+), 44 deletions(-)
-
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index 6cc81a29b6..e125837d68 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -334,6 +334,73 @@ static int mmu_translate_asce(CPUS390XState *env, ta=
-rget_ulong vaddr,
-     return r;
- }
-=20
-+static void mmu_handle_skey(target_ulong addr, int rw, int *flags)
-+{
-+    static S390SKeysClass *skeyclass;
-+    static S390SKeysState *ss;
-+    uint8_t key;
-+    int rc;
-+
-+    if (unlikely(!ss)) {
-+        ss =3D s390_get_skeys_device();
-+        skeyclass =3D S390_SKEYS_GET_CLASS(ss);
-+    }
-+
-+    /*
-+     * Whenever we create a new TLB entry, we set the storage key refere=
-nce
-+     * bit. In case we allow write accesses, we set the storage key chan=
-ge
-+     * bit. Whenever the guest changes the storage key, we have to flush=
- the
-+     * TLBs of all CPUs (the whole TLB or all affected entries), so that=
- the
-+     * next reference/change will result in an MMU fault and make us pro=
-perly
-+     * update the storage key here.
-+     *
-+     * Note 1: "record of references ... is not necessarily accurate",
-+     *         "change bit may be set in case no storing has occurred".
-+     *         -> We can set reference/change bits even on exceptions.
-+     * Note 2: certain accesses seem to ignore storage keys. For example=
-,
-+     *         DAT translation does not set reference bits for table acc=
-esses.
-+     *
-+     * TODO: key-controlled protection. Only CPU accesses make use of th=
-e
-+     *       PSW key. CSS accesses are different - we have to pass in th=
-e key.
-+     *
-+     * TODO: we have races between getting and setting the key.
-+     */
-+    if (addr < ram_size) {
-+        rc =3D skeyclass->get_skeys(ss, addr / TARGET_PAGE_SIZE, 1, &key=
-);
-+        if (rc) {
-+            trace_get_skeys_nonzero(rc);
-+            return;
-+        }
-+
-+        switch (rw) {
-+        case MMU_DATA_LOAD:
-+        case MMU_INST_FETCH:
-+            /*
-+             * The TLB entry has to remain write-protected on read-fault=
-s if
-+             * the storage key does not indicate a change already. Other=
-wise
-+             * we might miss setting the change bit on write accesses.
-+             */
-+            if (!(key & SK_C)) {
-+                *flags &=3D ~PAGE_WRITE;
-+            }
-+            break;
-+        case MMU_DATA_STORE:
-+            key |=3D SK_C;
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+
-+        /* Any store/fetch sets the reference bit */
-+        key |=3D SK_R;
-+
-+        rc =3D skeyclass->set_skeys(ss, addr / TARGET_PAGE_SIZE, 1, &key=
-);
-+        if (rc) {
-+            trace_set_skeys_nonzero(rc);
-+        }
-+    }
-+}
-+
- /**
-  * Translate a virtual (logical) address into a physical (absolute) addr=
-ess.
-  * @param vaddr  the virtual address
-@@ -347,16 +414,9 @@ static int mmu_translate_asce(CPUS390XState *env, ta=
-rget_ulong vaddr,
- int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64=
-_t asc,
-                   target_ulong *raddr, int *flags, bool exc)
- {
--    static S390SKeysState *ss;
--    static S390SKeysClass *skeyclass;
-     uint64_t asce;
--    uint8_t key;
-     int r;
-=20
--    if (unlikely(!ss)) {
--        ss =3D s390_get_skeys_device();
--        skeyclass =3D S390_SKEYS_GET_CLASS(ss);
--    }
-=20
-     *flags =3D PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-     if (is_low_address(vaddr & TARGET_PAGE_MASK) && lowprot_enabled(env,=
- asc)) {
-@@ -413,42 +473,7 @@ nodat:
-     /* Convert real address -> absolute address */
-     *raddr =3D mmu_real2abs(env, *raddr);
-=20
--    if (*raddr < ram_size) {
--        r =3D skeyclass->get_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &ke=
-y);
--        if (r) {
--            trace_get_skeys_nonzero(r);
--            return 0;
--        }
--
--        switch (rw) {
--        case MMU_DATA_LOAD:
--        case MMU_INST_FETCH:
--            /*
--             * The TLB entry has to remain write-protected on read-fault=
-s if
--             * the storage key does not indicate a change already. Other=
-wise
--             * we might miss setting the change bit on write accesses.
--             */
--            if (!(key & SK_C)) {
--                *flags &=3D ~PAGE_WRITE;
--            }
--            break;
--        case MMU_DATA_STORE:
--            key |=3D SK_C;
--            break;
--        default:
--            g_assert_not_reached();
--        }
--
--        /* Any store/fetch sets the reference bit */
--        key |=3D SK_R;
--
--        r =3D skeyclass->set_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &ke=
-y);
--        if (r) {
--            trace_set_skeys_nonzero(r);
--            return 0;
--        }
--    }
--
-+    mmu_handle_skey(*raddr, rw, flags);
-     return 0;
- }
-=20
-@@ -566,6 +591,6 @@ int mmu_translate_real(CPUS390XState *env, target_ulo=
-ng raddr, int rw,
-=20
-     *addr =3D mmu_real2abs(env, raddr & TARGET_PAGE_MASK);
-=20
--    /* TODO: storage key handling */
-+    mmu_handle_skey(*addr, rw, flags);
-     return 0;
- }
---=20
-2.21.0
-
 
