@@ -2,89 +2,91 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F709C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A905C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:55:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19AB920656
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:49:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 441112067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:55:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r11EJ5FN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19AB920656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QAFxhHBD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441112067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyH4e-0001Of-BZ
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:49:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59067)
+	id 1hyH9a-00030U-7y
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyH3M-0000bn-Mt
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:48:39 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1hyH8m-0002a2-Lg
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyH3J-0007pL-2k
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:48:36 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33566)
+ (envelope-from <alex.bennee@linaro.org>) id 1hyH8i-0004Z9-8n
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:54:12 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54346)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hyH3I-0007ot-RP
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:48:32 -0400
-Received: by mail-oi1-x241.google.com with SMTP id u15so2311330oiv.0
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:48:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=WN5IKN5DloNomZ2mLa8vS5cnHjb2JFd5ccO6E1V1l4o=;
- b=r11EJ5FNjTzlN9Hd4hFm1gHL+Loya8rwgqD6rAJjGVTQzdVA+/hDVG91OvHsXHqV68
- Yo6ymu3x7XsiJUGx56TZdWbADvz0EetMc92TU+L1RkxpHDpELPmlUMTSTjlQ+ZkStF3L
- 5sKtD3NwXvRd5Fm0SrYNnja1ka0NkCBQb31qFkNO4If2rOSthdrQSOAvhzl2P0Ovasss
- H5AhgFVB7Q2KII5vNRb4ecKgd2NSZ3aDeawXODHQjtcybxoatre/x1avDisZHl0jSMW6
- pyGhkhrs8u37jWclR4Fl1+cJN2U882jlKDu2r1BG4r3hfmMK3wcptqKztWwqekd3w80r
- MfaQ==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1hyH8i-0004Y2-0w
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:54:08 -0400
+Received: by mail-wm1-x344.google.com with SMTP id p74so1512466wme.4
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:54:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=7Zd1VeIvJJTKFlfB0C619go0c3lxtupiGwV3YH4QWVE=;
+ b=QAFxhHBDstcMbIwtVlsmzgMyMOch12h45PkPeRISiQ0fvav5CLY6csCW0C1p7ChDnk
+ RDHoFexfMWhNyNOzpNAs86GwEvFt57+L15cVJW4jUizLVvkk9eLSS3xFZXkOCD+LgHa6
+ iwqXE5ioTzBYLRCvnYg791kGOqoAOMwSsthYYgib0Z61WW6/oqPhAuEoIO43/9Ao3xB8
+ k4sQxq9qZ19fDpdWzrwv8jY8LSqu/f/Y36e3gWXPUrvGhOdty3iwXvjktoxPQqKzPg0r
+ UItcDeDLe53WHpmzI/vVdsHiQ0HkrVbonCOgd3+Thcc6Rf/PbuLI7eWLmIG7z3EQuElf
+ Gevg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=WN5IKN5DloNomZ2mLa8vS5cnHjb2JFd5ccO6E1V1l4o=;
- b=Z4LWeI9DsGuFb6UAHR1DF8DsXbXkBHOz4Yh5Iba7ouksH598IRLA/pbmWWjlKtwFoe
- BV5WMeWJ+mUno9o8eIR3zfxYWwp2gR+10peMm29HL9IzVrc3NhdYWJqoqzFHVWTlTzjQ
- dp3Wclz4MT6IAE+CNKv2QBdbudmz1i43BTfs1uip7/zS8Ye02OQxsWtMsLdFmbuSzwuI
- DgEDMjGgYbPSE7iHz6G7nL8Dz2x0dOHytK37//kJkRW49rRQWOqDZzOeO6Lxgq1o7Z4u
- 7VLeXvYesveS+1ps+m8KHVY9fBpoFW+z3U1FBsRjXIHgCO762l3EviMizTXp+0GsK6mn
- +fNw==
-X-Gm-Message-State: APjAAAWxaFiekHdk6h2cabeoBiFdCCi8lxtl+CpuY0qAO8W5QH+/4Hhl
- BdcDH9pZ2njd8s+In8rKKpEluTWt9JILmQF+O8c=
-X-Google-Smtp-Source: APXvYqzKa3r67BWYtv772veJo4RDIdEPDWgJFZ8cLWtcar7M9q1dufj8q5N5M6oSWbmXT5V9NDLX7eFok6PD+I6n9kc=
-X-Received: by 2002:a05:6808:8cd:: with SMTP id
- k13mr1899474oij.136.1565880511908; 
- Thu, 15 Aug 2019 07:48:31 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=7Zd1VeIvJJTKFlfB0C619go0c3lxtupiGwV3YH4QWVE=;
+ b=TqOaHDmJPkO7THI7amjBOdCmPMqx8yLmFNC5qXrhSQUyn++Mw8ufPCIwqEJ5nLSHKD
+ 4g2lR34Vgrmy53Cmx4VsplB2JBIjSOsWv6wPJF2ZFvE96lbiQksa+e4rzeAJA0LNrnuZ
+ ImbHsP+sXgl8gsw45gD1RS/DjybJ7svuTTUrbJx7F8+mT35OEfA1qulmmIKg80riRP87
+ 5JN66BpSJKSo/4tlbb3yX7NV9TOsVoWRdScRjPDBh8cuuTvplYZqKw/iLwsEpnI9MewN
+ HrKNhH6wvhFpVyhhkQt049mQRYHXAjR2pDwlRrTrDaEpyVoAJ4v18p0eqYTUihfz4hiG
+ Jdrg==
+X-Gm-Message-State: APjAAAVmeP+pKKkmKJgM7+Zyhx+esx+O75bRfkSp1NzOiDb+QMj2khJk
+ 4IHJMPXOfVxqMLG/+3VKxanThw==
+X-Google-Smtp-Source: APXvYqwaGYI4TY3XhxOqi4bhLWLJZ9V0a4LJKf/xAv4RApblEQWimTJlDnSX80EpKm79E81m6sDwRw==
+X-Received: by 2002:a1c:d10b:: with SMTP id i11mr3306988wmg.78.1565880846902; 
+ Thu, 15 Aug 2019 07:54:06 -0700 (PDT)
+Received: from zen.linaroharston ([81.128.185.34])
+ by smtp.gmail.com with ESMTPSA id o9sm2269401wrj.17.2019.08.15.07.54.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 15 Aug 2019 07:54:06 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E66271FF87;
+ Thu, 15 Aug 2019 15:54:05 +0100 (BST)
+References: <20190815021857.19526-1-vandersonmr2@gmail.com>
+ <20190815021857.19526-5-vandersonmr2@gmail.com>
+User-agent: mu4e 1.3.4; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+In-reply-to: <20190815021857.19526-5-vandersonmr2@gmail.com>
+Date: Thu, 15 Aug 2019 15:54:05 +0100
+Message-ID: <87o90qmqcy.fsf@linaro.org>
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Thu, 15 Aug 2019 07:48:31
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Thu, 15 Aug 2019 07:48:31
- -0700 (PDT)
-In-Reply-To: <20190813124946.25322-5-alex.bennee@linaro.org>
-References: <20190813124946.25322-1-alex.bennee@linaro.org>
- <20190813124946.25322-5-alex.bennee@linaro.org>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 15 Aug 2019 16:48:31 +0200
-Message-ID: <CAL1e-=g4Cxd74r3NyShEPpFEqx2JoT2x75zLeUXejgVgtVjSHA@mail.gmail.com>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v3 04/13] fpu: use min/max values from
- stdint.h for integral overflow
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v5 04/10] accel: replacing part of
+ CONFIG_PROFILER with TBStats
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,159 +98,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, armbru@redhat.com,
- Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-13.08.2019. 14.52, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> =D1=98=D0=B5=
- =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+
+vandersonmr <vandersonmr2@gmail.com> writes:
+
+> We add some of the statistics collected in the TCGProfiler
+> into the TBStats, having the statistics not only for the whole
+> emulation but for each TB. Then, we removed these stats
+> from TCGProfiler and reconstruct the information for the
+> "info jit" using the sum of all TBStats statistics.
 >
-> Remove some more use of LIT64 while making the meaning more clear. We
-> also avoid the need of casts as the results by definition fit into the
-> return type.
+> The goal is to have one unique and better way of collecting
+> emulation statistics. Moreover, checking dynamiclly if the
+> profiling is enabled showed to have an insignificant impact
+> on the performance:
+> https://wiki.qemu.org/Internships/ProjectIdeas/TCGCodeQuality#Overheads.
 >
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
 > ---
->  fpu/softfloat.c | 30 ++++++++++++++----------------
->  1 file changed, 14 insertions(+), 16 deletions(-)
+>  accel/tcg/tb-stats.c      | 95 +++++++++++++++++++++++++++++++++++++++
+>  accel/tcg/translate-all.c |  8 +---
+>  include/exec/tb-stats.h   | 11 +++++
+>  tcg/tcg.c                 | 93 +++++---------------------------------
+>  tcg/tcg.h                 | 10 -----
+>  5 files changed, 118 insertions(+), 99 deletions(-)
 >
-> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-> index 9e57b7b5933..a1e1e9a8559 100644
-> --- a/fpu/softfloat.c
-> +++ b/fpu/softfloat.c
-> @@ -3444,9 +3444,7 @@ static int64_t roundAndPackInt64(flag zSign,
-uint64_t absZ0, uint64_t absZ1,
->      if ( z && ( ( z < 0 ) ^ zSign ) ) {
->   overflow:
->          float_raise(float_flag_invalid, status);
-> -        return
-> -              zSign ? (int64_t) LIT64( 0x8000000000000000 )
-> -            : LIT64( 0x7FFFFFFFFFFFFFFF );
-> +        return zSign ? INT64_MIN : INT64_MAX;
->      }
-
-In function roundAndPavkInt32 tgere is a following segment:
-
-    if ( ( absZ>>32 ) || ( z && ( ( z < 0 ) ^ zSign ) ) ) {
-        float_raise(float_flag_invalid, status);
-        return zSign ? (int32_t) 0x80000000 : 0x7FFFFFFF;
-    }
-
-Perhaps replace these constants with INT32_MIN, INT32_MAX, for similar
-reasons, in the same or a separate patch?
-
-Aleksandar
-
-
->      if (absZ1) {
->          status->float_exception_flags |=3D float_flag_inexact;
-> @@ -3497,7 +3495,7 @@ static int64_t roundAndPackUint64(flag zSign,
-uint64_t absZ0,
->          ++absZ0;
->          if (absZ0 =3D=3D 0) {
->              float_raise(float_flag_invalid, status);
-> -            return LIT64(0xFFFFFFFFFFFFFFFF);
-> +            return UINT64_MAX;
->          }
->          absZ0 &=3D ~(((uint64_t)(absZ1<<1) =3D=3D 0) & roundNearestEven)=
-;
->      }
-> @@ -5518,9 +5516,9 @@ int64_t floatx80_to_int64(floatx80 a, float_status
-*status)
->          if ( shiftCount ) {
->              float_raise(float_flag_invalid, status);
->              if (!aSign || floatx80_is_any_nan(a)) {
-> -                return LIT64( 0x7FFFFFFFFFFFFFFF );
-> +                return INT64_MAX;
->              }
-> -            return (int64_t) LIT64( 0x8000000000000000 );
-> +            return INT64_MIN;
->          }
->          aSigExtra =3D 0;
->      }
-> @@ -5561,10 +5559,10 @@ int64_t floatx80_to_int64_round_to_zero(floatx80
-a, float_status *status)
->          if ( ( a.high !=3D 0xC03E ) || aSig ) {
->              float_raise(float_flag_invalid, status);
->              if ( ! aSign || ( ( aExp =3D=3D 0x7FFF ) && aSig ) ) {
-> -                return LIT64( 0x7FFFFFFFFFFFFFFF );
-> +                return INT64_MAX;
->              }
->          }
-> -        return (int64_t) LIT64( 0x8000000000000000 );
-> +        return INT64_MIN;
->      }
->      else if ( aExp < 0x3FFF ) {
->          if (aExp | aSig) {
-> @@ -6623,7 +6621,7 @@ int32_t float128_to_int32_round_to_zero(float128 a,
-float_status *status)
->      if ( ( z < 0 ) ^ aSign ) {
->   invalid:
->          float_raise(float_flag_invalid, status);
-> -        return aSign ? (int32_t) 0x80000000 : 0x7FFFFFFF;
-> +        return aSign ? INT32_MIN : INT32_MAX;
->      }
->      if ( ( aSig0<<shiftCount ) !=3D savedASig ) {
->          status->float_exception_flags |=3D float_flag_inexact;
-> @@ -6662,9 +6660,9 @@ int64_t float128_to_int64(float128 a, float_status
-*status)
->                        && ( aSig1 || ( aSig0 !=3D LIT64( 0x00010000000000=
-00
-) ) )
->                      )
->                 ) {
-> -                return LIT64( 0x7FFFFFFFFFFFFFFF );
-> +                return INT64_MAX;
->              }
-> -            return (int64_t) LIT64( 0x8000000000000000 );
-> +            return INT64_MIN;
->          }
->          shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
->      }
-> @@ -6710,10 +6708,10 @@ int64_t float128_to_int64_round_to_zero(float128
-a, float_status *status)
->              else {
->                  float_raise(float_flag_invalid, status);
->                  if ( ! aSign || ( ( aExp =3D=3D 0x7FFF ) && ( aSig0 | aS=
-ig1
-) ) ) {
-> -                    return LIT64( 0x7FFFFFFFFFFFFFFF );
-> +                    return INT64_MAX;
->                  }
->              }
-> -            return (int64_t) LIT64( 0x8000000000000000 );
-> +            return INT64_MIN;
->          }
->          z =3D ( aSig0<<shiftCount ) | ( aSig1>>( ( - shiftCount ) & 63 )=
- );
->          if ( (uint64_t) ( aSig1<<shiftCount ) ) {
-> @@ -6764,19 +6762,19 @@ uint64_t float128_to_uint64(float128 a,
-float_status *status)
->      if (aSign && (aExp > 0x3FFE)) {
->          float_raise(float_flag_invalid, status);
->          if (float128_is_any_nan(a)) {
-> -            return LIT64(0xFFFFFFFFFFFFFFFF);
-> +            return UINT64_MAX;
->          } else {
->              return 0;
->          }
->      }
->      if (aExp) {
-> -        aSig0 |=3D LIT64(0x0001000000000000);
-> +        aSig0 |=3D UINT64_C(0x0001000000000000);
->      }
->      shiftCount =3D 0x402F - aExp;
->      if (shiftCount <=3D 0) {
->          if (0x403E < aExp) {
->              float_raise(float_flag_invalid, status);
-> -            return LIT64(0xFFFFFFFFFFFFFFFF);
-> +            return UINT64_MAX;
->          }
->          shortShift128Left(aSig0, aSig1, -shiftCount, &aSig0, &aSig1);
->      } else {
-> --
-> 2.20.1
+> diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
+> index 3489133e9e..9b720d9b86 100644
+> --- a/accel/tcg/tb-stats.c
+> +++ b/accel/tcg/tb-stats.c
+> @@ -1,9 +1,104 @@
+>  #include "qemu/osdep.h"
 >
+>  #include "disas/disas.h"
+> +#include "exec/exec-all.h"
+> +#include "tcg.h"
+> +
+> +#include "qemu/qemu-print.h"
 >
+>  #include "exec/tb-stats.h"
+>
+> +struct jit_profile_info {
+> +    uint64_t translations;
+> +    uint64_t aborted;
+> +    uint64_t ops;
+> +    unsigned ops_max;
+> +    uint64_t del_ops;
+> +    uint64_t temps;
+> +    unsigned temps_max;
+> +    uint64_t host;
+> +    uint64_t guest;
+> +    uint64_t search_data;
+> +};
+> +
+> +/* accumulate the statistics from all TBs */
+> +static void collect_jit_profile_info(void *p, uint32_t hash, void *userp)
+> +{
+> +    struct jit_profile_info *jpi =3D userp;
+> +    TBStatistics *tbs =3D p;
+> +
+> +    jpi->translations +=3D tbs->translations.total;
+> +    jpi->ops +=3D tbs->code.num_tcg_ops;
+> +    if (stat_per_translation(tbs, code.num_tcg_ops) > jpi->ops_max) {
+> +        jpi->ops_max =3D stat_per_translation(tbs, code.num_tcg_ops);
+> +    }
+> +    jpi->del_ops +=3D tbs->code.deleted_ops;
+> +    jpi->temps +=3D tbs->code.temps;
+> +    if (stat_per_translation(tbs, code.temps) > jpi->temps_max) {
+> +        jpi->temps_max =3D stat_per_translation(tbs, code.temps);
+> +    }
+> +    jpi->host +=3D tbs->code.out_len;
+> +    jpi->guest +=3D tbs->code.in_len;
+> +    jpi->search_data +=3D tbs->code.search_out_len;
+> +}
+> +
+> +/* dump JIT statisticis using TCGProfile and TBStats */
+> +void dump_jit_profile_info(TCGProfile *s)
+> +{
+> +    if (!tb_stats_collection_enabled()) {
+> +        return;
+> +    }
+> +
+> +    struct jit_profile_info *jpi =3D g_new0(struct jit_profile_info, 1);
+> +
+> +    qht_iter(&tb_ctx.tb_stats, collect_jit_profile_info, jpi);
+> +
+> +    if (jpi->translations) {
+> +        qemu_printf("translated TBs      %" PRId64 "\n", jpi->translatio=
+ns);
+> +        qemu_printf("avg ops/TB          %0.1f max=3D%d\n",
+> +                jpi->ops / (double) jpi->translations, jpi->ops_max);
+> +        qemu_printf("deleted ops/TB      %0.2f\n",
+> +                jpi->del_ops / (double) jpi->translations);
+> +        qemu_printf("avg temps/TB        %0.2f max=3D%d\n",
+> +                jpi->temps / (double) jpi->translations, jpi->temps_max);
+> +        qemu_printf("avg host code/TB    %0.1f\n",
+> +                jpi->host / (double) jpi->translations);
+> +        qemu_printf("avg search data/TB  %0.1f\n",
+> +                jpi->search_data / (double) jpi->translations);
+> +
+> +        if (s) {
+> +            int64_t tot =3D s->interm_time + s->code_time;
+> +            qemu_printf("JIT cycles          %" PRId64 " (%0.3f s at 2.4=
+ GHz)\n",
+> +                            tot, tot / 2.4e9);
+> +            qemu_printf("cycles/op           %0.1f\n",
+> +                        jpi->ops ? (double)tot / jpi->ops : 0);
+> +            qemu_printf("cycles/in byte      %0.1f\n",
+> +                        jpi->guest ? (double)tot / jpi->guest : 0);
+> +            qemu_printf("cycles/out byte     %0.1f\n",
+> +                        jpi->host ? (double)tot / jpi->host : 0);
+> +            qemu_printf("cycles/search byte     %0.1f\n",
+> +                        jpi->search_data ? (double)tot / jpi->search_dat=
+a : 0);
+> +            if (tot =3D=3D 0) {
+> +                tot =3D 1;
+> +            }
+> +            qemu_printf("  gen_interm time   %0.1f%%\n",
+> +                        (double)s->interm_time / tot * 100.0);
+> +            qemu_printf("  gen_code time     %0.1f%%\n",
+> +                        (double)s->code_time / tot * 100.0);
+> +            qemu_printf("optim./code time    %0.1f%%\n",
+> +                        (double)s->opt_time / (s->code_time ? s->code_ti=
+me : 1)
+> +                        * 100.0);
+> +            qemu_printf("liveness/code time  %0.1f%%\n",
+> +                    (double)s->la_time / (s->code_time ? s->code_time : =
+1) * 100.0);
+> +            qemu_printf("cpu_restore count   %" PRId64 "\n",
+> +                    s->restore_count);
+> +            qemu_printf("  avg cycles        %0.1f\n",
+> +                    s->restore_count ? (double)s->restore_time / s->rest=
+ore_count : 0);
+> +        }
+> +    }
+
+I think the g_free(jpi) should be moved from the later patches to here.
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
+
