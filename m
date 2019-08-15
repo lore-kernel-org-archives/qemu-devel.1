@@ -2,92 +2,143 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD517C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE08C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A107C205F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:07:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A107C205F4
+	by mail.kernel.org (Postfix) with ESMTPS id 493862064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:35:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 493862064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyJE6-0003os-ID
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 13:07:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50956)
+	id 1hyJeS-00027p-9c
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 13:35:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hyJ8d-0008AH-IL
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:02:15 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyJdl-0001iG-Bc
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hyJ8Z-0005cU-Gy
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:02:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46812)
+ (envelope-from <jsnow@redhat.com>) id 1hyJdf-0004cO-0G
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:34:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44918)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hyJ8K-0005VU-HU; Thu, 15 Aug 2019 13:01:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hyJdS-0004Dp-PV; Thu, 15 Aug 2019 13:34:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D16383064FD4;
- Thu, 15 Aug 2019 17:01:51 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-81.brq.redhat.com
- [10.40.204.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D6E91001947;
- Thu, 15 Aug 2019 17:01:50 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-36-mreitz@redhat.com>
- <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 5966A3DE31;
+ Thu, 15 Aug 2019 17:34:00 +0000 (UTC)
+Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A224417AAA;
+ Thu, 15 Aug 2019 17:33:54 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
+ <20190814100735.24234-3-vsementsov@virtuozzo.com>
+ <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
+ <20190815104928.GC7415@linux.fritz.box>
+ <9c290e4e-1d3b-bc6e-c6e6-28a0414b866e@redhat.com>
+ <20190815164821.GE7415@linux.fritz.box>
+From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <39c41687-e192-e63a-984f-6d60b075df1a@redhat.com>
-Date: Thu, 15 Aug 2019 19:01:48 +0200
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <5591197d-f66c-e79d-f92d-16e4c7b42cc1@redhat.com>
+Date: Thu, 15 Aug 2019 13:33:53 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="0ED8TDdAXiYfA82Xudm5GsoVFGK92Yuhk"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20190815164821.GE7415@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Thu, 15 Aug 2019 17:01:51 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.29]); Thu, 15 Aug 2019 17:34:00 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 35/42] block: Fix check_to_replace_node()
+Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: deprecate implicit filters
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,382 +150,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
+ libvir-list@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0ED8TDdAXiYfA82Xudm5GsoVFGK92Yuhk
-Content-Type: multipart/mixed; boundary="iknqjXsBS9vF0WMTsODD2p8OBYx6CK9V5";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <39c41687-e192-e63a-984f-6d60b075df1a@redhat.com>
-Subject: Re: [PATCH v6 35/42] block: Fix check_to_replace_node()
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-36-mreitz@redhat.com>
- <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
-In-Reply-To: <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
-
---iknqjXsBS9vF0WMTsODD2p8OBYx6CK9V5
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 15.08.19 17:21, Vladimir Sementsov-Ogievskiy wrote:
-> 09.08.2019 19:14, Max Reitz wrote:
->> Currently, check_to_replace_node() only allows mirror to replace a nod=
-e
->> in the chain of the source node, and only if it is the first non-filte=
-r
->> node below the source.  Well, technically, the idea is that you can
->> exactly replace a quorum child by mirroring from quorum.
+On 8/15/19 12:48 PM, Kevin Wolf wrote:
+> Am 15.08.2019 um 18:07 hat John Snow geschrieben:
+>> On 8/15/19 6:49 AM, Kevin Wolf wrote:
+>>> Am 14.08.2019 um 21:27 hat John Snow geschrieben:
+>>>>
+>>>> This might be OK to do right away, though.
+>>>>
+>>>> I asked Markus this not too long ago; do we want to amend the QAPI
+>>>> schema specification to allow commands to return with "Warning" strings,
+>>>> or "Deprecated" stings to allow in-band deprecation notices for cases
+>>>> like these?
+>>>>
+>>>> example:
+>>>>
+>>>> { "return": {},
+>>>>   "deprecated": True,
+>>>>   "warning": "Omitting filter-node-name parameter is deprecated, it will
+>>>> be required in the future"
+>>>> }
+>>>>
+>>>> There's no "error" key, so this should be recognized as success by
+>>>> compatible clients, but they'll definitely see the extra information.
+>>>>
+>>>> Part of my motivation is to facilitate a more aggressive deprecation of
+>>>> legacy features by ensuring that we are able to rigorously notify users
+>>>> through any means that they need to adjust their scripts.
+>>>
+>>> Who would read this, though? In the best case it ends up deep in a
+>>> libvirt log that nobody will look at because there was no error. In the
+>>> more common case, the debug level is configured so that QMP traffic
+>>> isn't even logged.
+>>>
+>>> Kevin
+>>>
 >>
->> This has (probably) two reasons:
->> (1) We do not want to create loops.
->> (2) @replaces and @device should have exactly the same content so
->>      replacing them does not cause visible data to change.
+>> I believe you are right, but I also can't shake the feeling that this
+>> attitude ensures that we'll never find a way to expose this information
+>> to the end-user. Is this not too defeatist?
+> 
+> I think the discussed approach that seemed most likely to me to succeed
+> was adding a command line option that makes QEMU just crash if you use a
+> deprecated feature, and enable that in libvirt test cases (or possibly
+> even any non-release builds, though maybe it's a bit harsh there).
+> 
+>> I think deprecation notices in the QMP stream has two benefits:
 >>
->> This has two issues:
->> (1) It is overly restrictive.  It is completely fine for @replaces to =
-be
->>      a filter.
->> (2) It is not restrictive enough.  You can create loops with this as
->>      follows:
+>> 1) Any direct usages via qmp-shell or manual JSON connection are likely
+>> to see this message in development or testing. I feel the usage of QEMU
+>> directly is more likely to increase with time as other stacks seek to
+>> work around libvirt.
 >>
->> $ qemu-img create -f qcow2 /tmp/source.qcow2 64M
->> $ qemu-system-x86_64 -qmp stdio
->> {"execute": "qmp_capabilities"}
->> {"execute": "object-add",
->>   "arguments": {"qom-type": "throttle-group", "id": "tg0"}}
->> {"execute": "blockdev-add",
->>   "arguments": {
->>       "node-name": "source",
->>       "driver": "throttle",
->>       "throttle-group": "tg0",
->>       "file": {
->>           "node-name": "filtered",
->>           "driver": "qcow2",
->>           "file": {
->>               "driver": "file",
->>               "filename": "/tmp/source.qcow2"
->>           } } } }
->> {"execute": "drive-mirror",
->>   "arguments": {
->>       "job-id": "mirror",
->>       "device": "source",
->>       "target": "/tmp/target.qcow2",
->>       "format": "qcow2",
->>       "node-name": "target",
->>       "sync" :"none",
->>       "replaces": "filtered"
->>   } }
->> {"execute": "block-job-complete", "arguments": {"device": "mirror"}}
+>> [Whether or not they should is another question, but I believe the
+>> current reality to be that people are trying to.]
+> 
+> I don't know about other people, but as a human user, I don't care about
+> deprecation notices. As long as something works, I use it, and once I
+> get an error message back, I'll use something else.
+> 
+> If I manually enter drive_mirror and get a warning back, that doesn't
+> tell me that libvirt still does the same thing and needs to be fixed. It
+> just tells me that in the future I might need to change the commands
+> that I use manually.
+> 
+
+That the message we return needs to be *useful* doesn't sound like a
+count against it.
+
+> I guess this would still prevent adding new libvirt features that build
+> on deprecated QEMU features because some manual testing will be involved
+> there. But was this ever a problem?
+> 
+
+No, because until recently we didn't deprecate anything.
+
+>> 2) Programmatic deprecation notices can't be presented to a user at all
+>> if we don't send them; at least this way it becomes libvirt's problem
+>> over what to do with them. Perhaps even just in testing and regression
+>> suites libvirt can assert that it sees no deprecation warnings (or
+>> whitelist certain ones it knows about.)
 >>
->> And qemu crashes because of a stack overflow due to the loop being
->> created (target's backing file is source, so when it replaces filtered=
-,
->> it points to itself through source).
->>
->> (blockdev-mirror can be broken similarly.)
->>
->> So let us make the checks for the two conditions above explicit, which=
+>> In the case of libvirt, it's not even necessarily about making sure the
+>> end user sees it, because it isn't even necessarily the user's fault --
+>> it's libvirt's. This is a sure-fire programmatic way to communicate
+>> compatibility changes to libvirt.
+> 
+> If libvirt uses this to make test cases fail, it could work.
+> 
 
->> makes the whole function exactly as restrictive as it needs to be.
->>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>   include/block/block.h |  1 +
->>   block.c               | 83 +++++++++++++++++++++++++++++++++++++++--=
---
->>   blockdev.c            | 34 ++++++++++++++++--
->>   3 files changed, 110 insertions(+), 8 deletions(-)
->>
->> diff --git a/include/block/block.h b/include/block/block.h
->> index 6ba853fb90..8da706cd89 100644
->> --- a/include/block/block.h
->> +++ b/include/block/block.h
->> @@ -404,6 +404,7 @@ bool bdrv_is_first_non_filter(BlockDriverState *ca=
-ndidate);
->>  =20
->>   /* check if a named node can be replaced when doing drive-mirror */
->>   BlockDriverState *check_to_replace_node(BlockDriverState *parent_bs,=
+Yeah, I think there's solid use there. I'll continue along in Markus's
+thread.
 
->> +                                        BlockDriverState *backing_bs,=
-
->>                                           const char *node_name, Error=
- **errp);
->>  =20
->>   /* async block I/O */
->> diff --git a/block.c b/block.c
->> index 915b80153c..4858d3e718 100644
->> --- a/block.c
->> +++ b/block.c
->> @@ -6290,7 +6290,59 @@ bool bdrv_is_first_non_filter(BlockDriverState =
-*candidate)
->>       return false;
->>   }
->>  =20
->> +static bool is_child_of(BlockDriverState *child, BlockDriverState *pa=
-rent)
->> +{
->> +    BdrvChild *c;
->> +
->> +    if (!parent) {
->> +        return false;
->> +    }
->> +
->> +    QLIST_FOREACH(c, &parent->children, next) {
->> +        if (c->bs =3D=3D child || is_child_of(child, c->bs)) {
->> +            return true;
->> +        }
->> +    }
->> +
->> +    return false;
->> +}
->> +
->> +/*
->> + * Return true if there are only filters in [@top, @base).  Note that=
-
->> + * this may include quorum (which bdrv_chain_contains() cannot
->> + * handle).
->=20
-> More presizely: return true if exists chain of filters from top to base=
- or if
-> top =3D=3D base.
->=20
-> I keep in mind backup-top filter:
->=20
-> [backup-top]
-> |          \target
-
-backup-top can=E2=80=99t be a filter if it has two children with differen=
-t
-contents, though.
-
-(commit-top and mirror-top aren=E2=80=99t filters either.)
-
-That=E2=80=99s why there must be a unique chain [@top, @base).
-
-I should probably not that it will return true if top =3D=3D base, though=
-, yes.
-
-> |backing    -------->[target]
-> V                    /
-> [source]  <---------/backing
->=20
->> + */
->> +static bool is_filtered_child(BlockDriverState *top, BlockDriverState=
- *base)
->> +{
->> +    BdrvChild *c;
->> +
->> +    if (!top) {
->> +        return false;
->> +    }
->> +
->> +    if (top =3D=3D base) {
->> +        return true;
->> +    }
->> +
->> +    if (!top->drv->is_filter) {
->> +        return false;
->> +    }
->> +
->> +    QLIST_FOREACH(c, &top->children, next) {
->> +        if (is_filtered_child(c->bs, base)) {
->> +            return true;
->> +        }
->> +    }
->=20
-> interesting, how much is it better to somehow reuse DFS search written =
-in should_update_child()..
-> [just note, don't do it in these series please]
->=20
->> +
->> +    return false;
->> +}
->> +
->> +/*
->> + * @parent_bs is mirror's source BDS, @backing_bs is the BDS which
->> + * will be attached to the target when mirror completes.
->> + */
->>   BlockDriverState *check_to_replace_node(BlockDriverState *parent_bs,=
-
->> +                                        BlockDriverState *backing_bs,=
-
->>                                           const char *node_name, Error=
- **errp)
->>   {
->>       BlockDriverState *to_replace_bs =3D bdrv_find_node(node_name);
->> @@ -6309,13 +6361,32 @@ BlockDriverState *check_to_replace_node(BlockD=
-riverState *parent_bs,
->>           goto out;
->>       }
->>  =20
->> -    /* We don't want arbitrary node of the BDS chain to be replaced o=
-nly the top
->> -     * most non filter in order to prevent data corruption.
->> -     * Another benefit is that this tests exclude backing files which=
- are
->> -     * blocked by the backing blockers.
->> +    /*
->> +     * If to_replace_bs is (recursively) a child of backing_bs,
->> +     * replacing it may create a loop.  We cannot allow that.
->>        */
->> -    if (!bdrv_recurse_is_first_non_filter(parent_bs, to_replace_bs)) =
-{
->> -        error_setg(errp, "Only top most non filter can be replaced");=
-
->> +    if (to_replace_bs =3D=3D backing_bs || is_child_of(to_replace_bs,=
- backing_bs)) {
->=20
-> first condition is covered by second, so first may be omitted.
-
-It is not.  is_child_of() does not return true if child =3D=3D parent.
-
->> +        error_setg(errp, "Replacing this node would result in a loop"=
-);
->> +        to_replace_bs =3D NULL;
->> +        goto out;
->> +    }
->> +
->> +    /*
->> +     * Mirror is designed in such a way that when it completes, the
->> +     * source BDS is seamlessly replaced. =20
->=20
-> Not source but to_replace_bs is replaced?
-
-It has originally been designed to replace the source.  If it could
-replace any arbitrary BDS, all of this would be moot.
-
->> It is therefore not allowed
->> +     * to replace a BDS where this condition would be violated, as th=
-at
->> +     * would defeat the purpose of mirror and could lead to data
->> +     * corruption.
->> +     * Therefore, between parent_bs and to_replace_bs there may be
->> +     * only filters (and the one on top must be a filter, too), so
->> +     * their data always stays in sync and mirror can complete and
->> +     * replace to_replace_bs without any possible corruptions.
->> +     */
->> +    if (!is_filtered_child(parent_bs, to_replace_bs) &&
->> +        !is_filtered_child(to_replace_bs, parent_bs))
->> +    {
->> +        error_setg(errp, "The node to be replaced must be connected t=
-o the "
->> +                   "source through filter nodes only");
->=20
-> "and the one on top must be a filter, too" not mentioned in the error..=
-
-
-Well, unless the source node is the node to be replaced.  Hm...  This
-gets very hard to express.  I think I=E2=80=99d prefer to keep this as it=
- is,
-even though it is not quite correct, unless you have a better suggestion
-of what to report. :-/
-
->>           to_replace_bs =3D NULL;
->>           goto out;
->>       }
->> diff --git a/blockdev.c b/blockdev.c
->> index 4e72f6f701..758e0b5431 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -3887,7 +3887,7 @@ static void blockdev_mirror_common(const char *j=
-ob_id, BlockDriverState *bs,
->>       }
->>  =20
->>       if (has_replaces) {
->> -        BlockDriverState *to_replace_bs;
->> +        BlockDriverState *to_replace_bs, *backing_bs;
->>           AioContext *replace_aio_context;
->>           int64_t bs_size, replace_size;
->>  =20
->> @@ -3897,7 +3897,37 @@ static void blockdev_mirror_common(const char *=
-job_id, BlockDriverState *bs,
->>               return;
->>           }
->>  =20
->> -        to_replace_bs =3D check_to_replace_node(bs, replaces, errp);
->> +        if (backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN ||
->> +            backing_mode =3D=3D MIRROR_OPEN_BACKING_CHAIN)
->> +        {
->> +            /*
->> +             * While we do not quite know what OPEN_BACKING_CHAIN
->> +             * (used for mode=3Dexisting) will yield, it is probably
->> +             * best to restrict it exactly like SOURCE_BACKING_CHAIN,=
-
->> +             * because that is our best guess.
->> +             */
->> +            switch (sync) {
->> +            case MIRROR_SYNC_MODE_FULL:
->> +                backing_bs =3D NULL;
->> +                break;
->> +
->> +            case MIRROR_SYNC_MODE_TOP:
->> +                backing_bs =3D bdrv_filtered_cow_bs(bdrv_skip_rw_filt=
-ers(bs));
->=20
-> why not  bdrv_backing_chain_next(bs) like in mirror_start?
-
-Good question.  I suppose it should be
-bdrv_filtered_cow_bs(bdrv_backing_chain_next(bs)) in mirror_start()?
-Because with sync=3Dtop, we just want to remove the topmost COW node (and=
-
-filters on top), but keep filters behind it.
-
-Max
-
->> +                break;
->> +
->> +            case MIRROR_SYNC_MODE_NONE:
->> +                backing_bs =3D bs;
->> +                break;
->> +
->> +            default:
->> +                abort();
->> +            }
->> +        } else {
->> +            assert(backing_mode =3D=3D MIRROR_LEAVE_BACKING_CHAIN);
->> +            backing_bs =3D bdrv_filtered_cow_bs(bdrv_skip_rw_filters(=
-target));
->> +        }
->> +
->> +        to_replace_bs =3D check_to_replace_node(bs, backing_bs, repla=
-ces, errp);
->>           if (!to_replace_bs) {
->>               return;
->>           }
->>
->=20
->=20
-
-
-
---iknqjXsBS9vF0WMTsODD2p8OBYx6CK9V5--
-
---0ED8TDdAXiYfA82Xudm5GsoVFGK92Yuhk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1Vj/wACgkQ9AfbAGHV
-z0C21Af/d757Bg+lFZw43leowdQ8VXlVwMmQZEncBrb4u9AmM+bMGekz4H+d5Nty
-Nh2jUrVS3T2ClN3yGlHUSZyl1/SFGEVHA3BXDtbr4JflgsLBhs+fuA4AEHzdPhUe
-Nf+wFJB125GeH4bKgvHKuBqjT3hfF6eTEHRLeheuv4c3sau7Kvj+fBKFdBFpFHnf
-6mKW8avZinJ0uCd6tXAeaShfjd+6cIvH2dn77FeV2kND8gbokAqAuk5IX7SaMMiu
-wQFcoByXMuZBRvXlO3z7ddC1iAmrn1g7uG4JVzYeu64kU76nObOt5tyUh+GI9vYg
-JEr1kMUpB8LcXWzH2qmFxu5oI2F5iQ==
-=iAZJ
------END PGP SIGNATURE-----
-
---0ED8TDdAXiYfA82Xudm5GsoVFGK92Yuhk--
+> Kevin
+> 
 
