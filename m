@@ -2,62 +2,69 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B90ABC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 08:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA2C3C31E40
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 08:53:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8EE1F218C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 08:50:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8EE1F218C9
+	by mail.kernel.org (Postfix) with ESMTPS id 909CF2064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 08:53:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 909CF2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyBSL-0000bn-OQ
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 04:50:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40391)
+	id 1hyBVV-0001r5-Ll
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 04:53:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1hyBRW-00006i-Mr
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 04:49:11 -0400
+ (envelope-from <abologna@redhat.com>) id 1hyBUh-0001Gp-AZ
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 04:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1hyBRV-00038G-Hw
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 04:49:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39800)
+ (envelope-from <abologna@redhat.com>) id 1hyBUg-0004NK-95
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 04:52:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51192)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>)
- id 1hyBRS-00036n-W3; Thu, 15 Aug 2019 04:49:07 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <abologna@redhat.com>)
+ id 1hyBUd-0004M9-Tr; Thu, 15 Aug 2019 04:52:24 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5391F2D0FCE;
- Thu, 15 Aug 2019 08:49:06 +0000 (UTC)
-Received: from dhcp-4-67.tlv.redhat.com (dhcp-4-67.tlv.redhat.com [10.35.4.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7946181768;
- Thu, 15 Aug 2019 08:49:01 +0000 (UTC)
-Message-ID: <4c7435dac1f719c71da8b11eafd3d2a36f3bb8d8.camel@redhat.com>
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Date: Thu, 15 Aug 2019 11:49:00 +0300
-In-Reply-To: <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
-References: <20190814202219.1870-1-mlevitsk@redhat.com>
- <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 2B6892A09CA;
+ Thu, 15 Aug 2019 08:52:23 +0000 (UTC)
+Received: from kinshicho (unknown [10.43.2.73])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AD8E45D1;
+ Thu, 15 Aug 2019 08:52:18 +0000 (UTC)
+Message-ID: <3bb3f4872c452fc9af2fc982b991a72dd3928a4e.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,  "Richard
+ W . M . Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, Pino Toscano
+ <ptoscano@redhat.com>
+Date: Thu, 15 Aug 2019 10:52:17 +0200
+In-Reply-To: <e47b3d6e-c68d-c9f2-3681-3f29a5543ce7@redhat.com>
+References: <20190814121527.17876-1-philmd@redhat.com>
+ <20190814121527.17876-3-philmd@redhat.com>
+ <4876e26ccda980f45e0ad1492097a66b07fe65de.camel@redhat.com>
+ <ca03335f-55a1-322f-401d-a02a2d115b66@redhat.com>
+ <9becb1b8d13703740411ae0e1e6e0580fe6a1bc7.camel@redhat.com>
+ <e47b3d6e-c68d-c9f2-3681-3f29a5543ce7@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 15 Aug 2019 08:49:06 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Thu, 15 Aug 2019 08:52:23 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key
- management
+Subject: Re: [Qemu-devel] [PATCH 2/4] configure: Avoid using libssh
+ deprecated API
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,93 +76,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?=E5=91=A8=E6=96=87=E9=9D=92?= <1151451036@qq.com>,
+ Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2019-08-14 at 16:08 -0500, Eric Blake wrote:
-> On 8/14/19 3:22 PM, Maxim Levitsky wrote:
-> 
-> > This is an issue that was raised today on IRC with Kevin Wolf. Really thanks
-> > for the idea!
-> > 
-> > We agreed that this new qmp interface should take the same options as
-> > blockdev-create does, however since we want to be able to edit the encryption
-> > slots separately, this implies that we sort of need to allow this on creation
-> > time as well.
-> > 
-> > Also the BlockdevCreateOptions is a union, which is specialized by the driver name
-> > which is great for creation, but for update, the driver name is already known,
-> > and thus the user should not be forced to pass it again.
-> > However qmp doesn't seem to support union type guessing based on actual fields
-> > given (this might not be desired either), which complicates this somewhat.
-> 
-> Does the idea of a union type with a default value for the discriminator
-> help?  Maybe we have a discriminator which defaults to 'auto', and add a
-> union branch 'auto':'any'.  During creation, if the "driver":"auto"
-> branch is selected (usually implicitly by omitting "driver", but also
-> possible explicitly), the creation attempt is rejected as invalid
-> regardless of the contents of the remaining 'any'.  But during amend
-> usage, if the 'auto' branch is selected, we then add in the proper
-> "driver":"xyz" and reparse the QAPI object to determine if the remaining
-> fields in 'any' still meet the specification for the required driver branch.
-> 
-> This idea may still require some tweaks to the QAPI generator, but it's
-> the best I can come up with for a way to parse an arbitrary JSON object
-> with unknown validation, then reparse it again after adding more
-> information that would constrain the parse differently.
-> 
+On Wed, 2019-08-14 at 17:14 +0200, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 8/14/19 4:51 PM, Andrea Bolognani wrote:
+> > On Wed, 2019-08-14 at 16:15 +0200, Philippe Mathieu-Daud=C3=A9 wrote:
+> > > On 8/14/19 3:27 PM, Andrea Bolognani wrote:
+> > > > On Wed, 2019-08-14 at 14:15 +0200, Philippe Mathieu-Daud=C3=A9 wr=
+ote:
+> > > > > Suggested-by: Andrea Bolognani <abologna@redhat.com>
+> > > > > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > > > > ---
+> > > > >  block/ssh.c | 2 +-
+> > > > >  configure   | 7 +++++++
+> > > > >  2 files changed, 8 insertions(+), 1 deletion(-)
+> > > >=20
+> > > > Did I really suggest this? I have no recollection of doing so, or
+> > > > even getting involved with libssh support in QEMU at all for that
+> > > > matter.
+> > >=20
+> > > I took this suggestion from
+> > > https://www.redhat.com/archives/libvir-list/2018-May/msg00597.html
+> >=20
+> > I see :)
+> >=20
+> > I feel like adding a Suggested-by because of something that was
+> > posted on an unrelated project's mailing list is stretching the
+> > definition of the tag a bit, so if you end up having to respin I
+> > think it would be reasonable to drop it, but honestly it's not a
+> > big deal either way: I was just curious.
+>=20
+> Understood, sorry.
 
-This could work, but the idea of doing the parsing twice might not be easy to implement.
-We currently have the qmp parser completely separated from the rest of the qemu,
-so only once the qmp command parsing is done, the corresponding callback is called.
+Nothing to apologize for! :)
 
-
-I am thinking. Since any 'update' commmand would need to sepecify the node to work on,
-one could add some kind of expression for the qmp frontend to query the driver of that
-node itself, which would solve that problem
-
-
-Something like that:
-
-{ 'union': 'BlockdevAmendOptions',
-
-  'base': {
-      'node-name':         'str' },
-
-  'discriminator': { 'get_block_driver(node-name)' } ,
-
-  'data': {
-      'file':           'BlockdevCreateOptionsFile',
-      'gluster':        'BlockdevCreateOptionsGluster',
-      'luks':           'BlockdevCreateOptionsLUKS',
-      'nfs':            'BlockdevCreateOptionsNfs',
-      'parallels':      'BlockdevCreateOptionsParallels',
-      'qcow':           'BlockdevCreateOptionsQcow',
-      'qcow2':          'BlockdevCreateOptionsQcow2',
-      'qed':            'BlockdevCreateOptionsQed',
-      'rbd':            'BlockdevCreateOptionsRbd',
-      'sheepdog':       'BlockdevCreateOptionsSheepdog',
-      'ssh':            'BlockdevCreateOptionsSsh',
-      'vdi':            'BlockdevCreateOptionsVdi',
-      'vhdx':           'BlockdevCreateOptionsVhdx',
-      'vmdk':           'BlockdevCreateOptionsVmdk',
-      'vpc':            'BlockdevCreateOptionsVpc'
-  } }
-
-
-The 'get_block_driver' expression will make the QMP frontend, take the value of the node-name union field,
-and look up the block driver associated with it and use that as a discriminator.
-
-Syntax wise we can (at some expense of readability) use json to express the same like
-
-'discriminator': { 'field' : 'node-name', 'transform': 'getdrivername' },
-
-Best regards,
-	Maxim Levitsky
+--=20
+Andrea Bolognani / Red Hat / Virtualization
 
 
