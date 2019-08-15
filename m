@@ -8,81 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8E3C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FA5C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 453D2208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:44:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D19FF208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:45:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ph8XWJkK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453D2208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nH4GXcGm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D19FF208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5ka-0006Sn-7P
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:44:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48592)
+	id 1hy5lA-00072S-H1
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5MP-0000a5-W4
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:31 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Dl-0006UA-1o
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5MO-0001bV-75
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:29 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:35415)
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Di-0000Oe-Qi
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:32 -0400
+Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:42195)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1hy5MO-0001b8-2F
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:28 -0400
-Received: by mail-qt1-x843.google.com with SMTP id u34so950783qte.2
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:19:28 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Di-0000Nx-Lf
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:30 -0400
+Received: by mail-yw1-xc42.google.com with SMTP id z63so290727ywz.9
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vErop0rGwk60sa3Qa4x2OiK1fh1r4aRc9p7r0AqR3oI=;
- b=Ph8XWJkK+6L+jNeXmHhkWiUCXrKNQYGI/LDLm5spgCRQW7kHFusJs/qpisw7IUmnM4
- LZu91l43c8MTepbeJTSq99ZQT3FdwxJp52kR3MiYKx8NKwtFHqo5pl5ipD2YwzmRflGK
- 1lDjMc6XiNRZsbMhppebY2BPyW4hkh3RgHPwxX2Xj2PM0f2xOisePOTBn+BmLhgL1wiy
- f9anGDcAJaTrStzC1rTQPD6jRetQGf7YxIohFeES6F1XAcGin+wIZ+IBs3TFDz6XI8wW
- Z25AbPWE6a+kwkFiAEHcVicyN8zcaqBkqevAFXFBUsYhn2e4e+aDhRZKXF902yeYjfqR
- wR+A==
+ bh=7BueW4Yx+T+QYuOxbWUj1eJfzlDzg85DNPgtbyCQMpY=;
+ b=nH4GXcGmmTrPc2hqWZkwKCCEhJJXVMj+RVI2Zg+CF3U2Tx6lWI7Xf4/ORf86fKNcRk
+ CPYOELCAHUJQMlGw98hYIUo8UqIHPuHS9QkF7stpK9phDb1FjRMUFdGPdAbwWaLjOAFb
+ 0ZD0tzer1hvK1YJGixA+ZacJtr3C2N91MTaI0H0fGzy2FncCK0gOX5QjWvBwyfal8Pim
+ GYrJnhtoeeT1CIcCqOPrcARwa0B1QFtIprg2OSS+UJmZMr+KBjIVeIZpPuaOHwCgbZ8/
+ YG2Tmxgu44LS4CGOV74MG+om9Q3D4/84zcNnnb18gafSIEuPWmejx+MnXq2ZqpJ1SJog
+ s/+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vErop0rGwk60sa3Qa4x2OiK1fh1r4aRc9p7r0AqR3oI=;
- b=Mm3djhYIQNHad/BPv05i+pM+lWKMw1JSJsgvFbiZ4mVu+VzBLOEu0HG7rcAFTgm0pO
- LX+s7W+yovWvQAZLnNUhKGToD3L61i4221PY9PyKu/7oU1hBFyoUJNWZzRPBIwNTDSxX
- Tk7kIXGijNkfGfwOpcICrBCY9i65KMkRyYyV2Jy2NSvOP5MLy0jVAJYOvr8ex2ukDUp7
- fl/rfXGvaUzBiUnE3C7LyYifw0fOlnVTwAhC7YaQcNAbo5fyh1ewAd1kKSMkVR1p+gFi
- u76IX8WQkxvC2EQ+0TJqcyqLWdOo6ggxt3q367l9egqpNbmJkLyXoLKGsYx9knMwUaGM
- DGlw==
-X-Gm-Message-State: APjAAAXXqbRVghzrzhrHhDJLiWc0XDFYw8yTZYlkucb2QhIZPN+eGArM
- GXIYRHncqQC21YDBU30a74V2gGCZne0=
-X-Google-Smtp-Source: APXvYqxQhm32tXzVXJOo13OJKMd53oCQN4XSQOThEopKA2oS+nKUmkhvIO1oG+AAAaG/NiBw57whng==
-X-Received: by 2002:ac8:764f:: with SMTP id i15mr2039555qtr.194.1565835567208; 
- Wed, 14 Aug 2019 19:19:27 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:482:121::1])
- by smtp.googlemail.com with ESMTPSA id o5sm757943qkf.10.2019.08.14.19.19.25
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:19:26 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
+ bh=7BueW4Yx+T+QYuOxbWUj1eJfzlDzg85DNPgtbyCQMpY=;
+ b=LkDK9AJIp3xYH0NxgQnSz9JyR+V0XZW+r78tFSpVw72CJwJF24oHjTilRT1uLYwJGA
+ h4XFqYm7zRfQ/QFGuOx02kTx4XPgtqKo3xA+4nGZ7kdV9dzJpgldnQ92hPiuuxjNo2gu
+ 5t82FEJ5LCXeLp2kWzgkADIkUXPxRLrF8ixnhLt+LZN0JN9h1d3GV2uAUKJ/4+9zM0e1
+ FYuX/9OZRH6Qrx411VJKEqwlkddDtqxolIZFINdPLD6UsK2YH+NVTrQ1Vx+8jR+GpxEE
+ goMLQDJamXbQlECkDLbsPikAasqXlKKLStxkR+8bpuFTBK1Qlxl5QAkcd7TakzcM6jY1
+ FjZw==
+X-Gm-Message-State: APjAAAVtAXw4bWbJJtjwhgnnt9qE9thCqSEpqCQ+Ha262lXmUpY43kRl
+ iFiY65Krz7I34d8iY9PyTRCBjprj
+X-Google-Smtp-Source: APXvYqw99ag4zX/gcb5x5FTG9AHEL6/mnH+SE9KfopBaGA7lK8OZ2FvPeuDtm5I8itwz9KPpW9b/Gw==
+X-Received: by 2002:a81:8706:: with SMTP id x6mr1590510ywf.512.1565835029907; 
+ Wed, 14 Aug 2019 19:10:29 -0700 (PDT)
+Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
+ by smtp.gmail.com with ESMTPSA id
+ j3sm374882ywk.21.2019.08.14.19.10.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Aug 2019 19:10:29 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:18:48 -0300
-Message-Id: <20190815021857.19526-2-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190815021857.19526-1-vandersonmr2@gmail.com>
-References: <20190815021857.19526-1-vandersonmr2@gmail.com>
+Date: Wed, 14 Aug 2019 22:09:21 -0400
+Message-Id: <20190815020928.9679-40-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
+References: <20190815020928.9679-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::843
-Subject: [Qemu-devel] [PATCH v5 01/10] accel: introducing TBStatistics
- structure
+X-Received-From: 2607:f8b0:4864:20::c42
+Subject: [Qemu-devel] [RFC PATCH v3 39/46] target/i386: introduce SSE code
+ generators
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,336 +94,404 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To store statistics for each TB, we created a TBStatistics structure
-which is linked with the TBs. TBStatistics can stay alive after
-tb_flush and be relinked to a regenerated TB. So the statistics can
-be accumulated even through flushes.
+Introduce code generators required by SSE instructions.
 
-The goal is to have all present and future qemu/tcg statistics and
-meta-data stored in this new structure.
-
-Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- accel/tcg/Makefile.objs      |  2 +-
- accel/tcg/perf/Makefile.objs |  1 +
- accel/tcg/tb-stats.c         | 39 ++++++++++++++++++++++++
- accel/tcg/translate-all.c    | 57 ++++++++++++++++++++++++++++++++++++
- include/exec/exec-all.h      | 15 +++-------
- include/exec/tb-context.h    | 12 ++++++++
- include/exec/tb-hash.h       |  7 +++++
- include/exec/tb-stats.h      | 43 +++++++++++++++++++++++++++
- util/log.c                   |  2 ++
- 9 files changed, 166 insertions(+), 12 deletions(-)
- create mode 100644 accel/tcg/perf/Makefile.objs
- create mode 100644 accel/tcg/tb-stats.c
- create mode 100644 include/exec/tb-stats.h
+ target/i386/translate.c | 319 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 319 insertions(+)
 
-diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-index d381a02f34..49ffe81b5d 100644
---- a/accel/tcg/Makefile.objs
-+++ b/accel/tcg/Makefile.objs
-@@ -2,7 +2,7 @@ obj-$(CONFIG_SOFTMMU) += tcg-all.o
- obj-$(CONFIG_SOFTMMU) += cputlb.o
- obj-y += tcg-runtime.o tcg-runtime-gvec.o
- obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
--obj-y += translator.o
-+obj-y += translator.o tb-stats.o
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index ef64fe606f..3d526ee470 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -5360,6 +5360,9 @@ INSNOP_LDST(xmm_t0, Mhq)
+ #define DEF_GEN_INSN2_GVEC_MM(mnem, gvec, opT1, opT2, vece)       \
+     DEF_GEN_INSN2_GVEC(mnem, gvec, opT1, opT2, vece,              \
+                        sizeof(MMXReg), sizeof(MMXReg))
++#define DEF_GEN_INSN2_GVEC_XMM(mnem, gvec, opT1, opT2, vece)      \
++    DEF_GEN_INSN2_GVEC(mnem, gvec, opT1, opT2, vece,              \
++                       sizeof(XMMReg), sizeof(XMMReg))
  
- obj-$(CONFIG_USER_ONLY) += user-exec.o
- obj-$(call lnot,$(CONFIG_SOFTMMU)) += user-exec-stub.o
-diff --git a/accel/tcg/perf/Makefile.objs b/accel/tcg/perf/Makefile.objs
-new file mode 100644
-index 0000000000..f82fba35e5
---- /dev/null
-+++ b/accel/tcg/perf/Makefile.objs
-@@ -0,0 +1 @@
-+obj-y += jitdump.o
-diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
-new file mode 100644
-index 0000000000..02844717cb
---- /dev/null
-+++ b/accel/tcg/tb-stats.c
-@@ -0,0 +1,39 @@
-+#include "qemu/osdep.h"
-+
-+#include "disas/disas.h"
-+
-+#include "exec/tb-stats.h"
-+
-+void init_tb_stats_htable_if_not(void)
-+{
-+    if (tb_stats_collection_enabled() && !tb_ctx.tb_stats.map) {
-+        qht_init(&tb_ctx.tb_stats, tb_stats_cmp,
-+                CODE_GEN_HTABLE_SIZE, QHT_MODE_AUTO_RESIZE);
-+    }
-+}
-+
-+void enable_collect_tb_stats(void)
-+{
-+    init_tb_stats_htable_if_not();
-+    tcg_collect_tb_stats = TB_STATS_RUNNING;
-+}
-+
-+void disable_collect_tb_stats(void)
-+{
-+    tcg_collect_tb_stats = TB_STATS_PAUSED;
-+}
-+
-+void pause_collect_tb_stats(void)
-+{
-+    tcg_collect_tb_stats = TB_STATS_STOPPED;
-+}
-+
-+bool tb_stats_collection_enabled(void)
-+{
-+    return tcg_collect_tb_stats == TB_STATS_RUNNING;
-+}
-+
-+bool tb_stats_collection_paused(void)
-+{
-+    return tcg_collect_tb_stats == TB_STATS_PAUSED;
-+}
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 5d1e08b169..b7bccacd3b 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1118,6 +1118,23 @@ static inline void code_gen_alloc(size_t tb_size)
-     }
- }
+ #define DEF_GEN_INSN3_GVEC(mnem, gvec, opT1, opT2, opT3, vece, oprsz, maxsz) \
+     GEN_INSN3(mnem, opT1, opT2, opT3)                                   \
+@@ -5369,6 +5372,9 @@ INSNOP_LDST(xmm_t0, Mhq)
+ #define DEF_GEN_INSN3_GVEC_MM(mnem, gvec, opT1, opT2, opT3, vece)   \
+     DEF_GEN_INSN3_GVEC(mnem, gvec, opT1, opT2, opT3, vece,          \
+                        sizeof(MMXReg), sizeof(MMXReg))
++#define DEF_GEN_INSN3_GVEC_XMM(mnem, gvec, opT1, opT2, opT3, vece)  \
++    DEF_GEN_INSN3_GVEC(mnem, gvec, opT1, opT2, opT3, vece,          \
++                       sizeof(XMMReg), sizeof(XMMReg))
  
-+/*
-+ * This is the more or less the same compare as tb_cmp(), but the
-+ * data persists over tb_flush. We also aggregate the various
-+ * variations of cflags under one record and ignore the details of
-+ * page overlap (although we can count it).
-+ */
-+bool tb_stats_cmp(const void *ap, const void *bp)
+ GEN_INSN2(movq, Pq, Eq);        /* forward declaration */
+ GEN_INSN2(movd, Pq, Ed)
+@@ -5399,6 +5405,90 @@ GEN_INSN2(movq, Eq, Pq)
+ 
+ DEF_GEN_INSN2_GVEC_MM(movq, mov, Pq, Qq, MO_64)
+ DEF_GEN_INSN2_GVEC_MM(movq, mov, Qq, Pq, MO_64)
++DEF_GEN_INSN2_GVEC_XMM(movaps, mov, Vdq, Wdq, MO_64)
++DEF_GEN_INSN2_GVEC_XMM(movaps, mov, Wdq, Vdq, MO_64)
++DEF_GEN_INSN2_GVEC_XMM(movups, mov, Vdq, Wdq, MO_64)
++DEF_GEN_INSN2_GVEC_XMM(movups, mov, Wdq, Vdq, MO_64)
++
++GEN_INSN2(movss, Wd, Vd);       /* forward declaration */
++GEN_INSN4(movss, Vdq, Vdq, Wd, modrm_mod)
 +{
-+    const TBStatistics *a = ap;
-+    const TBStatistics *b = bp;
++    assert(arg1 == arg2);
 +
-+    return a->phys_pc == b->phys_pc &&
-+        a->pc == b->pc &&
-+        a->cs_base == b->cs_base &&
-+        a->flags == b->flags;
-+}
-+
- static bool tb_cmp(const void *ap, const void *bp)
- {
-     const TranslationBlock *a = ap;
-@@ -1137,6 +1154,7 @@ static void tb_htable_init(void)
-     unsigned int mode = QHT_MODE_AUTO_RESIZE;
- 
-     qht_init(&tb_ctx.htable, tb_cmp, CODE_GEN_HTABLE_SIZE, mode);
-+    init_tb_stats_htable_if_not();
- }
- 
- /* Must be called before using the QEMU cpus. 'tb_size' is the size
-@@ -1666,6 +1684,34 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-     return tb;
- }
- 
-+static TBStatistics *tb_get_stats(tb_page_addr_t phys_pc, target_ulong pc,
-+                                  target_ulong cs_base, uint32_t flags,
-+                                  TranslationBlock *current_tb)
-+{
-+    TBStatistics *new_stats = g_new0(TBStatistics, 1);
-+    uint32_t hash = tb_stats_hash_func(phys_pc, pc, flags);
-+    void *existing_stats = NULL;
-+    new_stats->phys_pc = phys_pc;
-+    new_stats->pc = pc;
-+    new_stats->cs_base = cs_base;
-+    new_stats->flags = flags;
-+    new_stats->tb = current_tb;
-+
-+    qht_insert(&tb_ctx.tb_stats, new_stats, hash, &existing_stats);
-+
-+    if (unlikely(existing_stats)) {
-+        /*
-+         * If there is already a TBStatistic for this TB from a previous flush
-+         * then just make the new TB point to the older TBStatistic
-+         */
-+        g_free(new_stats);
-+        return existing_stats;
++    if (arg4 == 3) {
++        /* merging movss */
++        gen_insn2(movss, Wd, Vd)(env, s, arg1, arg3);
 +    } else {
-+        return new_stats;
++        /* zero-extending movss */
++        const TCGv_i32 r32 = tcg_temp_new_i32();
++        const TCGv_i64 r64 = tcg_temp_new_i64();
++
++        tcg_gen_ld_i32(r32, cpu_env, arg3 + offsetof(ZMMReg, ZMM_L(0)));
++        tcg_gen_extu_i32_i64(r64, r32);
++        tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(0)));
++
++        tcg_gen_movi_i64(r64, 0);
++        tcg_gen_st_i64(r64, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
++
++        tcg_temp_free_i32(r32);
++        tcg_temp_free_i64(r64);
 +    }
 +}
 +
-+
- /* Called with mmap_lock held for user mode emulation.  */
- TranslationBlock *tb_gen_code(CPUState *cpu,
-                               target_ulong pc, target_ulong cs_base,
-@@ -1732,6 +1778,17 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-     ti = profile_getclock();
- #endif
- 
-+    /*
-+     * We want to fetch the stats structure before we start code
-+     * generation so we can count interesting things about this
-+     * generation.
-+     */
-+    if (tb_stats_collection_enabled()) {
-+        tb->tb_stats = tb_get_stats(phys_pc, pc, cs_base, flags, tb);
-+    } else {
-+        tb->tb_stats = NULL;
-+    }
-+
-     tcg_func_start(tcg_ctx);
- 
-     tcg_ctx->cpu = env_cpu(env);
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 16034ee651..24bd6a0a0c 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -22,21 +22,11 @@
- 
- #include "exec/tb-context.h"
- #include "sysemu/cpus.h"
-+#include "exec/tb-stats.h"
- 
- /* allow to see translation results - the slowdown should be negligible, so we leave it */
- #define DEBUG_DISAS
- 
--/* Page tracking code uses ram addresses in system mode, and virtual
--   addresses in userspace mode.  Define tb_page_addr_t to be an appropriate
--   type.  */
--#if defined(CONFIG_USER_ONLY)
--typedef abi_ulong tb_page_addr_t;
--#define TB_PAGE_ADDR_FMT TARGET_ABI_FMT_lx
--#else
--typedef ram_addr_t tb_page_addr_t;
--#define TB_PAGE_ADDR_FMT RAM_ADDR_FMT
--#endif
--
- #include "qemu/log.h"
- 
- void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns);
-@@ -403,6 +393,9 @@ struct TranslationBlock {
-     uintptr_t jmp_list_head;
-     uintptr_t jmp_list_next[2];
-     uintptr_t jmp_dest[2];
-+
-+    /* Pointer to a struct where statistics from the TB is stored */
-+    TBStatistics *tb_stats;
- };
- 
- extern bool parallel_cpus;
-diff --git a/include/exec/tb-context.h b/include/exec/tb-context.h
-index feb585e0a7..3cfb62a338 100644
---- a/include/exec/tb-context.h
-+++ b/include/exec/tb-context.h
-@@ -23,6 +23,17 @@
- #include "qemu/thread.h"
- #include "qemu/qht.h"
- 
-+/* Page tracking code uses ram addresses in system mode, and virtual
-+   addresses in userspace mode.  Define tb_page_addr_t to be an appropriate
-+   type.  */
-+#if defined(CONFIG_USER_ONLY)
-+typedef abi_ulong tb_page_addr_t;
-+#define TB_PAGE_ADDR_FMT TARGET_ABI_FMT_lx
-+#else
-+typedef ram_addr_t tb_page_addr_t;
-+#define TB_PAGE_ADDR_FMT RAM_ADDR_FMT
-+#endif
-+
- #define CODE_GEN_HTABLE_BITS     15
- #define CODE_GEN_HTABLE_SIZE     (1 << CODE_GEN_HTABLE_BITS)
- 
-@@ -35,6 +46,7 @@ struct TBContext {
- 
-     /* statistics */
-     unsigned tb_flush_count;
-+    struct qht tb_stats;
- };
- 
- extern TBContext tb_ctx;
-diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
-index 4f3a37d927..54c477fe79 100644
---- a/include/exec/tb-hash.h
-+++ b/include/exec/tb-hash.h
-@@ -64,4 +64,11 @@ uint32_t tb_hash_func(tb_page_addr_t phys_pc, target_ulong pc, uint32_t flags,
-     return qemu_xxhash7(phys_pc, pc, flags, cf_mask, trace_vcpu_dstate);
- }
- 
-+static inline
-+uint32_t tb_stats_hash_func(tb_page_addr_t phys_pc, target_ulong pc,
-+                            uint32_t flags)
++GEN_INSN2(movss, Wd, Vd)
 +{
-+    return qemu_xxhash5(phys_pc, pc, flags);
++    const insnop_arg_t(Wd) dofs = offsetof(ZMMReg, ZMM_L(0));
++    const insnop_arg_t(Vd) aofs = offsetof(ZMMReg, ZMM_L(0));
++    gen_op_movl(s, arg1 + dofs, arg2 + aofs);
 +}
 +
- #endif
-diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-new file mode 100644
-index 0000000000..cc8f8a6ce6
---- /dev/null
-+++ b/include/exec/tb-stats.h
-@@ -0,0 +1,43 @@
-+#ifndef TB_STATS_H
++GEN_INSN2(movhlps, Vq, UdqMhq)
++{
++    const size_t dofs = offsetof(ZMMReg, ZMM_Q(0));
++    const size_t aofs = offsetof(ZMMReg, ZMM_Q(1));
++    gen_op_movq(s, arg1 + dofs, arg2 + aofs);
++}
 +
-+#define TB_STATS_H
++GEN_INSN2(movlps, Mq, Vq)
++{
++    assert(arg1 == s->A0);
++    gen_stq_env_A0(s, arg2 + offsetof(ZMMReg, ZMM_Q(0)));
++}
 +
-+#include "exec/cpu-common.h"
-+#include "exec/tb-context.h"
-+#include "tcg.h"
++GEN_INSN3(movlhps, Vdq, Vq, Wq)
++{
++    assert(arg1 == arg2);
 +
-+typedef struct TBStatistics TBStatistics;
++    const size_t dofs = offsetof(ZMMReg, ZMM_Q(1));
++    const size_t aofs = offsetof(ZMMReg, ZMM_Q(0));
++    gen_op_movq(s, arg1 + dofs, arg3 + aofs);
++}
 +
-+/*
-+ * This struct stores statistics such as execution count of the
-+ * TranslationBlocks. Each sets of TBs for a given phys_pc/pc/flags
-+ * has its own TBStatistics which will persist over tb_flush.
-+ *
-+ * We include additional counters to track number of translations as
-+ * well as variants for compile flags.
-+ */
-+struct TBStatistics {
-+    tb_page_addr_t phys_pc;
-+    target_ulong pc;
-+    uint32_t     flags;
-+    /* cs_base isn't included in the hash but we do check for matches */
-+    target_ulong cs_base;
-+    /* current TB linked to this TBStatistics */
-+    TranslationBlock *tb;
-+};
++GEN_INSN2(movhps, Mq, Vdq)
++{
++    assert(arg1 == s->A0);
++    gen_stq_env_A0(s, arg2 + offsetof(ZMMReg, ZMM_Q(1)));
++}
 +
-+bool tb_stats_cmp(const void *ap, const void *bp);
++DEF_GEN_INSN2_HELPER_DEP(pmovmskb, pmovmskb_mmx, Gd, Nq)
 +
-+void init_tb_stats_htable_if_not(void);
++GEN_INSN2(pmovmskb, Gq, Nq)
++{
++    const TCGv_i32 arg1_r32 = tcg_temp_new_i32();
++    gen_insn2(pmovmskb, Gd, Nq)(env, s, arg1_r32, arg2);
++    tcg_gen_extu_i32_i64(arg1, arg1_r32);
++    tcg_temp_free_i32(arg1_r32);
++}
 +
-+/* TBStatistic collection controls */
-+enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED, TB_STATS_STOPPED };
-+extern int tcg_collect_tb_stats;
++DEF_GEN_INSN2_HELPER_DEP(movmskps, movmskps, Gd, Udq)
 +
-+void enable_collect_tb_stats(void);
-+void disable_collect_tb_stats(void);
-+void pause_collect_tb_stats(void);
-+bool tb_stats_collection_enabled(void);
-+bool tb_stats_collection_paused(void);
-+
-+#endif
-diff --git a/util/log.c b/util/log.c
-index 1d1b33f7d9..393a17115b 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -31,6 +31,8 @@ int qemu_loglevel;
- static int log_append = 0;
- static GArray *debug_regions;
++GEN_INSN2(movmskps, Gq, Udq)
++{
++    const TCGv_i32 arg1_r32 = tcg_temp_new_i32();
++    gen_insn2(movmskps, Gd, Udq)(env, s, arg1_r32, arg2);
++    tcg_gen_extu_i32_i64(arg1, arg1_r32);
++    tcg_temp_free_i32(arg1_r32);
++}
  
-+int tcg_collect_tb_stats;
+ DEF_GEN_INSN3_GVEC_MM(paddb, add, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(paddw, add, Pq, Pq, Qq, MO_16)
+@@ -5407,6 +5497,8 @@ DEF_GEN_INSN3_GVEC_MM(paddsb, ssadd, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(paddsw, ssadd, Pq, Pq, Qq, MO_16)
+ DEF_GEN_INSN3_GVEC_MM(paddusb, usadd, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(paddusw, usadd, Pq, Pq, Qq, MO_16)
++DEF_GEN_INSN3_HELPER_EPP(addps, addps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(addss, addss, Vd, Vd, Wd)
+ 
+ DEF_GEN_INSN3_GVEC_MM(psubb, sub, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(psubw, sub, Pq, Pq, Qq, MO_16)
+@@ -5415,11 +5507,38 @@ DEF_GEN_INSN3_GVEC_MM(psubsb, sssub, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(psubsw, sssub, Pq, Pq, Qq, MO_16)
+ DEF_GEN_INSN3_GVEC_MM(psubusb, ussub, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(psubusw, ussub, Pq, Pq, Qq, MO_16)
++DEF_GEN_INSN3_HELPER_EPP(subps, subps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(subss, subss, Vd, Vd, Wd)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(pmullw, pmullw_mmx, Pq, Pq, Qq)
+ DEF_GEN_INSN3_HELPER_EPP(pmulhw, pmulhw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pmulhuw, pmulhuw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(mulps, mulps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(mulss, mulss, Vd, Vd, Wd)
+ DEF_GEN_INSN3_HELPER_EPP(pmaddwd, pmaddwd_mmx, Pq, Pq, Qq)
+ 
++DEF_GEN_INSN3_HELPER_EPP(divps, divps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(divss, divss, Vd, Vd, Wd)
 +
- /* Return the number of characters emitted.  */
- int qemu_log(const char *fmt, ...)
- {
++DEF_GEN_INSN2_HELPER_EPP(rcpps, rcpps, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(rcpss, rcpss, Vd, Wd)
++DEF_GEN_INSN2_HELPER_EPP(sqrtps, sqrtps, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(sqrtss, sqrtss, Vd, Wd)
++DEF_GEN_INSN2_HELPER_EPP(rsqrtps, rsqrtps, Vdq, Wdq)
++DEF_GEN_INSN2_HELPER_EPP(rsqrtss, rsqrtss, Vd, Wd)
++
++DEF_GEN_INSN3_GVEC_MM(pminub, umin, Pq, Pq, Qq, MO_8)
++DEF_GEN_INSN3_GVEC_MM(pminsw, smin, Pq, Pq, Qq, MO_16)
++DEF_GEN_INSN3_HELPER_EPP(minps, minps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(minss, minss, Vd, Vd, Wd)
++DEF_GEN_INSN3_GVEC_MM(pmaxub, umax, Pq, Pq, Qq, MO_8)
++DEF_GEN_INSN3_GVEC_MM(pmaxsw, smax, Pq, Pq, Qq, MO_16)
++DEF_GEN_INSN3_HELPER_EPP(maxps, maxps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(maxss, maxss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_mmx, Pq, Pq, Qq)
++DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_mmx, Pq, Pq, Qq)
++
+ DEF_GEN_INSN3_GVEC_MM(pcmpeqb, cmpeq, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(pcmpeqw, cmpeq, Pq, Pq, Qq, MO_16)
+ DEF_GEN_INSN3_GVEC_MM(pcmpeqd, cmpeq, Pq, Pq, Qq, MO_32)
+@@ -5427,10 +5546,98 @@ DEF_GEN_INSN3_GVEC_MM(pcmpgtb, cmpgt, Pq, Pq, Qq, MO_8)
+ DEF_GEN_INSN3_GVEC_MM(pcmpgtw, cmpgt, Pq, Pq, Qq, MO_16)
+ DEF_GEN_INSN3_GVEC_MM(pcmpgtd, cmpgt, Pq, Pq, Qq, MO_32)
+ 
++DEF_GEN_INSN3_HELPER_EPP(cmpeqps, cmpeqps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpeqss, cmpeqss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpltps, cmpltps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpltss, cmpltss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpleps, cmpleps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpless, cmpless, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpunordps, cmpunordps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpunordss, cmpunordss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpneqps, cmpneqps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpneqss, cmpneqss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpnltps, cmpnltps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpnltss, cmpnltss, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpnleps, cmpnleps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpnless, cmpnless, Vd, Vd, Wd)
++DEF_GEN_INSN3_HELPER_EPP(cmpordps, cmpordps, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(cmpordss, cmpordss, Vd, Vd, Wd)
++
++GEN_INSN4(cmpps, Vdq, Vdq, Wdq, Ib)
++{
++    switch (arg4 & 7) {
++    case 0:
++        gen_insn3(cmpeqps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 1:
++        gen_insn3(cmpltps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 2:
++        gen_insn3(cmpleps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 3:
++        gen_insn3(cmpunordps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 4:
++        gen_insn3(cmpneqps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 5:
++        gen_insn3(cmpnltps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 6:
++        gen_insn3(cmpnleps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    case 7:
++        gen_insn3(cmpordps, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
++        return;
++    }
++
++    g_assert_not_reached();
++}
++
++GEN_INSN4(cmpss, Vd, Vd, Wd, Ib)
++{
++    switch (arg4 & 7) {
++    case 0:
++        gen_insn3(cmpeqss, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 1:
++        gen_insn3(cmpltss, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 2:
++        gen_insn3(cmpless, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 3:
++        gen_insn3(cmpunordss, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 4:
++        gen_insn3(cmpneqss, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 5:
++        gen_insn3(cmpnltss, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 6:
++        gen_insn3(cmpnless, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    case 7:
++        gen_insn3(cmpordss, Vd, Vd, Wd)(env, s, arg1, arg2, arg3);
++        return;
++    }
++
++    g_assert_not_reached();
++}
++
++DEF_GEN_INSN2_HELPER_EPP(comiss, comiss, Vd, Wd)
++DEF_GEN_INSN2_HELPER_EPP(ucomiss, ucomiss, Vd, Wd)
++
+ DEF_GEN_INSN3_GVEC_MM(pand, and, Pq, Pq, Qq, MO_64)
++DEF_GEN_INSN3_GVEC_XMM(andps, and, Vdq, Vdq, Wdq, MO_64)
+ DEF_GEN_INSN3_GVEC_MM(pandn, andn, Pq, Pq, Qq, MO_64)
++DEF_GEN_INSN3_GVEC_XMM(andnps, andn, Vdq, Vdq, Wdq, MO_64)
+ DEF_GEN_INSN3_GVEC_MM(por, or, Pq, Pq, Qq, MO_64)
++DEF_GEN_INSN3_GVEC_XMM(orps, or, Vdq, Vdq, Wdq, MO_64)
+ DEF_GEN_INSN3_GVEC_MM(pxor, xor, Pq, Pq, Qq, MO_64)
++DEF_GEN_INSN3_GVEC_XMM(xorps, xor, Vdq, Vdq, Wdq, MO_64)
+ 
+ DEF_GEN_INSN3_HELPER_EPP(psllw, psllw_mmx, Pq, Pq, Qq)
+ DEF_GEN_INSN3_HELPER_EPP(pslld, pslld_mmx, Pq, Pq, Qq)
+@@ -5473,8 +5680,120 @@ DEF_GEN_INSN3_HELPER_EPP(punpckhbw, punpckhbw_mmx, Pq, Pq, Qq)
+ DEF_GEN_INSN3_HELPER_EPP(punpckhwd, punpckhwd_mmx, Pq, Pq, Qq)
+ DEF_GEN_INSN3_HELPER_EPP(punpckhdq, punpckhdq_mmx, Pq, Pq, Qq)
+ 
++DEF_GEN_INSN3_HELPER_EPP(unpcklps, punpckldq_xmm, Vdq, Vdq, Wdq)
++DEF_GEN_INSN3_HELPER_EPP(unpckhps, punpckhdq_xmm, Vdq, Vdq, Wdq)
++
++DEF_GEN_INSN3_HELPER_PPI(pshufw, pshufw_mmx, Pq, Qq, Ib)
++DEF_GEN_INSN4_HELPER_PPI(shufps, shufps, Vdq, Vdq, Wdq, Ib)
++
++GEN_INSN4(pinsrw, Pq, Pq, RdMw, Ib)
++{
++    assert(arg1 == arg2);
++
++    const size_t ofs = offsetof(MMXReg, MMX_W(arg4 & 3));
++    tcg_gen_st16_i32(arg3, cpu_env, arg1 + ofs);
++}
++
++GEN_INSN3(pextrw, Gd, Nq, Ib)
++{
++    const size_t ofs = offsetof(MMXReg, MMX_W(arg3 & 3));
++    tcg_gen_ld16u_i32(arg1, cpu_env, arg2 + ofs);
++}
++
++GEN_INSN3(pextrw, Gq, Nq, Ib)
++{
++    const size_t ofs = offsetof(MMXReg, MMX_W(arg3 & 3));
++    tcg_gen_ld16u_i64(arg1, cpu_env, arg2 + ofs);
++}
++
++DEF_GEN_INSN2_HELPER_EPP(cvtpi2ps, cvtpi2ps, Vdq, Qq)
++DEF_GEN_INSN2_HELPER_EPD(cvtsi2ss, cvtsi2ss, Vd, Ed)
++DEF_GEN_INSN2_HELPER_EPQ(cvtsi2ss, cvtsq2ss, Vd, Eq)
++DEF_GEN_INSN2_HELPER_EPP(cvtps2pi, cvtps2pi, Pq, Wq)
++DEF_GEN_INSN2_HELPER_DEP(cvtss2si, cvtss2si, Gd, Wd)
++DEF_GEN_INSN2_HELPER_QEP(cvtss2si, cvtss2sq, Gq, Wd)
++DEF_GEN_INSN2_HELPER_EPP(cvttps2pi, cvttps2pi, Pq, Wq)
++DEF_GEN_INSN2_HELPER_DEP(cvttss2si, cvttss2si, Gd, Wd)
++DEF_GEN_INSN2_HELPER_QEP(cvttss2si, cvttss2sq, Gq, Wd)
++
++GEN_INSN2(maskmovq, Pq, Nq)
++{
++    const TCGv_ptr arg1_ptr = tcg_temp_new_ptr();
++    const TCGv_ptr arg2_ptr = tcg_temp_new_ptr();
++
++    tcg_gen_mov_tl(s->A0, cpu_regs[R_EDI]);
++    gen_extu(s->aflag, s->A0);
++    gen_add_A0_ds_seg(s);
++
++    tcg_gen_addi_ptr(arg1_ptr, cpu_env, arg1);
++    tcg_gen_addi_ptr(arg2_ptr, cpu_env, arg2);
++    gen_helper_maskmov_mmx(cpu_env, arg1_ptr, arg2_ptr, s->A0);
++
++    tcg_temp_free_ptr(arg1_ptr);
++    tcg_temp_free_ptr(arg2_ptr);
++}
++
++GEN_INSN2(movntps, Mdq, Vdq)
++{
++    assert(arg1 == s->A0);
++    gen_sto_env_A0(s, arg2);
++}
++
++GEN_INSN2(movntq, Mq, Pq)
++{
++    assert(arg1 == s->A0);
++    gen_stq_env_A0(s, arg2);
++}
++
+ DEF_GEN_INSN0_HELPER(emms, emms)
+ 
++GEN_INSN0(sfence)
++{
++    if (s->prefix & PREFIX_LOCK) {
++        gen_illegal_opcode(s);
++    } else {
++        tcg_gen_mb(TCG_MO_ST_ST | TCG_BAR_SC);
++    }
++}
++
++GEN_INSN1(ldmxcsr, Md)
++{
++    if ((s->flags & HF_EM_MASK) || !(s->flags & HF_OSFXSR_MASK)) {
++        gen_illegal_opcode(s);
++    } else if (s->flags & HF_TS_MASK) {
++        gen_exception(s, EXCP07_PREX);
++    } else {
++        tcg_gen_qemu_ld_i32(s->tmp2_i32, arg1, s->mem_index, MO_LEUL);
++        gen_helper_ldmxcsr(cpu_env, s->tmp2_i32);
++    }
++}
++
++GEN_INSN1(stmxcsr, Md)
++{
++    if ((s->flags & HF_EM_MASK) || !(s->flags & HF_OSFXSR_MASK)) {
++        gen_illegal_opcode(s);
++    } else if (s->flags & HF_TS_MASK) {
++        gen_exception(s, EXCP07_PREX);
++    } else {
++        const size_t ofs = offsetof(CPUX86State, mxcsr);
++        tcg_gen_ld_i32(s->tmp2_i32, cpu_env, ofs);
++        tcg_gen_qemu_st_i32(s->tmp2_i32, arg1, s->mem_index, MO_LEUL);
++    }
++}
++
++GEN_INSN1(prefetcht0, Mb)
++{
++}
++GEN_INSN1(prefetcht1, Mb)
++{
++}
++GEN_INSN1(prefetcht2, Mb)
++{
++}
++GEN_INSN1(prefetchnta, Mb)
++{
++}
++
+ /*
+  * Instruction translators
+  */
 -- 
-2.22.0
+2.20.1
 
 
