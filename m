@@ -2,88 +2,89 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EFB7C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F709C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:49:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC1C420656
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:47:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19AB920656
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:49:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lBqHImar"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC1C420656
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r11EJ5FN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19AB920656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyH2I-00005z-Ux
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:47:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58443)
+	id 1hyH4e-0001Of-BZ
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:49:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1hyH0f-0007dS-6w
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:45:52 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyH3M-0000bn-Mt
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:48:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hyH0c-0005wL-GA
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:45:49 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42909)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyH3J-0007pL-2k
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:48:36 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33566)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hyH0c-0005vN-9W
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:45:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id b16so2431645wrq.9
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:45:46 -0700 (PDT)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1hyH3I-0007ot-RP
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:48:32 -0400
+Received: by mail-oi1-x241.google.com with SMTP id u15so2311330oiv.0
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=gr2ZOYCI3DXPPFZ99wVrTGHMpO9u7sXtf/eSec5Mrck=;
- b=lBqHImarQKRJYI6mX3XQnnZna3nv9nM1/ThxWCqBSpK3lXUT6G1/ionpxloByouONt
- ud/dnwap0qYmvDN1UTn1PwEWeiH+K73Ijbh3T2LIY9myMZJZ4BzgUHe31JP5UwYsJgrM
- EA+hL1puPkgJCYHVV2SChXcu14fL3QQCGjdRwU4S8fh6YyMPx2nr2A1GWPixt+lO2Lt3
- ukCrKbMjS60izVg/dArRpeBiotVzSfXE9GZqQX4DV5xuCig5OQWgVZpOc2AmtYq66bjy
- x5r8qCeKdZ9idu/ir5wI/FuunJEDlcOAjEJ4UsJMm5/YJeRceRxJ/Vybt32cvDVvSn+2
- v+1Q==
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=WN5IKN5DloNomZ2mLa8vS5cnHjb2JFd5ccO6E1V1l4o=;
+ b=r11EJ5FNjTzlN9Hd4hFm1gHL+Loya8rwgqD6rAJjGVTQzdVA+/hDVG91OvHsXHqV68
+ Yo6ymu3x7XsiJUGx56TZdWbADvz0EetMc92TU+L1RkxpHDpELPmlUMTSTjlQ+ZkStF3L
+ 5sKtD3NwXvRd5Fm0SrYNnja1ka0NkCBQb31qFkNO4If2rOSthdrQSOAvhzl2P0Ovasss
+ H5AhgFVB7Q2KII5vNRb4ecKgd2NSZ3aDeawXODHQjtcybxoatre/x1avDisZHl0jSMW6
+ pyGhkhrs8u37jWclR4Fl1+cJN2U882jlKDu2r1BG4r3hfmMK3wcptqKztWwqekd3w80r
+ MfaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=gr2ZOYCI3DXPPFZ99wVrTGHMpO9u7sXtf/eSec5Mrck=;
- b=dHlgDX45fgfjEOm02VrXstRP+QdBCjaYBDlks+pYzNwSpecWFjd9feQ3QBVHKjyNUA
- +ftR4bt4W0DjYeanGKB1V9vnJcVOYvHMqop/vPTym/n6nwQ7nProrwvL32UPIDEJyV7g
- 5IeolmNqwBa9K/CsVHIgIs0AZMxTGZvAs8VOy+7PjcWcvgipEpirgg9Cw/hbMx5Xrdqg
- IGzQO8D0dui9EQ/QucSuj7sy8Txx7wRD4fExHh0Brg2encolZG/sS1cBMPOAoVhoEhGa
- LLj3Xv8clp9z7LlWIgOEK8Ay8CzzzINIzAeUlbW5DY65tEV/9e6mAlsJl8bhMitkdcph
- +dew==
-X-Gm-Message-State: APjAAAXSfABo89nUAffufUd4ZzZsFGUyB1GN/ka26G83qaaeWsNAwUIL
- aqX4IvE+tHc8d4dJuYBVfDcuzSIwZdM=
-X-Google-Smtp-Source: APXvYqxy5DpsSMf6aEo0LKPw1/IPu6eC5+t4CZcCHNj1UyKbr5k0Sum/hHabEvOIXu8MwPlGG6tgDA==
-X-Received: by 2002:a5d:6b11:: with SMTP id v17mr5728002wrw.323.1565880344955; 
- Thu, 15 Aug 2019 07:45:44 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id g14sm5214831wrb.38.2019.08.15.07.45.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 07:45:44 -0700 (PDT)
-Date: Thu, 15 Aug 2019 15:45:42 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Message-ID: <20190815144542.GH10996@stefanha-x1.localdomain>
-References: <20190815120247.13413-1-philmd@redhat.com>
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=WN5IKN5DloNomZ2mLa8vS5cnHjb2JFd5ccO6E1V1l4o=;
+ b=Z4LWeI9DsGuFb6UAHR1DF8DsXbXkBHOz4Yh5Iba7ouksH598IRLA/pbmWWjlKtwFoe
+ BV5WMeWJ+mUno9o8eIR3zfxYWwp2gR+10peMm29HL9IzVrc3NhdYWJqoqzFHVWTlTzjQ
+ dp3Wclz4MT6IAE+CNKv2QBdbudmz1i43BTfs1uip7/zS8Ye02OQxsWtMsLdFmbuSzwuI
+ DgEDMjGgYbPSE7iHz6G7nL8Dz2x0dOHytK37//kJkRW49rRQWOqDZzOeO6Lxgq1o7Z4u
+ 7VLeXvYesveS+1ps+m8KHVY9fBpoFW+z3U1FBsRjXIHgCO762l3EviMizTXp+0GsK6mn
+ +fNw==
+X-Gm-Message-State: APjAAAWxaFiekHdk6h2cabeoBiFdCCi8lxtl+CpuY0qAO8W5QH+/4Hhl
+ BdcDH9pZ2njd8s+In8rKKpEluTWt9JILmQF+O8c=
+X-Google-Smtp-Source: APXvYqzKa3r67BWYtv772veJo4RDIdEPDWgJFZ8cLWtcar7M9q1dufj8q5N5M6oSWbmXT5V9NDLX7eFok6PD+I6n9kc=
+X-Received: by 2002:a05:6808:8cd:: with SMTP id
+ k13mr1899474oij.136.1565880511908; 
+ Thu, 15 Aug 2019 07:48:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WIIRZ1HQ6FgrlPgb"
-Content-Disposition: inline
-In-Reply-To: <20190815120247.13413-1-philmd@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Thu, 15 Aug 2019 07:48:31
+ -0700 (PDT)
+Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Thu, 15 Aug 2019 07:48:31
+ -0700 (PDT)
+In-Reply-To: <20190813124946.25322-5-alex.bennee@linaro.org>
+References: <20190813124946.25322-1-alex.bennee@linaro.org>
+ <20190813124946.25322-5-alex.bennee@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 15 Aug 2019 16:48:31 +0200
+Message-ID: <CAL1e-=g4Cxd74r3NyShEPpFEqx2JoT2x75zLeUXejgVgtVjSHA@mail.gmail.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
-Subject: Re: [Qemu-devel] [PATCH] trace: Clarify DTrace/SystemTap help
- message
+X-Received-From: 2607:f8b0:4864:20::241
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Content-Filtered-By: Mailman/MimeDel 2.1.23
+Subject: Re: [Qemu-devel] [PATCH v3 04/13] fpu: use min/max values from
+ stdint.h for integral overflow
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,104 +96,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, armbru@redhat.com,
+ Aurelien Jarno <aurelien@aurel32.net>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---WIIRZ1HQ6FgrlPgb
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Aug 15, 2019 at 02:02:47PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Most tracing backends are implemented within QEMU, except the
-> DTrace/SystemTap backends.
->=20
-> One side effect is when running 'qemu -trace help', an incomplete
-> list of trace events is displayed when using the DTrace/SystemTap
-> backends.
->=20
-> This is partly due to trace events registered as modules with
-> trace_init(), and since the events are not used within QEMU,
-> the linker optimize and remove the unused modules (which is
-> OK in this particular case).
-> Currently only the events compiled in trace-root.o and in the
-> last trace.o member of libqemuutil.a are linked, resulting in
-> an incomplete list of events.
->=20
-> To avoid confusion, improve the help message, recommending to
-> use the proper systemtap script to display the events list.
->=20
-> Before:
->=20
->   $ lm32-softmmu/qemu-system-lm32 -trace help 2>&1 | wc -l
->   70
->=20
-> After:
->=20
->   $ lm32-softmmu/qemu-system-lm32 -trace help
->   Run 'qemu-trace-stap list qemu-system-lm32' to print a list
->   of names of trace points with the DTrace/SystemTap backends.
->=20
->   $ qemu-trace-stap list qemu-system-lm32 | wc -l
->   1136
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+13.08.2019. 14.52, "Alex Benn=C3=A9e" <alex.bennee@linaro.org> =D1=98=D0=B5=
+ =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
+>
+> Remove some more use of LIT64 while making the meaning more clear. We
+> also avoid the need of casts as the results by definition fit into the
+> return type.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  trace/control.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->=20
-> diff --git a/trace/control.c b/trace/control.c
-> index 43fb7868db..bc2fe0859d 100644
-> --- a/trace/control.c
-> +++ b/trace/control.c
-> @@ -159,12 +159,19 @@ TraceEvent *trace_event_iter_next(TraceEventIter *i=
-ter)
-> =20
->  void trace_list_events(void)
->  {
-> +#ifdef CONFIG_TRACE_DTRACE
-> +    fprintf(stderr, "Run 'qemu-trace-stap list %s' to print a list\n"
-> +                    "of names of trace points with the DTrace/SystemTap"
-> +                    " backends.\n",
-> +                    error_get_progname());
-> +#else
->      TraceEventIter iter;
->      TraceEvent *ev;
->      trace_event_iter_init(&iter, NULL);
->      while ((ev =3D trace_event_iter_next(&iter)) !=3D NULL) {
->          fprintf(stderr, "%s\n", trace_event_get_name(ev));
+>  fpu/softfloat.c | 30 ++++++++++++++----------------
+>  1 file changed, 14 insertions(+), 16 deletions(-)
+>
+> diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+> index 9e57b7b5933..a1e1e9a8559 100644
+> --- a/fpu/softfloat.c
+> +++ b/fpu/softfloat.c
+> @@ -3444,9 +3444,7 @@ static int64_t roundAndPackInt64(flag zSign,
+uint64_t absZ0, uint64_t absZ1,
+>      if ( z && ( ( z < 0 ) ^ zSign ) ) {
+>   overflow:
+>          float_raise(float_flag_invalid, status);
+> -        return
+> -              zSign ? (int64_t) LIT64( 0x8000000000000000 )
+> -            : LIT64( 0x7FFFFFFFFFFFFFFF );
+> +        return zSign ? INT64_MIN : INT64_MAX;
 >      }
-> +#endif
 
-Multiple trace backends can be built into QEMU.  In that case the list
-might be complete and the user may not be using stap at all.  Perhaps
-the message should be turned into a warning instead and the list should
-still be printed:
+In function roundAndPavkInt32 tgere is a following segment:
 
-  This list of trace events may be incompletel.  Run 'qemu-trace-stap
-  list %s' to print a list of names of trace events with the
-  DTrace/SystemTap backends.
+    if ( ( absZ>>32 ) || ( z && ( ( z < 0 ) ^ zSign ) ) ) {
+        float_raise(float_flag_invalid, status);
+        return zSign ? (int32_t) 0x80000000 : 0x7FFFFFFF;
+    }
 
-Stefan
+Perhaps replace these constants with INT32_MIN, INT32_MAX, for similar
+reasons, in the same or a separate patch?
 
---WIIRZ1HQ6FgrlPgb
-Content-Type: application/pgp-signature; name="signature.asc"
+Aleksandar
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1VcBYACgkQnKSrs4Gr
-c8iAhgf/R34Nbzzc2pAFcqPG6d5d0iDIlLx7KPN9esY2ybgYP5I6LCI4HiRMM8hU
-lhg+y+VRvPE6YZ9b3/jD6sOjz+tVB3dh3dblSUoWrC/3XzPUmw6fChCp4vBKKIvO
-I5OFcyX7SX9rvrhbLbcscAay1RMTY6TteV7z3ch5EBIjqUYtkz/4y3AwHvPOSSRc
-qXxl9VnIEZb25whnNQUb8V3/GJYrptCwbfnprEBecq0zHuo/e5VSpBoXsE5J+UBs
-kWRRr2eoVN2m4Hh0ZF0+C99uAtr1YGyugqet6i4LO4ZejtKQDiX9Ky8BtFp4Ko6h
-M0qzW/ooZOJAZMIyXL6uYK1+OeYQyQ==
-=0Zod
------END PGP SIGNATURE-----
-
---WIIRZ1HQ6FgrlPgb--
-
+>      if (absZ1) {
+>          status->float_exception_flags |=3D float_flag_inexact;
+> @@ -3497,7 +3495,7 @@ static int64_t roundAndPackUint64(flag zSign,
+uint64_t absZ0,
+>          ++absZ0;
+>          if (absZ0 =3D=3D 0) {
+>              float_raise(float_flag_invalid, status);
+> -            return LIT64(0xFFFFFFFFFFFFFFFF);
+> +            return UINT64_MAX;
+>          }
+>          absZ0 &=3D ~(((uint64_t)(absZ1<<1) =3D=3D 0) & roundNearestEven)=
+;
+>      }
+> @@ -5518,9 +5516,9 @@ int64_t floatx80_to_int64(floatx80 a, float_status
+*status)
+>          if ( shiftCount ) {
+>              float_raise(float_flag_invalid, status);
+>              if (!aSign || floatx80_is_any_nan(a)) {
+> -                return LIT64( 0x7FFFFFFFFFFFFFFF );
+> +                return INT64_MAX;
+>              }
+> -            return (int64_t) LIT64( 0x8000000000000000 );
+> +            return INT64_MIN;
+>          }
+>          aSigExtra =3D 0;
+>      }
+> @@ -5561,10 +5559,10 @@ int64_t floatx80_to_int64_round_to_zero(floatx80
+a, float_status *status)
+>          if ( ( a.high !=3D 0xC03E ) || aSig ) {
+>              float_raise(float_flag_invalid, status);
+>              if ( ! aSign || ( ( aExp =3D=3D 0x7FFF ) && aSig ) ) {
+> -                return LIT64( 0x7FFFFFFFFFFFFFFF );
+> +                return INT64_MAX;
+>              }
+>          }
+> -        return (int64_t) LIT64( 0x8000000000000000 );
+> +        return INT64_MIN;
+>      }
+>      else if ( aExp < 0x3FFF ) {
+>          if (aExp | aSig) {
+> @@ -6623,7 +6621,7 @@ int32_t float128_to_int32_round_to_zero(float128 a,
+float_status *status)
+>      if ( ( z < 0 ) ^ aSign ) {
+>   invalid:
+>          float_raise(float_flag_invalid, status);
+> -        return aSign ? (int32_t) 0x80000000 : 0x7FFFFFFF;
+> +        return aSign ? INT32_MIN : INT32_MAX;
+>      }
+>      if ( ( aSig0<<shiftCount ) !=3D savedASig ) {
+>          status->float_exception_flags |=3D float_flag_inexact;
+> @@ -6662,9 +6660,9 @@ int64_t float128_to_int64(float128 a, float_status
+*status)
+>                        && ( aSig1 || ( aSig0 !=3D LIT64( 0x00010000000000=
+00
+) ) )
+>                      )
+>                 ) {
+> -                return LIT64( 0x7FFFFFFFFFFFFFFF );
+> +                return INT64_MAX;
+>              }
+> -            return (int64_t) LIT64( 0x8000000000000000 );
+> +            return INT64_MIN;
+>          }
+>          shortShift128Left( aSig0, aSig1, - shiftCount, &aSig0, &aSig1 );
+>      }
+> @@ -6710,10 +6708,10 @@ int64_t float128_to_int64_round_to_zero(float128
+a, float_status *status)
+>              else {
+>                  float_raise(float_flag_invalid, status);
+>                  if ( ! aSign || ( ( aExp =3D=3D 0x7FFF ) && ( aSig0 | aS=
+ig1
+) ) ) {
+> -                    return LIT64( 0x7FFFFFFFFFFFFFFF );
+> +                    return INT64_MAX;
+>                  }
+>              }
+> -            return (int64_t) LIT64( 0x8000000000000000 );
+> +            return INT64_MIN;
+>          }
+>          z =3D ( aSig0<<shiftCount ) | ( aSig1>>( ( - shiftCount ) & 63 )=
+ );
+>          if ( (uint64_t) ( aSig1<<shiftCount ) ) {
+> @@ -6764,19 +6762,19 @@ uint64_t float128_to_uint64(float128 a,
+float_status *status)
+>      if (aSign && (aExp > 0x3FFE)) {
+>          float_raise(float_flag_invalid, status);
+>          if (float128_is_any_nan(a)) {
+> -            return LIT64(0xFFFFFFFFFFFFFFFF);
+> +            return UINT64_MAX;
+>          } else {
+>              return 0;
+>          }
+>      }
+>      if (aExp) {
+> -        aSig0 |=3D LIT64(0x0001000000000000);
+> +        aSig0 |=3D UINT64_C(0x0001000000000000);
+>      }
+>      shiftCount =3D 0x402F - aExp;
+>      if (shiftCount <=3D 0) {
+>          if (0x403E < aExp) {
+>              float_raise(float_flag_invalid, status);
+> -            return LIT64(0xFFFFFFFFFFFFFFFF);
+> +            return UINT64_MAX;
+>          }
+>          shortShift128Left(aSig0, aSig1, -shiftCount, &aSig0, &aSig1);
+>      } else {
+> --
+> 2.20.1
+>
+>
