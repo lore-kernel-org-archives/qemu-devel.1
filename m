@@ -2,59 +2,107 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2ABFC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2308CC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:42:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACDDD205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:41:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACDDD205C9
+	by mail.kernel.org (Postfix) with ESMTPS id EA18A2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:42:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA18A2083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKh2-0004Wr-Bo
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37543)
+	id 1hyKhd-0005Uj-Rz
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:42:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37899)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hyKXB-00030G-0a
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:31:40 -0400
+ (envelope-from <thuth@redhat.com>) id 1hyKaD-0005OZ-LW
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hyKX8-0001xv-46
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:31:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59585)
+ (envelope-from <thuth@redhat.com>) id 1hyKaB-0005R0-17
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:34:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32786)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>)
- id 1hyKX1-0001gg-8k; Thu, 15 Aug 2019 14:31:27 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hyKaA-0005Qg-Pr
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:34:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 0D75B30BC838;
- Thu, 15 Aug 2019 18:31:25 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9044C600CD;
- Thu, 15 Aug 2019 18:31:24 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Thu, 15 Aug 2019 13:30:37 -0500
-Message-Id: <20190815183039.4264-8-eblake@redhat.com>
-In-Reply-To: <20190815183039.4264-1-eblake@redhat.com>
-References: <20190815183039.4264-1-eblake@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 1D1253082DDD;
+ Thu, 15 Aug 2019 18:34:42 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-65.ams2.redhat.com [10.36.116.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9928F1EA;
+ Thu, 15 Aug 2019 18:34:39 +0000 (UTC)
+To: qemu-devel@nongnu.org, no-reply@patchew.org
+References: <156589304949.15902.14073502863056314747@5dec9699b7de>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Organization: Red Hat
+Message-ID: <2fa2ba07-a3dc-6b06-8f76-f432b1bb3230@redhat.com>
+Date: Thu, 15 Aug 2019 20:34:38 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <156589304949.15902.14073502863056314747@5dec9699b7de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Thu, 15 Aug 2019 18:31:25 +0000 (UTC)
-Content-Transfer-Encoding: quoted-printable
+ (mx1.redhat.com [10.5.110.46]); Thu, 15 Aug 2019 18:34:42 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 7/9] block/nbd: move from quit to state
+Subject: Re: [Qemu-devel] [PULL 0/9] qtest patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,270 +114,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org, fam@euphon.net,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 8/15/19 8:17 PM, no-reply@patchew.org wrote:
+> Patchew URL: https://patchew.org/QEMU/20190815175922.3475-1-thuth@redhat.com/
+> 
+> Hi,
+> 
+> This series failed build test on s390x host. Please find the details below.
+[...]
+> The full log is available at
+> http://patchew.org/logs/20190815175922.3475-1-thuth@redhat.com/testing.s390x/?type=message.
 
-To implement reconnect we need several states for the client:
-CONNECTED, QUIT and two different CONNECTING states. CONNECTING states
-will be added in the following patches. This patch implements CONNECTED
-and QUIT.
+The error message is not really useful and seems unrelated:
 
-QUIT means, that we should close the connection and fail all current
-and further requests (like old quit =3D true).
+make: *** [/var/tmp/patchew-tester-tmp-krxfzhwl/src/rules.mak:69:
+qobject/block-qdict.o] Error 1
 
-CONNECTED means that connection is ok, we can send requests (like old
-quit =3D false).
+I did not touch anything in qobject/ at all in this series, so the
+problem is likely something completely different? Could it be that the
+machine simply ran out of disk space or something similar?
 
-For receiving loop we use a comparison of the current state with QUIT,
-because reconnect will be in the same loop, so it should be looping
-until the end.
-
-Opposite, for requests we use a comparison of the current state with
-CONNECTED, as we don't want to send requests in future CONNECTING
-states.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20190618114328.55249-4-vsementsov@virtuozzo.com>
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/nbd.c | 58 ++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 21 deletions(-)
-
-diff --git a/block/nbd.c b/block/nbd.c
-index 3a243d9de96e..d03b00fc30b0 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -53,6 +53,11 @@ typedef struct {
-     bool receiving;         /* waiting for connection_co? */
- } NBDClientRequest;
-
-+typedef enum NBDClientState {
-+    NBD_CLIENT_CONNECTED,
-+    NBD_CLIENT_QUIT
-+} NBDClientState;
-+
- typedef struct BDRVNBDState {
-     QIOChannelSocket *sioc; /* The master data channel */
-     QIOChannel *ioc; /* The current I/O channel which may differ (eg TLS=
-) */
-@@ -62,17 +67,23 @@ typedef struct BDRVNBDState {
-     CoQueue free_sema;
-     Coroutine *connection_co;
-     int in_flight;
-+    NBDClientState state;
-
-     NBDClientRequest requests[MAX_NBD_REQUESTS];
-     NBDReply reply;
-     BlockDriverState *bs;
--    bool quit;
-
-     /* For nbd_refresh_filename() */
-     SocketAddress *saddr;
-     char *export, *tlscredsid;
- } BDRVNBDState;
-
-+/* @ret will be used for reconnect in future */
-+static void nbd_channel_error(BDRVNBDState *s, int ret)
-+{
-+    s->state =3D NBD_CLIENT_QUIT;
-+}
-+
- static void nbd_recv_coroutines_wake_all(BDRVNBDState *s)
- {
-     int i;
-@@ -151,7 +162,7 @@ static coroutine_fn void nbd_connection_entry(void *o=
-paque)
-     int ret =3D 0;
-     Error *local_err =3D NULL;
-
--    while (!s->quit) {
-+    while (s->state !=3D NBD_CLIENT_QUIT) {
-         /*
-          * The NBD client can only really be considered idle when it has
-          * yielded from qio_channel_readv_all_eof(), waiting for data. T=
-his is
-@@ -169,6 +180,7 @@ static coroutine_fn void nbd_connection_entry(void *o=
-paque)
-             error_free(local_err);
-         }
-         if (ret <=3D 0) {
-+            nbd_channel_error(s, ret ? ret : -EIO);
-             break;
-         }
-
-@@ -183,6 +195,7 @@ static coroutine_fn void nbd_connection_entry(void *o=
-paque)
-             !s->requests[i].receiving ||
-             (nbd_reply_is_structured(&s->reply) && !s->info.structured_r=
-eply))
-         {
-+            nbd_channel_error(s, -EINVAL);
-             break;
-         }
-
-@@ -202,7 +215,6 @@ static coroutine_fn void nbd_connection_entry(void *o=
-paque)
-         qemu_coroutine_yield();
-     }
-
--    s->quit =3D true;
-     nbd_recv_coroutines_wake_all(s);
-     bdrv_dec_in_flight(s->bs);
-
-@@ -215,12 +227,18 @@ static int nbd_co_send_request(BlockDriverState *bs=
-,
-                                QEMUIOVector *qiov)
- {
-     BDRVNBDState *s =3D (BDRVNBDState *)bs->opaque;
--    int rc, i;
-+    int rc, i =3D -1;
-
-     qemu_co_mutex_lock(&s->send_mutex);
-     while (s->in_flight =3D=3D MAX_NBD_REQUESTS) {
-         qemu_co_queue_wait(&s->free_sema, &s->send_mutex);
-     }
-+
-+    if (s->state !=3D NBD_CLIENT_CONNECTED) {
-+        rc =3D -EIO;
-+        goto err;
-+    }
-+
-     s->in_flight++;
-
-     for (i =3D 0; i < MAX_NBD_REQUESTS; i++) {
-@@ -238,16 +256,12 @@ static int nbd_co_send_request(BlockDriverState *bs=
-,
-
-     request->handle =3D INDEX_TO_HANDLE(s, i);
-
--    if (s->quit) {
--        rc =3D -EIO;
--        goto err;
--    }
-     assert(s->ioc);
-
-     if (qiov) {
-         qio_channel_set_cork(s->ioc, true);
-         rc =3D nbd_send_request(s->ioc, request);
--        if (rc >=3D 0 && !s->quit) {
-+        if (rc >=3D 0 && s->state =3D=3D NBD_CLIENT_CONNECTED) {
-             if (qio_channel_writev_all(s->ioc, qiov->iov, qiov->niov,
-                                        NULL) < 0) {
-                 rc =3D -EIO;
-@@ -262,9 +276,11 @@ static int nbd_co_send_request(BlockDriverState *bs,
-
- err:
-     if (rc < 0) {
--        s->quit =3D true;
--        s->requests[i].coroutine =3D NULL;
--        s->in_flight--;
-+        nbd_channel_error(s, rc);
-+        if (i !=3D -1) {
-+            s->requests[i].coroutine =3D NULL;
-+            s->in_flight--;
-+        }
-         qemu_co_queue_next(&s->free_sema);
-     }
-     qemu_co_mutex_unlock(&s->send_mutex);
-@@ -556,7 +572,7 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
-     s->requests[i].receiving =3D true;
-     qemu_coroutine_yield();
-     s->requests[i].receiving =3D false;
--    if (s->quit) {
-+    if (s->state !=3D NBD_CLIENT_CONNECTED) {
-         error_setg(errp, "Connection closed");
-         return -EIO;
-     }
-@@ -641,7 +657,7 @@ static coroutine_fn int nbd_co_receive_one_chunk(
-
-     if (ret < 0) {
-         memset(reply, 0, sizeof(*reply));
--        s->quit =3D true;
-+        nbd_channel_error(s, ret);
-     } else {
-         /* For assert at loop start in nbd_connection_entry */
-         *reply =3D s->reply;
-@@ -709,7 +725,7 @@ static bool nbd_reply_chunk_iter_receive(BDRVNBDState=
- *s,
-     NBDReply local_reply;
-     NBDStructuredReplyChunk *chunk;
-     Error *local_err =3D NULL;
--    if (s->quit) {
-+    if (s->state !=3D NBD_CLIENT_CONNECTED) {
-         error_setg(&local_err, "Connection closed");
-         nbd_iter_channel_error(iter, -EIO, &local_err);
-         goto break_loop;
-@@ -734,7 +750,7 @@ static bool nbd_reply_chunk_iter_receive(BDRVNBDState=
- *s,
-     }
-
-     /* Do not execute the body of NBD_FOREACH_REPLY_CHUNK for simple rep=
-ly. */
--    if (nbd_reply_is_simple(reply) || s->quit) {
-+    if (nbd_reply_is_simple(reply) || s->state !=3D NBD_CLIENT_CONNECTED=
-) {
-         goto break_loop;
-     }
-
-@@ -808,14 +824,14 @@ static int nbd_co_receive_cmdread_reply(BDRVNBDStat=
-e *s, uint64_t handle,
-             ret =3D nbd_parse_offset_hole_payload(s, &reply.structured, =
-payload,
-                                                 offset, qiov, &local_err=
-);
-             if (ret < 0) {
--                s->quit =3D true;
-+                nbd_channel_error(s, ret);
-                 nbd_iter_channel_error(&iter, ret, &local_err);
-             }
-             break;
-         default:
-             if (!nbd_reply_type_is_error(chunk->type)) {
-                 /* not allowed reply type */
--                s->quit =3D true;
-+                nbd_channel_error(s, -EINVAL);
-                 error_setg(&local_err,
-                            "Unexpected reply type: %d (%s) for CMD_READ"=
-,
-                            chunk->type, nbd_reply_type_lookup(chunk->typ=
-e));
-@@ -853,7 +869,7 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDSt=
-ate *s,
-         switch (chunk->type) {
-         case NBD_REPLY_TYPE_BLOCK_STATUS:
-             if (received) {
--                s->quit =3D true;
-+                nbd_channel_error(s, -EINVAL);
-                 error_setg(&local_err, "Several BLOCK_STATUS chunks in r=
-eply");
-                 nbd_iter_channel_error(&iter, -EINVAL, &local_err);
-             }
-@@ -863,13 +879,13 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBD=
-State *s,
-                                                 payload, length, extent,
-                                                 &local_err);
-             if (ret < 0) {
--                s->quit =3D true;
-+                nbd_channel_error(s, ret);
-                 nbd_iter_channel_error(&iter, ret, &local_err);
-             }
-             break;
-         default:
-             if (!nbd_reply_type_is_error(chunk->type)) {
--                s->quit =3D true;
-+                nbd_channel_error(s, -EINVAL);
-                 error_setg(&local_err,
-                            "Unexpected reply type: %d (%s) "
-                            "for CMD_BLOCK_STATUS",
---=20
-2.20.1
-
+ Thomas
 
