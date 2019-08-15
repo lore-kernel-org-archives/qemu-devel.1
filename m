@@ -8,81 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF85C32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 583E1C32753
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:43:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16501208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:42:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2213E208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:43:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ixz3l+hQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16501208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PoY8Ekq7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2213E208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5ih-0003mL-TK
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:42:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47033)
+	id 1hy5jc-0004kj-1X
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:43:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50864)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5Dh-0006On-E4
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:30 -0400
+ (envelope-from <vandersonmr2@gmail.com>) id 1hy5e6-0006jl-QD
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:37:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5Df-0000JW-Vr
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:29 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:35390)
+ (envelope-from <vandersonmr2@gmail.com>) id 1hy5e5-0006Zx-QZ
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:37:46 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:35659)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Df-0000Is-OS
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:27 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id g19so303346ywe.2
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:27 -0700 (PDT)
+ (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
+ id 1hy5e5-0006ZK-MR
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:37:45 -0400
+Received: by mail-qt1-x842.google.com with SMTP id u34so985463qte.2
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:37:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Oa5aZEs83L472CM0YZbfZrmUS/bt8pTnh7Q8gJGZz9w=;
- b=Ixz3l+hQ66tm6CAXUOzoGjlXs/GoTQEQX/Nn+U/pAZvkm/fFNvr5TP5xe+0oJVht5M
- 1Y/st4M1lDJrRyRhBzDqf+/pRDiul//iC/akQSFhlA7ypvoYs5f7nvp91x1ZKh7u8feo
- MXQQLsk39GKlpe/y2/FPm+92Junn6epSLkpTTawmPbQ6F5iQlqOvxU1m9+Atv8kfPIwn
- g6b527qta73zvsl78COtxA7zF4qVxDo4KtKfbbTWGt9H/jWNVfVZ56Siw8eUdmf4r9I0
- V610rCJJGtiu6hHgLY7Y12eksV07VnSHK1kihxIqjBSqacjfeaPwW60W5TMN3L8cutqu
- Qmkw==
+ bh=fFC4esQW2qMfDSIJCUM850Bj6YD7rV98KCqVZlJNxBo=;
+ b=PoY8Ekq7CJL+AhECNm8TT86vlhkdVpXgNYZUJMoGBfmAmsu738jsGfpVBnXBR4LbBq
+ uZ7iCOekmXif4fP/Mf8NHehRvKFTXTb7nyoR/v0Kdm26RMBSu2K9koeTVXZPfM7Lf3xe
+ /L7B4ZM5ZV2YSe/NMjGFb+i8IfgLPZoeHTHLoaXehdQLcbzl9pL+LIHDRLo26o5imd4x
+ P3S/FfTnDGv6Fg5cGKQh8QVcoLipQrY4qMQqRAZBsJLtCQkwHRpBQ8Owd11GUOvbxL30
+ vf/XJ06/aetE8xYlhIOxU2MHfTAMLz6MkLxCJyYVRObkGK9yBJUCK+CiKXq3Jm6f34fG
+ 2CsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Oa5aZEs83L472CM0YZbfZrmUS/bt8pTnh7Q8gJGZz9w=;
- b=XoQ/kTxdPHC2AJSfRvUV4k6tqwxgKNwIxllDKW6C9uF/p/Gfr0bYmvW622sLuoSgD8
- Dh3TS7mnPoVCddO4kMdc023dcU4G9kMjcMfMYszWoaq6sAUNLUXdtwsKyuI4a0Etg7mq
- 86nhFXKk9MPLqHI+ouiwpOstmRDgxGkdKhxyNGpzlwJmkwOT+k96mCIU5qkikU68KgjA
- e0viyPnW9yCp4Kk6JeZ9TAheMaipPOcmlkBHpW469sRhctaSBcVfADOQknXwLtfQybQU
- wdgEgWz7ge6FHLQwnc79cjJU/c1kfbH/dt8/kIJ6A5BYyTsePp8efbTzJBQCtCQ149MV
- vbjg==
-X-Gm-Message-State: APjAAAX5BVLQGKPqZELaV0aPP34ULZN6SYqVHpw/hbmd0KHdM27YWQ6l
- XqVFsGgVgzOoGIV5e/rHSfl+tUt0
-X-Google-Smtp-Source: APXvYqzJqIjXyThj9CBBPRByG9eh0pyygxiwsdVZXPmXu6eqZ0CwXRdW3oTbSoI4fx1sAQPQIUJREA==
-X-Received: by 2002:a0d:c841:: with SMTP id k62mr1513667ywd.95.1565835027092; 
- Wed, 14 Aug 2019 19:10:27 -0700 (PDT)
-Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
- by smtp.gmail.com with ESMTPSA id
- j3sm374882ywk.21.2019.08.14.19.10.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:10:26 -0700 (PDT)
-From: Jan Bobek <jan.bobek@gmail.com>
+ bh=fFC4esQW2qMfDSIJCUM850Bj6YD7rV98KCqVZlJNxBo=;
+ b=PO7U4hcq1/tKVeL4xjUVK9us3Bz7eeMl3COmLdLLA1og1p8DyE+a5pbBZGrXD0EvL4
+ tKAeNKCHrhRXg4NtjoUkJX8JvkTHaL2MZDA0JylRbG413C4Fm+q8HREUMsx2jwbVu4KT
+ In8Y4SZwsKWr1q+8iVrUXn7w1V24CL6EzL+aWkjGMbvnWCzob+8r6UQAjRFRGFvaSyfd
+ Xq+8PKxhC6/362lN8VsmVSkMKm5GhmLAb8lPiGu7UjewFqDaqHe22pjGmacI0G7sfybw
+ xI8LCFhtEhPtOne2UOLCy09+lrZ3u2URukg1kYW53fDmeIykgRut5lZ9VSPy7kWI9jEO
+ S6XQ==
+X-Gm-Message-State: APjAAAXHIkDtUivg9550LyqHIbA0qrL/KmDVnubrb9p9J4olBaBLfPfJ
+ Sh+ASfcMo5lhIDf6PFQ4IeKqm6lj/Tf7hw==
+X-Google-Smtp-Source: APXvYqyveCOrWKEtnFw6oh2dtBOLRbnVqP+QvHwiaXUQCEz+HBOuKXO5GUHFb2m9Bey0iJDXFC5qBw==
+X-Received: by 2002:aed:3e6f:: with SMTP id m44mr2158452qtf.220.1565836664960; 
+ Wed, 14 Aug 2019 19:37:44 -0700 (PDT)
+Received: from localhost.localdomain ([2804:14c:482:121::1])
+ by smtp.googlemail.com with ESMTPSA id t24sm764052qto.69.2019.08.14.19.37.43
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 14 Aug 2019 19:37:44 -0700 (PDT)
+From: vandersonmr <vandersonmr2@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 22:09:18 -0400
-Message-Id: <20190815020928.9679-37-jan.bobek@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
-References: <20190815020928.9679-1-jan.bobek@gmail.com>
+Date: Wed, 14 Aug 2019 23:37:25 -0300
+Message-Id: <20190815023725.2659-3-vandersonmr2@gmail.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190815023725.2659-1-vandersonmr2@gmail.com>
+References: <20190815023725.2659-1-vandersonmr2@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c43
-Subject: [Qemu-devel] [RFC PATCH v3 36/46] target/i386: introduce MMX code
- generators
+X-Received-From: 2607:f8b0:4864:20::842
+Subject: [Qemu-devel] [PATCH v1 2/2] tb-stats: adding TBStatistics info into
+ perf dump
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,149 +94,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Bobek <jan.bobek@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Define code generators required for MMX instructions.
+Adding TBStatistics information to linux perf TB's symbol names.
 
-Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+This commit depends on the following PATCH:
+[PATCH v5 00/10] Measure Tiny Code Generation Quality
+
+Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
 ---
- target/i386/translate.c | 111 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ accel/tcg/perf/jitdump.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 4fecb0d240..a02e9cd0d2 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -5357,12 +5357,123 @@ INSNOP_LDST(xmm_t0, Mhq)
-     {                                                                   \
-         tcg_gen_gvec_ ## gvec(vece, arg1, arg2, oprsz, maxsz);          \
-     }
-+#define DEF_GEN_INSN2_GVEC_MM(mnem, gvec, opT1, opT2, vece)       \
-+    DEF_GEN_INSN2_GVEC(mnem, gvec, opT1, opT2, vece,              \
-+                       sizeof(MMXReg), sizeof(MMXReg))
+diff --git a/accel/tcg/perf/jitdump.c b/accel/tcg/perf/jitdump.c
+index 6f4c0911c2..b2334fd601 100644
+--- a/accel/tcg/perf/jitdump.c
++++ b/accel/tcg/perf/jitdump.c
+@@ -8,6 +8,7 @@
+ #include <sys/syscall.h>
+ #include <elf.h>
  
- #define DEF_GEN_INSN3_GVEC(mnem, gvec, opT1, opT2, opT3, vece, oprsz, maxsz) \
-     GEN_INSN3(mnem, opT1, opT2, opT3)                                   \
-     {                                                                   \
-         tcg_gen_gvec_ ## gvec(vece, arg1, arg2, arg3, oprsz, maxsz);    \
-     }
-+#define DEF_GEN_INSN3_GVEC_MM(mnem, gvec, opT1, opT2, opT3, vece)   \
-+    DEF_GEN_INSN3_GVEC(mnem, gvec, opT1, opT2, opT3, vece,          \
-+                       sizeof(MMXReg), sizeof(MMXReg))
++#include "exec/tb-stats.h"
+ #include "jitdump.h"
+ #include "qemu-common.h"
+ 
+@@ -135,7 +136,19 @@ void start_jitdump_file(void)
+ void append_load_in_jitdump_file(TranslationBlock *tb)
+ {
+     GString *func_name = g_string_new(NULL);
+-    g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc, '\0');
++    if (tb->tb_stats) {
++        TBStatistics *tbs = tb->tb_stats;
++        g = stat_per_translation(tbs, code.num_guest_inst);
++        ops = stat_per_translation(tbs, code.num_tcg_ops);
++        ops_opt = stat_per_translation(tbs, code.num_tcg_ops_opt);
++        spills = stat_per_translation(tbs, code.spills);
 +
-+GEN_INSN2(movq, Pq, Eq);        /* forward declaration */
-+GEN_INSN2(movd, Pq, Ed)
-+{
-+    const insnop_arg_t(Eq) arg2_r64 = tcg_temp_new_i64();
-+    tcg_gen_extu_i32_i64(arg2_r64, arg2);
-+    gen_insn2(movq, Pq, Eq)(env, s, arg1, arg2_r64);
-+    tcg_temp_free_i64(arg2_r64);
-+}
-+
-+GEN_INSN2(movd, Ed, Pq)
-+{
-+    const insnop_arg_t(Pq) ofs = offsetof(MMXReg, MMX_L(0));
-+    tcg_gen_ld_i32(arg1, cpu_env, arg2 + ofs);
-+}
-+
-+GEN_INSN2(movq, Pq, Eq)
-+{
-+    const insnop_arg_t(Pq) ofs = offsetof(MMXReg, MMX_Q(0));
-+    tcg_gen_st_i64(arg2, cpu_env, arg1 + ofs);
-+}
-+
-+GEN_INSN2(movq, Eq, Pq)
-+{
-+    const insnop_arg_t(Pq) ofs = offsetof(MMXReg, MMX_Q(0));
-+    tcg_gen_ld_i64(arg1, cpu_env, arg2 + ofs);
-+}
-+
-+DEF_GEN_INSN2_GVEC_MM(movq, mov, Pq, Qq, MO_64)
-+DEF_GEN_INSN2_GVEC_MM(movq, mov, Qq, Pq, MO_64)
-+
-+DEF_GEN_INSN3_GVEC_MM(paddb, add, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(paddw, add, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_MM(paddd, add, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_MM(paddsb, ssadd, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(paddsw, ssadd, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_MM(paddusb, usadd, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(paddusw, usadd, Pq, Pq, Qq, MO_16)
-+
-+DEF_GEN_INSN3_GVEC_MM(psubb, sub, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(psubw, sub, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_MM(psubd, sub, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_MM(psubsb, sssub, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(psubsw, sssub, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_MM(psubusb, ussub, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(psubusw, ussub, Pq, Pq, Qq, MO_16)
-+
-+DEF_GEN_INSN3_HELPER_EPP(pmullw, pmullw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmulhw, pmulhw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmaddwd, pmaddwd_mmx, Pq, Pq, Qq)
-+
-+DEF_GEN_INSN3_GVEC_MM(pcmpeqb, cmpeq, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(pcmpeqw, cmpeq, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_MM(pcmpeqd, cmpeq, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_MM(pcmpgtb, cmpgt, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_MM(pcmpgtw, cmpgt, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_MM(pcmpgtd, cmpgt, Pq, Pq, Qq, MO_32)
-+
-+DEF_GEN_INSN3_GVEC_MM(pand, and, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_MM(pandn, andn, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_MM(por, or, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_MM(pxor, xor, Pq, Pq, Qq, MO_64)
-+
-+DEF_GEN_INSN3_HELPER_EPP(psllw, psllw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pslld, pslld_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psllq, psllq_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrlw, psrlw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrld, psrld_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrlq, psrlq_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psraw, psraw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_mmx, Pq, Pq, Qq)
-+
-+#define DEF_GEN_PSHIFT_IMM_MM(mnem, opT1, opT2)                         \
-+    GEN_INSN3(mnem, opT1, opT2, Ib)                                     \
-+    {                                                                   \
-+        const uint64_t arg3_ui64 = (uint8_t)arg3;                       \
-+        const insnop_arg_t(Eq) arg3_r64 = s->tmp1_i64;                  \
-+        const insnop_arg_t(Qq) arg3_mm =                                \
-+            offsetof(CPUX86State, mmx_t0.MMX_Q(0));                     \
-+                                                                        \
-+        tcg_gen_movi_i64(arg3_r64, arg3_ui64);                          \
-+        gen_insn2(movq, Pq, Eq)(env, s, arg3_mm, arg3_r64);             \
-+        gen_insn3(mnem, Pq, Pq, Qq)(env, s, arg1, arg2, arg3_mm);       \
++        g_string_printf(func_name,
++                "TB virt:0x"TARGET_FMT_lx" (g:%u op:%u opt:%u spills:%d)%c",
++                tb->pc, g, ops, ops_opt, spills, '\0');
++    } else {
++        g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc, '\0');
 +    }
-+
-+DEF_GEN_PSHIFT_IMM_MM(psllw, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(pslld, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(psllq, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(psrlw, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(psrld, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(psrlq, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(psraw, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_MM(psrad, Nq, Nq)
-+
-+DEF_GEN_INSN3_HELPER_EPP(packsswb, packsswb_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(packssdw, packssdw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(packuswb, packuswb_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(punpcklbw, punpcklbw_mmx, Pq, Pq, Qd)
-+DEF_GEN_INSN3_HELPER_EPP(punpcklwd, punpcklwd_mmx, Pq, Pq, Qd)
-+DEF_GEN_INSN3_HELPER_EPP(punpckldq, punpckldq_mmx, Pq, Pq, Qd)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhbw, punpckhbw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhwd, punpckhwd_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhdq, punpckhdq_mmx, Pq, Pq, Qq)
-+
-+DEF_GEN_INSN0_HELPER(emms, emms)
  
- /*
-  * Instruction translators
+     struct jr_code_load *load_event = g_new0(struct jr_code_load, 1);
+     load_event->p.id = JIT_CODE_LOAD;
 -- 
-2.20.1
+2.22.0
 
 
