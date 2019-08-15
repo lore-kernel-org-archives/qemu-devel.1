@@ -2,89 +2,90 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB3C7C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E312C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:22:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 709522083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:21:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gpo05l9P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 709522083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D88982083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:22:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88982083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyFgh-0004Ec-Ge
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:21:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45932)
+	id 1hyFhj-0005Qd-4L
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:22:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1hyFfv-0003TF-Kn
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:20:22 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hyFgq-0004cc-Rd
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hyFfs-0002Jw-5Z
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:20:19 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38243)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hyFfr-0002JG-LJ
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:20:15 -0400
-Received: by mail-wr1-x443.google.com with SMTP id g17so2208710wrr.5
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 06:20:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=gsRzpuxPuG0tEvg7NT3BA7aoPEIMGSJPI6OQ9O15cDc=;
- b=gpo05l9PfkB8XCQ4I7z3JG0DqIgze6Y/ODu/9tOfqaEe9qcOCPp/VpagJwO5OzuYx3
- rLnSznPTfpQIBdcZj2SrIMT1lOU/1lfCtM22pAMYh0k51bU5NI3GQ9a3HLVIVvWcplb5
- mdQhIPJXX+82dtiNw70sK/Uuca8JEfiQrQ63qC877F4VAaJEZkZQcqnRcvQ/rINhi6Ge
- laHe1/cnwS27hCqkJXcZ+ryflTMxQrPc2OT8oQXnIyK1+P5WTatvFe64KDHeITvw+X11
- VVvlNJMtaQGOVDTSD0Bl4Zrdyes6ziPm4YH1hB1nFkSrY5IQS0npa2e04FPKIuIzJ3l+
- dTXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=gsRzpuxPuG0tEvg7NT3BA7aoPEIMGSJPI6OQ9O15cDc=;
- b=lelTBmrrsQ5J2TefEGBQ96SEQiI+Oaxd0S2QplGu0STdXHNz/evT6qOMGC02ASYEsO
- 8Jn20nFSysdeK8/rmenf5FnsyjuumCT+fxJt8F+0oVyy2SDBtuYjZ+Bq9clSRb9UDhWl
- Cz0EVi2uZ3L4G+5OScovbfVY77PYqNwcx0sYbS80YJOnOpvHz1+0aYoZwTM26adrM+sT
- aRsdMxvyAfQOGMd8VZXtu7AmHv2vaqHcnbAkk9EXqgiGp72dgmBwhE/acvT3SEztylKB
- HQUME+Soa1qTEjY80TNqBOjXOYPOl8sbnZ3oiMZhqkjHTXgeZe/CWoIoXoBcCrCKeXJF
- n4ZA==
-X-Gm-Message-State: APjAAAVI/fz351ulUb8oOZ61Nsb5QbwNgw7j1LSmGjlhY2j9YPTk0UYR
- WvLvO2TU5eSYvpNZxvDPrM8=
-X-Google-Smtp-Source: APXvYqw7fuxixC342XjweFpzHT9NJIB/fLugfO3zP5pciMl+yPBfaUlCaWgfU/mLwY1zy+Qz+3z5yA==
-X-Received: by 2002:adf:82d4:: with SMTP id 78mr5083274wrc.85.1565875214172;
- Thu, 15 Aug 2019 06:20:14 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id p10sm1188204wma.8.2019.08.15.06.20.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 06:20:13 -0700 (PDT)
-Date: Thu, 15 Aug 2019 14:20:12 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20190815132012.GB10996@stefanha-x1.localdomain>
-References: <HK2PR04MB38595779EA521C94675599F981DC0@HK2PR04MB3859.apcprd04.prod.outlook.com>
- <20190730162803-mutt-send-email-mst@kernel.org>
+ (envelope-from <mreitz@redhat.com>) id 1hyFgn-00031E-Ur
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:21:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45446)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hyFgi-0002vG-5y; Thu, 15 Aug 2019 09:21:08 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6916581F31;
+ Thu, 15 Aug 2019 13:21:07 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EFA2837BA;
+ Thu, 15 Aug 2019 13:21:03 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <86631ca8-2d5b-3e28-91a4-26aec499593f@redhat.com>
+Date: Thu, 15 Aug 2019 15:21:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190815121042.121309-1-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="K8nIJk4ghYZn606h"
-Content-Disposition: inline
-In-Reply-To: <20190730162803-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: Re: [Qemu-devel] [PATCH] vhost-vsock: report QMP event when set
- running
+ protocol="application/pgp-signature";
+ boundary="gxoiVTOozK6qIjXgN9PZBmXfQDs5xlBlj"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Thu, 15 Aug 2019 13:21:07 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] qcow2: async handling of fragmented
+ io
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,53 +97,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "N. B." <n.b@live.com>, Ning Bo <ning.bo9@zte.com.cn>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, stefanha@redhat.com,
- "armbru@redhat.com" <armbru@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gxoiVTOozK6qIjXgN9PZBmXfQDs5xlBlj
+Content-Type: multipart/mixed; boundary="wzGFqCWDlpLLpn2rzwTdZXF89Ke9GuEjA";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
+ kwolf@redhat.com, den@openvz.org, stefanha@redhat.com
+Message-ID: <86631ca8-2d5b-3e28-91a4-26aec499593f@redhat.com>
+Subject: Re: [PATCH v3 0/4] qcow2: async handling of fragmented io
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190815121042.121309-1-vsementsov@virtuozzo.com>
 
---K8nIJk4ghYZn606h
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--wzGFqCWDlpLLpn2rzwTdZXF89Ke9GuEjA
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 30, 2019 at 04:29:35PM -0400, Michael S. Tsirkin wrote:
-> On Tue, Jul 30, 2019 at 12:24:27PM +0000, N. B. wrote:
-> > From: Ning Bo <n.b@live.com>
-> >=20
-> > Report vsock running event so that the upper application can
-> > control boot sequence.
-> > see https://github.com/kata-containers/runtime/pull/1918
-> >=20
-> > Signed-off-by: Ning Bo <ning.bo9@zte.com.cn>
->=20
-> Cc Stefan.
->=20
-> Stefan, are you willing to maintain virtio/vhost-vsock in qemu, too?
->=20
-> If yes let's add an entry to MAINTAINERS, ok?
+On 15.08.19 14:10, Vladimir Sementsov-Ogievskiy wrote:
+> 01: - use coroutine_fn where appropriate !!!!!!!!!!!!!!!!!!!!!!!
 
-Yes, I'll send a patch.
+:-)
 
-Stefan
 
---K8nIJk4ghYZn606h
+--wzGFqCWDlpLLpn2rzwTdZXF89Ke9GuEjA--
+
+--gxoiVTOozK6qIjXgN9PZBmXfQDs5xlBlj
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1VXAwACgkQnKSrs4Gr
-c8iIEQf8CHaO2PWMSm0/zUQyXg2Js/wPjeZ4cN0aECNdvw0SRK54WUdQlngYKgx9
-2VrT6oI4xTLo8/MHoE1SJeh+vttfROM/duAmF5aRxiYvUG22OH2SM0cbLm78bz5L
-SufVGd5UFGejIVYIlN045i0urhuhkBvo7/oPglauUtt6CmXkuoYj8UBNS06Mr/qU
-Ldqi/kgpa7t0P6Utzb5bxGybPquLWNO6aRfYbHliYfsNpoTAPeK4TYWdW5zqxAve
-1riBDyLoXm7C4ylQSYrqa728uT4dYez3wDWkEMoJeIsM71OhtZpfqen2zFlrXjqE
-E8Q8B16rioiQeqXpqHS6wELWQN4VCQ==
-=nr8q
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1VXD0ACgkQ9AfbAGHV
+z0CZMQf+IHMTp0/25r1Nlk0Uoa+ewvtBY6I2nqVpakLC5hP1hYkFzYJzGtEz5z1c
+Kluh04es3UpgSVPek/n5s2RJBVXsGudwD9EFuDjSvyjYiABhSaTGyjNwQcNeqwOf
+yha22mkwVq70fspXD3ul1hs++e1o1gc4DuEFhOS+RiLmUkuR8pVFr1Z0g/RJDgsx
+mENSn0c0kIy7KaIkASjFRHaomnSnimfUB/FS0Xc57utGj2kqKQhZGbQxugOO6cG5
+aQyoUmbs4R6Pq4N+wrfpsqUHV6DP8wV/ZKyAkDY7Z3Efx1BMwfyl0kxaZ3UpSy3w
+bSfvIALHmpjMUi4J7HXMhDFroe+qBw==
+=IuyJ
 -----END PGP SIGNATURE-----
 
---K8nIJk4ghYZn606h--
+--gxoiVTOozK6qIjXgN9PZBmXfQDs5xlBlj--
 
