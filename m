@@ -2,141 +2,65 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8484DC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8DFEC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B5112084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:04:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B5112084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B91EF20644
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:14:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B91EF20644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyNqw-0003Gl-74
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 18:04:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35339)
+	id 1hyO0V-0005oN-SP
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 18:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hyNps-0002l6-KT
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:03:10 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hyNzs-0005ML-Md
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:13:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hyNpr-0001nV-68
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:03:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53086)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hyNpl-0001l5-Kk; Thu, 15 Aug 2019 18:03:01 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 28E393091754;
- Thu, 15 Aug 2019 22:03:00 +0000 (UTC)
-Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3F74661F21;
- Thu, 15 Aug 2019 22:02:59 +0000 (UTC)
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20190815185024.7010-1-eblake@redhat.com>
- <e2c4f996-a1c3-d7aa-fc3e-4fffc596e8de@redhat.com>
- <5dbb9c0d-4eb0-b6a0-ff23-107010fa3c1f@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <f75b0dcf-5a3d-3c8b-6a2f-5c97063dbb49@redhat.com>
-Date: Thu, 15 Aug 2019 18:02:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <no-reply@patchew.org>) id 1hyNzr-0006bV-6O
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:13:28 -0400
+Resent-Date: Thu, 15 Aug 2019 18:13:28 -0400
+Resent-Message-Id: <E1hyNzr-0006bV-6O@eggs.gnu.org>
+Received: from sender-of-o53.zoho.com ([135.84.80.218]:21890)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hyNzq-0006b4-Uz; Thu, 15 Aug 2019 18:13:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565907194; cv=none; d=zoho.com; s=zohoarc; 
+ b=RVGTeKNxRgXZLOrPkW5DasA63RDKN2yc3eQ9fvk4yssWA3vfOBQH2ZtJX2cb+vwugl9cch/wgDafQwVXoImGCdXTFogWh2rKIOS/ofFybB0jU5GgBbdKMJ1Tsq+ztXgZ5Fioacn/BJer8ioZvQUnMOW84//retQvZqzEnsmbqwo=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565907194;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=Dx+2a9Zbil5ET+qllYNyFSRzUUtN98tObSiZFW3mz3M=; 
+ b=AUc2wUpjlk+5BVNSgGb71CzWW2gcpEnN5YhlXIEK/G9bPDdgbteTFxx1ywmDC/vYiR1mhYfn6nOxhwi3UWAnWgDTlLsP+rmBvLWjX/TDLg4npq9g8dmb4ywwBt25AoBMrcoqcUGLJJZCo3TwcaMYy+skHGm2QwhvRuvgergbOsc=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565907189662921.7316424924544;
+ Thu, 15 Aug 2019 15:13:09 -0700 (PDT)
+In-Reply-To: <cover.1565904855.git.alistair.francis@wdc.com>
+Message-ID: <156590718846.17677.8197101794228197057@5dec9699b7de>
 MIME-Version: 1.0
-In-Reply-To: <5dbb9c0d-4eb0-b6a0-ff23-107010fa3c1f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.41]); Thu, 15 Aug 2019 22:03:00 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alistair.francis@wdc.com
+Date: Thu, 15 Aug 2019 15:13:09 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nbd: Advertise multi-conn for
- shared read-only connections
+X-Received-From: 135.84.80.218
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] RISC-V: Hypervisor prep work part 2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,80 +72,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
- "open list:Network Block Dev..." <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, alistair.francis@wdc.com, palmer@sifive.com,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTY1OTA0ODU1Lmdp
+dC5hbGlzdGFpci5mcmFuY2lzQHdkYy5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1
+aWxkIHRlc3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2ls
+bCBiZSBpbnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcg
+dG8gYSBjb21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2Ui
+CiMgYnJhbmNoCnNldCAtZQoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8g
+Ij09PSBQQUNLQUdFUyA9PT0iCnJwbSAtcWEKCmVjaG8KZWNobyAiPT09IFVOQU1FID09PSIKdW5h
+bWUgLWEKCkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1
+aWxkCm1rZGlyIC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25m
+aWd1cmUgLS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAtajQKIyBYWFg6IHdlIG5lZWQg
+cmVsaWFibGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEKbWFrZSBpbnN0YWxsCj09PSBU
+RVNUIFNDUklQVCBFTkQgPT09CgogIENDICAgICAgbWlwcy1zb2Z0bW11L2h3L3ZmaW8vZGlzcGxh
+eS5vCiAgQ0MgICAgICBtaXBzLXNvZnRtbXUvaHcvdmlydGlvL3ZpcnRpby5vCiAgR0VOICAgICBu
+aW9zMi1zb2Z0bW11L2htcC1jb21tYW5kcy5oCmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQg
+MSBleGl0IHN0YXR1cwogIEdFTiAgICAgbmlvczItc29mdG1tdS9obXAtY29tbWFuZHMtaW5mby5o
+CiAgR0VOICAgICBuaW9zMi1zb2Z0bW11L2NvbmZpZy1kZXZpY2VzLmgKICBHRU4gICAgIG5pb3My
+LXNvZnRtbXUvY29uZmlnLXRhcmdldC5oCi0tLQogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3
+L21pc2MvbnJmNTFfcm5nLm8KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9uZXQvdmlydGlv
+LW5ldC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvaHcvbnZyYW0vbnJmNTFfbnZtLm8KY29s
+bGVjdDI6IGVycm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbTWFr
+ZWZpbGU6MjA5OiBxZW11LXN5c3RlbS1uaW9zMl0gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxl
+OjQ3MjogbmlvczItc29mdG1tdS9hbGxdIEVycm9yIDIKICBDQyAgICAgIGFhcmNoNjQtc29mdG1t
+dS9ody9wY21jaWEvcHhhMnh4Lm8KLS0tCm1ha2VbMV06ICoqKiBbL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLW1hOGpxdjB1L3NyYy9ydWxlcy5tYWs6Njk6IGh3L3ZmaW8vcGNpLm9dIEVycm9y
+IDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioq
+IFtNYWtlZmlsZTo0NzI6IGFhcmNoNjQtc29mdG1tdS9hbGxdIEVycm9yIDIKY29sbGVjdDI6IGVy
+cm9yOiBsZCByZXR1cm5lZCAxIGV4aXQgc3RhdHVzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MjA5
+OiBxZW11LXN5c3RlbS1taXBzXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDcyOiBtaXBz
+LXNvZnRtbXUvYWxsXSBFcnJvciAyCj09PSBPVVRQVVQgRU5EID09PQoKClRoZSBmdWxsIGxvZyBp
+cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvY292ZXIuMTU2NTkwNDg1NS5n
+aXQuYWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tL3Rlc3RpbmcuczM5MHgvP3R5cGU9bWVzc2FnZS4K
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
+ZGhhdC5jb20=
 
-
-On 8/15/19 5:54 PM, Eric Blake wrote:
-> On 8/15/19 4:45 PM, John Snow wrote:
->>
->>
->> On 8/15/19 2:50 PM, Eric Blake wrote:
->>> The NBD specification defines NBD_FLAG_CAN_MULTI_CONN, which can be
->>> advertised when the server promises cache consistency between
->>> simultaneous clients (basically, rules that determine what FUA and
->>> flush from one client are able to guarantee for reads from another
->>> client).  When we don't permit simultaneous clients (such as qemu-nbd
->>> without -e), the bit makes no sense; and for writable images, we
->>> probably have a lot more work before we can declare that actions from
->>> one client are cache-consistent with actions from another.  But for
->>> read-only images, where flush isn't changing any data, we might as
->>> well advertise multi-conn support.  What's more, advertisement of the
->>> bit makes it easier for clients to determine if 'qemu-nbd -e' was in
->>> use, where a second connection will succeed rather than hang until the
->>> first client goes away.
->>>
->>> This patch affects qemu as server in advertising the bit.  We may want
->>> to consider patches to qemu as client to attempt parallel connections
->>> for higher throughput by spreading the load over those connections
->>> when a server advertises multi-conn, but for now sticking to one
->>> connection per nbd:// BDS is okay.
->>>
-> 
->>> +++ b/blockdev-nbd.c
->>> @@ -189,7 +189,7 @@ void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
->>>      }
->>>
->>>      exp = nbd_export_new(bs, 0, len, name, NULL, bitmap,
->>> -                         writable ? 0 : NBD_FLAG_READ_ONLY,
->>> +                         writable ? 0 : NBD_FLAG_READ_ONLY, true,
->>>                           NULL, false, on_eject_blk, errp);
->>
->> Why is it okay to force the share bit on regardless of the value of
->> 'writable' ?
-> 
-> Well, it's probably not, except that...
-> 
-> 
->>> @@ -1486,6 +1486,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
->>>      perm = BLK_PERM_CONSISTENT_READ;
->>>      if ((nbdflags & NBD_FLAG_READ_ONLY) == 0) {
->>>          perm |= BLK_PERM_WRITE;
->>> +    } else if (shared) {
->>> +        nbdflags |= NBD_FLAG_CAN_MULTI_CONN;
->>>      }
-> 
-> requesting shared=true has no effect for a writable export.
-> 
-> I can tweak it for less confusion, though.
-> 
-
-"Yes John, when it's an else-if it really does matter what specific
-condition it's following."
-
-(Ah, there it is.)
-
-Yeah, I think if you have hopes to support this flag in the future for
-writable exports, I think it might be nicer to reject this bit for RW;
-and adjust the caller to only request it conditionally.
-
-Or not. I guess we don't have to maintain backwards compatibility for
-internal API like that, so ... dealer's choice:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
 
