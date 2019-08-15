@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85C9C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73766C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:41:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7019B206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E864206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:41:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="N7GD0piI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7019B206C1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Vt/QbBP8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E864206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyNUd-0004vl-6E
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 17:41:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60358)
+	id 1hyNUf-0004wy-1Y
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 17:41:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=1236ab962=alistair.francis@wdc.com>)
- id 1hyNS5-0002y8-Do
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:38:34 -0400
+ id 1hyNS7-0002z2-Gx
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:38:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=1236ab962=alistair.francis@wdc.com>)
- id 1hyNRy-0006EA-KG
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:38:33 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54904)
+ id 1hyNS6-0006I1-AA
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:38:35 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54908)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=1236ab962=alistair.francis@wdc.com>)
- id 1hyNRy-0006Cd-9k; Thu, 15 Aug 2019 17:38:26 -0400
+ id 1hyNS5-0006E6-QK; Thu, 15 Aug 2019 17:38:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1565905107; x=1597441107;
+ t=1565905115; x=1597441115;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=B5+pkTekbS4sZgZb2fbvUF9PuHTWwgChjNdnoZ8/yKY=;
- b=N7GD0piIFihWr2C/RLSeyDYMMh1txf0jEx6k5mTYSKwvPKt6RCFrdw/4
- JXaXrRyWciAK5juOyE812bXjyzXzYbiovaNzkUr/dPSLkaOkv8tO7USCD
- BrZbyysL9MqWw0z8xZM/fHRHZ4N0oiWrhuOQijpLcRVSa2KOR8711QkNz
- TKJyWqvxKi7fj9UVEXLc0pwGvyRCiEbJDP6wOvn9ihKWzTUHRrkWaV/Bc
- SApvjEpzEMXqOEJGNCfQeHns9i48cnS5CALMmRDTGvhiiPu9R4T2QIJGD
- JafDUpAD0oOlm6IMiSPrDRAzRaEUIW4G8so2G/2fyKYg0i0z8uqXne4EV A==;
-IronPort-SDR: s8SXx819O2wsaTWvVyi4rBucUvpOqwxx1imihL+o0sWXinRbcG2wfOjXTXe1XWKwdKd0mlYrFZ
- wyKX79EZBMeHBL7nN07ilrja5kY3U80qLwuBFGeBnz04KANIDfxJQFCL27RdnwALxEep2ruD3f
- N3Ie7aUqVlkc8I4tZHPOeqCvoAyCTmZhYbysV/FVn7KfnZep2V3epzeNFxJy6QTpvqZeOiZSDO
- kRR9csTnnmwLIOeaK8egwPy7y6wF+kq0ki3kme8UJXOmxzt3nYgoC2zU4mZQ/v8V+g0nUsFBCY
- 6xg=
-X-IronPort-AV: E=Sophos;i="5.64,389,1559491200"; d="scan'208";a="116881532"
+ bh=JH2/KzCxUZ/IlH6d53HOYIkrrIM66OuD6Zo3M2JGc0c=;
+ b=Vt/QbBP8wlsaxfupL3eXMYEKg5eFq+1C5jGv1BDlZisCvmtp6Ybza3ZS
+ rd2gH2dpe8Z0C9F3u384Pq9k0HJzgrZdMGpo/VmDxwBtD6xmn4o+DxgJz
+ ZTjQydGXeZj3FziOc4DalhsLCqbMJauFRBr7QSTNafXIcvj5bnxWacKgi
+ 2NBF3WiEhxIGowMc4/+ZrSAaQSK0Hfkuka3jwfmFDpRguY23Wwihl/c2y
+ FezaAciZNvAzcfY+6kf5qZdFP8dEhJsH8tZBbLD/NKCAKoVmPkqU4CSIt
+ KRWe4IvsDYDzQmA9SwT55cgFfXeZcuIBKe15aPTkXsJxXQSb3qultu66/ A==;
+IronPort-SDR: hPTW4t0CwQ28KEhadNeLRR1b4KdGHxPoYkM1vbhh+1woJ8YQtET3q4gqC5FuW2HOUNEOVJU/rX
+ 7plMT2184fCqq2cr/CmoiXw+HrK1IAG0peVt3kqWKnXPBNiOqkw1KeakDoeHlavkwJ3akB6Esl
+ AMHb6bNxRpzDvFdY81sISP1gp7cuxRfs/TciVS8vBgoUMUPLs0v+7lcX4bUHC2+stUvf1ouLsW
+ FNgQR4kwfJpdu3HT4jR+JO3gv8vmjarWgqUwvoLOe2mY2/8AR4YXmjaHiSgRdB0LITVSxfPiXa
+ 5qI=
+X-IronPort-AV: E=Sophos;i="5.64,389,1559491200"; d="scan'208";a="116881536"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 16 Aug 2019 05:38:24 +0800
-IronPort-SDR: g1C7n/ZUIzoifQyFfrqgNy4/AP9uPfwMxq8mpZ3udurxoIdm8mo1Mgdbp2uD4pOcXJUkk+sf6E
- MWP4lihurj/tXYq5ZsN7Toqjq7+GVPL6b5Io69KHJYOzCOcrBu5iC+M6Jm0IR/uvrtunmLJ9E7
- 4QBZ8QICq1hbR9x9w5MP0Zpkh0XKlFHkkiz6gOV4TcsIfhsLnopSX6HulGOR9GZu7C2MTBjB5W
- 3j524YEYCAquo2c8UTA8PHrXeYKszXzEtlOuedZkNxZ9OKgSPrt8XqVETYyPtPUWTmdQdrVK2Y
- exoce7dkf3N6Noq6ILb7n/HM
+ by ob1.hgst.iphmx.com with ESMTP; 16 Aug 2019 05:38:30 +0800
+IronPort-SDR: bmh2v6siYRrnbxUfcHxb3zT7u2Moj0nU8TP3CsQp2YbHAQpy5HEOANIyNjxrxEFxo4IgIyu2mF
+ pT6IpRdhFNSzo0WGiQ+xu/PR9jiTsjGIPZ4341fTmaXGo3XLFU0hzbvke+Gpd0sWJ/6d2Gmg7H
+ DVMXB8At5GXSMOakoGEk+DqM91EZ7hYaW1/fOCH7sxxcObseAUfEMrcnDQaRQb5tFqAxst/Vwn
+ GP8teCJCfSyjzFHzu0P/qFteFZQtabZ5COdaa/ikFDJGfFnY5NG5jQSMo0CWHdHv3Ksnx7ZKPX
+ ER+VrD92NRPnwh9As809kwuZ
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Aug 2019 14:35:55 -0700
-IronPort-SDR: O6zMu+gEITSx3YQ4MqSfRVaio/mRWu///LIrcCA1oxofnH9bvaKBUI/tIJFertnAw7Fwq8ogkt
- UmX5yYhKacAhiBb2pJche9rYgN9ztw0oHPM/qIV94pZ7tpDtu5Gt8ltYbW0KRQR0aqhhgysR+i
- 96jW2TYI8zXT4NDOgYT2kXRGD5e99XIW+pc9TPDwafZwIOOHk/lGPh0W2yoM+U963CVjuhDOz4
- eKtDB7CzRRC8fqOydfY1lt1mhPrIF3HDi5UKuKtvNS1mPenXZP8o5VkzhAZQcHUCrWBvzp8lEH
- +LM=
+ 15 Aug 2019 14:36:00 -0700
+IronPort-SDR: oyBUCGt9ck7qhNkSKYabd2xBKnF0VAwdvrl3m6ME9/uBgeycfaVErUAmfqeelx6PMvs4EbeHsx
+ q24O6hx43LEB2pc61hAUpIC/MZxgbiaAJUvyqkbYayw8yhtGAqENCPlfDIYdqMo+iC/1WGSUQ1
+ W/QnuG5p1/YL078pzV1tdEaZirYKb/jWibtH1qCyb5YIyIsicExNW8QpFcygfj+cQXqAws3KQ6
+ AW4gcVTCPFEPWwbKrtFbxI4gQ/n0wfaxZWzCBmfVbyY4FDcG7GHt8ckircY6Rag/VJVGmGXWuY
+ xTI=
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.157.58])
- by uls-op-cesaip01.wdc.com with ESMTP; 15 Aug 2019 14:38:24 -0700
+ by uls-op-cesaip01.wdc.com with ESMTP; 15 Aug 2019 14:38:29 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Date: Thu, 15 Aug 2019 14:34:55 -0700
-Message-Id: <59bed3d7342ef7513a60285e2711c162be5559fc.1565904855.git.alistair.francis@wdc.com>
+Date: Thu, 15 Aug 2019 14:35:01 -0700
+Message-Id: <083ae70e31e202880ed8babf4de1a3c1ea27100b.1565904855.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <cover.1565904855.git.alistair.francis@wdc.com>
 References: <cover.1565904855.git.alistair.francis@wdc.com>
@@ -86,8 +86,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
 X-Received-From: 216.71.153.144
-Subject: [Qemu-devel] [PATCH v3 4/7] target/riscv: Update the Hypervisor
- CSRs to v0.4
+Subject: [Qemu-devel] [PATCH v3 6/7] target/riscv: Fix mstatus dirty mask
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,67 +103,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update the Hypervisor CSR addresses to match the v0.4 spec.
-
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
 ---
- target/riscv/cpu_bits.h | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ target/riscv/csr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 11f971ad5d..e99834856c 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -173,6 +173,24 @@
- #define CSR_SPTBR           0x180
- #define CSR_SATP            0x180
+diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+index 2789215b5e..f767ad24be 100644
+--- a/target/riscv/csr.c
++++ b/target/riscv/csr.c
+@@ -335,7 +335,7 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+              * RV32: MPV and MTL are not in mstatus. The current plan is to
+              * add them to mstatush. For now, we just don't support it.
+              */
+-            mask |= MSTATUS_MPP | MSTATUS_MPV;
++            mask |= MSTATUS_MTL | MSTATUS_MPV;
+ #endif
+     }
  
-+/* Hpervisor CSRs */
-+#define CSR_HSTATUS         0x600
-+#define CSR_HEDELEG         0x602
-+#define CSR_HIDELEG         0x603
-+#define CSR_HCOUNTERNEN     0x606
-+#define CSR_HGATP           0x680
-+
-+#if defined(TARGET_RISCV32)
-+#define HGATP_MODE           SATP32_MODE
-+#define HGATP_VMID           SATP32_ASID
-+#define HGATP_PPN            SATP32_PPN
-+#endif
-+#if defined(TARGET_RISCV64)
-+#define HGATP_MODE           SATP64_MODE
-+#define HGATP_VMID           SATP64_ASID
-+#define HGATP_PPN            SATP64_PPN
-+#endif
-+
- /* Physical Memory Protection */
- #define CSR_PMPCFG0         0x3a0
- #define CSR_PMPCFG1         0x3a1
-@@ -206,23 +224,6 @@
- #define CSR_DPC             0x7b1
- #define CSR_DSCRATCH        0x7b2
- 
--/* Hpervisor CSRs */
--#define CSR_HSTATUS         0xa00
--#define CSR_HEDELEG         0xa02
--#define CSR_HIDELEG         0xa03
--#define CSR_HGATP           0xa80
--
--#if defined(TARGET_RISCV32)
--#define HGATP_MODE           SATP32_MODE
--#define HGATP_ASID           SATP32_ASID
--#define HGATP_PPN            SATP32_PPN
--#endif
--#if defined(TARGET_RISCV64)
--#define HGATP_MODE           SATP64_MODE
--#define HGATP_ASID           SATP64_ASID
--#define HGATP_PPN            SATP64_PPN
--#endif
--
- /* Performance Counters */
- #define CSR_MHPMCOUNTER3    0xb03
- #define CSR_MHPMCOUNTER4    0xb04
 -- 
 2.22.0
 
