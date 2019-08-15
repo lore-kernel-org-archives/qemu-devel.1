@@ -8,81 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 132DBC32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD375C32753
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEDB5208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97234208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:39:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPigVSIv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEDB5208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s/JjnCGu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97234208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5f5-0007pk-Dt
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:38:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48710)
+	id 1hy5fO-0008Hp-6Q
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:39:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5Mi-00012G-Um
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:49 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Dd-0006HV-0r
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5Mh-0001xU-VT
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:48 -0400
-Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:42814)
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Db-0000CA-33
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:24 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:46815)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1hy5Mh-0001wf-RY
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:47 -0400
-Received: by mail-qt1-x841.google.com with SMTP id t12so904592qtp.9
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:19:47 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5DZ-00009Z-5W
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:21 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id x10so388132ybs.13
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xH2u0/l2SqxJvZU8OkINvq+WEc2i5lm3OL3evVav5e8=;
- b=PPigVSIvqqoUz+yKwIcmJpybQ2D2IxQ+eyIAXlsxj0q7rtVrAWBIH8wPb+ffMpJYoG
- 2MbR7TXa4CyKQ3Oq9Nu4W2VGpxWx0o4vQRJkfknW2Q8UoKhNv2FBDwBvApu4j1RZYikX
- XYOiHj37u5KRZlTVTPN/uLQFtIkfwy/pnEjrkjhcW67WrllSPqgyatCa2XghRAMDzO9m
- XQeXIoGNZDHs+oGFcw7TRSGW8q6SnhCUoDPack8E6YVD16XNONq0+aGttdc2bAj3eupz
- 3y7nEzA2aWDaHrzLYSAXqtNZmnMFA9SzEEvJ3E1FQibONWBZUozi2EVY8JjSw9rVHBgR
- BneA==
+ bh=KTZS4tJ/LSxPvJ6feZUj0bPHzSOsx4OeZQC9Z8aW7OI=;
+ b=s/JjnCGu7gTqBtb8b9W5KNiFaJ8lDMBoYNolIyiCDx4ECgyerucFHVKSmPKYiw4JRW
+ hnVJHR4tSZe/VuMaEOrC8QvACDx5Q1+3RlapamAbpHCc3U6f3BKNxcO/c/EDeV1j/qRi
+ g5Sd5hvO/phf+HuM+Ar04lRnUzOWHuX3va3ulYzV24Cb6hTJAPZbfiRaQyyJpYaeYVLE
+ c7/bDTxVojEuLkgUPPF49n+Jv61v+h+nnKMUfswQ90L9n079aFt69ZuQQSWChF46D4KO
+ KjlnVUtdGNtoBtzNnSLAgZwsDmRasOJwkJUfo3Nha3wTCMH4ui9MGNorFhSGRHVLutRC
+ DmcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xH2u0/l2SqxJvZU8OkINvq+WEc2i5lm3OL3evVav5e8=;
- b=sjAiJ5IOPk9NDqxHMIKwXuuY8Vi/uwd9xcbj+joQls2fazD6TWqjaS945v+Y7Rrl+r
- 9wTDCsQmdHXfKcgcNqoYiP7B9YRddrO7kYyvicB3g33+FzJbgjyxgT4ip3BH0ve2t2nR
- U6EAB1NDGLLTY1RDP5r7jA4o97WhOCOwK4vBadgJP0E59g00iBhwpsyYm63xqbladwlK
- HPN+8ZCaEjKCNCOs24eg43QYCsRaErAWZwdQfh8aRQw6d8pBePOFcRCqXuERHnvRTHtx
- 1Fj4wMG936pRxkZtl3QJ1S0jqL03eBGr8xJ6st15/H8oTr62DgC8PxStnCyyRoUt7az5
- G69A==
-X-Gm-Message-State: APjAAAVOEbdAVTGb2dA32l/4DEEIDFKFmZTB4GsObgYZqzmJaPE5Ezih
- WrftW7y332+ZgkfCyD8nJXgkIR1NDqZVXg==
-X-Google-Smtp-Source: APXvYqzgokjF3SKSmsltzGEtxbxu7xkGLnYJd8upYJ7hbd9lCH/KDpn1KI7Zg6AlHKawBfmqNHV0bg==
-X-Received: by 2002:aed:2e02:: with SMTP id j2mr1966540qtd.89.1565835587177;
- Wed, 14 Aug 2019 19:19:47 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:482:121::1])
- by smtp.googlemail.com with ESMTPSA id o5sm757943qkf.10.2019.08.14.19.19.45
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:19:46 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
+ bh=KTZS4tJ/LSxPvJ6feZUj0bPHzSOsx4OeZQC9Z8aW7OI=;
+ b=gvmG/0wB9/M7u6KGMlDNWbj8pMxnhyFNLhHBkMI2xRTnvWYpol5/PtuhCrRnlZvlko
+ BhHYK0pIEHIoOsEFfb7LzdFje4wUmSN6LrJt9RTsUaYG/FkYXkwTKEX53gkGTJcQwHct
+ ZLmdKdtJTSwd1AMO0jxOJy8pOaziXcpCUJEvWrWmzhTpu+gTjrO62GVIseEjfZEyV7g7
+ gVCdNAbcRvPMAbVlWGBWDhjyLB1jhL1Cn0cP4GpY0RqsJRdTv7g3fETc6d7IfESH/6D7
+ GoyZuJH+qe9NbYgP/hVxrDKySTDJ4lyigd9lCH6AfJ4gDd/nPi3Hc0GQYDy2VtqxgQwT
+ 04Wg==
+X-Gm-Message-State: APjAAAWx+evZ+rFr3SMCl7gtO6RlfUwflCfyBTPDVwdy0o3J8HrUwLMz
+ Gshnua+MwR+F/I72NAxnbmeiysxd
+X-Google-Smtp-Source: APXvYqyWdLgsGoSKBSLs0/fiRBsVYDjbcZNnvIhxHsY8u9bxNHNjn60uYKS2EOqlIUpzv/FOlKd1jQ==
+X-Received: by 2002:a5b:642:: with SMTP id o2mr2107309ybq.70.1565835020296;
+ Wed, 14 Aug 2019 19:10:20 -0700 (PDT)
+Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
+ by smtp.gmail.com with ESMTPSA id
+ j3sm374882ywk.21.2019.08.14.19.10.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Aug 2019 19:10:19 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:18:57 -0300
-Message-Id: <20190815021857.19526-11-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190815021857.19526-1-vandersonmr2@gmail.com>
-References: <20190815021857.19526-1-vandersonmr2@gmail.com>
+Date: Wed, 14 Aug 2019 22:09:10 -0400
+Message-Id: <20190815020928.9679-29-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
+References: <20190815020928.9679-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::841
-Subject: [Qemu-devel] [PATCH v5 10/10] linux-user: dumping hot TBs at the
- end of the execution
+X-Received-From: 2607:f8b0:4864:20::b43
+Subject: [Qemu-devel] [RFC PATCH v3 28/46] target/i386: introduce P*, N*,
+ Q* (MMX) operands
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,35 +94,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, vandersonmr <vandersonmr2@gmail.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-dumps, in linux-user mode, the hottest TBs if -d tb_stats is used.
+These address the MMX-technology register file; the corresponding
+cpu_env offset is passed as the operand value. Notably, offset of the
+entire register is pased at all times, regardless of the operand-size
+suffix.
 
-Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- linux-user/exit.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/i386/translate.c | 79 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 79 insertions(+)
 
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-index bdda720553..7226104959 100644
---- a/linux-user/exit.c
-+++ b/linux-user/exit.c
-@@ -28,6 +28,10 @@ extern void __gcov_dump(void);
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index 779b692942..bd3c7f9356 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -5011,6 +5011,85 @@ INSNOP_LDST(tcg_temp_i64, Mq)
+     }
+ }
  
- void preexit_cleanup(CPUArchState *env, int code)
- {
-+    if (tb_stats_collection_enabled()) {
-+        dump_tbs_info(max_num_hot_tbs_to_dump, SORT_BY_HOTNESS, false);
++/*
++ * MMX-technology register operands
++ */
++#define DEF_INSNOP_MM(opT, opTmmid)                                     \
++    typedef unsigned int insnop_arg_t(opT);                             \
++    typedef struct {                                                    \
++        insnop_ctxt_t(opTmmid) mmid;                                    \
++    } insnop_ctxt_t(opT);                                               \
++                                                                        \
++    INSNOP_INIT(opT)                                                    \
++    {                                                                   \
++        return insnop_init(opTmmid)(&ctxt->mmid, env, s, modrm, is_write); \
++    }                                                                   \
++    INSNOP_PREPARE(opT)                                                 \
++    {                                                                   \
++        const insnop_arg_t(opTmmid) mmid =                              \
++            insnop_prepare(opTmmid)(&ctxt->mmid, env, s, modrm, is_write); \
++        const insnop_arg_t(opT) arg =                                   \
++            offsetof(CPUX86State, fpregs[mmid & 7].mmx);                \
++        insnop_finalize(opTmmid)(&ctxt->mmid, env, s, modrm, is_write, mmid); \
++        return arg;                                                     \
++    }                                                                   \
++    INSNOP_FINALIZE(opT)                                                \
++    {                                                                   \
 +    }
 +
- #ifdef TARGET_GPROF
-         _mcleanup();
- #endif
++typedef unsigned int insnop_arg_t(mm_t0);
++typedef struct {} insnop_ctxt_t(mm_t0);
++
++INSNOP_INIT(mm_t0)
++{
++    return 0;
++}
++INSNOP_PREPARE(mm_t0)
++{
++    return offsetof(CPUX86State, mmx_t0);
++}
++INSNOP_FINALIZE(mm_t0)
++{
++}
++
++DEF_INSNOP_MM(P, modrm_reg)
++DEF_INSNOP_ALIAS(Pd, P)
++DEF_INSNOP_ALIAS(Pq, P)
++
++DEF_INSNOP_MM(N, modrm_rm_direct)
++DEF_INSNOP_ALIAS(Nd, N)
++DEF_INSNOP_ALIAS(Nq, N)
++
++DEF_INSNOP_LDST(MQd, mm_t0, Md)
++DEF_INSNOP_LDST(MQq, mm_t0, Mq)
++DEF_INSNOP_EITHER(Qd, Nd, MQd)
++DEF_INSNOP_EITHER(Qq, Nq, MQq)
++
++INSNOP_LDST(mm_t0, Md)
++{
++    const insnop_arg_t(mm_t0) ofs =
++        offsetof(MMXReg, MMX_L(0));
++
++    assert(ptr == s->A0);
++    if (is_write) {
++        gen_std_env_A0(s, arg + ofs);
++    } else {
++        gen_ldd_env_A0(s, arg + ofs);
++    }
++}
++INSNOP_LDST(mm_t0, Mq)
++{
++    const insnop_arg_t(mm_t0) ofs =
++        offsetof(MMXReg, MMX_Q(0));
++
++    assert(ptr == s->A0);
++    if (is_write) {
++        gen_stq_env_A0(s, arg + ofs);
++    } else {
++        gen_ldq_env_A0(s, arg + ofs);
++    }
++}
++
+ static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
+ {
+     enum {
 -- 
-2.22.0
+2.20.1
 
 
