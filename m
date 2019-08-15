@@ -2,142 +2,57 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45475C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 903FBC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:01:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0863E2063F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:42:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0863E2063F
+	by mail.kernel.org (Postfix) with ESMTPS id 670382083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:01:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670382083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyJlM-000521-2i
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 13:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57203)
+	id 1hyK3x-0001Lo-Qn
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:01:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60971)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hyJjv-00041y-G6
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:40:47 -0400
+ (envelope-from <thuth@redhat.com>) id 1hyK2A-00087Q-KV
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hyJjr-00085Q-0X
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:40:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36394)
+ (envelope-from <thuth@redhat.com>) id 1hyK27-00018J-Tp
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:59:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52378)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hyJje-0007ey-Ak; Thu, 15 Aug 2019 13:40:28 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hyK27-00014t-Om
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:59:31 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id BF5D13090FD4;
- Thu, 15 Aug 2019 17:40:23 +0000 (UTC)
-Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DAF9280E9;
- Thu, 15 Aug 2019 17:40:19 +0000 (UTC)
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
- <20190814100735.24234-3-vsementsov@virtuozzo.com>
- <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
- <8736i2zf8e.fsf_-_@dusky.pond.sub.org>
-From: John Snow <jsnow@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <423f2f82-9111-9c19-85b6-2645f66ab641@redhat.com>
-Date: Thu, 15 Aug 2019 13:40:19 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <8736i2zf8e.fsf_-_@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ by mx1.redhat.com (Postfix) with ESMTPS id 1716A2A09B9;
+ Thu, 15 Aug 2019 17:59:30 +0000 (UTC)
+Received: from thuth.com (ovpn-116-65.ams2.redhat.com [10.36.116.65])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 35E9917CF8;
+ Thu, 15 Aug 2019 17:59:27 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+	qemu-devel@nongnu.org
+Date: Thu, 15 Aug 2019 19:59:13 +0200
+Message-Id: <20190815175922.3475-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.43]); Thu, 15 Aug 2019 17:40:23 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.38]); Thu, 15 Aug 2019 17:59:30 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] Exposing feature deprecation to machine clients
- (was: [PATCH 2/2] qapi: deprecate implicit filters)
+Subject: [Qemu-devel] [PULL 0/9] qtest patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -149,220 +64,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, den@openvz.org
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+ Hi Peter,
 
+the following changes since commit 9e06029aea3b2eca1d5261352e695edc1e7d7b8b:
 
-On 8/15/19 10:16 AM, Markus Armbruster wrote:
-> John Snow <jsnow@redhat.com> writes:
-> 
->> On 8/14/19 6:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> To get rid of implicit filters related workarounds in future let's
->>> deprecate them now.
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
-> [...]
->>> diff --git a/blockdev.c b/blockdev.c
->>> index 36e9368e01..b3cfaccce1 100644
->>> --- a/blockdev.c
->>> +++ b/blockdev.c
->>> @@ -3292,6 +3292,11 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
->>>      BlockdevOnError on_error = BLOCKDEV_ON_ERROR_REPORT;
->>>      int job_flags = JOB_DEFAULT;
->>>  
->>> +    if (!has_filter_node_name) {
->>> +        warn_report("Omitting filter-node-name parameter is deprecated, it "
->>> +                    "will be required in future");
->>> +    }
->>> +
->>>      if (!has_speed) {
->>>          speed = 0;
->>>      }
->>> @@ -3990,6 +3995,11 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
->>>      Error *local_err = NULL;
->>>      int ret;
->>>  
->>> +    if (!has_filter_node_name) {
->>> +        warn_report("Omitting filter-node-name parameter is deprecated, it "
->>> +                    "will be required in future");
->>> +    }
->>> +
->>>      bs = qmp_get_root_bs(device, errp);
->>>      if (!bs) {
->>>          return;
->>>
->>
->> This might be OK to do right away, though.
->>
->> I asked Markus this not too long ago; do we want to amend the QAPI
->> schema specification to allow commands to return with "Warning" strings,
->> or "Deprecated" stings to allow in-band deprecation notices for cases
->> like these?
->>
->> example:
->>
->> { "return": {},
->>   "deprecated": True,
->>   "warning": "Omitting filter-node-name parameter is deprecated, it will
->> be required in the future"
->> }
->>
->> There's no "error" key, so this should be recognized as success by
->> compatible clients, but they'll definitely see the extra information.
-> 
-> This is a compatible evolution of the QMP protocol.
-> 
->> Part of my motivation is to facilitate a more aggressive deprecation of
->> legacy features by ensuring that we are able to rigorously notify users
->> through any means that they need to adjust their scripts.
-> 
-> Yes, we should help libvirt etc. with detecting use of deprecated
-> features.  We discussed this at the KVM Forum 2018 BoF on deprecating
-> stuff.  Minutes:
-> 
->     Message-ID: <87mur0ls8o.fsf@dusky.pond.sub.org>
->     https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg05828.html
-> 
-> Last item is relevant here.
-> 
-> Adding deprecation information to QMP's success response belongs to "We
-> can also pass the buck to the next layer up", next to "emit a QMP
-> event".
-> 
-> Let's compare the two, i.e. "deprecation info in success response"
-> vs. "deprecation event".
-> 
-> 1. Possible triggers
-> 
-> Anything we put in the success response should only ever apply to the
-> (successful) command.  So this one's limited to QMP commands.
-> 
-> A QMP event is not limited to QMP commands.  For instance, it could be
-> emitted for deprecated CLI features (long after the fact, in addition to
-> human-readable warnings on stderr), or when we detect use of a
-> deprecated feature only after we sent the success response, say in a
-> job.  Neither use case is particularly convincing.  Reporting use of
-> deprecated CLI in QMP feels like a work-around for the CLI's
-> machine-unfriendliness.  Job-like commands should really check their
-> arguments upfront.
-> 
-> 2. Connection to trigger
-> 
-> Connecting responses to commands is the QMP protocol's responsibility.
-> Transmitting deprecation information in the response trivially ties it
-> to the offending command.
-> 
-> The QMP protocol doesn't tie events to anything.  Thus, a deprecation
-> event needs an event-specific tie to its trigger.
-> 
-> The obvious way to tie it to a command mirrors how the QMP protocol ties
-> responses to commands: by command ID.  The event either has to be sent
-> just to the offending monitor (currently, all events are broadcast to
-> all monitors), or include a suitable monitor ID.
-> 
-> For non-command triggers, we'd have to invent some other tie.
-> 
-> 3. Interface complexity
-> 
-> Tying the event to some arbitrary trigger adds complexity.
-> 
-> Do we need non-command triggers, and badly enough to justify the
-> additional complexity?
-> 
-> 4. Implementation complexity 
-> 
-> Emitting an event could be as simple as
-> 
->     qapi_event_send_deprecated(qmp_command_id(),
->                                "Omitting 'filter-node-name'");
-> 
-> where qmp_command_id() returns the ID of the currently executing
-> command.  Making qmp_command_id() work is up to the QMP core.  Simple
-> enough as long as each QMP command runs to completion before its monitor
-> starts the next one.
-> 
-> The event is "fire and forget".  There is no warning object propagated
-> up the call chain into the QMP core like errors objects are.
-> 
-> "Fire and forget" is ideal for letting arbitrary code decide "this is
-> deprecated".
-> 
-> Note the QAPI schema remains untouched.
-> 
-> Unlike an event, which can be emitted anywhere, the success response
-> gets built in the QMP core.  To have the core add deprecation info to
-> it, we need to get the info to the core.
-> 
-> If deprecation info originates in command code, like errors do, we need
-> to propagate it up the call chain into the QMP core like errors.
-> 
-> Propagating errors is painful.  It has caused massive churn all over the
-> place.
-> 
-> I don't think we can hitch deprecation info to the existing error
-> propagation, since we need to take the success path back to the QMP
-> core, not an error path.
-> 
-> Propagating a second object for warnings... thanks, but no thanks.
-> 
+  Update version for v4.1.0 release (2019-08-15 13:03:37 +0100)
 
-Probably the best argument against it. Fire-and-forget avoids the
-problem. Events might work just fine, but the "tie" bit seems like a yak
-in need of a shave.
+are available in the Git repository at:
 
-> The QMP core could provide a function for recording deprecation info for
-> the currently executing QMP command.  This is how we used to record
-> errors in QMP commands, until Anthony rammed through what we have now.
-> The commit messages (e.g. d5ec4f27c38) provide no justification.  I
-> dimly recall adamant (oral?) claims that recording errors in the Monitor
-> object cannot work for us.
-> 
-> I smell a swamp.
-> 
-> Can we avoid plumbing deprecation info from command code to QMP core?
-> Only if the QMP core itself can recognize deprecated interfaces.  I
-> believe it can for the cases we can expose in introspecion.  Let me
-> explain.
-> 
-> Kevin recently added "features" to the QAPI schema language.  The
-> implementation is incomplete, but that's detail.  The idea is to tack a
-> "deprecated" feature to deprecated stuff in the QAPI schema.
-> 
+  https://gitlab.com/huth/qemu.git tags/pull-request-2019-08-15
 
-That's a good idea too; but the semantics of exactly *what* was
-deprecated may be hard to capture.
+for you to fetch changes up to 6fc9f3d347aee337421f8afc4d0984294f8ea6c3:
 
-> Commands and arguments need to support features for that.
-> Implementation should be relatively straightforward.
-> 
-> Deprecating an argument's optionalness may require a
-> "optional-deprecated" feature.  I've seen more elegant designs, but I've
-> also seen plenty of uglier ones.
-> 
-> Note that features are tied to schema syntax.  To express semantically
-> conditional deprecation like "if you specify argument FOO, then not
-> specifying argument BAR is deprecated", we'd have to add a language for
-> these conditions.  Uh, not now, maybe never.
-> 
-> The primary use of having deprecation defined in the QAPI schema is
-> introspection.  The BoF minutes mention this, too.
-> 
-> A secondary use could be detecting use of deprecated features right in
-> the QMP core.  No need for ad hoc code in commands, no need for plumbing
-> information from there to the QMP core.
-> 
-> I'd like to pursue this idea, then see how well it suits our deprecation
-> needs.
-> 
+  tests/libqtest: Make qmp_assert_success() independent from global_qtest (2019-08-15 19:24:10 +0200)
 
-I should clearly remember to talk to you before thinking about QMP in
-public, because you've thought about it much more.
+----------------------------------------------------------------
+- Fix for ctrl queue in the virtio-net QOS driver
+- Improve Valgrind reports in the tests that use the null-co driver
+- Get rid of global_qtest related code in libqtest and libqos
+----------------------------------------------------------------
 
---js
+Andrey Shinkevich (1):
+      tests: Set read-zeroes on for null-co driver
+
+Oleinik, Alexander (2):
+      qtest: Rename qtest.c:qtest_init()
+      libqos: Account for the ctrl queue in virtio-net
+
+Thomas Huth (6):
+      tests/libqos: Make generic virtio code independent from global_qtest
+      tests/libqos: Make virtio-pci code independent from global_qtest
+      tests/libqtest: Remove unused function hmp()
+      tests/libqtest: Clean up qtest_cb_for_every_machine() wrt global_qtest
+      tests/libqtest: Make qtest_qmp_device_add/del independent from global_qtest
+      tests/libqtest: Make qmp_assert_success() independent from global_qtest
+
+ include/sysemu/qtest.h     |   2 +-
+ qtest.c                    |   3 +-
+ tests/cpu-plug-test.c      |  15 +++--
+ tests/drive_del-test.c     |   3 +-
+ tests/e1000e-test.c        |   2 +-
+ tests/ivshmem-test.c       |   2 +-
+ tests/libqos/usb.c         |   6 +-
+ tests/libqos/usb.h         |   2 +-
+ tests/libqos/virtio-net.c  |   1 +
+ tests/libqos/virtio-net.h  |   2 +-
+ tests/libqos/virtio-pci.c  |   8 +--
+ tests/libqos/virtio-scsi.c |   3 +-
+ tests/libqos/virtio.c      |  81 ++++++++++++-----------
+ tests/libqos/virtio.h      |  30 +++++----
+ tests/libqtest.c           |  37 ++++-------
+ tests/libqtest.h           |  24 +++----
+ tests/megasas-test.c       |   3 +-
+ tests/nvme-test.c          |   3 +-
+ tests/qmp-test.c           |   2 +-
+ tests/test-blockjob-txn.c  |   5 +-
+ tests/test-blockjob.c      |   5 +-
+ tests/usb-hcd-ohci-test.c  |   2 +-
+ tests/usb-hcd-uhci-test.c  |  11 ++--
+ tests/usb-hcd-xhci-test.c  |  25 ++++---
+ tests/virtio-9p-test.c     |  16 +++--
+ tests/virtio-blk-test.c    | 159 ++++++++++++++++++++++++---------------------
+ tests/virtio-ccw-test.c    |  25 ++++---
+ tests/virtio-net-test.c    |  35 ++++++----
+ tests/virtio-rng-test.c    |   2 +-
+ tests/virtio-scsi-test.c   |  35 ++++++----
+ tests/virtio-serial-test.c |   4 +-
+ vl.c                       |   2 +-
+ 32 files changed, 300 insertions(+), 255 deletions(-)
 
