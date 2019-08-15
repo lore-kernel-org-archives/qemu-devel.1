@@ -2,66 +2,75 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CFCC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 19:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E779EC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 19:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A16E206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 19:00:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A16E206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BD2A8206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 19:06:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD2A8206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKyj-0005EH-ER
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 15:00:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40365)
+	id 1hyL51-0007dZ-SJ
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 15:06:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42354)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1hyKqN-000683-DV
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:51:29 -0400
+ (envelope-from <bounces@canonical.com>) id 1hyL4G-0007BZ-4U
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 15:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hyKqK-0000Tp-V2
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:51:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32848)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hyKqK-0000Sa-N3
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:51:24 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 56D4811A12;
- Thu, 15 Aug 2019 18:51:23 +0000 (UTC)
-Received: from work-vm (ovpn-117-19.ams2.redhat.com [10.36.117.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A33101001B12;
- Thu, 15 Aug 2019 18:51:20 +0000 (UTC)
-Date: Thu, 15 Aug 2019 19:51:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>, kwolf@redhat.com, mreitz@redhat.com
-Message-ID: <20190815185118.GB2883@work-vm>
-References: <cover.1565892399.git.lukasstraub2@web.de>
- <20190815200823.3de1bd14@luklap>
+ (envelope-from <bounces@canonical.com>) id 1hyL4D-0004c5-Hh
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 15:05:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53384)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hyL4D-0004bG-CW
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 15:05:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hyL4B-0006Nd-W9
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 19:05:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id EC24B2E80C9
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 19:05:43 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190815200823.3de1bd14@luklap>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.28]); Thu, 15 Aug 2019 18:51:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Aug 2019 18:53:00 -0000
+From: Thomas Huth <1836453@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: build mingw windows
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: philmd th-huth
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <156303278818.15899.18047331425183338168.malonedeb@soybean.canonical.com>
+Message-Id: <156589518041.22845.5119864176094158556.malone@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19022";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: 0e33077ea9ddcb3c40024762cc0ce20fc1a84fac
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] Replication: Ignore requests after
- failover
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1836453] Re: "qemu-nsis\*.bmp" -> no files found"
+ when building with MXE
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -70,114 +79,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Wen Congyang <wencongyang2@huawei.com>
+Reply-To: Bug 1836453 <1836453@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lukas Straub (lukasstraub2@web.de) wrote:
-> After failover the Secondary side of replication shouldn't change state, because
-> it now functions as our primary disk.
-> 
-> In replication_start, replication_do_checkpoint, replication_stop, ignore
-> the request if current state is BLOCK_REPLICATION_DONE (sucessful failover) or
-> BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging active
-> and hidden images into the base image).
-> 
-> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Fix has been included here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Db3ce38dcf93a1203
 
-We should add some block people to this one to review it; cc'ing in
-Kevin and Max.
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Dave
+-- =
 
-> ---
->  block/replication.c | 38 +++++++++++++++++++++++++++++++++++---
->  1 file changed, 35 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/replication.c b/block/replication.c
-> index 3d4dedddfc..97cc65c0cf 100644
-> --- a/block/replication.c
-> +++ b/block/replication.c
-> @@ -454,6 +454,17 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
->      aio_context_acquire(aio_context);
->      s = bs->opaque;
-> 
-> +    if (s->stage == BLOCK_REPLICATION_DONE ||
-> +        s->stage == BLOCK_REPLICATION_FAILOVER) {
-> +        /*
-> +         * This case happens when a secondary is promoted to primary.
-> +         * Ignore the request because the secondary side of replication
-> +         * doesn't have to do anything anymore.
-> +         */
-> +        aio_context_release(aio_context);
-> +        return;
-> +    }
-> +
->      if (s->stage != BLOCK_REPLICATION_NONE) {
->          error_setg(errp, "Block replication is running or done");
->          aio_context_release(aio_context);
-> @@ -529,8 +540,7 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
->                     "Block device is in use by internal backup job");
-> 
->          top_bs = bdrv_lookup_bs(s->top_id, s->top_id, NULL);
-> -        if (!top_bs || !bdrv_is_root_node(top_bs) ||
-> -            !check_top_bs(top_bs, bs)) {
-> +        if (!top_bs || !check_top_bs(top_bs, bs)) {
->              error_setg(errp, "No top_bs or it is invalid");
->              reopen_backing_file(bs, false, NULL);
->              aio_context_release(aio_context);
-> @@ -577,6 +587,17 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
->      aio_context_acquire(aio_context);
->      s = bs->opaque;
-> 
-> +    if (s->stage == BLOCK_REPLICATION_DONE ||
-> +        s->stage == BLOCK_REPLICATION_FAILOVER) {
-> +        /*
-> +         * This case happens when a secondary was promoted to primary.
-> +         * Ignore the request because the secondary side of replication
-> +         * doesn't have to do anything anymore.
-> +         */
-> +        aio_context_release(aio_context);
-> +        return;
-> +    }
-> +
->      if (s->mode == REPLICATION_MODE_SECONDARY) {
->          secondary_do_checkpoint(s, errp);
->      }
-> @@ -593,7 +614,7 @@ static void replication_get_error(ReplicationState *rs, Error **errp)
->      aio_context_acquire(aio_context);
->      s = bs->opaque;
-> 
-> -    if (s->stage != BLOCK_REPLICATION_RUNNING) {
-> +    if (s->stage == BLOCK_REPLICATION_NONE) {
->          error_setg(errp, "Block replication is not running");
->          aio_context_release(aio_context);
->          return;
-> @@ -635,6 +656,17 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
->      aio_context_acquire(aio_context);
->      s = bs->opaque;
-> 
-> +    if (s->stage == BLOCK_REPLICATION_DONE ||
-> +        s->stage == BLOCK_REPLICATION_FAILOVER) {
-> +        /*
-> +         * This case happens when a secondary was promoted to primary.
-> +         * Ignore the request because the secondary side of replication
-> +         * doesn't have to do anything anymore.
-> +         */
-> +        aio_context_release(aio_context);
-> +        return;
-> +    }
-> +
->      if (s->stage != BLOCK_REPLICATION_RUNNING) {
->          error_setg(errp, "Block replication is not running");
->          aio_context_release(aio_context);
-> --
-> 2.20.1
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1836453
+
+Title:
+  "qemu-nsis\*.bmp" -> no files found" when building with MXE
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Already reported for 4.0:
+  https://lists.gnu.org/archive/html/qemu-devel/2019-01/msg07005.html
+
+  host: Docker qemu:debian-win32-cross
+
+  $ make installer
+  (cd /tmp/qemu-nsis; \
+           for i in qemu-system-*.exe; do \
+             arch=3D${i%.exe}; \
+             arch=3D${arch#qemu-system-}; \
+             echo Section \"$arch\" Section_$arch; \
+             echo SetOutPath \"\$INSTDIR\"; \
+             echo File \"\${BINDIR}\\$i\"; \
+             echo SectionEnd; \
+           done \
+          ) >/tmp/qemu-nsis/system-emulations.nsh
+  makensis -V2 -NOCD \
+                  -DCONFIG_DOCUMENTATION=3D"y" \
+                   \
+                  -DBINDIR=3D"/tmp/qemu-nsis" \
+                   \
+                  -DSRCDIR=3D"/source/qemu" \
+                  -DOUTFILE=3D"qemu-setup-4.0.90.exe" \
+                  -DDISPLAYVERSION=3D"4.0.90" \
+                  /source/qemu/qemu.nsi
+  File: "/tmp/qemu-nsis\*.bmp" -> no files found.
+  Usage: File [/nonfatal] [/a] ([/r] [/x filespec [...]] filespec [...] |
+     /oname=3Doutfile one_file_only)
+  Error in script "/source/qemu/qemu.nsi" on line 122 -- aborting creation =
+process
+  Makefile:1077: recipe for target 'qemu-setup-4.0.90.exe' failed
+  make: *** [qemu-setup-4.0.90.exe] Error 1
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1836453/+subscriptions
 
