@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D11C32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A39C3C32753
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E804208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B65E2084F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:52:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clvpy6qy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E804208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxrH0Tq1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B65E2084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5qr-0006J3-KH
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:50:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47140)
+	id 1hy5sM-0008Q6-Ca
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:52:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5Dp-0006al-1o
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:39 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Dq-0006dJ-My
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5Dm-0000WL-1I
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:36 -0400
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:41460)
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Dm-0000Xf-Uk
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:38 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:40117)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Dl-0000Vp-RN
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:33 -0400
-Received: by mail-yb1-xb42.google.com with SMTP id n7so398864ybd.8
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:33 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Dm-0000X9-OT
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:34 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id j6so401455ybm.7
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5e6l03Qz5LQ2A/rrsuSgH7TNz9zLWV4wYVJ76E7XL0A=;
- b=clvpy6qyVDPIkGPHsIPLL16HuTRgPFPSFSpWbDm+RJu4ggSF4ZZQ9F4PEwbrvujHCM
- SpM9Rsdfifgsiv//CElikUTigeUwj0maVPyqkjgd/JPajO3BzxFD2/eSk/09ZASz4eKQ
- II4qUVxz2Tqb3+YlHM3VPZAu/sovI7LRSABWTAFgb0JbXTRONGWHezBQ/sRDZWe4J3d+
- YKggBy3iqiPp3SA1+jC/jdwpvV+hrWtLlAs0fzAz+LMHDmgZB0qSalC4dwJUl9fdWB31
- SdpXEpp4ti4gg8Yp/WBB3GjKqiEG3K1UkR1IOS3dGRi9ikUB7ehw/KmFKYwdXr6qySjm
- +99A==
+ bh=am6aHLZRZqCmn4TjEMCIEvy9PQaPrCKzH8p7kQXlzXM=;
+ b=lxrH0Tq1EY/mP6GmmbNhAZVvC51TOx1Sjm1BkwgHPozBugYmaYXHNE346bUHufvmMv
+ zDCZvkjhUcJRvAK+CoFlXUcDAVQfozBsXVTCwArg0WhX2vHepWWRMP1UitpRmOB/kyGX
+ b6fiaQsi6xQGlWrAg13Rb98Bu0qpXf6RiLosmQoj+p+DyF1BBE5bPwvg/IvHPhrUTBie
+ ZFg8BssQjw0uj/NLbDpSycIyF7CBaVGLR44Ddt0ouMLBsH+FNrTbm0BrM9XimxxT1ZXE
+ gxZtDm1sgmv1C3YhL8ZBb9KteJGhaCjv+CCtFi3GalXAoaKgKGoB14W97IS+I4M53+KA
+ 98Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5e6l03Qz5LQ2A/rrsuSgH7TNz9zLWV4wYVJ76E7XL0A=;
- b=KQ/ywltPZjf+lSggUjll5qf/2nxICLwtv9jmRrGCyJEwmFjIqlgc9FYpex30cmS9Kx
- twpmIglR3veWyz43j20DOmZUAL/UavuhKJNil1oTkV4BZafvo4dsFsJ4Qbul28O82akS
- uUi/PEA1yS+Z27v9Ii4d8v8JkO8hiC5Tk60+5KmbFbTwO57gSXdEt8Ut0Imlecz9MwiZ
- WVhWL+tVDhh5MRpioBuHyYwjD+sTcceqEkuGHXYaBTozIM1/GU08Lg3fYGtJdMLDzIe5
- Ke3PjVddBPIq6rhIxwAIWzHfse9RmYpFlWcnqSzBaxsqlKr0PGnAIEB/I0DV018k+GQc
- DTvA==
-X-Gm-Message-State: APjAAAXoXtP16kCWaW8KtKJKhTYpDUCzcdaY/IGmeLfX0srvmccWo+Qq
- QjvrFzHcF9SuyFrDrc2CgocEkuI7
-X-Google-Smtp-Source: APXvYqwKSJ1OfM0fnnGuDELrTZT/XAqoeyucOfluD/YwZYklzPzdqR9G1wnHad1119uE/a75eHO4uw==
-X-Received: by 2002:a25:97c1:: with SMTP id j1mr2043613ybo.349.1565835032861; 
- Wed, 14 Aug 2019 19:10:32 -0700 (PDT)
+ bh=am6aHLZRZqCmn4TjEMCIEvy9PQaPrCKzH8p7kQXlzXM=;
+ b=IIZMRa0D4eCfiwfrB/Muay6yisomr2TN3A18hcd2lXFFrtun8km/fhF90DX08GHDck
+ 14fTgaBj8QFRZy5xr46GedZ0A+X5WmQKLeXgPLrPy8JjwWgwYzFZdqIclMIa8O5E/t5e
+ 7TY/V0LofV/hHm6ic/0fuy9xS6cxFyhLzO9oBkgeSqFLm2KGcApUtC63uXMD3PjllssC
+ BcBtDYS60umjoLknTgxdUGbxk965M/s3Tt7nPlMnTYYduludhQnK8V0JMNUqg3Oq7IN6
+ 0n0NZGU6D9QRoxJK/azStl04i6f9hXUrzWyqu1iYH4N+1xTaSkJqv8BTlmPX62VBjyr0
+ dYsA==
+X-Gm-Message-State: APjAAAVsmxsNCP+7J6d2e6A3iQsEGn0GZ+uxbJX1ZxpuGagqbb9+J2Sp
+ 5ydGqZ6tRnecbjiPS6uzHnZN1WMw
+X-Google-Smtp-Source: APXvYqyux9uQJRqDaq3LVIuSkUe00qzC3CyPvE8c5bQMv5rxjJujW54Wra1nOsHFsnDqsZjdqwA5/A==
+X-Received: by 2002:a25:bb01:: with SMTP id z1mr2011898ybg.445.1565835033459; 
+ Wed, 14 Aug 2019 19:10:33 -0700 (PDT)
 Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
  by smtp.gmail.com with ESMTPSA id
- j3sm374882ywk.21.2019.08.14.19.10.31
+ j3sm374882ywk.21.2019.08.14.19.10.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:10:32 -0700 (PDT)
+ Wed, 14 Aug 2019 19:10:33 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 22:09:24 -0400
-Message-Id: <20190815020928.9679-43-jan.bobek@gmail.com>
+Date: Wed, 14 Aug 2019 22:09:25 -0400
+Message-Id: <20190815020928.9679-44-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
 References: <20190815020928.9679-1-jan.bobek@gmail.com>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b42
-Subject: [Qemu-devel] [RFC PATCH v3 42/46] target/i386: introduce SSE2 code
- generators
+X-Received-From: 2607:f8b0:4864:20::b41
+Subject: [Qemu-devel] [RFC PATCH v3 43/46] target/i386: introduce SSE2
+ instructions to sse-opcode.inc.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,702 +101,603 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce code generators required by SSE2 instructions.
+Add all the SSE2 instruction entries to sse-opcode.inc.h.
 
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- target/i386/translate.c | 444 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 442 insertions(+), 2 deletions(-)
+ target/i386/sse-opcode.inc.h | 323 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 322 insertions(+), 1 deletion(-)
 
-diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 177bedd0ef..7ec082e79d 100644
---- a/target/i386/translate.c
-+++ b/target/i386/translate.c
-@@ -5391,6 +5391,21 @@ GEN_INSN2(movd, Ed, Pq)
-     tcg_gen_ld_i32(arg1, cpu_env, arg2 + ofs);
- }
+diff --git a/target/i386/sse-opcode.inc.h b/target/i386/sse-opcode.inc.h
+index 39947aeb51..efa67b7ce2 100644
+--- a/target/i386/sse-opcode.inc.h
++++ b/target/i386/sse-opcode.inc.h
+@@ -43,241 +43,535 @@
+ OPCODE(movd, LEG(NP, 0F, 0, 0x6e), MMX, WR, Pq, Ed)
+ /* NP 0F 7E /r: MOVD r/m32,mm */
+ OPCODE(movd, LEG(NP, 0F, 0, 0x7e), MMX, WR, Ed, Pq)
++/* 66 0F 6E /r: MOVD xmm,r/m32 */
++OPCODE(movd, LEG(66, 0F, 0, 0x6e), SSE2, WR, Vdq, Ed)
++/* 66 0F 7E /r: MOVD r/m32,xmm */
++OPCODE(movd, LEG(66, 0F, 0, 0x7e), SSE2, WR, Ed, Vdq)
+ /* NP REX.W + 0F 6E /r: MOVQ mm,r/m64 */
+ OPCODE(movq, LEG(NP, 0F, 1, 0x6e), MMX, WR, Pq, Eq)
+ /* NP REX.W + 0F 7E /r: MOVQ r/m64,mm */
+ OPCODE(movq, LEG(NP, 0F, 1, 0x7e), MMX, WR, Eq, Pq)
++/* 66 REX.W 0F 6E /r: MOVQ xmm,r/m64 */
++OPCODE(movq, LEG(66, 0F, 1, 0x6e), SSE2, WR, Vdq, Eq)
++/* 66 REX.W 0F 7E /r: MOVQ r/m64,xmm */
++OPCODE(movq, LEG(66, 0F, 1, 0x7e), SSE2, WR, Eq, Vdq)
+ /* NP 0F 6F /r: MOVQ mm, mm/m64 */
+ OPCODE(movq, LEG(NP, 0F, 0, 0x6f), MMX, WR, Pq, Qq)
+ /* NP 0F 7F /r: MOVQ mm/m64, mm */
+ OPCODE(movq, LEG(NP, 0F, 0, 0x7f), MMX, WR, Qq, Pq)
++/* F3 0F 7E /r: MOVQ xmm1, xmm2/m64 */
++OPCODE(movq, LEG(F3, 0F, 0, 0x7e), SSE2, WR, Vdq, Wq)
++/* 66 0F D6 /r: MOVQ xmm2/m64, xmm1 */
++OPCODE(movq, LEG(66, 0F, 0, 0xd6), SSE2, WR, UdqMq, Vq)
+ /* NP 0F 28 /r: MOVAPS xmm1, xmm2/m128 */
+ OPCODE(movaps, LEG(NP, 0F, 0, 0x28), SSE, WR, Vdq, Wdq)
+ /* NP 0F 29 /r: MOVAPS xmm2/m128, xmm1 */
+ OPCODE(movaps, LEG(NP, 0F, 0, 0x29), SSE, WR, Wdq, Vdq)
++/* 66 0F 28 /r: MOVAPD xmm1, xmm2/m128 */
++OPCODE(movapd, LEG(66, 0F, 0, 0x28), SSE2, WR, Vdq, Wdq)
++/* 66 0F 29 /r: MOVAPD xmm2/m128, xmm1 */
++OPCODE(movapd, LEG(66, 0F, 0, 0x29), SSE2, WR, Wdq, Vdq)
++/* 66 0F 6F /r: MOVDQA xmm1, xmm2/m128 */
++OPCODE(movdqa, LEG(66, 0F, 0, 0x6f), SSE2, WR, Vdq, Wdq)
++/* 66 0F 7F /r: MOVDQA xmm2/m128, xmm1 */
++OPCODE(movdqa, LEG(66, 0F, 0, 0x7f), SSE2, WR, Wdq, Vdq)
+ /* NP 0F 10 /r: MOVUPS xmm1, xmm2/m128 */
+ OPCODE(movups, LEG(NP, 0F, 0, 0x10), SSE, WR, Vdq, Wdq)
+ /* NP 0F 11 /r: MOVUPS xmm2/m128, xmm1 */
+ OPCODE(movups, LEG(NP, 0F, 0, 0x11), SSE, WR, Wdq, Vdq)
++/* 66 0F 10 /r: MOVUPD xmm1, xmm2/m128 */
++OPCODE(movupd, LEG(66, 0F, 0, 0x10), SSE2, WR, Vdq, Wdq)
++/* 66 0F 11 /r: MOVUPD xmm2/m128, xmm1 */
++OPCODE(movupd, LEG(66, 0F, 0, 0x11), SSE2, WR, Wdq, Vdq)
++/* F3 0F 6F /r: MOVDQU xmm1,xmm2/m128 */
++OPCODE(movdqu, LEG(F3, 0F, 0, 0x6f), SSE2, WR, Vdq, Wdq)
++/* F3 0F 7F /r: MOVDQU xmm2/m128,xmm1 */
++OPCODE(movdqu, LEG(F3, 0F, 0, 0x7f), SSE2, WR, Wdq, Vdq)
+ /* F3 0F 10 /r: MOVSS xmm1, xmm2/m32 */
+ OPCODE(movss, LEG(F3, 0F, 0, 0x10), SSE, WRRR, Vdq, Vdq, Wd, modrm_mod)
+ /* F3 0F 11 /r: MOVSS xmm2/m32, xmm1 */
+ OPCODE(movss, LEG(F3, 0F, 0, 0x11), SSE, WR, Wd, Vd)
++/* F2 0F 10 /r: MOVSD xmm1, xmm2/m64 */
++OPCODE(movsd, LEG(F2, 0F, 0, 0x10), SSE2, WRRR, Vdq, Vdq, Wq, modrm_mod)
++/* F2 0F 11 /r: MOVSD xmm1/m64, xmm2 */
++OPCODE(movsd, LEG(F2, 0F, 0, 0x11), SSE2, WR, Wq, Vq)
++/* F3 0F D6 /r: MOVQ2DQ xmm, mm */
++OPCODE(movq2dq, LEG(F3, 0F, 0, 0xd6), SSE2, WR, Vdq, Nq)
++/* F2 0F D6 /r: MOVDQ2Q mm, xmm */
++OPCODE(movdq2q, LEG(F2, 0F, 0, 0xd6), SSE2, WR, Pq, Uq)
+ /* NP 0F 12 /r: MOVHLPS xmm1, xmm2 */
+ /* NP 0F 12 /r: MOVLPS xmm1, m64 */
+ OPCODE(movhlps, LEG(NP, 0F, 0, 0x12), SSE, WR, Vq, UdqMhq)
+ /* 0F 13 /r: MOVLPS m64, xmm1 */
+ OPCODE(movlps, LEG(NP, 0F, 0, 0x13), SSE, WR, Mq, Vq)
++/* 66 0F 12 /r: MOVLPD xmm1,m64 */
++OPCODE(movlpd, LEG(66, 0F, 0, 0x12), SSE2, WR, Vq, Mq)
++/* 66 0F 13 /r: MOVLPD m64,xmm1 */
++OPCODE(movlpd, LEG(66, 0F, 0, 0x13), SSE2, WR, Mq, Vq)
+ /* NP 0F 16 /r: MOVLHPS xmm1, xmm2 */
+ /* NP 0F 16 /r: MOVHPS xmm1, m64 */
+ OPCODE(movlhps, LEG(NP, 0F, 0, 0x16), SSE, WRR, Vdq, Vq, Wq)
+ /* NP 0F 17 /r: MOVHPS m64, xmm1 */
+ OPCODE(movhps, LEG(NP, 0F, 0, 0x17), SSE, WR, Mq, Vdq)
++/* 66 0F 16 /r: MOVHPD xmm1, m64 */
++OPCODE(movhpd, LEG(66, 0F, 0, 0x16), SSE2, WRR, Vdq, Vd, Mq)
++/* 66 0F 17 /r: MOVHPD m64, xmm1 */
++OPCODE(movhpd, LEG(66, 0F, 0, 0x17), SSE2, WR, Mq, Vdq)
+ /* NP 0F D7 /r: PMOVMSKB r32, mm */
+ OPCODE(pmovmskb, LEG(NP, 0F, 0, 0xd7), SSE, WR, Gd, Nq)
+ /* NP REX.W 0F D7 /r: PMOVMSKB r64, mm */
+ OPCODE(pmovmskb, LEG(NP, 0F, 1, 0xd7), SSE, WR, Gq, Nq)
++/* 66 0F D7 /r: PMOVMSKB r32, xmm */
++OPCODE(pmovmskb, LEG(66, 0F, 0, 0xd7), SSE2, WR, Gd, Udq)
++/* 66 REX.W 0F D7 /r: PMOVMSKB r64, xmm */
++OPCODE(pmovmskb, LEG(66, 0F, 1, 0xd7), SSE2, WR, Gq, Udq)
+ /* NP 0F 50 /r: MOVMSKPS r32, xmm */
+ OPCODE(movmskps, LEG(NP, 0F, 0, 0x50), SSE, WR, Gd, Udq)
+ /* NP REX.W 0F 50 /r: MOVMSKPS r64, xmm */
+ OPCODE(movmskps, LEG(NP, 0F, 1, 0x50), SSE, WR, Gq, Udq)
++/* 66 0F 50 /r: MOVMSKPD r32, xmm */
++OPCODE(movmskpd, LEG(66, 0F, 0, 0x50), SSE2, WR, Gd, Udq)
++/* 66 REX.W 0F 50 /r: MOVMSKPD r64, xmm */
++OPCODE(movmskpd, LEG(66, 0F, 1, 0x50), SSE2, WR, Gq, Udq)
+ /* NP 0F FC /r: PADDB mm, mm/m64 */
+ OPCODE(paddb, LEG(NP, 0F, 0, 0xfc), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F FC /r: PADDB xmm1, xmm2/m128 */
++OPCODE(paddb, LEG(66, 0F, 0, 0xfc), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F FD /r: PADDW mm, mm/m64 */
+ OPCODE(paddw, LEG(NP, 0F, 0, 0xfd), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F FD /r: PADDW xmm1, xmm2/m128 */
++OPCODE(paddw, LEG(66, 0F, 0, 0xfd), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F FE /r: PADDD mm, mm/m64 */
+ OPCODE(paddd, LEG(NP, 0F, 0, 0xfe), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F FE /r: PADDD xmm1, xmm2/m128 */
++OPCODE(paddd, LEG(66, 0F, 0, 0xfe), SSE2, WRR, Vdq, Vdq, Wdq)
++/* NP 0F D4 /r: PADDQ mm, mm/m64 */
++OPCODE(paddq, LEG(NP, 0F, 0, 0xd4), SSE2, WRR, Pq, Pq, Qq)
++/* 66 0F D4 /r: PADDQ xmm1, xmm2/m128 */
++OPCODE(paddq, LEG(66, 0F, 0, 0xd4), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F EC /r: PADDSB mm, mm/m64 */
+ OPCODE(paddsb, LEG(NP, 0F, 0, 0xec), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F EC /r: PADDSB xmm1, xmm2/m128 */
++OPCODE(paddsb, LEG(66, 0F, 0, 0xec), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F ED /r: PADDSW mm, mm/m64 */
+ OPCODE(paddsw, LEG(NP, 0F, 0, 0xed), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F ED /r: PADDSW xmm1, xmm2/m128 */
++OPCODE(paddsw, LEG(66, 0F, 0, 0xed), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F DC /r: PADDUSB mm,mm/m64 */
+ OPCODE(paddusb, LEG(NP, 0F, 0, 0xdc), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F DC /r: PADDUSB xmm1,xmm2/m128 */
++OPCODE(paddusb, LEG(66, 0F, 0, 0xdc), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F DD /r: PADDUSW mm,mm/m64 */
+ OPCODE(paddusw, LEG(NP, 0F, 0, 0xdd), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F DD /r: PADDUSW xmm1,xmm2/m128 */
++OPCODE(paddusw, LEG(66, 0F, 0, 0xdd), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 58 /r: ADDPS xmm1, xmm2/m128 */
+ OPCODE(addps, LEG(NP, 0F, 0, 0x58), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 58 /r: ADDPD xmm1, xmm2/m128 */
++OPCODE(addpd, LEG(66, 0F, 0, 0x58), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* F3 0F 58 /r: ADDSS xmm1, xmm2/m32 */
+ OPCODE(addss, LEG(F3, 0F, 0, 0x58), SSE, WRR, Vd, Vd, Wd)
++/* F2 0F 58 /r: ADDSD xmm1, xmm2/m64 */
++OPCODE(addsd, LEG(F2, 0F, 0, 0x58), SSE2, WRR, Vq, Vq, Wq)
+ /* NP 0F F8 /r: PSUBB mm, mm/m64 */
+ OPCODE(psubb, LEG(NP, 0F, 0, 0xf8), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F F8 /r: PSUBB xmm1, xmm2/m128 */
++OPCODE(psubb, LEG(66, 0F, 0, 0xf8), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F F9 /r: PSUBW mm, mm/m64 */
+ OPCODE(psubw, LEG(NP, 0F, 0, 0xf9), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F F9 /r: PSUBW xmm1, xmm2/m128 */
++OPCODE(psubw, LEG(66, 0F, 0, 0xf9), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F FA /r: PSUBD mm, mm/m64 */
+ OPCODE(psubd, LEG(NP, 0F, 0, 0xfa), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F FA /r: PSUBD xmm1, xmm2/m128 */
++OPCODE(psubd, LEG(66, 0F, 0, 0xfa), SSE2, WRR, Vdq, Vdq, Wdq)
++/* NP 0F FB /r: PSUBQ mm1, mm2/m64 */
++OPCODE(psubq, LEG(NP, 0F, 0, 0xfb), SSE2, WRR, Pq, Pq, Qq)
++/* 66 0F FB /r: PSUBQ xmm1, xmm2/m128 */
++OPCODE(psubq, LEG(66, 0F, 0, 0xfb), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E8 /r: PSUBSB mm, mm/m64 */
+ OPCODE(psubsb, LEG(NP, 0F, 0, 0xe8), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F E8 /r: PSUBSB xmm1, xmm2/m128 */
++OPCODE(psubsb, LEG(66, 0F, 0, 0xe8), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E9 /r: PSUBSW mm, mm/m64 */
+ OPCODE(psubsw, LEG(NP, 0F, 0, 0xe9), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F E9 /r: PSUBSW xmm1, xmm2/m128 */
++OPCODE(psubsw, LEG(66, 0F, 0, 0xe9), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F D8 /r: PSUBUSB mm, mm/m64 */
+ OPCODE(psubusb, LEG(NP, 0F, 0, 0xd8), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F D8 /r: PSUBUSB xmm1, xmm2/m128 */
++OPCODE(psubusb, LEG(66, 0F, 0, 0xd8), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F D9 /r: PSUBUSW mm, mm/m64 */
+ OPCODE(psubusw, LEG(NP, 0F, 0, 0xd9), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F D9 /r: PSUBUSW xmm1, xmm2/m128 */
++OPCODE(psubusw, LEG(66, 0F, 0, 0xd9), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 5C /r: SUBPS xmm1, xmm2/m128 */
+ OPCODE(subps, LEG(NP, 0F, 0, 0x5c), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 5C /r: SUBPD xmm1, xmm2/m128 */
++OPCODE(subpd, LEG(66, 0F, 0, 0x5c), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* F3 0F 5C /r: SUBSS xmm1, xmm2/m32 */
+ OPCODE(subss, LEG(F3, 0F, 0, 0x5c), SSE, WRR, Vd, Vd, Wd)
++/* F2 0F 5C /r: SUBSD xmm1, xmm2/m64 */
++OPCODE(subsd, LEG(F2, 0F, 0, 0x5c), SSE2, WRR, Vq, Vq, Wq)
+ /* NP 0F D5 /r: PMULLW mm, mm/m64 */
+ OPCODE(pmullw, LEG(NP, 0F, 0, 0xd5), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F D5 /r: PMULLW xmm1, xmm2/m128 */
++OPCODE(pmullw, LEG(66, 0F, 0, 0xd5), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E5 /r: PMULHW mm, mm/m64 */
+ OPCODE(pmulhw, LEG(NP, 0F, 0, 0xe5), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F E5 /r: PMULHW xmm1, xmm2/m128 */
++OPCODE(pmulhw, LEG(66, 0F, 0, 0xe5), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E4 /r: PMULHUW mm1, mm2/m64 */
+ OPCODE(pmulhuw, LEG(NP, 0F, 0, 0xe4), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F E4 /r: PMULHUW xmm1, xmm2/m128 */
++OPCODE(pmulhuw, LEG(66, 0F, 0, 0xe4), SSE2, WRR, Vdq, Vdq, Wdq)
++/* NP 0F F4 /r: PMULUDQ mm1, mm2/m64 */
++OPCODE(pmuludq, LEG(NP, 0F, 0, 0xf4), SSE2, WRR, Pq, Pq, Qq)
++/* 66 0F F4 /r: PMULUDQ xmm1, xmm2/m128 */
++OPCODE(pmuludq, LEG(66, 0F, 0, 0xf4), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 59 /r: MULPS xmm1, xmm2/m128 */
+ OPCODE(mulps, LEG(NP, 0F, 0, 0x59), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 59 /r: MULPD xmm1, xmm2/m128 */
++OPCODE(mulpd, LEG(66, 0F, 0, 0x59), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* F3 0F 59 /r: MULSS xmm1,xmm2/m32 */
+ OPCODE(mulss, LEG(F3, 0F, 0, 0x59), SSE, WRR, Vd, Vd, Wd)
++/* F2 0F 59 /r: MULSD xmm1,xmm2/m64 */
++OPCODE(mulsd, LEG(F2, 0F, 0, 0x59), SSE2, WRR, Vq, Vq, Wq)
+ /* NP 0F F5 /r: PMADDWD mm, mm/m64 */
+ OPCODE(pmaddwd, LEG(NP, 0F, 0, 0xf5), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F F5 /r: PMADDWD xmm1, xmm2/m128 */
++OPCODE(pmaddwd, LEG(66, 0F, 0, 0xf5), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 5E /r: DIVPS xmm1, xmm2/m128 */
+ OPCODE(divps, LEG(NP, 0F, 0, 0x5e), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 5E /r: DIVPD xmm1, xmm2/m128 */
++OPCODE(divpd, LEG(66, 0F, 0, 0x5e), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* F3 0F 5E /r: DIVSS xmm1, xmm2/m32 */
+ OPCODE(divss, LEG(F3, 0F, 0, 0x5e), SSE, WRR, Vd, Vd, Wd)
++/* F2 0F 5E /r: DIVSD xmm1, xmm2/m64 */
++OPCODE(divsd, LEG(F2, 0F, 0, 0x5e), SSE2, WRR, Vq, Vq, Wq)
+ /* NP 0F 53 /r: RCPPS xmm1, xmm2/m128 */
+ OPCODE(rcpps, LEG(NP, 0F, 0, 0x53), SSE, WR, Vdq, Wdq)
+ /* F3 0F 53 /r: RCPSS xmm1, xmm2/m32 */
+ OPCODE(rcpss, LEG(F3, 0F, 0, 0x53), SSE, WR, Vd, Wd)
+ /* NP 0F 51 /r: SQRTPS xmm1, xmm2/m128 */
+ OPCODE(sqrtps, LEG(NP, 0F, 0, 0x51), SSE, WR, Vdq, Wdq)
++/* 66 0F 51 /r: SQRTPD xmm1, xmm2/m128 */
++OPCODE(sqrtpd, LEG(66, 0F, 0, 0x51), SSE2, WR, Vdq, Wdq)
+ /* F3 0F 51 /r: SQRTSS xmm1, xmm2/m32 */
+ OPCODE(sqrtss, LEG(F3, 0F, 0, 0x51), SSE, WR, Vd, Wd)
++/* F2 0F 51 /r: SQRTSD xmm1,xmm2/m64 */
++OPCODE(sqrtsd, LEG(F2, 0F, 0, 0x51), SSE2, WR, Vq, Wq)
+ /* NP 0F 52 /r: RSQRTPS xmm1, xmm2/m128 */
+ OPCODE(rsqrtps, LEG(NP, 0F, 0, 0x52), SSE, WR, Vdq, Wdq)
+ /* F3 0F 52 /r: RSQRTSS xmm1, xmm2/m32 */
+ OPCODE(rsqrtss, LEG(F3, 0F, 0, 0x52), SSE, WR, Vd, Wd)
+ /* NP 0F DA /r: PMINUB mm1, mm2/m64 */
+ OPCODE(pminub, LEG(NP, 0F, 0, 0xda), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F DA /r: PMINUB xmm1, xmm2/m128 */
++OPCODE(pminub, LEG(66, 0F, 0, 0xda), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F EA /r: PMINSW mm1, mm2/m64 */
+ OPCODE(pminsw, LEG(NP, 0F, 0, 0xea), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F EA /r: PMINSW xmm1, xmm2/m128 */
++OPCODE(pminsw, LEG(66, 0F, 0, 0xea), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 5D /r: MINPS xmm1, xmm2/m128 */
+ OPCODE(minps, LEG(NP, 0F, 0, 0x5d), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 5D /r: MINPD xmm1, xmm2/m128 */
++OPCODE(minpd, LEG(66, 0F, 0, 0x5d), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* F3 0F 5D /r: MINSS xmm1,xmm2/m32 */
+ OPCODE(minss, LEG(F3, 0F, 0, 0x5d), SSE, WRR, Vd, Vd, Wd)
++/* F2 0F 5D /r: MINSD xmm1, xmm2/m64 */
++OPCODE(minsd, LEG(F2, 0F, 0, 0x5d), SSE2, WRR, Vq, Vq, Wq)
+ /* NP 0F DE /r: PMAXUB mm1, mm2/m64 */
+ OPCODE(pmaxub, LEG(NP, 0F, 0, 0xde), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F DE /r: PMAXUB xmm1, xmm2/m128 */
++OPCODE(pmaxub, LEG(66, 0F, 0, 0xde), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F EE /r: PMAXSW mm1, mm2/m64 */
+ OPCODE(pmaxsw, LEG(NP, 0F, 0, 0xee), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F EE /r: PMAXSW xmm1, xmm2/m128 */
++OPCODE(pmaxsw, LEG(66, 0F, 0, 0xee), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 5F /r: MAXPS xmm1, xmm2/m128 */
+ OPCODE(maxps, LEG(NP, 0F, 0, 0x5f), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 5F /r: MAXPD xmm1, xmm2/m128 */
++OPCODE(maxpd, LEG(66, 0F, 0, 0x5f), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* F3 0F 5F /r: MAXSS xmm1, xmm2/m32 */
+ OPCODE(maxss, LEG(F3, 0F, 0, 0x5f), SSE, WRR, Vd, Vd, Wd)
++/* F2 0F 5F /r: MAXSD xmm1, xmm2/m64 */
++OPCODE(maxsd, LEG(F2, 0F, 0, 0x5f), SSE2, WRR, Vq, Vq, Wq)
+ /* NP 0F E0 /r: PAVGB mm1, mm2/m64 */
+ OPCODE(pavgb, LEG(NP, 0F, 0, 0xe0), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F E0 /r: PAVGB xmm1, xmm2/m128 */
++OPCODE(pavgb, LEG(66, 0F, 0, 0xe0), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E3 /r: PAVGW mm1, mm2/m64 */
+ OPCODE(pavgw, LEG(NP, 0F, 0, 0xe3), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F E3 /r: PAVGW xmm1, xmm2/m128 */
++OPCODE(pavgw, LEG(66, 0F, 0, 0xe3), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F F6 /r: PSADBW mm1, mm2/m64 */
+ OPCODE(psadbw, LEG(NP, 0F, 0, 0xf6), SSE, WRR, Pq, Pq, Qq)
++/* 66 0F F6 /r: PSADBW xmm1, xmm2/m128 */
++OPCODE(psadbw, LEG(66, 0F, 0, 0xf6), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 74 /r: PCMPEQB mm,mm/m64 */
+ OPCODE(pcmpeqb, LEG(NP, 0F, 0, 0x74), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 74 /r: PCMPEQB xmm1,xmm2/m128 */
++OPCODE(pcmpeqb, LEG(66, 0F, 0, 0x74), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 75 /r: PCMPEQW mm,mm/m64 */
+ OPCODE(pcmpeqw, LEG(NP, 0F, 0, 0x75), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 75 /r: PCMPEQW xmm1,xmm2/m128 */
++OPCODE(pcmpeqw, LEG(66, 0F, 0, 0x75), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 76 /r: PCMPEQD mm,mm/m64 */
+ OPCODE(pcmpeqd, LEG(NP, 0F, 0, 0x76), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 76 /r: PCMPEQD xmm1,xmm2/m128 */
++OPCODE(pcmpeqd, LEG(66, 0F, 0, 0x76), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 64 /r: PCMPGTB mm,mm/m64 */
+ OPCODE(pcmpgtb, LEG(NP, 0F, 0, 0x64), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 64 /r: PCMPGTB xmm1,xmm2/m128 */
++OPCODE(pcmpgtb, LEG(66, 0F, 0, 0x64), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 65 /r: PCMPGTW mm,mm/m64 */
+ OPCODE(pcmpgtw, LEG(NP, 0F, 0, 0x65), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 65 /r: PCMPGTW xmm1,xmm2/m128 */
++OPCODE(pcmpgtw, LEG(66, 0F, 0, 0x65), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 66 /r: PCMPGTD mm,mm/m64 */
+ OPCODE(pcmpgtd, LEG(NP, 0F, 0, 0x66), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 66 /r: PCMPGTD xmm1,xmm2/m128 */
++OPCODE(pcmpgtd, LEG(66, 0F, 0, 0x66), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F C2 /r ib: CMPPS xmm1, xmm2/m128, imm8 */
+ OPCODE(cmpps, LEG(NP, 0F, 0, 0xc2), SSE, WRRR, Vdq, Vdq, Wdq, Ib)
++/* 66 0F C2 /r ib: CMPPD xmm1, xmm2/m128, imm8 */
++OPCODE(cmppd, LEG(66, 0F, 0, 0xc2), SSE2, WRRR, Vdq, Vdq, Wdq, Ib)
+ /* F3 0F C2 /r ib: CMPSS xmm1, xmm2/m32, imm8 */
+ OPCODE(cmpss, LEG(F3, 0F, 0, 0xc2), SSE, WRRR, Vd, Vd, Wd, Ib)
++/* F2 0F C2 /r ib: CMPSD xmm1, xmm2/m64, imm8 */
++OPCODE(cmpsd, LEG(F2, 0F, 0, 0xc2), SSE2, WRRR, Vq, Vq, Wq, Ib)
+ /* NP 0F 2E /r: UCOMISS xmm1, xmm2/m32 */
+ OPCODE(ucomiss, LEG(NP, 0F, 0, 0x2e), SSE, RR, Vd, Wd)
++/* 66 0F 2E /r: UCOMISD xmm1, xmm2/m64 */
++OPCODE(ucomisd, LEG(66, 0F, 0, 0x2e), SSE2, RR, Vq, Wq)
+ /* NP 0F 2F /r: COMISS xmm1, xmm2/m32 */
+ OPCODE(comiss, LEG(NP, 0F, 0, 0x2f), SSE, RR, Vd, Wd)
++/* 66 0F 2F /r: COMISD xmm1, xmm2/m64 */
++OPCODE(comisd, LEG(66, 0F, 0, 0x2f), SSE2, RR, Vq, Wq)
+ /* NP 0F DB /r: PAND mm, mm/m64 */
+ OPCODE(pand, LEG(NP, 0F, 0, 0xdb), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F DB /r: PAND xmm1, xmm2/m128 */
++OPCODE(pand, LEG(66, 0F, 0, 0xdb), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 54 /r: ANDPS xmm1, xmm2/m128 */
+ OPCODE(andps, LEG(NP, 0F, 0, 0x54), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 54 /r: ANDPD xmm1, xmm2/m128 */
++OPCODE(andpd, LEG(66, 0F, 0, 0x54), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F DF /r: PANDN mm, mm/m64 */
+ OPCODE(pandn, LEG(NP, 0F, 0, 0xdf), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F DF /r: PANDN xmm1, xmm2/m128 */
++OPCODE(pandn, LEG(66, 0F, 0, 0xdf), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 55 /r: ANDNPS xmm1, xmm2/m128 */
+ OPCODE(andnps, LEG(NP, 0F, 0, 0x55), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 55 /r: ANDNPD xmm1, xmm2/m128 */
++OPCODE(andnpd, LEG(66, 0F, 0, 0x55), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F EB /r: POR mm, mm/m64 */
+ OPCODE(por, LEG(NP, 0F, 0, 0xeb), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F EB /r: POR xmm1, xmm2/m128 */
++OPCODE(por, LEG(66, 0F, 0, 0xeb), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 56 /r: ORPS xmm1, xmm2/m128 */
+ OPCODE(orps, LEG(NP, 0F, 0, 0x56), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 56 /r: ORPD xmm1, xmm2/m128 */
++OPCODE(orpd, LEG(66, 0F, 0, 0x56), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F EF /r: PXOR mm, mm/m64 */
+ OPCODE(pxor, LEG(NP, 0F, 0, 0xef), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F EF /r: PXOR xmm1, xmm2/m128 */
++OPCODE(pxor, LEG(66, 0F, 0, 0xef), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 57 /r: XORPS xmm1, xmm2/m128 */
+ OPCODE(xorps, LEG(NP, 0F, 0, 0x57), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 57 /r: XORPD xmm1, xmm2/m128 */
++OPCODE(xorpd, LEG(66, 0F, 0, 0x57), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F F1 /r: PSLLW mm, mm/m64 */
+ OPCODE(psllw, LEG(NP, 0F, 0, 0xf1), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F F1 /r: PSLLW xmm1, xmm2/m128 */
++OPCODE(psllw, LEG(66, 0F, 0, 0xf1), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F F2 /r: PSLLD mm, mm/m64 */
+ OPCODE(pslld, LEG(NP, 0F, 0, 0xf2), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F F2 /r: PSLLD xmm1, xmm2/m128 */
++OPCODE(pslld, LEG(66, 0F, 0, 0xf2), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F F3 /r: PSLLQ mm, mm/m64 */
+ OPCODE(psllq, LEG(NP, 0F, 0, 0xf3), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F F3 /r: PSLLQ xmm1, xmm2/m128 */
++OPCODE(psllq, LEG(66, 0F, 0, 0xf3), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F D1 /r: PSRLW mm, mm/m64 */
+ OPCODE(psrlw, LEG(NP, 0F, 0, 0xd1), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F D1 /r: PSRLW xmm1, xmm2/m128 */
++OPCODE(psrlw, LEG(66, 0F, 0, 0xd1), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F D2 /r: PSRLD mm, mm/m64 */
+ OPCODE(psrld, LEG(NP, 0F, 0, 0xd2), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F D2 /r: PSRLD xmm1, xmm2/m128 */
++OPCODE(psrld, LEG(66, 0F, 0, 0xd2), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F D3 /r: PSRLQ mm, mm/m64 */
+ OPCODE(psrlq, LEG(NP, 0F, 0, 0xd3), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F D3 /r: PSRLQ xmm1, xmm2/m128 */
++OPCODE(psrlq, LEG(66, 0F, 0, 0xd3), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E1 /r: PSRAW mm,mm/m64 */
+ OPCODE(psraw, LEG(NP, 0F, 0, 0xe1), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F E1 /r: PSRAW xmm1,xmm2/m128 */
++OPCODE(psraw, LEG(66, 0F, 0, 0xe1), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F E2 /r: PSRAD mm,mm/m64 */
+ OPCODE(psrad, LEG(NP, 0F, 0, 0xe2), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F E2 /r: PSRAD xmm1,xmm2/m128 */
++OPCODE(psrad, LEG(66, 0F, 0, 0xe2), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 63 /r: PACKSSWB mm1, mm2/m64 */
+ OPCODE(packsswb, LEG(NP, 0F, 0, 0x63), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 63 /r: PACKSSWB xmm1, xmm2/m128 */
++OPCODE(packsswb, LEG(66, 0F, 0, 0x63), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 6B /r: PACKSSDW mm1, mm2/m64 */
+ OPCODE(packssdw, LEG(NP, 0F, 0, 0x6b), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 6B /r: PACKSSDW xmm1, xmm2/m128 */
++OPCODE(packssdw, LEG(66, 0F, 0, 0x6b), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 67 /r: PACKUSWB mm, mm/m64 */
+ OPCODE(packuswb, LEG(NP, 0F, 0, 0x67), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 67 /r: PACKUSWB xmm1, xmm2/m128 */
++OPCODE(packuswb, LEG(66, 0F, 0, 0x67), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 68 /r: PUNPCKHBW mm, mm/m64 */
+ OPCODE(punpckhbw, LEG(NP, 0F, 0, 0x68), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 68 /r: PUNPCKHBW xmm1, xmm2/m128 */
++OPCODE(punpckhbw, LEG(66, 0F, 0, 0x68), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 69 /r: PUNPCKHWD mm, mm/m64 */
+ OPCODE(punpckhwd, LEG(NP, 0F, 0, 0x69), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 69 /r: PUNPCKHWD xmm1, xmm2/m128 */
++OPCODE(punpckhwd, LEG(66, 0F, 0, 0x69), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 6A /r: PUNPCKHDQ mm, mm/m64 */
+ OPCODE(punpckhdq, LEG(NP, 0F, 0, 0x6a), MMX, WRR, Pq, Pq, Qq)
++/* 66 0F 6A /r: PUNPCKHDQ xmm1, xmm2/m128 */
++OPCODE(punpckhdq, LEG(66, 0F, 0, 0x6a), SSE2, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 6D /r: PUNPCKHQDQ xmm1, xmm2/m128 */
++OPCODE(punpckhqdq, LEG(66, 0F, 0, 0x6d), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 60 /r: PUNPCKLBW mm, mm/m32 */
+ OPCODE(punpcklbw, LEG(NP, 0F, 0, 0x60), MMX, WRR, Pq, Pq, Qd)
++/* 66 0F 60 /r: PUNPCKLBW xmm1, xmm2/m128 */
++OPCODE(punpcklbw, LEG(66, 0F, 0, 0x60), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 61 /r: PUNPCKLWD mm, mm/m32 */
+ OPCODE(punpcklwd, LEG(NP, 0F, 0, 0x61), MMX, WRR, Pq, Pq, Qd)
++/* 66 0F 61 /r: PUNPCKLWD xmm1, xmm2/m128 */
++OPCODE(punpcklwd, LEG(66, 0F, 0, 0x61), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 62 /r: PUNPCKLDQ mm, mm/m32 */
+ OPCODE(punpckldq, LEG(NP, 0F, 0, 0x62), MMX, WRR, Pq, Pq, Qd)
++/* 66 0F 62 /r: PUNPCKLDQ xmm1, xmm2/m128 */
++OPCODE(punpckldq, LEG(66, 0F, 0, 0x62), SSE2, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 6C /r: PUNPCKLQDQ xmm1, xmm2/m128 */
++OPCODE(punpcklqdq, LEG(66, 0F, 0, 0x6c), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 14 /r: UNPCKLPS xmm1, xmm2/m128 */
+ OPCODE(unpcklps, LEG(NP, 0F, 0, 0x14), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 14 /r: UNPCKLPD xmm1, xmm2/m128 */
++OPCODE(unpcklpd, LEG(66, 0F, 0, 0x14), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 15 /r: UNPCKHPS xmm1, xmm2/m128 */
+ OPCODE(unpckhps, LEG(NP, 0F, 0, 0x15), SSE, WRR, Vdq, Vdq, Wdq)
++/* 66 0F 15 /r: UNPCKHPD xmm1, xmm2/m128 */
++OPCODE(unpckhpd, LEG(66, 0F, 0, 0x15), SSE2, WRR, Vdq, Vdq, Wdq)
+ /* NP 0F 70 /r ib: PSHUFW mm1, mm2/m64, imm8 */
+ OPCODE(pshufw, LEG(NP, 0F, 0, 0x70), SSE, WRR, Pq, Qq, Ib)
++/* F2 0F 70 /r ib: PSHUFLW xmm1, xmm2/m128, imm8 */
++OPCODE(pshuflw, LEG(F2, 0F, 0, 0x70), SSE2, WRR, Vdq, Wdq, Ib)
++/* F3 0F 70 /r ib: PSHUFHW xmm1, xmm2/m128, imm8 */
++OPCODE(pshufhw, LEG(F3, 0F, 0, 0x70), SSE2, WRR, Vdq, Wdq, Ib)
++/* 66 0F 70 /r ib: PSHUFD xmm1, xmm2/m128, imm8 */
++OPCODE(pshufd, LEG(66, 0F, 0, 0x70), SSE2, WRR, Vdq, Wdq, Ib)
+ /* NP 0F C6 /r ib: SHUFPS xmm1, xmm3/m128, imm8 */
+ OPCODE(shufps, LEG(NP, 0F, 0, 0xc6), SSE, WRRR, Vdq, Vdq, Wdq, Ib)
++/* 66 0F C6 /r ib: SHUFPD xmm1, xmm2/m128, imm8 */
++OPCODE(shufpd, LEG(66, 0F, 0, 0xc6), SSE2, WRRR, Vdq, Vdq, Wdq, Ib)
+ /* NP 0F C4 /r ib: PINSRW mm, r32/m16, imm8 */
+ OPCODE(pinsrw, LEG(NP, 0F, 0, 0xc4), SSE, WRRR, Pq, Pq, RdMw, Ib)
++/* 66 0F C4 /r ib: PINSRW xmm, r32/m16, imm8 */
++OPCODE(pinsrw, LEG(66, 0F, 0, 0xc4), SSE2, WRRR, Vdq, Vdq, RdMw, Ib)
+ /* NP 0F C5 /r ib: PEXTRW r32, mm, imm8 */
+ OPCODE(pextrw, LEG(NP, 0F, 0, 0xc5), SSE, WRR, Gd, Nq, Ib)
+ /* NP REX.W 0F C5 /r ib: PEXTRW r64, mm, imm8 */
+ OPCODE(pextrw, LEG(NP, 0F, 1, 0xc5), SSE, WRR, Gq, Nq, Ib)
++/* 66 0F C5 /r ib: PEXTRW r32, xmm, imm8 */
++OPCODE(pextrw, LEG(66, 0F, 0, 0xc5), SSE2, WRR, Gd, Udq, Ib)
++/* 66 REX.W 0F C5 /r ib: PEXTRW r64, xmm, imm8 */
++OPCODE(pextrw, LEG(66, 0F, 1, 0xc5), SSE2, WRR, Gq, Udq, Ib)
+ /* NP 0F 2A /r: CVTPI2PS xmm, mm/m64 */
+ OPCODE(cvtpi2ps, LEG(NP, 0F, 0, 0x2a), SSE, WR, Vdq, Qq)
+ /* F3 0F 2A /r: CVTSI2SS xmm1,r/m32 */
+ OPCODE(cvtsi2ss, LEG(F3, 0F, 0, 0x2a), SSE, WR, Vd, Ed)
+ /* F3 REX.W 0F 2A /r: CVTSI2SS xmm1,r/m64 */
+ OPCODE(cvtsi2ss, LEG(F3, 0F, 1, 0x2a), SSE, WR, Vd, Eq)
++/* 66 0F 2A /r: CVTPI2PD xmm, mm/m64 */
++OPCODE(cvtpi2pd, LEG(66, 0F, 0, 0x2a), SSE2, WR, Vdq, Qq)
++/* F2 0F 2A /r: CVTSI2SD xmm1,r32/m32 */
++OPCODE(cvtsi2sd, LEG(F2, 0F, 0, 0x2a), SSE2, WR, Vq, Ed)
++/* F2 REX.W 0F 2A /r: CVTSI2SD xmm1,r/m64 */
++OPCODE(cvtsi2sd, LEG(F2, 0F, 1, 0x2a), SSE2, WR, Vq, Eq)
+ /* NP 0F 2D /r: CVTPS2PI mm, xmm/m64 */
+ OPCODE(cvtps2pi, LEG(NP, 0F, 0, 0x2d), SSE, WR, Pq, Wq)
+ /* F3 0F 2D /r: CVTSS2SI r32,xmm1/m32 */
+ OPCODE(cvtss2si, LEG(F3, 0F, 0, 0x2d), SSE, WR, Gd, Wd)
+ /* F3 REX.W 0F 2D /r: CVTSS2SI r64,xmm1/m32 */
+ OPCODE(cvtss2si, LEG(F3, 0F, 1, 0x2d), SSE, WR, Gq, Wd)
++/* 66 0F 2D /r: CVTPD2PI mm, xmm/m128 */
++OPCODE(cvtpd2pi, LEG(66, 0F, 0, 0x2d), SSE2, WR, Pq, Wdq)
++/* F2 0F 2D /r: CVTSD2SI r32,xmm1/m64 */
++OPCODE(cvtsd2si, LEG(F2, 0F, 0, 0x2d), SSE2, WR, Gd, Wq)
++/* F2 REX.W 0F 2D /r: CVTSD2SI r64,xmm1/m64 */
++OPCODE(cvtsd2si, LEG(F2, 0F, 1, 0x2d), SSE2, WR, Gq, Wq)
+ /* NP 0F 2C /r: CVTTPS2PI mm, xmm/m64 */
+ OPCODE(cvttps2pi, LEG(NP, 0F, 0, 0x2c), SSE, WR, Pq, Wq)
+ /* F3 0F 2C /r: CVTTSS2SI r32,xmm1/m32 */
+ OPCODE(cvttss2si, LEG(F3, 0F, 0, 0x2c), SSE, WR, Gd, Wd)
+ /* F3 REX.W 0F 2C /r: CVTTSS2SI r64,xmm1/m32 */
+ OPCODE(cvttss2si, LEG(F3, 0F, 1, 0x2c), SSE, WR, Gq, Wd)
++/* 66 0F 2C /r: CVTTPD2PI mm, xmm/m128 */
++OPCODE(cvttpd2pi, LEG(66, 0F, 0, 0x2c), SSE2, WR, Pq, Wdq)
++/* F2 0F 2C /r: CVTTSD2SI r32,xmm1/m64 */
++OPCODE(cvttsd2si, LEG(F2, 0F, 0, 0x2c), SSE2, WR, Gd, Wq)
++/* F2 REX.W 0F 2C /r: CVTTSD2SI r64,xmm1/m64 */
++OPCODE(cvttsd2si, LEG(F2, 0F, 1, 0x2c), SSE2, WR, Gq, Wq)
++/* F2 0F E6 /r: CVTPD2DQ xmm1, xmm2/m128 */
++OPCODE(cvtpd2dq, LEG(F2, 0F, 0, 0xe6), SSE2, WR, Vdq, Wdq)
++/* 66 0F E6 /r: CVTTPD2DQ xmm1, xmm2/m128 */
++OPCODE(cvttpd2dq, LEG(66, 0F, 0, 0xe6), SSE2, WR, Vdq, Wdq)
++/* F3 0F E6 /r: CVTDQ2PD xmm1, xmm2/m64 */
++OPCODE(cvtdq2pd, LEG(F3, 0F, 0, 0xe6), SSE2, WR, Vdq, Wq)
++/* NP 0F 5A /r: CVTPS2PD xmm1, xmm2/m64 */
++OPCODE(cvtps2pd, LEG(NP, 0F, 0, 0x5a), SSE2, WR, Vdq, Wq)
++/* 66 0F 5A /r: CVTPD2PS xmm1, xmm2/m128 */
++OPCODE(cvtpd2ps, LEG(66, 0F, 0, 0x5a), SSE2, WR, Vdq, Wdq)
++/* F3 0F 5A /r: CVTSS2SD xmm1, xmm2/m32 */
++OPCODE(cvtss2sd, LEG(F3, 0F, 0, 0x5a), SSE2, WR, Vq, Wd)
++/* F2 0F 5A /r: CVTSD2SS xmm1, xmm2/m64 */
++OPCODE(cvtsd2ss, LEG(F2, 0F, 0, 0x5a), SSE2, WR, Vd, Wq)
++/* NP 0F 5B /r: CVTDQ2PS xmm1, xmm2/m128 */
++OPCODE(cvtdq2ps, LEG(NP, 0F, 0, 0x5b), SSE2, WR, Vdq, Wdq)
++/* 66 0F 5B /r: CVTPS2DQ xmm1, xmm2/m128 */
++OPCODE(cvtps2dq, LEG(66, 0F, 0, 0x5b), SSE2, WR, Vdq, Wdq)
++/* F3 0F 5B /r: CVTTPS2DQ xmm1, xmm2/m128 */
++OPCODE(cvttps2dq, LEG(F3, 0F, 0, 0x5b), SSE2, WR, Vdq, Wdq)
+ /* NP 0F F7 /r: MASKMOVQ mm1, mm2 */
+ OPCODE(maskmovq, LEG(NP, 0F, 0, 0xf7), SSE, RR, Pq, Nq)
++/* 66 0F F7 /r: MASKMOVDQU xmm1, xmm2 */
++OPCODE(maskmovdqu, LEG(66, 0F, 0, 0xf7), SSE2, RR, Vdq, Udq)
+ /* NP 0F 2B /r: MOVNTPS m128, xmm1 */
+ OPCODE(movntps, LEG(NP, 0F, 0, 0x2b), SSE, WR, Mdq, Vdq)
++/* 66 0F 2B /r: MOVNTPD m128, xmm1 */
++OPCODE(movntpd, LEG(66, 0F, 0, 0x2b), SSE2, WR, Mdq, Vdq)
++/* NP 0F C3 /r: MOVNTI m32, r32 */
++OPCODE(movnti, LEG(NP, 0F, 0, 0xc3), SSE2, WR, Md, Gd)
++/* NP REX.W + 0F C3 /r: MOVNTI m64, r64 */
++OPCODE(movnti, LEG(NP, 0F, 1, 0xc3), SSE2, WR, Mq, Gq)
+ /* NP 0F E7 /r: MOVNTQ m64, mm */
+ OPCODE(movntq, LEG(NP, 0F, 0, 0xe7), SSE, WR, Mq, Pq)
++/* 66 0F E7 /r: MOVNTDQ m128, xmm1 */
++OPCODE(movntdq, LEG(66, 0F, 0, 0xe7), SSE2, WR, Mdq, Vdq)
++/* F3 90: PAUSE */
++OPCODE(pause, LEG(F3, NA, 0, 0x90), SSE2, )
+ /* NP 0F 77: EMMS */
+ OPCODE(emms, LEG(NP, 0F, 0, 0x77), MMX, )
  
-+GEN_INSN2(movq, Vdq, Eq);       /* forward declaration */
-+GEN_INSN2(movd, Vdq, Ed)
-+{
-+    const insnop_arg_t(Eq) arg2_r64 = tcg_temp_new_i64();
-+    tcg_gen_extu_i32_i64(arg2_r64, arg2);
-+    gen_insn2(movq, Vdq, Eq)(env, s, arg1, arg2_r64);
-+    tcg_temp_free_i64(arg2_r64);
-+}
++OPCODE_GRP(grp12_LEG_66, LEG(66, 0F, 0, 0x71))
++OPCODE_GRP_BEGIN(grp12_LEG_66)
++    /* 66 0F 71 /6 ib: PSLLW xmm1, imm8 */
++    OPCODE_GRPMEMB(grp12_LEG_66, psllw, 6, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 71 /2 ib: PSRLW xmm1, imm8 */
++    OPCODE_GRPMEMB(grp12_LEG_66, psrlw, 2, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 71 /4 ib: PSRAW xmm1,imm8 */
++    OPCODE_GRPMEMB(grp12_LEG_66, psraw, 4, SSE2, WRR, Udq, Udq, Ib)
++OPCODE_GRP_END(grp12_LEG_66)
 +
-+GEN_INSN2(movd, Ed, Vdq)
-+{
-+    const insnop_arg_t(Vdq) ofs = offsetof(ZMMReg, ZMM_L(0));
-+    tcg_gen_ld_i32(arg1, cpu_env, arg2 + ofs);
-+}
-+
- GEN_INSN2(movq, Pq, Eq)
- {
-     const insnop_arg_t(Pq) ofs = offsetof(MMXReg, MMX_Q(0));
-@@ -5403,12 +5418,53 @@ GEN_INSN2(movq, Eq, Pq)
-     tcg_gen_ld_i64(arg1, cpu_env, arg2 + ofs);
- }
+ OPCODE_GRP(grp12_LEG_NP, LEG(NP, 0F, 0, 0x71))
+ OPCODE_GRP_BEGIN(grp12_LEG_NP)
+     /* NP 0F 71 /6 ib: PSLLW mm1, imm8 */
+@@ -288,6 +582,16 @@ OPCODE_GRP_BEGIN(grp12_LEG_NP)
+     OPCODE_GRPMEMB(grp12_LEG_NP, psraw, 4, MMX, WRR, Nq, Nq, Ib)
+ OPCODE_GRP_END(grp12_LEG_NP)
  
-+GEN_INSN2(movq, Vdq, Eq)
-+{
-+    const insnop_arg_t(Vdq) ofs0 = offsetof(ZMMReg, ZMM_Q(0));
-+    tcg_gen_st_i64(arg2, cpu_env, arg1 + ofs0);
++OPCODE_GRP(grp13_LEG_66, LEG(66, 0F, 0, 0x72))
++OPCODE_GRP_BEGIN(grp13_LEG_66)
++    /* 66 0F 72 /6 ib: PSLLD xmm1, imm8 */
++    OPCODE_GRPMEMB(grp13_LEG_66, pslld, 6, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 72 /2 ib: PSRLD xmm1, imm8 */
++    OPCODE_GRPMEMB(grp13_LEG_66, psrld, 2, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 72 /4 ib: PSRAD xmm1,imm8 */
++    OPCODE_GRPMEMB(grp13_LEG_66, psrad, 4, SSE2, WRR, Udq, Udq, Ib)
++OPCODE_GRP_END(grp13_LEG_66)
 +
-+    const insnop_arg_t(Vdq) ofs1 = offsetof(ZMMReg, ZMM_Q(1));
-+    tcg_gen_movi_i64(arg2, 0);
-+    tcg_gen_st_i64(arg2, cpu_env, arg1 + ofs1);
-+}
-+
-+GEN_INSN2(movq, Eq, Vdq)
-+{
-+    const insnop_arg_t(Vdq) ofs = offsetof(ZMMReg, ZMM_Q(0));
-+    tcg_gen_ld_i64(arg1, cpu_env, arg2 + ofs);
-+}
-+
- DEF_GEN_INSN2_GVEC_MM(movq, mov, Pq, Qq, MO_64)
- DEF_GEN_INSN2_GVEC_MM(movq, mov, Qq, Pq, MO_64)
-+
-+GEN_INSN2(movq, Vdq, Wq)
-+{
-+    const insnop_arg_t(Vdq) dofs = offsetof(ZMMReg, ZMM_Q(0));
-+    const insnop_arg_t(Wq) aofs = offsetof(ZMMReg, ZMM_Q(0));
-+    gen_op_movq(s, arg1 + dofs, arg2 + aofs);
-+
-+    const TCGv_i64 r64z = tcg_const_i64(0);
-+    tcg_gen_st_i64(r64z, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
-+    tcg_temp_free_i64(r64z);
-+}
-+
-+GEN_INSN2(movq, UdqMq, Vq)
-+{
-+    gen_insn2(movq, Vdq, Wq)(env, s, arg1, arg2);
-+}
-+
- DEF_GEN_INSN2_GVEC_XMM(movaps, mov, Vdq, Wdq, MO_64)
- DEF_GEN_INSN2_GVEC_XMM(movaps, mov, Wdq, Vdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movapd, mov, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movapd, mov, Wdq, Vdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movdqa, mov, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movdqa, mov, Wdq, Vdq, MO_64)
- DEF_GEN_INSN2_GVEC_XMM(movups, mov, Vdq, Wdq, MO_64)
- DEF_GEN_INSN2_GVEC_XMM(movups, mov, Wdq, Vdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movupd, mov, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movupd, mov, Wdq, Vdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movdqu, mov, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN2_GVEC_XMM(movdqu, mov, Wdq, Vdq, MO_64)
+ OPCODE_GRP(grp13_LEG_NP, LEG(NP, 0F, 0, 0x72))
+ OPCODE_GRP_BEGIN(grp13_LEG_NP)
+     /* NP 0F 72 /6 ib: PSLLD mm, imm8 */
+@@ -298,6 +602,18 @@ OPCODE_GRP_BEGIN(grp13_LEG_NP)
+     OPCODE_GRPMEMB(grp13_LEG_NP, psrad, 4, MMX, WRR, Nq, Nq, Ib)
+ OPCODE_GRP_END(grp13_LEG_NP)
  
- GEN_INSN2(movss, Wd, Vd);       /* forward declaration */
- GEN_INSN4(movss, Vdq, Vdq, Wd, modrm_mod)
-@@ -5442,6 +5498,44 @@ GEN_INSN2(movss, Wd, Vd)
-     gen_op_movl(s, arg1 + dofs, arg2 + aofs);
- }
- 
-+GEN_INSN2(movsd, Wq, Vq);       /* forward declaration */
-+GEN_INSN4(movsd, Vdq, Vdq, Wq, modrm_mod)
-+{
-+    assert(arg1 == arg2);
++OPCODE_GRP(grp14_LEG_66, LEG(66, 0F, 0, 0x73))
++OPCODE_GRP_BEGIN(grp14_LEG_66)
++    /* 66 0F 73 /6 ib: PSLLQ xmm1, imm8 */
++    OPCODE_GRPMEMB(grp14_LEG_66, psllq, 6, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 73 /7 ib: PSLLDQ xmm1, imm8 */
++    OPCODE_GRPMEMB(grp14_LEG_66, pslldq, 7, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 73 /2 ib: PSRLQ xmm1, imm8 */
++    OPCODE_GRPMEMB(grp14_LEG_66, psrlq, 2, SSE2, WRR, Udq, Udq, Ib)
++    /* 66 0F 73 /3 ib: PSRLDQ xmm1, imm8 */
++    OPCODE_GRPMEMB(grp14_LEG_66, psrldq, 3, SSE2, WRR, Udq, Udq, Ib)
++OPCODE_GRP_END(grp14_LEG_66)
 +
-+    if (arg4 == 3) {
-+        /* merging movsd */
-+        gen_insn2(movsd, Wq, Vq)(env, s, arg1, arg3);
-+    } else {
-+        /* zero-extending movsd */
-+        gen_insn2(movq, Vdq, Wq)(env, s, arg1, arg3);
-+    }
-+}
-+
-+GEN_INSN2(movsd, Wq, Vq)
-+{
-+    const size_t ofs = offsetof(ZMMReg, ZMM_Q(0));
-+    gen_op_movq(s, arg1 + ofs, arg2 + ofs);
-+}
-+
-+GEN_INSN2(movq2dq, Vdq, Nq)
-+{
-+    const insnop_arg_t(Vdq) dofs = offsetof(ZMMReg, ZMM_Q(0));
-+    const insnop_arg_t(Nq) aofs = offsetof(MMXReg, MMX_Q(0));
-+    gen_op_movq(s, arg1 + dofs, arg2 + aofs);
-+
-+    const TCGv_i64 r64z = tcg_const_i64(0);
-+    tcg_gen_st_i64(r64z, cpu_env, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
-+    tcg_temp_free_i64(r64z);
-+}
-+
-+GEN_INSN2(movdq2q, Pq, Uq)
-+{
-+    const insnop_arg_t(Pq) dofs = offsetof(MMXReg, MMX_Q(0));
-+    const insnop_arg_t(Uq) aofs = offsetof(ZMMReg, ZMM_Q(0));
-+    gen_op_movq(s, arg1 + dofs, arg2 + aofs);
-+}
-+
- GEN_INSN2(movhlps, Vq, UdqMhq)
- {
-     const size_t dofs = offsetof(ZMMReg, ZMM_Q(0));
-@@ -5455,6 +5549,17 @@ GEN_INSN2(movlps, Mq, Vq)
-     gen_stq_env_A0(s, arg2 + offsetof(ZMMReg, ZMM_Q(0)));
- }
- 
-+GEN_INSN2(movlpd, Vq, Mq)
-+{
-+    assert(arg2 == s->A0);
-+    gen_ldq_env_A0(s, arg1 + offsetof(ZMMReg, ZMM_Q(0)));
-+}
-+
-+GEN_INSN2(movlpd, Mq, Vq)
-+{
-+    gen_insn2(movlps, Mq, Vq)(env, s, arg1, arg2);
-+}
-+
- GEN_INSN3(movlhps, Vdq, Vq, Wq)
- {
-     assert(arg1 == arg2);
-@@ -5470,6 +5575,18 @@ GEN_INSN2(movhps, Mq, Vdq)
-     gen_stq_env_A0(s, arg2 + offsetof(ZMMReg, ZMM_Q(1)));
- }
- 
-+GEN_INSN3(movhpd, Vdq, Vd, Mq)
-+{
-+    assert(arg1 == arg2);
-+    assert(arg3 == s->A0);
-+    gen_ldq_env_A0(s, arg1 + offsetof(ZMMReg, ZMM_Q(1)));
-+}
-+
-+GEN_INSN2(movhpd, Mq, Vdq)
-+{
-+    gen_insn2(movhps, Mq, Vdq)(env, s, arg1, arg2);
-+}
-+
- DEF_GEN_INSN2_HELPER_DEP(pmovmskb, pmovmskb_mmx, Gd, Nq)
- 
- GEN_INSN2(pmovmskb, Gq, Nq)
-@@ -5480,6 +5597,16 @@ GEN_INSN2(pmovmskb, Gq, Nq)
-     tcg_temp_free_i32(arg1_r32);
- }
- 
-+DEF_GEN_INSN2_HELPER_DEP(pmovmskb, pmovmskb_xmm, Gd, Udq)
-+
-+GEN_INSN2(pmovmskb, Gq, Udq)
-+{
-+    const TCGv_i32 arg1_r32 = tcg_temp_new_i32();
-+    gen_insn2(pmovmskb, Gd, Udq)(env, s, arg1_r32, arg2);
-+    tcg_gen_extu_i32_i64(arg1, arg1_r32);
-+    tcg_temp_free_i32(arg1_r32);
-+}
-+
- DEF_GEN_INSN2_HELPER_DEP(movmskps, movmskps, Gd, Udq)
- 
- GEN_INSN2(movmskps, Gq, Udq)
-@@ -5490,78 +5617,155 @@ GEN_INSN2(movmskps, Gq, Udq)
-     tcg_temp_free_i32(arg1_r32);
- }
- 
-+DEF_GEN_INSN2_HELPER_DEP(movmskpd, movmskpd, Gd, Udq)
-+
-+GEN_INSN2(movmskpd, Gq, Udq)
-+{
-+    const TCGv_i32 arg1_r32 = tcg_temp_new_i32();
-+    gen_insn2(movmskpd, Gd, Udq)(env, s, arg1_r32, arg2);
-+    tcg_gen_extu_i32_i64(arg1, arg1_r32);
-+    tcg_temp_free_i32(arg1_r32);
-+}
-+
- DEF_GEN_INSN3_GVEC_MM(paddb, add, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(paddb, add, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(paddw, add, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(paddw, add, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_GVEC_MM(paddd, add, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_XMM(paddd, add, Vdq, Vdq, Wdq, MO_32)
-+DEF_GEN_INSN3_GVEC_MM(paddq, add, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(paddq, add, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_MM(paddsb, ssadd, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(paddsb, ssadd, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(paddsw, ssadd, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(paddsw, ssadd, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_GVEC_MM(paddusb, usadd, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(paddusb, usadd, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(paddusw, usadd, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(paddusw, usadd, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_HELPER_EPP(addps, addps, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(addss, addss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(addpd, addpd, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(addsd, addsd, Vq, Vq, Wq)
- 
- DEF_GEN_INSN3_GVEC_MM(psubb, sub, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(psubb, sub, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(psubw, sub, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(psubw, sub, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_GVEC_MM(psubd, sub, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_XMM(psubd, sub, Vdq, Vdq, Wdq, MO_32)
-+DEF_GEN_INSN3_GVEC_MM(psubq, sub, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(psubq, sub, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_MM(psubsb, sssub, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(psubsb, sssub, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(psubsw, sssub, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(psubsw, sssub, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_GVEC_MM(psubusb, ussub, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(psubusb, ussub, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(psubusw, ussub, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(psubusw, ussub, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_HELPER_EPP(subps, subps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(subpd, subpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(subss, subss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(subsd, subsd, Vq, Vq, Wq)
- 
- DEF_GEN_INSN3_HELPER_EPP(pmullw, pmullw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmullw, pmullw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(pmulhw, pmulhw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmulhw, pmulhw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(pmulhuw, pmulhuw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmulhuw, pmulhuw_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(pmuludq, pmuludq_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmuludq, pmuludq_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(mulps, mulps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(mulpd, mulpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(mulss, mulss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(mulsd, mulsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(pmaddwd, pmaddwd_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pmaddwd, pmaddwd_xmm, Vdq, Vdq, Wdq)
- 
- DEF_GEN_INSN3_HELPER_EPP(divps, divps, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(divss, divss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(divpd, divpd, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(divsd, divsd, Vq, Vq, Wq)
- 
- DEF_GEN_INSN2_HELPER_EPP(rcpps, rcpps, Vdq, Wdq)
- DEF_GEN_INSN2_HELPER_EPP(rcpss, rcpss, Vd, Wd)
- DEF_GEN_INSN2_HELPER_EPP(sqrtps, sqrtps, Vdq, Wdq)
-+DEF_GEN_INSN2_HELPER_EPP(sqrtpd, sqrtpd, Vdq, Wdq)
- DEF_GEN_INSN2_HELPER_EPP(sqrtss, sqrtss, Vd, Wd)
-+DEF_GEN_INSN2_HELPER_EPP(sqrtsd, sqrtsd, Vq, Wq)
- DEF_GEN_INSN2_HELPER_EPP(rsqrtps, rsqrtps, Vdq, Wdq)
- DEF_GEN_INSN2_HELPER_EPP(rsqrtss, rsqrtss, Vd, Wd)
- 
- DEF_GEN_INSN3_GVEC_MM(pminub, umin, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(pminub, umin, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(pminsw, smin, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(pminsw, smin, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_HELPER_EPP(minps, minps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(minpd, minpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(minss, minss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(minsd, minsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_GVEC_MM(pmaxub, umax, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(pmaxub, umax, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(pmaxsw, smax, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(pmaxsw, smax, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_HELPER_EPP(maxps, maxps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(maxpd, maxpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(maxss, maxss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(maxsd, maxsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pavgb, pavgb_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pavgw, pavgw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psadbw, psadbw_xmm, Vdq, Vdq, Wdq)
- 
- DEF_GEN_INSN3_GVEC_MM(pcmpeqb, cmpeq, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(pcmpeqb, cmpeq, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(pcmpeqw, cmpeq, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(pcmpeqw, cmpeq, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_GVEC_MM(pcmpeqd, cmpeq, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_XMM(pcmpeqd, cmpeq, Vdq, Vdq, Wdq, MO_32)
- DEF_GEN_INSN3_GVEC_MM(pcmpgtb, cmpgt, Pq, Pq, Qq, MO_8)
-+DEF_GEN_INSN3_GVEC_XMM(pcmpgtb, cmpgt, Vdq, Vdq, Wdq, MO_8)
- DEF_GEN_INSN3_GVEC_MM(pcmpgtw, cmpgt, Pq, Pq, Qq, MO_16)
-+DEF_GEN_INSN3_GVEC_XMM(pcmpgtw, cmpgt, Vdq, Vdq, Wdq, MO_16)
- DEF_GEN_INSN3_GVEC_MM(pcmpgtd, cmpgt, Pq, Pq, Qq, MO_32)
-+DEF_GEN_INSN3_GVEC_XMM(pcmpgtd, cmpgt, Vdq, Vdq, Wdq, MO_32)
- 
- DEF_GEN_INSN3_HELPER_EPP(cmpeqps, cmpeqps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpeqpd, cmpeqpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpeqss, cmpeqss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpeqsd, cmpeqsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpltps, cmpltps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpltpd, cmpltpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpltss, cmpltss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpltsd, cmpltsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpleps, cmpleps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmplepd, cmplepd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpless, cmpless, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmplesd, cmplesd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpunordps, cmpunordps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpunordpd, cmpunordpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpunordss, cmpunordss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpunordsd, cmpunordsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpneqps, cmpneqps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpneqpd, cmpneqpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpneqss, cmpneqss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpneqsd, cmpneqsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpnltps, cmpnltps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpnltpd, cmpnltpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpnltss, cmpnltss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpnltsd, cmpnltsd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpnleps, cmpnleps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpnlepd, cmpnlepd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpnless, cmpnless, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpnlesd, cmpnlesd, Vq, Vq, Wq)
- DEF_GEN_INSN3_HELPER_EPP(cmpordps, cmpordps, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(cmpordpd, cmpordpd, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(cmpordss, cmpordss, Vd, Vd, Wd)
-+DEF_GEN_INSN3_HELPER_EPP(cmpordsd, cmpordsd, Vq, Vq, Wq)
- 
- GEN_INSN4(cmpps, Vdq, Vdq, Wdq, Ib)
- {
-@@ -5595,6 +5799,38 @@ GEN_INSN4(cmpps, Vdq, Vdq, Wdq, Ib)
-     g_assert_not_reached();
- }
- 
-+GEN_INSN4(cmppd, Vdq, Vdq, Wdq, Ib)
-+{
-+    switch (arg4 & 7) {
-+    case 0:
-+        gen_insn3(cmpeqpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 1:
-+        gen_insn3(cmpltpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 2:
-+        gen_insn3(cmplepd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 3:
-+        gen_insn3(cmpunordpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 4:
-+        gen_insn3(cmpneqpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 5:
-+        gen_insn3(cmpnltpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 6:
-+        gen_insn3(cmpnlepd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 7:
-+        gen_insn3(cmpordpd, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3);
-+        return;
-+    }
-+
-+    g_assert_not_reached();
-+}
-+
- GEN_INSN4(cmpss, Vd, Vd, Wd, Ib)
- {
-     switch (arg4 & 7) {
-@@ -5627,26 +5863,78 @@ GEN_INSN4(cmpss, Vd, Vd, Wd, Ib)
-     g_assert_not_reached();
- }
- 
-+GEN_INSN4(cmpsd, Vq, Vq, Wq, Ib)
-+{
-+    switch (arg4 & 7) {
-+    case 0:
-+        gen_insn3(cmpeqsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 1:
-+        gen_insn3(cmpltsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 2:
-+        gen_insn3(cmplesd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 3:
-+        gen_insn3(cmpunordsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 4:
-+        gen_insn3(cmpneqsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 5:
-+        gen_insn3(cmpnltsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 6:
-+        gen_insn3(cmpnlesd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    case 7:
-+        gen_insn3(cmpordsd, Vq, Vq, Wq)(env, s, arg1, arg2, arg3);
-+        return;
-+    }
-+
-+    g_assert_not_reached();
-+}
-+
- DEF_GEN_INSN2_HELPER_EPP(comiss, comiss, Vd, Wd)
-+DEF_GEN_INSN2_HELPER_EPP(comisd, comisd, Vq, Wq)
- DEF_GEN_INSN2_HELPER_EPP(ucomiss, ucomiss, Vd, Wd)
-+DEF_GEN_INSN2_HELPER_EPP(ucomisd, ucomisd, Vq, Wq)
- 
- DEF_GEN_INSN3_GVEC_MM(pand, and, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(pand, and, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_XMM(andps, and, Vdq, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(andpd, and, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_MM(pandn, andn, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(pandn, andn, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_XMM(andnps, andn, Vdq, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(andnpd, andn, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_MM(por, or, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(por, or, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_XMM(orps, or, Vdq, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(orpd, or, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_MM(pxor, xor, Pq, Pq, Qq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(pxor, xor, Vdq, Vdq, Wdq, MO_64)
- DEF_GEN_INSN3_GVEC_XMM(xorps, xor, Vdq, Vdq, Wdq, MO_64)
-+DEF_GEN_INSN3_GVEC_XMM(xorpd, xor, Vdq, Vdq, Wdq, MO_64)
- 
- DEF_GEN_INSN3_HELPER_EPP(psllw, psllw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psllw, psllw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(pslld, pslld_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(pslld, pslld_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psllq, psllq_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psllq, psllq_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(pslldq, pslldq_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psrlw, psrlw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrlw, psrlw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psrld, psrld_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrld, psrld_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psrlq, psrlq_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrlq, psrlq_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(psrldq, psrldq_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psraw, psraw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psraw, psraw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_xmm, Vdq, Vdq, Wdq)
- 
- #define DEF_GEN_PSHIFT_IMM_MM(mnem, opT1, opT2)                         \
-     GEN_INSN3(mnem, opT1, opT2, Ib)                                     \
-@@ -5660,31 +5948,70 @@ DEF_GEN_INSN3_HELPER_EPP(psrad, psrad_mmx, Pq, Pq, Qq)
-         gen_insn2(movq, Pq, Eq)(env, s, arg3_mm, arg3_r64);             \
-         gen_insn3(mnem, Pq, Pq, Qq)(env, s, arg1, arg2, arg3_mm);       \
-     }
-+#define DEF_GEN_PSHIFT_IMM_XMM(mnem, opT1, opT2)                        \
-+    GEN_INSN3(mnem, opT1, opT2, Ib)                                     \
-+    {                                                                   \
-+        const uint64_t arg3_ui64 = (uint8_t)arg3;                       \
-+        const insnop_arg_t(Eq) arg3_r64 = s->tmp1_i64;                  \
-+        const insnop_arg_t(Wdq) arg3_xmm =                              \
-+            offsetof(CPUX86State, xmm_t0.ZMM_Q(0));                     \
-+                                                                        \
-+        tcg_gen_movi_i64(arg3_r64, arg3_ui64);                          \
-+        gen_insn2(movq, Vdq, Eq)(env, s, arg3_xmm, arg3_r64);           \
-+        gen_insn3(mnem, Vdq, Vdq, Wdq)(env, s, arg1, arg2, arg3_xmm);   \
-+    }
- 
- DEF_GEN_PSHIFT_IMM_MM(psllw, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psllw, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(pslld, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(pslld, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(psllq, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psllq, Udq, Udq)
-+DEF_GEN_PSHIFT_IMM_XMM(pslldq, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(psrlw, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psrlw, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(psrld, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psrld, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(psrlq, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psrlq, Udq, Udq)
-+DEF_GEN_PSHIFT_IMM_XMM(psrldq, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(psraw, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psraw, Udq, Udq)
- DEF_GEN_PSHIFT_IMM_MM(psrad, Nq, Nq)
-+DEF_GEN_PSHIFT_IMM_XMM(psrad, Udq, Udq)
- 
- DEF_GEN_INSN3_HELPER_EPP(packsswb, packsswb_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(packsswb, packsswb_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(packssdw, packssdw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(packssdw, packssdw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(packuswb, packuswb_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(packuswb, packuswb_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(punpcklbw, punpcklbw_mmx, Pq, Pq, Qd)
-+DEF_GEN_INSN3_HELPER_EPP(punpcklbw, punpcklbw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(punpcklwd, punpcklwd_mmx, Pq, Pq, Qd)
-+DEF_GEN_INSN3_HELPER_EPP(punpcklwd, punpcklwd_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(punpckldq, punpckldq_mmx, Pq, Pq, Qd)
-+DEF_GEN_INSN3_HELPER_EPP(punpckldq, punpckldq_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(punpcklqdq, punpcklqdq_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(punpckhbw, punpckhbw_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhbw, punpckhbw_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(punpckhwd, punpckhwd_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhwd, punpckhwd_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(punpckhdq, punpckhdq_mmx, Pq, Pq, Qq)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhdq, punpckhdq_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(punpckhqdq, punpckhqdq_xmm, Vdq, Vdq, Wdq)
- 
- DEF_GEN_INSN3_HELPER_EPP(unpcklps, punpckldq_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(unpcklpd, punpcklqdq_xmm, Vdq, Vdq, Wdq)
- DEF_GEN_INSN3_HELPER_EPP(unpckhps, punpckhdq_xmm, Vdq, Vdq, Wdq)
-+DEF_GEN_INSN3_HELPER_EPP(unpckhpd, punpckhqdq_xmm, Vdq, Vdq, Wdq)
- 
- DEF_GEN_INSN3_HELPER_PPI(pshufw, pshufw_mmx, Pq, Qq, Ib)
-+DEF_GEN_INSN3_HELPER_PPI(pshuflw, pshuflw_xmm, Vdq, Wdq, Ib)
-+DEF_GEN_INSN3_HELPER_PPI(pshufhw, pshufhw_xmm, Vdq, Wdq, Ib)
-+DEF_GEN_INSN3_HELPER_PPI(pshufd, pshufd_xmm, Vdq, Wdq, Ib)
- DEF_GEN_INSN4_HELPER_PPI(shufps, shufps, Vdq, Vdq, Wdq, Ib)
-+DEF_GEN_INSN4_HELPER_PPI(shufpd, shufpd, Vdq, Vdq, Wdq, Ib)
- 
- GEN_INSN4(pinsrw, Pq, Pq, RdMw, Ib)
- {
-@@ -5694,6 +6021,14 @@ GEN_INSN4(pinsrw, Pq, Pq, RdMw, Ib)
-     tcg_gen_st16_i32(arg3, cpu_env, arg1 + ofs);
- }
- 
-+GEN_INSN4(pinsrw, Vdq, Vdq, RdMw, Ib)
-+{
-+    assert(arg1 == arg2);
-+
-+    const size_t ofs = offsetof(ZMMReg, ZMM_W(arg4 & 7));
-+    tcg_gen_st16_i32(arg3, cpu_env, arg1 + ofs);
-+}
-+
- GEN_INSN3(pextrw, Gd, Nq, Ib)
- {
-     const size_t ofs = offsetof(MMXReg, MMX_W(arg3 & 3));
-@@ -5706,15 +6041,47 @@ GEN_INSN3(pextrw, Gq, Nq, Ib)
-     tcg_gen_ld16u_i64(arg1, cpu_env, arg2 + ofs);
- }
- 
-+GEN_INSN3(pextrw, Gd, Udq, Ib)
-+{
-+    const size_t ofs = offsetof(ZMMReg, ZMM_W(arg3 & 7));
-+    tcg_gen_ld16u_i32(arg1, cpu_env, arg2 + ofs);
-+}
-+
-+GEN_INSN3(pextrw, Gq, Udq, Ib)
-+{
-+    const size_t ofs = offsetof(ZMMReg, ZMM_W(arg3 & 7));
-+    tcg_gen_ld16u_i64(arg1, cpu_env, arg2 + ofs);
-+}
-+
- DEF_GEN_INSN2_HELPER_EPP(cvtpi2ps, cvtpi2ps, Vdq, Qq)
- DEF_GEN_INSN2_HELPER_EPD(cvtsi2ss, cvtsi2ss, Vd, Ed)
- DEF_GEN_INSN2_HELPER_EPQ(cvtsi2ss, cvtsq2ss, Vd, Eq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtpi2pd, cvtpi2pd, Vdq, Qq)
-+DEF_GEN_INSN2_HELPER_EPD(cvtsi2sd, cvtsi2sd, Vq, Ed)
-+DEF_GEN_INSN2_HELPER_EPQ(cvtsi2sd, cvtsq2sd, Vq, Eq)
- DEF_GEN_INSN2_HELPER_EPP(cvtps2pi, cvtps2pi, Pq, Wq)
- DEF_GEN_INSN2_HELPER_DEP(cvtss2si, cvtss2si, Gd, Wd)
- DEF_GEN_INSN2_HELPER_QEP(cvtss2si, cvtss2sq, Gq, Wd)
-+DEF_GEN_INSN2_HELPER_EPP(cvtpd2pi, cvtpd2pi, Pq, Wdq)
-+DEF_GEN_INSN2_HELPER_DEP(cvtsd2si, cvtsd2si, Gd, Wq)
-+DEF_GEN_INSN2_HELPER_QEP(cvtsd2si, cvtsd2sq, Gq, Wq)
- DEF_GEN_INSN2_HELPER_EPP(cvttps2pi, cvttps2pi, Pq, Wq)
- DEF_GEN_INSN2_HELPER_DEP(cvttss2si, cvttss2si, Gd, Wd)
- DEF_GEN_INSN2_HELPER_QEP(cvttss2si, cvttss2sq, Gq, Wd)
-+DEF_GEN_INSN2_HELPER_EPP(cvttpd2pi, cvttpd2pi, Pq, Wdq)
-+DEF_GEN_INSN2_HELPER_DEP(cvttsd2si, cvttsd2si, Gd, Wq)
-+DEF_GEN_INSN2_HELPER_QEP(cvttsd2si, cvttsd2sq, Gq, Wq)
-+
-+DEF_GEN_INSN2_HELPER_EPP(cvtpd2dq, cvtpd2dq, Vdq, Wdq)
-+DEF_GEN_INSN2_HELPER_EPP(cvttpd2dq, cvttpd2dq, Vdq, Wdq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtdq2pd, cvtdq2pd, Vdq, Wq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtps2pd, cvtps2pd, Vdq, Wq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtpd2ps, cvtpd2ps, Vdq, Wdq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtss2sd, cvtss2sd, Vq, Wd)
-+DEF_GEN_INSN2_HELPER_EPP(cvtsd2ss, cvtsd2ss, Vd, Wq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtdq2ps, cvtdq2ps, Vdq, Wdq)
-+DEF_GEN_INSN2_HELPER_EPP(cvtps2dq, cvtps2dq, Vdq, Wdq)
-+DEF_GEN_INSN2_HELPER_EPP(cvttps2dq, cvttps2dq, Vdq, Wdq)
- 
- GEN_INSN2(maskmovq, Pq, Nq)
- {
-@@ -5733,26 +6100,99 @@ GEN_INSN2(maskmovq, Pq, Nq)
-     tcg_temp_free_ptr(arg2_ptr);
- }
- 
-+GEN_INSN2(maskmovdqu, Vdq, Udq)
-+{
-+    const TCGv_ptr arg1_ptr = tcg_temp_new_ptr();
-+    const TCGv_ptr arg2_ptr = tcg_temp_new_ptr();
-+
-+    tcg_gen_mov_tl(s->A0, cpu_regs[R_EDI]);
-+    gen_extu(s->aflag, s->A0);
-+    gen_add_A0_ds_seg(s);
-+
-+    tcg_gen_addi_ptr(arg1_ptr, cpu_env, arg1);
-+    tcg_gen_addi_ptr(arg2_ptr, cpu_env, arg2);
-+    gen_helper_maskmov_xmm(cpu_env, arg1_ptr, arg2_ptr, s->A0);
-+
-+    tcg_temp_free_ptr(arg1_ptr);
-+    tcg_temp_free_ptr(arg2_ptr);
-+}
-+
- GEN_INSN2(movntps, Mdq, Vdq)
- {
-     assert(arg1 == s->A0);
-     gen_sto_env_A0(s, arg2);
- }
- 
-+GEN_INSN2(movntpd, Mdq, Vdq)
-+{
-+    assert(arg1 == s->A0);
-+    gen_sto_env_A0(s, arg2);
-+}
-+
-+GEN_INSN2(movnti, Md, Gd)
-+{
-+    tcg_gen_qemu_st_i32(arg2, arg1, s->mem_index, MO_LEUL);
-+}
-+
-+GEN_INSN2(movnti, Mq, Gq)
-+{
-+    tcg_gen_qemu_st_i64(arg2, arg1, s->mem_index, MO_LEQ);
-+}
-+
- GEN_INSN2(movntq, Mq, Pq)
- {
-     assert(arg1 == s->A0);
-     gen_stq_env_A0(s, arg2);
- }
- 
-+GEN_INSN2(movntdq, Mdq, Vdq)
-+{
-+    assert(arg1 == s->A0);
-+    gen_sto_env_A0(s, arg2);
-+}
-+
-+GEN_INSN0(pause)
-+{
-+    /* handled in disas_insn at the moment */
-+    g_assert_not_reached();
-+}
-+
- DEF_GEN_INSN0_HELPER(emms, emms)
- 
--GEN_INSN0(sfence)
-+GEN_INSN2(sfence_clflush, modrm_mod, modrm)
-+{
-+    if (arg1 == 3) {
-+        /* sfence */
-+        if (s->prefix & PREFIX_LOCK) {
-+            gen_illegal_opcode(s);
-+        } else {
-+            tcg_gen_mb(TCG_MO_ST_ST | TCG_BAR_SC);
-+        }
-+    } else {
-+        /* clflush */
-+        if (ck_cpuid(env, s, CK_CPUID_CLFLUSH)) {
-+            gen_illegal_opcode(s);
-+        } else {
-+            gen_nop_modrm(env, s, arg2);
-+        }
-+    }
-+}
-+
-+GEN_INSN0(lfence)
-+{
-+    if (s->prefix & PREFIX_LOCK) {
-+        gen_illegal_opcode(s);
-+    } else {
-+        tcg_gen_mb(TCG_MO_LD_LD | TCG_BAR_SC);
-+    }
-+ }
-+
-+GEN_INSN0(mfence)
- {
-     if (s->prefix & PREFIX_LOCK) {
-         gen_illegal_opcode(s);
-     } else {
--        tcg_gen_mb(TCG_MO_ST_ST | TCG_BAR_SC);
-+        tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
-     }
- }
- 
+ OPCODE_GRP(grp14_LEG_NP, LEG(NP, 0F, 0, 0x73))
+ OPCODE_GRP_BEGIN(grp14_LEG_NP)
+     /* NP 0F 73 /6 ib: PSLLQ mm, imm8 */
+@@ -309,7 +625,12 @@ OPCODE_GRP_END(grp14_LEG_NP)
+ OPCODE_GRP(grp15_LEG_NP, LEG(NP, 0F, 0, 0xae))
+ OPCODE_GRP_BEGIN(grp15_LEG_NP)
+     /* NP 0F AE /7: SFENCE */
+-    OPCODE_GRPMEMB(grp15_LEG_NP, sfence, 7, SSE, )
++    /* NP 0F AE /7: CLFLUSH m8 */
++    OPCODE_GRPMEMB(grp15_LEG_NP, sfence_clflush, 7, SSE, RR, modrm_mod, modrm)
++    /* NP 0F AE /5: LFENCE */
++    OPCODE_GRPMEMB(grp15_LEG_NP, lfence, 5, SSE2, )
++    /* NP 0F AE /6: MFENCE */
++    OPCODE_GRPMEMB(grp15_LEG_NP, mfence, 6, SSE2, )
+     /* NP 0F AE /2: LDMXCSR m32 */
+     OPCODE_GRPMEMB(grp15_LEG_NP, ldmxcsr, 2, SSE, R, Md)
+     /* NP 0F AE /3: STMXCSR m32 */
 -- 
 2.20.1
 
