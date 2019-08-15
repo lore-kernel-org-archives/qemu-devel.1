@@ -2,90 +2,87 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CB1FC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE65C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:54:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E3E4C208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:42:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3E4C208C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AE6442086C
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:54:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuCrYHGR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE6442086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyG1T-0002yf-4n
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:42:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48603)
+	id 1hyGCc-0005XQ-Pq
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:54:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hyG0f-0002TQ-FY
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:41:49 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hyGBn-000512-P2
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:53:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hyG0c-0002aA-H8
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:41:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48752)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hyG0V-0002St-03; Thu, 15 Aug 2019 09:41:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 94D02308427D;
- Thu, 15 Aug 2019 13:41:33 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.205.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D9E65C1D8;
- Thu, 15 Aug 2019 13:41:29 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
- <20190815121042.121309-2-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ffb68839-2d43-210f-4041-3482e72501a7@redhat.com>
-Date: Thu, 15 Aug 2019 15:41:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <stefanha@gmail.com>) id 1hyGBk-000063-TP
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:53:15 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35265)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>)
+ id 1hyGBk-00005s-Mj; Thu, 15 Aug 2019 09:53:12 -0400
+Received: by mail-wm1-x344.google.com with SMTP id l2so1323937wmg.0;
+ Thu, 15 Aug 2019 06:53:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=Wn/K6TyKkAfA96NrFqoPly88RvSOM+kMolzJJ+VA9GM=;
+ b=UuCrYHGRuI3CSEzBrYZDiZ89Yz7KTY6dPJPaFGtRlmgDy2q6GIKBrNGeDzF6U+S8cZ
+ uiI8GBA7ubutjNki+KKN/2UoL+A8ejnTlGrQQ0mDmbTtDl0wopClU+by5LAVVA/HZhwc
+ IXTaFMkba3WFCqPCoRSVTNsI/+ePhwNetkIhI7kgWRFpSnILkiJ9ySjUIoMLpnp+TgoJ
+ iaFWREPsdI4077Uwu+wH6T1Ba18IZU/HlWRCEsiDNrd5RtD4KXHH+CrFd9xNlEZJxHjf
+ wuPeGE+aTJD3EyQwrwyOeszuxeTGzwtoupWwLCODJSDyfk6zCEnlQQh2R8BADnN+rVle
+ SHKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=Wn/K6TyKkAfA96NrFqoPly88RvSOM+kMolzJJ+VA9GM=;
+ b=HuK/9Ml/cnuVoCj5rbhJig8VHToNWu8cfrBeHuGceTbh95l3m7utPDroV8z8bX7Sv6
+ t1xPQdW+V6YSS7134LOQA5RuHsUpr9bkC1esCbgPPWoO29B40uXtXe0mj0nOrQHN4RI3
+ DpkYMrlpOWtE0oRCaSEVSwIucXfern303NUu2d13OEFUmw0teYhOl1DBVKawzM0RkIKs
+ jYXeHmdIR+A4dJet9G8/zIBURxV47jRzlyjnY8Q44SMB9GrBdwipvoeSL0tEd080ZNYD
+ JgAzbHY90a+ZzAlAUMpI2gV9V0Wo+BCTGEQbLqq+TBeiYnGwS7ZETXXskRMqynWc8YHC
+ UgcA==
+X-Gm-Message-State: APjAAAUYsWuIVlgsvE3J1NFIuaTPCOizn8F7Fe4/M3boLAwvHXKysR1l
+ VcmTz6eIqVqlI8UAEC659bU=
+X-Google-Smtp-Source: APXvYqwGpdxpwWecZQJ7cJRgjdBrlx2yVplJhTvO0FYYLqr2a27Dg9iHEaslMp0Oqkvg6wFkWH+WhQ==
+X-Received: by 2002:a1c:200a:: with SMTP id g10mr2733625wmg.160.1565877191415; 
+ Thu, 15 Aug 2019 06:53:11 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id c15sm8761730wrb.80.2019.08.15.06.53.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 15 Aug 2019 06:53:10 -0700 (PDT)
+Date: Thu, 15 Aug 2019 14:53:09 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Artemy Kapitula <dalt74@gmail.com>
+Message-ID: <20190815135309.GC10996@stefanha-x1.localdomain>
+References: <2c685097-1647-e2d3-8b8a-21f76551ce3c@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190815121042.121309-2-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="PNQJmcoHY4klNtNU13oKoQKy9iF2Ul5Bz"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.40]); Thu, 15 Aug 2019 13:41:33 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] block: introduce aio task pool
+ protocol="application/pgp-signature"; boundary="CblX+4bnyfN0pR09"
+Content-Disposition: inline
+In-Reply-To: <2c685097-1647-e2d3-8b8a-21f76551ce3c@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [PATCH v0] Implement new cache mode "target"
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,86 +94,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PNQJmcoHY4klNtNU13oKoQKy9iF2Ul5Bz
-Content-Type: multipart/mixed; boundary="kVizUf7eICzzYHerYC7j1hQk7FhUAilRa";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
- kwolf@redhat.com, den@openvz.org, stefanha@redhat.com
-Message-ID: <ffb68839-2d43-210f-4041-3482e72501a7@redhat.com>
-Subject: Re: [PATCH v3 1/4] block: introduce aio task pool
-References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
- <20190815121042.121309-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20190815121042.121309-2-vsementsov@virtuozzo.com>
 
---kVizUf7eICzzYHerYC7j1hQk7FhUAilRa
+--CblX+4bnyfN0pR09
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 15.08.19 14:10, Vladimir Sementsov-Ogievskiy wrote:
-> Common interface for aio task loops. To be used for improving
-> performance of synchronous io loops in qcow2, block-stream,
-> copy-on-read, and may be other places.
+On Wed, Aug 07, 2019 at 04:09:54PM +0300, Artemy Kapitula wrote:
+
+Hi,
+Please use "scripts/get_maintainer.pl -f block.c" to find out which
+maintainers to email.  qemu-devel@nongnu.org is a high-traffic list and
+patches not CCed to the right maintainer may not get quick review.
+
+> There is an issue with databases in VM that perform too slow
+> on generic SAN storages. The key point is fdatasync that flushes
+> disk on SCSI target.
 >=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> The QEMU blockdev "target" cache mode intended to be used with
+> SAN storages and is a mix of "none" by using direct I/O and
+> "unsafe" that omit device flush.
+>=20
+> Such storages has its own data integrity protection and can
+> be operated with direct I/O without additional fdatasyc().
+>=20
+> With generic SCSI targets like LIO or SCST it boost performance
+> up to 100% on some profiles like database with transaction journal
+> (postrgesql/mssql/oracle etc) or virtualized SDS (ceph/rook inside
+> VMs) which performs block device cache flush on journal record.
+
+If the physical storage controller has a Battery Backed Unit (BBU) or
+similar then flush requests are not required with O_DIRECT.  This has
+been a common enterprise storage configuration for many years and is
+already supported in QEMU today:
+
+Configure the guest with cache=3Dnone and disable the emulated storage
+controller's write cache (e.g. -device virtio-blk-pci,write-cache=3Doff).
+Inside the guest /sys/block/$BLKDEV/queue/write_cache should show "write
+through".
+
+I think this patch is not necessary since write-cache=3Doff already
+exists.  cache=3Dtarget is also slower since the guest sends unnecessary
+flush requests to the emulated storage controller.
+
+Thanks,
+Stefan
+
+> Signed-off-by: Artemy Kapitula <dalt74@gmail.com>
 > ---
->  include/block/aio_task.h |  54 +++++++++++++++++
->  block/aio_task.c         | 124 +++++++++++++++++++++++++++++++++++++++=
-
->  block/Makefile.objs      |   2 +
->  3 files changed, 180 insertions(+)
->  create mode 100644 include/block/aio_task.h
->  create mode 100644 block/aio_task.c
+>  block.c                | 4 ++++
+>  qemu-options.hx        | 3 ++-
+>  tests/qemu-iotests/026 | 2 +-
+>  tests/qemu-iotests/091 | 2 +-
+>  4 files changed, 8 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/include/block/aio_task.h b/include/block/aio_task.h
-> new file mode 100644
-> index 0000000000..58b4d99e59
-> --- /dev/null
-> +++ b/include/block/aio_task.h
+> diff --git a/block.c b/block.c
+> index cbd8da5f3b..60919d82ff 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -884,6 +884,10 @@ int bdrv_parse_cache_mode(const char *mode, int *fla=
+gs, bool *writethrough)
+>      } else if (!strcmp(mode, "unsafe")) {
+>          *writethrough =3D false;
+>          *flags |=3D BDRV_O_NO_FLUSH;
+> +    } else if (!strcmp(mode, "target")) {
+> +        *writethrough =3D false;
+> +        *flags |=3D BDRV_O_NOCACHE;
+> +        *flags |=3D BDRV_O_NO_FLUSH;
+>      } else if (!strcmp(mode, "writethrough")) {
+>          *writethrough =3D true;
+>      } else {
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9621e934c0..01f1f4ad34 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -1065,7 +1065,7 @@ This option defines the type of the media: disk or =
+cdrom.
+>  @var{snapshot} is "on" or "off" and controls snapshot mode for the given=
+ drive
+>  (see @option{-snapshot}).
+>  @item cache=3D@var{cache}
+> -@var{cache} is "none", "writeback", "unsafe", "directsync" or "writethro=
+ugh"
+> +@var{cache} is "none", "writeback", "unsafe", "target", "directsync" or =
+"writethrough"
+>  and controls how the host cache is used to access block data. This is a
+>  shortcut that sets the @option{cache.direct} and @option{cache.no-flush}
+>  options (as in @option{-blockdev}), and additionally @option{cache.write=
+back},
+> @@ -1084,6 +1084,7 @@ none         =E2=94=82 on                on        =
+     off
+>  writethrough =E2=94=82 off               off            off
+>  directsync   =E2=94=82 off               on             off
+>  unsafe       =E2=94=82 on                off            on
+> +target       =E2=94=82 on                on             on
+>  @end example
+>  The default mode is @option{cache=3Dwriteback}.
+> diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
+> index e30243608b..e7179b0de4 100755
+> --- a/tests/qemu-iotests/026
+> +++ b/tests/qemu-iotests/026
+> @@ -42,7 +42,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+>  _supported_fmt qcow2
+>  _supported_proto file
+>  _default_cache_mode "writethrough"
+> -_supported_cache_modes "writethrough" "none"
+> +_supported_cache_modes "writethrough" "none" "target"
+>  # The refcount table tests expect a certain minimum width for refcount e=
+ntries
+>  # (so that the refcount table actually needs to grow); that minimum is 1=
+6 bits,
+>  # being the default refcount entry width.
+> diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
+> index d62ef18a02..2eaf258c8a 100755
+> --- a/tests/qemu-iotests/091
+> +++ b/tests/qemu-iotests/091
+> @@ -47,7 +47,7 @@ _supported_fmt qcow2
+>  _supported_proto file
+>  _supported_os Linux
+>  _default_cache_mode "none"
+> -_supported_cache_modes "writethrough" "none" "writeback"
+> +_supported_cache_modes "writethrough" "none" "writeback" "target"
+>  size=3D1G
+> --=20
+> 2.21.0
+>=20
+>=20
+>=20
 
-[...]
-
-> +AioTaskPool *aio_task_pool_new(int max_busy_tasks);
-
-Because aio_task_pool_wait_one() asserts that it runs in the same
-coroutine as aio_task_pool_new(), this should be a coroutine_fn as well.
-O:-)
-
-But I don=E2=80=99t want to be responsible for breaking your =E2=80=9C1=E2=
-=80=9D key (assuming
-you have the exclamation mark there):
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-
---kVizUf7eICzzYHerYC7j1hQk7FhUAilRa--
-
---PNQJmcoHY4klNtNU13oKoQKy9iF2Ul5Bz
+--CblX+4bnyfN0pR09
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1VYQcACgkQ9AfbAGHV
-z0BBIQf+OeRizF4yMtowRaPe67w6xp8nEMBg1AZQHKliSpxD+BA51SOAi35l4lRV
-sX77ZEvWqyNB5chopV9ZvhZi38VPn0ka7JixujD1X1QFNki78EQ5/kHuo86i9G9Q
-devrdF18JjMwjxGqJyFsJ1kPbLyOp1VurC4MckJw31wkNtfeAt15Jtv6ovSbastC
-tSZ/BIxb2zkHvAE6Bhji8de2OAOnJCy+550oj4XyvPOIFQU12uwWGHnvhnxtz0Uy
-qIXKgA0DZARraGJQXuQM8iUNeWpBs+6oufXxe6clrfBjEsus1VTbf4pKrHcXz1AN
-K+nofRDjIiOfay3FbjFbyMY+T61Zdw==
-=4P2k
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1VY8UACgkQnKSrs4Gr
+c8hCLQf/X3cD1YCccg01il8Z0Ar+prFZPbma4VnGZYu7+K0I7hjQme8H9j9rMK9W
+PnnMAy5Nt2cfrk6T1SlgjIprwYxVZbnWVm8ksXXifo2S/mz/OECowijV3OC1peBm
+sUxEvI6GUBB5EG8OFsg7Uwa6JwaGIXQB8KDNR1PH4+UPti4kCpGAi6KVhFYqiA26
+yqwW7AuuuuiRf4IE0TkNxgpWIDooNg6nniI+SURE3B/bRWqss4X2HNT11E3NqTcX
+PD1QSIazKW1Ic6D0c+DeJR+UwRgOvJ+kypMXOi5jDqxYsKhA9C/VovUvl6wu7qOM
+iH/Xi4xuOQibAF4ffy0bNgvK4Le4zw==
+=6L0g
 -----END PGP SIGNATURE-----
 
---PNQJmcoHY4klNtNU13oKoQKy9iF2Ul5Bz--
+--CblX+4bnyfN0pR09--
 
