@@ -2,52 +2,50 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE08C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45475C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:42:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 493862064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:35:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 493862064A
+	by mail.kernel.org (Postfix) with ESMTPS id 0863E2063F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 17:42:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0863E2063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyJeS-00027p-9c
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 13:35:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54736)
+	id 1hyJlM-000521-2i
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 13:42:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hyJdl-0001iG-Bc
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:34:25 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyJjv-00041y-G6
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:40:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hyJdf-0004cO-0G
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:34:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44918)
+ (envelope-from <jsnow@redhat.com>) id 1hyJjr-00085Q-0X
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 13:40:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36394)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hyJdS-0004Dp-PV; Thu, 15 Aug 2019 13:34:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hyJje-0007ey-Ak; Thu, 15 Aug 2019 13:40:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5966A3DE31;
- Thu, 15 Aug 2019 17:34:00 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id BF5D13090FD4;
+ Thu, 15 Aug 2019 17:40:23 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A224417AAA;
- Thu, 15 Aug 2019 17:33:54 +0000 (UTC)
-To: Kevin Wolf <kwolf@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DAF9280E9;
+ Thu, 15 Aug 2019 17:40:19 +0000 (UTC)
+To: Markus Armbruster <armbru@redhat.com>
 References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
  <20190814100735.24234-3-vsementsov@virtuozzo.com>
  <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
- <20190815104928.GC7415@linux.fritz.box>
- <9c290e4e-1d3b-bc6e-c6e6-28a0414b866e@redhat.com>
- <20190815164821.GE7415@linux.fritz.box>
+ <8736i2zf8e.fsf_-_@dusky.pond.sub.org>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -124,21 +122,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <5591197d-f66c-e79d-f92d-16e4c7b42cc1@redhat.com>
-Date: Thu, 15 Aug 2019 13:33:53 -0400
+Message-ID: <423f2f82-9111-9c19-85b6-2645f66ab641@redhat.com>
+Date: Thu, 15 Aug 2019 13:40:19 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190815164821.GE7415@linux.fritz.box>
+In-Reply-To: <8736i2zf8e.fsf_-_@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Thu, 15 Aug 2019 17:34:00 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Thu, 15 Aug 2019 17:40:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: deprecate implicit filters
+Subject: Re: [Qemu-devel] Exposing feature deprecation to machine clients
+ (was: [PATCH 2/2] qapi: deprecate implicit filters)
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,104 +149,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- libvir-list@redhat.com, armbru@redhat.com, mreitz@redhat.com, den@openvz.org
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/15/19 12:48 PM, Kevin Wolf wrote:
-> Am 15.08.2019 um 18:07 hat John Snow geschrieben:
->> On 8/15/19 6:49 AM, Kevin Wolf wrote:
->>> Am 14.08.2019 um 21:27 hat John Snow geschrieben:
->>>>
->>>> This might be OK to do right away, though.
->>>>
->>>> I asked Markus this not too long ago; do we want to amend the QAPI
->>>> schema specification to allow commands to return with "Warning" strings,
->>>> or "Deprecated" stings to allow in-band deprecation notices for cases
->>>> like these?
->>>>
->>>> example:
->>>>
->>>> { "return": {},
->>>>   "deprecated": True,
->>>>   "warning": "Omitting filter-node-name parameter is deprecated, it will
->>>> be required in the future"
->>>> }
->>>>
->>>> There's no "error" key, so this should be recognized as success by
->>>> compatible clients, but they'll definitely see the extra information.
->>>>
->>>> Part of my motivation is to facilitate a more aggressive deprecation of
->>>> legacy features by ensuring that we are able to rigorously notify users
->>>> through any means that they need to adjust their scripts.
+
+
+On 8/15/19 10:16 AM, Markus Armbruster wrote:
+> John Snow <jsnow@redhat.com> writes:
+> 
+>> On 8/14/19 6:07 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>> To get rid of implicit filters related workarounds in future let's
+>>> deprecate them now.
 >>>
->>> Who would read this, though? In the best case it ends up deep in a
->>> libvirt log that nobody will look at because there was no error. In the
->>> more common case, the debug level is configured so that QMP traffic
->>> isn't even logged.
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+> [...]
+>>> diff --git a/blockdev.c b/blockdev.c
+>>> index 36e9368e01..b3cfaccce1 100644
+>>> --- a/blockdev.c
+>>> +++ b/blockdev.c
+>>> @@ -3292,6 +3292,11 @@ void qmp_block_commit(bool has_job_id, const char *job_id, const char *device,
+>>>      BlockdevOnError on_error = BLOCKDEV_ON_ERROR_REPORT;
+>>>      int job_flags = JOB_DEFAULT;
+>>>  
+>>> +    if (!has_filter_node_name) {
+>>> +        warn_report("Omitting filter-node-name parameter is deprecated, it "
+>>> +                    "will be required in future");
+>>> +    }
+>>> +
+>>>      if (!has_speed) {
+>>>          speed = 0;
+>>>      }
+>>> @@ -3990,6 +3995,11 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
+>>>      Error *local_err = NULL;
+>>>      int ret;
+>>>  
+>>> +    if (!has_filter_node_name) {
+>>> +        warn_report("Omitting filter-node-name parameter is deprecated, it "
+>>> +                    "will be required in future");
+>>> +    }
+>>> +
+>>>      bs = qmp_get_root_bs(device, errp);
+>>>      if (!bs) {
+>>>          return;
 >>>
->>> Kevin
->>>
 >>
->> I believe you are right, but I also can't shake the feeling that this
->> attitude ensures that we'll never find a way to expose this information
->> to the end-user. Is this not too defeatist?
-> 
-> I think the discussed approach that seemed most likely to me to succeed
-> was adding a command line option that makes QEMU just crash if you use a
-> deprecated feature, and enable that in libvirt test cases (or possibly
-> even any non-release builds, though maybe it's a bit harsh there).
-> 
->> I think deprecation notices in the QMP stream has two benefits:
+>> This might be OK to do right away, though.
 >>
->> 1) Any direct usages via qmp-shell or manual JSON connection are likely
->> to see this message in development or testing. I feel the usage of QEMU
->> directly is more likely to increase with time as other stacks seek to
->> work around libvirt.
+>> I asked Markus this not too long ago; do we want to amend the QAPI
+>> schema specification to allow commands to return with "Warning" strings,
+>> or "Deprecated" stings to allow in-band deprecation notices for cases
+>> like these?
 >>
->> [Whether or not they should is another question, but I believe the
->> current reality to be that people are trying to.]
-> 
-> I don't know about other people, but as a human user, I don't care about
-> deprecation notices. As long as something works, I use it, and once I
-> get an error message back, I'll use something else.
-> 
-> If I manually enter drive_mirror and get a warning back, that doesn't
-> tell me that libvirt still does the same thing and needs to be fixed. It
-> just tells me that in the future I might need to change the commands
-> that I use manually.
-> 
-
-That the message we return needs to be *useful* doesn't sound like a
-count against it.
-
-> I guess this would still prevent adding new libvirt features that build
-> on deprecated QEMU features because some manual testing will be involved
-> there. But was this ever a problem?
-> 
-
-No, because until recently we didn't deprecate anything.
-
->> 2) Programmatic deprecation notices can't be presented to a user at all
->> if we don't send them; at least this way it becomes libvirt's problem
->> over what to do with them. Perhaps even just in testing and regression
->> suites libvirt can assert that it sees no deprecation warnings (or
->> whitelist certain ones it knows about.)
+>> example:
 >>
->> In the case of libvirt, it's not even necessarily about making sure the
->> end user sees it, because it isn't even necessarily the user's fault --
->> it's libvirt's. This is a sure-fire programmatic way to communicate
->> compatibility changes to libvirt.
+>> { "return": {},
+>>   "deprecated": True,
+>>   "warning": "Omitting filter-node-name parameter is deprecated, it will
+>> be required in the future"
+>> }
+>>
+>> There's no "error" key, so this should be recognized as success by
+>> compatible clients, but they'll definitely see the extra information.
 > 
-> If libvirt uses this to make test cases fail, it could work.
+> This is a compatible evolution of the QMP protocol.
+> 
+>> Part of my motivation is to facilitate a more aggressive deprecation of
+>> legacy features by ensuring that we are able to rigorously notify users
+>> through any means that they need to adjust their scripts.
+> 
+> Yes, we should help libvirt etc. with detecting use of deprecated
+> features.  We discussed this at the KVM Forum 2018 BoF on deprecating
+> stuff.  Minutes:
+> 
+>     Message-ID: <87mur0ls8o.fsf@dusky.pond.sub.org>
+>     https://lists.nongnu.org/archive/html/qemu-devel/2018-10/msg05828.html
+> 
+> Last item is relevant here.
+> 
+> Adding deprecation information to QMP's success response belongs to "We
+> can also pass the buck to the next layer up", next to "emit a QMP
+> event".
+> 
+> Let's compare the two, i.e. "deprecation info in success response"
+> vs. "deprecation event".
+> 
+> 1. Possible triggers
+> 
+> Anything we put in the success response should only ever apply to the
+> (successful) command.  So this one's limited to QMP commands.
+> 
+> A QMP event is not limited to QMP commands.  For instance, it could be
+> emitted for deprecated CLI features (long after the fact, in addition to
+> human-readable warnings on stderr), or when we detect use of a
+> deprecated feature only after we sent the success response, say in a
+> job.  Neither use case is particularly convincing.  Reporting use of
+> deprecated CLI in QMP feels like a work-around for the CLI's
+> machine-unfriendliness.  Job-like commands should really check their
+> arguments upfront.
+> 
+> 2. Connection to trigger
+> 
+> Connecting responses to commands is the QMP protocol's responsibility.
+> Transmitting deprecation information in the response trivially ties it
+> to the offending command.
+> 
+> The QMP protocol doesn't tie events to anything.  Thus, a deprecation
+> event needs an event-specific tie to its trigger.
+> 
+> The obvious way to tie it to a command mirrors how the QMP protocol ties
+> responses to commands: by command ID.  The event either has to be sent
+> just to the offending monitor (currently, all events are broadcast to
+> all monitors), or include a suitable monitor ID.
+> 
+> For non-command triggers, we'd have to invent some other tie.
+> 
+> 3. Interface complexity
+> 
+> Tying the event to some arbitrary trigger adds complexity.
+> 
+> Do we need non-command triggers, and badly enough to justify the
+> additional complexity?
+> 
+> 4. Implementation complexity 
+> 
+> Emitting an event could be as simple as
+> 
+>     qapi_event_send_deprecated(qmp_command_id(),
+>                                "Omitting 'filter-node-name'");
+> 
+> where qmp_command_id() returns the ID of the currently executing
+> command.  Making qmp_command_id() work is up to the QMP core.  Simple
+> enough as long as each QMP command runs to completion before its monitor
+> starts the next one.
+> 
+> The event is "fire and forget".  There is no warning object propagated
+> up the call chain into the QMP core like errors objects are.
+> 
+> "Fire and forget" is ideal for letting arbitrary code decide "this is
+> deprecated".
+> 
+> Note the QAPI schema remains untouched.
+> 
+> Unlike an event, which can be emitted anywhere, the success response
+> gets built in the QMP core.  To have the core add deprecation info to
+> it, we need to get the info to the core.
+> 
+> If deprecation info originates in command code, like errors do, we need
+> to propagate it up the call chain into the QMP core like errors.
+> 
+> Propagating errors is painful.  It has caused massive churn all over the
+> place.
+> 
+> I don't think we can hitch deprecation info to the existing error
+> propagation, since we need to take the success path back to the QMP
+> core, not an error path.
+> 
+> Propagating a second object for warnings... thanks, but no thanks.
 > 
 
-Yeah, I think there's solid use there. I'll continue along in Markus's
-thread.
+Probably the best argument against it. Fire-and-forget avoids the
+problem. Events might work just fine, but the "tie" bit seems like a yak
+in need of a shave.
 
-> Kevin
+> The QMP core could provide a function for recording deprecation info for
+> the currently executing QMP command.  This is how we used to record
+> errors in QMP commands, until Anthony rammed through what we have now.
+> The commit messages (e.g. d5ec4f27c38) provide no justification.  I
+> dimly recall adamant (oral?) claims that recording errors in the Monitor
+> object cannot work for us.
 > 
+> I smell a swamp.
+> 
+> Can we avoid plumbing deprecation info from command code to QMP core?
+> Only if the QMP core itself can recognize deprecated interfaces.  I
+> believe it can for the cases we can expose in introspecion.  Let me
+> explain.
+> 
+> Kevin recently added "features" to the QAPI schema language.  The
+> implementation is incomplete, but that's detail.  The idea is to tack a
+> "deprecated" feature to deprecated stuff in the QAPI schema.
+> 
+
+That's a good idea too; but the semantics of exactly *what* was
+deprecated may be hard to capture.
+
+> Commands and arguments need to support features for that.
+> Implementation should be relatively straightforward.
+> 
+> Deprecating an argument's optionalness may require a
+> "optional-deprecated" feature.  I've seen more elegant designs, but I've
+> also seen plenty of uglier ones.
+> 
+> Note that features are tied to schema syntax.  To express semantically
+> conditional deprecation like "if you specify argument FOO, then not
+> specifying argument BAR is deprecated", we'd have to add a language for
+> these conditions.  Uh, not now, maybe never.
+> 
+> The primary use of having deprecation defined in the QAPI schema is
+> introspection.  The BoF minutes mention this, too.
+> 
+> A secondary use could be detecting use of deprecated features right in
+> the QMP core.  No need for ad hoc code in commands, no need for plumbing
+> information from there to the QMP core.
+> 
+> I'd like to pursue this idea, then see how well it suits our deprecation
+> needs.
+> 
+
+I should clearly remember to talk to you before thinking about QMP in
+public, because you've thought about it much more.
+
+--js
 
