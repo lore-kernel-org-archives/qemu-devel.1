@@ -2,73 +2,93 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA59AC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD10C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AF342083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:17:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AF342083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C44CB2083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:17:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C44CB2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyFd1-0001xx-5L
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:17:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45330)
+	id 1hyFda-0002JV-SW
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:17:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyFbU-0001BQ-M4
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:15:48 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hyFbm-0001M4-TX
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:16:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyFbQ-0007X2-U8
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:15:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46438)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyFbQ-0007WK-OQ
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:15:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyFbP-0003sa-82
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 13:15:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3AE832E80C7
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 13:15:39 +0000 (UTC)
+ (envelope-from <mreitz@redhat.com>) id 1hyFbj-0007gZ-IH
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:16:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42932)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hyFbd-0007dD-6K; Thu, 15 Aug 2019 09:15:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 48311796E0;
+ Thu, 15 Aug 2019 13:15:52 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A0FC841C7;
+ Thu, 15 Aug 2019 13:15:48 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190802095239.31975-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <d2a58313-6ae8-4310-8121-03eb6692b598@redhat.com>
+Date: Thu, 15 Aug 2019 15:15:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Aug 2019 13:01:53 -0000
-From: Fritz Katze <1840252@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fritz-the-cat pmaydell
-X-Launchpad-Bug-Reporter: Fritz Katze (fritz-the-cat)
-X-Launchpad-Bug-Modifier: Fritz Katze (fritz-the-cat)
-X-Launchpad-Bug-Duplicate: 1823790
-References: <156587313029.22360.18407191936417196823.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156587411382.27151.15497800291968980704.launchpad@gac.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: a55c7d35f4a42fee9d7ff5bf81105373b3f73704
+In-Reply-To: <20190802095239.31975-1-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="0hdZ9YHsZcTNtLrhnJlaWL7lWnSmzinTS"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.25]); Thu, 15 Aug 2019 13:15:52 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1840252] Re: Infinite loop over ERANGE from
- getsockopt
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v4] blockjob: drain all job nodes in
+ block_job_drain
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,208 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1840252 <1840252@bugs.launchpad.net>
+Cc: kwolf@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-*** This bug is a duplicate of bug 1823790 ***
-    https://bugs.launchpad.net/bugs/1823790
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0hdZ9YHsZcTNtLrhnJlaWL7lWnSmzinTS
+Content-Type: multipart/mixed; boundary="RLck9abnJk7fPfKnSyEw1G1Y8rFutxsp3";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, den@openvz.org
+Message-ID: <d2a58313-6ae8-4310-8121-03eb6692b598@redhat.com>
+Subject: Re: [PATCH v4] blockjob: drain all job nodes in block_job_drain
+References: <20190802095239.31975-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190802095239.31975-1-vsementsov@virtuozzo.com>
 
-** Description changed:
+--RLck9abnJk7fPfKnSyEw1G1Y8rFutxsp3
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-  Host system: Ubuntu 18.04.3 AMD64
-  Qemu Version: qemu-arm-static --version
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.17)
-  =
+On 02.08.19 11:52, Vladimir Sementsov-Ogievskiy wrote:
+> Instead of draining additional nodes in each job code, let's do it in
+> common block_job_drain, draining just all job's children.
+> BlockJobDriver.drain becomes unused, so, drop it at all.
+>=20
+> It's also a first step to finally get rid of blockjob->blk.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
 
-- Emulated System: =
+What do you think of Kevin=E2=80=99s comment that draining the block node=
+s may
+actually be entirely unnecessary?
 
-+ Emulated System:
-  Root file system taken from RaspberryPi 3 image
-  ubuntu-18.04.3-preinstalled-server-armhf+raspi3.img
-  from http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.3-prei=
-nstalled-server-armhf+raspi3.img.xz.
-  =
+Max
 
-  Then using system-nspawn with with /usr/bin/qemu-arm-static copied in.
-  =
 
-- When executing commands like =
+--RLck9abnJk7fPfKnSyEw1G1Y8rFutxsp3--
 
--   dpkg -i (--force-all) <...>.deb
-+ When executing commands like
-+ =C2=A0=C2=A0dpkg -i (--force-all) <...>.deb
-  or
--   tar tvf ..
-+ =C2=A0=C2=A0tar tvf ..
-  or
--   tar xvf ..
-+ =C2=A0=C2=A0tar xvf ..
-  the hosting qemu-arm-static process goes into an infinite loop of getsock=
-opt calls of the form:
-  getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
- (Numerical result out of range)
-  I assume that this is because of an infinite retry without checking the a=
-ctual error code of the call.
-  =
+--0hdZ9YHsZcTNtLrhnJlaWL7lWnSmzinTS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-  strace:
-  openat(AT_FDCWD, "/lib/arm-linux-gnueabihf/librt.so.1", O_RDONLY|O_CLOEXE=
-C) =3D 12
-  read(12, "\177ELF\1\1\1\3\0\0\0\0\0\0\0\0\3\0(\0\1\0\0\0\20\30\0\0004\0\0=
-\0"..., 512) =3D 512
-  lseek(12, 21236, SEEK_SET)              =3D 21236
-  read(12, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\=
-0"..., 1240) =3D 1240
-  lseek(12, 20856, SEEK_SET)              =3D 20856
-  read(12, "A2\0\0\0aeabi\0\1(\0\0\0\0057-A\0\6\n\7A\10\1\t\2\n\4\22"..., 5=
-1) =3D 51
-  fstat(12, {st_mode=3DS_IFREG|0644, st_size=3D22476, ...}) =3D 0
-  mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MA=
-P_ANONYMOUS|MAP_DENYWRIT
-  E, -1, 0) =3D 0x7f419952c000
-  mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MA=
-P_DENYWRITE, 12, 0) =3D 0x
-  7f419952c000
-  mprotect(0x7f4199531000, 61440, PROT_NONE) =3D 0
-  mmap(0x7f4199540000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MA=
-P_DENYWRITE, 12, 0x4000)
--  =3D 0x7f4199540000
-+ =C2=A0=3D 0x7f4199540000
-  close(12)                               =3D 0
-  mprotect(0x7f4199540000, 4096, PROT_READ) =3D 0
-  mprotect(0x7f4199578000, 8192, PROT_READ) =3D 0
-- mmap(0x7f419957b000, 28672, PROT_NONE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOU=
-S|MAP_NORESERVE, -1, 0) =
+-----BEGIN PGP SIGNATURE-----
 
-+ mmap(0x7f419957b000, 28672, PROT_NONE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOU=
-S|MAP_NORESERVE, -1, 0)
-  =3D 0x7f419957b000
-  rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
-  rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
-  rt_sigprocmask(SIG_SETMASK, [HUP USR1 USR2 PIPE ALRM CHLD TSTP URG VTALRM=
- PROF WINCH IO], NULL, 8
-  ) =3D 0
-  access("/etc/systemd/dont-synthesize-nobody", F_OK) =3D -1 ENOENT (No suc=
-h file or directory)
-  getpid()                                =3D 26
-  socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) =3D 12
-  getsockopt(12, SOL_SOCKET, SO_RCVBUF, [212992], [4]) =3D 0
-  setsockopt(12, SOL_SOCKET, SO_RCVBUFFORCE, [8388608], 4) =3D -1 EPERM (Op=
-eration not permitted)
-  setsockopt(12, SOL_SOCKET, SO_RCVBUF, [8388608], 4) =3D 0
-  getsockopt(12, SOL_SOCKET, SO_SNDBUF, [212992], [4]) =3D 0
-  setsockopt(12, SOL_SOCKET, SO_SNDBUFFORCE, [8388608], 4) =3D -1 EPERM (Op=
-eration not permitted)
-  setsockopt(12, SOL_SOCKET, SO_SNDBUF, [8388608], 4) =3D 0
-  connect(12, {sa_family=3DAF_UNIX, sun_path=3D"/run/dbus/system_bus_socket=
-"}, 29) =3D 0
-  getsockopt(12, SOL_SOCKET, SO_PEERCRED, {pid=3D0, uid=3D0, gid=3D0}, [12]=
-) =3D 0
-- getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
- (Numerical result out of =
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1VWwMACgkQ9AfbAGHV
+z0A5sAgAreAj1AwJJn0WlAfBYCbyMrINPXxASrNqaxb7B9mjjhbuRsnbhqBFbfkG
+Hg9h+htcCOqz9JiQ5AsiklPqVF61MlgeEVQQC2mghLqEBLQG6zfHZbwEmGpdmUul
+85CMVc4ViZ+RRCpUgHDXinQtXZ3DQInwMclGQAWLJt8S7KZ5zIxH21dZlHWb8CE5
+5t7AQp3yGrtSVnVNK8zv0aoJf0KREf855DuGmf0+kw0mygIaid5vNrDCoqjHVeg7
+pibAgVWgvowF0no3WWOFaXL5dV6FN5HJz5biaQ7q/BA4qQN3gPAtIpSr2rHd56ap
+uP0gLxc20JgaAyd2wVUnhWYC/IuA/A==
+=UBPf
+-----END PGP SIGNATURE-----
 
-+ getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
- (Numerical result out of
-  range)
-+ =
-
-+ And this last entry repeats endlessly.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1840252
-
-Title:
-  Infinite loop over  ERANGE from getsockopt
-
-Status in QEMU:
-  New
-
-Bug description:
-  Host system: Ubuntu 18.04.3 AMD64
-  Qemu Version: qemu-arm-static --version
-  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.17)
-
-  Emulated System:
-  Root file system taken from RaspberryPi 3 image
-  ubuntu-18.04.3-preinstalled-server-armhf+raspi3.img
-  from http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.3-prei=
-nstalled-server-armhf+raspi3.img.xz.
-
-  Then using system-nspawn with with /usr/bin/qemu-arm-static copied in.
-
-  When executing commands like
-  =C2=A0=C2=A0dpkg -i (--force-all) <...>.deb
-  or
-  =C2=A0=C2=A0tar tvf ..
-  or
-  =C2=A0=C2=A0tar xvf ..
-  the hosting qemu-arm-static process goes into an infinite loop of getsock=
-opt calls of the form:
-  getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
- (Numerical result out of range)
-  I assume that this is because of an infinite retry without checking the a=
-ctual error code of the call.
-
-  strace:
-  openat(AT_FDCWD, "/lib/arm-linux-gnueabihf/librt.so.1", O_RDONLY|O_CLOEXE=
-C) =3D 12
-  read(12, "\177ELF\1\1\1\3\0\0\0\0\0\0\0\0\3\0(\0\1\0\0\0\20\30\0\0004\0\0=
-\0"..., 512) =3D 512
-  lseek(12, 21236, SEEK_SET)              =3D 21236
-  read(12, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\=
-0"..., 1240) =3D 1240
-  lseek(12, 20856, SEEK_SET)              =3D 20856
-  read(12, "A2\0\0\0aeabi\0\1(\0\0\0\0057-A\0\6\n\7A\10\1\t\2\n\4\22"..., 5=
-1) =3D 51
-  fstat(12, {st_mode=3DS_IFREG|0644, st_size=3D22476, ...}) =3D 0
-  mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MA=
-P_ANONYMOUS|MAP_DENYWRIT
-  E, -1, 0) =3D 0x7f419952c000
-  mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MA=
-P_DENYWRITE, 12, 0) =3D 0x
-  7f419952c000
-  mprotect(0x7f4199531000, 61440, PROT_NONE) =3D 0
-  mmap(0x7f4199540000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MA=
-P_DENYWRITE, 12, 0x4000)
-  =C2=A0=3D 0x7f4199540000
-  close(12)                               =3D 0
-  mprotect(0x7f4199540000, 4096, PROT_READ) =3D 0
-  mprotect(0x7f4199578000, 8192, PROT_READ) =3D 0
-  mmap(0x7f419957b000, 28672, PROT_NONE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOU=
-S|MAP_NORESERVE, -1, 0)
-  =3D 0x7f419957b000
-  rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
-  rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
-  rt_sigprocmask(SIG_SETMASK, [HUP USR1 USR2 PIPE ALRM CHLD TSTP URG VTALRM=
- PROF WINCH IO], NULL, 8
-  ) =3D 0
-  access("/etc/systemd/dont-synthesize-nobody", F_OK) =3D -1 ENOENT (No suc=
-h file or directory)
-  getpid()                                =3D 26
-  socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) =3D 12
-  getsockopt(12, SOL_SOCKET, SO_RCVBUF, [212992], [4]) =3D 0
-  setsockopt(12, SOL_SOCKET, SO_RCVBUFFORCE, [8388608], 4) =3D -1 EPERM (Op=
-eration not permitted)
-  setsockopt(12, SOL_SOCKET, SO_RCVBUF, [8388608], 4) =3D 0
-  getsockopt(12, SOL_SOCKET, SO_SNDBUF, [212992], [4]) =3D 0
-  setsockopt(12, SOL_SOCKET, SO_SNDBUFFORCE, [8388608], 4) =3D -1 EPERM (Op=
-eration not permitted)
-  setsockopt(12, SOL_SOCKET, SO_SNDBUF, [8388608], 4) =3D 0
-  connect(12, {sa_family=3DAF_UNIX, sun_path=3D"/run/dbus/system_bus_socket=
-"}, 29) =3D 0
-  getsockopt(12, SOL_SOCKET, SO_PEERCRED, {pid=3D0, uid=3D0, gid=3D0}, [12]=
-) =3D 0
-  getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
- (Numerical result out of
-  range)
-
-  And this last entry repeats endlessly.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1840252/+subscriptions
+--0hdZ9YHsZcTNtLrhnJlaWL7lWnSmzinTS--
 
