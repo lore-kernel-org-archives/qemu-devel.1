@@ -2,73 +2,86 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 351A9C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51691C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:57:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 048FD206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 048FD206C1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1B7CE206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:57:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="bFHur7bK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B7CE206C1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKvn-0002f2-60
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:57:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41253)
+	id 1hyKwN-0002dL-17
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:57:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyKuo-00028v-JF
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:56:04 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1hyKoG-0004BE-Rv
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyKum-00055b-2i
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:56:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52474)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyKul-00054h-Gw
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:56:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyKuj-0005ab-7N
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 18:55:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id DB1F22E80D9
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 18:55:56 +0000 (UTC)
+ (envelope-from <lukasstraub2@web.de>) id 1hyKoE-0006pH-Gp
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:16 -0400
+Received: from mout.web.de ([212.227.17.12]:34461)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hyKoE-0006nb-5L
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1565894932;
+ bh=sjqB++GCWNjjWXcs6v9hboDynw6QHR2DxdUD6di7Nt8=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=bFHur7bKeEQ44g9vY4+bxnt+OxBcXIC1wGJYimfwZqPI8RN+6FghHQ9RWUkk7+uB+
+ OBGohxOvTXcN4+8x/DZpK7AOo1ycX4tMyRVm8p91TKtWsAMBthAm3KwFc9SX+i2pve
+ VnKIvRe/e5Fon9qungSKpBWYUhp0x0NKw3cdFkdk=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.245]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MPHC8-1htx5A2T6u-004WmS; Thu, 15
+ Aug 2019 20:48:52 +0200
+Date: Thu, 15 Aug 2019 20:48:49 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Message-ID: <cover.1565894837.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 15 Aug 2019 18:48:25 -0000
-From: Thomas Huth <1832914@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: radmehrsaeed7 th-huth
-X-Launchpad-Bug-Reporter: saeed (radmehrsaeed7)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156054768216.24530.6912218862187194732.malonedeb@gac.canonical.com>
-Message-Id: <156589490532.16226.17627147480305182392.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 0ab30507b523d98432a622f3ff47f97cf312f384
+X-Provags-ID: V03:K1:P41KZVetPFojcP3Qw6ng8leUH4MFEmaF240tx4au0Fw9QhXPatP
+ hIt400M7R3vFejueyYNVOS89L2SZLZ+G+1gbTP2z/O80O0EQsOdYDDU9T5rdc0qhD++TPEr
+ zC/dceQiTAl4/Y5Dy/8Ff1/jjpZV2b37iH9kkBgds6icGcKZcBlicnDuIBbHb29NtJuMJjA
+ ubSNdkfvewYObfMk7Bang==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:5VqTsvOyTp4=:TBn6Wb4aWqqOxdIKEss82m
+ 6s7uehnZulPW2RtcFDZIlYihk7yuHYW0vTJLB1IDoY+jBZmI5folVT2HQnyWVhwSuf+cqgXz/
+ KoE7iV6AzY0EsYoo6Go8kOeI4mURd/aNT48mbytZEpqhCe+TQfE1HhIVZxdOySvhPlngw5H96
+ AMDLajgyEWirc+SsCxvP+hWbQMYjxEiJSwEwChnf/aP3hLwuf3CThCVLsHNPPwpR39SE8RU+l
+ srm+qw0ijYx2LkXYqsRSue+XrjL61cEqzl87Gb7THTXRRusOvTEPvVu6qowPSFJMXDmXdijUN
+ ZIxPipB69SsFK48NKr4JVySoI9aPLhoiRV3atu2tLN8h/BoLotkspdE7pcVz6e2ZlAWScIP2S
+ pRpkpa/+9+fSizLGVclQQMyKsl6VT3z4z1iYPZAmqsXwDUd5LXg2CKFsyltIUKuopzH9mNaIP
+ 1821FRELWU1T1mzblIUDO/Ouk5vsHUftqvmb4WZrqS8qhdx6z5wQZjVTXC9gsQuAa9tBGRmGu
+ x0f6aB+M+w4k/4Os19m35SjDMtACFQLaQajkpMd2gYd30SCdXtoHV7pppfgC9PcsAfT1MHI41
+ FNEuZxRl3JaCHLslb2qkGkTPxUVDOcfW1LHeLf/GIhqMunJkyv29f8A2clH7V0QPenT8Dzvws
+ OdYizA43JRGGtxk3AInHeY74KFbstuORHFO985LlchXoi7GeXNo+6EJqCTeoHGUuueeuminfj
+ t4ZCHuhypgLSwi09rogN0gA5XdmBnGUauFZy09SjzJZc1BMfkJjVOx/03zRnGKj76DEvkjoK4
+ fG+AzMpkmFeiUDf5jE53AWgD44Jq8GAddd/X03gJB7XdZ5RoMQsrzujRuvZp0VAiKYYnWb5fn
+ h33+yw1mYTb9+qC73jGPV7umNXHQ4xhahDgeUSWI9KNgZ6YgIReuVdyV/ePYhswskqkbpO0p2
+ 7qH8eM7KHTnbrTGJbxVZMpLhPwShwv7dvgiMHGENCu2BhSDw9wrR0vOUVpJKwU+EE4qUdxHa/
+ A4X81TUCsCdRIq5pIUXOiEnf3sZuGOyOBQCP2WNJlhZwUTtKZnhuw9E/i1oLztSX21W43s+4+
+ NbWcXCtFgmG+CdgK0ojN5PtUplyTN2bZJNe3YJ1yL3JgiguAlMHpYxPD9C5gaDxcUYXezut5v
+ 1TfZU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1832914] Re: Wrong error log when drive is
- specified qcow but qcow2 image file used.
+X-Received-From: 212.227.17.12
+Subject: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
+ replication
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,44 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1832914 <1832914@bugs.launchpad.net>
+Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>,
+ Wen Congyang <wencongyang2@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix has been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D197bfa7da7c8eeb39aa5
+Hello Everyone,
+These Patches add support for continious replication to colo.
+Please review.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Regards,
+Lukas Straub
 
--- =
+v2:
+ - fix email formating
+ - fix checkpatch.pl warnings
+ - fix patchew error
+ - clearer commit messages
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1832914
+Lukas Straub (3):
+  Replication: Ignore requests after failover
+  net/filter.c: Add Options to insert filters anywhere in the filter
+    list
+  Update Documentation
 
-Title:
-  Wrong error log when drive is specified qcow but qcow2 image file
-  used.
+ block/replication.c  |  38 ++++++++-
+ docs/COLO-FT.txt     | 185 ++++++++++++++++++++++++++++++++-----------
+ include/net/filter.h |   2 +
+ net/filter.c         |  71 ++++++++++++++++-
+ qemu-options.hx      |  10 +--
+ 5 files changed, 250 insertions(+), 56 deletions(-)
 
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  On archlinux qemu version 4.0.0 when I type:
-
-  $ qemu-system-x86_64 -drive format=3Dqcow,file=3Dimage.qcow2 ...
-
-  I get this output in stderr
-
-  qemu-system-x86_64 -drive format=3Dqcow,file=3Dimage.qcow2 ...:
-  Unsupported qcow version 3
-
-  image.qcow2 is a qcow2 image created by qemu-img. error states that
-  problem is with lack support with qcow3 format but real problem is
-  that foramt=3Dqcow is wrong option.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1832914/+subscriptions
+=2D-
+2.20.1
 
