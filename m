@@ -8,81 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 583E1C32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAD5C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2213E208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:43:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95B09208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:44:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PoY8Ekq7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2213E208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GCzTHbuK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B09208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5jc-0004kj-1X
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:43:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50864)
+	id 1hy5k9-0005eq-CG
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46970)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5e6-0006jl-QD
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:37:47 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5De-0006JB-41
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5e5-0006Zx-QZ
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:37:46 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:35659)
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Dd-0000F2-2z
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:25 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:45962)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1hy5e5-0006ZK-MR
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:37:45 -0400
-Received: by mail-qt1-x842.google.com with SMTP id u34so985463qte.2
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:37:45 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Dc-0000Dn-VA
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:25 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id u32so388462ybi.12
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=fFC4esQW2qMfDSIJCUM850Bj6YD7rV98KCqVZlJNxBo=;
- b=PoY8Ekq7CJL+AhECNm8TT86vlhkdVpXgNYZUJMoGBfmAmsu738jsGfpVBnXBR4LbBq
- uZ7iCOekmXif4fP/Mf8NHehRvKFTXTb7nyoR/v0Kdm26RMBSu2K9koeTVXZPfM7Lf3xe
- /L7B4ZM5ZV2YSe/NMjGFb+i8IfgLPZoeHTHLoaXehdQLcbzl9pL+LIHDRLo26o5imd4x
- P3S/FfTnDGv6Fg5cGKQh8QVcoLipQrY4qMQqRAZBsJLtCQkwHRpBQ8Owd11GUOvbxL30
- vf/XJ06/aetE8xYlhIOxU2MHfTAMLz6MkLxCJyYVRObkGK9yBJUCK+CiKXq3Jm6f34fG
- 2CsQ==
+ bh=ChWMIPl+dab6o+BediH5d8eY5VFridF7PbVi1UCCf4c=;
+ b=GCzTHbuKq1+/cvJUsDndSXsF3DN/oieM/iQMqcOYe6zJ0vg82U8rKh73x9RCwVEe5a
+ g6/s9NMO5m0XP83sVn/GucTZjWTfxCSKgoYM/cq9zj3kqLMr67fxOlF3rexX9Svtll8j
+ 4wVGMKbL/ApADJtx+BmtK/W64gmNmw5v1HhydwWtKvnh7nN7MrEpP+wktemKt8Muk0cw
+ EKG/InFa6CZUhIGYCTbZmYpyWQKh8ijRMoZCQ4x7kcnPF+/XKaKY4W0e3xYCng1/TaTC
+ H1BP+6Hixyf8ALXQFf3PgS8H1CRkSWJWiT7AwJVYD6bCXmnwJ0dxDlgGXq6LmXDxG0u2
+ WZmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=fFC4esQW2qMfDSIJCUM850Bj6YD7rV98KCqVZlJNxBo=;
- b=PO7U4hcq1/tKVeL4xjUVK9us3Bz7eeMl3COmLdLLA1og1p8DyE+a5pbBZGrXD0EvL4
- tKAeNKCHrhRXg4NtjoUkJX8JvkTHaL2MZDA0JylRbG413C4Fm+q8HREUMsx2jwbVu4KT
- In8Y4SZwsKWr1q+8iVrUXn7w1V24CL6EzL+aWkjGMbvnWCzob+8r6UQAjRFRGFvaSyfd
- Xq+8PKxhC6/362lN8VsmVSkMKm5GhmLAb8lPiGu7UjewFqDaqHe22pjGmacI0G7sfybw
- xI8LCFhtEhPtOne2UOLCy09+lrZ3u2URukg1kYW53fDmeIykgRut5lZ9VSPy7kWI9jEO
- S6XQ==
-X-Gm-Message-State: APjAAAXHIkDtUivg9550LyqHIbA0qrL/KmDVnubrb9p9J4olBaBLfPfJ
- Sh+ASfcMo5lhIDf6PFQ4IeKqm6lj/Tf7hw==
-X-Google-Smtp-Source: APXvYqyveCOrWKEtnFw6oh2dtBOLRbnVqP+QvHwiaXUQCEz+HBOuKXO5GUHFb2m9Bey0iJDXFC5qBw==
-X-Received: by 2002:aed:3e6f:: with SMTP id m44mr2158452qtf.220.1565836664960; 
- Wed, 14 Aug 2019 19:37:44 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:482:121::1])
- by smtp.googlemail.com with ESMTPSA id t24sm764052qto.69.2019.08.14.19.37.43
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:37:44 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
+ bh=ChWMIPl+dab6o+BediH5d8eY5VFridF7PbVi1UCCf4c=;
+ b=YhwLLdri6onUUmIz7/Um0eIq2p3gVObIR5/+RqlbluF5djIUHaGgQHClFQbsHl0ySH
+ ZfXE4lHdOXZ4ayH9q8SwZzBlBFKgFTvJ1IcmGZTD9cmigq9x9O8S+XxdETv9rRZaM/vC
+ 3SIdiDJmh2HxfqbH7bnLFqJFrPvzfHvszOvnc6Ei1cH/1poNX/I3LU60mL6oMh1aVc87
+ a80wS5ag/XyjeCisNVcu61mKOtOt9tzg/XTUOzhs1KiM2uoAPSIjp/GCBL4KdRxgw4LH
+ mL+c+0Mudk4GVr/rt8dDW+naMUWEjHHd4+dxuhnlIfpqv91or2DzlFroPwO/1L/i32o+
+ RjUQ==
+X-Gm-Message-State: APjAAAWu6QDawEnf/N79Vckao+25d/A4qT6zPbzKg9aNlIfqDduS8xnf
+ GO1pr11JH9tOiwX966ZIuGpaPvWP
+X-Google-Smtp-Source: APXvYqxcijV8iwBOtSQjefYwFM2icUCZISZhudJLROLl40sksa8//EinJQXSeFDlkWuC6FiOk6CxDQ==
+X-Received: by 2002:a25:2f42:: with SMTP id v63mr1956098ybv.228.1565835023859; 
+ Wed, 14 Aug 2019 19:10:23 -0700 (PDT)
+Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
+ by smtp.gmail.com with ESMTPSA id
+ j3sm374882ywk.21.2019.08.14.19.10.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Aug 2019 19:10:23 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:37:25 -0300
-Message-Id: <20190815023725.2659-3-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190815023725.2659-1-vandersonmr2@gmail.com>
-References: <20190815023725.2659-1-vandersonmr2@gmail.com>
+Date: Wed, 14 Aug 2019 22:09:14 -0400
+Message-Id: <20190815020928.9679-33-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
+References: <20190815020928.9679-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::842
-Subject: [Qemu-devel] [PATCH v1 2/2] tb-stats: adding TBStatistics info into
- perf dump
+X-Received-From: 2607:f8b0:4864:20::b41
+Subject: [Qemu-devel] [RFC PATCH v3 32/46] target/i386: introduce gvec-based
+ code generator macros
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,56 +94,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding TBStatistics information to linux perf TB's symbol names.
+Code generators defined using these macros rely on a gvec operation
+(i.e. tcg_gen_gvec_*).
 
-This commit depends on the following PATCH:
-[PATCH v5 00/10] Measure Tiny Code Generation Quality
-
-Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- accel/tcg/perf/jitdump.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ target/i386/translate.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/accel/tcg/perf/jitdump.c b/accel/tcg/perf/jitdump.c
-index 6f4c0911c2..b2334fd601 100644
---- a/accel/tcg/perf/jitdump.c
-+++ b/accel/tcg/perf/jitdump.c
-@@ -8,6 +8,7 @@
- #include <sys/syscall.h>
- #include <elf.h>
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index b28d651b82..75652afb45 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -23,6 +23,7 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg-op.h"
++#include "tcg-op-gvec.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/translator.h"
  
-+#include "exec/tb-stats.h"
- #include "jitdump.h"
- #include "qemu-common.h"
+@@ -5351,6 +5352,18 @@ INSNOP_LDST(xmm_t0, Mhq)
+         tcg_temp_free_i32(arg4_r32);                                    \
+     }
  
-@@ -135,7 +136,19 @@ void start_jitdump_file(void)
- void append_load_in_jitdump_file(TranslationBlock *tb)
- {
-     GString *func_name = g_string_new(NULL);
--    g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc, '\0');
-+    if (tb->tb_stats) {
-+        TBStatistics *tbs = tb->tb_stats;
-+        g = stat_per_translation(tbs, code.num_guest_inst);
-+        ops = stat_per_translation(tbs, code.num_tcg_ops);
-+        ops_opt = stat_per_translation(tbs, code.num_tcg_ops_opt);
-+        spills = stat_per_translation(tbs, code.spills);
-+
-+        g_string_printf(func_name,
-+                "TB virt:0x"TARGET_FMT_lx" (g:%u op:%u opt:%u spills:%d)%c",
-+                tb->pc, g, ops, ops_opt, spills, '\0');
-+    } else {
-+        g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc, '\0');
++#define DEF_GEN_INSN2_GVEC(mnem, gvec, opT1, opT2, vece, oprsz, maxsz)  \
++    GEN_INSN2(mnem, opT1, opT2)                                         \
++    {                                                                   \
++        tcg_gen_gvec_ ## gvec(vece, arg1, arg2, oprsz, maxsz);          \
 +    }
- 
-     struct jr_code_load *load_event = g_new0(struct jr_code_load, 1);
-     load_event->p.id = JIT_CODE_LOAD;
++
++#define DEF_GEN_INSN3_GVEC(mnem, gvec, opT1, opT2, opT3, vece, oprsz, maxsz) \
++    GEN_INSN3(mnem, opT1, opT2, opT3)                                   \
++    {                                                                   \
++        tcg_gen_gvec_ ## gvec(vece, arg1, arg2, arg3, oprsz, maxsz);    \
++    }
++
+ static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
+ {
+     enum {
 -- 
-2.22.0
+2.20.1
 
 
