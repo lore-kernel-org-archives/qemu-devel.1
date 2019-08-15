@@ -2,83 +2,69 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B911C31E40
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F03C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:15:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA1C72063F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:13:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="ZjQPOoPj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA1C72063F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 48D772063F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:15:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D772063F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyBpR-0002qW-WA
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 05:13:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43656)
+	id 1hyBqk-0003me-FR
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 05:15:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43856)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hyBon-0002I4-01
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:13:14 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hyBq4-0003K2-3e
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:14:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1hyBoj-0007DV-St
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:13:10 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:54432)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1hyBoj-0007Ab-90
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:13:09 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::162])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id BED9B2E14E2;
- Thu, 15 Aug 2019 12:13:03 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id
- wBY72Sx7sq-D3ca8cLE; Thu, 15 Aug 2019 12:13:03 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1565860383; bh=B7EK2GhJGApi4tZTOKSu4Y3tsZBqHu13prTvNCPOzVA=;
- h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
- b=ZjQPOoPjBW5UlWDz0n+cAWg7tLNwKPKJAq0+lcwb1/5HuYdQyqKzVDkbbeMjkHN8C
- IVu+2MvYeKw6a9NnWWTgBBdnSHmbFtTVorx366yeEyNGUB25X0z4JuLZQzdx2nGJqY
- GsdVQn/uyJ7GS8SPczOiLf87eghugq3SO5r9MyuA=
-Authentication-Results: mxbackcorp1j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1j.mail.yandex.net (localhost [::1])
- by mxbackcorp1j.mail.yandex.net with LMTP id lmtrCairuk-60OCv4Ek
- for <yury-kotov@yandex-team.ru>; Thu, 15 Aug 2019 12:12:52 +0300
-Received: by sas1-fc7737ec834f.qloud-c.yandex.net with HTTP;
- Thu, 15 Aug 2019 12:12:52 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Peter Crosthwaite <crosthwaite.peter@gmail.com>,
- Richard Henderson <rth@twiddle.net>, Juan Quintela <quintela@redhat.com>,
- Dr. David Alan Gilbert <dgilbert@redhat.com>, Stefan Weil <sw@weilnetz.de>
-In-Reply-To: <2013231565163716@vla1-1374b6242101.qloud-c.yandex.net>
-References: <20190723134215.25095-1-yury-kotov@yandex-team.ru>
- <2013231565163716@vla1-1374b6242101.qloud-c.yandex.net>
+ (envelope-from <no-reply@patchew.org>) id 1hyBq2-0007vz-Ja
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:14:31 -0400
+Resent-Date: Thu, 15 Aug 2019 05:14:31 -0400
+Resent-Message-Id: <E1hyBq2-0007vz-Ja@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21927)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hyBq2-0007vL-Bt
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:14:30 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565860462; cv=none; d=zoho.com; s=zohoarc; 
+ b=OXluaIh3NQjckBLgK8ebCLcHhiqLbckXgGLxs2hLxBw/aMqaSKG9XXUDpD/o6c3C1gEmczDVqZ2B63qfB9mrKJw7cU9ALu9YwlPGUYFKCT0O0aciOEomUbU3cgBTjaQWxwz6foH9rbWO1UTG6jRu77aoPFVSjxiOK9hi3d2U5cU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565860462;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=rbv0hPASHUbXh52EGxbH92T9ZJULn7ojhaPhmCGAbQM=; 
+ b=Mma2lahV7hSbod1xYaRiwMMlqzFEP/c1abnFAKYsW9iOl1e9ZFIk9Q91qArpNzA5T7fqk2FlpO9lYF+HOwcSWTrh61N/31GP6+KI7tx1MZLKDqSO/vwu7YVygBmNmKQjmjxAlX08j1kFntjgz7897G78MvfGDERY/jufWUdtbQs=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565860459096121.29602105391746;
+ Thu, 15 Aug 2019 02:14:19 -0700 (PDT)
+In-Reply-To: <20190815023725.2659-1-vandersonmr2@gmail.com>
+Message-ID: <156586045812.14588.16742949359632852303@5dec9699b7de>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Thu, 15 Aug 2019 12:13:02 +0300
-Message-Id: <3137561565860372@sas1-fc7737ec834f.qloud-c.yandex.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a02:6b8:0:1619::183
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] High downtime with 95+ throttle pct
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vandersonmr2@gmail.com
+Date: Thu, 15 Aug 2019 02:14:19 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Integrating qemu to Linux Perf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,67 +73,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:Overall" <qemu-devel@nongnu.org>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>
+Reply-To: qemu-devel@nongnu.org
+Cc: vandersonmr2@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping ping
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgxNTAyMzcyNS4yNjU5
+LTEtdmFuZGVyc29ubXIyQGdtYWlsLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhl
+IGFzYW4gYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kCnRo
+ZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBw
+cm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBt
+YWtlIGRvY2tlci10ZXN0LWRlYnVnQGZlZG9yYSBUQVJHRVRfTElTVD14ODZfNjQtc29mdG1tdSBK
+PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAgIHg4Nl82NC1z
+b2Z0bW11L2h3L2ludGMvYXBpY19jb21tb24ubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcv
+aW50Yy9pb2FwaWMubwogIENDICAgICAgeDg2XzY0LXNvZnRtbXUvaHcvaXNhL2xwY19pY2g5Lm8K
+L3RtcC9xZW11LXRlc3Qvc3JjL2FjY2VsL3RjZy9wZXJmL2ppdGR1bXAuYzoxMToxMDogZmF0YWwg
+ZXJyb3I6ICdleGVjL3RiLXN0YXRzLmgnIGZpbGUgbm90IGZvdW5kCiNpbmNsdWRlICJleGVjL3Ri
+LXN0YXRzLmgiCiAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+CiAgQ0MgICAgICB4ODZfNjQtc29m
+dG1tdS9ody9taXNjL2l2c2htZW0ubwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
+cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTA4MTUwMjM3MjUuMjY1OS0xLXZhbmRlcnNvbm1yMkBn
+bWFpbC5jb20vdGVzdGluZy5hc2FuLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQg
+YXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-07.08.2019, 10:42, "Yury Kotov" <yury-kotov@yandex-team.ru>:
-> Ping
->
-> 23.07.2019, 16:42, "Yury Kotov" <yury-kotov@yandex-team.ru>:
->> =C2=A0Hi,
->>
->> =C2=A0V4:
->> =C2=A0* The test was simplified to prevent false fails.
->>
->> =C2=A0V3:
->> =C2=A0* Rebase fixes (migrate_set_parameter -> migrate_set_parameter_i=
-nt)
->>
->> =C2=A0V2:
->> =C2=A0* Added a test
->> =C2=A0* Fixed qemu_cond_timedwait for qsp
->>
->> =C2=A0I wrote a test for migration auto converge and found out a stran=
-ge thing:
->> =C2=A01. Enable auto converge
->> =C2=A02. Set max-bandwidth 1Gb/s
->> =C2=A03. Set downtime-limit 1ms
->> =C2=A04. Run standard test (just writes a byte per page)
->> =C2=A05. Wait for converge
->> =C2=A06. It's converged with 99% throttle percentage
->> =C2=A07. The result downtime was about 300-600ms <<<<
->>
->> =C2=A0It's much higher than expected 1ms. I figured out that cpu_throt=
-tle_thread()
->> =C2=A0function sleeps for 100ms+ for high throttle percentage (>=3D95%=
-) in VCPU thread.
->> =C2=A0And it sleeps even after a cpu kick.
->>
->> =C2=A0Fixed it by using timedwait for ms part of sleep.
->> =C2=A0E.g timedwait(halt_cond, 1ms) + usleep(500).
->>
->> =C2=A0Regards,
->> =C2=A0Yury
->>
->> =C2=A0Yury Kotov (3):
->> =C2=A0=C2=A0=C2=A0qemu-thread: Add qemu_cond_timedwait
->> =C2=A0=C2=A0=C2=A0cpus: Fix throttling during vm_stop
->> =C2=A0=C2=A0=C2=A0tests/migration: Add a test for auto converge
->>
->> =C2=A0=C2=A0cpus.c | 27 +++++++---
->> =C2=A0=C2=A0include/qemu/thread.h | 18 +++++++
->> =C2=A0=C2=A0tests/migration-test.c | 103 +++++++++++++++++++++++++++++=
-+++++-----
->> =C2=A0=C2=A0util/qemu-thread-posix.c | 40 ++++++++++-----
->> =C2=A0=C2=A0util/qemu-thread-win32.c | 16 ++++++
->> =C2=A0=C2=A0util/qsp.c | 18 +++++++
->> =C2=A0=C2=A06 files changed, 191 insertions(+), 31 deletions(-)
->>
->> =C2=A0--
->> =C2=A02.22.0
 
