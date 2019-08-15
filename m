@@ -2,166 +2,114 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB1EC32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 00:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00439C433FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 00:53:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9A282067D
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 00:52:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHjOPbMr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9A282067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C79B82067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 00:53:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79B82067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy40E-0004sn-R5
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 20:52:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37570)
+	id 1hy41c-0005rs-S7
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 20:53:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1hy3zW-0004Qw-7y
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 20:51:47 -0400
+ (envelope-from <BROGERS@suse.com>) id 1hy40m-0005Rq-Js
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 20:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hy3zU-0002Fw-Il
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 20:51:45 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:32951)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy3zU-0002FM-Av
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 20:51:44 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id e65so261503ywh.0
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 17:51:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=bXJEih6+5m+tUoHwYHglFIz9w1cp4nIEjFR1O2gLpYk=;
- b=KHjOPbMrtmAJQ/Y99Bh47aEVXAtMqnJLOeIQbkT2zkDhEe1dDr/bqki+dBG/zzyvj0
- OdN5jGhVYr0JeWsZrz+tFXh6hRhLfJrBuFRutkOpoutiGgTbA5zfeWl4L8EiVQmqFEtW
- ILbtH96xIuQhraa4CwoHgpaVEiLVPW6aXGUfYb0l70DDlIH4SAYQQ6rWicY6y3OT0VZ+
- gNLQNn6Hll7bIVXtXTdItoPF5iTGkhVXSwT6x6e5WDM2/2cOqYCPUzOvlfFTDRWSNo+O
- jZALTPn3tTvO9FEJsW2pEOsmoGJDk6X1HyE39Uxfe9INApZw0V2VslGW683loJGyphKO
- oPbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to;
- bh=bXJEih6+5m+tUoHwYHglFIz9w1cp4nIEjFR1O2gLpYk=;
- b=FlX/uk9CSAvpPVeBKPwN+vuhbfJ6j+0CMxWL7RwsBH5h6S6dF8284MJGc1Z0oQbz4n
- 4WG5fMacvFHZ5p37RgMRH46BzJEh3c/0wu2XtVOjKgQVtt/PogFFMiVIOb4z52PhTAb+
- WBejNHIi+18LH7CzpRFqS+M6JjsRKNHpIaHywiBUcgtAvpoedKjLfPPn86xCtdo0rznB
- W/Imwt+ujq+rAINO5K9HUIBwnASCY/eaJ9Oq3oqtOYrqBAPS9fIsNDwlpfsX7Gr1t8Zn
- iEON/NIgqhpqHEOqcLrNvWG91KR+5/m2x/7Vgnc3qeR5TDG9lO8U7K2Ophwix/BQ8iT5
- li3A==
-X-Gm-Message-State: APjAAAVtD1nSeCn21ZdGGX4U8755HX9Zsbq+UVWnW3NBiiogahHS/doC
- GfGfBCKVZUngT2a0+FjNhMk=
-X-Google-Smtp-Source: APXvYqy8rvSC8Wbs4cuRjA7PomekwAAxYGiLq8aoKKDl3VszMxy+LqjZf+qz9yLWmFPnd5QPvYoEYw==
-X-Received: by 2002:a81:8184:: with SMTP id r126mr1474310ywf.26.1565830303503; 
- Wed, 14 Aug 2019 17:51:43 -0700 (PDT)
-Received: from ?IPv6:2601:c0:c67f:e390:8a9a:e33f:caf8:f018?
- ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
- by smtp.googlemail.com with ESMTPSA id e12sm259380ywe.85.2019.08.14.17.51.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 14 Aug 2019 17:51:42 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20190810041255.6820-1-jan.bobek@gmail.com>
- <20190810041255.6820-24-jan.bobek@gmail.com>
- <3b2287fd-df92-ecc2-4eaf-e4f01be57be0@linaro.org>
-From: Jan Bobek <jan.bobek@gmail.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jan.bobek@gmail.com; prefer-encrypt=mutual; keydata=
- mQINBFbeakcBEACzYOxOXdeT3Ns+5fdSqZFODAb3VXBKQ9DL7ooxLQRhvAx6rKXP/ZkBD7eg
- q8DJuvx6FbH227wpX+JZQawtolRJO+BTOuyU4ANPn3LGQHNtI78VhjafK7/Geb/9J6mTLl+P
- iS1EpLjKFbaLQboOaVVCPOHfLJOMNm5Ks9iHVKPQcUWUnroZdm55MIWjRw+wYGpmLD/R+FK/
- Cm1fS3j+tu9VYFoEFZmwW//PYzmEtYHpwXA6dOWEd12cu2208/JcEHYBl0Z6Oga0xAk2OxU5
- BOELuewGLuSiWik4z594GLVleC2NMnr3gUPl1y8ADrKzQwYmPgytIdsQ0tkV5rK9R1XTk03e
- ZLViYWJt5dgea+jGWcHPKPfLln53V4nCbwklGFLJQDMo8hL82bjJ7x9bsXoAnkPxJgYHgsM0
- LCLewqEIN6khniNv/1vOAKnwoXywlIKsWrx/pFz4xXNLVHoLlkRUl1DeWWzuaha2xEsm0yfe
- QkntqMrHC0CkBFzM1/ZE8fj8JBMjMG8me93RK9mr03TV4aROgQfi4Pjy55VKal/WpVkD4tKo
- nTN0nHkPVsHfx+htN/+A3nnUFyfesE1wWdCxhqhIn8d/Aw9KqraYmbyTzRErXLadA4O0UmZZ
- yPyNWQhTgGfJ9r66S+CifsiHkHlzJ/9i9AcHeh6+rXs9gjk4YwARAQABtB9KYW4gQm9iZWsg
- PGphbi5ib2Jla0BnbWFpbC5jb20+iQJRBBMBAgA7AhsDAh4BAheAAhkBFiEETAzi4j5xV5X9
- nNm0vpyriGq+2b4FAlwy32MFCwkIBwIGFQoJCAsCBBYCAwEACgkQvpyriGq+2b6NPw/9Fi+N
- vmxMd81Oh3hHUZlh8fNqcvXmHqnKHslJJG9M8CXkWcd1cF+sWX+lhi2Pvi4KA2Ng++NEpi6p
- sPrY9ZSPb4gAQYFgq6aXonnsrNSHeBMZI0E2mbK1YW4lYYJuMpqotBKqpgpoP9Fd8QbBR9vA
- Dm18fcDQFJP0vBmLY2TWo2tdqUH1X3z1xpdADpdjMZeQ+LrQ823Vi8ib0aanaR+gJ+20w7tn
- M+iTAGSz9jj+IAjDvrt6dpgwKaN+sFpqQFr0ClItDgtWWChIOEo7AVxK35jEHZnRpAbSvX3q
- WxETfA/1/UiDD67FQ5mwzTm95oYw+bN6jYpQgv9BkWeOhvVi63bcQ212B5w/YJ/WysriD2tp
- j/cTbVBgW2Al29fbeKyqdCr43yqR0ZyZcKuOKpwEtkF4xo3Z4ZR6x4uZewCjNirlwKDSI9sE
- w137DWzREIk7sd2kZrMnFAjVOTVic8fs+jCeohuy6Eq7l+lMCWsyJTcXSY3HHmXAgoQu8HRE
- uwQB0H5rTWn4Hz/2OtWlYHxHcqGwcUP3bdxqch001JwycoYJFnqM27whPussfxRK3i6d0CiX
- 8N1lwBb4ukIH8y5ZFmdhMA960aTGVpeew5fnzRveZj2Fn6kPZX7Z5t0eXpdl0sYyKvxPy/rP
- 9atlD0qdA7LSBksLIoSQ5EE+rfhAvSO5Ag0EVt5qRwEQAL1zSWDNDk5M7kPTRuonvez0WbBq
- Sl36BBKMSsAVT7L5TTksQH0T/5N7+vTIXlOTefP2KN+8uITUR7Ld2grjdcLIpx86ff4gVmuv
- P7Xc0wKd/dmDPVqEtBKbCPCtnHznZWUWe/zJNru9aE2RwumMjMzAqXX8VEzy+XSqToneX1a2
- +k6+4ZRWvrJ5Kb+5vs+ccw5hQlWyF7vruUNLLVO9LgPD4BbIKyyhosuVp8PtJqdsz27eb3y0
- oh4ThSwx+S7lYucUB30HUtqBWJ9gMiqmXDLEhx+3v5wxCWm0oko9nnwk0PstRkZ39WAawnix
- gpQ+3Gw32yFZaDOEbfbob2+Tyc3/NA7aTnllvK1ihXaHr7dzwbE96XSEsz1RPOl/Cn2cZ0gY
- 1/kMzUesBqrlyBIGl9TY/QLu3z2B/INwc/ZlN3oEIJRXhS0KvtUA8tT4NSXVz8yLLO7tQv/g
- tSP0B2jsZRhm3QReCJT/cNmlOJ3O7b835Vpd+QbFoyCbKRcT6dVHl+Ay5UZykihg45HXDwtl
- FRgYUh7xJuxHnF8SDMlPcFqdOocPXq/fgfbxDFhLOFIj/qzEI892wu5lxfDGn9u8KCZ8p55N
- YSlcLOYlvDfCr5/syBWqO928XMOXdmQqhUFsP2aV0L3pL35qh7kfsAdSN4S0KgdQq4DUe8Mf
- +GXaHyIVABEBAAGJAjwEGAECACYCGwwWIQRMDOLiPnFXlf2c2bS+nKuIar7ZvgUCXGyXZwUJ
- By12uwAKCRC+nKuIar7Zvj4mEACW5/tViY+6MMv4Qh7zCXTmyNOepFjaSdbeBXpgL6IHbO3y
- kH5K90vCGl8rgQvIxOnX5cj/o1/y8NnfJ+lv94Hlqg9DkDHt4V2Zu570gIs81dlhxOqjZh/h
- 14LLigmx699j6ZfpRksuGKS07/3ZomrBBsMTzK+44+BXX1zLBqSamwD038TAq8n9DwILAVma
- 5C814/i1OciQz2HhK6QH8hMFMtX/8E//B6Q5oy9GPjrznYy+Wq52cmrwX7asqTkJ8q+oryaO
- I/popEdiE2boPz2KTa2fti2otyhU7Qc1iTdvIoUxyXZtQP7bI5RspvGHk6IP+5ksOdBjG6D6
- IifJ1gw7cHip1mxz75uFb52jscIjkdSDhveAiSqnwAlMBy/UD2QVwTTL2o34jXwofkK+I20S
- J5kDhUuqYrsD4zMGHX/PWa7w7oeUU3cHejj0KI6MrN6LdvYPckycglZbS2AKUd82m6XES8gA
- 2pVPSjTH8BQKQ/Bbdgt7X416igU0nfpuj5aXe3NuLSO1sJbYRGFERTkUgxZm/RpRytGL4SPt
- PQUBJBl8uNYwyN5Y19lwsghGFPeYeTgcPsaEf6YsLVwozZBId4WNDAaVgnxibxH4Xjb6JkwJ
- 2W9jjN3tvmY+O0w1rnvRIJ99Btq6Qls7Nj+tdDDEKhufxpRrHTmwBUuLN+zZ9LkCDQRcbJZM
- ARAAvczli16jbnLXksVpMj0Z8JRiIdJvE23xofalA4R+Y5oKrK+mcpTUcb+XIdkArrQNQQtq
- pgPHLI5Dn4urmgs4E9KlBe+4fQBIzP0jyx8wH1MjhGak9QQXpLL5Z6evUdhjuyIoAb5rUgOb
- yl+wu9vmIYsJD4HzYul+nQkx/RxTZ3/OUN5JamL7AoAL5dHKOSpEUqRHq7ZoNqn6OGDxRInX
- dgnSs0SDYVAKVK7B8iFhEmdFXN25jOXLAtwtAh9cVGISfjEQftlvnoLQ6g+UbJ0XMWr6Y8pf
- mfOXPEoP9takIlhoZqxFiJ98lHtbkJ2u0hDTuAYe+HxBZT16bcCsucSITC6h3qQJTMxJgQ0C
- 5fA23ZUA9l4RszA7Lb6/wxIzko2jzZDbMaK8tsX5hHn7pJoPA34w3sY9hocMn707PWcxVVYf
- zl9YL3cAqcbD3hMTi3v+ukw7ArQ8sKaSYMBBC9GH54ePmiLpJ3wOsgNxxeIVvnCjVwMms8Br
- fLfnV+kuB0GABOOCsVXLkS73VjpouDzZ9k7SuZ+wVPZbJfgqLIHOT/j2nyVYVQCmzZ733E2c
- 1/Qywe2hUfZz5NWg4fFiFywBGqcHCoeMjDuZgJ6VRMxtfAQhC3FWoLrcQYhY3l1MvNToIm6M
- 4quvsQcJ6CMnVxpu1ULAhSkpmTvsH0BCjWeYLBEAEQEAAYkEcgQYAQoAJgIbAhYhBEwM4uI+
- cVeV/ZzZtL6cq4hqvtm+BQJcbJqwBQkBn0q2AkDBdCAEGQEKAB0WIQRI9g6q0xHepFmsS61l
- 6DaV2uM2zwUCXGyWTAAKCRBl6DaV2uM2z0m3D/9ebunqJVHvk1pIiJ29GfzXqUIVCyG3aXyG
- T0RwXrQ9mKil+6/zLvAWh9NeksSIqKFDCQkC55WTUd1jL/lpDdipLo32BBLG+N0L40Nab1dM
- QldolDWocwmJuD99bWJmd0bkmVGCLDiXVgOyec8BFggixnqVEvrz7Sh0lP9tnsb4BE7v63Q0
- q8uFt+n3swBvMnbjbNs2uGCyRz4f0tasF3Dd3R+08LZydrarJ15C0Smqghjald8UmJNi7uvI
- ZVwcEHSt6imp9gd4uAtcis8ebXkwAkWhW/n5DCpNVlZ8ve3haA767SJCuf4eIcPLIwW9KcgE
- nZ3zQPqclkd9TEmttIxk7C/MoRjxNC+gkyAMQXksxPIDVutythS8JVacMSaDshFtO0RiZ/mH
- e4oGdsBcRhThM923M9iMZAM1XLQpd5Pe+VhDsDN3+QXwkDH88t7tocamj/Ew5UT8qmZy7BJt
- vtDPeybOgxgiVDTlvEARUHK20UiLa7l8HEnJNInlSjakch6MF6axI1Ye81Ahc/snl5PP1gYl
- lmoQkJlRPTYgH/NLtRqcECff5pjOtUEoWWXrxRSKc0QRsTT5DhC4Z2CX3p6k0RDeMvZJnbyV
- geYWFyT5YBPvZBf0meL541JsfvTpOhcfdk//2RvMsyxNaGeemvWQEJKg/C/fTH3So3pEmPkE
- GwkQvpyriGq+2b6xKw//ToIcWJv1S+COsfuCZLTPL0f80pIr7yFYGcOcEfhbkdoZHAcWZP/X
- 50NeUuSOYGoT6+pU6a6lvycB7JTuAHuSIHo8HpIPF+sju14FN47Yd1n9akW89HLeSzR5paw3
- g9FD1TbK9uFmK+bxMREAj1Gtd7qcummK6ArpjkEdOjwPXBz9n1iVo/Jgq11Mbhg8TYCP8WRw
- 8Lv+znH/cTSTgDxM92S79wDuFoO50zhlWzPa/g2prrUIxJxs74uBEGYy8LulRv25MfdQJVAY
- YE6+HYAJL6S/ko2m6XCr3hLsnD0kXamzvpJtDhbgBcXDd05XDjEFurZTOWv+thwVb+BAedhP
- XrH9DQ7/VUQBHnXz1ts5NYMjBI5NC1d16DYPtkCY0N9Jcv+fyJlAYpS7PHlZsyZmK7uUbm6p
- xRARxxjf+U86NTBAtdnDIO/NYxhX587vXuTm2pA2pnkKYTK74QLc/ys6rO3Cwo2QSFkxx3UZ
- uD1PmEfcmmfqPmuv037Dzpe5hYj5csGsdNLMLSK1WZqaAhBAtCnh3Rme71Je7f+eObRAHHGZ
- sftsaIi3kpdIyUnKybZhViIlXs8Cde5O2HCI0NhHnaDnxKdmHaIZVlH1hX3koaRrWCeGjts1
- WWOVGHwSUSJ3lpUXEBHBicrX3bH/vUVTNTnwzGLSf/23VC9WYAe69II=
-Message-ID: <70531d32-93d9-ae7e-26d0-5183b89b6faa@gmail.com>
-Date: Wed, 14 Aug 2019 20:51:41 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <BROGERS@suse.com>) id 1hy40j-0002oi-IC
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 20:53:02 -0400
+Received: from m4a0039g.houston.softwaregrp.com ([15.124.2.85]:57882)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <BROGERS@suse.com>) id 1hy40h-0002mB-BE
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 20:52:59 -0400
+Received: FROM m4a0039g.houston.softwaregrp.com (15.120.17.147) BY
+ m4a0039g.houston.softwaregrp.com WITH ESMTP; 
+ Thu, 15 Aug 2019 00:52:43 +0000
+Received: from M9W0067.microfocus.com (2002:f79:be::f79:be) by
+ M4W0335.microfocus.com (2002:f78:1193::f78:1193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10; Thu, 15 Aug 2019 00:50:00 +0000
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (15.124.72.11) by
+ M9W0067.microfocus.com (15.121.0.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1591.10 via Frontend Transport; Thu, 15 Aug 2019 00:50:00 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Pa8779bqitgZVRhORCSmp0zZiF3dO77swTrtl4iWLYm4vNt6ALwD5J6ZrC5svb85Dh7OPbsmoTTJh4lPDEsWmU1kDmaykqScj72JwklbYKXil15LGFXlcAK/q2fUkHgfUhlHU9Od7Uy5OatPla9pcyMKB/rE7T6P7Tw4K8aA1z1kmg4Xt3aCH/1+o/MPUgKIvFviFJSAZL4AFTJJE3VdeglqlOvuyrwg0puMHni0vPQF3QEXoc56iI2US5nrrMjE6j4l8xIH1pOK8Nk4HhUv5aBH0Wg4u4OGclG61xTI8TYJJO7uCDMm7rwOJvfsm4A0nqOZwLXzlfqcuZe1GLy4aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WTWzyvGyN/065mN23dhwAxHshB6OQVeepSwFNZu1K1E=;
+ b=KcekBdg83qW/+tuwJ38pVZaEmlWao3bzlwoXHBv9VjBt4rq+Mf5ZZvmJKqVaYuck+og9fNCM121iZDf4HPxfqrhkkUQf/JxYEPLQ8fZwVfPozLAjm+kkKfghkvQeZ2OjANQEhPCKX8hY7tTjJhmWRpy2/maL/q1JksmjJ2KigzbtQeudrLPlfxHfp143cDxd4pDfnQng/XJRIoNVLhw45FyJo/u+S9SpG9zunq6OL6SumBvhWPAv2czIab1cyLafMyqbknqcZP+J6wIIGcr6GlQqs51STSw4Z8oeYktZu1YVhBIDrV47ciZ4SM6VbA/dYVuOvvUAvL+Gd1FJj0M81w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+Received: from CH2PR18MB3096.namprd18.prod.outlook.com (10.255.155.222) by
+ CH2PR18MB3287.namprd18.prod.outlook.com (52.132.247.84) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.18; Thu, 15 Aug 2019 00:49:58 +0000
+Received: from CH2PR18MB3096.namprd18.prod.outlook.com
+ ([fe80::54ad:4562:f961:5610]) by CH2PR18MB3096.namprd18.prod.outlook.com
+ ([fe80::54ad:4562:f961:5610%3]) with mapi id 15.20.2157.022; Thu, 15 Aug 2019
+ 00:49:58 +0000
+From: Bruce Rogers <BROGERS@suse.com>
+To: "ehabkost@redhat.com" <ehabkost@redhat.com>, "marcel.apfelbaum@gmail.com"
+ <marcel.apfelbaum@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Thread-Topic: current QEMU can't start pc-q35-2.12  SEV guest
+Thread-Index: AQHVUwNccBcqwdRS4UOs8Xi34penKg==
+Date: Thu, 15 Aug 2019 00:49:58 +0000
+Message-ID: <89368c9df9e960ead712227ac8dd3e1793c164b0.camel@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=BROGERS@suse.com; 
+x-originating-ip: [63.248.144.38]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5ee1f55d-5cd8-435a-2729-08d7211a7f84
+x-microsoft-antispam: BCL:0; PCL:0;
+ RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);
+ SRVR:CH2PR18MB3287; 
+x-ms-traffictypediagnostic: CH2PR18MB3287:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <CH2PR18MB3287B9360CFD776ED096303FD9AC0@CH2PR18MB3287.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 01304918F3
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(366004)(376002)(396003)(136003)(346002)(39860400002)(199004)(189003)(14454004)(5660300002)(478600001)(3846002)(2501003)(6116002)(99286004)(53936002)(6436002)(4326008)(36756003)(86362001)(110136005)(2201001)(91956017)(71200400001)(64756008)(66066001)(6486002)(476003)(66446008)(8936002)(76116006)(25786009)(118296001)(66946007)(486006)(2906002)(66556008)(316002)(66476007)(71190400001)(6512007)(6506007)(8676002)(7736002)(81166006)(186003)(26005)(305945005)(102836004)(107886003)(81156014)(2616005)(256004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:CH2PR18MB3287;
+ H:CH2PR18MB3096.namprd18.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: suse.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 6AHbairO8yotJA9EF1Dazr6mjRs/Y2jyCMxrhCb5jPucEtyFCQR/Pha1FXO8u9/oblX3FLxrrpARVJzvcF3PiDWc+W++C3DIcWR6/+jvtEE6pzmk/g5BPYL+2638l7u1hx12bUuFQKkg/0NqXitFxy/7vZ3tbQyO5tLmkZuyOyNxCGOT5LYK+lE69i5m3qQHmkAf4WY8qPxaHR6pesJZGoLmE3EFNQFZ+PQqsrh+nSqBLzIlUADFnJHK1VEph3ViknTsOc0B1pVLkHlLwtNirOaZewZq2p7MKey2IcdT2fR5+yGL2RYQ18xf50qIrQbb5zKUxJsSppt2nhie0eqWwvJ9NpQg5n33UEC4imdjLyA75Lkp0Wjeqf4+2neSJcxVLWyoVBBI+621AHcWhWongGXvi2OYUhhgC2ybkT7G570=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <74EFDA7D16439E4B802BB1B05E469DE9@namprd18.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <3b2287fd-df92-ecc2-4eaf-e4f01be57be0@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="bjg89lcR8Kt0zJVm3CCx8eWo9Ox2iBMQp"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::c43
-Subject: Re: [Qemu-devel] [RFC PATCH v2 23/39] target/i386: introduce
- instruction translator macros
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ee1f55d-5cd8-435a-2729-08d7211a7f84
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2019 00:49:58.7008 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 856b813c-16e5-49a5-85ec-6f081e13b527
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: R4Wl/AHRh7KH5x+1cHIOdkb8+hsbbcBotVMwdU7VuMD5znX+oz1kRamqgn/sVG+629Mt+yXyj4SO3YBCoRBuSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR18MB3287
+X-OriginatorOrg: suse.com
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 15.124.2.85
+Subject: [Qemu-devel] current QEMU can't start pc-q35-2.12  SEV guest
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -173,92 +121,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Liang Yan <LYan@suse.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bjg89lcR8Kt0zJVm3CCx8eWo9Ox2iBMQp
-Content-Type: multipart/mixed; boundary="3AHKMI34WVA0xoeyj7kon4Shqxw5Vdgzp";
- protected-headers="v1"
-From: Jan Bobek <jan.bobek@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Message-ID: <70531d32-93d9-ae7e-26d0-5183b89b6faa@gmail.com>
-Subject: Re: [RFC PATCH v2 23/39] target/i386: introduce instruction
- translator macros
-References: <20190810041255.6820-1-jan.bobek@gmail.com>
- <20190810041255.6820-24-jan.bobek@gmail.com>
- <3b2287fd-df92-ecc2-4eaf-e4f01be57be0@linaro.org>
-In-Reply-To: <3b2287fd-df92-ecc2-4eaf-e4f01be57be0@linaro.org>
-
---3AHKMI34WVA0xoeyj7kon4Shqxw5Vdgzp
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 8/13/19 2:30 AM, Richard Henderson wrote:
-> On 8/10/19 5:12 AM, Jan Bobek wrote:
->> +#define CASES_LEG_NP_0F_W0(opcode)              \
->> +    case opcode | M_0F | W_0:
->> +#define CASES_LEG_NP_0F_W1(opcode)              \
->> +    case opcode | M_0F | W_1:
->> +#define CASES_LEG_F3_0F_W0(opcode)              \
->> +    case opcode | M_0F | P_F3 | W_0:
->> +#define CASES_LEG_F3_0F_W1(opcode)              \
->> +    case opcode | M_0F | P_F3 | W_1:
->> +
->> +#define LEG(p, m, w)                            \
->> +    CASES_LEG_ ## p ## _ ## m ## _W ## w
->> +#define INSN(mnem, cases, opcode, feat)         \
->> +    cases(opcode)                               \
->=20
-> It appears as if you don't need the CASES_* macros here.
->=20
-> #define LEG(p, m, w, op) \
->    case P_##p | M_##m | W_##2 | op
->=20
-> #define INSN(mnem, leg, feat) \
->    leg: translate_insn(env, s, CK_CPUID_##feat, gen_insn(mnem));
->=20
-> so long as P_NP is in the enumeration above with value 0.
->=20
-> Unless there's some other reason that opcode needs to stay separate?
-
-I was thinking ahead with the CASES_* macros here: if I have LIG
-and/or WIG in the VEX prefix, I'll need more than one case label,
-but only one label in other cases. However, that's not a reason
-for the opcode to be separate, and I think I like it stashed with
-the rest of the prefix fields better.
-
--Jan
-=20
-
-
---3AHKMI34WVA0xoeyj7kon4Shqxw5Vdgzp--
-
---bjg89lcR8Kt0zJVm3CCx8eWo9Ox2iBMQp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEESPYOqtMR3qRZrEutZeg2ldrjNs8FAl1UrJ0ACgkQZeg2ldrj
-Ns/VvRAAiGjNMP2Z+/UEAHw9uGMModxOMhYW/SD094Jy+B/c1u4KW0KQWcb4LNoJ
-Axmdw/el7/txRUvZYtjjREHEnaCBodDLZ0HjITmuYmZJLKnQ252PF7rCrSWhAIte
-2tXhkjFWw1jm+7nKHFp1wqdLUb9x/HQ16P0dv31UhKRK3Kdx6VL5LsR6QZDmw47i
-9W2dJIw9KiVWBLvHflAbYjlV3atjD8u+4od0yMNEWdGYhaafd4q2Z21BsZz5XFRS
-rMc1SthjqhjoNO47I9Giy1eab2zumAxP9Ud2EuGvQbX5izq47h3Mngby9xAALYZ4
-7httgnVv/ZStNGKGLhBnvZspj6zHSH0xFljjFAnIuvehOQMb0TNKDvWVMTaDLKbF
-rzDRf6DlxAZjjOECTh1vSkb2fpr4qlloTB9I9wTQCI51+OF35moDHLnFRm0PN7JR
-pw/LBow3DubWRjgMAqLYvhJW01iTG5lHGOcWSee0kjBNgQMdjR6lrfhrSePJXigu
-0TZJ5dQQgs/mS7HMcEUPeBG5IuetJrdBy9zmCvvpt1yGXujSUdjg2PnR1YmTQwJN
-0iWqIaXn+DzgEmHibwHBqTG+733Pa7MzTBl3+qnQcppENeG7F7LIxqeQTwYxcqY/
-0hGnjfi2KlZi+FWhERXkLQulwaY9ycHPpuAYkLwuGQuOUBJb/BM=
-=jj8S
------END PGP SIGNATURE-----
-
---bjg89lcR8Kt0zJVm3CCx8eWo9Ox2iBMQp--
+SGksDQoNCkkgcmFuIGludG8gYSBjYXNlIHdoZXJlIGEgZ3Vlc3Qgb24gYSBTRVYgY2FwYWJsZSBo
+b3N0LCB3aGljaCB3YXMNCmVuYWJsZWQgdG8gdXNlIFNFViBhbmQgdXNpbmcgYW4gb2xkZXIgbWFj
+aGluZSB0eXBlIHdhcyBubyBsb25nZXIgYWJsZQ0KdG8gcnVuIHdoZW4gdGhlIFFFTVUgdmVyc2lv
+biBoYWQgYmVlbiB1cGRhdGVkLg0KDQpTcGVjaWZpY2FsbHksIHdoZW4gdGhlIGd1ZXN0IHdhcyBp
+bnN0YWxsZWQgYW5kIHJ1bm5pbmcgdW5kZXIgYSB2Mi4xMg0KUUVNVSwgc2V0IHVwIGZvciBTRVYg
+KG9rIGl0IHdhcyB2Mi4xMSB3aXRoIFNFViBzdXBwb3J0IGJhY2twb3J0ZWQsIGJ1dA0KdGhlIGRl
+dGFpbHMgc3RpbGwgYXBwbHkpLCB1c2luZyBhIGNvbW1hbmQgbGluZSBzdWNoIGFzIGZvbGxvd3M6
+DQoNCnFlbXUtc3lzdGVtLXg4Nl82NCAtY3B1IEVQWUMtSUJSUyBcDQotbWFjaGluZSBwYy1xMzUt
+Mi4xMixhY2NlbD1rdm0sbWVtb3J5LWVuY3J5cHRpb249c2V2MCBcDQotb2JqZWN0IHNldi1ndWVz
+dCxpZD1zZXYwLC4uLg0KDQpUaGUgZ3Vlc3QgcmFuIGZpbmUsIHVzaW5nIFNFViBtZW1vcnkgZW5y
+eXB0aW9uLg0KDQpMYXRlciB0aGUgdmVyc2lvbiBvZiBRRU1VIHdhcyB1cGRhdGVkIHRvIHYzLjEu
+MCwgYW5kIHRoZSBzYW1lIGd1ZXN0IG5vdw0KaHVuZyBhdCBib290LCB3aGVuIHVzaW5nIHRoZSBl
+eGFjdCBzYW1lIGNvbW1hbmQgbGluZS4gKEN1cnJlbnQgUUVNVQ0Kc3RpbGwgaGFzIHRoZSBzYW1l
+IHByb2JsZW0uKQ0KDQpVcG9uIGludmVzdGlnYXRpb24sIEkgZmluZCB0aGF0IHRoZSBoYW5kbGlu
+ZyBvZiB4bGV2ZWwgaW4NCnRhcmdldC9pMzg2L2NwdS5jIHJlbGllcyBpbmNsdWRlcyBhbiBleHBs
+aWNpdCBkZXRlY3Rpb24gb2YgU0VWIGJlaW5nDQplbmFibGVkIGFuZCBzZXRzIHRoZSBjcHVpZF9t
+aW5feGxldmVsIGluIHRoZSBDUFVYODZTdGF0ZSBzdHJ1Y3R1cmUgdG8NCjB4ODAwMDAwMUYgYXMg
+dGhlIHJlcXVpcmVkIG1pbmltdW0gZm9yIFNFViBzdXBwb3J0LiBUaGlzIG5vcm1hbGx5IGlzDQp1
+c2VkIHRvIHNldCB0aGUgeGxldmVsIHRoZSBndWVzdCBzZWVzLCBhbGxvd2luZyBpdCB0byB1c2Ug
+U0VWLg0KDQpUaGUgY29tcGF0IHNldHRpbmdzIGZvciB0aGUgdjIuMTIgbWFjaGluZSB0eXBlIGlu
+Y2x1ZGUgYW4geGxldmVsIHZhbHVlDQphc3NvY2lhdGVkIHdpdGggaXQgKDB4ODAwMDAwMEEpLiBV
+bmZvcnR1bmF0ZWx5IHRoZSBwcm9jZXNzaW5nIG9mIHRoZQ0KY29tcGF0IHNldHRpbmdzIGdldHMg
+Y29uZmxhdGVkIHdpdGggdGhlIGxvZ2ljIG9mIGhhbmRsaW5nIGEgdXNlcg0KZXhwbGljaXRseSBz
+cGVjaWZ5aW5nIGFuIHhsZXZlbCBvbiB0aGUgY29tbWFuZCBsaW5lLCB3aGljaCBpcyB0cmVhdGVk
+DQphcyBhbiAib3ZlcnJpZGUiIGNvbmRpdGlvbiwgb3ZlcnJpZGluZyB0aGUgb3RoZXIgeGxldmVs
+IHNlbGVjdGlvbnMNCndoaWNoIHdvdWxkIG90aGVyd2lzZSBiZSBkb25lIGluIHRoZSBRRU1VIGNw
+dSBjb2RlLg0KDQpTbywgaW4gdGhlIHNjZW5hcmlvIEkgZGVzY3JpYmUgYWJvdmUsIHRoZSBvcmln
+aW5hbCwgd29ya2luZyBjYXNlIHdvdWxkDQpwcm92aWRlIGFuIGNwdWlkIHhsZXZlbCB2YWx1ZSBv
+ZiAweDgwMDAwMDFGIHRvIHRoZSBndWVzdCAoY29ycmVjdCksIGFuZA0KdGhlIGZhaWxpbmcgY2Fz
+ZSBlbmRzIHVwIHByb3ZpZGluZyB0aGUgdmFsdWUgMHg4MDAwMDAwQSAoaW5jb3JyZWN0KS4NCg0K
+SXQgc2VlbXMgdG8gbWUgdGhhdCB0aGUgaGFuZGxpbmcgb2YgdGhlIGNvbXBhdCBzZXR0aW5ncyBh
+bmQgdGhlDQpleHBsaWNpdCB4bGV2ZWwgc2V0dGluZyBieSB0aGUgdXNlciBzaG91bGQgYmUgcHJv
+Y2Vzc2VkIHNlcGFyYXRlbHksIGJ1dA0KSSBkb24ndCBzZWUgaG93IHRvIGRvIHRoYXQgZWFzaWx5
+Lg0KDQpIb3cgc2hvdWxkIHRoaXMgcHJvYmxlbSBiZSByZXNvbHZlZD8NCg0KSW4gbXkgY2FzZSwg
+SSd2ZSBhZGRlZCB0byB0aGUgY29kZSB3aGljaCBpcyBmb3IgY2hlY2tpbmcgYSB1c2VyDQpwcm92
+aWRlZCB4bGV2ZWwgdmFsdWUsIHRoZSBjaGVjayBhZ2FpbiBmb3Igc2V2X2VuYWJsZWQoKSwgYW5k
+IGlmIHRoYXQncw0KdGhlIGNhc2UsIEkgc3RpbGwgYXBwbHkgdGhlIGNwdWlkX21pbl94bGV2ZWwg
+dmFsdWUuIFRoaXMgd29ya3MgZm9yIHRoZQ0KdGltZSBiZWluZywgYnV0IGRvZXNuJ3Qgc2VlbSB0
+byBiZSB0aGUgcmlnaHQgc29sdXRpb24uDQoNCkxvb2tpbmcgZm9yd2FyZCB0byB5b3VyIGhlbHAg
+d2l0aCB0aGlzIGlzc3VlLg0KDQpUaGFua3MsDQoNCkJydWNlDQo=
 
