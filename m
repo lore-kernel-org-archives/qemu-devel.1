@@ -2,87 +2,87 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DF9C433FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 150DBC32753
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0E59208C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:47:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2C0B208C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:47:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PDY8tVWt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E59208C2
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oxv5q8mF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C0B208C2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5nV-0001Nv-Dw
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:47:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48660)
+	id 1hy5ng-0001ei-KW
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:47:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5Ma-0000qZ-Ig
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:41 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Di-0006Qu-Hw
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vandersonmr2@gmail.com>) id 1hy5MZ-0001me-0X
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:40 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:44450)
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5Dg-0000Ki-S8
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:30 -0400
+Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:33201)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
- id 1hy5MY-0001mP-T3
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:38 -0400
-Received: by mail-qt1-x844.google.com with SMTP id 44so889662qtg.11
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:19:38 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Dg-0000KJ-N6
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:28 -0400
+Received: by mail-yw1-xc43.google.com with SMTP id e65so307189ywh.0
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Wb4KcoWnaCnYbF72DRr9dR9BuvxlxCZEPYlHe1HxHes=;
- b=PDY8tVWtz9ZEd2wVc6ThuiHPtaDV73Z27I5in8d5oLUVv7BJ6/PCP/tLHqFIbf6nGM
- xoCOeEacn007gPZ+NZOb8lmCWb5pYyJk1MHAB2QE2Vl89kJF7pEwiR2dUev29BUNC6j5
- F8jw1BDoViQSdKuj9ejWgaSMCk4wQyIlAnyn8Rc3IyOX2VIGhvoiXw8Jyc6XOrWpqZy7
- Fo+bKY+tgrILJgqOU0jVGP2V8w838fZov2gBr8DQay98445YqxYdG6cJtbGS4CWtmEwS
- v+XF3j6J13fVORh2i4X81k+9a6He/T3+jfVEEPfzvCRYmKfFuubrYhLe9pm9bH3P0SzN
- 2C8A==
+ bh=YAFcdKLU/wuX+zS9zd557KA961hwea+B01MnE+gI14k=;
+ b=oxv5q8mF4ud7oXxehddLjWFtY56/DlvYUOganMaKIlsvBxP/kCPcguuuYg6M3NOebS
+ dDLZOdqv04iA1Rf8lQMGYr6c6fIDVTUlyPPdnT4nzfNi3W8WQqYm5mKlLbUU/QwEP/ID
+ k0wlzmjHluk9MgCHJ9SoD4cD9P7oA+1kX7Bc25mTgsaHnKPEWYZhqAzWv5yQgXEkGOuu
+ q/8lDMf3wCkoiiFZQnRaMCrYcC2XWaFn2FbareHx4hAmMFo2d+gngiNq0NA7WiyurhL7
+ 60jzm8m7pSsMELe0c+8jFZfO8gXfxK9SpQIE87OJldxnextRByRVQPEnODv7+05+tFfc
+ 6Dgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Wb4KcoWnaCnYbF72DRr9dR9BuvxlxCZEPYlHe1HxHes=;
- b=bSc6NLjUD2W+C4Y8mgr7y5ojRkWMWAAzOfzsMk3GnTRMaZv4oV/jNAFj3GYHYDbS/h
- 7ABuBHlF7Rsc0/YrWx4kqtDtKddPD5VgZ+8bxM0vzCH2/7RX/OSEwnvTap3g/+ieibMl
- QnNV99HbKyVhp9LGOWzYRTZ+coWF3uk/OTKMQUowZmxbPh/89oJTywHRuMs95spE6u+b
- Scko+Kp36kMWnvAIhtJAzhFtdYdBBWj/nbb2XH0rQgM/00BZ1Ms5nQvpO0EiaV658Rqk
- B5gz2FdTha8TpwQXUZHT6e/DhoHGoAq7cf2BqHlTRbzzQ2spInHAVtbB9mPnhyAks+Vl
- 2HzQ==
-X-Gm-Message-State: APjAAAWfdm0ac2nPCit9SnE+uf8DUH6MZYK1N1yftAUkCW5n6fVCImRD
- z6qWv6YQvcxTFNtiQH7IP+rs+v4RyCs=
-X-Google-Smtp-Source: APXvYqwVZijoYBGnZMtpa/+zotDo0Nus1YjM4Vt+ugKHwyGvVSssLW6cGvJXGm+3NkDrTfrIVLe+Mw==
-X-Received: by 2002:a0c:96a8:: with SMTP id a37mr1881222qvd.132.1565835578028; 
- Wed, 14 Aug 2019 19:19:38 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:482:121::1])
- by smtp.googlemail.com with ESMTPSA id o5sm757943qkf.10.2019.08.14.19.19.36
- (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:19:37 -0700 (PDT)
-From: vandersonmr <vandersonmr2@gmail.com>
+ bh=YAFcdKLU/wuX+zS9zd557KA961hwea+B01MnE+gI14k=;
+ b=LjMdnPAQ/OKLFVHvaV4XlchnMesRA9qPo7aOJqv2a9D/VkBhX4Z3CPoomm+iGUTN6+
+ i4gYaL8nj6e8/EXk44YNgm6vLq5172WvxAQbISChobVBh9w0xX1HIvR6KherzCvEfHWV
+ jpIoygMO75K7Wsp3MZPeBHqoRJprsb1n3OVVYiRYHyPikP6fuY9kOr97MeC1HnqjGQd+
+ DXxpaaiw0p+oqeTmjBRpKwsd7c3gaJaHuRy/yFTUH78XaSUKCPuwdYHrtHjOT0QNeSjT
+ 7BBCBC8mBwlRSz/KsT/QHnC/ghUt/F3M4QopiaZpltqjM0G0oXL/eQxW6xLx7SzKEIhE
+ OexA==
+X-Gm-Message-State: APjAAAUxom1Q0QshqbxdIfuqgvtkfUdfmne0QSFQxpeVC+WjrO5tqWX9
+ v1Xnb2cUHg6y24FDQsAelwVQ13vh
+X-Google-Smtp-Source: APXvYqyEQjnEhumjeSZbEQqCyjdlUrG/6h9iB2xO7rM0t7wRog+kS/bTakeY/HCDg9L8liAUD+Efrw==
+X-Received: by 2002:a81:8501:: with SMTP id v1mr1557260ywf.187.1565835028024; 
+ Wed, 14 Aug 2019 19:10:28 -0700 (PDT)
+Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
+ by smtp.gmail.com with ESMTPSA id
+ j3sm374882ywk.21.2019.08.14.19.10.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Aug 2019 19:10:27 -0700 (PDT)
+From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 23:18:53 -0300
-Message-Id: <20190815021857.19526-7-vandersonmr2@gmail.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190815021857.19526-1-vandersonmr2@gmail.com>
-References: <20190815021857.19526-1-vandersonmr2@gmail.com>
+Date: Wed, 14 Aug 2019 22:09:19 -0400
+Message-Id: <20190815020928.9679-38-jan.bobek@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
+References: <20190815020928.9679-1-jan.bobek@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::844
-Subject: [Qemu-devel] [PATCH v5 06/10] log: adding -d tb_stats to control
- tbstats
+X-Received-From: 2607:f8b0:4864:20::c43
+Subject: [Qemu-devel] [RFC PATCH v3 37/46] target/i386: introduce MMX
+ instructions to sse-opcode.inc.h
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,221 +94,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Jan Bobek <jan.bobek@gmail.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding -d tb_stats to control TBStatistics collection:
+Add all MMX instruction entries to sse-opcode.inc.h.
 
- -d tb_stats[[,level=(+all+jit+exec+time)][,dump_limit=<number>]]
-
-"dump_limit" is used to limit the number of dumped TBStats in
-linux-user mode.
-
-[all+jit+exec+time] control the profilling level used
-by the TBStats. Can be used as follow:
-
--d tb_stats
--d tb_stats,level=jit+time
--d tb_stats,dump_limit=15
-...
-
-Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- accel/tcg/tb-stats.c      |  1 +
- accel/tcg/translator.c    |  1 +
- include/exec/gen-icount.h |  1 +
- include/exec/tb-stats.h   | 15 ---------------
- include/qemu-common.h     | 15 +++++++++++++++
- include/qemu/log.h        |  1 +
- tcg/tcg.c                 |  1 +
- util/log.c                | 35 +++++++++++++++++++++++++++++++++++
- 8 files changed, 55 insertions(+), 15 deletions(-)
+ target/i386/sse-opcode.inc.h | 131 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 131 insertions(+)
 
-diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
-index 2bb1fde837..dddb9d4537 100644
---- a/accel/tcg/tb-stats.c
-+++ b/accel/tcg/tb-stats.c
-@@ -3,6 +3,7 @@
- #include "disas/disas.h"
- #include "exec/exec-all.h"
- #include "tcg.h"
-+#include "qemu-common.h"
+diff --git a/target/i386/sse-opcode.inc.h b/target/i386/sse-opcode.inc.h
+index c5e81a6a80..36963e5a7c 100644
+--- a/target/i386/sse-opcode.inc.h
++++ b/target/i386/sse-opcode.inc.h
+@@ -39,6 +39,137 @@
+ #   define OPCODE_GRP_END(grpname)
+ #endif /* OPCODE_GRP_END */
  
- #include "qemu/qemu-print.h"
- 
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index 834265d5be..ea7c3a9f77 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -16,6 +16,7 @@
- #include "exec/gen-icount.h"
- #include "exec/log.h"
- #include "exec/translator.h"
-+#include "qemu-common.h"
- 
- /* Pairs with tcg_clear_temp_count.
-    To be called by #TranslatorOps.{translate_insn,tb_stop} if
-diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
-index b3efe41894..6f54586dd6 100644
---- a/include/exec/gen-icount.h
-+++ b/include/exec/gen-icount.h
-@@ -2,6 +2,7 @@
- #define GEN_ICOUNT_H
- 
- #include "qemu/timer.h"
-+#include "qemu-common.h"
- 
- /* Helpers for instruction counting code generation.  */
- 
-diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-index 1dcfcdf9e8..c0948e606a 100644
---- a/include/exec/tb-stats.h
-+++ b/include/exec/tb-stats.h
-@@ -79,21 +79,6 @@ void init_tb_stats_htable_if_not(void);
- void dump_jit_profile_info(TCGProfile *s);
- 
- /* TBStatistic collection controls */
--enum TBStatsStatus {
--    TB_STATS_DISABLED = 0,
--    TB_STATS_RUNNING,
--    TB_STATS_PAUSED,
--    TB_STATS_STOPPED
--};
--
--#define TB_NOTHING    0
--#define TB_EXEC_STATS 1
--#define TB_JIT_STATS  2
--#define TB_JIT_TIME   4
--
--extern int tcg_collect_tb_stats;
--extern uint32_t default_tbstats_flag;
--
- void enable_collect_tb_stats(void);
- void disable_collect_tb_stats(void);
- void pause_collect_tb_stats(void);
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 0235cd3b91..362e48c445 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -130,4 +130,19 @@ void page_size_init(void);
-  * returned. */
- bool dump_in_progress(void);
- 
-+enum TBStatsStatus {
-+    TB_STATS_DISABLED = 0,
-+    TB_STATS_RUNNING,
-+    TB_STATS_PAUSED,
-+    TB_STATS_STOPPED
-+};
++/* NP 0F 6E /r: MOVD mm,r/m32 */
++OPCODE(movd, LEG(NP, 0F, 0, 0x6e), MMX, WR, Pq, Ed)
++/* NP 0F 7E /r: MOVD r/m32,mm */
++OPCODE(movd, LEG(NP, 0F, 0, 0x7e), MMX, WR, Ed, Pq)
++/* NP REX.W + 0F 6E /r: MOVQ mm,r/m64 */
++OPCODE(movq, LEG(NP, 0F, 1, 0x6e), MMX, WR, Pq, Eq)
++/* NP REX.W + 0F 7E /r: MOVQ r/m64,mm */
++OPCODE(movq, LEG(NP, 0F, 1, 0x7e), MMX, WR, Eq, Pq)
++/* NP 0F 6F /r: MOVQ mm, mm/m64 */
++OPCODE(movq, LEG(NP, 0F, 0, 0x6f), MMX, WR, Pq, Qq)
++/* NP 0F 7F /r: MOVQ mm/m64, mm */
++OPCODE(movq, LEG(NP, 0F, 0, 0x7f), MMX, WR, Qq, Pq)
++/* NP 0F FC /r: PADDB mm, mm/m64 */
++OPCODE(paddb, LEG(NP, 0F, 0, 0xfc), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F FD /r: PADDW mm, mm/m64 */
++OPCODE(paddw, LEG(NP, 0F, 0, 0xfd), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F FE /r: PADDD mm, mm/m64 */
++OPCODE(paddd, LEG(NP, 0F, 0, 0xfe), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F EC /r: PADDSB mm, mm/m64 */
++OPCODE(paddsb, LEG(NP, 0F, 0, 0xec), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F ED /r: PADDSW mm, mm/m64 */
++OPCODE(paddsw, LEG(NP, 0F, 0, 0xed), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F DC /r: PADDUSB mm,mm/m64 */
++OPCODE(paddusb, LEG(NP, 0F, 0, 0xdc), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F DD /r: PADDUSW mm,mm/m64 */
++OPCODE(paddusw, LEG(NP, 0F, 0, 0xdd), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F F8 /r: PSUBB mm, mm/m64 */
++OPCODE(psubb, LEG(NP, 0F, 0, 0xf8), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F F9 /r: PSUBW mm, mm/m64 */
++OPCODE(psubw, LEG(NP, 0F, 0, 0xf9), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F FA /r: PSUBD mm, mm/m64 */
++OPCODE(psubd, LEG(NP, 0F, 0, 0xfa), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F E8 /r: PSUBSB mm, mm/m64 */
++OPCODE(psubsb, LEG(NP, 0F, 0, 0xe8), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F E9 /r: PSUBSW mm, mm/m64 */
++OPCODE(psubsw, LEG(NP, 0F, 0, 0xe9), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F D8 /r: PSUBUSB mm, mm/m64 */
++OPCODE(psubusb, LEG(NP, 0F, 0, 0xd8), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F D9 /r: PSUBUSW mm, mm/m64 */
++OPCODE(psubusw, LEG(NP, 0F, 0, 0xd9), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F D5 /r: PMULLW mm, mm/m64 */
++OPCODE(pmullw, LEG(NP, 0F, 0, 0xd5), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F E5 /r: PMULHW mm, mm/m64 */
++OPCODE(pmulhw, LEG(NP, 0F, 0, 0xe5), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F F5 /r: PMADDWD mm, mm/m64 */
++OPCODE(pmaddwd, LEG(NP, 0F, 0, 0xf5), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 74 /r: PCMPEQB mm,mm/m64 */
++OPCODE(pcmpeqb, LEG(NP, 0F, 0, 0x74), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 75 /r: PCMPEQW mm,mm/m64 */
++OPCODE(pcmpeqw, LEG(NP, 0F, 0, 0x75), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 76 /r: PCMPEQD mm,mm/m64 */
++OPCODE(pcmpeqd, LEG(NP, 0F, 0, 0x76), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 64 /r: PCMPGTB mm,mm/m64 */
++OPCODE(pcmpgtb, LEG(NP, 0F, 0, 0x64), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 65 /r: PCMPGTW mm,mm/m64 */
++OPCODE(pcmpgtw, LEG(NP, 0F, 0, 0x65), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 66 /r: PCMPGTD mm,mm/m64 */
++OPCODE(pcmpgtd, LEG(NP, 0F, 0, 0x66), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F DB /r: PAND mm, mm/m64 */
++OPCODE(pand, LEG(NP, 0F, 0, 0xdb), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F DF /r: PANDN mm, mm/m64 */
++OPCODE(pandn, LEG(NP, 0F, 0, 0xdf), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F EB /r: POR mm, mm/m64 */
++OPCODE(por, LEG(NP, 0F, 0, 0xeb), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F EF /r: PXOR mm, mm/m64 */
++OPCODE(pxor, LEG(NP, 0F, 0, 0xef), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F F1 /r: PSLLW mm, mm/m64 */
++OPCODE(psllw, LEG(NP, 0F, 0, 0xf1), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F F2 /r: PSLLD mm, mm/m64 */
++OPCODE(pslld, LEG(NP, 0F, 0, 0xf2), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F F3 /r: PSLLQ mm, mm/m64 */
++OPCODE(psllq, LEG(NP, 0F, 0, 0xf3), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F D1 /r: PSRLW mm, mm/m64 */
++OPCODE(psrlw, LEG(NP, 0F, 0, 0xd1), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F D2 /r: PSRLD mm, mm/m64 */
++OPCODE(psrld, LEG(NP, 0F, 0, 0xd2), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F D3 /r: PSRLQ mm, mm/m64 */
++OPCODE(psrlq, LEG(NP, 0F, 0, 0xd3), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F E1 /r: PSRAW mm,mm/m64 */
++OPCODE(psraw, LEG(NP, 0F, 0, 0xe1), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F E2 /r: PSRAD mm,mm/m64 */
++OPCODE(psrad, LEG(NP, 0F, 0, 0xe2), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 63 /r: PACKSSWB mm1, mm2/m64 */
++OPCODE(packsswb, LEG(NP, 0F, 0, 0x63), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 6B /r: PACKSSDW mm1, mm2/m64 */
++OPCODE(packssdw, LEG(NP, 0F, 0, 0x6b), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 67 /r: PACKUSWB mm, mm/m64 */
++OPCODE(packuswb, LEG(NP, 0F, 0, 0x67), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 68 /r: PUNPCKHBW mm, mm/m64 */
++OPCODE(punpckhbw, LEG(NP, 0F, 0, 0x68), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 69 /r: PUNPCKHWD mm, mm/m64 */
++OPCODE(punpckhwd, LEG(NP, 0F, 0, 0x69), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 6A /r: PUNPCKHDQ mm, mm/m64 */
++OPCODE(punpckhdq, LEG(NP, 0F, 0, 0x6a), MMX, WRR, Pq, Pq, Qq)
++/* NP 0F 60 /r: PUNPCKLBW mm, mm/m32 */
++OPCODE(punpcklbw, LEG(NP, 0F, 0, 0x60), MMX, WRR, Pq, Pq, Qd)
++/* NP 0F 61 /r: PUNPCKLWD mm, mm/m32 */
++OPCODE(punpcklwd, LEG(NP, 0F, 0, 0x61), MMX, WRR, Pq, Pq, Qd)
++/* NP 0F 62 /r: PUNPCKLDQ mm, mm/m32 */
++OPCODE(punpckldq, LEG(NP, 0F, 0, 0x62), MMX, WRR, Pq, Pq, Qd)
++/* NP 0F 77: EMMS */
++OPCODE(emms, LEG(NP, 0F, 0, 0x77), MMX, )
 +
-+#define TB_NOTHING    0
-+#define TB_EXEC_STATS 1
-+#define TB_JIT_STATS  2
-+#define TB_JIT_TIME   4
++OPCODE_GRP(grp12_LEG_NP, LEG(NP, 0F, 0, 0x71))
++OPCODE_GRP_BEGIN(grp12_LEG_NP)
++    /* NP 0F 71 /6 ib: PSLLW mm1, imm8 */
++    OPCODE_GRPMEMB(grp12_LEG_NP, psllw, 6, MMX, WRR, Nq, Nq, Ib)
++    /* NP 0F 71 /2 ib: PSRLW mm, imm8 */
++    OPCODE_GRPMEMB(grp12_LEG_NP, psrlw, 2, MMX, WRR, Nq, Nq, Ib)
++    /* NP 0F 71 /4 ib: PSRAW mm,imm8 */
++    OPCODE_GRPMEMB(grp12_LEG_NP, psraw, 4, MMX, WRR, Nq, Nq, Ib)
++OPCODE_GRP_END(grp12_LEG_NP)
 +
-+extern int tcg_collect_tb_stats;
-+extern uint32_t default_tbstats_flag;
++OPCODE_GRP(grp13_LEG_NP, LEG(NP, 0F, 0, 0x72))
++OPCODE_GRP_BEGIN(grp13_LEG_NP)
++    /* NP 0F 72 /6 ib: PSLLD mm, imm8 */
++    OPCODE_GRPMEMB(grp13_LEG_NP, pslld, 6, MMX, WRR, Nq, Nq, Ib)
++    /* NP 0F 72 /2 ib: PSRLD mm, imm8 */
++    OPCODE_GRPMEMB(grp13_LEG_NP, psrld, 2, MMX, WRR, Nq, Nq, Ib)
++    /* NP 0F 72 /4 ib: PSRAD mm,imm8 */
++    OPCODE_GRPMEMB(grp13_LEG_NP, psrad, 4, MMX, WRR, Nq, Nq, Ib)
++OPCODE_GRP_END(grp13_LEG_NP)
 +
- #endif
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index b097a6cae1..a8d1997cde 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -45,6 +45,7 @@ static inline bool qemu_log_separate(void)
- /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
- #define CPU_LOG_TB_OP_IND  (1 << 16)
- #define CPU_LOG_TB_FPU     (1 << 17)
-+#define CPU_LOG_TB_STATS   (1 << 18)
- 
- /* Lock output for a series of related logs.  Since this is not needed
-  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 1cd07c6c47..c6c9c938dc 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -35,6 +35,7 @@
- #include "qemu/host-utils.h"
- #include "qemu/qemu-print.h"
- #include "qemu/timer.h"
-+#include "qemu-common.h"
- 
- /* Note: the long term plan is to reduce the dependencies on the QEMU
-    CPU definitions. Currently they are used for qemu_ld/st
-diff --git a/util/log.c b/util/log.c
-index 29021a4584..09cfb13b45 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -19,17 +19,20 @@
- 
- #include "qemu/osdep.h"
- #include "qemu/log.h"
-+#include "qemu/qemu-print.h"
- #include "qemu/range.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qemu/cutils.h"
- #include "trace/control.h"
-+#include "qemu-common.h"
- 
- static char *logfilename;
- FILE *qemu_logfile;
- int qemu_loglevel;
- static int log_append = 0;
- static GArray *debug_regions;
-+int32_t max_num_hot_tbs_to_dump;
- 
- int tcg_collect_tb_stats;
- uint32_t default_tbstats_flag;
-@@ -276,6 +279,9 @@ const QEMULogItem qemu_log_items[] = {
-     { CPU_LOG_TB_NOCHAIN, "nochain",
-       "do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"
-       "complete traces" },
-+    { CPU_LOG_TB_STATS, "tb_stats[[,level=(+all+jit+exec+time)][,dump_limit=<number>]]",
-+      "enable collection of TBs statistics"
-+      "(and dump until given a limit if in user mode).\n" },
-     { 0, NULL, NULL },
- };
- 
-@@ -297,6 +303,35 @@ int qemu_str_to_log_mask(const char *str)
-             trace_enable_events((*tmp) + 6);
-             mask |= LOG_TRACE;
- #endif
-+        } else if (g_str_has_prefix(*tmp, "tb_stats")) {
-+            mask |= CPU_LOG_TB_STATS;
-+            default_tbstats_flag = TB_JIT_STATS | TB_EXEC_STATS | TB_JIT_TIME;
-+            tcg_collect_tb_stats = TB_STATS_RUNNING;
-+        } else if (tcg_collect_tb_stats == TB_STATS_RUNNING &&
-+                g_str_has_prefix(*tmp, "dump_limit=")) {
++OPCODE_GRP(grp14_LEG_NP, LEG(NP, 0F, 0, 0x73))
++OPCODE_GRP_BEGIN(grp14_LEG_NP)
++    /* NP 0F 73 /6 ib: PSLLQ mm, imm8 */
++    OPCODE_GRPMEMB(grp14_LEG_NP, psllq, 6, MMX, WRR, Nq, Nq, Ib)
++    /* NP 0F 73 /2 ib: PSRLQ mm, imm8 */
++    OPCODE_GRPMEMB(grp14_LEG_NP, psrlq, 2, MMX, WRR, Nq, Nq, Ib)
++OPCODE_GRP_END(grp14_LEG_NP)
 +
-+            max_num_hot_tbs_to_dump = atoi((*tmp) + 11);
-+        } else if (tcg_collect_tb_stats == TB_STATS_RUNNING &&
-+                g_str_has_prefix(*tmp, "level=")) {
-+
-+            default_tbstats_flag = 0;
-+            char **level_parts = g_strsplit(*tmp + 6, "+", 0);
-+            char **level_tmp;
-+            for (level_tmp = level_parts; level_tmp && *level_tmp; level_tmp++) {
-+                if (g_str_equal(*level_tmp, "jit")) {
-+                    default_tbstats_flag |= TB_JIT_STATS;
-+                } else if (g_str_equal(*level_tmp, "exec")) {
-+                    default_tbstats_flag |= TB_EXEC_STATS;
-+                } else if (g_str_equal(*level_tmp, "time")) {
-+                    default_tbstats_flag |= TB_JIT_TIME;
-+                } else if (g_str_equal(*level_tmp, "all")) {
-+                    default_tbstats_flag |= TB_JIT_STATS | TB_EXEC_STATS | TB_JIT_TIME;
-+                } else {
-+                    fprintf(stderr, "no option level=%s, valid options are:"
-+                            "all, jit, exec or/and time\n", *level_tmp);
-+                    exit(1);
-+                }
-+            }
-         } else {
-             for (item = qemu_log_items; item->mask != 0; item++) {
-                 if (g_str_equal(*tmp, item->name)) {
+ #undef FMTI____
+ #undef FMTI__R__
+ #undef FMTI__RR__
 -- 
-2.22.0
+2.20.1
 
 
