@@ -2,107 +2,60 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2308CC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2405DC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA18A2083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:42:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA18A2083B
+	by mail.kernel.org (Postfix) with ESMTPS id E9A512083B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:43:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9A512083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKhd-0005Uj-Rz
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:42:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37899)
+	id 1hyKiu-0006vh-TJ
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:43:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1hyKaD-0005OZ-LW
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:34:48 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hyKdj-0000yr-CF
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1hyKaB-0005R0-17
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:34:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32786)
+ (envelope-from <ehabkost@redhat.com>) id 1hyKdg-0000kW-Dy
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:38:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45664)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1hyKaA-0005Qg-Pr
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:34:42 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hyKdg-0000jN-6a
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:38:20 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D1253082DDD;
- Thu, 15 Aug 2019 18:34:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-65.ams2.redhat.com [10.36.116.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9928F1EA;
- Thu, 15 Aug 2019 18:34:39 +0000 (UTC)
-To: qemu-devel@nongnu.org, no-reply@patchew.org
-References: <156589304949.15902.14073502863056314747@5dec9699b7de>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=thuth@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Organization: Red Hat
-Message-ID: <2fa2ba07-a3dc-6b06-8f76-f432b1bb3230@redhat.com>
-Date: Thu, 15 Aug 2019 20:34:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ by mx1.redhat.com (Postfix) with ESMTPS id 8089E307D90D;
+ Thu, 15 Aug 2019 18:38:19 +0000 (UTC)
+Received: from localhost (ovpn-116-32.gru2.redhat.com [10.97.116.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9AE8A6266B;
+ Thu, 15 Aug 2019 18:38:16 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Thu, 15 Aug 2019 15:38:03 -0300
+Message-Id: <20190815183803.13346-4-ehabkost@redhat.com>
+In-Reply-To: <20190815183803.13346-1-ehabkost@redhat.com>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <156589304949.15902.14073502863056314747@5dec9699b7de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 15 Aug 2019 18:34:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.48]); Thu, 15 Aug 2019 18:38:19 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PULL 0/9] qtest patches
+Subject: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties mandatory
+ unless necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,30 +67,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, peter.maydell@linaro.org, fam@euphon.net,
- pbonzini@redhat.com
+Cc: Peter Krempa <pkrempa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Like Xu <like.xu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/15/19 8:17 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20190815175922.3475-1-thuth@redhat.com/
-> 
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
-[...]
-> The full log is available at
-> http://patchew.org/logs/20190815175922.3475-1-thuth@redhat.com/testing.s390x/?type=message.
+We have this issue reported when using libvirt to hotplug CPUs:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1741451
 
-The error message is not really useful and seems unrelated:
+Basically, libvirt is not copying die-id from
+query-hotpluggable-cpus, but die-id is now mandatory.
 
-make: *** [/var/tmp/patchew-tester-tmp-krxfzhwl/src/rules.mak:69:
-qobject/block-qdict.o] Error 1
+We could blame libvirt and say it is not following the documented
+interface, because we have this buried in the QAPI schema
+documentation:
 
-I did not touch anything in qobject/ at all in this series, so the
-problem is likely something completely different? Could it be that the
-machine simply ran out of disk space or something similar?
+> Note: currently there are 5 properties that could be present
+> but management should be prepared to pass through other
+> properties with device_add command to allow for future
+> interface extension. This also requires the filed names to be kept in
+> sync with the properties passed to -device/device_add.
 
- Thomas
+But I don't think this would be reasonable from us.  We can just
+make QEMU more flexible and let CPU properties to be omitted when
+there's no ambiguity.  This will allow us to keep compatibility
+with existing libvirt versions.
+
+Test case included to ensure we don't break this again.
+
+Cc: Peter Krempa <pkrempa@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ hw/i386/pc.c                             | 17 +++++++
+ tests/acceptance/pc_cpu_hotplug_props.py | 59 ++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+)
+ create mode 100644 tests/acceptance/pc_cpu_hotplug_props.py
+
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index fb4ac5ca90..4d773c862d 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2403,6 +2403,23 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplu=
+g_dev,
+         int max_socket =3D (ms->smp.max_cpus - 1) /
+                                 smp_threads / smp_cores / pcms->smp_dies=
+;
+=20
++        /*
++         * If there's only one possible value for a topology property,
++         * allow it to be omitted.
++         */
++        if (cpu->socket_id < 0 && max_socket =3D=3D 0) {
++            cpu->socket_id =3D 0;
++        }
++        if (cpu->die_id < 0 && pcms->smp_dies =3D=3D 1) {
++            cpu->die_id =3D 0;
++        }
++        if (cpu->core_id < 0 && smp_cores =3D=3D 1) {
++            cpu->core_id =3D 0;
++        }
++        if (cpu->thread_id < 0 && smp_threads =3D=3D 1) {
++            cpu->thread_id =3D 0;
++        }
++
+         if (cpu->socket_id < 0) {
+             error_setg(errp, "CPU socket-id is not set");
+             return;
+diff --git a/tests/acceptance/pc_cpu_hotplug_props.py b/tests/acceptance/=
+pc_cpu_hotplug_props.py
+new file mode 100644
+index 0000000000..2c36926214
+--- /dev/null
++++ b/tests/acceptance/pc_cpu_hotplug_props.py
+@@ -0,0 +1,59 @@
++#
++# Ensure CPU topology parameters may be omitted on -device
++#
++#  Copyright (c) 2019 Red Hat Inc
++#
++# Author:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licen=
+ses/>.
++#
++
++from avocado_qemu import Test
++
++class OmittedCPUProps(Test):
++    """
++    :avocado: tags=3Darch:x86_64
++    """
++    def test_only_socket(self):
++        self.vm.add_args('-nodefaults', '-S')
++        self.vm.add_args('-smp', '1,sockets=3D2,maxcpus=3D2')
++        self.vm.add_args('-cpu', 'qemu64')
++        self.vm.add_args('-device', 'qemu64-x86_64-cpu,socket-id=3D1')
++        self.vm.launch()
++        self.assertEquals(len(self.vm.command('query-cpus')), 2)
++
++    def test_only_die(self):
++        self.vm.add_args('-nodefaults', '-S')
++        self.vm.add_args('-smp', '1,dies=3D2,maxcpus=3D2')
++        self.vm.add_args('-cpu', 'qemu64')
++        self.vm.add_args('-device', 'qemu64-x86_64-cpu,die-id=3D1')
++        self.vm.launch()
++        self.assertEquals(len(self.vm.command('query-cpus')), 2)
++
++    def test_only_core(self):
++        self.vm.add_args('-nodefaults', '-S')
++        self.vm.add_args('-smp', '1,cores=3D2,maxcpus=3D2')
++        self.vm.add_args('-cpu', 'qemu64')
++        self.vm.add_args('-device', 'qemu64-x86_64-cpu,core-id=3D1')
++        self.vm.launch()
++        self.assertEquals(len(self.vm.command('query-cpus')), 2)
++
++    def test_only_thread(self):
++        self.vm.add_args('-nodefaults', '-S')
++        self.vm.add_args('-smp', '1,threads=3D2,maxcpus=3D2')
++        self.vm.add_args('-cpu', 'qemu64')
++        self.vm.add_args('-device', 'qemu64-x86_64-cpu,thread-id=3D1')
++        self.vm.launch()
++        self.assertEquals(len(self.vm.command('query-cpus')), 2)
+--=20
+2.21.0
+
 
