@@ -2,82 +2,51 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA50DC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:04:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96924C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:12:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3B972173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:04:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SS5pI7aS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B972173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6B89A2086C
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:12:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B89A2086C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyEU3-00008o-UD
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 08:03:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35775)
+	id 1hyEc1-0003yg-7B
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 08:12:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyET4-0007We-Vm
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:02:59 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hyEah-0002Ux-5u
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:10:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyET3-0005jZ-Op
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:02:58 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44636)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyET2-0005gS-DO
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:02:57 -0400
-Received: by mail-oi1-x243.google.com with SMTP id k22so1567698oiw.11
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 05:02:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PKUnr/M5oGNx8UyDStGHIVSwFmorItLwHa5Q5q86s8k=;
- b=SS5pI7aSc2FDFB5Du2eyfXWc+iBZwvvd1nm01BlohJHP+X3BLtK/RWa+Obco4EKsX5
- c3aakMNrrBB/skr/7IXXiyx119UocyLTMTCRO2zdNNvP0+QRlpal4PVNlXWAI+l89Fl5
- J0r+4CxhCpciPN/fLBEKb9Kwa0impncpwPGMWQDm78SzX/qLHjZj6PoqwHyakWGMFwmK
- h8RTvqPWnRg5Ec0C0cxwEOQ9oS3vAysskyktjD4xi5sOLo1hVq5cFxUeRefiEz30RIUz
- czYmQNw5wig4M5md8SN/skXkxLWl8A8UaWb0LO+AkepYHR2GfpYX086wpjDL9LMxajJf
- ldsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PKUnr/M5oGNx8UyDStGHIVSwFmorItLwHa5Q5q86s8k=;
- b=OQnkdH7Ue/X6pb4YsopJfOOv7F4R0e0iYeMHZQCIxrZxpwjtiJG47SogYBzq34HHVj
- udWjiZodt8T5ofHb17+MJCIEcsPy6azTAytTKxt/flkUpTE5++mwmluk5CM5fJmOHgwW
- EVnSk4fs2nKIdVSc2fb7SYdH6TzIeVQEa4gGN5g8W9bIYEeDKxybmvjfqqaaDkHhhBhn
- AVyw8YAyLRNqhHb7BF6AzRXzYTyL01sMMugPDZ6oep549oT9AUpS2sPxOPX+eyrsZnvB
- QG4VULwCwGr63jmeayqe2oTL7/bn+KWe2BEhmFXzPONPo3lSHpMoCmMISRZJdb8BkNAm
- l1ug==
-X-Gm-Message-State: APjAAAUCoeP+ageUr4FcxzGuwDf3yI+6UObdB39zhOyvHCnAYmvJxUoe
- D8kIgD9JwJww0R0vfdaN1pe4yjsx6h/sLr9EKutQhQ==
-X-Google-Smtp-Source: APXvYqy7Bb5G0DfZpI+ylyTWDJyth598QPUrS7Dx2RtFQhyJxOQ1kkpRBhxiczcxXP1S4X+mFRIz2nqJ4ph9R5romRY=
-X-Received: by 2002:a54:4718:: with SMTP id k24mr1155459oik.146.1565870573506; 
- Thu, 15 Aug 2019 05:02:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190808202616.13782-1-richard.henderson@linaro.org>
- <20190808202616.13782-8-richard.henderson@linaro.org>
- <CAFEAcA8exvd3khkNhw2JnJWHdkFH5O=ut7LvN9Tz5H0ZTg95Sw@mail.gmail.com>
- <0F6CB102-2C02-4A7B-84FF-52CC3E6593FE@linaro.org>
-In-Reply-To: <0F6CB102-2C02-4A7B-84FF-52CC3E6593FE@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 15 Aug 2019 13:02:41 +0100
-Message-ID: <CAFEAcA9kVDa6ssbcqSin6QM-Ujf3iYe6VVjoaDrjtjzeHehdtw@mail.gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
-Subject: Re: [Qemu-devel] [PATCH 7/7] target/arm: Use tcg_gen_extrh_i64_i32
- to extract the high word
+ (envelope-from <vsementsov@virtuozzo.com>) id 1hyEaf-00031M-Ns
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:10:51 -0400
+Received: from relay.sw.ru ([185.231.240.75]:35644)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hyEac-0002vI-AA; Thu, 15 Aug 2019 08:10:46 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1hyEaZ-00060k-4k; Thu, 15 Aug 2019 15:10:43 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Date: Thu, 15 Aug 2019 15:10:40 +0300
+Message-Id: <20190815121042.121309-3-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 185.231.240.75
+Subject: [Qemu-devel] [PATCH v3 2/4] block/qcow2: refactor
+ qcow2_co_preadv_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +58,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 15 Aug 2019 at 12:56, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
->
->
->
-> >
-> >This patch is fine, but I noticed while reviewing it that tcg/README
-> >labels both the extrl_i64_i32 and extrh_i64_i32 operations as
-> >"for 64-bit hosts only". Presumably that's a documentation error,
-> >since we're not guarding the existing uses of the extrl_i64_i32
-> >here with any kind of ifdeffery to restrict them to 64-bit hosts ?
-> >
->
->
-> A documentation unclarity in that the opcodes are for 64-bit hosts. The tcg_gen_* functions are always available, and expand to INDEX_op_mov_i32 on 32-bit hosts.
+Further patch will run partial requests of iterations of
+qcow2_co_preadv in parallel for performance reasons. To prepare for
+this, separate part which may be parallelized into separate function
+(qcow2_co_preadv_task).
 
-Oh, I see. We should probably split that document out properly
-into a primary "what you need to know to generate TCG code as
-a target" (which is the main audience) and "what you need to
-implement for a TCG backend (which I guess is relevant to fewer
-people).
+While being here, also separate encrypted clusters reading to own
+function, like it is done for compressed reading.
 
-thanks
--- PMM
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qapi/block-core.json |   2 +-
+ block/qcow2.c        | 205 +++++++++++++++++++++++--------------------
+ 2 files changed, 111 insertions(+), 96 deletions(-)
+
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0d43d4f37c..dd80aa11db 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3266,7 +3266,7 @@
+             'pwritev_rmw_tail', 'pwritev_rmw_after_tail', 'pwritev',
+             'pwritev_zero', 'pwritev_done', 'empty_image_prepare',
+             'l1_shrink_write_table', 'l1_shrink_free_l2_clusters',
+-            'cor_write', 'cluster_alloc_space', 'none'] }
++            'cor_write', 'cluster_alloc_space', 'none', 'read_encrypted'] }
+ 
+ ##
+ # @BlkdebugIOType:
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 93ab7edcea..89afb4272e 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -1967,17 +1967,114 @@ out:
+     return ret;
+ }
+ 
++static coroutine_fn int
++qcow2_co_preadv_encrypted(BlockDriverState *bs,
++                           uint64_t file_cluster_offset,
++                           uint64_t offset,
++                           uint64_t bytes,
++                           QEMUIOVector *qiov,
++                           uint64_t qiov_offset)
++{
++    int ret;
++    BDRVQcow2State *s = bs->opaque;
++    uint8_t *buf;
++
++    assert(bs->encrypted && s->crypto);
++    assert(bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
++
++    /*
++     * For encrypted images, read everything into a temporary
++     * contiguous buffer on which the AES functions can work.
++     * Also, decryption in a separate buffer is better as it
++     * prevents the guest from learning information about the
++     * encrypted nature of the virtual disk.
++     */
++
++    buf = qemu_try_blockalign(s->data_file->bs, bytes);
++    if (buf == NULL) {
++        return -ENOMEM;
++    }
++
++    BLKDBG_EVENT(bs->file, BLKDBG_READ_ENCRYPTED);
++    ret = bdrv_co_pread(s->data_file,
++                        file_cluster_offset + offset_into_cluster(s, offset),
++                        bytes, buf, 0);
++    if (ret < 0) {
++        goto fail;
++    }
++
++    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++    if (qcow2_co_decrypt(bs, file_cluster_offset, offset, buf, bytes) < 0) {
++        ret = -EIO;
++        goto fail;
++    }
++    qemu_iovec_from_buf(qiov, qiov_offset, buf, bytes);
++
++fail:
++    qemu_vfree(buf);
++
++    return ret;
++}
++
++static coroutine_fn int qcow2_co_preadv_task(BlockDriverState *bs,
++                                             QCow2ClusterType cluster_type,
++                                             uint64_t file_cluster_offset,
++                                             uint64_t offset, uint64_t bytes,
++                                             QEMUIOVector *qiov,
++                                             size_t qiov_offset)
++{
++    BDRVQcow2State *s = bs->opaque;
++    int offset_in_cluster = offset_into_cluster(s, offset);
++
++    switch (cluster_type) {
++    case QCOW2_CLUSTER_ZERO_PLAIN:
++    case QCOW2_CLUSTER_ZERO_ALLOC:
++        /* Both zero types are handled in qcow2_co_preadv_part */
++        g_assert_not_reached();
++
++    case QCOW2_CLUSTER_UNALLOCATED:
++        assert(bs->backing); /* otherwise handled in qcow2_co_preadv_part */
++
++        BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
++        return bdrv_co_preadv_part(bs->backing, offset, bytes,
++                                   qiov, qiov_offset, 0);
++
++    case QCOW2_CLUSTER_COMPRESSED:
++        return qcow2_co_preadv_compressed(bs, file_cluster_offset,
++                                          offset, bytes, qiov, qiov_offset);
++
++    case QCOW2_CLUSTER_NORMAL:
++        if ((file_cluster_offset & 511) != 0) {
++            return -EIO;
++        }
++
++        if (bs->encrypted) {
++            return qcow2_co_preadv_encrypted(bs, file_cluster_offset,
++                                             offset, bytes, qiov, qiov_offset);
++        }
++
++        BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
++        return bdrv_co_preadv_part(s->data_file,
++                                   file_cluster_offset + offset_in_cluster,
++                                   bytes, qiov, qiov_offset, 0);
++
++    default:
++        g_assert_not_reached();
++    }
++
++    g_assert_not_reached();
++}
++
+ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+                                              uint64_t offset, uint64_t bytes,
+                                              QEMUIOVector *qiov,
+                                              size_t qiov_offset, int flags)
+ {
+     BDRVQcow2State *s = bs->opaque;
+-    int offset_in_cluster;
+     int ret;
+     unsigned int cur_bytes; /* number of bytes in current iteration */
+     uint64_t cluster_offset = 0;
+-    uint8_t *cluster_data = NULL;
+ 
+     while (bytes != 0) {
+ 
+@@ -1992,111 +2089,29 @@ static coroutine_fn int qcow2_co_preadv_part(BlockDriverState *bs,
+         ret = qcow2_get_cluster_offset(bs, offset, &cur_bytes, &cluster_offset);
+         qemu_co_mutex_unlock(&s->lock);
+         if (ret < 0) {
+-            goto fail;
++            return ret;
+         }
+ 
+-        offset_in_cluster = offset_into_cluster(s, offset);
+-
+-        switch (ret) {
+-        case QCOW2_CLUSTER_UNALLOCATED:
+-
+-            if (bs->backing) {
+-                BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+-                ret = bdrv_co_preadv_part(bs->backing, offset, cur_bytes,
+-                                          qiov, qiov_offset, 0);
+-                if (ret < 0) {
+-                    goto fail;
+-                }
+-            } else {
+-                /* Note: in this case, no need to wait */
+-                qemu_iovec_memset(qiov, qiov_offset, 0, cur_bytes);
+-            }
+-            break;
+-
+-        case QCOW2_CLUSTER_ZERO_PLAIN:
+-        case QCOW2_CLUSTER_ZERO_ALLOC:
++        if (ret == QCOW2_CLUSTER_ZERO_PLAIN ||
++            ret == QCOW2_CLUSTER_ZERO_ALLOC ||
++            (ret == QCOW2_CLUSTER_UNALLOCATED && !bs->backing))
++        {
+             qemu_iovec_memset(qiov, qiov_offset, 0, cur_bytes);
+-            break;
+-
+-        case QCOW2_CLUSTER_COMPRESSED:
+-            ret = qcow2_co_preadv_compressed(bs, cluster_offset,
+-                                             offset, cur_bytes,
+-                                             qiov, qiov_offset);
++        } else {
++            ret = qcow2_co_preadv_task(bs, ret,
++                                       cluster_offset, offset, cur_bytes,
++                                       qiov, qiov_offset);
+             if (ret < 0) {
+-                goto fail;
+-            }
+-
+-            break;
+-
+-        case QCOW2_CLUSTER_NORMAL:
+-            if ((cluster_offset & 511) != 0) {
+-                ret = -EIO;
+-                goto fail;
+-            }
+-
+-            if (bs->encrypted) {
+-                assert(s->crypto);
+-
+-                /*
+-                 * For encrypted images, read everything into a temporary
+-                 * contiguous buffer on which the AES functions can work.
+-                 */
+-                if (!cluster_data) {
+-                    cluster_data =
+-                        qemu_try_blockalign(s->data_file->bs,
+-                                            QCOW_MAX_CRYPT_CLUSTERS
+-                                            * s->cluster_size);
+-                    if (cluster_data == NULL) {
+-                        ret = -ENOMEM;
+-                        goto fail;
+-                    }
+-                }
+-
+-                assert(cur_bytes <= QCOW_MAX_CRYPT_CLUSTERS * s->cluster_size);
+-
+-                BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+-                ret = bdrv_co_pread(s->data_file,
+-                                    cluster_offset + offset_in_cluster,
+-                                    cur_bytes, cluster_data, 0);
+-                if (ret < 0) {
+-                    goto fail;
+-                }
+-
+-                assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-                assert((cur_bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-                if (qcow2_co_decrypt(bs, cluster_offset, offset,
+-                                     cluster_data, cur_bytes) < 0) {
+-                    ret = -EIO;
+-                    goto fail;
+-                }
+-                qemu_iovec_from_buf(qiov, qiov_offset, cluster_data, cur_bytes);
+-            } else {
+-                BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+-                ret = bdrv_co_preadv_part(s->data_file,
+-                                          cluster_offset + offset_in_cluster,
+-                                          cur_bytes, qiov, qiov_offset, 0);
+-                if (ret < 0) {
+-                    goto fail;
+-                }
++                return ret;
+             }
+-            break;
+-
+-        default:
+-            g_assert_not_reached();
+-            ret = -EIO;
+-            goto fail;
+         }
+ 
+         bytes -= cur_bytes;
+         offset += cur_bytes;
+         qiov_offset += cur_bytes;
+     }
+-    ret = 0;
+-
+-fail:
+-    qemu_vfree(cluster_data);
+ 
+-    return ret;
++    return 0;
+ }
+ 
+ /* Check if it's possible to merge a write request with the writing of
+-- 
+2.18.0
+
 
