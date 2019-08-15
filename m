@@ -2,91 +2,82 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81181C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:20:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC485C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:22:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A5B3206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:20:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DkJDsT/n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A5B3206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 897C22054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:22:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 897C22054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43987 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyIU1-00041Y-9W
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 12:20:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44798)
+	id 1hyIWI-0005Mu-Pk
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 12:22:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1hyIT7-0003GZ-Dj
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:19:23 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hyIVP-0004ux-D0
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hyIT1-00040u-SK
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:19:17 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53042)
+ (envelope-from <pbonzini@redhat.com>) id 1hyIVH-0004lN-TJ
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:21:39 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38193)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hyIT1-00040h-LR
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:19:11 -0400
-Received: by mail-wm1-x344.google.com with SMTP id o4so1736476wmh.2
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 09:19:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=jE4/H3ZcGHKEAkpJEvCy9ZY+H2orhbWFbJwTJnT6Xxw=;
- b=DkJDsT/nAnr0Vk26lARZGluWbrmD757n4TJcx505c7usuVf8b9BtEWe49GKyRMRQ/a
- 3tc0WA4JhprsjZR6edO+YcIiFhJmYHmd9Y+ionf8aBq/acdf8au2bhM8pdnqm5fV6c/R
- ENWOIkZZFYnkicLogaLLpz5cL1WFCHwouhFGAXPEWGfb50HpNVx7k1cQyrqBKAQ455Fd
- ybuiwuprUlHPZx5W1ypvnN6zDQjFzWahDMa6JtnfMDZF0euAA2ohCSg7w7Sl/dhNKkbo
- HOVxEBlKCiUUpmhwOqNa1oy93C9xXHOtUoMNipdpESZ44z+Z0sMDelPnk5Y9rS94WtRs
- r/BQ==
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hyIVH-0004l7-N3
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:21:31 -0400
+Received: by mail-wr1-f67.google.com with SMTP id g17so2726304wrr.5
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 09:21:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=jE4/H3ZcGHKEAkpJEvCy9ZY+H2orhbWFbJwTJnT6Xxw=;
- b=Ax8kjXHUP20zW3zJ7Z0jpMXcwu3dC5OiVfQ2T2Onj9cDzHmGz9QOZ0xrDajJMOHpx6
- yNO1DLY3GQktLY1yX7cnmSaNYrg+q0O+Ro60qblswTFMXnmnvbJem13kXkOl2AfUub46
- UOfKHcIXX9Ji+6YMzx53S91iI41TmV4ijJJy9OJI8mJ1ABiI/YuSopltFXX7lOPHRt9f
- ADzoS5Y4+Rbrne3chBDMPvfVoZxpRRkM79igP00TqkxZA41cDWZzcAT0TYnTkGypGL1/
- H53xGh+zxwl7DVoMqqPPg8c9g3q4MGfFPd/pYUy2Ohh0r5HUcaxWb3bQB+D3OZ0ar8Ct
- x7Xg==
-X-Gm-Message-State: APjAAAVFaH1Ho6KIfC303/RFsL+3+YW4pBp+jviUo1u0z2LioY82IX2m
- yO8y7IKU1Xbc5V3a+KTF9vBE1w==
-X-Google-Smtp-Source: APXvYqyGxahV1xXnobrKVIJMEsJqAXRa/py5TWW0Hc1iPPxnVBplxR5lf4PNKaRA5wN5GqPgfo6ywQ==
-X-Received: by 2002:a1c:9a4b:: with SMTP id c72mr3494888wme.102.1565885949276; 
- Thu, 15 Aug 2019 09:19:09 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id e14sm1381407wme.35.2019.08.15.09.19.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 09:19:08 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 36C461FF87;
- Thu, 15 Aug 2019 17:19:08 +0100 (BST)
-References: <20190815023725.2659-1-vandersonmr2@gmail.com>
- <20190815023725.2659-3-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190815023725.2659-3-vandersonmr2@gmail.com>
-Date: Thu, 15 Aug 2019 17:19:08 +0100
-Message-ID: <87k1bemmf7.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=0NnnyLAZl8sqrxHu4b/221KYMc1jXMKtn8iJbHOPjs4=;
+ b=CbRrY3abGsIh+TcfwsIPJlgBm0Q4sinD1i9E3wB9dHb7mXIAJIfnTyv+/Kljl4w2RS
+ oMWlWzwhMyG+F5rl+kIUEceyqDigx5AxO6Y/PyuONYOBudJmwyZVXrhVxb9J5jhAPJwL
+ Hxhm5GgtcLBc016u1RYNBFTGdbH7cckfFKmvVwEj4Jxs0vXHpSArtqya7j+TUk9n0bF7
+ OcwKITEl3h7bHiDYhtwnNhmTLQ7csVeb/wJvQRetFmGyICicWbQ2/+7cVY3kpjunI6Q4
+ Wm2KmwwGSbok0mZs8DPySqytXYmBtKPmteUUN1HG7k8CHohqsvH2QCsuEy9w544PgvGM
+ fc9w==
+X-Gm-Message-State: APjAAAXfOtyARbcej7gQgeWc/mtgZwlMQUaCKNQUHhIq5/h18r54yK5G
+ wGfNnGp96+wbUaLnQeKd1rRe2g==
+X-Google-Smtp-Source: APXvYqxDjCalPqFnWeza9wR4BtPSi9Xqqfhjg4f/c/CIK+SoRJz8EiEUXuZLjNS4qYqugpf3lA+p+w==
+X-Received: by 2002:adf:c594:: with SMTP id m20mr6778454wrg.126.1565886090547; 
+ Thu, 15 Aug 2019 09:21:30 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:2cae:66cd:dd43:92d9?
+ ([2001:b07:6468:f312:2cae:66cd:dd43:92d9])
+ by smtp.gmail.com with ESMTPSA id i66sm2018975wmg.2.2019.08.15.09.21.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 15 Aug 2019 09:21:30 -0700 (PDT)
+To: Laszlo Ersek <lersek@redhat.com>, devel@edk2.groups.io,
+ "Yao, Jiewen" <jiewen.yao@intel.com>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+ <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
+ <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
+Date: Thu, 15 Aug 2019 18:21:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
-Subject: Re: [Qemu-devel] [PATCH v1 2/2] tb-stats: adding TBStatistics info
- into perf dump
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,52 +89,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ edk2-rfc-groups-io <rfc@edk2.groups.io>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 15/08/19 17:00, Laszlo Ersek wrote:
+> On 08/14/19 16:04, Paolo Bonzini wrote:
+>> On 14/08/19 15:20, Yao, Jiewen wrote:
+>>>> - Does this part require a new branch somewhere in the OVMF SEC code?
+>>>>   How do we determine whether the CPU executing SEC is BSP or
+>>>>   hot-plugged AP?
+>>> [Jiewen] I think this is blocked from hardware perspective, since the first instruction.
+>>> There are some hardware specific registers can be used to determine if the CPU is new added.
+>>> I don’t think this must be same as the real hardware.
+>>> You are free to invent some registers in device model to be used in OVMF hot plug driver.
+>>
+>> Yes, this would be a new operation mode for QEMU, that only applies to
+>> hot-plugged CPUs.  In this mode the AP doesn't reply to INIT or SMI, in
+>> fact it doesn't reply to anything at all.
+>>
+>>>> - How do we tell the hot-plugged AP where to start execution? (I.e. that
+>>>>   it should execute code at a particular pflash location.)
+>>> [Jiewen] Same real mode reset vector at FFFF:FFF0.
+>>
+>> You do not need a reset vector or INIT/SIPI/SIPI sequence at all in
+>> QEMU.  The AP does not start execution at all when it is unplugged, so
+>> no cache-as-RAM etc.
+>>
+>> We only need to modify QEMU so that hot-plugged APIs do not reply to
+>> INIT/SIPI/SMI.
+>>
+>>> I don’t think there is problem for real hardware, who always has CAR.
+>>> Can QEMU provide some CPU specific space, such as MMIO region?
+>>
+>> Why is a CPU-specific region needed if every other processor is in SMM
+>> and thus trusted.
+> 
+> I was going through the steps Jiewen and Yingwen recommended.
+> 
+> In step (02), the new CPU is expected to set up RAM access. In step
+> (03), the new CPU, executing code from flash, is expected to "send board
+> message to tell host CPU (GPIO->SCI) -- I am waiting for hot-add
+> message." For that action, the new CPU may need a stack (minimally if we
+> want to use C function calls).
+> 
+> Until step (03), there had been no word about any other (= pre-plugged)
+> CPUs (more precisely, Jiewen even confirmed "No impact to other
+> processors"), so I didn't assume that other CPUs had entered SMM.
+> 
+> Paolo, I've attempted to read Jiewen's response, and yours, as carefully
+> as I can. I'm still very confused. If you have a better understanding,
+> could you please write up the 15-step process from the thread starter
+> again, with all QEMU customizations applied? Such as, unnecessary steps
+> removed, and platform specifics filled in.
 
-vandersonmr <vandersonmr2@gmail.com> writes:
+Sure.
 
-> Adding TBStatistics information to linux perf TB's symbol names.
->
-> This commit depends on the following PATCH:
-> [PATCH v5 00/10] Measure Tiny Code Generation Quality
->
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
-> ---
->  accel/tcg/perf/jitdump.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/accel/tcg/perf/jitdump.c b/accel/tcg/perf/jitdump.c
-> index 6f4c0911c2..b2334fd601 100644
-> --- a/accel/tcg/perf/jitdump.c
-> +++ b/accel/tcg/perf/jitdump.c
-> @@ -8,6 +8,7 @@
->  #include <sys/syscall.h>
->  #include <elf.h>
->
-> +#include "exec/tb-stats.h"
->  #include "jitdump.h"
->  #include "qemu-common.h"
->
-> @@ -135,7 +136,19 @@ void start_jitdump_file(void)
->  void append_load_in_jitdump_file(TranslationBlock *tb)
->  {
->      GString *func_name =3D g_string_new(NULL);
-> -    g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc, '\=
-0');
-> +    if (tb->tb_stats) {
-> +        TBStatistics *tbs =3D tb->tb_stats;
-> +        g =3D stat_per_translation(tbs, code.num_guest_inst);
-> +        ops =3D stat_per_translation(tbs, code.num_tcg_ops);
-> +        ops_opt =3D stat_per_translation(tbs, code.num_tcg_ops_opt);
-> +        spills =3D stat_per_translation(tbs, code.spills);
+(01a) QEMU: create new CPU.  The CPU already exists, but it does not
+     start running code until unparked by the CPU hotplug controller.
 
-Where are the declarations for these functions?
+(01b) QEMU: trigger SCI
 
---
-Alex Benn=C3=A9e
+(02-03) no equivalent
+
+(04) Host CPU: (OS) execute GPE handler from DSDT
+
+(05) Host CPU: (OS) Port 0xB2 write, all CPUs enter SMM (NOTE: New CPU
+     will not enter CPU because SMI is disabled)
+
+(06) Host CPU: (SMM) Save 38000, Update 38000 -- fill simple SMM
+     rebase code.
+
+(07a) Host CPU: (SMM) Write to CPU hotplug controller to enable
+     new CPU
+
+(07b) Host CPU: (SMM) Send INIT/SIPI/SIPI to new CPU.
+
+(08a) New CPU: (Low RAM) Enter protected mode.
+
+(08b) New CPU: (Flash) Signals host CPU to proceed and enter cli;hlt loop.
+
+(09) Host CPU: (SMM) Send SMI to the new CPU only.
+
+(10) New CPU: (SMM) Run SMM code at 38000, and rebase SMBASE to
+     TSEG.
+
+(11) Host CPU: (SMM) Restore 38000.
+
+(12) Host CPU: (SMM) Update located data structure to add the new CPU
+     information. (This step will involve CPU_SERVICE protocol)
+
+(13) New CPU: (Flash) do whatever other initialization is needed
+
+(14) New CPU: (Flash) Deadloop, and wait for INIT-SIPI-SIPI.
+
+(15) Host CPU: (OS) Send INIT-SIPI-SIPI to pull new CPU in..
+
+
+In other words, the cache-as-RAM phase of 02-03 is replaced by the
+INIT-SIPI-SIPI sequence of 07b-08a-08b.
+
+
+>> The QEMU DSDT could be modified (when secure boot is in effect) to OUT
+>> to 0xB2 when hotplug happens.  It could write a well-known value to
+>> 0xB2, to be read by an SMI handler in edk2.
+> 
+> I dislike involving QEMU's generated DSDT in anything SMM (even
+> injecting the SMI), because the AML interpreter runs in the OS.
+> 
+> If a malicious OS kernel is a bit too enlightened about the DSDT, it
+> could willfully diverge from the process that we design. If QEMU
+> broadcast the SMI internally, the guest OS could not interfere with that.
+> 
+> If the purpose of the SMI is specifically to force all CPUs into SMM
+> (and thereby force them into trusted state), then the OS would be
+> explicitly counter-interested in carrying out the AML operations from
+> QEMU's DSDT.
+
+But since the hotplug controller would only be accessible from SMM,
+there would be no other way to invoke it than to follow the DSDT's
+instruction and write to 0xB2.  FWIW, real hardware also has plenty of
+0xB2 writes in the DSDT or in APEI tables (e.g. for persistent store
+access).
+
+Paolo
 
