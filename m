@@ -2,94 +2,64 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F02FDC433FF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4DAC31E40
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B512F2133F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:10:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GnxUhN2X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B512F2133F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B3677205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 09:12:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3677205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyBmJ-0000g1-VJ
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 05:10:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43225)
+	id 1hyBne-0001dO-Oz
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 05:12:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1hyBlg-0000Aw-7g
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:10:01 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hyBmX-00010l-Hd
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1hyBlf-0005o8-AL
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:10:00 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53350)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1hyBlf-0005ni-37
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:09:59 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 10so699189wmp.3
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 02:09:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1oomXRITwGgesqF3NS3HPb6mmGXTSX7u4A6AoAH+bxs=;
- b=GnxUhN2XmoGgXSufuO6sfPCQ0j+Q+3/tSeV/Dt25g+1Z6PXmrLZVovaSBEr+zSqgon
- NeSt03kWJakTsPQg+CxUtsVWFu6NpPJFM0C0jXJ4DUW6O/xMKavObCSUHNpjbC/dAQjk
- L9aZ/Se3xkgUdTFWwyNwy3J8/Yy56JJiK1QLBt090qsDJUJdA8NmWL86Tth1rvGKeAv+
- owck8KjGvCGi1vsTyw/eglk4sjPI+wCsvAp9Exzp64WmNJQvyL9P9uPI51Hq4kTV640x
- oXqsAe3AiktUDyfoesghu7+2LJ5zFgpB2gvJKd+KrxkB96+M1YzqYdYyiAjDagi8+rwu
- CBWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1oomXRITwGgesqF3NS3HPb6mmGXTSX7u4A6AoAH+bxs=;
- b=mdpsFkBJfO+iM78B+KZYNDgeh4ADjhM2NfQgD7S/Tq2rHifFckLqVkpl4ie+7gQYjU
- JWQVNG080U7PLLo9FYhWjtkzAl845wbPNrvaSxznxEoR9J/JM5d6YvnzfN8GpeQFG2GP
- bBs1oboUrEvrLs5CvJ9rzgERxPdr9Nzx/QBLi/OEbc31bZHAFYQfuRNs9GxQpSfeQoQa
- 8KLBE1zagNZVqGV8wijWJs7Pk9SK/alO0wCOKb+Kwgc2PA1O/Fuw8XNFHenu04r+SjZ5
- d4LVvaJTthW0ROP7CfP+pog/RnnrL2Aew8N0kEOYyW/qjhnzjj6PmVDhhsU855ih3A0V
- 1wUw==
-X-Gm-Message-State: APjAAAV8aFzS9uHCA+0RwA22YsI4ddYPpkui/ahj7Y5njV11O38vL4GA
- R0goNepnX1cVnpSEG2fBTM+K7w==
-X-Google-Smtp-Source: APXvYqyIwlIFgQ1LoI2uSUjBWkKFzXF5S6MAUKUF5s6TEFOlIHInNbZnmJHGN3Z+vW3fNerTflkDKA==
-X-Received: by 2002:a7b:c3d0:: with SMTP id t16mr1818539wmj.25.1565860197330; 
- Thu, 15 Aug 2019 02:09:57 -0700 (PDT)
-Received: from ?IPv6:2a02:c7f:a69:1700:8897:9507:94c2:b98d?
- ([2a02:c7f:a69:1700:8897:9507:94c2:b98d])
- by smtp.gmail.com with ESMTPSA id r16sm4115196wrc.81.2019.08.15.02.09.56
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 15 Aug 2019 02:09:56 -0700 (PDT)
-To: Jan Bobek <jan.bobek@gmail.com>, qemu-devel@nongnu.org
-References: <20190810041255.6820-1-jan.bobek@gmail.com>
- <20190810041255.6820-17-jan.bobek@gmail.com>
- <b0bfa230-f508-ace2-6daf-75f2156251d6@linaro.org>
- <cee901d6-9423-8c0e-3b61-f3b09019ac5d@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <d9cefe05-3119-c0c3-816b-b2df7378d0be@linaro.org>
-Date: Thu, 15 Aug 2019 10:09:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <kwolf@redhat.com>) id 1hyBmW-0006Cb-E4
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 05:10:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60188)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hyBmT-0006AU-Km; Thu, 15 Aug 2019 05:10:49 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D1D1AC057F2E;
+ Thu, 15 Aug 2019 09:10:47 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-12.ams2.redhat.com [10.36.117.12])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55DA67D3FC;
+ Thu, 15 Aug 2019 09:10:41 +0000 (UTC)
+Date: Thu, 15 Aug 2019 11:10:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Message-ID: <20190815091039.GA7415@linux.fritz.box>
+References: <20190814202219.1870-1-mlevitsk@redhat.com>
+ <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cee901d6-9423-8c0e-3b61-f3b09019ac5d@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
-Subject: Re: [Qemu-devel] [RFC PATCH v2 16/39] target/i386: introduce
- instruction operand infrastructure
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="PEIAKu/WMn1b1Hv9"
+Content-Disposition: inline
+In-Reply-To: <d0635a23-7f99-9cf7-500c-af668e8ca370@redhat.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.32]); Thu, 15 Aug 2019 09:10:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 00/13] RFC: luks/encrypted qcow2 key
+ management
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,37 +71,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/15/19 1:00 AM, Jan Bobek wrote:
-> On 8/13/19 2:07 AM, Richard Henderson wrote:
->> On 8/10/19 5:12 AM, Jan Bobek wrote:
->>> +#define INSNOP_INIT(opT, init_stmt)                                \
->>> +    static int insnop_init(opT)(CPUX86State *env, DisasContext *s, \
->>> +                                int modrm, insnop_t(opT) *op)      \
->>> +    {                                                              \
->>> +        init_stmt;                                                 \
->>> +    }
->> ...
->>> +#define INSNOP_INIT_FAIL        return 1
->>> +#define INSNOP_INIT_OK(x)       return ((*(op) = (x)), 0)
->>
->> Return bool and true on success.
-> 
-> So, the reason why I did this "inverted" logic (0 = success, 1 =
-> failure) is because I was anticipating I might need to differentiate
-> between two or more different failures, in which case returning
-> different non-zero values for different error cases makes perfect
-> sense. I have not made use of it yet, but I'd rather hold on to this
-> idiom at least for now, until I am 100 % sure it really is
-> unnecessary.
 
-In that case "int" still isn't the best return type -- an enumeration would be.
+--PEIAKu/WMn1b1Hv9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Am 14.08.2019 um 23:08 hat Eric Blake geschrieben:
+> On 8/14/19 3:22 PM, Maxim Levitsky wrote:
+>=20
+> > This is an issue that was raised today on IRC with Kevin Wolf. Really t=
+hanks
+> > for the idea!
+> >=20
+> > We agreed that this new qmp interface should take the same options as
+> > blockdev-create does, however since we want to be able to edit the encr=
+yption
+> > slots separately, this implies that we sort of need to allow this on cr=
+eation
+> > time as well.
+> >=20
+> > Also the BlockdevCreateOptions is a union, which is specialized by the =
+driver name
+> > which is great for creation, but for update, the driver name is already=
+ known,
+> > and thus the user should not be forced to pass it again.
+> > However qmp doesn't seem to support union type guessing based on actual=
+ fields
+> > given (this might not be desired either), which complicates this somewh=
+at.
+>=20
+> Does the idea of a union type with a default value for the discriminator
+> help?  Maybe we have a discriminator which defaults to 'auto', and add a
+> union branch 'auto':'any'.  During creation, if the "driver":"auto"
+> branch is selected (usually implicitly by omitting "driver", but also
+> possible explicitly), the creation attempt is rejected as invalid
+> regardless of the contents of the remaining 'any'.  But during amend
+> usage, if the 'auto' branch is selected, we then add in the proper
+> "driver":"xyz" and reparse the QAPI object to determine if the remaining
+> fields in 'any' still meet the specification for the required driver bran=
+ch.
+>=20
+> This idea may still require some tweaks to the QAPI generator, but it's
+> the best I can come up with for a way to parse an arbitrary JSON object
+> with unknown validation, then reparse it again after adding more
+> information that would constrain the parse differently.
 
-r~
+Feels like this would be a lot of code just to allow the client to omit
+passing a value that it knows anyway. If this were a human interface, I
+could understand the desire to make commands less verbose, but for QMP I
+honestly don't see the point when it's not trivial.
 
+Kevin
+
+--PEIAKu/WMn1b1Hv9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJdVSGPAAoJEH8JsnLIjy/WtpgP/2H2n9oGcS6sTiQsAp4tKO3/
+EoOm45ZXH44f6ysYOe9LBf0EPJjZ1A0JpjM9mD/UqjNHFyKTFe+qnobujKcip1kU
+I5rBG3CvT17tDtI6RzriJ6WGY4Dzzf4ULAgBxpHeb1NjI//MAy2H4Enu+uLoiZ0U
+aXibOEqmc5iVdlI4S3uCRdkKaLdie5zJHRxKV9oZL4zo9vOkOQ06TCRWEsr1knYn
+Y57KE/WU/y5xaPyGrgITBxjstp42IA8vOTOQWSt7xpdmUPS2BjqzxlCSUSTBGenJ
+oSmywYJMR9MHjS8fOTGkhp8SzjOqiHRziXt1dF991IZH37GXRLud8HsA4Lq3JlKX
+ysfNwABac8BL9sKG8ZPhgm9fqAOm8jKXJENqUcLtWkKv6db/f48c+A9KbGCOyEFl
+AIKEmc1w58CHXYK2MMU9bvj1GAnrQhQWcHDlZuuhchs0NZfqy0b9k+B/ufjvuVZG
+f5//JGhI+6ScaIDSULQo1qUHomkbNZx+AdHDkrPOSmp8cxKxyR3lh2SE6vUQHnpG
+pIY7YN+41Ko4mcK5FIXCIntv56AtI5Mms4FlkChZSmSWt1vCEKNh0XKeSnd7YukC
+6YOI58Slzpu0GOQcQKJwo7GEs97+OCEgjBrzhcgMvup7k/x7D1GzvFtZKKOPQCzi
+n34Aifl3q804JmlJJAoA
+=ZuvE
+-----END PGP SIGNATURE-----
+
+--PEIAKu/WMn1b1Hv9--
 
