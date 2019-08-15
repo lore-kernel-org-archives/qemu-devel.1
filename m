@@ -2,109 +2,71 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F2DC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD9CC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:51:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 108E72084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:42:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="IBcoW5cp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 108E72084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id DAC0020644
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 12:51:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAC0020644
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyF4z-000874-HU
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 08:42:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40788)
+	id 1hyFE1-00024o-Uf
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 08:51:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <darren.kenny@oracle.com>) id 1hyF4J-0007gs-PM
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:41:29 -0400
+ (envelope-from <bounces@canonical.com>) id 1hyFDB-0001ez-D3
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <darren.kenny@oracle.com>) id 1hyF4I-0007fo-6i
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:41:27 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:54272)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
- id 1hyF4H-0007ej-R5
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:41:26 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7FCcQBJ019203;
- Thu, 15 Aug 2019 12:41:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=42vjv25Rum8vkMZqpLR+rf75kLIb6iSn/c/I2RoD7MA=;
- b=IBcoW5cplI3Gw7gRvYiVCUlZrAhNtfbs+A2AjDu9WNKI+E9xkp9n+7YlXJijkPtjCrUx
- bBQPQGubeCJMYebOMac6cSRJn3szsb/Q32ASVY6KC11cp1kPR2F8A8HKZEytTlBC0iVe
- BIwGjeLwtFeA2QBVLyYOCPloPl/ILvm3OMJFegOgjml3cVFSBgruyx6mIAOv24EbhNlD
- 5AZt/vscfd93zYWJWABLerxlC+zZj1YQ6rz7U4897A1V9ckRD5t3AUiqKMbsjQbWXrXz
- VZRcvAHosPyTmHMPLevUnhxyurP7tteJhEOqc0avsHk37lHBWWEOOTxDJch4krZkLKst bg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2u9nvpjmpd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 15 Aug 2019 12:41:21 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7FCcOvo149194;
- Thu, 15 Aug 2019 12:41:20 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2ucmwjmufx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 15 Aug 2019 12:41:20 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7FCfJGa008418;
- Thu, 15 Aug 2019 12:41:19 GMT
-Received: from starbug-lenovo.ie.oracle.com (/10.169.104.251)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 15 Aug 2019 05:41:18 -0700
-Date: Thu, 15 Aug 2019 13:41:14 +0100
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <20190815124114.du6huaca56jp6heb@starbug-lenovo.ie.oracle.com>
-Mail-Followup-To: Paolo Bonzini <pbonzini@redhat.com>,
- "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "bsd@redhat.com" <bsd@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
-References: <20190805071038.32146-1-alxndr@bu.edu>
- <20190805071038.32146-2-alxndr@bu.edu>
- <7d90f16e-d77f-077e-5291-ae4d5ee3d668@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1hyFD9-0002hV-Dt
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:50:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43602)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1hyFD7-0002fI-QQ
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 08:50:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1hyFD6-0001si-Ct
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 12:50:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 5F5692E80C7
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 12:50:32 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <7d90f16e-d77f-077e-5291-ae4d5ee3d668@redhat.com>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9349
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908150134
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9349
- signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908150134
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic]
-X-Received-From: 141.146.126.78
-Subject: Re: [Qemu-devel] [RFC PATCH v2 01/17] fuzz: Move initialization
- from main to qemu_init
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Aug 2019 12:45:30 -0000
+From: Fritz Katze <1840252@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: fritz-the-cat
+X-Launchpad-Bug-Reporter: Fritz Katze (fritz-the-cat)
+X-Launchpad-Bug-Modifier: Fritz Katze (fritz-the-cat)
+Message-Id: <156587313029.22360.18407191936417196823.malonedeb@chaenomeles.canonical.com>
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com); Revision="19022";
+ Instance="launchpad-lazr.conf"
+X-Launchpad-Hash: f69a3ed609fc2ead40de04cca82bb66afd2094eb
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 91.189.90.7
+Subject: [Qemu-devel] [Bug 1840252] [NEW] Infinite loop over ERANGE from
+ getsockopt
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -113,90 +75,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Oleinik, Alexander" <alxndr@bu.edu>, "bsd@redhat.com" <bsd@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Reply-To: Bug 1840252 <1840252@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 05, 2019 at 09:43:06AM +0200, Paolo Bonzini wrote:
->On 05/08/19 09:11, Oleinik, Alexander wrote:
->> Using this, we avoid needing a special case to break out of main(),
->> early, when initializing the fuzzer, as we can just call qemu_init.
->> There is still a #define around main(), since it otherwise conflicts
->> with the libfuzzer main().
->>
->> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
->> ---
->>  include/sysemu/sysemu.h |  5 +++++
->>  vl.c                    | 25 +++++++++++++++++++++++--
->>  2 files changed, 28 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->> index 984c439ac9..a63d5ccce3 100644
->> --- a/include/sysemu/sysemu.h
->> +++ b/include/sysemu/sysemu.h
->> @@ -184,6 +184,8 @@ QemuOpts *qemu_get_machine_opts(void);
->>
->>  bool defaults_enabled(void);
->>
->> +int qemu_init(int argc, char **argv, char **envp);
->> +
->>  extern QemuOptsList qemu_legacy_drive_opts;
->>  extern QemuOptsList qemu_common_drive_opts;
->>  extern QemuOptsList qemu_drive_opts;
->> @@ -197,4 +199,7 @@ extern QemuOptsList qemu_global_opts;
->>  extern QemuOptsList qemu_mon_opts;
->>  extern QemuOptsList qemu_semihosting_config_opts;
->>
->> +#ifdef CONFIG_FUZZ
->> +int real_main(int argc, char **argv, char **envp);
->> +#endif
->>  #endif
->> diff --git a/vl.c b/vl.c
->> index 130a389712..914bb9b2de 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -130,6 +130,10 @@ int main(int argc, char **argv)
->>  #include "sysemu/iothread.h"
->>  #include "qemu/guest-random.h"
->>
->> +#ifdef CONFIG_FUZZ
->> +#include "tests/libqtest.h"
->> +#endif
->
->Why is this #include needed?
->
->If you leave out the changes to introduce real_main, the patch can be
->committed independent of the rest.  Those can be introduced in patch 2
->or even 12 ("Add fuzzer skeleton").
+Public bug reported:
 
-The build actually fails for me due to this include, because it has it's own
-and different declaration of qtest_init:
+Host system: Ubuntu 18.04.3 AMD64
+Qemu Version: qemu-arm-static --version
+qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.17)
 
-  In file included from vl.c:134:
-  .../qemu-upstream-libfuzz/./tests/libqtest.h:57:13: error: conflicting types for 'qtest_init'
-  QTestState *qtest_init(const char *extra_args);
-              ^
-  .../qemu-upstream-libfuzz/include/sysemu/qtest.h:27:6: note: previous declaration is here
-  void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp);
-       ^
-  In file included from vl.c:134:
-  .../qemu-upstream-libfuzz/./tests/libqtest.h:640:35: error: too few arguments to function call, expected 3, have 1
-      global_qtest = qtest_init(args);
-                     ~~~~~~~~~~     ^
-  .../qemu-upstream-libfuzz/include/sysemu/qtest.h:27:1: note: 'qtest_init' declared here
-  void qtest_init(const char *qtest_chrdev, const char *qtest_log, Error **errp);
-  ^
-  2 errors generated.
+Emulated System: =
 
-(It's probably a separate issue as to why there are 2 functions with
-the same name, are not static and have different signatures in the
-first place)
+Root file system taken from RaspberryPi 3 image
+ubuntu-18.04.3-preinstalled-server-armhf+raspi3.img
+from http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.3-preins=
+talled-server-armhf+raspi3.img.xz.
 
-Thanks,
+Then using system-nspawn with with /usr/bin/qemu-arm-static copied in.
 
-Darren.
+When executing commands like =
 
+  dpkg -i (--force-all) <...>.deb
+or
+  tar tvf ..
+or
+  tar xvf ..
+the hosting qemu-arm-static process goes into an infinite loop of getsockop=
+t calls of the form:
+getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE (=
+Numerical result out of range)
+I assume that this is because of an infinite retry without checking the act=
+ual error code of the call.
+
+strace:
+openat(AT_FDCWD, "/lib/arm-linux-gnueabihf/librt.so.1", O_RDONLY|O_CLOEXEC)=
+ =3D 12
+read(12, "\177ELF\1\1\1\3\0\0\0\0\0\0\0\0\3\0(\0\1\0\0\0\20\30\0\0004\0\0\0=
+"..., 512) =3D 512
+lseek(12, 21236, SEEK_SET)              =3D 21236
+read(12, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"=
+..., 1240) =3D 1240
+lseek(12, 20856, SEEK_SET)              =3D 20856
+read(12, "A2\0\0\0aeabi\0\1(\0\0\0\0057-A\0\6\n\7A\10\1\t\2\n\4\22"..., 51)=
+ =3D 51
+fstat(12, {st_mode=3DS_IFREG|0644, st_size=3D22476, ...}) =3D 0
+mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_=
+ANONYMOUS|MAP_DENYWRIT
+E, -1, 0) =3D 0x7f419952c000
+mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_=
+DENYWRITE, 12, 0) =3D 0x
+7f419952c000
+mprotect(0x7f4199531000, 61440, PROT_NONE) =3D 0
+mmap(0x7f4199540000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_=
+DENYWRITE, 12, 0x4000)
+ =3D 0x7f4199540000
+close(12)                               =3D 0
+mprotect(0x7f4199540000, 4096, PROT_READ) =3D 0
+mprotect(0x7f4199578000, 8192, PROT_READ) =3D 0
+mmap(0x7f419957b000, 28672, PROT_NONE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS|=
+MAP_NORESERVE, -1, 0) =
+
+=3D 0x7f419957b000
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
+rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
+rt_sigprocmask(SIG_SETMASK, [HUP USR1 USR2 PIPE ALRM CHLD TSTP URG VTALRM P=
+ROF WINCH IO], NULL, 8
+) =3D 0
+access("/etc/systemd/dont-synthesize-nobody", F_OK) =3D -1 ENOENT (No such =
+file or directory)
+getpid()                                =3D 26
+socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) =3D 12
+getsockopt(12, SOL_SOCKET, SO_RCVBUF, [212992], [4]) =3D 0
+setsockopt(12, SOL_SOCKET, SO_RCVBUFFORCE, [8388608], 4) =3D -1 EPERM (Oper=
+ation not permitted)
+setsockopt(12, SOL_SOCKET, SO_RCVBUF, [8388608], 4) =3D 0
+getsockopt(12, SOL_SOCKET, SO_SNDBUF, [212992], [4]) =3D 0
+setsockopt(12, SOL_SOCKET, SO_SNDBUFFORCE, [8388608], 4) =3D -1 EPERM (Oper=
+ation not permitted)
+setsockopt(12, SOL_SOCKET, SO_SNDBUF, [8388608], 4) =3D 0
+connect(12, {sa_family=3DAF_UNIX, sun_path=3D"/run/dbus/system_bus_socket"}=
+, 29) =3D 0
+getsockopt(12, SOL_SOCKET, SO_PEERCRED, {pid=3D0, uid=3D0, gid=3D0}, [12]) =
+=3D 0
+getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE (=
+Numerical result out of =
+
+range)
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1840252
+
+Title:
+  Infinite loop over  ERANGE from getsockopt
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host system: Ubuntu 18.04.3 AMD64
+  Qemu Version: qemu-arm-static --version
+  qemu-arm version 2.11.1(Debian 1:2.11+dfsg-1ubuntu7.17)
+
+  Emulated System: =
+
+  Root file system taken from RaspberryPi 3 image
+  ubuntu-18.04.3-preinstalled-server-armhf+raspi3.img
+  from http://cdimage.ubuntu.com/releases/18.04/release/ubuntu-18.04.3-prei=
+nstalled-server-armhf+raspi3.img.xz.
+
+  Then using system-nspawn with with /usr/bin/qemu-arm-static copied in.
+
+  When executing commands like =
+
+    dpkg -i (--force-all) <...>.deb
+  or
+    tar tvf ..
+  or
+    tar xvf ..
+  the hosting qemu-arm-static process goes into an infinite loop of getsock=
+opt calls of the form:
+  getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
+ (Numerical result out of range)
+  I assume that this is because of an infinite retry without checking the a=
+ctual error code of the call.
+
+  strace:
+  openat(AT_FDCWD, "/lib/arm-linux-gnueabihf/librt.so.1", O_RDONLY|O_CLOEXE=
+C) =3D 12
+  read(12, "\177ELF\1\1\1\3\0\0\0\0\0\0\0\0\3\0(\0\1\0\0\0\20\30\0\0004\0\0=
+\0"..., 512) =3D 512
+  lseek(12, 21236, SEEK_SET)              =3D 21236
+  read(12, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\=
+0"..., 1240) =3D 1240
+  lseek(12, 20856, SEEK_SET)              =3D 20856
+  read(12, "A2\0\0\0aeabi\0\1(\0\0\0\0057-A\0\6\n\7A\10\1\t\2\n\4\22"..., 5=
+1) =3D 51
+  fstat(12, {st_mode=3DS_IFREG|0644, st_size=3D22476, ...}) =3D 0
+  mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MA=
+P_ANONYMOUS|MAP_DENYWRIT
+  E, -1, 0) =3D 0x7f419952c000
+  mmap(0x7f419952c000, 90112, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MA=
+P_DENYWRITE, 12, 0) =3D 0x
+  7f419952c000
+  mprotect(0x7f4199531000, 61440, PROT_NONE) =3D 0
+  mmap(0x7f4199540000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MA=
+P_DENYWRITE, 12, 0x4000)
+   =3D 0x7f4199540000
+  close(12)                               =3D 0
+  mprotect(0x7f4199540000, 4096, PROT_READ) =3D 0
+  mprotect(0x7f4199578000, 8192, PROT_READ) =3D 0
+  mmap(0x7f419957b000, 28672, PROT_NONE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOU=
+S|MAP_NORESERVE, -1, 0) =
+
+  =3D 0x7f419957b000
+  rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
+  rt_sigprocmask(SIG_SETMASK, ~[RTMIN RT_1], NULL, 8) =3D 0
+  rt_sigprocmask(SIG_SETMASK, [HUP USR1 USR2 PIPE ALRM CHLD TSTP URG VTALRM=
+ PROF WINCH IO], NULL, 8
+  ) =3D 0
+  access("/etc/systemd/dont-synthesize-nobody", F_OK) =3D -1 ENOENT (No suc=
+h file or directory)
+  getpid()                                =3D 26
+  socket(AF_UNIX, SOCK_STREAM|SOCK_CLOEXEC|SOCK_NONBLOCK, 0) =3D 12
+  getsockopt(12, SOL_SOCKET, SO_RCVBUF, [212992], [4]) =3D 0
+  setsockopt(12, SOL_SOCKET, SO_RCVBUFFORCE, [8388608], 4) =3D -1 EPERM (Op=
+eration not permitted)
+  setsockopt(12, SOL_SOCKET, SO_RCVBUF, [8388608], 4) =3D 0
+  getsockopt(12, SOL_SOCKET, SO_SNDBUF, [212992], [4]) =3D 0
+  setsockopt(12, SOL_SOCKET, SO_SNDBUFFORCE, [8388608], 4) =3D -1 EPERM (Op=
+eration not permitted)
+  setsockopt(12, SOL_SOCKET, SO_SNDBUF, [8388608], 4) =3D 0
+  connect(12, {sa_family=3DAF_UNIX, sun_path=3D"/run/dbus/system_bus_socket=
+"}, 29) =3D 0
+  getsockopt(12, SOL_SOCKET, SO_PEERCRED, {pid=3D0, uid=3D0, gid=3D0}, [12]=
+) =3D 0
+  getsockopt(12, SOL_SOCKET, SO_PEERSEC, 0x7fff7cac49d8, [4]) =3D -1 ERANGE=
+ (Numerical result out of =
+
+  range)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1840252/+subscriptions
 
