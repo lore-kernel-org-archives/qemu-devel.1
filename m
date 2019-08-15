@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC5E7C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEA6C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:13:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 774B22064A
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:13:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68FA32064A
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:13:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="fTUhRiLD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 774B22064A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="JtTS9op+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68FA32064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKFG-0002A9-Hd
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:13:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34287)
+	id 1hyKFL-0002IP-Dv
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:13:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34257)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1hyKBD-0007Ud-DP
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:08:57 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1hyKB8-0007RV-Bl
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:08:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1hyKB8-0006fH-92
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:08:54 -0400
-Received: from mout.web.de ([217.72.192.78]:46047)
+ (envelope-from <lukasstraub2@web.de>) id 1hyKB5-0006c0-Vw
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:08:50 -0400
+Received: from mout.web.de ([217.72.192.78]:49285)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hyKB5-0006au-Vs
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:08:48 -0400
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hyKB3-0006WD-Pr
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:08:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1565892516;
- bh=JG1Avi7Oca3GslRcQqG5Jk+YrYiZWG7vyGoqSBKja0o=;
+ s=dbaedf251592; t=1565892506;
+ bh=1aMK3WcfXGtXkTJdGeILldP4LKkJ6RJ1Yf8zxuMXcY0=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=fTUhRiLDBQ35x1euexk5XIbpPBh6f6AyTi/+HJdnckJxwWYIQ5/K5uguD/Qm6CJqQ
- BVZ700FXByvnO97Eayv9E72ODJQnVsFB5HwNfMvfv4KhVClLVYMe4LikVJ3tdokeYS
- NypQ0bTe2+Dh7v3ScDh6tm13XIBEDIHL7uCiOBfM=
+ b=JtTS9op+mNlmcwE89uGiKLqsFcKRsAeTbjDAXk7rFPUbAbYALNvgIdYuODi2xSk1+
+ Gfk9jKMPQOA/vMkvUTk2c29ZpJEQKN0anw/DAMKyGJ00myHaNrsLlHiP469oP0T0RB
+ EbLb+AooWQo0ylXJeoVjwXDMhuE3ilxzmMXoKvKc=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from luklap ([89.247.255.245]) by smtp.web.de (mrweb103
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lm4hJ-1iX6lJ1lWD-00Zjkh; Thu, 15
- Aug 2019 20:08:36 +0200
-Date: Thu, 15 Aug 2019 20:08:35 +0200
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Maaur-1hii3v2OrZ-00K7tj; Thu, 15
+ Aug 2019 20:08:26 +0200
+Date: Thu, 15 Aug 2019 20:08:23 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <20190815200835.20f24b5f@luklap>
+Message-ID: <20190815200823.3de1bd14@luklap>
 In-Reply-To: <cover.1565892399.git.lukasstraub2@web.de>
 References: <cover.1565892399.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:wJiT6/HV0o8p7nIfWhPWjRouTpAlH4Xc1bka5IZRbJZj+GXH3f4
- qQoKv0Np713y+UVRIedkchc2LYhXX/AlY1d9jSBuryN2AaFVWUvmw5e4N6mkG+bB8a7Swix
- msirlZqrTxO5bKtv3He/IiEgg607yvqbbNOUG3giKmtr6bcF5OuAT8QeamcyUW5gud0mos8
- 9yO4uAoxEegxXP9H62kyQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:5uHPlfZxhqc=:jwcTjFXue3XqeggVfZfhnn
- kZL6n26W5Gi+dB9tbmmUtY13MVsDGq+OgHAKMvRmVN7an+3KcVD5IjzBPE8lfn+y+zDbLFtrZ
- UF6xdvtDKm0Pftdck2NRC3UHUomFikvhIMMUGArS2FsTKZKMLCDWew4RgTXRK1GCFJvuRD/Wh
- DiSCc23wIltE7ByW70kJVArbr3UVsBGosymXueu+0GdE+oSvqX88IsIN2I/cgX9e+nAGzLudP
- NZohBrJcU2fIezOMpfyZSy4ouvBbk7UcQd790n6LkE7d9OqheyP+f4tkeDAOD/pfkwZvZE7cC
- uj494t0drdlw4RsDHM+4e6De+8aFZ2pWWOUD54YygxcY3B2CmHW8P4a5b+h0ROoZRdfEAJcQ4
- rCOsEDes3lhjtOyom6FG9x6ScOgrdopOekx3qGkCoMNknIhf0M/GF3r4jyropJDS5DOBggR9o
- ksCpLET5fAhXjMx7o0asvifwlUhp8sARGYk2GDnL95Utp2MfaBaqebEhSavwzDAZu0Jvb/225
- ScKtpT4KTmLUMYDjkpu/mJ0vtecIPQYxBz+GWbZcqJD1XhA6yTYBSo45k4XDqpSuo26rVq6N3
- GxYDujr1w9So+Aa+MnhZMU8DuzyhAIjnPAUHHKCFcPDOphUs5irSDHY2Euz9UcBAXsPRegSx2
- BB244v89pGYD8LcC/YhbnpV7vBGBp48MXJ6A1sb6lyh7zcf0AfOoedOl6yzzlcrod69bO93SM
- KuU0xW7QA5ik0Mpgr9v/AYkaNaJgrEexdNPZtz7//mP5IDFFsgVseXbKVl6I3Wrso8EY0HFxE
- 0YdDf8mkYoNRw2uciWS48ZS90wyhUSWAgMgyxV/E5KWfjsxwWGLUpBPJMq3qNjiY2/3L7JyDP
- tjgWt6aRfjG89JfJl1mQntP0j9ZklB1TIW4MafSlCrHrqwGbPSLt0xLuOgX3ZiciPKrzv0rOX
- VQsoF+RsTvcBjcm39Qyi4BY2eaWSb7qMmH3JCVFy2CU1cIU8cLmqOmJM08uuThnEGHEEhSNQx
- SN+HLfsdLLkbmlPyAwau6laP4ySLoCzBcS+nLc0b1JQ7HsYG4l3hwlToQR1fFbz53S0QjtO9R
- B14828MFjrQosyPkipco7664zWG/jN+AaFp8GMnBrpyn/yIDf9tKz/Ihfv3Z5yXqFdmw09E42
- AgvGU=
+X-Provags-ID: V03:K1:rM1nWaZ12bjUfaU57768Ifo1LoOkeyHGgiBGivHQ36HR+pe99mB
+ ZFr6ZyvdhoclTvIBydSrvru0Gq2ozdWVQf1anXr9dkTObBH8KTwiYlZUwAYXqM5P/92M1ac
+ UFywEHBBIlteyIWs7U8fD8P4JKG8T1vUQ1XA9XlRCaAniEUMKihxqbg+5PgMhU4GiCMtUds
+ bMN9NHq4WGlfSQoMYOGgA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1uReHKE3F4A=:8CNo+FMgWhHDQ9awysVLHq
+ KgFt0p/13cmKAFUYC+8oFk8/25LudFgCPkQYehszrGSOATqXcr+/Y3sETWqXitUYYyKjmTBR1
+ 6D9JY/8SDuusvAiOSPfPayX5gePpXPcFSrw7tNEadnZaPBo/ldV9QVkuKNsqhroC9vQUZOOsk
+ mm0TxbR4XnwtbN5wHdhb1yxU5mroe4D3QVsumaRqwu7n5MJh/3obnm5U1hf8eoWYNf80XDBNi
+ AdgcOE+rA58vILoz84fzHtjM02wV7c7CnOru65QQ54WxvSb7DXaG2hifLkrmJ8lJ6HgkYR+jr
+ pvUTGHRA0vG0zzuGV5tvAGk4DUL1r579DnacXrQIiV8DwiDprN4K8hMY9edCKnrcKcHOqim5s
+ 0dgPUeagXXa/02J55964Vy0z4LrGtz5r70k+ub+cCnad/JQJ7ye/VsbQOG9JNDyCevLHsYHTz
+ sU81BUqo3vZysYk0pDouCUtmxQ3RBIVHadBLmp0GVcguNB7ViLevecB3T1Trj069ZGn3k2twQ
+ 5tGp/GNpeqbeRKDfAxvKUmYBX4xqRVZAAxqDeOto9CoS+ryuDiD1ZlkUS+r4detk3BAZJJifu
+ YIdfTafu3UqPTQAVPdcYm/zs/74Nsx/wYjwYXCT86H6YlPT6krEZ7je6KsYK/K13TTGU1YxoV
+ tEWCPe9pJCRIs0oFv2P5p33tJZ9fCLMG8IOlbvO+DSOrEXZhoUp+6c1E5aOLzJH4rGd92zoFK
+ oSqmvm4N9LgKIk+OBnTnB0sWIL4htL/+2gAE1Ej9/xuo9SZqs/IHNp1xl7xMbrB5PxILdDice
+ N55BBLkQEY268FJvuJyLW+qHKprIxzT/raDl3Xu2to/lTF0R9Ae5dQVydC4Vi0iRIhyC/Freg
+ kPLbnYuHFgI+vqFopPT6Zp+fY0cTt4SKzCXN+0StjBgqGAnFVmnc3Ok1rtH97egl/SiBW2Yb3
+ uLu+j2rVblew1uhxD+hKbLbP6f/WOupZNBL4dHa5p7mSplJMI2BpFh+bnmQrIJe/eVmb5HRWO
+ 1vczH2He7cHXQ2UGsoW67v/esy0uF88dJpw/0+BAVoO93nux9x6WKkHD39ul/RcB3eKstQgtk
+ Pvg+UgUdlftsb6sIx5mshmgJ6/95yfSt9skBH8xbm82flbKIYebhdYdqmyz0Sve3qM8MTcR34
+ ivLUA=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 217.72.192.78
-Subject: [Qemu-devel] [PATCH v2 3/3] Update Documentation
+Subject: [Qemu-devel] [PATCH v2 1/3] Replication: Ignore requests after
+ failover
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,320 +99,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Document the qemu command-line and qmp commands for continious replication
+After failover the Secondary side of replication shouldn't change state, b=
+ecause
+it now functions as our primary disk.
+
+In replication_start, replication_do_checkpoint, replication_stop, ignore
+the request if current state is BLOCK_REPLICATION_DONE (sucessful failover=
+) or
+BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging act=
+ive
+and hidden images into the base image).
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
----
- docs/COLO-FT.txt | 185 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 138 insertions(+), 47 deletions(-)
+=2D--
+ block/replication.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
 
-diff --git a/docs/COLO-FT.txt b/docs/COLO-FT.txt
-index ad24680d13..c08bfbd3a8 100644
---- a/docs/COLO-FT.txt
-+++ b/docs/COLO-FT.txt
-@@ -145,35 +145,64 @@ The diagram just shows the main qmp command, you can =
-get the detail
- in test procedure.
-=20
- =3D=3D Test procedure =3D=3D
-+Note: Here we are running both instances on the same Machine for testing,=
-=20
-+change the IP Addresses if you want to run it on two Hosts
+diff --git a/block/replication.c b/block/replication.c
+index 3d4dedddfc..97cc65c0cf 100644
+=2D-- a/block/replication.c
++++ b/block/replication.c
+@@ -454,6 +454,17 @@ static void replication_start(ReplicationState *rs, R=
+eplicationMode mode,
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary is promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
- 1. Startup qemu
- Primary:
--# qemu-system-x86_64 -accel kvm -m 2048 -smp 2 -qmp stdio -name primary \
--  -device piix3-usb-uhci -vnc :7 \
--  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
--  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
--  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfif=
-o,vote-threshold=3D1,\
--         children.0.file.filename=3D1.raw,\
--         children.0.driver=3Draw -S
-+# imagefolder=3D"/mnt/vms/colo-test"
+     if (s->stage !=3D BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is running or done");
+         aio_context_release(aio_context);
+@@ -529,8 +540,7 @@ static void replication_start(ReplicationState *rs, Re=
+plicationMode mode,
+                    "Block device is in use by internal backup job");
+
+         top_bs =3D bdrv_lookup_bs(s->top_id, s->top_id, NULL);
+-        if (!top_bs || !bdrv_is_root_node(top_bs) ||
+-            !check_top_bs(top_bs, bs)) {
++        if (!top_bs || !check_top_bs(top_bs, bs)) {
+             error_setg(errp, "No top_bs or it is invalid");
+             reopen_backing_file(bs, false, NULL);
+             aio_context_release(aio_context);
+@@ -577,6 +587,17 @@ static void replication_do_checkpoint(ReplicationStat=
+e *rs, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary was promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
-+# cp --reflink=3Dauto $imagefolder/primary.qcow2 $imagefolder/primary-copy=
-.qcow2
+     if (s->mode =3D=3D REPLICATION_MODE_SECONDARY) {
+         secondary_do_checkpoint(s, errp);
+     }
+@@ -593,7 +614,7 @@ static void replication_get_error(ReplicationState *rs=
+, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
+-    if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
++    if (s->stage =3D=3D BLOCK_REPLICATION_NONE) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+         return;
+@@ -635,6 +656,17 @@ static void replication_stop(ReplicationState *rs, bo=
+ol failover, Error **errp)
+     aio_context_acquire(aio_context);
+     s =3D bs->opaque;
+
++    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
++        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
++        /*
++         * This case happens when a secondary was promoted to primary.
++         * Ignore the request because the secondary side of replication
++         * doesn't have to do anything anymore.
++         */
++        aio_context_release(aio_context);
++        return;
++    }
 +
-+# qemu-system-x86_64 -enable-kvm -cpu qemu64,+kvmclock -m 512 -smp 1 -qmp =
-stdio \
-+   -vnc :0 -k de -device piix3-usb-uhci -device usb-tablet -name primary \
-+   -netdev tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/lib/qemu/qemu-bridge-hel=
-per \
-+   -device rtl8139,id=3De0,netdev=3Dhn0 \
-+   -chardev socket,id=3Dmirror0,host=3D127.0.0.1,port=3D9003,server,nowait=
- \
-+   -chardev socket,id=3Dcompare1,host=3D127.0.0.1,port=3D9004,server,wait \
-+   -chardev socket,id=3Dcompare0,host=3D127.0.0.1,port=3D9001,server,nowai=
-t \
-+   -chardev socket,id=3Dcompare0-0,host=3D127.0.0.1,port=3D9001 \
-+   -chardev socket,id=3Dcompare_out,host=3D127.0.0.1,port=3D9005,server,no=
-wait \
-+   -chardev socket,id=3Dcompare_out0,host=3D127.0.0.1,port=3D9005 \
-+   -object filter-mirror,id=3Dm0,netdev=3Dhn0,queue=3Dtx,outdev=3Dmirror0 \
-+   -object filter-redirector,netdev=3Dhn0,id=3Dredire0,queue=3Drx,indev=3D=
-compare_out \
-+   -object filter-redirector,netdev=3Dhn0,id=3Dredire1,queue=3Drx,outdev=
-=3Dcompare0 \
-+   -object iothread,id=3Diothread1 \
-+   -object colo-compare,id=3Dcomp0,primary_in=3Dcompare0-0,secondary_in=3D=
-compare1,\
-+outdev=3Dcompare_out0,iothread=3Diothread1 \
-+   -drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vot=
-e-threshold=3D1,\
-+children.0.file.filename=3D$imagefolder/primary.qcow2,children.0.driver=3D=
-qcow2 -S
-+
- Secondary:
--# qemu-system-x86_64 -accel kvm -m 2048 -smp 2 -qmp stdio -name secondary \
--  -device piix3-usb-uhci -vnc :7 \
--  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
--  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
--  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D1.raw,driver=3Draw=
-,node-name=3Dnode0 \
--  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dseconda=
-ry,\
--         file.driver=3Dqcow2,top-id=3Dactive-disk0,\
--         file.file.filename=3D/mnt/ramfs/active_disk.img,\
--         file.backing.driver=3Dqcow2,\
--         file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
--         file.backing.backing=3Dsecondary-disk0 \
--  -incoming tcp:0:8888
-+# imagefolder=3D"/mnt/vms/colo-test"
-+
-+# qemu-img create -f qcow2 $imagefolder/secondary-active.qcow2 10G
-+
-+# qemu-img create -f qcow2 $imagefolder/secondary-hidden.qcow2 10G
-+
-+# qemu-system-x86_64 -enable-kvm -cpu qemu64,+kvmclock -m 512 -smp 1 -qmp =
-stdio \
-+   -vnc :1 -k de -device piix3-usb-uhci -device usb-tablet -name secondary=
- \
-+   -netdev tap,id=3Dhn0,vhost=3Doff,helper=3D/usr/lib/qemu/qemu-bridge-hel=
-per \
-+   -device rtl8139,id=3De0,netdev=3Dhn0 \
-+   -chardev socket,id=3Dred0,host=3D127.0.0.1,port=3D9003,reconnect=3D1 \
-+   -chardev socket,id=3Dred1,host=3D127.0.0.1,port=3D9004,reconnect=3D1 \
-+   -object filter-redirector,id=3Df1,netdev=3Dhn0,queue=3Dtx,indev=3Dred0 \
-+   -object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1=
- \
-+   -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall \
-+   -drive if=3Dnone,id=3Dparent0,file.filename=3D$imagefolder/primary-copy=
-.qcow2,driver=3Dqcow2 \
-+   -drive if=3Dnone,id=3Dchilds0,driver=3Dreplication,mode=3Dsecondary,fil=
-e.driver=3Dqcow2,\
-+top-id=3Dchilds0,file.file.filename=3D$imagefolder/secondary-active.qcow2,\
-+file.backing.driver=3Dqcow2,file.backing.file.filename=3D$imagefolder/seco=
-ndary-hidden.qcow2,\
-+file.backing.backing=3Dparent0 \
-+   -drive if=3Dide,id=3Dcolo-disk0,driver=3Dquorum,read-pattern=3Dfifo,vot=
-e-threshold=3D1,\
-+children.0.file=3Dchilds0,children.0.driver=3Draw \
-+   -incoming tcp:0:9998
-+
-=20
- 2. On Secondary VM's QEMU monitor, issue command
- {'execute':'qmp_capabilities'}
--{ 'execute': 'nbd-server-start',
--  'arguments': {'addr': {'type': 'inet', 'data': {'host': 'xx.xx.xx.xx', '=
-port': '8889'} } }
--}
--{'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', '=
-writable': true } }
-+{'execute': 'nbd-server-start', 'arguments': {'addr': {'type': 'inet', 'da=
-ta': {'host': '127.0.0.1', 'port': '9999'} } } }
-+{'execute': 'nbd-server-add', 'arguments': {'device': 'parent0', 'writable=
-': true } }
-=20
- Note:
-   a. The qmp command nbd-server-start and nbd-server-add must be run
-@@ -184,12 +213,10 @@ Note:
-=20
- 3. On Primary VM's QEMU monitor, issue command:
- {'execute':'qmp_capabilities'}
--{ 'execute': 'human-monitor-command',
--  'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,m=
-ode=3Dprimary,file.driver=3Dnbd,file.host=3Dxx.xx.xx.xx,file.port=3D8889,fi=
-le.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
--{ 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', '=
-node': 'nbd_client0' } }
--{ 'execute': 'migrate-set-capabilities',
--      'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': tr=
-ue } ] } }
--{ 'execute': 'migrate', 'arguments': {'uri': 'tcp:xx.xx.xx.xx:8888' } }
-+{'execute': 'human-monitor-command', 'arguments': {'command-line': 'drive_=
-add -n buddy driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.hos=
-t=3D127.0.0.1,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplicatio=
-n0'}}
-+{'execute': 'x-blockdev-change', 'arguments':{'parent': 'colo-disk0', 'nod=
-e': 'replication0' } }
-+{'execute': 'migrate-set-capabilities', 'arguments': {'capabilities': [ {'=
-capability': 'x-colo', 'state': true } ] } }
-+{'execute': 'migrate', 'arguments': {'uri': 'tcp:127.0.0.1:9998' } }
-=20
-   Note:
-   a. There should be only one NBD Client for each primary disk.
-@@ -199,27 +226,91 @@ Note:
-=20
- 4. After the above steps, you will see, whenever you make changes to PVM, =
-SVM will be synced.
- You can issue command '{ "execute": "migrate-set-parameters" , "arguments"=
-:{ "x-checkpoint-delay": 2000 } }'
--to change the checkpoint period time
-+to change the idle checkpoint period time
-=20
- 5. Failover test
--You can kill Primary VM and run 'x_colo_lost_heartbeat' in Secondary VM's
--monitor at the same time, then SVM will failover and client will not detec=
-t this
--change.
-+You can kill one of the VMs and Failover on the surviving VM:=20
-=20
--Before issuing '{ "execute": "x-colo-lost-heartbeat" }' command, we have to
--issue block related command to stop block replication.
--Primary:
--  Remove the nbd child from the quorum:
--  { 'execute': 'x-blockdev-change', 'arguments': {'parent': 'colo-disk0', =
-'child': 'children.1'}}
--  { 'execute': 'human-monitor-command','arguments': {'command-line': 'driv=
-e_del blk-buddy0'}}
--  Note: there is no qmp command to remove the blockdev now
-+=3D=3D Primary Failover =3D=3D
-+The Secondary died, resume on the Primary
-=20
--Secondary:
--  The primary host is down, so we should do the following thing:
--  { 'execute': 'nbd-server-stop' }
-+{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0', 'ch=
-ild': 'children.1'} }
-+{'execute': 'human-monitor-command', 'arguments':{ 'command-line': 'drive_=
-del replication0' } }
-+{'execute': 'object-del', 'arguments':{ 'id': 'comp0' } }
-+{'execute': 'object-del', 'arguments':{ 'id': 'iothread1' } }
-+{'execute': 'object-del', 'arguments':{ 'id': 'm0' } }
-+{'execute': 'object-del', 'arguments':{ 'id': 'redire0' } }
-+{'execute': 'object-del', 'arguments':{ 'id': 'redire1' } }
-+{'execute': 'x-colo-lost-heartbeat' }
-+
-+=3D=3D Secondary Failover =3D=3D
-+The Primary died, resume on the Secondary and prepare to become the new Pr=
-imary
-+
-+{'execute': 'nbd-server-stop'}
-+{'execute': 'x-colo-lost-heartbeat'}
-+
-+{'execute': 'object-del', 'arguments':{ 'id': 'f2' } }
-+{'execute': 'object-del', 'arguments':{ 'id': 'f1' } }
-+{'execute': 'chardev-remove', 'arguments':{ 'id': 'red1' } }
-+{'execute': 'chardev-remove', 'arguments':{ 'id': 'red0' } }
-+
-+{'execute': 'chardev-add', 'arguments':{ 'id': 'mirror0', 'backend': {'typ=
-e': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.0.0=
-.1', 'port': '9003' } }, 'server': true } } } }
-+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare1', 'backend': {'ty=
-pe': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.0.=
-0.1', 'port': '9004' } }, 'server': true } } } }
-+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare0', 'backend': {'ty=
-pe': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.0.=
-0.1', 'port': '9001' } }, 'server': true } } } }
-+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare0-0', 'backend': {'=
-type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127.=
-0.0.1', 'port': '9001' } }, 'server': false } } } }
-+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare_out', 'backend': {=
-'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '127=
-.0.0.1', 'port': '9005' } }, 'server': true } } } }
-+{'execute': 'chardev-add', 'arguments':{ 'id': 'compare_out0', 'backend': =
-{'type': 'socket', 'data': {'addr': { 'type': 'inet', 'data': { 'host': '12=
-7.0.0.1', 'port': '9005' } }, 'server': false } } } }
-+
-+=3D=3D Primary resume replication =3D=3D
-+Resume replication after new Secondary is up.
-+
-+Start the new Secondary, then:
-+{'execute': 'drive-mirror', 'arguments':{ 'device': 'colo-disk0', 'job-id'=
-: 'resync', 'target': 'nbd://127.0.0.1:9999/parent0', 'mode': 'existing', '=
-format': 'raw', 'sync': 'full'} }
-+
-+Wait until disk is synced, then:
-+{'execute': 'stop'}
-+{'execute': 'block-job-cancel', 'arguments':{ 'device': 'resync'} }
-+
-+{'execute': 'human-monitor-command', 'arguments':{ 'command-line': 'drive_=
-add -n buddy driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.hos=
-t=3D127.0.0.1,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplicatio=
-n0'}}
-+{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0', 'no=
-de': 'replication0' } }
-+
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-mirror', 'id':=
- 'm0', 'props': { 'netdev': 'hn0', 'queue': 'tx', 'outdev': 'mirror0' } } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
-id': 'redire0', 'props': { 'netdev': 'hn0', 'queue': 'rx', 'indev': 'compar=
-e_out' } } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
-id': 'redire1', 'props': { 'netdev': 'hn0', 'queue': 'rx', 'outdev': 'compa=
-re0' } } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'iothread', 'id': 'iot=
-hread1' } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'colo-compare', 'id': =
-'comp0', 'props': { 'primary_in': 'compare0-0', 'secondary_in': 'compare1',=
- 'outdev': 'compare_out0', 'iothread': 'iothread1' } } }
-+
-+{'execute': 'migrate-set-capabilities', 'arguments':{ 'capabilities': [ {'=
-capability': 'x-colo', 'state': true } ] } }
-+{'execute': 'migrate', 'arguments':{ 'uri': 'tcp:127.0.0.1:9998' } }
-+
-+Note:
-+If this Primary previously was a Secondary, then we need to insert the=20
-+filters before the filter-rewriter by using the=20
-+"'insert': 'before', 'position': 'rew0'" Options. See below.
-+
-+=3D=3D Secondary resume replication =3D=3D
-+Become Primary and resume replication after new Secondary is up.
-+
-+Start the new Secondary, then:
-+{'execute': 'drive-mirror', 'arguments':{ 'device': 'colo-disk0', 'job-id'=
-: 'resync', 'target': 'nbd://127.0.0.1:9999/parent0', 'mode': 'existing', '=
-format': 'raw', 'sync': 'full'} }
-+
-+Wait until disk is synced, then:
-+{'execute': 'stop'}
-+{'execute': 'block-job-cancel', 'arguments':{ 'device': 'resync' } }
-+
-+{'execute': 'human-monitor-command', 'arguments':{ 'command-line': 'drive_=
-add -n buddy driver=3Dreplication,mode=3Dprimary,file.driver=3Dnbd,file.hos=
-t=3D127.0.0.1,file.port=3D9999,file.export=3Dparent0,node-name=3Dreplicatio=
-n0'}}
-+{'execute': 'x-blockdev-change', 'arguments':{ 'parent': 'colo-disk0', 'no=
-de': 'replication0' } }
-+
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-mirror', 'id':=
- 'm0', 'props': { 'insert': 'before', 'position': 'rew0', 'netdev': 'hn0', =
-'queue': 'tx', 'outdev': 'mirror0' } } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
-id': 'redire0', 'props': { 'insert': 'before', 'position': 'rew0', 'netdev'=
-: 'hn0', 'queue': 'rx', 'indev': 'compare_out' } } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'filter-redirector', '=
-id': 'redire1', 'props': { 'insert': 'before', 'position': 'rew0', 'netdev'=
-: 'hn0', 'queue': 'rx', 'outdev': 'compare0' } } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'iothread', 'id': 'iot=
-hread1' } }
-+{'execute': 'object-add', 'arguments':{ 'qom-type': 'colo-compare', 'id': =
-'comp0', 'props': { 'primary_in': 'compare0-0', 'secondary_in': 'compare1',=
- 'outdev': 'compare_out0', 'iothread': 'iothread1' } } }
-+
-+{'execute': 'migrate-set-capabilities', 'arguments':{ 'capabilities': [ {'=
-capability': 'x-colo', 'state': true } ] } }
-+{'execute': 'migrate', 'arguments':{ 'uri': 'tcp:127.0.0.1:9998' } }
-=20
- =3D=3D TODO =3D=3D
--1. Support continuous VM replication.
--2. Support shared storage.
--3. Develop the heartbeat part.
--4. Reduce checkpoint VM=E2=80=99s downtime while doing checkpoint.
-+1. Support shared storage.
-+2. Develop the heartbeat part.
-+3. Reduce checkpoint VM=E2=80=99s downtime while doing checkpoint.
---=20
+     if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
+         error_setg(errp, "Block replication is not running");
+         aio_context_release(aio_context);
+=2D-
 2.20.1
+
 
