@@ -2,62 +2,63 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC867C3A59C
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CFCC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 19:00:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1013206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:58:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1013206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 6A16E206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 19:00:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A16E206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKx9-000426-Ss
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:58:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41431)
+	id 1hyKyj-0005EH-ER
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 15:00:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40365)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1hyKwU-0003W6-CP
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:57:48 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hyKqN-000683-DV
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hyKwR-0006JT-U5
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:57:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36824)
+ (envelope-from <dgilbert@redhat.com>) id 1hyKqK-0000Tp-V2
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:51:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:32848)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hyKwR-0006Iz-Ol
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:57:43 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hyKqK-0000Sa-N3
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:51:24 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C04A68535C;
- Thu, 15 Aug 2019 18:57:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 56D4811A12;
+ Thu, 15 Aug 2019 18:51:23 +0000 (UTC)
 Received: from work-vm (ovpn-117-19.ams2.redhat.com [10.36.117.19])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4285E1001925;
- Thu, 15 Aug 2019 18:57:40 +0000 (UTC)
-Date: Thu, 15 Aug 2019 19:57:37 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A33101001B12;
+ Thu, 15 Aug 2019 18:51:20 +0000 (UTC)
+Date: Thu, 15 Aug 2019 19:51:18 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lukas Straub <lukasstraub2@web.de>
-Message-ID: <20190815185737.GC2883@work-vm>
-References: <20190815200815.2cffc21b@luklap>
+To: Lukas Straub <lukasstraub2@web.de>, kwolf@redhat.com, mreitz@redhat.com
+Message-ID: <20190815185118.GB2883@work-vm>
+References: <cover.1565892399.git.lukasstraub2@web.de>
+ <20190815200823.3de1bd14@luklap>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190815200815.2cffc21b@luklap>
+In-Reply-To: <20190815200823.3de1bd14@luklap>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.25]); Thu, 15 Aug 2019 18:57:42 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.28]); Thu, 15 Aug 2019 18:51:23 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] colo: Add support for continious
- replication
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] Replication: Ignore requests after
+ failover
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,59 +78,105 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 * Lukas Straub (lukasstraub2@web.de) wrote:
-> Hello Everyone,
-> These Patches add support for continious replication to colo.
-> Please review.
+> After failover the Secondary side of replication shouldn't change state, because
+> it now functions as our primary disk.
+> 
+> In replication_start, replication_do_checkpoint, replication_stop, ignore
+> the request if current state is BLOCK_REPLICATION_DONE (sucessful failover) or
+> BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging active
+> and hidden images into the base image).
+> 
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 
-
-OK, for those who haven't followed COLO for so long; 'continuous
-replication' is when after the first primary fails, you can promote the 
-original secondary to a new primary and start replicating again;
-
-i.e. current COLO gives you
-
-p<->s
-    <primary fails>
-    s
-
-with your patches you can do
-
-    s becomes p2
-    p2<->s2
-
-and you're back to being resilient again.
-
-Which is great; because that was always an important missing piece.
-
-Do you have some test scripts/setup for this - it would be great
-to automate some testing.
+We should add some block people to this one to review it; cc'ing in
+Kevin and Max.
 
 Dave
 
-> Regards,
-> Lukas Straub
+> ---
+>  block/replication.c | 38 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 35 insertions(+), 3 deletions(-)
 > 
-> v2:
->  - fix email formating
->  - fix checkpatch.pl warnings
->  - fix patchew error
->  - clearer commit messages
+> diff --git a/block/replication.c b/block/replication.c
+> index 3d4dedddfc..97cc65c0cf 100644
+> --- a/block/replication.c
+> +++ b/block/replication.c
+> @@ -454,6 +454,17 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+>      aio_context_acquire(aio_context);
+>      s = bs->opaque;
 > 
-> Lukas Straub (3):
->   Replication: Ignore requests after failover
->   net/filter.c: Add Options to insert filters anywhere in the filter
->     list
->   Update Documentation
+> +    if (s->stage == BLOCK_REPLICATION_DONE ||
+> +        s->stage == BLOCK_REPLICATION_FAILOVER) {
+> +        /*
+> +         * This case happens when a secondary is promoted to primary.
+> +         * Ignore the request because the secondary side of replication
+> +         * doesn't have to do anything anymore.
+> +         */
+> +        aio_context_release(aio_context);
+> +        return;
+> +    }
+> +
+>      if (s->stage != BLOCK_REPLICATION_NONE) {
+>          error_setg(errp, "Block replication is running or done");
+>          aio_context_release(aio_context);
+> @@ -529,8 +540,7 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
+>                     "Block device is in use by internal backup job");
 > 
->  block/replication.c  |  38 ++++++++-
->  docs/COLO-FT.txt     | 185 ++++++++++++++++++++++++++++++++-----------
->  include/net/filter.h |   2 +
->  net/filter.c         |  71 ++++++++++++++++-
->  qemu-options.hx      |  10 +--
->  5 files changed, 250 insertions(+), 56 deletions(-)
+>          top_bs = bdrv_lookup_bs(s->top_id, s->top_id, NULL);
+> -        if (!top_bs || !bdrv_is_root_node(top_bs) ||
+> -            !check_top_bs(top_bs, bs)) {
+> +        if (!top_bs || !check_top_bs(top_bs, bs)) {
+>              error_setg(errp, "No top_bs or it is invalid");
+>              reopen_backing_file(bs, false, NULL);
+>              aio_context_release(aio_context);
+> @@ -577,6 +587,17 @@ static void replication_do_checkpoint(ReplicationState *rs, Error **errp)
+>      aio_context_acquire(aio_context);
+>      s = bs->opaque;
 > 
+> +    if (s->stage == BLOCK_REPLICATION_DONE ||
+> +        s->stage == BLOCK_REPLICATION_FAILOVER) {
+> +        /*
+> +         * This case happens when a secondary was promoted to primary.
+> +         * Ignore the request because the secondary side of replication
+> +         * doesn't have to do anything anymore.
+> +         */
+> +        aio_context_release(aio_context);
+> +        return;
+> +    }
+> +
+>      if (s->mode == REPLICATION_MODE_SECONDARY) {
+>          secondary_do_checkpoint(s, errp);
+>      }
+> @@ -593,7 +614,7 @@ static void replication_get_error(ReplicationState *rs, Error **errp)
+>      aio_context_acquire(aio_context);
+>      s = bs->opaque;
+> 
+> -    if (s->stage != BLOCK_REPLICATION_RUNNING) {
+> +    if (s->stage == BLOCK_REPLICATION_NONE) {
+>          error_setg(errp, "Block replication is not running");
+>          aio_context_release(aio_context);
+>          return;
+> @@ -635,6 +656,17 @@ static void replication_stop(ReplicationState *rs, bool failover, Error **errp)
+>      aio_context_acquire(aio_context);
+>      s = bs->opaque;
+> 
+> +    if (s->stage == BLOCK_REPLICATION_DONE ||
+> +        s->stage == BLOCK_REPLICATION_FAILOVER) {
+> +        /*
+> +         * This case happens when a secondary was promoted to primary.
+> +         * Ignore the request because the secondary side of replication
+> +         * doesn't have to do anything anymore.
+> +         */
+> +        aio_context_release(aio_context);
+> +        return;
+> +    }
+> +
+>      if (s->stage != BLOCK_REPLICATION_RUNNING) {
+>          error_setg(errp, "Block replication is not running");
+>          aio_context_release(aio_context);
 > --
 > 2.20.1
+> 
 > 
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
