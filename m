@@ -2,83 +2,139 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69370C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:49:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF47CC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:49:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E715206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:49:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A/3zwQid"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E715206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7E987206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:49:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E987206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyNcO-0005Gt-D3
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 17:49:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60893)
+	id 1hyNcy-00066C-Oj
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 17:49:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33474)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1hyNVL-0006cO-Ba
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:41:56 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyNZF-0002dL-Lj
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:45:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hyNVJ-0008U6-S0
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:41:54 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39521)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hyNVF-0008Rt-Ce; Thu, 15 Aug 2019 17:41:49 -0400
-Received: by mail-lj1-x243.google.com with SMTP id x4so3506849ljj.6;
- Thu, 15 Aug 2019 14:41:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mpzB4QzWmrsVeeBHmrRO/WNE0c5CLLv1hTvhcVikB4s=;
- b=A/3zwQidzMhR7Tr5pZegryyE38yRZiJNfTRGbEb7vEfLg6KJ0LOnhYEX7tT4UeANQn
- VOQn3KKYg2SnBsDbr12qrpBzAx7/c42/EA3TAVEidYcxo8et8PzLDdrn06ZT7U8dwrbg
- lxxDdxBlt0vWs8/8hpbs7izx9eJzuuqPeqXnzbSdKwutTXJEVuamOVw317p38sf1JfM7
- KtnH7NqCKi30NttCfMDYvKrTcKeJTJbudY6TSRpY/3/x9ZApVsLB4x6mtQBQIKuWy8HB
- ZKery89ulACNoBPR0zP/IdbfiRRV/QzHzUQtJfu7Al6I6+uEPI9p2gp3fUU+Cfk0Gk5t
- SesA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mpzB4QzWmrsVeeBHmrRO/WNE0c5CLLv1hTvhcVikB4s=;
- b=tXA/drSwbqD5oS5hpmbhkv3DhXgmfZpDQWipFJqqUsd0axX4sfOmsjGJu48tvfUzxH
- QXrkfSvw7tlmtKCvJASClf+/PuMItZwTZZDsSgNzeKHPtL96rmMffiXYQ8WTG5emCGZM
- WnV5DJkOeEIR7yLS6MVBuSiR8unUrPbzsDN5m7ffIG+6zDNXqrgD/N/yQRblZmT2Shae
- doI9DH2oq5Ztw/+qlmQRaYoBG2QdIvzLI+F6Oghm584RyEo+MSMPvUad4MH0hd5pgO4C
- 6KRD4u14k0i7+vGynMEjkgzaKWA0tJLXYLOhqLLDw+vbmSJSgAPZ90OL9ALzCxLfl2/O
- K9fw==
-X-Gm-Message-State: APjAAAXpTNUXEI/93oRn7pP1bkrrFn+Xvu80VOX5a+J0HDr6WvxIw5Q2
- XIpLjbwcehizIe7qKHv0jAyqTI7jCRmFt4qM720=
-X-Google-Smtp-Source: APXvYqyp2xcTt+mGhvjKglsdioB01Mv74JsBI8e1onvbpxCOSvvDU841enpFwUqjdHDQBeRThNDFVge5AppgknhD4SU=
-X-Received: by 2002:a2e:a202:: with SMTP id h2mr3723716ljm.146.1565905307701; 
- Thu, 15 Aug 2019 14:41:47 -0700 (PDT)
+ (envelope-from <jsnow@redhat.com>) id 1hyNZD-0002YJ-TK
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:45:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48062)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hyNZA-0002WX-7t; Thu, 15 Aug 2019 17:45:52 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 7E02A307CDD1;
+ Thu, 15 Aug 2019 21:45:51 +0000 (UTC)
+Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 997F161F21;
+ Thu, 15 Aug 2019 21:45:50 +0000 (UTC)
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20190815185024.7010-1-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <e2c4f996-a1c3-d7aa-fc3e-4fffc596e8de@redhat.com>
+Date: Thu, 15 Aug 2019 17:45:50 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <97a6ae9f-2845-4a3c-2a31-367787622268@c-sky.com>
- <CAKmqyKMqCKS_-rxZ2WYEn+m2gDom27rd2f2FCe0LmVs9brPcAQ@mail.gmail.com>
- <c502163b-ed8a-89d1-6437-9b0f49e88a84@c-sky.com>
- <CAKmqyKM5zneojhPe57h1+h3pav5kQxFaMnhNiwWRUa=nbzS3Ag@mail.gmail.com>
- <CAL1e-=hVLQWThYSm78bTCbQPfAABjx_rG9nEa9gV6PvSN8ge2w@mail.gmail.com>
- <CAFEAcA9bDU4AWetkR4w4WLUzMW_MMy0CsVa5SibWqf85RyaX5g@mail.gmail.com>
-In-Reply-To: <CAFEAcA9bDU4AWetkR4w4WLUzMW_MMy0CsVa5SibWqf85RyaX5g@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 15 Aug 2019 14:37:52 -0700
-Message-ID: <CAKmqyKM44ZAHgc5cYAiAXXtVG=dMcX1i7FLn+2mMwM1Av4Gqzg@mail.gmail.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
-Subject: Re: [Qemu-devel] RISC-V: Vector && DSP Extension
+In-Reply-To: <20190815185024.7010-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.49]); Thu, 15 Aug 2019 21:45:51 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] nbd: Advertise multi-conn for
+ shared read-only connections
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,64 +146,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, bastian@mail.uni-paderborn.de,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, LIU ZhiWei <zhiwei_liu@c-sky.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, vsementsov@virtuozzo.com,
+ "open list:Network Block Dev..." <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 15, 2019 at 2:07 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On Thu, 15 Aug 2019 at 09:53, Aleksandar Markovic
-> <aleksandar.m.mail@gmail.com> wrote:
-> >
-> > > We can accept draft
-> > > extensions in QEMU as long as they are disabled by default.
->
-> > Hi, Alistair, Palmer,
-> >
-> > Is this an official stance of QEMU community, or perhaps Alistair's
-> > personal judgement, or maybe a rule within risv subcomunity?
->
-> Alistair asked on a previous thread; my view was:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg03364.html
-> and nobody else spoke up disagreeing (summary: should at least be
-> disabled-by-default and only enabled by setting an explicit
-> property whose name should start with the 'x-' prefix).
 
-Agreed!
 
->
-> In general QEMU does sometimes introduce experimental extensions
-> (we've had them in the block layer, for example) and so the 'x-'
-> property to enable them is a reasonably established convention.
-> I think it's a reasonable compromise to allow this sort of work
-> to start and not have to live out-of-tree for a long time, without
-> confusing users or getting into a situation where some QEMU
-> versions behave differently or to obsolete drafts of a spec
-> without it being clear from the command line that experimental
-> extensions are being enabled.
->
-> There is also an element of "submaintainer judgement" to be applied
-> here -- upstream is probably not the place for a draft extension
-> to be implemented if it is:
->  * still fast moving or subject to major changes of design direction
->  * major changes to the codebase (especially if it requires
->    changes to core code) that might later need to be redone
->    entirely differently
->  * still experimental
+On 8/15/19 2:50 PM, Eric Blake wrote:
+> The NBD specification defines NBD_FLAG_CAN_MULTI_CONN, which can be
+> advertised when the server promises cache consistency between
+> simultaneous clients (basically, rules that determine what FUA and
+> flush from one client are able to guarantee for reads from another
+> client).  When we don't permit simultaneous clients (such as qemu-nbd
+> without -e), the bit makes no sense; and for writable images, we
+> probably have a lot more work before we can declare that actions from
+> one client are cache-consistent with actions from another.  But for
+> read-only images, where flush isn't changing any data, we might as
+> well advertise multi-conn support.  What's more, advertisement of the
+> bit makes it easier for clients to determine if 'qemu-nbd -e' was in
+> use, where a second connection will succeed rather than hang until the
+> first client goes away.
+> 
+> This patch affects qemu as server in advertising the bit.  We may want
+> to consider patches to qemu as client to attempt parallel connections
+> for higher throughput by spreading the load over those connections
+> when a server advertises multi-conn, but for now sticking to one
+> connection per nbd:// BDS is okay.
+> 
+> See also: https://bugzilla.redhat.com/1708300
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  docs/interop/nbd.txt | 1 +
+>  include/block/nbd.h  | 2 +-
+>  blockdev-nbd.c       | 2 +-
+>  nbd/server.c         | 4 +++-
+>  qemu-nbd.c           | 2 +-
+>  5 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
+> index fc64473e02b2..6dfec7f47647 100644
+> --- a/docs/interop/nbd.txt
+> +++ b/docs/interop/nbd.txt
+> @@ -53,3 +53,4 @@ the operation of that feature.
+>  * 2.12: NBD_CMD_BLOCK_STATUS for "base:allocation"
+>  * 3.0: NBD_OPT_STARTTLS with TLS Pre-Shared Keys (PSK),
+>  NBD_CMD_BLOCK_STATUS for "qemu:dirty-bitmap:", NBD_CMD_CACHE
+> +* 4.2: NBD_FLAG_CAN_MULTI_CONN for sharable read-only exports
+> diff --git a/include/block/nbd.h b/include/block/nbd.h
+> index 7b36d672f046..991fd52a5134 100644
+> --- a/include/block/nbd.h
+> +++ b/include/block/nbd.h
+> @@ -326,7 +326,7 @@ typedef struct NBDClient NBDClient;
+> 
+>  NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+>                            uint64_t size, const char *name, const char *desc,
+> -                          const char *bitmap, uint16_t nbdflags,
+> +                          const char *bitmap, uint16_t nbdflags, bool shared,
+>                            void (*close)(NBDExport *), bool writethrough,
+>                            BlockBackend *on_eject_blk, Error **errp);
+>  void nbd_export_close(NBDExport *exp);
+> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+> index 66eebab31875..e5d228771292 100644
+> --- a/blockdev-nbd.c
+> +++ b/blockdev-nbd.c
+> @@ -189,7 +189,7 @@ void qmp_nbd_server_add(const char *device, bool has_name, const char *name,
+>      }
+> 
+>      exp = nbd_export_new(bs, 0, len, name, NULL, bitmap,
+> -                         writable ? 0 : NBD_FLAG_READ_ONLY,
+> +                         writable ? 0 : NBD_FLAG_READ_ONLY, true,
+>                           NULL, false, on_eject_blk, errp);
 
-Yep, agreed. For RISC-V I think this would extend to only allowing
-extensions that have backing from the foundation and are under active
-discussion.
+Why is it okay to force the share bit on regardless of the value of
+'writable' ?
 
-Alistair
-
->
-> thanks
-> -- PMM
+>      if (!exp) {
+>          return;
+> diff --git a/nbd/server.c b/nbd/server.c
+> index a2cf085f7635..a602d85070ff 100644
+> --- a/nbd/server.c
+> +++ b/nbd/server.c
+> @@ -1460,7 +1460,7 @@ static void nbd_eject_notifier(Notifier *n, void *data)
+> 
+>  NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+>                            uint64_t size, const char *name, const char *desc,
+> -                          const char *bitmap, uint16_t nbdflags,
+> +                          const char *bitmap, uint16_t nbdflags, bool shared,
+>                            void (*close)(NBDExport *), bool writethrough,
+>                            BlockBackend *on_eject_blk, Error **errp)
+>  {
+> @@ -1486,6 +1486,8 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+>      perm = BLK_PERM_CONSISTENT_READ;
+>      if ((nbdflags & NBD_FLAG_READ_ONLY) == 0) {
+>          perm |= BLK_PERM_WRITE;
+> +    } else if (shared) {
+> +        nbdflags |= NBD_FLAG_CAN_MULTI_CONN;
+>      }
+>      blk = blk_new(bdrv_get_aio_context(bs), perm,
+>                    BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED |
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index 049645491dab..55f5ceaf5c92 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -1173,7 +1173,7 @@ int main(int argc, char **argv)
+>      }
+> 
+>      export = nbd_export_new(bs, dev_offset, fd_size, export_name,
+> -                            export_description, bitmap, nbdflags,
+> +                            export_description, bitmap, nbdflags, shared > 1,
+>                              nbd_export_closed, writethrough, NULL,
+>                              &error_fatal);
+> 
 
