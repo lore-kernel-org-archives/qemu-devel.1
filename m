@@ -2,75 +2,91 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FDAC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:55:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 598E2C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1971A2133F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:55:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1971A2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 2D5A62054F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 13:57:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D5A62054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyGDZ-0006Ui-6a
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:55:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50089)
+	id 1hyGFY-0007ft-5y
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 09:57:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50357)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1hyGCn-0005qJ-Sb
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:54:20 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hyGEp-00076T-DC
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:56:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1hyGCl-0000aH-0l
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:54:17 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:42444)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1hyGCk-0000Vj-Rk
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:54:14 -0400
-Received: by mail-pl1-f195.google.com with SMTP id y1so1095079plp.9
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 06:54:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=D5d7UKjZK1DIN4VHoZOYfjri0arMQikd3DYAbT6818w=;
- b=PpsAb7DmMNSSxftBwMFWJ5JWToq16KCqUaOswtZ6vCr8GWQ3dWKuu5BSTrqR1SMWJX
- aYFZisZviXvAUe8Iy+B6km295/gpi/MzsCzzhU9olZSUEXmV+/utokS0Vq7CDy9ETdN7
- 5OQR2B3zLYAkaoGpUi7XLsfplygNkGY5KUxQMs/8yno28QkQdQboDq8ecWyNb/wgCZuQ
- JyVEDQjCSNu/foxVDfY0yy3g5DLiFr6fYAIRDmBImEZOH0wTbBIiOxd+zYh41Pm8I2y1
- w8bCMU0+kwtKey7TPUNj3TW0m0IzCPf2+JZyj1TuUT9TdYeYJHXFrBx1du1f8e6HnTAy
- Q+6A==
-X-Gm-Message-State: APjAAAXFKuKf1lN8NmQ1xwCmpKsksVXGJrCehvS1XHaI3/qtFULgd3t7
- eFEf0hcIEZHS6vr9MDjm+UQcfw==
-X-Google-Smtp-Source: APXvYqwUrJbt4o+02bDe3Ht50fX6xvsg74V5n/mrmiw4zE0l6lQkH0axFHBS+2q/3XXovTocIViNLQ==
-X-Received: by 2002:a17:902:b084:: with SMTP id
- p4mr4352728plr.309.1565877252870; 
- Thu, 15 Aug 2019 06:54:12 -0700 (PDT)
-Received: from xz-x1 ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id c26sm2626103pfr.172.2019.08.15.06.54.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 06:54:12 -0700 (PDT)
-Date: Thu, 15 Aug 2019 21:54:00 +0800
-From: Peter Xu <peterx@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Message-ID: <20190815135400.GC8463@xz-x1>
-References: <20190730172137.23114-1-eric.auger@redhat.com>
- <20190730172137.23114-4-eric.auger@redhat.com>
+ (envelope-from <mreitz@redhat.com>) id 1hyGEm-0001eX-0q
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 09:56:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59156)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hyGEg-0001d3-U2; Thu, 15 Aug 2019 09:56:15 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1832B305B41C;
+ Thu, 15 Aug 2019 13:56:14 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E0D735D6A9;
+ Thu, 15 Aug 2019 13:56:09 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+ <20190815121042.121309-3-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <75fef7c0-c493-1c39-f623-c3426ced2dae@redhat.com>
+Date: Thu, 15 Aug 2019 15:56:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190730172137.23114-4-eric.auger@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20190815121042.121309-3-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="4KaGU1dM61DXUar3ON77bqmQkqIGQqGfx"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.47]); Thu, 15 Aug 2019 13:56:14 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.214.195
-Subject: Re: [Qemu-devel] [PATCH for-4.2 v10 03/15] virtio-iommu: Add
- skeleton
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] block/qcow2: refactor
+ qcow2_co_preadv_part
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,140 +98,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, kevin.tian@intel.com, mst@redhat.com,
- tn@semihalf.com, qemu-devel@nongnu.org, alex.williamson@redhat.com,
- qemu-arm@nongnu.org, jean-philippe@linaro.org, bharat.bhushan@nxp.com,
- eric.auger.pro@gmail.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 30, 2019 at 07:21:25PM +0200, Eric Auger wrote:
-> +static void virtio_iommu_handle_command(VirtIODevice *vdev, VirtQueue *vq)
-> +{
-> +    VirtIOIOMMU *s = VIRTIO_IOMMU(vdev);
-> +    struct virtio_iommu_req_head head;
-> +    struct virtio_iommu_req_tail tail;
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4KaGU1dM61DXUar3ON77bqmQkqIGQqGfx
+Content-Type: multipart/mixed; boundary="gBX6bhCYsDI1v1VgZVmR1rVfyAN4LEfcT";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
+ kwolf@redhat.com, den@openvz.org, stefanha@redhat.com
+Message-ID: <75fef7c0-c493-1c39-f623-c3426ced2dae@redhat.com>
+Subject: Re: [PATCH v3 2/4] block/qcow2: refactor qcow2_co_preadv_part
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+ <20190815121042.121309-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20190815121042.121309-3-vsementsov@virtuozzo.com>
 
-[1]
+--gBX6bhCYsDI1v1VgZVmR1rVfyAN4LEfcT
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> +    VirtQueueElement *elem;
-> +    unsigned int iov_cnt;
-> +    struct iovec *iov;
-> +    size_t sz;
-> +
-> +    for (;;) {
-> +        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
-> +        if (!elem) {
-> +            return;
-> +        }
-> +
-> +        if (iov_size(elem->in_sg, elem->in_num) < sizeof(tail) ||
-> +            iov_size(elem->out_sg, elem->out_num) < sizeof(head)) {
-> +            virtio_error(vdev, "virtio-iommu bad head/tail size");
-> +            virtqueue_detach_element(vq, elem, 0);
-> +            g_free(elem);
-> +            break;
-> +        }
-> +
-> +        iov_cnt = elem->out_num;
-> +        iov = g_memdup(elem->out_sg, sizeof(struct iovec) * elem->out_num);
+On 15.08.19 14:10, Vladimir Sementsov-Ogievskiy wrote:
+> Further patch will run partial requests of iterations of
+> qcow2_co_preadv in parallel for performance reasons. To prepare for
+> this, separate part which may be parallelized into separate function
+> (qcow2_co_preadv_task).
+>=20
+> While being here, also separate encrypted clusters reading to own
+> function, like it is done for compressed reading.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  qapi/block-core.json |   2 +-
+>  block/qcow2.c        | 205 +++++++++++++++++++++++--------------------=
 
-Could I ask why memdup is needed here?
+>  2 files changed, 111 insertions(+), 96 deletions(-)
 
-> +        sz = iov_to_buf(iov, iov_cnt, 0, &head, sizeof(head));
-> +        if (unlikely(sz != sizeof(head))) {
-> +            tail.status = VIRTIO_IOMMU_S_DEVERR;
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Do you need to zero the reserved bits to make sure it won't contain
-garbage?  Same question to below uses of tail.
 
-> +            goto out;
-> +        }
-> +        qemu_mutex_lock(&s->mutex);
-> +        switch (head.type) {
-> +        case VIRTIO_IOMMU_T_ATTACH:
-> +            tail.status = virtio_iommu_handle_attach(s, iov, iov_cnt);
-> +            break;
-> +        case VIRTIO_IOMMU_T_DETACH:
-> +            tail.status = virtio_iommu_handle_detach(s, iov, iov_cnt);
-> +            break;
-> +        case VIRTIO_IOMMU_T_MAP:
-> +            tail.status = virtio_iommu_handle_map(s, iov, iov_cnt);
-> +            break;
-> +        case VIRTIO_IOMMU_T_UNMAP:
-> +            tail.status = virtio_iommu_handle_unmap(s, iov, iov_cnt);
-> +            break;
-> +        default:
-> +            tail.status = VIRTIO_IOMMU_S_UNSUPP;
-> +        }
-> +        qemu_mutex_unlock(&s->mutex);
-> +
-> +out:
-> +        sz = iov_from_buf(elem->in_sg, elem->in_num, 0,
-> +                          &tail, sizeof(tail));
-> +        assert(sz == sizeof(tail));
-> +
-> +        virtqueue_push(vq, elem, sizeof(tail));
+--gBX6bhCYsDI1v1VgZVmR1rVfyAN4LEfcT--
 
-s/tail/head/ (though they are the same size)?
+--4KaGU1dM61DXUar3ON77bqmQkqIGQqGfx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-> +        virtio_notify(vdev, vq);
-> +        g_free(elem);
-> +    }
-> +}
+-----BEGIN PGP SIGNATURE-----
 
-[...]
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1VZHcACgkQ9AfbAGHV
+z0DOCgf+KrYGJAokERS5R1bgdxgSyMv0rPf3qob+7Kn9QpyZagcBXijCKjEkZFxt
+fLswAKlGfdLw9ZXUuz7+dz2c8DmWB/5Y6ISZqGq1OcrmyYWhWayAZ3MC62FV+dUl
+cvXCxpuGpU4Uw81Uaa9l8KK5mIttNGeQrFStYjn+ENbLqZszFQj+UA/LE47HAjUC
+nb0xBaAGqQ8jhPy4R28uBYvO/xBshE8hjq3ptwoNs2YNmeLdD3wld+mSeWMxJcpK
+e9E5vnKzw6F3LlAu/LujaH1X0I7C5GnMd0Z1FYdIhUMPTmFyudlliXRyjNrHz3Vs
+E+hnPptxjBmS5sl3Ew06TGzx299Wug==
+=FJS/
+-----END PGP SIGNATURE-----
 
-> +static void virtio_iommu_set_features(VirtIODevice *vdev, uint64_t val)
-> +{
-> +    VirtIOIOMMU *dev = VIRTIO_IOMMU(vdev);
-> +
-> +    dev->acked_features = val;
-> +    trace_virtio_iommu_set_features(dev->acked_features);
-> +}
-> +
-> +static const VMStateDescription vmstate_virtio_iommu_device = {
-> +    .name = "virtio-iommu-device",
-> +    .unmigratable = 1,
-
-Curious, is there explicit reason to not support migration from the
-first version? :)
-
-> +};
-> +
-> +static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
-> +{
-> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> +    VirtIOIOMMU *s = VIRTIO_IOMMU(dev);
-> +
-> +    virtio_init(vdev, "virtio-iommu", VIRTIO_ID_IOMMU,
-> +                sizeof(struct virtio_iommu_config));
-> +
-> +    s->req_vq = virtio_add_queue(vdev, VIOMMU_DEFAULT_QUEUE_SIZE,
-> +                             virtio_iommu_handle_command);
-> +    s->event_vq = virtio_add_queue(vdev, VIOMMU_DEFAULT_QUEUE_SIZE, NULL);
-> +
-> +    s->config.page_size_mask = TARGET_PAGE_MASK;
-> +    s->config.input_range.end = -1UL;
-> +    s->config.domain_range.start = 0;
-
-Zero input_range.start = 0?  After all domain_range.start is zeroed.
-
-> +    s->config.domain_range.end = 32;
-> +
-> +    virtio_add_feature(&s->features, VIRTIO_RING_F_EVENT_IDX);
-> +    virtio_add_feature(&s->features, VIRTIO_RING_F_INDIRECT_DESC);
-> +    virtio_add_feature(&s->features, VIRTIO_F_VERSION_1);
-> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_INPUT_RANGE);
-> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_DOMAIN_RANGE);
-> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MAP_UNMAP);
-> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_BYPASS);
-> +    virtio_add_feature(&s->features, VIRTIO_IOMMU_F_MMIO);
-> +}
-
-Regards,
-
--- 
-Peter Xu
+--4KaGU1dM61DXUar3ON77bqmQkqIGQqGfx--
 
