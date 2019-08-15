@@ -5,74 +5,74 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B779C32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891BDC32753
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 130FD20C01
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 535C920644
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:21:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNhcdwqq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 130FD20C01
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ax3FMlcQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 535C920644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5Nx-00020B-I3
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:21:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46781)
+	id 1hy5OO-0002SA-3J
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5DQ-00066j-TH
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:14 -0400
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5DK-00061S-JC
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5DP-0008NX-1g
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:12 -0400
-Received: from mail-yw1-xc43.google.com ([2607:f8b0:4864:20::c43]:41222)
+ (envelope-from <jan.bobek@gmail.com>) id 1hy5DJ-0008JA-F3
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:06 -0400
+Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:34784)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5DO-0008N7-T6
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:10 -0400
-Received: by mail-yw1-xc43.google.com with SMTP id i138so291818ywg.8
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:10 -0700 (PDT)
+ (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5DJ-0008Ir-Av
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:05 -0400
+Received: by mail-yb1-xb44.google.com with SMTP id q5so410892ybp.1
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9601ErWO7zgsMa+wbbKQmtGl/jKL1D9g8CD0vQWqE9E=;
- b=iNhcdwqqaExZxJiPGrqQyHrClhTFZJNpX/mbXbnosTy9oiDYRbpAsIl+AHxxdx60Ol
- aRPaESzyfwKTcJdT60GO91hh4NGfKi8qaB+Qv0Y4lnQCVV76D4mxRZ346QEYygSNGetS
- qJIiWrG2Kd281uZjCIgENkiS0fNYlKK8omNWVthF06RUllOJqkEiDw5+pC8l3MjeOMiR
- UCt4AJYmCodXWlWthHk9hB08nAND0uUszAJkGeqcEDHxv/FAWpzGupXPkdzkUrZ1tsY3
- HBc3Blvc5+8nWOZnXDTbiI5BUXp0yluePXg2pM5b2ORASHVVZxp9FV+QcTmRkqeaVGIP
- Rilg==
+ bh=cyegfqQ66vBczNAfRKb53VrlCHN8G52UPrZRGksak8s=;
+ b=Ax3FMlcQ3g0lEpaB+kMd1sXkssslXecIEK/Oe99/4mQT77YFSXD7GVRRIIFWheSgfX
+ Pw/A08TGyRJybPRWGQzx1KbUohOeRZlbA134gJFLa5+s81KNltYgBIgaH5vaH459aykm
+ MpiFaCNXoqlKSAEaAufif7sdsGJAIXiSpRG+IhJx2w4fIBqPrnQ1DFwbyMEue3f7GtDq
+ PxyywUgzHo5C7s24U5Hulj1Q/gThyIIWz221OtMkq9sK8gBCx9w1+e3pse+VYLhh/j5C
+ u6LqTtaLfbytgbzf+8d92WtmnyQEE5Gpyfl4hwVxaAkT3bEXo2Wz1FwgO3R2y9Jdg+sh
+ qG6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9601ErWO7zgsMa+wbbKQmtGl/jKL1D9g8CD0vQWqE9E=;
- b=Dw3I10lODpebiziL/RiRFXIBXIHSxSZawgN+siDNP83K89tztiNIALnssfsQjb3oGh
- WjaIF5BOx6BXaf1vLKyRVG3h/h8IY/RXOAaF/H31QqoUQuzVmXR46bkC9wk/n+P5T0KU
- evHawYIvefVZb1aXvX7i7b9XJCU4chZ/e6SUfHLby70nCBWo7adeL+ac0JYKf/dn5C3O
- 9DBVrJlc8AeAiPFFZnnT57s+PjvY0uDD1rUa34RD6cOy9vnLaNm4Y2W6Z3R2boxynUIW
- 8tD+EKxdxTUq+EXOE9b2/g7xLmTt07FmrmiezWnnRKXU/qm+dP9972s3wC/ov1J630zL
- lzYA==
-X-Gm-Message-State: APjAAAVlKPrDUcT2BXOR2Nw77KsbFWUl2ROYCA2m3XLlwqLFM+8PdDYF
- yQEdbxmC1oLLEUhRiIKc0T3EOMav
-X-Google-Smtp-Source: APXvYqwHdHY++d1KD7W3zCEVotPiMi/DyEU2xRFwg0KW5omu8cBPQKoTmAPxc2PQe74UTt1m+I/NHg==
-X-Received: by 2002:a0d:f2c4:: with SMTP id b187mr1616819ywf.103.1565835010255; 
- Wed, 14 Aug 2019 19:10:10 -0700 (PDT)
+ bh=cyegfqQ66vBczNAfRKb53VrlCHN8G52UPrZRGksak8s=;
+ b=p8zhQnom/PbHcqiQrXMzzgjxAW4PE/KeC546C2JApf3E7eaBRwAgip+BnsmlTWnAQ2
+ EeJoopqxzkusdPlR7Jwb7g9+fk+ay2bI8clV6jS4+9fYsBxmTMBYsnwKIgrUy5su2U7c
+ YobSQZGjKUJiXfI5cgS5TPzm2UKQ4b9Ux9QHJFXke12jJprFb4MyUSLYD8wKRQdeVZC7
+ zgo8Nrk93Cno2ZwV2AC25BgdzAa3jQ8sXtgSVGY8TlL/d9oPE0n6e5uWQ0GqMnaCN1li
+ 81fNiYdaOi/FE1wM06VACPFEHRGqtDy50VVwKwuhcLO/hDtCGQ/a/Pqnj0BjtPVDBm8f
+ QcuQ==
+X-Gm-Message-State: APjAAAXsuMdgnznzg0g6q2dFRyCcBitkYhoIEZVlzAtdeWPw6cTcm1la
+ JaOfhTuZiRNfAcj9UB++2YaUzSy5
+X-Google-Smtp-Source: APXvYqxdcei3XxSvO+ysY7mDmf+cycYP+OEY0v6vvLfK/C9RDhHYbwGYWDB+56lj149TXvrFQN0x1Q==
+X-Received: by 2002:a25:8285:: with SMTP id r5mr1886591ybk.268.1565835004638; 
+ Wed, 14 Aug 2019 19:10:04 -0700 (PDT)
 Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
  by smtp.gmail.com with ESMTPSA id
- j3sm374882ywk.21.2019.08.14.19.10.09
+ j3sm374882ywk.21.2019.08.14.19.10.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:10:09 -0700 (PDT)
+ Wed, 14 Aug 2019 19:10:03 -0700 (PDT)
 From: Jan Bobek <jan.bobek@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 22:08:59 -0400
-Message-Id: <20190815020928.9679-18-jan.bobek@gmail.com>
+Date: Wed, 14 Aug 2019 22:08:53 -0400
+Message-Id: <20190815020928.9679-12-jan.bobek@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
 References: <20190815020928.9679-1-jan.bobek@gmail.com>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c43
-Subject: [Qemu-devel] [RFC PATCH v3 17/46] target/i386: introduce generic
- operand alias
+X-Received-From: 2607:f8b0:4864:20::b44
+Subject: [Qemu-devel] [RFC PATCH v3 11/46] target/i386: introduce gen_(ld,
+ st)d_env_A0
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,45 +101,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It turns out it is useful to be able to declare operand name
-aliases. Introduce a macro to capture this functionality.
+Similar in spirit to the already present gen_(ld,st)(q,o)_env_A0, it
+will prove useful in later commits for smaller-sized vector loads.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
 ---
- target/i386/translate.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ target/i386/translate.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 9d00b36406..8989e6504c 100644
+index c5ec309fe2..258351fce3 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -4576,6 +4576,26 @@ static int ck_cpuid(CPUX86State *env, DisasContext *s, CkCpuidFeat feat)
-                                      int modrm, bool is_write,  \
-                                      insnop_arg_t(opT) arg)
+@@ -2652,6 +2652,18 @@ static void gen_jmp(DisasContext *s, target_ulong eip)
+     gen_jmp_tb(s, eip, 0);
+ }
  
-+/*
-+ * Operand alias
-+ */
-+#define DEF_INSNOP_ALIAS(opT, opT2)                                     \
-+    typedef insnop_arg_t(opT2) insnop_arg_t(opT);                       \
-+    typedef insnop_ctxt_t(opT2) insnop_ctxt_t(opT);                     \
-+                                                                        \
-+    INSNOP_INIT(opT)                                                    \
-+    {                                                                   \
-+        return insnop_init(opT2)(ctxt, env, s, modrm, is_write);        \
-+    }                                                                   \
-+    INSNOP_PREPARE(opT)                                                 \
-+    {                                                                   \
-+        return insnop_prepare(opT2)(ctxt, env, s, modrm, is_write);     \
-+    }                                                                   \
-+    INSNOP_FINALIZE(opT)                                                \
-+    {                                                                   \
-+        insnop_finalize(opT2)(ctxt, env, s, modrm, is_write, arg);      \
-+    }
++static inline void gen_ldd_env_A0(DisasContext *s, int offset)
++{
++    tcg_gen_qemu_ld_i32(s->tmp2_i32, s->A0, s->mem_index, MO_LEUL);
++    tcg_gen_st_i32(s->tmp2_i32, cpu_env, offset);
++}
 +
- static void gen_sse_ng(CPUX86State *env, DisasContext *s, int b)
++static inline void gen_std_env_A0(DisasContext *s, int offset)
++{
++    tcg_gen_ld_i32(s->tmp2_i32, cpu_env, offset);
++    tcg_gen_qemu_st_i32(s->tmp2_i32, s->A0, s->mem_index, MO_LEUL);
++}
++
+ static inline void gen_ldq_env_A0(DisasContext *s, int offset)
  {
-     enum {
+     tcg_gen_qemu_ld_i64(s->tmp1_i64, s->A0, s->mem_index, MO_LEQ);
 -- 
 2.20.1
 
