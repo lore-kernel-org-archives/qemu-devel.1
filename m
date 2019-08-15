@@ -2,90 +2,90 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D6FC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD45BC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:10:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CB2B206C2
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:10:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jv/zc/Al"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CB2B206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E456206C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:10:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E456206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyGS8-0007KH-B8
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:10:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52251)
+	id 1hyGSW-00082g-Qy
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:10:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1hyGRD-0006LX-Fq
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:09:16 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hyGRf-0006y2-9P
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:09:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1hyGR9-0006Zd-W3
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:09:11 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35410)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hyGR9-0006ZJ-Ow
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:09:07 -0400
-Received: by mail-wm1-x342.google.com with SMTP id l2so1371397wmg.0
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=OLB5A5wHOJlR64f5SBrWhDf8RUtqyHFS9eLIH1A2V7g=;
- b=jv/zc/Al3Tniia2JujYGtyWywnmAm4BsnThrtyyBdSPK6kSZuMUY1zcnKla+6+lN4h
- 9riM+AXNekFDyBLExSX2+S6J5p+axXBiO4yyeAPyZj6e0piDhZIazJs2LOBMa4IbSR1B
- 527t2y6INPvQMvBf+azniTaJ/Qa0x+bPam3/eL51XKV2dgV7CkhNVWAvp1UlTgDCJC3F
- ot/dDYVtvPYdtr01OOxcQv0MFC9VEPhR/gc25BWtisBLExNTbtMi3Xbf9rWC/1m0J4kX
- SZGCZfPJH0oNhZHrsyGWbkWWsIF/w1+QNA1juk1CDeOA8wV9g81F14Rvw/AAPrMm+BtG
- ptgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=OLB5A5wHOJlR64f5SBrWhDf8RUtqyHFS9eLIH1A2V7g=;
- b=eipgO2c+1tlxyN9TZz2Rwur0f9+o9usgZ9tTOaHyOWHWFHsaemeHWOq4Ew6EXYtqCO
- SmH2OpyAOVjn9rQgzGjOlFlhPbUrBSwTG8ZTHKJ9DDktxaMIg30pipTerOhEFiR050iW
- 8iQaDte7Otq05qecl+vy6Wfp/LP/2AGzlgz9lptg/iXDzbAcdBtQ3Ysyzgc2TlHRY7WX
- rwwMzImC/l1nQM56N+2Bcz7PF8IekrPh2cEpywqX+qs6nxUZGZ5vcVn81qLiGR8iZ83R
- ug2dKY3o+3F2l4ioyd0sVI2/27VILtdoQLIn/QHeZShwKlwevRdhGDfc+M4l9oJweQU3
- Xl6A==
-X-Gm-Message-State: APjAAAVd+qexkNUKvGC0wDzYZPqoQl1fon6mUmnsEpkb/9Nmk/vbze+Z
- ttlRL0NhnlrqnwleXuinM50Ytpu8/zA=
-X-Google-Smtp-Source: APXvYqz2wDjNmRwMOTo1sCrAN86VvJjwwbBrR8JUD7WbBTFVAXuWuIWug299M+wNSAtSmtvlDhJ8bw==
-X-Received: by 2002:a1c:1d4f:: with SMTP id d76mr3096343wmd.127.1565878146593; 
- Thu, 15 Aug 2019 07:09:06 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id v124sm1482239wmf.23.2019.08.15.07.09.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 07:09:05 -0700 (PDT)
-Date: Thu, 15 Aug 2019 15:09:04 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20190815140904.GF10996@stefanha-x1.localdomain>
-References: <20190813133042.11683-1-stefanha@redhat.com>
- <39b21ab6-bf1b-69c1-bbea-fb6f1b637132@redhat.com>
- <20190814132306.GF23970@stefanha-x1.localdomain>
- <20190815061340.gryxnfwaaoswqqi7@sirius.home.kraxel.org>
+ (envelope-from <mreitz@redhat.com>) id 1hyGRd-00074S-5K
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:09:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37882)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hyGRU-0006t8-5c; Thu, 15 Aug 2019 10:09:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 6C1B63090FC7;
+ Thu, 15 Aug 2019 14:09:27 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.205.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AE621608AB;
+ Thu, 15 Aug 2019 14:09:18 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ed48ba6b-f90d-abe6-c77e-34c4a6bfab8c@redhat.com>
+Date: Thu, 15 Aug 2019 16:09:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <20190815121042.121309-1-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UBnjLfzoMQYIXCvq"
-Content-Disposition: inline
-In-Reply-To: <20190815061340.gryxnfwaaoswqqi7@sirius.home.kraxel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH] usb: reword -usb command-line option and
- mention xHCI
+ protocol="application/pgp-signature";
+ boundary="V3qI8IfzMd12mnIrFSUC08sYrm8QXVbOr"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.43]); Thu, 15 Aug 2019 14:09:27 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] qcow2: async handling of fragmented
+ io
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,66 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--V3qI8IfzMd12mnIrFSUC08sYrm8QXVbOr
+Content-Type: multipart/mixed; boundary="G1mCEwo8gRAZyEIZ9dos7TbAufMQwO8BU";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com,
+ kwolf@redhat.com, den@openvz.org, stefanha@redhat.com
+Message-ID: <ed48ba6b-f90d-abe6-c77e-34c4a6bfab8c@redhat.com>
+Subject: Re: [PATCH v3 0/4] qcow2: async handling of fragmented io
+References: <20190815121042.121309-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20190815121042.121309-1-vsementsov@virtuozzo.com>
 
---UBnjLfzoMQYIXCvq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--G1mCEwo8gRAZyEIZ9dos7TbAufMQwO8BU
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 15, 2019 at 08:13:40AM +0200, Gerd Hoffmann wrote:
->   Hi,
+On 15.08.19 14:10, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
 >=20
-> > > > -Enable the USB driver (if it is not used by default yet).
-> > > > +Enable USB emulation on machine types with an on-board USB host co=
-ntroller (if
-> > > > +not enabled by default).  Note that on-board USB host controllers =
-may not
-> > > > +support USB 3.0.  In this case -device nec-usb-xhci can be used in=
-stead on
-> > >=20
-> > > Should we maybe rather recommend qemu-xhci instead?
-> >=20
-> > I think nec-usb-xhci is preferred because there are Windows drivers.
-> > IIRC qemu-xhci works under Linux but not under Windows (just because the
-> > PCI Vendor/Device ID aren't covered by any driver).
-> >=20
-> > Gerd: Can you confirm this?
->=20
-> That applies to windows 7 only, which is EOL next year.
->=20
-> win7 doesn't ship with xhci drivers, but you can download and use
-> nec/renesas drivers which require nec-usb-xhci.
->=20
-> win8+ ships with generic xhci drivers which works with all xhci
-> hardware, including qemu-xhci.
->=20
-> So it indeed makes sense to refer to qemu-xhci.
+> Here is an asynchronous scheme for handling fragmented qcow2
+> reads and writes. Both qcow2 read and write functions loops through
+> sequential portions of data. The series aim it to parallelize these
+> loops iterations.
+> It improves performance for fragmented qcow2 images, I've tested it
+> as described below.
 
-Thanks, will fix in v2!
+Looks good to me, but I can=E2=80=99t take it yet because I need to wait =
+for
+Stefan=E2=80=99s branch to be merged, of course.
 
-Stefan
+Speaking of which, why didn=E2=80=99t you add any tests for the *_part()
+methods?  I find it a bit unsettling that nothing would have caught the
+bug you had in v2 in patch 3.
 
---UBnjLfzoMQYIXCvq
+Max
+
+
+--G1mCEwo8gRAZyEIZ9dos7TbAufMQwO8BU--
+
+--V3qI8IfzMd12mnIrFSUC08sYrm8QXVbOr
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1VZ4AACgkQnKSrs4Gr
-c8jgvQgAwZUSWIOGfWWlLNwOI1IhJhy8MG7bFhJv1FT+szmc40/oEkW3t8MmCvtt
-Zyk1I3aI3ckpgcrlkye3fM5A9ZN7n3HNd3OC5W24RJHQnG4bkxR9zl2jyH4qbICw
-3dTmA1uC/U42XZNEDXTewVJjZfCy5li6uCRvVcMBXq4h2ge05U8p5aP10UfQI4Q9
-H2QzGDXdQl02Mvat0wK68dNGX7LmQubXyCNjgjN8EiT1WRJ2VJhUtZy9Z+QD3kYy
-6v9OQYaNgOeV7LoQ+ipWdLYPUSFt5S9RnTIElaKTciMPG0XZet80AQJOLJ1qvTXU
-FxBHMo3MC9xedNHmiGCcboYeg5ZiEw==
-=GeZZ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1VZ40ACgkQ9AfbAGHV
+z0ALHwgAhLebFtomso4RaMeALq1gWVC0oKq4QZVbQQ14Op6Q7lVoocaH/54SxcLP
+AwBJAEkZwtx2G93iZerLtc3MPEZfH/+GECQDkT9/+0p+gdJzUPZo54yZX7XSgoAm
+tGx1Zn+Io0ydYqlMxuX7DIH3x6d17mHpejmL/Ne3icjYV+pePIVJAPEpwBzqfxkn
+L0WwgXF/OZtOPSN0MaGLkc+JcnJt6hK8AOtSXfbA8cZAWX8J2zoc2DiwmOAFahWw
+yjYYfTR4yZLPqHobEaS85OyRxGKOKmLZZQw58MOXg3rybdeZVDy24ApGUsV4vjTb
+nSzZlgU3IPwVJ46su/wmB8qTZdB8wQ==
+=akLY
 -----END PGP SIGNATURE-----
 
---UBnjLfzoMQYIXCvq--
+--V3qI8IfzMd12mnIrFSUC08sYrm8QXVbOr--
 
