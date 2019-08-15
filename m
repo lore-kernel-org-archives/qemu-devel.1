@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 868C4C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B82CC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:47:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D65E20578
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:46:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D65E20578
+	by mail.kernel.org (Postfix) with ESMTPS id 10E61206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:47:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10E61206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyItD-0005TY-Mg
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 12:46:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47204)
+	id 1hyIuR-0006W9-Jp
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 12:47:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1hyIir-0001WX-ED
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:35:36 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1hyIjq-0002pt-A6
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:36:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1hyIin-0002FV-F4
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:35:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58802)
+ (envelope-from <dgilbert@redhat.com>) id 1hyIjm-0003Ix-QO
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:36:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40390)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hyIin-0002F5-AC
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:35:29 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1hyIjm-0003Il-LC
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:36:30 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9E186302C07A;
- Thu, 15 Aug 2019 16:35:28 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id B004E51EE1;
+ Thu, 15 Aug 2019 16:36:29 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-117-19.ams2.redhat.com
  [10.36.117.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 889353737;
- Thu, 15 Aug 2019 16:35:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B8713737;
+ Thu, 15 Aug 2019 16:36:22 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 15 Aug 2019 17:34:38 +0100
-Message-Id: <20190815163504.18937-8-dgilbert@redhat.com>
+Date: Thu, 15 Aug 2019 17:34:52 +0100
+Message-Id: <20190815163504.18937-22-dgilbert@redhat.com>
 In-Reply-To: <20190815163504.18937-1-dgilbert@redhat.com>
 References: <20190815163504.18937-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Thu, 15 Aug 2019 16:35:28 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Thu, 15 Aug 2019 16:36:30 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 07/33] migration/postcopy: reduce one operation
- to calculate fixup_start_addr
+Subject: [Qemu-devel] [PULL 21/33] migration/postcopy: use QEMU_IS_ALIGNED
+ to replace host_offset
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,39 +77,54 @@ Sender: "Qemu-devel"
 
 From: Wei Yang <richardw.yang@linux.intel.com>
 
-Use the same way for run_end to calculate run_start, which saves one
-operation.
+Use QEMU_IS_ALIGNED for the check, it would be more consistent with
+other align calculations.
 
 Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-Message-Id: <20190710050814.31344-2-richardw.yang@linux.intel.com>
+Message-Id: <20190806004648.8659-3-richardw.yang@linux.intel.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ migration/ram.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 4bb5e24459..da399f2c8a 100644
+index d2184c3cfc..eee68a7991 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -2973,10 +2973,12 @@ static void postcopy_chunk_hostpages_pass(Migrati=
+@@ -2955,14 +2955,12 @@ static void postcopy_chunk_hostpages_pass(Migrati=
 onState *ms, bool unsent_pass,
-         host_offset =3D run_start % host_ratio;
-         if (host_offset) {
-             do_fixup =3D true;
--            run_start -=3D host_offset;
--            fixup_start_addr =3D run_start;
--            /* For the next pass */
--            run_start =3D run_start + host_ratio;
-+            fixup_start_addr =3D run_start - host_offset;
-+            /*
-+             * This host page has gone, the next loop iteration starts
-+             * from after the fixup
-+             */
-+            run_start =3D fixup_start_addr + host_ratio;
-         } else {
+     }
+=20
+     while (run_start < pages) {
+-        unsigned long host_offset;
+=20
+         /*
+          * If the start of this run of pages is in the middle of a host
+          * page, then we need to fixup this host page.
+          */
+-        host_offset =3D run_start % host_ratio;
+-        if (!host_offset) {
++        if (QEMU_IS_ALIGNED(run_start, host_ratio)) {
              /* Find the end of this run */
-             unsigned long run_end;
+             if (unsent_pass) {
+                 run_start =3D find_next_bit(unsentmap, pages, run_start =
++ 1);
+@@ -2974,10 +2972,9 @@ static void postcopy_chunk_hostpages_pass(Migratio=
+nState *ms, bool unsent_pass,
+              * run doesn't finish at the end of a host page
+              * and we need to discard.
+              */
+-            host_offset =3D run_start % host_ratio;
+         }
+=20
+-        if (host_offset) {
++        if (!QEMU_IS_ALIGNED(run_start, host_ratio)) {
+             unsigned long page;
+             unsigned long fixup_start_addr =3D QEMU_ALIGN_DOWN(run_start=
+,
+                                                              host_ratio)=
+;
 --=20
 2.21.0
 
