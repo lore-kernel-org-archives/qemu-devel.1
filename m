@@ -2,82 +2,67 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEA0C32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 03:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABCAC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 03:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A9752063F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 03:21:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fintelia.io header.i=@fintelia.io header.b="yd2Jr8BW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A9752063F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fintelia.io
+	by mail.kernel.org (Postfix) with ESMTPS id 6F95A205F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 03:21:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F95A205F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy6Jw-00072E-RI
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 23:21:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56211)
+	id 1hy6KS-0007z7-Kq
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 23:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56265)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1hy6JF-0006Zk-IH
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 23:20:18 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hy6Jj-00070j-0F
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 23:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1hy6JE-0000c6-E8
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 23:20:17 -0400
-Received: from rs224.mailgun.us ([209.61.151.224]:57881)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71)
- (envelope-from <bounce+cf442f.9b4e76-qemu-devel=nongnu.org@fintelia.io>)
- id 1hy6JE-0000Qa-9d
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 23:20:16 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=fintelia.io; q=dns/txt;
- s=pic; 
- t=1565839210; h=Content-Type: Cc: To: Subject: Message-ID: Date: From:
- In-Reply-To: References: MIME-Version: Sender;
- bh=TGRmOencxkNJKKjbOhlM38uvH+S9TS7YhpbtNU8KsUo=;
- b=yd2Jr8BWuKppqWGTSyWrouYESODd1vE8tYb+euIXTmtWrbmaY1ZlbBVo7yGFvVdS4pfwG638
- qG3o6qWgxDD+lY2WAfsRz4pdRsH9Ze9oDeTZcNCaFfufrRcVQ4dNRPCBITdiKfzsm4efzhcb
- 8bxkudlpvJP4CMiNFzyItPd5T7b4DblXVY0jGiYu0/I/q6wluhaMGcAw7f1tZYl54+3AxsC9
- EdCOIL4WW5jREvA2tPtEM08+p6lgFMQbnE75kt6WhLeNec9i7obQjoyR+YqGH7joeFUuKVJZ
- xUykIBJ7Xz5Q0preZxlRDKv0AUbRwuTEa8GMTpOJaK6SHOywTOa0kQ==
-X-Mailgun-Sending-Ip: 209.61.151.224
-X-Mailgun-Sid: WyJlMGM5NSIsICJxZW11LWRldmVsQG5vbmdudS5vcmciLCAiOWI0ZTc2Il0=
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com
- [209.85.167.47])
- by mxa.mailgun.org with ESMTP id 5d54cf67.7fe250f0ebf0-smtp-out-n03;
- Thu, 15 Aug 2019 03:20:07 -0000 (UTC)
-Received: by mail-lf1-f47.google.com with SMTP id x3so774345lfc.0;
- Wed, 14 Aug 2019 20:20:06 -0700 (PDT)
-X-Gm-Message-State: APjAAAVCtMJQQkq3/AH3mkEHtel47ZsJLAVwAocSiQWWlt7n6kQtJeSX
- 24AQhmtkXNocmlBqTbRrZRwCEk/uKQM7e/PGmEE=
-X-Google-Smtp-Source: APXvYqwZFRkstBb1VAzkVdfbew4AawzIrkKGElCn1QcxgEZMyab1OvQT+XWlX75BvdTIVpeT4SIceHRbymph9yAtN7Q=
-X-Received: by 2002:a19:6f09:: with SMTP id k9mr1318809lfc.102.1565839205247; 
- Wed, 14 Aug 2019 20:20:05 -0700 (PDT)
+ (envelope-from <no-reply@patchew.org>) id 1hy6Jh-00019N-Bg
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 23:20:46 -0400
+Resent-Date: Wed, 14 Aug 2019 23:20:46 -0400
+Resent-Message-Id: <E1hy6Jh-00019N-Bg@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21921)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hy6Jh-00017U-2y
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 23:20:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565839233; cv=none; d=zoho.com; s=zohoarc; 
+ b=ix6e1cPdDa0qpRJYC5vE6GVnB6iJhPHekxFlwHkUjhbD+kkIR+qZvSzMh6lDZrXk9AxjS6xpvuMsPKR49FKoZgidG6XU3zS01mft9Mbr9Jpkcv1UQL3DK3TaKfeuTMrWf14RycRogEbfhni3+Sjap5vhs6LhrtR8Rj7tzwSmZIs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565839233;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=hyiDm99Y7gVR3L1CTrsUGqO22EPKV8qt9q1gqvFiOEg=; 
+ b=F5Gu3d/A0wYc5msfzbCusleJeYnPb+Cp8uKwr1RcyEQkahlAL05lg8AiBZpQQTonIvMBpXrRzQqGv8y7YiP9bcfjlZK2x8mo3VZNCw8vbpnEmpVflXZE0YF83kLz0rTJeUvOhgpTFYdGRD+I/DOubGlg+s0pRasCzORt4gTX4Vk=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565839229501855.6548970289311;
+ Wed, 14 Aug 2019 20:20:29 -0700 (PDT)
+In-Reply-To: <cover.1565814686.git.lukasstraub2@web.de>
+Message-ID: <156583922839.3056.7768886745241439528@5dec9699b7de>
 MIME-Version: 1.0
-References: <20190701154617.22908-1-jonathan@fintelia.io>
- <CAKmqyKOsMO7SvvDfiqhywxb=oaqo=NDjw==reVpU9sLh+3dGuw@mail.gmail.com>
- <CAEUhbmXBnu_Fet99AjQj6XZ10m045N8kY7d8VNy28ktmFBsrQQ@mail.gmail.com>
- <CANnJOVGXcTkH2_2cRqAv0CnZx4xHQ_npEjW-au-FPxe_cU0=5Q@mail.gmail.com>
-In-Reply-To: <CANnJOVGXcTkH2_2cRqAv0CnZx4xHQ_npEjW-au-FPxe_cU0=5Q@mail.gmail.com>
-From: Jonathan Behrens <jonathan@fintelia.io>
-Date: Wed, 14 Aug 2019 23:19:39 -0400
-X-Gmail-Original-Message-ID: <CANnJOVHdcb2wuTZ9U5ziJsuPVin8pae9gUZjh=VH5WJ_5Yn+rw@mail.gmail.com>
-Message-ID: <CANnJOVHdcb2wuTZ9U5ziJsuPVin8pae9gUZjh=VH5WJ_5Yn+rw@mail.gmail.com>
-To: "open list:RISC-V" <qemu-riscv@nongnu.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: lukasstraub2@web.de
+Date: Wed, 14 Aug 2019 20:20:29 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.61.151.224
-Content-Type: text/plain; charset="UTF-8"
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] [PATCH v2] target/riscv: Hardwire mcounter.TM and
- upper bits of [m|s]counteren
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH 0/3] colo: Add support for continious
+ replication
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,52 +74,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Alistair Francis <alistair23@gmail.com>, Bin Meng <bmeng.cn@gmail.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: chen.zhang@intel.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping! What is the status of this patch?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTY1ODE0Njg2Lmdp
+dC5sdWthc3N0cmF1YjJAd2ViLmRlLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0
+ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93LgoKPT09IFRF
+U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAojIFRlc3Rpbmcgc2NyaXB0IHdpbGwgYmUg
+aW52b2tlZCB1bmRlciB0aGUgZ2l0IGNoZWNrb3V0IHdpdGgKIyBIRUFEIHBvaW50aW5nIHRvIGEg
+Y29tbWl0IHRoYXQgaGFzIHRoZSBwYXRjaGVzIGFwcGxpZWQgb24gdG9wIG9mICJiYXNlIgojIGJy
+YW5jaApzZXQgLWUKCmVjaG8KZWNobyAiPT09IEVOViA9PT0iCmVudgoKZWNobwplY2hvICI9PT0g
+UEFDS0FHRVMgPT09IgpycG0gLXFhCgplY2hvCmVjaG8gIj09PSBVTkFNRSA9PT0iCnVuYW1lIC1h
+CgpDQz0kSE9NRS9iaW4vY2MKSU5TVEFMTD0kUFdEL2luc3RhbGwKQlVJTEQ9JFBXRC9idWlsZApt
+a2RpciAtcCAkQlVJTEQgJElOU1RBTEwKU1JDPSRQV0QKY2QgJEJVSUxECiRTUkMvY29uZmlndXJl
+IC0tY2M9JENDIC0tcHJlZml4PSRJTlNUQUxMCm1ha2UgLWo0CiMgWFhYOiB3ZSBuZWVkIHJlbGlh
+YmxlIGNsZWFuIHVwCiMgbWFrZSBjaGVjayAtajQgVj0xCm1ha2UgaW5zdGFsbAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKICAgICAgICAgICAgICAgICBmcm9tIC92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC02amk2cWZpMi9zcmMvaW5jbHVkZS9uZXQvZmlsdGVyLmg6MTMsCiAgICAgICAgICAg
+ICAgICAgZnJvbSAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtNmppNnFmaTIvc3JjL25ldC9m
+aWx0ZXIuYzoxNDoKL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLTZqaTZxZmkyL3NyYy9uZXQv
+ZmlsdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG5ldGZpbHRlcl9jb21wbGV0ZeKAmToKL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLTZqaTZxZmkyL3NyYy9pbmNsdWRlL3FlbXUvcXVldWUuaDo0MTI6
+NDQ6IGVycm9yOiDigJhwb3NpdGlvbuKAmSBtYXkgYmUgdXNlZCB1bmluaXRpYWxpemVkIGluIHRo
+aXMgZnVuY3Rpb24gWy1XZXJyb3I9bWF5YmUtdW5pbml0aWFsaXplZF0KICA0MTIgfCAgICAgICAg
+IChsaXN0ZWxtKS0+ZmllbGQudHFlX2NpcmMudHFsX3ByZXYgPSAmKGVsbSktPmZpZWxkLnRxZV9j
+aXJjOyAgICAgICAgIFwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXgovdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtNmppNnFmaTIvc3JjL25ldC9m
+aWx0ZXIuYzoyMzc6MjE6IG5vdGU6IOKAmHBvc2l0aW9u4oCZIHdhcyBkZWNsYXJlZCBoZXJlCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy9jb3Zl
+ci4xNTY1ODE0Njg2LmdpdC5sdWthc3N0cmF1YjJAd2ViLmRlL3Rlc3RpbmcuczM5MHgvP3R5cGU9
+bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
 
-On Wed, Jul 3, 2019 at 2:02 PM Jonathan Behrens <jonathan@fintelia.io>
-wrote:
 
-> Bin, that proposal proved to be somewhat more controversial than I was
-> expecting, since it was different than how currently available hardware
-> worked. This option seemed much more likely to be accepted in the short
-> term.
->
-> Jonathan
->
-> On Mon, Jul 1, 2019 at 9:26 PM Bin Meng <bmeng.cn@gmail.com> wrote:
->
->> On Tue, Jul 2, 2019 at 8:20 AM Alistair Francis <alistair23@gmail.com>
->> wrote:
->> >
->> > On Mon, Jul 1, 2019 at 8:56 AM <jonathan@fintelia.io> wrote:
->> > >
->> > > From: Jonathan Behrens <jonathan@fintelia.io>
->> > >
->> > > QEMU currently always triggers an illegal instruction exception when
->> > > code attempts to read the time CSR. This is valid behavor, but only if
->> > > the TM bit in mcounteren is hardwired to zero. This change also
->> > > corrects mcounteren and scounteren CSRs to be 32-bits on both 32-bit
->> > > and 64-bit targets.
->> > >
->> > > Signed-off-by: Jonathan Behrens <jonathan@fintelia.io>
->> >
->> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
->> >
->>
->> I am a little bit lost here. I think we agreed to allow directly read
->> to time CSR when mcounteren.TM is set, no?
->>
->> Regards,
->> Bin
->>
->
