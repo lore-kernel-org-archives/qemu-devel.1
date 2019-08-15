@@ -8,81 +8,80 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A39C3C32753
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6143BC433FF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B65E2084F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:52:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AC282084F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 02:52:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxrH0Tq1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B65E2084F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zt6yOYhX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AC282084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hy5sM-0008Q6-Ca
-	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:52:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47162)
+	id 1hy5sZ-0000IP-Cn
+	for qemu-devel@archiver.kernel.org; Wed, 14 Aug 2019 22:52:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5Dq-0006dJ-My
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:42 -0400
+ (envelope-from <vandersonmr2@gmail.com>) id 1hy5MR-0000cg-M7
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.bobek@gmail.com>) id 1hy5Dm-0000Xf-Uk
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:38 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:40117)
+ (envelope-from <vandersonmr2@gmail.com>) id 1hy5MQ-0001ct-4r
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:31 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:43950)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jan.bobek@gmail.com>) id 1hy5Dm-0000X9-OT
- for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:10:34 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id j6so401455ybm.7
- for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:10:34 -0700 (PDT)
+ (Exim 4.71) (envelope-from <vandersonmr2@gmail.com>)
+ id 1hy5MQ-0001cW-0s
+ for qemu-devel@nongnu.org; Wed, 14 Aug 2019 22:19:30 -0400
+Received: by mail-qt1-x842.google.com with SMTP id b11so896310qtp.10
+ for <qemu-devel@nongnu.org>; Wed, 14 Aug 2019 19:19:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=am6aHLZRZqCmn4TjEMCIEvy9PQaPrCKzH8p7kQXlzXM=;
- b=lxrH0Tq1EY/mP6GmmbNhAZVvC51TOx1Sjm1BkwgHPozBugYmaYXHNE346bUHufvmMv
- zDCZvkjhUcJRvAK+CoFlXUcDAVQfozBsXVTCwArg0WhX2vHepWWRMP1UitpRmOB/kyGX
- b6fiaQsi6xQGlWrAg13Rb98Bu0qpXf6RiLosmQoj+p+DyF1BBE5bPwvg/IvHPhrUTBie
- ZFg8BssQjw0uj/NLbDpSycIyF7CBaVGLR44Ddt0ouMLBsH+FNrTbm0BrM9XimxxT1ZXE
- gxZtDm1sgmv1C3YhL8ZBb9KteJGhaCjv+CCtFi3GalXAoaKgKGoB14W97IS+I4M53+KA
- 98Ww==
+ bh=J+5X1vqIJ+CD8k9SeFSpb++0TRf0wiFY3wllBJkAPIA=;
+ b=Zt6yOYhX/JUQTU0CZIygrs8nebTthCFg2PCVCrQXGP9dB4E6ewDN+MhPefNB2iczO+
+ VW04FHGkHkiHh/3sZk0wFjXHjSsESmdCLRfebhyg/KoU/l7afMXX7JWZC79xk7Mun7qi
+ 1ZD2DS9xUh5YhSpgVFzwqj4I/4yymA0xPWrlH/rC1Vlm+2yy+kbs8B5rxcnXH5c6p//l
+ 2Ceiu9vHt/kTl4kjlZVv49nSuaDt88CyviXzTE7VDvhykC1bAteS1hydRDszUQu47qgB
+ /pnbbt3h6Vi/vJZKRMr3PP2HTXTbGnjAI+3Kmn4v3P6Q8zRN27a3en3/JVnBw7U59n78
+ 0M3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=am6aHLZRZqCmn4TjEMCIEvy9PQaPrCKzH8p7kQXlzXM=;
- b=IIZMRa0D4eCfiwfrB/Muay6yisomr2TN3A18hcd2lXFFrtun8km/fhF90DX08GHDck
- 14fTgaBj8QFRZy5xr46GedZ0A+X5WmQKLeXgPLrPy8JjwWgwYzFZdqIclMIa8O5E/t5e
- 7TY/V0LofV/hHm6ic/0fuy9xS6cxFyhLzO9oBkgeSqFLm2KGcApUtC63uXMD3PjllssC
- BcBtDYS60umjoLknTgxdUGbxk965M/s3Tt7nPlMnTYYduludhQnK8V0JMNUqg3Oq7IN6
- 0n0NZGU6D9QRoxJK/azStl04i6f9hXUrzWyqu1iYH4N+1xTaSkJqv8BTlmPX62VBjyr0
- dYsA==
-X-Gm-Message-State: APjAAAVsmxsNCP+7J6d2e6A3iQsEGn0GZ+uxbJX1ZxpuGagqbb9+J2Sp
- 5ydGqZ6tRnecbjiPS6uzHnZN1WMw
-X-Google-Smtp-Source: APXvYqyux9uQJRqDaq3LVIuSkUe00qzC3CyPvE8c5bQMv5rxjJujW54Wra1nOsHFsnDqsZjdqwA5/A==
-X-Received: by 2002:a25:bb01:: with SMTP id z1mr2011898ybg.445.1565835033459; 
- Wed, 14 Aug 2019 19:10:33 -0700 (PDT)
-Received: from dionysus.attlocal.net ([2601:c0:c67f:e390:8a9a:e33f:caf8:f018])
- by smtp.gmail.com with ESMTPSA id
- j3sm374882ywk.21.2019.08.14.19.10.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Aug 2019 19:10:33 -0700 (PDT)
-From: Jan Bobek <jan.bobek@gmail.com>
+ bh=J+5X1vqIJ+CD8k9SeFSpb++0TRf0wiFY3wllBJkAPIA=;
+ b=s3/6oqJ77OogV77TC8rPahvs6qpRBmXAfW08sTGasCiv0+j7aWunhtTqf045MgyElM
+ c/b0e7hbkz46fbAcYmKmGkhrbqT2/dnwzoo2m7G5v0/+nRtmkg5T6mmcJwDKH90HNYGj
+ OQUn02rOJrE+uWK8wMsGi4T9txNdRhyrQpZuJyol7cnvg5d7Lj2WVHQ/i5Tq15xVtd1c
+ NXe4sOzQKQu+4HybSjxixV9wEdCt+RqY7xa0YosNUqXqSz3A5a0ckRnt/LPge42jAPnr
+ PB1lNW9Btopi0v9bx5lLyNcnyAsb/rV1Ld7qeY/V2AcGk37ncOFTYY4oCzk06m7lQ4kr
+ rkKw==
+X-Gm-Message-State: APjAAAWFEMfw1zuBwBHDA1ypXgZQBhlqrA3RGiYn3dl1OFUFXWWXzOkk
+ SMD1UQOGamJtHISQoRt5TLw+wk8K70Y=
+X-Google-Smtp-Source: APXvYqww0qGRNdCUI99I5TpSjb8KaWtrtTPDaEOCm8iC+0LstSU6t/Fp7mq5P95zdAZIaBWtIt1AgQ==
+X-Received: by 2002:ac8:5354:: with SMTP id d20mr1996415qto.119.1565835569197; 
+ Wed, 14 Aug 2019 19:19:29 -0700 (PDT)
+Received: from localhost.localdomain ([2804:14c:482:121::1])
+ by smtp.googlemail.com with ESMTPSA id o5sm757943qkf.10.2019.08.14.19.19.27
+ (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+ Wed, 14 Aug 2019 19:19:28 -0700 (PDT)
+From: vandersonmr <vandersonmr2@gmail.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 14 Aug 2019 22:09:25 -0400
-Message-Id: <20190815020928.9679-44-jan.bobek@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190815020928.9679-1-jan.bobek@gmail.com>
-References: <20190815020928.9679-1-jan.bobek@gmail.com>
+Date: Wed, 14 Aug 2019 23:18:49 -0300
+Message-Id: <20190815021857.19526-3-vandersonmr2@gmail.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190815021857.19526-1-vandersonmr2@gmail.com>
+References: <20190815021857.19526-1-vandersonmr2@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::b41
-Subject: [Qemu-devel] [RFC PATCH v3 43/46] target/i386: introduce SSE2
- instructions to sse-opcode.inc.h
+X-Received-From: 2607:f8b0:4864:20::842
+Subject: [Qemu-devel] [PATCH v5 02/10] accel: collecting TB execution count
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,611 +93,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jan Bobek <jan.bobek@gmail.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add all the SSE2 instruction entries to sse-opcode.inc.h.
+If a TB has a TBS (TBStatistics) with the TB_EXEC_STATS
+enabled, then we instrument the start code of this TB
+to atomically count the number of times it is executed.
+We count both the number of "normal" executions and atomic
+executions of a TB.
 
-Signed-off-by: Jan Bobek <jan.bobek@gmail.com>
+The execution count of the TB is stored in its respective
+TBS.
+
+All TBStatistics are created by default with the flags from
+default_tbstats_flag.
+
+Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
 ---
- target/i386/sse-opcode.inc.h | 323 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 322 insertions(+), 1 deletion(-)
+ accel/tcg/cpu-exec.c      |  4 ++++
+ accel/tcg/tb-stats.c      |  5 +++++
+ accel/tcg/tcg-runtime.c   |  7 +++++++
+ accel/tcg/tcg-runtime.h   |  2 ++
+ accel/tcg/translate-all.c |  7 +++++++
+ accel/tcg/translator.c    |  1 +
+ include/exec/gen-icount.h |  9 +++++++++
+ include/exec/tb-stats.h   | 19 +++++++++++++++++++
+ util/log.c                |  1 +
+ 9 files changed, 55 insertions(+)
 
-diff --git a/target/i386/sse-opcode.inc.h b/target/i386/sse-opcode.inc.h
-index 39947aeb51..efa67b7ce2 100644
---- a/target/i386/sse-opcode.inc.h
-+++ b/target/i386/sse-opcode.inc.h
-@@ -43,241 +43,535 @@
- OPCODE(movd, LEG(NP, 0F, 0, 0x6e), MMX, WR, Pq, Ed)
- /* NP 0F 7E /r: MOVD r/m32,mm */
- OPCODE(movd, LEG(NP, 0F, 0, 0x7e), MMX, WR, Ed, Pq)
-+/* 66 0F 6E /r: MOVD xmm,r/m32 */
-+OPCODE(movd, LEG(66, 0F, 0, 0x6e), SSE2, WR, Vdq, Ed)
-+/* 66 0F 7E /r: MOVD r/m32,xmm */
-+OPCODE(movd, LEG(66, 0F, 0, 0x7e), SSE2, WR, Ed, Vdq)
- /* NP REX.W + 0F 6E /r: MOVQ mm,r/m64 */
- OPCODE(movq, LEG(NP, 0F, 1, 0x6e), MMX, WR, Pq, Eq)
- /* NP REX.W + 0F 7E /r: MOVQ r/m64,mm */
- OPCODE(movq, LEG(NP, 0F, 1, 0x7e), MMX, WR, Eq, Pq)
-+/* 66 REX.W 0F 6E /r: MOVQ xmm,r/m64 */
-+OPCODE(movq, LEG(66, 0F, 1, 0x6e), SSE2, WR, Vdq, Eq)
-+/* 66 REX.W 0F 7E /r: MOVQ r/m64,xmm */
-+OPCODE(movq, LEG(66, 0F, 1, 0x7e), SSE2, WR, Eq, Vdq)
- /* NP 0F 6F /r: MOVQ mm, mm/m64 */
- OPCODE(movq, LEG(NP, 0F, 0, 0x6f), MMX, WR, Pq, Qq)
- /* NP 0F 7F /r: MOVQ mm/m64, mm */
- OPCODE(movq, LEG(NP, 0F, 0, 0x7f), MMX, WR, Qq, Pq)
-+/* F3 0F 7E /r: MOVQ xmm1, xmm2/m64 */
-+OPCODE(movq, LEG(F3, 0F, 0, 0x7e), SSE2, WR, Vdq, Wq)
-+/* 66 0F D6 /r: MOVQ xmm2/m64, xmm1 */
-+OPCODE(movq, LEG(66, 0F, 0, 0xd6), SSE2, WR, UdqMq, Vq)
- /* NP 0F 28 /r: MOVAPS xmm1, xmm2/m128 */
- OPCODE(movaps, LEG(NP, 0F, 0, 0x28), SSE, WR, Vdq, Wdq)
- /* NP 0F 29 /r: MOVAPS xmm2/m128, xmm1 */
- OPCODE(movaps, LEG(NP, 0F, 0, 0x29), SSE, WR, Wdq, Vdq)
-+/* 66 0F 28 /r: MOVAPD xmm1, xmm2/m128 */
-+OPCODE(movapd, LEG(66, 0F, 0, 0x28), SSE2, WR, Vdq, Wdq)
-+/* 66 0F 29 /r: MOVAPD xmm2/m128, xmm1 */
-+OPCODE(movapd, LEG(66, 0F, 0, 0x29), SSE2, WR, Wdq, Vdq)
-+/* 66 0F 6F /r: MOVDQA xmm1, xmm2/m128 */
-+OPCODE(movdqa, LEG(66, 0F, 0, 0x6f), SSE2, WR, Vdq, Wdq)
-+/* 66 0F 7F /r: MOVDQA xmm2/m128, xmm1 */
-+OPCODE(movdqa, LEG(66, 0F, 0, 0x7f), SSE2, WR, Wdq, Vdq)
- /* NP 0F 10 /r: MOVUPS xmm1, xmm2/m128 */
- OPCODE(movups, LEG(NP, 0F, 0, 0x10), SSE, WR, Vdq, Wdq)
- /* NP 0F 11 /r: MOVUPS xmm2/m128, xmm1 */
- OPCODE(movups, LEG(NP, 0F, 0, 0x11), SSE, WR, Wdq, Vdq)
-+/* 66 0F 10 /r: MOVUPD xmm1, xmm2/m128 */
-+OPCODE(movupd, LEG(66, 0F, 0, 0x10), SSE2, WR, Vdq, Wdq)
-+/* 66 0F 11 /r: MOVUPD xmm2/m128, xmm1 */
-+OPCODE(movupd, LEG(66, 0F, 0, 0x11), SSE2, WR, Wdq, Vdq)
-+/* F3 0F 6F /r: MOVDQU xmm1,xmm2/m128 */
-+OPCODE(movdqu, LEG(F3, 0F, 0, 0x6f), SSE2, WR, Vdq, Wdq)
-+/* F3 0F 7F /r: MOVDQU xmm2/m128,xmm1 */
-+OPCODE(movdqu, LEG(F3, 0F, 0, 0x7f), SSE2, WR, Wdq, Vdq)
- /* F3 0F 10 /r: MOVSS xmm1, xmm2/m32 */
- OPCODE(movss, LEG(F3, 0F, 0, 0x10), SSE, WRRR, Vdq, Vdq, Wd, modrm_mod)
- /* F3 0F 11 /r: MOVSS xmm2/m32, xmm1 */
- OPCODE(movss, LEG(F3, 0F, 0, 0x11), SSE, WR, Wd, Vd)
-+/* F2 0F 10 /r: MOVSD xmm1, xmm2/m64 */
-+OPCODE(movsd, LEG(F2, 0F, 0, 0x10), SSE2, WRRR, Vdq, Vdq, Wq, modrm_mod)
-+/* F2 0F 11 /r: MOVSD xmm1/m64, xmm2 */
-+OPCODE(movsd, LEG(F2, 0F, 0, 0x11), SSE2, WR, Wq, Vq)
-+/* F3 0F D6 /r: MOVQ2DQ xmm, mm */
-+OPCODE(movq2dq, LEG(F3, 0F, 0, 0xd6), SSE2, WR, Vdq, Nq)
-+/* F2 0F D6 /r: MOVDQ2Q mm, xmm */
-+OPCODE(movdq2q, LEG(F2, 0F, 0, 0xd6), SSE2, WR, Pq, Uq)
- /* NP 0F 12 /r: MOVHLPS xmm1, xmm2 */
- /* NP 0F 12 /r: MOVLPS xmm1, m64 */
- OPCODE(movhlps, LEG(NP, 0F, 0, 0x12), SSE, WR, Vq, UdqMhq)
- /* 0F 13 /r: MOVLPS m64, xmm1 */
- OPCODE(movlps, LEG(NP, 0F, 0, 0x13), SSE, WR, Mq, Vq)
-+/* 66 0F 12 /r: MOVLPD xmm1,m64 */
-+OPCODE(movlpd, LEG(66, 0F, 0, 0x12), SSE2, WR, Vq, Mq)
-+/* 66 0F 13 /r: MOVLPD m64,xmm1 */
-+OPCODE(movlpd, LEG(66, 0F, 0, 0x13), SSE2, WR, Mq, Vq)
- /* NP 0F 16 /r: MOVLHPS xmm1, xmm2 */
- /* NP 0F 16 /r: MOVHPS xmm1, m64 */
- OPCODE(movlhps, LEG(NP, 0F, 0, 0x16), SSE, WRR, Vdq, Vq, Wq)
- /* NP 0F 17 /r: MOVHPS m64, xmm1 */
- OPCODE(movhps, LEG(NP, 0F, 0, 0x17), SSE, WR, Mq, Vdq)
-+/* 66 0F 16 /r: MOVHPD xmm1, m64 */
-+OPCODE(movhpd, LEG(66, 0F, 0, 0x16), SSE2, WRR, Vdq, Vd, Mq)
-+/* 66 0F 17 /r: MOVHPD m64, xmm1 */
-+OPCODE(movhpd, LEG(66, 0F, 0, 0x17), SSE2, WR, Mq, Vdq)
- /* NP 0F D7 /r: PMOVMSKB r32, mm */
- OPCODE(pmovmskb, LEG(NP, 0F, 0, 0xd7), SSE, WR, Gd, Nq)
- /* NP REX.W 0F D7 /r: PMOVMSKB r64, mm */
- OPCODE(pmovmskb, LEG(NP, 0F, 1, 0xd7), SSE, WR, Gq, Nq)
-+/* 66 0F D7 /r: PMOVMSKB r32, xmm */
-+OPCODE(pmovmskb, LEG(66, 0F, 0, 0xd7), SSE2, WR, Gd, Udq)
-+/* 66 REX.W 0F D7 /r: PMOVMSKB r64, xmm */
-+OPCODE(pmovmskb, LEG(66, 0F, 1, 0xd7), SSE2, WR, Gq, Udq)
- /* NP 0F 50 /r: MOVMSKPS r32, xmm */
- OPCODE(movmskps, LEG(NP, 0F, 0, 0x50), SSE, WR, Gd, Udq)
- /* NP REX.W 0F 50 /r: MOVMSKPS r64, xmm */
- OPCODE(movmskps, LEG(NP, 0F, 1, 0x50), SSE, WR, Gq, Udq)
-+/* 66 0F 50 /r: MOVMSKPD r32, xmm */
-+OPCODE(movmskpd, LEG(66, 0F, 0, 0x50), SSE2, WR, Gd, Udq)
-+/* 66 REX.W 0F 50 /r: MOVMSKPD r64, xmm */
-+OPCODE(movmskpd, LEG(66, 0F, 1, 0x50), SSE2, WR, Gq, Udq)
- /* NP 0F FC /r: PADDB mm, mm/m64 */
- OPCODE(paddb, LEG(NP, 0F, 0, 0xfc), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F FC /r: PADDB xmm1, xmm2/m128 */
-+OPCODE(paddb, LEG(66, 0F, 0, 0xfc), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F FD /r: PADDW mm, mm/m64 */
- OPCODE(paddw, LEG(NP, 0F, 0, 0xfd), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F FD /r: PADDW xmm1, xmm2/m128 */
-+OPCODE(paddw, LEG(66, 0F, 0, 0xfd), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F FE /r: PADDD mm, mm/m64 */
- OPCODE(paddd, LEG(NP, 0F, 0, 0xfe), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F FE /r: PADDD xmm1, xmm2/m128 */
-+OPCODE(paddd, LEG(66, 0F, 0, 0xfe), SSE2, WRR, Vdq, Vdq, Wdq)
-+/* NP 0F D4 /r: PADDQ mm, mm/m64 */
-+OPCODE(paddq, LEG(NP, 0F, 0, 0xd4), SSE2, WRR, Pq, Pq, Qq)
-+/* 66 0F D4 /r: PADDQ xmm1, xmm2/m128 */
-+OPCODE(paddq, LEG(66, 0F, 0, 0xd4), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F EC /r: PADDSB mm, mm/m64 */
- OPCODE(paddsb, LEG(NP, 0F, 0, 0xec), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F EC /r: PADDSB xmm1, xmm2/m128 */
-+OPCODE(paddsb, LEG(66, 0F, 0, 0xec), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F ED /r: PADDSW mm, mm/m64 */
- OPCODE(paddsw, LEG(NP, 0F, 0, 0xed), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F ED /r: PADDSW xmm1, xmm2/m128 */
-+OPCODE(paddsw, LEG(66, 0F, 0, 0xed), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F DC /r: PADDUSB mm,mm/m64 */
- OPCODE(paddusb, LEG(NP, 0F, 0, 0xdc), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F DC /r: PADDUSB xmm1,xmm2/m128 */
-+OPCODE(paddusb, LEG(66, 0F, 0, 0xdc), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F DD /r: PADDUSW mm,mm/m64 */
- OPCODE(paddusw, LEG(NP, 0F, 0, 0xdd), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F DD /r: PADDUSW xmm1,xmm2/m128 */
-+OPCODE(paddusw, LEG(66, 0F, 0, 0xdd), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 58 /r: ADDPS xmm1, xmm2/m128 */
- OPCODE(addps, LEG(NP, 0F, 0, 0x58), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 58 /r: ADDPD xmm1, xmm2/m128 */
-+OPCODE(addpd, LEG(66, 0F, 0, 0x58), SSE2, WRR, Vdq, Vdq, Wdq)
- /* F3 0F 58 /r: ADDSS xmm1, xmm2/m32 */
- OPCODE(addss, LEG(F3, 0F, 0, 0x58), SSE, WRR, Vd, Vd, Wd)
-+/* F2 0F 58 /r: ADDSD xmm1, xmm2/m64 */
-+OPCODE(addsd, LEG(F2, 0F, 0, 0x58), SSE2, WRR, Vq, Vq, Wq)
- /* NP 0F F8 /r: PSUBB mm, mm/m64 */
- OPCODE(psubb, LEG(NP, 0F, 0, 0xf8), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F F8 /r: PSUBB xmm1, xmm2/m128 */
-+OPCODE(psubb, LEG(66, 0F, 0, 0xf8), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F F9 /r: PSUBW mm, mm/m64 */
- OPCODE(psubw, LEG(NP, 0F, 0, 0xf9), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F F9 /r: PSUBW xmm1, xmm2/m128 */
-+OPCODE(psubw, LEG(66, 0F, 0, 0xf9), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F FA /r: PSUBD mm, mm/m64 */
- OPCODE(psubd, LEG(NP, 0F, 0, 0xfa), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F FA /r: PSUBD xmm1, xmm2/m128 */
-+OPCODE(psubd, LEG(66, 0F, 0, 0xfa), SSE2, WRR, Vdq, Vdq, Wdq)
-+/* NP 0F FB /r: PSUBQ mm1, mm2/m64 */
-+OPCODE(psubq, LEG(NP, 0F, 0, 0xfb), SSE2, WRR, Pq, Pq, Qq)
-+/* 66 0F FB /r: PSUBQ xmm1, xmm2/m128 */
-+OPCODE(psubq, LEG(66, 0F, 0, 0xfb), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E8 /r: PSUBSB mm, mm/m64 */
- OPCODE(psubsb, LEG(NP, 0F, 0, 0xe8), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F E8 /r: PSUBSB xmm1, xmm2/m128 */
-+OPCODE(psubsb, LEG(66, 0F, 0, 0xe8), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E9 /r: PSUBSW mm, mm/m64 */
- OPCODE(psubsw, LEG(NP, 0F, 0, 0xe9), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F E9 /r: PSUBSW xmm1, xmm2/m128 */
-+OPCODE(psubsw, LEG(66, 0F, 0, 0xe9), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F D8 /r: PSUBUSB mm, mm/m64 */
- OPCODE(psubusb, LEG(NP, 0F, 0, 0xd8), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F D8 /r: PSUBUSB xmm1, xmm2/m128 */
-+OPCODE(psubusb, LEG(66, 0F, 0, 0xd8), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F D9 /r: PSUBUSW mm, mm/m64 */
- OPCODE(psubusw, LEG(NP, 0F, 0, 0xd9), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F D9 /r: PSUBUSW xmm1, xmm2/m128 */
-+OPCODE(psubusw, LEG(66, 0F, 0, 0xd9), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 5C /r: SUBPS xmm1, xmm2/m128 */
- OPCODE(subps, LEG(NP, 0F, 0, 0x5c), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 5C /r: SUBPD xmm1, xmm2/m128 */
-+OPCODE(subpd, LEG(66, 0F, 0, 0x5c), SSE2, WRR, Vdq, Vdq, Wdq)
- /* F3 0F 5C /r: SUBSS xmm1, xmm2/m32 */
- OPCODE(subss, LEG(F3, 0F, 0, 0x5c), SSE, WRR, Vd, Vd, Wd)
-+/* F2 0F 5C /r: SUBSD xmm1, xmm2/m64 */
-+OPCODE(subsd, LEG(F2, 0F, 0, 0x5c), SSE2, WRR, Vq, Vq, Wq)
- /* NP 0F D5 /r: PMULLW mm, mm/m64 */
- OPCODE(pmullw, LEG(NP, 0F, 0, 0xd5), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F D5 /r: PMULLW xmm1, xmm2/m128 */
-+OPCODE(pmullw, LEG(66, 0F, 0, 0xd5), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E5 /r: PMULHW mm, mm/m64 */
- OPCODE(pmulhw, LEG(NP, 0F, 0, 0xe5), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F E5 /r: PMULHW xmm1, xmm2/m128 */
-+OPCODE(pmulhw, LEG(66, 0F, 0, 0xe5), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E4 /r: PMULHUW mm1, mm2/m64 */
- OPCODE(pmulhuw, LEG(NP, 0F, 0, 0xe4), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F E4 /r: PMULHUW xmm1, xmm2/m128 */
-+OPCODE(pmulhuw, LEG(66, 0F, 0, 0xe4), SSE2, WRR, Vdq, Vdq, Wdq)
-+/* NP 0F F4 /r: PMULUDQ mm1, mm2/m64 */
-+OPCODE(pmuludq, LEG(NP, 0F, 0, 0xf4), SSE2, WRR, Pq, Pq, Qq)
-+/* 66 0F F4 /r: PMULUDQ xmm1, xmm2/m128 */
-+OPCODE(pmuludq, LEG(66, 0F, 0, 0xf4), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 59 /r: MULPS xmm1, xmm2/m128 */
- OPCODE(mulps, LEG(NP, 0F, 0, 0x59), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 59 /r: MULPD xmm1, xmm2/m128 */
-+OPCODE(mulpd, LEG(66, 0F, 0, 0x59), SSE2, WRR, Vdq, Vdq, Wdq)
- /* F3 0F 59 /r: MULSS xmm1,xmm2/m32 */
- OPCODE(mulss, LEG(F3, 0F, 0, 0x59), SSE, WRR, Vd, Vd, Wd)
-+/* F2 0F 59 /r: MULSD xmm1,xmm2/m64 */
-+OPCODE(mulsd, LEG(F2, 0F, 0, 0x59), SSE2, WRR, Vq, Vq, Wq)
- /* NP 0F F5 /r: PMADDWD mm, mm/m64 */
- OPCODE(pmaddwd, LEG(NP, 0F, 0, 0xf5), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F F5 /r: PMADDWD xmm1, xmm2/m128 */
-+OPCODE(pmaddwd, LEG(66, 0F, 0, 0xf5), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 5E /r: DIVPS xmm1, xmm2/m128 */
- OPCODE(divps, LEG(NP, 0F, 0, 0x5e), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 5E /r: DIVPD xmm1, xmm2/m128 */
-+OPCODE(divpd, LEG(66, 0F, 0, 0x5e), SSE2, WRR, Vdq, Vdq, Wdq)
- /* F3 0F 5E /r: DIVSS xmm1, xmm2/m32 */
- OPCODE(divss, LEG(F3, 0F, 0, 0x5e), SSE, WRR, Vd, Vd, Wd)
-+/* F2 0F 5E /r: DIVSD xmm1, xmm2/m64 */
-+OPCODE(divsd, LEG(F2, 0F, 0, 0x5e), SSE2, WRR, Vq, Vq, Wq)
- /* NP 0F 53 /r: RCPPS xmm1, xmm2/m128 */
- OPCODE(rcpps, LEG(NP, 0F, 0, 0x53), SSE, WR, Vdq, Wdq)
- /* F3 0F 53 /r: RCPSS xmm1, xmm2/m32 */
- OPCODE(rcpss, LEG(F3, 0F, 0, 0x53), SSE, WR, Vd, Wd)
- /* NP 0F 51 /r: SQRTPS xmm1, xmm2/m128 */
- OPCODE(sqrtps, LEG(NP, 0F, 0, 0x51), SSE, WR, Vdq, Wdq)
-+/* 66 0F 51 /r: SQRTPD xmm1, xmm2/m128 */
-+OPCODE(sqrtpd, LEG(66, 0F, 0, 0x51), SSE2, WR, Vdq, Wdq)
- /* F3 0F 51 /r: SQRTSS xmm1, xmm2/m32 */
- OPCODE(sqrtss, LEG(F3, 0F, 0, 0x51), SSE, WR, Vd, Wd)
-+/* F2 0F 51 /r: SQRTSD xmm1,xmm2/m64 */
-+OPCODE(sqrtsd, LEG(F2, 0F, 0, 0x51), SSE2, WR, Vq, Wq)
- /* NP 0F 52 /r: RSQRTPS xmm1, xmm2/m128 */
- OPCODE(rsqrtps, LEG(NP, 0F, 0, 0x52), SSE, WR, Vdq, Wdq)
- /* F3 0F 52 /r: RSQRTSS xmm1, xmm2/m32 */
- OPCODE(rsqrtss, LEG(F3, 0F, 0, 0x52), SSE, WR, Vd, Wd)
- /* NP 0F DA /r: PMINUB mm1, mm2/m64 */
- OPCODE(pminub, LEG(NP, 0F, 0, 0xda), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F DA /r: PMINUB xmm1, xmm2/m128 */
-+OPCODE(pminub, LEG(66, 0F, 0, 0xda), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F EA /r: PMINSW mm1, mm2/m64 */
- OPCODE(pminsw, LEG(NP, 0F, 0, 0xea), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F EA /r: PMINSW xmm1, xmm2/m128 */
-+OPCODE(pminsw, LEG(66, 0F, 0, 0xea), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 5D /r: MINPS xmm1, xmm2/m128 */
- OPCODE(minps, LEG(NP, 0F, 0, 0x5d), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 5D /r: MINPD xmm1, xmm2/m128 */
-+OPCODE(minpd, LEG(66, 0F, 0, 0x5d), SSE2, WRR, Vdq, Vdq, Wdq)
- /* F3 0F 5D /r: MINSS xmm1,xmm2/m32 */
- OPCODE(minss, LEG(F3, 0F, 0, 0x5d), SSE, WRR, Vd, Vd, Wd)
-+/* F2 0F 5D /r: MINSD xmm1, xmm2/m64 */
-+OPCODE(minsd, LEG(F2, 0F, 0, 0x5d), SSE2, WRR, Vq, Vq, Wq)
- /* NP 0F DE /r: PMAXUB mm1, mm2/m64 */
- OPCODE(pmaxub, LEG(NP, 0F, 0, 0xde), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F DE /r: PMAXUB xmm1, xmm2/m128 */
-+OPCODE(pmaxub, LEG(66, 0F, 0, 0xde), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F EE /r: PMAXSW mm1, mm2/m64 */
- OPCODE(pmaxsw, LEG(NP, 0F, 0, 0xee), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F EE /r: PMAXSW xmm1, xmm2/m128 */
-+OPCODE(pmaxsw, LEG(66, 0F, 0, 0xee), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 5F /r: MAXPS xmm1, xmm2/m128 */
- OPCODE(maxps, LEG(NP, 0F, 0, 0x5f), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 5F /r: MAXPD xmm1, xmm2/m128 */
-+OPCODE(maxpd, LEG(66, 0F, 0, 0x5f), SSE2, WRR, Vdq, Vdq, Wdq)
- /* F3 0F 5F /r: MAXSS xmm1, xmm2/m32 */
- OPCODE(maxss, LEG(F3, 0F, 0, 0x5f), SSE, WRR, Vd, Vd, Wd)
-+/* F2 0F 5F /r: MAXSD xmm1, xmm2/m64 */
-+OPCODE(maxsd, LEG(F2, 0F, 0, 0x5f), SSE2, WRR, Vq, Vq, Wq)
- /* NP 0F E0 /r: PAVGB mm1, mm2/m64 */
- OPCODE(pavgb, LEG(NP, 0F, 0, 0xe0), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F E0 /r: PAVGB xmm1, xmm2/m128 */
-+OPCODE(pavgb, LEG(66, 0F, 0, 0xe0), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E3 /r: PAVGW mm1, mm2/m64 */
- OPCODE(pavgw, LEG(NP, 0F, 0, 0xe3), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F E3 /r: PAVGW xmm1, xmm2/m128 */
-+OPCODE(pavgw, LEG(66, 0F, 0, 0xe3), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F F6 /r: PSADBW mm1, mm2/m64 */
- OPCODE(psadbw, LEG(NP, 0F, 0, 0xf6), SSE, WRR, Pq, Pq, Qq)
-+/* 66 0F F6 /r: PSADBW xmm1, xmm2/m128 */
-+OPCODE(psadbw, LEG(66, 0F, 0, 0xf6), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 74 /r: PCMPEQB mm,mm/m64 */
- OPCODE(pcmpeqb, LEG(NP, 0F, 0, 0x74), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 74 /r: PCMPEQB xmm1,xmm2/m128 */
-+OPCODE(pcmpeqb, LEG(66, 0F, 0, 0x74), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 75 /r: PCMPEQW mm,mm/m64 */
- OPCODE(pcmpeqw, LEG(NP, 0F, 0, 0x75), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 75 /r: PCMPEQW xmm1,xmm2/m128 */
-+OPCODE(pcmpeqw, LEG(66, 0F, 0, 0x75), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 76 /r: PCMPEQD mm,mm/m64 */
- OPCODE(pcmpeqd, LEG(NP, 0F, 0, 0x76), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 76 /r: PCMPEQD xmm1,xmm2/m128 */
-+OPCODE(pcmpeqd, LEG(66, 0F, 0, 0x76), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 64 /r: PCMPGTB mm,mm/m64 */
- OPCODE(pcmpgtb, LEG(NP, 0F, 0, 0x64), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 64 /r: PCMPGTB xmm1,xmm2/m128 */
-+OPCODE(pcmpgtb, LEG(66, 0F, 0, 0x64), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 65 /r: PCMPGTW mm,mm/m64 */
- OPCODE(pcmpgtw, LEG(NP, 0F, 0, 0x65), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 65 /r: PCMPGTW xmm1,xmm2/m128 */
-+OPCODE(pcmpgtw, LEG(66, 0F, 0, 0x65), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 66 /r: PCMPGTD mm,mm/m64 */
- OPCODE(pcmpgtd, LEG(NP, 0F, 0, 0x66), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 66 /r: PCMPGTD xmm1,xmm2/m128 */
-+OPCODE(pcmpgtd, LEG(66, 0F, 0, 0x66), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F C2 /r ib: CMPPS xmm1, xmm2/m128, imm8 */
- OPCODE(cmpps, LEG(NP, 0F, 0, 0xc2), SSE, WRRR, Vdq, Vdq, Wdq, Ib)
-+/* 66 0F C2 /r ib: CMPPD xmm1, xmm2/m128, imm8 */
-+OPCODE(cmppd, LEG(66, 0F, 0, 0xc2), SSE2, WRRR, Vdq, Vdq, Wdq, Ib)
- /* F3 0F C2 /r ib: CMPSS xmm1, xmm2/m32, imm8 */
- OPCODE(cmpss, LEG(F3, 0F, 0, 0xc2), SSE, WRRR, Vd, Vd, Wd, Ib)
-+/* F2 0F C2 /r ib: CMPSD xmm1, xmm2/m64, imm8 */
-+OPCODE(cmpsd, LEG(F2, 0F, 0, 0xc2), SSE2, WRRR, Vq, Vq, Wq, Ib)
- /* NP 0F 2E /r: UCOMISS xmm1, xmm2/m32 */
- OPCODE(ucomiss, LEG(NP, 0F, 0, 0x2e), SSE, RR, Vd, Wd)
-+/* 66 0F 2E /r: UCOMISD xmm1, xmm2/m64 */
-+OPCODE(ucomisd, LEG(66, 0F, 0, 0x2e), SSE2, RR, Vq, Wq)
- /* NP 0F 2F /r: COMISS xmm1, xmm2/m32 */
- OPCODE(comiss, LEG(NP, 0F, 0, 0x2f), SSE, RR, Vd, Wd)
-+/* 66 0F 2F /r: COMISD xmm1, xmm2/m64 */
-+OPCODE(comisd, LEG(66, 0F, 0, 0x2f), SSE2, RR, Vq, Wq)
- /* NP 0F DB /r: PAND mm, mm/m64 */
- OPCODE(pand, LEG(NP, 0F, 0, 0xdb), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F DB /r: PAND xmm1, xmm2/m128 */
-+OPCODE(pand, LEG(66, 0F, 0, 0xdb), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 54 /r: ANDPS xmm1, xmm2/m128 */
- OPCODE(andps, LEG(NP, 0F, 0, 0x54), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 54 /r: ANDPD xmm1, xmm2/m128 */
-+OPCODE(andpd, LEG(66, 0F, 0, 0x54), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F DF /r: PANDN mm, mm/m64 */
- OPCODE(pandn, LEG(NP, 0F, 0, 0xdf), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F DF /r: PANDN xmm1, xmm2/m128 */
-+OPCODE(pandn, LEG(66, 0F, 0, 0xdf), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 55 /r: ANDNPS xmm1, xmm2/m128 */
- OPCODE(andnps, LEG(NP, 0F, 0, 0x55), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 55 /r: ANDNPD xmm1, xmm2/m128 */
-+OPCODE(andnpd, LEG(66, 0F, 0, 0x55), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F EB /r: POR mm, mm/m64 */
- OPCODE(por, LEG(NP, 0F, 0, 0xeb), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F EB /r: POR xmm1, xmm2/m128 */
-+OPCODE(por, LEG(66, 0F, 0, 0xeb), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 56 /r: ORPS xmm1, xmm2/m128 */
- OPCODE(orps, LEG(NP, 0F, 0, 0x56), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 56 /r: ORPD xmm1, xmm2/m128 */
-+OPCODE(orpd, LEG(66, 0F, 0, 0x56), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F EF /r: PXOR mm, mm/m64 */
- OPCODE(pxor, LEG(NP, 0F, 0, 0xef), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F EF /r: PXOR xmm1, xmm2/m128 */
-+OPCODE(pxor, LEG(66, 0F, 0, 0xef), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 57 /r: XORPS xmm1, xmm2/m128 */
- OPCODE(xorps, LEG(NP, 0F, 0, 0x57), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 57 /r: XORPD xmm1, xmm2/m128 */
-+OPCODE(xorpd, LEG(66, 0F, 0, 0x57), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F F1 /r: PSLLW mm, mm/m64 */
- OPCODE(psllw, LEG(NP, 0F, 0, 0xf1), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F F1 /r: PSLLW xmm1, xmm2/m128 */
-+OPCODE(psllw, LEG(66, 0F, 0, 0xf1), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F F2 /r: PSLLD mm, mm/m64 */
- OPCODE(pslld, LEG(NP, 0F, 0, 0xf2), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F F2 /r: PSLLD xmm1, xmm2/m128 */
-+OPCODE(pslld, LEG(66, 0F, 0, 0xf2), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F F3 /r: PSLLQ mm, mm/m64 */
- OPCODE(psllq, LEG(NP, 0F, 0, 0xf3), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F F3 /r: PSLLQ xmm1, xmm2/m128 */
-+OPCODE(psllq, LEG(66, 0F, 0, 0xf3), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F D1 /r: PSRLW mm, mm/m64 */
- OPCODE(psrlw, LEG(NP, 0F, 0, 0xd1), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F D1 /r: PSRLW xmm1, xmm2/m128 */
-+OPCODE(psrlw, LEG(66, 0F, 0, 0xd1), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F D2 /r: PSRLD mm, mm/m64 */
- OPCODE(psrld, LEG(NP, 0F, 0, 0xd2), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F D2 /r: PSRLD xmm1, xmm2/m128 */
-+OPCODE(psrld, LEG(66, 0F, 0, 0xd2), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F D3 /r: PSRLQ mm, mm/m64 */
- OPCODE(psrlq, LEG(NP, 0F, 0, 0xd3), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F D3 /r: PSRLQ xmm1, xmm2/m128 */
-+OPCODE(psrlq, LEG(66, 0F, 0, 0xd3), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E1 /r: PSRAW mm,mm/m64 */
- OPCODE(psraw, LEG(NP, 0F, 0, 0xe1), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F E1 /r: PSRAW xmm1,xmm2/m128 */
-+OPCODE(psraw, LEG(66, 0F, 0, 0xe1), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F E2 /r: PSRAD mm,mm/m64 */
- OPCODE(psrad, LEG(NP, 0F, 0, 0xe2), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F E2 /r: PSRAD xmm1,xmm2/m128 */
-+OPCODE(psrad, LEG(66, 0F, 0, 0xe2), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 63 /r: PACKSSWB mm1, mm2/m64 */
- OPCODE(packsswb, LEG(NP, 0F, 0, 0x63), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 63 /r: PACKSSWB xmm1, xmm2/m128 */
-+OPCODE(packsswb, LEG(66, 0F, 0, 0x63), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 6B /r: PACKSSDW mm1, mm2/m64 */
- OPCODE(packssdw, LEG(NP, 0F, 0, 0x6b), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 6B /r: PACKSSDW xmm1, xmm2/m128 */
-+OPCODE(packssdw, LEG(66, 0F, 0, 0x6b), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 67 /r: PACKUSWB mm, mm/m64 */
- OPCODE(packuswb, LEG(NP, 0F, 0, 0x67), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 67 /r: PACKUSWB xmm1, xmm2/m128 */
-+OPCODE(packuswb, LEG(66, 0F, 0, 0x67), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 68 /r: PUNPCKHBW mm, mm/m64 */
- OPCODE(punpckhbw, LEG(NP, 0F, 0, 0x68), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 68 /r: PUNPCKHBW xmm1, xmm2/m128 */
-+OPCODE(punpckhbw, LEG(66, 0F, 0, 0x68), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 69 /r: PUNPCKHWD mm, mm/m64 */
- OPCODE(punpckhwd, LEG(NP, 0F, 0, 0x69), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 69 /r: PUNPCKHWD xmm1, xmm2/m128 */
-+OPCODE(punpckhwd, LEG(66, 0F, 0, 0x69), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 6A /r: PUNPCKHDQ mm, mm/m64 */
- OPCODE(punpckhdq, LEG(NP, 0F, 0, 0x6a), MMX, WRR, Pq, Pq, Qq)
-+/* 66 0F 6A /r: PUNPCKHDQ xmm1, xmm2/m128 */
-+OPCODE(punpckhdq, LEG(66, 0F, 0, 0x6a), SSE2, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 6D /r: PUNPCKHQDQ xmm1, xmm2/m128 */
-+OPCODE(punpckhqdq, LEG(66, 0F, 0, 0x6d), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 60 /r: PUNPCKLBW mm, mm/m32 */
- OPCODE(punpcklbw, LEG(NP, 0F, 0, 0x60), MMX, WRR, Pq, Pq, Qd)
-+/* 66 0F 60 /r: PUNPCKLBW xmm1, xmm2/m128 */
-+OPCODE(punpcklbw, LEG(66, 0F, 0, 0x60), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 61 /r: PUNPCKLWD mm, mm/m32 */
- OPCODE(punpcklwd, LEG(NP, 0F, 0, 0x61), MMX, WRR, Pq, Pq, Qd)
-+/* 66 0F 61 /r: PUNPCKLWD xmm1, xmm2/m128 */
-+OPCODE(punpcklwd, LEG(66, 0F, 0, 0x61), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 62 /r: PUNPCKLDQ mm, mm/m32 */
- OPCODE(punpckldq, LEG(NP, 0F, 0, 0x62), MMX, WRR, Pq, Pq, Qd)
-+/* 66 0F 62 /r: PUNPCKLDQ xmm1, xmm2/m128 */
-+OPCODE(punpckldq, LEG(66, 0F, 0, 0x62), SSE2, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 6C /r: PUNPCKLQDQ xmm1, xmm2/m128 */
-+OPCODE(punpcklqdq, LEG(66, 0F, 0, 0x6c), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 14 /r: UNPCKLPS xmm1, xmm2/m128 */
- OPCODE(unpcklps, LEG(NP, 0F, 0, 0x14), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 14 /r: UNPCKLPD xmm1, xmm2/m128 */
-+OPCODE(unpcklpd, LEG(66, 0F, 0, 0x14), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 15 /r: UNPCKHPS xmm1, xmm2/m128 */
- OPCODE(unpckhps, LEG(NP, 0F, 0, 0x15), SSE, WRR, Vdq, Vdq, Wdq)
-+/* 66 0F 15 /r: UNPCKHPD xmm1, xmm2/m128 */
-+OPCODE(unpckhpd, LEG(66, 0F, 0, 0x15), SSE2, WRR, Vdq, Vdq, Wdq)
- /* NP 0F 70 /r ib: PSHUFW mm1, mm2/m64, imm8 */
- OPCODE(pshufw, LEG(NP, 0F, 0, 0x70), SSE, WRR, Pq, Qq, Ib)
-+/* F2 0F 70 /r ib: PSHUFLW xmm1, xmm2/m128, imm8 */
-+OPCODE(pshuflw, LEG(F2, 0F, 0, 0x70), SSE2, WRR, Vdq, Wdq, Ib)
-+/* F3 0F 70 /r ib: PSHUFHW xmm1, xmm2/m128, imm8 */
-+OPCODE(pshufhw, LEG(F3, 0F, 0, 0x70), SSE2, WRR, Vdq, Wdq, Ib)
-+/* 66 0F 70 /r ib: PSHUFD xmm1, xmm2/m128, imm8 */
-+OPCODE(pshufd, LEG(66, 0F, 0, 0x70), SSE2, WRR, Vdq, Wdq, Ib)
- /* NP 0F C6 /r ib: SHUFPS xmm1, xmm3/m128, imm8 */
- OPCODE(shufps, LEG(NP, 0F, 0, 0xc6), SSE, WRRR, Vdq, Vdq, Wdq, Ib)
-+/* 66 0F C6 /r ib: SHUFPD xmm1, xmm2/m128, imm8 */
-+OPCODE(shufpd, LEG(66, 0F, 0, 0xc6), SSE2, WRRR, Vdq, Vdq, Wdq, Ib)
- /* NP 0F C4 /r ib: PINSRW mm, r32/m16, imm8 */
- OPCODE(pinsrw, LEG(NP, 0F, 0, 0xc4), SSE, WRRR, Pq, Pq, RdMw, Ib)
-+/* 66 0F C4 /r ib: PINSRW xmm, r32/m16, imm8 */
-+OPCODE(pinsrw, LEG(66, 0F, 0, 0xc4), SSE2, WRRR, Vdq, Vdq, RdMw, Ib)
- /* NP 0F C5 /r ib: PEXTRW r32, mm, imm8 */
- OPCODE(pextrw, LEG(NP, 0F, 0, 0xc5), SSE, WRR, Gd, Nq, Ib)
- /* NP REX.W 0F C5 /r ib: PEXTRW r64, mm, imm8 */
- OPCODE(pextrw, LEG(NP, 0F, 1, 0xc5), SSE, WRR, Gq, Nq, Ib)
-+/* 66 0F C5 /r ib: PEXTRW r32, xmm, imm8 */
-+OPCODE(pextrw, LEG(66, 0F, 0, 0xc5), SSE2, WRR, Gd, Udq, Ib)
-+/* 66 REX.W 0F C5 /r ib: PEXTRW r64, xmm, imm8 */
-+OPCODE(pextrw, LEG(66, 0F, 1, 0xc5), SSE2, WRR, Gq, Udq, Ib)
- /* NP 0F 2A /r: CVTPI2PS xmm, mm/m64 */
- OPCODE(cvtpi2ps, LEG(NP, 0F, 0, 0x2a), SSE, WR, Vdq, Qq)
- /* F3 0F 2A /r: CVTSI2SS xmm1,r/m32 */
- OPCODE(cvtsi2ss, LEG(F3, 0F, 0, 0x2a), SSE, WR, Vd, Ed)
- /* F3 REX.W 0F 2A /r: CVTSI2SS xmm1,r/m64 */
- OPCODE(cvtsi2ss, LEG(F3, 0F, 1, 0x2a), SSE, WR, Vd, Eq)
-+/* 66 0F 2A /r: CVTPI2PD xmm, mm/m64 */
-+OPCODE(cvtpi2pd, LEG(66, 0F, 0, 0x2a), SSE2, WR, Vdq, Qq)
-+/* F2 0F 2A /r: CVTSI2SD xmm1,r32/m32 */
-+OPCODE(cvtsi2sd, LEG(F2, 0F, 0, 0x2a), SSE2, WR, Vq, Ed)
-+/* F2 REX.W 0F 2A /r: CVTSI2SD xmm1,r/m64 */
-+OPCODE(cvtsi2sd, LEG(F2, 0F, 1, 0x2a), SSE2, WR, Vq, Eq)
- /* NP 0F 2D /r: CVTPS2PI mm, xmm/m64 */
- OPCODE(cvtps2pi, LEG(NP, 0F, 0, 0x2d), SSE, WR, Pq, Wq)
- /* F3 0F 2D /r: CVTSS2SI r32,xmm1/m32 */
- OPCODE(cvtss2si, LEG(F3, 0F, 0, 0x2d), SSE, WR, Gd, Wd)
- /* F3 REX.W 0F 2D /r: CVTSS2SI r64,xmm1/m32 */
- OPCODE(cvtss2si, LEG(F3, 0F, 1, 0x2d), SSE, WR, Gq, Wd)
-+/* 66 0F 2D /r: CVTPD2PI mm, xmm/m128 */
-+OPCODE(cvtpd2pi, LEG(66, 0F, 0, 0x2d), SSE2, WR, Pq, Wdq)
-+/* F2 0F 2D /r: CVTSD2SI r32,xmm1/m64 */
-+OPCODE(cvtsd2si, LEG(F2, 0F, 0, 0x2d), SSE2, WR, Gd, Wq)
-+/* F2 REX.W 0F 2D /r: CVTSD2SI r64,xmm1/m64 */
-+OPCODE(cvtsd2si, LEG(F2, 0F, 1, 0x2d), SSE2, WR, Gq, Wq)
- /* NP 0F 2C /r: CVTTPS2PI mm, xmm/m64 */
- OPCODE(cvttps2pi, LEG(NP, 0F, 0, 0x2c), SSE, WR, Pq, Wq)
- /* F3 0F 2C /r: CVTTSS2SI r32,xmm1/m32 */
- OPCODE(cvttss2si, LEG(F3, 0F, 0, 0x2c), SSE, WR, Gd, Wd)
- /* F3 REX.W 0F 2C /r: CVTTSS2SI r64,xmm1/m32 */
- OPCODE(cvttss2si, LEG(F3, 0F, 1, 0x2c), SSE, WR, Gq, Wd)
-+/* 66 0F 2C /r: CVTTPD2PI mm, xmm/m128 */
-+OPCODE(cvttpd2pi, LEG(66, 0F, 0, 0x2c), SSE2, WR, Pq, Wdq)
-+/* F2 0F 2C /r: CVTTSD2SI r32,xmm1/m64 */
-+OPCODE(cvttsd2si, LEG(F2, 0F, 0, 0x2c), SSE2, WR, Gd, Wq)
-+/* F2 REX.W 0F 2C /r: CVTTSD2SI r64,xmm1/m64 */
-+OPCODE(cvttsd2si, LEG(F2, 0F, 1, 0x2c), SSE2, WR, Gq, Wq)
-+/* F2 0F E6 /r: CVTPD2DQ xmm1, xmm2/m128 */
-+OPCODE(cvtpd2dq, LEG(F2, 0F, 0, 0xe6), SSE2, WR, Vdq, Wdq)
-+/* 66 0F E6 /r: CVTTPD2DQ xmm1, xmm2/m128 */
-+OPCODE(cvttpd2dq, LEG(66, 0F, 0, 0xe6), SSE2, WR, Vdq, Wdq)
-+/* F3 0F E6 /r: CVTDQ2PD xmm1, xmm2/m64 */
-+OPCODE(cvtdq2pd, LEG(F3, 0F, 0, 0xe6), SSE2, WR, Vdq, Wq)
-+/* NP 0F 5A /r: CVTPS2PD xmm1, xmm2/m64 */
-+OPCODE(cvtps2pd, LEG(NP, 0F, 0, 0x5a), SSE2, WR, Vdq, Wq)
-+/* 66 0F 5A /r: CVTPD2PS xmm1, xmm2/m128 */
-+OPCODE(cvtpd2ps, LEG(66, 0F, 0, 0x5a), SSE2, WR, Vdq, Wdq)
-+/* F3 0F 5A /r: CVTSS2SD xmm1, xmm2/m32 */
-+OPCODE(cvtss2sd, LEG(F3, 0F, 0, 0x5a), SSE2, WR, Vq, Wd)
-+/* F2 0F 5A /r: CVTSD2SS xmm1, xmm2/m64 */
-+OPCODE(cvtsd2ss, LEG(F2, 0F, 0, 0x5a), SSE2, WR, Vd, Wq)
-+/* NP 0F 5B /r: CVTDQ2PS xmm1, xmm2/m128 */
-+OPCODE(cvtdq2ps, LEG(NP, 0F, 0, 0x5b), SSE2, WR, Vdq, Wdq)
-+/* 66 0F 5B /r: CVTPS2DQ xmm1, xmm2/m128 */
-+OPCODE(cvtps2dq, LEG(66, 0F, 0, 0x5b), SSE2, WR, Vdq, Wdq)
-+/* F3 0F 5B /r: CVTTPS2DQ xmm1, xmm2/m128 */
-+OPCODE(cvttps2dq, LEG(F3, 0F, 0, 0x5b), SSE2, WR, Vdq, Wdq)
- /* NP 0F F7 /r: MASKMOVQ mm1, mm2 */
- OPCODE(maskmovq, LEG(NP, 0F, 0, 0xf7), SSE, RR, Pq, Nq)
-+/* 66 0F F7 /r: MASKMOVDQU xmm1, xmm2 */
-+OPCODE(maskmovdqu, LEG(66, 0F, 0, 0xf7), SSE2, RR, Vdq, Udq)
- /* NP 0F 2B /r: MOVNTPS m128, xmm1 */
- OPCODE(movntps, LEG(NP, 0F, 0, 0x2b), SSE, WR, Mdq, Vdq)
-+/* 66 0F 2B /r: MOVNTPD m128, xmm1 */
-+OPCODE(movntpd, LEG(66, 0F, 0, 0x2b), SSE2, WR, Mdq, Vdq)
-+/* NP 0F C3 /r: MOVNTI m32, r32 */
-+OPCODE(movnti, LEG(NP, 0F, 0, 0xc3), SSE2, WR, Md, Gd)
-+/* NP REX.W + 0F C3 /r: MOVNTI m64, r64 */
-+OPCODE(movnti, LEG(NP, 0F, 1, 0xc3), SSE2, WR, Mq, Gq)
- /* NP 0F E7 /r: MOVNTQ m64, mm */
- OPCODE(movntq, LEG(NP, 0F, 0, 0xe7), SSE, WR, Mq, Pq)
-+/* 66 0F E7 /r: MOVNTDQ m128, xmm1 */
-+OPCODE(movntdq, LEG(66, 0F, 0, 0xe7), SSE2, WR, Mdq, Vdq)
-+/* F3 90: PAUSE */
-+OPCODE(pause, LEG(F3, NA, 0, 0x90), SSE2, )
- /* NP 0F 77: EMMS */
- OPCODE(emms, LEG(NP, 0F, 0, 0x77), MMX, )
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 6c85c3ee1e..e54be69499 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -252,6 +252,10 @@ void cpu_exec_step_atomic(CPUState *cpu)
  
-+OPCODE_GRP(grp12_LEG_66, LEG(66, 0F, 0, 0x71))
-+OPCODE_GRP_BEGIN(grp12_LEG_66)
-+    /* 66 0F 71 /6 ib: PSLLW xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp12_LEG_66, psllw, 6, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 71 /2 ib: PSRLW xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp12_LEG_66, psrlw, 2, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 71 /4 ib: PSRAW xmm1,imm8 */
-+    OPCODE_GRPMEMB(grp12_LEG_66, psraw, 4, SSE2, WRR, Udq, Udq, Ib)
-+OPCODE_GRP_END(grp12_LEG_66)
-+
- OPCODE_GRP(grp12_LEG_NP, LEG(NP, 0F, 0, 0x71))
- OPCODE_GRP_BEGIN(grp12_LEG_NP)
-     /* NP 0F 71 /6 ib: PSLLW mm1, imm8 */
-@@ -288,6 +582,16 @@ OPCODE_GRP_BEGIN(grp12_LEG_NP)
-     OPCODE_GRPMEMB(grp12_LEG_NP, psraw, 4, MMX, WRR, Nq, Nq, Ib)
- OPCODE_GRP_END(grp12_LEG_NP)
+         start_exclusive();
  
-+OPCODE_GRP(grp13_LEG_66, LEG(66, 0F, 0, 0x72))
-+OPCODE_GRP_BEGIN(grp13_LEG_66)
-+    /* 66 0F 72 /6 ib: PSLLD xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp13_LEG_66, pslld, 6, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 72 /2 ib: PSRLD xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp13_LEG_66, psrld, 2, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 72 /4 ib: PSRAD xmm1,imm8 */
-+    OPCODE_GRPMEMB(grp13_LEG_66, psrad, 4, SSE2, WRR, Udq, Udq, Ib)
-+OPCODE_GRP_END(grp13_LEG_66)
++        if (tb_stats_enabled(tb, TB_EXEC_STATS)) {
++            tb->tb_stats->executions.atomic++;
++        }
 +
- OPCODE_GRP(grp13_LEG_NP, LEG(NP, 0F, 0, 0x72))
- OPCODE_GRP_BEGIN(grp13_LEG_NP)
-     /* NP 0F 72 /6 ib: PSLLD mm, imm8 */
-@@ -298,6 +602,18 @@ OPCODE_GRP_BEGIN(grp13_LEG_NP)
-     OPCODE_GRPMEMB(grp13_LEG_NP, psrad, 4, MMX, WRR, Nq, Nq, Ib)
- OPCODE_GRP_END(grp13_LEG_NP)
+         /* Since we got here, we know that parallel_cpus must be true.  */
+         parallel_cpus = false;
+         in_exclusive_region = true;
+diff --git a/accel/tcg/tb-stats.c b/accel/tcg/tb-stats.c
+index 02844717cb..3489133e9e 100644
+--- a/accel/tcg/tb-stats.c
++++ b/accel/tcg/tb-stats.c
+@@ -37,3 +37,8 @@ bool tb_stats_collection_paused(void)
+ {
+     return tcg_collect_tb_stats == TB_STATS_PAUSED;
+ }
++
++uint32_t get_default_tbstats_flag(void)
++{
++    return default_tbstats_flag;
++}
+diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+index 8a1e408e31..6f4aafba11 100644
+--- a/accel/tcg/tcg-runtime.c
++++ b/accel/tcg/tcg-runtime.c
+@@ -167,3 +167,10 @@ void HELPER(exit_atomic)(CPUArchState *env)
+ {
+     cpu_loop_exit_atomic(env_cpu(env), GETPC());
+ }
++
++void HELPER(inc_exec_freq)(void *ptr)
++{
++    TBStatistics *stats = (TBStatistics *) ptr;
++    g_assert(stats);
++    atomic_inc(&stats->executions.normal);
++}
+diff --git a/accel/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+index 4fa61b49b4..bf0b75dbe8 100644
+--- a/accel/tcg/tcg-runtime.h
++++ b/accel/tcg/tcg-runtime.h
+@@ -28,6 +28,8 @@ DEF_HELPER_FLAGS_1(lookup_tb_ptr, TCG_CALL_NO_WG_SE, ptr, env)
  
-+OPCODE_GRP(grp14_LEG_66, LEG(66, 0F, 0, 0x73))
-+OPCODE_GRP_BEGIN(grp14_LEG_66)
-+    /* 66 0F 73 /6 ib: PSLLQ xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp14_LEG_66, psllq, 6, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 73 /7 ib: PSLLDQ xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp14_LEG_66, pslldq, 7, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 73 /2 ib: PSRLQ xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp14_LEG_66, psrlq, 2, SSE2, WRR, Udq, Udq, Ib)
-+    /* 66 0F 73 /3 ib: PSRLDQ xmm1, imm8 */
-+    OPCODE_GRPMEMB(grp14_LEG_66, psrldq, 3, SSE2, WRR, Udq, Udq, Ib)
-+OPCODE_GRP_END(grp14_LEG_66)
+ DEF_HELPER_FLAGS_1(exit_atomic, TCG_CALL_NO_WG, noreturn, env)
+ 
++DEF_HELPER_FLAGS_1(inc_exec_freq, TCG_CALL_NO_RWG, void, ptr)
 +
- OPCODE_GRP(grp14_LEG_NP, LEG(NP, 0F, 0, 0x73))
- OPCODE_GRP_BEGIN(grp14_LEG_NP)
-     /* NP 0F 73 /6 ib: PSLLQ mm, imm8 */
-@@ -309,7 +625,12 @@ OPCODE_GRP_END(grp14_LEG_NP)
- OPCODE_GRP(grp15_LEG_NP, LEG(NP, 0F, 0, 0xae))
- OPCODE_GRP_BEGIN(grp15_LEG_NP)
-     /* NP 0F AE /7: SFENCE */
--    OPCODE_GRPMEMB(grp15_LEG_NP, sfence, 7, SSE, )
-+    /* NP 0F AE /7: CLFLUSH m8 */
-+    OPCODE_GRPMEMB(grp15_LEG_NP, sfence_clflush, 7, SSE, RR, modrm_mod, modrm)
-+    /* NP 0F AE /5: LFENCE */
-+    OPCODE_GRPMEMB(grp15_LEG_NP, lfence, 5, SSE2, )
-+    /* NP 0F AE /6: MFENCE */
-+    OPCODE_GRPMEMB(grp15_LEG_NP, mfence, 6, SSE2, )
-     /* NP 0F AE /2: LDMXCSR m32 */
-     OPCODE_GRPMEMB(grp15_LEG_NP, ldmxcsr, 2, SSE, R, Md)
-     /* NP 0F AE /3: STMXCSR m32 */
+ #ifdef CONFIG_SOFTMMU
+ 
+ DEF_HELPER_FLAGS_5(atomic_cmpxchgb, TCG_CALL_NO_WG,
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index b7bccacd3b..df08d183df 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1785,6 +1785,13 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+      */
+     if (tb_stats_collection_enabled()) {
+         tb->tb_stats = tb_get_stats(phys_pc, pc, cs_base, flags, tb);
++        uint32_t flag = get_default_tbstats_flag();
++
++        if (qemu_log_in_addr_range(tb->pc)) {
++            if (flag & TB_EXEC_STATS) {
++                tb->tb_stats->stats_enabled |= TB_EXEC_STATS;
++            }
++        }
+     } else {
+         tb->tb_stats = NULL;
+     }
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index 9226a348a3..396a11e828 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -46,6 +46,7 @@ void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
+ 
+     ops->init_disas_context(db, cpu);
+     tcg_debug_assert(db->is_jmp == DISAS_NEXT);  /* no early exit */
++    gen_tb_exec_count(tb);
+ 
+     /* Reset the temp count so that we can identify leaks */
+     tcg_clear_temp_count();
+diff --git a/include/exec/gen-icount.h b/include/exec/gen-icount.h
+index f7669b6841..b3efe41894 100644
+--- a/include/exec/gen-icount.h
++++ b/include/exec/gen-icount.h
+@@ -7,6 +7,15 @@
+ 
+ static TCGOp *icount_start_insn;
+ 
++static inline void gen_tb_exec_count(TranslationBlock *tb)
++{
++    if (tb_stats_enabled(tb, TB_EXEC_STATS)) {
++        TCGv_ptr ptr = tcg_const_ptr(tb->tb_stats);
++        gen_helper_inc_exec_freq(ptr);
++        tcg_temp_free_ptr(ptr);
++    }
++}
++
+ static inline void gen_tb_start(TranslationBlock *tb)
+ {
+     TCGv_i32 count, imm;
+diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
+index cc8f8a6ce6..0265050b79 100644
+--- a/include/exec/tb-stats.h
++++ b/include/exec/tb-stats.h
+@@ -6,6 +6,9 @@
+ #include "exec/tb-context.h"
+ #include "tcg.h"
+ 
++#define tb_stats_enabled(tb, JIT_STATS) \
++    (tb && tb->tb_stats && (tb->tb_stats->stats_enabled & JIT_STATS))
++
+ typedef struct TBStatistics TBStatistics;
+ 
+ /*
+@@ -22,6 +25,15 @@ struct TBStatistics {
+     uint32_t     flags;
+     /* cs_base isn't included in the hash but we do check for matches */
+     target_ulong cs_base;
++
++    uint32_t stats_enabled;
++
++    /* Execution stats */
++    struct {
++        unsigned long normal;
++        unsigned long atomic;
++    } executions;
++
+     /* current TB linked to this TBStatistics */
+     TranslationBlock *tb;
+ };
+@@ -32,7 +44,12 @@ void init_tb_stats_htable_if_not(void);
+ 
+ /* TBStatistic collection controls */
+ enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED, TB_STATS_STOPPED };
++
++#define TB_NOTHING    0
++#define TB_EXEC_STATS 1
++
+ extern int tcg_collect_tb_stats;
++extern uint32_t default_tbstats_flag;
+ 
+ void enable_collect_tb_stats(void);
+ void disable_collect_tb_stats(void);
+@@ -40,4 +57,6 @@ void pause_collect_tb_stats(void);
+ bool tb_stats_collection_enabled(void);
+ bool tb_stats_collection_paused(void);
+ 
++uint32_t get_default_tbstats_flag(void);
++
+ #endif
+diff --git a/util/log.c b/util/log.c
+index 393a17115b..29021a4584 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -32,6 +32,7 @@ static int log_append = 0;
+ static GArray *debug_regions;
+ 
+ int tcg_collect_tb_stats;
++uint32_t default_tbstats_flag;
+ 
+ /* Return the number of characters emitted.  */
+ int qemu_log(const char *fmt, ...)
 -- 
-2.20.1
+2.22.0
 
 
