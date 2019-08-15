@@ -2,58 +2,60 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA721C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60542C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEB1F206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:39:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEB1F206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 3695E206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:39:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3695E206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyHqS-0007Fy-Eo
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 11:39:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38718)
+	id 1hyHqU-0007JP-8r
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 11:39:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38816)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hyHoA-0004kx-3Z
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:37:01 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hyHoL-00053H-Pm
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hyHo6-0000Ni-TR
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:36:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42896)
+ (envelope-from <mreitz@redhat.com>) id 1hyHoG-0000RO-RW
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:37:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56682)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hyHnw-0000Ke-K3; Thu, 15 Aug 2019 11:36:44 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ id 1hyHo7-0000Np-Lg; Thu, 15 Aug 2019 11:36:55 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1652A2A09DA;
- Thu, 15 Aug 2019 15:36:43 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 06ED6C058CBD;
+ Thu, 15 Aug 2019 15:36:55 +0000 (UTC)
 Received: from localhost (ovpn-204-81.brq.redhat.com [10.40.204.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11CBD69CAC;
- Thu, 15 Aug 2019 15:36:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DDDE100194E;
+ Thu, 15 Aug 2019 15:36:54 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Date: Thu, 15 Aug 2019 17:36:31 +0200
-Message-Id: <20190815153638.4600-1-mreitz@redhat.com>
+Date: Thu, 15 Aug 2019 17:36:34 +0200
+Message-Id: <20190815153638.4600-4-mreitz@redhat.com>
+In-Reply-To: <20190815153638.4600-1-mreitz@redhat.com>
+References: <20190815153638.4600-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Thu, 15 Aug 2019 15:36:43 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.32]); Thu, 15 Aug 2019 15:36:55 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v2 0/7] vmdk: Misc fixes
+Subject: [Qemu-devel] [PATCH v2 3/7] iotests: Keep testing broken relative
+ extent paths
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,95 +73,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I made the mistake of trying to run the iotests with all non-default
-subformats our vmdk driver has to offer:
-- monolithicFlat
-- twoGbMaxExtentSparse
-- twoGbMaxExtentFlat
-- streamOptimized
+We had a test for a case where relative extent paths did not work, but
+unfortunately we just fixed the underlying problem, so it works now.
+This patch adds a new test case that still fails.
 
-Many things broke, so this series fixes what I found.  It=E2=80=99s mostl=
-y just
-iotest fixes, but there are actually two real fixes in here.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+---
+ tests/qemu-iotests/059     | 27 +++++++++++++++++++++++++++
+ tests/qemu-iotests/059.out |  4 ++++
+ 2 files changed, 31 insertions(+)
 
-
-v2:
-- Patch 2: Don=E2=80=99t treat extent filenames with protocol prefixes as
-  absolute filenames =E2=80=93 this may be the right thing to do, but:
-  (1) path_combine() doesn=E2=80=99t (it just ignores whether the suppose=
-d
-      relative filename has a potential protocol prefix), so this is how
-      we handled it so far,
-  (2) It would break other cases (when a filename contains a colon for
-      no particular reason), as seen in iotest 126.
-  That means you cannot have an extent file e.g. on an http server while
-  the descriptor is on a local filesystem, but I hope nobody would ever
-  want to do that.
-
-- Patch 3: Fix paste-o [John]
-
-- Patch 7: twoGbMaxExtentSparse works now with the change to patch 2, so
-  we no longer have to mark it unsupported [Thanks for the insistent
-  inquiry, John :-)]
-
-
-git-backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream pat=
-ch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
-
-001/7:[----] [--] 'iotests: Fix _filter_img_create()'
-002/7:[0002] [FC] 'vmdk: Use bdrv_dirname() for relative extent paths'
-003/7:[0002] [FC] 'iotests: Keep testing broken relative extent paths'
-004/7:[----] [--] 'vmdk: Reject invalid compressed writes'
-005/7:[----] [--] 'iotests: Disable broken streamOptimized tests'
-006/7:[----] [--] 'iotests: Disable 110 for vmdk.twoGbMaxExtentSparse'
-007/7:[0006] [FC] 'iotests: Disable 126 for some vmdk subformats'
-
-
-Max Reitz (7):
-  iotests: Fix _filter_img_create()
-  vmdk: Use bdrv_dirname() for relative extent paths
-  iotests: Keep testing broken relative extent paths
-  vmdk: Reject invalid compressed writes
-  iotests: Disable broken streamOptimized tests
-  iotests: Disable 110 for vmdk.twoGbMaxExtentSparse
-  iotests: Disable 126 for flat vmdk subformats
-
- block/vmdk.c                     | 64 ++++++++++++++++++++++----------
- tests/qemu-iotests/002           |  1 +
- tests/qemu-iotests/003           |  1 +
- tests/qemu-iotests/005           |  3 +-
- tests/qemu-iotests/009           |  1 +
- tests/qemu-iotests/010           |  1 +
- tests/qemu-iotests/011           |  1 +
- tests/qemu-iotests/017           |  3 +-
- tests/qemu-iotests/018           |  3 +-
- tests/qemu-iotests/019           |  3 +-
- tests/qemu-iotests/020           |  3 +-
- tests/qemu-iotests/027           |  1 +
- tests/qemu-iotests/032           |  1 +
- tests/qemu-iotests/033           |  1 +
- tests/qemu-iotests/034           |  3 +-
- tests/qemu-iotests/037           |  3 +-
- tests/qemu-iotests/059           | 34 ++++++++++++++++-
- tests/qemu-iotests/059.out       | 24 +++++++-----
- tests/qemu-iotests/063           |  3 +-
- tests/qemu-iotests/072           |  1 +
- tests/qemu-iotests/105           |  3 +-
- tests/qemu-iotests/110           |  3 +-
- tests/qemu-iotests/126           |  2 +
- tests/qemu-iotests/197           |  1 +
- tests/qemu-iotests/215           |  1 +
- tests/qemu-iotests/251           |  1 +
- tests/qemu-iotests/common.filter |  4 +-
- 27 files changed, 127 insertions(+), 43 deletions(-)
-
+diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
+index fbed5f9483..10bfbaecec 100755
+--- a/tests/qemu-iotests/059
++++ b/tests/qemu-iotests/059
+@@ -114,6 +114,8 @@ $QEMU_IMG convert -f qcow2 -O vmdk -o subformat=3Dstr=
+eamOptimized "$TEST_IMG.qcow2
+=20
+ echo
+ echo "=3D=3D=3D Testing monolithicFlat with internally generated JSON fi=
+le name =3D=3D=3D"
++
++echo '--- blkdebug ---'
+ # Should work, because bdrv_dirname() works fine with blkdebug
+ IMGOPTS=3D"subformat=3DmonolithicFlat" _make_test_img 64M
+ $QEMU_IO -c "open -o driver=3D$IMGFMT,file.driver=3Dblkdebug,file.image.=
+filename=3D$TEST_IMG,file.inject-error.0.event=3Dread_aio" \
+@@ -122,6 +124,31 @@ $QEMU_IO -c "open -o driver=3D$IMGFMT,file.driver=3D=
+blkdebug,file.image.filename=3D$TE
+     | _filter_testdir | _filter_imgfmt | _filter_img_info
+ _cleanup_test_img
+=20
++echo '--- quorum ---'
++# Should not work, because bdrv_dirname() does not work with quorum
++IMGOPTS=3D"subformat=3DmonolithicFlat" _make_test_img 64M
++cp "$TEST_IMG" "$TEST_IMG.orig"
++
++filename=3D"json:{
++    \"driver\": \"$IMGFMT\",
++    \"file\": {
++        \"driver\": \"quorum\",
++        \"children\": [ {
++            \"driver\": \"file\",
++            \"filename\": \"$TEST_IMG\"
++        }, {
++            \"driver\": \"file\",
++            \"filename\": \"$TEST_IMG.orig\"
++        } ],
++        \"vote-threshold\": 1
++    } }"
++
++filename=3D$(echo "$filename" | tr '\n' ' ' | sed -e 's/\s\+/ /g')
++$QEMU_IMG info "$filename" 2>&1 \
++    | sed -e "s/'json:[^']*'/\$QUORUM_FILE/g" \
++    | _filter_testdir | _filter_imgfmt | _filter_img_info
++
++
+ echo
+ echo "=3D=3D=3D Testing version 3 =3D=3D=3D"
+ _use_sample_img iotest-version3.vmdk.bz2
+diff --git a/tests/qemu-iotests/059.out b/tests/qemu-iotests/059.out
+index 120cddd207..f8895ba434 100644
+--- a/tests/qemu-iotests/059.out
++++ b/tests/qemu-iotests/059.out
+@@ -2049,10 +2049,14 @@ wrote 512/512 bytes at offset 10240
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+=20
+ =3D=3D=3D Testing monolithicFlat with internally generated JSON file nam=
+e =3D=3D=3D
++--- blkdebug ---
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
+ format name: IMGFMT
+ cluster size: 0 bytes
+ vm state offset: 0 bytes
++--- quorum ---
++Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D67108864
++qemu-img: Could not open $QUORUM_FILE: Cannot use relative paths with VM=
+DK descriptor file $QUORUM_FILE: Cannot generate a base directory for quo=
+rum nodes
+=20
+ =3D=3D=3D Testing version 3 =3D=3D=3D
+ image: TEST_DIR/iotest-version3.IMGFMT
 --=20
 2.21.0
 
