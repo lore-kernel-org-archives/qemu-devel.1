@@ -2,54 +2,66 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0981CC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD4CC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:37:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC8AC206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:35:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC8AC206C1
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 4D33F206C2
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 22:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D33F206C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyOL0-0006iM-0Q
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 18:35:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38088)
+	id 1hyONM-00089h-H0
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 18:37:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1hyOH9-00034c-J9
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:31:20 -0400
+ (envelope-from <no-reply@patchew.org>) id 1hyOMc-0007Q8-Ot
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1hyOH8-0006Lf-27
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:31:19 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:47231)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1hyOH7-0006KT-Ox
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:31:17 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id A51D374BAF3;
- Fri, 16 Aug 2019 00:31:14 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0DB1074581E; Fri, 16 Aug 2019 00:31:14 +0200 (CEST)
-Message-Id: <1e658a7a7198a9ab10084bb85348e7d0a37a9055.1565907489.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1565907489.git.balaton@eik.bme.hu>
-References: <cover.1565907489.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Fri, 16 Aug 2019 00:18:09 +0200
+ (envelope-from <no-reply@patchew.org>) id 1hyOMb-0002Rt-4s
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 18:36:58 -0400
+Resent-Date: Thu, 15 Aug 2019 18:36:58 -0400
+Resent-Message-Id: <E1hyOMb-0002Rt-4s@eggs.gnu.org>
+Received: from sender4-of-o59.zoho.com ([136.143.188.59]:21907)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1hyOMa-0002PA-SK; Thu, 15 Aug 2019 18:36:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1565908608; cv=none; d=zoho.com; s=zohoarc; 
+ b=dBpclirASt8H6euJJ8UwS5Z82pzyaz3jFehTaG26JYm4oJG0Un4BcrOv99gemrC2XgvhsobZwqYxGiJOaqvZWKBaGei2oR19DlEulQRcro97n5Cgk6HpMlyWBiDeKfUWdsJkCPMWzhvFZLyccngssxJMD+29eshdEbjT1WO8BxA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com;
+ s=zohoarc; t=1565908608;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To:ARC-Authentication-Results;
+ bh=hDdZcPso8Br3U3/Kw7d8h5SGixvev+NIVGv2QQIygIQ=; 
+ b=i+f2yI4FWqPfC+1jpblbLPaolKh7OC75JXqE5g/U5xqGK89pAqazcLamd0mvHA2JloYS7DgrqnhdpIwoO2W3QtkuPTqRvZlxia4BC3YKZXaUFgCS8CKf72iLHjocv8feMlqv17TdvgvN2EgNDasfrEH4W+EvS64VsyB/KwJwuhk=
+ARC-Authentication-Results: i=1; mx.zoho.com; dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1565908607210324.2209190167731;
+ Thu, 15 Aug 2019 15:36:47 -0700 (PDT)
+In-Reply-To: <20190815185024.7010-1-eblake@redhat.com>
+Message-ID: <156590860597.18217.2953978604697927652@5dec9699b7de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: qemu-devel@nongnu.org
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
-Subject: [Qemu-devel] [PATCH 2/3] ati-vga: Support unaligned access to
- hardware cursor registers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: eblake@redhat.com
+Date: Thu, 15 Aug 2019 15:36:47 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 136.143.188.59
+Subject: Re: [Qemu-devel] [PATCH] nbd: Advertise multi-conn for shared
+ read-only connections
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,168 +73,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ rjones@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes horizontal mouse movement and pointer color with MacOS that
-writes these registers with access size less than 4 so previously only
-the last portion of access was effective overwriting previous partial
-writes.
-
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/display/ati.c | 87 +++++++++++++++++++++++++++++++++++++-------------=
-------
- 1 file changed, 58 insertions(+), 29 deletions(-)
-
-diff --git a/hw/display/ati.c b/hw/display/ati.c
-index 87ad18664d..5e2c4ba4aa 100644
---- a/hw/display/ati.c
-+++ b/hw/display/ati.c
-@@ -385,22 +385,28 @@ static uint64_t ati_mm_read(void *opaque, hwaddr ad=
-dr, unsigned int size)
-     case 0xf00 ... 0xfff:
-         val =3D pci_default_read_config(&s->dev, addr - 0xf00, size);
-         break;
--    case CUR_OFFSET:
--        val =3D s->regs.cur_offset;
--        break;
--    case CUR_HORZ_VERT_POSN:
--        val =3D s->regs.cur_hv_pos;
--        val |=3D s->regs.cur_offset & BIT(31);
-+    case CUR_OFFSET ... CUR_OFFSET + 3:
-+        val =3D ati_reg_read_offs(s->regs.cur_offset, addr - CUR_OFFSET,=
- size);
-+        break;
-+    case CUR_HORZ_VERT_POSN ... CUR_HORZ_VERT_POSN + 3:
-+        val =3D ati_reg_read_offs(s->regs.cur_hv_pos,
-+                                addr - CUR_HORZ_VERT_POSN, size);
-+        if (addr + size > CUR_HORZ_VERT_POSN + 3) {
-+            val |=3D (s->regs.cur_offset & BIT(31)) >> (4 - size);
-+        }
-         break;
--    case CUR_HORZ_VERT_OFF:
--        val =3D s->regs.cur_hv_offs;
--        val |=3D s->regs.cur_offset & BIT(31);
-+    case CUR_HORZ_VERT_OFF ... CUR_HORZ_VERT_OFF + 3:
-+        val =3D ati_reg_read_offs(s->regs.cur_hv_offs,
-+                                addr - CUR_HORZ_VERT_OFF, size);
-+        if (addr + size > CUR_HORZ_VERT_OFF + 3) {
-+            val |=3D (s->regs.cur_offset & BIT(31)) >> (4 - size);
-+        }
-         break;
--    case CUR_CLR0:
--        val =3D s->regs.cur_color0;
-+    case CUR_CLR0 ... CUR_CLR0 + 3:
-+        val =3D ati_reg_read_offs(s->regs.cur_color0, addr - CUR_CLR0, s=
-ize);
-         break;
--    case CUR_CLR1:
--        val =3D s->regs.cur_color1;
-+    case CUR_CLR1 ... CUR_CLR1 + 3:
-+        val =3D ati_reg_read_offs(s->regs.cur_color1, addr - CUR_CLR1, s=
-ize);
-         break;
-     case DST_OFFSET:
-         val =3D s->regs.dst_offset;
-@@ -672,48 +678,71 @@ static void ati_mm_write(void *opaque, hwaddr addr,
-     case 0xf00 ... 0xfff:
-         /* read-only copy of PCI config space so ignore writes */
-         break;
--    case CUR_OFFSET:
--        if (s->regs.cur_offset !=3D (data & 0x87fffff0)) {
--            s->regs.cur_offset =3D data & 0x87fffff0;
-+    case CUR_OFFSET ... CUR_OFFSET + 3:
-+    {
-+        uint32_t t =3D s->regs.cur_offset;
-+
-+        ati_reg_write_offs(&t, addr - CUR_OFFSET, data, size);
-+        t &=3D 0x87fffff0;
-+        if (s->regs.cur_offset !=3D t) {
-+            s->regs.cur_offset =3D t;
-             ati_cursor_define(s);
-         }
-         break;
--    case CUR_HORZ_VERT_POSN:
--        s->regs.cur_hv_pos =3D data & 0x3fff0fff;
--        if (data & BIT(31)) {
--            s->regs.cur_offset |=3D data & BIT(31);
-+    }
-+    case CUR_HORZ_VERT_POSN ... CUR_HORZ_VERT_POSN + 3:
-+    {
-+        uint32_t t =3D s->regs.cur_hv_pos | (s->regs.cur_offset & BIT(31=
-));
-+
-+        ati_reg_write_offs(&t, addr - CUR_HORZ_VERT_POSN, data, size);
-+        s->regs.cur_hv_pos =3D t & 0x3fff0fff;
-+        if (t & BIT(31)) {
-+            s->regs.cur_offset |=3D t & BIT(31);
-         } else if (s->regs.cur_offset & BIT(31)) {
-             s->regs.cur_offset &=3D ~BIT(31);
-             ati_cursor_define(s);
-         }
-         if (!s->cursor_guest_mode &&
--            (s->regs.crtc_gen_cntl & CRTC2_CUR_EN) && !(data & BIT(31)))=
- {
-+            (s->regs.crtc_gen_cntl & CRTC2_CUR_EN) && !(t & BIT(31))) {
-             dpy_mouse_set(s->vga.con, s->regs.cur_hv_pos >> 16,
-                           s->regs.cur_hv_pos & 0xffff, 1);
-         }
-         break;
-+    }
-     case CUR_HORZ_VERT_OFF:
--        s->regs.cur_hv_offs =3D data & 0x3f003f;
--        if (data & BIT(31)) {
--            s->regs.cur_offset |=3D data & BIT(31);
-+    {
-+        uint32_t t =3D s->regs.cur_hv_offs | (s->regs.cur_offset & BIT(3=
-1));
-+
-+        ati_reg_write_offs(&t, addr - CUR_HORZ_VERT_OFF, data, size);
-+        s->regs.cur_hv_offs =3D t & 0x3f003f;
-+        if (t & BIT(31)) {
-+            s->regs.cur_offset |=3D t & BIT(31);
-         } else if (s->regs.cur_offset & BIT(31)) {
-             s->regs.cur_offset &=3D ~BIT(31);
-             ati_cursor_define(s);
-         }
-         break;
--    case CUR_CLR0:
--        if (s->regs.cur_color0 !=3D (data & 0xffffff)) {
--            s->regs.cur_color0 =3D data & 0xffffff;
-+    }
-+    case CUR_CLR0 ... CUR_CLR0 + 3:
-+    {
-+        uint32_t t =3D s->regs.cur_color0;
-+
-+        ati_reg_write_offs(&t, addr - CUR_CLR0, data, size);
-+        t &=3D 0xffffff;
-+        if (s->regs.cur_color0 !=3D t) {
-+            s->regs.cur_color0 =3D t;
-             ati_cursor_define(s);
-         }
-         break;
--    case CUR_CLR1:
-+    }
-+    case CUR_CLR1 ... CUR_CLR1 + 3:
-         /*
-          * Update cursor unconditionally here because some clients set u=
-p
-          * other registers before actually writing cursor data to memory=
- at
-          * offset so we would miss cursor change unless always updating =
-here
-          */
--        s->regs.cur_color1 =3D data & 0xffffff;
-+        ati_reg_write_offs(&s->regs.cur_color1, addr - CUR_CLR1, data, s=
-ize);
-+        s->regs.cur_color1 &=3D 0xffffff;
-         ati_cursor_define(s);
-         break;
-     case DST_OFFSET:
---=20
-2.13.7
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MDgxNTE4NTAyNC43MDEw
+LTEtZWJsYWtlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIGJ1aWxkIHRl
+c3Qgb24gczM5MHggaG9zdC4gUGxlYXNlIGZpbmQgdGhlIGRldGFpbHMgYmVsb3cuCgo9PT0gVEVT
+VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCiMgVGVzdGluZyBzY3JpcHQgd2lsbCBiZSBp
+bnZva2VkIHVuZGVyIHRoZSBnaXQgY2hlY2tvdXQgd2l0aAojIEhFQUQgcG9pbnRpbmcgdG8gYSBj
+b21taXQgdGhhdCBoYXMgdGhlIHBhdGNoZXMgYXBwbGllZCBvbiB0b3Agb2YgImJhc2UiCiMgYnJh
+bmNoCnNldCAtZQoKZWNobwplY2hvICI9PT0gRU5WID09PSIKZW52CgplY2hvCmVjaG8gIj09PSBQ
+QUNLQUdFUyA9PT0iCnJwbSAtcWEKCmVjaG8KZWNobyAiPT09IFVOQU1FID09PSIKdW5hbWUgLWEK
+CkNDPSRIT01FL2Jpbi9jYwpJTlNUQUxMPSRQV0QvaW5zdGFsbApCVUlMRD0kUFdEL2J1aWxkCm1r
+ZGlyIC1wICRCVUlMRCAkSU5TVEFMTApTUkM9JFBXRApjZCAkQlVJTEQKJFNSQy9jb25maWd1cmUg
+LS1jYz0kQ0MgLS1wcmVmaXg9JElOU1RBTEwKbWFrZSAtajQKIyBYWFg6IHdlIG5lZWQgcmVsaWFi
+bGUgY2xlYW4gdXAKIyBtYWtlIGNoZWNrIC1qNCBWPTEKbWFrZSBpbnN0YWxsCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgogIENDICAgICAgbWlwczY0LXNvZnRtbXUvdHJhY2UvY29udHJvbC10YXJn
+ZXQubwogIENDICAgICAgbWlwczY0LXNvZnRtbXUvdHJhY2UvZ2VuZXJhdGVkLWhlbHBlcnMubwog
+IExJTksgICAgbWlwczY0LXNvZnRtbXUvcWVtdS1zeXN0ZW0tbWlwczY0CmNvbGxlY3QyOiBlcnJv
+cjogbGQgcmV0dXJuZWQgMSBleGl0IHN0YXR1cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjIwOTog
+cWVtdS1zeXN0ZW0tbWlwczY0XSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDcyOiBtaXBz
+NjQtc29mdG1tdS9hbGxdIEVycm9yIDIKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQg
+am9icy4uLi4KCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
+Zy9sb2dzLzIwMTkwODE1MTg1MDI0LjcwMTAtMS1lYmxha2VAcmVkaGF0LmNvbS90ZXN0aW5nLnMz
+OTB4Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
