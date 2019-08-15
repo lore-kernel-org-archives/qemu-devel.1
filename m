@@ -2,63 +2,139 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A59C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD06C3A59C
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:48:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5664320665
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:47:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5664320665
+	by mail.kernel.org (Postfix) with ESMTPS id 531DF20665
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:48:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 531DF20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyHyP-0008MA-5A
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 11:47:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40064)
+	id 1hyHzc-0001dQ-DS
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 11:48:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1hyHuj-0004zx-O5
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:43:49 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyHyO-0000PN-Sf
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1hyHue-0002UC-IT
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:43:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44462)
+ (envelope-from <jsnow@redhat.com>) id 1hyHyJ-00046k-Jz
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:47:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44010)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>)
- id 1hyHue-0002Tx-B6; Thu, 15 Aug 2019 11:43:40 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>)
+ id 1hyHy8-00041J-Bp; Thu, 15 Aug 2019 11:47:16 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D78FFC015C30;
- Thu, 15 Aug 2019 15:43:38 +0000 (UTC)
-Received: from gondolin (ovpn-116-91.ams2.redhat.com [10.36.116.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B75F93798;
- Thu, 15 Aug 2019 15:43:33 +0000 (UTC)
-Date: Thu, 15 Aug 2019 17:43:30 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Message-ID: <20190815174330.3d66bd2c.cohuck@redhat.com>
-In-Reply-To: <20190814072355.15333-3-david@redhat.com>
-References: <20190814072355.15333-1-david@redhat.com>
- <20190814072355.15333-3-david@redhat.com>
-Organization: Red Hat GmbH
+ by mx1.redhat.com (Postfix) with ESMTPS id 83DC4309C38A;
+ Thu, 15 Aug 2019 15:47:15 +0000 (UTC)
+Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B668B600CD;
+ Thu, 15 Aug 2019 15:47:14 +0000 (UTC)
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20190815110623.13646-1-kwolf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <e7962845-e16b-437b-e418-2eb7df603a2f@redhat.com>
+Date: Thu, 15 Aug 2019 11:47:14 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190815110623.13646-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 15 Aug 2019 15:43:38 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.43]); Thu, 15 Aug 2019 15:47:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH-for-4.2 v2 2/6] s390x/tcg: Rework MMU
- selection for instruction fetches
+Subject: Re: [Qemu-devel] [PATCH v2] qemu-img convert: Deprecate using -n
+ and -o together
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,123 +146,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 14 Aug 2019 09:23:51 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> Instructions are always fetched from primary address space, except when
-> in home address mode. Perform the selection directly in cpu_mmu_index().
+
+On 8/15/19 7:06 AM, Kevin Wolf wrote:
+> bdrv_create options specified with -o have no effect when skipping image
+> creation with -n, so this doesn't make sense. Warn against the misuse
+> and deprecate the combination so we can make it a hard error later.
 > 
-> get_mem_index() is only used to perform data access, instructions are
-> fetched via cpu_lduw_code(), which translates to cpu_mmu_index(env, true).
-> 
-> We don't care about restricting the access permissions of the TLB
-> entries anymore, as we no longer enter PRIMARY entries into the
-> SECONDARY MMU. Cleanup related code a bit.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  target/s390x/cpu.h        |  7 +++++++
->  target/s390x/mmu_helper.c | 38 +++++++++++++++-----------------------
->  2 files changed, 22 insertions(+), 23 deletions(-)
+> 
+> - Hopefully removed the "finger-wagging" that John saw, without stating
+>   that the combination doesn't have a well-defined behaviour (because
+>   skipping image creation and therefore ignoring -o is well-defined
+>   behaviour).
 > 
 
-(...)
+I'm sorry if that critique was in itself a finger-wag :( I'm not always
+the best with tone in written language myself.
 
-> diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-> index 6e9c4d6151..c34e8d2021 100644
-> --- a/target/s390x/mmu_helper.c
-> +++ b/target/s390x/mmu_helper.c
-> @@ -349,8 +349,9 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->  {
->      static S390SKeysState *ss;
->      static S390SKeysClass *skeyclass;
-> -    int r = -1;
-> +    uint64_t asce;
->      uint8_t key;
-> +    int r;
->  
->      if (unlikely(!ss)) {
->          ss = s390_get_skeys_device();
-> @@ -380,36 +381,21 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->  
->      if (!(env->psw.mask & PSW_MASK_DAT)) {
->          *raddr = vaddr;
-> -        r = 0;
-> -        goto out;
-> +        goto nodat;
+Arguably this is supposed to be my primary language, too.
+
+>  qemu-img.c           | 5 +++++
+>  qemu-deprecated.texi | 7 +++++++
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/qemu-img.c b/qemu-img.c
+> index 79983772de..d9321f6418 100644
+> --- a/qemu-img.c
+> +++ b/qemu-img.c
+> @@ -2231,6 +2231,11 @@ static int img_convert(int argc, char **argv)
+>          goto fail_getopt;
 >      }
 >  
->      switch (asc) {
->      case PSW_ASC_PRIMARY:
->          PTE_DPRINTF("%s: asc=primary\n", __func__);
-> -        r = mmu_translate_asce(env, vaddr, asc, env->cregs[1], raddr, flags,
-> -                               rw, exc);
-> +        asce = env->cregs[1];
->          break;
->      case PSW_ASC_HOME:
->          PTE_DPRINTF("%s: asc=home\n", __func__);
-> -        r = mmu_translate_asce(env, vaddr, asc, env->cregs[13], raddr, flags,
-> -                               rw, exc);
-> +        asce = env->cregs[13];
->          break;
->      case PSW_ASC_SECONDARY:
->          PTE_DPRINTF("%s: asc=secondary\n", __func__);
-> -        /*
-> -         * Instruction: Primary
-> -         * Data: Secondary
-> -         */
-> -        if (rw == MMU_INST_FETCH) {
-> -            r = mmu_translate_asce(env, vaddr, PSW_ASC_PRIMARY, env->cregs[1],
-> -                                   raddr, flags, rw, exc);
-> -            *flags &= ~(PAGE_READ | PAGE_WRITE);
-> -        } else {
-> -            r = mmu_translate_asce(env, vaddr, PSW_ASC_SECONDARY, env->cregs[7],
-> -                                   raddr, flags, rw, exc);
-> -            *flags &= ~(PAGE_EXEC);
-> -        }
-> +        asce = env->cregs[7];
->          break;
->      case PSW_ASC_ACCREG:
->      default:
-> @@ -417,11 +403,17 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->          break;
->      }
->  
-> - out:
-> +    /* perform the DAT translation */
-> +    r = mmu_translate_asce(env, vaddr, asc, asce, raddr, flags, rw, exc);
-> +    if (r) {
-> +        return r;
+> +    if (skip_create && options) {
+> +        warn_report("-o has no effect when skipping image creation");
+> +        warn_report("This will become an error in future QEMU versions.");
 > +    }
 > +
-> +nodat:
->      /* Convert real address -> absolute address */
->      *raddr = mmu_real2abs(env, *raddr);
+>      s.src_num = argc - optind - 1;
+>      out_filename = s.src_num >= 1 ? argv[argc - 1] : NULL;
 >  
-> -    if (r == 0 && *raddr < ram_size) {
-> +    if (*raddr < ram_size) {
->          if (skeyclass->get_skeys(ss, *raddr / TARGET_PAGE_SIZE, 1, &key)) {
->              trace_get_skeys_nonzero(r);
-
-I think you might up here with an uninitialized r before patch 4?
-
->              return 0;
-> @@ -441,7 +433,7 @@ int mmu_translate(CPUS390XState *env, target_ulong vaddr, int rw, uint64_t asc,
->          }
->      }
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index fff07bb2a3..f7680c08e1 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -305,6 +305,13 @@ to just export the entire image and then mount only /dev/nbd0p1 than
+>  it is to reinvoke @command{qemu-nbd -c /dev/nbd0} limited to just a
+>  subset of the image.
 >  
-> -    return r;
-> +    return 0;
->  }
+> +@subsection qemu-img convert -n -o (since 4.2.0)
+> +
+> +All options specified in @option{-o} are image creation options, so
+> +they have no effect when used with @option{-n} to skip image creation.
+> +Silently ignored options can be confusing, so this combination of
+> +options will be made an error in future versions.
+> +
+>  @section Build system
 >  
->  /**
+>  @subsection Python 2 support (since 4.1.0)
+> 
 
+I do think this reads more pleasantly, though, so thank you very much
+for that!
+
+Reviewed-by: John Snow <jsnow@redhat.com>
 
