@@ -2,90 +2,88 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FA7C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB6EC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2F59206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:30:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE0B620644
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 14:41:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wGXSJN8N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F59206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ptu68Wl6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0B620644
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyGmD-00026L-Ov
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:30:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55559)
+	id 1hyGwU-00051i-Qv
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 10:41:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57553)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1hyGlK-0001Pe-HM
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:30:03 -0400
+ (envelope-from <stefanha@gmail.com>) id 1hyGvj-0004Yq-Te
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1hyGlF-0006TO-KE
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:29:58 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39489)
+ (envelope-from <stefanha@gmail.com>) id 1hyGvg-0000JS-Gl
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:40:43 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36610)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1hyGlF-0006Rw-A0
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:29:53 -0400
-Received: by mail-wm1-x342.google.com with SMTP id i63so1418043wmg.4
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:29:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Do+lFqCdg+S/4kuYB+AioAZUhBp4TolHdQYAwGLJDa8=;
- b=wGXSJN8NnQtnjqD2DQfsNeClzcxvW2BehbnVlt4URblOuryOWD26sEhKNt2w+CtybM
- wXhmUMg9QoISOGqboM0V1EJc8TXzaU3+ntOjU91rY5FtMIIJWGtBPZUKxjZOi00SOaGh
- h9F9elp6xr/7Uk+cHT0IHvwwnzXTGnVc9uaMW7Y3dKX8zJxRgEbOmBfqJG2rIKToCVHv
- IntOhahR/SLMe17unzL58oERfURFig4wC4grUavXytEVst79aGD0BZCPoU8x0BnEnGKu
- sBzxldqJKPHskvBQfhC58U5ecsq8ORQ6KCTQg9kwMeBaTPBZ5r65zWtUij0RtS0uRX6L
- blUg==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1hyGvg-0000GQ-9J
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 10:40:40 -0400
+Received: by mail-wr1-x441.google.com with SMTP id r3so2445382wrt.3
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 07:40:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=LUrjubN1G5MJi5k8S6ggI5Bp3QK9HWaT8QIkjRMSK9g=;
+ b=Ptu68Wl6mRI/Yx32kvLrQEVR9lrqpriRgGHnOslNhA/DQgNp3Z9WiQx6ptrZZYAZLp
+ zYXYPZOacIpLV1EXfNgkNvtIEmbVP4h3ehCF5QNnSHqY/ulWfXqg1tytF8H9HOlBJtx1
+ CsVf+BVw5IXlNFZwiJM8ZZ7aNQIEfOXLCR3OGrWpMfM/LxxVcJRMDfXf7Vz5dANnQCq6
+ EChHwdcXYHulKyBaU8EsXgqrZnpK1zZSkyyRLUZTLQdqqpKYlfB41dcphakqFQ5kTok7
+ 9HehMdfaW58ecM8PCNpxPXPpcCT72BRiPfnxWtC2L2hhqf/M7KSa351X7B7JjZDff/BV
+ scMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Do+lFqCdg+S/4kuYB+AioAZUhBp4TolHdQYAwGLJDa8=;
- b=dCq/KbiqkXI+OZ7asSIFFil4JVAnjmJgmaggDV8XUW8g087MNeMvxE/tWwo2FbEeP/
- xsT2PJUffrFNa+2KWZwmCCnrXPveOk6hQzFcgZn9lAVAvzVNt8xFwl62X04j0bWWCSGP
- UdWME25VtI0+kbao2nUq2KRjqy3HLhAeSa5OP1CvhE5UTE89pNRjsxB4GGYIBsSqrl0a
- /xbNS8q+m/JZ1o4AGtaN0JfiEylTgNCTXMj0hGj+ubpKJM+/t2vVZYaWqvbPuYYvUg0W
- R07lGTLD3VGvobHjYLfSbuho/xGQZObgfxXzk3K3AD23lVEsH0cALvj+H7wOaMK4o2Si
- qnpw==
-X-Gm-Message-State: APjAAAWPALeOJKPlAFPHjRAm2OWFi5a9Q4RnFu5A8rv1KLMpABBSoIWu
- 1R4XLqO2tkOjG6i3I3WCKVzMoQ==
-X-Google-Smtp-Source: APXvYqy4rtRm+1bN7Sk2KXxVy3q9lKlHuJVyLURvZ3yCnxpyFaceaLHGAL5rxm57Cg3NySaPCowvsg==
-X-Received: by 2002:a1c:c1cd:: with SMTP id r196mr3170200wmf.127.1565879391893; 
- Thu, 15 Aug 2019 07:29:51 -0700 (PDT)
-Received: from zen.linaroharston ([81.128.185.34])
- by smtp.gmail.com with ESMTPSA id l14sm4250973wrn.42.2019.08.15.07.29.51
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=LUrjubN1G5MJi5k8S6ggI5Bp3QK9HWaT8QIkjRMSK9g=;
+ b=miF2LilI1LHE94jX190tXZaNZjxCaLguy2beeI/W9uLugfLiMEpVJM26UoDp2weyYC
+ WkPXEDMNndP8nExd/eEl2cuJMprGsWQDIjiFNyKJQxVKeTIRHHhTh8znhIw18GurwuP+
+ 7zKFKi3hbTDJL2ZwBOPfZSXkxw5ZmW90PyII4XhCsIeQsP7xvBdMh5CTip5iMHQwiaZT
+ /SYX2HPbchDh8qf2tJ8Ftnb/KZjuLQ2DuQ9Fe/+k/Nu/4PYGPXOy/T3UuGtIOMCSBXN0
+ nnHA5alAY87TzwUU40RmfaE5hDPeqFYPxLQnpHgrvslJvhNDwRjO7JbC4sxcJMrAcRAg
+ wkIw==
+X-Gm-Message-State: APjAAAUG1dPKaeg9zk8/akIXpsr18gk+FXe/fZ8DVljP3HhM4y/weF+5
+ ZHQeAgi02UThAPE/HW6Bxq4=
+X-Google-Smtp-Source: APXvYqyNlR0xoEOu31CXmHFypXm4X1hiHX3NE9FXSjTLE4AkNkMpfPvEeEqVTHJliZGcy2ODgHPRGg==
+X-Received: by 2002:adf:dd88:: with SMTP id x8mr6159495wrl.331.1565880038690; 
+ Thu, 15 Aug 2019 07:40:38 -0700 (PDT)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id t24sm1448637wmj.14.2019.08.15.07.40.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Aug 2019 07:29:51 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DD15F1FF87;
- Thu, 15 Aug 2019 15:29:50 +0100 (BST)
-References: <20190815021857.19526-1-vandersonmr2@gmail.com>
- <20190815021857.19526-4-vandersonmr2@gmail.com>
-User-agent: mu4e 1.3.4; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-In-reply-to: <20190815021857.19526-4-vandersonmr2@gmail.com>
-Date: Thu, 15 Aug 2019 15:29:50 +0100
-Message-ID: <87pnl6mrhd.fsf@linaro.org>
+ Thu, 15 Aug 2019 07:40:38 -0700 (PDT)
+Date: Thu, 15 Aug 2019 15:40:36 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: vandersonmr <vandersonmr2@gmail.com>
+Message-ID: <20190815144036.GG10996@stefanha-x1.localdomain>
+References: <20190815023725.2659-1-vandersonmr2@gmail.com>
+ <20190815023725.2659-2-vandersonmr2@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="UKNXkkdQCYZ6W5l3"
+Content-Disposition: inline
+In-Reply-To: <20190815023725.2659-2-vandersonmr2@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
-Subject: Re: [Qemu-devel] [PATCH v5 03/10] accel: collecting JIT statistics
+X-Received-From: 2a00:1450:4864:20::441
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] accel/tcg: adding integration with
+ linux perf
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,217 +95,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, vandersonmr <vandersonmr2@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-vandersonmr <vandersonmr2@gmail.com> writes:
+--UKNXkkdQCYZ6W5l3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> If a TB has a TBS (TBStatistics) with the TB_JIT_STATS
-> enabled then we collect statistics of its translation
-> processes and code translation.
->
-> Collecting the number of host instructions seems to be
-> not simple as it would imply in having to modify several
-> target source files. So, for now, we are only collecting
-> the size of the host gen code.
->
-> Signed-off-by: Vanderson M. do Rosario <vandersonmr2@gmail.com>
+On Wed, Aug 14, 2019 at 11:37:24PM -0300, vandersonmr wrote:
+> This commit adds support to Linux Perf in order
+> to be able to analyze qemu jitted code and
+> also to able to see the TBs PC in it.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Is there any reference to the file format?  Please include it in a code
+comment, if such a thing exists.
 
-> ---
->  accel/tcg/translate-all.c | 14 ++++++++++++++
->  accel/tcg/translator.c    |  4 ++++
->  include/exec/tb-stats.h   | 15 +++++++++++++++
->  tcg/tcg.c                 | 23 +++++++++++++++++++++++
->  tcg/tcg.h                 |  2 ++
->  5 files changed, 58 insertions(+)
->
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index df08d183df..85c6b7b409 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -1696,6 +1696,7 @@ static TBStatistics *tb_get_stats(tb_page_addr_t ph=
-ys_pc, target_ulong pc,
->      new_stats->cs_base =3D cs_base;
->      new_stats->flags =3D flags;
->      new_stats->tb =3D current_tb;
-> +    new_stats->translations.total =3D 1;
->
->      qht_insert(&tb_ctx.tb_stats, new_stats, hash, &existing_stats);
->
-> @@ -1705,6 +1706,7 @@ static TBStatistics *tb_get_stats(tb_page_addr_t ph=
-ys_pc, target_ulong pc,
->           * then just make the new TB point to the older TBStatistic
->           */
->          g_free(new_stats);
-> +        ((TBStatistics *) existing_stats)->tb =3D current_tb;
->          return existing_stats;
->      } else {
->          return new_stats;
-> @@ -1792,6 +1794,11 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->                  tb->tb_stats->stats_enabled |=3D TB_EXEC_STATS;
->              }
->          }
+> diff --git a/accel/tcg/perf/jitdump.c b/accel/tcg/perf/jitdump.c
+> new file mode 100644
+> index 0000000000..6f4c0911c2
+> --- /dev/null
+> +++ b/accel/tcg/perf/jitdump.c
+> @@ -0,0 +1,180 @@
+
+License header?
+
+> +#ifdef __linux__
+
+If the entire source file is #ifdef __linux__ then Makefile.objs should
+probably contain obj-$(CONFIG_LINUX) +=3D jitdump.o instead.  Letting the
+build system decide what to compile is cleaner than ifdeffing large
+amounts of code.
+
 > +
-> +        if (flag & TB_JIT_STATS) {
-> +            tb->tb_stats->stats_enabled |=3D TB_JIT_STATS;
-> +            atomic_inc(&tb->tb_stats->translations.total);
-> +        }
->      } else {
->          tb->tb_stats =3D NULL;
->      }
-> @@ -1869,6 +1876,10 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      atomic_set(&prof->search_out_len, prof->search_out_len + search_size=
-);
->  #endif
->
-> +    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
-> +        atomic_add(&tb->tb_stats->code.out_len, gen_code_size);
+> +#include <stdint.h>
+> +
+> +#include <stdio.h>
+> +#include <unistd.h>
+> +#include <time.h>
+> +#include <sys/syscall.h>
+> +#include <elf.h>
+> +
+> +#include "jitdump.h"
+> +#include "qemu-common.h"
+
+Please follow QEMU's header ordering conventions.  See ./HACKING "1.2.
+Include directives".
+
+> +void start_jitdump_file(void)
+> +{
+> +    GString *dumpfile_name =3D g_string_new(NULL);;
+> +    g_string_printf(dumpfile_name, "./jit-%d.dump", getpid());
+
+Simpler:
+
+  gchar *dumpfile_name =3D g_strdup_printf("./jit-%d.dump", getpid());
+  ...
+  g_free(dumpfile_name);
+
+> +    dumpfile =3D fopen(dumpfile_name->str, "w+");
+
+getpid() and the global dumpfile variable make me wonder what happens
+with multi-threaded TCG?
+
+> +
+> +    perf_marker =3D mmap(NULL, sysconf(_SC_PAGESIZE),
+
+Please mention the point of this mmap in a comment.  My best guess is
+that perf stores the /proc/$PID/maps and this is how it finds the
+jitdump file?
+
+> +                          PROT_READ | PROT_EXEC,
+> +                          MAP_PRIVATE,
+> +                          fileno(dumpfile), 0);
+> +
+> +    if (perf_marker =3D=3D MAP_FAILED) {
+> +        printf("Failed to create mmap marker file for perf %d\n", fileno=
+(dumpfile));
+> +        fclose(dumpfile);
+> +        return;
 > +    }
 > +
->  #ifdef DEBUG_DISAS
->      if (qemu_loglevel_mask(CPU_LOG_TB_OUT_ASM) &&
->          qemu_log_in_addr_range(tb->pc)) {
-> @@ -1926,6 +1937,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
->      phys_page2 =3D -1;
->      if ((pc & TARGET_PAGE_MASK) !=3D virt_page2) {
->          phys_page2 =3D get_page_addr_code(env, virt_page2);
-> +        if (tb_stats_enabled(tb, TB_JIT_STATS)) {
-> +            atomic_inc(&tb->tb_stats->translations.spanning);
-> +        }
->      }
->      /*
->       * No explicit memory barrier is required -- tb_link_page() makes the
-> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-> index 396a11e828..834265d5be 100644
-> --- a/accel/tcg/translator.c
-> +++ b/accel/tcg/translator.c
-> @@ -117,6 +117,10 @@ void translator_loop(const TranslatorOps *ops, Disas=
-ContextBase *db,
->      db->tb->size =3D db->pc_next - db->pc_first;
->      db->tb->icount =3D db->num_insns;
->
-> +    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
-> +        atomic_add(&db->tb->tb_stats->code.num_guest_inst, db->num_insns=
-);
-> +    }
+> +    g_string_free(dumpfile_name, TRUE);
 > +
->  #ifdef DEBUG_DISAS
->      if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
->          && qemu_log_in_addr_range(db->pc_first)) {
-> diff --git a/include/exec/tb-stats.h b/include/exec/tb-stats.h
-> index 0265050b79..3c219123c2 100644
-> --- a/include/exec/tb-stats.h
-> +++ b/include/exec/tb-stats.h
-> @@ -34,6 +34,20 @@ struct TBStatistics {
->          unsigned long atomic;
->      } executions;
->
-> +    struct {
-> +        unsigned num_guest_inst;
-> +        unsigned num_tcg_ops;
-> +        unsigned num_tcg_ops_opt;
-> +        unsigned spills;
-> +        unsigned out_len;
-> +    } code;
-> +
-> +    struct {
-> +        unsigned long total;
-> +        unsigned long uncached;
-> +        unsigned long spanning;
-> +    } translations;
-> +
->      /* current TB linked to this TBStatistics */
->      TranslationBlock *tb;
->  };
-> @@ -47,6 +61,7 @@ enum TBStatsStatus { TB_STATS_RUNNING, TB_STATS_PAUSED,=
- TB_STATS_STOPPED };
->
->  #define TB_NOTHING    0
->  #define TB_EXEC_STATS 1
-> +#define TB_JIT_STATS  (1 << 2)
->
->  extern int tcg_collect_tb_stats;
->  extern uint32_t default_tbstats_flag;
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index be2c33c400..446e3d1708 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -3126,6 +3126,11 @@ static void temp_sync(TCGContext *s, TCGTemp *ts, =
-TCGRegSet allocated_regs,
->          case TEMP_VAL_REG:
->              tcg_out_st(s, ts->type, ts->reg,
->                         ts->mem_base->reg, ts->mem_offset);
-> +
-> +            /* Count number of spills */
-> +            if (tb_stats_enabled(s->current_tb, TB_JIT_STATS)) {
-> +                atomic_inc(&s->current_tb->tb_stats->code.spills);
-> +            }
->              break;
->
->          case TEMP_VAL_MEM:
-> @@ -3997,6 +4002,8 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *t=
-b)
->      int i, num_insns;
->      TCGOp *op;
->
-> +    s->current_tb =3D tb;
-> +
->  #ifdef CONFIG_PROFILER
->      {
->          int n =3D 0;
-> @@ -4028,6 +4035,14 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *=
-tb)
->      }
->  #endif
->
-> +    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
-> +        int n =3D 0;
-> +        QTAILQ_FOREACH(op, &s->ops, link) {
-> +            n++;
-> +        }
-> +        atomic_add(&tb->tb_stats->code.num_tcg_ops, n);
-> +    }
-> +
->  #ifdef CONFIG_DEBUG_TCG
->      /* Ensure all labels referenced have been emitted.  */
->      {
-> @@ -4094,6 +4109,14 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *=
-tb)
->      }
->  #endif
->
-> +    if (tb_stats_enabled(tb, TB_JIT_STATS)) {
-> +        int n =3D 0;
-> +        QTAILQ_FOREACH(op, &s->ops, link) {
-> +            n++;
-> +        }
-> +        atomic_add(&tb->tb_stats->code.num_tcg_ops_opt, n);
-> +    }
-> +
->      tcg_reg_alloc_start(s);
->
->      s->code_buf =3D tb->tc.ptr;
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index b411e17a28..bf6f3bcba3 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -738,6 +738,8 @@ struct TCGContext {
->
->      uint16_t gen_insn_end_off[TCG_MAX_INSNS];
->      target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
-> +
-> +    TranslationBlock *current_tb;
->  };
->
->  extern TCGContext tcg_init_ctx;
+> +    struct jitheader *header =3D g_new0(struct jitheader, 1);
 
+Why g_new this struct?  It's small and can be declared on the stack.
 
---
-Alex Benn=C3=A9e
+Please use g_free() with g_malloc/new/etc().  It's not safe to mismatch
+glib and libc memory allocation functions.
+
+> +    header->magic =3D 0x4A695444;
+> +    header->version =3D 1;
+> +    header->elf_mach =3D get_e_machine();
+> +    header->total_size =3D sizeof(struct jitheader);
+> +    header->pid =3D getpid();
+> +    header->timestamp =3D get_timestamp();
+> +
+> +    fwrite(header, header->total_size, 1, dumpfile);
+> +
+> +    free(header);
+> +    fflush(dumpfile);
+> +}
+> +
+> +void append_load_in_jitdump_file(TranslationBlock *tb)
+> +{
+> +    GString *func_name =3D g_string_new(NULL);
+> +    g_string_printf(func_name, "TB virt:0x"TARGET_FMT_lx"%c", tb->pc, '\=
+0');
+
+The explicit NUL character looks strange to me.  I think the idea is to
+avoid func_name->len + 1?  Adding NUL characters to C strings can be a
+source of bugs, I would stick to convention and do len + 1 instead of
+putting NUL characters into the GString.  This is a question of style
+though.
+
+> +
+> +    struct jr_code_load *load_event =3D g_new0(struct jr_code_load, 1);
+
+No need to allocate load_event on the heap.
+
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9621e934c0..1c26eeeb9c 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -4147,6 +4147,18 @@ STEXI
+>  Enable FIPS 140-2 compliance mode.
+>  ETEXI
+> =20
+> +#ifdef __linux__
+> +DEF("perf", 0, QEMU_OPTION_perf,
+> +    "-perf    dump jitdump files to help linux perf JIT code visualizati=
+on\n",
+> +    QEMU_ARCH_ALL)
+> +#endif
+> +STEXI
+> +@item -perf
+> +@findex -perf
+> +Dumps jitdump files to help linux perf JIT code visualization
+
+Suggestions on expanding the documentation:
+
+Where are the jitdump files dumped?  The current working directory?
+
+Anything to say about the naming scheme for these files?
+
+Can you include an example of how to load them into perf(1)?
+
+--UKNXkkdQCYZ6W5l3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl1VbuQACgkQnKSrs4Gr
+c8hKdAf3X2YbRC+vFntjIhFPpE2g/BM6fbrk4GnbApLxXGjRW6c0pATQ+zQ3ce17
+KlRiYlSkozSgWO6QRaH8WiWj0MXaROiGL/qdxJVUMwDdCuwWKoXxivJtq5sQhjt2
+duUjXoiA9qEAuN1ylbPEFBqMKFfws+bvtb+g9eZtsGO2YbqCdXnEfV+WOh9beBhy
+CopsohgzbbulO4/4ZqWhtJex0W0DtsvY1ZkPTU5w84AYJamTpwxhS2RW5tZIImM8
+Izc8h8qSJFcws6xM75MpDZ6MGb4eNLmVr8qs8liJ6MDxISJkKiFSxWO7cFnrr9k3
+TYz/fApW+IygauWIYDMOjz2JzCkI
+=ZDuQ
+-----END PGP SIGNATURE-----
+
+--UKNXkkdQCYZ6W5l3--
 
