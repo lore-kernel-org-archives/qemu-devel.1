@@ -2,61 +2,58 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CAB2C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86EABC3A59B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:35:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 076C12084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:34:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 076C12084D
+	by mail.kernel.org (Postfix) with ESMTPS id 6249C2063F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:35:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6249C2063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKaJ-0004vL-P5
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:34:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37333)
+	id 1hyKaR-000558-2N
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:34:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37280)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1hyKWW-0002m8-TI
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:30:59 -0400
+ (envelope-from <eblake@redhat.com>) id 1hyKWL-0002bP-Pv
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1hyKWU-0001JJ-Ak
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:30:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35056)
+ (envelope-from <eblake@redhat.com>) id 1hyKWI-0001Bf-GL
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:30:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:28522)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hyKWU-0001I8-1a
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:30:54 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1hyKWI-0001B4-BE
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:30:42 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 63A1AC08E2BD;
- Thu, 15 Aug 2019 18:30:53 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id E89AB89C35
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 18:30:40 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-117-22.phx2.redhat.com [10.3.117.22])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 21BFE8388F;
- Thu, 15 Aug 2019 18:30:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B1AF312A6A
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 18:30:40 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Thu, 15 Aug 2019 13:30:31 -0500
-Message-Id: <20190815183039.4264-2-eblake@redhat.com>
-In-Reply-To: <20190815183039.4264-1-eblake@redhat.com>
-References: <20190815183039.4264-1-eblake@redhat.com>
+Date: Thu, 15 Aug 2019 13:30:30 -0500
+Message-Id: <20190815183039.4264-1-eblake@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.31]); Thu, 15 Aug 2019 18:30:53 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.27]); Thu, 15 Aug 2019 18:30:41 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 1/9] qapi: Add InetSocketAddress member
- keep-alive
+Subject: [Qemu-devel] [PULL 0/9] First batch of 4.2 NBD patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,111 +65,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+The following changes since commit 9e06029aea3b2eca1d5261352e695edc1e7d7b=
+8b:
 
-It's needed to provide keepalive for nbd client to track server
-availability.
+  Update version for v4.1.0 release (2019-08-15 13:03:37 +0100)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20190725094937.32454-1-vsementsov@virtuozzo.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Acked-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-[eblake: Fix error message typo]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- qapi/sockets.json   |  6 +++++-
- util/qemu-sockets.c | 28 ++++++++++++++++++++++++++++
- 2 files changed, 33 insertions(+), 1 deletion(-)
+are available in the Git repository at:
 
-diff --git a/qapi/sockets.json b/qapi/sockets.json
-index fc81d8d5e8b9..32375f3a361e 100644
---- a/qapi/sockets.json
-+++ b/qapi/sockets.json
-@@ -53,6 +53,9 @@
- #
- # @ipv6: whether to accept IPv6 addresses, default try both IPv4 and IPv=
-6
- #
-+# @keep-alive: enable keep-alive when connecting to this socket. Not sup=
-ported
-+#              for passive sockets. (Since 4.2)
-+#
- # Since: 1.3
- ##
- { 'struct': 'InetSocketAddress',
-@@ -61,7 +64,8 @@
-     '*numeric':  'bool',
-     '*to': 'uint16',
-     '*ipv4': 'bool',
--    '*ipv6': 'bool' } }
-+    '*ipv6': 'bool',
-+    '*keep-alive': 'bool' } }
+  https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-08-15
 
- ##
- # @UnixSocketAddress:
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index a5092dbd12e7..e3a1666578d9 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -219,6 +219,12 @@ static int inet_listen_saddr(InetSocketAddress *sadd=
-r,
-     bool socket_created =3D false;
-     Error *err =3D NULL;
+for you to fetch changes up to 8f071c9db506e03abcb1b76ec6d3d2f9488cc3b3:
 
-+    if (saddr->keep_alive) {
-+        error_setg(errp, "keep-alive option is not supported for passive=
- "
-+                   "sockets");
-+        return -1;
-+    }
-+
-     memset(&ai,0, sizeof(ai));
-     ai.ai_flags =3D AI_PASSIVE;
-     if (saddr->has_numeric && saddr->numeric) {
-@@ -458,6 +464,19 @@ int inet_connect_saddr(InetSocketAddress *saddr, Err=
-or **errp)
-     }
+  block/nbd: refactor nbd connection parameters (2019-08-15 13:22:14 -050=
+0)
 
-     freeaddrinfo(res);
-+
-+    if (saddr->keep_alive) {
-+        int val =3D 1;
-+        int ret =3D qemu_setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE,
-+                                  &val, sizeof(val));
-+
-+        if (ret < 0) {
-+            error_setg_errno(errp, errno, "Unable to set KEEPALIVE");
-+            close(sock);
-+            return -1;
-+        }
-+    }
-+
-     return sock;
- }
+----------------------------------------------------------------
+nbd patches for 2019-08-15
 
-@@ -653,6 +672,15 @@ int inet_parse(InetSocketAddress *addr, const char *=
-str, Error **errp)
-         }
-         addr->has_ipv6 =3D true;
-     }
-+    begin =3D strstr(optstr, ",keep-alive");
-+    if (begin) {
-+        if (inet_parse_flag("keep-alive", begin + strlen(",keep-alive"),
-+                            &addr->keep_alive, errp) < 0)
-+        {
-+            return -1;
-+        }
-+        addr->has_keep_alive =3D true;
-+    }
-     return 0;
- }
+- Addition of InetSocketAddress keep-alive
+- Addition of BDRV_REQ_PREFETCH for more efficient copy-on-read
+- Initial refactoring in preparation of NBD reconnect
+
+----------------------------------------------------------------
+Vladimir Sementsov-Ogievskiy (9):
+      qapi: Add InetSocketAddress member keep-alive
+      block: implement BDRV_REQ_PREFETCH
+      block/stream: use BDRV_REQ_PREFETCH
+      nbd: improve CMD_CACHE: use BDRV_REQ_PREFETCH
+      block/nbd: split connection_co start out of nbd_client_connect
+      block/nbd: use non-blocking io channel for nbd negotiation
+      block/nbd: move from quit to state
+      block/nbd: add cmdline and qapi parameter reconnect-delay
+      block/nbd: refactor nbd connection parameters
+
+ qapi/block-core.json  |  11 ++-
+ qapi/sockets.json     |   6 +-
+ include/block/block.h |   8 ++-
+ include/block/nbd.h   |   3 +-
+ block/io.c            |  18 +++--
+ block/nbd.c           | 195 +++++++++++++++++++++++++++++---------------=
+------
+ block/stream.c        |  24 +++----
+ nbd/client.c          |  16 +++--
+ nbd/server.c          |  43 ++++++++---
+ qemu-nbd.c            |   2 +-
+ util/qemu-sockets.c   |  28 ++++++++
+ 11 files changed, 233 insertions(+), 121 deletions(-)
+
+Vladimir Sementsov-Ogievskiy (9):
+  qapi: Add InetSocketAddress member keep-alive
+  block: implement BDRV_REQ_PREFETCH
+  block/stream: use BDRV_REQ_PREFETCH
+  nbd: improve CMD_CACHE: use BDRV_REQ_PREFETCH
+  block/nbd: split connection_co start out of nbd_client_connect
+  block/nbd: use non-blocking io channel for nbd negotiation
+  block/nbd: move from quit to state
+  block/nbd: add cmdline and qapi parameter reconnect-delay
+  block/nbd: refactor nbd connection parameters
+
+ qapi/block-core.json  |  11 ++-
+ qapi/sockets.json     |   6 +-
+ include/block/block.h |   8 +-
+ include/block/nbd.h   |   3 +-
+ block/io.c            |  18 ++--
+ block/nbd.c           | 195 ++++++++++++++++++++++++------------------
+ block/stream.c        |  24 ++----
+ nbd/client.c          |  16 ++--
+ nbd/server.c          |  43 ++++++++--
+ qemu-nbd.c            |   2 +-
+ util/qemu-sockets.c   |  28 ++++++
+ 11 files changed, 233 insertions(+), 121 deletions(-)
 
 --=20
 2.20.1
