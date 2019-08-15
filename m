@@ -2,81 +2,91 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF22C3A59B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:05:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC85C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66F842084D
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:05:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66F842084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 578E3206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 15:17:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B6jKtKvk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 578E3206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyHK5-0002KI-Lm
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 11:05:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34478)
+	id 1hyHVg-0004sT-Am
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 11:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1hyHJG-0001bW-7k
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:05:06 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1hyHUG-0004Hs-AJ
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:16:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1hyHJ8-0001ME-BE
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:04:59 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36743)
+ (envelope-from <richard.henderson@linaro.org>) id 1hyHUA-0005uR-Et
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:16:23 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:37767)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hyHJ8-0001Lq-5C
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:04:54 -0400
-Received: by mail-wm1-f66.google.com with SMTP id g67so1527138wme.1
- for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 08:04:54 -0700 (PDT)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1hyHU9-0005ty-VD
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:16:18 -0400
+Received: by mail-wm1-x344.google.com with SMTP id z23so1563708wmf.2
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 08:16:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:user-agent:in-reply-to:references:mime-version
+ :content-transfer-encoding:subject:to:cc:from:message-id;
+ bh=CKSoQeCMqfHPDVeCAgfZMxfTqtNaEakztdSQT/EZkzc=;
+ b=B6jKtKvk9Ri373+kJuOKakY7Q5Na6Yi8/vfYE+eol0rP3ihTL2zRMOhbxTaRMU9xTZ
+ ZU4qaWAaY8Iw0Qan/4eHUDPrUlyvIKSR6iP7eoo5E+azgarfvNYxuzbJCpPpiNa16fuJ
+ AvmG/YfNvjlE0D3i+6ZGay1mN9EhuV7nWRjOWiLfw8WXJ/55VEqE33ofm16Q8rZSG4Yh
+ ZOtrnNvsdFUiAMsAFfTvElFJf97Aq+DHFT3KBfJoJx/cTY1n92XgWZ8m5Oa0pbG0Pkms
+ n8Ot0iHAfxNBqVC06m1J0fnmc0r3p58Q4GLHYfd5hf3EAMpbYTZPmqDdzUrCWk5f+UAj
+ fY8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BXqakQouAf8iNefsUR10DgPLRdonq6VSp8J+jEhvq7U=;
- b=O0HUA3JAgcl7bTs/dXmsbBzMtNSNV5uEqee2ixni/8z1jtwdAPvrqeioFjdl7EgJpo
- R7SuoQTOhhqhPBI0okSUVhzUHnwhueuWNSjNwZXHyyHZeT92gPJtChl5iu0HFnETlQhV
- S8qwVXy3m2qw6hsTfqgyHipTvjp3yEUnHZd7S5PMcISzloAMouPhlF9qOqTxk/RVMXaW
- OJkqHjwb27NI5Rhr0iKc90bbCmn6vRAnjfInEHV/5IMHO64dO/dmvDxtgxZEogHQa3IM
- ALqnHTTqAWvSsZVvam18GNWpzcCUd19ezA5WNLc+yqMkw5j+wd7PHLpJVIgqmRFUwDNU
- y23w==
-X-Gm-Message-State: APjAAAV7OZlVXKyUO31OqQJPLQ144ZxxrKBs/DGo/73jUxcjpFrTcbFp
- UppkgwiDYdQ6jN4RWybGRvln0g==
-X-Google-Smtp-Source: APXvYqy86f3oQmfrVE8vYZcvpbGvEeCCI32BoF/cvJsl/HDM0/P8PljPgydlgQxBXb06bSXLS91u+Q==
-X-Received: by 2002:a05:600c:352:: with SMTP id
- u18mr3196669wmd.141.1565881492865; 
- Thu, 15 Aug 2019 08:04:52 -0700 (PDT)
-Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
- [88.10.102.251])
- by smtp.gmail.com with ESMTPSA id c12sm2733314wrx.46.2019.08.15.08.04.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 15 Aug 2019 08:04:52 -0700 (PDT)
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20190815120247.13413-1-philmd@redhat.com>
- <20190815144542.GH10996@stefanha-x1.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
- url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
-Message-ID: <d6f7a21f-1294-52e8-5164-2fbdcf169e9d@redhat.com>
-Date: Thu, 15 Aug 2019 17:04:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ h=x-gm-message-state:date:user-agent:in-reply-to:references
+ :mime-version:content-transfer-encoding:subject:to:cc:from
+ :message-id;
+ bh=CKSoQeCMqfHPDVeCAgfZMxfTqtNaEakztdSQT/EZkzc=;
+ b=B+Lztm4ypTBgns9Yu8MjOoFgMcXhhnDheU5Rn5pxpXugNsiWCZd933kXjaq3BkZ87e
+ kX4FJn4xEU/Wgt8VH/AIVhvbY/t/DgYs3QnObrlbK1p9sR9l9zEpVz/gmGKHhNLdlVrz
+ FApkPWe6TYuVf6ah4eXvDvOX6r5c/bNUkDkrGHrAiopHVAI8UViyOzfkMoIFLuy6dctY
+ wjoFZbNMh+0D7sqEU4SVPSLXblLi/JIm4KiiqKeK/1z7cVZ6CXMq9D1vkHwX4PzOs3tr
+ OIyvnwBLqqwez0yM+ZUlejAKnxkEcBfQGDDoqU76HeLLZ7ZErguDjUDGkQVskVcUzAFu
+ ZqIw==
+X-Gm-Message-State: APjAAAW78Pdv1CAh4xsIsdumxd5w6xrvPQsaQ0a6U2P5tI51JwBCz9Fs
+ ipAmYbR7BjoGq1ZMh39BXVTr6g==
+X-Google-Smtp-Source: APXvYqxgkEcZTEZLwwKw4eJfJj9h0nWDf8vSHNIwdtTxbXKGD7M6/MU6+Q6MKnQOsIGr6VZu2MiLvQ==
+X-Received: by 2002:a7b:cf2d:: with SMTP id m13mr3271311wmg.120.1565882176690; 
+ Thu, 15 Aug 2019 08:16:16 -0700 (PDT)
+Received: from [10.254.112.49] ([94.119.64.8])
+ by smtp.gmail.com with ESMTPSA id x24sm1478356wmh.5.2019.08.15.08.16.16
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 15 Aug 2019 08:16:16 -0700 (PDT)
+Date: Thu, 15 Aug 2019 16:16:10 +0100
+User-Agent: K-9 Mail for Android
+In-Reply-To: <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
+References: <20190815020928.9679-1-jan.bobek@gmail.com>
+ <20190815020928.9679-16-jan.bobek@gmail.com>
+ <CAL1e-=jNu8w-9wgkz5Ug-uZKWreEY=6EqD_cYN_KY_qXfn2TPQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190815144542.GH10996@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.128.66
-Subject: Re: [Qemu-devel] [PATCH] trace: Clarify DTrace/SystemTap help
- message
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Jan Bobek <jan.bobek@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <FAFB0922-2E01-4945-A45F-2C98456C57A8@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
+Subject: Re: [Qemu-devel] [RFC PATCH v3 15/46] target/i386: introduce
+ function ck_cpuid
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,90 +98,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?ISO-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/15/19 4:45 PM, Stefan Hajnoczi wrote:
-> On Thu, Aug 15, 2019 at 02:02:47PM +0200, Philippe Mathieu-Daudé wrote:
->> Most tracing backends are implemented within QEMU, except the
->> DTrace/SystemTap backends.
->>
->> One side effect is when running 'qemu -trace help', an incomplete
->> list of trace events is displayed when using the DTrace/SystemTap
->> backends.
->>
->> This is partly due to trace events registered as modules with
->> trace_init(), and since the events are not used within QEMU,
->> the linker optimize and remove the unused modules (which is
->> OK in this particular case).
->> Currently only the events compiled in trace-root.o and in the
->> last trace.o member of libqemuutil.a are linked, resulting in
->> an incomplete list of events.
->>
->> To avoid confusion, improve the help message, recommending to
->> use the proper systemtap script to display the events list.
->>
->> Before:
->>
->>   $ lm32-softmmu/qemu-system-lm32 -trace help 2>&1 | wc -l
->>   70
->>
->> After:
->>
->>   $ lm32-softmmu/qemu-system-lm32 -trace help
->>   Run 'qemu-trace-stap list qemu-system-lm32' to print a list
->>   of names of trace points with the DTrace/SystemTap backends.
->>
->>   $ qemu-trace-stap list qemu-system-lm32 | wc -l
->>   1136
->>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>  trace/control.c | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/trace/control.c b/trace/control.c
->> index 43fb7868db..bc2fe0859d 100644
->> --- a/trace/control.c
->> +++ b/trace/control.c
->> @@ -159,12 +159,19 @@ TraceEvent *trace_event_iter_next(TraceEventIter *iter)
->>  
->>  void trace_list_events(void)
->>  {
->> +#ifdef CONFIG_TRACE_DTRACE
->> +    fprintf(stderr, "Run 'qemu-trace-stap list %s' to print a list\n"
->> +                    "of names of trace points with the DTrace/SystemTap"
->> +                    " backends.\n",
->> +                    error_get_progname());
->> +#else
->>      TraceEventIter iter;
->>      TraceEvent *ev;
->>      trace_event_iter_init(&iter, NULL);
->>      while ((ev = trace_event_iter_next(&iter)) != NULL) {
->>          fprintf(stderr, "%s\n", trace_event_get_name(ev));
->>      }
->> +#endif
-> 
-> Multiple trace backends can be built into QEMU.  In that case the list
+On August 15, 2019 4:01:33 PM GMT+01:00, Aleksandar Markovic
+>
+>The function should be called check_cpuid(), imho=2E I know, Richard
+>would
+>like c_ci(), or simpler cc(), better=2E
 
-I did not know, that explains the final 's' to the
---enable-trace-backends option.
+Now you're just playing the fool=2E  Cut it out=2E
 
-The "== Trace backends ==" of docs/devel/tracing.txt is not clear about
-this.
 
-> might be complete and the user may not be using stap at all.  Perhaps
-> the message should be turned into a warning instead and the list should
-> still be printed:
-> 
->   This list of trace events may be incompletel.  Run 'qemu-trace-stap
->   list %s' to print a list of names of trace events with the
->   DTrace/SystemTap backends.
-
-OK, thanks!
-
-Phil.
+r~
 
