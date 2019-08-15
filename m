@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B00BC3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BDFC3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:52:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43235206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6ABF2206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 18:52:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="P+EWcm6t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43235206C1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="XhDEdUMC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ABF2206C1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyKrI-0006In-9B
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:52:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40021)
+	id 1hyKrN-0006PI-GM
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 14:52:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40042)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1hyKoG-0004BF-UG
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:19 -0400
+ (envelope-from <lukasstraub2@web.de>) id 1hyKoK-0004BU-6o
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1hyKoE-0006pO-IX
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:16 -0400
-Received: from mout.web.de ([212.227.17.12]:37549)
+ (envelope-from <lukasstraub2@web.de>) id 1hyKoH-0006rj-1B
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:20 -0400
+Received: from mout.web.de ([212.227.17.12]:32861)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hyKoE-0006oA-AM
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:14 -0400
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1hyKoG-0006qj-P9
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 14:49:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1565894936;
- bh=1aMK3WcfXGtXkTJdGeILldP4LKkJ6RJ1Yf8zxuMXcY0=;
+ s=dbaedf251592; t=1565894942;
+ bh=lWpltg5ktOFn/3NdP2OLih9c+P9SmdyvyAgJtuJDT7s=;
  h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=P+EWcm6tPBDbTSgxuA/Ce4H5DITJa7kJcVWQ38l9Ami+5z4EsUR9QV22H4LgPg0vg
- 34SFZRyWcLcjNsy7HJ1tS0qvJV4Gzl++/KTITYS30TA8Z0O2DsBt0JQKKSoP31dJZ5
- 0MX55l5J//GokFG0Mq6g72DDFbH8BuPS+4GHsu7A=
+ b=XhDEdUMC8l9P1Mg0Ufweg4bTQU7fmNvtA0hSAb3mbeEWAx3yCHG/SkBoJH/jZL+QV
+ wWMZ1JbOhXB2k4FSgF2725PMufao1LTjNKsBYyhwJCz72YnKbLkoS0JS9r89i+EVzG
+ 3e3yBKSPKvWW8epcFnXTX83llesk2J5xT3Gp0ARw=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([89.247.255.245]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MKrLo-1hyKnv3PBA-0006xH; Thu, 15
- Aug 2019 20:48:55 +0200
-Date: Thu, 15 Aug 2019 20:48:55 +0200
+Received: from luklap ([89.247.255.245]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LqUbl-1iSjjr2Atd-00e4yx; Thu, 15
+ Aug 2019 20:49:02 +0200
+Date: Thu, 15 Aug 2019 20:48:58 +0200
 From: Lukas Straub <lukasstraub2@web.de>
 To: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <b80079b17afcbdf46a907a26d61ce0be97cbed72.1565894837.git.lukasstraub2@web.de>
+Message-ID: <6643a807a5f4c5ceb2f09e0718e97e5f968577f7.1565894837.git.lukasstraub2@web.de>
 In-Reply-To: <cover.1565894837.git.lukasstraub2@web.de>
 References: <cover.1565894837.git.lukasstraub2@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:XQIUXgVxtTTP+gnNFrDF7pKHWUhHtD0MetyfahPJ/KNbrEYPCYD
- e+nA2H/GjV9EnQHFitx/3nISTb5AwvJaz85XZ+SNrFoP/F148vCwh9RZ3H2cJUwv+d+6hTb
- s3JF78BC9/C7jkEFxvRmPxV5rRMuicHI9UPaMd/dLxdJktsI2s5/TFUuLkeifUsG8Q57a0U
- oM6/AxEBbVZ+YlTv/he+w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:sqRi+eHfCxw=:fNrT2wuUE8cHT6GIP5X6Cz
- FbMHX2zE54crVy1PS2T8oFNjj6/3x767CUsv5icfJqewPMrGgxcFinsXtcK3311ah8ksNgZQk
- vqLaILrtsyXfvq2MM1Rz0b6nUxF8gvtmQA+UVnC4FWlrCxxwbInaxxp45iVOpl8g4qzns3rjX
- bfZmYWtVZmGojN6a7w1nHXjf9yiFh+EbtoPFif8vLq6pvayI+ztAZOa+Zm3UaxJVYdLrvqNsH
- mdlJsLjriIsY7UEAYAN/qIR4aLKen3Mk320a47Vl9aE/Q/j7xDehrERZCw6GXJxUULcN/ucaK
- eLGFfafJ54wUtYS6F7ZAp6dkDK4+W/S75WGSaQF7LJFTXJ1zzoBcfFVNsZQbZMdZ1LqScoPna
- efUvhP2r1nwQrWlbHqO6kznyoWarzadPeWc3Ht8PJ93Yhj4LEq7Ui5Abmd157Ghk7smQOtE2l
- zRexQWZkyi8nikQdc+hN40zR8xuNUec61SLnpVGtpCR/zvx8sX+5AxH/T4e6jSp0Lwl+eQVYq
- jIb9N1dAZRV+YLJXE5L0K9f7lMmqgI3hMOtWZh/7WAMxoM/cyT3D0jgYzfmZhPsMyxgZz8hFI
- Rlfttq4D8J8IdqcnapfIMnOsZf7ovk3OIBy56vKrhmDIBG1GMbJoxl9wgHi2HBgggc8jXFD6c
- Pf4U1m3DFoZGIk3DRs/OOPTajKn49KaF+wWnqYbTv1Fxo9KIjlSdQWqWsL3NOPKSIpl3NA74w
- 8dkLC7/ELqC0/2og7VFOijCp5w3FSwkQQiGqCS4av1CSdOaD1jgyReF9dKNu5iKggWy9yqWzx
- luL/MMyXKy9ofqorTnL76lUNMh2LF3IXZ+PKxtAtAPPJweHgeF7vlyEYVzDVksJARj2jcHVGi
- B4F9SQYbIqdTzH/XAKm9puBu1KrduZWR/zynnyzq1kG6JzcDMojRa5ywb6VjU3hjghx3fznSj
- Kkyo+ibewjbbRZAIt0X49rkegAmOcCq/nc5ir6cMLD7AI7Jc7zfOzkZ3h5JF6/NvcIo/r0bSB
- mbVLBLkmIcEVbrH9vx9D3CbPhy977MYfFqkZ/6gZONM5lOYvE4mrqbemWp3q+rXml7bXQAo4W
- 6vF64DmuUxQ7a5CuKTkziJBTygPefz/dKJ9ieefQEz4E6n6sP56O/MgKt0+RP384of9sjkViu
- 23Zkk=
+X-Provags-ID: V03:K1:WmttyqNDQt8jPJGz2T9hC4N2dmAecKZzb4G8OCz92i/89W+CKyg
+ dKq6RhBBijRKruGEhgZfUx766tuGyAwgBM17vCorLVYVMttVpIVeyuQqQy3KHg1mbxDsE/l
+ tBN0er/zQNao2kxf3LWsRW8jkU2l2ejWrJ28gqd02aPXev5XAKDaV7/lTnLHNWUOWXM4wZF
+ WA8vpwJNRB6dAmZBoUlkQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mgWX4sXRvUg=:ygP62wYIu2bzqGILZkKJWI
+ HU55eix1RJ7OhbK7G2HuoISG2DdaEc4QBS+DGLsNOe9Wo5TDcK10LCsxa4N8QcSOBSQ97jYqq
+ YXsk/fWX2jeF7yZC+HzJAGPB68bQ5brznn7E+YQzr4GlwdrzZPlIU3DkknQlAnh2Vb15AK/os
+ VOfh7puCvz2oLu8XsZe1gytj/fzPT2yqNFnG0y9czralx0m4ihdJ0pG+v788nsT2xRLiXphIb
+ uz58/Ub8ZEfHh0huwZIpOqbavf11qQvu02zPtLCrUWAqH2GC9oOky/mogJMCzUrt8MzCHORje
+ lmn4jxm4p72V5lxH4iDZIP9VFNtcyxggdWJ9dqCorncRfCDFRJGQFJVLY/h7O/zy0o03eCDde
+ 2vVX76bz21FuMU08s1LwI+xYJjPEhWdWE2oYjbtrf8zEXrJth1FRi13Oh1ocNwr55lqJLSmd6
+ jzeR40tTuizkVZo6OubrU45d32XVKJklXKRLzokdq0CpFTs2oSMwi7n8OyBsxQDvqsCWRQmRw
+ 0qplI2U9jdIclxf9eUtTCRGo9jZgolyRO3lTQtIAUT06Dih7iAiZVTj3LvDqVZ/alJ0yDTWQf
+ 5x14kEJpiRPyTqBy+y+BILVBDhli9iQa8fPICFqNkfMASOIybGx9BDvZLf91E1eHyuyzUMnLz
+ ZY+gnWBjA5z3AFeHmlPvBOzminWbVEkJW9DzfA4Ho5CN7Lp5sSo4uw0ljyUbyUtrG/PUGdip0
+ 5/IG+2f7xOX/cWM79OuWWXf18F1LeJmEjJJ+RZqJfxbRHPYI5qsVUTK/RuhiiVPwgV7CSuXE3
+ vwpJVVrsr02JdOlCRUkpm55Tex1M6avtmdhuX/xzAoZk3GdvIZ0mcEqVoG+8jqmstAtymOscv
+ QGREqKYuwDTg3J9hepIM5yhxv67LNkySKBOTwXErg5/Lfuur9XXtgGydt/7L1Pt+79EHF/lyJ
+ abVn4ED27H+Dn1NS+UFNxbFEZGjehQB+eh+W/j6M0Y6kU1nIoFNb7hulTXUpQhdwoffkztgrU
+ SpNOpoVzHEEJh0b6EoUsKahw7Qzg/2dZRUQeCmYMwaJ4vOS01cvRqtWxbYBh1nzF1Cq97k5zP
+ o0JYRTSn1uojFQeSN/9TsbEY0osskQbjS5FSKhgoBsMBSVvbkgycGmLhyXPtkXc6Nx3LqDmqY
+ 1CorM=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 212.227.17.12
-Subject: [Qemu-devel] [PATCH v2 1/3] Replication: Ignore requests after
- failover
+Subject: [Qemu-devel] [PATCH v2 2/3] net/filter.c: Add Options to insert
+ filters anywhere in the filter list
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,104 +99,236 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-After failover the Secondary side of replication shouldn't change state, b=
-ecause
-it now functions as our primary disk.
+To switch the Secondary to Primary, we need to insert new filters
+before the filter-rewriter.
 
-In replication_start, replication_do_checkpoint, replication_stop, ignore
-the request if current state is BLOCK_REPLICATION_DONE (sucessful failover=
-) or
-BLOCK_REPLICATION_FAILOVER (failover in progres i.e. currently merging act=
-ive
-and hidden images into the base image).
+Add the options insert=3D and position=3D to be able to insert filters
+anywhere in the filter list.
+
+position should be either "head", "tail" or the id of another filter.
+insert should be either "before" or "after" to specify where to
+insert the new filter relative to the one specified with position.
 
 Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 =2D--
- block/replication.c | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
+ include/net/filter.h |  2 ++
+ net/filter.c         | 71 +++++++++++++++++++++++++++++++++++++++++++-
+ qemu-options.hx      | 10 +++----
+ 3 files changed, 77 insertions(+), 6 deletions(-)
 
-diff --git a/block/replication.c b/block/replication.c
-index 3d4dedddfc..97cc65c0cf 100644
-=2D-- a/block/replication.c
-+++ b/block/replication.c
-@@ -454,6 +454,17 @@ static void replication_start(ReplicationState *rs, R=
-eplicationMode mode,
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
+diff --git a/include/net/filter.h b/include/net/filter.h
+index 49da666ac0..355c178f75 100644
+=2D-- a/include/net/filter.h
++++ b/include/net/filter.h
+@@ -62,6 +62,8 @@ struct NetFilterState {
+     NetClientState *netdev;
+     NetFilterDirection direction;
+     bool on;
++    char *position;
++    bool insert_before;
+     QTAILQ_ENTRY(NetFilterState) next;
+ };
 
-+    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
-+        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
-+        /*
-+         * This case happens when a secondary is promoted to primary.
-+         * Ignore the request because the secondary side of replication
-+         * doesn't have to do anything anymore.
-+         */
-+        aio_context_release(aio_context);
-+        return;
-+    }
-+
-     if (s->stage !=3D BLOCK_REPLICATION_NONE) {
-         error_setg(errp, "Block replication is running or done");
-         aio_context_release(aio_context);
-@@ -529,8 +540,7 @@ static void replication_start(ReplicationState *rs, Re=
-plicationMode mode,
-                    "Block device is in use by internal backup job");
-
-         top_bs =3D bdrv_lookup_bs(s->top_id, s->top_id, NULL);
--        if (!top_bs || !bdrv_is_root_node(top_bs) ||
--            !check_top_bs(top_bs, bs)) {
-+        if (!top_bs || !check_top_bs(top_bs, bs)) {
-             error_setg(errp, "No top_bs or it is invalid");
-             reopen_backing_file(bs, false, NULL);
-             aio_context_release(aio_context);
-@@ -577,6 +587,17 @@ static void replication_do_checkpoint(ReplicationStat=
-e *rs, Error **errp)
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
-
-+    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
-+        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
-+        /*
-+         * This case happens when a secondary was promoted to primary.
-+         * Ignore the request because the secondary side of replication
-+         * doesn't have to do anything anymore.
-+         */
-+        aio_context_release(aio_context);
-+        return;
-+    }
-+
-     if (s->mode =3D=3D REPLICATION_MODE_SECONDARY) {
-         secondary_do_checkpoint(s, errp);
+diff --git a/net/filter.c b/net/filter.c
+index 28d1930db7..309fd778df 100644
+=2D-- a/net/filter.c
++++ b/net/filter.c
+@@ -171,11 +171,47 @@ static void netfilter_set_status(Object *obj, const =
+char *str, Error **errp)
      }
-@@ -593,7 +614,7 @@ static void replication_get_error(ReplicationState *rs=
-, Error **errp)
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
+ }
 
--    if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
-+    if (s->stage =3D=3D BLOCK_REPLICATION_NONE) {
-         error_setg(errp, "Block replication is not running");
-         aio_context_release(aio_context);
-         return;
-@@ -635,6 +656,17 @@ static void replication_stop(ReplicationState *rs, bo=
-ol failover, Error **errp)
-     aio_context_acquire(aio_context);
-     s =3D bs->opaque;
-
-+    if (s->stage =3D=3D BLOCK_REPLICATION_DONE ||
-+        s->stage =3D=3D BLOCK_REPLICATION_FAILOVER) {
-+        /*
-+         * This case happens when a secondary was promoted to primary.
-+         * Ignore the request because the secondary side of replication
-+         * doesn't have to do anything anymore.
-+         */
-+        aio_context_release(aio_context);
++static char *netfilter_get_position(Object *obj, Error **errp)
++{
++    NetFilterState *nf =3D NETFILTER(obj);
++
++    return g_strdup(nf->position);
++}
++
++static void netfilter_set_position(Object *obj, const char *str, Error **=
+errp)
++{
++    NetFilterState *nf =3D NETFILTER(obj);
++
++    nf->position =3D g_strdup(str);
++}
++
++static char *netfilter_get_insert(Object *obj, Error **errp)
++{
++    NetFilterState *nf =3D NETFILTER(obj);
++
++    return nf->insert_before ? g_strdup("before") : g_strdup("after");
++}
++
++static void netfilter_set_insert(Object *obj, const char *str, Error **er=
+rp)
++{
++    NetFilterState *nf =3D NETFILTER(obj);
++
++    if (strcmp(str, "before") && strcmp(str, "after")) {
++        error_setg(errp, "Invalid value for netfilter insert, "
++                         "should be 'head' or 'tail'");
 +        return;
 +    }
 +
-     if (s->stage !=3D BLOCK_REPLICATION_RUNNING) {
-         error_setg(errp, "Block replication is not running");
-         aio_context_release(aio_context);
++    nf->insert_before =3D !strcmp(str, "before");
++}
++
+ static void netfilter_init(Object *obj)
+ {
+     NetFilterState *nf =3D NETFILTER(obj);
+
+     nf->on =3D true;
++    nf->insert_before =3D false;
++    nf->position =3D g_strdup("tail");
+
+     object_property_add_str(obj, "netdev",
+                             netfilter_get_netdev_id, netfilter_set_netdev=
+_id,
+@@ -187,11 +223,18 @@ static void netfilter_init(Object *obj)
+     object_property_add_str(obj, "status",
+                             netfilter_get_status, netfilter_set_status,
+                             NULL);
++    object_property_add_str(obj, "position",
++                            netfilter_get_position, netfilter_set_positio=
+n,
++                            NULL);
++    object_property_add_str(obj, "insert",
++                            netfilter_get_insert, netfilter_set_insert,
++                            NULL);
+ }
+
+ static void netfilter_complete(UserCreatable *uc, Error **errp)
+ {
+     NetFilterState *nf =3D NETFILTER(uc);
++    NetFilterState *position =3D NULL;
+     NetClientState *ncs[MAX_QUEUE_NUM];
+     NetFilterClass *nfc =3D NETFILTER_GET_CLASS(uc);
+     int queues;
+@@ -219,6 +262,20 @@ static void netfilter_complete(UserCreatable *uc, Err=
+or **errp)
+         return;
+     }
+
++    if (strcmp(nf->position, "head") && strcmp(nf->position, "tail")) {
++        /* Search for the position to insert before/after */
++        Object *container;
++        Object *obj;
++
++        container =3D object_get_objects_root();
++        obj =3D object_resolve_path_component(container, nf->position);
++        if (!obj) {
++            error_setg(errp, "filter '%s' not found", nf->position);
++            return;
++        }
++        position =3D NETFILTER(obj);
++    }
++
+     nf->netdev =3D ncs[0];
+
+     if (nfc->setup) {
+@@ -228,7 +285,18 @@ static void netfilter_complete(UserCreatable *uc, Err=
+or **errp)
+             return;
+         }
+     }
+-    QTAILQ_INSERT_TAIL(&nf->netdev->filters, nf, next);
++
++    if (position) {
++        if (nf->insert_before) {
++            QTAILQ_INSERT_BEFORE(position, nf, next);
++        } else {
++            QTAILQ_INSERT_AFTER(&nf->netdev->filters, position, nf, next)=
+;
++        }
++    } else if (!strcmp(nf->position, "head")) {
++        QTAILQ_INSERT_HEAD(&nf->netdev->filters, nf, next);
++    } else if (!strcmp(nf->position, "tail")) {
++        QTAILQ_INSERT_TAIL(&nf->netdev->filters, nf, next);
++    }
+ }
+
+ static void netfilter_finalize(Object *obj)
+@@ -245,6 +313,7 @@ static void netfilter_finalize(Object *obj)
+         QTAILQ_REMOVE(&nf->netdev->filters, nf, next);
+     }
+     g_free(nf->netdev_id);
++    g_free(nf->position);
+ }
+
+ static void default_handle_event(NetFilterState *nf, int event, Error **e=
+rrp)
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 08749a3391..f0a47a0746 100644
+=2D-- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4368,7 +4368,7 @@ applications, they can do this through this paramete=
+r. Its format is
+ a gnutls priority string as described at
+ @url{https://gnutls.org/manual/html_node/Priority-Strings.html}.
+
+-@item -object filter-buffer,id=3D@var{id},netdev=3D@var{netdevid},interva=
+l=3D@var{t}[,queue=3D@var{all|rx|tx}][,status=3D@var{on|off}]
++@item -object filter-buffer,id=3D@var{id},netdev=3D@var{netdevid},interva=
+l=3D@var{t}[,queue=3D@var{all|rx|tx}][,status=3D@var{on|off}][,position=3D=
+@var{head|tail|id}][,insert=3D@var{after|before}]
+
+ Interval @var{t} can't be 0, this filter batches the packet delivery: all
+ packets arriving in a given interval on netdev @var{netdevid} are delayed
+@@ -4387,11 +4387,11 @@ queue @var{all|rx|tx} is an option that can be app=
+lied to any netfilter.
+ @option{tx}: the filter is attached to the transmit queue of the netdev,
+              where it will receive packets sent by the netdev.
+
+-@item -object filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=
+=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support]
++@item -object filter-mirror,id=3D@var{id},netdev=3D@var{netdevid},outdev=
+=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vnet_hdr_support][,position=3D=
+@var{head|tail|id}][,insert=3D@var{after|before}]
+
+ filter-mirror on netdev @var{netdevid},mirror net packet to chardev@var{c=
+hardevid}, if it has the vnet_hdr_support flag, filter-mirror will mirror =
+packet with vnet_hdr_len.
+
+-@item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},ind=
+ev=3D@var{chardevid},outdev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vne=
+t_hdr_support]
++@item -object filter-redirector,id=3D@var{id},netdev=3D@var{netdevid},ind=
+ev=3D@var{chardevid},outdev=3D@var{chardevid},queue=3D@var{all|rx|tx}[,vne=
+t_hdr_support][,position=3D@var{head|tail|id}][,insert=3D@var{after|before=
+}]
+
+ filter-redirector on netdev @var{netdevid},redirect filter's net packet t=
+o chardev
+ @var{chardevid},and redirect indev's packet to filter.if it has the vnet_=
+hdr_support flag,
+@@ -4400,7 +4400,7 @@ Create a filter-redirector we need to differ outdev =
+id from indev id, id can not
+ be the same. we can just use indev or outdev, but at least one of indev o=
+r outdev
+ need to be specified.
+
+-@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=
+=3D@var{all|rx|tx},[vnet_hdr_support]
++@item -object filter-rewriter,id=3D@var{id},netdev=3D@var{netdevid},queue=
+=3D@var{all|rx|tx},[vnet_hdr_support][,position=3D@var{head|tail|id}][,ins=
+ert=3D@var{after|before}]
+
+ Filter-rewriter is a part of COLO project.It will rewrite tcp packet to
+ secondary from primary to keep secondary tcp connection,and rewrite
+@@ -4413,7 +4413,7 @@ colo secondary:
+ -object filter-redirector,id=3Df2,netdev=3Dhn0,queue=3Drx,outdev=3Dred1
+ -object filter-rewriter,id=3Drew0,netdev=3Dhn0,queue=3Dall
+
+-@item -object filter-dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{f=
+ilename}][,maxlen=3D@var{len}]
++@item -object filter-dump,id=3D@var{id},netdev=3D@var{dev}[,file=3D@var{f=
+ilename}][,maxlen=3D@var{len}][,position=3D@var{head|tail|id}][,insert=3D@=
+var{after|before}]
+
+ Dump the network traffic on netdev @var{dev} to the file specified by
+ @var{filename}. At most @var{len} bytes (64k by default) per packet are s=
+tored.
 =2D-
 2.20.1
 
