@@ -2,92 +2,80 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E63C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EF5C3A589
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:44:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F0DA206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A7F6206C1
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 21:44:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Fs4LNCNn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F0DA206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MvM7FbZu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A7F6206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyNXJ-0008OV-92
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 17:43:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60396)
+	id 1hyNYD-0001Av-JV
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 17:44:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=1236ab962=alistair.francis@wdc.com>)
- id 1hyNS7-0002z5-IM
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:38:37 -0400
+ (envelope-from <alistair23@gmail.com>) id 1hyNWh-0007wW-OV
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=1236ab962=alistair.francis@wdc.com>)
- id 1hyNS6-0006I6-Ab
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:38:35 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54904)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <prvs=1236ab962=alistair.francis@wdc.com>)
- id 1hyNS5-0006Cd-UN; Thu, 15 Aug 2019 17:38:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1565905115; x=1597441115;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=mtN8VsVTJ5yGXOOOwZJu4dyH/vwKNXbGitRWezTpJus=;
- b=Fs4LNCNn3H4DmdJZ8d/S/18qm3EZyK4KAQFm7NM/apzW3Ag8pAz1R14W
- 8bMJ5/tGQ87mTPNPbJV5+HNV+D8/VzYfkarFiHYRbgSGElVVZJxsuNyob
- 7rPs+Yslu15QEg8heutpdz+Pru/IfiWTd25ZP/m+6aCddWlWvqE1j59Xm
- ihU1om60rYwT8W7BHwVT60BMKOIFGY+rorPZknm7koZlSHbAvu49NdquB
- VKjXYG9A4rq1WUahU/Q3p59gt1V5SfazvwPoVnOscxE90QegL1lDZtDJ+
- xvxynoZM4RTW7exvxc/ZwSpVrz3fqU1F08vEFEWHkMObEnfKKwG0GSrgG w==;
-IronPort-SDR: 6SGXrum4XXWW1BZQM4+hL4hkOK7SpDdZ5qIajjKoPtdsFgZbjg08CzIuRxO848KxUdYKuZAZkt
- 0/Cd+OAB/Xz5LmtWcNRabpbOCNqHLu8iTOqwueV6C0E/4tbAkbwDxI4iBRuBpuF09fLLqBImYf
- IQd9WiYfiPUeVQht3SELEEsFuZyqAIHWNWerX+4QNXjw9lHk1qbSLhExkSIsE6cZXglumfI/pV
- 2XjnsDVYprIDWNKUuQCXfRpq7a5VlFaTsa9E0ZG4zjFikB0zxirIi6gRsBG5u0yzzgL1c+nVxM
- 0pY=
-X-IronPort-AV: E=Sophos;i="5.64,389,1559491200"; d="scan'208";a="116881542"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 16 Aug 2019 05:38:33 +0800
-IronPort-SDR: m0A5vs/dSkhZpwa1MJBenFoZaUmjcunxwJyvHwUoWaTI1jxnREBj+RWdbS95g+KLs4u3U35xF1
- ZGh/XlIbZsr8ehhJmcv8hNc04FOG5ebIakFHlNLGU7Of5IjqJLBX+/OE3r0WjLyRmwWoXP20Tg
- TD+Y3agbgFGLwtDJVqj4Kjh22OaZzdjzfOky88K4CVe1CE+bDJn3Z/fQ/srtUEvBDX2eK+H/B5
- c+41YMPccrDIGUiEz8uBNcjEZVomiHIZutDVcf+4Hco3uS2ph+U+78NDf9pCnmHZNf/O/AFUN9
- L/DsW85NF9fl8X7/Q6J6rGTH
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Aug 2019 14:36:03 -0700
-IronPort-SDR: 4HPxB2ojzz9R0wPEaoxKVEftqx7w39CUOQ78zDob1dWCJzsUuoBXmShxQ5bz1UzqoOP5mHBIQO
- bTnqN5TSyIVZncSRUZLnQ6TIirNfqOahvqJc0VdtbcHCpaVMe9f9fYR7mjzsZurWmvzp5Yojfg
- SOoao3SU9zQbydYU7WFxf8dRqeCHb5kMqikPyD96tTfL0v3WbDHDOm8wklccTzGgKRaeFZRlxj
- TsYBLrHNrjvss5qYFz4cG1LXqaQF8gGOAVBfiUW6dZrW9kQKhcZqa2d7wYouYhKv6sW5Y5VADh
- oC4=
-Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
- risc6-mainframe.int.fusionio.com) ([10.196.157.58])
- by uls-op-cesaip01.wdc.com with ESMTP; 15 Aug 2019 14:38:33 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Date: Thu, 15 Aug 2019 14:35:04 -0700
-Message-Id: <7e476df36a8c2ba53162e9a5f62e9fa171da00ad.1565904855.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <cover.1565904855.git.alistair.francis@wdc.com>
-References: <cover.1565904855.git.alistair.francis@wdc.com>
+ (envelope-from <alistair23@gmail.com>) id 1hyNWg-0000vy-Hc
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 17:43:19 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:44882)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1hyNWc-0000qp-Fp; Thu, 15 Aug 2019 17:43:14 -0400
+Received: by mail-lf1-x141.google.com with SMTP id v16so691782lfg.11;
+ Thu, 15 Aug 2019 14:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/+c8Nbw+bFOYPr5aQg/CMUm/D+sQebTcSx7yxtjjGYI=;
+ b=MvM7FbZuMBpuwXlbAlZjCkg08xH7JF8uRsMQZpl9CIjJtU1cMpphplWPKlmPVN5CwA
+ YTiJqmQKPp9fKDSFEmlodEhMmArhihyN/Ga0YQAlRZa25WUGaiufNybckiJLlB4xfWI9
+ haOsga1qoSpZGW6H5YCsScFDIOXl18MNedUlSwjLxQMqw/cUYdqjRreHLfAwJynkXo5G
+ XNmD/ChMoZ7DOmAexyg4ry4oTMAooEO3t4mRDz9+IF/ZjHKHvc0gNy5Qh8gSsIVLK84w
+ Jq2ytq1kGydepoxf5hsmJCNPR3PQIyccwOXGzSvFhXiMYE4aGW+gSGM10vgLTmDaz8G3
+ NARQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/+c8Nbw+bFOYPr5aQg/CMUm/D+sQebTcSx7yxtjjGYI=;
+ b=Kwr9iucq/pm+D93BdGU/h2hFn3/spkumUJiaiG2Sdfe37R66UwFTG8Y1HkulnxnUAp
+ pRt7u9LTOxh6yQo3DYaeHceNTcmH9+++eTr9el40s2Z91Ay4KWhBn0jNbglaGlbkpwfU
+ Ir/6UYqHFD23NdGw6bCs1f/wdYOeCTlZEjReKVsbkyBVfAWQtZQUezxjNUta/Z7ynJjq
+ qvZ3yc044mJPhzS/OybgqaAtlgWCZTj+MeUns5NgrqeNJcLxT8YoNdpNSG0h6kUBU1DV
+ zkXU5pj5BCSdlV/U9Z6Lwg5S4w5CGdAKLjxuHRu3ZMSFvQuyLSO+VhXXgL1Uo4cOJ2vG
+ TU5A==
+X-Gm-Message-State: APjAAAUICTbj0XrJh+lMkiwAi9zXikBu3r4spwQqyu7xIQppb/1KcK0D
+ wCeRNOV0wp+sCpcHpBQc1MBMKSeWHA6uHoz7vSM=
+X-Google-Smtp-Source: APXvYqyHJoi37ZbXpVAo+5uKlDTXhllZArPZCc6oAHwSRkW1OtPWsFIWPEGHX4XWofzpYjdkwv8Bdiu2RmMWpcgDcWA=
+X-Received: by 2002:a19:ed11:: with SMTP id y17mr3420355lfy.141.1565905392888; 
+ Thu, 15 Aug 2019 14:43:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x
-X-Received-From: 216.71.153.144
-Subject: [Qemu-devel] [PATCH v3 7/7] target/riscv: Convert mip to
- target_ulong
+References: <CAFEAcA-A5P+2XE49dg582CRtDPH0CXevyYfkGkaDH3HN=NFYcg@mail.gmail.com>
+ <mhng-19b0dd58-7f8d-45a6-ac6b-049be291d2a7@palmer-si-x1e>
+In-Reply-To: <mhng-19b0dd58-7f8d-45a6-ac6b-049be291d2a7@palmer-si-x1e>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 15 Aug 2019 14:39:18 -0700
+Message-ID: <CAKmqyKMyv8gt8Gb6y0DMktnWnSKBw4ePwOXBzWkEpw5GVmyG0A@mail.gmail.com>
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::141
+Subject: Re: [Qemu-devel] [PULL 04/32] target/riscv: Implement
+ riscv_cpu_unassigned_access
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,33 +87,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, palmer@sifive.com, alistair.francis@wdc.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The mip register is an MXLEN-bit long register. Convert it to a
-target_ulong type instead of uint32_t.
+On Tue, Aug 13, 2019 at 3:44 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+>
+> On Thu, 01 Aug 2019 08:39:17 PDT (-0700), Peter Maydell wrote:
+> > On Wed, 3 Jul 2019 at 09:41, Palmer Dabbelt <palmer@sifive.com> wrote:
+> >>
+> >> From: Michael Clark <mjc@sifive.com>
+> >>
+> >> This patch adds support for the riscv_cpu_unassigned_access call
+> >> and will raise a load or store access fault.
+> >>
+> >> Signed-off-by: Michael Clark <mjc@sifive.com>
+> >> [Changes by AF:
+> >>  - Squash two patches and rewrite commit message
+> >>  - Set baddr to the access address
+> >> ]
+> >> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> >> Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
+> >> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> >
+> > Oops, I missed seeing this go by. The do_unassigned_access
+> > hook is deprecated and you should drop this and use
+> > the do_transaction_failed hook instead.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Argh!
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 2dc9b17678..0a7985c3f7 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -130,7 +130,7 @@ struct CPURISCVState {
-      * wuth the invariant that CPU_INTERRUPT_HARD is set iff mip is non-zero.
-      * mip is 32-bits to allow atomic_read on 32-bit hosts.
-      */
--    uint32_t mip;
-+    target_ulong mip;
-     uint32_t miclaim;
- 
-     target_ulong mie;
--- 
-2.22.0
+> >
+> > The distinction between the two is that do_unassigned_access
+> > will end up being called for any failing access, including
+> > not just "normal" guest accesses but also for bad accesses
+> > that happen during page table walks (which often want to
+> > be reported to the guest differently) and also accesses
+> > by random devices like DMA controllers (where throwing a
+> > cpu exception is always a bug).
+> >
+> > Changing the hook implementation itself should be straightforward;
+> > commit 6ad4d7eed05a1e23537f is an example of doing that on Alpha.
+> > You also want to check all the places in your target code that
+> > do physical memory accesses, determine what the right behaviour
+> > if they get a bus fault is, and implement that (or at least put
+> > in TODO comments).
+>
+> Sorry, updating that has been on my TODO list for a while now.  I figured it
+> was better to have the deprecated version in there than nothing at all.  I've
+> written some patches to fix this, but I want to give them another look before
+> sending them out.
 
+I was going to start looking into this, but if you already have
+patches I won't bother. Let me know if you want a hand with the
+conversion.
+
+Alistair
+
+>
 
