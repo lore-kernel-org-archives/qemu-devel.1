@@ -2,89 +2,82 @@ Return-Path: <SRS0=gzPR=WL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65462C3A589
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDF7C3A59C
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:07:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3655E206C1
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:02:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3655E206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 7177F20644
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Aug 2019 16:07:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7177F20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43703 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyID2-0006kx-4L
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 12:02:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41981)
+	id 1hyIHO-0002OB-UL
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 12:07:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42682)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hyI9V-0005SZ-Le
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:59:05 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hyIEY-0008PI-8c
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hyI9S-0001Bl-8W
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 11:59:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47548)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hyI9J-00017V-G3; Thu, 15 Aug 2019 11:58:49 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B98DF3175286;
- Thu, 15 Aug 2019 15:58:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-81.brq.redhat.com
- [10.40.204.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F36C100194E;
- Thu, 15 Aug 2019 15:58:47 +0000 (UTC)
-To: qemu-block@nongnu.org
-References: <20190809185253.17535-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
+ (envelope-from <pbonzini@redhat.com>) id 1hyIES-0003St-OZ
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:04:13 -0400
+Received: from mail-wm1-f49.google.com ([209.85.128.49]:36425)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hyIES-0003Ql-I9
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 12:04:08 -0400
+Received: by mail-wm1-f49.google.com with SMTP id g67so1691479wme.1
+ for <qemu-devel@nongnu.org>; Thu, 15 Aug 2019 09:04:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=12CmPXDKohJIalirQWLIymjm76aqAmjolo9JFT55CfI=;
+ b=uR2hGCyn5ynH1lKjOOQQQj6WHKvGfhoSXy+ZqtWTu2hXloJx0Judku2wlj6kYBzh8m
+ i2yjGQVSxCD830JaYfC/u/h/01nEqEFfYxfCn4Sp5amNjyQHAh9DL+SpUlBt9L7RdTYC
+ C0yn4dloxgJ2yrEKsO4OafIVv6kpsdmkULMb1XXmsBk6l7wYCXnIOD7CPhUnLq6PNbUC
+ wuScB5V1w0JLIUEyU7wyKNVhJgvqNyeMjt/Riq2Er9CNOZFkVEFr4V/E4yuxzkjs7Pkz
+ 1oqYBa4v4yXt40uke9UU/B/9daykWbpxoPSw/QZ27Iii9Fy0DCQaqGJ3sXm6atW0XpXa
+ zKcg==
+X-Gm-Message-State: APjAAAU8OLyOHNELiqRmEr8K8AykTOAmZXGqeaT7wyhfcicv4mnAg93S
+ nSxhYCMto+hCd7kxzgmuWzuqtg==
+X-Google-Smtp-Source: APXvYqyCgR9nyP3oIWWPvbZlOfkCKQomPMTsxIfhP9S+ZkYqKC0bUJHNEYieFprlEnuxW+YpF+UTyg==
+X-Received: by 2002:a1c:4c02:: with SMTP id z2mr3669896wmf.92.1565885046124;
+ Thu, 15 Aug 2019 09:04:06 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:2cae:66cd:dd43:92d9?
+ ([2001:b07:6468:f312:2cae:66cd:dd43:92d9])
+ by smtp.gmail.com with ESMTPSA id c1sm1465195wmc.40.2019.08.15.09.04.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 15 Aug 2019 09:04:05 -0700 (PDT)
+To: "Yao, Jiewen" <jiewen.yao@intel.com>, Laszlo Ersek <lersek@redhat.com>,
+ edk2-devel-groups-io <devel@edk2.groups.io>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+ <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75E4E9@shsmsx102.ccr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <389220c3-8374-8293-f520-f9fe5da25e4c@redhat.com>
-Date: Thu, 15 Aug 2019 17:58:45 +0200
+Message-ID: <f71b97ee-7add-6c18-bdce-a08fbb6be28c@redhat.com>
+Date: Thu, 15 Aug 2019 18:04:03 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190809185253.17535-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="SYGmMQgznZFN4hyaE3gmEyZcGKT4HVozE"
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Thu, 15 Aug 2019 15:58:48 +0000 (UTC)
+In-Reply-To: <74D8A39837DF1E4DA445A8C0B3885C503F75E4E9@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 141 when run with qed
+ [fuzzy]
+X-Received-From: 209.85.128.49
+Subject: Re: [Qemu-devel] CPU hotplug using SMM with QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,72 +89,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ edk2-rfc-groups-io <rfc@edk2.groups.io>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---SYGmMQgznZFN4hyaE3gmEyZcGKT4HVozE
-Content-Type: multipart/mixed; boundary="psa9cHDBHcvccWGFHLuYf5X8pnrA8xd9A";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <389220c3-8374-8293-f520-f9fe5da25e4c@redhat.com>
-Subject: Re: [PATCH] iotests: Fix 141 when run with qed
-References: <20190809185253.17535-1-mreitz@redhat.com>
-In-Reply-To: <20190809185253.17535-1-mreitz@redhat.com>
+On 15/08/19 11:55, Yao, Jiewen wrote:
+> Hi Paolo
+> I am not sure what do you mean - "You do not need a reset vector ...".
+> If so, where is the first instruction of the new CPU in the virtualization environment?
+> Please help me understand that at first. Then we can continue the discussion.
 
---psa9cHDBHcvccWGFHLuYf5X8pnrA8xd9A
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The BSP starts running from 0xFFFFFFF0.  APs do not start running at all
+and just sit waiting for an INIT-SIPI-SIPI sequence.  Please see my
+proposal in the reply to Laszlo.
 
-On 09.08.19 20:52, Max Reitz wrote:
-> 69f47505ee has changed qcow2 in such a way that the commit job run in
-> test 141 (and 144[1]) returns before it emits the READY event.  However=
-,
-> 141 also runs with qed, where the order is still the other way around.
-> Just filter out the {"return": {}} so the test passes for qed again.
->=20
-> [1] 144 only runs with qcow2, so it is fine as it is.
->=20
-> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Fixes: 69f47505ee66afaa513305de0c1895a224e52c45
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/141           | 9 +++++++--
->  tests/qemu-iotests/141.out       | 5 -----
->  tests/qemu-iotests/common.filter | 5 +++++
->  3 files changed, 12 insertions(+), 7 deletions(-)
-
-Thanks for the reviews, applied to my block-next branch.
-
-Max
-
-
---psa9cHDBHcvccWGFHLuYf5X8pnrA8xd9A--
-
---SYGmMQgznZFN4hyaE3gmEyZcGKT4HVozE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1VgTYACgkQ9AfbAGHV
-z0CRSAf/X7X5IJ/p8lkXPlcBGeyZMzZHra0eBbXTm3S7Qxv+WDi/H3hSYMFiWpXl
-sL6c6UJk8mZ3dI09v2lFMizOtGH8sEq8YhGoRGwoPTU9YjiccI96muKbEwjKLGj5
-JQPRRX32PbsgHIVJRQkh1MvRRpnsmnoCgL3hnC1+5iXwTzq5PfDzyzxcHAMZUJsl
-2cHuHuMHs3Iqvlij+ptM1xZ7Kc0WKGcxZ1sT7Nq9NHwnDofnN4tjf1+VAFOUBh5N
-oi5Qi2i+gYUe+acEqqUssKyH9R9eUHo6hnPFkLK5LC63vi6drD3edmraPgzXliZP
-6yn7SwVM+c6EGaK/gZXe7K3EJb9g7w==
-=i4PL
------END PGP SIGNATURE-----
-
---SYGmMQgznZFN4hyaE3gmEyZcGKT4HVozE--
+Paolo
 
