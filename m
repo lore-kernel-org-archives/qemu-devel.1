@@ -2,79 +2,65 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F92C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 17:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B69AC3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 17:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E9932086C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 17:34:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tq2L41f0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9932086C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 26395205F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 17:43:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26395205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyg7C-0003bz-9a
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 13:34:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56541)
+	id 1hygGS-0005X6-9P
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 13:43:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1hyg6K-0003Ap-JB
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 13:33:21 -0400
+ (envelope-from <ehabkost@redhat.com>) id 1hygFY-0004qH-1H
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 13:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1hyg6J-0008Ri-0F
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 13:33:20 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:37608)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1hyg6I-0008RC-Nh; Fri, 16 Aug 2019 13:33:18 -0400
-Received: by mail-lf1-x143.google.com with SMTP id c9so4589640lfh.4;
- Fri, 16 Aug 2019 10:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Sg4DchbEuir7TA0M1GFZRMxqEoBHsIS0Huq+Eu6XP0k=;
- b=tq2L41f0IXTzezULoWr4I2QKNjUexaVTTQg4co5CBG2JxMdyIf2laO9gqvrufs5moQ
- PjU+gA/jUC3iTLwWxjz4hAb0kmd4eMJqHyUktCt2RuVgFMRxSkkxDy6m5v4kNSmaIFdX
- tPTNh9YzyFq4Y+CnyofyEDxabRQ6Agv8oUa56mfDI4UodYe/qUPw/aIv/BdKGaLOt+3t
- zq4hmXnfXDqMUpZxJ99liHNlRfdXaC+v2AB3xVd6ePVcKssQxra0UJdQe4QWxr/V6ngk
- v8xgvKuiZSCHUoP9/7A7hgkfdhLn1Z+hP91QXRPjFL9CzASrN3hXk1TgMQAgN9A9PYX3
- Sp2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Sg4DchbEuir7TA0M1GFZRMxqEoBHsIS0Huq+Eu6XP0k=;
- b=kcSZ4dLW1po37NxGDVZOBuW8CJ1cYwZXEBLi49ra1JsWNrZmaS8b+6d1/cuDvuvGog
- nkWQYcqKHHysh85Id71XSE3JMVoQLk+IyXqdDD8fnkGy1MOwa6cfnNxUscDRXoYcMZF0
- 8jEbq8fa156Il58D8xioSKkCFCL22Hy8GLToJqJ3DSSF4O5QBO3ppnDlTQE/bwgevVzP
- ZSS+1n5PyWZ/g7QxcGiHugBUgt/csuaMFcc/z3vVm0uo98feWlgo++JsBAm1Re5B/7Bn
- jBn/d1B4vUzd8j3Bv5hktXhyN2mnOmEeVFWZPYbkaDnzmA/0JPE1D745t7vj+bpwiqxG
- hdkQ==
-X-Gm-Message-State: APjAAAXHYnZkePTZoak7Z7gB5XP1qKp23NOdBqkzRXmWDVAkiUwRTXjA
- QvzCuZ/IdtTnDzTSCE0+SXSKiOIqtcoEJL2Ms7c=
-X-Google-Smtp-Source: APXvYqxSO9/6CRejVavGlJcQRfBJgqfkdm4/NF7DbI9ZQxD3Ma/RlKEvHre92ZB0++pU76jshZJdvMxmYkuJOzrLPMQ=
-X-Received: by 2002:a19:7006:: with SMTP id h6mr5784362lfc.5.1565976797286;
- Fri, 16 Aug 2019 10:33:17 -0700 (PDT)
+ (envelope-from <ehabkost@redhat.com>) id 1hygFU-0005F5-Oe
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 13:42:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49178)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1hygFU-0005Ea-Iq
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 13:42:48 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 804AD30833B0;
+ Fri, 16 Aug 2019 17:42:47 +0000 (UTC)
+Received: from localhost (ovpn-116-32.gru2.redhat.com [10.97.116.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CB0387C9;
+ Fri, 16 Aug 2019 17:42:44 +0000 (UTC)
+Date: Fri, 16 Aug 2019 14:42:41 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Message-ID: <20190816174241.GE3908@habkost.net>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
+ <20190815183803.13346-4-ehabkost@redhat.com>
+ <87pnl5sks3.fsf@dusky.pond.sub.org>
+ <20190816074932.GK13569@beluga.usersys.redhat.com>
+ <87h86hpae5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <0141541d-43ff-98d8-e9d4-4a2fdcfdcf36@c-sky.com>
-In-Reply-To: <0141541d-43ff-98d8-e9d4-4a2fdcfdcf36@c-sky.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 16 Aug 2019 10:29:21 -0700
-Message-ID: <CAKmqyKPr0V6acB2-Y+N1-aoj-5LSofwi=Jz=u6KFJN1fPUWjzA@mail.gmail.com>
-To: liuzhiwei <zhiwei_liu@c-sky.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::143
-Subject: Re: [Qemu-devel] RISCV: when will the CLIC be ready?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h86hpae5.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 16 Aug 2019 17:42:47 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
+ mandatory unless necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +72,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Yash Mankad <ymankad@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Like Xu <like.xu@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Erik Skultety <eskultet@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Miroslav Rezanina <mrezanin@redhat.com>,
+ "Danilo C. L. de Paula" <ddepaula@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 15, 2019 at 8:39 PM liuzhiwei <zhiwei_liu@c-sky.com> wrote:
->
-> Hi, Palmer
->
-> When Michael Clark still was the maintainer of RISCV QEMU, he wrote in the mail list, "the CLIC interrupt controller is under testing,
-> and will be included in QEMU 3.1 or 3.2". It is pity that the CLIC is not in
-> included even in QEMU 4.1.0.
+On Fri, Aug 16, 2019 at 02:22:58PM +0200, Markus Armbruster wrote:
+> Erik Skultety <eskultet@redhat.com> writes:
+> 
+> > On Fri, Aug 16, 2019 at 08:10:20AM +0200, Markus Armbruster wrote:
+> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+> >>
+> >> > We have this issue reported when using libvirt to hotplug CPUs:
+> >> > https://bugzilla.redhat.com/show_bug.cgi?id=1741451
+> >> >
+> >> > Basically, libvirt is not copying die-id from
+> >> > query-hotpluggable-cpus, but die-id is now mandatory.
+> >>
+> >> Uh-oh, "is now mandatory": making an optional property mandatory is an
+> >> incompatible change.  When did we do that?  Commit hash, please.
+> >>
+> >> [...]
+> >>
+> >
+> > I don't even see it as being optional ever - the property wasn't even
+> > recognized before commit 176d2cda0de introduced it as mandatory.
+> 
+> Compatibility break.
+> 
+> Commit 176d2cda0de is in v4.1.0.  If I had learned about it a bit
+> earlier, I would've argued for a last minute fix or a revert.  Now we
+> have a regression in the release.
+> 
+> Eduardo, I think this fix should go into v4.1.1.  Please add cc:
+> qemu-stable.
 
-I see that there is a CLIC branch available here:
-https://github.com/riscv/riscv-qemu/pull/157
+I did it in v2.
 
-It looks like all of the work is in a single commit
-(https://github.com/riscv/riscv-qemu/pull/157/commits/206d9ac339feb9ef2c325402a00f0f45f453d019)
-and that most of the other commits in the PR have already made it into
-master.
+> 
+> How can we best avoid such compatibility breaks to slip in undetected?
+> 
+> A static checker would be nice.  For vmstate, we have
+> scripts/vmstate-static-checker.py.  Not sure it's used.
 
-Although the CLIC commit is very large it doesn't seem impossible to
-manually pull out the CLIC bits and apply it onto master.
+I don't think this specific bug would be detected with a static
+checker.  "die-id is mandatory" is not something that can be
+extracted by looking at QOM data structures.  The new rule was
+being enforced by the hotplug handler callbacks, and the hotplug
+handler call tree is a bit complex (too complex for my taste, but
+I digress).
 
-Do you know the state of the CLIC model? If it's working it shouldn't
-be too hard to rebase the work and get the code into mainline.
+We could have detected this with a simple CPU hotplug automated
+test case, though.  Or with a very simple -device test case like
+the one I have submitted with this patch.
 
-Alistair
+This was detected by libvirt automated test cases.  It would be
+nice if this was run during the -rc stage and not only after the
+4.1.0 release, though.
 
->
-> As we have cpus using CLIC, I have to use the out of tree qemu code in SIFIVE
-> a long time. Could you tell me when it will be upstreamed?
->
-> Best Regards
-> Zhiwei
->
+I don't know details of the test job.  Danilo, Mirek, Yash: do
+you know how this bug was detected, and what we could do to run
+the same test jobs in upstream QEMU release candidates?
+
+-- 
+Eduardo
 
