@@ -2,86 +2,95 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CBDC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 20:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B22DC3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:08:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02E412077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 20:41:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YruAphYX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02E412077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B614206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:08:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B614206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyj2T-0006Rl-7G
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 16:41:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55353)
+	id 1hyjSA-0004vj-Dr
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 17:08:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyj1S-0005mV-Hg
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 16:40:31 -0400
+ (envelope-from <ymankad@redhat.com>) id 1hyjRO-0004U9-AA
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1hyj1R-00023W-6z
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 16:40:30 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:34181)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1hyj1O-00022U-3A; Fri, 16 Aug 2019 16:40:26 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id l12so5756806oil.1;
- Fri, 16 Aug 2019 13:40:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=c9VsMHVCP4KfoSfL3VT11e66qBGPrsJnARN0azHYKUA=;
- b=YruAphYXMraAMzob3smlwmxNmmkPlIQEgYTiRbIk8y2XT4dB3GTBiSveuZvvK7GWuN
- +EcOnTH39Q1PWPlhz2u9aNGY2yi6zRAitbYyZPJA2RFL2jEYxIvi8Uq6U0pj1jrTUJCs
- QhddWSsicrpvR7sXHu1GCux5lmllT98cLNM4/KLEUksn7fQu/paDujKtE9A7gmnSnXY7
- W3BNXem2A4lEQmhO52nf5b2Uks1tCfMqRCo1jhiDaDqUu4GGZmVRN1iIrai9R71xNQvG
- kIhAzZkJHAkpvJbbtV30zEpZAZHPaeD3j7DJ52IRyaeAk2xNlU/nr9aG7G5QTEA189Q9
- Y68Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=c9VsMHVCP4KfoSfL3VT11e66qBGPrsJnARN0azHYKUA=;
- b=iwUSkdyzQ9KR9KyyLssmwbM6NMXjQLCm/nAz6Y+Q4oOqwJ73iYMuyuzaHQR5s8g6ah
- tpsUFYO72Gycg4bGYr9VFVPoKyrSDnxESmUzk5Cxm+ATRFfNf6O49MW70+LPTiZ3AuwQ
- ezbYOOVs+nfBMe6dwWSv1AmyXFhzCgjzIvq+sPBWcMfzkX8Pxlu0TGL15jvrusZW5MsF
- 7Gbz0Ngvmiwzk/7ecJ2n+VsK6HD5EZVKWqzlNEQ6kxtldTnyYebKIpRQcHqDaX4vgozQ
- l1ulxdST/MGi6Dq5V6GL6RoEx7GvQR7x4kqCmW3CeYiTZUvMaxKmOF1B87iPEkv40zkU
- 0zcg==
-X-Gm-Message-State: APjAAAVZtXxStQBGPu2Hv9MQENtJIELvwsMRrzBAZbAIO/bfT5SFP4I4
- HIumkccCTGsRFI81XT8rEqn9IUL4aH3ZKpIZCwY=
-X-Google-Smtp-Source: APXvYqxaTWOAm/l1MOhvoSsoq5mkFcyhEntd6Wirl7CSo0Md0lq8qVQSRwbxOaJJ35Fn38tf0wvQ7v3r1wGxH8dokwo=
-X-Received: by 2002:a05:6808:8cd:: with SMTP id
- k13mr6459721oij.136.1565988024958; 
- Fri, 16 Aug 2019 13:40:24 -0700 (PDT)
+ (envelope-from <ymankad@redhat.com>) id 1hyjRM-0005H1-H3
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:07:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49490)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ymankad@redhat.com>) id 1hyjRM-0005Fo-8o
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:07:16 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 569D8309DEF3;
+ Fri, 16 Aug 2019 21:07:14 +0000 (UTC)
+Received: from apollo.usersys.redhat.com (unused-10-15-17-159.yyz.redhat.com
+ [10.15.17.159])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C83175D9DC;
+ Fri, 16 Aug 2019 21:07:10 +0000 (UTC)
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20190815183803.13346-1-ehabkost@redhat.com>
+ <20190815183803.13346-4-ehabkost@redhat.com>
+ <87pnl5sks3.fsf@dusky.pond.sub.org>
+ <20190816074932.GK13569@beluga.usersys.redhat.com>
+ <87h86hpae5.fsf@dusky.pond.sub.org> <20190816174241.GE3908@habkost.net>
+From: Yash Mankad <ymankad@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=ymankad@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFecwEYBCAC7QUnuTKRrz39gLumVG+KNB8XmHqHKypYPMkdJNLx33LAhmDVEeBEB6Zyn
+ ryVtNClL4GVrmDOROp53kIkJh4uSAeu71w3/RJLrrHIs/NlFZ1cH3hEAwShLKYkXoVfqBN3m
+ zhbqyndmPy8fviOIDcyzEBEIDbgsLgMebJTAto/ihLgEeG9dMF4qUuCcb3sWIao/WHSr9XHB
+ OtZnvVUGueIM3DqEC2g5BN8025riOOL3UGRmIctJR+2dM+j0aCIbARGv1B66o300gJfjxm24
+ /CbD/I6Wt2PHrNv/d4nXjfNElaBCiVw9513m2maFJeFaSPJpAGZjyDN/niNcpvxg6XaLABEB
+ AAG0P1lhc2ggTWFua2FkIChTb2Z0d2FyZSBFbmdpbmVlciBhdCBSZWQgSGF0KSA8eW1hbmth
+ ZEByZWRoYXQuY29tPokBNwQTAQgAIQUCV5zARgIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIX
+ gAAKCRBjP1s2LzTrMJhfB/9mRNS3eMAy17wRSjnR1/AtNZ2qwBbyjnor0+Q7UfYUXKvFBNJo
+ LnX6zphFJ/fZMqIM5BrE7T90Mm5Qy3qoK1c0QibN97OECrPn9epGPKiiI+1WZrIX9S3crCui
+ hyIS4IuOOmgtVJx+akWCbfYPaybNsTPLBFJZ0+aATSe9Nbeb4XUS3RAqlRUEdejNGxxtKLtZ
+ xgXsmL/il6Fp4EX53H1+d83Rk4V+S2KvMfrFEB+mxF7JFUv0E071br42po/EDnYj2wLM/STh
+ Fgp5LO4qTPrwD8mllibLSF6ZCrjNYW1EctJF7oYbfFXwPUh9LWh0opKwzo8ne5ZN/4hzexHU
+ 4MnquQENBFecwEYBCACnrkQgxRis8b1DRRIWu+Gxxp4Xv85c19A3IyNudvihSNSSV8mSZ+ei
+ 9Xev80IhgExf+1MeTPvuWmD1FogqC5Pi6bEs29ZZvSde+DH1BeVoKVn4zY+rCSqyrlRfx8Zd
+ xJXIICfOgfDRjDf0nKPiI14ujdT0zMOPJHQ8wf267kMWmS32eQPTLJmemhl9WhEett+i1WLq
+ 84DjbEhtkTO6FdboEcTN1fMSpkXz+jgfvgCCZIfJJ+AI/V/VjBBn264VdDdOE/AFfc6B1QYf
+ 6X3npdUmXjlE5QIadoaOHf6e+qMSEchKfMa9ban0dH1THVAm2Z8Ji+l0tNYJ/e3mndXcVJv7
+ ABEBAAGJAR8EGAEIAAkFAlecwEYCGwwACgkQYz9bNi806zAlVwgAj0auI5iVWxdCEnxGDAFC
+ 7uuZeBfiRGUwnaeRLcs2N6zLdN7Y9aoLv0RMrQhTP1DiIOi2xuCiUeGAY533fIpQOtE+AHgY
+ fFqUG9gwK9Web5Tec+SNOBXeULRd8flo3RIkKMUR6RBynHkvEt2WbGRfr4gP6RuYzwBL1EWv
+ nigkhVXsLA+hyut5C8OMXcxG61vbat2duyBgqROV0UbMau9Nr+t5w2isusgHe3fia1h5uwsh
+ 3UDO4xAD/Il16hZqcPbgKW3+S7uR3V2LKwCqX0S/9gYwaIfiBgvEt7EAbj2YZfYvcWjbBwDu
+ stjeTrSRCejEli4lN7PsSM6/NaLsIPKMgQ==
+Message-ID: <75655410-9af9-e463-9471-675299929bde@redhat.com>
+Date: Fri, 16 Aug 2019 17:07:10 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 16 Aug 2019 13:40:24
- -0700 (PDT)
-Received: by 2002:a05:6830:10d7:0:0:0:0 with HTTP; Fri, 16 Aug 2019 13:40:24
- -0700 (PDT)
-In-Reply-To: <CAAgDR1NQSoO6d-OSB_YqbrPA6vxYnq7ZJE_=LoA=eLdmoc3Rsw@mail.gmail.com>
-References: <CAAgDR1NQSoO6d-OSB_YqbrPA6vxYnq7ZJE_=LoA=eLdmoc3Rsw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 16 Aug 2019 22:40:24 +0200
-Message-ID: <CAL1e-=gE94D+JXnje7e8+_-P7qBjRTmmX548fA+89Zx-Q-HfWQ@mail.gmail.com>
-To: Sebastian Rasmussen <sebras@gmail.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190816174241.GE3908@habkost.net>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: Re: [Qemu-devel] Translation of qemu to Swedish...
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.45]); Fri, 16 Aug 2019 21:07:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
+ mandatory unless necessary
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,130 +102,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Krempa <pkrempa@redhat.com>, Like Xu <like.xu@linux.intel.com>,
+ Erik Skultety <eskultet@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>,
+ "Danilo C. L. de Paula" <ddepaula@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-16.08.2019. 22.20, "Sebastian Rasmussen" <sebras@gmail.com> =D1=98=D0=B5 =
-=D0=BD=D0=B0=D0=BF=D0=B8=D1=81=D0=B0=D0=BE/=D0=BB=D0=B0:
->
-> Hi!
->
-> I noticed that a translation to Swedish was missing,
-> so I'd like to contribute that. Let me know if there is
-> some issue and I'll do my best to fix it. :)
->
->  / Sebastian
->
-> From 9d8525b987e0db8309b6221a7e2a292fa5db9eec Mon Sep 17 00:00:00 2001
-> From: Sebastian Rasmussen <sebras@gmail.com>
-> Date: Fri, 16 Aug 2019 21:22:11 +0200
-> Subject: [PATCH] Added Swedish translation.
->
-> Signed-off-by: Sebastian Rasmussen <sebras@gmail.com>
-> ---
 
-Very kind of you, Sebastian!
 
-I don't have any computer at hand to check, do I am asking you, or anybody
-else, to check if there is no clash between hot keys: you used 'f' for both
-"_F=C3=A5nga inmatning" and "Visa _flika", 'a' for "_Avsluta" and "Zooma ti=
-ll
-_anpassad storlek", and 'h' for "_Helsk=C3=A4rm" and "F=C3=A5nga vid _hovri=
-ng". (If
-those hot keys are applicable at different situations, they are OK, but not
-in the same situation.)
+On 8/16/19 1:42 PM, Eduardo Habkost wrote:
+> On Fri, Aug 16, 2019 at 02:22:58PM +0200, Markus Armbruster wrote:
+>> Erik Skultety <eskultet@redhat.com> writes:
+>>
+>>> On Fri, Aug 16, 2019 at 08:10:20AM +0200, Markus Armbruster wrote:
+>>>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>>>
+>>>>> We have this issue reported when using libvirt to hotplug CPUs:
+>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1741451
+>>>>>
+>>>>> Basically, libvirt is not copying die-id from
+>>>>> query-hotpluggable-cpus, but die-id is now mandatory.
+>>>> Uh-oh, "is now mandatory": making an optional property mandatory is =
+an
+>>>> incompatible change.  When did we do that?  Commit hash, please.
+>>>>
+>>>> [...]
+>>>>
+>>> I don't even see it as being optional ever - the property wasn't even=
 
-Tack ska du ha!
-
-Aleksandar
-
->  po/sv.po | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 75 insertions(+)
->  create mode 100644 po/sv.po
+>>> recognized before commit 176d2cda0de introduced it as mandatory.
+>> Compatibility break.
+>>
+>> Commit 176d2cda0de is in v4.1.0.  If I had learned about it a bit
+>> earlier, I would've argued for a last minute fix or a revert.  Now we
+>> have a regression in the release.
+>>
+>> Eduardo, I think this fix should go into v4.1.1.  Please add cc:
+>> qemu-stable.
+> I did it in v2.
 >
-> diff --git a/po/sv.po b/po/sv.po
-> new file mode 100644
-> index 0000000000..e1ef3f7776
-> --- /dev/null
-> +++ b/po/sv.po
-> @@ -0,0 +1,75 @@
-> +# Swedish translation of qemu po-file.
-> +# This file is put in the public domain.
-> +# Sebastian Rasmussen <sebras@gmail.com>, 2019.
-> +#
-> +msgid ""
-> +msgstr ""
-> +"Project-Id-Version: QEMU 2.12.91\n"
-> +"Report-Msgid-Bugs-To: qemu-devel@nongnu.org\n"
-> +"POT-Creation-Date: 2018-07-18 07:56+0200\n"
-> +"PO-Revision-Date: 2019-08-16 21:19+0200\n"
-> +"Last-Translator: Sebastian Rasmussen <sebras@gmail.com>\n"
-> +"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
-> +"Language: sv\n"
-> +"MIME-Version: 1.0\n"
-> +"Content-Type: text/plain; charset=3DUTF-8\n"
-> +"Content-Transfer-Encoding: 8bit\n"
-> +"Plural-Forms: nplurals=3D2; plural=3D(n !=3D 1);\n"
-> +"X-Generator: Poedit 2.2.3\n"
-> +
-> +msgid " - Press Ctrl+Alt+G to release grab"
-> +msgstr " - Tryck Ctrl+Alt+G f=C3=B6r att sluta f=C3=A5nga"
-> +
-> +msgid " [Paused]"
-> +msgstr " [Pausad]"
-> +
-> +msgid "_Pause"
-> +msgstr "_Paus"
-> +
-> +msgid "_Reset"
-> +msgstr "_Starta om"
-> +
-> +msgid "Power _Down"
-> +msgstr "St=C3=A4ng _ner"
-> +
-> +msgid "_Quit"
-> +msgstr "_Avsluta"
-> +
-> +msgid "_Fullscreen"
-> +msgstr "_Helsk=C3=A4rm"
-> +
-> +msgid "_Copy"
-> +msgstr "_Kopiera"
-> +
-> +msgid "Zoom _In"
-> +msgstr "Zooma _in"
-> +
-> +msgid "Zoom _Out"
-> +msgstr "Zooma _ut"
-> +
-> +msgid "Best _Fit"
-> +msgstr "Anpassad _storlek"
-> +
-> +msgid "Zoom To _Fit"
-> +msgstr "Zooma till _anpassad storlek"
-> +
-> +msgid "Grab On _Hover"
-> +msgstr "F=C3=A5nga vid _hovring"
-> +
-> +msgid "_Grab Input"
-> +msgstr "_F=C3=A5nga inmatning"
-> +
-> +msgid "Show _Tabs"
-> +msgstr "Visa _flika"
-> +
-> +msgid "Detach Tab"
-> +msgstr "Frig=C3=B6r flik"
-> +
-> +msgid "Show Menubar"
-> +msgstr "Visa menyrad"
-> +
-> +msgid "_Machine"
-> +msgstr "_Maskin"
-> +
-> +msgid "_View"
-> +msgstr "_Visa"
-> --
-> 2.23.0.rc1
+>> How can we best avoid such compatibility breaks to slip in undetected?=
+
+>>
+>> A static checker would be nice.  For vmstate, we have
+>> scripts/vmstate-static-checker.py.  Not sure it's used.
+> I don't think this specific bug would be detected with a static
+> checker.  "die-id is mandatory" is not something that can be
+> extracted by looking at QOM data structures.  The new rule was
+> being enforced by the hotplug handler callbacks, and the hotplug
+> handler call tree is a bit complex (too complex for my taste, but
+> I digress).
 >
+> We could have detected this with a simple CPU hotplug automated
+> test case, though.  Or with a very simple -device test case like
+> the one I have submitted with this patch.
+>
+> This was detected by libvirt automated test cases.  It would be
+> nice if this was run during the -rc stage and not only after the
+> 4.1.0 release, though.
+>
+> I don't know details of the test job.  Danilo, Mirek, Yash: do
+> you know how this bug was detected, and what we could do to run
+> the same test jobs in upstream QEMU release candidates?
+
+This bug was caught by our internal gating tests.
+
+The libvirt gating tests for the virt module include the
+following Avocado-VT test case:
+
+libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_operate.save
+
+This job failed with the error that you can see in the description
+of the BZ#1741451 [0].
+
+If you think that this would have been caught by a simple hotplug
+case, I'd recommend adding a test for hotplug to avocado_qemu.
+Otherwise, if you want, I can look into adding this particular
+libvirt test case to our QEMU CI efforts.
+
+Thanks,
+Yash
+
+[0] https://bugzilla.redhat.com/show_bug.cgi?id=3D1741451#c0
+
+
+
+>
+
+
+
