@@ -2,88 +2,94 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1591DC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A49C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:39:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3FFE2064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:38:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="auqJtNoL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3FFE2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EEA0C2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:39:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA0C2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycRP-00031G-Hr
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:38:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35264)
+	id 1hycSL-0004Mr-0s
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:39:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37139)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6s-0003OH-Or
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:41 -0400
+ (envelope-from <mreitz@redhat.com>) id 1hycJC-0003C8-AY
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:30:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6o-0005St-VK
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:38 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:54847)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyc6o-0005Ry-Kb
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:34 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id p74so4023098wme.4
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=h4Kov0gouAMEel5NC/aLENgpRMLwwNbVgx6hHvUU4Vk=;
- b=auqJtNoLqfOUWEXUUhNn4KIv2AdIfzfwmkgHCJo2OiVHbogo0xgLaxycU9wJ8UmDZI
- 4h48iyC1f3PZ/ZmrRRsHg15YqC1zrbUZdKH22PkMqA0J0zk43nKZsV4AxpHZykOwjc9X
- pjuC6alsfwlakYPmZNm4QbdBpZBeNb1q0WneTNO4FlCUfqsBJshL9c64ab7e7rRjglrT
- WpWQDzJmhlVWuIgNaU8PsYXdS9kHquh7f/RXPPyvjvHO5iI1/8n0QFQiOuWvKAaRt1WP
- o67Jv1208/VfIN9VHk4EDanKxM1Qzy/Entt79hsXw7k/4UWHmnzajFikga3aFwAW/plY
- goMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=h4Kov0gouAMEel5NC/aLENgpRMLwwNbVgx6hHvUU4Vk=;
- b=tomkKiEnCnRV0kz7PL/3xPHXGc8F2X2qgBuhKcyx4Z+cJJDjfMhlgZuNqoWhGkPvKr
- /GY0XVQOfW0iFi3gndXVpMSmJ2/e+KSgFZvuA9EEeXeakI2krxii9EiRsXmYtBQxPhRw
- v6mGqIPFU2JwnDFcBxIbFPmlxx7iGp8s76P7dmY0cWhQGjJOVMCfeHqtjS81il8V//+6
- GXcJQVh7yECgkSE2XUPGi9gx5IjDghOLcYB+TUM4Tac7CbuXPrFZyvXwRfiEEw5fdXtj
- cj68yGTUJqtD5yM943YMCPimLl8sJXZF9tkM2q3oQq7slhuZSx3Sg6qAPkdjxvNb2lvS
- XI1Q==
-X-Gm-Message-State: APjAAAWCU6LAVclyr/iz7f8FpQvT49EG2HP0s80VPTJLkQ0ql6LyySfO
- bXTsyezCA2DyGQTjJmyl3lnJi4rt5R0buQ==
-X-Google-Smtp-Source: APXvYqwSEEHetJ6J1e947DcoJUYfEx+OKi3wMwn4Q0H1wAWvqwF1eiwm0GlLjDxPR70XY2dvEeRrWA==
-X-Received: by 2002:a1c:b342:: with SMTP id c63mr7422362wmf.84.1565961452726; 
- Fri, 16 Aug 2019 06:17:32 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.31
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 06:17:32 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 14:17:01 +0100
-Message-Id: <20190816131719.28244-12-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
-References: <20190816131719.28244-1-peter.maydell@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1hycJA-0005Xm-4z
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:30:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39962)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>)
+ id 1hycJ5-0005UC-KP; Fri, 16 Aug 2019 09:30:15 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id D664F81F19;
+ Fri, 16 Aug 2019 13:30:14 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-156.brq.redhat.com
+ [10.40.204.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8072317995;
+ Fri, 16 Aug 2019 13:30:13 +0000 (UTC)
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-36-mreitz@redhat.com>
+ <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
+ <39c41687-e192-e63a-984f-6d60b075df1a@redhat.com>
+ <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <7fb5ae37-ee74-a235-fb6d-80a93146bbfb@redhat.com>
+Date: Fri, 16 Aug 2019 15:30:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32c
-Subject: [Qemu-devel] [PULL 11/29] target/arm: Replace s->pc with
- s->base.pc_next
+In-Reply-To: <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.27]); Fri, 16 Aug 2019 13:30:14 +0000 (UTC)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+X-Received-From: 209.132.183.28
+Subject: Re: [Qemu-devel] [PATCH v6 35/42] block: Fix check_to_replace_node()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,645 +101,461 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ
+Content-Type: multipart/mixed; boundary="qPRfallPfhRy2QG0KGBExz0V0ZgcFGDd6";
+ protected-headers="v1"
+From: Max Reitz <mreitz@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Kevin Wolf <kwolf@redhat.com>
+Message-ID: <7fb5ae37-ee74-a235-fb6d-80a93146bbfb@redhat.com>
+Subject: Re: [PATCH v6 35/42] block: Fix check_to_replace_node()
+References: <20190809161407.11920-1-mreitz@redhat.com>
+ <20190809161407.11920-36-mreitz@redhat.com>
+ <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
+ <39c41687-e192-e63a-984f-6d60b075df1a@redhat.com>
+ <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
+In-Reply-To: <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
 
-We must update s->base.pc_next when we return from the translate_insn
-hook to the main translator loop.  By incrementing s->base.pc_next
-immediately after reading the insn word, "pc_next" contains the address
-of the next instruction throughout translation.
+--qPRfallPfhRy2QG0KGBExz0V0ZgcFGDd6
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-All remaining uses of s->pc are referencing the address of the next insn,
-so this is now a simple global replacement.  Remove the "s->pc" field.
+On 16.08.19 13:01, Vladimir Sementsov-Ogievskiy wrote:
+> 15.08.2019 20:01, Max Reitz wrote:
+>> On 15.08.19 17:21, Vladimir Sementsov-Ogievskiy wrote:
+>>> 09.08.2019 19:14, Max Reitz wrote:
+>>>> Currently, check_to_replace_node() only allows mirror to replace a n=
+ode
+>>>> in the chain of the source node, and only if it is the first non-fil=
+ter
+>>>> node below the source.  Well, technically, the idea is that you can
+>>>> exactly replace a quorum child by mirroring from quorum.
+>>>>
+>>>> This has (probably) two reasons:
+>>>> (1) We do not want to create loops.
+>>>> (2) @replaces and @device should have exactly the same content so
+>>>>       replacing them does not cause visible data to change.
+>>>>
+>>>> This has two issues:
+>>>> (1) It is overly restrictive.  It is completely fine for @replaces t=
+o be
+>>>>       a filter.
+>>>> (2) It is not restrictive enough.  You can create loops with this as=
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190807045335.1361-7-richard.henderson@linaro.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/translate.h     |   1 -
- target/arm/translate-a64.c |  51 +++++++++---------
- target/arm/translate.c     | 103 ++++++++++++++++++-------------------
- 3 files changed, 72 insertions(+), 83 deletions(-)
+>>>>       follows:
+>>>>
+>>>> $ qemu-img create -f qcow2 /tmp/source.qcow2 64M
+>>>> $ qemu-system-x86_64 -qmp stdio
+>>>> {"execute": "qmp_capabilities"}
+>>>> {"execute": "object-add",
+>>>>    "arguments": {"qom-type": "throttle-group", "id": "tg0"}}
+>>>> {"execute": "blockdev-add",
+>>>>    "arguments": {
+>>>>        "node-name": "source",
+>>>>        "driver": "throttle",
+>>>>        "throttle-group": "tg0",
+>>>>        "file": {
+>>>>            "node-name": "filtered",
+>>>>            "driver": "qcow2",
+>>>>            "file": {
+>>>>                "driver": "file",
+>>>>                "filename": "/tmp/source.qcow2"
+>>>>            } } } }
+>>>> {"execute": "drive-mirror",
+>>>>    "arguments": {
+>>>>        "job-id": "mirror",
+>>>>        "device": "source",
+>>>>        "target": "/tmp/target.qcow2",
+>>>>        "format": "qcow2",
+>>>>        "node-name": "target",
+>>>>        "sync" :"none",
+>>>>        "replaces": "filtered"
+>>>>    } }
+>>>> {"execute": "block-job-complete", "arguments": {"device": "mirror"}}=
 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index 53ac50bc028..64304c957ee 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -10,7 +10,6 @@ typedef struct DisasContext {
-     DisasContextBase base;
-     const ARMISARegisters *isar;
- 
--    target_ulong pc;
-     /* The address of the current instruction being translated. */
-     target_ulong pc_curr;
-     target_ulong page_start;
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index a0b557ddcec..bc89f2c8317 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -255,7 +255,7 @@ static void gen_exception_internal(int excp)
- 
- static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
- {
--    gen_a64_set_pc_im(s->pc - offset);
-+    gen_a64_set_pc_im(s->base.pc_next - offset);
-     gen_exception_internal(excp);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -263,7 +263,7 @@ static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
- static void gen_exception_insn(DisasContext *s, int offset, int excp,
-                                uint32_t syndrome, uint32_t target_el)
- {
--    gen_a64_set_pc_im(s->pc - offset);
-+    gen_a64_set_pc_im(s->base.pc_next - offset);
-     gen_exception(excp, syndrome, target_el);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -273,7 +273,7 @@ static void gen_exception_bkpt_insn(DisasContext *s, int offset,
- {
-     TCGv_i32 tcg_syn;
- 
--    gen_a64_set_pc_im(s->pc - offset);
-+    gen_a64_set_pc_im(s->base.pc_next - offset);
-     tcg_syn = tcg_const_i32(syndrome);
-     gen_helper_exception_bkpt_insn(cpu_env, tcg_syn);
-     tcg_temp_free_i32(tcg_syn);
-@@ -1238,7 +1238,7 @@ static void disas_uncond_b_imm(DisasContext *s, uint32_t insn)
- 
-     if (insn & (1U << 31)) {
-         /* BL Branch with link */
--        tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
-+        tcg_gen_movi_i64(cpu_reg(s, 30), s->base.pc_next);
-     }
- 
-     /* B Branch / BL Branch with link */
-@@ -1271,7 +1271,7 @@ static void disas_comp_b_imm(DisasContext *s, uint32_t insn)
-     tcg_gen_brcondi_i64(op ? TCG_COND_NE : TCG_COND_EQ,
-                         tcg_cmp, 0, label_match);
- 
--    gen_goto_tb(s, 0, s->pc);
-+    gen_goto_tb(s, 0, s->base.pc_next);
-     gen_set_label(label_match);
-     gen_goto_tb(s, 1, addr);
- }
-@@ -1302,7 +1302,7 @@ static void disas_test_b_imm(DisasContext *s, uint32_t insn)
-     tcg_gen_brcondi_i64(op ? TCG_COND_NE : TCG_COND_EQ,
-                         tcg_cmp, 0, label_match);
-     tcg_temp_free_i64(tcg_cmp);
--    gen_goto_tb(s, 0, s->pc);
-+    gen_goto_tb(s, 0, s->base.pc_next);
-     gen_set_label(label_match);
-     gen_goto_tb(s, 1, addr);
- }
-@@ -1330,7 +1330,7 @@ static void disas_cond_b_imm(DisasContext *s, uint32_t insn)
-         /* genuinely conditional branches */
-         TCGLabel *label_match = gen_new_label();
-         arm_gen_test_cc(cond, label_match);
--        gen_goto_tb(s, 0, s->pc);
-+        gen_goto_tb(s, 0, s->base.pc_next);
-         gen_set_label(label_match);
-         gen_goto_tb(s, 1, addr);
-     } else {
-@@ -1491,7 +1491,7 @@ static void handle_sync(DisasContext *s, uint32_t insn,
-          * any pending interrupts immediately.
-          */
-         reset_btype(s);
--        gen_goto_tb(s, 0, s->pc);
-+        gen_goto_tb(s, 0, s->base.pc_next);
-         return;
- 
-     case 7: /* SB */
-@@ -1503,7 +1503,7 @@ static void handle_sync(DisasContext *s, uint32_t insn,
-          * MB and end the TB instead.
-          */
-         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--        gen_goto_tb(s, 0, s->pc);
-+        gen_goto_tb(s, 0, s->base.pc_next);
-         return;
- 
-     default:
-@@ -2015,7 +2015,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         gen_a64_set_pc(s, dst);
-         /* BLR also needs to load return address */
-         if (opc == 1) {
--            tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
-+            tcg_gen_movi_i64(cpu_reg(s, 30), s->base.pc_next);
-         }
-         break;
- 
-@@ -2042,7 +2042,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
-         gen_a64_set_pc(s, dst);
-         /* BLRAA also needs to load return address */
-         if (opc == 9) {
--            tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
-+            tcg_gen_movi_i64(cpu_reg(s, 30), s->base.pc_next);
-         }
-         break;
- 
-@@ -14030,10 +14030,10 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
- {
-     uint32_t insn;
- 
--    s->pc_curr = s->pc;
--    insn = arm_ldl_code(env, s->pc, s->sctlr_b);
-+    s->pc_curr = s->base.pc_next;
-+    insn = arm_ldl_code(env, s->base.pc_next, s->sctlr_b);
-     s->insn = insn;
--    s->pc += 4;
-+    s->base.pc_next += 4;
- 
-     s->fp_access_checked = false;
- 
-@@ -14130,7 +14130,6 @@ static void aarch64_tr_init_disas_context(DisasContextBase *dcbase,
-     int bound, core_mmu_idx;
- 
-     dc->isar = &arm_cpu->isar;
--    dc->pc = dc->base.pc_first;
-     dc->condjmp = 0;
- 
-     dc->aarch64 = 1;
-@@ -14203,7 +14202,7 @@ static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(dc->pc, 0, 0);
-+    tcg_gen_insn_start(dc->base.pc_next, 0, 0);
-     dc->insn_start = tcg_last_op();
- }
- 
-@@ -14213,7 +14212,7 @@ static bool aarch64_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
-     if (bp->flags & BP_CPU) {
--        gen_a64_set_pc_im(dc->pc);
-+        gen_a64_set_pc_im(dc->base.pc_next);
-         gen_helper_check_breakpoints(cpu_env);
-         /* End the TB early; it likely won't be executed */
-         dc->base.is_jmp = DISAS_TOO_MANY;
-@@ -14224,7 +14223,7 @@ static bool aarch64_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-            to for it to be properly cleared -- thus we
-            increment the PC here so that the logic setting
-            tb->size below does the right thing.  */
--        dc->pc += 4;
-+        dc->base.pc_next += 4;
-         dc->base.is_jmp = DISAS_NORETURN;
-     }
- 
-@@ -14254,7 +14253,6 @@ static void aarch64_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         disas_a64_insn(env, dc);
-     }
- 
--    dc->base.pc_next = dc->pc;
-     translator_loop_temp_check(&dc->base);
- }
- 
-@@ -14270,7 +14268,7 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-          */
-         switch (dc->base.is_jmp) {
-         default:
--            gen_a64_set_pc_im(dc->pc);
-+            gen_a64_set_pc_im(dc->base.pc_next);
-             /* fall through */
-         case DISAS_EXIT:
-         case DISAS_JUMP:
-@@ -14287,11 +14285,11 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         switch (dc->base.is_jmp) {
-         case DISAS_NEXT:
-         case DISAS_TOO_MANY:
--            gen_goto_tb(dc, 1, dc->pc);
-+            gen_goto_tb(dc, 1, dc->base.pc_next);
-             break;
-         default:
-         case DISAS_UPDATE:
--            gen_a64_set_pc_im(dc->pc);
-+            gen_a64_set_pc_im(dc->base.pc_next);
-             /* fall through */
-         case DISAS_EXIT:
-             tcg_gen_exit_tb(NULL, 0);
-@@ -14303,11 +14301,11 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         case DISAS_SWI:
-             break;
-         case DISAS_WFE:
--            gen_a64_set_pc_im(dc->pc);
-+            gen_a64_set_pc_im(dc->base.pc_next);
-             gen_helper_wfe(cpu_env);
-             break;
-         case DISAS_YIELD:
--            gen_a64_set_pc_im(dc->pc);
-+            gen_a64_set_pc_im(dc->base.pc_next);
-             gen_helper_yield(cpu_env);
-             break;
-         case DISAS_WFI:
-@@ -14317,7 +14315,7 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-              */
-             TCGv_i32 tmp = tcg_const_i32(4);
- 
--            gen_a64_set_pc_im(dc->pc);
-+            gen_a64_set_pc_im(dc->base.pc_next);
-             gen_helper_wfi(cpu_env, tmp);
-             tcg_temp_free_i32(tmp);
-             /* The helper doesn't necessarily throw an exception, but we
-@@ -14328,9 +14326,6 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         }
-         }
-     }
--
--    /* Functions above can change dc->pc, so re-align db->pc_next */
--    dc->base.pc_next = dc->pc;
- }
- 
- static void aarch64_tr_disas_log(const DisasContextBase *dcbase,
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 8779d36a868..14572b8501b 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1036,7 +1036,7 @@ static inline void gen_blxns(DisasContext *s, int rm)
-      * We do however need to set the PC, because the blxns helper reads it.
-      * The blxns helper may throw an exception.
-      */
--    gen_set_pc_im(s, s->pc);
-+    gen_set_pc_im(s, s->base.pc_next);
-     gen_helper_v7m_blxns(cpu_env, var);
-     tcg_temp_free_i32(var);
-     s->base.is_jmp = DISAS_EXIT;
-@@ -1222,7 +1222,7 @@ static inline void gen_hvc(DisasContext *s, int imm16)
-      * for single stepping.)
-      */
-     s->svc_imm = imm16;
--    gen_set_pc_im(s, s->pc);
-+    gen_set_pc_im(s, s->base.pc_next);
-     s->base.is_jmp = DISAS_HVC;
- }
- 
-@@ -1237,14 +1237,14 @@ static inline void gen_smc(DisasContext *s)
-     tmp = tcg_const_i32(syn_aa32_smc());
-     gen_helper_pre_smc(cpu_env, tmp);
-     tcg_temp_free_i32(tmp);
--    gen_set_pc_im(s, s->pc);
-+    gen_set_pc_im(s, s->base.pc_next);
-     s->base.is_jmp = DISAS_SMC;
- }
- 
- static void gen_exception_internal_insn(DisasContext *s, int offset, int excp)
- {
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - offset);
-+    gen_set_pc_im(s, s->base.pc_next - offset);
-     gen_exception_internal(excp);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -1253,7 +1253,7 @@ static void gen_exception_insn(DisasContext *s, int offset, int excp,
-                                int syn, uint32_t target_el)
- {
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - offset);
-+    gen_set_pc_im(s, s->base.pc_next - offset);
-     gen_exception(excp, syn, target_el);
-     s->base.is_jmp = DISAS_NORETURN;
- }
-@@ -1263,7 +1263,7 @@ static void gen_exception_bkpt_insn(DisasContext *s, int offset, uint32_t syn)
-     TCGv_i32 tcg_syn;
- 
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - offset);
-+    gen_set_pc_im(s, s->base.pc_next - offset);
-     tcg_syn = tcg_const_i32(syn);
-     gen_helper_exception_bkpt_insn(cpu_env, tcg_syn);
-     tcg_temp_free_i32(tcg_syn);
-@@ -1273,7 +1273,7 @@ static void gen_exception_bkpt_insn(DisasContext *s, int offset, uint32_t syn)
- /* Force a TB lookup after an instruction that changes the CPU state.  */
- static inline void gen_lookup_tb(DisasContext *s)
- {
--    tcg_gen_movi_i32(cpu_R[15], s->pc);
-+    tcg_gen_movi_i32(cpu_R[15], s->base.pc_next);
-     s->base.is_jmp = DISAS_EXIT;
- }
- 
-@@ -2909,7 +2909,7 @@ static inline bool use_goto_tb(DisasContext *s, target_ulong dest)
- {
- #ifndef CONFIG_USER_ONLY
-     return (s->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK) ||
--           ((s->pc - 1) & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
-+           ((s->base.pc_next - 1) & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
- #else
-     return true;
- #endif
-@@ -3279,17 +3279,17 @@ static void gen_nop_hint(DisasContext *s, int val)
-          */
-     case 1: /* yield */
-         if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
--            gen_set_pc_im(s, s->pc);
-+            gen_set_pc_im(s, s->base.pc_next);
-             s->base.is_jmp = DISAS_YIELD;
-         }
-         break;
-     case 3: /* wfi */
--        gen_set_pc_im(s, s->pc);
-+        gen_set_pc_im(s, s->base.pc_next);
-         s->base.is_jmp = DISAS_WFI;
-         break;
-     case 2: /* wfe */
-         if (!(tb_cflags(s->base.tb) & CF_PARALLEL)) {
--            gen_set_pc_im(s, s->pc);
-+            gen_set_pc_im(s, s->base.pc_next);
-             s->base.is_jmp = DISAS_WFE;
-         }
-         break;
-@@ -7240,7 +7240,7 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
-             if (isread) {
-                 return 1;
-             }
--            gen_set_pc_im(s, s->pc);
-+            gen_set_pc_im(s, s->base.pc_next);
-             s->base.is_jmp = DISAS_WFI;
-             return 0;
-         default:
-@@ -7804,7 +7804,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                  * self-modifying code correctly and also to take
-                  * any pending interrupts immediately.
-                  */
--                gen_goto_tb(s, 0, s->pc);
-+                gen_goto_tb(s, 0, s->base.pc_next);
-                 return;
-             case 7: /* sb */
-                 if ((insn & 0xf) || !dc_isar_feature(aa32_sb, s)) {
-@@ -7815,7 +7815,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                  * for TCG; MB and end the TB instead.
-                  */
-                 tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--                gen_goto_tb(s, 0, s->pc);
-+                gen_goto_tb(s, 0, s->base.pc_next);
-                 return;
-             default:
-                 goto illegal_op;
-@@ -7871,7 +7871,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             int32_t offset;
- 
-             tmp = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp, s->pc);
-+            tcg_gen_movi_i32(tmp, s->base.pc_next);
-             store_reg(s, 14, tmp);
-             /* Sign-extend the 24-bit offset */
-             offset = (((int32_t)insn) << 8) >> 8;
-@@ -8056,7 +8056,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             /* branch link/exchange thumb (blx) */
-             tmp = load_reg(s, rm);
-             tmp2 = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp2, s->pc);
-+            tcg_gen_movi_i32(tmp2, s->base.pc_next);
-             store_reg(s, 14, tmp2);
-             gen_bx(s, tmp);
-             break;
-@@ -9222,7 +9222,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                 /* branch (and link) */
-                 if (insn & (1 << 24)) {
-                     tmp = tcg_temp_new_i32();
--                    tcg_gen_movi_i32(tmp, s->pc);
-+                    tcg_gen_movi_i32(tmp, s->base.pc_next);
-                     store_reg(s, 14, tmp);
-                 }
-                 offset = sextract32(insn << 2, 0, 26);
-@@ -9244,7 +9244,7 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-             break;
-         case 0xf:
-             /* swi */
--            gen_set_pc_im(s, s->pc);
-+            gen_set_pc_im(s, s->base.pc_next);
-             s->svc_imm = extract32(insn, 0, 24);
-             s->base.is_jmp = DISAS_SWI;
-             break;
-@@ -10326,7 +10326,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
- 
-                 if (insn & (1 << 14)) {
-                     /* Branch and link.  */
--                    tcg_gen_movi_i32(cpu_R[14], s->pc | 1);
-+                    tcg_gen_movi_i32(cpu_R[14], s->base.pc_next | 1);
-                 }
- 
-                 offset += read_pc(s);
-@@ -10449,7 +10449,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                              * and also to take any pending interrupts
-                              * immediately.
-                              */
--                            gen_goto_tb(s, 0, s->pc);
-+                            gen_goto_tb(s, 0, s->base.pc_next);
-                             break;
-                         case 7: /* sb */
-                             if ((insn & 0xf) || !dc_isar_feature(aa32_sb, s)) {
-@@ -10460,7 +10460,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                              * for TCG; MB and end the TB instead.
-                              */
-                             tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
--                            gen_goto_tb(s, 0, s->pc);
-+                            gen_goto_tb(s, 0, s->base.pc_next);
-                             break;
-                         default:
-                             goto illegal_op;
-@@ -11121,7 +11121,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-                 /* BLX/BX */
-                 tmp = load_reg(s, rm);
-                 if (link) {
--                    val = (uint32_t)s->pc | 1;
-+                    val = (uint32_t)s->base.pc_next | 1;
-                     tmp2 = tcg_temp_new_i32();
-                     tcg_gen_movi_i32(tmp2, val);
-                     store_reg(s, 14, tmp2);
-@@ -11695,7 +11695,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
- 
-         if (cond == 0xf) {
-             /* swi */
--            gen_set_pc_im(s, s->pc);
-+            gen_set_pc_im(s, s->base.pc_next);
-             s->svc_imm = extract32(insn, 0, 8);
-             s->base.is_jmp = DISAS_SWI;
-             break;
-@@ -11724,7 +11724,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             tcg_gen_andi_i32(tmp, tmp, 0xfffffffc);
- 
-             tmp2 = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp2, s->pc | 1);
-+            tcg_gen_movi_i32(tmp2, s->base.pc_next | 1);
-             store_reg(s, 14, tmp2);
-             gen_bx(s, tmp);
-             break;
-@@ -11749,7 +11749,7 @@ static void disas_thumb_insn(DisasContext *s, uint32_t insn)
-             tcg_gen_addi_i32(tmp, tmp, offset);
- 
-             tmp2 = tcg_temp_new_i32();
--            tcg_gen_movi_i32(tmp2, s->pc | 1);
-+            tcg_gen_movi_i32(tmp2, s->base.pc_next | 1);
-             store_reg(s, 14, tmp2);
-             gen_bx(s, tmp);
-         } else {
-@@ -11769,16 +11769,16 @@ undef:
- 
- static bool insn_crosses_page(CPUARMState *env, DisasContext *s)
- {
--    /* Return true if the insn at dc->pc might cross a page boundary.
-+    /* Return true if the insn at dc->base.pc_next might cross a page boundary.
-      * (False positives are OK, false negatives are not.)
-      * We know this is a Thumb insn, and our caller ensures we are
--     * only called if dc->pc is less than 4 bytes from the page
-+     * only called if dc->base.pc_next is less than 4 bytes from the page
-      * boundary, so we cross the page if the first 16 bits indicate
-      * that this is a 32 bit insn.
-      */
--    uint16_t insn = arm_lduw_code(env, s->pc, s->sctlr_b);
-+    uint16_t insn = arm_lduw_code(env, s->base.pc_next, s->sctlr_b);
- 
--    return !thumb_insn_is_16bit(s, s->pc, insn);
-+    return !thumb_insn_is_16bit(s, s->base.pc_next, insn);
- }
- 
- static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-@@ -11790,7 +11790,6 @@ static void arm_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     uint32_t condexec, core_mmu_idx;
- 
-     dc->isar = &cpu->isar;
--    dc->pc = dc->base.pc_first;
-     dc->condjmp = 0;
- 
-     dc->aarch64 = 0;
-@@ -11922,7 +11921,7 @@ static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
- {
-     DisasContext *dc = container_of(dcbase, DisasContext, base);
- 
--    tcg_gen_insn_start(dc->pc,
-+    tcg_gen_insn_start(dc->base.pc_next,
-                        (dc->condexec_cond << 4) | (dc->condexec_mask >> 1),
-                        0);
-     dc->insn_start = tcg_last_op();
-@@ -11935,7 +11934,7 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
- 
-     if (bp->flags & BP_CPU) {
-         gen_set_condexec(dc);
--        gen_set_pc_im(dc, dc->pc);
-+        gen_set_pc_im(dc, dc->base.pc_next);
-         gen_helper_check_breakpoints(cpu_env);
-         /* End the TB early; it's likely not going to be executed */
-         dc->base.is_jmp = DISAS_TOO_MANY;
-@@ -11948,7 +11947,7 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-            tb->size below does the right thing.  */
-         /* TODO: Advance PC by correct instruction length to
-          * avoid disassembler error messages */
--        dc->pc += 2;
-+        dc->base.pc_next += 2;
-         dc->base.is_jmp = DISAS_NORETURN;
-     }
- 
-@@ -11959,7 +11958,7 @@ static bool arm_pre_translate_insn(DisasContext *dc)
- {
- #ifdef CONFIG_USER_ONLY
-     /* Intercept jump to the magic kernel page.  */
--    if (dc->pc >= 0xffff0000) {
-+    if (dc->base.pc_next >= 0xffff0000) {
-         /* We always get here via a jump, so know we are not in a
-            conditional execution block.  */
-         gen_exception_internal(EXCP_KERNEL_TRAP);
-@@ -11994,7 +11993,6 @@ static void arm_post_translate_insn(DisasContext *dc)
-         gen_set_label(dc->condlabel);
-         dc->condjmp = 0;
-     }
--    dc->base.pc_next = dc->pc;
-     translator_loop_temp_check(&dc->base);
- }
- 
-@@ -12008,10 +12006,10 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         return;
-     }
- 
--    dc->pc_curr = dc->pc;
--    insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
-+    dc->pc_curr = dc->base.pc_next;
-+    insn = arm_ldl_code(env, dc->base.pc_next, dc->sctlr_b);
-     dc->insn = insn;
--    dc->pc += 4;
-+    dc->base.pc_next += 4;
-     disas_arm_insn(dc, insn);
- 
-     arm_post_translate_insn(dc);
-@@ -12077,15 +12075,15 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         return;
-     }
- 
--    dc->pc_curr = dc->pc;
--    insn = arm_lduw_code(env, dc->pc, dc->sctlr_b);
--    is_16bit = thumb_insn_is_16bit(dc, dc->pc, insn);
--    dc->pc += 2;
-+    dc->pc_curr = dc->base.pc_next;
-+    insn = arm_lduw_code(env, dc->base.pc_next, dc->sctlr_b);
-+    is_16bit = thumb_insn_is_16bit(dc, dc->base.pc_next, insn);
-+    dc->base.pc_next += 2;
-     if (!is_16bit) {
--        uint32_t insn2 = arm_lduw_code(env, dc->pc, dc->sctlr_b);
-+        uint32_t insn2 = arm_lduw_code(env, dc->base.pc_next, dc->sctlr_b);
- 
-         insn = insn << 16 | insn2;
--        dc->pc += 2;
-+        dc->base.pc_next += 2;
-     }
-     dc->insn = insn;
- 
-@@ -12133,8 +12131,8 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-      * but isn't very efficient).
-      */
-     if (dc->base.is_jmp == DISAS_NEXT
--        && (dc->pc - dc->page_start >= TARGET_PAGE_SIZE
--            || (dc->pc - dc->page_start >= TARGET_PAGE_SIZE - 3
-+        && (dc->base.pc_next - dc->page_start >= TARGET_PAGE_SIZE
-+            || (dc->base.pc_next - dc->page_start >= TARGET_PAGE_SIZE - 3
-                 && insn_crosses_page(env, dc)))) {
-         dc->base.is_jmp = DISAS_TOO_MANY;
-     }
-@@ -12179,7 +12177,7 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         case DISAS_NEXT:
-         case DISAS_TOO_MANY:
-         case DISAS_UPDATE:
--            gen_set_pc_im(dc, dc->pc);
-+            gen_set_pc_im(dc, dc->base.pc_next);
-             /* fall through */
-         default:
-             /* FIXME: Single stepping a WFI insn will not halt the CPU. */
-@@ -12200,13 +12198,13 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         switch(dc->base.is_jmp) {
-         case DISAS_NEXT:
-         case DISAS_TOO_MANY:
--            gen_goto_tb(dc, 1, dc->pc);
-+            gen_goto_tb(dc, 1, dc->base.pc_next);
-             break;
-         case DISAS_JUMP:
-             gen_goto_ptr();
-             break;
-         case DISAS_UPDATE:
--            gen_set_pc_im(dc, dc->pc);
-+            gen_set_pc_im(dc, dc->base.pc_next);
-             /* fall through */
-         default:
-             /* indicate that the hash table must be used to find the next TB */
-@@ -12252,15 +12250,12 @@ static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
-         gen_set_label(dc->condlabel);
-         gen_set_condexec(dc);
-         if (unlikely(is_singlestepping(dc))) {
--            gen_set_pc_im(dc, dc->pc);
-+            gen_set_pc_im(dc, dc->base.pc_next);
-             gen_singlestep_exception(dc);
-         } else {
--            gen_goto_tb(dc, 1, dc->pc);
-+            gen_goto_tb(dc, 1, dc->base.pc_next);
-         }
-     }
--
--    /* Functions above can change dc->pc, so re-align db->pc_next */
--    dc->base.pc_next = dc->pc;
- }
- 
- static void arm_tr_disas_log(const DisasContextBase *dcbase, CPUState *cpu)
--- 
-2.20.1
+>>>>
+>>>> And qemu crashes because of a stack overflow due to the loop being
+>>>> created (target's backing file is source, so when it replaces filter=
+ed,
+>>>> it points to itself through source).
+>>>>
+>>>> (blockdev-mirror can be broken similarly.)
+>>>>
+>>>> So let us make the checks for the two conditions above explicit, whi=
+ch
+>>>> makes the whole function exactly as restrictive as it needs to be.
+>>>>
+>>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>>>> ---
+>>>>    include/block/block.h |  1 +
+>>>>    block.c               | 83 ++++++++++++++++++++++++++++++++++++++=
++----
+>>>>    blockdev.c            | 34 ++++++++++++++++--
+>>>>    3 files changed, 110 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/include/block/block.h b/include/block/block.h
+>>>> index 6ba853fb90..8da706cd89 100644
+>>>> --- a/include/block/block.h
+>>>> +++ b/include/block/block.h
+>>>> @@ -404,6 +404,7 @@ bool bdrv_is_first_non_filter(BlockDriverState *=
+candidate);
+>>>>   =20
+>>>>    /* check if a named node can be replaced when doing drive-mirror =
+*/
+>>>>    BlockDriverState *check_to_replace_node(BlockDriverState *parent_=
+bs,
+>>>> +                                        BlockDriverState *backing_b=
+s,
+>>>>                                            const char *node_name, Er=
+ror **errp);
+>>>>   =20
+>>>>    /* async block I/O */
+>>>> diff --git a/block.c b/block.c
+>>>> index 915b80153c..4858d3e718 100644
+>>>> --- a/block.c
+>>>> +++ b/block.c
+>>>> @@ -6290,7 +6290,59 @@ bool bdrv_is_first_non_filter(BlockDriverStat=
+e *candidate)
+>>>>        return false;
+>>>>    }
+>>>>   =20
+>>>> +static bool is_child_of(BlockDriverState *child, BlockDriverState *=
+parent)
+>>>> +{
+>>>> +    BdrvChild *c;
+>>>> +
+>>>> +    if (!parent) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    QLIST_FOREACH(c, &parent->children, next) {
+>>>> +        if (c->bs =3D=3D child || is_child_of(child, c->bs)) {
+>>>> +            return true;
+>>>> +        }
+>>>> +    }
+>>>> +
+>>>> +    return false;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * Return true if there are only filters in [@top, @base).  Note th=
+at
+>>>> + * this may include quorum (which bdrv_chain_contains() cannot
+>>>> + * handle).
+>>>
+>>> More presizely: return true if exists chain of filters from top to ba=
+se or if
+>>> top =3D=3D base.
+>>>
+>>> I keep in mind backup-top filter:
+>>>
+>>> [backup-top]
+>>> |          \target
+>>
+>> backup-top can=E2=80=99t be a filter if it has two children with diffe=
+rent
+>> contents, though.
+>=20
+> Why? target is special child, unrelated to what is read/written over ba=
+ckup-top.
+> It's an own business of backup-top.
+>=20
+>>
+>> (commit-top and mirror-top aren=E2=80=99t filters either.)
+>=20
+> Ahm, I missed something. They have is_filter =3D true and their childre=
+n considered
+> to be filtered-rw children in your series? And than, who they are? Form=
+at nodes?
+> And how they appears in backing chains than?
 
+Er, right, I remember, I made them filters in patch 1 of this series. m( =
+:-)
+
+But the chain would still be unique, in a sense, because backup-top only
+has one filtered child, so you could go down the chain with
+bdrv_filtered_rw_child().
+
+This function doesn=E2=80=99t do that because of Quorum, which is actuall=
+y a
+better example.  All of its children are filtered, so we must consider
+all of them.
+
+But backup-top is actually a reason why this function is wrong as it is;
+the target is not a filtered child, so it shouldn=E2=80=99t return true t=
+here.
+
+Hmmmm.
+
+Actually, bdrv_recurse_is_first_non_filter() does nearly what we want.
+(Which is why it was used here.)  The only problem is that it expects
+@candidate to be a non-filter (as the name implies).  But we don=E2=80=99=
+t care
+about that, actually.
+
+I suppose I can just turn bdrv_recurse_is_first_non_filter() into
+bdrv_is_child_of(); it has only two callers, one is here, the other is
+bdrv_is_first_non_filter().  In the latter, we can just check whether
+@candidate is a filter and return false if it isn=E2=80=99t.
+
+>> That=E2=80=99s why there must be a unique chain [@top, @base).
+>>
+>> I should probably not that it will return true if top =3D=3D base, tho=
+ugh, yes.
+>>
+>>> |backing    -------->[target]
+>>> V                    /
+>>> [source]  <---------/backing
+>>>
+>>>> + */
+>>>> +static bool is_filtered_child(BlockDriverState *top, BlockDriverSta=
+te *base)
+>>>> +{
+>>>> +    BdrvChild *c;
+>>>> +
+>>>> +    if (!top) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    if (top =3D=3D base) {
+>>>> +        return true;
+>>>> +    }
+>>>> +
+>>>> +    if (!top->drv->is_filter) {
+>>>> +        return false;
+>>>> +    }
+>>>> +
+>>>> +    QLIST_FOREACH(c, &top->children, next) {
+>>>> +        if (is_filtered_child(c->bs, base)) {
+>>>> +            return true;
+>>>> +        }
+>>>> +    }
+>>>
+>>> interesting, how much is it better to somehow reuse DFS search writte=
+n in should_update_child()..
+>>> [just note, don't do it in these series please]
+>>>
+>>>> +
+>>>> +    return false;
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * @parent_bs is mirror's source BDS, @backing_bs is the BDS which
+>>>> + * will be attached to the target when mirror completes.
+>>>> + */
+>>>>    BlockDriverState *check_to_replace_node(BlockDriverState *parent_=
+bs,
+>>>> +                                        BlockDriverState *backing_b=
+s,
+>>>>                                            const char *node_name, Er=
+ror **errp)
+>>>>    {
+>>>>        BlockDriverState *to_replace_bs =3D bdrv_find_node(node_name)=
+;
+>>>> @@ -6309,13 +6361,32 @@ BlockDriverState *check_to_replace_node(Bloc=
+kDriverState *parent_bs,
+>>>>            goto out;
+>>>>        }
+>>>>   =20
+>>>> -    /* We don't want arbitrary node of the BDS chain to be replaced=
+ only the top
+>>>> -     * most non filter in order to prevent data corruption.
+>>>> -     * Another benefit is that this tests exclude backing files whi=
+ch are
+>>>> -     * blocked by the backing blockers.
+>>>> +    /*
+>>>> +     * If to_replace_bs is (recursively) a child of backing_bs,
+>>>> +     * replacing it may create a loop.  We cannot allow that.
+>>>>         */
+>>>> -    if (!bdrv_recurse_is_first_non_filter(parent_bs, to_replace_bs)=
+) {
+>>>> -        error_setg(errp, "Only top most non filter can be replaced"=
+);
+>>>> +    if (to_replace_bs =3D=3D backing_bs || is_child_of(to_replace_b=
+s, backing_bs)) {
+>>>
+>>> first condition is covered by second, so first may be omitted.
+>>
+>> It is not.  is_child_of() does not return true if child =3D=3D parent.=
+
+>>
+>>>> +        error_setg(errp, "Replacing this node would result in a loo=
+p");
+>>>> +        to_replace_bs =3D NULL;
+>>>> +        goto out;
+>>>> +    }
+>>>> +
+>>>> +    /*
+>>>> +     * Mirror is designed in such a way that when it completes, the=
+
+>>>> +     * source BDS is seamlessly replaced.
+>>>
+>>> Not source but to_replace_bs is replaced?
+>>
+>> It has originally been designed to replace the source.  If it could
+>> replace any arbitrary BDS, all of this would be moot.
+>=20
+> quorum child, you saying about in commit message?
+
+Which is not any arbitrary BDS, but one that looks exactly like the sourc=
+e.
+
+My point is, mirror has been *designed* to replace the source
+seamlessly.  It can do more things today, but that was its original point=
+=2E
+
+That means that the target must be exactly the same as the source.  And
+then we come to this:
+
+>>>> It is therefore not allowed
+>>>> +     * to replace a BDS where this condition would be violated, as =
+that
+>>>> +     * would defeat the purpose of mirror and could lead to data
+>>>> +     * corruption.
+>>>> +     * Therefore, between parent_bs and to_replace_bs there may be
+>>>> +     * only filters (and the one on top must be a filter, too), so
+>>>> +     * their data always stays in sync and mirror can complete and
+>>>> +     * replace to_replace_bs without any possible corruptions.
+
+So replacing a node that=E2=80=99s connected to the source only through f=
+ilters
+is fine because that means the replaced node will also have the same
+content as the source.
+
+
+How about I replace the first paragraph with:
+
+At the end of the mirror job, the target exhibits exactly the same
+content as the source, so it can replace the source node seamlessly.  It
+cannot replace a BDS that differs in content, as that could lead to data
+corruption.
+
+?
+
+>>>> +     */
+>>>> +    if (!is_filtered_child(parent_bs, to_replace_bs) &&
+>>>> +        !is_filtered_child(to_replace_bs, parent_bs))
+>>>> +    {
+>>>> +        error_setg(errp, "The node to be replaced must be connected=
+ to the "
+>>>> +                   "source through filter nodes only");
+>>>
+>>> "and the one on top must be a filter, too" not mentioned in the error=
+=2E.
+>>
+>> Well, unless the source node is the node to be replaced.  Hm...  This
+>> gets very hard to express.  I think I=E2=80=99d prefer to keep this as=
+ it is,
+>> even though it is not quite correct, unless you have a better suggesti=
+on
+>> of what to report. :-/
+>=20
+> I can't imaging something better than just add "(and the one on top mus=
+t be a filter, too)"
+
+The problem is that =E2=80=9Cthe one on top=E2=80=9D wouldn=E2=80=99t sou=
+nd very clear to me as
+a user.
+
+Maybe include the explanation =C3=A0 la =E2=80=9CThe node to be replaced =
+must be
+connected to the source through filter nodes only, so its data is the
+exact same at all times=E2=80=9D?  Maybe then users can guess what this
+=E2=80=9Cconnected=E2=80=9D means exactly.
+
+>>>>            to_replace_bs =3D NULL;
+>>>>            goto out;
+>>>>        }
+>>>> diff --git a/blockdev.c b/blockdev.c
+>>>> index 4e72f6f701..758e0b5431 100644
+>>>> --- a/blockdev.c
+>>>> +++ b/blockdev.c
+>>>> @@ -3887,7 +3887,7 @@ static void blockdev_mirror_common(const char =
+*job_id, BlockDriverState *bs,
+>>>>        }
+>>>>   =20
+>>>>        if (has_replaces) {
+>>>> -        BlockDriverState *to_replace_bs;
+>>>> +        BlockDriverState *to_replace_bs, *backing_bs;
+>>>>            AioContext *replace_aio_context;
+>>>>            int64_t bs_size, replace_size;
+>>>>   =20
+>>>> @@ -3897,7 +3897,37 @@ static void blockdev_mirror_common(const char=
+ *job_id, BlockDriverState *bs,
+>>>>                return;
+>>>>            }
+>>>>   =20
+>>>> -        to_replace_bs =3D check_to_replace_node(bs, replaces, errp)=
+;
+>>>> +        if (backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN ||
+>>>> +            backing_mode =3D=3D MIRROR_OPEN_BACKING_CHAIN)
+>>>> +        {
+>>>> +            /*
+>>>> +             * While we do not quite know what OPEN_BACKING_CHAIN
+>>>> +             * (used for mode=3Dexisting) will yield, it is probabl=
+y
+>>>> +             * best to restrict it exactly like SOURCE_BACKING_CHAI=
+N,
+>>>> +             * because that is our best guess.
+>>>> +             */
+>>>> +            switch (sync) {
+>>>> +            case MIRROR_SYNC_MODE_FULL:
+>>>> +                backing_bs =3D NULL;
+>>>> +                break;
+>>>> +
+>>>> +            case MIRROR_SYNC_MODE_TOP:
+>>>> +                backing_bs =3D bdrv_filtered_cow_bs(bdrv_skip_rw_fi=
+lters(bs));
+>>>
+>>> why not  bdrv_backing_chain_next(bs) like in mirror_start?
+>>
+>> Good question.  I suppose it should be
+>> bdrv_filtered_cow_bs(bdrv_backing_chain_next(bs)) in mirror_start()?
+>=20
+> You mean bdrv_filtered_cow_bs(bdrv_skip_rw_filters(bs)), I hope)
+
+Er, yes, sure.
+
+>> Because with sync=3Dtop, we just want to remove the topmost COW node (=
+and
+>> filters on top), but keep filters behind it.
+>>
+>=20
+> Agreed.
+
+OK.
+
+Max
+
+
+--qPRfallPfhRy2QG0KGBExz0V0ZgcFGDd6--
+
+--pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1Wr+MACgkQ9AfbAGHV
+z0CXLwgAjjxox2EWGEHitjFtdEZfPHptZ3DIl0JEr8aiq2iJkO49a1Fen2H2+O/L
+8jNyZkXa+5EZjBQyjcIkhHFx6o/XWFdK80/tlLMTTFB9rzbESz7j2c3GGS4ARncs
+s3cNxToMS8TPCC2Zj/aiX94HxuIaU9dsVZRZ4W0cHZmdcaQGbvuNC8foeh/rmcjw
+rvAFFi3tPaq0r7YOYnhZVFzTMxDcSrkIPUMNO5sukOEuqsrcqdOuF5bWXdO/F/pf
+mm2I3PZBmxdDG7ioKhzr5i8Vel4SiMLnsKg0r1ArWAR14/kF8RbFDoEQ2o/yG+Xs
+5fUASQk40lX0CoB8E/rG0Geo1JhXgw==
+=Jx9P
+-----END PGP SIGNATURE-----
+
+--pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ--
 
