@@ -2,70 +2,84 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CACD5C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF21C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0B622077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:10:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0B622077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB8842133F
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:21:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB8842133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyWNW-0004Ii-Mp
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:10:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34739)
+	id 1hyWYe-0007eF-S3
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:21:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWMm-0003ai-9m
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:09:45 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1hyWXJ-0006vE-Vy
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:20:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWMh-0006qA-2W
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:09:40 -0400
-Received: from smtpe1.intersmtp.com ([62.239.224.235]:55508)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWM9-0006cq-MI; Fri, 16 Aug 2019 03:09:02 -0400
-Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
- RDW083A011ED67.bt.com (10.187.98.37) with Microsoft SMTP Server (TLS) id
- 14.3.439.0; Fri, 16 Aug 2019 08:14:54 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:08:58 +0100
-Received: from tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
- ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:08:58 +0100
-From: <tony.nguyen@bt.com>
-To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 01/42] configure: Define
- TARGET_ALIGNED_ONLY
-Thread-Index: AQHVVAF5i4oYfhiDzEeoIHrQlSlk7Q==
-Date: Fri, 16 Aug 2019 07:08:58 +0000
-Message-ID: <1565939336110.11174@bt.com>
-References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
-In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
-Accept-Language: en-AU, en-GB, en-US
-Content-Language: en-AU
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.187.101.40]
+ (envelope-from <pbonzini@redhat.com>) id 1hyWXH-00047s-2B
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:20:33 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46924)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1hyWXG-00047D-Qo
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:20:30 -0400
+Received: by mail-wr1-f67.google.com with SMTP id z1so564963wru.13
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 00:20:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vu7zsJGIAIkEevTa7V9vSfl8BKlpIou4VHiXR7sMf/Y=;
+ b=kgQr2RQ1DQ4brvRlu/GCKedbvyoqZpvMMOV8Nk3tSfpgvoocn5s5xBKxyJjMp0bCJ8
+ 2oHBGNJvqtOszsBZCkEOzvm5qbQ00S5np21W1kR3+ExenvHDbF4upzb26REHgRMWwzWp
+ K6Del+C8pILWIWPw8/uX+rBkrwI5q+Uq1/URtVWD8ypdVF+5SkKzoPVmCtd44lzLT/j0
+ tw7XDxIy6YUkLGNPKIQTI5bJaHXGmY/vFm9iyrCD0VfkcpHFPtdFxg97yk3yiodOj/KV
+ q8uxZO15fkYmEYpYP2flBl5BXwBW0L1soYZkd6LgPZICuW513MK1c1ZVA5Ja2MU096Zy
+ lBUg==
+X-Gm-Message-State: APjAAAXk8TFAJEIYzFuJOdcOn9U6+Mvr4Bs373dw7H8otkhXZA2kdmrn
+ w/lK62yoODGvI9RFfZGKKZqdtw==
+X-Google-Smtp-Source: APXvYqxf1E8r7aBKpZKcY0Hl7blxs/qU72E+crvocqo1RAGHv9kb7sMM1mhlq3IzHFs0GrNZO0wn2Q==
+X-Received: by 2002:adf:8183:: with SMTP id 3mr8913470wra.181.1565940029661;
+ Fri, 16 Aug 2019 00:20:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:399c:411e:1ccb:f240?
+ ([2001:b07:6468:f312:399c:411e:1ccb:f240])
+ by smtp.gmail.com with ESMTPSA id f134sm4306382wmg.20.2019.08.16.00.20.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Aug 2019 00:20:28 -0700 (PDT)
+To: "Yao, Jiewen" <jiewen.yao@intel.com>, Laszlo Ersek <lersek@redhat.com>,
+ "devel@edk2.groups.io" <devel@edk2.groups.io>
+References: <8091f6e8-b1ec-f017-1430-00b0255729f4@redhat.com>
+ <effa5e32-be1e-4703-4419-8866b7754e2d@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75B680@shsmsx102.ccr.corp.intel.com>
+ <047801f8-624a-2300-3cf7-1daa1395ce59@redhat.com>
+ <99219f81-33a3-f447-95f8-f10341d70084@redhat.com>
+ <6f8b9507-58d0-5fbd-b827-c7194b3b2948@redhat.com>
+ <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <7cb458ea-956e-c1df-33f7-025e4f0f22df@redhat.com>
+Date: Fri, 16 Aug 2019 09:20:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 62.239.224.235
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 01/42] configure: Define TARGET_ALIGNED_ONLY
+In-Reply-To: <74D8A39837DF1E4DA445A8C0B3885C503F75FAD3@shsmsx102.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.221.67
+Subject: Re: [Qemu-devel] [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,241 +91,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: frederic.konrad@adacore.com, berto@igalia.com, qemu-block@nongnu.org,
- arikalo@wavecomp.com, pasic@linux.ibm.com, hpoussin@reactos.org,
- anthony.perard@citrix.com, xen-devel@lists.xenproject.org, lersek@redhat.com,
- jasowang@redhat.com, jiri@resnulli.us, ehabkost@redhat.com,
- b.galvani@gmail.com, eric.auger@redhat.com, alex.williamson@redhat.com,
- stefanha@redhat.com, jsnow@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- andrew@aj.id.au, claudio.fontana@suse.com, crwulff@gmail.com,
- laurent@vivier.eu, sundeep.lkml@gmail.com, michael@walle.cc,
- qemu-ppc@nongnu.org, kbastian@mail.uni-paderborn.de, imammedo@redhat.com,
- fam@euphon.net, peter.maydell@linaro.org, david@redhat.com, palmer@sifive.com,
- keith.busch@intel.com, jcmvbkbc@gmail.com, hare@suse.com,
- sstabellini@kernel.org, andrew.smirnov@gmail.com, deller@gmx.de,
- magnus.damm@gmail.com, atar4qemu@gmail.com, minyard@acm.org, sw@weilnetz.de,
- yuval.shaia@oracle.com, qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- jan.kiszka@web.de, clg@kaod.org, shorne@gmail.com, qemu-riscv@nongnu.org,
- i.mitsyanko@gmail.com, cohuck@redhat.com, philmd@redhat.com,
- amarkovic@wavecomp.com, peter.chubb@nicta.com.au, aurelien@aurel32.net,
- pburton@wavecomp.com, sagark@eecs.berkeley.edu, green@moxielogic.com,
- kraxel@redhat.com, edgar.iglesias@gmail.com, gxt@mprc.pku.edu.cn,
- robh@kernel.org, borntraeger@de.ibm.com, joel@jms.id.au,
- antonynpavlov@gmail.com, chouteau@adacore.com, Andrew.Baumann@microsoft.com,
- mreitz@redhat.com, walling@linux.ibm.com, dmitry.fleytman@gmail.com,
- mst@redhat.com, mark.cave-ayland@ilande.co.uk, jslaby@suse.cz, marex@denx.de,
- proljc@gmail.com, marcandre.lureau@redhat.com, alistair@alistair23.me,
- paul.durrant@citrix.com, david@gibson.dropbear.id.au,
- xiaoguangrong.eric@gmail.com, huth@tuxfamily.org, jcd@tribudubois.net,
- pbonzini@redhat.com, stefanb@linux.ibm.com
+Cc: "Chen, Yingwen" <yingwen.chen@intel.com>,
+ Phillip Goerl <phillip.goerl@oracle.com>,
+ qemu devel list <qemu-devel@nongnu.org>, "Nakajima,
+ Jun" <jun.nakajima@intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ edk2-rfc-groups-io <rfc@edk2.groups.io>,
+ Joao Marcal Lemos Martins <joao.m.martins@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename ALIGNED_ONLY to TARGET_ALIGNED_ONLY for clarity and move
-defines out of target/foo/cpu.h into configure, as we do with
-TARGET_WORDS_BIGENDIAN, so that it is always defined early.
+On 16/08/19 04:46, Yao, Jiewen wrote:
+> Comment below:
+> 
+> 
+>> -----Original Message-----
+>> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
+>> Sent: Friday, August 16, 2019 12:21 AM
+>> To: Laszlo Ersek <lersek@redhat.com>; devel@edk2.groups.io; Yao, Jiewen
+>> <jiewen.yao@intel.com>
+>> Cc: edk2-rfc-groups-io <rfc@edk2.groups.io>; qemu devel list
+>> <qemu-devel@nongnu.org>; Igor Mammedov <imammedo@redhat.com>;
+>> Chen, Yingwen <yingwen.chen@intel.com>; Nakajima, Jun
+>> <jun.nakajima@intel.com>; Boris Ostrovsky <boris.ostrovsky@oracle.com>;
+>> Joao Marcal Lemos Martins <joao.m.martins@oracle.com>; Phillip Goerl
+>> <phillip.goerl@oracle.com>
+>> Subject: Re: [edk2-devel] CPU hotplug using SMM with QEMU+OVMF
+>>
+>> On 15/08/19 17:00, Laszlo Ersek wrote:
+>>> On 08/14/19 16:04, Paolo Bonzini wrote:
+>>>> On 14/08/19 15:20, Yao, Jiewen wrote:
+>>>>>> - Does this part require a new branch somewhere in the OVMF SEC
+>> code?
+>>>>>>   How do we determine whether the CPU executing SEC is BSP or
+>>>>>>   hot-plugged AP?
+>>>>> [Jiewen] I think this is blocked from hardware perspective, since the first
+>> instruction.
+>>>>> There are some hardware specific registers can be used to determine if
+>> the CPU is new added.
+>>>>> I don’t think this must be same as the real hardware.
+>>>>> You are free to invent some registers in device model to be used in
+>> OVMF hot plug driver.
+>>>>
+>>>> Yes, this would be a new operation mode for QEMU, that only applies to
+>>>> hot-plugged CPUs.  In this mode the AP doesn't reply to INIT or SMI, in
+>>>> fact it doesn't reply to anything at all.
+>>>>
+>>>>>> - How do we tell the hot-plugged AP where to start execution? (I.e.
+>> that
+>>>>>>   it should execute code at a particular pflash location.)
+>>>>> [Jiewen] Same real mode reset vector at FFFF:FFF0.
+>>>>
+>>>> You do not need a reset vector or INIT/SIPI/SIPI sequence at all in
+>>>> QEMU.  The AP does not start execution at all when it is unplugged, so
+>>>> no cache-as-RAM etc.
+>>>>
+>>>> We only need to modify QEMU so that hot-plugged APIs do not reply to
+>>>> INIT/SIPI/SMI.
+>>>>
+>>>>> I don’t think there is problem for real hardware, who always has CAR.
+>>>>> Can QEMU provide some CPU specific space, such as MMIO region?
+>>>>
+>>>> Why is a CPU-specific region needed if every other processor is in SMM
+>>>> and thus trusted.
+>>>
+>>> I was going through the steps Jiewen and Yingwen recommended.
+>>>
+>>> In step (02), the new CPU is expected to set up RAM access. In step
+>>> (03), the new CPU, executing code from flash, is expected to "send board
+>>> message to tell host CPU (GPIO->SCI) -- I am waiting for hot-add
+>>> message." For that action, the new CPU may need a stack (minimally if we
+>>> want to use C function calls).
+>>>
+>>> Until step (03), there had been no word about any other (= pre-plugged)
+>>> CPUs (more precisely, Jiewen even confirmed "No impact to other
+>>> processors"), so I didn't assume that other CPUs had entered SMM.
+>>>
+>>> Paolo, I've attempted to read Jiewen's response, and yours, as carefully
+>>> as I can. I'm still very confused. If you have a better understanding,
+>>> could you please write up the 15-step process from the thread starter
+>>> again, with all QEMU customizations applied? Such as, unnecessary steps
+>>> removed, and platform specifics filled in.
+>>
+>> Sure.
+>>
+>> (01a) QEMU: create new CPU.  The CPU already exists, but it does not
+>>      start running code until unparked by the CPU hotplug controller.
+>>
+>> (01b) QEMU: trigger SCI
+>>
+>> (02-03) no equivalent
+>>
+>> (04) Host CPU: (OS) execute GPE handler from DSDT
+>>
+>> (05) Host CPU: (OS) Port 0xB2 write, all CPUs enter SMM (NOTE: New CPU
+>>      will not enter CPU because SMI is disabled)
+>>
+>> (06) Host CPU: (SMM) Save 38000, Update 38000 -- fill simple SMM
+>>      rebase code.
+>>
+>> (07a) Host CPU: (SMM) Write to CPU hotplug controller to enable
+>>      new CPU
+>>
+>> (07b) Host CPU: (SMM) Send INIT/SIPI/SIPI to new CPU.
+> [Jiewen] NOTE: INIT/SIPI/SIPI can be sent by a malicious CPU. There is no
+> restriction that INIT/SIPI/SIPI can only be sent in SMM.
 
-Poisoned TARGET_ALIGNED_ONLY to prevent use in common code.
+All of the CPUs are now in SMM, and INIT/SIPI/SIPI will be discarded
+before 07a, so this is okay.
 
-Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
----
- configure             | 10 +++++++++-
- include/exec/poison.h |  1 +
- include/qom/cpu.h     |  2 +-
- target/alpha/cpu.h    |  2 --
- target/hppa/cpu.h     |  1 -
- target/mips/cpu.h     |  2 --
- target/sh4/cpu.h      |  2 --
- target/sparc/cpu.h    |  2 --
- target/xtensa/cpu.h   |  2 --
- tcg/tcg.c             |  2 +-
- tcg/tcg.h             |  8 +++++---
- 11 files changed, 17 insertions(+), 17 deletions(-)
+However I do see a problem, because a PCI device's DMA could overwrite
+0x38000 between (06) and (10) and hijack the code that is executed in
+SMM.  How is this avoided on real hardware?  By the time the new CPU
+enters SMM, it doesn't run off cache-as-RAM anymore.
 
-diff --git a/configure b/configure
-index 714e7fb..482ba0b 100755
---- a/configure
-+++ b/configure
-@@ -7431,8 +7431,13 @@ for target in $target_list; do
- target_dir=3D"$target"
- config_target_mak=3D$target_dir/config-target.mak
- target_name=3D$(echo $target | cut -d '-' -f 1)
-+target_aligned_only=3D"no"
-+case "$target_name" in
-+  alpha|hppa|mips64el|mips64|mipsel|mips|mipsn32|mipsn32el|sh4|sh4eb|sparc=
-|sparc64|sparc32plus|xtensa|xtensaeb)
-+  target_aligned_only=3D"yes"
-+  ;;
-+esac
- target_bigendian=3D"no"
--
- case "$target_name" in
-   armeb|aarch64_be|hppa|lm32|m68k|microblaze|mips|mipsn32|mips64|moxie|or1=
-k|ppc|ppc64|ppc64abi32|s390x|sh4eb|sparc|sparc64|sparc32plus|xtensaeb)
-   target_bigendian=3Dyes
-@@ -7717,6 +7722,9 @@ fi
- if supported_whpx_target $target; then
-     echo "CONFIG_WHPX=3Dy" >> $config_target_mak
- fi
-+if test "$target_aligned_only" =3D "yes" ; then
-+  echo "TARGET_ALIGNED_ONLY=3Dy" >> $config_target_mak
-+fi
- if test "$target_bigendian" =3D "yes" ; then
-   echo "TARGET_WORDS_BIGENDIAN=3Dy" >> $config_target_mak
- fi
-diff --git a/include/exec/poison.h b/include/exec/poison.h
-index b862320..955eb86 100644
---- a/include/exec/poison.h
-+++ b/include/exec/poison.h
-@@ -35,6 +35,7 @@
- #pragma GCC poison TARGET_UNICORE32
- #pragma GCC poison TARGET_XTENSA
+Paolo
 
-+#pragma GCC poison TARGET_ALIGNED_ONLY
- #pragma GCC poison TARGET_HAS_BFLT
- #pragma GCC poison TARGET_NAME
- #pragma GCC poison TARGET_SUPPORTS_MTTCG
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 5ee0046..9b50b73 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -89,7 +89,7 @@ struct TranslationBlock;
-  * @do_unassigned_access: Callback for unassigned access handling.
-  * (this is deprecated: new targets should use do_transaction_failed inste=
-ad)
-  * @do_unaligned_access: Callback for unaligned access handling, if
-- * the target defines #ALIGNED_ONLY.
-+ * the target defines #TARGET_ALIGNED_ONLY.
-  * @do_transaction_failed: Callback for handling failed memory transaction=
-s
-  * (ie bus faults or external aborts; not MMU faults)
-  * @virtio_is_big_endian: Callback to return %true if a CPU which supports
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index b3e8a82..16eb804 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -23,8 +23,6 @@
- #include "cpu-qom.h"
- #include "exec/cpu-defs.h"
+>> (08a) New CPU: (Low RAM) Enter protected mode.
+>
+> [Jiewen] NOTE: The new CPU still cannot use any physical memory, because
+> the INIT/SIPI/SIPI may be sent by malicious CPU in non-SMM environment.
+> 
+>> (08b) New CPU: (Flash) Signals host CPU to proceed and enter cli;hlt loop.
+>>
+>> (09) Host CPU: (SMM) Send SMI to the new CPU only.
+>>
+>> (10) New CPU: (SMM) Run SMM code at 38000, and rebase SMBASE to
+>>      TSEG.
+>>
+>> (11) Host CPU: (SMM) Restore 38000.
+>>
+>> (12) Host CPU: (SMM) Update located data structure to add the new CPU
+>>      information. (This step will involve CPU_SERVICE protocol)
+>>
+>> (13) New CPU: (Flash) do whatever other initialization is needed
+>>
+>> (14) New CPU: (Flash) Deadloop, and wait for INIT-SIPI-SIPI.
+>>
+>> (15) Host CPU: (OS) Send INIT-SIPI-SIPI to pull new CPU in..
+>>
+>>
+>> In other words, the cache-as-RAM phase of 02-03 is replaced by the
+>> INIT-SIPI-SIPI sequence of 07b-08a-08b.
+> [Jiewen] I am OK with this proposal.
+> I think the rule is same - the new CPU CANNOT touch any system memory,
+> no matter it is from reset-vector or from INIT/SIPI/SIPI.
+> Or I would say: if the new CPU want to touch some memory before first SMI, the memory should be
+> CPU specific or on the flash.
+> 
+> 
+> 
+>>>> The QEMU DSDT could be modified (when secure boot is in effect) to OUT
+>>>> to 0xB2 when hotplug happens.  It could write a well-known value to
+>>>> 0xB2, to be read by an SMI handler in edk2.
+>>>
+>>> I dislike involving QEMU's generated DSDT in anything SMM (even
+>>> injecting the SMI), because the AML interpreter runs in the OS.
+>>>
+>>> If a malicious OS kernel is a bit too enlightened about the DSDT, it
+>>> could willfully diverge from the process that we design. If QEMU
+>>> broadcast the SMI internally, the guest OS could not interfere with that.
+>>>
+>>> If the purpose of the SMI is specifically to force all CPUs into SMM
+>>> (and thereby force them into trusted state), then the OS would be
+>>> explicitly counter-interested in carrying out the AML operations from
+>>> QEMU's DSDT.
+>>
+>> But since the hotplug controller would only be accessible from SMM,
+>> there would be no other way to invoke it than to follow the DSDT's
+>> instruction and write to 0xB2.  FWIW, real hardware also has plenty of
+>> 0xB2 writes in the DSDT or in APEI tables (e.g. for persistent store
+>> access).
+>>
+>> Paolo
 
--#define ALIGNED_ONLY
--
- /* Alpha processors have a weak memory model */
- #define TCG_GUEST_DEFAULT_MO      (0)
-
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index aab251b..2be67c2 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -30,7 +30,6 @@
-    basis.  It's probably easier to fall back to a strong memory model.  */
- #define TCG_GUEST_DEFAULT_MO        TCG_MO_ALL
-
--#define ALIGNED_ONLY
- #define MMU_KERNEL_IDX   0
- #define MMU_USER_IDX     3
- #define MMU_PHYS_IDX     4
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 21c0615..c13cd4e 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -1,8 +1,6 @@
- #ifndef MIPS_CPU_H
- #define MIPS_CPU_H
-
--#define ALIGNED_ONLY
--
- #include "cpu-qom.h"
- #include "exec/cpu-defs.h"
- #include "fpu/softfloat.h"
-diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
-index aee733e..ecaa7a1 100644
---- a/target/sh4/cpu.h
-+++ b/target/sh4/cpu.h
-@@ -23,8 +23,6 @@
- #include "cpu-qom.h"
- #include "exec/cpu-defs.h"
-
--#define ALIGNED_ONLY
--
- /* CPU Subtypes */
- #define SH_CPU_SH7750  (1 << 0)
- #define SH_CPU_SH7750S (1 << 1)
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index 8ed2250..1406f0b 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -5,8 +5,6 @@
- #include "cpu-qom.h"
- #include "exec/cpu-defs.h"
-
--#define ALIGNED_ONLY
--
- #if !defined(TARGET_SPARC64)
- #define TARGET_DPREGS 16
- #else
-diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
-index 2c27713..0459243 100644
---- a/target/xtensa/cpu.h
-+++ b/target/xtensa/cpu.h
-@@ -32,8 +32,6 @@
- #include "exec/cpu-defs.h"
- #include "xtensa-isa.h"
-
--#define ALIGNED_ONLY
--
- /* Xtensa processors have a weak memory model */
- #define TCG_GUEST_DEFAULT_MO      (0)
-
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index be2c33c..8d23fb0 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1926,7 +1926,7 @@ static const char * const ldst_name[] =3D
- };
-
- static const char * const alignment_name[(MO_AMASK >> MO_ASHIFT) + 1] =3D =
-{
--#ifdef ALIGNED_ONLY
-+#ifdef TARGET_ALIGNED_ONLY
-     [MO_UNALN >> MO_ASHIFT]    =3D "un+",
-     [MO_ALIGN >> MO_ASHIFT]    =3D "",
- #else
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index b411e17..529acb2 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -333,10 +333,12 @@ typedef enum TCGMemOp {
-     MO_TE    =3D MO_LE,
- #endif
-
--    /* MO_UNALN accesses are never checked for alignment.
-+    /*
-+     * MO_UNALN accesses are never checked for alignment.
-      * MO_ALIGN accesses will result in a call to the CPU's
-      * do_unaligned_access hook if the guest address is not aligned.
--     * The default depends on whether the target CPU defines ALIGNED_ONLY.
-+     * The default depends on whether the target CPU defines
-+     * TARGET_ALIGNED_ONLY.
-      *
-      * Some architectures (e.g. ARMv8) need the address which is aligned
-      * to a size more than the size of the memory access.
-@@ -353,7 +355,7 @@ typedef enum TCGMemOp {
-      */
-     MO_ASHIFT =3D 4,
-     MO_AMASK =3D 7 << MO_ASHIFT,
--#ifdef ALIGNED_ONLY
-+#ifdef TARGET_ALIGNED_ONLY
-     MO_ALIGN =3D 0,
-     MO_UNALN =3D MO_AMASK,
- #else
---
-1.8.3.1
-
-?
 
