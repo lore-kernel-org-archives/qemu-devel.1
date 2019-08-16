@@ -2,60 +2,60 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1755FC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D592EC3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:34:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD47F205C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:33:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD47F205C9
+	by mail.kernel.org (Postfix) with ESMTPS id A65582077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:34:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65582077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hylik-00069k-9G
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:33:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46677)
+	id 1hyljm-0007wt-Dx
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:34:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hylPn-0006cm-Sb
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:49 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hylPy-0006xh-JO
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hylPm-00062u-En
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36046)
+ (envelope-from <jsnow@redhat.com>) id 1hylPw-0006HW-RK
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37242)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hylPj-0005wP-5P; Fri, 16 Aug 2019 19:13:43 -0400
+ id 1hylPs-0006Aw-Dw; Fri, 16 Aug 2019 19:13:52 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 5DD002CD811;
- Fri, 16 Aug 2019 23:13:41 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9E8C6190C022;
+ Fri, 16 Aug 2019 23:13:50 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3245A19C6A;
- Fri, 16 Aug 2019 23:13:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EBB0119C6A;
+ Fri, 16 Aug 2019 23:13:49 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 19:13:01 -0400
-Message-Id: <20190816231318.8650-20-jsnow@redhat.com>
+Date: Fri, 16 Aug 2019 19:13:12 -0400
+Message-Id: <20190816231318.8650-31-jsnow@redhat.com>
 In-Reply-To: <20190816231318.8650-1-jsnow@redhat.com>
 References: <20190816231318.8650-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.29]); Fri, 16 Aug 2019 23:13:41 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.70]); Fri, 16 Aug 2019 23:13:50 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 19/36] blockdev: reduce aio_context locked
- sections in bitmap add/remove
+Subject: [Qemu-devel] [PULL 30/36] block/backup: teach TOP to never copy
+ unallocated regions
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,121 +67,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
+Cc: peter.maydell@linaro.org, jsnow@redhat.com, qemu-stable@nongnu.org,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Presently, If sync=3DTOP is selected, we mark the entire bitmap as dirty.
+In the write notifier handler, we dutifully copy out such regions.
 
-Commit 0a6c86d024c52 returned these locks back to add/remove
-functionality, to protect from intersection of persistent bitmap
-related IO with other IO. But other bitmap-related functions called
-here are unrelated to the problem, and there are no needs to keep these
-calls inside critical sections.
+Fix this in three parts:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+1. Mark the bitmap as being initialized before the first yield.
+2. After the first yield but before the backup loop, interrogate the
+allocation status asynchronously and initialize the bitmap.
+3. Teach the write notifier to interrogate allocation status if it is
+invoked during bitmap initialization.
+
+As an effect of this patch, the job progress for TOP backups
+now behaves like this:
+
+- total progress starts at bdrv_length.
+- As allocation status is interrogated, total progress decreases.
+- As blocks are copied, current progress increases.
+
+Taken together, the floor and ceiling move to meet each other.
+
+
 Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20190716000117.25219-10-jsnow@redhat.com
+[Remove ret =3D -ECANCELED change. --js]
+[Squash in conflict resolution based on Max's patch --js]
+Message-id: c8b0ab36-79c8-0b4b-3193-4e12ed8c848b@redhat.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190708220502.12977-2-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c | 30 +++++++++++++-----------------
- 1 file changed, 13 insertions(+), 17 deletions(-)
+ block/backup.c     | 79 ++++++++++++++++++++++++++++++++++++++++------
+ block/trace-events |  1 +
+ 2 files changed, 71 insertions(+), 9 deletions(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index a44ab1f709e..bcd766a1a24 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2813,7 +2813,6 @@ void qmp_block_dirty_bitmap_add(const char *node, c=
-onst char *name,
- {
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
--    AioContext *aio_context =3D NULL;
+diff --git a/block/backup.c b/block/backup.c
+index f6bf32c9438..9e1382ec5c6 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -58,6 +58,7 @@ typedef struct BackupBlockJob {
+     int64_t copy_range_size;
 =20
-     if (!name || name[0] =3D=3D '\0') {
-         error_setg(errp, "Bitmap name cannot be empty");
-@@ -2849,16 +2848,20 @@ void qmp_block_dirty_bitmap_add(const char *node,=
- const char *name,
+     bool serialize_target_writes;
++    bool initializing_bitmap;
+ } BackupBlockJob;
+=20
+ static const BlockJobDriver backup_job_driver;
+@@ -227,6 +228,35 @@ static int backup_is_cluster_allocated(BackupBlockJo=
+b *s, int64_t offset,
      }
-=20
-     if (persistent) {
--        aio_context =3D bdrv_get_aio_context(bs);
-+        AioContext *aio_context =3D bdrv_get_aio_context(bs);
-+        bool ok;
-+
-         aio_context_acquire(aio_context);
--        if (!bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp=
-)) {
--            goto out;
-+        ok =3D bdrv_can_store_new_dirty_bitmap(bs, name, granularity, er=
-rp);
-+        aio_context_release(aio_context);
-+        if (!ok) {
-+            return;
-         }
-     }
-=20
-     bitmap =3D bdrv_create_dirty_bitmap(bs, granularity, name, errp);
-     if (bitmap =3D=3D NULL) {
--        goto out;
-+        return;
-     }
-=20
-     if (disabled) {
-@@ -2866,10 +2869,6 @@ void qmp_block_dirty_bitmap_add(const char *node, =
-const char *name,
-     }
-=20
-     bdrv_dirty_bitmap_set_persistence(bitmap, persistent);
-- out:
--    if (aio_context) {
--        aio_context_release(aio_context);
--    }
  }
 =20
- void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-@@ -2877,8 +2876,6 @@ void qmp_block_dirty_bitmap_remove(const char *node=
-, const char *name,
- {
-     BlockDriverState *bs;
-     BdrvDirtyBitmap *bitmap;
--    Error *local_err =3D NULL;
--    AioContext *aio_context =3D NULL;
-=20
-     bitmap =3D block_dirty_bitmap_lookup(node, name, &bs, errp);
-     if (!bitmap || !bs) {
-@@ -2891,20 +2888,19 @@ void qmp_block_dirty_bitmap_remove(const char *no=
-de, const char *name,
-     }
-=20
-     if (bdrv_dirty_bitmap_get_persistence(bitmap)) {
--        aio_context =3D bdrv_get_aio_context(bs);
-+        AioContext *aio_context =3D bdrv_get_aio_context(bs);
-+        Error *local_err =3D NULL;
++/**
++ * Reset bits in copy_bitmap starting at offset if they represent unallo=
+cated
++ * data in the image. May reset subsequent contiguous bits.
++ * @return 0 when the cluster at @offset was unallocated,
++ *         1 otherwise, and -ret on error.
++ */
++static int64_t backup_bitmap_reset_unallocated(BackupBlockJob *s,
++                                               int64_t offset, int64_t *=
+count)
++{
++    int ret;
++    int64_t clusters, bytes, estimate;
 +
-         aio_context_acquire(aio_context);
-         bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-+        aio_context_release(aio_context);
-         if (local_err !=3D NULL) {
-             error_propagate(errp, local_err);
--            goto out;
-+            return;
++    ret =3D backup_is_cluster_allocated(s, offset, &clusters);
++    if (ret < 0) {
++        return ret;
++    }
++
++    bytes =3D clusters * s->cluster_size;
++
++    if (!ret) {
++        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
++        estimate =3D bdrv_get_dirty_count(s->copy_bitmap);
++        job_progress_set_remaining(&s->common.job, estimate);
++    }
++
++    *count =3D bytes;
++    return ret;
++}
++
+ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
+                                       int64_t offset, uint64_t bytes,
+                                       bool *error_is_read,
+@@ -236,6 +266,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob =
+*job,
+     int ret =3D 0;
+     int64_t start, end; /* bytes */
+     void *bounce_buffer =3D NULL;
++    int64_t status_bytes;
+=20
+     qemu_co_rwlock_rdlock(&job->flush_rwlock);
+=20
+@@ -262,6 +293,17 @@ static int coroutine_fn backup_do_cow(BackupBlockJob=
+ *job,
+             dirty_end =3D end;
          }
+=20
++        if (job->initializing_bitmap) {
++            ret =3D backup_bitmap_reset_unallocated(job, start, &status_=
+bytes);
++            if (ret =3D=3D 0) {
++                trace_backup_do_cow_skip_range(job, start, status_bytes)=
+;
++                start +=3D status_bytes;
++                continue;
++            }
++            /* Clamp to known allocated region */
++            dirty_end =3D MIN(dirty_end, start + status_bytes);
++        }
++
+         trace_backup_do_cow_process(job, start);
+=20
+         if (job->use_copy_range) {
+@@ -446,18 +488,9 @@ static int coroutine_fn backup_loop(BackupBlockJob *=
+job)
+     int64_t offset;
+     BdrvDirtyBitmapIter *bdbi;
+     int ret =3D 0;
+-    int64_t dummy;
+=20
+     bdbi =3D bdrv_dirty_iter_new(job->copy_bitmap);
+     while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
+-        if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP &&
+-            !backup_is_cluster_allocated(job, offset, &dummy))
+-        {
+-            bdrv_reset_dirty_bitmap(job->copy_bitmap, offset,
+-                                    job->cluster_size);
+-            continue;
+-        }
+-
+         do {
+             if (yield_and_check(job)) {
+                 goto out;
+@@ -488,6 +521,13 @@ static void backup_init_copy_bitmap(BackupBlockJob *=
+job)
+                                                NULL, true);
+         assert(ret);
+     } else {
++        if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
++            /*
++             * We can't hog the coroutine to initialize this thoroughly.
++             * Set a flag and resume work when we are able to yield safe=
+ly.
++             */
++            job->initializing_bitmap =3D true;
++        }
+         bdrv_set_dirty_bitmap(job->copy_bitmap, 0, job->len);
      }
 =20
-     bdrv_release_dirty_bitmap(bs, bitmap);
-- out:
--    if (aio_context) {
--        aio_context_release(aio_context);
--    }
- }
+@@ -509,6 +549,26 @@ static int coroutine_fn backup_run(Job *job, Error *=
+*errp)
+     s->before_write.notify =3D backup_before_write_notify;
+     bdrv_add_before_write_notifier(bs, &s->before_write);
 =20
- /**
++    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
++        int64_t offset =3D 0;
++        int64_t count;
++
++        for (offset =3D 0; offset < s->len; ) {
++            if (yield_and_check(s)) {
++                ret =3D -ECANCELED;
++                goto out;
++            }
++
++            ret =3D backup_bitmap_reset_unallocated(s, offset, &count);
++            if (ret < 0) {
++                goto out;
++            }
++
++            offset +=3D count;
++        }
++        s->initializing_bitmap =3D false;
++    }
++
+     if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_NONE) {
+         /* All bits are set in copy_bitmap to allow any cluster to be co=
+pied.
+          * This does not actually require them to be copied. */
+@@ -521,6 +581,7 @@ static int coroutine_fn backup_run(Job *job, Error **=
+errp)
+         ret =3D backup_loop(s);
+     }
+=20
++ out:
+     notifier_with_return_remove(&s->before_write);
+=20
+     /* wait until pending backup_do_cow() calls have completed */
+diff --git a/block/trace-events b/block/trace-events
+index d724df0117d..04209f058d4 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -41,6 +41,7 @@ mirror_yield_in_flight(void *s, int64_t offset, int in_=
+flight) "s %p offset %" P
+ backup_do_cow_enter(void *job, int64_t start, int64_t offset, uint64_t b=
+ytes) "job %p start %" PRId64 " offset %" PRId64 " bytes %" PRIu64
+ backup_do_cow_return(void *job, int64_t offset, uint64_t bytes, int ret)=
+ "job %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
+ backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
++backup_do_cow_skip_range(void *job, int64_t start, uint64_t bytes) "job =
+%p start %"PRId64" bytes %"PRId64
+ backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
+ backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start=
+ %"PRId64" ret %d"
+ backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p star=
+t %"PRId64" ret %d"
 --=20
 2.21.0
 
