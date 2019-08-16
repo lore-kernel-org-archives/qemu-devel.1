@@ -2,59 +2,60 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6A2C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:48:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F389C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE17A2063F
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:48:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE17A2063F
+	by mail.kernel.org (Postfix) with ESMTPS id 7598A2063F
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:49:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7598A2063F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyXus-00009k-2b
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:48:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51983)
+	id 1hyXux-0000Jz-W6
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1hyXtE-0006zx-MY
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 04:47:17 -0400
+ (envelope-from <david@redhat.com>) id 1hyXtI-00073j-Al
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 04:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1hyXtD-0003s9-5P
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 04:47:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51050)
+ (envelope-from <david@redhat.com>) id 1hyXtH-0003vu-DJ
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 04:47:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45466)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <david@redhat.com>)
- id 1hyXtD-0003rM-0D; Fri, 16 Aug 2019 04:47:15 -0400
+ id 1hyXtH-0003vK-7y; Fri, 16 Aug 2019 04:47:19 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EB24285A07;
- Fri, 16 Aug 2019 08:47:13 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 79D7C30842A9;
+ Fri, 16 Aug 2019 08:47:18 +0000 (UTC)
 Received: from t460s.redhat.com (ovpn-116-249.ams2.redhat.com [10.36.116.249])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 45381F6DF;
- Fri, 16 Aug 2019 08:47:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 812B343FE2;
+ Fri, 16 Aug 2019 08:47:16 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 10:47:02 +0200
-Message-Id: <20190816084708.602-1-david@redhat.com>
+Date: Fri, 16 Aug 2019 10:47:04 +0200
+Message-Id: <20190816084708.602-3-david@redhat.com>
+In-Reply-To: <20190816084708.602-1-david@redhat.com>
+References: <20190816084708.602-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 16 Aug 2019 08:47:14 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 16 Aug 2019 08:47:18 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PATCH v3 0/6] s390x/mmu: Storage key reference and
- change bit handling
+Subject: [Qemu-devel] [PATCH v3 2/6] s390x/mmu: ASC selection in
+ s390_cpu_get_phys_page_debug()
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,50 +77,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The first two patches are modified patches from:
-    [PATCH-for-4.2 v1 0/9] s390x: MMU changes and extensions
+Let's select the ASC before calling the function. This is a prepararion
+to remove the ASC magic depending on the access mode from mmu_translate.
 
-This series primarily fixes minor things in the storage key handling code
-in the MMU and implements fairly reliable reference and change bit handli=
-ng
-for TCG. To track the reference and change bit, we have to invalidate
-TLB entries whenever the storage key is changed by the guest and make sur=
-e
-not TLB entry is writable in case the storage key does not indicate a
-change already.
+There is currently no way to distinguish if we have code or data access.
+For now, we were using code access, because especially when debugging wit=
+h
+the gdbstub, we want to read and disassemble what we single-step.
 
-With this series, the kvm-unit-test "skey" now passes. \o/
+Note: KVM guest can now no longer be crashed using qmp/hmp/gdbstub if the=
+y
+happen to be in AR mode.
 
-v2 -> v3:
-- Reshuffled patches to avoid a temporary uninitialized return value
-- Minor updates to patch descriptions
-- "s390x/tcg: Flush the TLB of all CPUs on SSKE and RRBE"
--- Updated comments
-- "s390x/mmu: Factor out storage key handling"
--- Reduce indentation
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/helper.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-v1 -> v2:
-- "s390x/tcg: Rework MMU selection for instruction fetches"
--- Cleanup return value handling
-- Added RB's
-
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-David Hildenbrand (6):
-  s390x/mmu: Trace the right value if setting/getting the storage key
-    fails
-  s390x/mmu: ASC selection in s390_cpu_get_phys_page_debug()
-  s390x/tcg: Rework MMU selection for instruction fetches
-  s390x/tcg: Flush the TLB of all CPUs on SSKE and RRBE
-  s390x/mmu: Better storage key reference and change bit handling
-  s390x/mmu: Factor out storage key handling
-
- target/s390x/cpu.h        |   7 ++
- target/s390x/helper.c     |   5 ++
- target/s390x/mem_helper.c |  10 +++
- target/s390x/mmu_helper.c | 135 ++++++++++++++++++++++++--------------
- 4 files changed, 107 insertions(+), 50 deletions(-)
-
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index 13ae9909ad..c5fb8966b6 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -58,6 +58,11 @@ hwaddr s390_cpu_get_phys_page_debug(CPUState *cs, vadd=
+r vaddr)
+         vaddr &=3D 0x7fffffff;
+     }
+=20
++    /* We want to read the code (e.g., see what we are single-stepping).=
+*/
++    if (asc !=3D PSW_ASC_HOME) {
++        asc =3D PSW_ASC_PRIMARY;
++    }
++
+     if (mmu_translate(env, vaddr, MMU_INST_FETCH, asc, &raddr, &prot, fa=
+lse)) {
+         return -1;
+     }
 --=20
 2.21.0
 
