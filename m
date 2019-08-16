@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4677FC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB2DC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:18:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FA262064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:17:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA262064A
+	by mail.kernel.org (Postfix) with ESMTPS id 058A52064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:18:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 058A52064A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyUcd-0000UA-Rc
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 01:17:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49811)
+	id 1hyUdO-0001O8-06
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 01:18:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyUaa-0007Zh-Ew
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:15:49 -0400
+ (envelope-from <bounces@canonical.com>) id 1hyUac-0007Zx-7K
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyUaZ-0004MM-AY
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:15:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53426)
+ (envelope-from <bounces@canonical.com>) id 1hyUab-0004O3-4i
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:15:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53508)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyUaZ-0004Lm-50
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:15:47 -0400
+ id 1hyUaa-0004NQ-VT
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:15:49 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyUaY-0004K5-Ac
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:15:46 +0000
+ id 1hyUaa-0004Bv-2T
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:15:48 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 39E832E80C8
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:15:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 0F0A42E8048
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:15:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Aug 2019 05:04:50 -0000
-From: Thomas Huth <1831545@bugs.launchpad.net>
+Date: Fri, 16 Aug 2019 05:08:49 -0000
+From: Thomas Huth <1738545@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=alex.bennee@linaro.org; 
-X-Launchpad-Bug-Tags: regression tcg
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andrew-randrianasulu
-X-Launchpad-Bug-Reporter: Andrew Randrianasulu (andrew-randrianasulu)
+X-Launchpad-Bug-Commenters: glaubitz pmaydell th-huth
+X-Launchpad-Bug-Reporter: John Paul Adrian Glaubitz (glaubitz)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <155962633298.7880.15982922254182327026.malonedeb@wampee.canonical.com>
-Message-Id: <156593189158.22288.16425892244905221856.launchpad@chaenomeles.canonical.com>
+References: <151343792336.25601.1495072942778945687.malonedeb@wampee.canonical.com>
+Message-Id: <156593212933.26859.14020746682777210288.malone@soybean.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 478ed210414679d8c828d058f27bff078796c3ed
+X-Launchpad-Hash: af211b63de66b0bed82a75f5ea47d214e0242bac
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1831545] Re: "accel/tcg: demacro cputlb" break
- qemu-system-x86_64 on 32-bit x86 host
+Subject: [Qemu-devel] [Bug 1738545] Re: Go binaries panic with "mmap errno
+ 9" on qemu-user
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,10 +77,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1831545 <1831545@bugs.launchpad.net>
+Reply-To: Bug 1738545 <1738545@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+
+I'm marking this bug as "fix released" now since the Arm problem has
+been fixed. If there is something else to do for sh4, please open a new
+bug as suggested by Peter.
 
 ** Changed in: qemu
        Status: Fix Committed =3D> Fix Released
@@ -90,44 +93,47 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1831545
+https://bugs.launchpad.net/bugs/1738545
 
 Title:
-  "accel/tcg: demacro cputlb" break qemu-system-x86_64 on 32-bit x86
-  host
+  Go binaries panic with "mmap errno 9" on qemu-user
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  As described in https://lists.gnu.org/archive/html/qemu-
-  devel//2019-05/msg07362.html I run into TCG regression in qemu-git.
+  Go binaries panic with "mmap errno 9" on qemu-user.
 
-  Unfortunately, fix from bug
-  https://bugs.launchpad.net/qemu/+bug/1830872 seems to be nonn-
-  effective for my case.
+  root@nofan:/# cat hello.go =
 
-  For reproduction (on 32-bit x86 host, in my case Slackware with gcc
-  5.5.0):
+  package main
 
-  ./configure --target-list=3Dx86_64-softmmu --disable-werror --enable-
-  debug-tcg
+  import "fmt"
 
-  make (-j5 in my case)
+  func main() {
+      fmt.Println("hello world")
+  }
+  root@nofan:/# gccgo-7 hello.go -o hello
+  root@nofan:/# ./hello =
 
-  try to boot any 64-bit kernel:
+  mmap errno 9
+  fatal error: mmap
 
-  x86_64-softmmu/qemu-system-x86_64 -kernel /boot/bzImage-4.12.0-x64
-  -accel tcg
+  runtime stack:
+  mmap errno 9
+  fatal error: mmap
+  panic during panic
 
-  result is - qemu appear to hang right after "Booting the kernel" line.
-  Decompression (xz) was ok.
+  runtime stack:
+  mmap errno 9
+  fatal error: mmap
+  stack trace unavailable
+  root@nofan:/#
 
-  Tested with qemu-git commit  e2a58ff493a2e00db3e963c1839c5374500110f2
+  Tested with qemu from git master with Debian unstable for armel.
 
-  32-bit OS can be booted fine, and -enable-kvm also allow 64 bit
-  kernel/os to boot.
+  Same binaries work fine on real hardware.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1831545/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1738545/+subscriptions
 
