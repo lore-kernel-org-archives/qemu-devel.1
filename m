@@ -2,95 +2,85 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B22DC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:08:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 901A8C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:22:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B614206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:08:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B614206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 49B492077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:22:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCwxJvFk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B492077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyjSA-0004vj-Dr
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 17:08:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59203)
+	id 1hyjgE-0000VC-Gk
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 17:22:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ymankad@redhat.com>) id 1hyjRO-0004U9-AA
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:07:19 -0400
+ (envelope-from <nirsof@gmail.com>) id 1hyjfU-0008PW-G5
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:21:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ymankad@redhat.com>) id 1hyjRM-0005H1-H3
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:07:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49490)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ymankad@redhat.com>) id 1hyjRM-0005Fo-8o
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:07:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 569D8309DEF3;
- Fri, 16 Aug 2019 21:07:14 +0000 (UTC)
-Received: from apollo.usersys.redhat.com (unused-10-15-17-159.yyz.redhat.com
- [10.15.17.159])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C83175D9DC;
- Fri, 16 Aug 2019 21:07:10 +0000 (UTC)
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <20190815183803.13346-1-ehabkost@redhat.com>
- <20190815183803.13346-4-ehabkost@redhat.com>
- <87pnl5sks3.fsf@dusky.pond.sub.org>
- <20190816074932.GK13569@beluga.usersys.redhat.com>
- <87h86hpae5.fsf@dusky.pond.sub.org> <20190816174241.GE3908@habkost.net>
-From: Yash Mankad <ymankad@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=ymankad@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFecwEYBCAC7QUnuTKRrz39gLumVG+KNB8XmHqHKypYPMkdJNLx33LAhmDVEeBEB6Zyn
- ryVtNClL4GVrmDOROp53kIkJh4uSAeu71w3/RJLrrHIs/NlFZ1cH3hEAwShLKYkXoVfqBN3m
- zhbqyndmPy8fviOIDcyzEBEIDbgsLgMebJTAto/ihLgEeG9dMF4qUuCcb3sWIao/WHSr9XHB
- OtZnvVUGueIM3DqEC2g5BN8025riOOL3UGRmIctJR+2dM+j0aCIbARGv1B66o300gJfjxm24
- /CbD/I6Wt2PHrNv/d4nXjfNElaBCiVw9513m2maFJeFaSPJpAGZjyDN/niNcpvxg6XaLABEB
- AAG0P1lhc2ggTWFua2FkIChTb2Z0d2FyZSBFbmdpbmVlciBhdCBSZWQgSGF0KSA8eW1hbmth
- ZEByZWRoYXQuY29tPokBNwQTAQgAIQUCV5zARgIbAwULCQgHAgYVCAkKCwIEFgIDAQIeAQIX
- gAAKCRBjP1s2LzTrMJhfB/9mRNS3eMAy17wRSjnR1/AtNZ2qwBbyjnor0+Q7UfYUXKvFBNJo
- LnX6zphFJ/fZMqIM5BrE7T90Mm5Qy3qoK1c0QibN97OECrPn9epGPKiiI+1WZrIX9S3crCui
- hyIS4IuOOmgtVJx+akWCbfYPaybNsTPLBFJZ0+aATSe9Nbeb4XUS3RAqlRUEdejNGxxtKLtZ
- xgXsmL/il6Fp4EX53H1+d83Rk4V+S2KvMfrFEB+mxF7JFUv0E071br42po/EDnYj2wLM/STh
- Fgp5LO4qTPrwD8mllibLSF6ZCrjNYW1EctJF7oYbfFXwPUh9LWh0opKwzo8ne5ZN/4hzexHU
- 4MnquQENBFecwEYBCACnrkQgxRis8b1DRRIWu+Gxxp4Xv85c19A3IyNudvihSNSSV8mSZ+ei
- 9Xev80IhgExf+1MeTPvuWmD1FogqC5Pi6bEs29ZZvSde+DH1BeVoKVn4zY+rCSqyrlRfx8Zd
- xJXIICfOgfDRjDf0nKPiI14ujdT0zMOPJHQ8wf267kMWmS32eQPTLJmemhl9WhEett+i1WLq
- 84DjbEhtkTO6FdboEcTN1fMSpkXz+jgfvgCCZIfJJ+AI/V/VjBBn264VdDdOE/AFfc6B1QYf
- 6X3npdUmXjlE5QIadoaOHf6e+qMSEchKfMa9ban0dH1THVAm2Z8Ji+l0tNYJ/e3mndXcVJv7
- ABEBAAGJAR8EGAEIAAkFAlecwEYCGwwACgkQYz9bNi806zAlVwgAj0auI5iVWxdCEnxGDAFC
- 7uuZeBfiRGUwnaeRLcs2N6zLdN7Y9aoLv0RMrQhTP1DiIOi2xuCiUeGAY533fIpQOtE+AHgY
- fFqUG9gwK9Web5Tec+SNOBXeULRd8flo3RIkKMUR6RBynHkvEt2WbGRfr4gP6RuYzwBL1EWv
- nigkhVXsLA+hyut5C8OMXcxG61vbat2duyBgqROV0UbMau9Nr+t5w2isusgHe3fia1h5uwsh
- 3UDO4xAD/Il16hZqcPbgKW3+S7uR3V2LKwCqX0S/9gYwaIfiBgvEt7EAbj2YZfYvcWjbBwDu
- stjeTrSRCejEli4lN7PsSM6/NaLsIPKMgQ==
-Message-ID: <75655410-9af9-e463-9471-675299929bde@redhat.com>
-Date: Fri, 16 Aug 2019 17:07:10 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <nirsof@gmail.com>) id 1hyjfS-0002hg-O4
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:21:52 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34230)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <nirsof@gmail.com>)
+ id 1hyjfO-0002ft-MK; Fri, 16 Aug 2019 17:21:46 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s18so2802408wrn.1;
+ Fri, 16 Aug 2019 14:21:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4lqSZ1m0WK/OEYPPjSPDg39E2UZXOnB9G/Y7GfNf7as=;
+ b=fCwxJvFkQivFoB3GcztjkFF43KEX2I8wFcnmMHRjB9JHS/GRmF6ldqrodwzyVVjhf9
+ RU5rNyfvHHoyVb8PF5hZ8+g0bYoTxPC6Z6KDCcbMrECH0tg5OQ+elAwWqRQPuRcdJvGf
+ TdmgoAmyLNUL0YwPkRNumaaL/5w+zCAX4wF5GhVPlJAwZKy7tZXdlVvQjdldJlh2woc5
+ xH6OQd7XMgkW2JqSw1NZpNSm7CM/FdlZJlSXu02Pqh2DzSkX9JIiKGap2H9BCfyeNHmo
+ 7hnmnHl4xYUT+YJoGpr6xm8CyaU5ljSjI9FzDrYme4MqU3XYxZrVwKp7agTP/7vp/UbI
+ KJ0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4lqSZ1m0WK/OEYPPjSPDg39E2UZXOnB9G/Y7GfNf7as=;
+ b=Oa3gccWCAoVXpFxJ35p5JaS2iKse7pt8obxpAITX2zZKGxryl8979Jtclge0WctCuQ
+ 2Z23ssDlppdSy+fKIQ0ir32B9DduE4bpPkLkIbFeh/dLWmUWEfLP/h/dBd5NkZb8Q3iY
+ 8YYFqQrEWGy+5i55VJ9fkc59avpY7KTuCJbFge2IgZmOqgCXq+GDy8ZCdcsijr4epW0C
+ JE5KBfM1YX7lTZjZaMXTRBjKEmPZ/qhoUxv1bnu80hfAC0DOMQ8Ww2mue2gEEjw9fOkM
+ SbQ0KZl9zEqdMa9JMH+p0NxzZV5APdbt2riIk0sgd5kcYmRkhjNdALXt9XkJH4+dL1Qa
+ 54uQ==
+X-Gm-Message-State: APjAAAVzrbs8WqBEmDTOkot6alyXudmC/0GYXLTblF5LM1VhwgWIx25q
+ NO+7sC26tTRLQbDNMVLLBZb1lSpfIjg=
+X-Google-Smtp-Source: APXvYqz4zf1ZXbSaEER6fx+xjtpXLrEZIJ8wbylUZlKgTIxSAy/AHEzyz6491Gvp9yvSEx2o7T/zrA==
+X-Received: by 2002:a5d:4c87:: with SMTP id z7mr12492007wrs.10.1565990504657; 
+ Fri, 16 Aug 2019 14:21:44 -0700 (PDT)
+Received: from localhost.localdomain (93-173-46-43.bb.netvision.net.il.
+ [93.173.46.43])
+ by smtp.gmail.com with ESMTPSA id s64sm11474524wmf.16.2019.08.16.14.21.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 16 Aug 2019 14:21:43 -0700 (PDT)
+From: Nir Soffer <nirsof@gmail.com>
+X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
+To: qemu-block@nongnu.org
+Date: Sat, 17 Aug 2019 00:21:22 +0300
+Message-Id: <20190816212122.8816-1-nsoffer@redhat.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190816174241.GE3908@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.45]); Fri, 16 Aug 2019 21:07:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 3/3] pc: Don't make CPU properties
- mandatory unless necessary
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
+Subject: [Qemu-devel] [PATCH] block: posix: Always allocate the first block
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,96 +92,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>, Like Xu <like.xu@linux.intel.com>,
- Erik Skultety <eskultet@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Miroslav Rezanina <mrezanin@redhat.com>,
- "Danilo C. L. de Paula" <ddepaula@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When creating an image with preallocation "off" or "falloc", the first
+block of the image is typically not allocated. When using Gluster
+storage backed by XFS filesystem, reading this block using direct I/O
+succeeds regardless of request length, fooling alignment detection.
 
+In this case we fallback to a safe value (4096) instead of the optimal
+value (512), which may lead to unneeded data copying when aligning
+requests.  Allocating the first block avoids the fallback.
 
-On 8/16/19 1:42 PM, Eduardo Habkost wrote:
-> On Fri, Aug 16, 2019 at 02:22:58PM +0200, Markus Armbruster wrote:
->> Erik Skultety <eskultet@redhat.com> writes:
->>
->>> On Fri, Aug 16, 2019 at 08:10:20AM +0200, Markus Armbruster wrote:
->>>> Eduardo Habkost <ehabkost@redhat.com> writes:
->>>>
->>>>> We have this issue reported when using libvirt to hotplug CPUs:
->>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1741451
->>>>>
->>>>> Basically, libvirt is not copying die-id from
->>>>> query-hotpluggable-cpus, but die-id is now mandatory.
->>>> Uh-oh, "is now mandatory": making an optional property mandatory is =
-an
->>>> incompatible change.  When did we do that?  Commit hash, please.
->>>>
->>>> [...]
->>>>
->>> I don't even see it as being optional ever - the property wasn't even=
+When using preallocation=off, we always allocate at least one filesystem
+block:
 
->>> recognized before commit 176d2cda0de introduced it as mandatory.
->> Compatibility break.
->>
->> Commit 176d2cda0de is in v4.1.0.  If I had learned about it a bit
->> earlier, I would've argued for a last minute fix or a revert.  Now we
->> have a regression in the release.
->>
->> Eduardo, I think this fix should go into v4.1.1.  Please add cc:
->> qemu-stable.
-> I did it in v2.
->
->> How can we best avoid such compatibility breaks to slip in undetected?=
+    $ ./qemu-img create -f raw test.raw 1g
+    Formatting 'test.raw', fmt=raw size=1073741824
 
->>
->> A static checker would be nice.  For vmstate, we have
->> scripts/vmstate-static-checker.py.  Not sure it's used.
-> I don't think this specific bug would be detected with a static
-> checker.  "die-id is mandatory" is not something that can be
-> extracted by looking at QOM data structures.  The new rule was
-> being enforced by the hotplug handler callbacks, and the hotplug
-> handler call tree is a bit complex (too complex for my taste, but
-> I digress).
->
-> We could have detected this with a simple CPU hotplug automated
-> test case, though.  Or with a very simple -device test case like
-> the one I have submitted with this patch.
->
-> This was detected by libvirt automated test cases.  It would be
-> nice if this was run during the -rc stage and not only after the
-> 4.1.0 release, though.
->
-> I don't know details of the test job.  Danilo, Mirek, Yash: do
-> you know how this bug was detected, and what we could do to run
-> the same test jobs in upstream QEMU release candidates?
+    $ ls -lhs test.raw
+    4.0K -rw-r--r--. 1 nsoffer nsoffer 1.0G Aug 16 23:48 test.raw
 
-This bug was caught by our internal gating tests.
+I did quick performance tests for these flows:
+- Provisioning a VM with a new raw image.
+- Copying disks with qemu-img convert to new raw target image
 
-The libvirt gating tests for the virt module include the
-following Avocado-VT test case:
+I installed Fedora 29 server on raw sparse image, measuring the time
+from clicking "Begin installation" until the "Reboot" button appears:
 
-libvirt_vcpu_plug_unplug.positive_test.vcpu_set.live.vm_operate.save
+Before(s)  After(s)     Diff(%)
+-------------------------------
+     356        389        +8.4
 
-This job failed with the error that you can see in the description
-of the BZ#1741451 [0].
+I ran this only once, so we cannot tell much from these results.
 
-If you think that this would have been caught by a simple hotplug
-case, I'd recommend adding a test for hotplug to avocado_qemu.
-Otherwise, if you want, I can look into adding this particular
-libvirt test case to our QEMU CI efforts.
+The second test was cloning the installation image with qemu-img
+convert, doing 10 runs:
 
-Thanks,
-Yash
+    for i in $(seq 10); do
+        rm -f dst.raw
+        sleep 10
+        time ./qemu-img convert -f raw -O raw -t none -T none src.raw dst.raw
+    done
 
-[0] https://bugzilla.redhat.com/show_bug.cgi?id=3D1741451#c0
+Here is a table comparing the total time spent:
 
+Type    Before(s)   After(s)    Diff(%)
+---------------------------------------
+real      530.028    469.123      -11.4
+user       17.204     10.768      -37.4
+sys        17.881      7.011      -60.7
 
+Here we see very clear improvement in CPU usage.
 
->
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+---
+ block/file-posix.c         | 25 +++++++++++++++++++++++++
+ tests/qemu-iotests/150.out |  1 +
+ tests/qemu-iotests/160     |  4 ++++
+ tests/qemu-iotests/175     | 19 +++++++++++++------
+ tests/qemu-iotests/175.out |  8 ++++----
+ tests/qemu-iotests/221.out | 12 ++++++++----
+ tests/qemu-iotests/253.out | 12 ++++++++----
+ 7 files changed, 63 insertions(+), 18 deletions(-)
 
+diff --git a/block/file-posix.c b/block/file-posix.c
+index b9c33c8f6c..3964dd2021 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1755,6 +1755,27 @@ static int handle_aiocb_discard(void *opaque)
+     return ret;
+ }
+ 
++/*
++ * Help alignment detection by allocating the first block.
++ *
++ * When reading with direct I/O from unallocated area on Gluster backed by XFS,
++ * reading succeeds regardless of request length. In this case we fallback to
++ * safe aligment which is not optimal. Allocating the first block avoids this
++ * fallback.
++ *
++ * Returns: 0 on success, -errno on failure.
++ */
++static int allocate_first_block(int fd)
++{
++    ssize_t n;
++
++    do {
++        n = pwrite(fd, "\0", 1, 0);
++    } while (n == -1 && errno == EINTR);
++
++    return (n == -1) ? -errno : 0;
++}
++
+ static int handle_aiocb_truncate(void *opaque)
+ {
+     RawPosixAIOData *aiocb = opaque;
+@@ -1794,6 +1815,8 @@ static int handle_aiocb_truncate(void *opaque)
+                 /* posix_fallocate() doesn't set errno. */
+                 error_setg_errno(errp, -result,
+                                  "Could not preallocate new data");
++            } else if (current_length == 0) {
++                allocate_first_block(fd);
+             }
+         } else {
+             result = 0;
+@@ -1855,6 +1878,8 @@ static int handle_aiocb_truncate(void *opaque)
+         if (ftruncate(fd, offset) != 0) {
+             result = -errno;
+             error_setg_errno(errp, -result, "Could not resize file");
++        } else if (current_length == 0 && offset > current_length) {
++            allocate_first_block(fd);
+         }
+         return result;
+     default:
+diff --git a/tests/qemu-iotests/150.out b/tests/qemu-iotests/150.out
+index 2a54e8dcfa..3cdc7727a5 100644
+--- a/tests/qemu-iotests/150.out
++++ b/tests/qemu-iotests/150.out
+@@ -3,6 +3,7 @@ QA output created by 150
+ === Mapping sparse conversion ===
+ 
+ Offset          Length          File
++0               0x1000          TEST_DIR/t.IMGFMT
+ 
+ === Mapping non-sparse conversion ===
+ 
+diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
+index df89d3864b..ad2d054a47 100755
+--- a/tests/qemu-iotests/160
++++ b/tests/qemu-iotests/160
+@@ -57,6 +57,10 @@ for skip in $TEST_SKIP_BLOCKS; do
+     $QEMU_IMG dd if="$TEST_IMG" of="$TEST_IMG.out" skip="$skip" -O "$IMGFMT" \
+         2> /dev/null
+     TEST_IMG="$TEST_IMG.out" _check_test_img
++
++    # We always write the first byte of an image.
++    printf "\0" > "$TEST_IMG.out.dd"
++
+     dd if="$TEST_IMG" of="$TEST_IMG.out.dd" skip="$skip" status=none
+ 
+     echo
+diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
+index 51e62c8276..c6a3a7bb1e 100755
+--- a/tests/qemu-iotests/175
++++ b/tests/qemu-iotests/175
+@@ -37,14 +37,16 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+ # the file size.  This function hides the resulting difference in the
+ # stat -c '%b' output.
+ # Parameter 1: Number of blocks an empty file occupies
+-# Parameter 2: Image size in bytes
++# Parameter 2: Minimal number of blocks in an image
++# Parameter 3: Image size in bytes
+ _filter_blocks()
+ {
+     extra_blocks=$1
+-    img_size=$2
++    min_blocks=$2
++    img_size=$3
+ 
+-    sed -e "s/blocks=$extra_blocks\\(\$\\|[^0-9]\\)/nothing allocated/" \
+-        -e "s/blocks=$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\\)/everything allocated/"
++    sed -e "s/blocks=$((extra_blocks + min_blocks))\\(\$\\|[^0-9]\\)/min allocation/" \
++        -e "s/blocks=$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\\)/max allocation/"
+ }
+ 
+ # get standard environment, filters and checks
+@@ -60,16 +62,21 @@ size=$((1 * 1024 * 1024))
+ touch "$TEST_DIR/empty"
+ extra_blocks=$(stat -c '%b' "$TEST_DIR/empty")
+ 
++# We always write the first byte; check how many blocks this filesystem
++# allocates to match empty image alloation.
++printf "\0" > "$TEST_DIR/empty"
++min_blocks=$(stat -c '%b' "$TEST_DIR/empty")
++
+ echo
+ echo "== creating image with default preallocation =="
+ _make_test_img $size | _filter_imgfmt
+-stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $size
++stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $min_blocks $size
+ 
+ for mode in off full falloc; do
+     echo
+     echo "== creating image with preallocation $mode =="
+     IMGOPTS=preallocation=$mode _make_test_img $size | _filter_imgfmt
+-    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $size
++    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $min_blocks $size
+ done
+ 
+ # success, all done
+diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
+index 6d9a5ed84e..263e521262 100644
+--- a/tests/qemu-iotests/175.out
++++ b/tests/qemu-iotests/175.out
+@@ -2,17 +2,17 @@ QA output created by 175
+ 
+ == creating image with default preallocation ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
+-size=1048576, nothing allocated
++size=1048576, min allocation
+ 
+ == creating image with preallocation off ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=off
+-size=1048576, nothing allocated
++size=1048576, min allocation
+ 
+ == creating image with preallocation full ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=full
+-size=1048576, everything allocated
++size=1048576, max allocation
+ 
+ == creating image with preallocation falloc ==
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=falloc
+-size=1048576, everything allocated
++size=1048576, max allocation
+  *** done
+diff --git a/tests/qemu-iotests/221.out b/tests/qemu-iotests/221.out
+index 9f9dd52bb0..dca024a0c3 100644
+--- a/tests/qemu-iotests/221.out
++++ b/tests/qemu-iotests/221.out
+@@ -3,14 +3,18 @@ QA output created by 221
+ === Check mapping of unaligned raw image ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65537
+-[{ "start": 0, "length": 66048, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+-[{ "start": 0, "length": 66048, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 61952, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 61952, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+ wrote 1/1 bytes at offset 65536
+ 1 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-[{ "start": 0, "length": 65536, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 61440, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
+ { "start": 65536, "length": 1, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+ { "start": 65537, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+-[{ "start": 0, "length": 65536, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 61440, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
+ { "start": 65536, "length": 1, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+ { "start": 65537, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+ *** done
+diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
+index 607c0baa0b..3d08b305d7 100644
+--- a/tests/qemu-iotests/253.out
++++ b/tests/qemu-iotests/253.out
+@@ -3,12 +3,16 @@ QA output created by 253
+ === Check mapping of unaligned raw image ===
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048575
+-[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+-[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+ wrote 65535/65535 bytes at offset 983040
+ 63.999 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+-[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 978944, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
+ { "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
+-[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
++[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
++{ "start": 4096, "length": 978944, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
+ { "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
+ *** done
+-- 
+2.20.1
 
 
