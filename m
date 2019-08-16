@@ -2,71 +2,83 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22FE5C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AABC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:40:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE77F20644
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:34:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE77F20644
+	by mail.kernel.org (Postfix) with ESMTPS id 83B432086C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 12:40:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B432086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hybRa-0005yy-2Q
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 08:34:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58059)
+	id 1hybWe-0007em-OZ
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 08:40:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1hybQR-0005TP-2k
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:33:47 -0400
+ (envelope-from <philmd@redhat.com>) id 1hybVf-0007DC-0Q
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1hybQQ-00037j-2e
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:33:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46184)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>)
- id 1hybQM-00035f-0L; Fri, 16 Aug 2019 08:33:42 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7C7E2308302F;
- Fri, 16 Aug 2019 12:33:40 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-117-142.ams2.redhat.com
- [10.36.117.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 145B01757C;
- Fri, 16 Aug 2019 12:33:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6C89310E6CCA; Fri, 16 Aug 2019 14:33:26 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190814100735.24234-1-vsementsov@virtuozzo.com>
- <20190814100735.24234-3-vsementsov@virtuozzo.com>
- <3eded188-0161-d494-194c-9d67da644eb1@redhat.com>
- <20190815104928.GC7415@linux.fritz.box>
- <9c290e4e-1d3b-bc6e-c6e6-28a0414b866e@redhat.com>
- <20190815164821.GE7415@linux.fritz.box>
- <87a7caut8t.fsf@dusky.pond.sub.org>
- <20190816082013.GB5014@localhost.localdomain>
-Date: Fri, 16 Aug 2019 14:33:26 +0200
-In-Reply-To: <20190816082013.GB5014@localhost.localdomain> (Kevin Wolf's
- message of "Fri, 16 Aug 2019 10:20:13 +0200")
-Message-ID: <87d0h5p9wp.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <philmd@redhat.com>) id 1hybVd-0005cH-HI
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:39:10 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37639)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1hybVd-0005bz-BZ
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 08:39:09 -0400
+Received: by mail-wm1-f67.google.com with SMTP id z23so3963808wmf.2
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:39:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JIqWNPutHNQXgTOfMbFQ4rFCNVlLt+0IsKVDsVkcZUE=;
+ b=kRm6f/1FO5WAq0XZBDT+JJI0VrqCvSRAd/u4Z8iyGcKQDUCoaQI1OZ4RMP+j9lazZb
+ 8BvyICkjAfubz2G0BeUUIjggSrG9Coc/1oHLWEi/TFcn04sVM5IRXDJN7ecs7eOb80I+
+ it+0YNcbK/0d/UMdHQ4Gn4JRWJEVV31OxkXmHDMXSris/FLkMFkAPsnm2niFW113dKp0
+ H+eg5zKAIwwN3GBWjI7pbYf4/QYqvhteeULZHKGO+JhLCHuwAYxjI3rce0NZC7aPtqET
+ oCxDlCvDfDuQB+3tVHQWtZQrvL9kvUK6ViPllxbybIPoFtaUq8AcCSLKPAVVzfYksKHf
+ t86A==
+X-Gm-Message-State: APjAAAXZIfK/69G3WsCe0ToRAXllSaELG4a2w5SJFD4W+TC3NOP7M5BQ
+ UzJ797CKafw9pNg+L7Q+3xFTNu20n1s=
+X-Google-Smtp-Source: APXvYqxjDMBCnhzTzIEVa+XoFPZ2olh3j2OpKA4YtI2R65V0og61M4GNgrcbtwe1VPSh95B/gJqlKQ==
+X-Received: by 2002:a1c:2015:: with SMTP id g21mr7059992wmg.33.1565959147947; 
+ Fri, 16 Aug 2019 05:39:07 -0700 (PDT)
+Received: from [192.168.1.39] (251.red-88-10-102.dynamicip.rima-tde.net.
+ [88.10.102.251])
+ by smtp.gmail.com with ESMTPSA id f7sm9524844wrf.8.2019.08.16.05.39.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Aug 2019 05:39:07 -0700 (PDT)
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20190813154653.20568-1-armbru@redhat.com>
+ <CAFEAcA9L1yA==UV__H_bkC+HBKNB1vMtAXidQsbNwDGSt6Yokw@mail.gmail.com>
+ <7d6c5482-183e-5373-03ac-18aac5055572@redhat.com>
+Openpgp: id=89C1E78F601EE86C867495CBA2A3FD6EDEADC0DE;
+ url=http://pgp.mit.edu/pks/lookup?op=get&search=0xA2A3FD6EDEADC0DE
+Message-ID: <80ed7df8-2dfc-4bb0-b3e4-3e58df9d0957@redhat.com>
+Date: Fri, 16 Aug 2019 14:39:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.46]); Fri, 16 Aug 2019 12:33:40 +0000 (UTC)
+In-Reply-To: <7d6c5482-183e-5373-03ac-18aac5055572@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH 2/2] qapi: deprecate implicit filters
+ [fuzzy]
+X-Received-From: 209.85.128.67
+Subject: Re: [Qemu-devel] [PULL 00/29] Header cleanup patches for 2019-08-13
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,48 +90,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, den@openvz.org, John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 8/16/19 1:23 PM, Philippe Mathieu-Daudé wrote:
+> On 8/16/19 12:59 PM, Peter Maydell wrote:
+>> On Tue, 13 Aug 2019 at 16:54, Markus Armbruster <armbru@redhat.com> wrote:
+>>>
+>>> The following changes since commit 864ab314f1d924129d06ac7b571f105a2b76a4b2:
+>>>
+>>>   Update version for v4.1.0-rc4 release (2019-08-06 17:05:21 +0100)
+>>>
+>>> are available in the Git repository at:
+>>>
+>>>   git://repo.or.cz/qemu/armbru.git tags/pull-include-2019-08-13
+>>>
+>>> for you to fetch changes up to 8d111fd683b678d3826e192bc07ffcc349a118b5:
+>>>
+>>>   sysemu: Split sysemu/runstate.h off sysemu/sysemu.h (2019-08-13 13:16:20 +0200)
+>>>
+>>> ----------------------------------------------------------------
+>>> Header cleanup patches for 2019-08-13
+>>>
+>>> ----------------------------------------------------------------
+>>> These patches are rather bothersome to rebase, so I'd like to get them
+>>> into 4.2 early.
+>>>
+>>
+>> Fails to build on OSX I'm afraid:
+>> /Users/pm215/src/qemu-for-merges/ui/cocoa.m:1166:5: error: implicit
+>> declaration of function 'qemu_system_shutdown_request' is invalid in
+>> C99 [-Werror,-Wimplicit-function-declaration]
+>>     qemu_system_shutdown_request(SHUTDOWN_CAUSE_HOST_UI);
+>>     ^
+> 
+> Ah I reported this one while reviewing v2:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg01150.html
+> 
+> Then didn't take the time to test OSX on v4 :(
+> 
+> BTW Travis should find this.
 
-> Am 15.08.2019 um 21:24 hat Markus Armbruster geschrieben:
-[...]
->> Let's assume all libvirt ever does with deprecation notices is logging
->> them.  Would that solve the problem of reliably alerting libvirt
->> developers to deprecation issues?  Nope.  But it could help
->> occasionally.
->
-> I'm not saying that deprecation notices would hurt, just that they
-> probably won't solve problem alone.
+Actually I did try v4 on Travis and it succeeded:
+https://travis-ci.org/philmd/qemu/builds/570743079
 
-No argument.
+But Travis seems to have updated smth on their OSX images (or brew is
+down?), now I get:
 
-> Crashing if --future is given and logging otherwise seems reasonable
-> enough to me. Whether we need to wire up a new deprecation mechanism in
-> QMP for the logging or if we can just keep printing to stderr is
-> debatable. stderr already ends up in a log file, a QMP extension would
-> require new libvirt code. If libvirt would log deprecation notices more
-> prominently, or use the information for tainting or any other kind of
-> processing, a dedicated QMP mechanism could be justified.
+  ERROR: glib-2.40 gthread-2.0 is required to compile QEMU
 
-I'd like to start with two tasks:
+Anyway, the culprit is:
 
-* A CLI option to configure what to do on use of a deprecated feature.
+commit 8d111fd683b678d3826e192bc07ffcc349a118b5 (tag:
+pull-include-2019-08-13)
+Author: Markus Armbruster <armbru@redhat.com>
+Date:   Mon Aug 12 07:23:59 2019 +0200
 
-  We currently warn.  We want to be able to crash instead.  Silencing
-  the warnings might be useful.  Turning them into errors might be
-  useful.
+    sysemu: Split sysemu/runstate.h off sysemu/sysemu.h
 
-  The existing ad hoc warnings need to be replaced by a call of a common
-  function that implements the configurable behavior.
+    sysemu/sysemu.h is a rather unfocused dumping ground for stuff related
+    to the system-emulator.  Evidence:
 
-* QAPI feature flag "deprecated", for introspectable deprecation, and
-  without ad hoc code.
+    * It's included widely: in my "build everything" tree, changing
+      sysemu/sysemu.h still triggers a recompile of some 1100 out of 6600
+      objects (not counting tests and objects that don't depend on
+      qemu/osdep.h, down from 5400 due to the previous two commits).
 
-Then see whether our users need more.
+    * It pulls in more than a dozen additional headers.
+
+ui/cocoa.m now needs to include "sysemu/runstate.h".
 
