@@ -6,50 +6,49 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9791BC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1050FC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:45:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EAEC20644
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:44:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EAEC20644
+	by mail.kernel.org (Postfix) with ESMTPS id DBE7F20644
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:45:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBE7F20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyWuA-00023b-53
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:44:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38722)
+	id 1hyWvE-0002ep-Ep
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:45:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38243)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWiz-00061S-Iw
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:32:41 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWha-0004wR-GO
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:31:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWin-0008Ij-RC
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:32:31 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.74]:57203)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWhV-0007ns-M0
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:31:10 -0400
+Received: from smtpe1.intersmtp.com ([62.239.224.237]:23503)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWhy-0007xg-50; Fri, 16 Aug 2019 03:31:34 -0400
-Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
- BWP09926079.bt.com (10.36.82.110) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 08:31:09 +0100
+ id 1hyWh2-0007dD-5y; Fri, 16 Aug 2019 03:30:37 -0400
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:31:31 +0100
+ RDW083A010ED66.bt.com (10.187.98.36) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Fri, 16 Aug 2019 08:29:38 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:30:34 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:31:31 +0100
+ 2019 08:30:34 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 14/42] exec: Hard code size with
- MO_{8|16|32|64}
-Thread-Index: AQHVVASf4LvM5FNQUUCqAafwFfyIRQ==
-Date: Fri, 16 Aug 2019 07:31:31 +0000
-Message-ID: <1565940690590.52845@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v7 11/42] memory: Access MemoryRegion with
+ MemOp
+Thread-Index: AQHVVAR9ZYg90QpGjUeRa3ureurxuw==
+Date: Fri, 16 Aug 2019 07:30:34 +0000
+Message-ID: <1565940633026.69822@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -60,13 +59,13 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 62.239.224.237
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 14/42] exec: Hard code size with
- MO_{8|16|32|64}
+Subject: [Qemu-devel] [PATCH v7 11/42] memory: Access MemoryRegion with MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,120 +108,135 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Temporarily no-op size_memop was introduced to aid the conversion of
-memory_region_dispatch_{read|write} operand "unsigned size" into
-"MemOp op".
-
-Now size_memop is implemented, again hard coded size but with
-MO_{8|16|32|64}. This is more expressive and avoids size_memop calls.
+Convert memory_region_dispatch_{read|write} operand "unsigned size"
+into a "MemOp op".
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- memory_ldst.inc.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ include/exec/memop.h  | 20 ++++++++++++++------
+ include/exec/memory.h |  9 +++++----
+ memory.c              |  7 +++++--
+ 3 files changed, 24 insertions(+), 12 deletions(-)
 
-diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-index 1e8a2fc..de658c4 100644
---- a/memory_ldst.inc.c
-+++ b/memory_ldst.inc.c
-@@ -38,7 +38,7 @@ static inline uint32_t glue(address_space_ldl_internal, S=
-UFFIX)(ARG1_DECL,
-         release_lock |=3D prepare_mmio_access(mr);
+diff --git a/include/exec/memop.h b/include/exec/memop.h
+index dfd76a1..0a610b7 100644
+--- a/include/exec/memop.h
++++ b/include/exec/memop.h
+@@ -12,6 +12,8 @@
+ #ifndef MEMOP_H
+ #define MEMOP_H
 
-         /* I/O case */
--        r =3D memory_region_dispatch_read(mr, addr1, &val, size_memop(4), =
-attrs);
-+        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_32, attrs);
- #if defined(TARGET_WORDS_BIGENDIAN)
-         if (endian =3D=3D DEVICE_LITTLE_ENDIAN) {
-             val =3D bswap32(val);
-@@ -114,7 +114,7 @@ static inline uint64_t glue(address_space_ldq_internal,=
- SUFFIX)(ARG1_DECL,
-         release_lock |=3D prepare_mmio_access(mr);
++#include "qemu/host-utils.h"
++
+ typedef enum MemOp {
+     MO_8     =3D 0,
+     MO_16    =3D 1,
+@@ -107,14 +109,20 @@ typedef enum MemOp {
+     MO_SSIZE =3D MO_SIZE | MO_SIGN,
+ } MemOp;
 
-         /* I/O case */
--        r =3D memory_region_dispatch_read(mr, addr1, &val, size_memop(8), =
-attrs);
-+        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_64, attrs);
- #if defined(TARGET_WORDS_BIGENDIAN)
-         if (endian =3D=3D DEVICE_LITTLE_ENDIAN) {
-             val =3D bswap64(val);
-@@ -188,7 +188,7 @@ uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
-         release_lock |=3D prepare_mmio_access(mr);
++/* MemOp to size in bytes.  */
++static inline unsigned memop_size(MemOp op)
++{
++    return 1 << (op & MO_SIZE);
++}
++
+ /* Size in bytes to MemOp.  */
+-static inline unsigned size_memop(unsigned size)
++static inline MemOp size_memop(unsigned size)
+ {
+-    /*
+-     * FIXME: No-op to aid conversion of memory_region_dispatch_{read|writ=
+e}
+-     * "unsigned size" operand into a "MemOp op".
+-     */
+-    return size;
++#ifdef CONFIG_DEBUG_TCG
++    /* Power of 2 up to 8.  */
++    assert((size & (size - 1)) =3D=3D 0 && size >=3D 1 && size <=3D 8);
++#endif
++    return ctz32(size);
+ }
 
-         /* I/O case */
--        r =3D memory_region_dispatch_read(mr, addr1, &val, size_memop(1), =
-attrs);
-+        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_8, attrs);
-     } else {
-         /* RAM case */
-         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -224,7 +224,7 @@ static inline uint32_t glue(address_space_lduw_internal=
-, SUFFIX)(ARG1_DECL,
-         release_lock |=3D prepare_mmio_access(mr);
-
-         /* I/O case */
--        r =3D memory_region_dispatch_read(mr, addr1, &val, size_memop(2), =
-attrs);
-+        r =3D memory_region_dispatch_read(mr, addr1, &val, MO_16, attrs);
- #if defined(TARGET_WORDS_BIGENDIAN)
-         if (endian =3D=3D DEVICE_LITTLE_ENDIAN) {
-             val =3D bswap16(val);
-@@ -300,7 +300,7 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL=
-,
-     if (l < 4 || !memory_access_is_direct(mr, true)) {
-         release_lock |=3D prepare_mmio_access(mr);
-
--        r =3D memory_region_dispatch_write(mr, addr1, val, size_memop(4), =
-attrs);
-+        r =3D memory_region_dispatch_write(mr, addr1, val, MO_32, attrs);
-     } else {
-         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-         stl_p(ptr, val);
-@@ -346,7 +346,7 @@ static inline void glue(address_space_stl_internal, SUF=
-FIX)(ARG1_DECL,
-             val =3D bswap32(val);
-         }
  #endif
--        r =3D memory_region_dispatch_write(mr, addr1, val, size_memop(4), =
-attrs);
-+        r =3D memory_region_dispatch_write(mr, addr1, val, MO_32, attrs);
-     } else {
-         /* RAM case */
-         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -408,7 +408,7 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
-     mr =3D TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (!memory_access_is_direct(mr, true)) {
-         release_lock |=3D prepare_mmio_access(mr);
--        r =3D memory_region_dispatch_write(mr, addr1, val, size_memop(1), =
-attrs);
-+        r =3D memory_region_dispatch_write(mr, addr1, val, MO_8, attrs);
-     } else {
-         /* RAM case */
-         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -451,7 +451,7 @@ static inline void glue(address_space_stw_internal, SUF=
-FIX)(ARG1_DECL,
-             val =3D bswap16(val);
-         }
- #endif
--        r =3D memory_region_dispatch_write(mr, addr1, val, size_memop(2), =
-attrs);
-+        r =3D memory_region_dispatch_write(mr, addr1, val, MO_16, attrs);
-     } else {
-         /* RAM case */
-         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
-@@ -524,7 +524,7 @@ static void glue(address_space_stq_internal, SUFFIX)(AR=
-G1_DECL,
-             val =3D bswap64(val);
-         }
- #endif
--        r =3D memory_region_dispatch_write(mr, addr1, val, size_memop(8), =
-attrs);
-+        r =3D memory_region_dispatch_write(mr, addr1, val, MO_64, attrs);
-     } else {
-         /* RAM case */
-         ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index bb0961d..975b86a 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -19,6 +19,7 @@
+ #include "exec/cpu-common.h"
+ #include "exec/hwaddr.h"
+ #include "exec/memattrs.h"
++#include "exec/memop.h"
+ #include "exec/ramlist.h"
+ #include "qemu/queue.h"
+ #include "qemu/int128.h"
+@@ -1731,13 +1732,13 @@ void mtree_info(bool flatview, bool dispatch_tree, =
+bool owner);
+  * @mr: #MemoryRegion to access
+  * @addr: address within that region
+  * @pval: pointer to uint64_t which the data is written to
+- * @size: size of the access in bytes
++ * @op: size, sign, and endianness of the memory operation
+  * @attrs: memory transaction attributes to use for the access
+  */
+ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
+                                         hwaddr addr,
+                                         uint64_t *pval,
+-                                        unsigned size,
++                                        MemOp op,
+                                         MemTxAttrs attrs);
+ /**
+  * memory_region_dispatch_write: perform a write directly to the specified
+@@ -1746,13 +1747,13 @@ MemTxResult memory_region_dispatch_read(MemoryRegio=
+n *mr,
+  * @mr: #MemoryRegion to access
+  * @addr: address within that region
+  * @data: data to write
+- * @size: size of the access in bytes
++ * @op: size, sign, and endianness of the memory operation
+  * @attrs: memory transaction attributes to use for the access
+  */
+ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+                                          hwaddr addr,
+                                          uint64_t data,
+-                                         unsigned size,
++                                         MemOp op,
+                                          MemTxAttrs attrs);
+
+ /**
+diff --git a/memory.c b/memory.c
+index 5d8c9a9..89ea4fb 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1439,9 +1439,10 @@ static MemTxResult memory_region_dispatch_read1(Memo=
+ryRegion *mr,
+ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
+                                         hwaddr addr,
+                                         uint64_t *pval,
+-                                        unsigned size,
++                                        MemOp op,
+                                         MemTxAttrs attrs)
+ {
++    unsigned size =3D memop_size(op);
+     MemTxResult r;
+
+     if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
+@@ -1483,9 +1484,11 @@ static bool memory_region_dispatch_write_eventfds(Me=
+moryRegion *mr,
+ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+                                          hwaddr addr,
+                                          uint64_t data,
+-                                         unsigned size,
++                                         MemOp op,
+                                          MemTxAttrs attrs)
+ {
++    unsigned size =3D memop_size(op);
++
+     if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
+         unassigned_mem_write(mr, addr, data, size);
+         return MEMTX_DECODE_ERROR;
 --
 1.8.3.1
 
