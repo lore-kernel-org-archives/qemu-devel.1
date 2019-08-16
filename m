@@ -7,83 +7,82 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AE9C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A04C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:27:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5E6A20578
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13C542086C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:27:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wCC6gSw1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5E6A20578
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rqi493ck"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13C542086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycEW-0004zn-Hv
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:25:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35187)
+	id 1hycG8-0007L8-Qf
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:27:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6m-0003KS-HX
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:34 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc6z-0003T0-BX
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc6k-0005P0-Ls
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:32 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:51712)
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc6x-0005ea-4X
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:44 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36654)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyc6k-0005NN-DW
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:30 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id 207so4029479wma.1
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:29 -0700 (PDT)
+ id 1hyc6v-0005bK-Ka
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:42 -0400
+Received: by mail-wm1-x341.google.com with SMTP id g67so4054798wme.1
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=j84/g0oOWSuF2eIUk7fO9+M3370kgvOYjABlA5jzGcs=;
- b=wCC6gSw1wU3Z/PQeUVuV2wEGIJhI5vaajGeoahFmISh1MdCsMbiXurigpbHX2vuXPe
- dmrzACxBg8Ers5E0JjV897szPAKaGHr/igRQFpFhG1k3zgjhknh8yUN3qmp2zvYFrq3m
- MPlZPPVJK00+q7w0ZS5ClbRi03XlLxd4JY/Nl4MJKg9VypDyuP1vArhoJ6sY8zaRuGZM
- /AvLUUzdcfQS/zZXVUvxIBFWEOLBS5J2awO18IhQ2zZRg8fviNLWZjMRN1pa9QDPmjF+
- NgcjD7EMdQ3pY3027vskUCTENLd6OZpRuXgUYxebSbejZ4B1JoydZ1A+KRk2ylqCWWr6
- roqg==
+ bh=gOG9eP09SX1I4DbWjnDpdxCQC9UZs4XVu+2nUeoKx4w=;
+ b=rqi493ckM5eAigzBVOVylWvnd22Z/Rl9aW4cRy9OULGGKUGKAHowCPJZUpeDPwuxk/
+ 9lhylEhRMlDv+k4FevUHesXRAIbYIKuZuHYpyDo2njsUJHa/B0n6RhkwkYBn9cOV9l4Q
+ L8twz7hr98oOUR0kb3HBq6Kh7+EDTzQ845nfRO+6ks4uz5AWs2wfkEe9IfgNxYgr3gQp
+ HP+CoVzTl0Ptu2a1hx7gj/F+QGwxQ8+mKMy4ha98CBKGy8nC3/xX8ZUAqbhKXlILvBEH
+ rT1Se+jqcXfpfEXMsMYCiU2nxNOjzww9nw5pRiWozGz67BQCi0ekAjIso2mnX/IADDrl
+ 7HvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=j84/g0oOWSuF2eIUk7fO9+M3370kgvOYjABlA5jzGcs=;
- b=gqSrkmDu0NxTa8EEURQu3N7qjJkpJmICZtjvarX3dMf/lAW4wuur0yVObq/1gVdsXd
- fZFEW2H7jHdPV/GOtoCZQcwJKHq14ycpaRslPJtYd+s6OPcOG/HTEJxwVKuvaD2bwwcU
- Ryiuu46J/ENv6b8zJJXeMx2u+envtiXMo7YXRVxnHaM1UR5H+DErWfPIAIG4EmqmdVRr
- ba84Qfpm25Tb+vDChCOF/e2jJV+2AIHjImC1LOonaFWPhQYgmEXl0+yhTeqIaaS8TSr0
- D8qTYfHF621XBAtA4ScZn1bDmwWhGcYu+eI7DX+fTzSG09gG4qIyf6Onr9yhsSqKaINC
- VBlA==
-X-Gm-Message-State: APjAAAW6jznANA9A7TuR9x3uzXD2RL+DZJEa1DP3Kfps6pPTrqesrqry
- ndawHHza+qEYY5y5jHjplEF+UZvPBnl3sg==
-X-Google-Smtp-Source: APXvYqwon+BkF4y2MBq90VvPNkSS9w6x2ezdic+kMd7v/dbVfhrkAcs28FUrt2fVURJUHWuIwuS+3g==
-X-Received: by 2002:a05:600c:22d7:: with SMTP id
- 23mr7773419wmg.0.1565961448455; 
- Fri, 16 Aug 2019 06:17:28 -0700 (PDT)
+ bh=gOG9eP09SX1I4DbWjnDpdxCQC9UZs4XVu+2nUeoKx4w=;
+ b=TUI6o8fGpCy/iVaGtDMrMwWKbTaGcrLmwdHsrrF5Lh67TTrmW2UbIXTphCJls3i9sh
+ 0LrlFEpsSeU40aH5RXmC+F5N2uv/1rF6+8KLwG71mnYXMl6fn/VVCg81LJlf/9HmLB6e
+ SABj2jz5oWKOVwoDTdQeH7eK0sox+EDXpZTqkynLCiGCulAuZsoGJBc1vDuIFHK+u0xX
+ o9NSakliV3CIMcOFXDwj8UMXsnQqBTze7p6/gMX6y9Oom454HZrKwNMhemTYxT6ME7IO
+ nYuxJu03fS/eg5PUQR+/n9+hMXy0ANgqHAMffW41QwgnVy3nMJDcU7p8fOSoOXOaz80Z
+ vdew==
+X-Gm-Message-State: APjAAAXApTmTUxsx0Qjgx2mNM1NHvOoAHPu52UcFGjKdtuKg3h1YRhEp
+ +irNrw4uPiBIt5tNHnUBF+NazRoLse7kcQ==
+X-Google-Smtp-Source: APXvYqwMbUoonxU9jngoQ+SoONtSF/n2jMZt1fCLQrYj2aiJ3K9T1XUCalzHvgQf+xv3CdghyPIKWA==
+X-Received: by 2002:a1c:5402:: with SMTP id i2mr7353020wmb.41.1565961460479;
+ Fri, 16 Aug 2019 06:17:40 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.27
+ by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.39
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 06:17:27 -0700 (PDT)
+ Fri, 16 Aug 2019 06:17:40 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 14:16:57 +0100
-Message-Id: <20190816131719.28244-8-peter.maydell@linaro.org>
+Date: Fri, 16 Aug 2019 14:17:08 +0100
+Message-Id: <20190816131719.28244-19-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
 References: <20190816131719.28244-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32e
-Subject: [Qemu-devel] [PULL 07/29] target/arm: Introduce pc_curr
+X-Received-From: 2a00:1450:4864:20::341
+Subject: [Qemu-devel] [PULL 18/29] target/arm/cpu: Ensure we can use the pmu
+ with kvm
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,231 +98,128 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
 
-Add a new field to retain the address of the instruction currently
-being translated.  The 32-bit uses are all within subroutines used
-by a32 and t32.  This will become less obvious when t16 support is
-merged with a32+t32, and having a clear definition will help.
+We first convert the pmu property from a static property to one with
+its own accessors. Then we use the set accessor to check if the PMU is
+supported when using KVM. Indeed a 32-bit KVM host does not support
+the PMU, so this check will catch an attempt to use it at property-set
+time.
 
-Convert aarch64 as well for consistency.  Note that there is one
-instance of a pre-assert fprintf that used the wrong value for the
-address of the current instruction.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20190807045335.1361-3-richard.henderson@linaro.org
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.h |  2 +-
- target/arm/translate.h     |  2 ++
- target/arm/translate-a64.c | 21 +++++++++++----------
- target/arm/translate.c     | 14 ++++++++------
- 4 files changed, 22 insertions(+), 17 deletions(-)
+ target/arm/kvm_arm.h | 14 ++++++++++++++
+ target/arm/cpu.c     | 30 +++++++++++++++++++++++++-----
+ target/arm/kvm.c     |  7 +++++++
+ 3 files changed, 46 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
-index 9ab40872d85..9cd2b3d2389 100644
---- a/target/arm/translate-a64.h
-+++ b/target/arm/translate-a64.h
-@@ -25,7 +25,7 @@ void unallocated_encoding(DisasContext *s);
-         qemu_log_mask(LOG_UNIMP,                                         \
-                       "%s:%d: unsupported instruction encoding 0x%08x "  \
-                       "at pc=%016" PRIx64 "\n",                          \
--                      __FILE__, __LINE__, insn, s->pc - 4);              \
-+                      __FILE__, __LINE__, insn, s->pc_curr);             \
-         unallocated_encoding(s);                                         \
-     } while (0)
- 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index b65954c669b..53ac50bc028 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -11,6 +11,8 @@ typedef struct DisasContext {
-     const ARMISARegisters *isar;
- 
-     target_ulong pc;
-+    /* The address of the current instruction being translated. */
-+    target_ulong pc_curr;
-     target_ulong page_start;
-     uint32_t insn;
-     /* Nonzero if this instruction has been conditionally skipped.  */
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 90850eadc1b..a0b557ddcec 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1234,7 +1234,7 @@ static inline AArch64DecodeFn *lookup_disas_fn(const AArch64DecodeTable *table,
+diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+index 98af1050a75..b3106c8600a 100644
+--- a/target/arm/kvm_arm.h
++++ b/target/arm/kvm_arm.h
+@@ -216,6 +216,15 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu);
   */
- static void disas_uncond_b_imm(DisasContext *s, uint32_t insn)
+ bool kvm_arm_aarch32_supported(CPUState *cs);
+ 
++/**
++ * bool kvm_arm_pmu_supported:
++ * @cs: CPUState
++ *
++ * Returns: true if the KVM VCPU can enable its PMU
++ * and false otherwise.
++ */
++bool kvm_arm_pmu_supported(CPUState *cs);
++
+ /**
+  * kvm_arm_get_max_vm_ipa_size - Returns the number of bits in the
+  * IPA address space supported by KVM
+@@ -261,6 +270,11 @@ static inline bool kvm_arm_aarch32_supported(CPUState *cs)
+     return false;
+ }
+ 
++static inline bool kvm_arm_pmu_supported(CPUState *cs)
++{
++    return false;
++}
++
+ static inline int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
  {
--    uint64_t addr = s->pc + sextract32(insn, 0, 26) * 4 - 4;
-+    uint64_t addr = s->pc_curr + sextract32(insn, 0, 26) * 4;
+     return -ENOENT;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index ec2ab95dbeb..2399c144718 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -994,10 +994,6 @@ static Property arm_cpu_has_el3_property =
+ static Property arm_cpu_cfgend_property =
+             DEFINE_PROP_BOOL("cfgend", ARMCPU, cfgend, false);
  
-     if (insn & (1U << 31)) {
-         /* BL Branch with link */
-@@ -1262,7 +1262,7 @@ static void disas_comp_b_imm(DisasContext *s, uint32_t insn)
-     sf = extract32(insn, 31, 1);
-     op = extract32(insn, 24, 1); /* 0: CBZ; 1: CBNZ */
-     rt = extract32(insn, 0, 5);
--    addr = s->pc + sextract32(insn, 5, 19) * 4 - 4;
-+    addr = s->pc_curr + sextract32(insn, 5, 19) * 4;
+-/* use property name "pmu" to match other archs and virt tools */
+-static Property arm_cpu_has_pmu_property =
+-            DEFINE_PROP_BOOL("pmu", ARMCPU, has_pmu, true);
+-
+ static Property arm_cpu_has_vfp_property =
+             DEFINE_PROP_BOOL("vfp", ARMCPU, has_vfp, true);
  
-     tcg_cmp = read_cpu_reg(s, rt, sf);
-     label_match = gen_new_label();
-@@ -1291,7 +1291,7 @@ static void disas_test_b_imm(DisasContext *s, uint32_t insn)
+@@ -1020,6 +1016,29 @@ static Property arm_cpu_pmsav7_dregion_property =
+                                            pmsav7_dregion,
+                                            qdev_prop_uint32, uint32_t);
  
-     bit_pos = (extract32(insn, 31, 1) << 5) | extract32(insn, 19, 5);
-     op = extract32(insn, 24, 1); /* 0: TBZ; 1: TBNZ */
--    addr = s->pc + sextract32(insn, 5, 14) * 4 - 4;
-+    addr = s->pc_curr + sextract32(insn, 5, 14) * 4;
-     rt = extract32(insn, 0, 5);
- 
-     tcg_cmp = tcg_temp_new_i64();
-@@ -1322,7 +1322,7 @@ static void disas_cond_b_imm(DisasContext *s, uint32_t insn)
-         unallocated_encoding(s);
-         return;
-     }
--    addr = s->pc + sextract32(insn, 5, 19) * 4 - 4;
-+    addr = s->pc_curr + sextract32(insn, 5, 19) * 4;
-     cond = extract32(insn, 0, 4);
- 
-     reset_btype(s);
-@@ -1706,7 +1706,7 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
-         TCGv_i32 tcg_syn, tcg_isread;
-         uint32_t syndrome;
- 
--        gen_a64_set_pc_im(s->pc - 4);
-+        gen_a64_set_pc_im(s->pc_curr);
-         tmpptr = tcg_const_ptr(ri);
-         syndrome = syn_aa64_sysregtrap(op0, op1, op2, crn, crm, rt, isread);
-         tcg_syn = tcg_const_i32(syndrome);
-@@ -1870,7 +1870,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
-             /* The pre HVC helper handles cases when HVC gets trapped
-              * as an undefined insn by runtime configuration.
-              */
--            gen_a64_set_pc_im(s->pc - 4);
-+            gen_a64_set_pc_im(s->pc_curr);
-             gen_helper_pre_hvc(cpu_env);
-             gen_ss_advance(s);
-             gen_exception_insn(s, 0, EXCP_HVC, syn_aa64_hvc(imm16), 2);
-@@ -1880,7 +1880,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
-                 unallocated_encoding(s);
-                 break;
-             }
--            gen_a64_set_pc_im(s->pc - 4);
-+            gen_a64_set_pc_im(s->pc_curr);
-             tmp = tcg_const_i32(syn_aa64_smc(imm16));
-             gen_helper_pre_smc(cpu_env, tmp);
-             tcg_temp_free_i32(tmp);
-@@ -2601,7 +2601,7 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
- 
-     tcg_rt = cpu_reg(s, rt);
- 
--    clean_addr = tcg_const_i64((s->pc - 4) + imm);
-+    clean_addr = tcg_const_i64(s->pc_curr + imm);
-     if (is_vector) {
-         do_fp_ld(s, rt, clean_addr, size);
-     } else {
-@@ -3580,7 +3580,7 @@ static void disas_pc_rel_adr(DisasContext *s, uint32_t insn)
-     offset = sextract64(insn, 5, 19);
-     offset = offset << 2 | extract32(insn, 29, 2);
-     rd = extract32(insn, 0, 5);
--    base = s->pc - 4;
-+    base = s->pc_curr;
- 
-     if (page) {
-         /* ADRP (page based) */
-@@ -11519,7 +11519,7 @@ static void disas_simd_three_reg_same_fp16(DisasContext *s, uint32_t insn)
-                 break;
-             default:
-                 fprintf(stderr, "%s: insn %#04x, fpop %#2x @ %#" PRIx64 "\n",
--                        __func__, insn, fpopcode, s->pc);
-+                        __func__, insn, fpopcode, s->pc_curr);
-                 g_assert_not_reached();
-             }
- 
-@@ -14030,6 +14030,7 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
++static bool arm_get_pmu(Object *obj, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    return cpu->has_pmu;
++}
++
++static void arm_set_pmu(Object *obj, bool value, Error **errp)
++{
++    ARMCPU *cpu = ARM_CPU(obj);
++
++    if (value) {
++        if (kvm_enabled() && !kvm_arm_pmu_supported(CPU(cpu))) {
++            error_setg(errp, "'pmu' feature not supported by KVM on this host");
++            return;
++        }
++        set_feature(&cpu->env, ARM_FEATURE_PMU);
++    } else {
++        unset_feature(&cpu->env, ARM_FEATURE_PMU);
++    }
++    cpu->has_pmu = value;
++}
++
+ static void arm_get_init_svtor(Object *obj, Visitor *v, const char *name,
+                                void *opaque, Error **errp)
  {
-     uint32_t insn;
- 
-+    s->pc_curr = s->pc;
-     insn = arm_ldl_code(env, s->pc, s->sctlr_b);
-     s->insn = insn;
-     s->pc += 4;
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index de941e6b3dc..fed08c63f81 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1197,7 +1197,7 @@ static inline void gen_hvc(DisasContext *s, int imm16)
-      * as an undefined insn by runtime configuration (ie before
-      * the insn really executes).
-      */
--    gen_set_pc_im(s, s->pc - 4);
-+    gen_set_pc_im(s, s->pc_curr);
-     gen_helper_pre_hvc(cpu_env);
-     /* Otherwise we will treat this as a real exception which
-      * happens after execution of the insn. (The distinction matters
-@@ -1216,7 +1216,7 @@ static inline void gen_smc(DisasContext *s)
-      */
-     TCGv_i32 tmp;
- 
--    gen_set_pc_im(s, s->pc - 4);
-+    gen_set_pc_im(s, s->pc_curr);
-     tmp = tcg_const_i32(syn_aa32_smc());
-     gen_helper_pre_smc(cpu_env, tmp);
-     tcg_temp_free_i32(tmp);
-@@ -3175,7 +3175,7 @@ static void gen_msr_banked(DisasContext *s, int r, int sysm, int rn)
- 
-     /* Sync state because msr_banked() can raise exceptions */
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - 4);
-+    gen_set_pc_im(s, s->pc_curr);
-     tcg_reg = load_reg(s, rn);
-     tcg_tgtmode = tcg_const_i32(tgtmode);
-     tcg_regno = tcg_const_i32(regno);
-@@ -3197,7 +3197,7 @@ static void gen_mrs_banked(DisasContext *s, int r, int sysm, int rn)
- 
-     /* Sync state because mrs_banked() can raise exceptions */
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - 4);
-+    gen_set_pc_im(s, s->pc_curr);
-     tcg_reg = tcg_temp_new_i32();
-     tcg_tgtmode = tcg_const_i32(tgtmode);
-     tcg_regno = tcg_const_i32(regno);
-@@ -7204,7 +7204,7 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
-             }
- 
-             gen_set_condexec(s);
--            gen_set_pc_im(s, s->pc - 4);
-+            gen_set_pc_im(s, s->pc_curr);
-             tmpptr = tcg_const_ptr(ri);
-             tcg_syn = tcg_const_i32(syndrome);
-             tcg_isread = tcg_const_i32(isread);
-@@ -7614,7 +7614,7 @@ static void gen_srs(DisasContext *s,
-     tmp = tcg_const_i32(mode);
-     /* get_r13_banked() will raise an exception if called from System mode */
-     gen_set_condexec(s);
--    gen_set_pc_im(s, s->pc - 4);
-+    gen_set_pc_im(s, s->pc_curr);
-     gen_helper_get_r13_banked(addr, cpu_env, tmp);
-     tcg_temp_free_i32(tmp);
-     switch (amode) {
-@@ -12039,6 +12039,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         return;
+@@ -1094,7 +1113,8 @@ void arm_cpu_post_init(Object *obj)
      }
  
-+    dc->pc_curr = dc->pc;
-     insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
-     dc->insn = insn;
-     dc->pc += 4;
-@@ -12107,6 +12108,7 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         return;
+     if (arm_feature(&cpu->env, ARM_FEATURE_PMU)) {
+-        qdev_property_add_static(DEVICE(obj), &arm_cpu_has_pmu_property,
++        cpu->has_pmu = true;
++        object_property_add_bool(obj, "pmu", arm_get_pmu, arm_set_pmu,
+                                  &error_abort);
      }
  
-+    dc->pc_curr = dc->pc;
-     insn = arm_lduw_code(env, dc->pc, dc->sctlr_b);
-     is_16bit = thumb_insn_is_16bit(dc, dc->pc, insn);
-     dc->pc += 2;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index fe4f461d4ef..bfe3d445e19 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -162,6 +162,13 @@ void kvm_arm_set_cpu_features_from_host(ARMCPU *cpu)
+     env->features = arm_host_cpu_features.features;
+ }
+ 
++bool kvm_arm_pmu_supported(CPUState *cpu)
++{
++    KVMState *s = KVM_STATE(current_machine->accelerator);
++
++    return kvm_check_extension(s, KVM_CAP_ARM_PMU_V3);
++}
++
+ int kvm_arm_get_max_vm_ipa_size(MachineState *ms)
+ {
+     KVMState *s = KVM_STATE(ms->accelerator);
 -- 
 2.20.1
 
