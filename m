@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F18C3A589
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 00:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E867EC3A589
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 01:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9B33D206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 00:59:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B33D206C1
+	by mail.kernel.org (Postfix) with ESMTPS id BA3A32089E
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 01:03:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA3A32089E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyQad-0003MW-Ry
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 20:59:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52358)
+	id 1hyQeB-00053d-Py
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 21:03:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52768)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hyQZv-0002mK-2M
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 20:58:52 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyQcx-0004ID-To
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 21:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hyQZt-0006rg-Rq
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 20:58:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53588)
+ (envelope-from <jsnow@redhat.com>) id 1hyQcv-00084P-SB
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 21:01:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42420)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hyQZr-0006pH-D8; Thu, 15 Aug 2019 20:58:47 -0400
+ id 1hyQcs-00082e-0H; Thu, 15 Aug 2019 21:01:54 -0400
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B707F31752B3;
- Fri, 16 Aug 2019 00:58:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2422030833A1;
+ Fri, 16 Aug 2019 01:01:53 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D1A6A1001938;
- Fri, 16 Aug 2019 00:58:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3A12B10013A7;
+ Fri, 16 Aug 2019 01:01:52 +0000 (UTC)
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563553816-148827-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1563553816-148827-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <8a3c53e5-5544-0ef1-e62c-341fba73d96f@redhat.com>
-Date: Thu, 15 Aug 2019 20:58:45 -0400
+Message-ID: <083ece64-0178-fe4a-45df-331257a115fb@redhat.com>
+Date: Thu, 15 Aug 2019 21:01:51 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1563553816-148827-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1563553816-148827-7-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.49]); Fri, 16 Aug 2019 00:58:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.44]); Fri, 16 Aug 2019 01:01:53 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 5/6] iotests: extended
- timeout under Valgrind
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/6] iotests: extend
+ sleeping time under Valgrind
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -157,80 +157,34 @@ Sender: "Qemu-devel"
 
 
 On 7/19/19 12:30 PM, Andrey Shinkevich wrote:
-> As the iotests run longer under the Valgrind, the QEMU_COMM_TIMEOUT is
-> to be increased in the test cases 028, 183 and 192 when running under
-> the Valgrind.
+> To synchronize the time when QEMU is running longer under the Valgrind,
+> increase the sleeping time in the test 247.
 > 
-> Suggested-by: Roman Kagan <rkagan@virtuozzo.com>
 > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  tests/qemu-iotests/028 | 6 +++++-
->  tests/qemu-iotests/183 | 9 ++++++++-
->  tests/qemu-iotests/192 | 6 +++++-
->  3 files changed, 18 insertions(+), 3 deletions(-)
+>  tests/qemu-iotests/247 | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-> index 01f4959..71301ec 100755
-> --- a/tests/qemu-iotests/028
-> +++ b/tests/qemu-iotests/028
-> @@ -110,7 +110,11 @@ echo
->  qemu_comm_method="monitor"
->  _launch_qemu -drive file="${TEST_IMG}",cache=${CACHEMODE},id=disk
->  h=$QEMU_HANDLE
-> -QEMU_COMM_TIMEOUT=1
+> diff --git a/tests/qemu-iotests/247 b/tests/qemu-iotests/247
+> index 546a794..c853b73 100755
+> --- a/tests/qemu-iotests/247
+> +++ b/tests/qemu-iotests/247
+> @@ -57,7 +57,11 @@ TEST_IMG="$TEST_IMG.4" _make_test_img $size
+>  {"execute":"block-commit",
+>   "arguments":{"device":"format-4", "top-node": "format-2", "base-node":"format-0", "job-id":"job0"}}
+>  EOF
+> -sleep 1
 > +if [ "${VALGRIND_QEMU}" == "y" ]; then
-> +    QEMU_COMM_TIMEOUT=7
+> +    sleep 10
 > +else
-> +    QEMU_COMM_TIMEOUT=1
+> +    sleep 1
 > +fi
->  
->  # Silence output since it contains the disk image path and QEMU's readline
->  # character echoing makes it very hard to filter the output. Plus, there
-> diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-> index fbe5a99..04fb344 100755
-> --- a/tests/qemu-iotests/183
-> +++ b/tests/qemu-iotests/183
-> @@ -94,8 +94,15 @@ if echo "$reply" | grep "compiled without old-style" > /dev/null; then
->      _notrun "migrate -b support not compiled in"
->  fi
->  
-> -QEMU_COMM_TIMEOUT=0.1 qemu_cmd_repeat=50 silent=yes \
-> +timeout_comm=$QEMU_COMM_TIMEOUT
-> +if [ "${VALGRIND_QEMU}" == "y" ]; then
-> +    QEMU_COMM_TIMEOUT=4
-> +else
-> +    QEMU_COMM_TIMEOUT=0.1
-> +fi
-> +qemu_cmd_repeat=50 silent=yes \
->      _send_qemu_cmd $src "{ 'execute': 'query-migrate' }" '"status": "completed"'
-> +QEMU_COMM_TIMEOUT=$timeout_comm
->  _send_qemu_cmd $src "{ 'execute': 'query-status' }" "return"
->  
->  echo
-> diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-> index 6193257..0344322 100755
-> --- a/tests/qemu-iotests/192
-> +++ b/tests/qemu-iotests/192
-> @@ -60,7 +60,11 @@ fi
->  qemu_comm_method="monitor"
->  _launch_qemu -drive $DRIVE_ARG -incoming defer
->  h=$QEMU_HANDLE
-> -QEMU_COMM_TIMEOUT=1
-> +if [ "${VALGRIND_QEMU}" == "y" ]; then
-> +    QEMU_COMM_TIMEOUT=7
-> +else
-> +    QEMU_COMM_TIMEOUT=1
-> +fi
->  
->  _send_qemu_cmd $h "nbd_server_start unix:$TEST_DIR/nbd" "(qemu)"
->  _send_qemu_cmd $h "nbd_server_add -w drive0" "(qemu)"
+>  echo '{"execute":"quit"}'
+>  ) | $QEMU -qmp stdio -nographic -nodefaults \
+>      -blockdev file,node-name=file-0,filename=$TEST_IMG.0,auto-read-only=on \
 > 
 
-I guess we're adding some more magic numbers to join the magic numbers
-we already have.
-
-Ah, well, perfection is a good way to make sure nothing good ever happens:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+This makes me nervous, though. Won't this race terribly? (Wait, why
+doesn't it race already?)
 
