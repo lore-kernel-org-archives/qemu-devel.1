@@ -2,71 +2,72 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FD0C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB37AC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:21:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B68BE206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:12:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68BE206C2
+	by mail.kernel.org (Postfix) with ESMTPS id 8AE48206C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:21:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE48206C2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyYHB-0003Bf-Qd
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 05:12:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56130)
+	id 1hyYQE-0005H9-Oz
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 05:21:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57251)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyYGZ-0002n3-5H
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:11:24 -0400
+ (envelope-from <bounces@canonical.com>) id 1hyYPZ-0004mF-4w
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyYGY-0001hg-1B
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:11:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52082)
+ (envelope-from <bounces@canonical.com>) id 1hyYPX-0004nx-MX
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:20:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55202)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyYGX-0001hG-Rp
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:11:21 -0400
+ id 1hyYPX-0004nc-Gu
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:20:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyYGU-0006S8-Kd
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 09:11:18 +0000
+ id 1hyYPW-0008RE-8x
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 09:20:38 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 98BD92E80D2
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 09:11:16 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 42B862E80C7
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 09:20:38 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Aug 2019 09:05:08 -0000
-From: Fritz Katze <1823790@bugs.launchpad.net>
+Date: Fri, 16 Aug 2019 09:06:26 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1839428@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
+ assignee=None; 
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: fritz-the-cat m-luescher pmaydell
-X-Launchpad-Bug-Reporter: =?utf-8?q?Matthias_L=C3=BCscher_=28m-luescher=29?=
-X-Launchpad-Bug-Modifier: Fritz Katze (fritz-the-cat)
-References: <155475569461.20468.17957138207618410360.malonedeb@chaenomeles.canonical.com>
-Message-Id: <156594630847.26323.16834800497865740159.malone@soybean.canonical.com>
+X-Launchpad-Bug-Commenters: maxujun philmd
+X-Launchpad-Bug-Reporter: Xujun Ma (maxujun)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <156524772160.13996.4537778553837159229.malonedeb@wampee.canonical.com>
+Message-Id: <156594638675.16537.17081821816860005098.malone@wampee.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 8f61ccb5c89a1db8bd491d62f0caab77d43948b4
+X-Launchpad-Hash: 2d9f72bbd63d6c939342751cdbf23bbd0d609359
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1823790] Re: QEMU mishandling of SO_PEERSEC
- forces systemd into tight loop
+Subject: [Qemu-devel] [Bug 1839428] Re: qemu core dumped when repeat
+ "system_reset" multiple times during guest boot
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -77,70 +78,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1823790 <1823790@bugs.launchpad.net>
+Reply-To: Bug 1839428 <1839428@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I patched linux-user/syscall.c (see below, branch stable-2.11) which works =
-around my problem.
-So far so good, but the qemu-arm that i compiled is terribly slow compared =
-to the one that came with Ubuntu 18.04. Any hints?
-I configured as this:
-./configure --static --enable-kvm --target-list=3Darm-linux-user
+This issue is very hard to reproduce.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 74d56e2ee6..4fa9a09b12 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -3185,6 +3185,8 @@ static abi_long do_getsockopt(int sockfd, int level, =
-int optname,
-         case TARGET_SO_SNDTIMEO:
-         case TARGET_SO_PEERNAME:
-             goto unimplemented;
-+        case TARGET_SO_PEERSEC: /* added to escape infinite loop */
-+            goto unimplemented;
-         case TARGET_SO_PEERCRED: {
-             struct ucred cr;
-             socklen_t crlen;
+It sometimes crashes, so I could mark few commits 'bad' while bisecting,
+but since it is not reliable, I'm not sure a commit is 'good' when there
+is no crash.
+
+For now after hours of testing I could reduce Xujun Ma's range to
+qemu-v3.1.0..1d31f1872b:
+
+commit 1d31f1872b337e4acac5bf6b3c2a45b66e43b494 (refs/bisect/bad)
+Merge: 20b084c4b1 88c869198a
+Author: Peter Maydell <peter.maydell@linaro.org>
+Date:   Mon Mar 4 11:04:31 2019 +0000
+
+    Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng
+    =
+
+    pci, pc, virtio: fixes, cleanups, tests
+    =
+
+    Lots of work on tests: BiosTablesTest UEFI app,
+    vhost-user testing for non-Linux hosts.
+    Misc cleanups and fixes all over the place
+    =
+
+    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+    =
+
+    * remotes/mst/tags/for_upstream: (26 commits)
+      pci: Sanity test minimum downstream LNKSTA
+      hw/smbios: fix offset of type 3 sku field
+      pci: Move NVIDIA vendor id to the rest of ids
+      virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
+      virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
+      virtio-balloon: Rework ballon_page() interface
+      virtio-balloon: Corrections to address verification
+      virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
+      i386/kvm: ignore masked irqs when update msi routes
+      contrib/vhost-user-blk: fix the compilation issue
+      Revert "contrib/vhost-user-blk: fix the compilation issue"
+      pc-dimm: use same mechanism for [get|set]_addr
+      tests/data: introduce "uefi-boot-images" with the "bios-tables-test" =
+ISOs
+      tests/uefi-test-tools: add build scripts
+      tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
+      roms: build the EfiRom utility from the roms/edk2 submodule
+      roms: add the edk2 project as a git submodule
+      vhost-user-test: create a temporary directory per TestServer
+      vhost-user-test: small changes to init_hugepagefs
+      vhost-user-test: create a main loop per TestServer
+      ...
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1823790
+https://bugs.launchpad.net/bugs/1839428
 
 Title:
-  QEMU mishandling of SO_PEERSEC forces systemd into tight loop
+   qemu core dumped when repeat "system_reset" multiple times during
+  guest boot
 
 Status in QEMU:
-  New
+  Confirmed
 
 Bug description:
-  While building Debian images for embedded ARM target systems I
-  detected that QEMU seems to force newer systemd daemons into a tight
-  loop.
+  commit 864ab314f1d924129d06ac7b571f105a2b76a4b2 (HEAD, tag: v4.1.0-rc4, o=
+rigin/master, origin/HEAD, master)
+  Test arch:x86 and power
 
-  My setup is the following:
+  Steps:
+  1.Boot up guest with command
+  power cmdline:
+  /usr/libexec/backup/qemu-kvm \
+   -smp 8 \
+   -m 4096 \
+   -nodefaults \
+   -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D1,bu=
+s=3Dpci.0,addr=3D0x7 \
+   -drive file=3Drhel77-ppc64le-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,fo=
+rmat=3Dqcow2,cache=3Dnone \
+   -chardev stdio,mux=3Don,id=3Dserial_id_serial0,server,nowait,signal=3Dof=
+f \
+   -device spapr-vty,id=3Dserial111,chardev=3Dserial_id_serial0 \
+   -mon chardev=3Dserial_id_serial0,mode=3Dreadline \
+  x86 cmdline:
+  /usr/libexec/qemu-kvm \
+   -m 4096 -smp 8 \
+   -boot menu=3Don \
+   -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1\
+   -drive file=3Drhel77-64-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,format=
+=3Dqcow2,cache=3Dnone \
+   -vga std \
+   -vnc :9 \
+   -nographic \
+   -device virtio-net-pci,netdev=3Dnet0,id=3Dnic0,mac=3D52:54:00:c4:e7:84 \
+   -netdev tap,id=3Dnet0,script=3D/etc/qemu-ifup,downscript=3D/etc/qemu-ifd=
+own,vhost=3Don \
 
-  Host machine: Ubuntu 18.04, amd64
-  LXD container: Debian Buster, arm64, systemd 241
-  QEMU: qemu-aarch64-static, 4.0.0-rc2 (custom build) and 3.1.0 (Debian 1:3=
-.1+dfsg-7)
+  2.when guest start to boot up kernel(when no output infomation),run
+  hmp command "system_reset"
 
-  To easily reproduce the issue I have created the following repository:
-  https://github.com/lueschem/edi-qemu
+  =
 
-  The call where systemd gets looping is the following:
-  2837 getsockopt(3,1,31,274891889456,274887218756,274888927920) =3D -1 err=
-no=3D34 (Numerical result out of range)
+  Result:
 
-  Furthermore I also verified that the issue is not related to LXD.
-  The same behavior can be reproduced using systemd-nspawn.
-
-  This issue reported against systemd seems to be related:
-  https://github.com/systemd/systemd/issues/11557
+  Sometimes,qemu core dumped with error as following:
+  system_reset
+  (qemu) qemu-system-ppc64: /root/qemu/hw/virtio/virtio.c:225: vring_get_re=
+gion_caches: Assertion `caches !=3D NULL' failed.
+  b.sh: line 11: 73679 Aborted                 (core dumped) /usr/local/bin=
+/qemu-system-ppc64 -enable-kvm -smp 8 -m 4096 -nodefaults -device virtio-bl=
+k-pci,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D1,bus=3Dpci.0,addr=3D0x7=
+ -drive file=3Drhel77-ppc64le-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,form=
+at=3Dqcow2,cache=3Dnone -chardev stdio,mux=3Don,id=3Dserial_id_serial0,serv=
+er,nowait,signal=3Doff -device spapr-vty,id=3Dserial111,chardev=3Dserial_id=
+_serial0 -mon chardev=3Dserial_id_serial0,mode=3Dreadline
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1823790/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1839428/+subscriptions
 
