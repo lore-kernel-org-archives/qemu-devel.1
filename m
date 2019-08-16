@@ -6,50 +6,49 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 850BDC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BA4C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:06:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B67B2133F
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:04:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B67B2133F
+	by mail.kernel.org (Postfix) with ESMTPS id 0984A2133F
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:06:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0984A2133F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyXE9-0003uv-5E
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39317)
+	id 1hyXFt-00066w-UB
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:06:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWkK-0007QZ-KY
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:34:04 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWoQ-0003mi-IN
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:38:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWkG-0000eW-Jb
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:34:00 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.78]:56457)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWoL-0003MM-DL
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:38:11 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.73]:29778)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWjY-0000Av-HM; Fri, 16 Aug 2019 03:33:14 -0400
-Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
- BWP09926083.bt.com (10.36.82.114) with Microsoft SMTP Server (version=TLS1_2, 
+ id 1hyWo0-00036w-SN; Fri, 16 Aug 2019 03:37:49 -0400
+Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
+ BWP09926078.bt.com (10.36.82.109) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 08:32:44 +0100
+ Aug 2019 08:37:07 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:33:05 +0100
+ tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:37:47 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:33:05 +0100
+ 2019 08:37:47 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 19/42] hw/dma: Declare device little or
- big endian
-Thread-Index: AQHVVATXv2y4d28XbEKe3xKBzbpwgA==
-Date: Fri, 16 Aug 2019 07:33:05 +0000
-Message-ID: <1565940784105.45471@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v7 35/42] exec: Delete DEVICE_HOST_ENDIAN
+Thread-Index: AQHVVAV/22SpmDs0VU2aZZpQIyY/gw==
+Date: Fri, 16 Aug 2019 07:37:46 +0000
+Message-ID: <1565941066081.69203@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -61,12 +60,11 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.78
+X-Received-From: 213.121.35.73
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 19/42] hw/dma: Declare device little or big
- endian
+Subject: [Qemu-devel]  [PATCH v7 35/42] exec: Delete DEVICE_HOST_ENDIAN
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,120 +107,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For each device declared with DEVICE_NATIVE_ENDIAN, find the set of
-targets from the set of target/hw/*/device.o.
+DEVICE_HOST_ENDIAN is conditional upon HOST_WORDS_BIGENDIAN.
 
-If the set of targets are all little or all big endian, re-declare
-the device endianness as DEVICE_LITTLE_ENDIAN or DEVICE_BIG_ENDIAN
-respectively.
-
-This *naive* deduction may result in genuinely native endian devices
-being incorrectly declared as little or big endian, but should not
-introduce regressions for current targets.
-
-These devices should be re-declared as DEVICE_NATIVE_ENDIAN if 1) it
-has a new target with an opposite endian or 2) someone informed knows
-better =3D)
+Code is cleaner if the single use of DEVICE_HOST_ENDIAN is instead
+directly conditional upon HOST_WORDS_BIGENDIAN.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- hw/dma/bcm2835_dma.c | 4 ++--
- hw/dma/etraxfs_dma.c | 2 +-
- hw/dma/pl080.c       | 2 +-
- hw/dma/pl330.c       | 2 +-
- hw/dma/puv3_dma.c    | 2 +-
- hw/dma/sparc32_dma.c | 2 +-
- 6 files changed, 7 insertions(+), 7 deletions(-)
+ include/exec/cpu-common.h | 8 --------
+ memory.c                  | 2 +-
+ 2 files changed, 1 insertion(+), 9 deletions(-)
 
-diff --git a/hw/dma/bcm2835_dma.c b/hw/dma/bcm2835_dma.c
-index a39e8f4..907d25c 100644
---- a/hw/dma/bcm2835_dma.c
-+++ b/hw/dma/bcm2835_dma.c
-@@ -288,7 +288,7 @@ static void bcm2835_dma15_write(void *opaque, hwaddr of=
-fset, uint64_t value,
- static const MemoryRegionOps bcm2835_dma0_ops =3D {
-     .read =3D bcm2835_dma0_read,
-     .write =3D bcm2835_dma0_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-     .valid.min_access_size =3D 4,
-     .valid.max_access_size =3D 4,
- };
-@@ -296,7 +296,7 @@ static const MemoryRegionOps bcm2835_dma0_ops =3D {
- static const MemoryRegionOps bcm2835_dma15_ops =3D {
-     .read =3D bcm2835_dma15_read,
-     .write =3D bcm2835_dma15_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-     .valid.min_access_size =3D 4,
-     .valid.max_access_size =3D 4,
- };
-diff --git a/hw/dma/etraxfs_dma.c b/hw/dma/etraxfs_dma.c
-index 85783eb..df3ba09 100644
---- a/hw/dma/etraxfs_dma.c
-+++ b/hw/dma/etraxfs_dma.c
-@@ -697,7 +697,7 @@ dma_write(void *opaque, hwaddr addr,
- static const MemoryRegionOps dma_ops =3D {
-  .read =3D dma_read,
-  .write =3D dma_write,
-- .endianness =3D DEVICE_NATIVE_ENDIAN,
-+ .endianness =3D DEVICE_LITTLE_ENDIAN,
-  .valid =3D {
-  .min_access_size =3D 1,
-  .max_access_size =3D 4
-diff --git a/hw/dma/pl080.c b/hw/dma/pl080.c
-index 7e57624..644eadb 100644
---- a/hw/dma/pl080.c
-+++ b/hw/dma/pl080.c
-@@ -346,7 +346,7 @@ static void pl080_write(void *opaque, hwaddr offset,
- static const MemoryRegionOps pl080_ops =3D {
-     .read =3D pl080_read,
-     .write =3D pl080_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+index 7eeb78c..b33dc0c 100644
+--- a/include/exec/cpu-common.h
++++ b/include/exec/cpu-common.h
+@@ -16,14 +16,6 @@ void tcg_flush_softmmu_tlb(CPUState *cs);
 
- static void pl080_reset(DeviceState *dev)
-diff --git a/hw/dma/pl330.c b/hw/dma/pl330.c
-index a56a3e7..4c51f2d 100644
---- a/hw/dma/pl330.c
-+++ b/hw/dma/pl330.c
-@@ -1493,7 +1493,7 @@ static uint64_t pl330_iomem_read(void *opaque, hwaddr=
- offset,
- static const MemoryRegionOps pl330_ops =3D {
-     .read =3D pl330_iomem_read,
-     .write =3D pl330_iomem_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-     .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-diff --git a/hw/dma/puv3_dma.c b/hw/dma/puv3_dma.c
-index 122f87a..7002373 100644
---- a/hw/dma/puv3_dma.c
-+++ b/hw/dma/puv3_dma.c
-@@ -75,7 +75,7 @@ static const MemoryRegionOps puv3_dma_ops =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
+ #if !defined(CONFIG_USER_ONLY)
 
- static void puv3_dma_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
-index 88765d0..6b32372 100644
---- a/hw/dma/sparc32_dma.c
-+++ b/hw/dma/sparc32_dma.c
-@@ -224,7 +224,7 @@ static void dma_mem_write(void *opaque, hwaddr addr,
- static const MemoryRegionOps dma_mem_ops =3D {
-     .read =3D dma_mem_read,
-     .write =3D dma_mem_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
+-#include "exec/memop.h"
+-
+-#if defined(HOST_WORDS_BIGENDIAN)
+-#define DEVICE_HOST_ENDIAN MO_BE
+-#else
+-#define DEVICE_HOST_ENDIAN MO_LE
+-#endif
+-
+ /* address in the RAM (different from a physical address) */
+ #if defined(CONFIG_XEN_BACKEND)
+ typedef uint64_t ram_addr_t;
+diff --git a/memory.c b/memory.c
+index 3cabb52..689390f 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1362,7 +1362,7 @@ static void memory_region_ram_device_write(void *opaq=
+ue, hwaddr addr,
+ static const MemoryRegionOps ram_device_mem_ops =3D {
+     .read =3D memory_region_ram_device_read,
+     .write =3D memory_region_ram_device_write,
+-    .endianness =3D DEVICE_HOST_ENDIAN,
++    .endianness =3D 0, /* Host endianness */
      .valid =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
+         .min_access_size =3D 1,
+         .max_access_size =3D 8,
 --
 1.8.3.1
 
