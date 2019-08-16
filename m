@@ -2,85 +2,82 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901A8C3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FE3C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49B492077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:22:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DD2B2077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 21:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCwxJvFk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B492077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="FpkKZLw2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DD2B2077C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyjgE-0000VC-Gk
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 17:22:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60948)
- by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nirsof@gmail.com>) id 1hyjfU-0008PW-G5
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:21:54 -0400
+	id 1hyjm6-0002RH-A0
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 17:28:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60088)
+ by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
+ <3lxxXXQMKCh4M6QAIIAF8.6IGK8GO-78P8FHIHAHO.ILA@flex--scw.bounces.google.com>)
+ id 1hyjXx-0007QG-7c
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:14:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nirsof@gmail.com>) id 1hyjfS-0002hg-O4
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:21:52 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34230)
+ (envelope-from
+ <3lxxXXQMKCh4M6QAIIAF8.6IGK8GO-78P8FHIHAHO.ILA@flex--scw.bounces.google.com>)
+ id 1hyjXv-0007xL-0s
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:14:05 -0400
+Received: from mail-pf1-x44a.google.com ([2607:f8b0:4864:20::44a]:46049)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nirsof@gmail.com>)
- id 1hyjfO-0002ft-MK; Fri, 16 Aug 2019 17:21:46 -0400
-Received: by mail-wr1-x443.google.com with SMTP id s18so2802408wrn.1;
- Fri, 16 Aug 2019 14:21:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4lqSZ1m0WK/OEYPPjSPDg39E2UZXOnB9G/Y7GfNf7as=;
- b=fCwxJvFkQivFoB3GcztjkFF43KEX2I8wFcnmMHRjB9JHS/GRmF6ldqrodwzyVVjhf9
- RU5rNyfvHHoyVb8PF5hZ8+g0bYoTxPC6Z6KDCcbMrECH0tg5OQ+elAwWqRQPuRcdJvGf
- TdmgoAmyLNUL0YwPkRNumaaL/5w+zCAX4wF5GhVPlJAwZKy7tZXdlVvQjdldJlh2woc5
- xH6OQd7XMgkW2JqSw1NZpNSm7CM/FdlZJlSXu02Pqh2DzSkX9JIiKGap2H9BCfyeNHmo
- 7hnmnHl4xYUT+YJoGpr6xm8CyaU5ljSjI9FzDrYme4MqU3XYxZrVwKp7agTP/7vp/UbI
- KJ0g==
+ (Exim 4.71) (envelope-from
+ <3lxxXXQMKCh4M6QAIIAF8.6IGK8GO-78P8FHIHAHO.ILA@flex--scw.bounces.google.com>)
+ id 1hyjXu-0007ue-8r
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 17:14:02 -0400
+Received: by mail-pf1-x44a.google.com with SMTP id w16so4585261pfn.12
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 14:14:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=kaoIQwDyK8bEoWe907lgLsxXKF/yKmR/QpCyb0YecPA=;
+ b=FpkKZLw26t97kT1DqJV3wFVQC1ne4Z0vTB9JHFNdpDvaKSxbY6DKvXMlvgwnQhKn18
+ jsq5JRNcm+iqaaXMpeH7MPBupeb8CkZyHAhaRCbrj0sS5awt8Ttge1knv6rgQO+rgINw
+ C7bkZjdCmcbL3p5J1pxnTDz696OgvX+uoG5WetWr7yhCrc3UOinN4iBNbdhf1jCeGTNY
+ fhw0ah3eSTWEA4dpEIS61S/fQc6EiL8cgT2nzPBK14xqEaldPO+A2BI7ORmyjnkTqo2+
+ 6QaDT4b/pW7NLLaNeoP1fSkAD0DQASgHNDTTdg2vkp0twmYLkUt/zWKafka4DqAF+sUI
+ qp5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=4lqSZ1m0WK/OEYPPjSPDg39E2UZXOnB9G/Y7GfNf7as=;
- b=Oa3gccWCAoVXpFxJ35p5JaS2iKse7pt8obxpAITX2zZKGxryl8979Jtclge0WctCuQ
- 2Z23ssDlppdSy+fKIQ0ir32B9DduE4bpPkLkIbFeh/dLWmUWEfLP/h/dBd5NkZb8Q3iY
- 8YYFqQrEWGy+5i55VJ9fkc59avpY7KTuCJbFge2IgZmOqgCXq+GDy8ZCdcsijr4epW0C
- JE5KBfM1YX7lTZjZaMXTRBjKEmPZ/qhoUxv1bnu80hfAC0DOMQ8Ww2mue2gEEjw9fOkM
- SbQ0KZl9zEqdMa9JMH+p0NxzZV5APdbt2riIk0sgd5kcYmRkhjNdALXt9XkJH4+dL1Qa
- 54uQ==
-X-Gm-Message-State: APjAAAVzrbs8WqBEmDTOkot6alyXudmC/0GYXLTblF5LM1VhwgWIx25q
- NO+7sC26tTRLQbDNMVLLBZb1lSpfIjg=
-X-Google-Smtp-Source: APXvYqz4zf1ZXbSaEER6fx+xjtpXLrEZIJ8wbylUZlKgTIxSAy/AHEzyz6491Gvp9yvSEx2o7T/zrA==
-X-Received: by 2002:a5d:4c87:: with SMTP id z7mr12492007wrs.10.1565990504657; 
- Fri, 16 Aug 2019 14:21:44 -0700 (PDT)
-Received: from localhost.localdomain (93-173-46-43.bb.netvision.net.il.
- [93.173.46.43])
- by smtp.gmail.com with ESMTPSA id s64sm11474524wmf.16.2019.08.16.14.21.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 14:21:43 -0700 (PDT)
-From: Nir Soffer <nirsof@gmail.com>
-X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
-To: qemu-block@nongnu.org
-Date: Sat, 17 Aug 2019 00:21:22 +0300
-Message-Id: <20190816212122.8816-1-nsoffer@redhat.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=kaoIQwDyK8bEoWe907lgLsxXKF/yKmR/QpCyb0YecPA=;
+ b=nntsT3a8gRD0HTdW/sSX3qZJz6Wn9MkkpUgKVh/cJzz7Q9+z31/dpLs7pMTp0z6HXK
+ TK+e8PPYmmJLatb8MJWRLYuGDj5nfYrTYevFgXmbPpONhgoGVmQaXicoGdZBpAqBfXKw
+ GFTJ3+E8ti5FF6Z7+7cxOjK4Ephi9e+9Qu2dz6BByGGiYL8eIdrpIeQMuuIhdRelOoOA
+ tKAnmavnd/UHUOIH9jswDvuImFSzNEc21DCpDAooitqFgWH6g1qv0/7aatGUPBNiwR6e
+ KEjkYVAUEgZsN2T3srUp1RbFzLWtM/++5fKzi0osS8TAW/IsCjnEKgDAFEWjtUnYfN62
+ 9QEQ==
+X-Gm-Message-State: APjAAAU23ax/pK2uOeWU8q5jWceYfBQUBkYbjFVQYCS4TJzpTXqcJwvG
+ 1RX0CAzL6jreREYK32NQst6nRRo=
+X-Google-Smtp-Source: APXvYqyF8tNT/uphND43ZKM+1/9v9e7K+M2fGVvadLy7zfzIcjJzFUkey9oWT/RwKDbj/1kcSQS8eBg=
+X-Received: by 2002:a63:ee08:: with SMTP id e8mr9606242pgi.70.1565990039302;
+ Fri, 16 Aug 2019 14:13:59 -0700 (PDT)
+Date: Fri, 16 Aug 2019 14:13:56 -0700
+Message-Id: <20190816211356.59244-1-scw@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.23.0.rc1.153.gdeed80330f-goog
+To: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
-Subject: [Qemu-devel] [PATCH] block: posix: Always allocate the first block
+X-Received-From: 2607:f8b0:4864:20::44a
+X-Mailman-Approved-At: Fri, 16 Aug 2019 17:27:49 -0400
+Subject: [Qemu-devel] [PATCH] Add support for ethtool via TARGET_SIOCETHTOOL
+ ioctls.
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,278 +89,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Nir Soffer <nsoffer@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+From: Shu-Chun Weng via Qemu-devel <qemu-devel@nongnu.org>
+Reply-To: Shu-Chun Weng <scw@google.com>
+Cc: arunkaly@google.com, qemu-devel@nongnu.org, Shu-Chun Weng <scw@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When creating an image with preallocation "off" or "falloc", the first
-block of the image is typically not allocated. When using Gluster
-storage backed by XFS filesystem, reading this block using direct I/O
-succeeds regardless of request length, fooling alignment detection.
+The ioctl numeric values are platform-independent and determined by
+the file include/uapi/linux/sockios.h in Linux kernel source code:
 
-In this case we fallback to a safe value (4096) instead of the optimal
-value (512), which may lead to unneeded data copying when aligning
-requests.  Allocating the first block avoids the fallback.
+  #define SIOCETHTOOL   0x8946
 
-When using preallocation=off, we always allocate at least one filesystem
-block:
+These ioctls get (or set) the field ifr_data of type char* in the
+structure ifreq. Such functionality is achieved in QEMU by using
+MK_STRUCT() and MK_PTR() macros with an appropriate argument, as
+it was done for existing similar cases.
 
-    $ ./qemu-img create -f raw test.raw 1g
-    Formatting 'test.raw', fmt=raw size=1073741824
-
-    $ ls -lhs test.raw
-    4.0K -rw-r--r--. 1 nsoffer nsoffer 1.0G Aug 16 23:48 test.raw
-
-I did quick performance tests for these flows:
-- Provisioning a VM with a new raw image.
-- Copying disks with qemu-img convert to new raw target image
-
-I installed Fedora 29 server on raw sparse image, measuring the time
-from clicking "Begin installation" until the "Reboot" button appears:
-
-Before(s)  After(s)     Diff(%)
--------------------------------
-     356        389        +8.4
-
-I ran this only once, so we cannot tell much from these results.
-
-The second test was cloning the installation image with qemu-img
-convert, doing 10 runs:
-
-    for i in $(seq 10); do
-        rm -f dst.raw
-        sleep 10
-        time ./qemu-img convert -f raw -O raw -t none -T none src.raw dst.raw
-    done
-
-Here is a table comparing the total time spent:
-
-Type    Before(s)   After(s)    Diff(%)
----------------------------------------
-real      530.028    469.123      -11.4
-user       17.204     10.768      -37.4
-sys        17.881      7.011      -60.7
-
-Here we see very clear improvement in CPU usage.
-
-Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+Signed-off-by: Shu-Chun Weng <scw@google.com>
 ---
- block/file-posix.c         | 25 +++++++++++++++++++++++++
- tests/qemu-iotests/150.out |  1 +
- tests/qemu-iotests/160     |  4 ++++
- tests/qemu-iotests/175     | 19 +++++++++++++------
- tests/qemu-iotests/175.out |  8 ++++----
- tests/qemu-iotests/221.out | 12 ++++++++----
- tests/qemu-iotests/253.out | 12 ++++++++----
- 7 files changed, 63 insertions(+), 18 deletions(-)
+ linux-user/ioctls.h       | 1 +
+ linux-user/syscall_defs.h | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index b9c33c8f6c..3964dd2021 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1755,6 +1755,27 @@ static int handle_aiocb_discard(void *opaque)
-     return ret;
- }
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 3281c97ca2..9d231df665 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -208,6 +208,7 @@
+   IOCTL(SIOCGIFINDEX, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_int_ifreq)))
+   IOCTL(SIOCSIFPFLAGS, IOC_W, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
+   IOCTL(SIOCGIFPFLAGS, IOC_W | IOC_R, MK_PTR(MK_STRUCT(STRUCT_short_ifreq)))
++  IOCTL(SIOCETHTOOL, IOC_R | IOC_W, MK_PTR(MK_STRUCT(STRUCT_ptr_ifreq)))
+   IOCTL(SIOCSIFLINK, 0, TYPE_NULL)
+   IOCTL_SPECIAL(SIOCGIFCONF, IOC_W | IOC_R, do_ioctl_ifconf,
+                 MK_PTR(MK_STRUCT(STRUCT_ifconf)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 0662270300..276f96039f 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -819,6 +819,8 @@ struct target_pollfd {
+ #define TARGET_SIOCGIFTXQLEN   0x8942          /* Get the tx queue length      */
+ #define TARGET_SIOCSIFTXQLEN   0x8943          /* Set the tx queue length      */
  
-+/*
-+ * Help alignment detection by allocating the first block.
-+ *
-+ * When reading with direct I/O from unallocated area on Gluster backed by XFS,
-+ * reading succeeds regardless of request length. In this case we fallback to
-+ * safe aligment which is not optimal. Allocating the first block avoids this
-+ * fallback.
-+ *
-+ * Returns: 0 on success, -errno on failure.
-+ */
-+static int allocate_first_block(int fd)
-+{
-+    ssize_t n;
++#define TARGET_SIOCETHTOOL     0x8946          /* Ethtool interface            */
 +
-+    do {
-+        n = pwrite(fd, "\0", 1, 0);
-+    } while (n == -1 && errno == EINTR);
-+
-+    return (n == -1) ? -errno : 0;
-+}
-+
- static int handle_aiocb_truncate(void *opaque)
- {
-     RawPosixAIOData *aiocb = opaque;
-@@ -1794,6 +1815,8 @@ static int handle_aiocb_truncate(void *opaque)
-                 /* posix_fallocate() doesn't set errno. */
-                 error_setg_errno(errp, -result,
-                                  "Could not preallocate new data");
-+            } else if (current_length == 0) {
-+                allocate_first_block(fd);
-             }
-         } else {
-             result = 0;
-@@ -1855,6 +1878,8 @@ static int handle_aiocb_truncate(void *opaque)
-         if (ftruncate(fd, offset) != 0) {
-             result = -errno;
-             error_setg_errno(errp, -result, "Could not resize file");
-+        } else if (current_length == 0 && offset > current_length) {
-+            allocate_first_block(fd);
-         }
-         return result;
-     default:
-diff --git a/tests/qemu-iotests/150.out b/tests/qemu-iotests/150.out
-index 2a54e8dcfa..3cdc7727a5 100644
---- a/tests/qemu-iotests/150.out
-+++ b/tests/qemu-iotests/150.out
-@@ -3,6 +3,7 @@ QA output created by 150
- === Mapping sparse conversion ===
- 
- Offset          Length          File
-+0               0x1000          TEST_DIR/t.IMGFMT
- 
- === Mapping non-sparse conversion ===
- 
-diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
-index df89d3864b..ad2d054a47 100755
---- a/tests/qemu-iotests/160
-+++ b/tests/qemu-iotests/160
-@@ -57,6 +57,10 @@ for skip in $TEST_SKIP_BLOCKS; do
-     $QEMU_IMG dd if="$TEST_IMG" of="$TEST_IMG.out" skip="$skip" -O "$IMGFMT" \
-         2> /dev/null
-     TEST_IMG="$TEST_IMG.out" _check_test_img
-+
-+    # We always write the first byte of an image.
-+    printf "\0" > "$TEST_IMG.out.dd"
-+
-     dd if="$TEST_IMG" of="$TEST_IMG.out.dd" skip="$skip" status=none
- 
-     echo
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index 51e62c8276..c6a3a7bb1e 100755
---- a/tests/qemu-iotests/175
-+++ b/tests/qemu-iotests/175
-@@ -37,14 +37,16 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- # the file size.  This function hides the resulting difference in the
- # stat -c '%b' output.
- # Parameter 1: Number of blocks an empty file occupies
--# Parameter 2: Image size in bytes
-+# Parameter 2: Minimal number of blocks in an image
-+# Parameter 3: Image size in bytes
- _filter_blocks()
- {
-     extra_blocks=$1
--    img_size=$2
-+    min_blocks=$2
-+    img_size=$3
- 
--    sed -e "s/blocks=$extra_blocks\\(\$\\|[^0-9]\\)/nothing allocated/" \
--        -e "s/blocks=$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\\)/everything allocated/"
-+    sed -e "s/blocks=$((extra_blocks + min_blocks))\\(\$\\|[^0-9]\\)/min allocation/" \
-+        -e "s/blocks=$((extra_blocks + img_size / 512))\\(\$\\|[^0-9]\\)/max allocation/"
- }
- 
- # get standard environment, filters and checks
-@@ -60,16 +62,21 @@ size=$((1 * 1024 * 1024))
- touch "$TEST_DIR/empty"
- extra_blocks=$(stat -c '%b' "$TEST_DIR/empty")
- 
-+# We always write the first byte; check how many blocks this filesystem
-+# allocates to match empty image alloation.
-+printf "\0" > "$TEST_DIR/empty"
-+min_blocks=$(stat -c '%b' "$TEST_DIR/empty")
-+
- echo
- echo "== creating image with default preallocation =="
- _make_test_img $size | _filter_imgfmt
--stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $size
-+stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $min_blocks $size
- 
- for mode in off full falloc; do
-     echo
-     echo "== creating image with preallocation $mode =="
-     IMGOPTS=preallocation=$mode _make_test_img $size | _filter_imgfmt
--    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $size
-+    stat -c "size=%s, blocks=%b" $TEST_IMG | _filter_blocks $extra_blocks $min_blocks $size
- done
- 
- # success, all done
-diff --git a/tests/qemu-iotests/175.out b/tests/qemu-iotests/175.out
-index 6d9a5ed84e..263e521262 100644
---- a/tests/qemu-iotests/175.out
-+++ b/tests/qemu-iotests/175.out
-@@ -2,17 +2,17 @@ QA output created by 175
- 
- == creating image with default preallocation ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
--size=1048576, nothing allocated
-+size=1048576, min allocation
- 
- == creating image with preallocation off ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=off
--size=1048576, nothing allocated
-+size=1048576, min allocation
- 
- == creating image with preallocation full ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=full
--size=1048576, everything allocated
-+size=1048576, max allocation
- 
- == creating image with preallocation falloc ==
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 preallocation=falloc
--size=1048576, everything allocated
-+size=1048576, max allocation
-  *** done
-diff --git a/tests/qemu-iotests/221.out b/tests/qemu-iotests/221.out
-index 9f9dd52bb0..dca024a0c3 100644
---- a/tests/qemu-iotests/221.out
-+++ b/tests/qemu-iotests/221.out
-@@ -3,14 +3,18 @@ QA output created by 221
- === Check mapping of unaligned raw image ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=65537
--[{ "start": 0, "length": 66048, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
--[{ "start": 0, "length": 66048, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 61952, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 61952, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
- wrote 1/1 bytes at offset 65536
- 1 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--[{ "start": 0, "length": 65536, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 61440, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
- { "start": 65536, "length": 1, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
- { "start": 65537, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
--[{ "start": 0, "length": 65536, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 61440, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
- { "start": 65536, "length": 1, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
- { "start": 65537, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
- *** done
-diff --git a/tests/qemu-iotests/253.out b/tests/qemu-iotests/253.out
-index 607c0baa0b..3d08b305d7 100644
---- a/tests/qemu-iotests/253.out
-+++ b/tests/qemu-iotests/253.out
-@@ -3,12 +3,16 @@ QA output created by 253
- === Check mapping of unaligned raw image ===
- 
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048575
--[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
--[{ "start": 0, "length": 1048576, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 1044480, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
- wrote 65535/65535 bytes at offset 983040
- 63.999 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
--[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 978944, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
- { "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
--[{ "start": 0, "length": 983040, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+[{ "start": 0, "length": 4096, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 4096, "length": 978944, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
- { "start": 983040, "length": 65536, "depth": 0, "zero": false, "data": true, "offset": OFFSET}]
- *** done
+ /* ARP cache control calls. */
+ #define TARGET_OLD_SIOCDARP    0x8950          /* old delete ARP table entry   */
+ #define TARGET_OLD_SIOCGARP    0x8951          /* old get ARP table entry      */
 -- 
-2.20.1
+2.23.0.rc1.153.gdeed80330f-goog
 
 
