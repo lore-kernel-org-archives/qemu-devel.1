@@ -6,50 +6,49 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0671DC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE0BEC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:04:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B693A2077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:03:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B693A2077C
+	by mail.kernel.org (Postfix) with ESMTPS id 745032077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:04:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 745032077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyXCS-0001MM-O2
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40390)
+	id 1hyXDO-0002n1-9N
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:04:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWmy-0001QI-Rn
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:36:48 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWlq-0000TX-83
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:35:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWmv-0002g1-UM
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:36:44 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.74]:10012)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWlm-0001Xx-Hw
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:35:34 -0400
+Received: from smtpe1.intersmtp.com ([62.239.224.235]:51437)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWmE-0002En-Gm; Fri, 16 Aug 2019 03:35:58 -0400
-Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
- BWP09926079.bt.com (10.36.82.110) with Microsoft SMTP Server (version=TLS1_2, 
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 08:35:34 +0100
+ id 1hyWlL-0001Ek-QA; Fri, 16 Aug 2019 03:35:04 -0400
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:35:56 +0100
+ RDW083A011ED67.bt.com (10.187.98.37) with Microsoft SMTP Server (TLS) id
+ 14.3.439.0; Fri, 16 Aug 2019 08:40:57 +0100
+Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
+ tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:35:00 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:35:56 +0100
+ 2019 08:35:00 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 29/42] hw/ssi: Declare device little or
+Thread-Topic: [Qemu-devel] [PATCH v7 26/42] hw/net: Declare device little or
  big endian
-Thread-Index: AQHVVAU9wbn561zm7k64tZGTYvMONA==
-Date: Fri, 16 Aug 2019 07:35:56 +0000
-Message-ID: <1565940955631.8939@bt.com>
+Thread-Index: AQHVVAUcPICP1n2ya0Cx6fWxt6l8Gg==
+Date: Fri, 16 Aug 2019 07:35:00 +0000
+Message-ID: <1565940899704.36138@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -60,12 +59,13 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.74
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 62.239.224.235
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 29/42] hw/ssi: Declare device little or big
+Subject: [Qemu-devel] [PATCH v7 26/42] hw/net: Declare device little or big
  endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,66 +126,101 @@ better =3D)
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- hw/ssi/mss-spi.c       | 2 +-
- hw/ssi/pl022.c         | 2 +-
- hw/ssi/stm32f2xx_spi.c | 2 +-
- hw/ssi/xilinx_spips.c  | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ hw/net/allwinner_emac.c | 2 +-
+ hw/net/imx_fec.c        | 2 +-
+ hw/net/lan9118.c        | 4 ++--
+ hw/net/lance.c          | 2 +-
+ hw/net/smc91c111.c      | 2 +-
+ hw/net/stellaris_enet.c | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
-index 4c9da5d..71fd138 100644
---- a/hw/ssi/mss-spi.c
-+++ b/hw/ssi/mss-spi.c
-@@ -359,7 +359,7 @@ static void spi_write(void *opaque, hwaddr addr,
- static const MemoryRegionOps spi_ops =3D {
-     .read =3D spi_read,
-     .write =3D spi_write,
+diff --git a/hw/net/allwinner_emac.c b/hw/net/allwinner_emac.c
+index eecda52..97e22e7 100644
+--- a/hw/net/allwinner_emac.c
++++ b/hw/net/allwinner_emac.c
+@@ -418,7 +418,7 @@ static void aw_emac_set_link(NetClientState *nc)
+ static const MemoryRegionOps aw_emac_mem_ops =3D {
+     .read =3D aw_emac_read,
+     .write =3D aw_emac_write,
 -    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +    .endianness =3D DEVICE_LITTLE_ENDIAN,
      .valid =3D {
-         .min_access_size =3D 1,
-         .max_access_size =3D 4
-diff --git a/hw/ssi/pl022.c b/hw/ssi/pl022.c
-index fec73ca..10d1995 100644
---- a/hw/ssi/pl022.c
-+++ b/hw/ssi/pl022.c
-@@ -226,7 +226,7 @@ static void pl022_reset(DeviceState *dev)
- static const MemoryRegionOps pl022_ops =3D {
-     .read =3D pl022_read,
-     .write =3D pl022_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
-
- static int pl022_post_load(void *opaque, int version_id)
-diff --git a/hw/ssi/stm32f2xx_spi.c b/hw/ssi/stm32f2xx_spi.c
-index 4249101..e1e5ab5 100644
---- a/hw/ssi/stm32f2xx_spi.c
-+++ b/hw/ssi/stm32f2xx_spi.c
-@@ -166,7 +166,7 @@ static void stm32f2xx_spi_write(void *opaque, hwaddr ad=
-dr,
- static const MemoryRegionOps stm32f2xx_spi_ops =3D {
-     .read =3D stm32f2xx_spi_read,
-     .write =3D stm32f2xx_spi_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
-
- static const VMStateDescription vmstate_stm32f2xx_spi =3D {
-diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-index b29e0a4..8cadc4e 100644
---- a/hw/ssi/xilinx_spips.c
-+++ b/hw/ssi/xilinx_spips.c
-@@ -1238,7 +1238,7 @@ static MemTxResult lqspi_write(void *opaque, hwaddr o=
-ffset, uint64_t value,
- static const MemoryRegionOps lqspi_ops =3D {
-     .read_with_attrs =3D lqspi_read,
-     .write_with_attrs =3D lqspi_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-     .impl =3D {
          .min_access_size =3D 4,
          .max_access_size =3D 4,
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index 404154e..76d42c8 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -1278,7 +1278,7 @@ static const MemoryRegionOps imx_eth_ops =3D {
+     .write                 =3D imx_eth_write,
+     .valid.min_access_size =3D 4,
+     .valid.max_access_size =3D 4,
+-    .endianness            =3D DEVICE_NATIVE_ENDIAN,
++    .endianness            =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static void imx_eth_cleanup(NetClientState *nc)
+diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
+index f6120be..bb1bbb3 100644
+--- a/hw/net/lan9118.c
++++ b/hw/net/lan9118.c
+@@ -1304,13 +1304,13 @@ static uint64_t lan9118_16bit_mode_read(void *opaqu=
+e, hwaddr offset,
+ static const MemoryRegionOps lan9118_mem_ops =3D {
+     .read =3D lan9118_readl,
+     .write =3D lan9118_writel,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static const MemoryRegionOps lan9118_16bit_mem_ops =3D {
+     .read =3D lan9118_16bit_mode_read,
+     .write =3D lan9118_16bit_mode_write,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static NetClientInfo net_lan9118_info =3D {
+diff --git a/hw/net/lance.c b/hw/net/lance.c
+index 2978c01..d95f170 100644
+--- a/hw/net/lance.c
++++ b/hw/net/lance.c
+@@ -74,7 +74,7 @@ static uint64_t lance_mem_read(void *opaque, hwaddr addr,
+ static const MemoryRegionOps lance_mem_ops =3D {
+     .read =3D lance_mem_read,
+     .write =3D lance_mem_write,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_BIG_ENDIAN,
+     .valid =3D {
+         .min_access_size =3D 2,
+         .max_access_size =3D 2,
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index 4a612ee..49e4bf5 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -757,7 +757,7 @@ static const MemoryRegionOps smc91c111_mem_ops =3D {
+     .write =3D smc91c111_writefn,
+     .valid.min_access_size =3D 1,
+     .valid.max_access_size =3D 4,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static NetClientInfo net_smc91c111_info =3D {
+diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
+index 2f645bf..15ec227 100644
+--- a/hw/net/stellaris_enet.c
++++ b/hw/net/stellaris_enet.c
+@@ -456,7 +456,7 @@ static void stellaris_enet_write(void *opaque, hwaddr o=
+ffset,
+ static const MemoryRegionOps stellaris_enet_ops =3D {
+     .read =3D stellaris_enet_read,
+     .write =3D stellaris_enet_write,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static void stellaris_enet_reset(DeviceState *dev)
 --
 1.8.3.1
 
