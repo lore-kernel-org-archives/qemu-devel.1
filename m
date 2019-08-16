@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBA1C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 150EBC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 185FF2064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:40:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D56BC2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:41:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPUq+TdL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 185FF2064A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Tb+48BBk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D56BC2064A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycSa-0004iM-3v
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:40:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35505)
+	id 1hycUC-0006s0-0b
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc79-0003fr-L2
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:56 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc75-0003Zv-75
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1hyc78-0005sR-CR
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:55 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:43275)
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc71-0005jz-E6
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:51 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55968)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1hyc78-0005ro-5U
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:54 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id y8so1511865wrn.10
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:54 -0700 (PDT)
+ id 1hyc71-0005is-6n
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:47 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f72so4029065wmf.5
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=xpfRGBW6oeUhJSHa15P6/UBxYtD8fPq019+58iIX+9c=;
- b=aPUq+TdLslcO8RXTZa+vkV8eq3VQ/Zy15/RPiP6brAiSp/buWu0tNc34pHEv7GBJbJ
- LsJgfN8KYKtz9siUPFYNjAoFMjdzvGG9Uk8UkSC9hNXPq93FWauXHucwq1yLy9if02gq
- w8wBTiP5e75xx7j7ntc7luo/G3deR+tc1AjkTLw6X84gKCugtgm5I/ClQQkf8afZ+4Da
- /sgdvP5fT6EcS7BIJzdEmjziY/NuElqUCXYNstsIWbEWj9dl/G+CRKw0ZNZnqD1n1LgZ
- 5Kjvas6of0HE6mDmTfptUBax+Skl9M+AqqpmUVx0KkbzIam/2oUUBd9yyJUBdrLbY1eC
- UP1g==
+ bh=yjLAbXFtKXx0083Aeg8KkwSsF2x8QfSQiu65gSb3dms=;
+ b=Tb+48BBkeKNpA4jC1CP3l/bsYhg9SniWNyq4KfjU70vF2DkKbMH+KgKX/CpIEf523h
+ lZqAePHsnXTSSco8Kia1l1pTcQ8Ta/hB+XlXJo8u6n5Q05zAaLkw6Yg20My2fRbuyr+V
+ VQgLFd3GPGXoFH7VXjv5Q/xBCCmrg9lpaij3evLa4g4fCiQDc3LD2F2CptEzaVoN98dS
+ aW7cC5xHw2EzxJeh8eIsRkyq8xOBXRkJ5XsqN12kkGMEF6wkXcetAvH99ctZH/eetEHX
+ lQNTOf+ugyxVixj1zPMvswebOKE7RhBO4aV9H7t7x+A6y3T/i3TZOgCcX6PwB7DH3gCJ
+ vAWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xpfRGBW6oeUhJSHa15P6/UBxYtD8fPq019+58iIX+9c=;
- b=JKvRPaZKI0oSplTESxWMk2wmVmD3gSbTXScawJ3NyziXGiXgVfO3AxIjRyyKdBlyt3
- i+Ecb3P6XTXmArJaX6FusqUJd1jWPs9ENlH8z18EAKEpfTUR7D2xI1G+4KA/03XA7wTe
- pjvPtasneHYk96qFo80cWZj02e3w8MtQdu4yKIcCwO0e3Gr1BQY+RI5vp4z4Nc6fkVL5
- YKWvk3OwirBN7eCXLWJx51T7vzqiKAN8ZNVUGC8FUKgzx4mhC7sseO6x0LEaDLhOBQOA
- 0ZD7k1dhtP7X1ydYYVA7RIzcyYRdHunSwKGPP0JbnkY9gQjjzRXP2AYV++SspZak0B+A
- /uoA==
-X-Gm-Message-State: APjAAAWt9qRKST7N8LTKJATuk/CfBAvfFGgDva5fsXX47DpC5uXEpT2m
- 89xZyovE2zUvnijsQD4PyL+FVPsfCkzzUg==
-X-Google-Smtp-Source: APXvYqz8PS10HhS1ioVuZlDIvXinErzGISaVVFRa1pxk0Mt5GKkdkpyyOeqzLFeex3l4AoOSUij3cg==
-X-Received: by 2002:a5d:678a:: with SMTP id v10mr10634933wru.116.1565961472867; 
- Fri, 16 Aug 2019 06:17:52 -0700 (PDT)
+ bh=yjLAbXFtKXx0083Aeg8KkwSsF2x8QfSQiu65gSb3dms=;
+ b=FxFh+XaaeU9TaCQuwpbB7k0WzmZEUO0SrSXqqq6ASFYGwEnKElDNssfKtFdpvqdY86
+ ELYTypJfQ0D9zWwiI2eDSRl2xWP2ZA9CPHtZjyOipwvqWbDU3POqGA7rsWlzMc3PaVYi
+ K4Usb9wBrEaFR/IcHXPxWo3PT8zj/gODvcLijThcjc5GsPCP+9cSu9VKSdM1E656FvNe
+ qJ6bjEJAlFz8aOtD21lWRPZvzwFUO6Dd5yxAR3ejw/cQ5kVLeO+uglquOfW5vnAdfNVe
+ AoVEZD+ohVUcgjcfnHykZZWILRdqNC7oU6GntR1NxiEr7+lkWY/JVoHfX6iAD2sQrJmc
+ O9ug==
+X-Gm-Message-State: APjAAAXOMsek9Kv3dEXaeW+LqbkOGp15V2ZYeMeW4XkJSud015yEyAMi
+ I1D6+E/h/Px59cGu7UVCWfNq0wdXb7flcw==
+X-Google-Smtp-Source: APXvYqyOMXIO+3LcpMzHDTJwXFaiI1wf2etTQvnwW17OcFCCjFt8TEVzmG2HoHM01C8LxyVfB020XQ==
+X-Received: by 2002:a1c:411:: with SMTP id 17mr2463791wme.34.1565961465584;
+ Fri, 16 Aug 2019 06:17:45 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.51
+ by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.44
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Aug 2019 06:17:52 -0700 (PDT)
+ Fri, 16 Aug 2019 06:17:45 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 14:17:18 +0100
-Message-Id: <20190816131719.28244-29-peter.maydell@linaro.org>
+Date: Fri, 16 Aug 2019 14:17:12 +0100
+Message-Id: <20190816131719.28244-23-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
 References: <20190816131719.28244-1-peter.maydell@linaro.org>
@@ -80,9 +80,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
-Subject: [Qemu-devel] [PULL 28/29] target/arm: Simplify SMMLA, SMMLAR, SMMLS,
- SMMLSR
+X-Received-From: 2a00:1450:4864:20::343
+Subject: [Qemu-devel] [PULL 22/29] target/arm/kvm64: Move the get/put of
+ fpsimd registers out
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,132 +98,214 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
 
-All of the inputs to these instructions are 32-bits.  Rather than
-extend each input to 64-bits and then extract the high 32-bits of
-the output, use tcg_gen_muls2_i32 and other 32-bit generator functions.
+Move the getting/putting of the fpsimd registers out of
+kvm_arch_get/put_registers() into their own helper functions
+to prepare for alternatively getting/putting SVE registers.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20190808202616.13782-7-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+No functional change.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate.c | 72 +++++++++++++++---------------------------
- 1 file changed, 26 insertions(+), 46 deletions(-)
+ target/arm/kvm64.c | 148 +++++++++++++++++++++++++++------------------
+ 1 file changed, 88 insertions(+), 60 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 2e160646206..9e2853fe76c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -376,34 +376,6 @@ static void gen_revsh(TCGv_i32 var)
-     tcg_gen_ext16s_i32(var, var);
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index ddde6268b9d..0b004d5d305 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -719,13 +719,53 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+ #define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
+                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
++static int kvm_arch_put_fpsimd(CPUState *cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
++    struct kvm_one_reg reg;
++    uint32_t fpr;
++    int i, ret;
++
++    for (i = 0; i < 32; i++) {
++        uint64_t *q = aa64_vfp_qreg(env, i);
++#ifdef HOST_WORDS_BIGENDIAN
++        uint64_t fp_val[2] = { q[1], q[0] };
++        reg.addr = (uintptr_t)fp_val;
++#else
++        reg.addr = (uintptr_t)q;
++#endif
++        reg.id = AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
++        ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    reg.addr = (uintptr_t)(&fpr);
++    fpr = vfp_get_fpsr(env);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
++    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++
++    reg.addr = (uintptr_t)(&fpr);
++    fpr = vfp_get_fpcr(env);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++
++    return 0;
++}
++
+ int kvm_arch_put_registers(CPUState *cs, int level)
+ {
+     struct kvm_one_reg reg;
+-    uint32_t fpr;
+     uint64_t val;
+-    int i;
+-    int ret;
++    int i, ret;
+     unsigned int el;
+ 
+     ARMCPU *cpu = ARM_CPU(cs);
+@@ -815,33 +855,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         }
+     }
+ 
+-    /* Advanced SIMD and FP registers. */
+-    for (i = 0; i < 32; i++) {
+-        uint64_t *q = aa64_vfp_qreg(env, i);
+-#ifdef HOST_WORDS_BIGENDIAN
+-        uint64_t fp_val[2] = { q[1], q[0] };
+-        reg.addr = (uintptr_t)fp_val;
+-#else
+-        reg.addr = (uintptr_t)q;
+-#endif
+-        reg.id = AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+-        ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+-        if (ret) {
+-            return ret;
+-        }
+-    }
+-
+-    reg.addr = (uintptr_t)(&fpr);
+-    fpr = vfp_get_fpsr(env);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
+-    }
+-
+-    fpr = vfp_get_fpcr(env);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
++    ret = kvm_arch_put_fpsimd(cs);
+     if (ret) {
+         return ret;
+     }
+@@ -862,14 +876,54 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+     return ret;
  }
  
--/* Return (b << 32) + a. Mark inputs as dead */
--static TCGv_i64 gen_addq_msw(TCGv_i64 a, TCGv_i32 b)
--{
--    TCGv_i64 tmp64 = tcg_temp_new_i64();
--
--    tcg_gen_extu_i32_i64(tmp64, b);
--    tcg_temp_free_i32(b);
--    tcg_gen_shli_i64(tmp64, tmp64, 32);
--    tcg_gen_add_i64(a, tmp64, a);
--
--    tcg_temp_free_i64(tmp64);
--    return a;
--}
--
--/* Return (b << 32) - a. Mark inputs as dead. */
--static TCGv_i64 gen_subq_msw(TCGv_i64 a, TCGv_i32 b)
--{
--    TCGv_i64 tmp64 = tcg_temp_new_i64();
--
--    tcg_gen_extu_i32_i64(tmp64, b);
--    tcg_temp_free_i32(b);
--    tcg_gen_shli_i64(tmp64, tmp64, 32);
--    tcg_gen_sub_i64(a, tmp64, a);
--
--    tcg_temp_free_i64(tmp64);
--    return a;
--}
--
- /* 32x32->64 multiply.  Marks inputs as dead.  */
- static TCGv_i64 gen_mulu_i64_i32(TCGv_i32 a, TCGv_i32 b)
++static int kvm_arch_get_fpsimd(CPUState *cs)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
++    struct kvm_one_reg reg;
++    uint32_t fpr;
++    int i, ret;
++
++    for (i = 0; i < 32; i++) {
++        uint64_t *q = aa64_vfp_qreg(env, i);
++        reg.id = AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
++        reg.addr = (uintptr_t)q;
++        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++        if (ret) {
++            return ret;
++        } else {
++#ifdef HOST_WORDS_BIGENDIAN
++            uint64_t t;
++            t = q[0], q[0] = q[1], q[1] = t;
++#endif
++        }
++    }
++
++    reg.addr = (uintptr_t)(&fpr);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
++    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++    vfp_set_fpsr(env, fpr);
++
++    reg.addr = (uintptr_t)(&fpr);
++    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
++    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    if (ret) {
++        return ret;
++    }
++    vfp_set_fpcr(env, fpr);
++
++    return 0;
++}
++
+ int kvm_arch_get_registers(CPUState *cs)
  {
-@@ -8857,23 +8829,27 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
-                            (SMMUL, SMMLA, SMMLS) */
-                         tmp = load_reg(s, rm);
-                         tmp2 = load_reg(s, rs);
--                        tmp64 = gen_muls_i64_i32(tmp, tmp2);
-+                        tcg_gen_muls2_i32(tmp2, tmp, tmp, tmp2);
+     struct kvm_one_reg reg;
+     uint64_t val;
+-    uint32_t fpr;
+     unsigned int el;
+-    int i;
+-    int ret;
++    int i, ret;
  
-                         if (rd != 15) {
--                            tmp = load_reg(s, rd);
-+                            tmp3 = load_reg(s, rd);
-                             if (insn & (1 << 6)) {
--                                tmp64 = gen_subq_msw(tmp64, tmp);
-+                                tcg_gen_sub_i32(tmp, tmp, tmp3);
-                             } else {
--                                tmp64 = gen_addq_msw(tmp64, tmp);
-+                                tcg_gen_add_i32(tmp, tmp, tmp3);
-                             }
-+                            tcg_temp_free_i32(tmp3);
-                         }
-                         if (insn & (1 << 5)) {
--                            tcg_gen_addi_i64(tmp64, tmp64, 0x80000000u);
-+                            /*
-+                             * Adding 0x80000000 to the 64-bit quantity
-+                             * means that we have carry in to the high
-+                             * word when the low word has the high bit set.
-+                             */
-+                            tcg_gen_shri_i32(tmp2, tmp2, 31);
-+                            tcg_gen_add_i32(tmp, tmp, tmp2);
-                         }
--                        tcg_gen_shri_i64(tmp64, tmp64, 32);
--                        tmp = tcg_temp_new_i32();
--                        tcg_gen_extrl_i64_i32(tmp, tmp64);
--                        tcg_temp_free_i64(tmp64);
-+                        tcg_temp_free_i32(tmp2);
-                         store_reg(s, rn, tmp);
-                         break;
-                     case 0:
-@@ -10099,22 +10075,26 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
-                   }
-                 break;
-             case 5: case 6: /* 32 * 32 -> 32msb (SMMUL, SMMLA, SMMLS) */
--                tmp64 = gen_muls_i64_i32(tmp, tmp2);
-+                tcg_gen_muls2_i32(tmp2, tmp, tmp, tmp2);
-                 if (rs != 15) {
--                    tmp = load_reg(s, rs);
-+                    tmp3 = load_reg(s, rs);
-                     if (insn & (1 << 20)) {
--                        tmp64 = gen_addq_msw(tmp64, tmp);
-+                        tcg_gen_add_i32(tmp, tmp, tmp3);
-                     } else {
--                        tmp64 = gen_subq_msw(tmp64, tmp);
-+                        tcg_gen_sub_i32(tmp, tmp, tmp3);
-                     }
-+                    tcg_temp_free_i32(tmp3);
-                 }
-                 if (insn & (1 << 4)) {
--                    tcg_gen_addi_i64(tmp64, tmp64, 0x80000000u);
-+                    /*
-+                     * Adding 0x80000000 to the 64-bit quantity
-+                     * means that we have carry in to the high
-+                     * word when the low word has the high bit set.
-+                     */
-+                    tcg_gen_shri_i32(tmp2, tmp2, 31);
-+                    tcg_gen_add_i32(tmp, tmp, tmp2);
-                 }
--                tcg_gen_shri_i64(tmp64, tmp64, 32);
--                tmp = tcg_temp_new_i32();
--                tcg_gen_extrl_i64_i32(tmp, tmp64);
--                tcg_temp_free_i64(tmp64);
-+                tcg_temp_free_i32(tmp2);
-                 break;
-             case 7: /* Unsigned sum of absolute differences.  */
-                 gen_helper_usad8(tmp, tmp, tmp2);
+     ARMCPU *cpu = ARM_CPU(cs);
+     CPUARMState *env = &cpu->env;
+@@ -958,36 +1012,10 @@ int kvm_arch_get_registers(CPUState *cs)
+         env->spsr = env->banked_spsr[i];
+     }
+ 
+-    /* Advanced SIMD and FP registers */
+-    for (i = 0; i < 32; i++) {
+-        uint64_t *q = aa64_vfp_qreg(env, i);
+-        reg.id = AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+-        reg.addr = (uintptr_t)q;
+-        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+-        if (ret) {
+-            return ret;
+-        } else {
+-#ifdef HOST_WORDS_BIGENDIAN
+-            uint64_t t;
+-            t = q[0], q[0] = q[1], q[1] = t;
+-#endif
+-        }
+-    }
+-
+-    reg.addr = (uintptr_t)(&fpr);
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
++    ret = kvm_arch_get_fpsimd(cs);
+     if (ret) {
+         return ret;
+     }
+-    vfp_set_fpsr(env, fpr);
+-
+-    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
+-    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+-    if (ret) {
+-        return ret;
+-    }
+-    vfp_set_fpcr(env, fpr);
+ 
+     ret = kvm_get_vcpu_events(cpu);
+     if (ret) {
 -- 
 2.20.1
 
