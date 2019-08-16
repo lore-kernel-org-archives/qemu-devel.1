@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0114C41514
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0671DC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 889FC2077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:02:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 889FC2077C
+	by mail.kernel.org (Postfix) with ESMTPS id B693A2077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 08:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B693A2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyXBc-0000Ez-Bh
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39778)
+	id 1hyXCS-0001MM-O2
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 04:03:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWlR-00006J-MV
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:35:14 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWmy-0001QI-Rn
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:36:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWlN-0001I3-Cp
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:35:09 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.74]:54791)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWmv-0002g1-UM
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:36:44 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.74]:10012)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWka-0000nh-Du; Fri, 16 Aug 2019 03:34:18 -0400
-Received: from tpw09926dag18f.domain1.systemhost.net (10.9.212.26) by
+ id 1hyWmE-0002En-Gm; Fri, 16 Aug 2019 03:35:58 -0400
+Received: from tpw09926dag18g.domain1.systemhost.net (10.9.212.34) by
  BWP09926079.bt.com (10.36.82.110) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 08:33:51 +0100
+ Aug 2019 08:35:34 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18f.domain1.systemhost.net (10.9.212.26) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:34:13 +0100
+ tpw09926dag18g.domain1.systemhost.net (10.9.212.34) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:35:56 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:34:13 +0100
+ 2019 08:35:56 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 23/42] hw/intc: Declare device little or
+Thread-Topic: [Qemu-devel] [PATCH v7 29/42] hw/ssi: Declare device little or
  big endian
-Thread-Index: AQHVVAUArrlrR1Zn3E+pnWujKo/uiQ==
-Date: Fri, 16 Aug 2019 07:34:13 +0000
-Message-ID: <1565940852602.49352@bt.com>
+Thread-Index: AQHVVAU9wbn561zm7k64tZGTYvMONA==
+Date: Fri, 16 Aug 2019 07:35:56 +0000
+Message-ID: <1565940955631.8939@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -65,7 +65,7 @@ X-Received-From: 213.121.35.74
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel] [PATCH v7 23/42] hw/intc: Declare device little or big
+Subject: [Qemu-devel] [PATCH v7 29/42] hw/ssi: Declare device little or big
  endian
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,148 +126,66 @@ better =3D)
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
 ---
- hw/intc/arm_gic.c     | 12 ++++++------
- hw/intc/arm_gicv3.c   |  4 ++--
- hw/intc/etraxfs_pic.c |  2 +-
- hw/intc/imx_avic.c    |  2 +-
- hw/intc/imx_gpcv2.c   |  2 +-
- hw/intc/pl190.c       |  2 +-
- hw/intc/puv3_intc.c   |  2 +-
- 7 files changed, 13 insertions(+), 13 deletions(-)
+ hw/ssi/mss-spi.c       | 2 +-
+ hw/ssi/pl022.c         | 2 +-
+ hw/ssi/stm32f2xx_spi.c | 2 +-
+ hw/ssi/xilinx_spips.c  | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 77427a4..283a63a 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -1999,38 +1999,38 @@ static const MemoryRegionOps gic_ops[2] =3D {
-     {
-         .read_with_attrs =3D gic_dist_read,
-         .write_with_attrs =3D gic_dist_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
-+        .endianness =3D DEVICE_LITTLE_ENDIAN,
-     },
-     {
-         .read_with_attrs =3D gic_thiscpu_read,
-         .write_with_attrs =3D gic_thiscpu_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
-+        .endianness =3D DEVICE_LITTLE_ENDIAN,
-     }
- };
-
- static const MemoryRegionOps gic_cpu_ops =3D {
-     .read_with_attrs =3D gic_do_cpu_read,
-     .write_with_attrs =3D gic_do_cpu_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
-
- static const MemoryRegionOps gic_virt_ops[2] =3D {
-     {
-         .read_with_attrs =3D gic_thiscpu_hyp_read,
-         .write_with_attrs =3D gic_thiscpu_hyp_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
-+        .endianness =3D DEVICE_LITTLE_ENDIAN,
-     },
-     {
-         .read_with_attrs =3D gic_thisvcpu_read,
-         .write_with_attrs =3D gic_thisvcpu_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
-+        .endianness =3D DEVICE_LITTLE_ENDIAN,
-     }
- };
-
- static const MemoryRegionOps gic_viface_ops =3D {
-     .read_with_attrs =3D gic_do_hyp_read,
-     .write_with_attrs =3D gic_do_hyp_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
-
- static void arm_gic_realize(DeviceState *dev, Error **errp)
-diff --git a/hw/intc/arm_gicv3.c b/hw/intc/arm_gicv3.c
-index 66eaa97..9b4d5ba 100644
---- a/hw/intc/arm_gicv3.c
-+++ b/hw/intc/arm_gicv3.c
-@@ -352,12 +352,12 @@ static const MemoryRegionOps gic_ops[] =3D {
-     {
-         .read_with_attrs =3D gicv3_dist_read,
-         .write_with_attrs =3D gicv3_dist_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
-+        .endianness =3D DEVICE_LITTLE_ENDIAN,
-     },
-     {
-         .read_with_attrs =3D gicv3_redist_read,
-         .write_with_attrs =3D gicv3_redist_write,
--        .endianness =3D DEVICE_NATIVE_ENDIAN,
-+        .endianness =3D DEVICE_LITTLE_ENDIAN,
-     }
- };
-
-diff --git a/hw/intc/etraxfs_pic.c b/hw/intc/etraxfs_pic.c
-index 20e1391..d4a27d1 100644
---- a/hw/intc/etraxfs_pic.c
-+++ b/hw/intc/etraxfs_pic.c
-@@ -111,7 +111,7 @@ static void pic_write(void *opaque, hwaddr addr,
- static const MemoryRegionOps pic_ops =3D {
-     .read =3D pic_read,
-     .write =3D pic_write,
+diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+index 4c9da5d..71fd138 100644
+--- a/hw/ssi/mss-spi.c
++++ b/hw/ssi/mss-spi.c
+@@ -359,7 +359,7 @@ static void spi_write(void *opaque, hwaddr addr,
+ static const MemoryRegionOps spi_ops =3D {
+     .read =3D spi_read,
+     .write =3D spi_write,
 -    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +    .endianness =3D DEVICE_LITTLE_ENDIAN,
      .valid =3D {
-         .min_access_size =3D 4,
+         .min_access_size =3D 1,
          .max_access_size =3D 4
-diff --git a/hw/intc/imx_avic.c b/hw/intc/imx_avic.c
-index 83a4101..4bef842 100644
---- a/hw/intc/imx_avic.c
-+++ b/hw/intc/imx_avic.c
-@@ -308,7 +308,7 @@ static void imx_avic_write(void *opaque, hwaddr offset,
- static const MemoryRegionOps imx_avic_ops =3D {
-     .read =3D imx_avic_read,
-     .write =3D imx_avic_write,
+diff --git a/hw/ssi/pl022.c b/hw/ssi/pl022.c
+index fec73ca..10d1995 100644
+--- a/hw/ssi/pl022.c
++++ b/hw/ssi/pl022.c
+@@ -226,7 +226,7 @@ static void pl022_reset(DeviceState *dev)
+ static const MemoryRegionOps pl022_ops =3D {
+     .read =3D pl022_read,
+     .write =3D pl022_write,
 -    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +    .endianness =3D DEVICE_LITTLE_ENDIAN,
  };
 
- static void imx_avic_reset(DeviceState *dev)
-diff --git a/hw/intc/imx_gpcv2.c b/hw/intc/imx_gpcv2.c
-index a83333b..f37e6b5 100644
---- a/hw/intc/imx_gpcv2.c
-+++ b/hw/intc/imx_gpcv2.c
-@@ -64,7 +64,7 @@ static void imx_gpcv2_write(void *opaque, hwaddr offset,
- static const struct MemoryRegionOps imx_gpcv2_ops =3D {
-     .read =3D imx_gpcv2_read,
-     .write =3D imx_gpcv2_write,
+ static int pl022_post_load(void *opaque, int version_id)
+diff --git a/hw/ssi/stm32f2xx_spi.c b/hw/ssi/stm32f2xx_spi.c
+index 4249101..e1e5ab5 100644
+--- a/hw/ssi/stm32f2xx_spi.c
++++ b/hw/ssi/stm32f2xx_spi.c
+@@ -166,7 +166,7 @@ static void stm32f2xx_spi_write(void *opaque, hwaddr ad=
+dr,
+ static const MemoryRegionOps stm32f2xx_spi_ops =3D {
+     .read =3D stm32f2xx_spi_read,
+     .write =3D stm32f2xx_spi_write,
+-    .endianness =3D DEVICE_NATIVE_ENDIAN,
++    .endianness =3D DEVICE_LITTLE_ENDIAN,
+ };
+
+ static const VMStateDescription vmstate_stm32f2xx_spi =3D {
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index b29e0a4..8cadc4e 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -1238,7 +1238,7 @@ static MemTxResult lqspi_write(void *opaque, hwaddr o=
+ffset, uint64_t value,
+ static const MemoryRegionOps lqspi_ops =3D {
+     .read_with_attrs =3D lqspi_read,
+     .write_with_attrs =3D lqspi_write,
 -    .endianness =3D DEVICE_NATIVE_ENDIAN,
 +    .endianness =3D DEVICE_LITTLE_ENDIAN,
      .impl =3D {
-         /*
-          * Our device would not work correctly if the guest was doing
-diff --git a/hw/intc/pl190.c b/hw/intc/pl190.c
-index b4f31ef..e6eab1e 100644
---- a/hw/intc/pl190.c
-+++ b/hw/intc/pl190.c
-@@ -220,7 +220,7 @@ static void pl190_write(void *opaque, hwaddr offset,
- static const MemoryRegionOps pl190_ops =3D {
-     .read =3D pl190_read,
-     .write =3D pl190_write,
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
-
- static void pl190_reset(DeviceState *d)
-diff --git a/hw/intc/puv3_intc.c b/hw/intc/puv3_intc.c
-index e2f6d98..97999cc 100644
---- a/hw/intc/puv3_intc.c
-+++ b/hw/intc/puv3_intc.c
-@@ -100,7 +100,7 @@ static const MemoryRegionOps puv3_intc_ops =3D {
          .min_access_size =3D 4,
          .max_access_size =3D 4,
-     },
--    .endianness =3D DEVICE_NATIVE_ENDIAN,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
- };
-
- static void puv3_intc_realize(DeviceState *dev, Error **errp)
 --
 1.8.3.1
 
