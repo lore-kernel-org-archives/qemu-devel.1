@@ -6,50 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FAF5C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CD2C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:59:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAE5B206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:59:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAE5B206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 74DEE206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:59:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74DEE206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56571 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycl0-0002jg-Rr
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:59:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45932)
+	id 1hyclC-00030F-IX
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyXFL-0005e2-9c
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 04:06:13 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWpc-0004xt-3z
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:39:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyXFA-0001tC-Da
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 04:06:03 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.77]:1144)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWpO-0003nC-GJ
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:39:26 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.75]:41731)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyXDH-0000Dx-HI; Fri, 16 Aug 2019 04:03:57 -0400
-Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- BWP09926082.bt.com (10.36.82.113) with Microsoft SMTP Server (version=TLS1_2, 
+ id 1hyWnZ-0002ta-A2; Fri, 16 Aug 2019 03:37:22 -0400
+Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
+ BWP09926080.bt.com (10.36.82.111) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 09:03:27 +0100
+ Aug 2019 08:36:50 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
- tpw09926dag18e.domain1.systemhost.net (10.9.212.18) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 09:03:50 +0100
+ tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:37:15 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 09:03:50 +0100
+ 2019 08:37:15 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
 Thread-Topic: [Qemu-devel] [PATCH v7 33/42] exec: Replace device_endian with
  MemOp
-Thread-Index: AQHVVAkjZtKLBgYtKUOwPfTO3b+n3w==
-Date: Fri, 16 Aug 2019 08:03:50 +0000
-Message-ID: <1565942626361.65540@bt.com>
+Thread-Index: AQHVVAVs+t4IKWsWxkaRpGwwGfOO6g==
+Date: Fri, 16 Aug 2019 07:37:15 +0000
+Message-ID: <1565941032362.60179@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -61,8 +61,8 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.77
-X-Mailman-Approved-At: Fri, 16 Aug 2019 09:56:42 -0400
+X-Received-From: 213.121.35.75
+X-Mailman-Approved-At: Fri, 16 Aug 2019 09:56:41 -0400
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
@@ -542,9 +542,9 @@ Acked-by: David Gibson <david@gibson.dropbear.id.au>
  include/hw/char/serial.h            |   2 +-
  ioport.c                            |   4 +-
  memory.c                            |  10 ++--
- memory_ldst.inc.c                   | 103 +++++++++++++++++---------------=
+ memory_ldst.inc.c                   | 102 +++++++++++++++++---------------=
 ----
- 426 files changed, 768 insertions(+), 771 deletions(-)
+ 426 files changed, 767 insertions(+), 771 deletions(-)
 
 diff --git a/exec.c b/exec.c
 index 9f69197..303f9a7 100644
@@ -5744,7 +5744,7 @@ index 6b51ae5..75a01d0 100644
 
  static void zynq_slcr_init(Object *obj)
 diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index d771d39..be6888c 100644
+index d771d39..973ad2d 100644
 --- a/hw/moxie/moxiesim.c
 +++ b/hw/moxie/moxiesim.c
 @@ -141,7 +141,7 @@ static void moxiesim_init(MachineState *machine)
@@ -5752,7 +5752,7 @@ index d771d39..be6888c 100644
      if (serial_hd(0)) {
          serial_mm_init(address_space_mem, 0x3f8, 0, env->irq[4],
 -                       8000000/16, serial_hd(0), DEVICE_LITTLE_ENDIAN);
-+                       8000000 / 16, serial_hd(0), MO_LE);
++                       8000000/16, serial_hd(0), MO_LE);
      }
  }
 
@@ -9012,7 +9012,7 @@ dr addr,
 
  static uint64_t memory_region_ram_device_read(void *opaque,
 diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-index de658c4..8fc790f 100644
+index de658c4..d08fc79 100644
 --- a/memory_ldst.inc.c
 +++ b/memory_ldst.inc.c
 @@ -21,8 +21,7 @@
@@ -9216,19 +9216,19 @@ sult,
  }
 
  /* warning: addr must be aligned. The ram page is not masked as dirty
-@@ -322,8 +319,8 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL=
+@@ -322,8 +319,7 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL=
 ,
 
  /* warning: addr must be aligned */
  static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
 -    hwaddr addr, uint32_t val, MemTxAttrs attrs,
 -    MemTxResult *result, enum device_endian endian)
-+    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result,
-+    MemOp endian)
++    hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result, MemO=
+p endian)
  {
      uint8_t *ptr;
      MemoryRegion *mr;
-@@ -338,11 +335,11 @@ static inline void glue(address_space_stl_internal, S=
+@@ -338,11 +334,11 @@ static inline void glue(address_space_stl_internal, S=
 UFFIX)(ARG1_DECL,
          release_lock |=3D prepare_mmio_access(mr);
 
@@ -9243,7 +9243,7 @@ UFFIX)(ARG1_DECL,
              val =3D bswap32(val);
          }
  #endif
-@@ -351,10 +348,10 @@ static inline void glue(address_space_stl_internal, S=
+@@ -351,10 +347,10 @@ static inline void glue(address_space_stl_internal, S=
 UFFIX)(ARG1_DECL,
          /* RAM case */
          ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
@@ -9257,7 +9257,7 @@ UFFIX)(ARG1_DECL,
              stl_be_p(ptr, val);
              break;
          default:
-@@ -377,21 +374,21 @@ void glue(address_space_stl, SUFFIX)(ARG1_DECL,
+@@ -377,21 +373,21 @@ void glue(address_space_stl, SUFFIX)(ARG1_DECL,
      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
  {
      glue(address_space_stl_internal, SUFFIX)(ARG1, addr, val, attrs,
@@ -9286,7 +9286,7 @@ t,
  }
 
  void glue(address_space_stb, SUFFIX)(ARG1_DECL,
-@@ -428,7 +425,7 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
+@@ -428,7 +424,7 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
  /* warning: addr must be aligned */
  static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
      hwaddr addr, uint32_t val, MemTxAttrs attrs,
@@ -9295,7 +9295,7 @@ t,
  {
      uint8_t *ptr;
      MemoryRegion *mr;
-@@ -443,11 +440,11 @@ static inline void glue(address_space_stw_internal, S=
+@@ -443,11 +439,11 @@ static inline void glue(address_space_stw_internal, S=
 UFFIX)(ARG1_DECL,
          release_lock |=3D prepare_mmio_access(mr);
 
@@ -9310,7 +9310,7 @@ UFFIX)(ARG1_DECL,
              val =3D bswap16(val);
          }
  #endif
-@@ -456,10 +453,10 @@ static inline void glue(address_space_stw_internal, S=
+@@ -456,10 +452,10 @@ static inline void glue(address_space_stw_internal, S=
 UFFIX)(ARG1_DECL,
          /* RAM case */
          ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
@@ -9324,7 +9324,7 @@ UFFIX)(ARG1_DECL,
              stw_be_p(ptr, val);
              break;
          default:
-@@ -482,26 +479,26 @@ void glue(address_space_stw, SUFFIX)(ARG1_DECL,
+@@ -482,26 +478,26 @@ void glue(address_space_stw, SUFFIX)(ARG1_DECL,
      hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
  {
      glue(address_space_stw_internal, SUFFIX)(ARG1, addr, val, attrs, resul=
@@ -9358,7 +9358,7 @@ t,
  {
      uint8_t *ptr;
      MemoryRegion *mr;
-@@ -516,11 +513,11 @@ static void glue(address_space_stq_internal, SUFFIX)(=
+@@ -516,11 +512,11 @@ static void glue(address_space_stq_internal, SUFFIX)(=
 ARG1_DECL,
          release_lock |=3D prepare_mmio_access(mr);
 
@@ -9373,7 +9373,7 @@ ARG1_DECL,
              val =3D bswap64(val);
          }
  #endif
-@@ -529,10 +526,10 @@ static void glue(address_space_stq_internal, SUFFIX)(=
+@@ -529,10 +525,10 @@ static void glue(address_space_stq_internal, SUFFIX)(=
 ARG1_DECL,
          /* RAM case */
          ptr =3D qemu_map_ram_ptr(mr->ram_block, addr1);
@@ -9387,7 +9387,7 @@ ARG1_DECL,
              stq_be_p(ptr, val);
              break;
          default:
-@@ -555,21 +552,21 @@ void glue(address_space_stq, SUFFIX)(ARG1_DECL,
+@@ -555,21 +551,21 @@ void glue(address_space_stq, SUFFIX)(ARG1_DECL,
      hwaddr addr, uint64_t val, MemTxAttrs attrs, MemTxResult *result)
  {
      glue(address_space_stq_internal, SUFFIX)(ARG1, addr, val, attrs, resul=
@@ -9418,5 +9418,5 @@ t,
 --
 1.8.3.1
 
-
+?
 
