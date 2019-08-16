@@ -2,51 +2,79 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0EFC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 15:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B05DC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 15:44:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35307206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 15:35:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35307206C2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id DB5B5206C2
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 15:44:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OhjMipA6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5B5206C2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyeGS-0004qb-7D
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 11:35:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58099)
+	id 1hyeOt-0006ez-W6
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 11:44:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hyeBR-0007s8-Kt
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:30:32 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hyeOH-0006Eh-Gu
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:43:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1hyeBO-0001dQ-7m
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:30:29 -0400
-Received: from relay.sw.ru ([185.231.240.75]:60434)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1hyeBH-0001Qc-0v; Fri, 16 Aug 2019 11:30:19 -0400
-Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1hyeBD-0007x1-CO; Fri, 16 Aug 2019 18:30:15 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Date: Fri, 16 Aug 2019 18:30:11 +0300
-Message-Id: <20190816153015.447957-2-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20190816153015.447957-1-vsementsov@virtuozzo.com>
-References: <20190816153015.447957-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 185.231.240.75
-Subject: [Qemu-devel] [PATCH v4 1/5] tests/qemu-iotests: Fix qemu-io related
- output in 026.out.nocache
+ (envelope-from <peter.maydell@linaro.org>) id 1hyeOF-0004rJ-Qh
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:43:45 -0400
+Received: from mail-io1-xd2f.google.com ([2607:f8b0:4864:20::d2f]:34560)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hyeOF-0004r1-Jr
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 11:43:43 -0400
+Received: by mail-io1-xd2f.google.com with SMTP id s21so7055342ioa.1
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 08:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=hISUx8PJHwJ2iX1azq87dBfcLKnt4BoKvhI2mPMozCg=;
+ b=OhjMipA6EUK+G0H7vHjhhzq25eek7QSwXH5+xfFXzTduVBp85LRYDC76XR8Kz+VuPm
+ d+IrASwI8TR7NMEvL0VbURx251TC1wx2x+0bAcjNUktUZFf50Y5OR8rheC0lvKq2/eR/
+ dS1I9wfMPX45fs4n0qtvq3YHu9CASe8o0yaiGnvw1RtiGytR4ByFM1RAzaOZ4HWBueH5
+ SYxcbyyDQkJN7Rc0ik+wfL/O4sXNfT7dPH4uPXAovuSJ88DrE+KW8IpAKdTLdCRWQWzD
+ bNiaFVtuZ1cC4NoQpncHccCP74UAC4Eae9skPK54T+oLGWJUDEzQ8dUEmqMs/4dnntQx
+ 83Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=hISUx8PJHwJ2iX1azq87dBfcLKnt4BoKvhI2mPMozCg=;
+ b=GGlf9nqEsGFpW1Tg98bzCiidzNa/o6ZrXLZ9ZWNRQHQJ2jo3RSuG48PBhkax6m3F+Y
+ +9e+rgFyl2DZ+mO2ynk2OvmaKMbt0Cb/TU7xx5WDFOjxiPNRgVcx2Nd1MYQ52eU927dd
+ NlPgcEM3CvMF98rou4nmgxXS3VzhTeQ7m1/rnARY73fojxmqneTRKalnF+UZhTdKYJKM
+ rF34v4/Q/3lgv5+dllwfMOedY18rggRObhnCMuasF1Vc9iLNI04hsu9E5ornHeAnFni3
+ pPd1D51ejW+C0UhKlP2+HM2iBrkgDZWE6rmKNGNYDVSvzeSu2wuYXb3D45vheu7gTj7n
+ c7ew==
+X-Gm-Message-State: APjAAAW5OD0B3reZpWWc9TFWhe88CSgEpjHWH9NpxHQfTMSCtLLzfH9O
+ dL7fKYeFSUlIvCs1z/mV8FeY9jMcGky4oXgmpTMRzA==
+X-Google-Smtp-Source: APXvYqyhk6+tvdyHRZ825h4iQ7+2aDCTV8u+ppVR4h/i1316DlViTQoKD8s+4CD61jK93z9TvKUoKc4vZSYrXrGLBIw=
+X-Received: by 2002:a02:81c5:: with SMTP id r5mr7379806jag.143.1565970222701; 
+ Fri, 16 Aug 2019 08:43:42 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190815183039.4264-1-eblake@redhat.com>
+In-Reply-To: <20190815183039.4264-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 16 Aug 2019 16:43:31 +0100
+Message-ID: <CAFEAcA8E6WJd6qmfEYF59RckGtEZRK=M8NYWngY3TKTf7=SHKQ@mail.gmail.com>
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d2f
+Subject: Re: [Qemu-devel] [PULL 0/9] First batch of 4.2 NBD patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,467 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu-io now prefixes its error and warnings with "qemu-io:".
-36b9986b08787019e fixed a lot of iotests output but forget about
-026.out.nocache. Fix it too.
+On Thu, 15 Aug 2019 at 19:34, Eric Blake <eblake@redhat.com> wrote:
+>
+> The following changes since commit 9e06029aea3b2eca1d5261352e695edc1e7d7b8b:
+>
+>   Update version for v4.1.0 release (2019-08-15 13:03:37 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://repo.or.cz/qemu/ericb.git tags/pull-nbd-2019-08-15
+>
+> for you to fetch changes up to 8f071c9db506e03abcb1b76ec6d3d2f9488cc3b3:
+>
+>   block/nbd: refactor nbd connection parameters (2019-08-15 13:22:14 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2019-08-15
+>
+> - Addition of InetSocketAddress keep-alive
+> - Addition of BDRV_REQ_PREFETCH for more efficient copy-on-read
+> - Initial refactoring in preparation of NBD reconnect
 
-Fixes: 99e98d7c9fc1a1639fad ("qemu-io: Use error_[gs]et_progname()")
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/026.out.nocache | 168 ++++++++++++++---------------
- 1 file changed, 84 insertions(+), 84 deletions(-)
 
-diff --git a/tests/qemu-iotests/026.out.nocache b/tests/qemu-iotests/026.out.nocache
-index 1ca6cda15c..6dda95dfb4 100644
---- a/tests/qemu-iotests/026.out.nocache
-+++ b/tests/qemu-iotests/026.out.nocache
-@@ -14,8 +14,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_update; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- 
- 1 leaked clusters were found on the image.
-@@ -23,8 +23,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_update; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- 
- 1 leaked clusters were found on the image.
-@@ -42,8 +42,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_update; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 1 leaked clusters were found on the image.
-@@ -51,8 +51,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_update; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 1 leaked clusters were found on the image.
-@@ -136,8 +136,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- 
- Event: l2_update; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-@@ -146,8 +146,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l2_update; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-@@ -168,8 +168,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824
- 
- Event: l2_update; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-@@ -178,8 +178,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l2_update; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- wrote 131072/131072 bytes at offset 0
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- 
-@@ -198,15 +198,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l2_alloc_write; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l2_alloc_write; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- 
- 1 leaked clusters were found on the image.
-@@ -224,15 +224,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l2_alloc_write; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l2_alloc_write; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 1 leaked clusters were found on the image.
-@@ -250,15 +250,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: write_aio; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: write_aio; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -274,15 +274,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: write_aio; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: write_aio; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -298,15 +298,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_load; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_load; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -322,15 +322,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_load; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_load; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -346,15 +346,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_update_part; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_update_part; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -370,15 +370,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_update_part; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_update_part; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -394,15 +394,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc; errno: 5; imm: off; once: off; write 
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc; errno: 5; imm: off; once: off; write -b
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -418,15 +418,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -485,8 +485,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 55 leaked clusters were found on the image.
-@@ -494,8 +494,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_hookup; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 251 leaked clusters were found on the image.
-@@ -513,15 +513,15 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_write; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_write; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -537,8 +537,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 10 leaked clusters were found on the image.
-@@ -546,8 +546,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_write_blocks; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 23 leaked clusters were found on the image.
-@@ -565,8 +565,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 10 leaked clusters were found on the image.
-@@ -574,8 +574,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_write_table; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 23 leaked clusters were found on the image.
-@@ -593,8 +593,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write 
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 10 leaked clusters were found on the image.
-@@ -602,8 +602,8 @@ This means waste of disk space, but no harm to data.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: refblock_alloc_switch_table; errno: 28; imm: off; once: off; write -b
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 23 leaked clusters were found on the image.
-@@ -639,8 +639,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_grow_write_table; errno: 5; imm: off; once: off
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -651,8 +651,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_grow_write_table; errno: 28; imm: off; once: off
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
-@@ -663,8 +663,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_grow_activate_table; errno: 5; imm: off; once: off
--Failed to flush the L2 table cache: Input/output error
--Failed to flush the refcount block cache: Input/output error
-+qemu-io: Failed to flush the L2 table cache: Input/output error
-+qemu-io: Failed to flush the refcount block cache: Input/output error
- write failed: Input/output error
- 
- 96 leaked clusters were found on the image.
-@@ -677,8 +677,8 @@ No errors were found on the image.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1073741824 
- 
- Event: l1_grow_activate_table; errno: 28; imm: off; once: off
--Failed to flush the L2 table cache: No space left on device
--Failed to flush the refcount block cache: No space left on device
-+qemu-io: Failed to flush the L2 table cache: No space left on device
-+qemu-io: Failed to flush the refcount block cache: No space left on device
- write failed: No space left on device
- 
- 96 leaked clusters were found on the image.
--- 
-2.18.0
+Applied, thanks.
 
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
