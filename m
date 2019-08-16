@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D854C3A589
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 00:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA482C3A589
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 00:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1F342086C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 00:41:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F342086C
+	by mail.kernel.org (Postfix) with ESMTPS id 96B212086C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 00:44:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B212086C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyQJ0-0006YX-VY
-	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 20:41:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50660)
+	id 1hyQMU-0007eL-P0
+	for qemu-devel@archiver.kernel.org; Thu, 15 Aug 2019 20:44:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50958)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hyQIM-0005pp-Vg
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 20:40:44 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hyQLs-00079K-1j
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 20:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hyQIL-0006Zx-KK
- for qemu-devel@nongnu.org; Thu, 15 Aug 2019 20:40:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55384)
+ (envelope-from <jsnow@redhat.com>) id 1hyQLr-0000Eh-2b
+ for qemu-devel@nongnu.org; Thu, 15 Aug 2019 20:44:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33270)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hyQIH-0006Xg-T4; Thu, 15 Aug 2019 20:40:38 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ id 1hyQLo-0000D9-Ju; Thu, 15 Aug 2019 20:44:16 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 8FF44307D88D;
- Fri, 16 Aug 2019 00:40:36 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 9086960AD5;
+ Fri, 16 Aug 2019 00:44:15 +0000 (UTC)
 Received: from [10.18.17.169] (dhcp-17-169.bos.redhat.com [10.18.17.169])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8B06484602;
- Fri, 16 Aug 2019 00:40:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8353210013A7;
+ Fri, 16 Aug 2019 00:44:12 +0000 (UTC)
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
  qemu-devel@nongnu.org, qemu-block@nongnu.org
 References: <1563553816-148827-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1563553816-148827-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1563553816-148827-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
@@ -121,22 +121,22 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <45fed680-02ee-14de-f8f3-4c8a2f0c0c02@redhat.com>
-Date: Thu, 15 Aug 2019 20:40:34 -0400
+Message-ID: <b7d55527-2a1a-c171-3a46-7723696d4aba@redhat.com>
+Date: Thu, 15 Aug 2019 20:44:11 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <1563553816-148827-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1563553816-148827-4-git-send-email-andrey.shinkevich@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.48]); Fri, 16 Aug 2019 00:40:36 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.30]); Fri, 16 Aug 2019 00:44:15 +0000 (UTC)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 2/6] iotests: exclude
- killed processes from running under Valgrind
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 3/6] iotests: Add
+ casenotrun report to bash tests
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,8 +148,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- mreitz@redhat.com
+Cc: kwolf@redhat.com, den@openvz.org, Cleber Rosa <crosa@redhat.com>,
+ vsementsov@virtuozzo.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -157,128 +157,44 @@ Sender: "Qemu-devel"
 
 
 On 7/19/19 12:30 PM, Andrey Shinkevich wrote:
->  The Valgrind tool fails to manage its termination when QEMU raises the
->  signal SIGKILL in the multi-threaded process. The bug has been
->  reported to the Valgrind maintainers and was registered as Bug 409141.
->  Let's exclude such test cases from running under the Valgrind until
->  new release of it because checking for the memory issues is covered by
->  other test cases.
+> The new function _casenotrun() is to be invoked if a test case cannot
+> be run for some reason. The user will be notified by a message passed
+> to the function.
 > 
 
-Link to the bug in the commit message, please:
-https://bugs.kde.org/show_bug.cgi?id=409141
+Oh, I assume this is a sub-test granularity; if we need to skip
+individual items.
 
-...Hey! It looks like they may have fixed it. However, we don't know if
-the user has a properly fixed version of valgrind or not.
+I'm good with this, but we should CC Cleber Rosa, who has struggled
+against this in the past, too.
 
-How long do we keep these workarounds in-tree?
-
+> Suggested-by: Kevin Wolf <kwolf@redhat.com>
 > Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  tests/qemu-iotests/039 | 5 +++++
->  tests/qemu-iotests/061 | 2 ++
->  tests/qemu-iotests/137 | 1 +
->  3 files changed, 8 insertions(+)
+>  tests/qemu-iotests/common.rc | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-> index 0d4e963..95115e2 100755
-> --- a/tests/qemu-iotests/039
-> +++ b/tests/qemu-iotests/039
-> @@ -65,6 +65,7 @@ echo "== Creating a dirty image file =="
->  IMGOPTS="compat=1.1,lazy_refcounts=on"
->  _make_test_img $size
+> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+> index 6e461a1..1089050 100644
+> --- a/tests/qemu-iotests/common.rc
+> +++ b/tests/qemu-iotests/common.rc
+> @@ -428,6 +428,13 @@ _notrun()
+>      exit
+>  }
 >  
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "write -P 0x5a 0 512" \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
->      | _filter_qemu_io
-> @@ -100,6 +101,7 @@ echo "== Opening a dirty image read/write should repair it =="
->  IMGOPTS="compat=1.1,lazy_refcounts=on"
->  _make_test_img $size
->  
-
-This seems like the sort of thing that's going to get forgotten about
-quickly. It's not clear (if you're reading the test source) why we're
-setting VALGRIND_QEMU="" before these invocations.
-
-Is it possible to create some kind of _NO_VALGRIND() shim that has some
-comment in it, like:
-
-# Valgrind bug #409141 https://bugs.kde.org/show_bug.cgi?id=409141
-# Until valgrind 3.16+ is ubiquitous, we must work around a hang in
-# valgrind when issuing sigkill. Disable valgrind for this invocation.
-
-VALGRIND_QEMU="" exec "$@"
-
-(something like that.)
-
-This way:
-
-(1) The workaround is being clearly demonstrated as a bit of a hack
-(2) The shim explains what the hack is for
-(3) When we decide we no longer need the hack, we can pull it out of a
-central location and easily grep to find callers of the shim.
-
-
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "write -P 0x5a 0 512" \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
->      | _filter_qemu_io
-> @@ -118,6 +120,7 @@ echo "== Creating an image file with lazy_refcounts=off =="
->  IMGOPTS="compat=1.1,lazy_refcounts=off"
->  _make_test_img $size
->  
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "write -P 0x5a 0 512" \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
->      | _filter_qemu_io
-> @@ -151,6 +154,7 @@ echo "== Changing lazy_refcounts setting at runtime =="
->  IMGOPTS="compat=1.1,lazy_refcounts=off"
->  _make_test_img $size
->  
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "reopen -o lazy-refcounts=on" \
->           -c "write -P 0x5a 0 512" \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-> @@ -163,6 +167,7 @@ _check_test_img
->  IMGOPTS="compat=1.1,lazy_refcounts=on"
->  _make_test_img $size
->  
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "reopen -o lazy-refcounts=off" \
->           -c "write -P 0x5a 0 512" \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 \
-> diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-> index d7dbd7e..5d0724c 100755
-> --- a/tests/qemu-iotests/061
-> +++ b/tests/qemu-iotests/061
-> @@ -73,6 +73,7 @@ echo
->  echo "=== Testing dirty version downgrade ==="
->  echo
->  IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
->  $PYTHON qcow2.py "$TEST_IMG" dump-header
-> @@ -107,6 +108,7 @@ echo
->  echo "=== Testing dirty lazy_refcounts=off ==="
->  echo
->  IMGOPTS="compat=1.1,lazy_refcounts=on" _make_test_img 64M
-> +VALGRIND_QEMU="" \
->  $QEMU_IO -c "write -P 0x2a 0 128k" -c flush \
->           -c "sigraise $(kill -l KILL)" "$TEST_IMG" 2>&1 | _filter_qemu_io
->  $PYTHON qcow2.py "$TEST_IMG" dump-header
-> diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-> index 0c3d2a1..a442fc8 100755
-> --- a/tests/qemu-iotests/137
-> +++ b/tests/qemu-iotests/137
-> @@ -130,6 +130,7 @@ echo
->  
->  # Whether lazy-refcounts was actually enabled can easily be tested: Check if
->  # the dirty bit is set after a crash
-> +VALGRIND_QEMU="" \
->  $QEMU_IO \
->      -c "reopen -o lazy-refcounts=on,overlap-check=blubb" \
->      -c "write -P 0x5a 0 512" \
+> +# bail out, setting up .casenotrun file
+> +#
+> +_casenotrun()
+> +{
+> +    echo "    [case not run] $*" >>"$OUTPUT_DIR/$seq.casenotrun"
+> +}
+> +
+>  # just plain bail out
+>  #
+>  _fail()
 > 
+
+seems fine to me otherwise.
+
+Reviewed-by: John Snow <jsnow@redhat.com>
 
