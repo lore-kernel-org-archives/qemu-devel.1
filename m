@@ -6,49 +6,50 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB4CC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9359C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:30:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 141A520644
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:29:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 141A520644
+	by mail.kernel.org (Postfix) with ESMTPS id A674F20644
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 07:30:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A674F20644
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyWfl-0001lx-J2
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:29:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37107)
+	id 1hyWgo-0003h6-Gk
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 03:30:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37231)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWeE-0000b5-C8
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:27:43 -0400
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWeg-0001Bo-3v
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tony.nguyen@bt.com>) id 1hyWeC-0006ef-Kl
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:27:42 -0400
-Received: from smtpe1.intersmtp.com ([213.121.35.79]:1532)
+ (envelope-from <tony.nguyen@bt.com>) id 1hyWed-0006l5-Qv
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 03:28:09 -0400
+Received: from smtpe1.intersmtp.com ([213.121.35.78]:32509)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <tony.nguyen@bt.com>)
- id 1hyWdv-0006YT-DV; Fri, 16 Aug 2019 03:27:23 -0400
+ id 1hyWeH-0006fn-H2; Fri, 16 Aug 2019 03:27:45 -0400
 Received: from tpw09926dag18h.domain1.systemhost.net (10.9.212.42) by
- BWP09926084.bt.com (10.36.82.115) with Microsoft SMTP Server (version=TLS1_2, 
+ BWP09926083.bt.com (10.36.82.114) with Microsoft SMTP Server (version=TLS1_2, 
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P256) id 15.1.1713.5; Fri, 16
- Aug 2019 08:27:00 +0100
+ Aug 2019 08:27:22 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net (10.9.212.18) by
  tpw09926dag18h.domain1.systemhost.net (10.9.212.42) with Microsoft SMTP
- Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:27:21 +0100
+ Server (TLS) id 15.0.1395.4; Fri, 16 Aug 2019 08:27:43 +0100
 Received: from tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c]) by tpw09926dag18e.domain1.systemhost.net
  ([fe80::a946:6348:ccf4:fa6c%12]) with mapi id 15.00.1395.000; Fri, 16 Aug
- 2019 08:27:21 +0100
+ 2019 08:27:43 +0100
 From: <tony.nguyen@bt.com>
 To: <qemu-devel@nongnu.org>
-Thread-Topic: [Qemu-devel] [PATCH v7 03/42] memory: Introduce size_memop
-Thread-Index: AQHVVAQKaBCA2VrA2kWD20s00rLafg==
-Date: Fri, 16 Aug 2019 07:27:21 +0000
-Message-ID: <1565940440547.47375@bt.com>
+Thread-Topic: [Qemu-devel] [PATCH v7 04/42] target/mips: Access MemoryRegion
+ with MemOp
+Thread-Index: AQHVVAQXgdDGsPFhD0WOP1A9ybepgA==
+Date: Fri, 16 Aug 2019 07:27:43 +0000
+Message-ID: <1565940462507.85555@bt.com>
 References: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 In-Reply-To: <43bc5e07ac614d0e8e740bf6007ff77b@tpw09926dag18e.domain1.systemhost.net>
 Accept-Language: en-AU, en-GB, en-US
@@ -60,11 +61,12 @@ x-ms-exchange-transport-fromentityheader: Hosted
 x-originating-ip: [10.187.101.40]
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 213.121.35.79
+X-Received-From: 213.121.35.78
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 X-Content-Filtered-By: Mailman/MimeDel 2.1.23
-Subject: [Qemu-devel]  [PATCH v7 03/42] memory: Introduce size_memop
+Subject: [Qemu-devel] [PATCH v7 04/42] target/mips: Access MemoryRegion with
+ MemOp
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,38 +112,51 @@ Sender: "Qemu-devel"
 The memory_region_dispatch_{read|write} operand "unsigned size" is
 being converted into a "MemOp op".
 
-Introduce no-op size_memop to aid preparatory conversion of
-interfaces.
+Convert interfaces by using no-op size_memop.
 
-Once interfaces are converted, size_memop will be implemented to
-return a MemOp from size in bytes.
+After all interfaces are converted, size_memop will be implemented
+and the memory_region_dispatch_{read|write} operand "unsigned size"
+will be converted into a "MemOp op".
+
+As size_memop is a no-op, this patch does not change any behaviour.
 
 Signed-off-by: Tony Nguyen <tony.nguyen@bt.com>
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/memop.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ target/mips/op_helper.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/memop.h b/include/exec/memop.h
-index 7262ca3..dfd76a1 100644
---- a/include/exec/memop.h
-+++ b/include/exec/memop.h
-@@ -107,4 +107,14 @@ typedef enum MemOp {
-     MO_SSIZE =3D MO_SIZE | MO_SIGN,
- } MemOp;
+diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+index 9e2e02f..1c72a00 100644
+--- a/target/mips/op_helper.c
++++ b/target/mips/op_helper.c
+@@ -24,6 +24,7 @@
+ #include "exec/helper-proto.h"
+ #include "exec/exec-all.h"
+ #include "exec/cpu_ldst.h"
++#include "exec/memop.h"
+ #include "sysemu/kvm.h"
 
-+/* Size in bytes to MemOp.  */
-+static inline unsigned size_memop(unsigned size)
-+{
-+    /*
-+     * FIXME: No-op to aid conversion of memory_region_dispatch_{read|writ=
-e}
-+     * "unsigned size" operand into a "MemOp op".
-+     */
-+    return size;
-+}
-+
+ /*************************************************************************=
+****/
+@@ -4740,11 +4741,11 @@ void helper_cache(CPUMIPSState *env, target_ulong a=
+ddr, uint32_t op)
+     if (op =3D=3D 9) {
+         /* Index Store Tag */
+         memory_region_dispatch_write(env->itc_tag, index, env->CP0_TagLo,
+-                                     8, MEMTXATTRS_UNSPECIFIED);
++                                     size_memop(8), MEMTXATTRS_UNSPECIFIED=
+);
+     } else if (op =3D=3D 5) {
+         /* Index Load Tag */
+         memory_region_dispatch_read(env->itc_tag, index, &env->CP0_TagLo,
+-                                    8, MEMTXATTRS_UNSPECIFIED);
++                                    size_memop(8), MEMTXATTRS_UNSPECIFIED)=
+;
+     }
  #endif
+ }
 --
 1.8.3.1
 
