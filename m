@@ -2,60 +2,59 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D592EC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4EFC3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:35:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A65582077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:34:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65582077C
+	by mail.kernel.org (Postfix) with ESMTPS id 5F3352077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:35:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F3352077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyljm-0007wt-Dx
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:34:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47051)
+	id 1hylkK-0000T5-Tg
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:35:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47112)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hylPy-0006xh-JO
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:14:00 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hylQ0-000727-Jz
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:14:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hylPw-0006HW-RK
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37242)
+ (envelope-from <jsnow@redhat.com>) id 1hylPy-0006JD-Da
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:14:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51258)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hylPs-0006Aw-Dw; Fri, 16 Aug 2019 19:13:52 -0400
+ id 1hylPt-0006CC-9w; Fri, 16 Aug 2019 19:13:53 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 9E8C6190C022;
- Fri, 16 Aug 2019 23:13:50 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5476C308427C;
+ Fri, 16 Aug 2019 23:13:47 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EBB0119C6A;
- Fri, 16 Aug 2019 23:13:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A120C19C6A;
+ Fri, 16 Aug 2019 23:13:46 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 19:13:12 -0400
-Message-Id: <20190816231318.8650-31-jsnow@redhat.com>
+Date: Fri, 16 Aug 2019 19:13:08 -0400
+Message-Id: <20190816231318.8650-27-jsnow@redhat.com>
 In-Reply-To: <20190816231318.8650-1-jsnow@redhat.com>
 References: <20190816231318.8650-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
- (mx1.redhat.com [10.5.110.70]); Fri, 16 Aug 2019 23:13:50 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.40]); Fri, 16 Aug 2019 23:13:47 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 30/36] block/backup: teach TOP to never copy
- unallocated regions
+Subject: [Qemu-devel] [PULL 26/36] iotests/257: test API failures
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,212 +72,256 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Presently, If sync=3DTOP is selected, we mark the entire bitmap as dirty.
-In the write notifier handler, we dutifully copy out such regions.
-
-Fix this in three parts:
-
-1. Mark the bitmap as being initialized before the first yield.
-2. After the first yield but before the backup loop, interrogate the
-allocation status asynchronously and initialize the bitmap.
-3. Teach the write notifier to interrogate allocation status if it is
-invoked during bitmap initialization.
-
-As an effect of this patch, the job progress for TOP backups
-now behaves like this:
-
-- total progress starts at bdrv_length.
-- As allocation status is interrogated, total progress decreases.
-- As blocks are copied, current progress increases.
-
-Taken together, the floor and ceiling move to meet each other.
-
-
 Signed-off-by: John Snow <jsnow@redhat.com>
-Message-id: 20190716000117.25219-10-jsnow@redhat.com
-[Remove ret =3D -ECANCELED change. --js]
-[Squash in conflict resolution based on Max's patch --js]
-Message-id: c8b0ab36-79c8-0b4b-3193-4e12ed8c848b@redhat.com
 Reviewed-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20190716000117.25219-6-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c     | 79 ++++++++++++++++++++++++++++++++++++++++------
- block/trace-events |  1 +
- 2 files changed, 71 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/257     | 67 ++++++++++++++++++++++++++++++
+ tests/qemu-iotests/257.out | 85 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 152 insertions(+)
 
-diff --git a/block/backup.c b/block/backup.c
-index f6bf32c9438..9e1382ec5c6 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -58,6 +58,7 @@ typedef struct BackupBlockJob {
-     int64_t copy_range_size;
+diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
+index aaa8f595043..53ab31c92e1 100755
+--- a/tests/qemu-iotests/257
++++ b/tests/qemu-iotests/257
+@@ -447,10 +447,77 @@ def test_bitmap_sync(bsync_mode, msync_mode=3D'bitm=
+ap', failure=3DNone):
+         compare_images(img_path, fbackup2)
+         log('')
 =20
-     bool serialize_target_writes;
-+    bool initializing_bitmap;
- } BackupBlockJob;
-=20
- static const BlockJobDriver backup_job_driver;
-@@ -227,6 +228,35 @@ static int backup_is_cluster_allocated(BackupBlockJo=
-b *s, int64_t offset,
-     }
- }
-=20
-+/**
-+ * Reset bits in copy_bitmap starting at offset if they represent unallo=
-cated
-+ * data in the image. May reset subsequent contiguous bits.
-+ * @return 0 when the cluster at @offset was unallocated,
-+ *         1 otherwise, and -ret on error.
-+ */
-+static int64_t backup_bitmap_reset_unallocated(BackupBlockJob *s,
-+                                               int64_t offset, int64_t *=
-count)
-+{
-+    int ret;
-+    int64_t clusters, bytes, estimate;
++def test_backup_api():
++    """
++    Test malformed and prohibited invocations of the backup API.
++    """
++    with iotests.FilePaths(['img', 'bsync1']) as \
++         (img_path, backup_path), \
++         iotests.VM() as vm:
 +
-+    ret =3D backup_is_cluster_allocated(s, offset, &clusters);
-+    if (ret < 0) {
-+        return ret;
-+    }
++        log("\n=3D=3D=3D API failure tests =3D=3D=3D\n")
++        log('--- Preparing image & VM ---\n')
++        drive0 =3D Drive(img_path, vm=3Dvm)
++        drive0.img_create(iotests.imgfmt, SIZE)
++        vm.add_device("{},id=3Dscsi0".format(iotests.get_virtio_scsi_dev=
+ice()))
++        vm.launch()
 +
-+    bytes =3D clusters * s->cluster_size;
-+
-+    if (!ret) {
-+        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
-+        estimate =3D bdrv_get_dirty_count(s->copy_bitmap);
-+        job_progress_set_remaining(&s->common.job, estimate);
-+    }
-+
-+    *count =3D bytes;
-+    return ret;
-+}
-+
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-                                       int64_t offset, uint64_t bytes,
-                                       bool *error_is_read,
-@@ -236,6 +266,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob =
-*job,
-     int ret =3D 0;
-     int64_t start, end; /* bytes */
-     void *bounce_buffer =3D NULL;
-+    int64_t status_bytes;
-=20
-     qemu_co_rwlock_rdlock(&job->flush_rwlock);
-=20
-@@ -262,6 +293,17 @@ static int coroutine_fn backup_do_cow(BackupBlockJob=
- *job,
-             dirty_end =3D end;
-         }
-=20
-+        if (job->initializing_bitmap) {
-+            ret =3D backup_bitmap_reset_unallocated(job, start, &status_=
-bytes);
-+            if (ret =3D=3D 0) {
-+                trace_backup_do_cow_skip_range(job, start, status_bytes)=
-;
-+                start +=3D status_bytes;
-+                continue;
-+            }
-+            /* Clamp to known allocated region */
-+            dirty_end =3D MIN(dirty_end, start + status_bytes);
++        file_config =3D {
++            'driver': 'file',
++            'filename': drive0.path
 +        }
 +
-         trace_backup_do_cow_process(job, start);
-=20
-         if (job->use_copy_range) {
-@@ -446,18 +488,9 @@ static int coroutine_fn backup_loop(BackupBlockJob *=
-job)
-     int64_t offset;
-     BdrvDirtyBitmapIter *bdbi;
-     int ret =3D 0;
--    int64_t dummy;
-=20
-     bdbi =3D bdrv_dirty_iter_new(job->copy_bitmap);
-     while ((offset =3D bdrv_dirty_iter_next(bdbi)) !=3D -1) {
--        if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP &&
--            !backup_is_cluster_allocated(job, offset, &dummy))
--        {
--            bdrv_reset_dirty_bitmap(job->copy_bitmap, offset,
--                                    job->cluster_size);
--            continue;
--        }
--
-         do {
-             if (yield_and_check(job)) {
-                 goto out;
-@@ -488,6 +521,13 @@ static void backup_init_copy_bitmap(BackupBlockJob *=
-job)
-                                                NULL, true);
-         assert(ret);
-     } else {
-+        if (job->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-+            /*
-+             * We can't hog the coroutine to initialize this thoroughly.
-+             * Set a flag and resume work when we are able to yield safe=
-ly.
-+             */
-+            job->initializing_bitmap =3D true;
++        vm.qmp_log('blockdev-add',
++                   filters=3D[iotests.filter_qmp_testfiles],
++                   node_name=3D"drive0",
++                   driver=3Ddrive0.fmt,
++                   file=3Dfile_config)
++        drive0.node =3D 'drive0'
++        drive0.device =3D 'device0'
++        vm.qmp_log("device_add", id=3Ddrive0.device,
++                   drive=3Ddrive0.name, driver=3D"scsi-hd")
++        log('')
++
++        target0 =3D Drive(backup_path, vm=3Dvm)
++        target0.create_target("backup_target", drive0.fmt, drive0.size)
++        log('')
++
++        vm.qmp_log("block-dirty-bitmap-add", node=3Ddrive0.name,
++                   name=3D"bitmap0", granularity=3DGRANULARITY)
++        log('')
++
++        log('-- Testing invalid QMP commands --\n')
++
++        error_cases =3D {
++            'incremental': {
++                None:        ['on-success', 'always', 'never', None],
++                'bitmap404': ['on-success', 'always', 'never', None],
++                'bitmap0':   ['always', 'never']
++            },
++            'bitmap': {
++                None:        ['on-success', 'always', 'never', None],
++                'bitmap404': ['on-success', 'always', 'never', None],
++                'bitmap0':   [None],
++            },
 +        }
-         bdrv_set_dirty_bitmap(job->copy_bitmap, 0, job->len);
-     }
-=20
-@@ -509,6 +549,26 @@ static int coroutine_fn backup_run(Job *job, Error *=
-*errp)
-     s->before_write.notify =3D backup_before_write_notify;
-     bdrv_add_before_write_notifier(bs, &s->before_write);
-=20
-+    if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_TOP) {
-+        int64_t offset =3D 0;
-+        int64_t count;
 +
-+        for (offset =3D 0; offset < s->len; ) {
-+            if (yield_and_check(s)) {
-+                ret =3D -ECANCELED;
-+                goto out;
-+            }
++        # Dicts, as always, are not stably-ordered prior to 3.7, so use =
+tuples:
++        for sync_mode in ('incremental', 'bitmap'):
++            log("-- Sync mode {:s} tests --\n".format(sync_mode))
++            for bitmap in (None, 'bitmap404', 'bitmap0'):
++                for policy in error_cases[sync_mode][bitmap]:
++                    blockdev_backup(drive0.vm, drive0.name, "backup_targ=
+et",
++                                    sync_mode, job_id=3D'api_job',
++                                    bitmap=3Dbitmap, bitmap_mode=3Dpolic=
+y)
++                    log('')
 +
-+            ret =3D backup_bitmap_reset_unallocated(s, offset, &count);
-+            if (ret < 0) {
-+                goto out;
-+            }
 +
-+            offset +=3D count;
-+        }
-+        s->initializing_bitmap =3D false;
-+    }
-+
-     if (s->sync_mode =3D=3D MIRROR_SYNC_MODE_NONE) {
-         /* All bits are set in copy_bitmap to allow any cluster to be co=
-pied.
-          * This does not actually require them to be copied. */
-@@ -521,6 +581,7 @@ static int coroutine_fn backup_run(Job *job, Error **=
-errp)
-         ret =3D backup_loop(s);
-     }
+ def main():
+     for bsync_mode in ("never", "on-success", "always"):
+         for failure in ("simulated", "intermediate", None):
+             test_bitmap_sync(bsync_mode, "bitmap", failure)
 =20
-+ out:
-     notifier_with_return_remove(&s->before_write);
++    test_backup_api()
++
+ if __name__ =3D=3D '__main__':
+     iotests.script_main(main, supported_fmts=3D['qcow2'])
+diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
+index 0abc96acd36..43f2e0f9c99 100644
+--- a/tests/qemu-iotests/257.out
++++ b/tests/qemu-iotests/257.out
+@@ -2245,3 +2245,88 @@ qemu_img compare "TEST_DIR/PID-bsync1" "TEST_DIR/P=
+ID-fbackup1" =3D=3D> Identical, OK
+ qemu_img compare "TEST_DIR/PID-bsync2" "TEST_DIR/PID-fbackup2" =3D=3D> I=
+dentical, OK!
+ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" =3D=3D> Iden=
+tical, OK!
 =20
-     /* wait until pending backup_do_cow() calls have completed */
-diff --git a/block/trace-events b/block/trace-events
-index d724df0117d..04209f058d4 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -41,6 +41,7 @@ mirror_yield_in_flight(void *s, int64_t offset, int in_=
-flight) "s %p offset %" P
- backup_do_cow_enter(void *job, int64_t start, int64_t offset, uint64_t b=
-ytes) "job %p start %" PRId64 " offset %" PRId64 " bytes %" PRIu64
- backup_do_cow_return(void *job, int64_t offset, uint64_t bytes, int ret)=
- "job %p offset %" PRId64 " bytes %" PRIu64 " ret %d"
- backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
-+backup_do_cow_skip_range(void *job, int64_t start, uint64_t bytes) "job =
-%p start %"PRId64" bytes %"PRId64
- backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
- backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start=
- %"PRId64" ret %d"
- backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p star=
-t %"PRId64" ret %d"
++
++=3D=3D=3D API failure tests =3D=3D=3D
++
++--- Preparing image & VM ---
++
++{"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": {"d=
+river": "file", "filename": "TEST_DIR/PID-img"}, "node-name": "drive0"}}
++{"return": {}}
++{"execute": "device_add", "arguments": {"drive": "drive0", "driver": "sc=
+si-hd", "id": "device0"}}
++{"return": {}}
++
++{}
++{"execute": "job-dismiss", "arguments": {"id": "bdc-file-job"}}
++{"return": {}}
++{}
++{}
++{"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
++{"return": {}}
++{}
++
++{"execute": "block-dirty-bitmap-add", "arguments": {"granularity": 65536=
+, "name": "bitmap0", "node": "drive0"}}
++{"return": {}}
++
++-- Testing invalid QMP commands --
++
++-- Sync mode incremental tests --
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success"=
+, "device": "drive0", "job-id": "api_job", "sync": "incremental", "target=
+": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "d=
+evice": "drive0", "job-id": "api_job", "sync": "incremental", "target": "=
+backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "de=
+vice": "drive0", "job-id": "api_job", "sync": "incremental", "target": "b=
+ackup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"device": "drive0", "job-id=
+": "api_job", "sync": "incremental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'incremental' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "on-success", "device": "drive0", "job-id": "api_job", "sync":=
+ "incremental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "always", "device": "drive0", "job-id": "api_job", "sync": "in=
+cremental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "never", "device": "drive0", "job-id": "api_job", "sync": "inc=
+remental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "dev=
+ice": "drive0", "job-id": "api_job", "sync": "incremental", "target": "ba=
+ckup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitma=
+p-mode": "always", "device": "drive0", "job-id": "api_job", "sync": "incr=
+emental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitma=
+p-mode": "never", "device": "drive0", "job-id": "api_job", "sync": "incre=
+mental", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'o=
+n-success' when using sync mode 'incremental'"}}
++
++-- Sync mode bitmap tests --
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success"=
+, "device": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "b=
+ackup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "d=
+evice": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backu=
+p_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "de=
+vice": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backup=
+_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"device": "drive0", "job-id=
+": "api_job", "sync": "bitmap", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "must provide a valid bitmap=
+ name for 'bitmap' sync mode"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "on-success", "device": "drive0", "job-id": "api_job", "sync":=
+ "bitmap", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "always", "device": "drive0", "job-id": "api_job", "sync": "bi=
+tmap", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bit=
+map-mode": "never", "device": "drive0", "job-id": "api_job", "sync": "bit=
+map", "target": "backup_target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "dev=
+ice": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backup_=
+target"}}
++{"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could no=
+t be found"}}
++
++{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "devic=
+e": "drive0", "job-id": "api_job", "sync": "bitmap", "target": "backup_ta=
+rget"}}
++{"error": {"class": "GenericError", "desc": "Bitmap sync mode must be gi=
+ven when providing a bitmap"}}
++
 --=20
 2.21.0
 
