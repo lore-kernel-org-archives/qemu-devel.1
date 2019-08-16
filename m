@@ -2,94 +2,87 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A49C3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BBA1C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:40:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEA0C2064A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:39:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEA0C2064A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 185FF2064A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 13:40:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPUq+TdL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 185FF2064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hycSL-0004Mr-0s
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:39:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37139)
+	id 1hycSa-0004iM-3v
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 09:40:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1hycJC-0003C8-AY
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:30:24 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc79-0003fr-L2
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1hycJA-0005Xm-4z
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:30:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39962)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>)
- id 1hycJ5-0005UC-KP; Fri, 16 Aug 2019 09:30:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D664F81F19;
- Fri, 16 Aug 2019 13:30:14 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-156.brq.redhat.com
- [10.40.204.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8072317995;
- Fri, 16 Aug 2019 13:30:13 +0000 (UTC)
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-36-mreitz@redhat.com>
- <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
- <39c41687-e192-e63a-984f-6d60b075df1a@redhat.com>
- <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7fb5ae37-ee74-a235-fb6d-80a93146bbfb@redhat.com>
-Date: Fri, 16 Aug 2019 15:30:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <peter.maydell@linaro.org>) id 1hyc78-0005sR-CR
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:55 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:43275)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1hyc78-0005ro-5U
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 09:17:54 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id y8so1511865wrn.10
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 06:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=xpfRGBW6oeUhJSHa15P6/UBxYtD8fPq019+58iIX+9c=;
+ b=aPUq+TdLslcO8RXTZa+vkV8eq3VQ/Zy15/RPiP6brAiSp/buWu0tNc34pHEv7GBJbJ
+ LsJgfN8KYKtz9siUPFYNjAoFMjdzvGG9Uk8UkSC9hNXPq93FWauXHucwq1yLy9if02gq
+ w8wBTiP5e75xx7j7ntc7luo/G3deR+tc1AjkTLw6X84gKCugtgm5I/ClQQkf8afZ+4Da
+ /sgdvP5fT6EcS7BIJzdEmjziY/NuElqUCXYNstsIWbEWj9dl/G+CRKw0ZNZnqD1n1LgZ
+ 5Kjvas6of0HE6mDmTfptUBax+Skl9M+AqqpmUVx0KkbzIam/2oUUBd9yyJUBdrLbY1eC
+ UP1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xpfRGBW6oeUhJSHa15P6/UBxYtD8fPq019+58iIX+9c=;
+ b=JKvRPaZKI0oSplTESxWMk2wmVmD3gSbTXScawJ3NyziXGiXgVfO3AxIjRyyKdBlyt3
+ i+Ecb3P6XTXmArJaX6FusqUJd1jWPs9ENlH8z18EAKEpfTUR7D2xI1G+4KA/03XA7wTe
+ pjvPtasneHYk96qFo80cWZj02e3w8MtQdu4yKIcCwO0e3Gr1BQY+RI5vp4z4Nc6fkVL5
+ YKWvk3OwirBN7eCXLWJx51T7vzqiKAN8ZNVUGC8FUKgzx4mhC7sseO6x0LEaDLhOBQOA
+ 0ZD7k1dhtP7X1ydYYVA7RIzcyYRdHunSwKGPP0JbnkY9gQjjzRXP2AYV++SspZak0B+A
+ /uoA==
+X-Gm-Message-State: APjAAAWt9qRKST7N8LTKJATuk/CfBAvfFGgDva5fsXX47DpC5uXEpT2m
+ 89xZyovE2zUvnijsQD4PyL+FVPsfCkzzUg==
+X-Google-Smtp-Source: APXvYqz8PS10HhS1ioVuZlDIvXinErzGISaVVFRa1pxk0Mt5GKkdkpyyOeqzLFeex3l4AoOSUij3cg==
+X-Received: by 2002:a5d:678a:: with SMTP id v10mr10634933wru.116.1565961472867; 
+ Fri, 16 Aug 2019 06:17:52 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 4sm8705796wro.78.2019.08.16.06.17.51
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 16 Aug 2019 06:17:52 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 16 Aug 2019 14:17:18 +0100
+Message-Id: <20190816131719.28244-29-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190816131719.28244-1-peter.maydell@linaro.org>
+References: <20190816131719.28244-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ"
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.27]); Fri, 16 Aug 2019 13:30:14 +0000 (UTC)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 209.132.183.28
-Subject: Re: [Qemu-devel] [PATCH v6 35/42] block: Fix check_to_replace_node()
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42b
+Subject: [Qemu-devel] [PULL 28/29] target/arm: Simplify SMMLA, SMMLAR, SMMLS,
+ SMMLSR
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,461 +94,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ
-Content-Type: multipart/mixed; boundary="qPRfallPfhRy2QG0KGBExz0V0ZgcFGDd6";
- protected-headers="v1"
-From: Max Reitz <mreitz@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <7fb5ae37-ee74-a235-fb6d-80a93146bbfb@redhat.com>
-Subject: Re: [PATCH v6 35/42] block: Fix check_to_replace_node()
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-36-mreitz@redhat.com>
- <92ded75c-caed-c674-f2ef-72b15b4405b4@virtuozzo.com>
- <39c41687-e192-e63a-984f-6d60b075df1a@redhat.com>
- <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
-In-Reply-To: <694d9499-de27-5aff-c93a-1b78c01160f3@virtuozzo.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
---qPRfallPfhRy2QG0KGBExz0V0ZgcFGDd6
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+All of the inputs to these instructions are 32-bits.  Rather than
+extend each input to 64-bits and then extract the high 32-bits of
+the output, use tcg_gen_muls2_i32 and other 32-bit generator functions.
 
-On 16.08.19 13:01, Vladimir Sementsov-Ogievskiy wrote:
-> 15.08.2019 20:01, Max Reitz wrote:
->> On 15.08.19 17:21, Vladimir Sementsov-Ogievskiy wrote:
->>> 09.08.2019 19:14, Max Reitz wrote:
->>>> Currently, check_to_replace_node() only allows mirror to replace a n=
-ode
->>>> in the chain of the source node, and only if it is the first non-fil=
-ter
->>>> node below the source.  Well, technically, the idea is that you can
->>>> exactly replace a quorum child by mirroring from quorum.
->>>>
->>>> This has (probably) two reasons:
->>>> (1) We do not want to create loops.
->>>> (2) @replaces and @device should have exactly the same content so
->>>>       replacing them does not cause visible data to change.
->>>>
->>>> This has two issues:
->>>> (1) It is overly restrictive.  It is completely fine for @replaces t=
-o be
->>>>       a filter.
->>>> (2) It is not restrictive enough.  You can create loops with this as=
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20190808202616.13782-7-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/translate.c | 72 +++++++++++++++---------------------------
+ 1 file changed, 26 insertions(+), 46 deletions(-)
 
->>>>       follows:
->>>>
->>>> $ qemu-img create -f qcow2 /tmp/source.qcow2 64M
->>>> $ qemu-system-x86_64 -qmp stdio
->>>> {"execute": "qmp_capabilities"}
->>>> {"execute": "object-add",
->>>>    "arguments": {"qom-type": "throttle-group", "id": "tg0"}}
->>>> {"execute": "blockdev-add",
->>>>    "arguments": {
->>>>        "node-name": "source",
->>>>        "driver": "throttle",
->>>>        "throttle-group": "tg0",
->>>>        "file": {
->>>>            "node-name": "filtered",
->>>>            "driver": "qcow2",
->>>>            "file": {
->>>>                "driver": "file",
->>>>                "filename": "/tmp/source.qcow2"
->>>>            } } } }
->>>> {"execute": "drive-mirror",
->>>>    "arguments": {
->>>>        "job-id": "mirror",
->>>>        "device": "source",
->>>>        "target": "/tmp/target.qcow2",
->>>>        "format": "qcow2",
->>>>        "node-name": "target",
->>>>        "sync" :"none",
->>>>        "replaces": "filtered"
->>>>    } }
->>>> {"execute": "block-job-complete", "arguments": {"device": "mirror"}}=
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 2e160646206..9e2853fe76c 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -376,34 +376,6 @@ static void gen_revsh(TCGv_i32 var)
+     tcg_gen_ext16s_i32(var, var);
+ }
+ 
+-/* Return (b << 32) + a. Mark inputs as dead */
+-static TCGv_i64 gen_addq_msw(TCGv_i64 a, TCGv_i32 b)
+-{
+-    TCGv_i64 tmp64 = tcg_temp_new_i64();
+-
+-    tcg_gen_extu_i32_i64(tmp64, b);
+-    tcg_temp_free_i32(b);
+-    tcg_gen_shli_i64(tmp64, tmp64, 32);
+-    tcg_gen_add_i64(a, tmp64, a);
+-
+-    tcg_temp_free_i64(tmp64);
+-    return a;
+-}
+-
+-/* Return (b << 32) - a. Mark inputs as dead. */
+-static TCGv_i64 gen_subq_msw(TCGv_i64 a, TCGv_i32 b)
+-{
+-    TCGv_i64 tmp64 = tcg_temp_new_i64();
+-
+-    tcg_gen_extu_i32_i64(tmp64, b);
+-    tcg_temp_free_i32(b);
+-    tcg_gen_shli_i64(tmp64, tmp64, 32);
+-    tcg_gen_sub_i64(a, tmp64, a);
+-
+-    tcg_temp_free_i64(tmp64);
+-    return a;
+-}
+-
+ /* 32x32->64 multiply.  Marks inputs as dead.  */
+ static TCGv_i64 gen_mulu_i64_i32(TCGv_i32 a, TCGv_i32 b)
+ {
+@@ -8857,23 +8829,27 @@ static void disas_arm_insn(DisasContext *s, unsigned int insn)
+                            (SMMUL, SMMLA, SMMLS) */
+                         tmp = load_reg(s, rm);
+                         tmp2 = load_reg(s, rs);
+-                        tmp64 = gen_muls_i64_i32(tmp, tmp2);
++                        tcg_gen_muls2_i32(tmp2, tmp, tmp, tmp2);
+ 
+                         if (rd != 15) {
+-                            tmp = load_reg(s, rd);
++                            tmp3 = load_reg(s, rd);
+                             if (insn & (1 << 6)) {
+-                                tmp64 = gen_subq_msw(tmp64, tmp);
++                                tcg_gen_sub_i32(tmp, tmp, tmp3);
+                             } else {
+-                                tmp64 = gen_addq_msw(tmp64, tmp);
++                                tcg_gen_add_i32(tmp, tmp, tmp3);
+                             }
++                            tcg_temp_free_i32(tmp3);
+                         }
+                         if (insn & (1 << 5)) {
+-                            tcg_gen_addi_i64(tmp64, tmp64, 0x80000000u);
++                            /*
++                             * Adding 0x80000000 to the 64-bit quantity
++                             * means that we have carry in to the high
++                             * word when the low word has the high bit set.
++                             */
++                            tcg_gen_shri_i32(tmp2, tmp2, 31);
++                            tcg_gen_add_i32(tmp, tmp, tmp2);
+                         }
+-                        tcg_gen_shri_i64(tmp64, tmp64, 32);
+-                        tmp = tcg_temp_new_i32();
+-                        tcg_gen_extrl_i64_i32(tmp, tmp64);
+-                        tcg_temp_free_i64(tmp64);
++                        tcg_temp_free_i32(tmp2);
+                         store_reg(s, rn, tmp);
+                         break;
+                     case 0:
+@@ -10099,22 +10075,26 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                   }
+                 break;
+             case 5: case 6: /* 32 * 32 -> 32msb (SMMUL, SMMLA, SMMLS) */
+-                tmp64 = gen_muls_i64_i32(tmp, tmp2);
++                tcg_gen_muls2_i32(tmp2, tmp, tmp, tmp2);
+                 if (rs != 15) {
+-                    tmp = load_reg(s, rs);
++                    tmp3 = load_reg(s, rs);
+                     if (insn & (1 << 20)) {
+-                        tmp64 = gen_addq_msw(tmp64, tmp);
++                        tcg_gen_add_i32(tmp, tmp, tmp3);
+                     } else {
+-                        tmp64 = gen_subq_msw(tmp64, tmp);
++                        tcg_gen_sub_i32(tmp, tmp, tmp3);
+                     }
++                    tcg_temp_free_i32(tmp3);
+                 }
+                 if (insn & (1 << 4)) {
+-                    tcg_gen_addi_i64(tmp64, tmp64, 0x80000000u);
++                    /*
++                     * Adding 0x80000000 to the 64-bit quantity
++                     * means that we have carry in to the high
++                     * word when the low word has the high bit set.
++                     */
++                    tcg_gen_shri_i32(tmp2, tmp2, 31);
++                    tcg_gen_add_i32(tmp, tmp, tmp2);
+                 }
+-                tcg_gen_shri_i64(tmp64, tmp64, 32);
+-                tmp = tcg_temp_new_i32();
+-                tcg_gen_extrl_i64_i32(tmp, tmp64);
+-                tcg_temp_free_i64(tmp64);
++                tcg_temp_free_i32(tmp2);
+                 break;
+             case 7: /* Unsigned sum of absolute differences.  */
+                 gen_helper_usad8(tmp, tmp, tmp2);
+-- 
+2.20.1
 
->>>>
->>>> And qemu crashes because of a stack overflow due to the loop being
->>>> created (target's backing file is source, so when it replaces filter=
-ed,
->>>> it points to itself through source).
->>>>
->>>> (blockdev-mirror can be broken similarly.)
->>>>
->>>> So let us make the checks for the two conditions above explicit, whi=
-ch
->>>> makes the whole function exactly as restrictive as it needs to be.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>    include/block/block.h |  1 +
->>>>    block.c               | 83 ++++++++++++++++++++++++++++++++++++++=
-+----
->>>>    blockdev.c            | 34 ++++++++++++++++--
->>>>    3 files changed, 110 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/include/block/block.h b/include/block/block.h
->>>> index 6ba853fb90..8da706cd89 100644
->>>> --- a/include/block/block.h
->>>> +++ b/include/block/block.h
->>>> @@ -404,6 +404,7 @@ bool bdrv_is_first_non_filter(BlockDriverState *=
-candidate);
->>>>   =20
->>>>    /* check if a named node can be replaced when doing drive-mirror =
-*/
->>>>    BlockDriverState *check_to_replace_node(BlockDriverState *parent_=
-bs,
->>>> +                                        BlockDriverState *backing_b=
-s,
->>>>                                            const char *node_name, Er=
-ror **errp);
->>>>   =20
->>>>    /* async block I/O */
->>>> diff --git a/block.c b/block.c
->>>> index 915b80153c..4858d3e718 100644
->>>> --- a/block.c
->>>> +++ b/block.c
->>>> @@ -6290,7 +6290,59 @@ bool bdrv_is_first_non_filter(BlockDriverStat=
-e *candidate)
->>>>        return false;
->>>>    }
->>>>   =20
->>>> +static bool is_child_of(BlockDriverState *child, BlockDriverState *=
-parent)
->>>> +{
->>>> +    BdrvChild *c;
->>>> +
->>>> +    if (!parent) {
->>>> +        return false;
->>>> +    }
->>>> +
->>>> +    QLIST_FOREACH(c, &parent->children, next) {
->>>> +        if (c->bs =3D=3D child || is_child_of(child, c->bs)) {
->>>> +            return true;
->>>> +        }
->>>> +    }
->>>> +
->>>> +    return false;
->>>> +}
->>>> +
->>>> +/*
->>>> + * Return true if there are only filters in [@top, @base).  Note th=
-at
->>>> + * this may include quorum (which bdrv_chain_contains() cannot
->>>> + * handle).
->>>
->>> More presizely: return true if exists chain of filters from top to ba=
-se or if
->>> top =3D=3D base.
->>>
->>> I keep in mind backup-top filter:
->>>
->>> [backup-top]
->>> |          \target
->>
->> backup-top can=E2=80=99t be a filter if it has two children with diffe=
-rent
->> contents, though.
->=20
-> Why? target is special child, unrelated to what is read/written over ba=
-ckup-top.
-> It's an own business of backup-top.
->=20
->>
->> (commit-top and mirror-top aren=E2=80=99t filters either.)
->=20
-> Ahm, I missed something. They have is_filter =3D true and their childre=
-n considered
-> to be filtered-rw children in your series? And than, who they are? Form=
-at nodes?
-> And how they appears in backing chains than?
-
-Er, right, I remember, I made them filters in patch 1 of this series. m( =
-:-)
-
-But the chain would still be unique, in a sense, because backup-top only
-has one filtered child, so you could go down the chain with
-bdrv_filtered_rw_child().
-
-This function doesn=E2=80=99t do that because of Quorum, which is actuall=
-y a
-better example.  All of its children are filtered, so we must consider
-all of them.
-
-But backup-top is actually a reason why this function is wrong as it is;
-the target is not a filtered child, so it shouldn=E2=80=99t return true t=
-here.
-
-Hmmmm.
-
-Actually, bdrv_recurse_is_first_non_filter() does nearly what we want.
-(Which is why it was used here.)  The only problem is that it expects
-@candidate to be a non-filter (as the name implies).  But we don=E2=80=99=
-t care
-about that, actually.
-
-I suppose I can just turn bdrv_recurse_is_first_non_filter() into
-bdrv_is_child_of(); it has only two callers, one is here, the other is
-bdrv_is_first_non_filter().  In the latter, we can just check whether
-@candidate is a filter and return false if it isn=E2=80=99t.
-
->> That=E2=80=99s why there must be a unique chain [@top, @base).
->>
->> I should probably not that it will return true if top =3D=3D base, tho=
-ugh, yes.
->>
->>> |backing    -------->[target]
->>> V                    /
->>> [source]  <---------/backing
->>>
->>>> + */
->>>> +static bool is_filtered_child(BlockDriverState *top, BlockDriverSta=
-te *base)
->>>> +{
->>>> +    BdrvChild *c;
->>>> +
->>>> +    if (!top) {
->>>> +        return false;
->>>> +    }
->>>> +
->>>> +    if (top =3D=3D base) {
->>>> +        return true;
->>>> +    }
->>>> +
->>>> +    if (!top->drv->is_filter) {
->>>> +        return false;
->>>> +    }
->>>> +
->>>> +    QLIST_FOREACH(c, &top->children, next) {
->>>> +        if (is_filtered_child(c->bs, base)) {
->>>> +            return true;
->>>> +        }
->>>> +    }
->>>
->>> interesting, how much is it better to somehow reuse DFS search writte=
-n in should_update_child()..
->>> [just note, don't do it in these series please]
->>>
->>>> +
->>>> +    return false;
->>>> +}
->>>> +
->>>> +/*
->>>> + * @parent_bs is mirror's source BDS, @backing_bs is the BDS which
->>>> + * will be attached to the target when mirror completes.
->>>> + */
->>>>    BlockDriverState *check_to_replace_node(BlockDriverState *parent_=
-bs,
->>>> +                                        BlockDriverState *backing_b=
-s,
->>>>                                            const char *node_name, Er=
-ror **errp)
->>>>    {
->>>>        BlockDriverState *to_replace_bs =3D bdrv_find_node(node_name)=
-;
->>>> @@ -6309,13 +6361,32 @@ BlockDriverState *check_to_replace_node(Bloc=
-kDriverState *parent_bs,
->>>>            goto out;
->>>>        }
->>>>   =20
->>>> -    /* We don't want arbitrary node of the BDS chain to be replaced=
- only the top
->>>> -     * most non filter in order to prevent data corruption.
->>>> -     * Another benefit is that this tests exclude backing files whi=
-ch are
->>>> -     * blocked by the backing blockers.
->>>> +    /*
->>>> +     * If to_replace_bs is (recursively) a child of backing_bs,
->>>> +     * replacing it may create a loop.  We cannot allow that.
->>>>         */
->>>> -    if (!bdrv_recurse_is_first_non_filter(parent_bs, to_replace_bs)=
-) {
->>>> -        error_setg(errp, "Only top most non filter can be replaced"=
-);
->>>> +    if (to_replace_bs =3D=3D backing_bs || is_child_of(to_replace_b=
-s, backing_bs)) {
->>>
->>> first condition is covered by second, so first may be omitted.
->>
->> It is not.  is_child_of() does not return true if child =3D=3D parent.=
-
->>
->>>> +        error_setg(errp, "Replacing this node would result in a loo=
-p");
->>>> +        to_replace_bs =3D NULL;
->>>> +        goto out;
->>>> +    }
->>>> +
->>>> +    /*
->>>> +     * Mirror is designed in such a way that when it completes, the=
-
->>>> +     * source BDS is seamlessly replaced.
->>>
->>> Not source but to_replace_bs is replaced?
->>
->> It has originally been designed to replace the source.  If it could
->> replace any arbitrary BDS, all of this would be moot.
->=20
-> quorum child, you saying about in commit message?
-
-Which is not any arbitrary BDS, but one that looks exactly like the sourc=
-e.
-
-My point is, mirror has been *designed* to replace the source
-seamlessly.  It can do more things today, but that was its original point=
-=2E
-
-That means that the target must be exactly the same as the source.  And
-then we come to this:
-
->>>> It is therefore not allowed
->>>> +     * to replace a BDS where this condition would be violated, as =
-that
->>>> +     * would defeat the purpose of mirror and could lead to data
->>>> +     * corruption.
->>>> +     * Therefore, between parent_bs and to_replace_bs there may be
->>>> +     * only filters (and the one on top must be a filter, too), so
->>>> +     * their data always stays in sync and mirror can complete and
->>>> +     * replace to_replace_bs without any possible corruptions.
-
-So replacing a node that=E2=80=99s connected to the source only through f=
-ilters
-is fine because that means the replaced node will also have the same
-content as the source.
-
-
-How about I replace the first paragraph with:
-
-At the end of the mirror job, the target exhibits exactly the same
-content as the source, so it can replace the source node seamlessly.  It
-cannot replace a BDS that differs in content, as that could lead to data
-corruption.
-
-?
-
->>>> +     */
->>>> +    if (!is_filtered_child(parent_bs, to_replace_bs) &&
->>>> +        !is_filtered_child(to_replace_bs, parent_bs))
->>>> +    {
->>>> +        error_setg(errp, "The node to be replaced must be connected=
- to the "
->>>> +                   "source through filter nodes only");
->>>
->>> "and the one on top must be a filter, too" not mentioned in the error=
-=2E.
->>
->> Well, unless the source node is the node to be replaced.  Hm...  This
->> gets very hard to express.  I think I=E2=80=99d prefer to keep this as=
- it is,
->> even though it is not quite correct, unless you have a better suggesti=
-on
->> of what to report. :-/
->=20
-> I can't imaging something better than just add "(and the one on top mus=
-t be a filter, too)"
-
-The problem is that =E2=80=9Cthe one on top=E2=80=9D wouldn=E2=80=99t sou=
-nd very clear to me as
-a user.
-
-Maybe include the explanation =C3=A0 la =E2=80=9CThe node to be replaced =
-must be
-connected to the source through filter nodes only, so its data is the
-exact same at all times=E2=80=9D?  Maybe then users can guess what this
-=E2=80=9Cconnected=E2=80=9D means exactly.
-
->>>>            to_replace_bs =3D NULL;
->>>>            goto out;
->>>>        }
->>>> diff --git a/blockdev.c b/blockdev.c
->>>> index 4e72f6f701..758e0b5431 100644
->>>> --- a/blockdev.c
->>>> +++ b/blockdev.c
->>>> @@ -3887,7 +3887,7 @@ static void blockdev_mirror_common(const char =
-*job_id, BlockDriverState *bs,
->>>>        }
->>>>   =20
->>>>        if (has_replaces) {
->>>> -        BlockDriverState *to_replace_bs;
->>>> +        BlockDriverState *to_replace_bs, *backing_bs;
->>>>            AioContext *replace_aio_context;
->>>>            int64_t bs_size, replace_size;
->>>>   =20
->>>> @@ -3897,7 +3897,37 @@ static void blockdev_mirror_common(const char=
- *job_id, BlockDriverState *bs,
->>>>                return;
->>>>            }
->>>>   =20
->>>> -        to_replace_bs =3D check_to_replace_node(bs, replaces, errp)=
-;
->>>> +        if (backing_mode =3D=3D MIRROR_SOURCE_BACKING_CHAIN ||
->>>> +            backing_mode =3D=3D MIRROR_OPEN_BACKING_CHAIN)
->>>> +        {
->>>> +            /*
->>>> +             * While we do not quite know what OPEN_BACKING_CHAIN
->>>> +             * (used for mode=3Dexisting) will yield, it is probabl=
-y
->>>> +             * best to restrict it exactly like SOURCE_BACKING_CHAI=
-N,
->>>> +             * because that is our best guess.
->>>> +             */
->>>> +            switch (sync) {
->>>> +            case MIRROR_SYNC_MODE_FULL:
->>>> +                backing_bs =3D NULL;
->>>> +                break;
->>>> +
->>>> +            case MIRROR_SYNC_MODE_TOP:
->>>> +                backing_bs =3D bdrv_filtered_cow_bs(bdrv_skip_rw_fi=
-lters(bs));
->>>
->>> why not  bdrv_backing_chain_next(bs) like in mirror_start?
->>
->> Good question.  I suppose it should be
->> bdrv_filtered_cow_bs(bdrv_backing_chain_next(bs)) in mirror_start()?
->=20
-> You mean bdrv_filtered_cow_bs(bdrv_skip_rw_filters(bs)), I hope)
-
-Er, yes, sure.
-
->> Because with sync=3Dtop, we just want to remove the topmost COW node (=
-and
->> filters on top), but keep filters behind it.
->>
->=20
-> Agreed.
-
-OK.
-
-Max
-
-
---qPRfallPfhRy2QG0KGBExz0V0ZgcFGDd6--
-
---pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl1Wr+MACgkQ9AfbAGHV
-z0CXLwgAjjxox2EWGEHitjFtdEZfPHptZ3DIl0JEr8aiq2iJkO49a1Fen2H2+O/L
-8jNyZkXa+5EZjBQyjcIkhHFx6o/XWFdK80/tlLMTTFB9rzbESz7j2c3GGS4ARncs
-s3cNxToMS8TPCC2Zj/aiX94HxuIaU9dsVZRZ4W0cHZmdcaQGbvuNC8foeh/rmcjw
-rvAFFi3tPaq0r7YOYnhZVFzTMxDcSrkIPUMNO5sukOEuqsrcqdOuF5bWXdO/F/pf
-mm2I3PZBmxdDG7ioKhzr5i8Vel4SiMLnsKg0r1ArWAR14/kF8RbFDoEQ2o/yG+Xs
-5fUASQk40lX0CoB8E/rG0Geo1JhXgw==
-=Jx9P
------END PGP SIGNATURE-----
-
---pxbM1Ygj7P4QFcMoPP4svX1hwWBpWaxkJ--
 
