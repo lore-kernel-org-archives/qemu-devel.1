@@ -2,60 +2,59 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 223C8C3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:30:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E1DC3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:30:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1F282077C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:30:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F282077C
+	by mail.kernel.org (Postfix) with ESMTPS id 750B32077C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:30:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750B32077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hylfc-00039W-2s
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:30:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46824)
+	id 1hylg7-0003db-06
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:30:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hylPr-0006k6-TO
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:53 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hylPk-0006V5-4N
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hylPq-00069f-NA
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60198)
+ (envelope-from <jsnow@redhat.com>) id 1hylPi-0005w6-B3
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hylPo-00065o-8E; Fri, 16 Aug 2019 19:13:48 -0400
+ id 1hylPc-0005ps-Ur; Fri, 16 Aug 2019 19:13:37 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 7E7A12A41;
- Fri, 16 Aug 2019 23:13:46 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 28926308427C;
+ Fri, 16 Aug 2019 23:13:36 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CA8A719C6A;
- Fri, 16 Aug 2019 23:13:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 74B65165D8;
+ Fri, 16 Aug 2019 23:13:35 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 19:13:07 -0400
-Message-Id: <20190816231318.8650-26-jsnow@redhat.com>
+Date: Fri, 16 Aug 2019 19:12:58 -0400
+Message-Id: <20190816231318.8650-17-jsnow@redhat.com>
 In-Reply-To: <20190816231318.8650-1-jsnow@redhat.com>
 References: <20190816231318.8650-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.38]); Fri, 16 Aug 2019 23:13:46 +0000 (UTC)
+ (mx1.redhat.com [10.5.110.40]); Fri, 16 Aug 2019 23:13:36 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 25/36] block/backup: hoist bitmap check into QMP
- interface
+Subject: [Qemu-devel] [PULL 16/36] iotests: Add virtio-scsi device helper
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,78 +72,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is nicer to do in the unified QMP interface that we have now,
-because it lets us use the right terminology back at the user.
+Seems that it comes up enough.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190716000117.25219-5-jsnow@redhat.com
+Message-id: 20190709232550.10724-17-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/backup.c | 13 ++++---------
- blockdev.c     | 10 ++++++++++
- 2 files changed, 14 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/040        | 6 +-----
+ tests/qemu-iotests/093        | 6 ++----
+ tests/qemu-iotests/139        | 7 ++-----
+ tests/qemu-iotests/238        | 5 +----
+ tests/qemu-iotests/iotests.py | 4 ++++
+ 5 files changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index f8309be01b3..f704c83a98f 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -576,6 +576,10 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-     assert(bs);
-     assert(target);
-=20
-+    /* QMP interface protects us from these cases */
-+    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
-+    assert(sync_bitmap || sync_mode !=3D MIRROR_SYNC_MODE_BITMAP);
-+
-     if (bs =3D=3D target) {
-         error_setg(errp, "Source and target cannot be the same");
-         return NULL;
-@@ -607,16 +611,7 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
-kDriverState *bs,
-         return NULL;
-     }
-=20
--    /* QMP interface should have handled translating this to bitmap mode=
- */
--    assert(sync_mode !=3D MIRROR_SYNC_MODE_INCREMENTAL);
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index aa0b1847e30..6db9abf8e6e 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -85,11 +85,7 @@ class TestSingleDrive(ImageCommitTestCase):
+         qemu_io('-f', 'raw', '-c', 'write -P 0xab 0 524288', backing_img=
+)
+         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xef 524288 524288=
+', mid_img)
+         self.vm =3D iotests.VM().add_drive(test_img, "node-name=3Dtop,ba=
+cking.node-name=3Dmid,backing.backing.node-name=3Dbase", interface=3D"non=
+e")
+-        if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-            self.vm.add_device("virtio-scsi-ccw")
+-        else:
+-            self.vm.add_device("virtio-scsi-pci")
 -
-     if (sync_mode =3D=3D MIRROR_SYNC_MODE_BITMAP) {
--        if (!sync_bitmap) {
--            error_setg(errp, "must provide a valid bitmap name for "
--                       "'%s' sync mode", MirrorSyncMode_str(sync_mode));
--            return NULL;
--        }
--
-         /* If we need to write to this bitmap, check that we can: */
-         if (bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER &&
-             bdrv_dirty_bitmap_check(sync_bitmap, BDRV_BITMAP_DEFAULT, er=
-rp)) {
-diff --git a/blockdev.c b/blockdev.c
-index 210226d8290..f889da0b427 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3529,6 +3529,16 @@ static BlockJob *do_backup_common(BackupCommon *ba=
-ckup,
-         return NULL;
-     }
++        self.vm.add_device(iotests.get_virtio_scsi_device())
+         self.vm.add_device("scsi-hd,id=3Dscsi0,drive=3Ddrive0")
+         self.vm.launch()
+         self.has_quit =3D False
+diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
+index 4b2cac1d0c6..3c4f5173cea 100755
+--- a/tests/qemu-iotests/093
++++ b/tests/qemu-iotests/093
+@@ -367,10 +367,8 @@ class ThrottleTestGroupNames(iotests.QMPTestCase):
+ class ThrottleTestRemovableMedia(iotests.QMPTestCase):
+     def setUp(self):
+         self.vm =3D iotests.VM()
+-        if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-            self.vm.add_device("virtio-scsi-ccw,id=3Dvirtio-scsi")
+-        else:
+-            self.vm.add_device("virtio-scsi-pci,id=3Dvirtio-scsi")
++        self.vm.add_device("{},id=3Dvirtio-scsi".format(
++            iotests.get_virtio_scsi_device()))
+         self.vm.launch()
 =20
-+    if ((backup->sync =3D=3D MIRROR_SYNC_MODE_BITMAP) ||
-+        (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL)) {
-+        /* done before desugaring 'incremental' to print the right messa=
-ge */
-+        if (!backup->has_bitmap) {
-+            error_setg(errp, "must provide a valid bitmap name for "
-+                       "'%s' sync mode", MirrorSyncMode_str(backup->sync=
-));
-+            return NULL;
-+        }
-+    }
-+
-     if (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL) {
-         if (backup->has_bitmap_mode &&
-             backup->bitmap_mode !=3D BITMAP_SYNC_MODE_ON_SUCCESS) {
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
+index 933b45121a9..2176ea51ba8 100755
+--- a/tests/qemu-iotests/139
++++ b/tests/qemu-iotests/139
+@@ -35,11 +35,8 @@ class TestBlockdevDel(iotests.QMPTestCase):
+     def setUp(self):
+         iotests.qemu_img('create', '-f', iotests.imgfmt, base_img, '1M')
+         self.vm =3D iotests.VM()
+-        if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-            self.vm.add_device("virtio-scsi-ccw,id=3Dvirtio-scsi")
+-        else:
+-            self.vm.add_device("virtio-scsi-pci,id=3Dvirtio-scsi")
+-
++        self.vm.add_device("{},id=3Dvirtio-scsi".format(
++            iotests.get_virtio_scsi_device()))
+         self.vm.launch()
+=20
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
+index 08bc7e6b4be..e5ac2b2ff84 100755
+--- a/tests/qemu-iotests/238
++++ b/tests/qemu-iotests/238
+@@ -23,10 +23,7 @@ import os
+ import iotests
+ from iotests import log
+=20
+-if iotests.qemu_default_machine =3D=3D 's390-ccw-virtio':
+-    virtio_scsi_device =3D 'virtio-scsi-ccw'
+-else:
+-    virtio_scsi_device =3D 'virtio-scsi-pci'
++virtio_scsi_device =3D iotests.get_virtio_scsi_device()
+=20
+ vm =3D iotests.VM()
+ vm.launch()
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+index 385dbad16ac..84438e837cb 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -164,6 +164,10 @@ def qemu_io_silent(*args):
+                          (-exitcode, ' '.join(args)))
+     return exitcode
+=20
++def get_virtio_scsi_device():
++    if qemu_default_machine =3D=3D 's390-ccw-virtio':
++        return 'virtio-scsi-ccw'
++    return 'virtio-scsi-pci'
+=20
+ class QemuIoInteractive:
+     def __init__(self, *args):
 --=20
 2.21.0
 
