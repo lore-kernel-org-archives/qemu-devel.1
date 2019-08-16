@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D01BC3A59D
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:24:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 406F8C3A59D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:25:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10153206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:24:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10153206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 1204D206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 23:25:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1204D206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hylaD-0003oD-Nc
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:24:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46302)
+	id 1hylbL-0005P8-K5
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 19:25:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1hylPe-0006Ky-7h
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:40 -0400
+ (envelope-from <jsnow@redhat.com>) id 1hylPk-0006Vi-3w
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1hylPb-0005nI-En
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13630)
+ (envelope-from <jsnow@redhat.com>) id 1hylPi-0005wg-R2
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 19:13:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53708)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jsnow@redhat.com>)
- id 1hylPX-0005hX-Ud; Fri, 16 Aug 2019 19:13:32 -0400
+ id 1hylPe-0005s8-VN; Fri, 16 Aug 2019 19:13:39 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2E9F9859FB;
- Fri, 16 Aug 2019 23:13:31 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0FA8F800DE0;
+ Fri, 16 Aug 2019 23:13:38 +0000 (UTC)
 Received: from probe.bos.redhat.com (dhcp-17-187.bos.redhat.com [10.18.17.187])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 78A03165D8;
- Fri, 16 Aug 2019 23:13:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B83119C6A;
+ Fri, 16 Aug 2019 23:13:37 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Fri, 16 Aug 2019 19:12:52 -0400
-Message-Id: <20190816231318.8650-11-jsnow@redhat.com>
+Date: Fri, 16 Aug 2019 19:13:00 -0400
+Message-Id: <20190816231318.8650-19-jsnow@redhat.com>
 In-Reply-To: <20190816231318.8650-1-jsnow@redhat.com>
 References: <20190816231318.8650-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
- (mx1.redhat.com [10.5.110.26]); Fri, 16 Aug 2019 23:13:31 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2
+ (mx1.redhat.com [10.5.110.67]); Fri, 16 Aug 2019 23:13:38 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 209.132.183.28
-Subject: [Qemu-devel] [PULL 10/36] block/dirty-bitmap: add
- bdrv_dirty_bitmap_get
+Subject: [Qemu-devel] [PULL 18/36] block/backup: loosen restriction on
+ readonly bitmaps
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,137 +73,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a public interface for get. While we're at it,
-rename "bdrv_get_dirty_bitmap_locked" to "bdrv_dirty_bitmap_get_locked".
-
-(There are more functions to rename to the bdrv_dirty_bitmap_VERB form,
-but they will wait until the conclusion of this series.)
+With the "never" sync policy, we actually can utilize readonly bitmaps
+now. Loosen the check at the QMP level, and tighten it based on
+provided arguments down at the job creation level instead.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190709232550.10724-11-jsnow@redhat.com
+Message-id: 20190709232550.10724-19-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/dirty-bitmap.c         | 19 ++++++++++++-------
- block/mirror.c               |  2 +-
- include/block/dirty-bitmap.h |  4 ++--
- migration/block.c            |  5 ++---
- nbd/server.c                 |  2 +-
- 5 files changed, 18 insertions(+), 14 deletions(-)
+ block/backup.c | 6 ++++++
+ blockdev.c     | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 7881fea684b..75a5daf116f 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -509,14 +509,19 @@ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockD=
-riverState *bs)
- }
-=20
- /* Called within bdrv_dirty_bitmap_lock..unlock */
--bool bdrv_get_dirty_locked(BlockDriverState *bs, BdrvDirtyBitmap *bitmap=
-,
--                           int64_t offset)
-+bool bdrv_dirty_bitmap_get_locked(BdrvDirtyBitmap *bitmap, int64_t offse=
-t)
- {
--    if (bitmap) {
--        return hbitmap_get(bitmap->bitmap, offset);
--    } else {
--        return false;
--    }
-+    return hbitmap_get(bitmap->bitmap, offset);
-+}
-+
-+bool bdrv_dirty_bitmap_get(BdrvDirtyBitmap *bitmap, int64_t offset)
-+{
-+    bool ret;
-+    bdrv_dirty_bitmap_lock(bitmap);
-+    ret =3D bdrv_dirty_bitmap_get_locked(bitmap, offset);
-+    bdrv_dirty_bitmap_unlock(bitmap);
-+
-+    return ret;
- }
-=20
- /**
-diff --git a/block/mirror.c b/block/mirror.c
-index 70f24d9ef63..2b870683f14 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -476,7 +476,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorB=
-lockJob *s)
-         int64_t next_offset =3D offset + nb_chunks * s->granularity;
-         int64_t next_chunk =3D next_offset / s->granularity;
-         if (next_offset >=3D s->bdev_length ||
--            !bdrv_get_dirty_locked(source, s->dirty_bitmap, next_offset)=
-) {
-+            !bdrv_dirty_bitmap_get_locked(s->dirty_bitmap, next_offset))=
- {
-             break;
+diff --git a/block/backup.c b/block/backup.c
+index 2be570c0bfd..f8309be01b3 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -617,6 +617,12 @@ BlockJob *backup_job_create(const char *job_id, Bloc=
+kDriverState *bs,
+             return NULL;
          }
-         if (test_bit(next_chunk, s->in_flight_bitmap)) {
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 62682eb865f..0120ef3f05a 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -84,12 +84,12 @@ void bdrv_dirty_bitmap_set_busy(BdrvDirtyBitmap *bitm=
-ap, bool busy);
- void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitma=
-p *src,
-                              HBitmap **backup, Error **errp);
- void bdrv_dirty_bitmap_set_migration(BdrvDirtyBitmap *bitmap, bool migra=
-tion);
-+bool bdrv_dirty_bitmap_get(BdrvDirtyBitmap *bitmap, int64_t offset);
 =20
- /* Functions that require manual locking.  */
- void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
- void bdrv_dirty_bitmap_unlock(BdrvDirtyBitmap *bitmap);
--bool bdrv_get_dirty_locked(BlockDriverState *bs, BdrvDirtyBitmap *bitmap=
-,
--                           int64_t offset);
-+bool bdrv_dirty_bitmap_get_locked(BdrvDirtyBitmap *bitmap, int64_t offse=
-t);
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes);
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-diff --git a/migration/block.c b/migration/block.c
-index e81fd7e14fa..aa747b55fa8 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -521,7 +521,6 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigD=
-evState *bmds,
-                                  int is_async)
- {
-     BlkMigBlock *blk;
--    BlockDriverState *bs =3D blk_bs(bmds->blk);
-     int64_t total_sectors =3D bmds->total_sectors;
-     int64_t sector;
-     int nr_sectors;
-@@ -536,8 +535,8 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigD=
-evState *bmds,
-             blk_mig_unlock();
++        /* If we need to write to this bitmap, check that we can: */
++        if (bitmap_mode !=3D BITMAP_SYNC_MODE_NEVER &&
++            bdrv_dirty_bitmap_check(sync_bitmap, BDRV_BITMAP_DEFAULT, er=
+rp)) {
++            return NULL;
++        }
++
+         /* Create a new bitmap, and freeze/disable this one. */
+         if (bdrv_dirty_bitmap_create_successor(bs, sync_bitmap, errp) < =
+0) {
+             return NULL;
+diff --git a/blockdev.c b/blockdev.c
+index 985b6cd75c0..a44ab1f709e 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -3491,7 +3491,7 @@ static BlockJob *do_backup_common(BackupCommon *bac=
+kup,
+                        "when providing a bitmap");
+             return NULL;
          }
-         bdrv_dirty_bitmap_lock(bmds->dirty_bitmap);
--        if (bdrv_get_dirty_locked(bs, bmds->dirty_bitmap,
--                                  sector * BDRV_SECTOR_SIZE)) {
-+        if (bdrv_dirty_bitmap_get_locked(bmds->dirty_bitmap,
-+                                         sector * BDRV_SECTOR_SIZE)) {
-             if (total_sectors - sector < BDRV_SECTORS_PER_DIRTY_CHUNK) {
-                 nr_sectors =3D total_sectors - sector;
-             } else {
-diff --git a/nbd/server.c b/nbd/server.c
-index 3eacb898757..f55ccf8edfd 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -2004,7 +2004,7 @@ static unsigned int bitmap_to_extents(BdrvDirtyBitm=
-ap *bitmap, uint64_t offset,
-     bdrv_dirty_bitmap_lock(bitmap);
-=20
-     it =3D bdrv_dirty_iter_new(bitmap);
--    dirty =3D bdrv_get_dirty_locked(NULL, bitmap, offset);
-+    dirty =3D bdrv_dirty_bitmap_get_locked(bitmap, offset);
-=20
-     assert(begin < overall_end && nb_extents);
-     while (begin < overall_end && i < nb_extents) {
+-        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_DEFAULT, errp)) {
++        if (bdrv_dirty_bitmap_check(bmap, BDRV_BITMAP_ALLOW_RO, errp)) {
+             return NULL;
+         }
+     }
 --=20
 2.21.0
 
