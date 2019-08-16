@@ -2,74 +2,62 @@ Return-Path: <SRS0=pVGd=WM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB37AC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 347AFC3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AE48206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:21:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE48206C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 086BB206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 09:37:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086BB206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyYQE-0005H9-Oz
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 05:21:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57251)
+	id 1hyYfL-0001ix-W8
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 05:37:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyYPZ-0004mF-4w
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:20:42 -0400
+ (envelope-from <kwolf@redhat.com>) id 1hyYdI-0008GT-CA
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyYPX-0004nx-MX
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:20:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55202)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyYPX-0004nc-Gu
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:20:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyYPW-0008RE-8x
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 09:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 42B862E80C7
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 09:20:38 +0000 (UTC)
+ (envelope-from <kwolf@redhat.com>) id 1hyYdH-0003YZ-6E
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 05:34:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54959)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>)
+ id 1hyYdB-0003Op-VH; Fri, 16 Aug 2019 05:34:47 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 2C9793083392;
+ Fri, 16 Aug 2019 09:34:44 +0000 (UTC)
+Received: from localhost.localdomain.com (dhcp-200-226.str.redhat.com
+ [10.33.200.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 696D95C1D6;
+ Fri, 16 Aug 2019 09:34:43 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Date: Fri, 16 Aug 2019 11:34:23 +0200
+Message-Id: <20190816093439.14262-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16
+ (mx1.redhat.com [10.5.110.44]); Fri, 16 Aug 2019 09:34:44 +0000 (UTC)
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Aug 2019 09:06:26 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1839428@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: maxujun philmd
-X-Launchpad-Bug-Reporter: Xujun Ma (maxujun)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <156524772160.13996.4537778553837159229.malonedeb@wampee.canonical.com>
-Message-Id: <156594638675.16537.17081821816860005098.malone@wampee.canonical.com>
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com); Revision="19022";
- Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 2d9f72bbd63d6c939342751cdbf23bbd0d609359
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
-X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1839428] Re: qemu core dumped when repeat
- "system_reset" multiple times during guest boot
+X-Received-From: 209.132.183.28
+Subject: [Qemu-devel] [PULL 00/16] Block layer patches
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,130 +66,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1839428 <1839428@bugs.launchpad.net>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This issue is very hard to reproduce.
+The following changes since commit 9e06029aea3b2eca1d5261352e695edc1e7d7b=
+8b:
 
-It sometimes crashes, so I could mark few commits 'bad' while bisecting,
-but since it is not reliable, I'm not sure a commit is 'good' when there
-is no crash.
+  Update version for v4.1.0 release (2019-08-15 13:03:37 +0100)
 
-For now after hours of testing I could reduce Xujun Ma's range to
-qemu-v3.1.0..1d31f1872b:
+are available in the Git repository at:
 
-commit 1d31f1872b337e4acac5bf6b3c2a45b66e43b494 (refs/bisect/bad)
-Merge: 20b084c4b1 88c869198a
-Author: Peter Maydell <peter.maydell@linaro.org>
-Date:   Mon Mar 4 11:04:31 2019 +0000
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-    Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
-ng
-    =
+for you to fetch changes up to a6b257a08e3d72219f03e461a52152672fec0612:
 
-    pci, pc, virtio: fixes, cleanups, tests
-    =
+  file-posix: Handle undetectable alignment (2019-08-16 11:29:11 +0200)
 
-    Lots of work on tests: BiosTablesTest UEFI app,
-    vhost-user testing for non-Linux hosts.
-    Misc cleanups and fixes all over the place
-    =
+----------------------------------------------------------------
+Block layer patches:
 
-    Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-    =
+- file-posix: Fix O_DIRECT alignment detection
+- Fixes for concurrent block jobs
+- block-backend: Queue requests while drained (fix IDE vs. job crashes)
+- qemu-img convert: Deprecate using -n and -o together
+- iotests: Migration tests with filter nodes
+- iotests: More media change tests
 
-    * remotes/mst/tags/for_upstream: (26 commits)
-      pci: Sanity test minimum downstream LNKSTA
-      hw/smbios: fix offset of type 3 sku field
-      pci: Move NVIDIA vendor id to the rest of ids
-      virtio-balloon: Safely handle BALLOON_PAGE_SIZE < host page size
-      virtio-balloon: Use ram_block_discard_range() instead of raw madvise()
-      virtio-balloon: Rework ballon_page() interface
-      virtio-balloon: Corrections to address verification
-      virtio-balloon: Remove unnecessary MADV_WILLNEED on deflate
-      i386/kvm: ignore masked irqs when update msi routes
-      contrib/vhost-user-blk: fix the compilation issue
-      Revert "contrib/vhost-user-blk: fix the compilation issue"
-      pc-dimm: use same mechanism for [get|set]_addr
-      tests/data: introduce "uefi-boot-images" with the "bios-tables-test" =
-ISOs
-      tests/uefi-test-tools: add build scripts
-      tests: introduce "uefi-test-tools" with the BiosTablesTest UEFI app
-      roms: build the EfiRom utility from the roms/edk2 submodule
-      roms: add the edk2 project as a git submodule
-      vhost-user-test: create a temporary directory per TestServer
-      vhost-user-test: small changes to init_hugepagefs
-      vhost-user-test: create a main loop per TestServer
-      ...
+----------------------------------------------------------------
+Kevin Wolf (10):
+      iotests/118: Test media change for scsi-cd
+      iotests/118: Create test classes dynamically
+      iotests/118: Add -blockdev based tests
+      iotests: Move migration helpers to iotests.py
+      iotests: Test migration with all kinds of filter nodes
+      block: Simplify bdrv_filter_default_perms()
+      block: Remove blk_pread_unthrottled()
+      mirror: Keep mirror_top_bs drained after dropping permissions
+      block-backend: Queue requests while drained
+      qemu-img convert: Deprecate using -n and -o together
 
--- =
+Max Reitz (5):
+      block: Keep subtree drained in drop_intermediate
+      block: Reduce (un)drains when replacing a child
+      tests: Test polling in bdrv_drop_intermediate()
+      tests: Test mid-drain bdrv_replace_child_noperm()
+      iotests: Add test for concurrent stream/commit
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1839428
+Nir Soffer (1):
+      file-posix: Handle undetectable alignment
 
-Title:
-   qemu core dumped when repeat "system_reset" multiple times during
-  guest boot
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  commit 864ab314f1d924129d06ac7b571f105a2b76a4b2 (HEAD, tag: v4.1.0-rc4, o=
-rigin/master, origin/HEAD, master)
-  Test arch:x86 and power
-
-  Steps:
-  1.Boot up guest with command
-  power cmdline:
-  /usr/libexec/backup/qemu-kvm \
-   -smp 8 \
-   -m 4096 \
-   -nodefaults \
-   -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D1,bu=
-s=3Dpci.0,addr=3D0x7 \
-   -drive file=3Drhel77-ppc64le-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,fo=
-rmat=3Dqcow2,cache=3Dnone \
-   -chardev stdio,mux=3Don,id=3Dserial_id_serial0,server,nowait,signal=3Dof=
-f \
-   -device spapr-vty,id=3Dserial111,chardev=3Dserial_id_serial0 \
-   -mon chardev=3Dserial_id_serial0,mode=3Dreadline \
-  x86 cmdline:
-  /usr/libexec/qemu-kvm \
-   -m 4096 -smp 8 \
-   -boot menu=3Don \
-   -device virtio-blk-pci,id=3Dimage1,drive=3Ddrive_image1\
-   -drive file=3Drhel77-64-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,format=
-=3Dqcow2,cache=3Dnone \
-   -vga std \
-   -vnc :9 \
-   -nographic \
-   -device virtio-net-pci,netdev=3Dnet0,id=3Dnic0,mac=3D52:54:00:c4:e7:84 \
-   -netdev tap,id=3Dnet0,script=3D/etc/qemu-ifup,downscript=3D/etc/qemu-ifd=
-own,vhost=3Don \
-
-  2.when guest start to boot up kernel(when no output infomation),run
-  hmp command "system_reset"
-
-  =
-
-  Result:
-
-  Sometimes,qemu core dumped with error as following:
-  system_reset
-  (qemu) qemu-system-ppc64: /root/qemu/hw/virtio/virtio.c:225: vring_get_re=
-gion_caches: Assertion `caches !=3D NULL' failed.
-  b.sh: line 11: 73679 Aborted                 (core dumped) /usr/local/bin=
-/qemu-system-ppc64 -enable-kvm -smp 8 -m 4096 -nodefaults -device virtio-bl=
-k-pci,id=3Dimage1,drive=3Ddrive_image1,bootindex=3D1,bus=3Dpci.0,addr=3D0x7=
- -drive file=3Drhel77-ppc64le-virtio.qcow2,if=3Dnone,id=3Ddrive_image1,form=
-at=3Dqcow2,cache=3Dnone -chardev stdio,mux=3Don,id=3Dserial_id_serial0,serv=
-er,nowait,signal=3Doff -device spapr-vty,id=3Dserial111,chardev=3Dserial_id=
-_serial0 -mon chardev=3Dserial_id_serial0,mode=3Dreadline
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1839428/+subscriptions
+ include/sysemu/block-backend.h |   3 +-
+ block.c                        |  63 +++---
+ block/backup.c                 |   1 +
+ block/block-backend.c          |  69 ++++--
+ block/commit.c                 |   2 +
+ block/file-posix.c             |  36 +++-
+ block/mirror.c                 |   7 +-
+ blockjob.c                     |   3 +
+ hw/block/hd-geometry.c         |   7 +-
+ qemu-img.c                     |   5 +
+ tests/test-bdrv-drain.c        | 476 +++++++++++++++++++++++++++++++++++=
+++++++
+ qemu-deprecated.texi           |   7 +
+ tests/qemu-iotests/118         |  84 ++++----
+ tests/qemu-iotests/118.out     |   4 +-
+ tests/qemu-iotests/234         |  30 +--
+ tests/qemu-iotests/258         | 163 ++++++++++++++
+ tests/qemu-iotests/258.out     |  33 +++
+ tests/qemu-iotests/262         |  82 +++++++
+ tests/qemu-iotests/262.out     |  17 ++
+ tests/qemu-iotests/group       |   2 +
+ tests/qemu-iotests/iotests.py  |  16 ++
+ 21 files changed, 983 insertions(+), 127 deletions(-)
+ create mode 100755 tests/qemu-iotests/258
+ create mode 100644 tests/qemu-iotests/258.out
+ create mode 100755 tests/qemu-iotests/262
+ create mode 100644 tests/qemu-iotests/262.out
 
