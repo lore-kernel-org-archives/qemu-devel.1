@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 340BFC3A59C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D22C3A59C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A007206C1
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:26:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A007206C1
+	by mail.kernel.org (Postfix) with ESMTPS id 23B18206C1
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Aug 2019 05:27:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23B18206C1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1hyUkj-0007Mh-RP
-	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 01:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50871)
+	id 1hyUle-0008Ez-B0
+	for qemu-devel@archiver.kernel.org; Fri, 16 Aug 2019 01:27:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50888)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1hyUk6-0006w8-Pl
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:25:40 -0400
+ (envelope-from <bounces@canonical.com>) id 1hyUk8-0006w9-1m
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1hyUk5-0004SU-H8
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:25:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54232)
+ (envelope-from <bounces@canonical.com>) id 1hyUk6-0004TP-Q7
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:25:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54282)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1hyUk5-0004SC-BZ
- for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:25:37 -0400
+ id 1hyUk6-0004Su-KL
+ for qemu-devel@nongnu.org; Fri, 16 Aug 2019 01:25:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1hyUk4-0004uR-Lf
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:25:36 +0000
+ id 1hyUk5-0004uU-So
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:25:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A1AE22E8053
- for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:25:36 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id D71022E8053
+ for <qemu-devel@nongnu.org>; Fri, 16 Aug 2019 05:25:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Aug 2019 05:15:51 -0000
-From: Thomas Huth <1834613@bugs.launchpad.net>
+Date: Fri, 16 Aug 2019 05:16:11 -0000
+From: Thomas Huth <1826172@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
  assignee=None; 
-X-Launchpad-Bug-Tags: ppc
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ddosolitary laurent-vivier
-X-Launchpad-Bug-Reporter: DDoSolitary (ddosolitary)
+X-Launchpad-Bug-Commenters: fonthime pmaydell
+X-Launchpad-Bug-Reporter: Gwendolyn Haller (fonthime)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <156171334969.18290.6262209650807716029.malonedeb@gac.canonical.com>
-Message-Id: <156593255256.16769.174395887338685267.launchpad@wampee.canonical.com>
+References: <155609911336.14005.5630723939838624325.malonedeb@gac.canonical.com>
+Message-Id: <156593257228.27026.3825521199497138514.launchpad@gac.canonical.com>
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com); Revision="19022";
  Instance="launchpad-lazr.conf"
-X-Launchpad-Hash: 64af4ae764757f5f51c4665f29739454474182a5
+X-Launchpad-Hash: d97c46bd40e574e4a2f7a4d72d608ffff8374899
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
 X-Received-From: 91.189.90.7
-Subject: [Qemu-devel] [Bug 1834613] Re: Crypto related operations failing on
- Alpine Linux on QEMU 4.0
+Subject: [Qemu-devel] [Bug 1826172] Re: Compilation on MSYS2/MinGW-w64 fails
+ with error: "__USE_MINGW_ANSI_STDIO" redefined
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 List-Id: <qemu-devel.nongnu.org>
@@ -78,7 +77,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1834613 <1834613@bugs.launchpad.net>
+Reply-To: Bug 1826172 <1826172@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -90,89 +89,72 @@ Sender: "Qemu-devel"
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1834613
+https://bugs.launchpad.net/bugs/1826172
 
 Title:
-  Crypto related operations failing on Alpine Linux on QEMU 4.0
+  Compilation on MSYS2/MinGW-w64 fails with error:
+  "__USE_MINGW_ANSI_STDIO" redefined
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  I'm unable to boot the netboot image of Alpine Linux using QEMU 4.0.
+  Compilation against GIT master fails at the following step:
 
-  Steps to reproduce:
+  =C2=A0=C2=A0CC      qga/commands.o
+  In file included from qga/commands.c:13:
+  C:/Tempy-chan/qemu/include/qemu/osdep.h:97: error: "__USE_MINGW_ANSI_STDI=
+O" redefined [-Werror]
+  =C2=A0#define __USE_MINGW_ANSI_STDIO 1
 
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/vmlinuz-vanilla
-  curl -O http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/ppc64le/netbo=
-ot/initramfs-vanilla
-  qemu-system-ppc64 -kernel vmlinuz-vanilla -initrd initramfs-vanilla -nogr=
-aphic -append "console=3Dhvc0 ip=3Ddhcp alpine_repo=3Dhttp://dl-cdn.alpinel=
-inux.org/alpine/v3.10/main"
+  In file included from C:/msys64/mingw64/x86_64-w64-mingw32/include/vadefs=
+.h:9,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from C:/msys64/mingw64/x86_64-w64-mingw32/inc=
+lude/_mingw_stdarg.h:14,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from C:/msys64/mingw64/x86_64-w64-mingw32/inc=
+lude/stdarg.h:140,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from C:/msys64/mingw64/lib/gcc/x86_64-w64-min=
+gw32/8.3.0/include/stdarg.h:1,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from C:/Tempy-chan/qemu/include/qemu/osdep.h:=
+88,
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0from qga/commands.c:13:
+  C:/msys64/mingw64/x86_64-w64-mingw32/include/_mingw.h:431: note: this is =
+the location of the previous definition
+  =C2=A0#define __USE_MINGW_ANSI_STDIO 0      /* was not defined so it shou=
+ld be 0 */
 
-  The init script will automatically download and install an in-memory
-  Alpine Linux environment. However, with QEMU 4.0, the installation
-  process will fail with "BAD signature" errors:
+  cc1.exe: all warnings being treated as errors
+  make: *** [/c/Tempy-chan/qemu/rules.mak:69: qga/commands.o] Error 1
 
-  (1/20) Installing musl (1.1.22-r2)
-  ERROR: musl-1.1.22-r2: BAD signature
-  (2/20) Installing busybox (1.30.1-r2)
-  ERROR: busybox-1.30.1-r2: BAD signature
-  (3/20) Installing alpine-baselayout (3.1.2-r0)
-  Executing alpine-baselayout-3.1.2-r0.pre-install
-  ERROR: alpine-baselayout-3.1.2-r0.pre-install: script exited with error 1=
-27
-  ERROR: alpine-baselayout-3.1.2-r0: BAD signature
-  (4/20) Installing openrc (0.41.2-r1)
-  ERROR: openrc-0.41.2-r1: BAD signature
-  (5/20) Installing alpine-conf (3.8.3-r0)
-  ERROR: alpine-conf-3.8.3-r0: BAD signature
-  (6/20) Installing libcrypto1.1 (1.1.1c-r0)
-  ERROR: libcrypto1.1-1.1.1c-r0: BAD signature
-  (7/20) Installing libssl1.1 (1.1.1c-r0)
-  ERROR: libssl1.1-1.1.1c-r0: BAD signature
-  (8/20) Installing ca-certificates-cacert (20190108-r0)
-  ERROR: ca-certificates-cacert-20190108-r0: BAD signature
-  (9/20) Installing libtls-standalone (2.9.1-r0)
-  ERROR: libtls-standalone-2.9.1-r0: BAD signature
-  (10/20) Installing ssl_client (1.30.1-r2)
-  ERROR: ssl_client-1.30.1-r2: BAD signature
-  (11/20) Installing zlib (1.2.11-r1)
-  ERROR: zlib-1.2.11-r1: BAD signature
-  (12/20) Installing apk-tools (2.10.4-r1)
-  ERROR: apk-tools-2.10.4-r1: BAD signature
-  (13/20) Installing busybox-suid (1.30.1-r2)
-  ERROR: busybox-suid-1.30.1-r2: BAD signature
-  (14/20) Installing busybox-initscripts (3.1-r7)
-  ERROR: busybox-initscripts-3.1-r7: BAD signature
-  (15/20) Installing scanelf (1.2.3-r0)
-  ERROR: scanelf-1.2.3-r0: BAD signature
-  (16/20) Installing musl-utils (1.1.22-r2)
-  ERROR: musl-utils-1.1.22-r2: BAD signature
-  (17/20) Installing libc-utils (0.7.1-r0)
-  ERROR: libc-utils-0.7.1-r0: BAD signature
-  (18/20) Installing alpine-keys (2.1-r2)
-  ERROR: alpine-keys-2.1-r2: BAD signature
-  (19/20) Installing alpine-base (3.10.0-r0)
-  ERROR: alpine-base-3.10.0-r0: BAD signature
-  (20/20) Installing openssl (1.1.1c-r0)
-  ERROR: openssl-1.1.1c-r0: BAD signature
-  20 errors; 0 MiB in 0 packages
-  ok.
-  grep: /sysroot/etc/inittab: No such file or directory
-  /sbin/init not found in new root. Launching emergency recovery shell
-  Type exit to continue boot.
-  sh: can't access tty; job control turned off
-  / #
+  Passing --extra-cflags=3D"-D__USE_MINGW_ANSI_STDIO" to configure
+  resolves the error. Digging deeper in
+  x86_64-w64-mingw32/include/_mingw.h, it looks like
+  __USE_MINGW_ANSI_STDIO is only defined for _GNU_SOURCE in C++
+  compilation. With C only code it's ignored and doesn't define
+  __USE_MINGW_ANSI_STDIO as expected:
 
-  If I boot up a disk image created by a previous version of QEMU,
-  crypto related operations like verifying a RSA signature using the
-  "openssl" command will also fail.
-
-  I didn't see these errors on previous QEMU versions or other
-  architectures on QEMU 4.0
+  /* We are activating __USE_MINGW_ANSI_STDIO for various define indicators.
+  =C2=A0=C2=A0=C2=A0Note that we enable it also for _GNU_SOURCE in C++, but=
+ not for C case. */
+  #if (defined (_POSIX) || defined (_POSIX_SOURCE) || defined (_POSIX_C_SOU=
+RCE) \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|| defined (_ISOC99_SOURCE) \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|| defined (_XOPEN_SOURCE) || defined (_XOP=
+EN_SOURCE_EXTENDED) \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|| (defined (_GNU_SOURCE) && defined (__cpl=
+usplus)) \
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0|| defined (_SVID_SOURCE)) \
+  =C2=A0=C2=A0=C2=A0=C2=A0&& !defined(__USE_MINGW_ANSI_STDIO)
+  /* Enable __USE_MINGW_ANSI_STDIO if _POSIX defined
+  =C2=A0* and If user did _not_ specify it explicitly... */
+  #  define __USE_MINGW_ANSI_STDIO			1
+  #endif
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1834613/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1826172/+subscriptions
 
